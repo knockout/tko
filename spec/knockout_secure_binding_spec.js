@@ -1,5 +1,9 @@
 describe("Knockout Secure Binding", function () {
-    it("Should exist", function () {
-        throw new Error("Well, it doesn't. Except in your head.")
+    it("Has loaded knockout", function () {
+        assert.property(window, 'ko')
+    })
+    it("secureBindingsProvider exist on 'ko'", function () {
+        // note that it could alternatively be exported with `require`
+        assert.property(ko, 'secureBindingsProvider')
     })
 })

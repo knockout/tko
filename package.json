@@ -2,9 +2,9 @@
   "name": "knockout-secure-binding",
   "version": "0.0.1",
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "mocha": "1.x.x",
-    "chai": "1.x.x",
+    "grunt": "0.x.x",
+    "mocha": "*",
+    "chai": "*",
     "knockout": "3.x.x"
     },
     "licenses": {
