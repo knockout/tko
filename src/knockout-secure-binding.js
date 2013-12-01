@@ -27,7 +27,7 @@
         this.fallback = options.fallback;
 
         // the binding classes -- defaults to ko bindingsHandlers
-        this.bindings = bindings || ko.bindingsHandlers;
+        this.bindings = bindings || ko.bindingHandlers;
     }
 
     function registerBindings(newBindings) {
@@ -49,6 +49,30 @@
         }
 
         return result;
+    }
+
+    function result(object, key) {
+        var keyLen = key.length;
+
+        if (object) {
+            if (key.substr(keyLen - 2) === "()") {
+                key = key.slice(0, keyLen - 2);
+                return object[key]();
+            }
+
+            return object[key];
+        }
+    }
+
+    function pluck(obj, string) {
+        var keys = string.split("."),
+        value = obj;
+
+        keys.forEach(function (key) {
+            value = result(value, key);
+        });
+
+        return value
     }
 
     /* Based on (public domain):
@@ -187,29 +211,30 @@
                     next();
                 }
             },
-            lookup = function (id) {
-                console.log("LOOKING UP", id)
+            lookup = function (id, context) {
                 switch (id) {
                     case 'true': return true;
                     case 'false': return false;
                     case 'null': return null;
                     case 'undefined': return void 0;
-                    default: return lookup_value(id)
+                    default:
                 }
+
+                return pluck(context, id);
             },
-            identifier = function () {
+            identifier = function (context) {
                 // an identifier we look up
                 var id = '';
                 white();
 
                 while (ch) {
                     if (ch === ':' || ch === '}' || ch === ',' || ch === ' ') {
-                        return lookup(id);
+                        return lookup(id, context);
                     }
                     id += ch;
                     next()
                 }
-                return lookup(id);
+                return lookup(id, context);
             },
             value,  // Place holder for the value function.
             array = function () {
@@ -266,14 +291,13 @@
                 }
                 error("Bad object");
             },
-            bindings = function () {
+            bindings = function (context) {
                 // parse a set of name: value pairs
                 var key,
-                    bindings = {};
+                bindings = {};
                 while (ch) {
                     key = name();
-                    bindings[key] = value();
-                    console.log("K", key, "V", bindings[key])
+                    bindings[key] = value(context);
                     white()
                     if (ch) {
                         next(',')
@@ -281,7 +305,7 @@
                 }
                 return bindings;
             };
-            value = function () {
+            value = function (context) {
                 // Parse a JSON value.
                 white();
                 switch (ch) {
@@ -290,17 +314,18 @@
                     case '"': return string();
                     case '-': return number();
                     default:
-                    return ch >= '0' && ch <= '9' ? number() : identifier();
+                    return ch >= '0' && ch <= '9' ? number()
+                    : identifier(context);
                 }
             };
             // Return the parse function. It will have access to all
             // of the above functions and variables.
-            return function (source) {
+            return function (source, context) {
                 var result;
                 text = source;
                 at = 0;
                 ch = ' ';
-                result = bindings();
+                result = bindings(context);
                 white();
                 if (ch) {
                     error("Syntax error");
@@ -319,6 +344,7 @@
         nodeHasBindings: nodeHasBindings,
         getBindings: getBindings,
         parse: parse,
+        pluck: pluck,
     })
 
     if (!exports) {
