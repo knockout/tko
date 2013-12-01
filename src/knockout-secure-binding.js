@@ -7,6 +7,11 @@
         factory(ko);
     }
 }(function(ko, exports, undefined) {
+    var NAME_REX_0 = new RegExp("[_A-Za-z]"),
+    NAME_REX_N = new RegExp("_A-Za-z0-9]"),
+    IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
+    IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]");
+
     function secureBindingsProvider(bindings, options) {
         var existingProvider = new ko.bindingProvider();
         options = options || {};
@@ -46,22 +51,7 @@
         return result;
     }
 
-    // Characters that can make up an identifier.
-    // Regex of [_A-Za-z][_A-Za-z0-9\.]*
-    //
-    // FIXME - lots of room for improvement, here.
-    //
-    function valid_identifier_char(ch, is_first_char) {
-        if (ch >= "A" && ch <= "Z") || (ch >= "a" && ch <= "z" || ch === '_') {
-            return true;
-        }
-        if (is_first_char) {
-            return false;
-        }
-        return (ch >= '0' && ch <= '9' || ch == '.')
-    }
-
-    /* Based on (public domain), with modified `word`:
+    /* Based on (public domain):
     https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
     */
     parse = (function () {
@@ -99,6 +89,22 @@
                 ch = text.charAt(at);
                 at += 1;
                 return ch;
+            },
+            name = function () {
+                // A name of a binding
+                // [_A-Za-z][_A-Za-z0-9]*
+                var name = '';
+                white();
+
+                while (ch) {
+                    if (ch === ':' || ch === ' ') {
+                        next()
+                        return name;
+                    }
+                    name += ch;
+                    next()
+                }
+                return name;
             },
             number = function () {
                 // Parse a number value.
@@ -181,23 +187,29 @@
                     next();
                 }
             },
-            word = function () {
-                // a word we look up
-                var word = '',
-                lookup_fn;
-
-                while (valid_identifier_char(ch)) {
-                    word += ch;
-                    next()
-                }
-
-                switch (word) {
+            lookup = function (id) {
+                console.log("LOOKING UP", id)
+                switch (id) {
                     case 'true': return true;
                     case 'false': return false;
                     case 'null': return null;
                     case 'undefined': return void 0;
-                    default: return lookup_value(word)
+                    default: return lookup_value(id)
                 }
+            },
+            identifier = function () {
+                // an identifier we look up
+                var id = '';
+                white();
+
+                while (ch) {
+                    if (ch === ':' || ch === '}' || ch === ',' || ch === ' ') {
+                        return lookup(id);
+                    }
+                    id += ch;
+                    next()
+                }
+                return lookup(id);
             },
             value,  // Place holder for the value function.
             array = function () {
@@ -224,39 +236,53 @@
                 error("Bad array");
             },
             object = function () {
-            // Parse an object value.
-            var key,
-            object = {};
+                // Parse an object value.
+                var key,
+                object = {};
 
-            if (ch === '{') {
-                next('{');
-                white();
-                if (ch === '}') {
-                    next('}');
-                    return object;   // empty object
-                }
-                while (ch) {
-                    key = string();
-                    white();
-                    next(':');
-                    if (Object.hasOwnProperty.call(object, key)) {
-                        error('Duplicate key "' + key + '"');
-                    }
-                    object[key] = value();
+                if (ch === '{') {
+                    next('{');
                     white();
                     if (ch === '}') {
                         next('}');
-                        return object;
+                        return object;   // empty object
                     }
-                    next(',');
-                    white();
+                    while (ch) {
+                        key = string();
+                        white();
+                        next(':');
+                        if (Object.hasOwnProperty.call(object, key)) {
+                            error('Duplicate key "' + key + '"');
+                        }
+                        object[key] = value();
+                        white();
+                        if (ch === '}') {
+                            next('}');
+                            return object;
+                        }
+                        next(',');
+                        white();
+                    }
                 }
-            }
-            error("Bad object");
-        };
-        value = function () {
-                // Parse a JSON value. It could be an object, an array, a
-                // string, a number, or a word.
+                error("Bad object");
+            },
+            bindings = function () {
+                // parse a set of name: value pairs
+                var key,
+                    bindings = {};
+                while (ch) {
+                    key = name();
+                    bindings[key] = value();
+                    console.log("K", key, "V", bindings[key])
+                    white()
+                    if (ch) {
+                        next(',')
+                    }
+                }
+                return bindings;
+            };
+            value = function () {
+                // Parse a JSON value.
                 white();
                 switch (ch) {
                     case '{': return object();
@@ -264,7 +290,7 @@
                     case '"': return string();
                     case '-': return number();
                     default:
-                    return ch >= '0' && ch <= '9' ? number() : word();
+                    return ch >= '0' && ch <= '9' ? number() : identifier();
                 }
             };
             // Return the parse function. It will have access to all
@@ -274,7 +300,7 @@
                 text = source;
                 at = 0;
                 ch = ' ';
-                result = value();
+                result = bindings();
                 white();
                 if (ch) {
                     error("Syntax error");
