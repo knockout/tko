@@ -8,7 +8,7 @@ Knockout's data-bind provider uses `new Function`, as seen in knockout/knockout#
 
 A `data-sbind` would not execute arbitrary javascript, but instead would be limited to lookups.
 
-This is something like [knockout-](`https://github.com/rniemeyer/knockout-classBindingProvider`).
+This is something like [knockout-classbindingProvider](`https://github.com/rniemeyer/knockout-classBindingProvider`).
 
 Objectives
 ---
