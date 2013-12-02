@@ -1,18 +1,41 @@
 Knockout Secure Binding
 =======================
 
-Add `data-sbind`, an alternative to `data-bind`, that does not violate
-*script-src* Content Security Policy.
+This adds a `data-sbind` binding provider, a drop-in alternative to `data-bind`, that does not violate *script-src* Content Security Policy.
 
-Knockout's data-bind provider uses `new Function`, as seen in knockout/knockout#903.
+This project exists because Knockout's `data-bind` uses `new Function`, as discussed in [knockout/knockout#903](/knockout/issues#903).
 
-A `data-sbind` would not execute arbitrary javascript, but instead would be limited to lookups.
+A `data-sbind` would not execute any of the string-to-script conversions prohibited by CSP, namely:
 
-This is something like [knockout-classbindingProvider](`https://github.com/rniemeyer/knockout-classBindingProvider`).
+- `eval`
+- `new Function`
+- `setTimeout(string)`
+- `setInterval(string)`
+
 
 Objectives
 ---
-Re-use as many accessor bindings as we can without having to change them.
+The `data-sbind` parser is designed to accommodate bindings much like the
+regular `data-bind`.
+
+Here are some examples of valid values for `data-sbind`:
+
+- `text: value`
+- `text: "string"`
+- `text: { object: "string" }`
+- `foreach: [1, 2.1, true, false, null, undefined]`
+- `text: value()`
+- `text: $data.value()`
+- `text: $context.obj().value()`
+
+Where the bindings (`text` and `foreach`) are Knockout's built-in bindings. The `data-sbind` binding provider uses Knockout's built-in bindings, as extended.
+
+Future bindings may include:
+
+- `text: value[0]`
+- `text: value[0].abc`
+- `text: value[0]().abc["str"]`
+
 
 Requires
 ---
