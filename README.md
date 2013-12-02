@@ -3,7 +3,7 @@ Knockout Secure Binding
 
 This adds a `data-sbind` binding provider, a drop-in alternative to `data-bind`, that does not violate *script-src* Content Security Policy.
 
-This project exists because Knockout's `data-bind` uses `new Function`, as discussed in [knockout/knockout#903](/knockout/issues#903).
+This project exists because Knockout's `data-bind` uses `new Function`, as discussed in [knockout/knockout#903](https://github.com/knockout/knockout/issues/903).
 
 A `data-sbind` would not execute any of the string-to-script conversions prohibited by CSP, namely:
 
