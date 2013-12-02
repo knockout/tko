@@ -41,18 +41,20 @@ describe("Knockout Secure Binding", function () {
         var div;
 
         beforeEach(function() {
-            div = document.createElement("div")
-            div.setAttribute("data-sbind", "alpha: '123'")
+            div = document.createElement("div");
+            div.setAttribute("data-sbind", 'alpha: "122.9"');
         });
 
-        // it("returns the appropriate binding", function () {
-        //     instance.bindings.alpha = function () {};
-        //     assert.equal(instance.getBindings(div),
-        //         instance.bindings.alpha)
-        // });
+        it("returns the appropriate binding", function () {
+            instance.bindings.alpha = function () {};
+            var bindings = instance.getBindings(div);
+
+            assert.equal(Object.keys(bindings).length, 1)
+            assert.equal(bindings['alpha'], instance.bindings.alpha)
+        });
     })
 
-    describe("the value parser", function () {
+    describe("the bindings parser", function () {
         it("parses bindings with JSON values", function () {
             var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
             value = instance.parse(binding_string);
@@ -76,6 +78,18 @@ describe("Knockout Secure Binding", function () {
             context = { x: 'y' },
             bindings = instance.parse(binding, context);
             assert.equal(bindings.a, "y");
+        })
+    })
+
+    describe("applying bindings", function () {
+        it("updates the value", function () {
+            var div = document.createElement("div"),
+            vm = { X1: 'Y1' };
+
+            div.setAttribute("data-sbind", "text: X1")
+            ko.bindingProvider.instance = instance;
+            ko.applyBindings(vm, div);
+            assert.equal(div.innerText, 'Y1');
         })
     })
 

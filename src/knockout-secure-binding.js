@@ -336,7 +336,17 @@
 
     // return the binding
     function getBindings(node, context) {
+        var bindings = {},
+        sbind_string;
+        if (node.nodeType === node.ELEMENT_NODE) {
+            sbind_string = node.getAttribute(this.attribute);
+        }
 
+        if (sbind_string) {
+            bindings = parse(sbind_string, context);
+        }
+
+        return bindings;
     }
 
     ko.utils.extend(secureBindingsProvider.prototype, {
