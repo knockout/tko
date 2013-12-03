@@ -1,24 +1,25 @@
 <html>
-  <head>
-    <title>Knockout Secure Binding - Local unit tests</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
-    <script src="../node_modules/mocha/mocha.js"></script>
-    <script src="../node_modules/chai/chai.js"></script>
-    <script src="../node_modules/sinon/pkg/sinon.js"></script>
-    <script src="../node_modules/knockout/build/output/knockout-latest.debug.js"></script>
-    <script src="../src/knockout-secure-binding.js"></script>
-    <script>mocha.setup('bdd')</script>
-    <script src="./knockout_secure_binding_spec.js"></script>
-    <script>
-      onload = function () {
-        var runner = mocha.run();
-        window.assert = chai.assert;
-        window.expect = chai.expect;
-      };
-    </script>
-  </head>
-  <body>
-    <div id="mocha"></div>
-  </body>
+<head>
+  <title>Knockout Secure Binding - Local unit tests</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="mocha.js"></script>
+  <script src="chai.js"></script>
+  <script src="sinon.js"></script>
+  <script src="knockout.js"></script>
+  <script src="knockout-secure-binding.js"></script>
+  <script>
+    mocha.ui('bdd');
+    mocha.reporter("html");
+    window.assert = chai.assert;
+    window.expect = chai.expect;
+  </script>
+  <script src="knockout_secure_binding_spec.js"></script>
+  <script>
+      mocha.run();
+  </script>
+</body>
 </html>

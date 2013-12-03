@@ -5,7 +5,8 @@
     "grunt": "0.x.x",
     "mocha": "*",
     "chai": "*",
-    "knockout": "3.x.x"
+    "knockout": "3.x.x",
+    "wd": "*"
   },
   "licenses": {
     "type": "MIT",
@@ -16,6 +17,7 @@
     "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
   },
   "dependencies": {
-    "sinon": "~1.7.3"
+    "sinon": "~1.7.3",
+    "wd-sync": "~1.2.3"
   }
 }
