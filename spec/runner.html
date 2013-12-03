@@ -11,17 +11,8 @@
   <script src="sinon.js"></script>
   <script src="knockout.js"></script>
   <script src="knockout-secure-binding.js"></script>
-  <script>
-    mocha.ui('bdd');
-    mocha.reporter("html");
-    window.assert = chai.assert;
-    window.expect = chai.expect;
-  </script>
+  <script src="init-mocha"></script>
   <script src="knockout_secure_binding_spec.js"></script>
-  <script>
-      mocha.run(function (res) {
-        window.results = true;
-      });
-  </script>
+  <script src="run-mocha"></script>
 </body>
 </html>

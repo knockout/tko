@@ -61,6 +61,16 @@ ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
 Bear in mind that if you are using an AMD loader, then KSB is exported (have a look at the example in the linked `classBindingProvider`).
 
 
+Tests
+---
+
+Automated tests with `chromedriver` can be initiated with
+`node spec/runner.js`.
+
+You can run a standalone server with `node spec/server.js`. It will
+print the URL for the server to the console.
+
+
 Requires
 ---
 

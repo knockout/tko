@@ -2,11 +2,12 @@
   "name": "knockout-secure-binding",
   "version": "0.0.1",
   "devDependencies": {
+    "chai": "*",
+    "colors": "*",
     "grunt": "0.x.x",
     "mocha": "*",
-    "chai": "*",
-    "sinon": "~1.7.3",
-    "selenium-webdriver": "*"
+    "selenium-webdriver": "*",
+    "sinon": "~1.7.3"
   },
   "licenses": {
     "type": "MIT",
