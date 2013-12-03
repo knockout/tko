@@ -41,6 +41,7 @@ describe("Knockout Secure Binding", function () {
         var div;
 
         beforeEach(function() {
+            ko.bindingProvider.instance = new ko.secureBindingsProvider()
             div = document.createElement("div");
             div.setAttribute("data-sbind", 'alpha: "122.9"');
             instance.bindings.alpha = {
@@ -77,6 +78,7 @@ describe("Knockout Secure Binding", function () {
         var div;
 
         beforeEach(function() {
+            ko.bindingProvider.instance = new ko.secureBindingsProvider()
             div = document.createElement("div");
             div.setAttribute("data-sbind", 'alpha: x');
             instance.bindings.alpha = {
@@ -108,7 +110,10 @@ describe("Knockout Secure Binding", function () {
     })
 
     describe("Knockout's Text binding", function () {
-        it("binding with data-sbind", function () {
+        beforeEach(function () {
+            ko.bindingProvider.instance = new ko.secureBindingsProvider()
+        })
+        it("binds with data-sbind", function () {
             var div = document.createElement("div")
             div.setAttribute("data-sbind", "text: obs")
             ko.applyBindings({obs: ko.observable("a towel")}, div)

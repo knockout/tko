@@ -12,10 +12,10 @@
     IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
     IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]"),
     identifier_strategies = {
-        'idempotent': function (name, obj) {
+        id: function (name, obj) {
             return obj ? obj[name] : void 0
         },
-        'function': function (name, obj) {
+        fn: function (name, obj) {
             return obj ? obj[name]() : void 0
         },
     }
@@ -72,10 +72,10 @@
             if (key.substr(keyLen - 2) == "()") {
                 // function
                 name = key.slice(0, keyLen - 2);
-                strategy = 'function';
+                strategy = 'fn';
             } else {
                 name = key;
-                strategy = 'idempotent';
+                strategy = 'id';
             }
 
             strategies.push({
