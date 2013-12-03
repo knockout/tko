@@ -59,21 +59,8 @@
         return result;
     }
 
-    function result(object, key) {
-        var keyLen = key.length;
-
-        if (object) {
-            if (key.substr(keyLen - 2) === "()") {
-                key = key.slice(0, keyLen - 2);
-                return object[key]();
-            }
-
-            return object[key];
-        }
-    }
-
     // return a function that performs a lookup on context
-    function pluck_function(string) {
+    function make_accessor(string, context, node) {
         var keys = string.split("."),
         strategies = [];
 
@@ -97,8 +84,15 @@
             })
         });
 
-        function pluck(context) {
-            var value = context;
+        function identifierAccessor() {
+            // equivalent to with(context){with(context.$data){...}}
+            var value;
+
+            if (context && context.$data) {
+                value = Object.hasOwnProperty.call(context.$data, strategies[0].name) ? context.$data : context;
+            } else {
+                value = context;
+            }
 
             strategies.forEach(function (strategy) {
                 value = strategy.execute(strategy.name, value)
@@ -107,7 +101,7 @@
             return value
         }
 
-        return pluck
+        return identifierAccessor
     }
 
     /* Based on (public domain):
@@ -246,7 +240,7 @@
                     next();
                 }
             },
-            lookup = function (id) {
+            lookup = function (node, context, id) {
                 switch (id) {
                     case 'true': return true;
                     case 'false': return false;
@@ -255,21 +249,21 @@
                     default:
                 }
 
-                return pluck_function(id);
+                return make_accessor(id, context, node);
             },
-            identifier = function (context) {
+            identifier = function (node, context) {
                 // an identifier we look up
                 var id = '';
                 white();
 
                 while (ch) {
                     if (ch === ':' || ch === '}' || ch === ',' || ch === ' ') {
-                        return lookup(id, context);
+                        return lookup(node, context, id);
                     }
                     id += ch;
                     next()
                 }
-                return lookup(id);
+                return lookup(node, context, id);
             },
             value,  // Place holder for the value function.
             array = function () {
@@ -326,13 +320,13 @@
                 }
                 error("Bad object");
             },
-            bindings = function (context) {
+            bindings = function (node, context) {
                 // parse a set of name: value pairs
                 var key,
                 bindings = {};
                 while (ch) {
                     key = name();
-                    bindings[key] = value(context);
+                    bindings[key] = value(node, context);
                     white()
                     if (ch) {
                         next(',')
@@ -340,7 +334,7 @@
                 }
                 return bindings;
             };
-            value = function (context) {
+            value = function (node, context) {
                 // Parse a JSON value.
                 white();
                 switch (ch) {
@@ -350,35 +344,47 @@
                     case '-': return number();
                     default:
                     return ch >= '0' && ch <= '9' ? number()
-                    : identifier(context);
+                    : identifier(node, context);
                 }
             };
             // Return the parse function. It will have access to all
             // of the above functions and variables.
-            return function (source, context) {
+            return function (source, node, context) {
                 var result;
                 text = source;
                 at = 0;
                 ch = ' ';
-                result = bindings(context);
+                result = bindings(node, context);
+
                 white();
                 if (ch) {
                     error("Syntax error");
                 }
+
+                ko.utils.objectForEach(result, function (name, value) {
+                    if (typeof(value) != 'function') {
+                        result[name] = function constAccessor() {
+                            return value
+                        }
+                    }
+                })
                 return result;
             };
         }());
 
-    // return the binding
-    function getBindings(node, context) {
+    // Return the name/valueAccessor pairs.
+    // (undocumented replacement for getBindings)
+    // see https://github.com/knockout/knockout/pull/742
+    function getBindingAccessors(node, context) {
         var bindings = {},
         sbind_string;
+
         if (node.nodeType === node.ELEMENT_NODE) {
             sbind_string = node.getAttribute(this.attribute);
         }
 
         if (sbind_string) {
-            bindings = parse(sbind_string, context);
+            bindings = parse(sbind_string, node, context);
         }
 
         return bindings;
@@ -387,9 +393,9 @@
     ko.utils.extend(secureBindingsProvider.prototype, {
         registerBindings: registerBindings,
         nodeHasBindings: nodeHasBindings,
-        getBindings: getBindings,
+        getBindingAccessors: getBindingAccessors,
         parse: parse,
-        pluck_function: pluck_function,
+        make_accessor: make_accessor,
     })
 
     if (!exports) {

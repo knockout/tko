@@ -6,14 +6,16 @@
     "mocha": "*",
     "chai": "*",
     "knockout": "3.x.x"
-    },
-    "licenses": {
-      "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
-      },
-      "repository":
-      {
-        "type": "git",
-        "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
-      }
-    }
+  },
+  "licenses": {
+    "type": "MIT",
+    "url": "http://www.opensource.org/licenses/mit-license.php"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
+  },
+  "dependencies": {
+    "sinon": "~1.7.3"
+  }
+}
