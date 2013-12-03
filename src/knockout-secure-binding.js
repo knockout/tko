@@ -10,7 +10,15 @@
     var NAME_REX_0 = new RegExp("[_A-Za-z]"),
     NAME_REX_N = new RegExp("_A-Za-z0-9]"),
     IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
-    IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]");
+    IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]"),
+    identifier_strategies = {
+        'idempotent': function (name, obj) {
+            return obj ? obj[name] : void 0
+        },
+        'function': function (name, obj) {
+            return obj ? obj[name]() : void 0
+        },
+    }
 
     function secureBindingsProvider(bindings, options) {
         var existingProvider = new ko.bindingProvider();
@@ -64,15 +72,42 @@
         }
     }
 
-    function pluck(obj, string) {
+    // return a function that performs a lookup on context
+    function pluck_function(string) {
         var keys = string.split("."),
-        value = obj;
+        strategies = [];
 
         keys.forEach(function (key) {
-            value = result(value, key);
+            var name,
+            strategy,
+            keyLen = key.length;
+
+            if (key.substr(keyLen - 2) == "()") {
+                // function
+                name = key.slice(0, keyLen - 2);
+                strategy = 'function';
+            } else {
+                name = key;
+                strategy = 'idempotent';
+            }
+
+            strategies.push({
+                name: name,
+                execute: identifier_strategies[strategy]
+            })
         });
 
-        return value
+        function pluck(context) {
+            var value = context;
+
+            strategies.forEach(function (strategy) {
+                value = strategy.execute(strategy.name, value)
+            })
+
+            return value
+        }
+
+        return pluck
     }
 
     /* Based on (public domain):
@@ -211,7 +246,7 @@
                     next();
                 }
             },
-            lookup = function (id, context) {
+            lookup = function (id) {
                 switch (id) {
                     case 'true': return true;
                     case 'false': return false;
@@ -220,7 +255,7 @@
                     default:
                 }
 
-                return pluck(context, id);
+                return pluck_function(id);
             },
             identifier = function (context) {
                 // an identifier we look up
@@ -234,7 +269,7 @@
                     id += ch;
                     next()
                 }
-                return lookup(id, context);
+                return lookup(id);
             },
             value,  // Place holder for the value function.
             array = function () {
@@ -354,7 +389,7 @@
         nodeHasBindings: nodeHasBindings,
         getBindings: getBindings,
         parse: parse,
-        pluck: pluck,
+        pluck_function: pluck_function,
     })
 
     if (!exports) {

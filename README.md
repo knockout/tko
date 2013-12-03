@@ -1,7 +1,7 @@
-Knockout Secure Binding
-=======================
+Knockout Secure Binding (KSB)
+=============================
 
-This adds a `data-sbind` binding provider, a drop-in alternative to `data-bind`, that does not violate *script-src* Content Security Policy.
+Knockout Secure Binding (KSB) adds a `data-sbind` binding provider, a drop-in alternative to `data-bind`, that does not violate *script-src* Content Security Policy.
 
 This project exists because Knockout's `data-bind` uses `new Function`, as discussed in [knockout/knockout#903](https://github.com/knockout/knockout/issues/903).
 
@@ -35,6 +35,18 @@ Future bindings may include:
 - `text: value[0]`
 - `text: value[0].abc`
 - `text: value[0]().abc["str"]`
+- `text: value(arg1, "arg2", 3)`
+
+Usage
+---
+
+This is a custom binding provider, and follows the same rules of application as, for example, [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider).
+
+```
+ko.bindingProvider.instance = new ko.secureBindingsHandler(bindings, options);
+```
+
+Bear in mind that if you are using an AMD loader, then KSB is exported (have a look at the example in the linked `classBindingProvider`).
 
 
 Requires

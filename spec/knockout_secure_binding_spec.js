@@ -93,9 +93,13 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
-    // pluck to get elements from deep in an object
+    // pluck to get elements from deep in an object.
+    //
+    // Our pluck is "softer" than a standard lookup in the sense that
+    // it will not throw an error if something is not found, but rather
+    // return undefined.
     describe("pluck", function () {
-        var  obj = {
+        var obj = {
             a: {
                 b: {
                     c: {
@@ -110,21 +114,22 @@ describe("Knockout Secure Binding", function () {
             }
         }, pluck;
         beforeEach(function () {
-            pluck = instance.pluck;
+            pluck = instance.pluck_function;
         })
         it("should pluck deep values from objects", function () {
-            assert.deepEqual(pluck(obj, 'a.b.c'), obj.a.b.c, 'a.b.c')
-            assert.equal(pluck(obj, 'a.b.c.d'), 1, "a.b.c.d")
-            assert.equal(pluck(obj, 'a.b.c.x'), undefined, "a.b.c.x")
-            assert.equal(pluck(obj, 'a.b.c.x'), undefined, "a.b.c.x")
-            assert.equal(pluck(obj, 'a.b.c.e.1'), 8, "a.b.c.e.1")
-            assert.equal(pluck(obj, 'x.r'), undefined, "x.r")
-            assert.equal(pluck(obj, 'x'), undefined, "x-undefined")
+            assert.deepEqual(pluck('a.b.c')(obj),
+                obj.a.b.c, 'a.b.c')
+            assert.equal(pluck('a.b.c.d')(obj), 1, "a.b.c.d")
+            assert.equal(pluck('a.b.c.x')(obj), undefined, "a.b.c.x")
+            assert.equal(pluck('a.b.c.x')(obj), undefined, "a.b.c.x")
+            assert.equal(pluck('a.b.c.e.1')(obj), 8, "a.b.c.e.1")
+            assert.equal(pluck('x.r')(obj), undefined, "x.r")
+            assert.equal(pluck('x')(obj), undefined, "x-undefined")
         })
 
         it("should call functions", function () {
-            assert.equal(pluck(obj, "F1()"), "R1", "F1")
-            assert.equal(pluck(obj, "F2().G()"), "R2", "F2")
+            assert.equal(pluck("F1()")(obj), "R1", "F1")
+            assert.equal(pluck("F2().G()")(obj), "R2", "F2")
         })
     });
 
