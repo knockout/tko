@@ -107,6 +107,15 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
+    describe("Knockout's Text binding", function () {
+        it("binding with data-sbind", function () {
+            var div = document.createElement("div")
+            div.setAttribute("data-sbind", "text: obs")
+            ko.applyBindings({obs: ko.observable("a towel")}, div)
+            assert.equal(div.textContent, "a towel")
+        })
+    })
+
     describe("the bindings parser", function () {
         it("parses bindings with JSON values", function () {
             var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',

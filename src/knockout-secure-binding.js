@@ -85,9 +85,9 @@
         });
 
         function identifierAccessor() {
-            // equivalent to with(context){with(context.$data){...}}
             var value;
 
+            // equivalent to with(context){with(context.$data){...}}
             if (context && context.$data) {
                 value = Object.hasOwnProperty.call(context.$data, strategies[0].name) ? context.$data : context;
             } else {
