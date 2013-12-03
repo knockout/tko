@@ -66,6 +66,8 @@ Requires
 
 Knockout 2.0+
 
+KSB may use some ES5isms such as `Array.forEach`.
+
 
 LICENSE
 ---
