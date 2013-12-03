@@ -19,6 +19,31 @@ describe("Knockout Secure Binding", function () {
         assert.property(ko, 'secureBindingsProvider')
     })
 
+    it("has eval or new Function throw a CSP error", function () {
+        var efn = function () { return eval("true") },
+            nfn = function () { new Function("return true") };
+
+        console.log("Expecting a CSP violation ...")
+        assert.throw(efn, /Content Security Policy/)
+        console.log("Expecting a CSP violation ...")
+        assert.throw(nfn, /Content Security Policy/)
+    })
+
+    it("will throw an CSP error with regular bindings", function () {
+        var div = document.createElement("div"),
+            fn = function () {
+                ko.applyBindings({obs: 1}, div)
+            };
+
+        // Although we cannot disable the CSP-violations, printing to the
+        // console, we can print a lead-in that makes it appear to be
+        // expected.
+        console.log("Expecting a CSP violation ...")
+        div.setAttribute("data-bind", "text: obs"),
+        ko.bindingProvider.instance = new ko.bindingProvider()
+        assert.throw(fn, /Content Security Policy/)
+    })
+
     it("provides a binding provider", function () {
         ko.bindingProvider.instance = new ko.secureBindingsProvider();
     })

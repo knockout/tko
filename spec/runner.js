@@ -39,7 +39,7 @@ function run_browser_tests() {
       var state = result.state;
       if (state !== 'passed') {
         fails++
-        state = state.red
+        state = state.red.bold
       } else {
         state = state.blue
       }

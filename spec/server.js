@@ -13,6 +13,9 @@ var http = require('http'),
     policy_list,
     policy_string;
 
+// change to this scripts directory for referencing paths
+process.chdir(__dirname)
+
 // we may change this accordingly
 policy_map = {
   "default-src": "'none'",
