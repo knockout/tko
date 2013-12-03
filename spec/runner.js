@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 var
-    webdriver = require('wd'),
-    chai = require('chai'),
+    webdriver = require('selenium-webdriver'),
     http = require('http'),
     fs = require('fs'),
     url = require('url'),
@@ -10,11 +9,15 @@ var
     server_port = 7887,
     server_host = 'localhost',
     server_responses,
+    expect_title,
     server,
     policy_map,
     policy_list,
     policy_string,
     browser_args = { browserName: "chrome", port: 4444 };
+
+// we use this for ensuring the document is loaded, below
+expect_title = "Knockout Secure Binding - Local unit tests"
 
 // we may change this accordingly
 policy_map = {
@@ -93,31 +96,39 @@ server = http.createServer(function (request, response) {
 
 
 function run_browser_tests() {
-  var client = webdriver.remote(),
-    browser = client.browser,
-    sync = client.sync;
+  var uri = 'http://' + server_host + ":" + server_port + '/runner.html',
+    remote_script = "return window.results",
+    results = false;
 
-  sync(function () {
-    browser.init(browser_args)
-    browser.get("http://localhost:7887/runner.html")
-    browser.get({
-         port: server_port,
-      host: server_host,
-      path: "/runner.html",
+  var driver = new webdriver.Builder().
+     withCapabilities(webdriver.Capabilities.chrome()).
+     build();
+
+  driver.get(uri)
+
+  // wait for title to load - make sure we're at the right spot
+  driver.wait(function() {
+   return driver.getTitle().then(function(title) {
+     return title === expect_title;
+   })
+  }, 1000)
+
+  // let the scripts run and get the mocha test results
+  driver.wait(function () {
+    return driver.executeScript(remote_script).then(function (res) {
+      results = res;
+      return res;
     })
-    console.log("TITLE",  browser.title())
-
+  }, 1000).then(function () {
+    console.log("Tests complete.")
   })
+
+  // quit the driver and exit without issue
+  driver.quit().then(function () {
+    process.exit(0)
+  });
 }
 
-
-// browser.on('status', function(info){
-//   console.log('\x1b[36m%s\x1b[0m', info);
-// });
-
-// browser.on('command', function(meth, path){
-//   console.log(' > \x1b[33m%s\x1b[0m: %s', meth, path);
-// });
 
 // when the server is listening we run our tests
 server.on("listening", run_browser_tests)

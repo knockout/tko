@@ -19,7 +19,9 @@
   </script>
   <script src="knockout_secure_binding_spec.js"></script>
   <script>
-      mocha.run();
+      mocha.run(function (res) {
+        window.results = true;
+      });
   </script>
 </body>
 </html>
