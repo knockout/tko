@@ -55,7 +55,7 @@ Usage
 This is a custom binding provider, and follows the same rules of application as, for example, [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider).
 
 ```
-ko.bindingProvider.instance = new ko.secureBindingsHandler(bindings, options);
+ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
 ```
 
 Bear in mind that if you are using an AMD loader, then KSB is exported (have a look at the example in the linked `classBindingProvider`).
