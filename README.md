@@ -28,11 +28,8 @@ The `data-sbind` differs from `data-bind` as follows:
 |           | `data-bind` | `data-sbind`
 | --- | --- | ---
 | Language  | Executes Javascript  | Parsed Javascript-like language
-| --- | --- | ---
 | Globals | Any | Must be added to context
-| --- | --- | ---
-| Function  | Any | Do not accept arguments
-| arguments |     |
+| Function arguments  | Any | Do not accept arguments
 
 Globals must be explicitly added to the
 [Knockout binding context](http://knockoutjs.com/documentation/binding-
@@ -91,13 +88,18 @@ piece of the security strategy applicable to your situation.
 Usage
 ---
 
-This is a custom binding provider, and follows the same rules of application as, for example, [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider).
+Custom Knockout binding providers follow the same general rules of
+application as [knockout-
+classBindingProvider](https://github.com/rniemeyer/knockout-
+classBindingProvider).
+
+So this works:
 
 ```
 ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
 ```
 
-Bear in mind that if you are using an AMD loader, then KSB is exported (have a look at the example in the linked `classBindingProvider`).
+Keep in mind that if you are using an AMD loader, then KSB is exported (have a look at the example in the linked `classBindingProvider`).
 
 
 Tests
