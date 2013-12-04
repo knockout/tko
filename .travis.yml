@@ -18,3 +18,7 @@ before_script:
   - wget http://chromedriver.storage.googleapis.com/2.7/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - sudo mv chromedriver /usr/bin/
+
+  - which chrome
+  - which chromedriver
+
