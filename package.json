@@ -21,6 +21,6 @@
     "knockout": "3.x.x"
   },
   "scripts": {
-    "server": "node spec/server.js"
+    "start": "node spec/server.js"
   }
 }

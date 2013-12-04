@@ -5,7 +5,7 @@ node_js:
 addons:
   sauce_connect:
     username: "brianmhunt"
-    access_key: "5fd92995-df2a-4e65-8747"
+    access_key: "cd6ce1e2-070f-4cf2-81b9"
 
 script:
-  - npm server
+  - npm start

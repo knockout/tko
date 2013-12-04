@@ -14,8 +14,8 @@ require('colors')
 var webdriver = require('selenium-webdriver'),
     server = require("./server"),
 
-    // our remote webdriver
-    sauce_hub,
+    // our Sauce webdriver url
+    hub_url,
 
     // what our webdriver may provide
     capabilities,
@@ -37,6 +37,9 @@ if (process.env['SAUCE_USERNAME']) {
   hub_url = "" + process.env['SAUCE_USERNAME']
     + ":" + process.env['SAUCE_ACCESS_KEY']
     + "@localhost:4445"
+
+  console.log("Sauce HUB URL ", hub_url)
+
   driver = webdriver.Remote(desired_capabilities=capabilities,
     command_executor="http://" + hub_url + "/wd/hub")
 } else {
