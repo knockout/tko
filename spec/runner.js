@@ -47,13 +47,18 @@ if (process.env['SAUCE_USERNAME']) {
   })
 
 } else {
+  // don't forget to start chromedriver with:
+  //  $ chromedriver --url-base=/wd/hub
+  // see https://github.com/camme/webdriverjs/issues/113
+
   console.log("\nTesting with local chromedriver".bold)
 
   client = webdriverjs.remote({
     host: "localhost",
     port: 9515,
+    logLevel: 'data',
     desiredCapabilities: capabilities
-  })
+  }).init()
 }
 
 
@@ -67,6 +72,7 @@ function run_browser_tests() {
   client.url(uri)
     .pause(WAIT)
     .getTitle(function (err, title) {
+      // just make sure we're at the right place
       if (err) {
         throw new Error(err)
       }
@@ -76,10 +82,12 @@ function run_browser_tests() {
       }
     })
     .execute(remote_script, null, function (err, res) {
+      // print output of the tests
       if (err) {
         throw new Error(err)
       }
-      results = res;
+      results = res.value;
+      console.log("\n\tBrowser test results\n".yellow)
       results.results.forEach(function (result) {
         var state = result.state;
         if (state !== 'passed') {
@@ -92,10 +100,10 @@ function run_browser_tests() {
         console.log(state + "  " + result.title)
       });
 
-      console.log("Total: ", results.results.length, " fails: ", fails)
+      console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
 
       // quit the client and exit with appropriate code
-      webdriverjs.endAll(function () {
+      client.end(function () {
         process.exit(fails)
       })
     })
