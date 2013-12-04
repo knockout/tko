@@ -37,14 +37,13 @@ if (process.env['SAUCE_USERNAME']) {
   capabilities["javascriptEnabled"] = true
   capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
   capabilities["tags"] = ["CI"]
+  capabilities["name"] = "Knockout Secure Binding/Travis"
 
   client = webdriverjs.remote({
     host: "localhost",
     port: 4445,
     user: process.env.SAUCE_USERNAME,
     key: process.env.SAUCE_ACCESS_KEY,
-    name: "Knockout Secure Binding/Travis",
-
     desiredCapabilities: capabilities
   })
 
