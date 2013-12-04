@@ -295,7 +295,7 @@
                 white();
 
                 while (ch) {
-                    if (ch === ':' || ch === '}' || ch === ',' || ch === ' ') {
+                    if (ch === ':' || ch === '}' || ch === ',' || ch === ' ' || ch === ']') {
                         return lookup(node, context, id);
                     }
                     id += ch;

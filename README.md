@@ -53,10 +53,12 @@ The `data-sbind` binding provider uses Knockout's built-in bindings, so
 
 Future bindings may expand our language to include:
 
+- Nested values in objects: `text: { x: value(), y: $element.id }`
 - Array numerical lookups: `text: value[0]`
 - Array string lookups: `text: value['x']`
 - Array variable lookups: `text: value[$index()]`
 - Compound array values: `text: value[0].abc`
+- Simple expressions: `text: x + y`
 
 
 Security implications
