@@ -33,7 +33,7 @@ if (process.env['SAUCE_USERNAME']) {
   // eg http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
   console.log("\nTesting with Sauce Labs".bold)
 
-  capabilities["build"] = process.env['TRAVIS_BUILD_NUMBER']
+  capabilities["build"] = process.env.TRAVIS_BUILD_NUMBER
   capabilities["javascriptEnabled"] = true
 
   client = webdriverjs.remote({
@@ -41,6 +41,7 @@ if (process.env['SAUCE_USERNAME']) {
     port: 4445,
     user: process.env.SAUCE_USERNAME,
     key: process.env.SAUCE_ACCESS_KEY,
+    name: "Knockout Secure Binding/Travis",
     desiredCapabilities: capabilities
   })
 
