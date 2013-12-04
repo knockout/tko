@@ -24,8 +24,6 @@ var webdriverjs = require('webdriverjs'),
     // we use this for ensuring the document is loaded, below
     expect_title = "Knockout Secure Binding - Local unit tests"
 
-console.log("WJS")
-
 capabilities = {
   browserName: "chrome"
 }
@@ -44,7 +42,7 @@ if (process.env['SAUCE_USERNAME']) {
     user: process.env.SAUCE_USERNAME,
     key: process.env.SAUCE_ACCESS_KEY,
     desiredCapabilities: capabilities
-  }).init()
+  })
 
 } else {
   // don't forget to start chromedriver with:
@@ -60,7 +58,7 @@ if (process.env['SAUCE_USERNAME']) {
     port: 9515,
     logLevel: 'data',
     desiredCapabilities: capabilities
-  }).init()
+  })
 }
 
 
@@ -71,7 +69,8 @@ function run_browser_tests() {
     WAIT = 1000,
     fails = 0;
 
-  client.url(uri)
+  client.init()
+    .url(uri)
     .pause(WAIT)
     .getTitle(function (err, title) {
       // just make sure we're at the right place
