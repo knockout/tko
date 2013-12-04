@@ -5,7 +5,6 @@
     "chai": "*",
     "colors": "*",
     "mocha": "*",
-    "selenium-webdriver": "*",
     "webdriverjs": "*",
     "sinon": "~1.7.3"
   },

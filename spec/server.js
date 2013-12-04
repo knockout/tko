@@ -78,14 +78,14 @@ server = http.createServer(function (request, response) {
     serve = server_responses[uri];
 
   if (!serve) {
-    console.log("404 ".red, request.url);
+    console.log(" \u2711 404 ".red, request.url);
     response.writeHead(404, {});
     response.write("404");
     response.end();
     return
   }
 
-  console.log("200 ".green, request.url);
+  console.log(" \u2712 200 ".green, request.url);
 
   fs.readFile(serve.path, function (err, data) {
     if (err) {
