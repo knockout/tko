@@ -4,7 +4,6 @@
   "devDependencies": {
     "chai": "*",
     "colors": "*",
-    "grunt": "0.x.x",
     "mocha": "*",
     "selenium-webdriver": "*",
     "sinon": "~1.7.3"
