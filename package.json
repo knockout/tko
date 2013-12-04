@@ -21,6 +21,6 @@
     "knockout": "3.x.x"
   },
   "scripts": {
-    "test": "node spec/runner.js"
+    "test": "node spec/runner.js firefox"
   }
 }
