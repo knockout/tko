@@ -87,10 +87,21 @@
         function identifierAccessor() {
             var value;
 
-            // equivalent to with(context){with(context.$data){...}}
-            if (context && context.$data) {
-                value = Object.hasOwnProperty.call(context.$data, strategies[0].name) ? context.$data : context;
+            if (strategies[0].name === "$context") {
+                // unshift $context
+                strategies.shift();
+                value = context;
+            } else if (strategies[0].name === "$element") {
+                // $element is the node bound
+                strategies.shift();
+                value = node;
+            } else if (context && context.$data) {
+                // Return $data if the first-dotted value is defined
+                // emulates with(context){with(context.$data){...}}
+                value = Object.hasOwnProperty.call(context.$data,
+                    strategies[0].name) ? context.$data : context;
             } else {
+                // The default is the $context.
                 value = context;
             }
 
