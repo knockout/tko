@@ -8,7 +8,7 @@ var http = require('http'),
 
     // Note that this port must be forwarded by sauce
     // see https://saucelabs.com/docs/connect
-    server_port = 2310,
+    server_port = parseInt(process.env.SERVER_PORT) || 2310,
     server_host = 'localhost',
     server_responses,
     policy_map,
