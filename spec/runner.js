@@ -69,7 +69,7 @@ function run_browser_tests() {
   var uri = 'http://' + server.host + ":" + server.port,
     remote_script = "return window.tests",
     results = false,
-    WAIT = 1000,
+    WAIT = 2500,
     fails = 0;
 
   client.init()
@@ -102,15 +102,14 @@ function run_browser_tests() {
         }
 
         console.log(state + "  " + result.title)
-      });
-
-      console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
-
-      // quit the client and exit with appropriate code
-      client.end(function () {
-        process.exit(fails)
       })
+      console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
     })
+    .end(function () {
+      // quit the client and exit with appropriate code
+      process.exit(fails)
+    })
+  return
 }
 
 
