@@ -8,11 +8,16 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 before_script:
+  - which firefox
+  - firefox -v
+  - which java
+  - java -v
+
   # Get the selenium standalone server
   - wget https://selenium.googlecode.com/files/selenium-server-standalone-2.37.0.jar
 
-  - which firefox
-  - firefox -v
+  - java -jar selenium-server-standalone-2.37.0.jar
+
 
 # configure chrome
 #   - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb

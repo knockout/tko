@@ -28,11 +28,12 @@ var webdriver = require('selenium-webdriver'),
 
 // we accept an argument of "firefox" to start Selenium
 if (process.argv[2] == "firefox") {
-  selenium_server = new SeleniumServer(selenium_jar,
-    { port: selenium_port })
-  selenium_server.start()
+  //selenium_server = new SeleniumServer(selenium_jar,
+  //  { port: selenium_port })
+  //selenium_server.start()
   driver = new webdriver.Builder().
-    usingServer(selenium_server.address()).
+    //usingServer(selenium_server.address()).
+    usingServer("http://localhost:4444").
     withCapabilities(webdriver.Capabilities.firefox())
 } else {
   driver = new webdriver.Builder().
