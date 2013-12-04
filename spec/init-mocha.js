@@ -11,6 +11,7 @@ window.tests = {
 };
 
 afterEach(function () {
+  console.log(" --- ", this.currentTest.fullTitle());
   window.tests.results.push({
     title: this.currentTest.fullTitle(),
     state: this.currentTest.state,

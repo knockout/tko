@@ -27,13 +27,9 @@ The `data-sbind` differs from `data-bind` as follows:
 
 |           | `data-bind` | `data-sbind`
 | --- | --- | ---
-| Language  | Executes Javascript  | Parsed Javascript-like language
-| Globals | Any | Must be added to context
-| Function arguments  | Any | Do not accept arguments
-
-Globals must be explicitly added to the
-[Knockout binding context](http://knockoutjs.com/documentation/binding-
-context.html) to be accessible.
+| Language  | Executes Javascript  | Parsed JSON-like language
+| Globals | Any | Must be added to the [Knockout binding context](http://knockoutjs.com/documentation/binding-context.html)
+| Function arguments  | Any | Arguments are not accepted
 
 
 Objectives

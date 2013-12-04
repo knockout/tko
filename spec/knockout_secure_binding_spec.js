@@ -172,6 +172,18 @@ describe("Knockout Secure Binding", function () {
             bindings = instance.parse(binding, null, context);
             assert.equal(bindings.a(), "y");
         })
+
+        it("Parses single-quote strings", function () {
+            var binding = "text: 'st\\'r'";
+            bindings = instance.parse(binding, null, {})
+            assert.equal(bindings.text(), "st'r")
+        })
+
+        it("Parses text: {object: 'string'}", function () {
+            var binding = "text: { object: 'string' }";
+            bindings = instance.parse(binding, null, {})
+            assert.equal(bindings.text(), "string")
+        })
     })
 
     // pluck to get elements from deep in an object.

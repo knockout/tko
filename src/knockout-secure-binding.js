@@ -111,6 +111,7 @@
         var at,     // The index of the current character
             ch,     // The current character
             escapee = {
+                "'": "'",
                 '"':  '"',
                 '\\': '\\',
                 '/':  '/',
@@ -207,6 +208,33 @@
                 if (ch === '"') {
                     while (next()) {
                         if (ch === '"') {
+                            next();
+                            return string;
+                        }
+                        if (ch === '\\') {
+                            next();
+                            if (ch === 'u') {
+                                uffff = 0;
+                                for (i = 0; i < 4; i += 1) {
+                                    hex = parseInt(next(), 16);
+                                    if (!isFinite(hex)) {
+                                        break;
+                                    }
+                                    uffff = uffff * 16 + hex;
+                                }
+                                string += String.fromCharCode(uffff);
+                            } else if (typeof escapee[ch] === 'string') {
+                                string += escapee[ch];
+                            } else {
+                                break;
+                            }
+                        } else {
+                            string += ch;
+                        }
+                    }
+                } else if (ch === "'") {
+                    while (next()) {
+                        if (ch === "'") {
                             next();
                             return string;
                         }
@@ -340,7 +368,7 @@
                 switch (ch) {
                     case '{': return object();
                     case '[': return array();
-                    case '"': return string();
+                    case '"': case "'": return string();
                     case '-': return number();
                     default:
                     return ch >= '0' && ch <= '9' ? number()
