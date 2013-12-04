@@ -13,6 +13,7 @@ before_script:
   - sudo apt-get update -qq
   - sudo dpkg -i ./google-chrome*.deb
   - sudo apt-get -f install
+  - sudo ln -s /usr/bin/google-chrome /usr/bin/chrome
 
 # configure chromedriver
   - wget http://chromedriver.storage.googleapis.com/2.7/chromedriver_linux64.zip
