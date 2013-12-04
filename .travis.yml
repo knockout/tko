@@ -11,7 +11,6 @@ before_script:
   - which firefox
   - firefox -v
   - which java
-  - java -v
 
   # Get the selenium standalone server
   - wget https://selenium.googlecode.com/files/selenium-server-standalone-2.37.0.jar
