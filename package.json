@@ -6,6 +6,7 @@
     "colors": "*",
     "mocha": "*",
     "selenium-webdriver": "*",
+    "webdriverjs": "*",
     "sinon": "~1.7.3"
   },
   "licenses": {
