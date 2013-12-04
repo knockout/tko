@@ -44,7 +44,7 @@ if (process.env['SAUCE_USERNAME']) {
     user: process.env.SAUCE_USERNAME,
     key: process.env.SAUCE_ACCESS_KEY,
     desiredCapabilities: capabilities
-  })
+  }).init()
 
 } else {
   // don't forget to start chromedriver with:
