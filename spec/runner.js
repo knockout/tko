@@ -52,6 +52,8 @@ if (process.env['SAUCE_USERNAME']) {
   // see https://github.com/camme/webdriverjs/issues/113
 
   console.log("\nTesting with local chromedriver".bold)
+  console.log("\nDon't forget to start chromedriver with" +
+              " $ chromedriver --url-base=/wd/hub".blue)
 
   client = webdriverjs.remote({
     host: "localhost",
