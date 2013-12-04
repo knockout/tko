@@ -3,11 +3,10 @@ require('colors')
 
 var webdriver = require('selenium-webdriver'),
     server = require("./server"),
+    capabilities = webdriver.Capabilities.chrome(),
 
-    expect_title;
-
-// we use this for ensuring the document is loaded, below
-expect_title = "Knockout Secure Binding - Local unit tests"
+    // we use this for ensuring the document is loaded, below
+    expect_title = "Knockout Secure Binding - Local unit tests"
 
 function run_browser_tests() {
   var uri = 'http://' + server.host + ":" + server.port,
@@ -15,9 +14,8 @@ function run_browser_tests() {
     results = false,
     fails = 0;
 
-  var driver = new webdriver.Builder().
-     withCapabilities(webdriver.Capabilities.chrome()).
-     build();
+  var driver = new webdriver.Builder()
+    .withCapabilities(capabilities).build();
 
   driver.get(uri)
 

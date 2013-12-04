@@ -3,16 +3,14 @@ Knockout Secure Binding (KSB)
 
  [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
 
-Knockout Secure Binding (KSB) adds a `data-sbind` binding provider, a drop-in alternative to `data-bind`, that does not violate the restrictions imposed by the default *script-src*
+Knockout Secure Binding (KSB) adds a binding provider that looks for the
+property `data-sbind`. It is a drop-in alternative to `data-bind`, but KSB
+does not violate the restrictions imposed by the default *script-src*
 [Content Security Policy](http://www.w3.org/TR/CSP/).
 
-This project exists because Knockout's `data-bind` uses `new Function`
-to parse bindings, as discussed in
+This project exists because Knockout's `data-bind` uses `new Function` to
+parse bindings, as discussed in
 [knockout/knockout#903](https://github.com/knockout/knockout/issues/903).
-
-This is not to say that any particular binding is free of such a call
-to this or other CSP-restricted functions. This only deals with the
-parsing portion.
 
 
 Language
@@ -21,7 +19,24 @@ Language
 The language used in the bindings is a proper superset of JSON, differing in that:
 
 1. the binding understands `undefined` keyword
-2. the binding looks up keywords on `$data` or `$context`.
+2. the binding looks up variables on `$data` or `$context`.
+
+Some examples of the `data-sbind` are below.
+
+The `data-sbind` differs from `data-bind` as follows:
+
+|           | `data-bind` | `data-sbind`
+| --- | --- | ---
+| Language  | Executes Javascript  | Parsed Javascript-like language
+| --- | --- | ---
+| Globals | Any | Must be added to context
+| --- | --- | ---
+| Function  | Any | Do not accept arguments
+| arguments |     |
+
+Globals must be explicitly added to the
+[Knockout binding context](http://knockoutjs.com/documentation/binding-
+context.html) to be accessible.
 
 
 Objectives
@@ -38,17 +53,39 @@ Here are some examples of valid values for `data-sbind`:
 - `text: value()`
 - `text: $data.value()`
 - `text: $context.obj().value()`
+- `text: $element.id`
 
-Where the example bindings here (`text` and `foreach`) are Knockout's
-built-in bindings. The `data-sbind` binding provider uses Knockout's
-built-in bindings, as extended.
+The `data-sbind` binding provider uses Knockout's built-in bindings, so
+`text`, `foreach`, and the others should work as expected.
 
 Future bindings may expand our language to include:
 
-- `text: value[0]`
-- `text: value[0].abc`
-- `text: value[0]().abc["str"]`
-- `text: value(arg1, "arg2", 3)`
+- Array numerical lookups: `text: value[0]`
+- Array string lookups: `text: value['x']`
+- Array variable lookups: `text: value[$index()]`
+- Compound array values: `text: value[0].abc`
+
+
+Security implications
+---
+
+The default binding provider for Knockout will not apply bindings when
+Content Security Policy prohibits the use of `new Function`.
+
+This is a worthwhile CSP prohibition. It prohibits Cross-site scripting (XSS). See e.g.
+
+* [Preventing XSS with Content Security Policy](http://benvinegar.github.io/csp-talk-2013/).
+
+As well, KSB also prevents the execution of arbitrary code in a Knockout
+binding. A malicious user could execute `text: $.getScript('...')` in
+Knockout on a DOM element that is having bindings applied, but this will not succeed in KSB because:
+
+1. The `$` is a global, and unless explicitly added to the binding context it will not be accessible;
+2. Functions in KSB do not accept arguments;
+3. A Content Security Policy can be enabled that prevents `script-src` from untrusted sources.
+
+Nevertheless, as you are undoubtedly aware, this is likely just one small
+piece of the security strategy applicable to your situation.
 
 
 Usage
