@@ -180,9 +180,9 @@ describe("Knockout Secure Binding", function () {
         })
 
         it("Parses text: {object: 'string'}", function () {
-            var binding = "text: { object: 'string' }";
+            var binding = "text: {object: 'string'}";
             bindings = instance.parse(binding, null, {})
-            assert.equal(bindings.text(), "string")
+            assert.deepEqual(bindings.text(), { object: "string" })
         })
     })
 

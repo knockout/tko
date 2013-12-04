@@ -152,7 +152,6 @@
 
                 while (ch) {
                     if (ch === ':' || ch === ' ') {
-                        next()
                         return name;
                     }
                     name += ch;
@@ -330,7 +329,11 @@
                         return object;   // empty object
                     }
                     while (ch) {
-                        key = string();
+                        if (ch === '"' || ch === "'") {
+                            key = string();
+                        } else {
+                            key = name();
+                        }
                         white();
                         next(':');
                         if (Object.hasOwnProperty.call(object, key)) {
@@ -354,6 +357,8 @@
                 bindings = {};
                 while (ch) {
                     key = name();
+                    white()
+                    next(":")
                     bindings[key] = value(node, context);
                     white()
                     if (ch) {
