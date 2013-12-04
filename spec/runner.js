@@ -42,6 +42,7 @@ if (process.env['SAUCE_USERNAME']) {
     user: process.env.SAUCE_USERNAME,
     key: process.env.SAUCE_ACCESS_KEY,
     name: "Knockout Secure Binding/Travis",
+    "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER,
     desiredCapabilities: capabilities
   })
 
