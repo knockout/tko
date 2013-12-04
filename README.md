@@ -1,6 +1,8 @@
 Knockout Secure Binding (KSB)
 =============================
 
+[https://travis-ci.org/brianmhunt/knockout-secure-binding.png](https://travis-ci.org/brianmhunt/knockout-secure-binding)
+
 Knockout Secure Binding (KSB) adds a `data-sbind` binding provider, a drop-in alternative to `data-bind`, that does not violate the restrictions imposed by the default *script-src*
 [Content Security Policy](http://www.w3.org/TR/CSP/).
 

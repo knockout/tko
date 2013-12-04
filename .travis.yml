@@ -1,12 +1,20 @@
 language: node_js
 node_js:
   - "0.10"
+
 before_install:
+# set up a headless X display
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+
 before_script:
-  # - wget https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb
+# configure chrome
   - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   - sudo apt-get update -qq
   - sudo dpkg -i ./google-chrome*.deb
   - sudo apt-get -f install
+
+# configure chromedriver
+  - wget http://chromedriver.storage.googleapis.com/2.7/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip
+  - sudo mv chromedriver /usr/bin/
