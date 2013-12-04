@@ -2,10 +2,21 @@ language: node_js
 node_js:
   - "0.10"
 
-addons:
-  sauce_connect:
-    username: "brianmhunt"
-    access_key: "cd6ce1e2-070f-4cf2-81b9"
+# See:
+# https://saucelabs.com/opensource/travis
+# http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
+# addons:
+#   sauce_connect:
+#     username: "brianmhunt"
+#     access_key: "cd6ce1e2-070f-4cf2-81b9"
+
+env:
+  - >
+    SAUCE_USERNAME="brianmhunt"
+    SAUCE_ACCESS_KEY="cd6ce1e2-070f-4cf2-81b9"
+
+before_script:
+  - curl https://gist.github.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 
 script:
   - npm start
