@@ -4,7 +4,8 @@ see eg https://github.com/rniemeyer/knockout-classBindingProvider/blob/master/sp
 */
 
 describe("Knockout Secure Binding", function () {
-    var instance;
+    var instance,
+        csp_rex = /Content Security Policy|blocked by CSP/;
 
     beforeEach(function () {
         instance = new ko.secureBindingsProvider();
@@ -24,9 +25,9 @@ describe("Knockout Secure Binding", function () {
             nfn = function () { new Function("return true") };
 
         console.log("Expecting a CSP violation ...")
-        assert.throw(efn, /Content Security Policy/)
+        assert.throw(efn, csp_rex)
         console.log("Expecting a CSP violation ...")
-        assert.throw(nfn, /Content Security Policy/)
+        assert.throw(nfn, csp_rex)
     })
 
     it("will throw an CSP error with regular bindings", function () {
@@ -41,7 +42,7 @@ describe("Knockout Secure Binding", function () {
         console.log("Expecting a CSP violation ...")
         div.setAttribute("data-bind", "text: obs"),
         ko.bindingProvider.instance = new ko.bindingProvider()
-        assert.throw(fn, /Content Security Policy/)
+        assert.throw(fn, csp_rex)
     })
 
     it("provides a binding provider", function () {
