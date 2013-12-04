@@ -12,30 +12,35 @@
 require('colors')
 
 var webdriver = require('selenium-webdriver'),
-    SeleniumServer = require('selenium-webdriver/remote').SeleniumServer,
     server = require("./server"),
 
-    // selenium setup for standalone servers
-    selenium_jar = "selenium-server-standalone-2.37.0.jar",
-    selenium_port = 4444,
-    selenium_server,
+    // our remote webdriver
+    sauce_hub,
 
-    // this is used below for the driver
-    driver,
+    // what our webdriver may provide
+    capabilities,
+
+    // sauce options
+    sauce,
 
     // we use this for ensuring the document is loaded, below
     expect_title = "Knockout Secure Binding - Local unit tests"
 
-// we accept an argument of "firefox" to start Selenium
-if (process.argv[2] == "firefox") {
-  //selenium_server = new SeleniumServer(selenium_jar,
-  //  { port: selenium_port })
-  //selenium_server.start()
-  driver = new webdriver.Builder().
-    //usingServer(selenium_server.address()).
-    usingServer("http://localhost:4444").
-    withCapabilities(webdriver.Capabilities.firefox())
+if (process.env['SAUCE_USERNAME']) {
+  // use sauce; see
+  // eg http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
+  console.log("\nTesting with Sauce Labs".bold)
+  capabilities = webdriver.Capabilities.chrome()
+
+  capabilities["build"] = process.env['TRAVIS_BUILD_NUMBER']
+
+  hub_url = "" + process.env['SAUCE_USERNAME']
+    + ":" + process.env['SAUCE_ACCESS_KEY']
+    + "@localhost:4445"
+  driver = webdriver.Remote(desired_capabilities=capabilities,
+    command_executor="http://" + hub_url + "/wd/hub")
 } else {
+  console.log("\nTesting with local chromedriver".bold)
   driver = new webdriver.Builder().
     withCapabilities(webdriver.Capabilities.chrome())
 }
