@@ -5,8 +5,8 @@
     "chai": "*",
     "colors": "*",
     "mocha": "*",
-    "webdriverjs": "*",
-    "sinon": "~1.7.3"
+    "sinon": "~1.7.3",
+    "wd": "~0.2.6"
   },
   "licenses": {
     "type": "MIT",

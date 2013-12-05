@@ -13,7 +13,7 @@
 require('colors')
 
 
-var webdriverjs = require('webdriverjs'),
+var webdriver = require('wd'),
     server = require("./server"),
 
     // our webdriver desired capabilities
@@ -35,52 +35,23 @@ capabilities = {
 
 
 process.on("SIGINT", function () {
-  function close_client() {
-    if (client) {
-      client.end(function () {
-        process.exit(1)
-      })
-    } else {
-      process.exit(1)
-    }
-  }
-
-  console.log("\tCtrl-C received; shutting down browser".red)
-  if (server.instance) {
-    server.instance.close(close_client)
+  console.log("\n\tCtrl-C received; shutting down browser\n".red)
+  if (client) {
+    client.quit(function () { process.exit(1) })
   } else {
-    close_client()
+    process.exit(1)
   }
 })
 
 
-function waitForExecute(script, callback, test_done, timeout) {
-  if (!timeout) {
-    timeout = 250
-  }
-
-  this.execute(script, null, function(err, res) {
-    if (err || test_done(res)) {
-      callback.call(this, err, res)
-      return
-    }
-
-    setTimeout(waitForExecute.bind(this, script, callback, test_done,
-      timeout), timeout)
-  })
-}
-
-
-function on_results(err, res) {
+function on_results(err, results) {
   // print output of the tests
-  var results,
-      fails = 0;
+  var fails = 0;
 
   if (err) {
     throw new Error(err)
   }
 
-  results = res.value;
   console.log("\n\tBROWSER TEST RESULTS".yellow +
               "\n\t--------------------\n".bold)
   results.results.forEach(function (result) {
@@ -96,42 +67,51 @@ function on_results(err, res) {
   console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
 
   // quit the client and exit with appropriate code
-  this.end(function () {
+  client.quit(function () {
     process.exit(fails)
   })
 }
 
 
-function run_browser_tests() {
-  var uri = 'http://' + server.host + ":" + server.port,
-    remote_script = "return window.tests";
+function get_mocha_results() {
+  var remote_script = "return window.tests && window.tests.complete";
 
-  function test_done(result) {
-    return result.value.complete
+  function on_complete() {
+    console.log("Tests complete.")
+    client.execute("return window.tests", on_results)
   }
 
-  client.init()
-    .url(uri)
-    .getTitle(function (err, title) {
-      // just make sure we're at the right place
-      if (err) {
-        throw new Error(err)
-      }
-      if (title !== expect_title) {
-        throw new Error("Expected title " + expect_title + " but got "
-          + title)
-      }
-    })
-    .call(waitForExecute.bind(client, remote_script, on_results, test_done))
+  client.waitForConditionInBrowser(remote_script, 1000, 200, on_complete)
+}
+
+
+function test_title() {
+  client.title(function (err, title) {
+    // just make sure we're at the right place
+    if (err) {
+      throw new Error(err)
+    }
+    if (title !== expect_title) {
+      throw new Error("Expected title " + expect_title + " but got "
+        + title)
+    }
+
+    get_mocha_results()
+  })
+}
+
+
+function run_browser_tests() {
+  var uri = 'http://' + server.host + ":" + server.port;
+
+  client.init(capabilities, function () {
+    client.get(uri, test_title)
+  })
   return
 }
 
 
 function init_chrome_client() {
-  // don't forget to start chromedriver with:
-  //  $ chromedriver --url-base=/wd/hub
-  // see https://github.com/camme/webdriverjs/issues/113
-
   console.log(
     "\n-----------------------------------------------------".bold +
     "\n       Don't forget to start chromedriver with" +
@@ -139,11 +119,11 @@ function init_chrome_client() {
     "\n\n-----------------------------------------------------".bold
   )
 
-  client = webdriverjs.remote({
-    host: webdriver_host,
+  client = webdriver.remote({
+    hostname: webdriver_host,
     port: webdriver_port,
     // logLevel: 'data',
-    desiredCapabilities: capabilities
+    // desiredCapabilities: capabilities
   })
 }
 
@@ -157,14 +137,15 @@ function init_sauce_client() {
   capabilities["javascriptEnabled"] = true
   capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
   capabilities["tags"] = ["CI"]
-  capabilities["name"] = process.env.JOB_NAME || "Knockout Secure Binding"
+  capabilities["name"] = process.env.JOB_NAME
+    || "Knockout Secure Binding"
 
-  client = webdriverjs.remote({
-    host: webdriver_host,
-    port: webdriver_port,
+  client = webdriver.remote({
+    hostname: "ondemand.saucelabs.com",
+    port: 80,
     user: process.env.SAUCE_USERNAME,
-    key: process.env.SAUCE_ACCESS_KEY,
-    desiredCapabilities: capabilities
+    pwd: process.env.SAUCE_ACCESS_KEY
+    // desiredCapabilities: capabilities
   })
 }
 
@@ -175,6 +156,13 @@ function init_client() {
   } else {
     init_chrome_client()
   }
+
+  client.on('status', function(info) {
+    console.log(info.cyan);
+  });
+  client.on('command', function(meth, path, data) {
+    console.log(' > ' + meth.yellow, path.grey, data || '');
+  });
 
   run_browser_tests()
 }
