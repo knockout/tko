@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - "0.10"
 env:
-  - SERVER_PORT="8080"
+  - SERVER_PORT="8080" JOB_NAME="Knockout Secure Binding"
 
 
 # See:
@@ -13,3 +13,15 @@ addons:
   sauce_connect:
     username: "brianmhunt"
     access_key: "cd6ce1e2-070f-4cf2-81b9-b814fe2f4ea5"
+
+# Record our selenium status
+# See eg
+# https://saucelabs.com/docs/additional-config
+# https://saucelabs.com/docs/status-images
+after_failure:
+  - >
+    curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": false}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
+
+after_success:
+  - >
+    curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": true}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}

@@ -3,6 +3,8 @@ Knockout Secure Binding (KSB)
 
  [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
 
+ [![Selenium Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
+
 Knockout Secure Binding (KSB) adds a binding provider that looks for the
 property `data-sbind`. It is a drop-in alternative to `data-bind`, but KSB
 does not violate the restrictions imposed by the default *script-src*

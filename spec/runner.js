@@ -157,7 +157,7 @@ function init_sauce_client() {
   capabilities["javascriptEnabled"] = true
   capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
   capabilities["tags"] = ["CI"]
-  capabilities["name"] = "Knockout Secure Binding"
+  capabilities["name"] = process.env.JOB_NAME || "Knockout Secure Binding"
 
   client = webdriverjs.remote({
     host: webdriver_host,
