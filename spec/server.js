@@ -100,8 +100,8 @@ server = http.createServer(function (request, response) {
 
 server.on("listening", function () {
     var uri = "http://" + server_host + ":" + server_port
-    console.log("\nServer:\t\t" + uri.bold.yellow)
-    console.log("Listening ...")
+    console.log("\n \u2699  Test server:\t\t" + uri.bold.yellow)
+    console.log(" \u2699  Listening ...")
 })
 
 // defer so our code finishes loading and any event handlers are bound.

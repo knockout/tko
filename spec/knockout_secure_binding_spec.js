@@ -11,11 +11,11 @@ describe("Knockout Secure Binding", function () {
         instance = new ko.secureBindingsProvider();
     })
 
-    it("Has a built-in delay", function (done) {
-      // we use this to make sure our test driver will actually
-      // work when the results are slow (who tests the testers?)
-      setTimeout(function () { done () }, 1000)
-    })
+    // it("Has a built-in delay", function (done) {
+    //   // we use this to make sure our test driver will actually
+    //   // work when the results are slow (who tests the testers?)
+    //   setTimeout(function () { done () }, 1000)
+    // })
 
     it("Has loaded knockout", function () {
         assert.property(window, 'ko')

@@ -23,7 +23,10 @@ var webdriverjs = require('webdriverjs'),
     client,
 
     // we use this for ensuring the document is loaded, below
-    expect_title = "Knockout Secure Binding - Local unit tests"
+    expect_title = "Knockout Secure Binding - Local unit tests",
+
+    webdriver_host = "localhost",
+    webdriver_port = 4445;
 
 
 capabilities = {
@@ -31,54 +34,29 @@ capabilities = {
 }
 
 
-if (process.env['SAUCE_USERNAME']) {
-  // use sauce; see
-  // eg http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
-  console.log("\nTesting with Sauce Labs".bold)
-
-  capabilities["build"] = process.env.TRAVIS_BUILD_NUMBER
-  capabilities["javascriptEnabled"] = true
-  capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
-  capabilities["tags"] = ["CI"]
-  capabilities["name"] = "Knockout Secure Binding"
-
-  client = webdriverjs.remote({
-    host: "localhost",
-    port: 4445,
-    user: process.env.SAUCE_USERNAME,
-    key: process.env.SAUCE_ACCESS_KEY,
-    desiredCapabilities: capabilities
-  })
-
-} else {
-  // don't forget to start chromedriver with:
-  //  $ chromedriver --url-base=/wd/hub
-  // see https://github.com/camme/webdriverjs/issues/113
-
-  console.log("\nTesting with local chromedriver".bold)
-  console.log("\nDon't forget to start chromedriver with" +
-              " $ chromedriver --url-base=/wd/hub".blue)
-
-  client = webdriverjs.remote({
-    host: "localhost",
-    port: 9515,
-    // logLevel: 'data',
-    desiredCapabilities: capabilities
-  })
-}
-
-
 process.on("SIGINT", function () {
+  function close_client() {
+    if (client) {
+      client.end(function () {
+        process.exit(1)
+      })
+    } else {
+      process.exit(1)
+    }
+  }
+
   console.log("\tCtrl-C received; shutting down browser".red)
-  client.end(function () {
-    process.exit(1)
-  })
+  if (server.instance) {
+    server.instance.close(close_client)
+  } else {
+    close_client()
+  }
 })
 
 
 function waitForExecute(script, callback, test_done, timeout) {
   if (!timeout) {
-    timeout = 150
+    timeout = 250
   }
 
   this.execute(script, null, function(err, res) {
@@ -103,7 +81,8 @@ function on_results(err, res) {
   }
 
   results = res.value;
-  console.log("\n\tBrowser test results\n".yellow)
+  console.log("\n\tBROWSER TEST RESULTS".yellow +
+              "\n\t--------------------\n".bold)
   results.results.forEach(function (result) {
     var state = result.state;
     if (state !== 'passed') {
@@ -148,5 +127,58 @@ function run_browser_tests() {
 }
 
 
+function init_chrome_client() {
+  // don't forget to start chromedriver with:
+  //  $ chromedriver --url-base=/wd/hub
+  // see https://github.com/camme/webdriverjs/issues/113
+
+  console.log(
+    "\n-----------------------------------------------------".bold +
+    "\n       Don't forget to start chromedriver with" +
+    "\n\n    $ chromedriver --url-base=/wd/hub --port=4445".bold.blue +
+    "\n\n-----------------------------------------------------".bold
+  )
+
+  client = webdriverjs.remote({
+    host: webdriver_host,
+    port: webdriver_port,
+    // logLevel: 'data',
+    desiredCapabilities: capabilities
+  })
+}
+
+
+function init_sauce_client() {
+  // use sauce; see
+  // eg http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
+  console.log("\nTesting with Sauce Labs".bold)
+
+  capabilities["build"] = process.env.TRAVIS_BUILD_NUMBER
+  capabilities["javascriptEnabled"] = true
+  capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
+  capabilities["tags"] = ["CI"]
+  capabilities["name"] = "Knockout Secure Binding"
+
+  client = webdriverjs.remote({
+    host: webdriver_host,
+    port: webdriver_port,
+    user: process.env.SAUCE_USERNAME,
+    key: process.env.SAUCE_ACCESS_KEY,
+    desiredCapabilities: capabilities
+  })
+}
+
+
+function init_client() {
+  if (process.env['SAUCE_USERNAME']) {
+    init_sauce_client()
+  } else {
+    init_chrome_client()
+  }
+
+  run_browser_tests()
+}
+
+
 // when the server is listening we run our tests
-server.instance.on("listening", run_browser_tests)
+server.instance.on("listening", init_client)
