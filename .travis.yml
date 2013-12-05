@@ -12,7 +12,7 @@ env:
     - JOB_NAME="Knockout Secure Binding"
   matrix:
     - BROWSER=chrome
-    # - BROWSER=firefox
+    # - BROWSER=firefox  # TODO
 
 # See:
 # https://saucelabs.com/opensource/travis
@@ -23,7 +23,7 @@ addons:
     username: "brianmhunt"
     access_key: "cd6ce1e2-070f-4cf2-81b9-b814fe2f4ea5"
 
-# Record our selenium status
+# Record our selenium status TODO
 # See eg
 # https://saucelabs.com/docs/additional-config
 # https://saucelabs.com/docs/status-images

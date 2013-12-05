@@ -22,22 +22,21 @@ Language
 The language used in the bindings is a proper superset of JSON, differing in that:
 
 1. the binding understands `undefined` keyword
-2. the binding looks up variables on `$data` or `$context`.
-
-Some examples of the `data-sbind` are below.
+2. the binding looks up variables on `$data` or `$context`
+3. strings may use single quotes
 
 The `data-sbind` differs from `data-bind` as follows:
 
 |           | `data-bind` | `data-sbind`
 | --- | --- | ---
 | Language  | Executes Javascript  | Parsed JSON-like language
-| Globals | Any | Must be added to the [Knockout binding context](http://knockoutjs.com/documentation/binding-context.html)
-| Function arguments  | Any | Arguments are not accepted
+| Globals | Accessible | Must be added to the [Knockout binding context](http://knockoutjs.com/documentation/binding-context.html)
+| Functions  | Accepts arbitrary arguments | Arguments are prohibited
 
 
-Objectives
+`data-sbind`
 ---
-The `data-sbind` parser is designed to accommodate bindings much like the
+The `data-sbind` parser is designed to accommodate bindings similar to
 regular `data-bind`.
 
 Here are some examples of valid values for `data-sbind`:
@@ -54,7 +53,10 @@ Here are some examples of valid values for `data-sbind`:
 The `data-sbind` binding provider uses Knockout's built-in bindings, so
 `text`, `foreach`, and the others should work as expected.
 
-Future bindings may expand our language to include:
+Roadmap
+---
+
+In the future our bindings may be expanded to include, for example:
 
 - Nested values in objects: `text: { x: value(), y: $element.id }`
 - Array numerical lookups: `text: value[0]`
@@ -62,28 +64,28 @@ Future bindings may expand our language to include:
 - Array variable lookups: `text: value[$index()]`
 - Compound array values: `text: value[0].abc`
 - Simple expressions: `text: x + y`
+- Simple comparisons: `css: { "xy": $index() < 4 }`
 
 
 Security implications
 ---
 
-The default binding provider for Knockout will not apply bindings when
-Content Security Policy prohibits the use of `new Function`.
+One cannot use the default `data-bind` provided by Knockout when a
+Content Security Policy prohibits unsafe evaluations (`eval`,
+`new Function`, `setTimeout(string)`, `setInterval(string)`).
 
-This is a worthwhile CSP prohibition. It prohibits Cross-site scripting (XSS). See e.g.
+Prohibiting unsafe evaluations with a Content Security Policy substantially reduces the risk
+of a cross-site scripting attack. See for example [Preventing XSS with Content Security Policy](http://benvinegar.github.io/csp-talk-2013/).
 
-* [Preventing XSS with Content Security Policy](http://benvinegar.github.io/csp-talk-2013/).
+By using `data-sbind` in place of `data-bind` one can continue use
+Knockout in an environment with a Content Security Policy.
 
-As well, KSB also prevents the execution of arbitrary code in a Knockout
-binding. A malicious user could execute `text: $.getScript('...')` in
-Knockout on a DOM element that is having bindings applied, but this will not succeed in KSB because:
+Independent of a Content Security Policy, KSB prevents the execution of arbitrary code in a Knockout binding. A malicious script such as
+`text: $.getScript('a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However this script
+will not execute in KSB because:
 
 1. The `$` is a global, and unless explicitly added to the binding context it will not be accessible;
-2. Functions in KSB do not accept arguments;
-3. A Content Security Policy can be enabled that prevents `script-src` from untrusted sources.
-
-Nevertheless, as you are undoubtedly aware, this is likely just one small
-piece of the security strategy applicable to your situation.
+2. Functions in KSB do not accept arguments.
 
 
 Usage
@@ -100,17 +102,21 @@ So this works:
 ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
 ```
 
-Keep in mind that if you are using an AMD loader, then KSB is exported (have a look at the example in the linked `classBindingProvider`).
+Keep in mind that if you are using an AMD loader, then KSB is exported
+(have a look at the example in the linked `classBindingProvider`).
 
 
 Tests
 ---
 
+You can run a standalone server with `node spec/server.js`. It will
+print the URL for the server to the console. You can connect
+to it with any browser and the tests will be executed.
+
 Automated tests with `chromedriver` can be initiated with
 `node spec/runner.js`.
-
-You can run a standalone server with `node spec/server.js`. It will
-print the URL for the server to the console.
+You will need to independently start `chromedriver` with
+`chromedriver --url-base=/wd/hub --port=4445`.
 
 
 Requires
@@ -118,7 +124,8 @@ Requires
 
 Knockout 2.0+
 
-KSB may use some ES5isms such as `Array.forEach`.
+KSB may use some ES5isms such as `Array.forEach`. In future we may
+use `defineProperty` or others.
 
 
 LICENSE
