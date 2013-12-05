@@ -99,12 +99,12 @@ Keep in mind that if you are using an AMD loader, then KSB is exported
 Tests
 ---
 
-You can run a standalone server with `node spec/server.js`. It will
+You can run a standalone server with `npm test`. It will
 print the URL for the server to the console. You can connect
 to it with any browser and the tests will be executed.
 
 Automated tests with `chromedriver` can be initiated with
-`node spec/runner.js`.
+`npm start`.
 You will need to independently start `chromedriver` with
 `chromedriver --url-base=/wd/hub --port=4445`.
 
