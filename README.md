@@ -15,56 +15,38 @@ This project exists because Knockout's `data-bind` uses `new Function` to
 parse bindings, as discussed in
 [knockout/knockout#903](https://github.com/knockout/knockout/issues/903).
 
+Using Knockout Secure Binding is as simple as changing `<div data-bind='text: value'></div>` to `<div data-sbind="text: value"></div>`.
 
-Language
+
+The `data-sbind` language
 ---
 
-The language used in the bindings is a proper superset of JSON, differing in that:
+The language used in `data-sbind` is a superset of JSON but a subset of Javascript. Let's call it the *sbind* language, for convenience.
 
-1. the binding understands `undefined` keyword
-2. the binding looks up variables on `$data` or `$context`
-3. strings may use single quotes
+The sbind language is closer to JSON than Javascript, so it's easier to describe its differences by comparing it to JSON. The sbind language differs from JSON in that:
 
-The `data-sbind` differs from `data-bind` as follows:
-
-|           | `data-bind` | `data-sbind`
-| --- | --- | ---
-| Language  | Executes Javascript  | Parsed JSON-like language
-| Globals | Accessible | Must be added to the [Knockout binding context](http://knockoutjs.com/documentation/binding-context.html)
-| Functions  | Accepts arbitrary arguments | Arguments are prohibited
+1. sbind understands the `undefined` keyword
+2. sbind looks up variables on `$data` or `$context` (in that order)
+3. a variable may be executed as a function, but it does not accept arguments
+4. strings in sbind may use single quotes
 
 
-`data-sbind`
----
-The `data-sbind` parser is designed to accommodate bindings similar to
-regular `data-bind`.
+**Examples**
 
 Here are some examples of valid values for `data-sbind`:
 
-- `text: value`
-- `text: "string"`
-- `text: { object: "string" }`
-- `foreach: [1, 2.1, true, false, null, undefined]`
-- `text: value()`
-- `text: $data.value()`
-- `text: $context.obj().value()`
-- `text: $element.id`
+- `text: value` -- variable lookup
+- `text: "string"` -- JSON value
+- `text: { object: "string" }` -- JSON object with constants
+- `foreach: [1, 2.1, true, false, null, undefined]` -- JSON array with
+    constants
+- `text: value()` -- variable lookup and execution
+- `text: $data.value()` -- execute nested variables
+- `text: $context.obj().value()` -- execute nested accessors
+- `text: $element.id` -- look up on the special `$element`
 
 The `data-sbind` binding provider uses Knockout's built-in bindings, so
-`text`, `foreach`, and the others should work as expected.
-
-Roadmap
----
-
-In the future our bindings may be expanded to include, for example:
-
-- Nested values in objects: `text: { x: value(), y: $element.id }`
-- Array numerical lookups: `text: value[0]`
-- Array string lookups: `text: value['x']`
-- Array variable lookups: `text: value[$index()]`
-- Compound array values: `text: value[0].abc`
-- Simple expressions: `text: x + y`
-- Simple comparisons: `css: { "xy": $index() < 4 }`
+`text`, `foreach`, and all the others should work as expected.
 
 
 Security implications
@@ -86,6 +68,14 @@ will not execute in KSB because:
 
 1. The `$` is a global, and unless explicitly added to the binding context it will not be accessible;
 2. Functions in KSB do not accept arguments.
+
+The `data-sbind` differs from `data-bind` as follows:
+
+|           | `data-bind` | `data-sbind`
+| --- | --- | ---
+| Language  | Executes Javascript  | Parsed JSON-like language
+| Globals | Accessible | Must be added to the [Knockout binding context](http://knockoutjs.com/documentation/binding-context.html)
+| Functions  | Accepts arbitrary arguments | Arguments are prohibited
 
 
 Usage
@@ -117,6 +107,20 @@ Automated tests with `chromedriver` can be initiated with
 `node spec/runner.js`.
 You will need to independently start `chromedriver` with
 `chromedriver --url-base=/wd/hub --port=4445`.
+
+
+Roadmap
+---
+
+In the future our bindings may be expanded to include, for example:
+
+- Nested values in objects: `text: { x: value(), y: $element.id }`
+- Array numerical lookups: `text: value[0]`
+- Array string lookups: `text: value['x']`
+- Array variable lookups: `text: value[$index()]`
+- Compound array values: `text: value[0].abc`
+- Simple expressions: `text: x + y`
+- Simple comparisons: `css: { "xy": $index() < 4 }`
 
 
 Requires
