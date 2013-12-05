@@ -12,7 +12,7 @@ env:
     - JOB_NAME="Knockout Secure Binding"
   matrix:
     - BROWSER=chrome
-    - BROWSER=firefox
+    # - BROWSER=firefox
 
 # See:
 # https://saucelabs.com/opensource/travis
@@ -27,10 +27,10 @@ addons:
 # See eg
 # https://saucelabs.com/docs/additional-config
 # https://saucelabs.com/docs/status-images
-after_failure:
-  - >
-    curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": false}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
+# after_failure:
+#   - >
+#     curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": false}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
 
-after_success:
-  - >
-    curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": true}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
+# after_success:
+#   - >
+#     curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": true}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
