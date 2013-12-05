@@ -7,7 +7,12 @@ branches:
 node_js:
   - "0.10"
 env:
-  - SERVER_PORT="8080" JOB_NAME="Knockout Secure Binding"
+  global:
+    - SERVER_PORT="8080"
+    - JOB_NAME="Knockout Secure Binding"
+  matrix:
+    - BROWSER=chrome
+    - BROWSER=firefox
 
 # See:
 # https://saucelabs.com/opensource/travis

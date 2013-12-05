@@ -30,7 +30,7 @@ var webdriver = require('wd'),
 
 
 capabilities = {
-  browserName: "chrome"
+  browserName: process.env.BROWSER || "chrome"
 }
 
 
