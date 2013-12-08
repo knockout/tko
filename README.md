@@ -1,5 +1,5 @@
-Knockout Secure Binding (KSB)
-=============================
+Knockout Secure Binding
+=======================
 
  [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
 
@@ -99,7 +99,8 @@ classBindingProvider)).
 
 **Options**
 
-The `ko.secureBindingsProvider` constructor accepts the options:
+The `ko.secureBindingsProvider` constructor accepts one argument,
+an object that may contain the following options:
 
 - `attribute` – the DOM attribute for the binding, defaults
     to `data-sbind`
