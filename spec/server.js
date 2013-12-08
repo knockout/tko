@@ -13,7 +13,8 @@ var http = require('http'),
     server_responses,
     policy_map,
     policy_list,
-    policy_string;
+    policy_string,
+    content_types;
 
 // change to this scripts directory for referencing paths
 process.chdir(__dirname)
@@ -72,6 +73,11 @@ server_responses = {
   }
 }
 
+content_types = {
+  '.css': "text/css",
+  ".js": "text/javascript"
+}
+
 // set up the server
 server = http.createServer(function (request, response) {
   var uri = url.parse(request.url).pathname,
@@ -84,6 +90,14 @@ server = http.createServer(function (request, response) {
     response.end();
     return
   }
+
+  if (!serve.headers) {
+    serve.headers = {}
+  }
+
+  serve.headers["Content-Type"] = content_types[
+    path.extname(serve.path)
+  ]
 
   console.log(" \u2712 200 ".green, request.url);
 
