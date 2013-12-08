@@ -153,6 +153,72 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
+    describe("The lookup of variables", function () {
+        it("accesses the context", function () {
+            var binding = "a: x",
+                context = { x: 'y' },
+                bindings = instance.parse(binding, null, context);
+            assert.equal(bindings.a(), "y");
+        })
+
+        it("accesses the globals", function () {
+            var binding = "a: z",
+                globals = { z: function () { } },
+                options = { globals: globals },
+                binder = new ko.secureBindingsProvider(options),
+                bindings = instance.parse(binding, null, {});
+            assert.equal(bindings.a(), globals.z)
+        })
+
+        it("accesses $data.value and value", function () {
+            var binding = "x: $data.value, y: value",
+                context = { '$data': { value: 42 }},
+                bindings = instance.parse(binding, null, context);
+            assert.equal(bindings.x(), 42)
+            assert.equal(bindings.y(), 42)
+        })
+
+        it("does not have access to `window` globals", function () {
+            var binding = "x: window, y: global, z: document",
+                bindings = instance.parse(binding, null, context);
+            assert.equal(bindings.x(), undefined)
+            assert.equal(bindings.y(), undefined)
+            assert.equal(bindings.z(), undefined)
+        })
+
+        it("recognizes $context", function () {
+            var binding = "x: $context.value, y: value",
+                context = { value: 42 },
+                bindings = instance.parse(binding, null, context);
+            assert.equal(bindings.x(), 42)
+            assert.equal(bindings.y(), 42)
+        })
+
+        it("recognizes $element", function () {
+            var binding = "x: $element.id",
+                node = { id: 42 },
+                bindings = instance.parse(binding, node, {});
+            assert.equal(bindings.x(), node.id)
+        })
+
+        it("accesses $data before $context", function () {
+            var binding = "x: value",
+                context = { value: 21, '$data': { value: 42 }},
+                bindings = instance.parse(binding, null, context);
+            assert.equal(bindings.x(), 42)
+        })
+
+        it("accesses $context before globals", function () {
+            var binding = "a: z",
+                context = { z: 42 },
+                globals = { z: 84 },
+                options = { globals: globals },
+                binder = new ko.secureBindingsProvider(options),
+                bindings = instance.parse(binding, null, context);
+            assert.equal(bindings.a(), 42)
+        })
+    })
+
     describe("the bindings parser", function () {
         it("parses bindings with JSON values", function () {
             var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
@@ -178,13 +244,6 @@ describe("Knockout Secure Binding", function () {
             assert.equal(value.y(), void 0);
         })
 
-        it("Looks up constant on the given context", function () {
-            var binding = "a: x",
-                context = { x: 'y' },
-                bindings = instance.parse(binding, null, context);
-            assert.equal(bindings.a(), "y");
-        })
-
         it("Parses single-quote strings", function () {
             var binding = "text: 'st\\'r'",
                 bindings = instance.parse(binding, null, {});
@@ -195,37 +254,6 @@ describe("Knockout Secure Binding", function () {
             var binding = "text: {object: 'string'}",
                 bindings = instance.parse(binding, null, {});
             assert.deepEqual(bindings.text(), { object: "string" })
-        })
-
-        it("Returns $data.value and value", function () {
-            var binding = "x: $data.value, y: value",
-                context = { '$data': { value: 42 }},
-                bindings = instance.parse(binding, null, context);
-            assert.equal(bindings.x(), 42)
-            assert.equal(bindings.y(), 42)
-        })
-
-        it("Recognizes $context", function () {
-            var binding = "x: $context.value, y: value",
-                context = { value: 42 },
-                bindings = instance.parse(binding, null, context);
-            assert.equal(bindings.x(), 42)
-            assert.equal(bindings.y(), 42)
-        })
-
-        it("Does not have access to globals", function () {
-            var binding = "x: window, y: global, z: document",
-                bindings = instance.parse(binding, null, context);
-            assert.equal(bindings.x(), undefined)
-            assert.equal(bindings.y(), undefined)
-            assert.equal(bindings.z(), undefined)
-        })
-
-        it("Recognizes $element", function () {
-            var binding = "x: $element.id",
-                node = { id: 42 },
-                bindings = instance.parse(binding, node, {});
-            assert.equal(bindings.x(), node.id)
         })
     })
 

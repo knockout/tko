@@ -11,6 +11,7 @@
     NAME_REX_N = new RegExp("_A-Za-z0-9]"),
     IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
     IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]"),
+    globals = {},
     identifier_strategies = {
         id: function (name, obj) {
             return obj ? obj[name] : void 0
@@ -20,22 +21,21 @@
         },
     }
 
-    function secureBindingsProvider(bindings, options) {
+    function secureBindingsProvider(options) {
         var existingProvider = new ko.bindingProvider();
         options = options || {};
 
         // override the attribute
         this.attribute = options.attribute || "data-sbind";
 
+        // set globals
+        globals = options.globals || {};
+
         // override the virtual attribute
         this.virtualAttribute = options.virtualAttribute || "ksb ";
 
-        // fallback to the existing binding provider
-        // if bindings are not found
-        this.fallback = options.fallback;
-
         // the binding classes -- defaults to ko bindingsHandlers
-        this.bindings = bindings || ko.bindingHandlers;
+        this.bindings = options.bindings || ko.bindingHandlers;
     }
 
     function registerBindings(newBindings) {
@@ -52,17 +52,44 @@
             result = value.indexOf(this.virtualAttribute) > -1;
         }
 
-        if (!result && this.fallback) {
-            result = existingProvider.nodeHasBindings(node);
+        return result;
+    }
+
+    // Return the $context, $context.$data, $element that corresponds
+    // to the function
+    function get_lookup_root(strategies, context, node) {
+        var name = strategies[0].name;
+
+        if (name === "$context") {
+            // unshift $context
+            strategies.shift()
+            return context
         }
 
-        return result;
+        if (name === "$element") {
+            // $element is the node bound
+            strategies.shift()
+            return node
+        }
+
+        if (context && context.$data
+            && Object.hasOwnProperty.call(context.$data, name)) {
+            // Return $data if the first-dotted value is defined
+            // emulates with(context){with(context.$data){...}}
+            return context.$data
+        }
+
+        if (context && Object.hasOwnProperty.call(context, name)) {
+            return context
+        }
+
+        return globals
     }
 
     // return a function that performs a lookup on context
     function make_accessor(string, context, node) {
         var keys = string.split("."),
-        strategies = [];
+            strategies = [];
 
         keys.forEach(function (key) {
             var name,
@@ -85,25 +112,7 @@
         });
 
         function identifierAccessor() {
-            var value;
-
-            if (strategies[0].name === "$context") {
-                // unshift $context
-                strategies.shift();
-                value = context;
-            } else if (strategies[0].name === "$element") {
-                // $element is the node bound
-                strategies.shift();
-                value = node;
-            } else if (context && context.$data) {
-                // Return $data if the first-dotted value is defined
-                // emulates with(context){with(context.$data){...}}
-                value = Object.hasOwnProperty.call(context.$data,
-                    strategies[0].name) ? context.$data : context;
-            } else {
-                // The default is the $context.
-                value = context;
-            }
+            var value = get_lookup_root(strategies, context, node);
 
             strategies.forEach(function (strategy) {
                 value = strategy.execute(strategy.name, value)
