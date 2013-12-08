@@ -93,7 +93,21 @@ ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
 ```
 
 Keep in mind that if you are using an AMD loader, then KSB is exported
-(have a look at the example in the linked `classBindingProvider`).
+(have a look at the example in [knockout-
+classBindingProvider](https://github.com/rniemeyer/knockout-
+classBindingProvider)).
+
+**Options**
+
+The `ko.secureBindingsProvider` constructor accepts the options:
+
+- `attribute` – the DOM attribute for the binding, defaults
+    to `data-sbind`
+
+- `globals` - Globals accessible in the attributes
+    (e.g. `_`, `$`, `moment`, ...)
+
+- `bindings` - The bindings to use, defaults to `ko.bindingHandlers`
 
 
 Tests
