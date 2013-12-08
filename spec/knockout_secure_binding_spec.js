@@ -217,6 +217,18 @@ describe("Knockout Secure Binding", function () {
                 bindings = instance.parse(binding, null, context);
             assert.equal(bindings.a(), 42)
         })
+
+        it("does not bleed globals", function () {
+            var binding = "a: z",
+                options_1 = { globals: { z: 168 } },
+                options_2 = { globals: {} },
+                binder_1 = new ko.secureBindingsProvider(options_1),
+                binder_2 = new ko.secureBindingsProvider(options_2),
+                bindings_1 = binder_1.parse(binding),
+                bindings_2 = binder_2.parse(binding);
+            assert.equal(bindings_1.a(), 168)
+            assert.equal(bindings_2.a(), undefined)
+        })
     })
 
     describe("the bindings parser", function () {
