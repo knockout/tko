@@ -56,7 +56,7 @@ server_responses = {
   "/sinon.js": {
     path: "../node_modules/sinon/pkg/sinon.js"
   },
-  "/knockout.js": {
+  "/knockout-latest.js": {
     path: "../node_modules/knockout/build/output/knockout-latest.debug.js"
   },
   "/knockout-secure-binding.js": {
@@ -65,10 +65,10 @@ server_responses = {
   "/knockout_secure_binding_spec.js": {
     path: "./knockout_secure_binding_spec.js"
   },
-  "/init-mocha": {
+  "/init-mocha.js": {
     path: "./init-mocha.js"
   },
-  "/run-mocha": {
+  "/run-mocha.js": {
     path: "./run-mocha.js"
   }
 }

@@ -27,31 +27,32 @@ module.exports = function (grunt) {
       },
     },
 
-    connect: {
-      server: {
-        options: {
-          port: 2310,
-          base: [
-          'node_modules/mocha/',
-          'node_modules/chai/',
-          'node_modules/sinon/pkg/',
-          'node_modules/knockout/build/output/',
-          'build/',
-          'spec/',
-          ],
-          keepalive: true,
-          middleware: function (connect, options) {
-            console.log("CONNECT", connect, "OPTIONS", options)
-            return [
-            connect.static(options.base),
-            function (req, res, next) {
-              console.log("REQ", req, "RES", res, "NEXT", next)
-            }
-            ]
-          }
-        }
-      }
-    }
+    // connect: {
+    //   server: {
+    //     options: {
+    //       port: 2310,
+    //       base: [
+    //       'node_modules/mocha/',
+    //       'node_modules/chai/',
+    //       'node_modules/sinon/pkg/',
+    //       'node_modules/knockout/build/output/',
+    //       'build/',
+    //       'spec/',
+    //       ],
+    //       keepalive: true,
+    //       middleware: function (connect, options) {
+    //         console.log("CONNECT", connect, "OPTIONS", options)
+    //         return [
+    //         connect.static(options.base),
+    //         function (req, res, next) {
+    //           console.log("REQ", req, "RES", res, "NEXT", next)
+    //           res.end('Hello from port ' + options.port)
+    //         }
+    //         ]
+    //       }
+    //     }
+    //   }
+    // }
   });
 
 
@@ -59,6 +60,11 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-watchify")
   grunt.loadNpmTasks('grunt-contrib-connect')
 
-
   grunt.registerTask("default", ['browserify'])
+
+  grunt.registerTask("server", "Start test server", function () {
+    var done = this.async()
+    grunt.log.write("Starting web server")
+    require("./spec/server.js").instance.on("close", done)
+  })
 };

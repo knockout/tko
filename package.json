@@ -9,8 +9,7 @@
     "wd": "~0.2.6",
     "grunt": "0.4.x",
     "grunt-browserify": "*",
-    "grunt-watchify": "*",
-    "grunt-contrib-connect": "~0.5.0"
+    "grunt-watchify": "*"
   },
   "main": "build/knockout-secure-binding.js",
   "licenses": {
