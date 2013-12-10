@@ -60,7 +60,7 @@ server_responses = {
     path: "../node_modules/knockout/build/output/knockout-latest.debug.js"
   },
   "/knockout-secure-binding.js": {
-    path: "../src/knockout-secure-binding.js"
+    path: "../build/knockout-secure-binding.js"
   },
   "/knockout_secure_binding_spec.js": {
     path: "./knockout_secure_binding_spec.js"
