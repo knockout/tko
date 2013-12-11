@@ -1,5 +1,20 @@
 module.exports = function (grunt) {
-  url = require('url')
+  require('colors')
+  var url = require('url'),
+      test_policy_map;
+
+  test_policy_map =
+    "default-src 'none'; \
+    font-src 'none'; \
+    frame-src 'none'; \
+    img-src 'none'; \
+    media-src 'none'; \
+    object-src 'none'; \
+    script-src 'self'; \
+    style-src 'self'; \
+    report-uri /csp".replace(/\s+/g, " ")
+
+// default-src 'none'; font-src 'none'; frame-src 'none'; img-src 'none'; media-src 'none'; object-src 'none'; script-src 'self'; style-src 'self'; report-uri /csp
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -29,7 +44,7 @@ module.exports = function (grunt) {
     },
 
     connect: { server: { options: {
-      port: 2310,
+      port: 7777,
       base: [
       'node_modules/mocha/',
       'node_modules/chai/',
@@ -42,9 +57,10 @@ module.exports = function (grunt) {
       middleware: function (connect, options) {
         middlewares = [
         function(req, res, next) {
-          if (url.parse(req.url).pathname.match(/\.html$/)) {
-            console.log("REQ URL", req.url)
-            req.headers['X-Content-Security-Policy'] = 'xyz'
+          console.log(req.method.blue, url.parse(req.url).pathname)
+          if (url.parse(req.url).pathname.match(/^\/$/)) {
+            req.url = req.url.replace("/", "/runner.html")
+            res.setHeader('Content-Security-Policy', test_policy_map)
           }
           next()
         }
@@ -62,10 +78,4 @@ grunt.loadNpmTasks("grunt-watchify")
 grunt.loadNpmTasks('grunt-contrib-connect')
 
 grunt.registerTask("default", ['browserify'])
-
-// grunt.registerTask("server", "Start test server", function () {
-//   var done = this.async()
-//   grunt.log.write("Starting web server")
-//   require("./spec/server.js").instance.on("close", done)
-// })
 };
