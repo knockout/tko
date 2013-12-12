@@ -16,6 +16,7 @@ module.exports = {
   server: {
    options: {
     port: 7777,
+    // keepalive: true,
     base: [
     'node_modules/mocha/',
     'node_modules/chai/',

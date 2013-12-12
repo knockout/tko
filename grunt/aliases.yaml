@@ -1,0 +1,15 @@
+---
+default:
+  - concat
+
+test:
+  - connect
+  - runner
+
+test-chromedriver:
+  - external_daemon:chromedriver
+  - connect
+  - runner
+
+server:
+  - connect:server:keepalive:true

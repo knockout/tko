@@ -15,7 +15,9 @@
     "grunt-external-daemon": "~1.1.0",
     "grunt-contrib-concat": "~0.3.0",
     "load-grunt-tasks": "~0.2.0",
-    "glob": "~3.2.7"
+    "glob": "~3.2.7",
+    "load-grunt-config": "~0.7.0",
+    "underscore": "~1.5.2"
   },
   "main": "build/knockout-secure-binding.js",
   "homepage": "https://github.com/brianmhunt/knockout-secure-binding",
