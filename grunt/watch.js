@@ -1,5 +1,5 @@
 module.exports = {
-    files: ['src/**/*.js'],
+    files: ['src/**/*.js', 'spec/*.js'],
     tasks: ['concat', 'jshint'],
     options: {
         livereload: true,
