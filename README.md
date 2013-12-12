@@ -82,9 +82,7 @@ Usage
 ---
 
 Custom Knockout binding providers follow the same general rules of
-application as [knockout-
-classBindingProvider](https://github.com/rniemeyer/knockout-
-classBindingProvider).
+application as [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider).
 
 So this works:
 
@@ -93,10 +91,7 @@ ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
 ```
 
 Keep in mind that if you are using an AMD loader, then KSB is exported
-(have a look at the example in [knockout-
-classBindingProvider](https://github.com/rniemeyer/knockout-
-classBindingProvider)).
-
+(have a look at the example in [knockout- classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider)).
 **Options**
 
 The `ko.secureBindingsProvider` constructor accepts one argument,
