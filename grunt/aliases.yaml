@@ -1,6 +1,8 @@
 ---
 default:
   - concat
+  - jshint
+  - uglify
 
 test:
   - connect

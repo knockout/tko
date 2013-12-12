@@ -11,6 +11,6 @@ module.exports = {
     'src/tail.js'
     ],
     // dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js',
-    dest: 'dist/<%= pkg.name %>.js',
+    dest: '<%= pkg.main %>',
   },
 }

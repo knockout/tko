@@ -7,17 +7,17 @@
  var NAME_REX_0 = new RegExp("[_A-Za-z]"),
  NAME_REX_N = new RegExp("_A-Za-z0-9]"),
  IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
- IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]"),
+ IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9.]"),
  globals = {},
  parse,
  identifier_strategies = {
     id: function (name, obj) {
-        return obj ? obj[name] : void 0
+        return obj ? obj[name] : void 0;
     },
     fn: function (name, obj) {
-        return obj ? obj[name]() : void 0
+        return obj ? obj[name]() : void 0;
     },
-}
+};
 
 /**
  * Return the $context, $context.$data, $element that corresponds
@@ -28,28 +28,28 @@ function get_lookup_root(strategies, context, node) {
 
     if (name === "$context") {
         // unshift $context
-        strategies.shift()
-        return context
+        strategies.shift();
+        return context;
     }
 
     if (name === "$element") {
         // $element is the node bound
-        strategies.shift()
-        return node
+        strategies.shift();
+        return node;
     }
 
-    if (context && context.$data
-        && Object.hasOwnProperty.call(context.$data, name)) {
+    if (context && context.$data &&
+        Object.hasOwnProperty.call(context.$data, name)) {
         // Return $data if the first-dotted value is defined
         // emulates with(context){with(context.$data){...}}
-        return context.$data
+        return context.$data;
     }
 
     if (context && Object.hasOwnProperty.call(context, name)) {
-        return context
+        return context;
     }
 
-    return globals
+    return globals;
 }
 
 /**
@@ -77,20 +77,20 @@ function make_accessor(string, context, node) {
         strategies.push({
             name: name,
             execute: identifier_strategies[strategy]
-        })
+        });
     });
 
     function identifierAccessor() {
         var value = get_lookup_root(strategies, context, node);
 
         strategies.forEach(function (strategy) {
-            value = strategy.execute(strategy.name, value)
-        })
+            value = strategy.execute(strategy.name, value);
+        });
 
-        return value
+        return value;
     }
 
-    return identifierAccessor
+    return identifierAccessor;
 }
 
 
@@ -142,7 +142,7 @@ var at,     // The index of the current character
                 return name;
             }
             name += ch;
-            next()
+            next();
         }
         return name;
     },
@@ -275,7 +275,7 @@ var at,     // The index of the current character
                 return lookup(node, context, id);
             }
             id += ch;
-            next()
+            next();
         }
         return lookup(node, context, id);
     },
@@ -344,12 +344,12 @@ var at,     // The index of the current character
         bindings = {};
         while (ch) {
             key = name();
-            white()
-            next(":")
+            white();
+            next(":");
             bindings[key] = value(node, context);
-            white()
+            white();
             if (ch) {
-                next(',')
+                next(',');
             }
         }
         return bindings;
@@ -384,10 +384,10 @@ var at,     // The index of the current character
         ko.utils.objectForEach(result, function (name, value) {
             if (typeof(value) != 'function') {
                 result[name] = function constAccessor() {
-                    return value
-                }
+                    return value;
+                };
             }
-        })
+        });
         return result;
     };
 }());

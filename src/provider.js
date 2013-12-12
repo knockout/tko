@@ -58,4 +58,4 @@ ko.utils.extend(secureBindingsProvider.prototype, {
     getBindingAccessors: getBindingAccessors,
     parse: parse,
     make_accessor: make_accessor,
-})
+});
