@@ -8,7 +8,7 @@ function secureBindingsProvider(options) {
     this.attribute = options.attribute || "data-sbind";
 
     // set globals
-    globals = options.globals || {};
+    this.globals = options.globals || {};
 
     // override the virtual attribute
     this.virtualAttribute = options.virtualAttribute || "ksb ";
@@ -46,7 +46,8 @@ function getBindingAccessors(node, context) {
     }
 
     if (sbind_string) {
-        bindings = parse(sbind_string, node, context);
+        bindings = new Parser(node, context, this.globals).parse(
+            sbind_string);
     }
 
     return bindings;
@@ -56,6 +57,5 @@ ko.utils.extend(secureBindingsProvider.prototype, {
     registerBindings: registerBindings,
     nodeHasBindings: nodeHasBindings,
     getBindingAccessors: getBindingAccessors,
-    parse: parse,
-    make_accessor: make_accessor,
+    Parser: Parser
 });
