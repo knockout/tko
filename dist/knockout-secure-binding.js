@@ -46,6 +46,7 @@ var Parser = (function () {
   function Parser(node, context, globals) {
     this.node = node;
     this.context = context;
+    this.globals = globals || {};
   }
 
   Parser.prototype.white = function () {
@@ -287,6 +288,7 @@ var Parser = (function () {
 
     if (context && context.$data &&
       Object.hasOwnProperty.call(context.$data, name)) {
+
       // Return $data if the first-dotted value is defined
       // emulates with(context){with(context.$data){...}}
       return context.$data;
@@ -302,7 +304,7 @@ var Parser = (function () {
   Parser.prototype.make_accessor = function (id) {
     var keys = id.split("."),
         strategies = [],
-        get_lookup_root = this.get_lookup_root;
+        get_lookup_root = this.get_lookup_root.bind(this);
 
     keys.forEach(function (key) {
         var name,
