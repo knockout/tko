@@ -46,7 +46,7 @@ function getBindingAccessors(node, context) {
     }
 
     if (sbind_string) {
-        bindings = parser.parse(sbind_string, node, context);
+        bindings = parse(sbind_string, node, context);
     }
 
     return bindings;
@@ -56,6 +56,6 @@ ko.utils.extend(secureBindingsProvider.prototype, {
     registerBindings: registerBindings,
     nodeHasBindings: nodeHasBindings,
     getBindingAccessors: getBindingAccessors,
-    parse: parser.parse,
-    make_accessor: parser.make_accessor,
+    parse: parse,
+    make_accessor: make_accessor,
 })

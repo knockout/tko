@@ -15,6 +15,7 @@ module.exports = {
     'src/provider.js',
     'src/tail.js'
     ],
-    dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js',
+    // dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js',
+    dest: 'dist/<%= pkg.name %>-latest.js',
   },
 }

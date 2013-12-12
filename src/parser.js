@@ -9,6 +9,7 @@
  IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
  IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9\.]"),
  globals = {},
+ parse,
  identifier_strategies = {
     id: function (name, obj) {
         return obj ? obj[name] : void 0
