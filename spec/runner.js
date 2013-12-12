@@ -14,13 +14,18 @@ require('colors')
 
 
 var webdriver = require('wd'),
-    server = require("./server"),
 
     // our webdriver desired capabilities
     capabilities,
 
     // what our webdriver may provide
     client,
+
+    // server config
+    server = {
+      host: 'localhost',
+      port: 7777
+    },
 
     // we use this for ensuring the document is loaded, below
     expect_title = "Knockout Secure Binding - Local unit tests",
@@ -112,13 +117,6 @@ function run_browser_tests() {
 
 
 function init_chrome_client() {
-  console.log(
-    "\n-----------------------------------------------------".bold +
-    "\n       Don't forget to start chromedriver with" +
-    "\n\n    $ chromedriver --url-base=/wd/hub --port=4445".bold.blue +
-    "\n\n-----------------------------------------------------".bold
-  )
-
   client = webdriver.remote({
     hostname: webdriver_host,
     port: webdriver_port,
@@ -167,6 +165,4 @@ function init_client() {
   run_browser_tests()
 }
 
-
-// when the server is listening we run our tests
-server.instance.on("listening", init_client)
+exports.init_client = init_client
