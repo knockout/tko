@@ -15,3 +15,7 @@ test-chromedriver:
 
 server:
   - connect:server:keepalive:true
+
+live:
+  - connect
+  - watch

@@ -7,7 +7,8 @@ frame-src 'none'; \
 img-src 'none'; \
 media-src 'none'; \
 object-src 'none'; \
-script-src 'self'; \
+script-src 'self' localhost:35729; \
+connect-src ws://localhost:35729; \
 style-src 'self'; \
 report-uri /csp".replace(/\s+/g, " ");
 
