@@ -49,10 +49,10 @@
   };
 
   Parser.prototype.next = function (c) {
-    if (c && C !== this.ch) {
+    if (c && c !== this.ch) {
       this.error("Expected '" + c + "' instead of '" + this.ch + "'");
     }
-    this.ch = text.charAt(this.at);
+    this.ch = this.text.charAt(this.at);
     this.at += 1;
     return this.ch;
   };
@@ -69,8 +69,10 @@
   Parser.prototype.name = function () {
     // A name of a binding
     // [_A-Za-z][_A-Za-z0-9]*
-    var name = '', ch = this.ch;
+    var name = '';
     this.white();
+
+    ch = this.ch;
 
     while (ch) {
       if (ch === ':' || ch === ' ') {
@@ -79,6 +81,7 @@
       name += ch;
       ch = this.next();
     }
+
     return name;
   };
 
@@ -159,69 +162,58 @@
     this.error("Bad object");
   };
 
-  Parser.prototype.string = function () {
-    var hex,
+
+  /**
+   * Read up to delim and return the string
+   * @param  {string} delim The delimiter, either ' or "
+   * @return {string}       The string read.
+   */
+  Parser.prototype.read_string = function (delim) {
+    var string = '',
+        hex,
         i,
-        string = '',
         uffff,
-        ch = this.ch;
-    if (ch === '"') {
-      ch = this.next();
-      while (ch) {
-        if (ch === '"') {
-          ch = this.next();
-          return string;
-        }
-        if (ch === '\\') {
-          ch = this.next();
-          if (ch === 'u') {
-            uffff = 0;
-            for (i = 0; i < 4; i += 1) {
-              hex = parseInt(ch = this.next(), 16);
-              if (!isFinite(hex)) {
-                break;
-              }
-              uffff = uffff * 16 + hex;
-            }
-            string += String.fromCharCode(uffff);
-          } else if (typeof escapee[ch] === 'string') {
-            string += escapee[ch];
-          } else {
-            break;
-          }
-        } else {
-          string += ch;
-        }
+        ch = this.next();
+
+    while (ch) {
+      if (ch === delim) {
+        ch = this.next();
+        return string;
       }
-    } else if (ch === "'") {
-      ch = this.next();
-      while (ch) {
-        if (ch === "'") {
-          ch = this.next();
-          return string;
-        }
-        if (ch === '\\') {
-          ch = this.next();
-          if (ch === 'u') {
-            uffff = 0;
-            for (i = 0; i < 4; i += 1) {
-              hex = parseInt(next(), 16);
-              if (!isFinite(hex)) {
-                break;
-              }
-              uffff = uffff * 16 + hex;
+      if (ch === '\\') {
+        ch = this.next();
+        if (ch === 'u') {
+          uffff = 0;
+          for (i = 0; i < 4; i += 1) {
+            hex = parseInt(ch = this.next(), 16);
+            if (!isFinite(hex)) {
+              break;
             }
-            string += String.fromCharCode(uffff);
-          } else if (typeof escapee[ch] === 'string') {
-            string += escapee[ch];
-          } else {
-            break;
+            uffff = uffff * 16 + hex;
           }
+          string += String.fromCharCode(uffff);
+        } else if (typeof escapee[ch] === 'string') {
+          string += escapee[ch];
         } else {
-          string += ch;
+          break;
         }
+      } else {
+        string += ch;
       }
+      ch = this.next();
     }
+
+    this.error("Bad string");
+  };
+
+  Parser.prototype.string = function () {
+    var ch = this.ch;
+    if (ch === '"') {
+      return this.read_string('"');
+    } else if (ch === "'") {
+      return this.read_string("'");
+    }
+
     this.error("Bad string");
   };
 
@@ -249,7 +241,9 @@
   };
 
   Parser.prototype.value = function () {
+    var ch;
     this.white();
+    ch = this.ch;
     switch (ch) {
       case '{': return this.object();
       case '[': return this.array();
@@ -298,9 +292,10 @@
     return this.globals;
   };
 
-  Parser.prototype.make_accessor = function () {
-    var keys = string.split("."),
-        strategies = [];
+  Parser.prototype.make_accessor = function (id) {
+    var keys = id.split("."),
+        strategies = [],
+        get_lookup_root = this.get_lookup_root;
 
     keys.forEach(function (key) {
         var name,
@@ -335,7 +330,7 @@
     return identifierAccessor;
   };
 
-  Parser.prototype.lookup = function () {
+  Parser.prototype.lookup = function (id) {
     switch (id) {
       case 'true': return true;
       case 'false': return false;
@@ -362,15 +357,20 @@
   };
 
   Parser.prototype.bindings = function () {
-    var key, bindings = {}, ch = this.ch;
+    var key,
+        bindings = {},
+        ch = this.ch;
+
     while (ch) {
       key = this.name();
       this.white();
       ch = this.next(":");
-      this.bindings[key] = this.value();
+      bindings[key] = this.value();
       this.white();
       if (this.ch) {
         ch = this.next(',');
+      } else {
+        ch = '';
       }
     }
     return bindings;
@@ -395,7 +395,7 @@
     result = this.bindings();
 
     this.white();
-    if (ch) {
+    if (this.ch) {
       this.error("Syntax Error");
     }
 

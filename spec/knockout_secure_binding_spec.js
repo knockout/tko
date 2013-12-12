@@ -75,21 +75,38 @@ describe("Knockout Secure Binding", function () {
         beforeEach(function() {
             ko.bindingProvider.instance = new ko.secureBindingsProvider()
             div = document.createElement("div");
-            div.setAttribute("data-sbind", 'alpha: "122.9"');
             instance.bindings.alpha = {
                 init: sinon.spy(),
                 update: sinon.spy()
             }
         });
 
-        it("returns a name/valueAccessor pair", function () {
+        it("reads multiple bindings", function () {
+            div.setAttribute("data-sbind", 'a: 123, b: "456"')
             var bindings = instance.getBindingAccessors(div);
-            assert.equal(Object.keys(bindings).length, 1)
-            assert.isFunction(bindings['alpha'])
-            assert.equal(bindings['alpha'](), "122.9")
+            assert.equal(Object.keys(bindings).length, 2, 'len')
+            assert.equal(bindings['a'](), 123, 'a')
+            assert.equal(bindings['b'](), "456", 'b')
+        });
+
+        it("escapes strings", function () {
+            div.setAttribute("data-sbind", 'a: "a\\"b", b: \'c\\\'d\'')
+            var bindings = instance.getBindingAccessors(div);
+            assert.equal(Object.keys(bindings).length, 2, 'len')
+            assert.equal(bindings['a'](), "a\"b", 'a')
+            assert.equal(bindings['b'](), "c\'d", 'b')
+        })
+
+        it("returns a name/valueAccessor pair", function () {
+            div.setAttribute("data-sbind", 'alpha: "122.9"');
+            var bindings = instance.getBindingAccessors(div);
+            assert.equal(Object.keys(bindings).length, 1, 'len')
+            assert.isFunction(bindings['alpha'], 'is accessor')
+            assert.equal(bindings['alpha'](), "122.9", '122.9')
         });
 
         it("becomes the valueAccessor", function () {
+            div.setAttribute("data-sbind", 'alpha: "122.9"');
             var i_spy = instance.bindings.alpha.init,
                 u_spy = instance.bindings.alpha.update,
                 args;
