@@ -1,81 +1,38 @@
 module.exports = function (grunt) {
-  require('colors')
-  var url = require('url'),
-      test_policy_map;
-
-  test_policy_map =
-    "default-src 'none'; \
-    font-src 'none'; \
-    frame-src 'none'; \
-    img-src 'none'; \
-    media-src 'none'; \
-    object-src 'none'; \
-    script-src 'self'; \
-    style-src 'self'; \
-    report-uri /csp".replace(/\s+/g, " ")
-
-// default-src 'none'; font-src 'none'; frame-src 'none'; img-src 'none'; media-src 'none'; object-src 'none'; script-src 'self'; style-src 'self'; report-uri /csp
-
-  grunt.initConfig({
+  // ref: http://www.thomasboyt.com/2013/09/01/maintainable-grunt.html
+  require('colors');
+  var config = {
     pkg: grunt.file.readJSON('package.json'),
+    env: process.env
+  }
 
-    browserify: {
-      dist: {
-        files: {
-          'build/knockout-secure-binding.js': ["src/**/*.js"]
-        },
-        shim: {
+  function loadConfig(path) {
+    var glob = require('glob');
+    var object = {};
+    var key;
 
-        }
-      }
-    },
+    glob.sync('*', {cwd: path}).forEach(function(option) {
+      key = option.replace(/\.js$/,'');
+      object[key] = require(path + option);
+    });
 
-    watchify: {
-      options: {
-        keepalive: true,
-        callback: function (b) {
-          return b
-        }
-      },
-      dist: {
-        src: './src/**/*.js',
-        dest: "build/knockout-secure-binding.js"
-      },
-    },
+    return object;
+  }
 
-    connect: { server: { options: {
-      port: 7777,
-      base: [
-      'node_modules/mocha/',
-      'node_modules/chai/',
-      'node_modules/sinon/pkg/',
-      'node_modules/knockout/build/output/',
-      'build/',
-      'spec/',
-      ],
-      keepalive: true,
-      middleware: function (connect, options) {
-        middlewares = [
-        function(req, res, next) {
-          console.log(req.method.blue, url.parse(req.url).pathname)
-          if (url.parse(req.url).pathname.match(/^\/$/)) {
-            req.url = req.url.replace("/", "/runner.html")
-            res.setHeader('Content-Security-Policy', test_policy_map)
-          }
-          next()
-        }
-        ]
-        options.base.forEach(function(base) {
-          middlewares.push(connect.static(base))
-        })
-        return middlewares
-      }}}
-    }
-  });
+  grunt.util._.extend(config, loadConfig('./tasks/options/'));
 
-grunt.loadNpmTasks("grunt-browserify")
-grunt.loadNpmTasks("grunt-watchify")
-grunt.loadNpmTasks('grunt-contrib-connect')
+  grunt.initConfig(config)
 
-grunt.registerTask("default", ['browserify'])
+  require('load-grunt-tasks')(grunt);
+
+  grunt.registerTask('runner', function () {
+    var done = this.async()
+    require('./spec/runner.js').init_client()
+  })
+  grunt.registerTask("server", "connect:server:keepalive:true")
+  grunt.registerTask("test-chromedriver", "Run tests with chromedriver",
+    ['external_daemon:chromedriver', 'connect', 'runner'])
+  grunt.registerTask("test", ['connect', 'runner'])
+  grunt.registerTask("default", ['concat'])
+
 };
