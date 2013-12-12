@@ -256,7 +256,7 @@ describe("Knockout Secure Binding", function () {
     describe("the bindings parser", function () {
         it("parses bindings with JSON values", function () {
             var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
-            value = instance.parse(binding_string);
+            value = new instance.Parser(null, {}).parse(binding_string);
             assert.equal(value.a(), "A", "string");
             assert.equal(value.b(), 1, "int");
             assert.equal(value.c(), 2.1, "float");
@@ -269,24 +269,28 @@ describe("Knockout Secure Binding", function () {
 
         it("Parses an array of JSON values", function () {
             var binding = "x: [1, 2.1, true, false, null, undefined]",
-                bindings = instance.parse(binding);
+                bindings = new instance.Parser(null, {}).parse(
+                    binding);
             assert.deepEqual(bindings.x(), [1, 2.1, true, false, null, undefined])
         })
 
         it("undefined keyword works", function () {
-            var value = instance.parse("y: undefined");
+            var value = new instance.Parser(null, {}).parse(
+                    "y: undefined");
             assert.equal(value.y(), void 0);
         })
 
         it("Parses single-quote strings", function () {
             var binding = "text: 'st\\'r'",
-                bindings = instance.parse(binding, null, {});
+                bindings = new instance.Parser(null, {}).parse(
+                    binding);
             assert.equal(bindings.text(), "st'r")
         })
 
         it("Parses text: {object: 'string'}", function () {
             var binding = "text: {object: 'string'}",
-                bindings = instance.parse(binding, null, {});
+                bindings = new instance.Parser(null, {}).parse(
+                    binding);
             assert.deepEqual(bindings.text(), { object: "string" })
         })
     })

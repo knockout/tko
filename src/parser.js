@@ -47,11 +47,12 @@
     while (ch && ch <= ' ') {
       ch = this.next();
     }
+    return ch;
   };
 
   Parser.prototype.next = function (c) {
     if (c && c !== this.ch) {
-      this.error("Expected '" + c + "' instead of '" + this.ch + "'");
+      this.error("Expected '" + c + "' but got '" + this.ch + "'");
     }
     this.ch = this.text.charAt(this.at);
     this.at += 1;
@@ -133,31 +134,31 @@
         ch = this.ch;
 
     if (ch === '{') {
-      ch = this.next('{');
-      this.white();
+      this.next('{');
+      ch = this.white();
       if (ch === '}') {
         ch = this.next('}');
         return object;
       }
       while (ch) {
         if (ch === '"' || ch === "'") {
-          key = string();
+          key = this.string();
         } else {
-          key = name();
+          key = this.name();
         }
         this.white();
         ch = this.next(':');
         if (Object.hasOwnProperty.call(object, key)) {
           this.error('Duplicate key "' + key + '"');
         }
-        object[key] = value();
-        this.white();
+        object[key] = this.value();
+        ch = this.white();
         if (ch === '}') {
           ch = this.next('}');
           return object;
         }
-        ch = this.next(',');
-        this.white();
+        this.next(',');
+        ch = this.white();
       }
     }
     this.error("Bad object");
@@ -219,7 +220,8 @@
   };
 
   Parser.prototype.array = function () {
-    var array = [], ch = this.ch;
+    var array = [],
+        ch = this.ch;
     if (ch === '[') {
       ch = this.next('[');
       this.white();
@@ -228,14 +230,14 @@
         return array;
       }
       while (ch) {
-        array.push(value());
-        this.white();
+        array.push(this.value());
+        ch = this.white();
         if (ch === ']') {
           ch = this.next(']');
           return array;
         }
-        ch = this.next(',');
-        this.white();
+        this.next(',');
+        ch = this.white();
       }
     }
     this.error("Bad array");
@@ -389,6 +391,11 @@
     return result;
   };
 
+  /**
+   * Get the bindings as name: accessor()
+   * @param  {string} source The binding string to parse.
+   * @return {object}        Map of name to accessor function.
+   */
   Parser.prototype.parse = function (source) {
     this.text = source;
     this.at = 0;
