@@ -1,7 +1,8 @@
 {
   "version": "0.0.6",
   "author": {
-    "name": "Brian M Hunt"
+    "name": "Brian M Hunt",
+    "email": "brianmhunt@gmail.com"
   },
   "name": "knockout-secure-binding",
   "devDependencies": {
@@ -27,7 +28,7 @@
   "homepage": "https://github.com/brianmhunt/knockout-secure-binding",
   "licenses": {
     "type": "MIT",
-    "url": "http://www.opensource.org/licenses/mit-license.php"
+    "url": "http://brianmhunt.mit-license.org/"
   },
   "repository": {
     "type": "git",
