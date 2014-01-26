@@ -158,12 +158,12 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
-    describe("Knockout's Text binding", function () {
+    describe("Knockout's bindings", function () {
         beforeEach(function () {
             ko.bindingProvider.instance = new ko.secureBindingsProvider()
         })
 
-        it("binds with data-sbind", function () {
+        it("binds Text with data-sbind", function () {
             var div = document.createElement("div")
             div.setAttribute("data-sbind", "text: obs")
             ko.applyBindings({obs: ko.observable("a towel")}, div)
@@ -178,7 +178,7 @@ describe("Knockout Secure Binding", function () {
             assert.equal(div.getAttribute("title"), context.aTitle)
         })
 
-        it("unwraps nested observables", function () {
+        it("sets attributes to observables in objects", function () {
             var div = document.createElement("div"),
                 context = { aTitle: ko.observable("petunia plant") };
             div.setAttribute("data-sbind", "attr: { title: aTitle }")
