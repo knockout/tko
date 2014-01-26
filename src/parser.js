@@ -1,8 +1,8 @@
 /**
- *
  * Originally based on (public domain):
  * https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
  */
+/* jshint -W083 */
 
  var Parser = (function () {
   var escapee = {
@@ -131,6 +131,7 @@
   Parser.prototype.object = function () {
     var key,
         object = {},
+        value,
         ch = this.ch;
 
     if (ch === '{') {
@@ -151,12 +152,26 @@
         if (Object.hasOwnProperty.call(object, key)) {
           this.error('Duplicate key "' + key + '"');
         }
-        object[key] = this.value();
+
+        value = this.value();
+
+        // Handle cases where object[key] is not a primitive.
+        if (value.name !== 'identifierAccessor') {
+          // primitives
+          object[key] = value;
+        } else {
+          Object.defineProperty(object, key, {
+            get: function () { return value(); },
+            enumerable: true
+          });
+        }
+
         ch = this.white();
         if (ch === '}') {
           ch = this.next('}');
           return object;
         }
+
         this.next(',');
         ch = this.white();
       }
@@ -380,6 +395,11 @@
     return bindings;
   };
 
+/**
+ * Convert result[name] from a value to a function (i.e. `valueAccessor()`)
+ * @param  {object} result [Map of top-level names to values]
+ * @return {object}        [Map of top-level names to functions]
+ */
   Parser.prototype.convert_to_accessors = function (result) {
     ko.utils.objectForEach(result, function (name, value) {
       if (typeof(value) != 'function') {
