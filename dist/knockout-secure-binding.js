@@ -407,7 +407,7 @@
             strategy,
             keyLen = key.length;
 
-        if (key.substr(keyLen - 2) == "()") {
+        if (key.substr(keyLen - 2) === "()") {
             // function
             name = key.slice(0, keyLen - 2);
             strategy = 'fn';
@@ -542,20 +542,20 @@
           lhs: root,
           op: op,
           rhs: value,
-        }
+        };
         leaf = root;
       } else {
         leaf.rhs = {
           lhs: leaf.rhs,
           op: op,
           rhs: value,
-        }
+        };
         leaf = leaf.rhs;
       }
     }
 
     return root;
-  }
+  };
 
   /**
    * Parse an expression – builds an operator tree, in something like
@@ -579,8 +579,8 @@
         nodes.push(this.value());
       }
       ch = this.white();
-      if (ch === ':' || ch === '}' || ch === ',' || ch === ']' || ch === ')'
-          || ch == '') {
+      if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
+          ch === ')' || ch === '') {
         break;
       }
       op = this.infix_operator();
@@ -590,11 +590,11 @@
       ch = this.white();
     }
 
-    if (nodes.length == 0) {
+    if (nodes.length === 0) {
       return undefined;
     }
 
-    if (nodes.length == 1) {
+    if (nodes.length === 1) {
       return nodes[0];
     }
 
@@ -608,8 +608,8 @@
     ch = this.white();
 
     while (ch) {
-      if (ch === ':' || ch === '}' || ch === ',' || ch === ' ' || ch === ']'
-          || ch == ')') {
+      if (ch === ':' || ch === '}' || ch === ',' || ch === ' ' ||
+          ch === ']' || ch === ')') {
         return this.lookup(id);
       }
       id += ch;
