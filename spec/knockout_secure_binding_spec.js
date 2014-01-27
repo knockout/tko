@@ -185,6 +185,17 @@ describe("Knockout Secure Binding", function () {
             ko.applyBindings(context, div)
             assert.equal(div.getAttribute("title"), context.aTitle())
         })
+
+        it("registers a click event", function () {
+            var div = document.createElement("div"),
+                called = false,
+                context = { cb: function () { called = true; } }
+            div.setAttribute("data-sbind", "click: cb")
+            ko.applyBindings(context, div)
+            assert.equal(called, false, "not called")
+            div.click()
+            assert.equal(called, true)
+        })
     })
 
     describe("The lookup of variables (get_lookup_root)", function () {
