@@ -112,7 +112,7 @@ Expressions
 KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table), namely:
 
 ```
-* / % + - < <= > >= in instanceof == != === !== && ||
+! * / % + - < <= > >= in instanceof == != === !== && ||
 ```
 
 Note that unlike the ordinary `data-bind`, if you refer to an item in an expression in `data-sbind` it will unwrap it. For example:

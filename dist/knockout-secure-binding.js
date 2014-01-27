@@ -392,8 +392,15 @@
    */
   Parser.prototype.make_accessor = function (id) {
     var keys = id.split("."),
+        negation = void 0,
         strategies = [],
         get_lookup_root = this.get_lookup_root.bind(this);
+
+    // negation operator(s)
+    while (keys[0][0] === '!') {
+      negation = !negation;
+      keys[0] = keys[0].substring(1);
+    }
 
     keys.forEach(function (key) {
         var name,
@@ -422,7 +429,13 @@
             value = strategy.execute(strategy.name, value);
         });
 
-        return value;
+        if (typeof(negation) == 'undefined') {
+          return value;
+        }
+
+        // !!observable only works if we unwrap the value, so if we saw a
+        // '!' we unwrap the result.
+        return negation ? !ko.unwrap(value) : ko.unwrap(value);
     }
 
     return identifierAccessor;

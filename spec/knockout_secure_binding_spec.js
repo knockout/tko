@@ -484,6 +484,37 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
+    describe("unary operations", function () {
+        it("include the negation operator", function () {
+            var binding = "neg: !a",
+                context = { a: ko.observable(false) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.neg(), true)
+            context.a(true);
+            assert.equal(bindings.neg(), false)
+        });
+
+        it("does the double negative", function () {
+            var binding = "neg: !!a",
+                context = { a: ko.observable(false) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.neg(), false)
+            context.a(true);
+            assert.equal(bindings.neg(), true)
+        });
+
+        it("works in an object", function () {
+            var binding = "neg: { x: !a, y: !!a }",
+                context = { a: ko.observable(false) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.neg().x, true)
+            assert.equal(bindings.neg().y, false)
+            context.a(true);
+            assert.equal(bindings.neg().x, false)
+            assert.equal(bindings.neg().y, true)
+        })
+    })
+
     // pluck to get elements from deep in an object.
     //
     // Our pluck is "softer" than a standard lookup in the sense that
