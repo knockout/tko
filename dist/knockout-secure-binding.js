@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.0.7 - 2014-1-26
+/*! knockout-secure-binding - v0.0.8 - 2014-1-27
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -137,10 +137,29 @@
     }
   };
 
+  /**
+   * Add a property to 'object' that equals the given value.
+   * @param  {Object} object The object to add the value to.
+   * @param  {String} key    object[key] is set to the given value.
+   * @param  {mixed}  value  The value, may be a primitive or a function. If a
+   *                         function it is unwrapped as a property.
+   */
+  Parser.prototype.object_add_value = function (object, key, value) {
+    if (typeof(value) !== 'function') {
+      // primitives
+      object[key] = value;
+    } else {
+      // Handle cases where object[key] is not a primitive.
+      Object.defineProperty(object, key, {
+        get: function () { return value(); },
+        enumerable: true
+      });
+    }
+  };
+
   Parser.prototype.object = function () {
     var key,
         object = {},
-        value,
         ch = this.ch;
 
     if (ch === '{') {
@@ -162,18 +181,7 @@
           this.error('Duplicate key "' + key + '"');
         }
 
-        value = this.value();
-
-        // Handle cases where object[key] is not a primitive.
-        if (value.name !== 'identifierAccessor') {
-          // primitives
-          object[key] = value;
-        } else {
-          Object.defineProperty(object, key, {
-            get: function () { return value(); },
-            enumerable: true
-          });
-        }
+        this.object_add_value(object, key, this.expression());
 
         ch = this.white();
         if (ch === '}') {
@@ -320,6 +328,11 @@
     return this.globals;
   };
 
+  /**
+   * Generate a function that looks up a value
+   * @param  {string} id  The value to be looked up e.g. x.y.z
+   * @return {function}   An accessor that returns the looked up value.
+   */
   Parser.prototype.make_accessor = function (id) {
     var keys = id.split("."),
         strategies = [],
@@ -364,10 +377,17 @@
       case 'false': return false;
       case 'null': return null;
       case 'undefined': return void 0;
-      default:
+      default: return this.make_accessor(id);
     }
+  };
 
-    return this.make_accessor(id);
+  /**
+   * Parse an expression – see
+   * @return {function}   A function that computes the value of the expression
+   *                      when called.
+   */
+  Parser.prototype.expression = function () {
+    return this.value();
   };
 
   Parser.prototype.identifier = function () {
@@ -393,7 +413,7 @@
       key = this.name();
       this.white();
       ch = this.next(":");
-      bindings[key] = this.value();
+      bindings[key] = this.expression();
       this.white();
       if (this.ch) {
         ch = this.next(',');

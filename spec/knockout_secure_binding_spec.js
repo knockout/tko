@@ -17,7 +17,7 @@ describe("Knockout Secure Binding", function () {
     //   setTimeout(function () { done () }, 1000)
     // })
 
-    it("Has loaded knockout", function () {
+    it("has loaded knockout", function () {
         assert.property(window, 'ko')
     })
 
@@ -284,7 +284,7 @@ describe("Knockout Secure Binding", function () {
             assert.equal(value.n(), null, "null");
         })
 
-        it("Parses an array of JSON values", function () {
+        it("parses an array of JSON values", function () {
             var binding = "x: [1, 2.1, true, false, null, undefined]",
                 bindings = new instance.Parser(null, {}).parse(
                     binding);
@@ -297,31 +297,39 @@ describe("Knockout Secure Binding", function () {
             assert.equal(value.y(), void 0);
         })
 
-        it("Parses single-quote strings", function () {
+        it("parses single-quote strings", function () {
             var binding = "text: 'st\\'r'",
                 bindings = new instance.Parser(null, {}).parse(
                     binding);
             assert.equal(bindings.text(), "st'r")
         })
 
-        it("Parses text: {object: 'string'}", function () {
+        it("parses text: {object: 'string'}", function () {
             var binding = "text: {object: 'string'}",
                 bindings = new instance.Parser(null, {}).parse(binding);
             assert.deepEqual(bindings.text(), { object: "string" })
         })
 
-        it("Parses object: attr: {name: value}", function () {
+        it("parses object: attr: {name: value}", function () {
             var binding = "attr: { klass: kValue }",
                 context = { kValue: 'Sam' }
                 bindings= new instance.Parser(null, context).parse(binding);
             assert.equal(bindings.attr().klass, 'Sam')
         })
 
-        it("Parses object: attr: {name: ko.observable(value)}", function () {
+        it("parses object: attr: {name: ko.observable(value)}", function () {
             var binding = "attr : { klass: kValue }",
                 context = { kValue: ko.observable('Gollum') }
                 bindings= new instance.Parser(null, context).parse(binding);
             assert.equal(bindings.attr().klass(), 'Gollum')
+        })
+
+        it("parses object: attr: {n1: v1, n2: v2}", function () {
+            var binding = "attr : { a: x, b: y }",
+                context = { x: 'Real', y: 'Imaginary' }
+                bindings= new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.attr().a, 'Real')
+            assert.equal(bindings.attr().b, 'Imaginary')
         })
     })
 
