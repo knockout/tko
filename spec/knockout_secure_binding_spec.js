@@ -270,6 +270,63 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
+    describe("the expression_nodes_to_tree function", function () {
+        var nodes_to_tree,
+            operators;
+
+        beforeEach(function () {
+            nodes_to_tree = instance.Parser.prototype.expression_nodes_to_tree;
+            operators = instance.Parser.operators;
+        })
+
+        it("converts a simple array to a tree", function () {
+            var nodes = ['a', operators['*'], 'b'],
+                tree = nodes_to_tree(nodes);
+            assert.equal(tree.lhs, 'a');
+            assert.equal(tree.rhs, 'b');
+            assert.equal(tree.op, operators['*']);
+        });
+
+        it("converts multiple * to a tree", function () {
+            var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
+                tree = nodes_to_tree(nodes);
+            assert.equal(tree.lhs, 'a');
+            assert.equal(tree.op, operators['*']);
+            assert.equal(tree.rhs.lhs, 'b');
+            assert.equal(tree.rhs.op, operators['/']);
+            assert.equal(tree.rhs.rhs, 'c');
+        });
+
+        it("Converts a complex set as expected", function () {
+            var nodes = [
+                'a', operators['*'], 'b',
+                operators['+'],
+                'c', operators['*'], 'd', operators['*'], 'e',
+                operators['>'],
+                'f', operators['+'], 'g', operators['%'], 'h',
+            ],
+                root = nodes_to_tree(nodes);
+            assert.equal(root.op, operators['>'], '>')
+
+            assert.equal(root.lhs.op, operators['+'], '+')
+            assert.equal(root.lhs.lhs.op, operators['*'], '*')
+            assert.equal(root.lhs.lhs.lhs, 'a')
+            assert.equal(root.lhs.lhs.rhs, 'b')
+
+            assert.equal(root.lhs.rhs.op, operators['*'], '*')
+            assert.equal(root.lhs.rhs.lhs, 'c')
+            assert.equal(root.lhs.rhs.rhs.lhs, 'd')
+            assert.equal(root.lhs.rhs.rhs.rhs, 'e')
+
+            assert.equal(root.rhs.op, operators['+'], 'rhs +')
+            assert.equal(root.rhs.lhs, 'f')
+
+            assert.equal(root.rhs.rhs.op, operators['%'])
+            assert.equal(root.rhs.rhs.lhs, 'g')
+            assert.equal(root.rhs.rhs.rhs, 'h')
+        });
+    })
+
     describe("the bindings parser", function () {
         it("parses bindings with JSON values", function () {
             var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
@@ -330,6 +387,89 @@ describe("Knockout Secure Binding", function () {
                 bindings= new instance.Parser(null, context).parse(binding);
             assert.equal(bindings.attr().a, 'Real')
             assert.equal(bindings.attr().b, 'Imaginary')
+        })
+    })
+
+    describe("the parsing of expressions", function () {
+        it("works with explicit braces ( )", function () {
+            var binding = "attr : (x)",
+                context = { x: 'spot' }
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.attr(), 'spot')
+        })
+
+        it("computes a + b", function () {
+            var binding = "text: a + b",
+                context = { a: 1, b: 2 },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text(), 3);
+        })
+
+        it("computes obs(a) + obs(b)", function () {
+            var binding = "text: a + b",
+                context = { a: ko.observable(1), b: ko.observable(2) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text(), 3);
+        })
+
+        it("computes a + b * c", function () {
+            var binding = "text: a + b * c",
+                context = { a: 1, b: 2, c: 4 },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text(), 1 + 2 * 4);
+        })
+
+        it("compares a + 3 > b * obs(c)", function () {
+            var binding = "text: a + 3 > b * c",
+                context = { a: 1, b: 2, c: ko.observable(4) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text(), 1 + 3 > 2 * 4);
+        })
+
+        it("computes complex arithematic as expected", function () {
+            var binding = "text: 1 * 4 % 3 + 11 * 99 / (8 - 14)",
+                bindings = new instance.Parser(null, {}).parse(binding);
+            assert.equal(bindings.text(), 1 * 4 % 3 + 11 * 99 / (8 - 14));
+            // == -180.5
+        })
+
+        it("recalculates observables", function () {
+            var binding = "text: a - b",
+                context = { a: ko.observable(1), b: ko.observable(2) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text(), -1);
+            context.a(2)
+            assert.equal(bindings.text(), 0);
+        })
+
+        it("sets properties of objects", function () {
+            var binding = "text: { x: 3 < 1, y: a < b }",
+                context = { a: ko.observable(1), b: ko.observable(2) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text().x, false);
+            assert.equal(bindings.text().y, true);
+            context.a(3)
+            assert.equal(bindings.text().y, false);
+        })
+
+        it("has working logic operations", function () {
+            var binding = "text: a || b",
+                context = { a: ko.observable(false), b: ko.observable(false) },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.equal(bindings.text(), false);
+            context.a(true)
+            assert.equal(bindings.text(), true);
+            context.a(false)
+            assert.equal(bindings.text(), false);
+            context.b(true)
+            assert.equal(bindings.text(), true);
+        })
+
+        it("does not unwrap a single observable argument", function () {
+            var binding = "text: a",
+                context = { a: ko.observable() },
+                bindings = new instance.Parser(null, context).parse(binding);
+            assert.ok(ko.isObservable(bindings.text()))
         })
     })
 

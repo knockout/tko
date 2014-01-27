@@ -44,6 +44,8 @@ Here are some examples of valid values for `data-sbind`:
 - `text: $data.value()` -- execute nested variables
 - `text: $context.obj().value()` -- execute nested accessors
 - `text: $element.id` -- look up on the special `$element`
+- `text: x + y`
+- `css: { "xy": $index() < 4 }`
 
 The `data-sbind` binding provider uses Knockout's built-in bindings, so
 `text`, `foreach`, and all the others should work as expected.
@@ -104,6 +106,27 @@ an object that may contain the following options:
 
 For example, `ko.secureBindingsProvider({ globals: { "$": jQuery }})`.
 
+Expressions
+---
+
+KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table), namely:
+
+```
+* / % + - < <= > >= in instanceof == != === !== && ||
+```
+
+Note that unlike the ordinary `data-bind`, if you refer to an item in an expression in `data-sbind` it will unwrap it. For example:
+
+```
+text: a > b
+```
+
+In Knockout if `a` and `b` are observables the comparison will not work as expected. However KSB will unwrap both `a` and `b` before the comparison. This is purely a convenience.
+
+If the varaible referred to is not part of an expression (e.g. `text: a`) then the variable will not be unwrapped before being passed to a binding. This is the expected behaviour.
+
+
+
 Tests
 ---
 
@@ -127,8 +150,6 @@ In the future our bindings may be expanded to include, for example:
 - Array string lookups: `text: value['x']`
 - Array variable lookups: `text: value[$index()]`
 - Compound array values: `text: value[0].abc`
-- Simple expressions: `text: x + y`
-- Simple comparisons: `css: { "xy": $index() < 4 }`
 
 
 Requires
@@ -136,8 +157,11 @@ Requires
 
 Knockout 2.0+
 
-KSB may use some ES5isms such as `Array.forEach`. In future we may
-use `defineProperty` or others.
+KSB uses some ES5 functions, namely:
+
+- `Array::forEach` and `Array::some`
+- `Function::bind`
+- `Object::defineProperty`
 
 
 LICENSE

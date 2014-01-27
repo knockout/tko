@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.0.8 - 2014-1-27
+/*! knockout-secure-binding - v0.0.9 - 2014-1-27
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -25,10 +25,7 @@
     r:    '\r',
     t:    '\t'
   },
-  NAME_REX_0 = new RegExp("[_A-Za-z]"),
-  NAME_REX_N = new RegExp("_A-Za-z0-9]"),
-  IDENTIFIER_REX_0 = new RegExp("_A-Za-z]"),
-  IDENTIFIER_REX_N = new RegExp("_A-Za-z0-9.]"),
+
   identifier_strategies = {
     id: function (name, obj) {
       return obj ? obj[name] : void 0;
@@ -36,7 +33,65 @@
     fn: function (name, obj) {
       return obj ? obj[name]() : void 0;
     },
+  },
+
+  prefix_ops = {
+    '!': function (v) { return !v; },
+    '~': function (v) { return ~v; },
+    '-': function (v) { return -v; },
+  },
+
+  operators = {
+    // mul/div
+    '*': function (a, b) { return a * b; },
+    '/': function (a, b) { return a / b; },
+    '%': function (a, b) { return a % b; },
+    // sub/add
+    '+': function (a, b) { return a + b; },
+    '-': function (a, b) { return a - b; },
+    // relational
+    '<': function (a, b) { return a < b; },
+    '<=': function (a, b) { return a <= b; },
+    '>': function (a, b) { return a > b; },
+    '>=': function (a, b) { return a >= b; },
+    'in': function (a, b) { return a in b; },
+    'instanceof': function (a, b) { return a instanceof b; },
+    // equality
+    '==': function (a, b) { return a == b; },
+    '!=': function (a, b) { return a != b; },
+    '===': function (a, b) { return a === b; },
+    '!==': function (a, b) { return a !== b; },
+    // logic
+    '&&': function (a, b) { return a && b; },
+    '||': function (a, b) { return a || b; },
   };
+
+  /* In order of precedence, see:
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
+  */
+    // multiply/divide/mod
+  operators['*'].precedence = 5;
+  operators['/'].precedence = 5;
+  operators['%'].precedence = 5;
+    // add/sub
+  operators['+'].precedence = 6;
+  operators['-'].precedence = 6;
+    // relational
+  operators['<'].precedence = 8;
+  operators['<='].precedence = 8;
+  operators['>'].precedence = 8;
+  operators['>='].precedence = 8;
+  operators['in'].precedence = 8;
+  operators['instanceof'].precedence = 8;
+    // equality
+  operators['=='].precedence = 9;
+  operators['!='].precedence = 9;
+  operators['==='].precedence = 9;
+  operators['!=='].precedence = 9;
+    // logic
+  operators['&&'].precedence = 13;
+  operators['||'].precedence = 14;
+
 
   /**
    * Construct a new Parser instance with new Parser(node, context)
@@ -50,6 +105,8 @@
     this.context = context;
     this.globals = globals || {};
   }
+
+  Parser.operators = operators;
 
   Parser.prototype.white = function () {
     var ch = this.ch;
@@ -262,7 +319,7 @@
         return array;
       }
       while (ch) {
-        array.push(this.value());
+        array.push(this.expression());
         ch = this.white();
         if (ch === ']') {
           ch = this.next(']');
@@ -340,8 +397,8 @@
 
     keys.forEach(function (key) {
         var name,
-        strategy,
-        keyLen = key.length;
+            strategy,
+            keyLen = key.length;
 
         if (key.substr(keyLen - 2) == "()") {
             // function
@@ -382,20 +439,164 @@
   };
 
   /**
-   * Parse an expression – see
+   * Get the function for the given operator.
+   * A `.precedence` value is added to the function, with increasing
+   * precedence having a higher number.
+   * @return {function} The function that performs the infix operation
+   */
+  Parser.prototype.infix_operator = function () {
+    var op = '',
+        op_fn,
+        ch = this.white();
+
+    while (ch) {
+      if (ch == ' ') {
+        break;
+      }
+      op += ch;
+      ch = this.next();
+    }
+
+    op_fn = operators[op];
+
+    if (!op_fn) {
+      this.error("Bad operator: '" + op + "'.");
+    }
+
+    return op_fn;
+  };
+
+  /**
+   * Return a function that calculates and returns an expression when called.
+   * @param  {array} ops  The operations to perform
+   * @return {function}   The function that calculates the expression.
+   */
+  Parser.prototype.make_expression_accessor = function (root) {
+    function node_value(node) {
+      var lhs, rhs;
+      if (typeof(node) === 'function') {
+        // Expressions on observables are nonsensical, so we unwrap any
+        // function values (e.g. identifiers).
+        return ko.unwrap(node());
+      }
+      if (typeof(node) !== 'object') {
+        return node;
+      }
+      lhs = node.lhs;
+      rhs = node.rhs;
+      // The node could be a regular object - weird though that may be.
+      // If it has a 'rhs', 'llhs' and 'op' properties, we take it as a node.
+      //  ^^^ TODO/FIXME - Practical, but arbitrary & perhaps not strict enough.
+      if (lhs && rhs && node.op) {
+        return node.op(node_value(lhs), node_value(rhs));
+      }
+      return node;
+    }
+    function expressionAccessor() {
+      return node_value(root);
+    }
+    return expressionAccessor;
+  };
+
+  /**
+   *  Convert an array of nodes to an executable tree.
+   *  @return {object} An object with a `lhs`, `rhs` and `op` key, corresponding
+   *                      to the left hand side, right hand side, and
+   *                      operation function.
+   */
+  Parser.prototype.expression_nodes_to_tree = function (nodes) {
+    var root,
+        leaf,
+        op,
+        value;
+
+    // primer
+    leaf = root = {
+      lhs: nodes.shift(),
+      op: nodes.shift(),
+      rhs: nodes.shift(),
+    };
+
+    while (nodes) {
+      op = nodes.shift();
+      value = nodes.shift();
+      if (!op) {
+        return root;
+      }
+      if (op.precedence > root.op.precedence) {
+        // rebase
+        root = {
+          lhs: root,
+          op: op,
+          rhs: value,
+        }
+        leaf = root;
+      } else {
+        leaf.rhs = {
+          lhs: leaf.rhs,
+          op: op,
+          rhs: value,
+        }
+        leaf = leaf.rhs;
+      }
+    }
+
+    return root;
+  }
+
+  /**
+   * Parse an expression – builds an operator tree, in something like
+   * Shunting-Yard.
+   *   See: http://en.wikipedia.org/wiki/Shunting-yard_algorithm
+   *
    * @return {function}   A function that computes the value of the expression
-   *                      when called.
+   *                      when called or a primitive.
    */
   Parser.prototype.expression = function () {
-    return this.value();
+    var root,
+        nodes = [],
+        ch = this.white();
+
+    while (ch) {
+      if (ch === '(') {
+        this.next();
+        nodes.push(this.expression());
+        this.next(')');
+      } else {
+        nodes.push(this.value());
+      }
+      ch = this.white();
+      if (ch === ':' || ch === '}' || ch === ',' || ch === ']' || ch === ')'
+          || ch == '') {
+        break;
+      }
+      op = this.infix_operator();
+      if (op) {
+        nodes.push(op);
+      }
+      ch = this.white();
+    }
+
+    if (nodes.length == 0) {
+      return undefined;
+    }
+
+    if (nodes.length == 1) {
+      return nodes[0];
+    }
+
+    return this.make_expression_accessor(
+      this.expression_nodes_to_tree(nodes)
+    );
   };
 
   Parser.prototype.identifier = function () {
-    var id = '', ch = this.ch;
-    this.white();
+    var id = '', ch;
+    ch = this.white();
 
     while (ch) {
-      if (ch === ':' || ch === '}' || ch === ',' || ch === ' ' || ch === ']') {
+      if (ch === ':' || ch === '}' || ch === ',' || ch === ' ' || ch === ']'
+          || ch == ')') {
         return this.lookup(id);
       }
       id += ch;
@@ -428,6 +629,9 @@
  * Convert result[name] from a value to a function (i.e. `valueAccessor()`)
  * @param  {object} result [Map of top-level names to values]
  * @return {object}        [Map of top-level names to functions]
+ *
+ * Accessors may be one of constAccessor (below), identifierAccessor or
+ * expressionAccessor.
  */
   Parser.prototype.convert_to_accessors = function (result) {
     ko.utils.objectForEach(result, function (name, value) {
