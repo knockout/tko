@@ -98,7 +98,7 @@ var Node = (function () {
       node = node.rhs;
     }
 
-    return node.get_node_value()
+    return value;
   };
 
   Node.prototype.get_leaf_value = function (leaf) {
@@ -136,12 +136,15 @@ var Node = (function () {
   Node.prototype.get_node_value = function () {
     var lhs, rhs;
 
-    if (this.op === operators['.'] || this.op.operator === operators['[]']) {
+    if (this.op === operators['.']) {
       return this.identifier_value();
     }
-
-    lhs = this.get_leaf_value(this.lhs);
-    rhs = this.get_leaf_value(this.rhs);
+    if (this.op.operator === operators['[]']) {
+      lhs = this.identifier_value();
+    } else {
+      lhs = this.get_leaf_value(this.lhs);
+      rhs = this.get_leaf_value(this.rhs);
+    }
 
     return this.op(lhs, rhs);
   };
@@ -169,6 +172,8 @@ var Expression = (function () {
         leaf,
         op,
         value;
+
+    console.log("build_tree", nodes)
 
     // primer
     leaf = root = new Node(nodes.shift(), nodes.shift(), nodes.shift());

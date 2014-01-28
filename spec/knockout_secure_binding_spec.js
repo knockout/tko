@@ -321,7 +321,7 @@ describe("Knockout Secure Binding", function () {
             assert.equal(tree.lhs, 'a');
             assert.equal(tree.rhs, 'b');
             assert.equal(tree.op, operators['*']);
-        });
+        })
 
         it("converts multiple * to a tree", function () {
             var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
@@ -331,9 +331,9 @@ describe("Knockout Secure Binding", function () {
             assert.equal(tree.rhs.lhs, 'b');
             assert.equal(tree.rhs.op, operators['/']);
             assert.equal(tree.rhs.rhs, 'c');
-        });
+        })
 
-        it("Converts a complex set as expected", function () {
+        it("converts a complex set as expected", function () {
             var nodes = [
                 'a', operators['*'], 'b',
                 operators['+'],
@@ -360,7 +360,40 @@ describe("Knockout Secure Binding", function () {
             assert.equal(root.rhs.rhs.op, operators['%'])
             assert.equal(root.rhs.rhs.lhs, 'g')
             assert.equal(root.rhs.rhs.rhs, 'h')
-        });
+        })
+
+        it("converts function calls (a())", function () {
+            var context = { x: function () { } },
+                parser = new Parser(null, context),
+                nodes = [
+                Identifier('x', parser),
+                operators['()'],
+                undefined
+            ],
+                root = nodes_to_tree(nodes);
+
+            assert.equal(root.lhs, nodes[0])
+            assert.equal(root.op, operators['()'])
+        })
+
+        it("converts a string of function calls (a().b())", function () {
+            var context = { x: function () { return { y: function () {}} } },
+                parser = new Parser(null, context),
+                nodes = [
+                Identifier('x', parser),
+                operators['()'],
+                undefined,
+                operators('.'),
+                Identifier('y', parser),
+                operators['()']
+            ],
+                root = nodes_to_tree(nodes);
+
+            assert.equal(root.lhs, nodes[0])
+            assert.equal(root.op, operators['()'])
+            assert.equal(root.rhs.lhs, nodes)
+        })
+
     })
 
     describe("the bindings parser", function () {
@@ -506,6 +539,15 @@ describe("Knockout Secure Binding", function () {
                 context = { a: ko.observable() },
                 bindings = new Parser(null, context).parse(binding);
             assert.ok(ko.isObservable(bindings.text()))
+        })
+
+        it("parses a string of functions a().b()", function () {
+            var binding = "ref: a().b()",
+                b = function () { return 'Cee' },
+                a = function () { return b },
+                context = { a: a },
+                bindings = new Parser(null, context).parse(binding);
+            assert.ok(bindings.ref(), 'Cee')
         })
     })
 
