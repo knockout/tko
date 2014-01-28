@@ -6,6 +6,8 @@ module.exports = {
   dist: {
     src: [
     'src/head.js',
+    'src/identifier.js',
+    'src/expression.js',
     'src/parser.js',
     'src/provider.js',
     'src/tail.js'

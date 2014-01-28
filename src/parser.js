@@ -16,73 +16,7 @@
     r:    '\r',
     t:    '\t'
   },
-
-  identifier_strategies = {
-    id: function (name, obj) {
-      return obj ? obj[name] : void 0;
-    },
-    fn: function (name, obj) {
-      return obj ? obj[name]() : void 0;
-    },
-  },
-
-  prefix_ops = {
-    '!': function (v) { return !v; },
-    '~': function (v) { return ~v; },
-    '-': function (v) { return -v; },
-  },
-
-  operators = {
-    // mul/div
-    '*': function (a, b) { return a * b; },
-    '/': function (a, b) { return a / b; },
-    '%': function (a, b) { return a % b; },
-    // sub/add
-    '+': function (a, b) { return a + b; },
-    '-': function (a, b) { return a - b; },
-    // relational
-    '<': function (a, b) { return a < b; },
-    '<=': function (a, b) { return a <= b; },
-    '>': function (a, b) { return a > b; },
-    '>=': function (a, b) { return a >= b; },
-    'in': function (a, b) { return a in b; },
-    'instanceof': function (a, b) { return a instanceof b; },
-    // equality
-    '==': function (a, b) { return a == b; },
-    '!=': function (a, b) { return a != b; },
-    '===': function (a, b) { return a === b; },
-    '!==': function (a, b) { return a !== b; },
-    // logic
-    '&&': function (a, b) { return a && b; },
-    '||': function (a, b) { return a || b; },
-  };
-
-  /* In order of precedence, see:
-    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
-  */
-    // multiply/divide/mod
-  operators['*'].precedence = 5;
-  operators['/'].precedence = 5;
-  operators['%'].precedence = 5;
-    // add/sub
-  operators['+'].precedence = 6;
-  operators['-'].precedence = 6;
-    // relational
-  operators['<'].precedence = 8;
-  operators['<='].precedence = 8;
-  operators['>'].precedence = 8;
-  operators['>='].precedence = 8;
-  operators['in'].precedence = 8;
-  operators['instanceof'].precedence = 8;
-    // equality
-  operators['=='].precedence = 9;
-  operators['!='].precedence = 9;
-  operators['==='].precedence = 9;
-  operators['!=='].precedence = 9;
-    // logic
-  operators['&&'].precedence = 13;
-  operators['||'].precedence = 14;
-
+    operators = Expression.operators;
 
   /**
    * Construct a new Parser instance with new Parser(node, context)
@@ -97,7 +31,10 @@
     this.globals = globals || {};
   }
 
-  Parser.operators = operators;
+  // exported for testing.
+  Parser.Expression = Expression;
+  Parser.Identifier = Identifier;
+  Parser.Node = Node;
 
   Parser.prototype.white = function () {
     var ch = this.ch;
@@ -117,12 +54,13 @@
   };
 
   Parser.prototype.error = function (m) {
-        throw {
-            name:    'SyntaxError',
-            message: m,
-            at:      this.at,
-            text:    this.text
-        };
+      console.trace()
+      throw {
+          name:    'SyntaxError',
+          message: m,
+          at:      this.at,
+          text:    this.text
+      };
   };
 
   Parser.prototype.name = function () {
@@ -134,7 +72,7 @@
     ch = this.ch;
 
     while (ch) {
-      if (ch === ':' || ch === ' ') {
+      if (ch === ':' || ch <= ' ') {
           return name;
       }
       name += ch;
@@ -193,15 +131,14 @@
    *                         function it is unwrapped as a property.
    */
   Parser.prototype.object_add_value = function (object, key, value) {
-    if (typeof(value) !== 'function') {
+    if (value instanceof Identifier || value instanceof Expression) {
+      Object.defineProperty(object, key, {
+        get: function () { return value.get_value(); },
+        enumerable: true,
+      });
+    } else {
       // primitives
       object[key] = value;
-    } else {
-      // Handle cases where object[key] is not a primitive.
-      Object.defineProperty(object, key, {
-        get: function () { return value(); },
-        enumerable: true
-      });
     }
   };
 
@@ -338,214 +275,64 @@
   };
 
   /**
-   * Return the $context, $context.$data, $element where we find the
-   * given element.
-   * @param  {string} name      The property name sought.
-   * @param  {array} strategies  An array of keys/methods to look up the
-   *                             desired value.
-   * @return {object}  The object containing the name.
-   */
-  Parser.prototype.get_lookup_root = function (name, strategies) {
-    var context = this.context,
-        node = this.node;
-
-    if (name === "$context") {
-      // unshift $context
-      strategies.shift();
-      return context;
-    }
-
-    if (name === "$element") {
-      // $element is the node bound
-      strategies.shift();
-      return node;
-    }
-
-    if (context && context.$data &&
-      Object.hasOwnProperty.call(context.$data, name)) {
-
-      // Return $data if the first-dotted value is defined
-      // emulates with(context){with(context.$data){...}}
-      return context.$data;
-    }
-
-    if (context && Object.hasOwnProperty.call(context, name)) {
-      return context;
-    }
-
-    return this.globals;
-  };
-
-  /**
-   * Generate a function that looks up a value
-   * @param  {string} id  The value to be looked up e.g. x.y.z
-   * @return {function}   An accessor that returns the looked up value.
-   */
-  Parser.prototype.make_accessor = function (id) {
-    var keys = id.split("."),
-        negation = void 0,
-        strategies = [],
-        get_lookup_root = this.get_lookup_root.bind(this);
-
-    // negation operator(s)
-    while (keys[0][0] === '!') {
-      negation = !negation;
-      keys[0] = keys[0].substring(1);
-    }
-
-    keys.forEach(function (key) {
-        var name,
-            strategy,
-            keyLen = key.length;
-
-        if (key.substr(keyLen - 2) === "()") {
-            // function
-            name = key.slice(0, keyLen - 2);
-            strategy = 'fn';
-        } else {
-            name = key;
-            strategy = 'id';
-        }
-
-        strategies.push({
-            name: name,
-            execute: identifier_strategies[strategy]
-        });
-    });
-
-    function identifierAccessor() {
-        var value = get_lookup_root(strategies[0].name, strategies);
-
-        strategies.forEach(function (strategy) {
-            value = strategy.execute(strategy.name, value);
-        });
-
-        if (typeof(negation) == 'undefined') {
-          return value;
-        }
-
-        // !!observable only works if we unwrap the value, so if we saw a
-        // '!' we unwrap the result.
-        return negation ? !ko.unwrap(value) : ko.unwrap(value);
-    }
-
-    return identifierAccessor;
-  };
-
-  Parser.prototype.lookup = function (id) {
-    switch (id) {
-      case 'true': return true;
-      case 'false': return false;
-      case 'null': return null;
-      case 'undefined': return void 0;
-      default: return this.make_accessor(id);
-    }
-  };
-
-  /**
    * Get the function for the given operator.
    * A `.precedence` value is added to the function, with increasing
    * precedence having a higher number.
    * @return {function} The function that performs the infix operation
    */
-  Parser.prototype.infix_operator = function () {
+  Parser.prototype.operator = function (lhs_is_identifier) {
     var op = '',
         op_fn,
         ch = this.white();
 
+    if (lhs_is_identifier) {
+      // lhs
+      if (ch === '(') {
+        this.next();
+        // function call fn()
+        ch = this.white();
+        this.next(')');
+        return operators['()'];
+      } else if (ch === '[') {
+        this.next();
+        // array lookup arr[expr]
+        expr = this.expression();
+        this.white();
+        this.next(']');
+        op_fn = function (a) {
+          var v;
+          if (expr instanceof Identifier || expr instanceof Expression) {
+            v = expr.get_value();
+          } else {
+            v = expr;
+          }
+          return a[ko.unwrap(v)];
+        }
+        op_fn.precedence = operators['[]'];
+        op_fn.operator = operators['[]'];
+        return op_fn;
+      }
+    }
+
     while (ch) {
-      if (ch == ' ') {
+      if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
+          ch === '"' || ch === "'" || ch === '{' || ch === '[' ||
+          ch === '(') {
         break;
       }
       op += ch;
       ch = this.next();
     }
 
-    op_fn = operators[op];
+    if (op !== '') {
+      op_fn = operators[op];
 
-    if (!op_fn) {
-      this.error("Bad operator: '" + op + "'.");
+      if (!op_fn) {
+        this.error("Bad operator: '" + op + "'.");
+      }
     }
 
     return op_fn;
-  };
-
-  /**
-   * Return a function that calculates and returns an expression when called.
-   * @param  {array} ops  The operations to perform
-   * @return {function}   The function that calculates the expression.
-   */
-  Parser.prototype.make_expression_accessor = function (root) {
-    function node_value(node) {
-      var lhs, rhs;
-      if (typeof(node) === 'function') {
-        // Expressions on observables are nonsensical, so we unwrap any
-        // function values (e.g. identifiers).
-        return ko.unwrap(node());
-      }
-      if (typeof(node) !== 'object') {
-        return node;
-      }
-      lhs = node.lhs;
-      rhs = node.rhs;
-      // The node could be a regular object - weird though that may be.
-      // If it has a 'rhs', 'llhs' and 'op' properties, we take it as a node.
-      //  ^^^ TODO/FIXME - Practical, but arbitrary & perhaps not strict enough.
-      if (lhs && rhs && node.op) {
-        return node.op(node_value(lhs), node_value(rhs));
-      }
-      return node;
-    }
-    function expressionAccessor() {
-      return node_value(root);
-    }
-    return expressionAccessor;
-  };
-
-  /**
-   *  Convert an array of nodes to an executable tree.
-   *  @return {object} An object with a `lhs`, `rhs` and `op` key, corresponding
-   *                      to the left hand side, right hand side, and
-   *                      operation function.
-   */
-  Parser.prototype.expression_nodes_to_tree = function (nodes) {
-    var root,
-        leaf,
-        op,
-        value;
-
-    // primer
-    leaf = root = {
-      lhs: nodes.shift(),
-      op: nodes.shift(),
-      rhs: nodes.shift(),
-    };
-
-    while (nodes) {
-      op = nodes.shift();
-      value = nodes.shift();
-      if (!op) {
-        return root;
-      }
-      if (op.precedence > root.op.precedence) {
-        // rebase
-        root = {
-          lhs: root,
-          op: op,
-          rhs: value,
-        };
-        leaf = root;
-      } else {
-        leaf.rhs = {
-          lhs: leaf.rhs,
-          op: op,
-          rhs: value,
-        };
-        leaf = leaf.rhs;
-      }
-    }
-
-    return root;
   };
 
   /**
@@ -559,22 +346,34 @@
   Parser.prototype.expression = function () {
     var root,
         nodes = [],
+        lhs_is_identifier,
+        node_value,
         ch = this.white();
 
     while (ch) {
+      // unary prefix operators
+      op = this.operator();
+      if (op) {
+        nodes.push(undefined);  // padding.
+        nodes.push(op);
+      }
+
       if (ch === '(') {
         this.next();
         nodes.push(this.expression());
         this.next(')');
       } else {
-        nodes.push(this.value());
+        node_value = this.value();
+        nodes.push(node_value);
+        lhs_is_identifier = node_value instanceof Identifier;
       }
       ch = this.white();
       if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
           ch === ')' || ch === '') {
         break;
       }
-      op = this.infix_operator();
+      // infix operators
+      op = this.operator(lhs_is_identifier);
       if (op) {
         nodes.push(op);
       }
@@ -589,25 +388,30 @@
       return nodes[0];
     }
 
-    return this.make_expression_accessor(
-      this.expression_nodes_to_tree(nodes)
-    );
+    return new Expression(nodes);
   };
+
 
   Parser.prototype.identifier = function () {
-    var id = '', ch;
+    var token = '', ch;
     ch = this.white();
-
     while (ch) {
-      if (ch === ':' || ch === '}' || ch === ',' || ch === ' ' ||
-          ch === ']' || ch === ')') {
-        return this.lookup(id);
+      if (ch === ':' || ch === '}' || ch === ',' || ch <= ' ' || ch === '[' ||
+          ch === ']' || ch === '(' || ch === ')' || ch === '.') {
+        break;
       }
-      id += ch;
+      token += ch;
       ch = this.next();
     }
-    return this.lookup(id);
+    switch (token) {
+      case 'true': return true;
+      case 'false': return false;
+      case 'null': return null;
+      case 'undefined': return void 0;
+      default: return new Identifier(token, this);
+    }
   };
+
 
   Parser.prototype.bindings = function () {
     var key,
@@ -639,7 +443,9 @@
  */
   Parser.prototype.convert_to_accessors = function (result) {
     ko.utils.objectForEach(result, function (name, value) {
-      if (typeof(value) != 'function') {
+      if (value instanceof Identifier || value instanceof Expression) {
+        result[name] = value.get_value.bind(value);
+      } else if (typeof(value) != 'function') {
         result[name] = function constAccessor() {
           return value;
         };

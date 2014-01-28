@@ -5,10 +5,20 @@ see eg https://github.com/rniemeyer/knockout-classBindingProvider/blob/master/sp
 
 describe("Knockout Secure Binding", function () {
     var instance,
+        Parser,
+        Expression,
+        Identifier,
+        Node,
+        operators,
         csp_rex = /Content Security Policy|blocked by CSP/;
 
     beforeEach(function () {
         instance = new ko.secureBindingsProvider();
+        Parser = instance.Parser,
+        Identifier = Parser.Identifier,
+        Expression = Parser.Expression,
+        Node = Parser.Node,
+        operators = Node.operators;
     })
 
     // it("Has a built-in delay", function (done) {
@@ -202,7 +212,7 @@ describe("Knockout Secure Binding", function () {
         it("accesses the context", function () {
             var binding = "a: x",
                 context = { x: 'y' },
-                bindings = new instance.Parser(null, context).parse(
+                bindings = new Parser(null, context).parse(
                     binding);
             assert.equal(bindings.a(), "y");
         })
@@ -210,7 +220,7 @@ describe("Knockout Secure Binding", function () {
         it("accesses the globals", function () {
             var binding = "a: z",
                 globals = { z: "ZZ" },
-                bindings = new instance.Parser(null, {}, globals).parse(
+                bindings = new Parser(null, {}, globals).parse(
                     binding);
             assert.equal(bindings.a(), globals.z)
         })
@@ -218,15 +228,32 @@ describe("Knockout Secure Binding", function () {
         it("accesses $data.value and value", function () {
             var binding = "x: $data.value, y: value",
                 context = { '$data': { value: 42 }},
-                bindings = new instance.Parser(null, context).parse(
+                bindings = new Parser(null, context).parse(
                     binding);
             assert.equal(bindings.x(), 42)
             assert.equal(bindings.y(), 42)
         })
 
+        it("ignores spaces", function () {
+            var binding = "x: $data  .  value, y: $data\n\t\r . \t\r\nvalue",
+                context = { '$data': { value: 42 }},
+                bindings = new Parser(null, context).parse(
+                    binding);
+            assert.equal(bindings.x(), 42)
+            assert.equal(bindings.y(), 42)
+        })
+
+        it("looks up nested elements in objects", function () {
+            var binding = "x: { y: { z: a.b.c } }",
+                context = { 'a': { b: { c: 11 }}},
+                bindings = new Parser(null, context).parse(
+                    binding);
+            assert.equal(bindings.x().y.z, 11)
+        })
+
         it("does not have access to `window` globals", function () {
             var binding = "x: window, y: global, z: document",
-                bindings = new instance.Parser(null, context).parse(
+                bindings = new Parser(null, context).parse(
                     binding);
             assert.equal(bindings.x(), undefined)
             assert.equal(bindings.y(), undefined)
@@ -236,7 +263,7 @@ describe("Knockout Secure Binding", function () {
         it("recognizes $context", function () {
             var binding = "x: $context.value, y: value",
                 context = { value: 42 },
-                bindings = new instance.Parser(null, context).parse(
+                bindings = new Parser(null, context).parse(
                     binding);
             assert.equal(bindings.x(), 42)
             assert.equal(bindings.y(), 42)
@@ -245,7 +272,7 @@ describe("Knockout Secure Binding", function () {
         it("recognizes $element", function () {
             var binding = "x: $element.id",
                 node = { id: 42 },
-                bindings = new instance.Parser(node, {}).parse(
+                bindings = new Parser(node, {}).parse(
                     binding);
             assert.equal(bindings.x(), node.id)
         })
@@ -253,7 +280,7 @@ describe("Knockout Secure Binding", function () {
         it("accesses $data before $context", function () {
             var binding = "x: value",
                 context = { value: 21, '$data': { value: 42 }},
-                bindings = new instance.Parser(null, context).parse(
+                bindings = new Parser(null, context).parse(
                     binding);
             assert.equal(bindings.x(), 42)
         })
@@ -262,7 +289,7 @@ describe("Knockout Secure Binding", function () {
             var binding = "a: z",
                 context = { z: 42 },
                 globals = { z: 84 },
-                bindings = new instance.Parser(null, context,
+                bindings = new Parser(null, context,
                     globals).parse(binding);
             assert.equal(bindings.a(), 42)
         })
@@ -272,22 +299,20 @@ describe("Knockout Secure Binding", function () {
             var binding = "a: z",
                 globals_1 = {z: 168},
                 globals_2 = {},
-                bindings_1 = new instance.Parser(null, context,
+                bindings_1 = new Parser(null, context,
                     globals_1).parse(binding),
-                bindings_2 = new instance.Parser(null, context,
+                bindings_2 = new Parser(null, context,
                     globals_2).parse(binding);
             assert.equal(bindings_1.a(), 168)
             assert.equal(bindings_2.a(), undefined)
         })
     })
 
-    describe("the expression_nodes_to_tree function", function () {
-        var nodes_to_tree,
-            operators;
+    describe("the build_tree function", function () {
+        var nodes_to_tree;
 
         beforeEach(function () {
-            nodes_to_tree = instance.Parser.prototype.expression_nodes_to_tree;
-            operators = instance.Parser.operators;
+            nodes_to_tree = Expression.prototype.build_tree;
         })
 
         it("converts a simple array to a tree", function () {
@@ -341,7 +366,7 @@ describe("Knockout Secure Binding", function () {
     describe("the bindings parser", function () {
         it("parses bindings with JSON values", function () {
             var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
-            value = new instance.Parser(null, {}).parse(binding_string);
+            value = new Parser(null, {}).parse(binding_string);
             assert.equal(value.a(), "A", "string");
             assert.equal(value.b(), 1, "int");
             assert.equal(value.c(), 2.1, "float");
@@ -354,48 +379,48 @@ describe("Knockout Secure Binding", function () {
 
         it("parses an array of JSON values", function () {
             var binding = "x: [1, 2.1, true, false, null, undefined]",
-                bindings = new instance.Parser(null, {}).parse(
+                bindings = new Parser(null, {}).parse(
                     binding);
             assert.deepEqual(bindings.x(), [1, 2.1, true, false, null, undefined])
         })
 
         it("undefined keyword works", function () {
-            var value = new instance.Parser(null, {}).parse(
+            var value = new Parser(null, {}).parse(
                     "y: undefined");
             assert.equal(value.y(), void 0);
         })
 
         it("parses single-quote strings", function () {
             var binding = "text: 'st\\'r'",
-                bindings = new instance.Parser(null, {}).parse(
+                bindings = new Parser(null, {}).parse(
                     binding);
             assert.equal(bindings.text(), "st'r")
         })
 
         it("parses text: {object: 'string'}", function () {
             var binding = "text: {object: 'string'}",
-                bindings = new instance.Parser(null, {}).parse(binding);
+                bindings = new Parser(null, {}).parse(binding);
             assert.deepEqual(bindings.text(), { object: "string" })
         })
 
         it("parses object: attr: {name: value}", function () {
             var binding = "attr: { klass: kValue }",
                 context = { kValue: 'Sam' }
-                bindings= new instance.Parser(null, context).parse(binding);
+                bindings= new Parser(null, context).parse(binding);
             assert.equal(bindings.attr().klass, 'Sam')
         })
 
         it("parses object: attr: {name: ko.observable(value)}", function () {
             var binding = "attr : { klass: kValue }",
                 context = { kValue: ko.observable('Gollum') }
-                bindings= new instance.Parser(null, context).parse(binding);
+                bindings= new Parser(null, context).parse(binding);
             assert.equal(bindings.attr().klass(), 'Gollum')
         })
 
         it("parses object: attr: {n1: v1, n2: v2}", function () {
             var binding = "attr : { a: x, b: y }",
                 context = { x: 'Real', y: 'Imaginary' }
-                bindings= new instance.Parser(null, context).parse(binding);
+                bindings= new Parser(null, context).parse(binding);
             assert.equal(bindings.attr().a, 'Real')
             assert.equal(bindings.attr().b, 'Imaginary')
         })
@@ -405,41 +430,41 @@ describe("Knockout Secure Binding", function () {
         it("works with explicit braces ( )", function () {
             var binding = "attr : (x)",
                 context = { x: 'spot' }
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.attr(), 'spot')
         })
 
         it("computes a + b", function () {
             var binding = "text: a + b",
                 context = { a: 1, b: 2 },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text(), 3);
         })
 
         it("computes obs(a) + obs(b)", function () {
             var binding = "text: a + b",
                 context = { a: ko.observable(1), b: ko.observable(2) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text(), 3);
         })
 
         it("computes a + b * c", function () {
             var binding = "text: a + b * c",
                 context = { a: 1, b: 2, c: 4 },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text(), 1 + 2 * 4);
         })
 
         it("compares a + 3 > b * obs(c)", function () {
             var binding = "text: a + 3 > b * c",
                 context = { a: 1, b: 2, c: ko.observable(4) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text(), 1 + 3 > 2 * 4);
         })
 
         it("computes complex arithematic as expected", function () {
             var binding = "text: 1 * 4 % 3 + 11 * 99 / (8 - 14)",
-                bindings = new instance.Parser(null, {}).parse(binding);
+                bindings = new Parser(null, {}).parse(binding);
             assert.equal(bindings.text(), 1 * 4 % 3 + 11 * 99 / (8 - 14));
             // == -180.5
         })
@@ -447,7 +472,7 @@ describe("Knockout Secure Binding", function () {
         it("recalculates observables", function () {
             var binding = "text: a - b",
                 context = { a: ko.observable(1), b: ko.observable(2) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text(), -1);
             context.a(2)
             assert.equal(bindings.text(), 0);
@@ -456,7 +481,7 @@ describe("Knockout Secure Binding", function () {
         it("sets properties of objects", function () {
             var binding = "text: { x: 3 < 1, y: a < b }",
                 context = { a: ko.observable(1), b: ko.observable(2) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text().x, false);
             assert.equal(bindings.text().y, true);
             context.a(3)
@@ -466,7 +491,7 @@ describe("Knockout Secure Binding", function () {
         it("has working logic operations", function () {
             var binding = "text: a || b",
                 context = { a: ko.observable(false), b: ko.observable(false) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.text(), false);
             context.a(true)
             assert.equal(bindings.text(), true);
@@ -479,7 +504,7 @@ describe("Knockout Secure Binding", function () {
         it("does not unwrap a single observable argument", function () {
             var binding = "text: a",
                 context = { a: ko.observable() },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.ok(ko.isObservable(bindings.text()))
         })
     })
@@ -488,7 +513,7 @@ describe("Knockout Secure Binding", function () {
         it("include the negation operator", function () {
             var binding = "neg: !a",
                 context = { a: ko.observable(false) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.neg(), true)
             context.a(true);
             assert.equal(bindings.neg(), false)
@@ -497,7 +522,7 @@ describe("Knockout Secure Binding", function () {
         it("does the double negative", function () {
             var binding = "neg: !!a",
                 context = { a: ko.observable(false) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.neg(), false)
             context.a(true);
             assert.equal(bindings.neg(), true)
@@ -506,7 +531,7 @@ describe("Knockout Secure Binding", function () {
         it("works in an object", function () {
             var binding = "neg: { x: !a, y: !!a }",
                 context = { a: ko.observable(false) },
-                bindings = new instance.Parser(null, context).parse(binding);
+                bindings = new Parser(null, context).parse(binding);
             assert.equal(bindings.neg().x, true)
             assert.equal(bindings.neg().y, false)
             context.a(true);
@@ -515,13 +540,42 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
-    // pluck to get elements from deep in an object.
-    //
-    // Our pluck is "softer" than a standard lookup in the sense that
-    // it will not throw an error if something is not found, but rather
-    // return undefined.
-    describe("make_accessor", function () {
-        var obj = {
+    describe("array accessors - []", function () {
+        it("works for [ int ]", function () {
+            var binding = "ref: a[ 4 ]",
+                context = { a: { 4: "square" } },
+                bindings = new Parser(null, context).parse(binding)
+            assert.equal(bindings.ref(), "square")
+        })
+
+        it("works for [ string ]", function () {
+            var binding = "neg: a [ 'hello' ]",
+                context = { a: { hello: 128} },
+                bindings = new Parser(null, context).parse(binding)
+            assert.equal(bindings.neg(), 128)
+        })
+
+        it("works for [ observable ]", function () {
+            var binding = "neg: a[ x ]",
+                context = { a: [ 123, 456 ], x: ko.observable(0) },
+                bindings = new Parser(null, context).parse(binding)
+            assert.equal(bindings.neg(), 123)
+            context.x(1)
+            assert.equal(bindings.neg(), 456)
+        })
+
+        it("works for [ observable ]", function () {
+            var binding = "neg: a[ x ]",
+                context = { a: [ 123, 456 ], x: ko.observable(1) },
+                bindings = new Parser(null, context).parse(binding)
+            assert.equal(bindings.neg(), 456)
+            context.x(0)
+            assert.equal(bindings.neg(), 123)
+        })
+    })
+
+    describe("parsing deep objects", function () {
+        var context = {
             a: {
                 b: {
                     c: {
@@ -534,29 +588,51 @@ describe("Knockout Secure Binding", function () {
             F2: function () {
                 return { G: function () { return 'R2' }}
             }
-        }, pluck, parser;
+        };
 
-        beforeEach(function () {
-            parser = new instance.Parser(null, obj);
-            pluck = function (what) {
-                return parser.make_accessor(what);
+        function expect_equal(binding, expect) {
+            var bindings = new Parser(null, context).parse("v: " + binding)
+            assert.equal(bindings.v(), expect)
+        }
+
+        function expect_deep_equal(binding, expect) {
+            var bindings = new Parser(null, context).parse("v: " + binding)
+            assert.deepEqual(bindings.v(), expect)
+        }
+
+        it("plucks 'a.b.c'", function () {
+            expect_deep_equal('a.b.c', context.a.b.c) // obj
+        })
+
+        it("plucks a.b.c.d", function () {
+            expect_equal('a.b.c.d', context.a.b.c.d) // 1
+        })
+
+        it("plucks a.b.c.x", function () {
+            expect_equal('a.b.c.x', context.a.b.c.x) // undefined
+        })
+
+        it("plucks a.b.c.d.e[1]", function () {
+            expect_equal("a.b.c.e[1]", context.a.b.c.e[1]) // 8
+        })
+
+        it("plucks 'x'", function () {
+            expect_equal('x', undefined)
+        })
+
+        it("throws when 'r' is not on x", function () {
+            function fn() {
+                expect_equal('x.r', x.r) // undefined
             }
+            assert.throws(fn, "x is not defined")
         })
 
-        it("should pluck deep values from objects", function () {
-            assert.deepEqual(pluck('a.b.c')(),
-                obj.a.b.c, 'a.b.c')
-            assert.equal(pluck('a.b.c.d')(), 1, "a.b.c.d")
-            assert.equal(pluck('a.b.c.x')(), undefined, "a.b.c.x")
-            assert.equal(pluck('a.b.c.x')(), undefined, "a.b.c.x")
-            assert.equal(pluck('a.b.c.e.1')(), 8, "a.b.c.e.1")
-            assert.equal(pluck('x.r')(), undefined, "x.r")
-            assert.equal(pluck('x')(), undefined, "x-undefined")
+        it("calls function F1", function () {
+            expect_equal('F1()', context.F1()) // R1
         })
 
-        it("should call functions", function () {
-            assert.equal(pluck("F1()")(), "R1", "F1")
-            assert.equal(pluck("F2().G()")(), "R2", "F2")
+        it("calls F2().G()", function () {
+            expect_equal("F2().G()", context.F2().G()) // R2
         })
     }); // make_accessor
 
