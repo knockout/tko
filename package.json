@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.1.0",
   "author": {
     "name": "Brian M Hunt",
     "email": "brianmhunt@gmail.com"
@@ -22,8 +22,7 @@
     "grunt-contrib-jshint": "~0.7.2",
     "grunt-contrib-uglify": "~0.2.7",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-bump": "0.0.13",
-    "grunt-shell": "~0.6.4"
+    "grunt-release": "~0.6.0"
   },
   "main": "dist/knockout-secure-binding.js",
   "homepage": "https://github.com/brianmhunt/knockout-secure-binding",
