@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.0.10 - 2014-1-28
+/*! knockout-secure-binding - v0.1.0 - 2014-1-30
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -24,13 +24,24 @@ var Identifier = (function () {
    * $data.token/$context.token/globals.token; this does not return intermediate
    * values on a chain of members i.e. $data.hello.there -- requesting the
    * Identifier('there').value will return $data/$context/globals.there
-   *
+   * @param  {object | Identifier | Expression} parent
    * @return {mixed}  Return the primitive or an accessor.
    */
-  Identifier.prototype.get_value = function () {
+  Identifier.prototype.get_value = function (parent) {
     var parser = this.parser,
         context = parser.context,
         token = this.token;
+
+    // parent is an optional source of the identifier e.g. for membership
+    // a.b, one might pass a in.
+    if (parent) {
+      if (typeof parent.get_value === 'function') {
+        parent = parent.get_value()[token];
+      } else if (typeof parent === 'object') {
+        return parent[token];
+      }
+      // throw new Error("Identifier given a bad parent " + parent)
+    }
 
     switch (token) {
       case '$element': return parser.node;
@@ -54,7 +65,7 @@ var Identifier = (function () {
 
     // globals.token
     return parser.globals && parser.globals[token];
-  }
+  };
 
   return Identifier;
 })();
@@ -81,35 +92,35 @@ var Node = (function () {
 
   var operators =  {
     // members
-    '.': function (a, b) { return a[b] },
-    '[]': function (a, b) { return a[b] },
+    '.': function member_dot(a, b) { return a[b]; },
+    '[]': function member_bkt(a, b) { return a[b]; },
     // function call
-    '()': function (a, b) { return a() },
+    '()': function fn_call(a, b) { return a(); },
     // unary
-    '!': function (a, b) { return !b },
-    '!!': function (a, b) { return !!b },
+    '!': function not(a, b) { return !b; },
+    '!!': function notnot(a, b) { return !!b; },
     // mul/div
-    '*': function (a, b) { return a * b; },
-    '/': function (a, b) { return a / b; },
-    '%': function (a, b) { return a % b; },
+    '*': function mul(a, b) { return a * b; },
+    '/': function div(a, b) { return a / b; },
+    '%': function mod(a, b) { return a % b; },
     // sub/add
-    '+': function (a, b) { return a + b; },
-    '-': function (a, b) { return a - b; },
+    '+': function add(a, b) { return a + b; },
+    '-': function sub(a, b) { return a - b; },
     // relational
-    '<': function (a, b) { return a < b; },
-    '<=': function (a, b) { return a <= b; },
-    '>': function (a, b) { return a > b; },
-    '>=': function (a, b) { return a >= b; },
+    '<': function lt(a, b) { return a < b; },
+    '<=': function le(a, b) { return a <= b; },
+    '>': function gt(a, b) { return a > b; },
+    '>=': function ge(a, b) { return a >= b; },
     // 'in': function (a, b) { return a in b; },
     // 'instanceof': function (a, b) { return a instanceof b; },
     // equality
-    '==': function (a, b) { return a == b; },
-    '!=': function (a, b) { return a != b; },
-    '===': function (a, b) { return a === b; },
-    '!==': function (a, b) { return a !== b; },
+    '==': function equal(a, b) { return a == b; },
+    '!=': function ne(a, b) { return a != b; },
+    '===': function sequal(a, b) { return a === b; },
+    '!==': function sne(a, b) { return a !== b; },
     // logic
-    '&&': function (a, b) { return a && b; },
-    '||': function (a, b) { return a || b; },
+    '&&': function logic_and(a, b) { return a && b; },
+    '||': function logic_or(a, b) { return a || b; },
   };
 
   /* In order of precedence, see:
@@ -119,7 +130,8 @@ var Node = (function () {
   operators['.'].precedence = 1;
   operators['[]'].precedence = 1;
     // function call
-  operators['()'].precedence = 2;
+    // usually 2, but a().b() is a() . b() not a.b()()
+  operators['()'].precedence = 0;
     // logical not
   operators['!'].precedence = 4;
   operators['!!'].precedence = 4; // explicit double-negative
@@ -148,33 +160,8 @@ var Node = (function () {
 
   Node.operators = operators;
 
-  /**
-   * Return the parameters for the '.' binding.
-   *
-   * @param  {node} node  A node with a '.' (member) operation
-   * @return {mixed}     The value of the node if the LHS otherwise the
-   */
-  Node.prototype.identifier_value = function () {
-    var value = this.lhs.get_value(),
-        node = this.rhs;
 
-    while (node) {
-      if (node.token) {
-        return value[node.token];
-      }
-
-      if (node.op != operators['.']) {
-        return node.get_node_value()
-      }
-
-      value = value[node.lhs.token];
-      node = node.rhs;
-    }
-
-    return value;
-  };
-
-  Node.prototype.get_leaf_value = function (leaf) {
+  Node.prototype.get_leaf_value = function (leaf, member_of) {
     if (typeof(leaf) === 'function') {
       // Expressions on observables are nonsensical, so we unwrap any
       // function values (e.g. identifiers).
@@ -183,20 +170,22 @@ var Node = (function () {
 
     // primitives
     if (typeof(leaf) !== 'object') {
-      return leaf;
+      return member_of ? member_of[leaf] : leaf;
     }
 
     // Identifiers and Expressions
     if (leaf instanceof Identifier || leaf instanceof Expression) {
-      return ko.unwrap(leaf.get_value());
+      // lhs is passed in as the parent of the leaf. It will be defined in
+      // cases like a.b.c as 'a' for 'b' then as 'b' for 'c'.
+      return ko.unwrap(leaf.get_value(member_of));
     }
 
     if (leaf instanceof Node) {
-      return leaf.get_node_value();
+      return leaf.get_node_value(member_of);
     }
 
-    throw new Error("Invalid type of leaf node" + leaf);
-  }
+    throw new Error("Invalid type of leaf node: " + leaf);
+  };
 
   /**
    * Return a function that calculates and returns an expression's value
@@ -206,17 +195,17 @@ var Node = (function () {
    *
    * Exported for testing.
    */
-  Node.prototype.get_node_value = function () {
-    var lhs, rhs;
+  Node.prototype.get_node_value = function (member_of) {
+    var lhs, rhs, member_op;
 
-    if (this.op === operators['.']) {
-      return this.identifier_value();
-    }
-    if (this.op.operator === operators['[]']) {
-      lhs = this.identifier_value();
-    } else {
-      lhs = this.get_leaf_value(this.lhs);
-      rhs = this.get_leaf_value(this.rhs);
+    member_op = this.op === operators['.'] || this.op === operators['[]'];
+
+    lhs = this.get_leaf_value(this.lhs, member_of);
+    rhs = this.get_leaf_value(this.rhs, member_op ? lhs : undefined);
+
+    // It is already computed in this case right-to-left.
+    if (member_op) {
+      return rhs;
     }
 
     return this.op(lhs, rhs);
@@ -246,7 +235,7 @@ var Expression = (function () {
         op,
         value;
 
-    console.log("build_tree", nodes)
+    // console.log("build_tree", nodes.slice(0))
 
     // primer
     leaf = root = new Node(nodes.shift(), nodes.shift(), nodes.shift());
@@ -255,7 +244,7 @@ var Expression = (function () {
       op = nodes.shift();
       value = nodes.shift();
       if (!op) {
-        return root;
+        break;
       }
       if (op.precedence > root.op.precedence) {
         // rebase
@@ -266,7 +255,9 @@ var Expression = (function () {
         leaf = leaf.rhs;
       }
     }
-  } // build_tree
+    // console.log("tree", root)
+    return root;
+  }; // build_tree
 
   Expression.prototype.get_value = function () {
     return this.root.get_node_value();
@@ -328,7 +319,7 @@ var Expression = (function () {
   };
 
   Parser.prototype.error = function (m) {
-      console.trace()
+      // console.trace()
       throw {
           name:    'SyntaxError',
           message: m,
@@ -581,7 +572,7 @@ var Expression = (function () {
             v = expr;
           }
           return a[ko.unwrap(v)];
-        }
+        };
         op_fn.precedence = operators['[]'];
         op_fn.operator = operators['[]'];
         return op_fn;

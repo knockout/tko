@@ -11,13 +11,24 @@ var Identifier = (function () {
    * $data.token/$context.token/globals.token; this does not return intermediate
    * values on a chain of members i.e. $data.hello.there -- requesting the
    * Identifier('there').value will return $data/$context/globals.there
-   *
+   * @param  {object | Identifier | Expression} parent
    * @return {mixed}  Return the primitive or an accessor.
    */
-  Identifier.prototype.get_value = function () {
+  Identifier.prototype.get_value = function (parent) {
     var parser = this.parser,
         context = parser.context,
         token = this.token;
+
+    // parent is an optional source of the identifier e.g. for membership
+    // a.b, one might pass a in.
+    if (parent) {
+      if (typeof parent.get_value === 'function') {
+        parent = parent.get_value()[token];
+      } else if (typeof parent === 'object') {
+        return parent[token];
+      }
+      // throw new Error("Identifier given a bad parent " + parent)
+    }
 
     switch (token) {
       case '$element': return parser.node;
@@ -41,7 +52,7 @@ var Identifier = (function () {
 
     // globals.token
     return parser.globals && parser.globals[token];
-  }
+  };
 
   return Identifier;
 })();

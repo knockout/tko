@@ -317,7 +317,8 @@ describe("Knockout Secure Binding", function () {
 
         it("converts a simple array to a tree", function () {
             var nodes = ['a', operators['*'], 'b'],
-                tree = nodes_to_tree(nodes);
+                tree = nodes_to_tree(nodes.slice(0));
+                // we use nodes.slice(0) to make a copy.
             assert.equal(tree.lhs, 'a');
             assert.equal(tree.rhs, 'b');
             assert.equal(tree.op, operators['*']);
@@ -325,7 +326,7 @@ describe("Knockout Secure Binding", function () {
 
         it("converts multiple * to a tree", function () {
             var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
-                tree = nodes_to_tree(nodes);
+                tree = nodes_to_tree(nodes.slice(0));
             assert.equal(tree.lhs, 'a');
             assert.equal(tree.op, operators['*']);
             assert.equal(tree.rhs.lhs, 'b');
@@ -341,7 +342,7 @@ describe("Knockout Secure Binding", function () {
                 operators['>'],
                 'f', operators['+'], 'g', operators['%'], 'h',
             ],
-                root = nodes_to_tree(nodes);
+                root = nodes_to_tree(nodes.slice(0));
             assert.equal(root.op, operators['>'], '>')
 
             assert.equal(root.lhs.op, operators['+'], '+')
@@ -364,34 +365,82 @@ describe("Knockout Secure Binding", function () {
 
         it("converts function calls (a())", function () {
             var context = { x: function () { } },
-                parser = new Parser(null, context),
-                nodes = [
-                Identifier('x', parser),
+                parser, nodes, root;
+            parser = new Parser(null, context);
+            nodes = [
+                new Identifier('x', parser),
                 operators['()'],
                 undefined
-            ],
-                root = nodes_to_tree(nodes);
+            ];
+            root = nodes_to_tree(nodes.slice(0));
 
             assert.equal(root.lhs, nodes[0])
             assert.equal(root.op, operators['()'])
         })
 
         it("converts a string of function calls (a().b())", function () {
-            var context = { x: function () { return { y: function () {}} } },
-                parser = new Parser(null, context),
-                nodes = [
-                Identifier('x', parser),
+            var y = function () { return 'z' },
+                x = function () { return { y: y } },
+                context = { x: x },
+                parser, node, root;
+
+            parser = new Parser(null, context);
+
+            nodes = [
+                new Identifier('x', parser),
                 operators['()'],
                 undefined,
-                operators('.'),
-                Identifier('y', parser),
+                operators['.'],
+                new Identifier('y', parser),
                 operators['()']
-            ],
-                root = nodes_to_tree(nodes);
+            ];
 
-            assert.equal(root.lhs, nodes[0])
-            assert.equal(root.op, operators['()'])
-            assert.equal(root.rhs.lhs, nodes)
+            root = nodes_to_tree(nodes.slice(0));
+
+            assert.equal(root.lhs.lhs, nodes[0])
+            assert.equal(root.lhs.op, operators['()'])
+            assert.equal(root.op, operators['.'])
+            assert.equal(root.rhs.lhs, nodes[4])
+            assert.equal(root.rhs.op, operators['()'])
+        })
+    })
+
+    describe("Node", function () {
+        var context, parser, identifiers,
+            f = function () { return 'Z' },
+            ff = function () { return { fr: f } },
+            g = function () { return { c: 'gY' }};
+
+        beforeEach(function () {
+            context = { f: f, ff: ff, g:g, c: 'Y' }
+            parser = new Parser(null, context)
+            identifiers = {
+                f: new Identifier("f", parser),
+                ff: new Identifier("ff", parser),
+                fr: new Identifier("fr", parser),
+                g: new Identifier("g", parser),
+            }
+        })
+
+        it("gets a value for f()", function () {
+            var root;
+            root = new Node(identifiers.f, operators['()'])
+            assert.equal(root.get_node_value(), 'Z')
+        })
+
+        it("gets a value for g().c", function () {
+            var root, lhs;
+            lhs = new Node(identifiers.g, operators['()'])
+            root = new Node(lhs, operators['.'], "c")
+            assert.equal(root.get_node_value(), 'gY')
+        })
+
+        it("gets value for ff().fr()", function () {
+            var root;
+            root = new Node(undefined, operators['.'])
+            root.lhs = new Node(identifiers.ff, operators['()'])
+            root.rhs = new Node(identifiers.fr, operators['()'])
+            assert.equal(root.get_node_value(), 'Z')
         })
 
     })
@@ -495,6 +544,13 @@ describe("Knockout Secure Binding", function () {
             assert.equal(bindings.text(), 1 + 3 > 2 * 4);
         })
 
+        it("respects brackets () precedence", function () {
+            var binding = "text: 2 * (3 + 4)",
+                bindings = new Parser(null, {}).parse(binding);
+            assert.equal(bindings.text(), 2 * (3 + 4))
+
+        })
+
         it("computes complex arithematic as expected", function () {
             var binding = "text: 1 * 4 % 3 + 11 * 99 / (8 - 14)",
                 bindings = new Parser(null, {}).parse(binding);
@@ -544,7 +600,7 @@ describe("Knockout Secure Binding", function () {
         it("parses a string of functions a().b()", function () {
             var binding = "ref: a().b()",
                 b = function () { return 'Cee' },
-                a = function () { return b },
+                a = function () { return { b: b } },
                 context = { a: a },
                 bindings = new Parser(null, context).parse(binding);
             assert.ok(bindings.ref(), 'Cee')
@@ -614,6 +670,14 @@ describe("Knockout Secure Binding", function () {
             context.x(0)
             assert.equal(bindings.neg(), 123)
         })
+
+        it("works off a function e.g. f()[1]") /*, function () {
+            var binding = "neg: f()[3]",
+                f = function () { return [3, 4, 5, 6]}
+                context = { f: f },
+                bindings = new Parser(null, context).parse(binding)
+            assert.equal(bindings.neg(), 6)
+        })*/
     })
 
     describe("parsing deep objects", function () {

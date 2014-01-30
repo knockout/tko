@@ -54,7 +54,7 @@
   };
 
   Parser.prototype.error = function (m) {
-      console.trace()
+      // console.trace()
       throw {
           name:    'SyntaxError',
           message: m,
@@ -307,7 +307,7 @@
             v = expr;
           }
           return a[ko.unwrap(v)];
-        }
+        };
         op_fn.precedence = operators['[]'];
         op_fn.operator = operators['[]'];
         return op_fn;

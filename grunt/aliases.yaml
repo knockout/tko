@@ -19,3 +19,8 @@ server:
 live:
   - connect
   - watch
+
+release:
+  - bump-only:minor
+  - build
+  - bump-commit
