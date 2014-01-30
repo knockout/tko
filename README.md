@@ -25,27 +25,11 @@ The language used in `data-sbind` is a superset of JSON but a subset of Javascri
 
 The sbind language is closer to JSON than Javascript, so it's easier to describe its differences by comparing it to JSON. The sbind language differs from JSON in that:
 
-1. sbind understands the `undefined` keyword
-2. sbind looks up variables on `$data` or `$context` (in that order)
-3. a variable may be executed as a function, but it does not accept arguments
-4. strings in sbind may use single quotes
-
-
-**Examples**
-
-Here are some examples of valid values for `data-sbind`:
-
-- `text: value` -- variable lookup
-- `text: "string"` -- JSON value
-- `text: { object: "string" }` -- JSON object with constants
-- `foreach: [1, 2.1, true, false, null, undefined]` -- JSON array with
-    constants
-- `text: value()` -- variable lookup and execution
-- `text: $data.value()` -- execute nested variables
-- `text: $context.obj().value()` -- execute nested accessors
-- `text: $element.id` -- look up on the special `$element`
-- `text: x + y`
-- `css: { "xy": $index() < 4 }`
+1. it understands the `undefined` keyword;
+2. it looks up variables on `$data` or `$context` or `globals` (in that order);
+3. functions cannot be passed arguments;
+4. a subset of Javascript expressions are available (see below);
+5. observables that are part of expressions are automatically unwrapped for convenience.
 
 The `data-sbind` binding provider uses Knockout's built-in bindings, so
 `text`, `foreach`, and all the others should work as expected.
@@ -80,20 +64,22 @@ The `data-sbind` differs from `data-bind` as follows:
 | Functions  | Accepts arbitrary arguments | Arguments are prohibited
 
 
-Usage
+Getting started
 ---
 
 Custom Knockout binding providers follow the same general rules of
 application as [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider).
 
-So this works:
+Here is an example that would mimic the native `data-bind`:
 
 ```
-ko.bindingProvider.instance = new ko.secureBindingsProvider(bindings, options);
+options = { globals: window, attribute: "data-bind" };
+ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
 ```
 
-Keep in mind that if you are using an AMD loader, then KSB is exported
-(have a look at the example in [knockout- classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider)).
+Bear in mind that if you are using an AMD loader, then KSB is exported
+(have a look at the example in [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider)).
+
 **Options**
 
 The `ko.secureBindingsProvider` constructor accepts one argument,
@@ -111,9 +97,15 @@ Expressions
 
 KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table), namely:
 
-```
-! * / % + - < <= > >= in instanceof == != === !== && ||
-```
+| Type | Operators  |
+| ---: | :-------- |
+| Negation | `!`          |
+| Multiplication | `*` `/` `%`      |
+| Addition | `+` `-` |
+| Comparison | `<` `<=` `>` `>=` |
+| Equality | `==` `!=` `===` `!==` |
+| Logic | `&&` `||` |
+
 
 Note that unlike the ordinary `data-bind`, if you refer to an item in an expression in `data-sbind` it will unwrap it. For example:
 
@@ -121,10 +113,11 @@ Note that unlike the ordinary `data-bind`, if you refer to an item in an express
 text: a > b
 ```
 
+where `a` and `b` are observables, they will be unwrapped.
+
 In Knockout if `a` and `b` are observables the comparison will not work as expected. However KSB will unwrap both `a` and `b` before the comparison. This is purely a convenience.
 
 If the varaible referred to is not part of an expression (e.g. `text: a`) then the variable will not be unwrapped before being passed to a binding. This is the expected behaviour.
-
 
 
 Tests
@@ -136,20 +129,9 @@ to it with any browser and the tests will be executed.
 
 Automated tests with `chromedriver` can be initiated with
 `npm start`.
+
 You will need to independently start `chromedriver` with
 `chromedriver --url-base=/wd/hub --port=4445`.
-
-
-Roadmap
----
-
-In the future our bindings may be expanded to include, for example:
-
-- Nested values in objects: `text: { x: value(), y: $element.id }`
-- Array numerical lookups: `text: value[0]`
-- Array string lookups: `text: value['x']`
-- Array variable lookups: `text: value[$index()]`
-- Compound array values: `text: value[0].abc`
 
 
 Requires
@@ -169,7 +151,7 @@ LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Brian M Hunt
+Copyright (c) 2013–2014 Brian M Hunt
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
