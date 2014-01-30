@@ -104,7 +104,7 @@ KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/do
 | Addition | `+` `-` |
 | Comparison | `<` `<=` `>` `>=` |
 | Equality | `==` `!=` `===` `!==` |
-| Logic | `&&` `||` |
+| Logic | `&&` `\|\|` |
 
 
 Note that unlike the ordinary `data-bind`, if you refer to an item in an expression in `data-sbind` it will unwrap it. For example:
