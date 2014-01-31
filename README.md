@@ -89,6 +89,7 @@ an object that may contain the following options:
     to `data-sbind`
 - `globals` - Globals accessible in the attributes
 - `bindings` - The bindings to use, defaults to `ko.bindingHandlers`
+- `noVirtualElements` – By default KSB binds to all virtual elements that match for Knockout (i.e. `<!-- ko ... -->...<!-- /ko -->`). Disable KSB binding virtual elements by setting this to `false`.
 
 For example, `ko.secureBindingsProvider({ globals: { "$": jQuery }})`.
 
