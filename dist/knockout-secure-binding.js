@@ -61,7 +61,7 @@ var Identifier = (function () {
   };
 
   /**
-   * Apply all () and [] lookus on the identifier
+   * Apply all () and [] lookups on the identifier
    * @param  {mixed} value  Should be an object.
    * @return {mixed}        The dereferenced value.
    */
