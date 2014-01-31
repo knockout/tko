@@ -142,9 +142,9 @@ Knockout 2.0+
 
 KSB uses some ES5 functions, namely:
 
-- `Array::forEach`, `Array::some`, `Array::reduce` and `Array::isArray`
-- `Function::bind`
-- `Object::defineProperty`
+- `Array.reduce`
+- `Function.bind`
+- `Object.defineProperty`
 
 
 LICENSE
