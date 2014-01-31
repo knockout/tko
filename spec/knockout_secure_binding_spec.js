@@ -719,22 +719,33 @@ describe("Knockout Secure Binding", function () {
     })
 
     describe("Virtual elements", function() {
+        beforeEach(function () {
+            ko.bindingProvider.instance = new ko.secureBindingsProvider();
+        })
+
         it("binds to a raw comment", function () {
-            var cmt = document.createComment("ksb test: obs");
+            var cmt = document.createComment("ko test: obs");
             assert.ok(instance.nodeHasBindings(cmt))
         })
 
         it("binds text in virtual element", function () {
-             var cmt = document.createComment("ksb text: obs"),
-                 context =  {  obs: ko.observable("a towel") };
-             /* we have to insert the node or we get a DOM error */
-             document.body.insertBefore(cmt, document.body.childNodes[0])
-             ko.applyBindings(context, cmt);
+             var cmt = document.createComment("ko text: obs"),
+                 context =  { obs: ko.observable("a towel") },
+                 bindings;
              bindings = instance.getBindingAccessors(cmt, context)
              assert.isObject(bindings)
              assert.isFunction(bindings.text)
              assert.equal(ko.unwrap(bindings.text()), context.obs())
          })
+
+        it("binds a sub-element comment", function () {
+            var div = document.createElement("div"),
+                context = { obs: ko.observable("a sperm whale") };
+            div.appendChild(document.createComment("ko text: obs"));
+            div.appendChild(document.createComment("/ko"));
+            ko.applyBindings(context, div);
+            assert.include(div.innerText, context.obs())
+        })
      })
 
 

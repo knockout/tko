@@ -7,11 +7,11 @@ function secureBindingsProvider(options) {
     // override the attribute
     this.attribute = options.attribute || "data-sbind";
 
+    // do we bind to the ko: virtual elements
+    this.noVirtualElements = options.noVirtualElements || false;
+
     // set globals
     this.globals = options.globals || {};
-
-    // override the virtual attribute
-    this.virtualAttribute = options.virtualAttribute || "ksb ";
 
     // the binding classes -- defaults to ko bindingsHandlers
     this.bindings = options.bindings || ko.bindingHandlers;
@@ -25,13 +25,14 @@ function nodeHasBindings(node) {
     var result, value;
 
     if (node.nodeType === node.ELEMENT_NODE) {
-        result = node.getAttribute(this.attribute);
+        return node.getAttribute(this.attribute);
     } else if (node.nodeType === node.COMMENT_NODE) {
-        value = "" + node.nodeValue || node.text;
-        result = value.indexOf(this.virtualAttribute) >= 0;
+        // If this is a comment node, Knockout has already filtered it as
+        // one matching <!-- ko: ... -->. We always assume binding
+        // responsibility (unless noVirtualElements is set).
+        // See: knockout/src/virtualElements.js
+        return !this.noVirtualElements;
     }
-
-    return result;
 }
 
 // Return the name/valueAccessor pairs.
@@ -44,7 +45,7 @@ function getBindingAccessors(node, context) {
     if (node.nodeType === node.ELEMENT_NODE) {
         sbind_string = node.getAttribute(this.attribute);
     } else if (node.nodeType === node.COMMENT_NODE) {
-        sbind_string = node.nodeValue.replace(this.virtualAttribute, "");
+        sbind_string = node.nodeValue.replace("ko ", "");
     }
 
     if (sbind_string) {
