@@ -114,7 +114,7 @@ var Node = (function () {
   Node.prototype.get_node_value = function (member_of) {
     var lhs, rhs, member_op;
 
-    member_op = this.op === operators['.'] || this.op === operators['[]'];
+    member_op = this.op === operators['.'];
 
     lhs = this.get_leaf_value(this.lhs, member_of);
     rhs = this.get_leaf_value(this.rhs, member_op ? lhs : undefined);
@@ -132,6 +132,7 @@ var Node = (function () {
 
 var Expression = (function () {
   function Expression(nodes) {
+    this.nodes = nodes;
     this.root = this.build_tree(nodes);
   }
 
@@ -176,6 +177,9 @@ var Expression = (function () {
   }; // build_tree
 
   Expression.prototype.get_value = function () {
+    if (!this.root) {
+      this.root = this.build_tree(this.nodes);
+    }
     return this.root.get_node_value();
   };
 
