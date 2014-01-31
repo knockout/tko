@@ -368,7 +368,7 @@ describe("Knockout Secure Binding", function () {
                 parser, nodes, root;
             parser = new Parser(null, context);
             nodes = [
-                new Identifier('x', parser),
+                new Identifier(parser, 'x'),
                 operators['()'],
                 undefined
             ];
@@ -387,11 +387,11 @@ describe("Knockout Secure Binding", function () {
             parser = new Parser(null, context);
 
             nodes = [
-                new Identifier('x', parser),
+                new Identifier(parser, 'x'),
                 operators['()'],
                 undefined,
                 operators['.'],
-                new Identifier('y', parser),
+                new Identifier(parser, 'y'),
                 operators['()']
             ];
 
@@ -405,6 +405,44 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
+    describe("Identifier", function () {
+        var c = 'Z', f = function () { return 'Fv' };
+
+        it("looks up values on the parser context", function () {
+            var context = { c: c, f: f },
+                parser = new Parser(null, context);
+            assert.equal(new Identifier(parser, "c").get_value(), 'Z')
+            assert.equal(new Identifier(parser, "f").get_value(), f)
+        })
+
+        describe("the dereference function", function () {
+            it("does nothing with no references", function () {
+                var refs = undefined,
+                    ident = new Identifier(null, 'x', refs);
+                assert.equal(ident.dereference('1'), 1)
+            })
+            it("does nothing with empty array references", function () {
+                var refs = [],
+                    ident = new Identifier(null, 'x', refs);
+                assert.equal(ident.dereference('1'), 1)
+            })
+            it("applies the functions of the refs to the value", function () {
+                var refs = [operators['()'], operators['()']],
+                    ident = new Identifier(null, 'x', refs),
+                    g = function () { return '42' },
+                    f = function () { return g };
+                assert.equal(ident.dereference(f), 42)
+            })
+        })
+
+        it("dereferences values on the parser", function () {
+            var context = { f: f },
+                parser = new Parser(null, context),
+                derefs = [operators['()']];
+            assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
+        })
+    })
+
     describe("Node", function () {
         var context, parser, identifiers,
             f = function () { return 'Z' },
@@ -415,10 +453,10 @@ describe("Knockout Secure Binding", function () {
             context = { f: f, ff: ff, g:g, c: 'Y' }
             parser = new Parser(null, context)
             identifiers = {
-                f: new Identifier("f", parser),
-                ff: new Identifier("ff", parser),
-                fr: new Identifier("fr", parser),
-                g: new Identifier("g", parser),
+                f: new Identifier(parser, "f"),
+                ff: new Identifier(parser, "ff"),
+                fr: new Identifier(parser, "fr"),
+                g: new Identifier(parser, "g"),
             }
         })
 

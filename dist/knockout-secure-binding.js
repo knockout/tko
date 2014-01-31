@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.1.0 - 2014-1-30
+/*! knockout-secure-binding - v0.1.0 - 2014-1-31
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -14,20 +14,13 @@
 
 
 var Identifier = (function () {
-  function Identifier(token, parser) {
+  function Identifier(parser, token, dereferences) {
     this.token = token;
+    this.dereferences = dereferences;
     this.parser = parser;
   }
 
-  /**
-   * Return the value as one would get it from the top-level i.e.
-   * $data.token/$context.token/globals.token; this does not return intermediate
-   * values on a chain of members i.e. $data.hello.there -- requesting the
-   * Identifier('there').value will return $data/$context/globals.there
-   * @param  {object | Identifier | Expression} parent
-   * @return {mixed}  Return the primitive or an accessor.
-   */
-  Identifier.prototype.get_value = function (parent) {
+  Identifier.prototype.lookup_value = function (parent) {
     var parser = this.parser,
         context = parser.context,
         token = this.token;
@@ -65,6 +58,34 @@ var Identifier = (function () {
 
     // globals.token
     return parser.globals && parser.globals[token];
+  }
+
+  /**
+   * Apply all () and [] lookus on the identifier
+   * @param  {mixed} value  Should be an object.
+   * @return {mixed}        The dereferenced value.
+   */
+  Identifier.prototype.dereference = function (value) {
+    var derefs = this.dereferences || [];
+    if (derefs.length === 0) {
+      return value;
+    }
+    console.log("derefs", derefs)
+    return derefs.reduce(
+      function (pv, deref_fn) { return deref_fn(pv) },
+      value);
+  }
+
+  /**
+   * Return the value as one would get it from the top-level i.e.
+   * $data.token/$context.token/globals.token; this does not return intermediate
+   * values on a chain of members i.e. $data.hello.there -- requesting the
+   * Identifier('there').value will return $data/$context/globals.there
+   * @param  {object | Identifier | Expression} parent
+   * @return {mixed}  Return the primitive or an accessor.
+   */
+  Identifier.prototype.get_value = function (parent) {
+    return this.dereference(this.lookup_value(parent));
   };
 
   return Identifier;
@@ -545,39 +566,10 @@ var Expression = (function () {
    * precedence having a higher number.
    * @return {function} The function that performs the infix operation
    */
-  Parser.prototype.operator = function (lhs_is_identifier) {
+  Parser.prototype.operator = function () {
     var op = '',
         op_fn,
         ch = this.white();
-
-    if (lhs_is_identifier) {
-      // lhs
-      if (ch === '(') {
-        this.next();
-        // function call fn()
-        ch = this.white();
-        this.next(')');
-        return operators['()'];
-      } else if (ch === '[') {
-        this.next();
-        // array lookup arr[expr]
-        expr = this.expression();
-        this.white();
-        this.next(']');
-        op_fn = function (a) {
-          var v;
-          if (expr instanceof Identifier || expr instanceof Expression) {
-            v = expr.get_value();
-          } else {
-            v = expr;
-          }
-          return a[ko.unwrap(v)];
-        };
-        op_fn.precedence = operators['[]'];
-        op_fn.operator = operators['[]'];
-        return op_fn;
-      }
-    }
 
     while (ch) {
       if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
@@ -611,7 +603,6 @@ var Expression = (function () {
   Parser.prototype.expression = function () {
     var root,
         nodes = [],
-        lhs_is_identifier,
         node_value,
         ch = this.white();
 
@@ -630,7 +621,6 @@ var Expression = (function () {
       } else {
         node_value = this.value();
         nodes.push(node_value);
-        lhs_is_identifier = node_value instanceof Identifier;
       }
       ch = this.white();
       if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
@@ -638,7 +628,7 @@ var Expression = (function () {
         break;
       }
       // infix operators
-      op = this.operator(lhs_is_identifier);
+      op = this.operator();
       if (op) {
         nodes.push(op);
       }
@@ -658,7 +648,7 @@ var Expression = (function () {
 
 
   Parser.prototype.identifier = function () {
-    var token = '', ch;
+    var token = '', ch, dereferences;
     ch = this.white();
     while (ch) {
       if (ch === ':' || ch === '}' || ch === ',' || ch <= ' ' || ch === '[' ||
@@ -672,9 +662,48 @@ var Expression = (function () {
       case 'true': return true;
       case 'false': return false;
       case 'null': return null;
+      // we use `void 0` because `undefined` can be redefined.
       case 'undefined': return void 0;
-      default: return new Identifier(token, this);
+      default:
     }
+
+    ch = this.white();
+
+    // Dereferences are the operators () or [x.y]
+    // e.g. a()[1]()['1234'] has 4 dereferences.
+    // Identifiers contain all their own dereferences
+    while (ch) {
+      if (ch === '(') {
+        // () dereferences
+        this.white();
+        this.next(')');
+        dereferences.push(operators['()']);
+      } else if (ch === '[') {
+        expr = this.expression();
+        this.white();
+        this.next(']');
+
+        op_fn = function (a) {
+          var v;
+          if (expr instanceof Identifier || expr instanceof Expression) {
+            v = expr.get_value();
+          } else {
+            v = expr;
+          }
+          return a[ko.unwrap(v)];
+        };
+
+        op_fn.precedence = operators['[]'];
+        op_fn.operator = operators['[]'];
+        dereferences.push(op_fn);
+      } else {
+        break;
+      }
+
+      ch = this.white();
+    }
+
+    return new Identifier(this, token, dereferences);
   };
 
 

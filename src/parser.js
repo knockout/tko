@@ -280,39 +280,10 @@
    * precedence having a higher number.
    * @return {function} The function that performs the infix operation
    */
-  Parser.prototype.operator = function (lhs_is_identifier) {
+  Parser.prototype.operator = function () {
     var op = '',
         op_fn,
         ch = this.white();
-
-    if (lhs_is_identifier) {
-      // lhs
-      if (ch === '(') {
-        this.next();
-        // function call fn()
-        ch = this.white();
-        this.next(')');
-        return operators['()'];
-      } else if (ch === '[') {
-        this.next();
-        // array lookup arr[expr]
-        expr = this.expression();
-        this.white();
-        this.next(']');
-        op_fn = function (a) {
-          var v;
-          if (expr instanceof Identifier || expr instanceof Expression) {
-            v = expr.get_value();
-          } else {
-            v = expr;
-          }
-          return a[ko.unwrap(v)];
-        };
-        op_fn.precedence = operators['[]'];
-        op_fn.operator = operators['[]'];
-        return op_fn;
-      }
-    }
 
     while (ch) {
       if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
@@ -346,7 +317,6 @@
   Parser.prototype.expression = function () {
     var root,
         nodes = [],
-        lhs_is_identifier,
         node_value,
         ch = this.white();
 
@@ -365,7 +335,6 @@
       } else {
         node_value = this.value();
         nodes.push(node_value);
-        lhs_is_identifier = node_value instanceof Identifier;
       }
       ch = this.white();
       if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
@@ -373,7 +342,7 @@
         break;
       }
       // infix operators
-      op = this.operator(lhs_is_identifier);
+      op = this.operator();
       if (op) {
         nodes.push(op);
       }
@@ -393,7 +362,7 @@
 
 
   Parser.prototype.identifier = function () {
-    var token = '', ch;
+    var token = '', ch, dereferences;
     ch = this.white();
     while (ch) {
       if (ch === ':' || ch === '}' || ch === ',' || ch <= ' ' || ch === '[' ||
@@ -407,9 +376,48 @@
       case 'true': return true;
       case 'false': return false;
       case 'null': return null;
+      // we use `void 0` because `undefined` can be redefined.
       case 'undefined': return void 0;
-      default: return new Identifier(token, this);
+      default:
     }
+
+    ch = this.white();
+
+    // Dereferences are the operators () or [x.y]
+    // e.g. a()[1]()['1234'] has 4 dereferences.
+    // Identifiers contain all their own dereferences
+    while (ch) {
+      if (ch === '(') {
+        // () dereferences
+        this.white();
+        this.next(')');
+        dereferences.push(operators['()']);
+      } else if (ch === '[') {
+        expr = this.expression();
+        this.white();
+        this.next(']');
+
+        op_fn = function (a) {
+          var v;
+          if (expr instanceof Identifier || expr instanceof Expression) {
+            v = expr.get_value();
+          } else {
+            v = expr;
+          }
+          return a[ko.unwrap(v)];
+        };
+
+        op_fn.precedence = operators['[]'];
+        op_fn.operator = operators['[]'];
+        dereferences.push(op_fn);
+      } else {
+        break;
+      }
+
+      ch = this.white();
+    }
+
+    return new Identifier(this, token, dereferences);
   };
 
 

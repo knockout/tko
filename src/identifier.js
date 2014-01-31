@@ -1,20 +1,13 @@
 
 
 var Identifier = (function () {
-  function Identifier(token, parser) {
+  function Identifier(parser, token, dereferences) {
     this.token = token;
+    this.dereferences = dereferences;
     this.parser = parser;
   }
 
-  /**
-   * Return the value as one would get it from the top-level i.e.
-   * $data.token/$context.token/globals.token; this does not return intermediate
-   * values on a chain of members i.e. $data.hello.there -- requesting the
-   * Identifier('there').value will return $data/$context/globals.there
-   * @param  {object | Identifier | Expression} parent
-   * @return {mixed}  Return the primitive or an accessor.
-   */
-  Identifier.prototype.get_value = function (parent) {
+  Identifier.prototype.lookup_value = function (parent) {
     var parser = this.parser,
         context = parser.context,
         token = this.token;
@@ -52,6 +45,34 @@ var Identifier = (function () {
 
     // globals.token
     return parser.globals && parser.globals[token];
+  }
+
+  /**
+   * Apply all () and [] lookus on the identifier
+   * @param  {mixed} value  Should be an object.
+   * @return {mixed}        The dereferenced value.
+   */
+  Identifier.prototype.dereference = function (value) {
+    var derefs = this.dereferences || [];
+    if (derefs.length === 0) {
+      return value;
+    }
+    console.log("derefs", derefs)
+    return derefs.reduce(
+      function (pv, deref_fn) { return deref_fn(pv) },
+      value);
+  }
+
+  /**
+   * Return the value as one would get it from the top-level i.e.
+   * $data.token/$context.token/globals.token; this does not return intermediate
+   * values on a chain of members i.e. $data.hello.there -- requesting the
+   * Identifier('there').value will return $data/$context/globals.there
+   * @param  {object | Identifier | Expression} parent
+   * @return {mixed}  Return the primitive or an accessor.
+   */
+  Identifier.prototype.get_value = function (parent) {
+    return this.dereference(this.lookup_value(parent));
   };
 
   return Identifier;
