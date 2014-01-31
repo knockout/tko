@@ -57,7 +57,6 @@ var Identifier = (function () {
     if (derefs.length === 0) {
       return value;
     }
-    console.log("derefs", derefs)
     return derefs.reduce(
       function (pv, deref_fn) { return deref_fn(pv) },
       value);
@@ -67,7 +66,9 @@ var Identifier = (function () {
    * Return the value as one would get it from the top-level i.e.
    * $data.token/$context.token/globals.token; this does not return intermediate
    * values on a chain of members i.e. $data.hello.there -- requesting the
-   * Identifier('there').value will return $data/$context/globals.there
+   * Identifier('there').value will return $data/$context/globals.there.
+   *
+   * This will dereference using () or [arg] member.
    * @param  {object | Identifier | Expression} parent
    * @return {mixed}  Return the primitive or an accessor.
    */

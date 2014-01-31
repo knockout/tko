@@ -70,7 +70,6 @@ var Identifier = (function () {
     if (derefs.length === 0) {
       return value;
     }
-    console.log("derefs", derefs)
     return derefs.reduce(
       function (pv, deref_fn) { return deref_fn(pv) },
       value);
@@ -80,7 +79,9 @@ var Identifier = (function () {
    * Return the value as one would get it from the top-level i.e.
    * $data.token/$context.token/globals.token; this does not return intermediate
    * values on a chain of members i.e. $data.hello.there -- requesting the
-   * Identifier('there').value will return $data/$context/globals.there
+   * Identifier('there').value will return $data/$context/globals.there.
+   *
+   * This will dereference using () or [arg] member.
    * @param  {object | Identifier | Expression} parent
    * @return {mixed}  Return the primitive or an accessor.
    */
@@ -340,7 +341,7 @@ var Expression = (function () {
   };
 
   Parser.prototype.error = function (m) {
-      // console.trace()
+      console.trace()
       throw {
           name:    'SyntaxError',
           message: m,
@@ -647,8 +648,52 @@ var Expression = (function () {
   };
 
 
+  /**
+   * A dereference applies to an identifer, being either a function
+   * call "()" or a membership lookup with square brackets "[member]".
+   * @return {fn or undefined}  Dereference function to be applied to the
+   *                            Identifier
+   */
+  Parser.prototype.dereference = function () {
+    var dereferences = [],
+        ch = this.white();
+
+    while (ch) {
+      if (ch === '(') {
+        // () dereferences
+        this.next('(');
+        this.white();
+        this.next(')');
+        return operators['()'];
+      } else if (ch === '[') {
+        this.next('[');
+        expr = this.expression();
+        this.white();
+        this.next(']');
+
+        op_fn = function (a) {
+          var v;
+          if (expr instanceof Identifier || expr instanceof Expression) {
+            v = expr.get_value();
+          } else {
+            v = expr;
+          }
+          return a[ko.unwrap(v)];
+        };
+
+        op_fn.precedence = operators['[]'];
+        op_fn.operator = operators['[]'];
+        return op_fn;
+      } else {
+        break;
+      }
+      ch = this.white();
+    }
+    return;
+  }
+
   Parser.prototype.identifier = function () {
-    var token = '', ch, dereferences;
+    var token = '', ch, deref, dereferences = [];
     ch = this.white();
     while (ch) {
       if (ch === ':' || ch === '}' || ch === ',' || ch <= ' ' || ch === '[' ||
@@ -666,46 +711,16 @@ var Expression = (function () {
       case 'undefined': return void 0;
       default:
     }
-
-    ch = this.white();
-
-    // Dereferences are the operators () or [x.y]
-    // e.g. a()[1]()['1234'] has 4 dereferences.
-    // Identifiers contain all their own dereferences
     while (ch) {
-      if (ch === '(') {
-        // () dereferences
-        this.white();
-        this.next(')');
-        dereferences.push(operators['()']);
-      } else if (ch === '[') {
-        expr = this.expression();
-        this.white();
-        this.next(']');
-
-        op_fn = function (a) {
-          var v;
-          if (expr instanceof Identifier || expr instanceof Expression) {
-            v = expr.get_value();
-          } else {
-            v = expr;
-          }
-          return a[ko.unwrap(v)];
-        };
-
-        op_fn.precedence = operators['[]'];
-        op_fn.operator = operators['[]'];
-        dereferences.push(op_fn);
+      deref = this.dereference();
+      if (deref) {
+        dereferences.push(deref);
       } else {
         break;
       }
-
-      ch = this.white();
     }
-
     return new Identifier(this, token, dereferences);
-  };
-
+  }
 
   Parser.prototype.bindings = function () {
     var key,

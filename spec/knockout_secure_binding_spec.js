@@ -709,13 +709,13 @@ describe("Knockout Secure Binding", function () {
             assert.equal(bindings.neg(), 123)
         })
 
-        it("works off a function e.g. f()[1]") /*, function () {
+        it("works off a function e.g. f()[1]", function () {
             var binding = "neg: f()[3]",
                 f = function () { return [3, 4, 5, 6]}
                 context = { f: f },
                 bindings = new Parser(null, context).parse(binding)
             assert.equal(bindings.neg(), 6)
-        })*/
+        })
     })
 
     describe("parsing deep objects", function () {
