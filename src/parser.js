@@ -54,7 +54,7 @@
   };
 
   Parser.prototype.error = function (m) {
-      console.trace()
+      // console.trace()
       throw {
           name:    'SyntaxError',
           message: m,
@@ -403,7 +403,7 @@
       ch = this.white();
     }
     return;
-  }
+  };
 
   Parser.prototype.identifier = function () {
     var token = '', ch, deref, dereferences = [];
@@ -433,7 +433,7 @@
       }
     }
     return new Identifier(this, token, dereferences);
-  }
+  };
 
   Parser.prototype.bindings = function () {
     var key,

@@ -45,7 +45,7 @@ var Identifier = (function () {
 
     // globals.token
     return parser.globals && parser.globals[token];
-  }
+  };
 
   /**
    * Apply all () and [] lookus on the identifier
@@ -58,9 +58,9 @@ var Identifier = (function () {
       return value;
     }
     return derefs.reduce(
-      function (pv, deref_fn) { return deref_fn(pv) },
+      function (pv, deref_fn) { return deref_fn(pv); },
       value);
-  }
+  };
 
   /**
    * Return the value as one would get it from the top-level i.e.
@@ -80,7 +80,10 @@ var Identifier = (function () {
 })();
 
 /**
- * Determine if a character is a valid item in an identifier
+ * Determine if a character is a valid item in an identifier.
+ * Note that we do not check whether the first item is a number, nor do we
+ * support unicode identifiers here.
+ * See: http://docstore.mik.ua/orelly/webprog/jscript/ch02_07.htm
  * @param  {[type]}  ch  The character
  * @return {Boolean}     True if [A-Za-z0-9_]
  */
