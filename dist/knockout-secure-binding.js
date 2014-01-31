@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.2.0 - 2014-1-31
+/*! knockout-secure-binding - v0.2.1 - 2014-1-31
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -824,7 +824,7 @@ function nodeHasBindings(node) {
         result = node.getAttribute(this.attribute);
     } else if (node.nodeType === node.COMMENT_NODE) {
         value = "" + node.nodeValue || node.text;
-        result = value.indexOf(this.virtualAttribute) > -1;
+        result = value.indexOf(this.virtualAttribute) >= 0;
     }
 
     return result;
@@ -839,11 +839,13 @@ function getBindingAccessors(node, context) {
 
     if (node.nodeType === node.ELEMENT_NODE) {
         sbind_string = node.getAttribute(this.attribute);
+    } else if (node.nodeType === node.COMMENT_NODE) {
+        sbind_string = node.nodeValue.replace(this.virtualAttribute, "");
     }
 
     if (sbind_string) {
-        bindings = new Parser(node, context, this.globals).parse(
-            sbind_string);
+        bindings = new Parser(node, context,this.globals)
+                             .parse(sbind_string);
     }
 
     return bindings;
