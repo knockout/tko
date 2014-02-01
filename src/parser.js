@@ -360,6 +360,27 @@
     return new Expression(nodes);
   };
 
+  /**
+   * Used with Function.bind to create Identifier's _deref_fn, below in
+   * dereference.
+   * @param  {Object} obj   the object passed in.
+   * @return {mixed}        the object'ss value.
+   */
+  function _deref_this(obj) {
+    if (this instanceof Identifier || this instanceof Expression) {
+      return obj[this.get_value()];
+    }
+    return obj[this];
+  }
+
+  /**
+   * Call the function-argument
+   * @param  {Function} Function to be called
+   * @return {monsters}
+   */
+  function _deref_call(fn) {
+    return fn();
+  }
 
   /**
    * A dereference applies to an identifer, being either a function
@@ -368,35 +389,37 @@
    *                            Identifier
    */
   Parser.prototype.dereference = function () {
-    var dereferences = [],
+    var member,
         ch = this.white();
 
     while (ch) {
       if (ch === '(') {
-        // () dereferences
+        // a() function call
         this.next('(');
         this.white();
         this.next(')');
-        return operators['()'];
+        return _deref_call;
       } else if (ch === '[') {
+        // a[x] membership
         this.next('[');
-        expr = this.expression();
+        member = this.expression();
         this.white();
         this.next(']');
 
-        op_fn = function (a) {
-          var v;
-          if (expr instanceof Identifier || expr instanceof Expression) {
-            v = expr.get_value();
-          } else {
-            v = expr;
+        return _deref_this.bind(member);
+      } else if (ch === '.') {
+        // a.x membership
+        member = '';
+        this.next('.');
+        ch = this.white();
+        while (ch) {
+          if (!is_identifier_char(ch)) {
+            break;
           }
-          return a[ko.unwrap(v)];
-        };
-
-        op_fn.precedence = operators['[]'];
-        op_fn.operator = operators['[]'];
-        return op_fn;
+          member += ch;
+          ch = this.next();
+        }
+        return _deref_this.bind(member);
       } else {
         break;
       }

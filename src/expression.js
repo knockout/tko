@@ -7,11 +7,6 @@ var Node = (function () {
   }
 
   var operators =  {
-    // members
-    '.': function member_dot(a, b) { return a[b]; },
-    '[]': function member_bkt(a, b) { return a[b]; },
-    // function call
-    '()': function fn_call(a, b) { return a(); },
     // unary
     '!': function not(a, b) { return !b; },
     '!!': function notnot(a, b) { return !!b; },
@@ -34,6 +29,10 @@ var Node = (function () {
     '!=': function ne(a, b) { return a != b; },
     '===': function sequal(a, b) { return a === b; },
     '!==': function sne(a, b) { return a !== b; },
+    // bitwise
+    '&': function bit_and(a, b) { return a & b; },
+    '^': function xor(a, b) { return a ^ b; },
+    '|': function bit_or(a, b) { return a | b; },
     // logic
     '&&': function logic_and(a, b) { return a && b; },
     '||': function logic_or(a, b) { return a || b; },
@@ -42,12 +41,6 @@ var Node = (function () {
   /* In order of precedence, see:
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
   */
-    // member lookup
-  operators['.'].precedence = 1;
-  operators['[]'].precedence = 1;
-    // function call
-    // usually 2, but a().b() is a() . b() not a.b()()
-  operators['()'].precedence = 0;
     // logical not
   operators['!'].precedence = 4;
   operators['!!'].precedence = 4; // explicit double-negative
@@ -70,6 +63,10 @@ var Node = (function () {
   operators['!='].precedence = 9;
   operators['==='].precedence = 9;
   operators['!=='].precedence = 9;
+    // bitwise
+  operators['&'].precedence = 10;
+  operators['^'].precedence = 11;
+  operators['|'].precedence = 12;
     // logic
   operators['&&'].precedence = 13;
   operators['||'].precedence = 14;
@@ -111,19 +108,10 @@ var Node = (function () {
    *
    * Exported for testing.
    */
-  Node.prototype.get_node_value = function (member_of) {
+  Node.prototype.get_node_value = function () {
     var lhs, rhs, member_op;
-
-    member_op = this.op === operators['.'];
-
-    lhs = this.get_leaf_value(this.lhs, member_of);
-    rhs = this.get_leaf_value(this.rhs, member_op ? lhs : undefined);
-
-    // It is already computed in this case right-to-left.
-    if (member_op) {
-      return rhs;
-    }
-
+    lhs = this.get_leaf_value(this.lhs);
+    rhs = this.get_leaf_value(this.rhs);
     return this.op(lhs, rhs);
   };
 

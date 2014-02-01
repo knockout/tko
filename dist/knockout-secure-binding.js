@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.2.3 - 2014-1-31
+/*! knockout-secure-binding - v0.3.0 - 2014-2-1
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -68,7 +68,7 @@ var Identifier = (function () {
   /**
    * Apply all () and [] functions on the identifier to the lhs value e.g.
    * a()[3] has deref functions that are essentially this:
-   *     [operators['()'], function () { return a[3] }]
+   *     [_deref_call, _deref_this where this=3]
    *
    * @param  {mixed} value  Should be an object.
    * @return {mixed}        The dereferenced value.
@@ -118,11 +118,6 @@ var Node = (function () {
   }
 
   var operators =  {
-    // members
-    '.': function member_dot(a, b) { return a[b]; },
-    '[]': function member_bkt(a, b) { return a[b]; },
-    // function call
-    '()': function fn_call(a, b) { return a(); },
     // unary
     '!': function not(a, b) { return !b; },
     '!!': function notnot(a, b) { return !!b; },
@@ -145,6 +140,10 @@ var Node = (function () {
     '!=': function ne(a, b) { return a != b; },
     '===': function sequal(a, b) { return a === b; },
     '!==': function sne(a, b) { return a !== b; },
+    // bitwise
+    '&': function bit_and(a, b) { return a & b; },
+    '^': function xor(a, b) { return a ^ b; },
+    '|': function bit_or(a, b) { return a | b; },
     // logic
     '&&': function logic_and(a, b) { return a && b; },
     '||': function logic_or(a, b) { return a || b; },
@@ -153,12 +152,6 @@ var Node = (function () {
   /* In order of precedence, see:
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
   */
-    // member lookup
-  operators['.'].precedence = 1;
-  operators['[]'].precedence = 1;
-    // function call
-    // usually 2, but a().b() is a() . b() not a.b()()
-  operators['()'].precedence = 0;
     // logical not
   operators['!'].precedence = 4;
   operators['!!'].precedence = 4; // explicit double-negative
@@ -181,6 +174,10 @@ var Node = (function () {
   operators['!='].precedence = 9;
   operators['==='].precedence = 9;
   operators['!=='].precedence = 9;
+    // bitwise
+  operators['&'].precedence = 10;
+  operators['^'].precedence = 11;
+  operators['|'].precedence = 12;
     // logic
   operators['&&'].precedence = 13;
   operators['||'].precedence = 14;
@@ -222,19 +219,10 @@ var Node = (function () {
    *
    * Exported for testing.
    */
-  Node.prototype.get_node_value = function (member_of) {
+  Node.prototype.get_node_value = function () {
     var lhs, rhs, member_op;
-
-    member_op = this.op === operators['.'];
-
-    lhs = this.get_leaf_value(this.lhs, member_of);
-    rhs = this.get_leaf_value(this.rhs, member_op ? lhs : undefined);
-
-    // It is already computed in this case right-to-left.
-    if (member_op) {
-      return rhs;
-    }
-
+    lhs = this.get_leaf_value(this.lhs);
+    rhs = this.get_leaf_value(this.rhs);
     return this.op(lhs, rhs);
   };
 
@@ -656,6 +644,27 @@ var Expression = (function () {
     return new Expression(nodes);
   };
 
+  /**
+   * Used with Function.bind to create Identifier's _deref_fn, below in
+   * dereference.
+   * @param  {Object} obj   the object passed in.
+   * @return {mixed}        the object'ss value.
+   */
+  function _deref_this(obj) {
+    if (this instanceof Identifier || this instanceof Expression) {
+      return obj[this.get_value()];
+    }
+    return obj[this];
+  }
+
+  /**
+   * Call the function-argument
+   * @param  {Function} Function to be called
+   * @return {monsters}
+   */
+  function _deref_call(fn) {
+    return fn();
+  }
 
   /**
    * A dereference applies to an identifer, being either a function
@@ -664,35 +673,37 @@ var Expression = (function () {
    *                            Identifier
    */
   Parser.prototype.dereference = function () {
-    var dereferences = [],
+    var member,
         ch = this.white();
 
     while (ch) {
       if (ch === '(') {
-        // () dereferences
+        // a() function call
         this.next('(');
         this.white();
         this.next(')');
-        return operators['()'];
+        return _deref_call;
       } else if (ch === '[') {
+        // a[x] membership
         this.next('[');
-        expr = this.expression();
+        member = this.expression();
         this.white();
         this.next(']');
 
-        op_fn = function (a) {
-          var v;
-          if (expr instanceof Identifier || expr instanceof Expression) {
-            v = expr.get_value();
-          } else {
-            v = expr;
+        return _deref_this.bind(member);
+      } else if (ch === '.') {
+        // a.x membership
+        member = '';
+        this.next('.');
+        ch = this.white();
+        while (ch) {
+          if (!is_identifier_char(ch)) {
+            break;
           }
-          return a[ko.unwrap(v)];
-        };
-
-        op_fn.precedence = operators['[]'];
-        op_fn.operator = operators['[]'];
-        return op_fn;
+          member += ch;
+          ch = this.next();
+        }
+        return _deref_this.bind(member);
       } else {
         break;
       }

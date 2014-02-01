@@ -55,7 +55,7 @@ var Identifier = (function () {
   /**
    * Apply all () and [] functions on the identifier to the lhs value e.g.
    * a()[3] has deref functions that are essentially this:
-   *     [operators['()'], function () { return a[3] }]
+   *     [_deref_call, _deref_this where this=3]
    *
    * @param  {mixed} value  Should be an object.
    * @return {mixed}        The dereferenced value.

@@ -1,16 +1,24 @@
 /*
-TODO: comments
-see eg https://github.com/rniemeyer/knockout-classBindingProvider/blob/master/spec/knockout-classBindingProvider.spec.js
+    Knockout Secure Binding  –  Spec
+
+    Notes:
+    1. The binding tests both Knockout's default binding and the secure binding
+       so The secure binding is not set by default, for an example of how to
+       test it see the test "changing Knockout's bindings to KSB" below
+
+    2. Note all the variables e.g. `instance` set in the outermost `describe`.
+       These make for shorthands throughout the tests.
+
 */
 
 describe("Knockout Secure Binding", function () {
-    var instance,
-        Parser,
-        Expression,
-        Identifier,
-        Node,
-        operators,
-        csp_rex = /Content Security Policy|blocked by CSP/;
+   var instance,
+       Parser,
+       Expression,
+       Identifier,
+       Node,
+       operators,
+       csp_rex = /Content Security Policy|blocked by CSP/;
 
     beforeEach(function () {
         instance = new ko.secureBindingsProvider();
@@ -32,13 +40,13 @@ describe("Knockout Secure Binding", function () {
     })
 
     it("secureBindingsProvider exist on 'ko'", function () {
-        // note that it could alternatively be exported with `require`
-        assert.property(ko, 'secureBindingsProvider')
-    })
+            // note that it could alternatively be exported with `require`
+            assert.property(ko, 'secureBindingsProvider')
+        })
 
     it("has eval or new Function throw a CSP error", function () {
         var efn = function () { return eval("true") },
-            nfn = function () { new Function("return true") };
+        nfn = function () { new Function("return true") };
 
         console.log("Expecting a CSP violation ...")
         assert.throw(efn, csp_rex)
@@ -48,251 +56,241 @@ describe("Knockout Secure Binding", function () {
 
     it("will throw an CSP error with regular bindings", function () {
         var div = document.createElement("div"),
-            fn = function () {
-                ko.applyBindings({obs: 1}, div)
-            };
+        fn = function () {
+            ko.applyBindings({obs: 1}, div)
+        };
 
-        // Although we cannot disable the CSP-violations, printing to the
-        // console, we can print a lead-in that makes it appear to be
-        // expected.
-        console.log("Expecting a CSP violation ...")
-        div.setAttribute("data-bind", "text: obs"),
-        ko.bindingProvider.instance = new ko.bindingProvider()
-        assert.throw(fn, csp_rex)
-    })
+            // Although we cannot disable the CSP-violations, printing to the
+            // console, we can print a lead-in that makes it appear to be
+            // expected.
+            console.log("Expecting a CSP violation ...")
+            div.setAttribute("data-bind", "text: obs"),
+            ko.bindingProvider.instance = new ko.bindingProvider()
+            assert.throw(fn, csp_rex)
+        })
 
     it("provides a binding provider", function () {
         ko.bindingProvider.instance = new ko.secureBindingsProvider();
     })
 
-    describe("nodeHasBindings", function() {
-        it("identifies elements with data-sbind", function () {
-            var div = document.createElement("div")
-            div.setAttribute("data-sbind", "x")
-            assert.ok(instance.nodeHasBindings(div))
-        })
-
-        it("does not identify elements without data-sbind", function () {
-            var div = document.createElement("div")
-            div.setAttribute("data-bind", "x")
-            assert.notOk(instance.nodeHasBindings(div))
-        })
+describe("nodeHasBindings", function() {
+    it("identifies elements with data-sbind", function () {
+        var div = document.createElement("div")
+        div.setAttribute("data-sbind", "x")
+        assert.ok(instance.nodeHasBindings(div))
     })
 
-    describe("getBindingAccessors with string arg", function() {
-        var div;
+    it("does not identify elements without data-sbind", function () {
+        var div = document.createElement("div")
+        div.setAttribute("data-bind", "x")
+        assert.notOk(instance.nodeHasBindings(div))
+    })
+})
 
-        beforeEach(function() {
-            ko.bindingProvider.instance = new ko.secureBindingsProvider()
-            div = document.createElement("div");
-            instance.bindings.alpha = {
-                init: sinon.spy(),
-                update: sinon.spy()
-            }
-        });
+describe("getBindingAccessors with string arg", function() {
+    var div;
 
-        it("reads multiple bindings", function () {
-            div.setAttribute("data-sbind", 'a: 123, b: "456"')
-            var bindings = instance.getBindingAccessors(div);
-            assert.equal(Object.keys(bindings).length, 2, 'len')
-            assert.equal(bindings['a'](), 123, 'a')
-            assert.equal(bindings['b'](), "456", 'b')
-        });
+    beforeEach(function() {
+        ko.bindingProvider.instance = new ko.secureBindingsProvider()
+        div = document.createElement("div");
+        instance.bindings.alpha = {
+            init: sinon.spy(),
+            update: sinon.spy()
+        }
+    });
 
-        it("escapes strings", function () {
-            div.setAttribute("data-sbind", 'a: "a\\"b", b: \'c\\\'d\'')
-            var bindings = instance.getBindingAccessors(div);
-            assert.equal(Object.keys(bindings).length, 2, 'len')
-            assert.equal(bindings['a'](), "a\"b", 'a')
-            assert.equal(bindings['b'](), "c\'d", 'b')
-        })
+    it("reads multiple bindings", function () {
+        div.setAttribute("data-sbind", 'a: 123, b: "456"')
+        var bindings = instance.getBindingAccessors(div);
+        assert.equal(Object.keys(bindings).length, 2, 'len')
+        assert.equal(bindings['a'](), 123, 'a')
+        assert.equal(bindings['b'](), "456", 'b')
+    });
 
-        it("returns a name/valueAccessor pair", function () {
-            div.setAttribute("data-sbind", 'alpha: "122.9"');
-            var bindings = instance.getBindingAccessors(div);
-            assert.equal(Object.keys(bindings).length, 1, 'len')
-            assert.isFunction(bindings['alpha'], 'is accessor')
-            assert.equal(bindings['alpha'](), "122.9", '122.9')
-        });
+    it("escapes strings", function () {
+        div.setAttribute("data-sbind", 'a: "a\\"b", b: \'c\\\'d\'')
+        var bindings = instance.getBindingAccessors(div);
+        assert.equal(Object.keys(bindings).length, 2, 'len')
+        assert.equal(bindings['a'](), "a\"b", 'a')
+        assert.equal(bindings['b'](), "c\'d", 'b')
+    })
 
-        it("becomes the valueAccessor", function () {
-            div.setAttribute("data-sbind", 'alpha: "122.9"');
-            var i_spy = instance.bindings.alpha.init,
-                u_spy = instance.bindings.alpha.update,
-                args;
-            ko.applyBindings({vm: true}, div);
-            assert.equal(i_spy.callCount, 1, "i_spy cc");
-            assert.equal(u_spy.callCount, 1, "u_spy cc");
-            args = i_spy.getCall(0).args;
+    it("returns a name/valueAccessor pair", function () {
+        div.setAttribute("data-sbind", 'alpha: "122.9"');
+        var bindings = instance.getBindingAccessors(div);
+        assert.equal(Object.keys(bindings).length, 1, 'len')
+        assert.isFunction(bindings['alpha'], 'is accessor')
+        assert.equal(bindings['alpha'](), "122.9", '122.9')
+    });
 
-            assert.equal(args[0], div, "u_spy div == node")
-            assert.equal(args[1](), "122.9", "valueAccessor")
+    it("becomes the valueAccessor", function () {
+        div.setAttribute("data-sbind", 'alpha: "122.9"');
+        var i_spy = instance.bindings.alpha.init,
+            u_spy = instance.bindings.alpha.update,
+            args;
+        ko.applyBindings({vm: true}, div);
+        assert.equal(i_spy.callCount, 1, "i_spy cc");
+        assert.equal(u_spy.callCount, 1, "u_spy cc");
+        args = i_spy.getCall(0).args;
+
+        assert.equal(args[0], div, "u_spy div == node")
+        assert.equal(args[1](), "122.9", "valueAccessor")
             // args[2] == allBindings
             assert.deepEqual(args[3], {vm: true}, "view model")
 
         })
-    })
+})
 
-    describe("getBindingAccessors with function arg", function () {
-        var div;
+describe("getBindingAccessors with function arg", function () {
+    var div;
 
-        beforeEach(function() {
-            ko.bindingProvider.instance = new ko.secureBindingsProvider()
-            div = document.createElement("div");
-            div.setAttribute("data-sbind", 'alpha: x');
-            instance.bindings.alpha = {
-                init: sinon.spy(),
-                update: sinon.spy()
-            }
-        });
+    beforeEach(function() {
+        ko.bindingProvider.instance = new ko.secureBindingsProvider()
+        div = document.createElement("div");
+        div.setAttribute("data-sbind", 'alpha: x');
+        instance.bindings.alpha = {
+            init: sinon.spy(),
+            update: sinon.spy()
+        }
+    });
 
-        it("returns a name/valueAccessor pair", function () {
-            var bindings = instance.getBindingAccessors(div);
-            assert.equal(Object.keys(bindings).length, 1)
-            assert.isFunction(bindings['alpha'])
-        });
+    it("returns a name/valueAccessor pair", function () {
+        var bindings = instance.getBindingAccessors(div);
+        assert.equal(Object.keys(bindings).length, 1)
+        assert.isFunction(bindings['alpha'])
+    });
 
-        it("becomes the valueAccessor", function () {
-            var i_spy = instance.bindings.alpha.init,
-                u_spy = instance.bindings.alpha.update,
-                args;
-            ko.applyBindings({x: 0xDEADBEEF}, div);
-            assert.equal(i_spy.callCount, 1, "i_spy cc");
-            assert.equal(u_spy.callCount, 1, "u_spy cc");
-            args = i_spy.getCall(0).args;
+    it("becomes the valueAccessor", function () {
+        var i_spy = instance.bindings.alpha.init,
+            u_spy = instance.bindings.alpha.update,
+            args;
+        ko.applyBindings({x: 0xDEADBEEF}, div);
+        assert.equal(i_spy.callCount, 1, "i_spy cc");
+        assert.equal(u_spy.callCount, 1, "u_spy cc");
+        args = i_spy.getCall(0).args;
 
-            assert.equal(args[0], div, "u_spy div == node")
-            assert.equal(args[1](), 0xDEADBEEF, "valueAccessor")
+        assert.equal(args[0], div, "u_spy div == node")
+        assert.equal(args[1](), 0xDEADBEEF, "valueAccessor")
             // args[2] == allBindings
             assert.deepEqual(args[3],  {x: 0xDEADBEEF}, "view model")
         })
+})
+
+describe("changing Knockout's bindings to KSB", function () {
+    beforeEach(function () {
+        ko.bindingProvider.instance = new ko.secureBindingsProvider()
     })
 
-    describe("Knockout's bindings", function () {
-        beforeEach(function () {
-            ko.bindingProvider.instance = new ko.secureBindingsProvider()
-        })
-
-        it("binds Text with data-sbind", function () {
-            var div = document.createElement("div")
-            div.setAttribute("data-sbind", "text: obs")
-            ko.applyBindings({obs: ko.observable("a towel")}, div)
-            assert.equal(div.textContent, "a towel")
-        })
-
-        it("sets attributes to constants", function () {
-            var div = document.createElement("div"),
-                context = { aTitle: "petunia plant" };
-            div.setAttribute("data-sbind", "attr: { title: aTitle }")
-            ko.applyBindings(context, div)
-            assert.equal(div.getAttribute("title"), context.aTitle)
-        })
-
-        it("sets attributes to observables in objects", function () {
-            var div = document.createElement("div"),
-                context = { aTitle: ko.observable("petunia plant") };
-            div.setAttribute("data-sbind", "attr: { title: aTitle }")
-            ko.applyBindings(context, div)
-            assert.equal(div.getAttribute("title"), context.aTitle())
-        })
-
-        it("registers a click event", function () {
-            var div = document.createElement("div"),
-                called = false,
-                context = { cb: function () { called = true; } }
-            div.setAttribute("data-sbind", "click: cb")
-            ko.applyBindings(context, div)
-            assert.equal(called, false, "not called")
-            div.click()
-            assert.equal(called, true)
-        })
+    it("binds Text with data-sbind", function () {
+        var div = document.createElement("div");
+        div.setAttribute("data-sbind", "text: obs")
+        ko.applyBindings({obs: ko.observable("a towel")}, div)
+        assert.equal(div.textContent, "a towel")
     })
 
-    describe("The lookup of variables (get_lookup_root)", function () {
-        it("accesses the context", function () {
-            var binding = "a: x",
-                context = { x: 'y' },
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.a(), "y");
-        })
+    it("sets attributes to constants", function () {
+        var div = document.createElement("div"),
+            context = { aTitle: "petunia plant" };
+        div.setAttribute("data-sbind", "attr: { title: aTitle }")
+        ko.applyBindings(context, div)
+        assert.equal(div.getAttribute("title"), context.aTitle)
+    })
 
-        it("accesses the globals", function () {
-            var binding = "a: z",
-                globals = { z: "ZZ" },
-                bindings = new Parser(null, {}, globals).parse(
-                    binding);
-            assert.equal(bindings.a(), globals.z)
-        })
+    it("sets attributes to observables in objects", function () {
+        var div = document.createElement("div"),
+            context = { aTitle: ko.observable("petunia plant") };
+        div.setAttribute("data-sbind", "attr: { title: aTitle }")
+        ko.applyBindings(context, div)
+        assert.equal(div.getAttribute("title"), context.aTitle())
+    })
 
-        it("accesses $data.value and value", function () {
-            var binding = "x: $data.value, y: value",
-                context = { '$data': { value: 42 }},
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.x(), 42)
-            assert.equal(bindings.y(), 42)
-        })
+    it("registers a click event", function () {
+        var div = document.createElement("div"),
+            called = false,
+            context = { cb: function () { called = true; } };
+        div.setAttribute("data-sbind", "click: cb")
+        ko.applyBindings(context, div)
+        assert.equal(called, false, "not called")
+        div.click()
+        assert.equal(called, true)
+    })
+})
 
-        it("ignores spaces", function () {
-            var binding = "x: $data  .  value, y: $data\n\t\r . \t\r\nvalue",
-                context = { '$data': { value: 42 }},
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.x(), 42)
-            assert.equal(bindings.y(), 42)
-        })
+describe("The lookup of variables (get_lookup_root)", function () {
+    it("accesses the context", function () {
+        var binding = "a: x",
+            context = { x: 'y' },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.a(), "y");
+    })
 
-        it("looks up nested elements in objects", function () {
-            var binding = "x: { y: { z: a.b.c } }",
-                context = { 'a': { b: { c: 11 }}},
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.x().y.z, 11)
-        })
+    it("accesses the globals", function () {
+        var binding = "a: z",
+            globals = { z: "ZZ" },
+            bindings = new Parser(null, {}, globals).parse(binding);
+        assert.equal(bindings.a(), globals.z)
+    })
 
-        it("does not have access to `window` globals", function () {
-            var binding = "x: window, y: global, z: document",
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.x(), undefined)
-            assert.equal(bindings.y(), undefined)
-            assert.equal(bindings.z(), undefined)
-        })
+    it("accesses $data.value and value", function () {
+        var binding = "x: $data.value, y: value",
+            context = { '$data': { value: 42 }},
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.x(), 42)
+        assert.equal(bindings.y(), 42)
+    })
 
-        it("recognizes $context", function () {
-            var binding = "x: $context.value, y: value",
-                context = { value: 42 },
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.x(), 42)
-            assert.equal(bindings.y(), 42)
-        })
+    it("ignores spaces", function () {
+        var binding = "x: $data  .  value, y: $data\n\t\r . \t\r\nvalue",
+            context = { '$data': { value: 42 }},
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.x(), 42)
+        assert.equal(bindings.y(), 42)
+    })
 
-        it("recognizes $element", function () {
-            var binding = "x: $element.id",
-                node = { id: 42 },
-                bindings = new Parser(node, {}).parse(
-                    binding);
-            assert.equal(bindings.x(), node.id)
-        })
+    it("looks up nested elements in objects", function () {
+        var binding = "x: { y: { z: a.b.c } }",
+            context = { 'a': { b: { c: 11 }}},
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.x().y.z, 11)
+    })
 
-        it("accesses $data before $context", function () {
-            var binding = "x: value",
-                context = { value: 21, '$data': { value: 42 }},
-                bindings = new Parser(null, context).parse(
-                    binding);
-            assert.equal(bindings.x(), 42)
-        })
+    it("does not have access to `window` globals", function () {
+        var binding = "x: window, y: global, z: document",
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.x(), undefined)
+        assert.equal(bindings.y(), undefined)
+        assert.equal(bindings.z(), undefined)
+    })
 
-        it("accesses $context before globals", function () {
-            var binding = "a: z",
-                context = { z: 42 },
-                globals = { z: 84 },
-                bindings = new Parser(null, context,
-                    globals).parse(binding);
-            assert.equal(bindings.a(), 42)
-        })
+    it("recognizes $context", function () {
+        var binding = "x: $context.value, y: value",
+            context = { value: 42 },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.x(), 42)
+        assert.equal(bindings.y(), 42)
+    })
+
+    it("recognizes $element", function () {
+        var binding = "x: $element.id",
+            node = { id: 42 },
+            bindings = new Parser(node, {}).parse(binding);
+        assert.equal(bindings.x(), node.id)
+    })
+
+    it("accesses $data before $context", function () {
+        var binding = "x: value",
+            context = { value: 21, '$data': { value: 42 }},
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.x(), 42)
+    })
+
+    it("accesses $context before globals", function () {
+        var binding = "a: z",
+            context = { z: 42 },
+            globals = { z: 84 },
+            bindings = new Parser(null, context, globals).parse(binding);
+        assert.equal(bindings.a(), 42)
+    })
 
         // SKIP FIXME / TODO
         it("does not bleed globals", function () {
@@ -308,507 +306,492 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
-    describe("the build_tree function", function () {
-        var nodes_to_tree;
+describe("the build_tree function", function () {
+    var nodes_to_tree;
 
-        beforeEach(function () {
-            nodes_to_tree = Expression.prototype.build_tree;
-        })
+    beforeEach(function () {
+        nodes_to_tree = Expression.prototype.build_tree;
+    })
 
-        it("converts a simple array to a tree", function () {
-            var nodes = ['a', operators['*'], 'b'],
-                tree = nodes_to_tree(nodes.slice(0));
+    it("converts a simple array to a tree", function () {
+        var nodes = ['a', operators['*'], 'b'],
+            tree = nodes_to_tree(nodes.slice(0));
                 // we use nodes.slice(0) to make a copy.
-            assert.equal(tree.lhs, 'a');
-            assert.equal(tree.rhs, 'b');
-            assert.equal(tree.op, operators['*']);
-        })
+                assert.equal(tree.lhs, 'a');
+                assert.equal(tree.rhs, 'b');
+                assert.equal(tree.op, operators['*']);
+            })
 
-        it("converts multiple * to a tree", function () {
-            var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
-                tree = nodes_to_tree(nodes.slice(0));
-            assert.equal(tree.lhs, 'a');
-            assert.equal(tree.op, operators['*']);
-            assert.equal(tree.rhs.lhs, 'b');
-            assert.equal(tree.rhs.op, operators['/']);
-            assert.equal(tree.rhs.rhs, 'c');
-        })
+    it("converts multiple * to a tree", function () {
+        var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
+            tree = nodes_to_tree(nodes.slice(0));
+        assert.equal(tree.lhs, 'a');
+        assert.equal(tree.op, operators['*']);
+        assert.equal(tree.rhs.lhs, 'b');
+        assert.equal(tree.rhs.op, operators['/']);
+        assert.equal(tree.rhs.rhs, 'c');
+    })
 
-        it("converts a complex set as expected", function () {
-            var nodes = [
-                'a', operators['*'], 'b',
-                operators['+'],
-                'c', operators['*'], 'd', operators['*'], 'e',
-                operators['>'],
-                'f', operators['+'], 'g', operators['%'], 'h',
+    it("converts a complex set as expected", function () {
+        var nodes = [
+            'a', operators['*'], 'b',
+            operators['+'],
+            'c', operators['*'], 'd', operators['*'], 'e',
+            operators['>'],
+            'f', operators['+'], 'g', operators['%'], 'h',
             ],
-                root = nodes_to_tree(nodes.slice(0));
-            assert.equal(root.op, operators['>'], '>')
+            root = nodes_to_tree(nodes.slice(0));
+        assert.equal(root.op, operators['>'], '>')
 
-            assert.equal(root.lhs.op, operators['+'], '+')
-            assert.equal(root.lhs.lhs.op, operators['*'], '*')
-            assert.equal(root.lhs.lhs.lhs, 'a')
-            assert.equal(root.lhs.lhs.rhs, 'b')
+        assert.equal(root.lhs.op, operators['+'], '+')
+        assert.equal(root.lhs.lhs.op, operators['*'], '*')
+        assert.equal(root.lhs.lhs.lhs, 'a')
+        assert.equal(root.lhs.lhs.rhs, 'b')
 
-            assert.equal(root.lhs.rhs.op, operators['*'], '*')
-            assert.equal(root.lhs.rhs.lhs, 'c')
-            assert.equal(root.lhs.rhs.rhs.lhs, 'd')
-            assert.equal(root.lhs.rhs.rhs.rhs, 'e')
+        assert.equal(root.lhs.rhs.op, operators['*'], '*')
+        assert.equal(root.lhs.rhs.lhs, 'c')
+        assert.equal(root.lhs.rhs.rhs.lhs, 'd')
+        assert.equal(root.lhs.rhs.rhs.rhs, 'e')
 
-            assert.equal(root.rhs.op, operators['+'], 'rhs +')
-            assert.equal(root.rhs.lhs, 'f')
+        assert.equal(root.rhs.op, operators['+'], 'rhs +')
+        assert.equal(root.rhs.lhs, 'f')
 
-            assert.equal(root.rhs.rhs.op, operators['%'])
-            assert.equal(root.rhs.rhs.lhs, 'g')
-            assert.equal(root.rhs.rhs.rhs, 'h')
-        })
+        assert.equal(root.rhs.rhs.op, operators['%'])
+        assert.equal(root.rhs.rhs.lhs, 'g')
+        assert.equal(root.rhs.rhs.rhs, 'h')
+    })
 
-        it("converts function calls (a())", function () {
-            var context = { x: function () { } },
-                parser, nodes, root;
+    it("converts function calls (a())", function () {
+        var context = { x: ko.observable(0x0F) },
+            parser, nodes, root;
             parser = new Parser(null, context);
             nodes = [
-                new Identifier(parser, 'x'),
-                operators['()'],
-                undefined
+                // the third argument is the same as _deref_call
+                new Identifier(parser, 'x', [function (a) { return a() }]),
+                operators['|'],
+                0x80
             ];
-            root = nodes_to_tree(nodes.slice(0));
+        root = nodes_to_tree(nodes.slice(0));
 
-            assert.equal(root.lhs, nodes[0])
-            assert.equal(root.op, operators['()'])
-        })
+        assert.equal(root.get_node_value(), 0x8F)
+    })
+})
 
-        it("converts a string of function calls (a().b())", function () {
-            var y = function () { return 'z' },
-                x = function () { return { y: y } },
-                context = { x: x },
-                parser, node, root;
+describe("Identifier", function () {
+    var c = 'Z',
+        f = function () { return 'Fv' };
 
+    it("looks up values on the parser context", function () {
+        var context = { c: c, f: f },
             parser = new Parser(null, context);
+        assert.equal(new Identifier(parser, "c").get_value(), 'Z')
+        assert.equal(new Identifier(parser, "f").get_value(), f)
+    })
 
-            nodes = [
-                new Identifier(parser, 'x'),
-                operators['()'],
-                undefined,
-                operators['.'],
-                new Identifier(parser, 'y'),
-                operators['()']
-            ];
-
-            root = nodes_to_tree(nodes.slice(0));
-
-            assert.equal(root.lhs.lhs, nodes[0])
-            assert.equal(root.lhs.op, operators['()'])
-            assert.equal(root.op, operators['.'])
-            assert.equal(root.rhs.lhs, nodes[4])
-            assert.equal(root.rhs.op, operators['()'])
+    describe("the dereference function", function () {
+        it("does nothing with no references", function () {
+            var refs = undefined,
+                ident = new Identifier(null, 'x', refs);
+            assert.equal(ident.dereference('1'), 1)
+        })
+        it("does nothing with empty array references", function () {
+            var refs = [],
+                ident = new Identifier(null, 'x', refs);
+            assert.equal(ident.dereference('1'), 1)
+        })
+        it("applies the functions of the refs to the value", function () {
+            var deref = function (a) { return a() },
+                refs = [deref, deref],
+                ident = new Identifier(null, 'x', refs),
+                g = function () { return '42' },
+                f = function () { return g };
+            assert.equal(ident.dereference(f), 42)
         })
     })
 
-    describe("Identifier", function () {
-        var c = 'Z', f = function () { return 'Fv' };
+    it("dereferences values on the parser", function () {
+        var context = { f: f },
+            parser = new Parser(null, context),
+            derefs = [function (a) { return a() }];
+        assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
+    })
+})
 
-        it("looks up values on the parser context", function () {
-            var context = { c: c, f: f },
-                parser = new Parser(null, context);
-            assert.equal(new Identifier(parser, "c").get_value(), 'Z')
-            assert.equal(new Identifier(parser, "f").get_value(), f)
-        })
-
-        describe("the dereference function", function () {
-            it("does nothing with no references", function () {
-                var refs = undefined,
-                    ident = new Identifier(null, 'x', refs);
-                assert.equal(ident.dereference('1'), 1)
-            })
-            it("does nothing with empty array references", function () {
-                var refs = [],
-                    ident = new Identifier(null, 'x', refs);
-                assert.equal(ident.dereference('1'), 1)
-            })
-            it("applies the functions of the refs to the value", function () {
-                var refs = [operators['()'], operators['()']],
-                    ident = new Identifier(null, 'x', refs),
-                    g = function () { return '42' },
-                    f = function () { return g };
-                assert.equal(ident.dereference(f), 42)
-            })
-        })
-
-        it("dereferences values on the parser", function () {
-            var context = { f: f },
-                parser = new Parser(null, context),
-                derefs = [operators['()']];
-            assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
-        })
+describe("Node", function () {
+    it("traverses the tree 19 * -2 + 4", function () {
+        var root = new Node();
+        root.op = operators['+']
+        root.lhs = new Node(19, operators['*'], -2)
+        root.rhs = 4
+        assert.equal(root.get_node_value(), 19 * -2 + 4)
     })
 
-    describe("Node", function () {
-        var context, parser, identifiers,
-            f = function () { return 'Z' },
-            ff = function () { return { fr: f } },
-            g = function () { return { c: 'gY' }};
-
-        beforeEach(function () {
-            context = { f: f, ff: ff, g:g, c: 'Y' }
-            parser = new Parser(null, context)
-            identifiers = {
-                f: new Identifier(parser, "f"),
-                ff: new Identifier(parser, "ff"),
-                fr: new Identifier(parser, "fr"),
-                g: new Identifier(parser, "g"),
-            }
-        })
-
-        it("gets a value for f()", function () {
-            var root;
-            root = new Node(identifiers.f, operators['()'])
-            assert.equal(root.get_node_value(), 'Z')
-        })
-
-        it("gets a value for g().c", function () {
-            var root, lhs;
-            lhs = new Node(identifiers.g, operators['()'])
-            root = new Node(lhs, operators['.'], "c")
-            assert.equal(root.get_node_value(), 'gY')
-        })
-
-        it("gets value for ff().fr()", function () {
-            var root;
-            root = new Node(undefined, operators['.'])
-            root.lhs = new Node(identifiers.ff, operators['()'])
-            root.rhs = new Node(identifiers.fr, operators['()'])
-            assert.equal(root.get_node_value(), 'Z')
-        })
-
+    it("looks up identifiers", function () {
+        var root = new Node(),
+            context = { x: 19 },
+            parser = new Parser(null, context),
+            ident = new Identifier(parser, 'x');
+        root.op = operators['+']
+        root.lhs = ident
+        root.rhs = 23
+        assert.equal(root.get_node_value(), 23 + 19)
     })
+})
 
-    describe("the bindings parser", function () {
-        it("parses bindings with JSON values", function () {
-            var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
+describe("the bindings parser", function () {
+    it("parses bindings with JSON values", function () {
+        var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
             value = new Parser(null, {}).parse(binding_string);
-            assert.equal(value.a(), "A", "string");
-            assert.equal(value.b(), 1, "int");
-            assert.equal(value.c(), 2.1, "float");
-            assert.deepEqual(value.d(), ["X",  "Y"], "array");
-            assert.deepEqual(value.e(), {"R": "V"}, "object");
-            assert.equal(value.t(), true, "true");
-            assert.equal(value.f(), false, "false");
-            assert.equal(value.n(), null, "null");
-        })
-
-        it("parses an array of JSON values", function () {
-            var binding = "x: [1, 2.1, true, false, null, undefined]",
-                bindings = new Parser(null, {}).parse(
-                    binding);
-            assert.deepEqual(bindings.x(), [1, 2.1, true, false, null, undefined])
-        })
-
-        it("undefined keyword works", function () {
-            var value = new Parser(null, {}).parse(
-                    "y: undefined");
-            assert.equal(value.y(), void 0);
-        })
-
-        it("parses single-quote strings", function () {
-            var binding = "text: 'st\\'r'",
-                bindings = new Parser(null, {}).parse(
-                    binding);
-            assert.equal(bindings.text(), "st'r")
-        })
-
-        it("parses text: {object: 'string'}", function () {
-            var binding = "text: {object: 'string'}",
-                bindings = new Parser(null, {}).parse(binding);
-            assert.deepEqual(bindings.text(), { object: "string" })
-        })
-
-        it("parses object: attr: {name: value}", function () {
-            var binding = "attr: { klass: kValue }",
-                context = { kValue: 'Sam' }
-                bindings= new Parser(null, context).parse(binding);
-            assert.equal(bindings.attr().klass, 'Sam')
-        })
-
-        it("parses object: attr: {name: ko.observable(value)}", function () {
-            var binding = "attr : { klass: kValue }",
-                context = { kValue: ko.observable('Gollum') }
-                bindings= new Parser(null, context).parse(binding);
-            assert.equal(bindings.attr().klass(), 'Gollum')
-        })
-
-        it("parses object: attr: {n1: v1, n2: v2}", function () {
-            var binding = "attr : { a: x, b: y }",
-                context = { x: 'Real', y: 'Imaginary' }
-                bindings= new Parser(null, context).parse(binding);
-            assert.equal(bindings.attr().a, 'Real')
-            assert.equal(bindings.attr().b, 'Imaginary')
-        })
+        assert.equal(value.a(), "A", "string");
+        assert.equal(value.b(), 1, "int");
+        assert.equal(value.c(), 2.1, "float");
+        assert.deepEqual(value.d(), ["X",  "Y"], "array");
+        assert.deepEqual(value.e(), {"R": "V"}, "object");
+        assert.equal(value.t(), true, "true");
+        assert.equal(value.f(), false, "false");
+        assert.equal(value.n(), null, "null");
     })
 
-    describe("the parsing of expressions", function () {
-        it("works with explicit braces ( )", function () {
-            var binding = "attr : (x)",
-                context = { x: 'spot' }
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.attr(), 'spot')
-        })
+    it("parses an array of JSON values", function () {
+        var binding = "x: [1, 2.1, true, false, null, undefined]",
+        bindings = new Parser(null, {}).parse(
+            binding);
+        assert.deepEqual(bindings.x(), [1, 2.1, true, false, null, undefined])
+    })
 
-        it("computes a + b", function () {
-            var binding = "text: a + b",
-                context = { a: 1, b: 2 },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text(), 3);
-        })
+    it("undefined keyword works", function () {
+        var value = new Parser(null, {}).parse(
+            "y: undefined");
+        assert.equal(value.y(), void 0);
+    })
 
-        it("computes obs(a) + obs(b)", function () {
-            var binding = "text: a + b",
-                context = { a: ko.observable(1), b: ko.observable(2) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text(), 3);
-        })
+    it("parses single-quote strings", function () {
+        var binding = "text: 'st\\'r'",
+            bindings = new Parser(null, {}).parse(binding);
+        assert.equal(bindings.text(), "st'r")
+    })
 
-        it("computes a + b * c", function () {
-            var binding = "text: a + b * c",
-                context = { a: 1, b: 2, c: 4 },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text(), 1 + 2 * 4);
-        })
+    it("parses text: {object: 'string'}", function () {
+        var binding = "text: {object: 'string'}",
+            bindings = new Parser(null, {}).parse(binding);
+        assert.deepEqual(bindings.text(), { object: "string" })
+    })
 
-        it("compares a + 3 > b * obs(c)", function () {
-            var binding = "text: a + 3 > b * c",
-                context = { a: 1, b: 2, c: ko.observable(4) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text(), 1 + 3 > 2 * 4);
-        })
+    it("parses object: attr: {name: value}", function () {
+        var binding = "attr: { klass: kValue }",
+            context = { kValue: 'Sam' }
+            bindings= new Parser(null, context).parse(binding);
+        assert.equal(bindings.attr().klass, 'Sam')
+    })
 
-        it("respects brackets () precedence", function () {
-            var binding = "text: 2 * (3 + 4)",
-                bindings = new Parser(null, {}).parse(binding);
-            assert.equal(bindings.text(), 2 * (3 + 4))
+    it("parses object: attr: {name: ko.observable(value)}", function () {
+        var binding = "attr : { klass: kValue }",
+            context = { kValue: ko.observable('Gollum') }
+            bindings= new Parser(null, context).parse(binding);
+        assert.equal(bindings.attr().klass(), 'Gollum')
+    })
 
-        })
+    it("parses object: attr: {n1: v1, n2: v2}", function () {
+        var binding = "attr : { a: x, b: y }",
+            context = { x: 'Real', y: 'Imaginary' }
+            bindings= new Parser(null, context).parse(binding);
+        assert.equal(bindings.attr().a, 'Real')
+        assert.equal(bindings.attr().b, 'Imaginary')
+    })
+})
 
-        it("computes complex arithematic as expected", function () {
-            var binding = "text: 1 * 4 % 3 + 11 * 99 / (8 - 14)",
-                bindings = new Parser(null, {}).parse(binding);
-            assert.equal(bindings.text(), 1 * 4 % 3 + 11 * 99 / (8 - 14));
+describe("the parsing of expressions", function () {
+    it("works with explicit braces ( )", function () {
+        var binding = "attr : (x)",
+            context = { x: 'spot' }
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.attr(), 'spot')
+    })
+
+    it("computes a + b", function () {
+        var binding = "text: a + b",
+            context = { a: 1, b: 2 },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), 3);
+    })
+
+    it("computes obs(a) + obs(b)", function () {
+        var binding = "text: a + b",
+            context = { a: ko.observable(1), b: ko.observable(2) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), 3);
+    })
+
+    it("computes a + b * c", function () {
+        var binding = "text: a + b * c",
+            context = { a: 1, b: 2, c: 4 },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), 1 + 2 * 4);
+    })
+
+    it("compares a + 3 > b * obs(c)", function () {
+        var binding = "text: a + 3 > b * c",
+            context = { a: 1, b: 2, c: ko.observable(4) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), 1 + 3 > 2 * 4);
+    })
+
+    it("respects brackets () precedence", function () {
+        var binding = "text: 2 * (3 + 4)",
+            bindings = new Parser(null, {}).parse(binding);
+        assert.equal(bindings.text(), 2 * (3 + 4))
+
+    })
+
+    it("computes complex arithematic as expected", function () {
+        var binding = "text: 1 * 4 % 3 + 11 * 99 / (8 - 14)",
+            bindings = new Parser(null, {}).parse(binding);
+        assert.equal(bindings.text(), 1 * 4 % 3 + 11 * 99 / (8 - 14));
             // == -180.5
         })
 
-        it("recalculates observables", function () {
-            var binding = "text: a - b",
-                context = { a: ko.observable(1), b: ko.observable(2) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text(), -1);
-            context.a(2)
-            assert.equal(bindings.text(), 0);
-        })
-
-        it("sets properties of objects", function () {
-            var binding = "text: { x: 3 < 1, y: a < b }",
-                context = { a: ko.observable(1), b: ko.observable(2) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text().x, false);
-            assert.equal(bindings.text().y, true);
-            context.a(3)
-            assert.equal(bindings.text().y, false);
-        })
-
-        it("has working logic operations", function () {
-            var binding = "text: a || b",
-                context = { a: ko.observable(false), b: ko.observable(false) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.text(), false);
-            context.a(true)
-            assert.equal(bindings.text(), true);
-            context.a(false)
-            assert.equal(bindings.text(), false);
-            context.b(true)
-            assert.equal(bindings.text(), true);
-        })
-
-        it("does not unwrap a single observable argument", function () {
-            var binding = "text: a",
-                context = { a: ko.observable() },
-                bindings = new Parser(null, context).parse(binding);
-            assert.ok(ko.isObservable(bindings.text()))
-        })
-
-        it("parses a string of functions a().b()", function () {
-            var binding = "ref: a().b()",
-                b = function () { return 'Cee' },
-                a = function () { return { b: b } },
-                context = { a: a },
-                bindings = new Parser(null, context).parse(binding);
-            assert.ok(bindings.ref(), 'Cee')
-        })
+    it("recalculates observables", function () {
+        var binding = "text: a - b",
+            context = { a: ko.observable(1), b: ko.observable(2) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), -1);
+        context.a(2)
+        assert.equal(bindings.text(), 0);
     })
 
-    describe("unary operations", function () {
-        it("include the negation operator", function () {
-            var binding = "neg: !a",
-                context = { a: ko.observable(false) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.neg(), true)
-            context.a(true);
-            assert.equal(bindings.neg(), false)
-        });
-
-        it("does the double negative", function () {
-            var binding = "neg: !!a",
-                context = { a: ko.observable(false) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.neg(), false)
-            context.a(true);
-            assert.equal(bindings.neg(), true)
-        });
-
-        it("works in an object", function () {
-            var binding = "neg: { x: !a, y: !!a }",
-                context = { a: ko.observable(false) },
-                bindings = new Parser(null, context).parse(binding);
-            assert.equal(bindings.neg().x, true)
-            assert.equal(bindings.neg().y, false)
-            context.a(true);
-            assert.equal(bindings.neg().x, false)
-            assert.equal(bindings.neg().y, true)
-        })
+    it("sets properties of objects", function () {
+        var binding = "text: { x: 3 < 1, y: a < b }",
+            context = { a: ko.observable(1), b: ko.observable(2) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text().x, false);
+        assert.equal(bindings.text().y, true);
+        context.a(3)
+        assert.equal(bindings.text().y, false);
     })
 
-    describe("array accessors - []", function () {
-        it("works for [ int ]", function () {
-            var binding = "ref: a[ 4 ]",
-                context = { a: { 4: "square" } },
-                bindings = new Parser(null, context).parse(binding)
-            assert.equal(bindings.ref(), "square")
-        })
+    it("has working logic operations", function () {
+        var binding = "text: a || b",
+            context = { a: ko.observable(false), b: ko.observable(false) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), false);
+        context.a(true)
+        assert.equal(bindings.text(), true);
+        context.a(false)
+        assert.equal(bindings.text(), false);
+        context.b(true)
+        assert.equal(bindings.text(), true);
+    })
 
-        it("works for [ string ]", function () {
-            var binding = "neg: a [ 'hello' ]",
-                context = { a: { hello: 128} },
-                bindings = new Parser(null, context).parse(binding)
-            assert.equal(bindings.neg(), 128)
-        })
+    it("does not unwrap a single observable argument", function () {
+        var binding = "text: a",
+            context = { a: ko.observable() },
+            bindings = new Parser(null, context).parse(binding);
+        assert.ok(ko.isObservable(bindings.text()))
+    })
 
-        it("works for [ observable ]", function () {
+    it("parses a string of functions a().b()", function () {
+        var binding = "ref: a().b()",
+            b = function () { return 'Cee' },
+            a = function () { return { b: b } },
+            context = { a: a },
+            bindings = new Parser(null, context).parse(binding);
+        assert.ok(bindings.ref(), 'Cee')
+    })
+})
+
+describe("unary operations", function () {
+    it("include the negation operator", function () {
+        var binding = "neg: !a",
+        context = { a: ko.observable(false) },
+        bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.neg(), true)
+        context.a(true);
+        assert.equal(bindings.neg(), false)
+    });
+
+    it("does the double negative", function () {
+        var binding = "neg: !!a",
+        context = { a: ko.observable(false) },
+        bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.neg(), false)
+        context.a(true);
+        assert.equal(bindings.neg(), true)
+    });
+
+    it("works in an object", function () {
+        var binding = "neg: { x: !a, y: !!a }",
+        context = { a: ko.observable(false) },
+        bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.neg().x, true)
+        assert.equal(bindings.neg().y, false)
+        context.a(true);
+        assert.equal(bindings.neg().x, false)
+        assert.equal(bindings.neg().y, true)
+    })
+})
+
+describe("array accessors - []", function () {
+    it("works for [ int ]", function () {
+        var binding = "ref: a[ 4 ]",
+        context = { a: { 4: "square" } },
+        bindings = new Parser(null, context).parse(binding)
+        assert.equal(bindings.ref(), "square")
+    })
+
+    it("works for [ string ]", function () {
+        var binding = "neg: a [ 'hello' ]",
+        context = { a: { hello: 128} },
+        bindings = new Parser(null, context).parse(binding)
+        assert.equal(bindings.neg(), 128)
+    })
+
+    it("works for [ observable ]", function () {
+            // make sure observables can be keys to objects.
             var binding = "neg: a[ x ]",
-                context = { a: [ 123, 456 ], x: ko.observable(0) },
-                bindings = new Parser(null, context).parse(binding)
-            assert.equal(bindings.neg(), 123)
-            context.x(1)
-            assert.equal(bindings.neg(), 456)
+            x = ko.observable(0),
+            context = { a: {}, x: x },
+            bindings;
+            context.a[x] = 12;
+            bindings = new Parser(null, context).parse(binding)
+            assert.equal(bindings.neg(), 12)
         })
 
-        it("works for [ observable ]", function () {
-            var binding = "neg: a[ x ]",
-                context = { a: [ 123, 456 ], x: ko.observable(1) },
-                bindings = new Parser(null, context).parse(binding)
-            assert.equal(bindings.neg(), 456)
-            context.x(0)
-            assert.equal(bindings.neg(), 123)
-        })
-
-        it("works off a function e.g. f()[1]", function () {
-            var binding = "neg: f()[3]",
-                f = function () { return [3, 4, 5, 6]}
-                context = { f: f },
-                bindings = new Parser(null, context).parse(binding)
-            assert.equal(bindings.neg(), 6)
-        })
+    it("works for [ observable() ]", function () {
+        var binding = "neg: a[ x() ]",
+        context = { a: [ 123, 456 ], x: ko.observable(1) },
+        bindings = new Parser(null, context).parse(binding)
+        assert.equal(bindings.neg(), 456)
+        context.x(0)
+        assert.equal(bindings.neg(), 123)
     })
 
-    describe("Virtual elements", function() {
-        beforeEach(function () {
-            ko.bindingProvider.instance = new ko.secureBindingsProvider();
-        })
+    it("works off a function e.g. f()[1]", function () {
+        var binding = "neg: f()[3]",
+        f = function () { return [3, 4, 5, 6]}
+        context = { f: f },
+        bindings = new Parser(null, context).parse(binding)
+        assert.equal(bindings.neg(), 6)
+    })
+})
 
-        it("binds to a raw comment", function () {
-            var cmt = document.createComment("ko test: obs");
-            assert.ok(instance.nodeHasBindings(cmt))
-        })
+describe("Virtual elements", function() {
+    beforeEach(function () {
+        ko.bindingProvider.instance = new ko.secureBindingsProvider();
+    })
 
-        it("binds text in virtual element", function () {
-             var cmt = document.createComment("ko text: obs"),
-                 context =  { obs: ko.observable("a towel") },
-                 bindings;
-             bindings = instance.getBindingAccessors(cmt, context)
-             assert.isObject(bindings)
-             assert.isFunction(bindings.text)
-             assert.equal(ko.unwrap(bindings.text()), context.obs())
-         })
+    it("binds to a raw comment", function () {
+        var cmt = document.createComment("ko test: obs");
+        assert.ok(instance.nodeHasBindings(cmt))
+    })
 
-        it("binds a sub-element comment", function () {
-            var div = document.createElement("div"),
-                context = { obs: ko.observable("a sperm whale") };
-            div.appendChild(document.createComment("ko text: obs"));
-            div.appendChild(document.createComment("/ko"));
-            ko.applyBindings(context, div);
-            assert.include(div.innerText, context.obs())
-        })
-     })
+    it("binds text in virtual element", function () {
+       var cmt = document.createComment("ko text: obs"),
+       context =  { obs: ko.observable("a towel") },
+       bindings;
+       bindings = instance.getBindingAccessors(cmt, context)
+       assert.isObject(bindings)
+       assert.isFunction(bindings.text)
+       assert.equal(ko.unwrap(bindings.text()), context.obs())
+   })
+
+    it("binds a sub-element comment", function () {
+        var div = document.createElement("div"),
+        context = { obs: ko.observable("a sperm whale") };
+        div.appendChild(document.createComment("ko text: obs"));
+        div.appendChild(document.createComment("/ko"));
+        ko.applyBindings(context, div);
+        assert.include(div.innerText, context.obs())
+    })
+})
 
 
-    describe("parsing deep objects", function () {
-        var context = {
-            a: {
-                b: {
-                    c: {
-                        d: 1,
-                        e: [9, 8]
-                    }
-                }
-            },
-            F1: function () { return 'R1' },
-            F2: function () {
-                return { G: function () { return 'R2' }}
-            }
-        };
+describe("compound expressions", function () {
+    var d = 42,
+        e = [9, 8],
+        c = { d: d, e: e },
+        b = { c: c },
+        a = { b: b },
+        yf2 = function () { return [ { yf2a: 'air' }, { yf2b: 'brick' } ] },
+        yf1 = function () { return yf2 },
+        y = [ yf1, yf2 ],
+        x = { y: y },
+        F1 = function () { return 'R1' },
+        F2 = function () {
+            return { G: function () { return 'R2' }}
+        },
+        obs = ko.observable({ d: d }),
+        context = { a: a, F1: F1, F2: F2, x: x, obs: obs };
 
-        function expect_equal(binding, expect) {
-            var bindings = new Parser(null, context).parse("v: " + binding)
-            assert.equal(bindings.v(), expect)
+    // a property of the observable (not the observable's value)
+    obs.P = y;
+
+    function expect_equal(binding, expect) {
+        var bindings = new Parser(null, context).parse("v: " + binding)
+        assert.equal(bindings.v(), expect)
+    }
+
+    function expect_deep_equal(binding, expect) {
+        var bindings = new Parser(null, context).parse("v: " + binding)
+        assert.deepEqual(bindings.v(), expect)
+    }
+
+    it("plucks 'a.b.c'", function () {
+        expect_deep_equal('a.b.c', context.a.b.c) // obj
+    })
+
+    it("plucks a.b.c.d", function () {
+        expect_equal('a.b.c.d', context.a.b.c.d) // 1
+    })
+
+    it("plucks a.b.c.x", function () {
+        expect_equal('a.b.c.x', context.a.b.c.x) // undefined
+    })
+
+    it("plucks a.b.c.d.e[1]", function () {
+        expect_equal("a.b.c.e[1]", context.a.b.c.e[1]) // 8
+    })
+
+    it("plucks 'u' (undefined)", function () {
+        expect_equal('u', undefined)
+    })
+
+    it("throws when 'r' is not on u", function () {
+        function fn() {
+            expect_equal('u.r', undefined) // undefined
         }
+        assert.throws(fn, "defined")
+    })
 
-        function expect_deep_equal(binding, expect) {
-            var bindings = new Parser(null, context).parse("v: " + binding)
-            assert.deepEqual(bindings.v(), expect)
-        }
+    it("calls function F1", function () {
+        expect_equal('F1()', context.F1()) // R1
+    })
 
-        it("plucks 'a.b.c'", function () {
-            expect_deep_equal('a.b.c', context.a.b.c) // obj
-        })
+    it("calls F2().G()", function () {
+        expect_equal("F2().G()", context.F2().G()) // R2
+    })
 
-        it("plucks a.b.c.d", function () {
-            expect_equal('a.b.c.d', context.a.b.c.d) // 1
-        })
+    it("gets 'brick' from x.y[0]()()[1].yf2b", function () {
+        var expect = x.y[0]()()[1].yf2b;
+        expect_equal("x.y[0]()()[1].yf2b", expect)
+    })
 
-        it("plucks a.b.c.x", function () {
-            expect_equal('a.b.c.x', context.a.b.c.x) // undefined
-        })
+    it("gets 'air' from x . y [ 0 ] ( ) ( ) [ 0 ] . yf2a", function () {
+        var expect = x.y[0]()()[0].yf2a;
+        expect_equal("\n\r\t x\n\r\t  .\n\r\t  y\n\r\t  [\n\r\t  0" +
+            "\n\r\t  ]\n\r\t  (\n\r\t  )\n\r\t  (\n\r\t  )\n\r\t  [" +
+            "\n\r\t  0\n\r\t  ]\n\r\t .\n\r\t yf2a", expect)
+    })
 
-        it("plucks a.b.c.d.e[1]", function () {
-            expect_equal("a.b.c.e[1]", context.a.b.c.e[1]) // 8
-        })
+    it("gets obs().d", function () {
+        expect_equal("obs().d", obs().d)
+    })
 
-        it("plucks 'x'", function () {
-            expect_equal('x', undefined)
-        })
+    it("gets obs.P", function () {
+        expect_equal("obs.P", obs.P)
+    })
 
-        it("throws when 'r' is not on x", function () {
-            function fn() {
-                expect_equal('x.r', x.r) // undefined
-            }
-            assert.throws(fn, "x is not defined")
-        })
-
-        it("calls function F1", function () {
-            expect_equal('F1()', context.F1()) // R1
-        })
-
-        it("calls F2().G()", function () {
-            expect_equal("F2().G()", context.F2().G()) // R2
-        })
-    }); // make_accessor
-
+    it("gets obs['P']", function () {
+        expect_equal("obs['P']", obs.P)
+    })
+}); //  compound functions
 })
