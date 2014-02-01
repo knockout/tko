@@ -6,10 +6,10 @@ Knockout Secure Binding
 <!--  [![Selenium Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
  -->
 
-Knockout Secure Binding (KSB) is a binding provider for [Knockout](http://knockoutjs.com) that can be used with a [Content Security Policy](http://www.w3.org/TR/CSP/) that disables inline scripts.
+Knockout Secure Binding (KSB) is a binding provider for [Knockout](http://knockoutjs.com) that can be used with a [Content Security Policy](http://www.w3.org/TR/CSP/) that disables `eval` and `new Function`.
 
 This project exists because Knockout's default binder uses `new Function` to
-parse bindings, as discussed in [knockout/knockout#903](https://github.com/knockout/knockout/issues/903), which violates the CSP inline-scripts prohibition.
+parse bindings, as discussed in [knockout/knockout#903](https://github.com/knockout/knockout/issues/903), which violates the CSP eval prohibition.
 
 Getting started
 ---
@@ -34,6 +34,8 @@ Before applying bindings, KSB is a near drop-in replacement for the standard Kno
 var options = { globals: window, attribute: "data-bind" };
 ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
 ```
+
+With the above, when you run `ko.applyBindings` the knockout bindings will be parsed by KSB and the respective bindings' `valueAccessors` will be KSB instead of Knockout's own binding engine (which at its core uses the `new Function`, which is barred by CSP's `eval` policy).
 
 When the `attribute` option is not provided the default binding for KSB is `data-sbind`. You can see more options below. By default KSB the `globals` object for KSB is an empty object. The options are described in more detail below.
 
