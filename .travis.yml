@@ -25,6 +25,8 @@ addons:
 
 before_script:
   - npm install -g grunt-cli
+  - cat package.json | grep version
+  - git rev-parse --short HEAD
 
 # Record our selenium status TODO
 # See eg
