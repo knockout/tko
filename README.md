@@ -140,7 +140,7 @@ KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/do
 | Comparison | `<` `<=` `>` `>=` |
 | Equality | `==` `!=` `===` `!==` |
 | Logic | `&&` <code>&#124;&#124;</code> |
-| Bitwise | `&` `^` <code>&124;</code> |
+| Bitwise | `&` `^` <code>&#124;</code> |
 
 Notes:
 
