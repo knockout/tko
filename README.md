@@ -114,11 +114,13 @@ Options
 The `ko.secureBindingsProvider` constructor accepts one argument,
 an object that may contain the following options:
 
-- `attribute` – the DOM attribute for the binding, defaults
-    to `data-sbind`
-- `globals` - Globals accessible in the attributes
-- `bindings` - The bindings to use, defaults to `ko.bindingHandlers`
-- `noVirtualElements` – By default KSB binds to all virtual elements that match for Knockout (i.e. `<!-- ko ... -->...<!-- /ko -->`). Disable KSB binding virtual elements by setting this to `false`.
+
+| Option | Default | Description |
+| ---: | :---: | :--- |
+| attribute | `data-sbind` | The binding value on attributes |
+| globals | `{}` | Where variables are looked up if not on `$context` or `$data` |
+| bindings | `ko.bindingHandlers` | The bindings KO will use with KSB |
+| noVirtualElements | `false` | Set to `true` to disable virtual element binding |
 
 For example, `ko.secureBindingsProvider({ globals: { "$": jQuery }})`.
 
@@ -198,7 +200,7 @@ The expression tree is straightforward and for something like `1 + 4 - 8` it loo
      (-)
 ```
 
-It should be reasonably performant, but I would not be surprised if it were a magnitude slower than native bindings for complex expressions. That said I have done no anaylsis. There is some room for improving the expression executions as well.
+It should be reasonably performant, but I would not be surprised if it were a magnitude slower than native bindings for complex expressions. That said I have done no experiments to compare. There is certainly some room for improving the expression executions.
 
 
 LICENSE
