@@ -76,7 +76,7 @@ This means that the following ought to work as expected:
 <a data-bind='click: fn, attr: { href: obs }'></a>
 ```
 
-The sbind language understands both compound identifiers (e.g. `obs()[1].member()` and expressions (e.g. `a + b * c`)). A full list of operators supported is below.
+The sbind language understands both compound identifiers (e.g. `obs()[1].member()` and expressions (e.g. `a + b * c`)). A full list of operators supported is below. Check out the `spec/knockout_secure_binding_spec.js` for a more thorough list of expressions that work as expected.
 
 There are some restrictions on the sbind language. These include:
 
