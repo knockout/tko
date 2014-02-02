@@ -168,10 +168,8 @@ Requires
 
 Knockout 2.0+
 
-KSB uses some ES5 functions, namely:
+KSB may use ES5 functions, namely:
 
-- `Array.reduce`
-- `Function.bind`
 - `Object.defineProperty`
 
 

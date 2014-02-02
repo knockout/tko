@@ -1,6 +1,6 @@
 
 
-var Identifier = (function () {
+Identifier = (function () {
   function Identifier(parser, token, dereferences) {
     this.token = token;
     this.dereferences = dereferences;
@@ -16,14 +16,10 @@ var Identifier = (function () {
     // `a.b`, one would pass `a` in as the parent when calling lookup_value
     // for `b`.
     if (parent) {
-      if (typeof parent.get_value === 'function') {
-        parent = parent.get_value()[token];
-      } else if (typeof parent === 'object') {
-        return parent[token];
-      }
-      throw new Error("Identifier given a bad parent " + parent);
+      return value_of(parent)[token];
     }
 
+    // short circuits
     switch (token) {
       case '$element': return parser.node;
       case '$context': return context;
@@ -48,10 +44,6 @@ var Identifier = (function () {
     return parser.globals && parser.globals[token];
   };
 
-  function _deref(value, deref_fn) {
-    return deref_fn(value);
-  }
-
   /**
    * Apply all () and [] functions on the identifier to the lhs value e.g.
    * a()[3] has deref functions that are essentially this:
@@ -61,7 +53,11 @@ var Identifier = (function () {
    * @return {mixed}        The dereferenced value.
    */
   Identifier.prototype.dereference = function (value) {
-    return (this.dereferences || []).reduce(_deref, value);
+    var i, n, refs = this.dereferences || [];
+    for (i = 0, n = refs.length; i < n; ++i) {
+      value = refs[i](value);
+    }
+    return value;
   };
 
   /**

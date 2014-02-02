@@ -1,5 +1,5 @@
 
-var Node = (function () {
+Node = (function () {
   function Node(lhs, op, rhs) {
     this.lhs = lhs;
     this.op = op;
@@ -118,7 +118,7 @@ var Node = (function () {
   return Node;
 })();
 
-var Expression = (function () {
+Expression = (function () {
   function Expression(nodes) {
     this.nodes = nodes;
     this.root = this.build_tree(nodes);
