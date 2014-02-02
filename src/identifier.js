@@ -53,9 +53,14 @@ Identifier = (function () {
    * @return {mixed}        The dereferenced value.
    */
   Identifier.prototype.dereference = function (value) {
-    var i, n, refs = this.dereferences || [];
+    var i, n, member, refs = this.dereferences || [];
     for (i = 0, n = refs.length; i < n; ++i) {
-      value = refs[i](value);
+      member = refs[i];
+      if (member === true) {
+        value = value();
+      } else {
+        value = value[value_of(member)];
+      }
     }
     return value;
   };

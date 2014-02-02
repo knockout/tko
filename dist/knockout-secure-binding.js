@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.3.1 - 2014-2-2
+/*! knockout-secure-binding - v0.3.2 - 2014-2-2
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -74,9 +74,14 @@ Identifier = (function () {
    * @return {mixed}        The dereferenced value.
    */
   Identifier.prototype.dereference = function (value) {
-    var i, n, refs = this.dereferences || [];
+    var i, n, member, refs = this.dereferences || [];
     for (i = 0, n = refs.length; i < n; ++i) {
-      value = refs[i](value);
+      member = refs[i];
+      if (member === true) {
+        value = value();
+      } else {
+        value = value[value_of(member)];
+      }
     }
     return value;
   };
@@ -664,7 +669,7 @@ Expression = (function () {
         this.next('(');
         this.white();
         this.next(')');
-        return function (fn) { return fn(); };
+        return true;  // in Identifier::dereference we check this
       } else if (ch === '[') {
         // a[x] membership
         this.next('[');
@@ -672,7 +677,7 @@ Expression = (function () {
         this.white();
         this.next(']');
 
-        return function (obj) { return obj[value_of(member)]; };
+        return member;
       } else if (ch === '.') {
         // a.x membership
         member = '';
@@ -685,7 +690,7 @@ Expression = (function () {
           member += ch;
           ch = this.next();
         }
-        return function (obj) { return obj[value_of(member)]; };
+        return member;
       } else {
         break;
       }

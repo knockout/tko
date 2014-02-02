@@ -376,7 +376,7 @@
         this.next('(');
         this.white();
         this.next(')');
-        return function (fn) { return fn(); };
+        return true;  // in Identifier::dereference we check this
       } else if (ch === '[') {
         // a[x] membership
         this.next('[');
@@ -384,7 +384,7 @@
         this.white();
         this.next(']');
 
-        return function (obj) { return obj[value_of(member)]; };
+        return member;
       } else if (ch === '.') {
         // a.x membership
         member = '';
@@ -397,7 +397,7 @@
           member += ch;
           ch = this.next();
         }
-        return function (obj) { return obj[value_of(member)]; };
+        return member;
       } else {
         break;
       }
