@@ -479,23 +479,31 @@ describe("the bindings parser", function () {
     it("parses object: attr: {name: value}", function () {
         var binding = "attr: { klass: kValue }",
             context = { kValue: 'Sam' }
-            bindings= new Parser(null, context).parse(binding);
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().klass, 'Sam')
     })
 
     it("parses object: attr: {name: ko.observable(value)}", function () {
         var binding = "attr : { klass: kValue }",
             context = { kValue: ko.observable('Gollum') }
-            bindings= new Parser(null, context).parse(binding);
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().klass(), 'Gollum')
     })
 
     it("parses object: attr: {n1: v1, n2: v2}", function () {
         var binding = "attr : { a: x, b: y }",
             context = { x: 'Real', y: 'Imaginary' }
-            bindings= new Parser(null, context).parse(binding);
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().a, 'Real')
         assert.equal(bindings.attr().b, 'Imaginary')
+    })
+
+    it("parses compound operator d()[0]()", function () {
+        var binding = "attr: d()[0]()",
+            d = function () { return [function () { return 'z' }]},
+            context = { d: d },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.attr(), 'z')
     })
 })
 
