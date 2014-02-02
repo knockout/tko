@@ -173,6 +173,18 @@ KSB may use ES5 functions, namely:
 - `Object.defineProperty`
 
 
+Performance
+---
+
+KSB seems to be comparable in performance to Knockout's regular bindings. Here
+is a [jsPerf example](http://jsperf.com/knockout-secure-binding), which seems to indicate KSB is around 7–10% slower, with a margin of error of ±10%.
+
+I would expect the KSB parser to be slower than the native Javascript parser, even though it does less. The expressions and identifiers looked up in KSB have
+a proportionately higher number of function calls per expression and dereference.
+
+So one would expect KSB to be slower than the native bindings. That said, the portion of Knockout that KSB sits in is not a big bottleneck for performance. Individual bindings and especially their respective DOM operations seem to be a much greater concern.
+
+
 How it works
 ---
 
@@ -200,7 +212,7 @@ The expression tree is straightforward and for something like `1 + 4 - 8` it loo
      (-)
 ```
 
-It should be reasonably performant, but I would not be surprised if it were a magnitude slower than native bindings for complex expressions. That said I have done no experiments to compare. There is certainly some room for improving the expression executions.
+All to say, there is no real magic (or dragons) here.
 
 
 LICENSE
