@@ -109,10 +109,8 @@ Node = (function () {
    * Exported for testing.
    */
   Node.prototype.get_node_value = function () {
-    var lhs, rhs, member_op;
-    lhs = this.get_leaf_value(this.lhs);
-    rhs = this.get_leaf_value(this.rhs);
-    return this.op(lhs, rhs);
+    return this.op(this.get_leaf_value(this.lhs),
+                   this.get_leaf_value(this.rhs));
   };
 
   return Node;
