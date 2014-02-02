@@ -367,7 +367,7 @@ describe("the build_tree function", function () {
             parser = new Parser(null, context);
             nodes = [
                 // the third argument is the same as _deref_call
-                new Identifier(parser, 'x', [function (a) { return a() }]),
+                new Identifier(parser, 'x', [true]),
                 operators['|'],
                 0x80
             ];
@@ -400,8 +400,7 @@ describe("Identifier", function () {
             assert.equal(ident.dereference('1'), 1)
         })
         it("applies the functions of the refs to the value", function () {
-            var deref = function (a) { return a() },
-                refs = [deref, deref],
+            var refs = [true, true],
                 ident = new Identifier(null, 'x', refs),
                 g = function () { return '42' },
                 f = function () { return g };
@@ -412,7 +411,7 @@ describe("Identifier", function () {
     it("dereferences values on the parser", function () {
         var context = { f: f },
             parser = new Parser(null, context),
-            derefs = [function (a) { return a() }];
+            derefs = [true];
         assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
     })
 })
@@ -715,12 +714,13 @@ describe("compound expressions", function () {
         yf1 = function () { return yf2 },
         y = [ yf1, yf2 ],
         x = { y: y },
+        z = function () { return [function() { return 'dv' }] },
         F1 = function () { return 'R1' },
         F2 = function () {
             return { G: function () { return 'R2' }}
         },
         obs = ko.observable({ d: d }),
-        context = { a: a, F1: F1, F2: F2, x: x, obs: obs };
+        context = { a: a, F1: F1, F2: F2, x: x, obs: obs, z: z };
 
     // a property of the observable (not the observable's value)
     obs.P = y;
@@ -780,6 +780,11 @@ describe("compound expressions", function () {
         expect_equal("\n\r\t x\n\r\t  .\n\r\t  y\n\r\t  [\n\r\t  0" +
             "\n\r\t  ]\n\r\t  (\n\r\t  )\n\r\t  (\n\r\t  )\n\r\t  [" +
             "\n\r\t  0\n\r\t  ]\n\r\t .\n\r\t yf2a", expect)
+    })
+
+    it("gets z()[0]()", function () {
+        var expect = z()[0]();
+        expect_equal("z()[0]()", expect)
     })
 
     it("gets obs().d", function () {

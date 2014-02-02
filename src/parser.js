@@ -427,7 +427,7 @@
     }
     while (ch) {
       deref = this.dereference();
-      if (deref) {
+      if (deref !== undefined) {
         dereferences.push(deref);
       } else {
         break;
