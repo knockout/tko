@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.3.4 - 2014-2-2
+/*! knockout-secure-binding - v0.3.4 - 2014-2-4
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -229,10 +229,8 @@ Node = (function () {
    * Exported for testing.
    */
   Node.prototype.get_node_value = function () {
-    var lhs, rhs, member_op;
-    lhs = this.get_leaf_value(this.lhs);
-    rhs = this.get_leaf_value(this.rhs);
-    return this.op(lhs, rhs);
+    return this.op(this.get_leaf_value(this.lhs),
+                   this.get_leaf_value(this.rhs));
   };
 
   return Node;
