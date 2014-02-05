@@ -292,19 +292,38 @@ describe("The lookup of variables (get_lookup_root)", function () {
         assert.equal(bindings.a(), 42)
     })
 
-        // SKIP FIXME / TODO
-        it("does not bleed globals", function () {
-            var binding = "a: z",
-                globals_1 = {z: 168},
-                globals_2 = {},
-                bindings_1 = new Parser(null, context,
-                    globals_1).parse(binding),
-                bindings_2 = new Parser(null, context,
-                    globals_2).parse(binding);
-            assert.equal(bindings_1.a(), 168)
-            assert.equal(bindings_2.a(), undefined)
-        })
+    it("accesses properties created with defineProperty", function () {
+        // style of e.g. knockout-es5
+        var binding = "a: z",
+            context = {},
+            bindings = new Parser(null, context).parse(binding),
+            obs = ko.observable();
+
+        Object.defineProperty(context, 'z', {
+            configurable: true,
+            enumerable: true,
+            get: obs,
+            set: obs
+        });
+
+        assert.equal(bindings.a(), undefined)
+        context.z = '142'
+        assert.equal(bindings.a(), 142)
+
     })
+
+    it("does not bleed globals", function () {
+        var binding = "a: z",
+            globals_1 = {z: 168},
+            globals_2 = {},
+            bindings_1 = new Parser(null, context,
+                globals_1).parse(binding),
+            bindings_2 = new Parser(null, context,
+                globals_2).parse(binding);
+        assert.equal(bindings_1.a(), 168)
+        assert.equal(bindings_2.a(), undefined)
+    })
+})
 
 describe("the build_tree function", function () {
     var nodes_to_tree;
