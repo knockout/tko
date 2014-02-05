@@ -369,8 +369,6 @@ describe("The lookup of variables (get_lookup_root)", function () {
         assert.equal(bindings.a(), undefined)
         context.z = '142'
         assert.equal(bindings.a(), 142)
-        context.z = '144'
-        assert.equal(bindings.a(), 144)
     })
 
     it("does not bleed globals", function () {
@@ -384,6 +382,7 @@ describe("The lookup of variables (get_lookup_root)", function () {
         assert.equal(bindings_1.a(), 168)
         assert.equal(bindings_2.a(), undefined)
     })
+})
 
 describe("the build_tree function", function () {
     var nodes_to_tree;
@@ -446,7 +445,7 @@ describe("the build_tree function", function () {
             parser = new Parser(null, context);
             nodes = [
                 // the third argument is the same as _deref_call
-                new Identifier(parser, 'x', [function (a) { return a() }]),
+                new Identifier(parser, 'x', [true]),
                 operators['|'],
                 0x80
             ];
@@ -479,8 +478,7 @@ describe("Identifier", function () {
             assert.equal(ident.dereference('1'), 1)
         })
         it("applies the functions of the refs to the value", function () {
-            var deref = function (a) { return a() },
-                refs = [deref, deref],
+            var refs = [true, true],
                 ident = new Identifier(null, 'x', refs),
                 g = function () { return '42' },
                 f = function () { return g };
@@ -491,7 +489,7 @@ describe("Identifier", function () {
     it("dereferences values on the parser", function () {
         var context = { f: f },
             parser = new Parser(null, context),
-            derefs = [function (a) { return a() }];
+            derefs = [true];
         assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
     })
 })
@@ -559,23 +557,31 @@ describe("the bindings parser", function () {
     it("parses object: attr: {name: value}", function () {
         var binding = "attr: { klass: kValue }",
             context = { kValue: 'Sam' }
-            bindings= new Parser(null, context).parse(binding);
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().klass, 'Sam')
     })
 
     it("parses object: attr: {name: ko.observable(value)}", function () {
         var binding = "attr : { klass: kValue }",
             context = { kValue: ko.observable('Gollum') }
-            bindings= new Parser(null, context).parse(binding);
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().klass(), 'Gollum')
     })
 
     it("parses object: attr: {n1: v1, n2: v2}", function () {
         var binding = "attr : { a: x, b: y }",
             context = { x: 'Real', y: 'Imaginary' }
-            bindings= new Parser(null, context).parse(binding);
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().a, 'Real')
         assert.equal(bindings.attr().b, 'Imaginary')
+    })
+
+    it("parses compound operator d()[0]()", function () {
+        var binding = "attr: d()[0]()",
+            d = function () { return [function () { return 'z' }]},
+            context = { d: d },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.attr(), 'z')
     })
 })
 
@@ -681,8 +687,8 @@ describe("the parsing of expressions", function () {
 describe("unary operations", function () {
     it("include the negation operator", function () {
         var binding = "neg: !a",
-        context = { a: ko.observable(false) },
-        bindings = new Parser(null, context).parse(binding);
+            context = { a: ko.observable(false) },
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), true)
         context.a(true);
         assert.equal(bindings.neg(), false)
@@ -690,8 +696,8 @@ describe("unary operations", function () {
 
     it("does the double negative", function () {
         var binding = "neg: !!a",
-        context = { a: ko.observable(false) },
-        bindings = new Parser(null, context).parse(binding);
+            context = { a: ko.observable(false) },
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), false)
         context.a(true);
         assert.equal(bindings.neg(), true)
@@ -699,14 +705,23 @@ describe("unary operations", function () {
 
     it("works in an object", function () {
         var binding = "neg: { x: !a, y: !!a }",
-        context = { a: ko.observable(false) },
-        bindings = new Parser(null, context).parse(binding);
+            context = { a: ko.observable(false) },
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg().x, true)
         assert.equal(bindings.neg().y, false)
         context.a(true);
         assert.equal(bindings.neg().x, false)
         assert.equal(bindings.neg().y, true)
     })
+
+    it("negates an expression eg !(a || b)"/*, function () {
+        var binding = 'ne: !(a || b)',
+            context = { a: ko.observable(true), b: ko.observable(false) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.ne(), false)
+        context.a(false)
+        assert.equal(bindings.ne(), true)
+    }*/)
 })
 
 describe("array accessors - []", function () {
@@ -719,26 +734,26 @@ describe("array accessors - []", function () {
 
     it("works for [ string ]", function () {
         var binding = "neg: a [ 'hello' ]",
-        context = { a: { hello: 128} },
-        bindings = new Parser(null, context).parse(binding)
+            context = { a: { hello: 128} },
+            bindings = new Parser(null, context).parse(binding)
         assert.equal(bindings.neg(), 128)
     })
 
     it("works for [ observable ]", function () {
-            // make sure observables can be keys to objects.
-            var binding = "neg: a[ x ]",
+        // make sure observables can be keys to objects.
+        var binding = "neg: a[ x ]",
             x = ko.observable(0),
             context = { a: {}, x: x },
             bindings;
             context.a[x] = 12;
-            bindings = new Parser(null, context).parse(binding)
-            assert.equal(bindings.neg(), 12)
-        })
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.neg(), 12)
+    })
 
     it("works for [ observable() ]", function () {
         var binding = "neg: a[ x() ]",
-        context = { a: [ 123, 456 ], x: ko.observable(1) },
-        bindings = new Parser(null, context).parse(binding)
+            context = { a: [ 123, 456 ], x: ko.observable(1) },
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), 456)
         context.x(0)
         assert.equal(bindings.neg(), 123)
@@ -746,11 +761,21 @@ describe("array accessors - []", function () {
 
     it("works off a function e.g. f()[1]", function () {
         var binding = "neg: f()[3]",
-        f = function () { return [3, 4, 5, 6]}
-        context = { f: f },
-        bindings = new Parser(null, context).parse(binding)
+            f = function () { return [3, 4, 5, 6]}
+            context = { f: f },
+            bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), 6)
     })
+
+    it("unwraps Identifier/Expression contents"/*, function () {
+        var binding = "arr: [a, a && b]",
+            context = { a: ko.observable(true), b: ko.observable(false) },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.arr()[0], true)
+        assert.equal(bindings.arr()[1], false)
+        context.b(true)
+        assert.equal(bindings.arr()[1], true)
+    }*/)
 })
 
 describe("Virtual elements", function() {
@@ -794,12 +819,13 @@ describe("compound expressions", function () {
         yf1 = function () { return yf2 },
         y = [ yf1, yf2 ],
         x = { y: y },
+        z = function () { return [function() { return 'dv' }] },
         F1 = function () { return 'R1' },
         F2 = function () {
             return { G: function () { return 'R2' }}
         },
         obs = ko.observable({ d: d }),
-        context = { a: a, F1: F1, F2: F2, x: x, obs: obs };
+        context = { a: a, F1: F1, F2: F2, x: x, obs: obs, z: z };
 
     // a property of the observable (not the observable's value)
     obs.P = y;
@@ -859,6 +885,11 @@ describe("compound expressions", function () {
         expect_equal("\n\r\t x\n\r\t  .\n\r\t  y\n\r\t  [\n\r\t  0" +
             "\n\r\t  ]\n\r\t  (\n\r\t  )\n\r\t  (\n\r\t  )\n\r\t  [" +
             "\n\r\t  0\n\r\t  ]\n\r\t .\n\r\t yf2a", expect)
+    })
+
+    it("gets z()[0]()", function () {
+        var expect = z()[0]();
+        expect_equal("z()[0]()", expect)
     })
 
     it("gets obs().d", function () {

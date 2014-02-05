@@ -4,7 +4,7 @@
  */
 /* jshint -W083 */
 
- var Parser = (function () {
+ Parser = (function () {
   var escapee = {
     "'": "'",
     '"':  '"',
@@ -363,28 +363,6 @@
   };
 
   /**
-   * Used with Function.bind to create Identifier's _deref_fn, below in
-   * dereference.
-   * @param  {Object} obj   the object passed in.
-   * @return {mixed}        the object'ss value.
-   */
-  function _deref_this(obj) {
-    if (this instanceof Identifier || this instanceof Expression) {
-      return obj[this.get_value()];
-    }
-    return obj[this];
-  }
-
-  /**
-   * Call the function-argument
-   * @param  {Function} Function to be called
-   * @return {monsters}
-   */
-  function _deref_call(fn) {
-    return fn();
-  }
-
-  /**
    * A dereference applies to an identifer, being either a function
    * call "()" or a membership lookup with square brackets "[member]".
    * @return {fn or undefined}  Dereference function to be applied to the
@@ -400,7 +378,7 @@
         this.next('(');
         this.white();
         this.next(')');
-        return _deref_call;
+        return true;  // in Identifier::dereference we check this
       } else if (ch === '[') {
         // a[x] membership
         this.next('[');
@@ -408,7 +386,7 @@
         this.white();
         this.next(']');
 
-        return _deref_this.bind(member);
+        return member;
       } else if (ch === '.') {
         // a.x membership
         member = '';
@@ -421,7 +399,7 @@
           member += ch;
           ch = this.next();
         }
-        return _deref_this.bind(member);
+        return member;
       } else {
         break;
       }
@@ -451,7 +429,7 @@
     }
     while (ch) {
       deref = this.dereference();
-      if (deref) {
+      if (deref !== undefined) {
         dereferences.push(deref);
       } else {
         break;

@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.3.0 - 2014-2-5
+/*! knockout-secure-binding - v0.3.5 - 2014-2-5
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -10,10 +10,18 @@
         factory(ko);
     }
 }(function(ko, exports, undefined) {
+  var Identifier, Expression, Parser, Node;
+
+  function value_of(item) {
+    if (item instanceof Identifier || item instanceof Expression) {
+      return item.get_value();
+    }
+    return item;
+  }
 
 
 
-var Identifier = (function () {
+Identifier = (function () {
   function Identifier(parser, token, dereferences) {
     this.token = token;
     this.dereferences = dereferences;
@@ -24,21 +32,17 @@ var Identifier = (function () {
     var parser = this.parser,
         $context = parser.context,
         token = this.token,
-        $data = $context.$data || {},
+        $data = context.$data || {},
         globals = parser.globals || {};
 
     // parent is an optional source of the identifier e.g. for membership
     // `a.b`, one would pass `a` in as the parent when calling lookup_value
     // for `b`.
     if (parent) {
-      if (typeof parent.get_value === 'function') {
-        parent = parent.get_value()[token];
-      } else if (typeof parent === 'object') {
-        return parent[token];
-      }
-      throw new Error("Identifier given a bad parent " + parent);
+      return value_of(parent)[token];
     }
 
+    // short circuits
     switch (token) {
       case '$element': return parser.node;
       case '$context': return $context;
@@ -49,10 +53,6 @@ var Identifier = (function () {
     return $data[token] || $context[token] || globals[token];
   };
 
-  function _deref(value, deref_fn) {
-    return deref_fn(value);
-  }
-
   /**
    * Apply all () and [] functions on the identifier to the lhs value e.g.
    * a()[3] has deref functions that are essentially this:
@@ -62,7 +62,16 @@ var Identifier = (function () {
    * @return {mixed}        The dereferenced value.
    */
   Identifier.prototype.dereference = function (value) {
-    return (this.dereferences || []).reduce(_deref, value);
+    var i, n, member, refs = this.dereferences || [];
+    for (i = 0, n = refs.length; i < n; ++i) {
+      member = refs[i];
+      if (member === true) {
+        value = value();
+      } else {
+        value = value[value_of(member)];
+      }
+    }
+    return value;
   };
 
   /**
@@ -98,7 +107,7 @@ function is_identifier_char(ch) {
 }
 
 
-var Node = (function () {
+Node = (function () {
   function Node(lhs, op, rhs) {
     this.lhs = lhs;
     this.op = op;
@@ -208,16 +217,14 @@ var Node = (function () {
    * Exported for testing.
    */
   Node.prototype.get_node_value = function () {
-    var lhs, rhs, member_op;
-    lhs = this.get_leaf_value(this.lhs);
-    rhs = this.get_leaf_value(this.rhs);
-    return this.op(lhs, rhs);
+    return this.op(this.get_leaf_value(this.lhs),
+                   this.get_leaf_value(this.rhs));
   };
 
   return Node;
 })();
 
-var Expression = (function () {
+Expression = (function () {
   function Expression(nodes) {
     this.nodes = nodes;
     this.root = this.build_tree(nodes);
@@ -276,7 +283,7 @@ var Expression = (function () {
 
 /* jshint -W083 */
 
- var Parser = (function () {
+ Parser = (function () {
   var escapee = {
     "'": "'",
     '"':  '"',
@@ -635,28 +642,6 @@ var Expression = (function () {
   };
 
   /**
-   * Used with Function.bind to create Identifier's _deref_fn, below in
-   * dereference.
-   * @param  {Object} obj   the object passed in.
-   * @return {mixed}        the object'ss value.
-   */
-  function _deref_this(obj) {
-    if (this instanceof Identifier || this instanceof Expression) {
-      return obj[this.get_value()];
-    }
-    return obj[this];
-  }
-
-  /**
-   * Call the function-argument
-   * @param  {Function} Function to be called
-   * @return {monsters}
-   */
-  function _deref_call(fn) {
-    return fn();
-  }
-
-  /**
    * A dereference applies to an identifer, being either a function
    * call "()" or a membership lookup with square brackets "[member]".
    * @return {fn or undefined}  Dereference function to be applied to the
@@ -672,7 +657,7 @@ var Expression = (function () {
         this.next('(');
         this.white();
         this.next(')');
-        return _deref_call;
+        return true;  // in Identifier::dereference we check this
       } else if (ch === '[') {
         // a[x] membership
         this.next('[');
@@ -680,7 +665,7 @@ var Expression = (function () {
         this.white();
         this.next(']');
 
-        return _deref_this.bind(member);
+        return member;
       } else if (ch === '.') {
         // a.x membership
         member = '';
@@ -693,7 +678,7 @@ var Expression = (function () {
           member += ch;
           ch = this.next();
         }
-        return _deref_this.bind(member);
+        return member;
       } else {
         break;
       }
@@ -723,7 +708,7 @@ var Expression = (function () {
     }
     while (ch) {
       deref = this.dereference();
-      if (deref) {
+      if (deref !== undefined) {
         dereferences.push(deref);
       } else {
         break;
