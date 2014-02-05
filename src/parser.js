@@ -3,8 +3,7 @@
  * https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
  */
 /* jshint -W083 */
-
- Parser = (function () {
+Parser = (function () {
   var escapee = {
     "'": "'",
     '"':  '"',

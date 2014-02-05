@@ -1,6 +1,6 @@
-/*! knockout-secure-binding - v0.3.5 - 2014-2-5
+/*! knockout-secure-binding - v0.3.6 - 2014-02-05
  *  https://github.com/brianmhunt/knockout-secure-binding
- *  Copyright (c) 2014 Brian M Hunt; License: MIT */
+ *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {
@@ -281,9 +281,12 @@ Expression = (function () {
 })();
 
 
+/**
+ * Originally based on (public domain):
+ * https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
+ */
 /* jshint -W083 */
-
- Parser = (function () {
+Parser = (function () {
   var escapee = {
     "'": "'",
     '"':  '"',
