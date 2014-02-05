@@ -273,6 +273,7 @@ describe("changing Knockout's bindings to KSB", function () {
         assert.equal(input.value, context.pobs)
         context.pobs = '415-273-9164'
         assert.equal(input.value, context.pobs)
+        assert.equal(input.value, '415-273-9164')
     })
 })
 

@@ -8,10 +8,10 @@ Identifier = (function () {
   }
 
   Identifier.prototype.lookup_value = function (parent) {
-    var parser = this.parser,
+    var token = this.token,
+        parser = this.parser,
         $context = parser.context,
-        token = this.token,
-        $data = context.$data || {},
+        $data = $context.$data || {},
         globals = parser.globals || {};
 
     // parent is an optional source of the identifier e.g. for membership
