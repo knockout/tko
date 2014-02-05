@@ -254,6 +254,26 @@ describe("changing Knockout's bindings to KSB", function () {
         input.dispatchEvent(evt)
         assert.equal(context.pobs, '273-9164')
     })
+
+    it("writes an input `value` binding for a defineProperty", function () {
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            obs = ko.observable(),
+            context = { };
+        Object.defineProperty(context, 'pobs', {
+            configurable: true,
+            enumerable: true,
+            get: obs,
+            set: obs
+        });
+        input.setAttribute("data-sbind", "value: pobs")
+        context.pobs = '273-9164'
+        ko.applyBindings(context, input)
+        assert.equal(context.pobs, obs())
+        assert.equal(input.value, context.pobs)
+        context.pobs = '415-273-9164'
+        assert.equal(input.value, context.pobs)
+    })
 })
 
 describe("The lookup of variables (get_lookup_root)", function () {

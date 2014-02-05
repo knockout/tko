@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.3.0 - 2014-2-1
+/*! knockout-secure-binding - v0.3.0 - 2014-2-5
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -22,8 +22,10 @@ var Identifier = (function () {
 
   Identifier.prototype.lookup_value = function (parent) {
     var parser = this.parser,
-        context = parser.context,
-        token = this.token;
+        $context = parser.context,
+        token = this.token,
+        $data = $context.$data || {},
+        globals = parser.globals || {};
 
     // parent is an optional source of the identifier e.g. for membership
     // `a.b`, one would pass `a` in as the parent when calling lookup_value
@@ -39,26 +41,12 @@ var Identifier = (function () {
 
     switch (token) {
       case '$element': return parser.node;
-      case '$context': return context;
-      case '$data': return context.$data;
+      case '$context': return $context;
+      case '$data': return $data;
       default:
     }
 
-    // $data.token
-    if (context && context.$data &&
-      Object.hasOwnProperty.call(context.$data, token)) {
-      // Return $data if the first-dotted value is defined
-      // emulates with(context){with(context.$data){...}}
-      return context.$data[token];
-    }
-
-    // $context.token
-    if (context && Object.hasOwnProperty.call(context, token)) {
-      return context[token];
-    }
-
-    // globals.token
-    return parser.globals && parser.globals[token];
+    return $data[token] || $context[token] || globals[token];
   };
 
   function _deref(value, deref_fn) {
@@ -417,7 +405,9 @@ var Expression = (function () {
   Parser.prototype.object_add_value = function (object, key, value) {
     if (value instanceof Identifier || value instanceof Expression) {
       Object.defineProperty(object, key, {
-        get: function () { return value.get_value(); },
+        get: function () {
+          return value.get_value();
+        },
         enumerable: true,
       });
     } else {
@@ -773,7 +763,10 @@ var Expression = (function () {
   Parser.prototype.convert_to_accessors = function (result) {
     ko.utils.objectForEach(result, function (name, value) {
       if (value instanceof Identifier || value instanceof Expression) {
-        result[name] = value.get_value.bind(value);
+        result[name] = function expidAccessor() {
+          // expression or identifier accessir
+          return value.get_value();
+        };
       } else if (typeof(value) != 'function') {
         result[name] = function constAccessor() {
           return value;
