@@ -111,6 +111,10 @@ gulp.task('live', ['watch', 'connect'], function () {
       .pipe(connect.reload())
 })
 
+gulp.task('test', ['connect'], function () {
+  require('./spec/runner.js').init_client()
+})
+
 gulp.task('default', ['concat', 'minify', 'lint']);
 
 // TODO: external chromedriver daemon (see grunt-external-daemon)
