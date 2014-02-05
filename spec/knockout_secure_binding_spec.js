@@ -214,6 +214,46 @@ describe("changing Knockout's bindings to KSB", function () {
         div.click()
         assert.equal(called, true)
     })
+
+    it("sets an input `value` binding ", function () {
+        var input = document.createElement("input"),
+            context = { vobs: ko.observable('273-9164') };
+        input.setAttribute("data-sbind", "value: vobs")
+        ko.applyBindings(context, input)
+        assert.equal(input.value, '273-9164')
+        context.vobs("Area code 415")
+        assert.equal(input.value, 'Area code 415')
+    })
+
+    it("reads an input `value` binding", function () {
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            context = { vobs: ko.observable() };
+        input.setAttribute("data-sbind", "value: vobs")
+        ko.applyBindings(context, input)
+        input.value = '273-9164'
+        input.dispatchEvent(evt)
+        assert.equal(context.vobs(), '273-9164')
+    })
+
+    it("reads an input `value` binding for a defineProperty", function () {
+        // see https://github.com/brianmhunt/knockout-secure-binding/issues/23
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            obs = ko.observable(),
+            context = { };
+        Object.defineProperty(context, 'pobs', {
+            configurable: true,
+            enumerable: true,
+            get: obs,
+            set: obs
+        });
+        input.setAttribute("data-sbind", "value: pobs")
+        ko.applyBindings(context, input)
+        input.value = '273-9164'
+        input.dispatchEvent(evt)
+        assert.equal(context.pobs, '273-9164')
+    })
 })
 
 describe("The lookup of variables (get_lookup_root)", function () {
@@ -292,18 +332,37 @@ describe("The lookup of variables (get_lookup_root)", function () {
         assert.equal(bindings.a(), 42)
     })
 
-        // SKIP FIXME / TODO
-        it("does not bleed globals", function () {
-            var binding = "a: z",
-                globals_1 = {z: 168},
-                globals_2 = {},
-                bindings_1 = new Parser(null, context,
-                    globals_1).parse(binding),
-                bindings_2 = new Parser(null, context,
-                    globals_2).parse(binding);
-            assert.equal(bindings_1.a(), 168)
-            assert.equal(bindings_2.a(), undefined)
-        })
+    it("accesses properties created with defineProperty", function () {
+        // style of e.g. knockout-es5
+        var binding = "a: z",
+            context = {},
+            bindings = new Parser(null, context).parse(binding),
+            obs = ko.observable();
+
+        Object.defineProperty(context, 'z', {
+            configurable: true,
+            enumerable: true,
+            get: obs,
+            set: obs
+        });
+
+        assert.equal(bindings.a(), undefined)
+        context.z = '142'
+        assert.equal(bindings.a(), 142)
+        context.z = '144'
+        assert.equal(bindings.a(), 144)
+    })
+
+    it("does not bleed globals", function () {
+        var binding = "a: z",
+            globals_1 = {z: 168},
+            globals_2 = {},
+            bindings_1 = new Parser(null, context,
+                globals_1).parse(binding),
+            bindings_2 = new Parser(null, context,
+                globals_2).parse(binding);
+        assert.equal(bindings_1.a(), 168)
+        assert.equal(bindings_2.a(), undefined)
     })
 
 describe("the build_tree function", function () {

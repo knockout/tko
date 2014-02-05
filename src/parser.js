@@ -133,7 +133,9 @@
   Parser.prototype.object_add_value = function (object, key, value) {
     if (value instanceof Identifier || value instanceof Expression) {
       Object.defineProperty(object, key, {
-        get: function () { return value.get_value(); },
+        get: function () {
+          return value.get_value();
+        },
         enumerable: true,
       });
     } else {
@@ -489,7 +491,10 @@
   Parser.prototype.convert_to_accessors = function (result) {
     ko.utils.objectForEach(result, function (name, value) {
       if (value instanceof Identifier || value instanceof Expression) {
-        result[name] = value.get_value.bind(value);
+        result[name] = function expidAccessor() {
+          // expression or identifier accessir
+          return value.get_value();
+        };
       } else if (typeof(value) != 'function') {
         result[name] = function constAccessor() {
           return value;
