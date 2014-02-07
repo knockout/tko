@@ -22,16 +22,16 @@ function registerBindings(newBindings) {
 }
 
 function nodeHasBindings(node) {
-    var result, value;
-
+    var value;
     if (node.nodeType === node.ELEMENT_NODE) {
         return node.getAttribute(this.attribute);
     } else if (node.nodeType === node.COMMENT_NODE) {
-        // If this is a comment node, Knockout has already filtered it as
-        // one matching <!-- ko: ... -->. We always assume binding
-        // responsibility (unless noVirtualElements is set).
-        // See: knockout/src/virtualElements.js
-        return !this.noVirtualElements;
+        if (this.noVirtualElements) {
+            return false;
+        }
+        value = ("" + node.nodeValue || node.text).trim();
+        // See also: knockout/src/virtualElements.js
+        return value.indexOf("ko ") === 0;
     }
 }
 

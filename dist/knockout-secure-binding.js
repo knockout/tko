@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.3.6 - 2014-02-05
+/*! knockout-secure-binding - v0.3.7 - 2014-02-07
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -812,16 +812,16 @@ function registerBindings(newBindings) {
 }
 
 function nodeHasBindings(node) {
-    var result, value;
-
+    var value;
     if (node.nodeType === node.ELEMENT_NODE) {
         return node.getAttribute(this.attribute);
     } else if (node.nodeType === node.COMMENT_NODE) {
-        // If this is a comment node, Knockout has already filtered it as
-        // one matching <!-- ko: ... -->. We always assume binding
-        // responsibility (unless noVirtualElements is set).
-        // See: knockout/src/virtualElements.js
-        return !this.noVirtualElements;
+        if (this.noVirtualElements) {
+            return false;
+        }
+        value = ("" + node.nodeValue || node.text).trim();
+        // See also: knockout/src/virtualElements.js
+        return value.indexOf("ko ") === 0;
     }
 }
 

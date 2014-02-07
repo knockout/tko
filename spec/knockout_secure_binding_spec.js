@@ -789,6 +789,11 @@ describe("Virtual elements", function() {
         assert.ok(instance.nodeHasBindings(cmt))
     })
 
+    it("ignores non ko: comments", function () {
+        var cmt = document.createComment("hello world");
+        assert.notOk(instance.nodeHasBindings(cmt))
+    })
+
     it("binds text in virtual element", function () {
        var cmt = document.createComment("ko text: obs"),
        context =  { obs: ko.observable("a towel") },
