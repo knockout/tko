@@ -1,3 +1,12 @@
+<a name="0.3.10"></a>
+### 0.3.10 (2014-02-10)
+
+
+#### Bug Fixes
+
+* **build:** Refresh package.json from cache after bump ([44475b50bf3b1d477c326904fba7430c6b92e0dd](git://github.com/brianmhunt/knockout-secure-binding.git/commit/44475b50bf3b1d477c326904fba7430c6b92e0dd))
+
+
 <a name="0.3.9"></a>
 ### 0.3.9 (2014-02-10)
 
