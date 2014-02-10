@@ -78,6 +78,8 @@ gulp.task('bump', function () {
 gulp.task("release", ['bump', 'concat', 'minify'], function () {
   // see eg
   //  https://github.com/tomchentw/gulp-livescript/blob/master/gulpfile.ls
+  // Note: http://stackoverflow.com/questions/9210542
+  delete require.cache[require.resolve('./package.json')];
   var pkg = require('./package.json'),
       version = pkg.version,
       commit_msg = "Release: " + version;
