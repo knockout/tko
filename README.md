@@ -176,9 +176,11 @@ Requires
 
 Knockout 2.0+
 
-KSB may use ES5 functions, namely:
+KSB may use ES5 functions, including (but perhaps not limited to):
 
 - `Object.defineProperty`
+- `Object.keys`
+- `String.trim`
 
 
 Performance
