@@ -236,8 +236,9 @@ describe("changing Knockout's bindings to KSB", function () {
         assert.equal(context.vobs(), '273-9164')
     })
 
-    it("reads an input `value` binding for a defineProperty"/*, function () {
+    it("reads an input `value` binding for a defineProperty", function () {
         // see https://github.com/brianmhunt/knockout-secure-binding/issues/23
+        // and http://stackoverflow.com/questions/21580173
         var input = document.createElement("input"),
             evt = new CustomEvent("change"),
             obs = ko.observable(),
@@ -253,7 +254,7 @@ describe("changing Knockout's bindings to KSB", function () {
         input.value = '273-9164'
         input.dispatchEvent(evt)
         assert.equal(context.pobs, '273-9164')
-    }*/)
+    })
 
     it("writes an input `value` binding for a defineProperty", function () {
         var input = document.createElement("input"),

@@ -466,10 +466,22 @@ Parser = (function () {
  * expressionAccessor.
  */
   Parser.prototype.convert_to_accessors = function (result) {
+    var propertyWriters = {};
     ko.utils.objectForEach(result, function (name, value) {
-      if (value instanceof Identifier || value instanceof Expression) {
-        result[name] = function expidAccessor() {
-          // expression or identifier accessir
+      if (value instanceof Identifier) {
+        // use twoWayBindings so the binding can update Identifier
+        // See http://stackoverflow.com/questions/21580173
+        result[name] = function () {
+          return value.get_value();
+        };
+
+        if (ko.expressionRewriting.twoWayBindings[name]) {
+          propertyWriters[name] = function(new_value) {
+            value.set_value(new_value);
+          };
+        }
+      } else if (value instanceof Expression) {
+        result[name] = function expressionAccessor() {
           return value.get_value();
         };
       } else if (typeof(value) != 'function') {
@@ -478,6 +490,13 @@ Parser = (function () {
         };
       }
     });
+
+    if (Object.keys(propertyWriters).length > 0) {
+      result._ko_property_writers = function () {
+        return propertyWriters;
+      };
+    }
+
     return result;
   };
 

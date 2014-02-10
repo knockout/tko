@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.3.7 - 2014-02-07
+/*! knockout-secure-binding - v0.3.8 - 2014-02-10
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -86,6 +86,26 @@ Identifier = (function () {
    */
   Identifier.prototype.get_value = function (parent) {
     return this.dereference(this.lookup_value(parent));
+  };
+
+  Identifier.prototype.set_value = function (new_value) {
+    var token = this.token,
+        parser = this.parser,
+        $context = parser.context,
+        $data = $context.$data || {},
+        globals = parser.globals || {};
+
+    if ($data.hasOwnProperty(token)) {
+      $data[token] = new_value;
+    } else if ($context.hasOwnProperty(token)) {
+      $context[token] = new_value;
+    } else if (globals.hasOwnProperty(token)) {
+      globals[token] = new_value;
+    } else {
+      throw new Error("Identifier::set_value -- " +
+        "The property '" + token + "' does not exist " +
+        "on the $data, $context, or globals.");
+    }
   };
 
   return Identifier;
@@ -749,10 +769,22 @@ Parser = (function () {
  * expressionAccessor.
  */
   Parser.prototype.convert_to_accessors = function (result) {
+    var propertyWriters = {};
     ko.utils.objectForEach(result, function (name, value) {
-      if (value instanceof Identifier || value instanceof Expression) {
-        result[name] = function expidAccessor() {
-          // expression or identifier accessir
+      if (value instanceof Identifier) {
+        // use twoWayBindings so the binding can update Identifier
+        // See http://stackoverflow.com/questions/21580173
+        result[name] = function () {
+          return value.get_value();
+        };
+
+        if (ko.expressionRewriting.twoWayBindings[name]) {
+          propertyWriters[name] = function(new_value) {
+            value.set_value(new_value);
+          };
+        }
+      } else if (value instanceof Expression) {
+        result[name] = function expressionAccessor() {
           return value.get_value();
         };
       } else if (typeof(value) != 'function') {
@@ -761,6 +793,13 @@ Parser = (function () {
         };
       }
     });
+
+    if (Object.keys(propertyWriters).length > 0) {
+      result._ko_property_writers = function () {
+        return propertyWriters;
+      };
+    }
+
     return result;
   };
 

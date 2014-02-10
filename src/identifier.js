@@ -67,6 +67,26 @@ Identifier = (function () {
     return this.dereference(this.lookup_value(parent));
   };
 
+  Identifier.prototype.set_value = function (new_value) {
+    var token = this.token,
+        parser = this.parser,
+        $context = parser.context,
+        $data = $context.$data || {},
+        globals = parser.globals || {};
+
+    if ($data.hasOwnProperty(token)) {
+      $data[token] = new_value;
+    } else if ($context.hasOwnProperty(token)) {
+      $context[token] = new_value;
+    } else if (globals.hasOwnProperty(token)) {
+      globals[token] = new_value;
+    } else {
+      throw new Error("Identifier::set_value -- " +
+        "The property '" + token + "' does not exist " +
+        "on the $data, $context, or globals.");
+    }
+  };
+
   return Identifier;
 })();
 
