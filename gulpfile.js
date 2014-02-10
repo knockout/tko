@@ -94,7 +94,7 @@ gulp.task("release", ['bump', 'concat', 'minify'], function () {
       .pipe(exec("git tag -a " + version + " -m '" + commit_msg + "'"))
       .pipe(exec("git push"))
       .pipe(exec("git push --tags"))
-      .pipe(exec("npm publish"))
+      .pipe(exec("npm publish"))  // always ahead by one???
 })
 
 gulp.task('connect', connect.server({
