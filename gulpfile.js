@@ -5,7 +5,9 @@ var gulp = require('gulp'),
     header = require('gulp-header'),
     bump = require('gulp-bump'),
     jshint = require('gulp-jshint'),
+    exec = require('gulp-exec'),
     connect = require('gulp-connect'),
+    changelog = require("gulp-conventional-changelog"),
     watch = require('gulp-watch'),
     url = require('url'),
     colors = require('colors'),
@@ -65,10 +67,45 @@ gulp.task('lint', function () {
       .pipe(jshint.reporter('jshint-stylish'));
 })
 
-gulp.task('bump', ['concat', 'minify'], function () {
+gulp.task('bump', function () {
   gulp.src('./package.json')
       .pipe(bump())
       .pipe(gulp.dest('./'));
+})
+
+// gulp.task('release', ['build', 'bump'], function(){
+//   var jsonFile, commitMsg;
+//   jsonFile = require('./package.json');
+//   commitMsg = "chore(release): " + jsonFile.version;
+//   return gulp
+// 	.src(['package .json', 'CHANGELOG .md'])
+// 	.pipe(gulpConventionalChangelog())
+// 	.pipe(gulp .dest('.'))
+// 	.pipe(gulpExec('git add -A'))
+// 	.pipe(gulpExec("git commit -m '" + commitMsg + "'"))
+// 	.pipe(gulpExec("git tag -a " + jsonFile
+// 	.version + " -m '" + commitMsg + "'"))
+// 	.pipe(gulpExec('git push'))
+// 	.pipe(gulpExec('git push --tags'))
+// 	.pipe(gulpExec('npm publish'));
+// });
+
+gulp.task("release", ['bump', 'concat', 'minify'], function () {
+  // see eg
+  //  https://github.com/tomchentw/gulp-livescript/blob/master/gulpfile.ls
+  var bumped_pkg = require('./package.json'),
+      version = bumped_pkg.version,
+      commit_msg = "Release: " + version;
+
+  gulp.src(['package.json', 'CHANGELOG.md'])
+      .pipe(changelog())
+      .pipe(gulp.dest("."))
+      .pipe(exec("git add -A"))
+      .pipe(exec("git commit -m '" + commit_msg + "'"))
+      .pipe(exec("git tag -a " + version + " -m '" + commit_msg + "'"))
+      .pipe(exec("git push"))
+      .pipe(exec("git push --tags"))
+      .pipe(exec("npm publish"))
 })
 
 gulp.task('connect', connect.server({
