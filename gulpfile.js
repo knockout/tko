@@ -12,7 +12,6 @@ var gulp = require('gulp'),
     url = require('url'),
     colors = require('colors'),
 
-    pkg = require('./package.json'),
     now = new Date(),
 
     scripts = [
@@ -43,6 +42,8 @@ style-src 'self'; \
 report-uri /csp".replace(/\s+/g, " ");
 
 gulp.task('concat', function () {
+  var pkg = require('./package.json');
+
   gulp.src(scripts)
       .pipe(concat("knockout-secure-binding.js"))
       .pipe(header(banner, { pkg: pkg, today: now }))
@@ -50,6 +51,7 @@ gulp.task('concat', function () {
 })
 
 gulp.task('minify', function () {
+  var pkg = require('./package.json');
   gulp.src(scripts)
       .pipe(concat("knockout-secure-binding.min.js"))
       .pipe(uglify())
@@ -73,30 +75,15 @@ gulp.task('bump', function () {
       .pipe(gulp.dest('./'));
 })
 
-// gulp.task('release', ['build', 'bump'], function(){
-//   var jsonFile, commitMsg;
-//   jsonFile = require('./package.json');
-//   commitMsg = "chore(release): " + jsonFile.version;
-//   return gulp
-// 	.src(['package .json', 'CHANGELOG .md'])
-// 	.pipe(gulpConventionalChangelog())
-// 	.pipe(gulp .dest('.'))
-// 	.pipe(gulpExec('git add -A'))
-// 	.pipe(gulpExec("git commit -m '" + commitMsg + "'"))
-// 	.pipe(gulpExec("git tag -a " + jsonFile
-// 	.version + " -m '" + commitMsg + "'"))
-// 	.pipe(gulpExec('git push'))
-// 	.pipe(gulpExec('git push --tags'))
-// 	.pipe(gulpExec('npm publish'));
-// });
-
 gulp.task("release", ['bump', 'concat', 'minify'], function () {
   // see eg
   //  https://github.com/tomchentw/gulp-livescript/blob/master/gulpfile.ls
-  var bumped_pkg = require('./package.json'),
-      version = bumped_pkg.version,
+  var pkg = require('./package.json'),
+      version = pkg.version,
       commit_msg = "Release: " + version;
 
+  // Conventional changelog:
+  // https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit
   gulp.src(['package.json', 'CHANGELOG.md'])
       .pipe(changelog())
       .pipe(gulp.dest("."))
@@ -142,7 +129,7 @@ gulp.task('connect', connect.server({
 }))
 
 gulp.task('live', ['watch', 'connect'], function () {
-  console.log("WATching", pkg.main, "then relaoding")
+  var pkg = require('./package.json');
   gulp.src([pkg.main, "spec/*"])
       .pipe(watch())
       .pipe(connect.reload())
