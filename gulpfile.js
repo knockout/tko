@@ -93,7 +93,8 @@ gulp.task("release", ['bump', 'concat', 'minify'], function () {
       .pipe(exec("git commit -m '" + commit_msg + "'"))
       .pipe(exec("git tag -a " + version + " -m '" + commit_msg + "'"))
       .pipe(exec("git push"))
-      .pipe(exec("git push --tags"))
+      .pipe(exec("git push origin refs/tags/" + version +
+        ":refs/tags/" + version))
       .pipe(exec("npm publish"))  // always ahead by one???
 })
 
