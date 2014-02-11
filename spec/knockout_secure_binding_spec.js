@@ -244,10 +244,7 @@ describe("changing Knockout's bindings to KSB", function () {
             obs = ko.observable(),
             context = { };
         Object.defineProperty(context, 'pobs', {
-            configurable: true,
-            enumerable: true,
-            get: obs,
-            set: obs
+            configurable: true, enumerable: true, get: obs, set: obs
         });
         input.setAttribute("data-sbind", "value: pobs")
         ko.applyBindings(context, input)
@@ -262,10 +259,7 @@ describe("changing Knockout's bindings to KSB", function () {
             obs = ko.observable(),
             context = { };
         Object.defineProperty(context, 'pobs', {
-            configurable: true,
-            enumerable: true,
-            get: obs,
-            set: obs
+            configurable: true, enumerable: true, get: obs, set: obs
         });
         input.setAttribute("data-sbind", "value: pobs")
         context.pobs = '273-9164'
@@ -275,6 +269,109 @@ describe("changing Knockout's bindings to KSB", function () {
         context.pobs = '415-273-9164'
         assert.equal(input.value, context.pobs)
         assert.equal(input.value, '415-273-9164')
+    })
+
+    it("writes an input object defineProperty", function () {
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            obs = ko.observable(),
+            context = { obj: {} };
+        Object.defineProperty(context.obj, 'sobs', {
+            configurable: true, enumerable: true, get: obs, set: obs
+        });
+        // apply the binding with a value
+        input.setAttribute("data-sbind", "value: obj.sobs")
+        context.obj.sobs = '273-9164'
+        ko.applyBindings(context, input)
+
+        // make sure the element is updated
+        assert.equal(context.obj.sobs, obs())
+        assert.equal(input.value, context.obj.sobs)
+
+        // update the observable and check the input values
+        context.obj.sobs = '415-273-9164'
+        assert.equal(input.value, context.obj.sobs)
+        assert.equal(input.value, '415-273-9164')
+    })
+
+    it("writes nested defineProperties", function () {
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            obs = ko.observable(),
+            context = {},
+            obj = {},
+            oo = ko.observable(obj);  // es5 wraps obj in an observable
+
+        Object.defineProperty(context, 'obj', {
+            configurable: true, enumerable: true, get: oo, set: oo
+        })
+
+        Object.defineProperty(context.obj, 'ddobs', {
+            configurable: true, enumerable: true, get: obs, set: obs
+        })
+
+        input.setAttribute("data-sbind", "value: obj.ddobs")
+        context.obj.ddobs = '555-2368'  // who ya gonna call?
+        ko.applyBindings(context, input)
+
+        assert.equal(context.obj.ddobs, obs())
+        assert.equal(input.value, context.obj.ddobs)
+
+        context.obj.ddobs = '646-555-2368'
+        assert.equal(input.value, '646-555-2368')
+    })
+
+    it("reads a nested defineProperty", function () {
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            obs = ko.observable(),
+            oo = ko.observable({}),
+            context = {};
+
+        Object.defineProperty(context, 'obj', {
+            configurable: true, enumerable: true, get: oo, set: oo
+        })
+
+        Object.defineProperty(oo(), 'drobs', {
+            configurable: true, enumerable: true, get: obs, set: obs
+        })
+
+        input.setAttribute("data-sbind", "value: obj.drobs")
+        ko.applyBindings(context, input)
+        input.value = '273.9164'
+        input.dispatchEvent(evt)
+        assert.equal(context.obj.drobs, '273.9164')
+    })
+
+    it("reads a multi-nested defineProperty", function () {
+        var input = document.createElement("input"),
+            evt = new CustomEvent("change"),
+            o0 = ko.observable({}),
+            o1 = ko.observable({}),
+            o2 = ko.observable({}),
+            context = {};
+
+        Object.defineProperty(context, 'o0', {
+            configurable: true, enumerable: true, get: o0, set: o0
+        })
+
+        Object.defineProperty(o0(), 'o1', {
+            configurable: true, enumerable: true, get: o1, set: o1
+        })
+
+        Object.defineProperty(o1(), 'o2', {
+            configurable: true, enumerable: true, get: o1, set: o1
+        })
+
+        Object.defineProperty(o2(), 'oN', {
+            configurable: true, enumerable: true, get: o1, set: o1
+        })
+
+        input.setAttribute("data-sbind", "value: o0.o1.o2.oN")
+        ko.applyBindings(context, input)
+        input.value = '1.7724'
+        input.dispatchEvent(evt)
+        assert.equal(context.o0.o1.o2.oN, '1.7724')
     })
 })
 

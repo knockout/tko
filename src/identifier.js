@@ -68,23 +68,52 @@ Identifier = (function () {
   };
 
   Identifier.prototype.set_value = function (new_value) {
-    var token = this.token,
-        parser = this.parser,
+    var parser = this.parser,
         $context = parser.context,
         $data = $context.$data || {},
-        globals = parser.globals || {};
+        globals = parser.globals || {},
+        refs = this.dereferences || [],
+        leaf = this.token,
+        i, n, root;
 
-    if ($data.hasOwnProperty(token)) {
-      $data[token] = new_value;
-    } else if ($context.hasOwnProperty(token)) {
-      $context[token] = new_value;
-    } else if (globals.hasOwnProperty(token)) {
-      globals[token] = new_value;
+    if (Object.hasOwnProperty.call($data, leaf)) {
+      root = $data;
+    } else if (Object.hasOwnProperty.call($context, leaf)) {
+      root = $context;
+    } else if (Object.hasOwnProperty.call(globals, leaf)) {
+      root = globals;
     } else {
       throw new Error("Identifier::set_value -- " +
-        "The property '" + token + "' does not exist " +
+        "The property '" + leaf + "' does not exist " +
         "on the $data, $context, or globals.");
     }
+
+    n = refs.length;
+    if (n === 0) {
+      root[leaf] = new_value;
+    }
+
+    // First dereference is $data/$context/global[token].
+    root = root[leaf];
+
+    // We cannot use this.dereference because that gives the leaf; to evoke
+    // the ES5 setter we have to call `obj[leaf] = new_value`
+    for (i = 0; i < n - 1; ++i) {
+      leaf = refs[i];
+      if (leaf === true) {
+        root = root();
+      } else {
+        root = root[value_of(leaf)];
+      }
+    }
+
+    // We indicate that a dereference is a function when it is `true`.
+    if (refs[i] === true) {
+      throw new Error("Cannot assign a value to a function.")
+    }
+
+    // Call the setter for the leaf.
+    root[value_of(refs[i])] = new_value;
   };
 
   return Identifier;
