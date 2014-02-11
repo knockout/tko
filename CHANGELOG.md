@@ -1,3 +1,12 @@
+<a name="0.3.11"></a>
+### 0.3.11 (2014-02-11)
+
+
+#### Bug Fixes
+
+* **identifier:** lookup of nested defineProperties ([7e6dd51e7fc43c3afa6d7b2b3f2ff1d998b3bf92](git://github.com/brianmhunt/knockout-secure-binding.git/commit/7e6dd51e7fc43c3afa6d7b2b3f2ff1d998b3bf92), closes [#26](git://github.com/brianmhunt/knockout-secure-binding.git/issues/26))
+
+
 <a name="0.3.10"></a>
 ### 0.3.10 (2014-02-10)
 
