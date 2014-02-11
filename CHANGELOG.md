@@ -1,3 +1,12 @@
+<a name="0.4.1"></a>
+### 0.4.1 (2014-02-11)
+
+
+#### Bug Fixes
+
+* **build:** separate 'bump' from 'release' tasks ([aaafa06db296632dfac699f9fd4b9668727a8a09](git://github.com/brianmhunt/knockout-secure-binding.git/commit/aaafa06db296632dfac699f9fd4b9668727a8a09))
+
+
 <a name="0.4.0"></a>
 ## 0.4.0 (2014-02-11)
 
