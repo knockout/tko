@@ -75,7 +75,7 @@ gulp.task('bump', function () {
       .pipe(gulp.dest('./'));
 })
 
-gulp.task("release", ['bump', 'concat', 'minify'], function () {
+gulp.task("release", ['concat', 'minify'], function () {
   // see eg
   //  https://github.com/tomchentw/gulp-livescript/blob/master/gulpfile.ls
   // Note: http://stackoverflow.com/questions/9210542
