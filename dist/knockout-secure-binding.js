@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.4.1 - 2014-02-11
+/*! knockout-secure-binding - v0.4.2 - 2014-02-13
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -130,7 +130,7 @@ Identifier = (function () {
 
     // We indicate that a dereference is a function when it is `true`.
     if (refs[i] === true) {
-      throw new Error("Cannot assign a value to a function.")
+      throw new Error("Cannot assign a value to a function.");
     }
 
     // Call the setter for the leaf.
@@ -743,8 +743,7 @@ Parser = (function () {
     var token = '', ch, deref, dereferences = [];
     ch = this.white();
     while (ch) {
-      if (ch === ':' || ch === '}' || ch === ',' || ch <= ' ' || ch === '[' ||
-          ch === ']' || ch === '(' || ch === ')' || ch === '.') {
+      if (!is_identifier_char(ch)) {
         break;
       }
       token += ch;

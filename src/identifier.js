@@ -109,7 +109,7 @@ Identifier = (function () {
 
     // We indicate that a dereference is a function when it is `true`.
     if (refs[i] === true) {
-      throw new Error("Cannot assign a value to a function.")
+      throw new Error("Cannot assign a value to a function.");
     }
 
     // Call the setter for the leaf.

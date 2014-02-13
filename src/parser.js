@@ -411,8 +411,7 @@ Parser = (function () {
     var token = '', ch, deref, dereferences = [];
     ch = this.white();
     while (ch) {
-      if (ch === ':' || ch === '}' || ch === ',' || ch <= ' ' || ch === '[' ||
-          ch === ']' || ch === '(' || ch === ')' || ch === '.') {
+      if (!is_identifier_char(ch)) {
         break;
       }
       token += ch;

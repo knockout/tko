@@ -682,6 +682,14 @@ describe("the bindings parser", function () {
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr(), 'z')
     })
+
+    it("parses string+var+string", function () {
+        // re issue #27
+        var binding = "text: 'prefix'+name+'postfix'"
+            context = { name: ko.observable('mike') },
+            bindings = new Parser(null, context).parse(binding);
+        assert.equal(bindings.text(), 'prefixmikepostfix')
+    })
 })
 
 describe("the parsing of expressions", function () {
