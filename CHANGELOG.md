@@ -1,3 +1,12 @@
+<a name="0.4.2"></a>
+### 0.4.2 (2014-02-13)
+
+
+#### Bug Fixes
+
+* **parser:** Fix identifiers including bad characters ([ce01e1d7681fa96684902d4688633f0367365068](git://github.com/brianmhunt/knockout-secure-binding.git/commit/ce01e1d7681fa96684902d4688633f0367365068), closes [#27](git://github.com/brianmhunt/knockout-secure-binding.git/issues/27))
+
+
 <a name="0.4.1"></a>
 ### 0.4.1 (2014-02-11)
 
