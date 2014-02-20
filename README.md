@@ -170,6 +170,7 @@ Automated tests with `chromedriver` can be initiated with
 You will need to independently start `chromedriver` with
 `chromedriver --url-base=/wd/hub --port=4445`.
 
+You can compile with `gulp`, and run a test server with `gulp live`.
 
 Requires
 ---
