@@ -46,11 +46,23 @@ Identifier = (function () {
    * @return {mixed}        The dereferenced value.
    */
   Identifier.prototype.dereference = function (value) {
-    var i, n, member, refs = this.dereferences || [];
+    var member,
+        refs = this.dereferences || [],
+        parser = this.parser,
+        $context = parser.context || {},
+        $data = $context.$data || {},
+        self = {
+          $context: $context,
+          $data: $data,
+          globals: parser.globals || {},
+          node: parser.node
+        },
+        i, n;
+
     for (i = 0, n = refs.length; i < n; ++i) {
       member = refs[i];
       if (member === true) {
-        value = value();
+        value = value.call(self);
       } else {
         value = value[value_of(member)];
       }

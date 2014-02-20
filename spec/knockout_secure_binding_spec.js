@@ -18,6 +18,7 @@ describe("Knockout Secure Binding", function () {
        Identifier,
        Node,
        operators,
+       original_provider = ko.bindingProvider,
        csp_rex = /Content Security Policy|blocked by CSP/;
 
     beforeEach(function () {
@@ -29,48 +30,44 @@ describe("Knockout Secure Binding", function () {
         operators = Node.operators;
     })
 
-    // it("Has a built-in delay", function (done) {
-    //   // we use this to make sure our test driver will actually
-    //   // work when the results are slow (who tests the testers?)
-    //   setTimeout(function () { done () }, 1000)
-    // })
-
     it("has loaded knockout", function () {
         assert.property(window, 'ko')
     })
 
     it("secureBindingsProvider exist on 'ko'", function () {
-            // note that it could alternatively be exported with `require`
-            assert.property(ko, 'secureBindingsProvider')
-        })
-
-    it("has eval or new Function throw a CSP error", function () {
-        var efn = function () { return eval("true") },
-        nfn = function () { new Function("return true") };
-
-        console.log("Expecting a CSP violation ...")
-        assert.throw(efn, csp_rex)
-        console.log("Expecting a CSP violation ...")
-        assert.throw(nfn, csp_rex)
+        // note that it could alternatively be exported with `require`
+        assert.property(ko, 'secureBindingsProvider')
     })
 
-    it("will throw an CSP error with regular bindings", function () {
-        var div = document.createElement("div"),
-        fn = function () {
-            ko.applyBindings({obs: 1}, div)
-        };
+    describe("the Knockout bindingProvider", function () {
+        it("uses the original binding provider", function () {
+            assert.equal(ko.bindingProvider, original_provider);
+        })
+
+        it("has eval or new Function throw a CSP error", function () {
+            var efn = function () { return eval("true") },
+                nfn = function () { new Function("return true") };
+
+            console.log("Expecting a CSP violation ...")
+            assert.throw(efn, csp_rex)
+            console.log("Expecting a CSP violation ...")
+            assert.throw(nfn, csp_rex)
+        })
+
+        it("will throw an CSP error with regular bindings", function () {
+            var div = document.createElement("div"),
+            fn = function () {
+                ko.applyBindings({obs: 1}, div)
+            };
 
             // Although we cannot disable the CSP-violations, printing to the
             // console, we can print a lead-in that makes it appear to be
             // expected.
             console.log("Expecting a CSP violation ...")
             div.setAttribute("data-bind", "text: obs"),
-            ko.bindingProvider.instance = new ko.bindingProvider()
+            ko.bindingProvider.instance = new original_provider();
             assert.throw(fn, csp_rex)
         })
-
-    it("provides a binding provider", function () {
-        ko.bindingProvider.instance = new ko.secureBindingsProvider();
     })
 
 describe("nodeHasBindings", function() {
@@ -568,21 +565,42 @@ describe("Identifier", function () {
     describe("the dereference function", function () {
         it("does nothing with no references", function () {
             var refs = undefined,
-                ident = new Identifier(null, 'x', refs);
+                ident = new Identifier({}, 'x', refs);
             assert.equal(ident.dereference('1'), 1)
         })
         it("does nothing with empty array references", function () {
             var refs = [],
-                ident = new Identifier(null, 'x', refs);
+                ident = new Identifier({}, 'x', refs);
             assert.equal(ident.dereference('1'), 1)
         })
         it("applies the functions of the refs to the value", function () {
             var refs = [true, true],
-                ident = new Identifier(null, 'x', refs),
+                ident = new Identifier({}, 'x', refs),
                 g = function () { return '42' },
                 f = function () { return g };
             assert.equal(ident.dereference(f), 42)
         })
+
+        it("sets `this` to {$data, $context, globals, node}", function () {
+            var div = document.createElement("div"),
+                globals = { Ramanujan: "1729" };
+                context = {
+                    fn: function () {
+                        assert.isObject(this)
+                        assert.equal(ko.contextFor(div), this.$context,
+                            '$context')
+                        assert.equal(ko.dataFor(div), this.$data, '$data')
+                        assert.deepEqual(globals, this.globals, 'globals')
+                        assert.equal(div, this.node, 'div')
+                        return 'sigtext'
+                    }
+                },
+            div.setAttribute("data-sbind", "text: $root.fn()")
+            ko.bindingProvider.instance = new ko.secureBindingsProvider({ globals: globals })
+            ko.applyBindings(context, div)
+            assert.equal(div.innerText, 'sigtext')
+        })
+
     })
 
     it("dereferences values on the parser", function () {
