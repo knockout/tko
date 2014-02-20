@@ -16,6 +16,9 @@ I have written a [blog post about KSB as well](http://brianmhunt.github.io/artic
 Getting started
 ---
 
+
+### Installing
+
 You can get KSB from `bower` with:
 
 ```
@@ -29,6 +32,8 @@ npm install knockout-secure-binding
 ```
 
 Save this to their respective settings with `--save-dev` or `--save`.
+
+### Using (script)
 
 Then include it in your project with a `script` tag and a property `secureBindingsProvider` will be added to the `ko` object. I.e.
 
@@ -53,7 +58,7 @@ Having called the above, when you run `ko.applyBindings` the knockout bindings w
 When the `attribute` option is not provided the default binding for KSB is `data-sbind`. You can see more options below. By default KSB the `globals` object for KSB is an empty object. The options are described in more detail below.
 
 
-### AMD Loader
+### Using (AMD Loader)
 
 If you are using an AMD loader, then KSB is exported, and you should be able to
 load it like this:
