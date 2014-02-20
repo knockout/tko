@@ -468,13 +468,13 @@ Parser = (function () {
     var propertyWriters = {};
     ko.utils.objectForEach(result, function (name, value) {
       if (value instanceof Identifier) {
-        // use twoWayBindings so the binding can update Identifier
+        // use _twoWayBindings so the binding can update Identifier
         // See http://stackoverflow.com/questions/21580173
         result[name] = function () {
           return value.get_value();
         };
 
-        if (ko.expressionRewriting.twoWayBindings[name]) {
+        if (ko.expressionRewriting._twoWayBindings[name]) {
           propertyWriters[name] = function(new_value) {
             value.set_value(new_value);
           };
