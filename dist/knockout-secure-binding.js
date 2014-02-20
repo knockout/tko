@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.4.3 - 2014-02-20
+/*! knockout-secure-binding - v0.4.4 - 2014-02-20
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -68,6 +68,7 @@ Identifier = (function () {
    */
   Identifier.prototype.dereference = function (value) {
     var member,
+        last_value,
         refs = this.dereferences || [],
         parser = this.parser,
         $context = parser.context || {},
@@ -76,15 +77,17 @@ Identifier = (function () {
           $context: $context,
           $data: $data,
           globals: parser.globals || {},
-          node: parser.node
+          $element: parser.node
         },
         i, n;
 
     for (i = 0, n = refs.length; i < n; ++i) {
       member = refs[i];
       if (member === true) {
-        value = value.call(self);
+        value = value.call(last_value || self);
+        last_value = value;
       } else {
+        last_value = value;
         value = value[value_of(member)];
       }
     }

@@ -581,7 +581,23 @@ describe("Identifier", function () {
             assert.equal(ident.dereference(f), 42)
         })
 
-        it("sets `this` to {$data, $context, globals, node}", function () {
+        it("sets `this` to the parent member", function () {
+            var div = document.createElement("div"),
+                context = {
+                    fn: function () {
+                        assert.isObject(this)
+                        assert.equal(this, context)
+                        return 'ahab'
+                    },
+                    moby: 'dick'
+                };
+            div.setAttribute("data-sbind", "text: $data.fn()")
+            ko.bindingProvider.instance = new ko.secureBindingsProvider()
+            ko.applyBindings(context, div)
+            assert.equal(div.innerText, 'ahab')
+        })
+
+        it("sets `this` of a top-level item to {$data, $context, globals, node}", function () {
             var div = document.createElement("div"),
                 globals = { Ramanujan: "1729" };
                 context = {
@@ -590,12 +606,12 @@ describe("Identifier", function () {
                         assert.equal(ko.contextFor(div), this.$context,
                             '$context')
                         assert.equal(ko.dataFor(div), this.$data, '$data')
+                        assert.equal(div, this.$element, 'div')
                         assert.deepEqual(globals, this.globals, 'globals')
-                        assert.equal(div, this.node, 'div')
                         return 'sigtext'
                     }
-                },
-            div.setAttribute("data-sbind", "text: $root.fn()")
+                };
+            div.setAttribute("data-sbind", "text: fn()")
             ko.bindingProvider.instance = new ko.secureBindingsProvider({ globals: globals })
             ko.applyBindings(context, div)
             assert.equal(div.innerText, 'sigtext')

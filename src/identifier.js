@@ -51,19 +51,22 @@ Identifier = (function () {
         parser = this.parser,
         $context = parser.context || {},
         $data = $context.$data || {},
-        self = {
+        self = { // top-level `this` in function calls
           $context: $context,
           $data: $data,
           globals: parser.globals || {},
-          node: parser.node
+          $element: parser.node
         },
+        last_value,  // becomes `this` in function calls to object properties.
         i, n;
 
     for (i = 0, n = refs.length; i < n; ++i) {
       member = refs[i];
       if (member === true) {
-        value = value.call(self);
+        value = value.call(last_value || self);
+        last_value = value;
       } else {
+        last_value = value;
         value = value[value_of(member)];
       }
     }
