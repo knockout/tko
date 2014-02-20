@@ -1,3 +1,12 @@
+<a name="0.4.4"></a>
+### 0.4.4 (2014-02-20)
+
+
+#### Bug Fixes
+
+* **identifiers:** Fix dereferences not setting `this` to members ([9f496be38bfb45c22011592d5c20a9a0f20e65d1](git://github.com/brianmhunt/knockout-secure-binding.git/commit/9f496be38bfb45c22011592d5c20a9a0f20e65d1))
+
+
 <a name="0.4.3"></a>
 ### 0.4.3 (2014-02-20)
 

@@ -68,17 +68,17 @@ Identifier = (function () {
    */
   Identifier.prototype.dereference = function (value) {
     var member,
-        last_value,
         refs = this.dereferences || [],
         parser = this.parser,
         $context = parser.context || {},
         $data = $context.$data || {},
-        self = {
+        self = { // top-level `this` in function calls
           $context: $context,
           $data: $data,
           globals: parser.globals || {},
           $element: parser.node
         },
+        last_value,  // becomes `this` in function calls to object properties.
         i, n;
 
     for (i = 0, n = refs.length; i < n; ++i) {
