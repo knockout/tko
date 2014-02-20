@@ -22,7 +22,6 @@ Identifier = (function () {
         $data = $context.$data || {},
         globals = parser.globals || {};
 
-    // Parent is
     if (parent) {
       return value_of(parent)[token];
     }
