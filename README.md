@@ -152,7 +152,7 @@ KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/do
 
 Notes:
 
-1. Observables in expressions are unwrapped as a convenience so `text: a > b` will unwrap both `a` and `b` if they are observables. It will not unwrap for membership i.e. `a.property` will return the `property` of the observable (`a.property`), not the property of the observable's unwrapped value (`ko.unwrap(a).property`). If the varaible referred to is not part of an expression (e.g. `text: a`) then the variable will not be unwrapped before being passed to a binding. This is the expected behaviour.
+1. Observables in expressions are unwrapped as a convenience so `text: a > b` will unwrap both `a` and `b` if they are observables. It will not unwrap for membership i.e. `a.property` will return the `property` of the observable (`a.property`), not the property of the observable's unwrapped value (`ko.unwrap(a).property`). If the variable referred to is not part of an expression (e.g. `text: a`) then the variable will not be unwrapped before being passed to a binding. This is the expected behaviour.
 
 2. While negation and double-negation are supported, trible negation (`!!!`) will not work as expected.
 
@@ -200,7 +200,7 @@ How it works
 
 KSB runs a one-pass parser on the bindings’ text and generates an array of identifier dereferences and a lazily generated syntax tree of expressions.
 
-The identifier dereferences for something like `<span data-bind='x: a.b["c"]()'></span>` will look like this:
+The identifier dereferences for something like `<span data-bind='x: a.b["c"]()'></span>` will look like (or convert into) this:
 
 ```
 [
