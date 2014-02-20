@@ -22,11 +22,11 @@ Node = (function () {
     '<=': function le(a, b) { return a <= b; },
     '>': function gt(a, b) { return a > b; },
     '>=': function ge(a, b) { return a >= b; },
-    // 'in': function (a, b) { return a in b; },
-    // 'instanceof': function (a, b) { return a instanceof b; },
+    //    TODO: 'in': function (a, b) { return a in b; },
+    //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
     // equality
-    '==': function equal(a, b) { return a == b; },
-    '!=': function ne(a, b) { return a != b; },
+    '==': function equal(a, b) { return a === b; },
+    '!=': function ne(a, b) { return a !== b; },
     '===': function sequal(a, b) { return a === b; },
     '!==': function sne(a, b) { return a !== b; },
     // bitwise
