@@ -1,3 +1,12 @@
+<a name="0.4.3"></a>
+### 0.4.3 (2014-02-20)
+
+
+#### Bug Fixes
+
+* **parser:** Use exported _twoWayBindings from Knockout ([8d051b38ea58001999d203e045b80a3832b46811](git://github.com/brianmhunt/knockout-secure-binding.git/commit/8d051b38ea58001999d203e045b80a3832b46811), closes [#29](git://github.com/brianmhunt/knockout-secure-binding.git/issues/29))
+
+
 <a name="0.4.2"></a>
 ### 0.4.2 (2014-02-13)
 
