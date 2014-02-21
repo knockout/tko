@@ -185,6 +185,8 @@ Notes:
 
 2. While negation and double-negation are supported, trible negation (`!!!`) will not work as expected.
 
+3. Equality operators in `sbind` (`==` and `!=`) will use their [non-evil equivalents, respectively `===` and `!==`](http://stackoverflow.com/a/359509/19212).
+
 
 Tests
 ---
