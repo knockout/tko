@@ -185,7 +185,7 @@ Notes:
 
 2. While negation and double-negation are supported, trible negation (`!!!`) will not work as expected.
 
-3. When you use equality operators in *sbind* (`==` and `!=`), the operation performed will be their [non-evil twins (`===` and `!==`)](http://stackoverflow.com/a/359509/19212). The following are exactly the same: `data-bind: x == y` and `data-bind: x === y`. As Douglas Crockford puts it, in [Javascript: The Good Parts](http://rads.stackoverflow.com/amzn/click/0596517742): “My advice is to never use the evil twins.”
+3. When you use equality operators in *sbind* (`==` and `!=`), the operation performed will be their [non-evil twins (`===` and `!==`)](http://stackoverflow.com/a/359509/19212). The following are exactly the same: `data-sbind: x == y` and `data-sbind: x === y`. As Douglas Crockford puts it, in [Javascript: The Good Parts](http://rads.stackoverflow.com/amzn/click/0596517742): “My advice is to never use the evil twins.”
 
 
 Tests
