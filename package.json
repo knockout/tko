@@ -35,7 +35,6 @@
     "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
   },
   "dependencies": {
-    "knockout": "3.x.x"
   },
   "scripts": {
     "start": "gulp connect",
