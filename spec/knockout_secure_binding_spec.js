@@ -954,12 +954,31 @@ describe("Virtual elements", function() {
     })
 })
 
-describe("Web component params", function () {
+describe("Web component custom elements", function () {
+   // Note: knockout/spec/components
    beforeEach(function () {
       ko.bindingProvider.instance = new ko.secureBindingsProvider();
    });
 
-   it("interprets the params of custom elements", function () {
+   it("inserts templates into custom elements", function (done) {
+      ko.components.register('helium', {
+         template: 'ce <span data-bind="text: 123"></span>'
+      });
+      var initialMarkup = '<div>He: <helium></helium></div>';
+      var root = document.createElement("div");
+      root.innerHTML = initialMarkup;
+
+      // Since components are loaded asynchronously, it doesn't show up synchronously
+      ko.applyBindings(null, root);
+      assert.equal(root.innerHTML, initialMarkup);
+      setTimeout(function () {
+         assert.equal(root.innerHTML,
+            '<div>He: <helium>ce <span data-bind="text: 123">123</span></helium></div>');
+         done();
+      }, 1);
+   });
+
+   it("interprets the params of custom elements", function (done) {
       var called = false;
       ko.components.register("argon", {
          viewModel: function(params) {
@@ -974,7 +993,11 @@ describe("Web component params", function () {
       );
       window.ace = ce;
       ko.applyBindings({delta: 'QxE'}, ce);
-      assert.equal(called, true);
+      setTimeout(function () {
+         console.log(ce.innerHTML)
+         assert.equal(called, true);
+         done()
+      }, 1)
    });
 });
 

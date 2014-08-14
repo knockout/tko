@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.4.4 - 2014-02-20
+/*! knockout-secure-binding - v0.4.4 - 2014-08-14
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -883,6 +883,7 @@ Parser = (function () {
 
 
 
+// See knockout/src/binding/bindingProvider.js
 
 function secureBindingsProvider(options) {
     var existingProvider = new ko.bindingProvider();
@@ -908,7 +909,8 @@ function registerBindings(newBindings) {
 function nodeHasBindings(node) {
     var value;
     if (node.nodeType === node.ELEMENT_NODE) {
-        return node.getAttribute(this.attribute);
+        return node.getAttribute(this.attribute)
+            || ko.components.getComponentNameForNode(node);
     } else if (node.nodeType === node.COMMENT_NODE) {
         if (this.noVirtualElements) {
             return false;
@@ -937,7 +939,14 @@ function getBindingAccessors(node, context) {
                              .parse(sbind_string);
     }
 
+    // emulate ko.components.addBindingsForCustomElement(bindings, node,
+    //     context, true);
+    if (node.nodeType === node.ELEMENT_NODE) {
+        // see https://github.com/knockout/knockout/blob/master/src/components/customElements.js
+    }
+
     return bindings;
+
 }
 
 ko.utils.extend(secureBindingsProvider.prototype, {
