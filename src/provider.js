@@ -16,6 +16,10 @@ function secureBindingsProvider(options) {
 
     // the binding classes -- defaults to ko bindingsHandlers
     this.bindings = options.bindings || ko.bindingHandlers;
+
+    // Cache the result of parsing binding strings.
+    // TODO
+    // this.cache = {};
 }
 
 function registerBindings(newBindings) {
@@ -37,37 +41,77 @@ function nodeHasBindings(node) {
     }
 }
 
+function getBindingsString(node) {
+    switch (node.nodeType) {
+        case node.ELEMENT_NODE:
+            return node.getAttribute(this.attribute);
+        case node.COMMENT_NODE:
+            return ko.virtualElements.virtualNodeBindingValue(node);
+        default:
+            return null;
+    }
+}
+
+function nodeParamRawMapper(param) {
+    return param();
+}
+
+function nodeParamsToObject(node, parser) {
+    var accessors = parser.parse(node.getAttribute('params'));
+    if (!accessors || Object.keys(accessors).length == 0) {
+        return {$raw: {}}
+    }
+    var $raw = ko.utils.objectMap(accessors, nodeParamRawMapper);
+    var params = ko.utils.objectMap($raw, ko.unwrap);
+    if (!params.hasOwnProperty('$raw')) {
+        params['$raw'] = $raw;
+    }
+    return params;
+}
+
+
+// Note we do not seem to need both getBindings and getBindingAccessors; just
+// the latter appears to suffice.
+//
 // Return the name/valueAccessor pairs.
 // (undocumented replacement for getBindings)
 // see https://github.com/knockout/knockout/pull/742
 function getBindingAccessors(node, context) {
     var bindings = {},
-    sbind_string;
+        component_name,
+        parser = new Parser(node, context, this.globals),
+        sbind_string = this.getBindingsString(node);
 
     if (node.nodeType === node.ELEMENT_NODE) {
-        sbind_string = node.getAttribute(this.attribute);
-    } else if (node.nodeType === node.COMMENT_NODE) {
-        sbind_string = node.nodeValue.replace("ko ", "");
+        component_name = ko.components.getComponentNameForNode(node);
     }
 
     if (sbind_string) {
-        bindings = new Parser(node, context,this.globals)
-                             .parse(sbind_string);
+        bindings = parser.parse(sbind_string || '');
     }
 
     // emulate ko.components.addBindingsForCustomElement(bindings, node,
     //     context, true);
-    if (node.nodeType === node.ELEMENT_NODE) {
-        // see https://github.com/knockout/knockout/blob/master/src/components/customElements.js
+    if (component_name) {
+        if (bindings.component) {
+            throw new Error("Cannot use a component binding on custom elements");
+        }
+        var componentBindingValue = {
+            'name': component_name,
+            'params': nodeParamsToObject(node, parser),
+        };
+        bindings.component =  function() { return componentBindingValue; };
     }
 
     return bindings;
-
 }
+
 
 ko.utils.extend(secureBindingsProvider.prototype, {
     registerBindings: registerBindings,
     nodeHasBindings: nodeHasBindings,
     getBindingAccessors: getBindingAccessors,
+    getBindingsString: getBindingsString,
+    nodeParamsToObject: nodeParamsToObject,
     Parser: Parser
 });

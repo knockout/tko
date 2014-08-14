@@ -17,6 +17,7 @@ describe("Knockout Secure Binding", function () {
        Expression,
        Identifier,
        Node,
+       nodeParamsToObject,
        operators,
        original_provider = ko.bindingProvider,
        csp_rex = /Content Security Policy|blocked by CSP/;
@@ -27,6 +28,7 @@ describe("Knockout Secure Binding", function () {
         Identifier = Parser.Identifier,
         Expression = Parser.Expression,
         Node = Parser.Node,
+        nodeParamsToObject = instance.nodeParamsToObject,
         operators = Node.operators;
     })
 
@@ -954,50 +956,89 @@ describe("Virtual elements", function() {
     })
 })
 
-describe("Web component custom elements", function () {
-   // Note: knockout/spec/components
-   beforeEach(function () {
-      ko.bindingProvider.instance = new ko.secureBindingsProvider();
+describe("Components", function () {
+   describe("custom elements", function () {
+      // Note: knockout/spec/components
+      beforeEach(function () {
+         ko.bindingProvider.instance = new ko.secureBindingsProvider();
+      });
+
+      it("inserts templates into custom elements", function (done) {
+         ko.components.register('helium', {
+            template: 'X<i data-sbind="text: 123"></i>'
+         });
+         var initialMarkup = 'He: <helium></helium>';
+         var root = document.createElement("div");
+         root.innerHTML = initialMarkup;
+
+         // Since components are loaded asynchronously, it doesn't show up synchronously
+         ko.applyBindings(null, root);
+         assert.equal(root.innerHTML, initialMarkup);
+         setTimeout(function () {
+            window.root = root;
+            assert.equal(root.innerHTML,
+               'He: <helium>X<i data-sbind="text: 123">123</i></helium>'
+            );
+            done();
+         }, 1);
+      });
+
+      it("interprets the params of custom elements", function (done) {
+         var called = false;
+         ko.components.register("argon", {
+            viewModel: function(params) {
+               this.delta = 'G2k'
+               called = true;
+            },
+            template: "<b>sXZ <u data-sbind='text: delta'></u></b>"
+         });
+         var ce = document.createElement("argon");
+         ce.setAttribute("params",
+            "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
+         );
+         window.ace = ce;
+         ko.applyBindings({delta: 'QxE'}, ce);
+         setTimeout(function () {
+            assert.equal(ce.innerHTML,
+               '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
+            assert.equal(called, true);
+            done()
+         }, 1)
+      });
    });
 
-   it("inserts templates into custom elements", function (done) {
-      ko.components.register('helium', {
-         template: 'ce <span data-bind="text: 123"></span>'
-      });
-      var initialMarkup = '<div>He: <helium></helium></div>';
-      var root = document.createElement("div");
-      root.innerHTML = initialMarkup;
+   describe("nodeParamsToObject", function () {
+      var parser = null;
+      beforeEach(function () {
 
-      // Since components are loaded asynchronously, it doesn't show up synchronously
-      ko.applyBindings(null, root);
-      assert.equal(root.innerHTML, initialMarkup);
-      setTimeout(function () {
-         assert.equal(root.innerHTML,
-            '<div>He: <helium>ce <span data-bind="text: 123">123</span></helium></div>');
-         done();
-      }, 1);
-   });
-
-   it("interprets the params of custom elements", function (done) {
-      var called = false;
-      ko.components.register("argon", {
-         viewModel: function(params) {
-            console.log("CONSTRUCTING", params)
-            called = true;
-         },
-         template: "<b>sXZ <u data-bind='text: delta'></u></b>"
       });
-      var ce = document.createElement("argon");
-      ce.setAttribute("params",
-         "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
-      );
-      window.ace = ce;
-      ko.applyBindings({delta: 'QxE'}, ce);
-      setTimeout(function () {
-         console.log(ce.innerHTML)
-         assert.equal(called, true);
-         done()
-      }, 1)
+      it("returns {$raw:{}} when there is no params attribute", function () {
+         var parser = bindings = new Parser(null, {});
+         var node = document.createElement("div");
+         assert.deepEqual(nodeParamsToObject(node, parser), {$raw:{}});
+      });
+
+      it("returns the params items", function () {
+         var parser = new Parser(null, {});
+         var node = document.createElement("div");
+         node.setAttribute('params', 'value: "42.99"')
+         var expect = {
+            value: "42.99",
+            $raw: {
+               value: "42.99"
+            }
+         };
+         assert.deepEqual(nodeParamsToObject(node, parser), expect);
+      });
+
+      it("returns unwrapped params", function () {
+         var parser = new Parser(null, {fe: ko.observable('Iron')});
+         var node = document.createElement("div");
+         node.setAttribute('params', 'type: fe');
+         var paramsObject = nodeParamsToObject(node, parser);
+         assert.equal(paramsObject.type, "Iron")
+         assert.equal(paramsObject.$raw.type(), "Iron")
+      });
    });
 });
 

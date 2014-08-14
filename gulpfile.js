@@ -39,7 +39,9 @@ object-src 'none'; \
 script-src 'self' localhost:36551; \
 connect-src ws://localhost:36551; \
 style-src 'self'; \
-report-uri /csp".replace(/\s+/g, " ");
+report-uri /csp".replace(/\s+/g, " "),
+
+    use_csp = true;
 
 gulp.task('concat', function () {
   var pkg = require('./package.json');
@@ -120,7 +122,9 @@ gulp.task('connect', connect.server({
         // / => /runner.html
         if (url.parse(req.url).pathname.match(/^\/$/)) {
           req.url = req.url.replace("/", "/runner.html")
-          res.setHeader('Content-Security-Policy', policy_map)
+          if (use_csp) {
+            res.setHeader('Content-Security-Policy', policy_map)
+          }
         }
         next()
       }
@@ -132,7 +136,15 @@ gulp.task('connect', connect.server({
   }
 }))
 
+gulp.task('no-csp', function() {
+  gutil.log(">>> DISABLING CSP <<<".red)
+  use_csp = false;
+});
+
+gulp.task('live-no-csp', ['no-csp', 'live']);
+
 gulp.task('live', ['watch', 'connect'], function () {
+  gutil.log(">>> Starting Live. <<< ".green)
   var pkg = require('./package.json');
   gulp.src([pkg.main, "spec/*"])
       .pipe(watch())

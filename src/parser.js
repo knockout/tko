@@ -509,6 +509,10 @@ Parser = (function () {
     this.at = 0;
     this.ch = ' ';
 
+    if (!this.text) {
+      return null;
+    }
+
     result = this.bindings();
 
     this.white();
@@ -521,4 +525,3 @@ Parser = (function () {
 
   return Parser;
 })();
-
