@@ -1,0 +1,32 @@
+
+@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300);
+
+body {
+  max-width: 800px;
+  margin: 0px auto;
+  font-size: 18px;
+  font-family: 'Roboto Slab', serif;
+}
+
+#mocha {
+  font-family: 'Roboto Slab', serif;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+#mocha h1 {
+  font-size: 24px;
+  font-weight: 300;
+}
+
+#mocha h1 a {
+  color: #44C;
+}
+
+#mocha h2 {
+  font-size: .8em;
+}
+
+#mocha .test a.replay {
+  width: 40px;
+}
