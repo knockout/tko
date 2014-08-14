@@ -936,8 +936,8 @@ describe("Virtual elements", function() {
 
     it("binds text in virtual element", function () {
        var cmt = document.createComment("ko text: obs"),
-       context =  { obs: ko.observable("a towel") },
-       bindings;
+         context =  { obs: ko.observable("a towel") },
+         bindings;
        bindings = instance.getBindingAccessors(cmt, context)
        assert.isObject(bindings)
        assert.isFunction(bindings.text)
@@ -954,6 +954,29 @@ describe("Virtual elements", function() {
     })
 })
 
+describe("Web component params", function () {
+   beforeEach(function () {
+      ko.bindingProvider.instance = new ko.secureBindingsProvider();
+   });
+
+   it("interprets the params of custom elements", function () {
+      var called = false;
+      ko.components.register("argon", {
+         viewModel: function(params) {
+            console.log("CONSTRUCTING", params)
+            called = true;
+         },
+         template: "<b>sXZ <u data-bind='text: delta'></u></b>"
+      });
+      var ce = document.createElement("argon");
+      ce.setAttribute("params",
+         "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
+      );
+      window.ace = ce;
+      ko.applyBindings({delta: 'QxE'}, ce);
+      assert.equal(called, true);
+   });
+});
 
 describe("compound expressions", function () {
     var d = 42,
