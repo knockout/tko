@@ -1,3 +1,12 @@
+## 0.5.0 (2014-08-15)
+
+
+#### Bug Fixes
+
+* **changelog:** Use non-stream conventional-changelog ([b7da4418](https://github.com/brianmhunt/knockout-secure-binding/commit/b7da44185e781418dceeaf1e74599483b115d84c))
+* **components:** Support KO 3.2 custom elements ([18d0d3f4](https://github.com/brianmhunt/knockout-secure-binding/commit/18d0d3f49dbce9f2746d9bfea6ce6f092937cb9c), closes [#33](https://github.com/brianmhunt/knockout-secure-binding/issues/33))
+* **parser:** Support bare bindings ([e6e58dfc](https://github.com/brianmhunt/knockout-secure-binding/commit/e6e58dfcd450507e45373beb4ee01c037f88792f), closes [#34](https://github.com/brianmhunt/knockout-secure-binding/issues/34))
+
 <a name="0.4.4"></a>
 ### 0.4.4 (2014-02-20)
 
@@ -67,4 +76,3 @@
 
 <a name="0.3.8"></a>
 ### 0.3.8 (2014-02-10)
-
