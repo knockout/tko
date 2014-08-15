@@ -1,7 +1,7 @@
 language: node_js
 branches:
-  only:
-  - master
+  # only:
+  # - master
 node_js:
 - '0.10'
 env:
@@ -9,13 +9,12 @@ env:
   - SELENIUM_HOST=hub.browserstack.com
   - SELENIUM_PORT=80
   - BS_AUTOMATE_PROJECT="$TRAVIS_REPO_SLUG"
-  - BS_AUTOMATE_BUILD="Travis build No. $TRAVIS_BUILD_NUMBER for $TRAVIS_REPO_SLUG"
+  - CI_AUTOMATE_BUILD="Travis build No. $TRAVIS_BUILD_NUMBER for $TRAVIS_REPO_SLUG"
   - secure: Fr8jNQXBurgjajrsO5de1ODN/Hi4sXjh6JMq8boRjhuxAFGVToC2+QEV65bh8tkk/6uuYO+OlbloxpPPkMg2lnb9OlPVrUiBnGCo5xxg67/VL5P7vqXXIIQCknh8rWNlUjojTKQAMYRuOO8klT8YPvVyJ3hMRdKhpMWk3JwzGSk=
   - secure: o2u5nnWSFya0TYW2/qlUIqZh8o5OiKF9c0bpBFGIRVN/HsW1S99042h+Cz5hXR21kCM6KpyxuS3RSVjneh4lzkLYFCOGmQXY3+cJqN2cV6s1ILQzw247TnnVzu71htSYhrAXyKmwj73UjIcUVslBLpCNNx8oWuzKn4qYGI1c2N8=
   - secure: nuCZZHw/AVWRtDOFdcO/jwzE4Z/feAMzS24QAbXZ5oqkzZt7DCh2XX1tBfV75y8qyYpPi5bt/I3CV69rFS3KG1B+d8JZmcj54V2BoHJMMAtUDwQNH279ABsx7vSiUOfQbFzsLhnY6myWciHmnzEfU3tUgBE50eGa/d0pnJwsI6w=
   - secure: I5FXBnmVjI6iBrzURliaTcuq6zT8vaq7R635xpFy8erUNPiuX4g5TxMxWn9PjHTgGGZ9BXKFZA9uPHshHwpt3di1X319y+BfSyZ4Ozg3jquQG2gRc0FMHPcrRNLWf6uNiMyErYCjOV2zCncZDVKXfLSflIS7ebei8EBYUmK2KSA=
   matrix:
   - SELENIUM_PLATFORM=WINDOWS SELENIUM_BROWSER=CHROME SELENIUM_VERSION=35
-before_script:
-- cat package.json | grep version
-- git rev-parse --short HEAD
+addons:
+  sauce_connect: true

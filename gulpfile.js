@@ -169,16 +169,16 @@ gulp.task('live', ['watch', 'connect'], function () {
 
 gulp.task('test', ['connect'], function (done) {
   require('./spec/runner.js')
-    .start_tests(done)
+    .start_tests()
     .then(function () {
       gutil.log("Finished tests".green)
       process.exit(); // disconnect connect server? connect.serverClose?
       // done()
-    }).catch(function (err) {
+    }).fail(function (err) {
       gutil.log("Err. ".red + err)
       process.exit(1);
     })
-    // .done();
+    .done();
 })
 
 gulp.task('default', ['concat', 'minify', 'lint']);

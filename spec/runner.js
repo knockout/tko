@@ -18,9 +18,6 @@ var webdriver = require('wd'),
     // our webdriver desired capabilities
     capabilities,
 
-    // what our webdriver may provide
-    client,
-
    // Address of the server that is serving up our tests. (i.e. our
   //  local server with CSP headers)
     local_server = {
@@ -34,33 +31,9 @@ var webdriver = require('wd'),
     webdriver_host = "localhost",
     webdriver_port = 4445;
 
-
-capabilities = {
-  project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
-  build: env.BS_AUTOMATE_BUILD || 'N/A',
-  platform: env.SELENIUM_PLATFORM || 'ANY',
-  browser: env.SELENIUM_BROWSER || 'chrome',
-  browser_version: env.SELENIUM_VERSION || '',
-}
-
-
-process.on("SIGINT", function () {
-  console.log("\n\tCtrl-C received; shutting down browser\n".red)
-  if (client) {
-    client.quit(function () { process.exit(1) })
-  } else {
-    process.exit(1)
-  }
-})
-
-
-function on_results(err, results) {
+function on_results(results) {
   // print output of the tests
   var fails = 0;
-
-  if (err) {
-    throw new Error(err)
-  }
 
   console.log("\n\tBROWSER TEST RESULTS".yellow +
               "\n\t--------------------\n".bold)
@@ -75,59 +48,35 @@ function on_results(err, results) {
     console.log(state + " " + result.title)
   })
   console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
-
-  // quit the client and exit with appropriate code
-  client.quit(function () {
-    process.exit(fails)
-  })
-}
-
-
-function get_mocha_results() {
-  var remote_script = "return window.tests && window.tests.complete";
-
-  function on_complete() {
-    console.log("Tests complete.")
-    client.execute("return window.tests", on_results)
+  if (fails != 0) {
+    throw new Error("Some tests failed.")
   }
-
-  client.waitForConditionInBrowser(remote_script, 1000, 200, on_complete)
-}
-
-
-function test_title() {
-  client.title(function (err, title) {
-    // just make sure we're at the right place
-    if (err) {
-      throw new Error(err)
-    }
-    if (title !== EXPECT_TITLE) {
-      throw new Error("Expected title " + EXPECT_TITLE + " but got "
-        + title)
-    }
-
-    get_mocha_results()
-  })
-}
-
-
-function run_browser_tests() {
-  var uri = 'http://' + local_server.host + ":" + local_server.port;
-
-  client.init(capabilities, function () {
-    client.get(uri, test_title)
-  })
-  return
 }
 
 exports.start_tests =
 function start_tests() {
+  var username, token;
+  var capabilities = {
+    project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
+    build: env.CI_AUTOMATE_BUILD || 'N/A',
+    platform: env.SELENIUM_PLATFORM || 'ANY',
+    browser: env.SELENIUM_BROWSER || 'chrome',
+    browser_version: env.SELENIUM_VERSION || '',
+    javascriptEnabled: true,
+    'tunner-identifier': env.TRAVIS_JOB_NUMBER,
+    tags: ['CI'],
+    name: env.JOB_NAME || 'KSB'
+  }
+
+  username = env.SAUCE_USERNAME;
+  token = env.SAUCE_ACCESS_KEY;
+  // username = env.BS_USER
+  // token = env.BS_KEY
+
   var browser =  webdriver.promiseChainRemote(
-    env.SELENIUM_HOST,
-    (env.SELENIUM_PORT || 80),
-    env.BS_USER,
-    env.BS_KEY
+    env.SELENIUM_HOST, (env.SELENIUM_PORT || 80), username, token
   );
+
   var uri = 'http://' + local_server.host + ":" + local_server.port;
 
   // extra logging.
@@ -135,24 +84,57 @@ function start_tests() {
     console.log(info.cyan);
   });
   browser.on('command', function(eventType, command, response) {
-    console.log(' > ' + eventType.cyan, command, (response || '').grey);
+    console.log(' > ' + eventType.blue, command, (response || '').grey);
   });
   browser.on('http', function(meth, path, data) {
-    console.log(' > ' + meth.magenta, path, (data || '').grey);
+    console.log(' > ' + meth.yellow, path, (data || '').grey);
   });
+
+  process.on("SIGINT", function () {
+    console.log("\n\tCtrl-C received; shutting down browser\n".red)
+    if (browser) {
+      browser.quit(function () { process.exit(1) })
+    } else {
+      process.exit(1)
+    }
+  })
+
+  var poll_script = "return window.tests_complete";
+  var results_script = "return window.tests";
+  var attempts = 10;
+  var poll = 1500;
 
   return browser
     .init(capabilities)
     .get(uri)
-    .title(function (title) {
-      var title = browser.title()
-      console.log("TITLE", title, "E", EXPECT_TITLE)
+    .title()
+    .then(function (title) {
       if (title !== EXPECT_TITLE) {
         throw new Error("Expected title " + EXPECT_TITLE + " but got "
           + title)
       }
-      console.log("Title", browser.title)
     })
-    .then()
+    .then(function () {
+      // Our custom polling, because waitForConditionInBrowser calls 'eval'.
+      // i.e. Our CSP prevents wd's safeExecute* (basically anything
+      // in wd/browser-scripts).
+      function exec() {
+        return browser
+          .chain()
+          .delay(poll)
+          .execute(poll_script)
+          .then(function (complete) {
+            if (--attempts == 0) {
+              throw new Error("Taking too long.")
+            }
+            if (!complete) {
+              return exec()
+            }
+          });
+      }
+      return exec()
+    })
+    .execute(results_script)
+    .then(on_results)
     .fin(function() { return browser.quit(); })
 }
