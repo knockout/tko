@@ -5,9 +5,9 @@
 //
 //  Automated testing of Knockout-Secure-Binding
 //
-//
-//  Some handy webdriver docs
-//  https://code.google.com/p/selenium/wiki/WebDriverJs
+//  Run with Chromedriver locally with;
+// chromedriver --url-base=/wd/hub --port=4445
+// SELENIUM_HOST=localhost SELENIUM_PORT=4445 npm test
 //
 'use strict'
 require('colors')
@@ -66,7 +66,7 @@ function start_tests() {
     javascriptEnabled: true,
     'tunner-identifier': env.TRAVIS_JOB_NUMBER,
     tags: ['CI'],
-    name: env.JOB_NAME || 'KSB'
+    name: 'KSB'
   }
 
   username = env.SAUCE_USERNAME;
