@@ -108,13 +108,13 @@ function start_tests() {
   return browser
     .init(capabilities)
     .get(uri)
-    .title()
-    .then(function (title) {
-      if (title !== EXPECT_TITLE) {
-        throw new Error("Expected title " + EXPECT_TITLE + " but got "
-          + title)
-      }
-    })
+    // .title()
+    // .then(function (title) {
+    //   if (title !== EXPECT_TITLE) {
+    //     throw new Error("Expected title " + EXPECT_TITLE + " but got "
+    //       + title)
+    //   }
+    // })
     .then(function () {
       // Our custom polling, because waitForConditionInBrowser calls 'eval'.
       // i.e. Our CSP prevents wd's safeExecute* (basically anything
