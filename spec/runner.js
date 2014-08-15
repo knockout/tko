@@ -9,6 +9,12 @@
 // chromedriver --url-base=/wd/hub --port=4445
 // SELENIUM_HOST=localhost SELENIUM_PORT=4445 npm test
 //
+// Run local tests on Sauce Labs with:
+// $ SELENIUM_HOST=localhost
+//     SELENIUM_PORT=4445 SAUCE_USERNAME=brianmhunt
+//     SAUCE_ACCESS_KEY=... npm test
+// ^^^ requires Sauce Connect to be listening on 4445.
+//
 'use strict'
 require('colors')
 
