@@ -12,8 +12,8 @@
 'use strict'
 require('colors')
 
-
 var webdriver = require('wd'),
+    env = process.env,
 
     // our webdriver desired capabilities
     capabilities,
@@ -21,21 +21,26 @@ var webdriver = require('wd'),
     // what our webdriver may provide
     client,
 
-    // server config
-    server = {
-      host: 'localhost',
+   // Address of the server that is serving up our tests. (i.e. our
+  //  local server with CSP headers)
+    local_server = {
+      host: "localhost",
       port: 7777
     },
 
     // we use this for ensuring the document is loaded, below
-    expect_title = "Knockout Secure Binding - Local unit tests",
+    EXPECT_TITLE = "Knockout Secure Binding - Local unit tests",
 
     webdriver_host = "localhost",
     webdriver_port = 4445;
 
 
 capabilities = {
-  browserName: process.env.BROWSER || "chrome"
+  project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
+  build: env.BS_AUTOMATE_BUILD || 'N/A',
+  platform: env.SELENIUM_PLATFORM || 'ANY',
+  browser: env.SELENIUM_BROWSER || 'chrome',
+  browser_version: env.SELENIUM_VERSION || '',
 }
 
 
@@ -96,8 +101,8 @@ function test_title() {
     if (err) {
       throw new Error(err)
     }
-    if (title !== expect_title) {
-      throw new Error("Expected title " + expect_title + " but got "
+    if (title !== EXPECT_TITLE) {
+      throw new Error("Expected title " + EXPECT_TITLE + " but got "
         + title)
     }
 
@@ -107,7 +112,7 @@ function test_title() {
 
 
 function run_browser_tests() {
-  var uri = 'http://' + server.host + ":" + server.port;
+  var uri = 'http://' + local_server.host + ":" + local_server.port;
 
   client.init(capabilities, function () {
     client.get(uri, test_title)
@@ -115,54 +120,39 @@ function run_browser_tests() {
   return
 }
 
+exports.start_tests =
+function start_tests() {
+  var browser =  webdriver.promiseChainRemote(
+    env.SELENIUM_HOST,
+    (env.SELENIUM_PORT || 80),
+    env.BS_USER,
+    env.BS_KEY
+  );
+  var uri = 'http://' + local_server.host + ":" + local_server.port;
 
-function init_chrome_client() {
-  client = webdriver.remote({
-    hostname: webdriver_host,
-    port: webdriver_port,
-    // logLevel: 'data',
-    // desiredCapabilities: capabilities
-  })
-}
-
-
-function init_sauce_client() {
-  // use sauce; see
-  // eg http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
-  console.log("\nTesting with Sauce Labs".bold)
-
-  capabilities["build"] = process.env.TRAVIS_BUILD_NUMBER
-  capabilities["javascriptEnabled"] = true
-  capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
-  capabilities["tags"] = ["CI"]
-  capabilities["name"] = process.env.JOB_NAME
-    || "Knockout Secure Binding"
-
-  client = webdriver.remote({
-    hostname: "ondemand.saucelabs.com",
-    port: 80,
-    user: process.env.SAUCE_USERNAME,
-    pwd: process.env.SAUCE_ACCESS_KEY
-    // desiredCapabilities: capabilities
-  })
-}
-
-
-function init_client() {
-  if (process.env['SAUCE_USERNAME']) {
-    init_sauce_client()
-  } else {
-    init_chrome_client()
-  }
-
-  client.on('status', function(info) {
+  // extra logging.
+  browser.on('status', function(info) {
     console.log(info.cyan);
   });
-  client.on('command', function(meth, path, data) {
-    console.log(' > ' + meth.yellow, path.grey, data || '');
+  browser.on('command', function(eventType, command, response) {
+    console.log(' > ' + eventType.cyan, command, (response || '').grey);
+  });
+  browser.on('http', function(meth, path, data) {
+    console.log(' > ' + meth.magenta, path, (data || '').grey);
   });
 
-  run_browser_tests()
+  return browser
+    .init(capabilities)
+    .get(uri)
+    .title(function (title) {
+      var title = browser.title()
+      console.log("TITLE", title, "E", EXPECT_TITLE)
+      if (title !== EXPECT_TITLE) {
+        throw new Error("Expected title " + EXPECT_TITLE + " but got "
+          + title)
+      }
+      console.log("Title", browser.title)
+    })
+    .then()
+    .fin(function() { return browser.quit(); })
 }
-
-exports.init_client = init_client

@@ -15,6 +15,7 @@ var fs = require('fs'),
 
     now = new Date(),
 
+
     scripts = [
       'src/head.js',
       'src/identifier.js',
@@ -113,41 +114,43 @@ gulp.task("release", ['concat', 'minify'], function () {
       .pipe(exec("npm publish"))  // always ahead by one???
 })
 
-gulp.task('connect', connect.server({
-  root: __dirname,
-  base: [
-    'node_modules/mocha/',
-    'node_modules/chai/',
-    'node_modules/sinon/pkg/',
-    // 'node_modules/knockout/build/output/',
-    // 'bower_components/knockout/dist/',
-    'dist/',
-    'spec/',
-  ],
-  port: 7777,
-  livereload: {
-    port: 36551
-  },
-  middleware: function (connect, options) {
-    middlewares = [
-      function(req, res, next) {
-        console.log(req.method.blue, url.parse(req.url).pathname)
-        // / => /runner.html
-        if (url.parse(req.url).pathname.match(/^\/$/)) {
-          req.url = req.url.replace("/", "/runner.html")
-          if (use_csp) {
-            res.setHeader('Content-Security-Policy', policy_map)
+gulp.task('connect', function () {
+  connect.server({
+    root: __dirname,
+    base: [
+      'node_modules/mocha/',
+      'node_modules/chai/',
+      'node_modules/sinon/pkg/',
+      // 'node_modules/knockout/build/output/',
+      // 'bower_components/knockout/dist/',
+      'dist/',
+      'spec/',
+    ],
+    port: 7777,
+    livereload: {
+      port: 36551
+    },
+    middleware: function (connect, options) {
+      middlewares = [
+        function(req, res, next) {
+          console.log(req.method.blue, url.parse(req.url).pathname)
+          // / => /runner.html
+          if (url.parse(req.url).pathname.match(/^\/$/)) {
+            req.url = req.url.replace("/", "/runner.html")
+            if (use_csp) {
+              res.setHeader('Content-Security-Policy', policy_map)
+            }
           }
+          next()
         }
-        next()
-      }
-    ]
-    options.base.forEach(function(base) {
-      middlewares.push(connect.static(base))
-    })
-    return middlewares
-  }
-}))
+      ]
+      options.base.forEach(function(base) {
+        middlewares.push(connect.static(base))
+      })
+      return middlewares
+    }
+  })
+})
 
 gulp.task('no-csp', function() {
   gutil.log(">>> DISABLING CSP <<<".red)
@@ -164,8 +167,18 @@ gulp.task('live', ['watch', 'connect'], function () {
       .pipe(connect.reload())
 })
 
-gulp.task('test', ['connect'], function () {
-  require('./spec/runner.js').init_client()
+gulp.task('test', ['connect'], function (done) {
+  require('./spec/runner.js')
+    .start_tests(done)
+    .then(function () {
+      gutil.log("Finished tests".green)
+      process.exit(); // disconnect connect server? connect.serverClose?
+      // done()
+    }).catch(function (err) {
+      gutil.log("Err. ".red + err)
+      process.exit(1);
+    })
+    // .done();
 })
 
 gulp.task('default', ['concat', 'minify', 'lint']);
