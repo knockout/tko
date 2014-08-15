@@ -683,6 +683,20 @@ describe("the bindings parser", function () {
         assert.equal(bindings.text(), "st'r")
     })
 
+    it("parses bare `text` as `text: null`", function () {
+      var binding = "text",
+          bindings = new Parser(null, {}).parse(binding);
+      assert.deepEqual(bindings.text(), null)
+   })
+
+    it("parses `a: 'a', b, c: 'c'` => ..., b: null, ...", function () {
+      var binding = "a: 'a', b, c: 'c'",
+          bindings = new Parser(null, {}).parse(binding);
+      assert.deepEqual(bindings.a(), 'a')
+      assert.deepEqual(bindings.b(), null)
+      assert.deepEqual(bindings.c(), 'c')
+   })
+
     it("parses text: {object: 'string'}", function () {
         var binding = "text: {object: 'string'}",
             bindings = new Parser(null, {}).parse(binding);
@@ -996,7 +1010,6 @@ describe("Components", function () {
          ce.setAttribute("params",
             "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
          );
-         window.ace = ce;
          ko.applyBindings({delta: 'QxE'}, ce);
          setTimeout(function () {
             assert.equal(ce.innerHTML,
@@ -1005,6 +1018,20 @@ describe("Components", function () {
             done()
          }, 1)
       });
+
+      it("uses empty params={$raw:{}} if the params attr is whitespace", function (done) {
+         var called = false;
+         ko.components.register("lithium", {
+            viewModel: function(params) {
+               assert.deepEqual(params, {$raw:{}})
+               done()
+            },
+            template: "hello"
+         });
+         var ce = document.createElement("lithium");
+         ce.setAttribute("params", "   ");
+         ko.applyBindings({delta: 'QxE'}, ce);
+      })
    });
 
    describe("nodeParamsToObject", function () {

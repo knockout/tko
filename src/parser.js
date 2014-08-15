@@ -64,14 +64,13 @@ Parser = (function () {
 
   Parser.prototype.name = function () {
     // A name of a binding
-    // [_A-Za-z][_A-Za-z0-9]*
     var name = '';
     this.white();
 
     ch = this.ch;
 
     while (ch) {
-      if (ch === ':' || ch <= ' ') {
+      if (ch === ':' || ch <= ' ' || ch === ',') {
           return name;
       }
       name += ch;
@@ -439,18 +438,30 @@ Parser = (function () {
   Parser.prototype.bindings = function () {
     var key,
         bindings = {},
+        sep,
         ch = this.ch;
 
     while (ch) {
       key = this.name();
-      this.white();
-      ch = this.next(":");
-      bindings[key] = this.expression();
-      this.white();
-      if (this.ch) {
-        ch = this.next(',');
+      sep = this.white();
+      if (!sep || sep === ',') {
+        if (sep) {
+          ch = this.next(',');
+        } else {
+          ch = '';
+        }
+        // A "bare" binding e.g. "text"; substitute value of 'null'
+        // so it becomes "text: null".
+        bindings[key] = null;
       } else {
-        ch = '';
+        ch = this.next(':');
+        bindings[key] = this.expression();
+        this.white();
+        if (this.ch) {
+          ch = this.next(',');
+        } else {
+          ch = '';
+        }
       }
     }
     return bindings;
@@ -505,7 +516,7 @@ Parser = (function () {
    * @return {object}        Map of name to accessor function.
    */
   Parser.prototype.parse = function (source) {
-    this.text = source;
+    this.text = (source || '').trim();
     this.at = 0;
     this.ch = ' ';
 
