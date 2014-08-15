@@ -79,12 +79,14 @@ function start_tests() {
   token = env.SAUCE_ACCESS_KEY;
   // username = env.BS_USER
   // token = env.BS_KEY
+  var selenium_host = env.SELENIUM_HOST || 'localhost';
+  var selenium_port = env.SELENIUM_PORT || 4445;
 
   console.log("-----  Connecting Webdriver to ", username, "@",
-    env.SELENIUM_HOST, env.SELENIUM_PORT||80);
+    selenium_host, ":", selenium_port);
 
   var browser =  webdriver.promiseChainRemote(
-    env.SELENIUM_HOST, (env.SELENIUM_PORT || 80), username, token
+    selenium_host, selenium_port, username, token
   );
 
   var uri = 'http://' + local_server.host + ":" + local_server.port;
