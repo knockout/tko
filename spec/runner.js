@@ -108,7 +108,7 @@ function start_tests() {
 
   var poll_script = "return window.tests_complete";
   var results_script = "return window.tests";
-  var attempts = 10;
+  var attempts = 25;
   var poll = 1500;
 
   return browser
