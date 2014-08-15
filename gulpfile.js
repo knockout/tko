@@ -91,7 +91,7 @@ gulp.task('changelog', function (done) {
   })
 })
 
-gulp.task("release", ['concat', 'minify', 'changelog'], function () {
+gulp.task("release", ['concat', 'minify'], function () {
   // see eg
   //  https://github.com/tomchentw/gulp-livescript/blob/master/gulpfile.ls
   // Note: http://stackoverflow.com/questions/9210542
