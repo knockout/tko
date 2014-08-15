@@ -1,4 +1,5 @@
-var gulp = require('gulp'),
+var fs = require('fs'),
+    gulp = require('gulp'),
     gutil = require('gulp-util'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
@@ -7,7 +8,7 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     exec = require('gulp-exec'),
     connect = require('gulp-connect'),
-    changelog = require("gulp-conventional-changelog"),
+    changelog = require("conventional-changelog"),
     watch = require('gulp-watch'),
     url = require('url'),
     colors = require('colors'),
@@ -77,7 +78,20 @@ gulp.task('bump', function () {
       .pipe(gulp.dest('./'));
 })
 
-gulp.task("release", ['concat', 'minify'], function () {
+gulp.task('changelog', function (done) {
+  changelog({
+    repository: "https://github.com/brianmhunt/knockout-secure-binding",
+    version: require('./package.json').version,
+  }, function (err, log) {
+    if (err) {
+      throw new Error("Unable to make changelog: " + err);
+    }
+    fs.writeFileSync('CHANGELOG.md', log);
+    gutil.log("Changelog updated.".green)
+  })
+})
+
+gulp.task("release", ['concat', 'minify', 'changelog'], function () {
   // see eg
   //  https://github.com/tomchentw/gulp-livescript/blob/master/gulpfile.ls
   // Note: http://stackoverflow.com/questions/9210542
@@ -88,8 +102,7 @@ gulp.task("release", ['concat', 'minify'], function () {
 
   // Conventional changelog:
   // https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit
-  gulp.src(['package.json', 'CHANGELOG.md'])
-      .pipe(changelog())
+  gulp.src('.')
       .pipe(gulp.dest("."))
       .pipe(exec("git add -A"))
       .pipe(exec("git commit -m '" + commit_msg + "'"))

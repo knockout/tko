@@ -22,7 +22,7 @@
     "gulp-connect": "~0.3.x",
     "gulp-watch": "~0.5.x",
     "gulp-exec": "~1.0.x",
-    "gulp-conventional-changelog": "~0.1.x"
+    "conventional-changelog": "~0.0.x"
   },
   "main": "dist/knockout-secure-binding.js",
   "homepage": "https://github.com/brianmhunt/knockout-secure-binding",
