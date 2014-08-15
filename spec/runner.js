@@ -61,7 +61,7 @@ function start_tests() {
     build: env.CI_AUTOMATE_BUILD || 'N/A',
     platform: env.SELENIUM_PLATFORM || 'ANY',
     browser: env.SELENIUM_BROWSER || 'chrome',
-    browserName: browser: env.SELENIUM_BROWSER || 'chrome',
+    browserName: env.SELENIUM_BROWSER || 'chrome',
     browser_version: env.SELENIUM_VERSION || '',
     javascriptEnabled: true,
     'tunner-identifier': env.TRAVIS_JOB_NUMBER,
