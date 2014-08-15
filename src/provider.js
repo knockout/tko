@@ -29,8 +29,8 @@ function registerBindings(newBindings) {
 function nodeHasBindings(node) {
     var value;
     if (node.nodeType === node.ELEMENT_NODE) {
-        return node.getAttribute(this.attribute)
-            || ko.components.getComponentNameForNode(node);
+        return node.getAttribute(this.attribute) ||
+            ko.components.getComponentNameForNode(node);
     } else if (node.nodeType === node.COMMENT_NODE) {
         if (this.noVirtualElements) {
             return false;
@@ -58,13 +58,13 @@ function nodeParamRawMapper(param) {
 
 function nodeParamsToObject(node, parser) {
     var accessors = parser.parse(node.getAttribute('params'));
-    if (!accessors || Object.keys(accessors).length == 0) {
-        return {$raw: {}}
+    if (!accessors || Object.keys(accessors).length === 0) {
+        return {$raw: {}};
     }
     var $raw = ko.utils.objectMap(accessors, nodeParamRawMapper);
     var params = ko.utils.objectMap($raw, ko.unwrap);
     if (!params.hasOwnProperty('$raw')) {
-        params['$raw'] = $raw;
+        params.$raw = $raw;
     }
     return params;
 }
