@@ -1,41 +1,19 @@
-# Hany precedent:
-# https://github.com/admc/wd/blob/master/.travis.yml
 language: node_js
 branches:
   only:
-    - master
+  - master
 node_js:
-  - "0.10"
+- '0.10'
 env:
   global:
-    - SERVER_PORT="8080"
-    - JOB_NAME="Knockout Secure Binding"
+  - SERVER_PORT="8080"
+  - JOB_NAME="Knockout Secure Binding"
+  - secure: Fr8jNQXBurgjajrsO5de1ODN/Hi4sXjh6JMq8boRjhuxAFGVToC2+QEV65bh8tkk/6uuYO+OlbloxpPPkMg2lnb9OlPVrUiBnGCo5xxg67/VL5P7vqXXIIQCknh8rWNlUjojTKQAMYRuOO8klT8YPvVyJ3hMRdKhpMWk3JwzGSk=
+  - secure: o2u5nnWSFya0TYW2/qlUIqZh8o5OiKF9c0bpBFGIRVN/HsW1S99042h+Cz5hXR21kCM6KpyxuS3RSVjneh4lzkLYFCOGmQXY3+cJqN2cV6s1ILQzw247TnnVzu71htSYhrAXyKmwj73UjIcUVslBLpCNNx8oWuzKn4qYGI1c2N8=
   matrix:
-    - BROWSER=chrome
-    # - BROWSER=firefox  # TODO
-
-# See:
-# https://saucelabs.com/opensource/travis
-# http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
-# https://saucelabs.com/docs/connect
+  - BROWSER=chrome
 addons:
-  sauce_connect:
-    username: "brianmhunt"
-    access_key: "cd6ce1e2-070f-4cf2-81b9-b814fe2f4ea5"
-
+  sauce_connect: true
 before_script:
-  - npm install -g grunt-cli
-  - cat package.json | grep version
-  - git rev-parse --short HEAD
-
-# Record our selenium status TODO
-# See eg
-# https://saucelabs.com/docs/additional-config
-# https://saucelabs.com/docs/status-images
-# after_failure:
-#   - >
-#     curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": false}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
-
-# after_success:
-#   - >
-#     curl -H "Content-Type:text/json" -s -X PUT -d '{"name": "${JOB_NAME}", "passed": true}' http://${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@saucelabs.com/rest/v1/${SAUCE_USERNAME}/jobs/${TRAVIS_JOB_ID}
+- cat package.json | grep version
+- git rev-parse --short HEAD
