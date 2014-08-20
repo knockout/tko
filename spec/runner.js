@@ -66,16 +66,17 @@ exports.start_tests =
 function start_tests() {
   var username, token;
   var capabilities = {
-    project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
-    build: env.CI_AUTOMATE_BUILD || 'N/A',
-    platform: env.SELENIUM_PLATFORM || 'ANY',
+    'browserstack.local': true,
+    'tunner-identifier': env.TRAVIS_JOB_NUMBER,
     browser: env.SELENIUM_BROWSER || 'chrome',
     browserName: env.SELENIUM_BROWSER || 'chrome',
     browser_version: env.SELENIUM_VERSION || '',
+    build: env.CI_AUTOMATE_BUILD || 'N/A',
     javascriptEnabled: true,
-    'tunner-identifier': env.TRAVIS_JOB_NUMBER,
+    name: 'KSB',
+    platform: env.SELENIUM_PLATFORM || 'ANY',
+    project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
     tags: ['CI'],
-    name: 'KSB'
   }
 
   // username = env.SAUCE_USERNAME;
@@ -119,6 +120,7 @@ function start_tests() {
   var attempts = 25;
   var poll = 1500;
 
+  console.log(">>> ", uri.green)
   return browser
     .init(capabilities)
     .get(uri)
