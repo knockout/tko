@@ -15,7 +15,21 @@ env:
   - secure: nuCZZHw/AVWRtDOFdcO/jwzE4Z/feAMzS24QAbXZ5oqkzZt7DCh2XX1tBfV75y8qyYpPi5bt/I3CV69rFS3KG1B+d8JZmcj54V2BoHJMMAtUDwQNH279ABsx7vSiUOfQbFzsLhnY6myWciHmnzEfU3tUgBE50eGa/d0pnJwsI6w=
   - secure: I5FXBnmVjI6iBrzURliaTcuq6zT8vaq7R635xpFy8erUNPiuX4g5TxMxWn9PjHTgGGZ9BXKFZA9uPHshHwpt3di1X319y+BfSyZ4Ozg3jquQG2gRc0FMHPcrRNLWf6uNiMyErYCjOV2zCncZDVKXfLSflIS7ebei8EBYUmK2KSA=
   matrix:
-  - SELENIUM_PLATFORM=WINDOWS SELENIUM_BROWSER=CHROME SELENIUM_VERSION=35
+  - PLATFORM=Windows:8 BROWSER=Chrome:33
+  - PLATFORM=Windows:8 BROWSER=Chrome:34
+  - PLATFORM=Windows:8 BROWSER=Chrome:35
+  - PLATFORM=Windows:8 BROWSER=Chrome:36
+  - PLATFORM=Windows:7 BROWSER=IE:10
+  - PLATFORM="Windows:8.1" BROWSER=IE:11
+  - PLATFORM="OS X:Mointain Lion" BROWSER=Safari:6.1
+  - PLATFORM="OS X:Mavericks" BROWSER=Safari:7.0
+  - PLATFORM="OS X:Mavericks" BROWSER=Firefox:27
+  - PLATFORM="OS X:Mavericks" BROWSER=Firefox:28
+  - PLATFORM="OS X:Mavericks" BROWSER=Firefox:29
+  - PLATFORM="OS X:Mavericks" BROWSER=Firefox:30
+  - PLATFORM="OS X:Mavericks" BROWSER=Firefox:31
+  - PLATFORM="Windows:8" BROWSER=Opera:12.15
+  - PLATFORM="Windows:8" BROWSER=Opera:12.16
 before_script:
   - wget https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip
   - "unzip BrowserStackLocal*"

@@ -64,17 +64,26 @@ function on_results(results) {
 
 exports.start_tests =
 function start_tests() {
+  var browser_pair = env.BROWSER || "chrome:35";
+  var os_pair = env.PLATFORM || "windows:8";
+
+  var browser_name = browser_pair.split(":")[0];
+  var browser_version = browser_pair.split(":")[1];
+  var os_name = os_pair.split(":")[0];
+  var os_version = os_pair.split(":")[1]
+
   var username, token;
   var capabilities = {
     'browserstack.local': true,
     'tunner-identifier': env.TRAVIS_JOB_NUMBER,
-    browser: env.SELENIUM_BROWSER || 'chrome',
-    browserName: env.SELENIUM_BROWSER || 'chrome',
-    browser_version: env.SELENIUM_VERSION || '',
+    browser: browser_name,
+    browserName: browser_name,
+    browser_version: browser_version,
     build: env.CI_AUTOMATE_BUILD || 'N/A',
     javascriptEnabled: true,
     name: 'KSB',
-    platform: env.SELENIUM_PLATFORM || 'ANY',
+    os: os_name,
+    os_version: os_version,
     project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
     tags: ['CI'],
   }
