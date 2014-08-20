@@ -50,10 +50,19 @@ report-uri /csp".replace(/\s+/g, " "),
     // Unless noted otherwise, browsers are disabled here because of
     // Selenium/BrowserStack issues.
     platforms = [
+      { browser: "chrome:28", os: "windows:8" },
+      { browser: "chrome:29", os: "windows:8" },
+      { browser: "chrome:30", os: "windows:8" },
+      { browser: "chrome:31", os: "windows:8" },
+      { browser: "chrome:32", os: "windows:8" },
       { browser: "chrome:33", os: "windows:8" },
       { browser: "chrome:34", os: "windows:8" },
       { browser: "chrome:35", os: "windows:8" },
       { browser: "chrome:36", os: "windows:8.1" },
+      { browser: "firefox:25", os: "windows:8.1" },
+      { browser: "firefox:26", os: "windows:8.1" },
+      { browser: "firefox:27", os: "windows:8.1" },
+      { browser: "firefox:28", os: "windows:8.1" },
       { browser: "firefox:29", os: "windows:8.1" },
       { browser: "firefox:30", os: "windows:8.1" },
       { browser: "firefox:31", os: "windows:8.1" },
@@ -230,19 +239,18 @@ gulp.task('test', ['connect'], function (done) {
     .then(function () {
       gutil.log()
       gutil.log(("========= Tested " + i + " platforms =========").bold)
+      gutil.log()
+      platforms.forEach(function (platform, idx) {
+        gutil.log("  - " +
+          (fails.indexOf(idx) >= 0 ? "FAIL".red : "PASS".green) +
+          "  " + platform.target_string.yellow
+        );
+      });
+      gutil.log()
       if (fails.length != 0) {
-        gutil.log()
-        platforms.forEach(function (platform, idx) {
-          gutil.log("  - " +
-            (fails.indexOf(idx) >= 0 ? "FAIL".red : "PASS".green) +
-            "  " + platform.target_string.yellow
-          );
-        });
-        gutil.log()
         process.exit(1);
       } else {
-        gutil.log("  All platforms passed.\n\n".green)
-        process.exit(0); // disconnect the server. (connect.serverClose??)
+        process.exit(0);
       }
     })
     .done()
