@@ -148,5 +148,7 @@ function start_tests(browser_name, browser_version, os_name, os_version,
       });
       throw new Error("Some tests failed for " + target_string.yellow)
     })
-    .fin(function() { return browser.quit(); })
+    .fin(function() {
+      return browser.quit();
+    })
 }

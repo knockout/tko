@@ -46,6 +46,7 @@ report-uri /csp".replace(/\s+/g, " "),
     use_csp = true,
     verbose = false,
 
+    // See: https://www.browserstack.com/automate/node#setting-os-and-browser
     platforms = [
       { browser: "chrome:33", os: "windows:8" },
       { browser: "chrome:34", os: "windows:8" },
@@ -54,10 +55,20 @@ report-uri /csp".replace(/\s+/g, " "),
       { browser: "firefox:29", os: "windows:8.1" },
       { browser: "firefox:30", os: "windows:8.1" },
       { browser: "firefox:31", os: "windows:8.1" },
-      { browser: "opera:12.15", os: "windows:8.1" },
-      { browser: "opera:12.16", os: "windows:8.1" },
-      { browser: "safari:6.1", os: "OS X:Mountain Lion" },
-      { browser: "safari:7", os: "OS X: Mavericks" },
+      { browser: "opera:20.0", os: "windows:8.1" },
+      { browser: "opera:21.0", os: "windows:8.1" },
+      { browser: "opera:22.0", os: "windows:8.1" },
+      { browser: "opera:23.0", os: "windows:8.1" },
+      { browser: "safari:5.1", os: "windows:8.1" },
+      { browser: "ie:7.0", os: "windows:xp" },
+      { browser: "ie:8.0", os: "windows:7" },
+      { browser: "ie:9.0", os: "windows:7" },
+      { browser: "ie:10.0", os: "windows:7" },
+      { browser: "ie:11.0", os: "windows:7" },
+      { browser: "ie:12.15", os: "windows:8.1" },
+      { browser: "ie:12.16", os: "windows:8.1" },
+      // { browser: "safari:6.1", os: "OS X:Mountain Lion" },
+      // { browser: "safari:7", os: "OS X:Mavericks" },
     ];
 
 gulp.task('concat', function () {
@@ -184,8 +195,6 @@ gulp.task('live', ['watch', 'connect'], function () {
 })
 
 
-
-
 gulp.task('test', ['connect'], function (done) {
   var i = 0;
   var fails = [];
@@ -197,6 +206,7 @@ gulp.task('test', ['connect'], function (done) {
     var os_version = platform.os.split(":")[1]
     var target_string = "" + browser_name + " (" + browser_version + ") on " +
       os_name + " " + os_version;
+    platform.target_string = target_string; // for logs, later.
     return runner
       .start_tests(browser_name, browser_version, os_name, os_version, target_string)
       .then(function () {
@@ -204,7 +214,7 @@ gulp.task('test', ['connect'], function (done) {
       })
       .fail(function (msg) {
         gutil.log(msg.message)
-        fails.push(target_string);
+        fails.push(i);
       })
       .then(function () {
         if (platforms[++i]) {
@@ -216,12 +226,14 @@ gulp.task('test', ['connect'], function (done) {
   test_platform(platforms[0])
     .then(function () {
       gutil.log()
-      gutil.log("========= Tested " + i + " platforms =========")
+      gutil.log(("========= Tested " + i + " platforms =========").bold)
       if (fails.length != 0) {
         gutil.log()
-        gutil.log("The following platforms had tests which failed: ")
-        fails.forEach(function (target_string) {
-          gutil.log("  - " + target_string.yellow);
+        platforms.forEach(function (platform, idx) {
+          gutil.log("  - " +
+            (fails.indexOf(idx) >= 0 ? "FAIL".red : "PASS".green) +
+            "  " + platform.target_string.yellow
+          );
         });
         gutil.log()
         process.exit(1);
