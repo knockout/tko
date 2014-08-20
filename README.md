@@ -3,8 +3,7 @@ Knockout Secure Binding
 
  [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
 
-<!--  [![Selenium Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
- -->
+Tested with multiple browsers with [BrowserStack](https://browserstack.com).
 
 Knockout Secure Binding (KSB) is a binding provider for [Knockout](http://knockoutjs.com) that can be used with a [Content Security Policy](http://www.w3.org/TR/CSP/) that disables `eval` and `new Function`.
 
@@ -281,4 +280,3 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
-
