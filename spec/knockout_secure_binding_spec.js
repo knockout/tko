@@ -184,7 +184,7 @@ describe("changing Knockout's bindings to KSB", function () {
         var div = document.createElement("div");
         div.setAttribute("data-sbind", "text: obs")
         ko.applyBindings({obs: ko.observable("a towel")}, div)
-        assert.equal(div.textContent, "a towel")
+        assert.equal(div.textContent || div.innerText, "a towel")
     })
 
     it("sets attributes to constants", function () {
@@ -596,7 +596,7 @@ describe("Identifier", function () {
             div.setAttribute("data-sbind", "text: $data.fn()")
             ko.bindingProvider.instance = new ko.secureBindingsProvider()
             ko.applyBindings(context, div)
-            assert.equal(div.innerText, 'ahab')
+            assert.equal(div.textContent || div.innerText, 'ahab')
         })
 
         it("sets `this` of a top-level item to {$data, $context, globals, node}", function () {
@@ -616,7 +616,7 @@ describe("Identifier", function () {
             div.setAttribute("data-sbind", "text: fn()")
             ko.bindingProvider.instance = new ko.secureBindingsProvider({ globals: globals })
             ko.applyBindings(context, div)
-            assert.equal(div.innerText, 'sigtext')
+            assert.equal(div.textContent || div.innerText, 'sigtext')
         })
 
     })
@@ -966,7 +966,7 @@ describe("Virtual elements", function() {
         div.appendChild(document.createComment("ko text: obs"));
         div.appendChild(document.createComment("/ko"));
         ko.applyBindings(context, div);
-        assert.include(div.innerText, context.obs())
+        assert.include(div.textContent || div.innerText, context.obs())
     })
 })
 
