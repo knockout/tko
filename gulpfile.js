@@ -47,6 +47,8 @@ report-uri /csp".replace(/\s+/g, " "),
     verbose = false,
 
     // See: https://www.browserstack.com/automate/node#setting-os-and-browser
+    // Unless noted otherwise, browsers are disabled here because of
+    // Selenium/BrowserStack issues.
     platforms = [
       { browser: "chrome:33", os: "windows:8" },
       { browser: "chrome:34", os: "windows:8" },
@@ -55,18 +57,19 @@ report-uri /csp".replace(/\s+/g, " "),
       { browser: "firefox:29", os: "windows:8.1" },
       { browser: "firefox:30", os: "windows:8.1" },
       { browser: "firefox:31", os: "windows:8.1" },
-      { browser: "opera:20.0", os: "windows:8.1" },
-      { browser: "opera:21.0", os: "windows:8.1" },
-      { browser: "opera:22.0", os: "windows:8.1" },
-      { browser: "opera:23.0", os: "windows:8.1" },
-      { browser: "safari:5.1", os: "windows:8.1" },
-      { browser: "ie:7.0", os: "windows:xp" },
-      { browser: "ie:8.0", os: "windows:7" },
-      { browser: "ie:9.0", os: "windows:7" },
-      { browser: "ie:10.0", os: "windows:7" },
-      { browser: "ie:11.0", os: "windows:7" },
-      { browser: "ie:12.15", os: "windows:8.1" },
-      { browser: "ie:12.16", os: "windows:8.1" },
+      // { browser: "opera:20.0", os: "windows:8.1" },
+      // { browser: "opera:21.0", os: "windows:8.1" },
+      // { browser: "opera:22.0", os: "windows:8.1" },
+      // { browser: "opera:23.0", os: "windows:8.1" },
+      // { browser: "safari:5.1", os: "windows:8.1" },
+
+      // Internet Explorer may need some work.
+      // { browser: "ie:7.0", os: "windows:xp" },
+      // { browser: "ie:8.0", os: "windows:7" },
+      // { browser: "ie:9.0", os: "windows:7" },
+      // { browser: "ie:10.0", os: "windows:7" },
+      // { browser: "ie:11.0", os: "windows:7" },
+
       // { browser: "safari:6.1", os: "OS X:Mountain Lion" },
       // { browser: "safari:7", os: "OS X:Mavericks" },
     ];
