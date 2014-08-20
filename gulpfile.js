@@ -44,23 +44,20 @@ style-src 'self'; \
 report-uri /csp".replace(/\s+/g, " "),
 
     use_csp = true,
+    verbose = false,
 
     platforms = [
+      { browser: "chrome:33", os: "windows:8" },
+      { browser: "chrome:34", os: "windows:8" },
       { browser: "chrome:35", os: "windows:8" },
-      // { browser: "chrome:36", os: "windows:8.1" },
+      { browser: "chrome:36", os: "windows:8.1" },
       { browser: "firefox:29", os: "windows:8.1" },
-      // { browser: "firefox:30", os: "windows:8.1" },
-      // { browser: "firefox:31", os: "windows:8.1" },
-      // { browser: "opera:12.15", os: "windows:8.1" },
-      // { browser: "opera:12.16", os: "windows:8.1" },
-      // - PLATFORM=Windows:8 BROWSER=Chrome:33
-      // - PLATFORM=Windows:8 BROWSER=Chrome:34
-      // - PLATFORM=Windows:8 BROWSER=Chrome:35
-      // - PLATFORM=Windows:8 BROWSER=Chrome:36
-      // - PLATFORM=Windows:7 BROWSER=IE:10
-      // - PLATFORM="Windows:8.1" BROWSER=IE:11
-      // - PLATFORM="OS X:Mointain Lion" BROWSER=Safari:6.1
-      // - PLATFORM="OS X:Mavericks" BROWSER=Safari:7.0
+      { browser: "firefox:30", os: "windows:8.1" },
+      { browser: "firefox:31", os: "windows:8.1" },
+      { browser: "opera:12.15", os: "windows:8.1" },
+      { browser: "opera:12.16", os: "windows:8.1" },
+      { browser: "safari:6.1", os: "OS X:Mountain Lion" },
+      { browser: "safari:7", os: "OS X: Mavericks" },
     ];
 
 gulp.task('concat', function () {
@@ -139,8 +136,6 @@ gulp.task('connect', function () {
       'node_modules/mocha/',
       'node_modules/chai/',
       'node_modules/sinon/pkg/',
-      // 'node_modules/knockout/build/output/',
-      // 'bower_components/knockout/dist/',
       'dist/',
       'spec/',
     ],
@@ -151,7 +146,10 @@ gulp.task('connect', function () {
     middleware: function (connect, options) {
       middlewares = [
         function(req, res, next) {
-          console.log("  (connect)  ".grey + req.method + ":" + url.parse(req.url).pathname)
+          if (verbose) {
+            console.log("  (connect)  ".grey + req.method + ":" +
+              url.parse(req.url).pathname)
+          }
           // / => /runner.html
           if (url.parse(req.url).pathname.match(/^\/$/)) {
             req.url = req.url.replace("/", "/runner.html")
@@ -205,7 +203,7 @@ gulp.task('test', ['connect'], function (done) {
         gutil.log("   All tests passed for " + target_string.yellow)
       })
       .fail(function (msg) {
-        gutil.log(msg)
+        gutil.log(msg.message)
         fails.push(target_string);
       })
       .then(function () {
@@ -217,15 +215,18 @@ gulp.task('test', ['connect'], function (done) {
 
   test_platform(platforms[0])
     .then(function () {
+      gutil.log()
+      gutil.log("========= Tested " + i + " platforms =========")
       if (fails.length != 0) {
-        gutil.log("\n\n... Some platform tests failed: ".red)
+        gutil.log()
+        gutil.log("The following platforms had tests which failed: ")
         fails.forEach(function (target_string) {
           gutil.log("  - " + target_string.yellow);
         });
         gutil.log()
         process.exit(1);
       } else {
-        gutil.log("\n\n  All platforms passed.\n\n".green)
+        gutil.log("  All platforms passed.\n\n".green)
         process.exit(0); // disconnect the server. (connect.serverClose??)
       }
     })

@@ -23,6 +23,7 @@
 require('colors')
 
 var webdriver = require('wd'),
+    gutil = require('gulp-util'),
     env = process.env,
 
     // our webdriver desired capabilities
@@ -43,7 +44,8 @@ var webdriver = require('wd'),
 
 
 exports.start_tests =
-function start_tests(browser_name, browser_version, os_name, os_version, target_string) {
+function start_tests(browser_name, browser_version, os_name, os_version,
+    target_string, verbose) {
   var username, token;
   var capabilities = {
     'browserstack.local': true,
@@ -64,32 +66,36 @@ function start_tests(browser_name, browser_version, os_name, os_version, target_
   token = env.BS_KEY
   var selenium_host = env.SELENIUM_HOST || 'localhost';
   var selenium_port = env.SELENIUM_PORT || 4445;
+  var uri = 'http://' + local_server.host + ":" + local_server.port;
 
-  console.log("\n\n");
-  console.log("       TESTING       ".bold + target_string.yellow)
-  console.log("       ----------------------------------------".bold)
-  console.log("\n\n ... Connecting Webdriver to ", username.cyan, "@",
+  gutil.log("\n");
+  gutil.log("       TESTING       ".bold + target_string.yellow)
+  gutil.log("       ----------------------------------------".bold)
+  gutil.log("Connecting Webdriver to ", username.cyan, "@",
     selenium_host.cyan, ":", ("" + selenium_port).cyan);
+  gutil.log("Directing Webdriver to URI: ", uri.green)
+
 
   var browser =  webdriver.promiseChainRemote(
     selenium_host, selenium_port, username, token
   );
 
-  var uri = 'http://' + local_server.host + ":" + local_server.port;
 
   // extra logging.
-  browser.on('status', function(info) {
-    console.log(info.cyan);
-  });
-  browser.on('command', function(eventType, command, response) {
-    console.log(' > ' + eventType.blue, command, (response || '').grey);
-  });
-  browser.on('http', function(meth, path, data) {
-    console.log(' > ' + meth.yellow, path, (data || '').grey);
-  });
+  if (verbose) {
+    browser.on('status', function(info) {
+      gutil.log(info.cyan);
+    });
+    browser.on('command', function(eventType, command, response) {
+      gutil.log(' > ' + eventType.blue, command, (response || '').grey);
+    });
+    browser.on('http', function(meth, path, data) {
+      gutil.log(' > ' + meth.yellow, path, (data || '').grey);
+    });
+  }
 
   process.on("SIGINT", function () {
-    console.log("\n\tCtrl-C received; shutting down browser\n".red)
+    gutil.log("\n\tCtrl-C received; shutting down browser\n".red)
     if (browser) {
       browser.quit(function () { process.exit(1) })
     } else {
@@ -102,7 +108,6 @@ function start_tests(browser_name, browser_version, os_name, os_version, target_
   var attempts = 25;
   var poll = 1500;
 
-  console.log(">>> ", uri.green)
   return browser
     .init(capabilities)
     .get(uri)
@@ -138,9 +143,8 @@ function start_tests(browser_name, browser_version, os_name, os_version, target_
       if (fails.length == 0) {
         return
       }
-      console.log("\t Some tests failed:".red)
       fails.forEach(function (failure) {
-        console.log("  - " + failure.yellow)
+        gutil.log("  X   ".bold + failure.red)
       });
       throw new Error("Some tests failed for " + target_string.yellow)
     })

@@ -9,7 +9,7 @@
     "chai": "*",
     "colors": "*",
     "conventional-changelog": "~0.0.x",
-    "gulp": "~3.5.x",
+    "gulp": "~3.8.x",
     "gulp-bump": "~0.1.x",
     "gulp-concat": "~2.1.x",
     "gulp-connect": "^2.0.6",
