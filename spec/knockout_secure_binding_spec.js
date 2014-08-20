@@ -41,36 +41,40 @@ describe("Knockout Secure Binding", function () {
         assert.property(ko, 'secureBindingsProvider')
     })
 
-    describe("the Knockout bindingProvider", function () {
-        it("uses the original binding provider", function () {
-            assert.equal(ko.bindingProvider, original_provider);
-        })
-
-        it("has eval or new Function throw a CSP error", function () {
-            var efn = function () { return eval("true") },
-                nfn = function () { new Function("return true") };
-
-            console.log("Expecting a CSP violation ...")
-            assert.throw(efn, csp_rex)
-            console.log("Expecting a CSP violation ...")
-            assert.throw(nfn, csp_rex)
-        })
-
-        it("will throw an CSP error with regular bindings", function () {
-            var div = document.createElement("div"),
-            fn = function () {
-                ko.applyBindings({obs: 1}, div)
-            };
-
-            // Although we cannot disable the CSP-violations, printing to the
-            // console, we can print a lead-in that makes it appear to be
-            // expected.
-            console.log("Expecting a CSP violation ...")
-            div.setAttribute("data-bind", "text: obs"),
-            ko.bindingProvider.instance = new original_provider();
-            assert.throw(fn, csp_rex)
-        })
-    })
+   // The following mucks up our test runner because even though a CSP is not
+   // respected, we still want to know whether KSB works -- i.e. it is not a
+   // failure of KSB if a browser does not support CSP.
+   //
+   //  describe("the Knockout bindingProvider", function () {
+   //      it("uses the original binding provider", function () {
+   //          assert.equal(ko.bindingProvider, original_provider);
+   //      })
+    //
+   //      it("has eval or new Function throw a CSP error", function () {
+   //          var efn = function () { return eval("true") },
+   //              nfn = function () { new Function("return true") };
+    //
+   //          console.log("Expecting a CSP violation ...")
+   //          assert.throw(efn, csp_rex)
+   //          console.log("Expecting a CSP violation ...")
+   //          assert.throw(nfn, csp_rex)
+   //      })
+    //
+   //      it("will throw an CSP error with regular bindings", function () {
+   //          var div = document.createElement("div"),
+   //          fn = function () {
+   //              ko.applyBindings({obs: 1}, div)
+   //          };
+    //
+   //          // Although we cannot disable the CSP-violations, printing to the
+   //          // console, we can print a lead-in that makes it appear to be
+   //          // expected.
+   //          console.log("Expecting a CSP violation ...")
+   //          div.setAttribute("data-bind", "text: obs"),
+   //          ko.bindingProvider.instance = new original_provider();
+   //          assert.throw(fn, csp_rex)
+   //      })
+   //  })
 
 describe("nodeHasBindings", function() {
     it("identifies elements with data-sbind", function () {
