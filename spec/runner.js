@@ -5,164 +5,150 @@
 //
 //  Automated testing of Knockout-Secure-Binding
 //
+//  Run with Chromedriver locally with;
+// chromedriver --url-base=/wd/hub --port=4445
+// SELENIUM_HOST=localhost SELENIUM_PORT=4445 npm test
 //
-//  Some handy webdriver docs
-//  https://code.google.com/p/selenium/wiki/WebDriverJs
 //
+// Run local tests on Sauce Labs with:
+// $ SELENIUM_HOST=localhost
+//     SELENIUM_PORT=4445 SAUCE_USERNAME=brianmhunt
+//     SAUCE_ACCESS_KEY=... npm test
+// ^^^ requires Sauce Connect to be listening on 4445.
+//
+// Run local tests with BrowserStack with
+//    ./BrowserStackLocal <<KEY>> localhost,4445,0
+
 'use strict'
 require('colors')
 
-
 var webdriver = require('wd'),
+    gutil = require('gulp-util'),
+    env = process.env,
 
     // our webdriver desired capabilities
     capabilities,
 
-    // what our webdriver may provide
-    client,
-
-    // server config
-    server = {
-      host: 'localhost',
+   // Address of the server that is serving up our tests. (i.e. our
+  //  local server with CSP headers)
+    local_server = {
+      host: "localhost",
       port: 7777
     },
 
     // we use this for ensuring the document is loaded, below
-    expect_title = "Knockout Secure Binding - Local unit tests",
+    EXPECT_TITLE = "Knockout Secure Binding - Local unit tests",
 
     webdriver_host = "localhost",
     webdriver_port = 4445;
 
 
-capabilities = {
-  browserName: process.env.BROWSER || "chrome"
-}
-
-
-process.on("SIGINT", function () {
-  console.log("\n\tCtrl-C received; shutting down browser\n".red)
-  if (client) {
-    client.quit(function () { process.exit(1) })
-  } else {
-    process.exit(1)
-  }
-})
-
-
-function on_results(err, results) {
-  // print output of the tests
-  var fails = 0;
-
-  if (err) {
-    throw new Error(err)
+exports.start_tests =
+function start_tests(browser_name, browser_version, os_name, os_version,
+    target_string, verbose) {
+  var username, token;
+  var capabilities = {
+    'browserstack.local': true,
+    'tunner-identifier': env.TRAVIS_JOB_NUMBER,
+    browser: browser_name,
+    browserName: browser_name,
+    browser_version: browser_version,
+    build: env.CI_AUTOMATE_BUILD || 'Manual',
+    javascriptEnabled: true,
+    name: 'KSB',
+    os: os_name,
+    os_version: os_version,
+    project: env.BS_AUTOMATE_PROJECT || 'local - Knockout Secure Binding',
+    tags: ['CI'],
   }
 
-  console.log("\n\tBROWSER TEST RESULTS".yellow +
-              "\n\t--------------------\n".bold)
-  results.results.forEach(function (result) {
-    var state = result.state;
-    if (state !== 'passed') {
-      fails++
-      state = ("  \u2714 " + state).red.bold
+  username = env.BS_USER
+  token = env.BS_KEY
+  var selenium_host = env.SELENIUM_HOST || 'localhost';
+  var selenium_port = env.SELENIUM_PORT || 4445;
+  var uri = 'http://' + local_server.host + ":" + local_server.port;
+
+  gutil.log("\n");
+  gutil.log("       TESTING       ".bold + target_string.yellow)
+  gutil.log("       ----------------------------------------".bold)
+  gutil.log("Connecting Webdriver to ", username.cyan, "@",
+    selenium_host.cyan, ":", ("" + selenium_port).cyan);
+  gutil.log("Directing Webdriver to URI: ", uri.green)
+
+
+  var browser =  webdriver.promiseChainRemote(
+    selenium_host, selenium_port, username, token
+  );
+
+
+  // extra logging.
+  if (verbose) {
+    browser.on('status', function(info) {
+      gutil.log(info.cyan);
+    });
+    browser.on('command', function(eventType, command, response) {
+      gutil.log(' > ' + eventType.blue, command, (response || '').grey);
+    });
+    browser.on('http', function(meth, path, data) {
+      gutil.log(' > ' + meth.yellow, path, (data || '').grey);
+    });
+  }
+
+  process.on("SIGINT", function () {
+    gutil.log("\n\tCtrl-C received; shutting down browser\n".red)
+    if (browser) {
+      browser.quit(function () { process.exit(1) })
     } else {
-      state = "  \u2713 ".green
+      process.exit(1)
     }
-    console.log(state + " " + result.title)
   })
-  console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
 
-  // quit the client and exit with appropriate code
-  client.quit(function () {
-    process.exit(fails)
-  })
+  var poll_script = "return window.tests_complete";
+  var results_script = "return window.fails";
+  var attempts = 25;
+  var poll = 1500;
+
+  return browser
+    .init(capabilities)
+    .get(uri)
+    .title()
+    .then(function (title) {
+      if (title !== EXPECT_TITLE) {
+        throw new Error("Expected title " + EXPECT_TITLE + " but got "
+          + title)
+      }
+    })
+    .then(function () {
+      // Our custom polling, because waitForConditionInBrowser calls 'eval'.
+      // i.e. Our CSP prevents wd's safeExecute* (basically anything
+      // in wd/browser-scripts).
+      function exec() {
+        return browser
+          .chain()
+          .delay(poll)
+          .execute(poll_script)
+          .then(function (complete) {
+            if (--attempts == 0) {
+              throw new Error("Taking too long.")
+            }
+            if (!complete) {
+              return exec()
+            }
+          });
+      }
+      return exec()
+    })
+    .execute(results_script)
+    .then(function (fails) {
+      if (fails.length == 0) {
+        return
+      }
+      fails.forEach(function (failure) {
+        gutil.log("  X   ".bold + failure.red)
+      });
+      throw new Error("Some tests failed for " + target_string.yellow)
+    })
+    .fin(function() {
+      return browser.quit();
+    })
 }
-
-
-function get_mocha_results() {
-  var remote_script = "return window.tests && window.tests.complete";
-
-  function on_complete() {
-    console.log("Tests complete.")
-    client.execute("return window.tests", on_results)
-  }
-
-  client.waitForConditionInBrowser(remote_script, 1000, 200, on_complete)
-}
-
-
-function test_title() {
-  client.title(function (err, title) {
-    // just make sure we're at the right place
-    if (err) {
-      throw new Error(err)
-    }
-    if (title !== expect_title) {
-      throw new Error("Expected title " + expect_title + " but got "
-        + title)
-    }
-
-    get_mocha_results()
-  })
-}
-
-
-function run_browser_tests() {
-  var uri = 'http://' + server.host + ":" + server.port;
-
-  client.init(capabilities, function () {
-    client.get(uri, test_title)
-  })
-  return
-}
-
-
-function init_chrome_client() {
-  client = webdriver.remote({
-    hostname: webdriver_host,
-    port: webdriver_port,
-    // logLevel: 'data',
-    // desiredCapabilities: capabilities
-  })
-}
-
-
-function init_sauce_client() {
-  // use sauce; see
-  // eg http://about.travis-ci.org/docs/user/gui-and-headless-browsers/
-  console.log("\nTesting with Sauce Labs".bold)
-
-  capabilities["build"] = process.env.TRAVIS_BUILD_NUMBER
-  capabilities["javascriptEnabled"] = true
-  capabilities["tunnel-identifier"] = process.env.TRAVIS_JOB_NUMBER,
-  capabilities["tags"] = ["CI"]
-  capabilities["name"] = process.env.JOB_NAME
-    || "Knockout Secure Binding"
-
-  client = webdriver.remote({
-    hostname: "ondemand.saucelabs.com",
-    port: 80,
-    user: process.env.SAUCE_USERNAME,
-    pwd: process.env.SAUCE_ACCESS_KEY
-    // desiredCapabilities: capabilities
-  })
-}
-
-
-function init_client() {
-  if (process.env['SAUCE_USERNAME']) {
-    init_sauce_client()
-  } else {
-    init_chrome_client()
-  }
-
-  client.on('status', function(info) {
-    console.log(info.cyan);
-  });
-  client.on('command', function(meth, path, data) {
-    console.log(' > ' + meth.yellow, path.grey, data || '');
-  });
-
-  run_browser_tests()
-}
-
-exports.init_client = init_client

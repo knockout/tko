@@ -12,6 +12,7 @@ var fs = require('fs'),
     watch = require('gulp-watch'),
     url = require('url'),
     colors = require('colors'),
+    runner = require('./spec/runner.js'),
 
     now = new Date(),
 
@@ -42,7 +43,36 @@ connect-src ws://localhost:36551; \
 style-src 'self'; \
 report-uri /csp".replace(/\s+/g, " "),
 
-    use_csp = true;
+    use_csp = true,
+    verbose = false,
+
+    // See: https://www.browserstack.com/automate/node#setting-os-and-browser
+    // Unless noted otherwise, browsers are disabled here because of
+    // Selenium/BrowserStack issues.
+    platforms = [
+      { browser: "chrome:33", os: "windows:8" },
+      { browser: "chrome:34", os: "windows:8" },
+      { browser: "chrome:35", os: "windows:8" },
+      { browser: "chrome:36", os: "windows:8.1" },
+      { browser: "firefox:29", os: "windows:8.1" },
+      { browser: "firefox:30", os: "windows:8.1" },
+      { browser: "firefox:31", os: "windows:8.1" },
+      // { browser: "opera:20.0", os: "windows:8.1" },
+      // { browser: "opera:21.0", os: "windows:8.1" },
+      // { browser: "opera:22.0", os: "windows:8.1" },
+      // { browser: "opera:23.0", os: "windows:8.1" },
+      // { browser: "safari:5.1", os: "windows:8.1" },
+
+      // Internet Explorer may need some work.
+      // { browser: "ie:7.0", os: "windows:xp" },
+      // { browser: "ie:8.0", os: "windows:7" },
+      // { browser: "ie:9.0", os: "windows:7" },
+      // { browser: "ie:10.0", os: "windows:7" },
+      // { browser: "ie:11.0", os: "windows:7" },
+
+      // { browser: "safari:6.1", os: "OS X:Mountain Lion" },
+      // { browser: "safari:7", os: "OS X:Mavericks" },
+    ];
 
 gulp.task('concat', function () {
   var pkg = require('./package.json');
@@ -113,41 +143,44 @@ gulp.task("release", ['concat', 'minify'], function () {
       .pipe(exec("npm publish"))  // always ahead by one???
 })
 
-gulp.task('connect', connect.server({
-  root: __dirname,
-  base: [
-    'node_modules/mocha/',
-    'node_modules/chai/',
-    'node_modules/sinon/pkg/',
-    // 'node_modules/knockout/build/output/',
-    // 'bower_components/knockout/dist/',
-    'dist/',
-    'spec/',
-  ],
-  port: 7777,
-  livereload: {
-    port: 36551
-  },
-  middleware: function (connect, options) {
-    middlewares = [
-      function(req, res, next) {
-        console.log(req.method.blue, url.parse(req.url).pathname)
-        // / => /runner.html
-        if (url.parse(req.url).pathname.match(/^\/$/)) {
-          req.url = req.url.replace("/", "/runner.html")
-          if (use_csp) {
-            res.setHeader('Content-Security-Policy', policy_map)
+gulp.task('connect', function () {
+  connect.server({
+    root: __dirname,
+    base: [
+      'node_modules/mocha/',
+      'node_modules/chai/',
+      'node_modules/sinon/pkg/',
+      'dist/',
+      'spec/',
+    ],
+    port: 7777,
+    livereload: {
+      port: 36551
+    },
+    middleware: function (connect, options) {
+      middlewares = [
+        function(req, res, next) {
+          if (verbose) {
+            console.log("  (connect)  ".grey + req.method + ":" +
+              url.parse(req.url).pathname)
           }
+          // / => /runner.html
+          if (url.parse(req.url).pathname.match(/^\/$/)) {
+            req.url = req.url.replace("/", "/runner.html")
+            if (use_csp) {
+              res.setHeader('Content-Security-Policy', policy_map)
+            }
+          }
+          next()
         }
-        next()
-      }
-    ]
-    options.base.forEach(function(base) {
-      middlewares.push(connect.static(base))
-    })
-    return middlewares
-  }
-}))
+      ]
+      options.base.forEach(function(base) {
+        middlewares.push(connect.static(base))
+      })
+      return middlewares
+    }
+  })
+})
 
 gulp.task('no-csp', function() {
   gutil.log(">>> DISABLING CSP <<<".red)
@@ -164,27 +197,55 @@ gulp.task('live', ['watch', 'connect'], function () {
       .pipe(connect.reload())
 })
 
-gulp.task('test', ['connect'], function () {
-  require('./spec/runner.js').init_client()
+
+gulp.task('test', ['connect'], function (done) {
+  var i = 0;
+  var fails = [];
+
+  function test_platform(platform) {
+    var browser_name = platform.browser.split(":")[0];
+    var browser_version = platform.browser.split(":")[1];
+    var os_name = platform.os.split(":")[0];
+    var os_version = platform.os.split(":")[1]
+    var target_string = "" + browser_name + " (" + browser_version + ") on " +
+      os_name + " " + os_version;
+    platform.target_string = target_string; // for logs, later.
+    return runner
+      .start_tests(browser_name, browser_version, os_name, os_version, target_string)
+      .then(function () {
+        gutil.log("   All tests passed for " + target_string.yellow)
+      })
+      .fail(function (msg) {
+        gutil.log(msg.message)
+        fails.push(i);
+      })
+      .then(function () {
+        if (platforms[++i]) {
+          return test_platform(platforms[i])
+        }
+      })
+  }
+
+  test_platform(platforms[0])
+    .then(function () {
+      gutil.log()
+      gutil.log(("========= Tested " + i + " platforms =========").bold)
+      if (fails.length != 0) {
+        gutil.log()
+        platforms.forEach(function (platform, idx) {
+          gutil.log("  - " +
+            (fails.indexOf(idx) >= 0 ? "FAIL".red : "PASS".green) +
+            "  " + platform.target_string.yellow
+          );
+        });
+        gutil.log()
+        process.exit(1);
+      } else {
+        gutil.log("  All platforms passed.\n\n".green)
+        process.exit(0); // disconnect the server. (connect.serverClose??)
+      }
+    })
+    .done()
 })
 
 gulp.task('default', ['concat', 'minify', 'lint']);
-
-// TODO: external chromedriver daemon (see grunt-external-daemon)
-// var net = require('net'),
-//     chromedriver_started = false;
-// chromedriver: {
-//   cmd: 'chromedriver',
-//   args: ['--url-base=/wd/hub', '--port=4445'],
-//   options: {
-//     startCheck: function startCheck(stdout, stderr) {
-//       var client = net.connect({port: 4445},
-//         function() {
-//           chromedriver_started = true;
-//           client.end();
-//         });
-//       return chromedriver_started;
-//     },
-//     verbose: true
-//   }
-// }
