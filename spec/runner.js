@@ -9,6 +9,7 @@
 // chromedriver --url-base=/wd/hub --port=4445
 // SELENIUM_HOST=localhost SELENIUM_PORT=4445 npm test
 //
+//
 // Run local tests on Sauce Labs with:
 // $ SELENIUM_HOST=localhost
 //     SELENIUM_PORT=4445 SAUCE_USERNAME=brianmhunt
@@ -40,38 +41,9 @@ var webdriver = require('wd'),
     webdriver_host = "localhost",
     webdriver_port = 4445;
 
-function on_results(results) {
-  // print output of the tests
-  var fails = 0;
-
-  console.log("\n\tBROWSER TEST RESULTS".yellow +
-              "\n\t--------------------\n".bold)
-  results.results.forEach(function (result) {
-    var state = result.state;
-    if (state !== 'passed') {
-      fails++
-      state = ("  \u2714 " + state).red.bold
-    } else {
-      state = "  \u2713 ".green
-    }
-    console.log(state + " " + result.title)
-  })
-  console.log("\n\tTotal: ", results.results.length, " fails: ", fails, "\n")
-  if (fails != 0) {
-    throw new Error("Some tests failed.")
-  }
-}
 
 exports.start_tests =
-function start_tests() {
-  var browser_pair = env.BROWSER || "chrome:35";
-  var os_pair = env.PLATFORM || "windows:8";
-
-  var browser_name = browser_pair.split(":")[0];
-  var browser_version = browser_pair.split(":")[1];
-  var os_name = os_pair.split(":")[0];
-  var os_version = os_pair.split(":")[1]
-
+function start_tests(browser_name, browser_version, os_name, os_version, target_string) {
   var username, token;
   var capabilities = {
     'browserstack.local': true,
@@ -79,24 +51,25 @@ function start_tests() {
     browser: browser_name,
     browserName: browser_name,
     browser_version: browser_version,
-    build: env.CI_AUTOMATE_BUILD || 'N/A',
+    build: env.CI_AUTOMATE_BUILD || 'Manual',
     javascriptEnabled: true,
     name: 'KSB',
     os: os_name,
     os_version: os_version,
-    project: env.BS_AUTOMATE_PROJECT || 'Outside CI',
+    project: env.BS_AUTOMATE_PROJECT || 'local - Knockout Secure Binding',
     tags: ['CI'],
   }
 
-  // username = env.SAUCE_USERNAME;
-  // token = env.SAUCE_ACCESS_KEY;
   username = env.BS_USER
   token = env.BS_KEY
   var selenium_host = env.SELENIUM_HOST || 'localhost';
   var selenium_port = env.SELENIUM_PORT || 4445;
 
-  console.log("-----  Connecting Webdriver to ", username, "@",
-    selenium_host, ":", selenium_port);
+  console.log("\n\n");
+  console.log("       TESTING       ".bold + target_string.yellow)
+  console.log("       ----------------------------------------".bold)
+  console.log("\n\n ... Connecting Webdriver to ", username.cyan, "@",
+    selenium_host.cyan, ":", ("" + selenium_port).cyan);
 
   var browser =  webdriver.promiseChainRemote(
     selenium_host, selenium_port, username, token
@@ -125,7 +98,7 @@ function start_tests() {
   })
 
   var poll_script = "return window.tests_complete";
-  var results_script = "return window.tests";
+  var results_script = "return window.fails";
   var attempts = 25;
   var poll = 1500;
 
@@ -161,6 +134,15 @@ function start_tests() {
       return exec()
     })
     .execute(results_script)
-    .then(on_results)
+    .then(function (fails) {
+      if (fails.length == 0) {
+        return
+      }
+      console.log("\t Some tests failed:".red)
+      fails.forEach(function (failure) {
+        console.log("  - " + failure.yellow)
+      });
+      throw new Error("Some tests failed for " + target_string.yellow)
+    })
     .fin(function() { return browser.quit(); })
 }

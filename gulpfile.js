@@ -12,9 +12,9 @@ var fs = require('fs'),
     watch = require('gulp-watch'),
     url = require('url'),
     colors = require('colors'),
+    runner = require('./spec/runner.js'),
 
     now = new Date(),
-
 
     scripts = [
       'src/head.js',
@@ -43,7 +43,25 @@ connect-src ws://localhost:36551; \
 style-src 'self'; \
 report-uri /csp".replace(/\s+/g, " "),
 
-    use_csp = true;
+    use_csp = true,
+
+    platforms = [
+      { browser: "chrome:35", os: "windows:8" },
+      // { browser: "chrome:36", os: "windows:8.1" },
+      { browser: "firefox:29", os: "windows:8.1" },
+      // { browser: "firefox:30", os: "windows:8.1" },
+      // { browser: "firefox:31", os: "windows:8.1" },
+      // { browser: "opera:12.15", os: "windows:8.1" },
+      // { browser: "opera:12.16", os: "windows:8.1" },
+      // - PLATFORM=Windows:8 BROWSER=Chrome:33
+      // - PLATFORM=Windows:8 BROWSER=Chrome:34
+      // - PLATFORM=Windows:8 BROWSER=Chrome:35
+      // - PLATFORM=Windows:8 BROWSER=Chrome:36
+      // - PLATFORM=Windows:7 BROWSER=IE:10
+      // - PLATFORM="Windows:8.1" BROWSER=IE:11
+      // - PLATFORM="OS X:Mointain Lion" BROWSER=Safari:6.1
+      // - PLATFORM="OS X:Mavericks" BROWSER=Safari:7.0
+    ];
 
 gulp.task('concat', function () {
   var pkg = require('./package.json');
@@ -133,7 +151,7 @@ gulp.task('connect', function () {
     middleware: function (connect, options) {
       middlewares = [
         function(req, res, next) {
-          console.log(req.method.blue, url.parse(req.url).pathname)
+          console.log("  (connect)  ".grey + req.method + ":" + url.parse(req.url).pathname)
           // / => /runner.html
           if (url.parse(req.url).pathname.match(/^\/$/)) {
             req.url = req.url.replace("/", "/runner.html")
@@ -167,37 +185,51 @@ gulp.task('live', ['watch', 'connect'], function () {
       .pipe(connect.reload())
 })
 
+
+
+
 gulp.task('test', ['connect'], function (done) {
-  require('./spec/runner.js')
-    .start_tests()
+  var i = 0;
+  var fails = [];
+
+  function test_platform(platform) {
+    var browser_name = platform.browser.split(":")[0];
+    var browser_version = platform.browser.split(":")[1];
+    var os_name = platform.os.split(":")[0];
+    var os_version = platform.os.split(":")[1]
+    var target_string = "" + browser_name + " (" + browser_version + ") on " +
+      os_name + " " + os_version;
+    return runner
+      .start_tests(browser_name, browser_version, os_name, os_version, target_string)
+      .then(function () {
+        gutil.log("   All tests passed for " + target_string.yellow)
+      })
+      .fail(function (msg) {
+        gutil.log(msg)
+        fails.push(target_string);
+      })
+      .then(function () {
+        if (platforms[++i]) {
+          return test_platform(platforms[i])
+        }
+      })
+  }
+
+  test_platform(platforms[0])
     .then(function () {
-      gutil.log("Finished tests".green)
-      process.exit(); // disconnect connect server? connect.serverClose?
-      // done()
-    }).fail(function (err) {
-      gutil.log("Err. ".red + err)
-      process.exit(1);
+      if (fails.length != 0) {
+        gutil.log("\n\n... Some platform tests failed: ".red)
+        fails.forEach(function (target_string) {
+          gutil.log("  - " + target_string.yellow);
+        });
+        gutil.log()
+        process.exit(1);
+      } else {
+        gutil.log("\n\n  All platforms passed.\n\n".green)
+        process.exit(0); // disconnect the server. (connect.serverClose??)
+      }
     })
-    .done();
+    .done()
 })
 
 gulp.task('default', ['concat', 'minify', 'lint']);
-
-// TODO: external chromedriver daemon (see grunt-external-daemon)
-// var net = require('net'),
-//     chromedriver_started = false;
-// chromedriver: {
-//   cmd: 'chromedriver',
-//   args: ['--url-base=/wd/hub', '--port=4445'],
-//   options: {
-//     startCheck: function startCheck(stdout, stderr) {
-//       var client = net.connect({port: 4445},
-//         function() {
-//           chromedriver_started = true;
-//           client.end();
-//         });
-//       return chromedriver_started;
-//     },
-//     verbose: true
-//   }
-// }
