@@ -16,5 +16,9 @@ env:
   - secure: I5FXBnmVjI6iBrzURliaTcuq6zT8vaq7R635xpFy8erUNPiuX4g5TxMxWn9PjHTgGGZ9BXKFZA9uPHshHwpt3di1X319y+BfSyZ4Ozg3jquQG2gRc0FMHPcrRNLWf6uNiMyErYCjOV2zCncZDVKXfLSflIS7ebei8EBYUmK2KSA=
   matrix:
   - SELENIUM_PLATFORM=WINDOWS SELENIUM_BROWSER=CHROME SELENIUM_VERSION=35
-addons:
-  sauce_connect: true
+before-secript:
+  - wget https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip
+  - "unzip BrowserStackLocal*"
+  - "./BrowserStackLocal $BS_KEY localhost,4445,0 &"
+# addons:
+#   sauce_connect: true

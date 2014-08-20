@@ -15,6 +15,9 @@
 //     SAUCE_ACCESS_KEY=... npm test
 // ^^^ requires Sauce Connect to be listening on 4445.
 //
+// Run local tests with BrowserStack with
+//    ./BrowserStackLocal <<KEY>> localhost,4445,0
+
 'use strict'
 require('colors')
 
@@ -75,10 +78,10 @@ function start_tests() {
     name: 'KSB'
   }
 
-  username = env.SAUCE_USERNAME;
-  token = env.SAUCE_ACCESS_KEY;
-  // username = env.BS_USER
-  // token = env.BS_KEY
+  // username = env.SAUCE_USERNAME;
+  // token = env.SAUCE_ACCESS_KEY;
+  username = env.BS_USER
+  token = env.BS_KEY
   var selenium_host = env.SELENIUM_HOST || 'localhost';
   var selenium_port = env.SELENIUM_PORT || 4445;
 
