@@ -247,7 +247,7 @@ gulp.task('test', ['connect'], function (done) {
     return test_platform(platforms[i++])
       .fail(function (msg) {
         gutil.log(msg.message)
-        fails.push(i);
+        fails.push(i - 1);
       })
       .then(function () {
         if (platforms[i]) {

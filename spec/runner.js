@@ -140,7 +140,7 @@ function start_tests(platform, verbose) {
     return exec()
   }
 
-  function on_fail(fails) {
+  function on_results(fails) {
     if (fails.length == 0) {
       return
     }
@@ -165,6 +165,6 @@ function start_tests(platform, verbose) {
     .then(test_title)
     .then(poll_for_results)
     .execute(results_script)
-    .then(on_fail)
+    .then(on_results)
     .fin(on_fin)
 }

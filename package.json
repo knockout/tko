@@ -32,6 +32,8 @@
     "url": "http://brianmhunt.mit-license.org/"
   },
   "test.platforms": [
+    "chrome:22/windows:8",
+    "chrome:23/windows:8",
     "chrome:24/windows:8",
     "chrome:25/windows:8",
     "chrome:26/windows:8",
@@ -45,6 +47,9 @@
     "chrome:34/windows:8",
     "chrome:35/windows:8",
     "chrome:36/windows:8.1",
+    "firefox:18/windows:8.1",
+    "firefox:19/windows:8.1",
+    "firefox:20/windows:8.1",
     "firefox:21/windows:8.1",
     "firefox:22/windows:8.1",
     "firefox:23/windows:8.1",
