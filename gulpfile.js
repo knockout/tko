@@ -13,6 +13,7 @@ var fs = require('fs'),
     url = require('url'),
     colors = require('colors'),
     runner = require('./spec/runner.js'),
+    yaml = require('js-yaml'),
 
     now = new Date(),
 
@@ -46,30 +47,12 @@ report-uri /csp".replace(/\s+/g, " "),
     use_csp = true,
     verbose = false,
 
-    // See: https://www.browserstack.com/automate/node#setting-os-and-browser
     // Unless noted otherwise, browsers are disabled here because of
     // Selenium/BrowserStack issues.
-    platforms = require('./package.json')['test.platforms'];
-    // platforms TODO:
-    // "opera:20.0/windows:8.1"
-    // "opera:21.0/windows:8.1",
-    // "opera:22.0/windows:8.1",
-    // "opera:23.0/windows:8.1",
+    platforms = yaml.safeLoad(
+      fs.readFileSync("./platforms.yaml", 'utf8')
+    );
 
-    // { browser: "opera:21.0", os: "windows:8.1" },
-    // { browser: "opera:22.0", os: "windows:8.1" },
-    // { browser: "opera:23.0", os: "windows:8.1" },
-    // { browser: "safari:5.1", os: "windows:8.1" },
-
-    // Internet Explorer may need some work.
-    // { browser: "ie:7.0", os: "windows:xp" },
-    // { browser: "ie:8.0", os: "windows:7" },
-    // { browser: "ie:9.0", os: "windows:7" },
-    // { browser: "ie:10.0", os: "windows:7" },
-    // { browser: "ie:11.0", os: "windows:7" },
-
-    // { browser: "safari:6.1", os: "OS X:Mountain Lion" },
-    // { browser: "safari:7", os: "OS X:Mavericks" },
 
 gulp.task('concat', function () {
   var pkg = require('./package.json');
@@ -226,7 +209,7 @@ platforms.forEach(function (platform_str) {
     gutil.log("Testing " + platform.name.yellow)
     test_platform(platform_str)
       .fail(function (msg) {
-        gutil.log(msg.message);
+        gutil.log("FAIL: ".red + msg.message);
         process.exit(1);
       })
       .then(done)
@@ -246,7 +229,7 @@ gulp.task('test', ['connect'], function (done) {
   function test_multiple_platforms() {
     return test_platform(platforms[i++])
       .fail(function (msg) {
-        gutil.log(msg.message)
+        gutil.log("FAIL: ".red + msg.message)
         fails.push(i - 1);
       })
       .then(function () {
