@@ -70,13 +70,10 @@ function start_tests(platform, verbose) {
   var selenium_port = env.SELENIUM_PORT || 4445;
   var uri = 'http://' + local_server.host + ":" + local_server.port;
 
-  gutil.log("\n");
-  gutil.log("       TESTING       ".bold + platform.name.yellow)
-  gutil.log("       ----------------------------------------".bold)
-  gutil.log("Connecting Webdriver to ", username.cyan, "@",
-    selenium_host.cyan, ":", ("" + selenium_port).cyan);
-  gutil.log("Directing Webdriver to URI: ", uri.green)
-
+  gutil.log("");
+  gutil.log(platform.name.yellow)
+  gutil.log("Webdriver ", username + "@" +
+    selenium_host + ":", selenium_port + ", opening: " + uri);
 
   var browser =  webdriver.promiseChainRemote(
     selenium_host, selenium_port, username, token

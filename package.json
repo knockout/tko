@@ -60,8 +60,7 @@
     "firefox:28/windows:8.1",
     "firefox:29/windows:8.1",
     "firefox:30/windows:8.1",
-    "firefox:31/windows:8.1",
-    "opera:20.0/windows:8.1"
+    "firefox:31/windows:8.1"
   ],
   "repository": {
     "type": "git",

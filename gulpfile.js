@@ -51,6 +51,7 @@ report-uri /csp".replace(/\s+/g, " "),
     // Selenium/BrowserStack issues.
     platforms = require('./package.json')['test.platforms'];
     // platforms TODO:
+    // "opera:20.0/windows:8.1"
     // "opera:21.0/windows:8.1",
     // "opera:22.0/windows:8.1",
     // "opera:23.0/windows:8.1",
@@ -72,7 +73,6 @@ report-uri /csp".replace(/\s+/g, " "),
 
 gulp.task('concat', function () {
   var pkg = require('./package.json');
-
   gulp.src(scripts)
       .pipe(concat("knockout-secure-binding.js"))
       .pipe(header(banner, { pkg: pkg, today: now }))
@@ -211,7 +211,7 @@ function test_platform(platform_str) {
   return runner
     .start_tests(platform, verbose)
     .then(function () {
-      gutil.log("\t\t\t\tAll tests passed.".green)
+      gutil.log(" ✓ ".green + "All tests passed.")
     })
 
 }
