@@ -73,7 +73,7 @@ report-uri /csp".replace(/\s+/g, " "),
       // { browser: "safari:5.1", os: "windows:8.1" },
 
       // Internet Explorer may need some work.
-      // { browser: "ie:7.0", os: "windows:xp" },
+      { browser: "ie:7.0", os: "windows:xp" },
       // { browser: "ie:8.0", os: "windows:7" },
       // { browser: "ie:9.0", os: "windows:7" },
       // { browser: "ie:10.0", os: "windows:7" },
