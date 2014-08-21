@@ -17,7 +17,10 @@
 // ^^^ requires Sauce Connect to be listening on 4445.
 //
 // Run local tests with BrowserStack with
-//    ./BrowserStackLocal <<KEY>> localhost,4445,0
+//  $ ./BrowserStackLocal <<KEY>> localhost,4445,0
+//  $ SELENIUM_HOST=hub.browserstack.com SELENIUM_PORT=80
+//    BS_KEY=<<key>> BS_USER=brianhunt1
+//    gulp test
 
 'use strict'
 require('colors')
@@ -94,61 +97,75 @@ function start_tests(browser_name, browser_version, os_name, os_version,
     });
   }
 
-  process.on("SIGINT", function () {
+  var on_sigint = function () {
     gutil.log("\n\tCtrl-C received; shutting down browser\n".red)
     if (browser) {
       browser.quit(function () { process.exit(1) })
     } else {
       process.exit(1)
     }
-  })
+  }
+
+  process.on("SIGINT", on_sigint)
 
   var poll_script = "return window.tests_complete";
   var results_script = "return window.fails";
   var attempts = 25;
   var poll = 1500;
 
+  function test_title(title) {
+    if (title !== EXPECT_TITLE) {
+      throw new Error("Expected title " + EXPECT_TITLE + " but got "
+        + title)
+    }
+  }
+
+  function poll_for_results() {
+    // Our custom polling, because waitForConditionInBrowser calls 'eval'.
+    // i.e. Our CSP prevents wd's safeExecute* (basically anything
+    // in wd/browser-scripts).
+    function exec() {
+      return browser
+        .chain()
+        .delay(poll)
+        .execute(poll_script)
+        .then(function (complete) {
+          if (--attempts == 0) {
+            throw new Error("Taking too long.")
+          }
+          if (!complete) {
+            return exec()
+          }
+        });
+    }
+    return exec()
+  }
+
+  function on_fail(fails) {
+    if (fails.length == 0) {
+      return
+    }
+    fails.forEach(function (failure) {
+      gutil.log("  X   ".bold + failure.red)
+    });
+    throw new Error("Some tests failed for " + target_string.yellow);
+  }
+
+  function on_fin() {
+    return browser
+      .quit()
+      .then(function () {
+        process.removeListener('SIGINT', on_sigint);
+      })
+  }
+
   return browser
     .init(capabilities)
     .get(uri)
     .title()
-    .then(function (title) {
-      if (title !== EXPECT_TITLE) {
-        throw new Error("Expected title " + EXPECT_TITLE + " but got "
-          + title)
-      }
-    })
-    .then(function () {
-      // Our custom polling, because waitForConditionInBrowser calls 'eval'.
-      // i.e. Our CSP prevents wd's safeExecute* (basically anything
-      // in wd/browser-scripts).
-      function exec() {
-        return browser
-          .chain()
-          .delay(poll)
-          .execute(poll_script)
-          .then(function (complete) {
-            if (--attempts == 0) {
-              throw new Error("Taking too long.")
-            }
-            if (!complete) {
-              return exec()
-            }
-          });
-      }
-      return exec()
-    })
+    .then(test_title)
+    .then(poll_for_results)
     .execute(results_script)
-    .then(function (fails) {
-      if (fails.length == 0) {
-        return
-      }
-      fails.forEach(function (failure) {
-        gutil.log("  X   ".bold + failure.red)
-      });
-      throw new Error("Some tests failed for " + target_string.yellow)
-    })
-    .fin(function() {
-      return browser.quit();
-    })
+    .then(on_fail)
+    .fin(on_fin)
 }
