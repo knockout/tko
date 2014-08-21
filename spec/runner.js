@@ -47,20 +47,19 @@ var webdriver = require('wd'),
 
 
 exports.start_tests =
-function start_tests(browser_name, browser_version, os_name, os_version,
-    target_string, verbose) {
+function start_tests(platform, verbose) {
   var username, token;
   var capabilities = {
     'browserstack.local': true,
     'tunner-identifier': env.TRAVIS_JOB_NUMBER,
-    browser: browser_name,
-    browserName: browser_name,
-    browser_version: browser_version,
+    browser: platform.browser_name,
+    browserName: platform.browser_name,
+    browser_version: platform.browser_ver,
     build: env.CI_AUTOMATE_BUILD || 'Manual',
     javascriptEnabled: true,
     name: 'KSB',
-    os: os_name,
-    os_version: os_version,
+    os: platform.os_name,
+    os_version: platform.os_ver,
     project: env.BS_AUTOMATE_PROJECT || 'local - Knockout Secure Binding',
     tags: ['CI'],
   }
@@ -72,7 +71,7 @@ function start_tests(browser_name, browser_version, os_name, os_version,
   var uri = 'http://' + local_server.host + ":" + local_server.port;
 
   gutil.log("\n");
-  gutil.log("       TESTING       ".bold + target_string.yellow)
+  gutil.log("       TESTING       ".bold + platform.name.yellow)
   gutil.log("       ----------------------------------------".bold)
   gutil.log("Connecting Webdriver to ", username.cyan, "@",
     selenium_host.cyan, ":", ("" + selenium_port).cyan);
@@ -110,8 +109,8 @@ function start_tests(browser_name, browser_version, os_name, os_version,
 
   var poll_script = "return window.tests_complete";
   var results_script = "return window.fails";
-  var attempts = 25;
-  var poll = 1500;
+  var attempts = 42;
+  var poll = 1000;
 
   function test_title(title) {
     if (title !== EXPECT_TITLE) {
@@ -148,7 +147,7 @@ function start_tests(browser_name, browser_version, os_name, os_version,
     fails.forEach(function (failure) {
       gutil.log("  X   ".bold + failure.red)
     });
-    throw new Error("Some tests failed for " + target_string.yellow);
+    throw new Error("Some tests failed.".yellow);
   }
 
   function on_fin() {

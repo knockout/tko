@@ -49,47 +49,26 @@ report-uri /csp".replace(/\s+/g, " "),
     // See: https://www.browserstack.com/automate/node#setting-os-and-browser
     // Unless noted otherwise, browsers are disabled here because of
     // Selenium/BrowserStack issues.
-    platforms = [
-      { browser: "chrome:24", os: "windows:8" },
-      { browser: "chrome:25", os: "windows:8" },
-      { browser: "chrome:26", os: "windows:8" },
-      { browser: "chrome:27", os: "windows:8" },
-      { browser: "chrome:28", os: "windows:8" },
-      { browser: "chrome:29", os: "windows:8" },
-      { browser: "chrome:30", os: "windows:8" },
-      { browser: "chrome:31", os: "windows:8" },
-      { browser: "chrome:32", os: "windows:8" },
-      { browser: "chrome:33", os: "windows:8" },
-      { browser: "chrome:34", os: "windows:8" },
-      { browser: "chrome:35", os: "windows:8" },
-      { browser: "chrome:36", os: "windows:8.1" },
-      { browser: "firefox:21", os: "windows:8.1" },
-      { browser: "firefox:22", os: "windows:8.1" },
-      { browser: "firefox:23", os: "windows:8.1" },
-      { browser: "firefox:24", os: "windows:8.1" },
-      { browser: "firefox:25", os: "windows:8.1" },
-      { browser: "firefox:26", os: "windows:8.1" },
-      { browser: "firefox:27", os: "windows:8.1" },
-      { browser: "firefox:28", os: "windows:8.1" },
-      { browser: "firefox:29", os: "windows:8.1" },
-      { browser: "firefox:30", os: "windows:8.1" },
-      { browser: "firefox:31", os: "windows:8.1" },
-      // { browser: "opera:20.0", os: "windows:8.1" },
-      // { browser: "opera:21.0", os: "windows:8.1" },
-      // { browser: "opera:22.0", os: "windows:8.1" },
-      // { browser: "opera:23.0", os: "windows:8.1" },
-      // { browser: "safari:5.1", os: "windows:8.1" },
+    platforms = require('./package.json')['test.platforms'];
+    // platforms TODO:
+    // "opera:21.0/windows:8.1",
+    // "opera:22.0/windows:8.1",
+    // "opera:23.0/windows:8.1",
 
-      // Internet Explorer may need some work.
-      // { browser: "ie:7.0", os: "windows:xp" },
-      // { browser: "ie:8.0", os: "windows:7" },
-      // { browser: "ie:9.0", os: "windows:7" },
-      // { browser: "ie:10.0", os: "windows:7" },
-      // { browser: "ie:11.0", os: "windows:7" },
+    // { browser: "opera:21.0", os: "windows:8.1" },
+    // { browser: "opera:22.0", os: "windows:8.1" },
+    // { browser: "opera:23.0", os: "windows:8.1" },
+    // { browser: "safari:5.1", os: "windows:8.1" },
 
-      // { browser: "safari:6.1", os: "OS X:Mountain Lion" },
-      // { browser: "safari:7", os: "OS X:Mavericks" },
-    ];
+    // Internet Explorer may need some work.
+    // { browser: "ie:7.0", os: "windows:xp" },
+    // { browser: "ie:8.0", os: "windows:7" },
+    // { browser: "ie:9.0", os: "windows:7" },
+    // { browser: "ie:10.0", os: "windows:7" },
+    // { browser: "ie:11.0", os: "windows:7" },
+
+    // { browser: "safari:6.1", os: "OS X:Mountain Lion" },
+    // { browser: "safari:7", os: "OS X:Mavericks" },
 
 gulp.task('concat', function () {
   var pkg = require('./package.json');
@@ -215,51 +194,82 @@ gulp.task('live', ['watch', 'connect'], function () {
 })
 
 
+function platform_as_obj(platform_str) {
+  var parts = platform_str.split(/[:\/]/);
+  return {
+    browser_name: parts[0],
+    browser_ver: parts[1],
+    os_name: parts[2],
+    os_ver: parts[3],
+    name: "" + parts[0] + " " + parts[1] + " on " +
+      parts[2] + " " + parts[3],
+  };
+}
+
+function test_platform(platform_str) {
+  var platform = platform_as_obj(platform_str);
+  return runner
+    .start_tests(platform, verbose)
+    .then(function () {
+      gutil.log("\t\t\t\tAll tests passed.".green)
+    })
+
+}
+
+// Add individual tasks for platforms e.g.
+platforms.forEach(function (platform_str) {
+  var platform = platform_as_obj(platform_str);
+  // full name e.g. chrome:29/windows:8
+  gulp.task(platform_str, ['connect'], function (done) {
+    verbose = true;
+    gutil.log()
+    gutil.log("Testing " + platform.name.yellow)
+    test_platform(platform_str)
+      .fail(function (msg) {
+        gutil.log(msg.message);
+        process.exit(1);
+      })
+      .then(done)
+      .then(process.exit)
+      .done();
+  });
+  // add e.g. chrome:32
+  // FIXME (all os's (or at least a sane choice))
+  gulp.task(platform.browser_name + ":" + platform.browser_ver,
+    [platform_str])
+})
+
 gulp.task('test', ['connect'], function (done) {
   var i = 0;
   var fails = [];
 
-  function test_platform(platform) {
-    var browser_name = platform.browser.split(":")[0];
-    var browser_version = platform.browser.split(":")[1];
-    var os_name = platform.os.split(":")[0];
-    var os_version = platform.os.split(":")[1]
-    var target_string = "" + browser_name + " (" + browser_version + ") on " +
-      os_name + " " + os_version;
-    platform.target_string = target_string; // for logs, later.
-    return runner
-      .start_tests(browser_name, browser_version, os_name, os_version, target_string)
-      .then(function () {
-        gutil.log("   All tests passed for " + target_string.yellow)
-      })
+  function test_multiple_platforms() {
+    return test_platform(platforms[i++])
       .fail(function (msg) {
         gutil.log(msg.message)
         fails.push(i);
       })
       .then(function () {
-        if (platforms[++i]) {
-          return test_platform(platforms[i])
+        if (platforms[i]) {
+          return test_multiple_platforms()
         }
       })
   }
 
-  test_platform(platforms[0])
+  test_multiple_platforms()
     .then(function () {
       gutil.log()
       gutil.log(("========= Tested " + i + " platforms =========").bold)
       gutil.log()
-      platforms.forEach(function (platform, idx) {
+      platforms.forEach(function (platform_str, idx) {
+        var platform = platform_as_obj(platform_str);
         gutil.log("  - " +
           (fails.indexOf(idx) >= 0 ? "FAIL".red : "PASS".green) +
-          "  " + platform.target_string.yellow
+          "  " + platform.name.yellow
         );
       });
       gutil.log()
-      if (fails.length != 0) {
-        process.exit(1);
-      } else {
-        process.exit(0);
-      }
+      process.exit(fails.length);
     })
     .done()
 })
