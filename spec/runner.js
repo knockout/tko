@@ -107,7 +107,8 @@ function start_tests(platform, verbose) {
   var poll_script = "return window.tests_complete";
   var results_script = "return window.fails";
   var attempts = 42;
-  var poll = 1000;
+  var poll = 3000;
+  // timeout = poll * attempts
 
   function test_title(title) {
     if (title !== EXPECT_TITLE) {

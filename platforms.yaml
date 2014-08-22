@@ -21,8 +21,19 @@
 # "opera:21.0/windows:8.1",
 # "opera:22.0/windows:8.1",
 # "opera:23.0/windows:8.1",
+#
+# Note we start Chrome at 15 and Firefox at 11 because that is where
+# CustomEvent support starts. We only use CustomEvent in the testing, so it
+# is possible that older versions could be supported by KSB or shimmed with e.g.
+# https://github.com/WebReflection/dom4#dom4.
 ---
-
+- "chrome:15/windows:8"
+- "chrome:16/windows:8"
+- "chrome:17/windows:8"
+- "chrome:18/windows:8"
+- "chrome:19/windows:8"
+- "chrome:20/windows:8"
+- "chrome:21/windows:8"
 - "chrome:22/windows:8"
 - "chrome:23/windows:8"
 - "chrome:24/windows:8"
@@ -38,7 +49,8 @@
 - "chrome:34/windows:8"
 - "chrome:35/windows:8"
 - "chrome:36/windows:8.1"
-- "firefox:18/windows:8.1"
+- "firefox:11.0/windows:xp"
+- "firefox:18/windows:7"
 - "firefox:19/windows:8.1"
 - "firefox:20/windows:8.1"
 - "firefox:21/windows:8.1"

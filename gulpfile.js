@@ -14,6 +14,7 @@ var fs = require('fs'),
     colors = require('colors'),
     runner = require('./spec/runner.js'),
     yaml = require('js-yaml'),
+    Q = require('q'),
 
     now = new Date(),
 
@@ -51,7 +52,10 @@ report-uri /csp".replace(/\s+/g, " "),
     // Selenium/BrowserStack issues.
     platforms = yaml.safeLoad(
       fs.readFileSync("./platforms.yaml", 'utf8')
-    );
+    ),
+
+    // how many parallel browser instances?
+    browser_streams = 2;
 
 
 gulp.task('concat', function () {
@@ -225,6 +229,7 @@ platforms.forEach(function (platform_str) {
 gulp.task('test', ['connect'], function (done) {
   var i = 0;
   var fails = [];
+  var streams = [];
 
   function test_multiple_platforms() {
     return test_platform(platforms[i++])
@@ -239,7 +244,13 @@ gulp.task('test', ['connect'], function (done) {
       })
   }
 
-  test_multiple_platforms()
+  gutil.log("Running ".blue + browser_streams +
+    " browser streams in parallel.".blue)
+  while (browser_streams--) {
+    streams.push(test_multiple_platforms());
+  }
+
+  Q.all(streams)
     .then(function () {
       gutil.log()
       gutil.log(("========= Tested " + i + " platforms =========").bold)
