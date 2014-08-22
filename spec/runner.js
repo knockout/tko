@@ -145,7 +145,7 @@ function start_tests(platform, verbose) {
       return
     }
     fails.forEach(function (failure) {
-      gutil.log("  X   ".bold + failure.red)
+      gutil.log("  X   ".bold + "(" + platform.name.magenta + ") " + failure.red);
     });
     throw new Error("Some tests failed.".yellow);
   }
@@ -153,7 +153,7 @@ function start_tests(platform, verbose) {
   function on_fin() {
     return browser
       .quit()
-      .then(function () {
+      .fin(function () {
         process.removeListener('SIGINT', on_sigint);
       })
   }

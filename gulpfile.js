@@ -213,7 +213,7 @@ platforms.forEach(function (platform_str) {
     gutil.log("Testing " + platform.name.yellow)
     test_platform(platform_str)
       .fail(function (msg) {
-        gutil.log(platform.name + ": FAIL -- ".red + msg.message);
+        gutil.log("FAIL -- ".red + msg.message);
         process.exit(1);
       })
       .then(done)
@@ -233,12 +233,16 @@ gulp.task('test', ['connect'], function (done) {
   console.time('task:test');
 
   function test_multiple_platforms() {
-    return test_platform(platforms[i++])
+    var platform_idx = i++;
+    var platform_str = platforms[platform_idx];
+    return test_platform(platform_str)
       .fail(function (msg) {
-        gutil.log("FAIL: ".red + msg.message)
-        fails.push(i - 1);
+        var platform = platform_as_obj(platform_str);
+        gutil.log(platform.name.magenta + " --- FAIL, message: ".red + msg.message);
+        fails.push(platform_idx);
       })
       .then(function () {
+        // check for another platform to-be tested.
         if (platforms[i]) {
           return test_multiple_platforms()
         }
