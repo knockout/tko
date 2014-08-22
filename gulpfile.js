@@ -230,6 +230,7 @@ gulp.task('test', ['connect'], function (done) {
   var i = 0;
   var fails = [];
   var streams = [];
+  console.time('task:test');
 
   function test_multiple_platforms() {
     return test_platform(platforms[i++])
@@ -263,6 +264,7 @@ gulp.task('test', ['connect'], function (done) {
         );
       });
       gutil.log()
+      console.timeEnd('task:test');
       process.exit(fails.length);
     })
     .done()
