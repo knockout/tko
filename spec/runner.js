@@ -71,9 +71,11 @@ function start_tests(platform, verbose) {
   var uri = 'http://' + local_server.host + ":" + local_server.port;
 
   gutil.log("");
-  gutil.log(platform.name.yellow)
-  gutil.log("Webdriver ", username + "@" +
-    selenium_host + ":", selenium_port + ", opening: " + uri);
+  gutil.log("Starting: " + platform.name.yellow)
+  if (verbose) {
+    gutil.log("Webdriver ", username + "@" +
+      selenium_host + ":", selenium_port + ", opening: " + uri);
+  }
 
   var browser =  webdriver.promiseChainRemote(
     selenium_host, selenium_port, username, token

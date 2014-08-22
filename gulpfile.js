@@ -198,7 +198,7 @@ function test_platform(platform_str) {
   return runner
     .start_tests(platform, verbose)
     .then(function () {
-      gutil.log(" ✓ ".green + "All tests passed.")
+      gutil.log(platform.name + ":  ✓  ".green + "all tests passed.")
     })
 
 }
@@ -213,7 +213,7 @@ platforms.forEach(function (platform_str) {
     gutil.log("Testing " + platform.name.yellow)
     test_platform(platform_str)
       .fail(function (msg) {
-        gutil.log("FAIL: ".red + msg.message);
+        gutil.log(platform.name + ": FAIL -- ".red + msg.message);
         process.exit(1);
       })
       .then(done)
