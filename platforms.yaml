@@ -27,7 +27,7 @@
 # is possible that older versions could be supported by KSB or shimmed with e.g.
 # https://github.com/WebReflection/dom4#dom4.
 ---
-- "chrome:15/windows:xp"
+#- "chrome:15/windows:xp"
 # Chrome 16 .. 23 Failing for no apparent reason on BrowserStack
 # - "chrome:16/windows:8"
 # - "chrome:17/windows:8"
