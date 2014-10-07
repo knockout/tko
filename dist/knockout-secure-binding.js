@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.5.0 - 2014-08-15
+/*! knockout-secure-binding - v0.5.0 - 2014-10-07
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -17,6 +17,30 @@
       return item.get_value();
     }
     return item;
+  }
+
+  // The following are also in ko.*, but not exposed.
+  function _object_map(source, mapping) {
+    // ko.utils.objectMap
+    if (!source) {
+      return source;
+    }
+    var target = {};
+    for (var prop in source) {
+      if (source.hasOwnProperty(prop)) {
+        target[prop] = mapping(source[prop], prop, source);
+      }
+    }
+    return target;
+  }
+
+  // ko.virtualElements.virtualNodeBindingValue
+  var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
+  var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
+
+  function _virtualNodeBindingValue(node) {
+    var regexMatch = (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(startCommentRegex);
+    return regexMatch ? regexMatch[1] : null;
   }
 
 
@@ -944,7 +968,7 @@ function getBindingsString(node) {
         case node.ELEMENT_NODE:
             return node.getAttribute(this.attribute);
         case node.COMMENT_NODE:
-            return ko.virtualElements.virtualNodeBindingValue(node);
+            return _virtualNodeBindingValue(node);
         default:
             return null;
     }
@@ -959,8 +983,8 @@ function nodeParamsToObject(node, parser) {
     if (!accessors || Object.keys(accessors).length === 0) {
         return {$raw: {}};
     }
-    var $raw = ko.utils.objectMap(accessors, nodeParamRawMapper);
-    var params = ko.utils.objectMap($raw, ko.unwrap);
+    var $raw = _object_map(accessors, nodeParamRawMapper);
+    var params = _object_map($raw, ko.unwrap);
     if (!params.hasOwnProperty('$raw')) {
         params.$raw = $raw;
     }

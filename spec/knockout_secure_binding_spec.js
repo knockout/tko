@@ -693,6 +693,12 @@ describe("the bindings parser", function () {
       assert.deepEqual(bindings.text(), null)
    })
 
+    it('parses `text: "alpha"`', function () {
+      var binding = 'text: "alpha"',
+          bindings = new Parser(null, {}).parse(binding);
+      assert.deepEqual(bindings.text(), 'alpha')
+    })
+
     it("parses `a: 'a', b, c: 'c'` => ..., b: null, ...", function () {
       var binding = "a: 'a', b, c: 'c'",
           bindings = new Parser(null, {}).parse(binding);
@@ -975,68 +981,84 @@ describe("Virtual elements", function() {
 })
 
 describe("Components", function () {
-   describe("custom elements", function () {
-      // Note: knockout/spec/components
-      beforeEach(function () {
-         ko.bindingProvider.instance = new ko.secureBindingsProvider();
+  describe("custom elements", function () {
+    // Note: knockout/spec/components
+    beforeEach(function () {
+       ko.bindingProvider.instance = new ko.secureBindingsProvider();
+    });
+
+    it("inserts templates into custom elements", function (done) {
+       ko.components.register('helium', {
+          template: 'X<i data-sbind="text: 123"></i>'
+       });
+       var initialMarkup = 'He: <helium></helium>';
+       var root = document.createElement("div");
+       root.innerHTML = initialMarkup;
+
+       // Since components are loaded asynchronously, it doesn't show up synchronously
+       ko.applyBindings(null, root);
+       assert.equal(root.innerHTML, initialMarkup);
+       setTimeout(function () {
+          window.root = root;
+          assert.equal(root.innerHTML,
+             'He: <helium>X<i data-sbind="text: 123">123</i></helium>'
+          );
+          done();
+       }, 1);
+    });
+
+    it("interprets the params of custom elements", function (done) {
+       var called = false;
+       ko.components.register("argon", {
+          viewModel: function(params) {
+             this.delta = 'G2k'
+             called = true;
+          },
+          template: "<b>sXZ <u data-sbind='text: delta'></u></b>"
+       });
+       var ce = document.createElement("argon");
+       ce.setAttribute("params",
+          "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
+       );
+       ko.applyBindings({delta: 'QxE'}, ce);
+       setTimeout(function () {
+          assert.equal(ce.innerHTML,
+             '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
+          assert.equal(called, true);
+          done()
+       }, 1)
+    });
+
+    it("uses empty params={$raw:{}} if the params attr is whitespace", function (done) {
+      var called = false;
+      ko.components.register("lithium", {
+        viewModel: function(params) {
+          assert.deepEqual(params, {$raw:{}})
+          done()
+        },
+        template: "hello"
       });
+      var ce = document.createElement("lithium");
+      ce.setAttribute("params", "   ");
+      ko.applyBindings({delta: 'QxE'}, ce);
+      // No error raised.
+    })
 
-      it("inserts templates into custom elements", function (done) {
-         ko.components.register('helium', {
-            template: 'X<i data-sbind="text: 123"></i>'
-         });
-         var initialMarkup = 'He: <helium></helium>';
-         var root = document.createElement("div");
-         root.innerHTML = initialMarkup;
-
-         // Since components are loaded asynchronously, it doesn't show up synchronously
-         ko.applyBindings(null, root);
-         assert.equal(root.innerHTML, initialMarkup);
-         setTimeout(function () {
-            window.root = root;
-            assert.equal(root.innerHTML,
-               'He: <helium>X<i data-sbind="text: 123">123</i></helium>'
-            );
-            done();
-         }, 1);
-      });
-
-      it("interprets the params of custom elements", function (done) {
-         var called = false;
-         ko.components.register("argon", {
-            viewModel: function(params) {
-               this.delta = 'G2k'
-               called = true;
-            },
-            template: "<b>sXZ <u data-sbind='text: delta'></u></b>"
-         });
-         var ce = document.createElement("argon");
-         ce.setAttribute("params",
-            "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
-         );
-         ko.applyBindings({delta: 'QxE'}, ce);
-         setTimeout(function () {
-            assert.equal(ce.innerHTML,
-               '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
-            assert.equal(called, true);
-            done()
-         }, 1)
-      });
-
-      it("uses empty params={$raw:{}} if the params attr is whitespace", function (done) {
-         var called = false;
-         ko.components.register("lithium", {
-            viewModel: function(params) {
-               assert.deepEqual(params, {$raw:{}})
-               done()
-            },
-            template: "hello"
-         });
-         var ce = document.createElement("lithium");
-         ce.setAttribute("params", "   ");
-         ko.applyBindings({delta: 'QxE'}, ce);
+    it('parses `text: "alpha"` on a custom element', function (done) {
+      // re brianmhunt/knockout-secure-binding#38
+      ko.components.register("neon", {
+        viewModel: function (params) {
+          assert.equal(params.text, "Knights of Ne.");
+          done();
+        },
+        template: "A noble gas and less noble car."
       })
-   });
+      var ne = document.createElement("neon");
+      ne.setAttribute("params", 'text: "Knights of Ne."')
+      ko.applyBindings({}, ne);
+      // No error raised.
+    })
+  });
 
    describe("nodeParamsToObject", function () {
       var parser = null;

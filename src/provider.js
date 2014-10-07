@@ -46,7 +46,7 @@ function getBindingsString(node) {
         case node.ELEMENT_NODE:
             return node.getAttribute(this.attribute);
         case node.COMMENT_NODE:
-            return ko.virtualElements.virtualNodeBindingValue(node);
+            return _virtualNodeBindingValue(node);
         default:
             return null;
     }
@@ -61,8 +61,8 @@ function nodeParamsToObject(node, parser) {
     if (!accessors || Object.keys(accessors).length === 0) {
         return {$raw: {}};
     }
-    var $raw = ko.utils.objectMap(accessors, nodeParamRawMapper);
-    var params = ko.utils.objectMap($raw, ko.unwrap);
+    var $raw = _object_map(accessors, nodeParamRawMapper);
+    var params = _object_map($raw, ko.unwrap);
     if (!params.hasOwnProperty('$raw')) {
         params.$raw = $raw;
     }
