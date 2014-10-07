@@ -1,3 +1,11 @@
+### 0.5.1 (2014-10-07)
+
+
+#### Bug Fixes
+
+* **parser:** Copy in private KO functions ([2c4e2799](https://github.com/brianmhunt/knockout-secure-binding/commit/2c4e279994c38a930741cadec4e981b37717fa82), closes [#38](https://github.com/brianmhunt/knockout-secure-binding/issues/38))
+
+
 ## 0.5.0 (2014-08-15)
 
 
