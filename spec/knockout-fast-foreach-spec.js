@@ -12,7 +12,7 @@ var view = {
   test_items: ko.observableArray()
 };
 
-var i = 60;
+var i = 600;
 while(i--) {
   view.test_items.push(i);
 }
