@@ -9,10 +9,29 @@
     <h1>Knockout Else Spec</h1>
     <h2><a href='?'>All tests</a></h2>
     <div id='mocha'></div>
+
+
+    <div id='FFfixture'>
+      <ul data-bind='fast-foreach: test_items'>
+        <li>
+          Hello, world. <code data-bind="text: $data"></code>.
+        </li>
+      </ul>
+    </div>
+    <div id='Ofixture'>
+      <ul data-bind='fast-foreach: test_items'>
+        <li>
+          Hello, world. <code data-bind="text: $data"></code>.
+        </li>
+      </ul>
+    </div>
+
+
     <script src='../node_modules/chai/chai.js'></script>
     <script src='../node_modules/mocha/mocha.js'></script>
     <script src='../node_modules/knockout/build/output/knockout-latest.debug.js'></script>
     <script src='../index.js'></script>
     <script src='knockout-fast-foreach-spec.js'></script>
+
   </body>
 </html>
