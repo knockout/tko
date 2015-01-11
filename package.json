@@ -1,0 +1,43 @@
+{
+  "name": "knockout-fast-foreach",
+  "version": "0.1.0",
+  "description": "Knockout Fast Foreach",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brianmhunt/knockout-fast-foreach.git"
+  },
+  "keywords": [
+    "knockout",
+    "foreach",
+    "javascript"
+  ],
+  "author": "Brian M Hunt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brianmhunt/knockout-fast-foreach/issues"
+  },
+  "homepage": "https://github.com/brianmhunt/knockout-fast-foreach",
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "gulp": "^3.8.8",
+    "gulp-bump": "^0.1.11",
+    "gulp-filter": "^1.0.2",
+    "gulp-footer": "^1.0.5",
+    "gulp-git": "^0.5.2",
+    "gulp-header": "^1.1.1",
+    "gulp-livereload": "^2.1.1",
+    "gulp-load-plugins": "^0.7.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-tag-version": "^1.1.0",
+    "gulp-webserver": "^0.8.3",
+    "js-yaml": "^3.2.2",
+    "knockout": "^3.2.0",
+    "mocha": "^1.21.5",
+    "yaml": "^0.2.3"
+  },
+  "dependencies": {}
+}
