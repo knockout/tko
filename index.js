@@ -1,4 +1,5 @@
-
+// index.js
+// --------
 // Polyfills
 if (!Array.isArray) {
   Array.isArray = function(arg) {
@@ -29,12 +30,18 @@ var raf = window.requestAnimationFrame
 function init_from_object(spec) {
   var data = spec.data,
       element = spec.element,
-      templateNodes = spec.name ? [document.getElementById(spec.name)] : [].slice.call(element.children);
+      templateNode = spec.name ? [document.getElementById(spec.name)] : element.cloneNode(true),
+      templateNodeSize = 0;
 
   // Initialize the data
   if (ko.isObservable(data) && !data.indexOf) {
     data = data.extend({trackArrayChanges: true});
   }
+
+  // Initialize the templateNodeSize;
+  ko.utils.arrayForEach(templateNode.children, function (child) {
+    if (child) templateNodeSize++;
+  })
 
   // Clear the element
   while (element.firstChild) {
@@ -44,22 +51,42 @@ function init_from_object(spec) {
   // Prime content
   ko.utils.arrayForEach(ko.unwrap(data), function(v) {
     var childContext = spec.$context.createChildContext(v, spec.as || null);
-    ko.utils.arrayForEach(templateNodes, function (node) {
-      node = node.cloneNode(true);
-      element.insertBefore(node, null);
-      ko.applyBindingsToDescendants(childContext, node);
+    ko.utils.arrayForEach(templateNode.children, function(child) {
+      if (!child) return;
+      var clone = child.cloneNode(true);
+      element.insertBefore(clone, null);
+      ko.applyBindingsToDescendants(childContext, clone);
     })
   })
 
   // Start subscriptions
-  function startChangeUpdate() {
-
-  }
-
   function on_array_change(changeSet) {
-    console.log("CHANGES!", changeSet)
-    changes.push.apply(changes, changeSet);
-    startChangeUpdate();
+    function startChangeUpdate() {
+      var nodes_to_remove = [],
+          elementNodes = element.children,
+          i, j;
+      ko.utils.arrayForEach(changeSet, function(change) {
+        // Change is of the form {status: "deleted|added|...", index: nnn, value: ...}
+        switch(change.status) {
+          case 'deleted':
+            for (var i = templateNodeSize * change.index, j = i + templateNodeSize; i < j; i++) {
+              nodes_to_remove.push(element.children[i]);
+            }
+            ko.utils.arrayForEach(nodes_to_remove, function(node) {
+              element.removeChild(node);
+            })            
+            break;
+          case 'added':
+            console.log("Add ...", change)
+            break;
+          default:
+            console.log("Unhandled array change:", change)
+        }
+      });
+    }
+
+    // raf(startChangeUpdate);
+    startChangeUpdate()
   }
 
   changeSubs = data.subscribe(on_array_change, null, 'arrayChange');
@@ -92,6 +119,7 @@ function init(element, valueAccessor, bindings, vm, context) {
   }
   return {controlsDescendantBindings: true}
 };
+
 
 ko.bindingHandlers['fast-foreach'] = {
   init: init

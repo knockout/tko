@@ -4,26 +4,46 @@
     <meta charset="utf-8">
     <title>Knockout-Fast-Foreach Spec</title>
     <link rel='stylesheet' href='../node_modules/mocha/mocha.css'/>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      #Ffixture, #Ofixture {
+        border: 1px solid green;
+        width: 40%;
+        float: left;
+        padding: 10px;
+        margin: 0;
+      }
+      #Ffixture ul, #Ofixture ul {
+        overflow-y: scroll;
+        max-height: 250px;
+        background-color: #CCC;
+      }
+    </style>
   </head>
   <body>
     <h1>Knockout Else Spec</h1>
     <h2><a href='?'>All tests</a></h2>
     <div id='mocha'></div>
-
-
-    <div id='FFfixture'>
-      <ul data-bind='fast-foreach: test_items'>
+    
+    <div id='Ffixture'>
+      <h3>Fast Foreach</h3>
+      <ul data-bind='fast-foreach: xarr'>
         <li>
-          Hello, world. <code data-bind="text: $data"></code>.
+          <b>Hello.</b> <code data-bind="text: $data"></code>.
         </li>
       </ul>
+      <div id='FfR'></div>
     </div>
     <div id='Ofixture'>
-      <ul data-bind='fast-foreach: test_items'>
+      <h3>Original Foreach</h3>
+      <ul data-bind='foreach: xarr'>
         <li>
-          Hello, world. <code data-bind="text: $data"></code>.
+          <b>Hello.</b> <code data-bind="text: $data"></code>.
         </li>
       </ul>
+      <div id='OfR'></div>
     </div>
 
 
