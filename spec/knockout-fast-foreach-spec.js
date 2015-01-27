@@ -40,7 +40,7 @@ function render_test(target, resultNode) {
   while (i--) view.xarr.shift();
   report(resultNode, "Remove 1/3rd ", (performance.now() - startTime))
 
-  // Adds
+  // Adds to middle
   startTime = performance.now();
   var i = Math.floor(xarrSize / 3);
   while (i--) view.xarr.unshift("+" + i)

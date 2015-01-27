@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.1.0 (2015-01-12T14:46:26.409Z)
+  Knockout Fast Foreach v0.1.0 (2015-01-27T14:55:56.019Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 */
@@ -44,12 +44,18 @@ var raf = window.requestAnimationFrame
 function init_from_object(spec) {
   var data = spec.data,
       element = spec.element,
-      templateNode = spec.name ? [document.getElementById(spec.name)] : element.cloneNode(true);
+      templateNode = spec.name ? [document.getElementById(spec.name)] : element.cloneNode(true),
+      templateNodeSize = 0;
 
   // Initialize the data
   if (ko.isObservable(data) && !data.indexOf) {
     data = data.extend({trackArrayChanges: true});
   }
+
+  // Initialize the templateNodeSize;
+  ko.utils.arrayForEach(templateNode.children, function (child) {
+    if (child) templateNodeSize++;
+  })
 
   // Clear the element
   while (element.firstChild) {
@@ -59,23 +65,36 @@ function init_from_object(spec) {
   // Prime content
   ko.utils.arrayForEach(ko.unwrap(data), function(v) {
     var childContext = spec.$context.createChildContext(v, spec.as || null);
-    var clone = templateNode.cloneNode(true);
-    ko.applyBindingsToDescendants(childContext, clone.children);
-    ko.utils.arrayForEach(clone.childNodes, function(child) {
-      // console.log("INSERTING", child)
-      if (child) element.insertBefore(child, null);
+    ko.utils.arrayForEach(templateNode.children, function(child) {
+      if (!child) return;
+      var clone = child.cloneNode(true);
+      element.insertBefore(clone, null);
+      ko.applyBindingsToDescendants(childContext, clone);
     })
   })
 
   // Start subscriptions
   function on_array_change(changeSet) {
     function startChangeUpdate() {
-      var nodes_to_remove = [];
+      var nodes_to_remove = [],
+          elementNodes = element.children,
+          i, j;
       ko.utils.arrayForEach(changeSet, function(change) {
+        // Change is of the form {status: "deleted|added|...", index: nnn, value: ...}
         switch(change.status) {
           case 'deleted':
-            nodes_to_remove.push();
+            for (var i = templateNodeSize * change.index, j = i + templateNodeSize; i < j; i++) {
+              nodes_to_remove.push(element.children[i]);
+            }
+            ko.utils.arrayForEach(nodes_to_remove, function(node) {
+              element.removeChild(node);
+            })            
             break;
+          case 'added':
+            console.log("Add ...", change)
+            break;
+          default:
+            console.log("Unhandled array change:", change)
         }
       });
     }
