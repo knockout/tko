@@ -25,12 +25,16 @@ function report(reportingNode, text, time) {
   reportingNode.appendChild(p);
 }
 
+// Making the changes synchronous so the time comparison works better.
+// The requestAnimationFrame should only speed things up.
+FastForEach.animateFrame = function(frame) { frame() };
 
 function render_test(target, resultNode) {
   var startTime = performance.now();
   var view = createView();
   // Bind
   ko.applyBindings(view, target);
+  
   report(resultNode, "Bind ", (performance.now() - startTime))
 
   // Deletes

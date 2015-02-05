@@ -10,14 +10,6 @@ function isPlainObject(o) {
   return !!o && typeof o === 'object' && o.constructor === Object;
 };
 
-// from FastDOM
-var raf = window.requestAnimationFrame
-  || window.webkitRequestAnimationFrame
-  || window.mozRequestAnimationFrame
-  || window.msRequestAnimationFrame
-  || function(cb) { return window.setTimeout(cb, 1000 / 60); };
-
-
 function FastForEach(spec) {
   var self = this;
   this.element = spec.element;
@@ -28,6 +20,7 @@ function FastForEach(spec) {
                                 : spec.element.cloneNode(true);
   this.changeQueue = [];
   this.startNodesList = [];
+  this.rendering_queued = false;
 
   // Make sure the observable is trackable.
   if (ko.isObservable(this.data) && !this.data.indexOf) {
@@ -54,8 +47,15 @@ function FastForEach(spec) {
 
   // Watch for changes
   this.changeSubs = this.data.subscribe(this.on_array_change, this, 'arrayChange');
-
 }
+
+
+FastForEach.animateFrame = window.requestAnimationFrame
+  || window.webkitRequestAnimationFrame
+  || window.mozRequestAnimationFrame
+  || window.msRequestAnimationFrame
+  || function(cb) { return window.setTimeout(cb, 1000 / 60); };
+
 
 FastForEach.prototype.dispose = function () {
   this.changeSubs.dispose();
@@ -73,7 +73,10 @@ FastForEach.prototype.on_array_change = function (changeSet) {
 
 FastForEach.prototype.registerChange = function () {
   var self = this;
-  raf(function () { self.processQueue() })
+  if (!this.rendering_queued) {
+    this.rendering_queued = true;
+    FastForEach.animateFrame.call(window, function () { self.processQueue() })
+  }
 }
 
 
@@ -83,7 +86,7 @@ FastForEach.prototype.processQueue = function () {
     self[changeItem.status](changeItem.index, changeItem.value)
   })
   this.changeQueue.length = 0;
-  this.after_process_queue(this);
+  this.rendering_queued = false;
 }
 
 
