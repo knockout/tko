@@ -109,7 +109,6 @@ FastForEach.prototype.added = function (index, value) {
 
 
 FastForEach.prototype.deleted = function (index, value) {
-  // startNodesList
   var ptr = this.startNodesList[index],
       lastNode = this.startNodesList[index + 1];
   this.element.removeChild(ptr);
@@ -147,5 +146,5 @@ ko.bindingHandlers['fastForEach'] = {
       ffe.dispose();
     });
     return {controlsDescendantBindings: true}
-}
+  }
 };
