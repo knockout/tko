@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.1.0 (2015-02-05T19:25:55.699Z)
+  Knockout Fast Foreach v0.1.0 (2015-02-05T20:32:32.416Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 */
@@ -14,98 +14,42 @@
 }(this, function (ko) {
 // index.js
 // --------
-// Polyfills
+// Fast For Each
+// 
+// Employing sound techniques to make a faster Knockout foreach binding.
+// --------
 
 // from https://github.com/jonschlinkert/is-plain-object
 function isPlainObject(o) {
   return !!o && typeof o === 'object' && o.constructor === Object;
 };
 
-// A range of nodes
-// spec contains {start: Node, end: Node, parent: Node, index: int}
-function NodeRange(spec) {
-  this.parent = spec.parent;
-  this.start = spec.start;
-  this.end = spec.end;
-  this.index = spec.index
-}
-
-NodeRange.prototype.remove = function remove() {
-  if (this.start === null) return;
-  var nodesRemoved = [];
-  var ptr = this.start;
-  while (ptr !== this.end) {
-    ptr = ptr.nextSibling;
-    this.parent.removeChild(this.start);
-    this.start = ptr;
-  }
-  this.start = this.end = null;
-}
-
-NodeRange.prototype.insertAfter = function insertAfter(nodes) {
-  var nextNode = this.end.nextSibling;
-  for (var i = nodes.length - 1; i >= 0; --i) {
-    nextNode = next.insertBefore(nodes[i]);
-  }
-}
-
-
-// from FastDOM
-var raf = window.requestAnimationFrame
-  || window.webkitRequestAnimationFrame
-  || window.mozRequestAnimationFrame
-  || window.msRequestAnimationFrame
-  || function(cb) { return window.setTimeout(cb, 1000 / 60); };
-
-
-// Spec is the usual for a `foreach` binding i.e. {
-//    name: template id string  (optional)
-//    data: array
-//    as: string
-//    ...
-//    + element: DOMNode
-// }
-function init_from_object(spec) {
-  // Insert a nodes at the given index
-  function insertBoundNodeAtIndex(index, data) {
-    var nodeCount = nodeList.length;
-    var childContext = spec.$context.createChildContext(item, spec.as || null);
-    index = (nodeCount + index) % nodeCount; // for modulo e.g. index of -1
-    var nodeRange = new NodeRange({
-      start: templateNode.firstChild,
-      end: templateNode.lastChild,
-      parent: element,
-      index: index
-    });
-    nodeRange.insertAfter() /// ....
-  }
-
-
-}
-
 function FastForEach(spec) {
+  var self = this;
   this.element = spec.element;
   this.$context = spec.$context;
   this.data = spec.data;
+  this.as = spec.as;
   this.templateNode = spec.name ? [document.getElementById(spec.name)]
-                                : element.cloneNode(true);
+                                : spec.element.cloneNode(true);
   this.changeQueue = [];
   this.startNodesList = [];
+  this.rendering_queued = false;
 
   // Make sure the observable is trackable.
-  if (ko.isObservable(data) && !data.indexOf) {
-    data = data.extend({trackArrayChanges: true});
+  if (ko.isObservable(this.data) && !this.data.indexOf) {
+    this.data = this.data.extend({trackArrayChanges: true});
   }
 
   // Clear the element
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
+  while (this.element.firstChild) {
+    this.element.removeChild(this.element.firstChild);
   }
 
   // Prime content
   var primeIdx = 0;
   ko.utils.arrayForEach(this.data(), function (item) {
-    this.changeQueue.push({
+    self.changeQueue.push({
       index: primeIdx++,
       status: "added",
       value: item
@@ -116,27 +60,37 @@ function FastForEach(spec) {
   }
 
   // Watch for changes
-  var changeSubs = this.data.subscribe(on_array_change, this, 'arrayChange');
-
-  ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-    changeSubs.dispose();
-  });
+  this.changeSubs = this.data.subscribe(this.on_array_change, this, 'arrayChange');
 }
 
 
-FastForEach.protoype.on_array_change = function (changeSet) {
+FastForEach.animateFrame = window.requestAnimationFrame
+  || window.webkitRequestAnimationFrame
+  || window.mozRequestAnimationFrame
+  || window.msRequestAnimationFrame
+  || function(cb) { return window.setTimeout(cb, 1000 / 60); };
+
+
+FastForEach.prototype.dispose = function () {
+  this.changeSubs.dispose();
+}
+
+
+FastForEach.prototype.on_array_change = function (changeSet) {
   var self = this;
-  ko.utils.forEach(changeSet, function(change) {
-    self.changeQueue.append(change);
+  ko.utils.arrayForEach(changeSet, function(change) {
+    self.changeQueue.push(change);
   })
-  this.registerChange()
+  this.registerChange();
 } 
 
 
 FastForEach.prototype.registerChange = function () {
   var self = this;
-  self.processQueue()
-  // raf(function () { self.processQueue() })
+  if (!this.rendering_queued) {
+    this.rendering_queued = true;
+    FastForEach.animateFrame.call(window, function () { self.processQueue() })
+  }
 }
 
 
@@ -145,49 +99,43 @@ FastForEach.prototype.processQueue = function () {
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     self[changeItem.status](changeItem.index, changeItem.value)
   })
-  this.changeSet.length = 0;
+  this.changeQueue.length = 0;
+  this.rendering_queued = false;
 }
 
 
 FastForEach.prototype.added = function (index, value) {
-  console.log("Inserting ", value, " at ", index)
-  // insertBoundNodeAtIndex(-1, item)
-  // ko.utils.arrayForEach(templateNode.children, function(child) {
-  //   if (!child) return;
-  //   var clone = child.cloneNode(true);
-  //   element.insertBefore(clone, null);
-  //   ko.applyBindingsToDescendants(childContext, clone);
-  // })
+  var childContext = this.$context.createChildContext(value, this.as || null);
+  var referenceElement = this.startNodesList[index] || null;
+  var firstChild = null;
+  var element = this.element;
+
+  ko.utils.arrayForEach(this.templateNode.children, function(child) {
+    if (!child) return;
+    var clone = child.cloneNode(true);
+    element.insertBefore(clone, referenceElement);
+    ko.applyBindingsToDescendants(childContext, clone);
+    firstChild = firstChild || clone;
+  })
+
+  this.startNodesList.splice(index, 0, firstChild);
 }
 
 
 FastForEach.prototype.deleted = function (index, value) {
   // startNodesList
-  console.log("Deleting ", value, " at ", index)
+  var ptr = this.startNodesList[index],
+      lastNode = this.startNodesList[index + 1];
+  this.element.removeChild(ptr);
+  while ((ptr = ptr.nextSibling) && ptr != lastNode) {
+    this.element.removeChild(ptr);
+  }
+  this.startNodesList.splice(index, 1)
 }
 
 
-// /*
-//     insertNodeRange
-//     --
-
-//     Insert the nodes represented in NodeRange into the DOM.
-//  */
-// FastForEach.prototype.insertNodeRange(node_range, index) {
-//   var lastNode = this.nodeRangeList[index].start,
-//       ptr = node_range.end;
-//   this.nodeRangeList.splice(index, 0, node_range);
-//   this.element.insertBefore(ptr, lastNode);
-//   lastNode = ptr;
-//   ptr = ptr.previousSibling;
-//   while(pre && ptr != node_range.start) {
-//     this.element.insertBefore(ptr, lastNode)
-//     lastNode = ptr;
-//     ptr = ptr.previousSibling;
-//   }
-// }
-
-
+// Overload, as needed.
+FastForEach.prototype.after_process_queue = function (fastforeach) {}
 
 
 // Valid valueAccessors:
@@ -198,23 +146,33 @@ FastForEach.prototype.deleted = function (index, value) {
 //    {data: array, name: string, as: string}
 function init(element, valueAccessor, bindings, vm, context) {
   var value = valueAccessor(),
-      spec = {};
-  try{
+      spec = {},
+      ffe;
+  try {
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
-      init_from_object(value);
+      ffe = new FastForEach(value);
     } else {
-      init_from_object({element: element, data: value, $context: context});
+      ffe = new FastForEach({
+        element: element,
+        data: value,
+        $context: context
+    });
     }
   } catch(e) {
     console.error("FF error", e.stack);
   }
+
+  ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+    ffe.dispose();
+  });
+
   return {controlsDescendantBindings: true}
 };
 
 
-ko.bindingHandlers['fast-foreach'] = {
+ko.bindingHandlers['fastForEach'] = {
   init: init
 };// Exports
   return {init: init};

@@ -75,7 +75,7 @@ FastForEach.prototype.registerChange = function () {
   var self = this;
   if (!this.rendering_queued) {
     this.rendering_queued = true;
-    FastForEach.animateFrame.call(window, function () { self.processQueue() })
+    FastForEach.animateFrame.call(window, function () { self.processQueue() });
   }
 }
 
@@ -120,21 +120,18 @@ FastForEach.prototype.deleted = function (index, value) {
 }
 
 
-// Overload, as needed.
-FastForEach.prototype.after_process_queue = function (fastforeach) {}
 
-
-// Valid valueAccessors:
-//    []
-//    ko.observable([])
-//    ko.observableArray([])
-//    ko.computed
-//    {data: array, name: string, as: string}
-function init(element, valueAccessor, bindings, vm, context) {
-  var value = valueAccessor(),
-      spec = {},
-      ffe;
-  try {
+ko.bindingHandlers['fastForEach'] = {
+  // Valid valueAccessors:
+  //    []
+  //    ko.observable([])
+  //    ko.observableArray([])
+  //    ko.computed
+  //    {data: array, name: string, as: string}
+  init: function init(element, valueAccessor, bindings, vm, context) {
+    var value = valueAccessor(),
+        spec = {},
+        ffe;
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
@@ -144,20 +141,11 @@ function init(element, valueAccessor, bindings, vm, context) {
         element: element,
         data: value,
         $context: context
-    });
+      });
     }
-  } catch(e) {
-    console.error("FF error", e.stack);
-  }
-
-  ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-    ffe.dispose();
-  });
-
-  return {controlsDescendantBindings: true}
-};
-
-
-ko.bindingHandlers['fastForEach'] = {
-  init: init
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      ffe.dispose();
+    });
+    return {controlsDescendantBindings: true}
+}
 };
