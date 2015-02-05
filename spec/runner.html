@@ -5,6 +5,9 @@
     <title>Knockout-Fast-Foreach Spec</title>
     <link rel='stylesheet' href='../node_modules/mocha/mocha.css'/>
     <style>
+      body {
+        padding: 50px;
+      }
       * {
         box-sizing: border-box;
       }
@@ -14,22 +17,27 @@
         float: left;
         padding: 10px;
         margin: 0;
+        margin-left: 18px;
       }
       #Ffixture ul, #Ofixture ul {
         overflow-y: scroll;
         max-height: 250px;
         background-color: #CCC;
       }
+      code {
+        font-weight: bold;
+        font-family: monospace;
+      }
     </style>
   </head>
   <body>
-    <h1>Knockout Else Spec</h1>
-    <h2><a href='?'>All tests</a></h2>
+    <h1>Knockout FastForEach Runner</h1>
+    <h2><a href='?'>Run tests</a></h2>
     <div id='mocha'></div>
     
     <div id='Ffixture'>
       <h3>Fast Foreach</h3>
-      <ul data-bind='fast-foreach: xarr'>
+      <ul data-bind='fastForEach: xarr'>
         <li>
           <b>Hello.</b> <code data-bind="text: $data"></code>.
         </li>

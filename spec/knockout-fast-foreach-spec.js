@@ -21,7 +21,7 @@ function createView() {
 
 function report(reportingNode, text, time) {
   var p = document.createElement("p");
-  p.innerText = text + " — " + time.toFixed(3) + "ms";
+  p.innerText = text + " — " + time.toFixed(1) + "ms";
   reportingNode.appendChild(p);
 }
 

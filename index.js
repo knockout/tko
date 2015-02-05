@@ -1,45 +1,14 @@
 // index.js
 // --------
-// Polyfills
-if (!Array.isArray) {
-  Array.isArray = function(arg) {
-    return Object.prototype.toString.call(arg) === '[object Array]';
-  };
-}
+// Fast For Each
+// 
+// Employing sound techniques to make a faster Knockout foreach binding.
+// --------
 
 // from https://github.com/jonschlinkert/is-plain-object
 function isPlainObject(o) {
   return !!o && typeof o === 'object' && o.constructor === Object;
 };
-
-// A range of nodes
-// spec contains {start: Node, end: Node, parent: Node, index: int}
-function NodeRange(spec) {
-  this.parent = spec.parent;
-  this.start = spec.start;
-  this.end = spec.end;
-  this.index = spec.index
-}
-
-NodeRange.prototype.remove = function remove() {
-  if (this.start === null) return;
-  var nodesRemoved = [];
-  var ptr = this.start;
-  while (ptr !== this.end) {
-    ptr = ptr.nextSibling;
-    this.parent.removeChild(this.start);
-    this.start = ptr;
-  }
-  this.start = this.end = null;
-}
-
-NodeRange.prototype.insertAfter = function insertAfter(nodes) {
-  var nextNode = this.end.nextSibling;
-  for (var i = nodes.length - 1; i >= 0; --i) {
-    nextNode = next.insertBefore(nodes[i]);
-  }
-}
-
 
 // from FastDOM
 var raf = window.requestAnimationFrame
@@ -49,89 +18,108 @@ var raf = window.requestAnimationFrame
   || function(cb) { return window.setTimeout(cb, 1000 / 60); };
 
 
-// Spec is the usual for a `foreach` binding i.e. {
-//    name: template id string  (optional)
-//    data: array
-//    as: string
-//    ...
-//    + element: DOMNode
-// }
-function init_from_object(spec) {
-  var data = spec.data,
-      element = spec.element,
-      templateNode = spec.name ? [document.getElementById(spec.name)] 
-                               : element.cloneNode(true),
-      changeQueue = [],
-      nodeList = [];
+function FastForEach(spec) {
+  var self = this;
+  this.element = spec.element;
+  this.$context = spec.$context;
+  this.data = spec.data;
+  this.as = spec.as;
+  this.templateNode = spec.name ? [document.getElementById(spec.name)]
+                                : spec.element.cloneNode(true);
+  this.changeQueue = [];
+  this.startNodesList = [];
 
-  // Insert a nodes at the given index
-  function insertBoundNodeAtIndex(index, data) {
-    var nodeCount = nodeList.length;
-    var childContext = spec.$context.createChildContext(item, spec.as || null);
-    index = (nodeCount + index) % nodeCount; // for modulo e.g. index of -1
-    var nodeRange = new NodeRange({
-      start: templateNode.firstChild,
-      end: templateNode.lastChild,
-      parent: element,
-      index: index
-    });
-    nodeRange.insertAfter() /// ....
-  }
-  
-  // Initialize the data
-  if (ko.isObservable(data) && !data.indexOf) {
-    data = data.extend({trackArrayChanges: true});
+  // Make sure the observable is trackable.
+  if (ko.isObservable(this.data) && !this.data.indexOf) {
+    this.data = this.data.extend({trackArrayChanges: true});
   }
 
   // Clear the element
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
+  while (this.element.firstChild) {
+    this.element.removeChild(this.element.firstChild);
   }
 
   // Prime content
-  ko.utils.arrayForEach(ko.unwrap(data), function(item) {
-    
-    insertBoundNodeAtIndex(-1, item)
-    ko.utils.arrayForEach(templateNode.children, function(child) {
-      if (!child) return;
-      var clone = child.cloneNode(true);
-      element.insertBefore(clone, null);
-      ko.applyBindingsToDescendants(childContext, clone);
-    })
+  var primeIdx = 0;
+  ko.utils.arrayForEach(this.data(), function (item) {
+    self.changeQueue.push({
+      index: primeIdx++,
+      status: "added",
+      value: item
+    });
+  })
+  if (primeIdx > 0) {
+    this.registerChange();
+  }
+
+  // Watch for changes
+  this.changeSubs = this.data.subscribe(this.on_array_change, this, 'arrayChange');
+
+}
+
+FastForEach.prototype.dispose = function () {
+  this.changeSubs.dispose();
+}
+
+
+FastForEach.prototype.on_array_change = function (changeSet) {
+  var self = this;
+  ko.utils.arrayForEach(changeSet, function(change) {
+    self.changeQueue.push(change);
+  })
+  this.registerChange();
+} 
+
+
+FastForEach.prototype.registerChange = function () {
+  var self = this;
+  raf(function () { self.processQueue() })
+}
+
+
+FastForEach.prototype.processQueue = function () {
+  var self = this;
+  ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
+    self[changeItem.status](changeItem.index, changeItem.value)
+  })
+  this.changeQueue.length = 0;
+  this.after_process_queue(this);
+}
+
+
+FastForEach.prototype.added = function (index, value) {
+  var childContext = this.$context.createChildContext(value, this.as || null);
+  var referenceElement = this.startNodesList[index] || null;
+  var firstChild = null;
+  var element = this.element;
+
+  ko.utils.arrayForEach(this.templateNode.children, function(child) {
+    if (!child) return;
+    var clone = child.cloneNode(true);
+    element.insertBefore(clone, referenceElement);
+    ko.applyBindingsToDescendants(childContext, clone);
+    firstChild = firstChild || clone;
   })
 
-  function applyChanges() {
-    ko.utils.arrayForEach(changeQueue, function(change) {
-      // Change is of the form {status: "deleted|added|...", index: nnn, value: ...}
-      switch(change.status) {
-        case 'deleted':
-
-        case 'added':
-          
-          break;
-        default:
-          console.log("Unhandled array change:", change)
-      }
-    });
-    changeQueue.length = 0;
-  }
-
-  // Start subscriptions
-  function on_array_change(changeSet) {
-    ko.utils.forEach(changeSet, function(change) {
-      changeQueue.append(change);
-    })
-    // raf(applyChanges);
-    applyChanges()
-  }
-
-  changeSubs = data.subscribe(on_array_change, null, 'arrayChange');
-
-  ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-    changeSubs.dispose();
-    changes.length = 0;
-  });
+  this.startNodesList.splice(index, 0, firstChild);
 }
+
+
+FastForEach.prototype.deleted = function (index, value) {
+  // startNodesList
+  var ptr = this.startNodesList[index],
+      lastNode = this.startNodesList[index + 1];
+  this.element.removeChild(ptr);
+  while ((ptr = ptr.nextSibling) && ptr != lastNode) {
+    this.element.removeChild(ptr);
+  }
+  this.startNodesList.splice(index, 1)
+}
+
+
+// Overload, as needed.
+FastForEach.prototype.after_process_queue = function (fastforeach) {}
+
 
 // Valid valueAccessors:
 //    []
@@ -141,22 +129,32 @@ function init_from_object(spec) {
 //    {data: array, name: string, as: string}
 function init(element, valueAccessor, bindings, vm, context) {
   var value = valueAccessor(),
-      spec = {};
-  try{
+      spec = {},
+      ffe;
+  try {
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
-      init_from_object(value);
+      ffe = new FastForEach(value);
     } else {
-      init_from_object({element: element, data: value, $context: context});
+      ffe = new FastForEach({
+        element: element,
+        data: value,
+        $context: context
+    });
     }
   } catch(e) {
     console.error("FF error", e.stack);
   }
+
+  ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+    ffe.dispose();
+  });
+
   return {controlsDescendantBindings: true}
 };
 
 
-ko.bindingHandlers['fast-foreach'] = {
+ko.bindingHandlers['fastForEach'] = {
   init: init
 };
