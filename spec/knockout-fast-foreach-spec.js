@@ -70,6 +70,41 @@ describe("applying bindings", function () {
     assert.equal(target.html(), 'Q<!-- ko text: $data -->E2<!-- /ko -->R' + 
                                 'Q<!-- ko text: $data -->V2<!-- /ko -->R')
   })
+
+  it("uses the name/id of a <template>", function () {
+    var target = $("<ul data-bind='fastForEach: {name: \"tID\", data: $data}'>Zee</ul>");
+    var list = ['F1', 'F2'];
+    var $template = $("<template id='tID'>X<!-- ko text: $data--><!--/ko--></template>")
+      .appendTo(document.body)
+    ko.applyBindings(list, target[0])
+    assert.equal(target.html(), "X<!-- ko text: $data-->F1<!--/ko-->" +
+                                "X<!-- ko text: $data-->F2<!--/ko-->");
+    $template.remove();
+  })
+
+  it("uses the name/id of a <script>", function () {
+    var target = $("<ul data-bind='fastForEach: {name: \"tID\", data: $data}'>Zee</ul>");
+    var list = ['G1', 'G2'];
+    var $template = $("<script type='text/ko-template' id='tID'></script>")
+      .appendTo(document.body)
+    $template.text("Y<!-- ko text: $data--><!--/ko-->");
+    ko.applyBindings(list, target[0])
+    assert.equal(target.html(), "Y<!-- ko text: $data-->G1<!--/ko-->" +
+                                "Y<!-- ko text: $data-->G2<!--/ko-->");
+    $template.remove();
+  })
+
+  it("uses the name/id of a <div>", function () {
+    var target = $("<ul data-bind='fastForEach: {name: \"tID2\", data: $data}'>Zee</ul>");
+    var list = ['H1', 'H2'];
+    var $template = $("<div id='tID2'>Z<!-- ko text: $data--><!--/ko--></div>")
+      .appendTo(document.body)
+    ko.applyBindings(list, target[0])
+    assert.equal(target.html(), "Z<!-- ko text: $data-->H1<!--/ko-->" +
+                                "Z<!-- ko text: $data-->H2<!--/ko-->");
+    $template.remove();
+  })
+
 })
 
 mocha.run();
@@ -123,5 +158,5 @@ function render_test(target, resultNode) {
   report(resultNode, "Add 1/3rd ", (performance.now() - startTime))
 }
 
-render_test(document.getElementById("Ffixture"), document.getElementById("FfR"));
-render_test(document.getElementById("Ofixture"), document.getElementById("OfR"));
+// render_test(document.getElementById("Ffixture"), document.getElementById("FfR"));
+// render_test(document.getElementById("Ofixture"), document.getElementById("OfR"));

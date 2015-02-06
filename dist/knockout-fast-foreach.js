@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.0 (2015-02-06T17:35:31.255Z)
+  Knockout Fast Foreach v0.2.1 (2015-02-06T18:03:46.519Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -30,15 +30,25 @@ function isPlainObject(o) {
 
 // Get a copy of the (possibly virtual) child nodes of the given element,
 // put them into a container, then empty the given node.
-function cutChildren(parentNode) {
+function makeTemplateNode(sourceNode) {
   var container = document.createElement("div");
+  var parentNode;
+  if (sourceNode.content) {
+    // For e.g. <template> tags
+    parentNode = sourceNode.content;
+  } else if (sourceNode.tagName === 'SCRIPT') {
+    parentNode = document.createElement("div");
+    parentNode.innerHTML = sourceNode.text;
+  } else {
+    // Anything else e.g. <div>
+    parentNode = sourceNode;
+  }
   ko.utils.arrayForEach(ko.virtualElements.childNodes(parentNode), function (child) {
     // FIXME - This cloneNode could be expensive; we may prefer to iterate over the 
     // parentNode children in reverse (so as not to foul the indexes as childNodes are
     // removed from parentNode when inserted into the container)
     if (child) container.insertBefore(child.cloneNode(true), null);
   });
-  ko.virtualElements.emptyNode(parentNode);
   return container;
 }
 
@@ -48,11 +58,15 @@ function FastForEach(spec) {
   this.$context = spec.$context;
   this.data = spec.data;
   this.as = spec.as;
-  this.templateNode = spec.name ? [document.getElementById(spec.name)]
-                                : cutChildren(spec.element);
+  this.templateNode = makeTemplateNode(
+    spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
+  );
   this.changeQueue = [];
   this.startNodesList = [];
   this.rendering_queued = false;
+
+  // Remove existing content.
+  ko.virtualElements.emptyNode(this.element);
 
   // Prime content
   var primeIdx = 0;
@@ -72,7 +86,6 @@ function FastForEach(spec) {
     if (!this.data.indexOf) {
       // Make sure the observable is trackable.
       this.data = this.data.extend({trackArrayChanges: true});
-      // FIXME ^^ memory leak?
     }
     this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
   }
