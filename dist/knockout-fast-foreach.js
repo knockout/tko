@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.0 (2015-02-06T16:41:34.426Z)
+  Knockout Fast Foreach v0.2.0 (2015-02-06T17:35:31.255Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -26,19 +26,18 @@
 // from https://github.com/jonschlinkert/is-plain-object
 function isPlainObject(o) {
   return !!o && typeof o === 'object' && o.constructor === Object;
-};
+}
 
 // Get a copy of the (possibly virtual) child nodes of the given element,
 // put them into a container, then empty the given node.
 function cutChildren(parentNode) {
   var container = document.createElement("div");
-  var firstChild = ko.virtualElements.firstChild(parentNode);
   ko.utils.arrayForEach(ko.virtualElements.childNodes(parentNode), function (child) {
     // FIXME - This cloneNode could be expensive; we may prefer to iterate over the 
     // parentNode children in reverse (so as not to foul the indexes as childNodes are
     // removed from parentNode when inserted into the container)
     if (child) container.insertBefore(child.cloneNode(true), null);
-  })
+  });
   ko.virtualElements.emptyNode(parentNode);
   return container;
 }
@@ -55,11 +54,6 @@ function FastForEach(spec) {
   this.startNodesList = [];
   this.rendering_queued = false;
 
-  // Clear the element
-  // while (this.element.firstChild) {
-  //   this.element.removeChild(this.element.firstChild);
-  // }
-
   // Prime content
   var primeIdx = 0;
   ko.utils.arrayForEach(ko.unwrap(this.data), function (item) {
@@ -68,7 +62,7 @@ function FastForEach(spec) {
       status: "added",
       value: item
     });
-  })
+  });
   if (primeIdx > 0) {
     this.registerChange();
   }
@@ -85,77 +79,80 @@ function FastForEach(spec) {
 }
 
 
-FastForEach.animateFrame = window.requestAnimationFrame
-  || window.webkitRequestAnimationFrame
-  || window.mozRequestAnimationFrame
-  || window.msRequestAnimationFrame
-  || function(cb) { return window.setTimeout(cb, 1000 / 60); };
+FastForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
+  function(cb) { return window.setTimeout(cb, 1000 / 60); };
 
 
 FastForEach.prototype.dispose = function () {
   this.changeSubs.dispose();
-}
+};
 
 
+// If the array changes we register the change.
 FastForEach.prototype.onArrayChange = function (changeSet) {
   var self = this;
   ko.utils.arrayForEach(changeSet, function(change) {
     self.changeQueue.push(change);
-  })
+  });
   this.registerChange();
-} 
+};
 
 
+// Once a change is registered, the ticking count-down starts for the processQueue.
 FastForEach.prototype.registerChange = function () {
   var self = this;
   if (!this.rendering_queued) {
     this.rendering_queued = true;
-    FastForEach.animateFrame.call(window, function () { self.processQueue() });
+    FastForEach.animateFrame.call(window, function () { self.processQueue(); });
   }
-}
+};
 
 
+// Reflect all the changes in the queue in the DOM, then wipe the queue.
 FastForEach.prototype.processQueue = function () {
   var self = this;
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     self[changeItem.status](changeItem.index, changeItem.value);
   });
-  this.changeQueue.length = 0;
+  this.changeQueue = [];
   this.rendering_queued = false;
-}
+};
 
 
+// Process a changeItem with {status: 'added', ...}
 FastForEach.prototype.added = function (index, value) {
   var childContext = this.$context.createChildContext(value, this.as || null);
   var referenceElement = this.startNodesList[index - 1] || null;
-  var firstChild = null;
-  var element = this.element;
   var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
   
   this.startNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
   ko.applyBindingsToDescendants(childContext, templateClone);
 
+  // Nodes are inserted in reverse order - pushed down immediately after
+  // the last node for the previous item or as the first node of element.
   for (var i = childNodes.length - 1; i >= 0; --i) {
     var child = childNodes[i];
     if (!child) return;
-    ko.virtualElements.insertAfter(element, child, referenceElement);
+    ko.virtualElements.insertAfter(this.element, child, referenceElement);
   }
-}
+};
 
 
+// Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (index, value) {
   var ptr = this.startNodesList[index],
       lastNode = this.startNodesList[index + 1];
   this.element.removeChild(ptr);
-  while ((ptr = ptr.nextSibling) && ptr != lastNode) {
+  while ((ptr = ptr.nextSibling) && ptr !== lastNode) {
     this.element.removeChild(ptr);
   }
-  this.startNodesList.splice(index, 1)
-}
+  this.startNodesList.splice(index, 1);
+};
 
 
-ko.bindingHandlers['fastForEach'] = {
+ko.bindingHandlers.fastForEach = {
   // Valid valueAccessors:
   //    []
   //    ko.observable([])
@@ -180,7 +177,7 @@ ko.bindingHandlers['fastForEach'] = {
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       ffe.dispose();
     });
-    return {controlsDescendantBindings: true}
+    return {controlsDescendantBindings: true};
   },
 
   // Export for testing, debugging, and overloading.
