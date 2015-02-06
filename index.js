@@ -62,7 +62,6 @@ function FastForEach(spec) {
     if (!this.data.indexOf) {
       // Make sure the observable is trackable.
       this.data = this.data.extend({trackArrayChanges: true});
-      // FIXME ^^ memory leak?
     }
     this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
   }
