@@ -41,7 +41,7 @@ gulp.task('js', function () {
     .pipe(gulp.dest('./dist'))
     .pipe(plugins.uglify())
     .pipe(plugins.rename("knockout-fast-foreach.min.js"))
-    .pipe(gulp.dest('./dist'))
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('watch', ['js'], function () {

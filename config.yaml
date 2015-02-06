@@ -3,6 +3,8 @@ header: |
     Knockout Fast Foreach v<%=pkg.version%> (<%=now.toISOString()%>)
     By: Brian M Hunt (C) 2015
     License: MIT
+
+    Adds `fastForEach` to `ko.bindingHandlers`.
   */
   (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -15,16 +17,15 @@ header: |
   }(this, function (ko) {
 
 footer: |
-  // Exports
-    return {init: init};
   }));
 
 webserver:
-  port: 4052
+  port: 4054
   directoryListing: true
   open: spec/runner.html
   livereload:
-    port: 4053
+    enable: true
+    port: 4055
 
 watch:
   index.js

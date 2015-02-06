@@ -1,7 +1,9 @@
 /*!
-  Knockout Fast Foreach v0.1.0 (2015-02-05T20:32:32.416Z)
+  Knockout Fast Foreach v0.1.0 (2015-02-06T13:31:15.845Z)
   By: Brian M Hunt (C) 2015
   License: MIT
+
+  Adds `fastForEach` to `ko.bindingHandlers`.
 */
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -89,7 +91,7 @@ FastForEach.prototype.registerChange = function () {
   var self = this;
   if (!this.rendering_queued) {
     this.rendering_queued = true;
-    FastForEach.animateFrame.call(window, function () { self.processQueue() })
+    FastForEach.animateFrame.call(window, function () { self.processQueue() });
   }
 }
 
@@ -123,7 +125,6 @@ FastForEach.prototype.added = function (index, value) {
 
 
 FastForEach.prototype.deleted = function (index, value) {
-  // startNodesList
   var ptr = this.startNodesList[index],
       lastNode = this.startNodesList[index + 1];
   this.element.removeChild(ptr);
@@ -134,21 +135,17 @@ FastForEach.prototype.deleted = function (index, value) {
 }
 
 
-// Overload, as needed.
-FastForEach.prototype.after_process_queue = function (fastforeach) {}
-
-
-// Valid valueAccessors:
-//    []
-//    ko.observable([])
-//    ko.observableArray([])
-//    ko.computed
-//    {data: array, name: string, as: string}
-function init(element, valueAccessor, bindings, vm, context) {
-  var value = valueAccessor(),
-      spec = {},
-      ffe;
-  try {
+ko.bindingHandlers['fastForEach'] = {
+  // Valid valueAccessors:
+  //    []
+  //    ko.observable([])
+  //    ko.observableArray([])
+  //    ko.computed
+  //    {data: array, name: string, as: string}
+  init: function init(element, valueAccessor, bindings, vm, context) {
+    var value = valueAccessor(),
+        spec = {},
+        ffe;
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
@@ -158,22 +155,15 @@ function init(element, valueAccessor, bindings, vm, context) {
         element: element,
         data: value,
         $context: context
-    });
+      });
     }
-  } catch(e) {
-    console.error("FF error", e.stack);
-  }
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      ffe.dispose();
+    });
+    return {controlsDescendantBindings: true}
+  },
 
-  ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-    ffe.dispose();
-  });
-
-  return {controlsDescendantBindings: true}
+  // Export for testing, debugging, and overloading.
+  FastForEach: FastForEach,
 };
-
-
-ko.bindingHandlers['fastForEach'] = {
-  init: init
-};// Exports
-  return {init: init};
 }));
