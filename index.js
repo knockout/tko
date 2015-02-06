@@ -46,7 +46,7 @@ function FastForEach(spec) {
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
   this.changeQueue = [];
-  this.startNodesList = [];
+  this.lastNodesList = [];
   this.rendering_queued = false;
 
   // Remove existing content.
@@ -88,10 +88,15 @@ FastForEach.prototype.dispose = function () {
 
 // If the array changes we register the change.
 FastForEach.prototype.onArrayChange = function (changeSet) {
-  var self = this;
-  ko.utils.arrayForEach(changeSet, function(change) {
-    self.changeQueue.push(change);
+  var changeMap = {
+    added: [],
+    deleted: [],
+  };
+  ko.utils.arrayForEach(changeSet, function(changeItem) {
+    changeMap[changeItem.status].push(changeItem);
   });
+  this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
+  this.changeQueue.push.apply(this.changeQueue, changeMap.added);
   this.registerChange();
 };
 
@@ -109,9 +114,17 @@ FastForEach.prototype.registerChange = function () {
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 FastForEach.prototype.processQueue = function () {
   var self = this;
+  var indexesToDelete = [];
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
+    if (changeItem.status === 'added') {
+      self.processDeletes(indexesToDelete);
+      indexesToDelete = [];
+    } else {
+      indexesToDelete.push(changeItem.index);
+    }
     self[changeItem.status](changeItem.index, changeItem.value);
   });
+  self.processDeletes(indexesToDelete);
   this.changeQueue = [];
   this.rendering_queued = false;
 };
@@ -120,11 +133,11 @@ FastForEach.prototype.processQueue = function () {
 // Process a changeItem with {status: 'added', ...}
 FastForEach.prototype.added = function (index, value) {
   var childContext = this.$context.createChildContext(value, this.as || null);
-  var referenceElement = this.startNodesList[index - 1] || null;
+  var referenceElement = this.lastNodesList[index - 1] || null;
   var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
   
-  this.startNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
+  this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
   ko.applyBindingsToDescendants(childContext, templateClone);
 
   // Nodes are inserted in reverse order - pushed down immediately after
@@ -139,13 +152,22 @@ FastForEach.prototype.added = function (index, value) {
 
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (index, value) {
-  var ptr = this.startNodesList[index],
-      lastNode = this.startNodesList[index + 1];
+  var ptr = this.lastNodesList[index],
+      lastNode = this.lastNodesList[index + 1];
   this.element.removeChild(ptr);
   while ((ptr = ptr.nextSibling) && ptr !== lastNode) {
     this.element.removeChild(ptr);
   }
-  this.startNodesList.splice(index, 1);
+};
+
+
+// We batch our deletion of item indexes in our parallel array.
+// See brianmhunt/knockout-fast-foreach#6/#8
+FastForEach.prototype.processDeletes = function (indexesToDelete) {
+  var self = this;
+  ko.utils.arrayForEach(indexesToDelete, function (index) {
+    self.lastNodesList.splice(index, 1);  
+  });
 };
 
 

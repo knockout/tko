@@ -12,8 +12,9 @@
 mocha.setup('bdd')
 assert = chai.assert;
 
-describe("applying bindings", function () {
-  var originalAnimateFrame = 
+// Make the frame animation synchronous; simplifies testing.
+function setupSynchronousFrameAnimation () {
+  var originalAnimateFrame = FastForEach.animateFrame;
   beforeEach(function () {
     originalAnimateFrame = FastForEach.animateFrame;
     FastForEach.animateFrame = function(frame) { frame() };
@@ -21,11 +22,36 @@ describe("applying bindings", function () {
   afterEach(function () {
     FastForEach.animateFrame = originalAnimateFrame;
   })
+}
+
+describe("applying bindings", function () {
+  setupSynchronousFrameAnimation()
 
   it("works with a static list", function () {
     var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
     var list = [1, 2, 3];
     ko.applyBindings(list, target[0])
+    assert.equal($(target).find("li").length, 3)
+  })
+
+  it("works with an observable array", function () {
+    var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+    var list = [1, 2, 3];
+    ko.applyBindings(ko.observableArray(list), target[0])
+    assert.equal($(target).find("li").length, 3)
+  })
+
+  it("works with a plain observable with an array", function () {
+    var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+    var list = [1, 2, 3];
+    ko.applyBindings(ko.observable(list), target[0])
+    assert.equal($(target).find("li").length, 3)
+  })
+
+  it("works with a computed observable", function () {
+    var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+    var list = [1, 2, 3];
+    ko.applyBindings(ko.computed({read: function () { return list }}), target[0])
     assert.equal($(target).find("li").length, 3)
   })
 
@@ -104,59 +130,90 @@ describe("applying bindings", function () {
                                 "Z<!-- ko text: $data-->H2<!--/ko-->");
     $template.remove();
   })
+})
 
+describe("observable array changes", function () {
+  setupSynchronousFrameAnimation();
+  var div, obs, view;
+
+  beforeEach(function () {
+    div = $("<div data-bind='fastForEach: obs'><i data-bind='text: $data'></i></div>");
+    obs = ko.observableArray();
+    view = {obs: obs};
+  })
+
+  it("adds an item to an empty list", function () {
+    ko.applyBindings(view, div[0]);
+    obs(['a'])
+    assert.equal(div.text(), 'a')
+  })
+
+  it("adds an item to the end of a pre-existing list", function () {
+    obs(['a'])
+    ko.applyBindings(view, div[0]);
+    obs.push('b')
+    assert.equal(div.text(), 'ab')
+  })
+
+  it("adds an item to the beginning of a pre-existing list", function () {
+    obs(['a'])
+    ko.applyBindings(view, div[0]);
+    obs.unshift('b')
+    assert.equal(div.text(), 'ba')
+  })
+
+  it("adds an item to the middle of a pre-existing list", function () {
+    obs(['a', 'b'])
+    ko.applyBindings(view, div[0]);
+    obs.splice(1, 0, 'c')
+    assert.equal(div.text(), 'acb')
+  })
+
+  it("deletes the last item", function () {
+    obs(['a'])
+    ko.applyBindings(view, div[0]);
+    obs([])
+    assert.equal(div.text(), '')
+  })
+
+  it("deletes from the beginning", function () {
+    obs(['a', 'b', 'c'])
+    ko.applyBindings(view, div[0]);
+    obs.shift()
+    assert.equal(div.text(), 'bc')
+  })
+
+  it("deletes from the beginning", function () {
+    obs(['a', 'b', 'c'])
+    ko.applyBindings(view, div[0]);
+    obs.pop()
+    assert.equal(div.text(), 'ab')
+  })
+
+  it("combines multiple adds and deletes", function () {
+    obs(['A', 'B', 'C', 'D', 'E', 'F'])
+    ko.applyBindings(view, div[0]);
+    obs(['x', 'B', 'C', 'D', 'z', 'F'])
+    assert.equal(div.text(), 'xBCDzF')
+  })
+
+  it("processes multiple deletes", function () {
+    // Per issue #6
+    ko.applyBindings(view, div[0]);
+    obs([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    assert.equal(div.text(), '0123456789')
+    obs([0, 1, 2, 3, 4])
+    assert.equal(div.text(), '01234')
+  })
+
+  it("processes numerous changes", function () {
+    ko.applyBindings(view, div[0]);
+    obs([5, 6, 7, 8, 9])
+    obs([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    assert.equal(div.text(), '0123456789')
+    obs(['a', 'b', 'c'])
+    assert.equal(div.text(), 'abc')
+  })
 })
 
 mocha.run();
-
-
-//
-//    Some performance tests
-//
-
-var xarrSize = 200;
-
-
-function createView() {
-  var i = xarrSize;
-  var view = { xarr: ko.observableArray() };
-  while(i--) { view.xarr.push(i); }
-  return view;
-}
-
-
-function report(reportingNode, text, time) {
-  var p = document.createElement("p");
-  p.innerText = text + " — " + time.toFixed(1) + "ms";
-  reportingNode.appendChild(p);
-}
-
-// Making the changes synchronous so the time comparison works better.
-// The requestAnimationFrame should only speed things up by eliminating
-// reflows.
-FastForEach.animateFrame = function(frame) { frame() };
-
-function render_test(target, resultNode) {
-  var startTime = performance.now();
-  var view = createView();
-  // Bind
-  ko.applyBindings(view, target);
-  
-  report(resultNode, "Bind ", (performance.now() - startTime))
-
-  // Deletes
-  startTime = performance.now()
-  var i = Math.floor(xarrSize / 3);
-  // Remove every third item.
-  while (i--) view.xarr.shift();
-  report(resultNode, "Remove 1/3rd ", (performance.now() - startTime))
-
-  // Adds to middle
-  startTime = performance.now();
-  var i = Math.floor(xarrSize / 3);
-  while (i--) view.xarr.unshift("+" + i)
-  report(resultNode, "Add 1/3rd ", (performance.now() - startTime))
-}
-
-// render_test(document.getElementById("Ffixture"), document.getElementById("FfR"));
-// render_test(document.getElementById("Ofixture"), document.getElementById("OfR"));

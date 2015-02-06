@@ -7,7 +7,7 @@
     <script src='http://localhost:4055/livereload.js'></script>
     <style>
       body {
-        padding: 50px;
+        padding: 30px;
       }
       * {
         box-sizing: border-box;
@@ -25,9 +25,6 @@
         max-height: 250px;
         background-color: #CCC;
       }
-      li {
-        border-right: 1px solid blue;        
-      }
       code {
         font-weight: bold;
         font-family: monospace;
@@ -36,28 +33,8 @@
   </head>
   <body>
     <h1>Knockout FastForEach Runner</h1>
-    <h2><a href='?'>Run tests</a></h2>
+    <h2><a href='?'>All tests</a></h2>
     <div id='mocha'></div>
-    
-    <div id='Ffixture'>
-      <h3>Fast Foreach</h3>
-      <ul data-bind='fastForEach: xarr'>
-        <li>
-          <b>Hello.</b> <code data-bind="text: $data"></code>.
-        </li>
-      </ul>
-      <div id='FfR'></div>
-    </div>
-
-    <div id='Ofixture'>
-      <h3>Original Foreach</h3>
-      <ul data-bind='foreach: xarr'>
-        <li>
-          <b>Hello.</b> <code data-bind="text: $data"></code>.
-        </li>
-      </ul>
-      <div id='OfR'></div>
-    </div>
 
     <script src='../node_modules/jquery/dist/jquery.js'></script>
     <script src='../node_modules/chai/chai.js'></script>
