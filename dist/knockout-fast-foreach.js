@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.2 (2015-02-06T22:30:30.709Z)
+  Knockout Fast Foreach v0.2.3 (2015-02-06T22:38:50.836Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -133,8 +133,10 @@ FastForEach.prototype.processQueue = function () {
   var indexesToDelete = [];
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     if (changeItem.status === 'added') {
-      self.processDeletes(indexesToDelete);
-      indexesToDelete = [];
+      if (indexesToDelete.length !== 0) {
+        self.processDeletes(indexesToDelete);
+        indexesToDelete = [];
+      }
     } else {
       indexesToDelete.push(changeItem.index);
     }

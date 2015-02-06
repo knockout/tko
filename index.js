@@ -117,8 +117,10 @@ FastForEach.prototype.processQueue = function () {
   var indexesToDelete = [];
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     if (changeItem.status === 'added') {
-      self.processDeletes(indexesToDelete);
-      indexesToDelete = [];
+      if (indexesToDelete.length !== 0) {
+        self.processDeletes(indexesToDelete);
+        indexesToDelete = [];
+      }
     } else {
       indexesToDelete.push(changeItem.index);
     }
