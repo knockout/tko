@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.4 (2015-02-07T13:16:03.029Z)
+  Knockout Fast Foreach v0.2.5 (2015-02-07T14:25:30.043Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -52,6 +52,15 @@ function makeTemplateNode(sourceNode) {
   return container;
 }
 
+// Mimic a KO change item 'add'
+function valueToChangeAddItem(value, index) {
+  return {
+    status: 'added',
+    value: value,
+    index: index
+  };
+}
+
 function FastForEach(spec) {
   var self = this;
   this.element = spec.element;
@@ -70,16 +79,9 @@ function FastForEach(spec) {
   ko.virtualElements.emptyNode(this.element);
 
   // Prime content
-  var primeIdx = 0;
-  ko.utils.arrayForEach(ko.unwrap(this.data), function (item) {
-    self.changeQueue.push({
-      index: primeIdx++,
-      status: "added",
-      value: item
-    });
-  });
-  if (primeIdx > 0) {
-    this.registerChange();
+  var primeData = ko.unwrap(this.data);
+  if (primeData.map) {
+    this.onArrayChange(primeData.map(valueToChangeAddItem));
   }
 
   // Watch for changes
@@ -99,12 +101,15 @@ FastForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestA
 
 
 FastForEach.prototype.dispose = function () {
-  this.changeSubs.dispose();
+  if (this.changSubs) {
+    this.changeSubs.dispose();
+  }
 };
 
 
 // If the array changes we register the change.
 FastForEach.prototype.onArrayChange = function (changeSet) {
+  var self = this;
   var changeMap = {
     added: [],
     deleted: [],
@@ -114,13 +119,7 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
   });
   this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
   this.changeQueue.push.apply(this.changeQueue, changeMap.added);
-  this.registerChange();
-};
-
-
-// Once a change is registered, the ticking count-down starts for the processQueue.
-FastForEach.prototype.registerChange = function () {
-  var self = this;
+  // Once a change is registered, the ticking count-down starts for the processQueue.
   if (!this.rendering_queued) {
     this.rendering_queued = true;
     FastForEach.animateFrame.call(window, function () { self.processQueue(); });
