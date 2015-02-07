@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.3 (2015-02-06T22:38:50.836Z)
+  Knockout Fast Foreach v0.2.4 (2015-02-07T13:16:03.029Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -63,6 +63,7 @@ function FastForEach(spec) {
   );
   this.changeQueue = [];
   this.lastNodesList = [];
+  this.indexesToDelete = [];
   this.rendering_queued = false;
 
   // Remove existing content.
@@ -130,19 +131,10 @@ FastForEach.prototype.registerChange = function () {
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 FastForEach.prototype.processQueue = function () {
   var self = this;
-  var indexesToDelete = [];
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
-    if (changeItem.status === 'added') {
-      if (indexesToDelete.length !== 0) {
-        self.processDeletes(indexesToDelete);
-        indexesToDelete = [];
-      }
-    } else {
-      indexesToDelete.push(changeItem.index);
-    }
     self[changeItem.status](changeItem.index, changeItem.value);
   });
-  self.processDeletes(indexesToDelete);
+  this.clearDeletedIndexes(this.indexesToDelete);
   this.changeQueue = [];
   this.rendering_queued = false;
 };
@@ -154,6 +146,10 @@ FastForEach.prototype.added = function (index, value) {
   var referenceElement = this.lastNodesList[index - 1] || null;
   var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
+
+  if (this.indexesToDelete.length !== 0) {
+    this.clearDeletedIndexes(this.indexesToDelete);
+  }
   
   this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
   ko.applyBindingsToDescendants(childContext, templateClone);
@@ -176,16 +172,18 @@ FastForEach.prototype.deleted = function (index, value) {
   while ((ptr = ptr.nextSibling) && ptr !== lastNode) {
     this.element.removeChild(ptr);
   }
+  this.indexesToDelete.push(index);
 };
 
 
 // We batch our deletion of item indexes in our parallel array.
 // See brianmhunt/knockout-fast-foreach#6/#8
-FastForEach.prototype.processDeletes = function (indexesToDelete) {
+FastForEach.prototype.clearDeletedIndexes = function () {
   var self = this;
-  ko.utils.arrayForEach(indexesToDelete, function (index) {
+  ko.utils.arrayForEach(this.indexesToDelete, function (index) {
     self.lastNodesList.splice(index, 1);  
   });
+  this.indexesToDelete = [];
 };
 
 
