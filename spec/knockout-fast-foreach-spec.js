@@ -68,7 +68,7 @@ describe("applying bindings", function () {
     ko.applyBindings(list, target[0])
     assert.equal($(target).html(), '<li><em data-bind="text: $data">a</em></li>' +
                                    '<li><em data-bind="text: $data">b</em></li>' +
-                                   '<li><em data-bind="text: $data">c</em></li>')    
+                                   '<li><em data-bind="text: $data">c</em></li>')
   })
 
   it("works with virtual elements", function () {
@@ -85,7 +85,7 @@ describe("applying bindings", function () {
     var target = $("<ul data-bind='fastForEach: $data'><!-- ko text: $data -->Z<!-- /ko --></ul>");
     var list = ['E', 'V'];
     ko.applyBindings(list, target[0])
-    assert.equal(target.html(), '<!-- ko text: $data -->E<!-- /ko -->' + 
+    assert.equal(target.html(), '<!-- ko text: $data -->E<!-- /ko -->' +
                                 '<!-- ko text: $data -->V<!-- /ko -->')
   })
 
@@ -93,7 +93,7 @@ describe("applying bindings", function () {
     var target = $("<ul data-bind='fastForEach: $data'>Q<!-- ko text: $data -->Z2<!-- /ko -->R</ul>");
     var list = ['E2', 'V2'];
     ko.applyBindings(list, target[0])
-    assert.equal(target.html(), 'Q<!-- ko text: $data -->E2<!-- /ko -->R' + 
+    assert.equal(target.html(), 'Q<!-- ko text: $data -->E2<!-- /ko -->R' +
                                 'Q<!-- ko text: $data -->V2<!-- /ko -->R')
   })
 
@@ -176,6 +176,19 @@ describe("observable array changes", function () {
     assert.equal(div.text(), '')
   })
 
+  it("deletes text nodes", function () {
+    div = $("<div data-bind='fastForEach: obs'>x<i data-bind='text: $data'></i>y</div>");
+    ko.applyBindings(view, div[0]);
+    obs(['a', 'b', 'c'])
+    assert.equal(div.text(), 'xayxbyxcy')
+    obs(['a', 'c'])
+    assert.equal(div.text(), 'xayxcy')
+    obs(['a'])
+    assert.equal(div.text(), 'xay')
+    obs([])
+    assert.equal(div.text(), '')
+  })
+
   it("deletes from the beginning", function () {
     obs(['a', 'b', 'c'])
     ko.applyBindings(view, div[0]);
@@ -214,6 +227,20 @@ describe("observable array changes", function () {
     obs(['a', 'b', 'c'])
     assert.equal(div.text(), 'abc')
   })
+
+  it("accepts changes via a computed observable", function() {
+    var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+    var toggle = ko.observable(true);
+    var list1 = [1, 2, 3];
+    var list2 = [1, 2, 3, 4, 5, 6];
+    ko.applyBindings(ko.computed({
+      read: function() { return toggle() ? list1 : list2; }
+    }), target[0])
+    assert.equal(target.text(), "123")
+    toggle(false)
+    assert.equal(target.text(), "123456")
+  })
+
 })
 
 mocha.run();

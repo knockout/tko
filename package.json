@@ -1,6 +1,6 @@
 {
   "name": "knockout-fast-foreach",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Knockout Fast Foreach",
   "main": "index.js",
   "scripts": {
