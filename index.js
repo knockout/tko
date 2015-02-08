@@ -1,9 +1,10 @@
 // index.js
 // --------
 // Fast For Each
-// 
+//
 // Employing sound techniques to make a faster Knockout foreach binding.
 // --------
+"use strict";
 
 //      Utilities
 
@@ -28,7 +29,7 @@ function makeTemplateNode(sourceNode) {
     parentNode = sourceNode;
   }
   ko.utils.arrayForEach(ko.virtualElements.childNodes(parentNode), function (child) {
-    // FIXME - This cloneNode could be expensive; we may prefer to iterate over the 
+    // FIXME - This cloneNode could be expensive; we may prefer to iterate over the
     // parentNode children in reverse (so as not to foul the indexes as childNodes are
     // removed from parentNode when inserted into the container)
     if (child) container.insertBefore(child.cloneNode(true), null);
@@ -101,10 +102,13 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
   ko.utils.arrayForEach(changeSet, function(changeItem) {
     changeMap[changeItem.status].push(changeItem);
   });
-  this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
+  if (changeMap.deleted.length > 0) {
+    this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
+    this.changeQueue.push({status: 'clearDeletedIndexes'})
+  }
   this.changeQueue.push.apply(this.changeQueue, changeMap.added);
   // Once a change is registered, the ticking count-down starts for the processQueue.
-  if (!this.rendering_queued) {
+  if (this.changeQueue.length > 0 && !this.rendering_queued) {
     this.rendering_queued = true;
     FastForEach.animateFrame.call(window, function () { self.processQueue(); });
   }
@@ -117,7 +121,6 @@ FastForEach.prototype.processQueue = function () {
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     self[changeItem.status](changeItem.index, changeItem.value);
   });
-  this.clearDeletedIndexes(this.indexesToDelete);
   this.changeQueue = [];
   this.rendering_queued = false;
 };
@@ -130,10 +133,6 @@ FastForEach.prototype.added = function (index, value) {
   var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
 
-  if (this.indexesToDelete.length !== 0) {
-    this.clearDeletedIndexes(this.indexesToDelete);
-  }
-  
   this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
   ko.applyBindingsToDescendants(childContext, templateClone);
 
@@ -150,11 +149,13 @@ FastForEach.prototype.added = function (index, value) {
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (index, value) {
   var ptr = this.lastNodesList[index],
-      lastNode = this.lastNodesList[index + 1];
-  this.element.removeChild(ptr);
-  while ((ptr = ptr.nextSibling) && ptr !== lastNode) {
-    this.element.removeChild(ptr);
-  }
+      lastNode = this.lastNodesList[index - 1];
+  do {
+    ptr = ptr.previousSibling;
+    this.element.removeChild((ptr && ptr.nextSibling) || this.element.firstChild)
+  } while (ptr && ptr !== lastNode);
+  // Any successor items will now skip this deleted element.
+  this.lastNodesList[index] = this.lastNodesList[index - 1];
   this.indexesToDelete.push(index);
 };
 
@@ -164,7 +165,7 @@ FastForEach.prototype.deleted = function (index, value) {
 FastForEach.prototype.clearDeletedIndexes = function () {
   var self = this;
   ko.utils.arrayForEach(this.indexesToDelete, function (index) {
-    self.lastNodesList.splice(index, 1);  
+    self.lastNodesList.splice(index, 1);
   });
   this.indexesToDelete = [];
 };
@@ -188,7 +189,7 @@ ko.bindingHandlers.fastForEach = {
     } else {
       ffe = new FastForEach({
         element: element,
-        data: value,
+        data: ko.unwrap(context.$rawData) === value ? context.$rawData : value,
         $context: context
       });
     }
@@ -203,4 +204,3 @@ ko.bindingHandlers.fastForEach = {
 };
 
 ko.virtualElements.allowedBindings.fastForEach = true;
-
