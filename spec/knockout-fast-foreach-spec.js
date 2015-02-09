@@ -215,13 +215,26 @@ describe("observable array changes", function () {
     ko.applyBindings(view, div[0]);
     obs([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     assert.equal(div.text(), '0123456789')
+    obs([1, 2, 3, 4, 5, 6, 7, 8])
+    assert.equal(div.text(), '12345678')
+    obs([1, 2, 3, 6, 7, 8])
+    assert.equal(div.text(), '123678')
     obs([0, 1, 2, 3, 4])
     assert.equal(div.text(), '01234')
+    obs([1, 2, 3, 4])
+    assert.equal(div.text(), '1234')
+    obs([3, 4])
+    assert.equal(div.text(), '34')
+    obs([3])
+    assert.equal(div.text(), '3')
+    obs([])
+    assert.equal(div.text(), '')
   })
 
   it("processes numerous changes", function () {
     ko.applyBindings(view, div[0]);
     obs([5, 6, 7, 8, 9])
+    assert.equal(div.text(), '56789')
     obs([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     assert.equal(div.text(), '0123456789')
     obs(['a', 'b', 'c'])
