@@ -125,6 +125,7 @@ FastForEach.prototype.processQueue = function () {
     // console.log("  ==> ", JSON.stringify($(self.element).text()))
   });
   this.rendering_queued = false;
+  // Callback so folks can do things.
   if (typeof this.afterQueueFlush === 'function') {
     this.afterQueueFlush(this.changeQueue);
   }

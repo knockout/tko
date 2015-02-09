@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.6 (2015-02-09T00:53:41.102Z)
+  Knockout Fast Foreach v0.2.7 (2015-02-09T01:33:29.283Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -71,6 +71,7 @@ function FastForEach(spec) {
   this.templateNode = makeTemplateNode(
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
+  this.afterQueueFlush = spec.afterQueueFlush;
   this.changeQueue = [];
   this.lastNodesList = [];
   this.indexesToDelete = [];
@@ -135,10 +136,16 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
 FastForEach.prototype.processQueue = function () {
   var self = this;
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
+    // console.log(self.data(), "CI", JSON.stringify(changeItem, null, 2), JSON.stringify($(self.element).text()))
     self[changeItem.status](changeItem.index, changeItem.value);
+    // console.log("  ==> ", JSON.stringify($(self.element).text()))
   });
-  this.changeQueue = [];
   this.rendering_queued = false;
+  // Callback so folks can do things.
+  if (typeof this.afterQueueFlush === 'function') {
+    this.afterQueueFlush(this.changeQueue);
+  }
+  this.changeQueue = [];
 };
 
 
@@ -170,7 +177,8 @@ FastForEach.prototype.deleted = function (index, value) {
     ptr = ptr.previousSibling;
     this.element.removeChild((ptr && ptr.nextSibling) || this.element.firstChild)
   } while (ptr && ptr !== lastNode);
-  // Any successor items will now skip this deleted element.
+  // The "last node" in the DOM from which we begin our delets of the next adjacent node is
+  // now the sibling that preceded the first node of this item. 
   this.lastNodesList[index] = this.lastNodesList[index - 1];
   this.indexesToDelete.push(index);
 };
@@ -179,10 +187,11 @@ FastForEach.prototype.deleted = function (index, value) {
 // We batch our deletion of item indexes in our parallel array.
 // See brianmhunt/knockout-fast-foreach#6/#8
 FastForEach.prototype.clearDeletedIndexes = function () {
-  var self = this;
-  ko.utils.arrayForEach(this.indexesToDelete, function (index) {
-    self.lastNodesList.splice(index, 1);
-  });
+  // We iterate in reverse on the presumption (following the unit tests) that KO's diff engine
+  // processes diffs (esp. deletes) monotonically ascending i.e. from index 0 -> N.
+  for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
+    this.lastNodesList.splice(this.indexesToDelete[i], 1);
+  }
   this.indexesToDelete = [];
 };
 
