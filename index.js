@@ -55,6 +55,7 @@ function FastForEach(spec) {
   this.templateNode = makeTemplateNode(
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
+  this.afterQueueFlush = spec.afterQueueFlush;
   this.changeQueue = [];
   this.lastNodesList = [];
   this.indexesToDelete = [];
@@ -123,8 +124,11 @@ FastForEach.prototype.processQueue = function () {
     self[changeItem.status](changeItem.index, changeItem.value);
     // console.log("  ==> ", JSON.stringify($(self.element).text()))
   });
-  this.changeQueue = [];
   this.rendering_queued = false;
+  if (typeof this.afterQueueFlush === 'function') {
+    this.afterQueueFlush(this.changeQueue);
+  }
+  this.changeQueue = [];
 };
 
 
