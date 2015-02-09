@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.7 (2015-02-09T01:33:29.283Z)
+  Knockout Fast Foreach v0.2.7 (2015-02-09T02:37:35.547Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
