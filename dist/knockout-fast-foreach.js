@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.7 (2015-02-09T14:42:50.288Z)
+  Knockout Fast Foreach v0.2.8 (2015-02-10T13:56:41.447Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -65,6 +65,8 @@ function valueToChangeAddItem(value, index) {
 function FastForEach(spec) {
   var self = this;
   this.element = spec.element;
+  this.container = ko.virtualElements.hasBindingValue(this.element) ?
+                   this.element.parentNode : this.element;
   this.$context = spec.$context;
   this.data = spec.data;
   this.as = spec.as;
@@ -172,10 +174,12 @@ FastForEach.prototype.added = function (index, value) {
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (index, value) {
   var ptr = this.lastNodesList[index],
-      lastNode = this.lastNodesList[index - 1];
+      // We use this.element because that will be the last previous node
+      // for virtual element lists.
+      lastNode = this.lastNodesList[index - 1] || this.element;
   do {
     ptr = ptr.previousSibling;
-    this.element.removeChild((ptr && ptr.nextSibling) || this.element.firstChild)
+    this.container.removeChild((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
   } while (ptr && ptr !== lastNode);
   // The "last node" in the DOM from which we begin our delets of the next adjacent node is
   // now the sibling that preceded the first node of this item. 

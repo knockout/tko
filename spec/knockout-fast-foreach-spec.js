@@ -189,6 +189,34 @@ describe("observable array changes", function () {
     assert.equal(div.text(), '')
   })
 
+  it("deletes from virtual elements", function () {
+    div = $("<div>")
+    div.append(document.createComment("ko fastForEach: obs"))
+    div.append($("<i data-bind='text: $data'></i>")[0])
+    div.append(document.createComment("/ko"))
+    ko.applyBindings(view, div[0]);
+    obs(['a', 'b', 'c'])
+    assert.equal(div.text(), 'abc')
+    obs(['a', 'c'])
+    assert.equal(div.text(), 'ac')
+    obs(['a'])
+    assert.equal(div.text(), 'a')
+    obs([])
+    assert.equal(div.text(), '')
+    obs(['a', 'b'])
+    assert.equal(div.text(), 'ab')
+    obs([])
+    assert.equal(div.text(), '')
+    obs(['a', 'b', 'c'])
+    assert.equal(div.text(), 'abc')
+    obs(['a'])
+    assert.equal(div.text(), 'a')
+    obs(['a', 'b', 'c'])
+    assert.equal(div.text(), 'abc')
+    obs(['c'])
+    assert.equal(div.text(), 'c')
+  })
+
   it("deletes from the beginning", function () {
     obs(['a', 'b', 'c'])
     ko.applyBindings(view, div[0]);
