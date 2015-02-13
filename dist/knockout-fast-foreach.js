@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.2.8 (2015-02-10T13:56:41.447Z)
+  Knockout Fast Foreach v0.3.0 (2015-02-13T01:53:46.069Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -28,6 +28,14 @@
 function isPlainObject(o) {
   return !!o && typeof o === 'object' && o.constructor === Object;
 }
+
+// From knockout/src/virtualElements.js
+var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
+var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
+function isVirtualNode(node) {
+  return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
+}
+
 
 // Get a copy of the (possibly virtual) child nodes of the given element,
 // put them into a container, then empty the given node.
@@ -65,7 +73,7 @@ function valueToChangeAddItem(value, index) {
 function FastForEach(spec) {
   var self = this;
   this.element = spec.element;
-  this.container = ko.virtualElements.hasBindingValue(this.element) ?
+  this.container = isVirtualNode(this.element) ?
                    this.element.parentNode : this.element;
   this.$context = spec.$context;
   this.data = spec.data;
