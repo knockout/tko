@@ -13,6 +13,14 @@ function isPlainObject(o) {
   return !!o && typeof o === 'object' && o.constructor === Object;
 }
 
+// From knockout/src/virtualElements.js
+var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
+var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
+function isVirtualNode(node) {
+  return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
+}
+
+
 // Get a copy of the (possibly virtual) child nodes of the given element,
 // put them into a container, then empty the given node.
 function makeTemplateNode(sourceNode) {
@@ -49,7 +57,7 @@ function valueToChangeAddItem(value, index) {
 function FastForEach(spec) {
   var self = this;
   this.element = spec.element;
-  this.container = ko.virtualElements.hasBindingValue(this.element) ?
+  this.container = isVirtualNode(this.element) ?
                    this.element.parentNode : this.element;
   this.$context = spec.$context;
   this.data = spec.data;
