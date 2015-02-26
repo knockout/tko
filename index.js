@@ -171,7 +171,7 @@ FastForEach.prototype.deleted = function (index, value) {
       lastNode = this.lastNodesList[index - 1] || this.element;
   do {
     ptr = ptr.previousSibling;
-    this.container.removeChild((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
+    ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
   } while (ptr && ptr !== lastNode);
   // The "last node" in the DOM from which we begin our delets of the next adjacent node is
   // now the sibling that preceded the first node of this item. 
