@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.3.0 (2015-02-13T01:53:46.069Z)
+  Knockout Fast Foreach v0.3.1 (2015-03-05T13:28:02.858Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -78,6 +78,7 @@ function FastForEach(spec) {
   this.$context = spec.$context;
   this.data = spec.data;
   this.as = spec.as;
+  this.noContext = spec.noContext;
   this.templateNode = makeTemplateNode(
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
@@ -161,10 +162,18 @@ FastForEach.prototype.processQueue = function () {
 
 // Process a changeItem with {status: 'added', ...}
 FastForEach.prototype.added = function (index, value) {
-  var childContext = this.$context.createChildContext(value, this.as || null);
   var referenceElement = this.lastNodesList[index - 1] || null;
   var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
+  var childContext;
+ 
+  if(this.noContext) {
+    childContext = this.$context.extend({
+      '$item' : value
+    });
+  } else {
+    childContext = this.$context.createChildContext(value, this.as || null);
+  }
 
   this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
   ko.applyBindingsToDescendants(childContext, templateClone);
@@ -187,7 +196,7 @@ FastForEach.prototype.deleted = function (index, value) {
       lastNode = this.lastNodesList[index - 1] || this.element;
   do {
     ptr = ptr.previousSibling;
-    this.container.removeChild((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
+    ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
   } while (ptr && ptr !== lastNode);
   // The "last node" in the DOM from which we begin our delets of the next adjacent node is
   // now the sibling that preceded the first node of this item. 
