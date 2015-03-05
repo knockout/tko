@@ -62,6 +62,7 @@ function FastForEach(spec) {
   this.$context = spec.$context;
   this.data = spec.data;
   this.as = spec.as;
+  this.noContext = spec.noContext;
   this.templateNode = makeTemplateNode(
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
@@ -145,10 +146,18 @@ FastForEach.prototype.processQueue = function () {
 
 // Process a changeItem with {status: 'added', ...}
 FastForEach.prototype.added = function (index, value) {
-  var childContext = this.$context.createChildContext(value, this.as || null);
   var referenceElement = this.lastNodesList[index - 1] || null;
   var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
+  var childContext;
+ 
+  if(this.noContext) {
+    childContext = this.$context.extend({
+      '$item' : value
+    });
+  } else {
+    childContext = this.$context.createChildContext(value, this.as || null);
+  }
 
   this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
   ko.applyBindingsToDescendants(childContext, templateClone);
