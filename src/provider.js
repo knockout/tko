@@ -30,7 +30,7 @@ function nodeHasBindings(node) {
     var value;
     if (node.nodeType === node.ELEMENT_NODE) {
         return node.getAttribute(this.attribute) ||
-            ko.components.getComponentNameForNode(node);
+            (ko.components && ko.components.getComponentNameForNode(node));
     } else if (node.nodeType === node.COMMENT_NODE) {
         if (this.noVirtualElements) {
             return false;
@@ -82,7 +82,7 @@ function getBindingAccessors(node, context) {
         parser = new Parser(node, context, this.globals),
         sbind_string = this.getBindingsString(node);
 
-    if (node.nodeType === node.ELEMENT_NODE) {
+    if (node.nodeType === node.ELEMENT_NODE && ko.components) {
         component_name = ko.components.getComponentNameForNode(node);
     }
 

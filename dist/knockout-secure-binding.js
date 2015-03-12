@@ -1,6 +1,6 @@
-/*! knockout-secure-binding - v0.5.1 - 2014-10-07
+/*! knockout-secure-binding - v0.5.2 - 2015-03-12
  *  https://github.com/brianmhunt/knockout-secure-binding
- *  Copyright (c) 2013 - 2014 Brian M Hunt; License: MIT */
+ *  Copyright (c) 2013 - 2015 Brian M Hunt; License: MIT */
 ;(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {
@@ -952,7 +952,7 @@ function nodeHasBindings(node) {
     var value;
     if (node.nodeType === node.ELEMENT_NODE) {
         return node.getAttribute(this.attribute) ||
-            ko.components.getComponentNameForNode(node);
+            (ko.components && ko.components.getComponentNameForNode(node));
     } else if (node.nodeType === node.COMMENT_NODE) {
         if (this.noVirtualElements) {
             return false;
@@ -1004,7 +1004,7 @@ function getBindingAccessors(node, context) {
         parser = new Parser(node, context, this.globals),
         sbind_string = this.getBindingsString(node);
 
-    if (node.nodeType === node.ELEMENT_NODE) {
+    if (node.nodeType === node.ELEMENT_NODE && ko.components) {
         component_name = ko.components.getComponentNameForNode(node);
     }
 
