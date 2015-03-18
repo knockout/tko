@@ -67,6 +67,7 @@ function FastForEach(spec) {
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
   this.afterQueueFlush = spec.afterQueueFlush;
+  this.beforeQueueFlush = spec.beforeQueueFlush;
   this.changeQueue = [];
   this.lastNodesList = [];
   this.indexesToDelete = [];
@@ -130,6 +131,12 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 FastForEach.prototype.processQueue = function () {
   var self = this;
+
+  // Callback so folks can do things before the queue flush.
+  if (typeof this.beforeQueueFlush === 'function') {
+    this.beforeQueueFlush(this.changeQueue);
+  }
+
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     // console.log(self.data(), "CI", JSON.stringify(changeItem, null, 2), JSON.stringify($(self.element).text()))
     self[changeItem.status](changeItem.index, changeItem.value);
