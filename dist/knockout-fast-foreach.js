@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.3.1 (2015-03-18T15:15:11.505Z)
+  Knockout Fast Foreach v0.3.1 (2015-05-04T16:59:40.256Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -11,7 +11,7 @@
   } else if (typeof exports === 'object') {
     module.exports = factory(require('knockout'));
   } else {
-    root.KnockoutElse = factory(root.ko);
+    root.KnockoutFastForeach = factory(root.ko);
   }
 }(this, function (ko) {
 // index.js
