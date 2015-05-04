@@ -12,7 +12,7 @@ header: |
     } else if (typeof exports === 'object') {
       module.exports = factory(require('knockout'));
     } else {
-      root.KnockoutElse = factory(root.ko);
+      root.KnockoutFastForeach = factory(root.ko);
     }
   }(this, function (ko) {
 
