@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.3.2 (2015-07-14T12:11:06.425Z)
+  Knockout Fast Foreach v0.3.2 (2015-07-14T13:09:43.300Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -102,6 +102,14 @@ function valueToChangeAddItem(value, index) {
   };
 }
 
+function isAdditionAdjacentToLast(changeIndex, arrayChanges) {
+  return changeIndex > 0 &&
+    changeIndex < arrayChanges.length &&
+    arrayChanges[changeIndex].status === "added" &&
+    arrayChanges[changeIndex - 1].status === "added" &&
+    arrayChanges[changeIndex - 1].index === arrayChanges[changeIndex].index - 1;
+}
+
 function FastForEach(spec) {
   var self = this;
   this.element = spec.element;
@@ -163,7 +171,7 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
   for (var i = 0, len = changeSet.length; i < len; i++) {
     // the change is appended to a last change info object when both are 'added' and have indexes next to each other
     // here I presume that ko is sending changes in monotonic order (in index variable) which happens to be true, tested with push and splice with multiple pushed values
-    if (i > 0 && changeSet[i].status === "added" && changeSet[i - 1].status === "added" && changeSet[i - 1].index === changeSet[i].index - 1) {
+    if (isAdditionAdjacentToLast(i, changeSet)) {
       var lastAdded = changeMap.added[changeMap.added.length - 1];
       if (!lastAdded.isBatch) {
         lastAdded.value = [lastAdded.value];
@@ -304,5 +312,4 @@ ko.bindingHandlers.fastForEach = {
   FastForEach: FastForEach,
 };
 
-ko.virtualElements.allowedBindings.fastForEach = true;
-}));
+ko.virtualElements.allowedBindings.fastForEach = true;}));
