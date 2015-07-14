@@ -16,6 +16,7 @@ function isPlainObject(o) {
 // From knockout/src/virtualElements.js
 var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
 var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
+var supportsDocumentFragment = document && typeof document.createDocumentFragment === "function";
 function isVirtualNode(node) {
   return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
 }
@@ -43,6 +44,37 @@ function makeTemplateNode(sourceNode) {
     if (child) container.insertBefore(child.cloneNode(true), null);
   });
   return container;
+}
+
+function insertAllAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode) {
+  // poor man's node and array check, should be enough for this
+  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined")
+    throw new Error("Expected a single node or a node array");
+
+  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
+    ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
+    return;
+  }
+
+  if (nodeOrNodeArrayToInsert.length === 1) {
+    ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert[0], insertAfterNode);
+    return;
+  }
+
+  if (supportsDocumentFragment) {
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i != nodeOrNodeArrayToInsert.length; ++i)
+      frag.appendChild(nodeOrNodeArrayToInsert[i]);
+    ko.virtualElements.insertAfter(containerNode, frag, insertAfterNode);
+  } else {
+    // Nodes are inserted in reverse order - pushed down immediately after
+    // the last node for the previous item or as the first node of element.
+    for (var i = nodeOrNodeArrayToInsert.length - 1; i >= 0; --i) {
+      var child = nodeOrNodeArrayToInsert[i];
+      if (!child) return;
+      ko.virtualElements.insertAfter(containerNode, child, insertAfterNode);
+    }
+  }
 }
 
 // Mimic a KO change item 'add'
@@ -112,9 +144,19 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
     added: [],
     deleted: [],
   };
-  ko.utils.arrayForEach(changeSet, function(changeItem) {
-    changeMap[changeItem.status].push(changeItem);
-  });
+  for (var i = 0, len = changeSet.length; i < len; i++) {
+    // the change is appended to a last change info object when both are 'added' and have indexes next to each other
+    // here I presume that ko is sending changes in monotonic order (in index variable) which happens to be true, tested with push and splice with multiple pushed values
+    if (i > 0 && changeSet[i].status === "added" && changeSet[i - 1].status === "added" && changeSet[i - 1].index === changeSet[i].index - 1) {
+      var lastAdded = changeMap.added[changeMap.added.length - 1];
+      if (!lastAdded.isBatch) {
+        lastAdded.value = [lastAdded.value];
+        lastAdded.isBatch = true;
+      }
+      lastAdded.value.push(changeSet[i].value);
+    } else
+      changeMap[changeSet[i].status].push(changeSet[i]);
+  }
   if (changeMap.deleted.length > 0) {
     this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
     this.changeQueue.push({status: 'clearDeletedIndexes'})
@@ -139,7 +181,7 @@ FastForEach.prototype.processQueue = function () {
 
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
     // console.log(self.data(), "CI", JSON.stringify(changeItem, null, 2), JSON.stringify($(self.element).text()))
-    self[changeItem.status](changeItem.index, changeItem.value);
+    self[changeItem.status](changeItem);
     // console.log("  ==> ", JSON.stringify($(self.element).text()))
   });
   this.rendering_queued = false;
@@ -152,35 +194,41 @@ FastForEach.prototype.processQueue = function () {
 
 
 // Process a changeItem with {status: 'added', ...}
-FastForEach.prototype.added = function (index, value) {
+FastForEach.prototype.added = function (changeItem) {
+  var index = changeItem.index;
+  var valuesToAdd = changeItem.isBatch ? changeItem.value : [changeItem.value];
   var referenceElement = this.lastNodesList[index - 1] || null;
-  var templateClone = this.templateNode.cloneNode(true);
-  var childNodes = ko.virtualElements.childNodes(templateClone);
-  var childContext;
- 
-  if(this.noContext) {
-    childContext = this.$context.extend({
-      '$item' : value
-    });
-  } else {
-    childContext = this.$context.createChildContext(value, this.as || null);
+  // gather all childnodes for a possible batch insertion
+  var allChildNodes = [];
+
+  for (var i = 0, len = valuesToAdd.length; i < len; ++i) {
+    var templateClone = this.templateNode.cloneNode(true);
+    var childContext;
+
+    if (this.noContext) {
+      childContext = this.$context.extend({
+        '$item': valuesToAdd[i]
+      });
+    } else {
+      childContext = this.$context.createChildContext(valuesToAdd[i], this.as || null);
+    }
+
+    // apply bindings first, and then process child nodes, because bindings can add childnodes
+    ko.applyBindingsToDescendants(childContext, templateClone);
+
+    var childNodes = ko.virtualElements.childNodes(templateClone);
+    allChildNodes.push.apply(allChildNodes, childNodes);
+    this.lastNodesList.splice(index + i, 0, childNodes[childNodes.length - 1]);
   }
 
-  this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
-  ko.applyBindingsToDescendants(childContext, templateClone);
-
-  // Nodes are inserted in reverse order - pushed down immediately after
-  // the last node for the previous item or as the first node of element.
-  for (var i = childNodes.length - 1; i >= 0; --i) {
-    var child = childNodes[i];
-    if (!child) return;
-    ko.virtualElements.insertAfter(this.element, child, referenceElement);
-  }
+  insertAllAfter(this.element, allChildNodes, referenceElement);
 };
 
 
 // Process a changeItem with {status: 'deleted', ...}
-FastForEach.prototype.deleted = function (index, value) {
+FastForEach.prototype.deleted = function (changeItem) {
+  var index = changeItem.index;
+  var value = changeItem.value;
   var ptr = this.lastNodesList[index],
       // We use this.element because that will be the last previous node
       // for virtual element lists.
