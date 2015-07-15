@@ -4,7 +4,6 @@
 //
 // Employing sound techniques to make a faster Knockout foreach binding.
 // --------
-"use strict";
 
 //      Utilities
 
@@ -18,7 +17,7 @@ var commentNodesHaveTextProperty = document && document.createComment("test").te
 var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
 var supportsDocumentFragment = document && typeof document.createDocumentFragment === "function";
 function isVirtualNode(node) {
-  return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
+  return (node.nodeType === 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
 }
 
 
@@ -41,15 +40,19 @@ function makeTemplateNode(sourceNode) {
     // FIXME - This cloneNode could be expensive; we may prefer to iterate over the
     // parentNode children in reverse (so as not to foul the indexes as childNodes are
     // removed from parentNode when inserted into the container)
-    if (child) container.insertBefore(child.cloneNode(true), null);
+    if (child) {
+      container.insertBefore(child.cloneNode(true), null);
+    }
   });
   return container;
 }
 
 function insertAllAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode) {
+  var frag, len, i;
   // poor man's node and array check, should be enough for this
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined")
+  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
     throw new Error("Expected a single node or a node array");
+  }
 
   if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
     ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
@@ -62,16 +65,20 @@ function insertAllAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode)
   }
 
   if (supportsDocumentFragment) {
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i != nodeOrNodeArrayToInsert.length; ++i)
+    frag = document.createDocumentFragment();
+
+    for (i = 0, len = nodeOrNodeArrayToInsert.length; i !== len; ++i) {
       frag.appendChild(nodeOrNodeArrayToInsert[i]);
+    }
     ko.virtualElements.insertAfter(containerNode, frag, insertAfterNode);
   } else {
     // Nodes are inserted in reverse order - pushed down immediately after
     // the last node for the previous item or as the first node of element.
-    for (var i = nodeOrNodeArrayToInsert.length - 1; i >= 0; --i) {
+    for (i = nodeOrNodeArrayToInsert.length - 1; i >= 0; --i) {
       var child = nodeOrNodeArrayToInsert[i];
-      if (!child) return;
+      if (!child) {
+        return;
+      }
       ko.virtualElements.insertAfter(containerNode, child, insertAfterNode);
     }
   }
@@ -95,7 +102,6 @@ function isAdditionAdjacentToLast(changeIndex, arrayChanges) {
 }
 
 function FastForEach(spec) {
-  var self = this;
   this.element = spec.element;
   this.container = isVirtualNode(this.element) ?
                    this.element.parentNode : this.element;
@@ -150,7 +156,7 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
   var self = this;
   var changeMap = {
     added: [],
-    deleted: [],
+    deleted: []
   };
   for (var i = 0, len = changeSet.length; i < len; i++) {
     // the change is appended to a last change info object when both are 'added' and have indexes next to each other
@@ -162,12 +168,13 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
         lastAdded.isBatch = true;
       }
       lastAdded.value.push(changeSet[i].value);
-    } else
+    } else {
       changeMap[changeSet[i].status].push(changeSet[i]);
+    }
   }
   if (changeMap.deleted.length > 0) {
     this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
-    this.changeQueue.push({status: 'clearDeletedIndexes'})
+    this.changeQueue.push({status: 'clearDeletedIndexes'});
   }
   this.changeQueue.push.apply(this.changeQueue, changeMap.added);
   // Once a change is registered, the ticking count-down starts for the processQueue.
@@ -225,6 +232,7 @@ FastForEach.prototype.added = function (changeItem) {
     ko.applyBindingsToDescendants(childContext, templateClone);
 
     var childNodes = ko.virtualElements.childNodes(templateClone);
+    // Note discussion at https://github.com/angular/angular.js/issues/7851
     allChildNodes.push.apply(allChildNodes, childNodes);
     this.lastNodesList.splice(index + i, 0, childNodes[childNodes.length - 1]);
   }
@@ -236,7 +244,6 @@ FastForEach.prototype.added = function (changeItem) {
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (changeItem) {
   var index = changeItem.index;
-  var value = changeItem.value;
   var ptr = this.lastNodesList[index],
       // We use this.element because that will be the last previous node
       // for virtual element lists.
@@ -246,7 +253,7 @@ FastForEach.prototype.deleted = function (changeItem) {
     ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
   } while (ptr && ptr !== lastNode);
   // The "last node" in the DOM from which we begin our delets of the next adjacent node is
-  // now the sibling that preceded the first node of this item. 
+  // now the sibling that preceded the first node of this item.
   this.lastNodesList[index] = this.lastNodesList[index - 1];
   this.indexesToDelete.push(index);
 };
@@ -273,7 +280,6 @@ ko.bindingHandlers.fastForEach = {
   //    {data: array, name: string, as: string}
   init: function init(element, valueAccessor, bindings, vm, context) {
     var value = valueAccessor(),
-        spec = {},
         ffe;
     if (isPlainObject(value)) {
       value.element = value.element || element;
@@ -293,7 +299,7 @@ ko.bindingHandlers.fastForEach = {
   },
 
   // Export for testing, debugging, and overloading.
-  FastForEach: FastForEach,
+  FastForEach: FastForEach
 };
 
 ko.virtualElements.allowedBindings.fastForEach = true;

@@ -15,6 +15,7 @@ header: |
       root.KnockoutFastForeach = factory(root.ko);
     }
   }(this, function (ko) {
+    "use strict";
 
 footer: |
   }));
