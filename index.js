@@ -233,7 +233,7 @@ FastForEach.prototype.added = function (changeItem) {
 
     var childNodes = ko.virtualElements.childNodes(templateClone);
     // Note discussion at https://github.com/angular/angular.js/issues/7851
-    allChildNodes.push.apply(allChildNodes, childNodes);
+    allChildNodes.push.apply(allChildNodes, Array.prototype.slice.call(childNodes));
     this.lastNodesList.splice(index + i, 0, childNodes[childNodes.length - 1]);
   }
 

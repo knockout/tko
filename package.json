@@ -1,10 +1,10 @@
 {
   "name": "knockout-fast-foreach",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Knockout Fast Foreach",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS2"
+    "test": "./node_modules/karma/bin/karma start --single-run"
   },
   "repository": {
     "type": "git",
@@ -38,9 +38,12 @@
     "js-yaml": "^3.2.2",
     "karma": "^0.12.37",
     "karma-mocha": "^0.2.0",
-    "karma-phantomjs2-launcher": "^0.1.6",
-    "knockout": "^3.3.0",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "phantomjs": "^1.9.17",
     "karma-chai": "^0.1.0"
+  },
+  "peerDependencies": {
+    "knockout": "^3.0.0"
   },
   "dependencies": {
   }
