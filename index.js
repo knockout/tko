@@ -165,7 +165,7 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
       var batchValues = changeMap.added[changeMap.added.length - 1].values;
       if (!batchValues) {
         // transform the last addition into a batch addition object
-        lastAddition = changeMap.added.pop();
+        var lastAddition = changeMap.added.pop();
         var batchAddition = {
           isBatch: true,
           status: 'added',
