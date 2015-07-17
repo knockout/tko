@@ -132,19 +132,6 @@ describe("applying bindings", function () {
   })
 })
 
-ko.observableArray.fn.refill = function (items) {
-  if (!(items instanceof Array))
-      return this.peek().length;
-  this.valueWillMutate();
-  var underlyingArray = this.peek();
-  while (underlyingArray.length) {
-      underlyingArray.pop();
-  }
-  Array.prototype.push.apply(underlyingArray, items);
-  this.valueHasMutated();
-  return this.peek().length;
-};  
-
 describe("observable array changes", function () {
   setupSynchronousFrameAnimation();
   var div, div2, obs, view;
