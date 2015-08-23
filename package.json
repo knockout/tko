@@ -4,7 +4,8 @@
   "description": "Knockout Fast Foreach",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run --browsers Chrome,PhantomJS,Firefox"
+    "test": "./node_modules/karma/bin/karma start --single-run --browsers Chrome,PhantomJS,Firefox",
+    "test_win": "node_modules\\.bin\\karma.cmd start --single-run --browsers Chrome,PhantomJS,Firefox"
   },
   "repository": {
     "type": "git",

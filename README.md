@@ -1,4 +1,4 @@
-knockout-fast-foreach
+﻿knockout-fast-foreach
 =====================
 
 An experiment in faster foreach binding.
@@ -11,7 +11,8 @@ Include in your project in the usual ways, then instead of `foreach` use
 Testing
 ---
 
-Run tests from the command line with `npm test`
+Run tests from the command line with `npm test`, or on Windows `npm run test_win`.
+
 
 Run tests in Chrome by installing `karma-chrome-launcher` then
 `$ ./node_modules/karma/bin/karma start --browsers Chrome`; the same applies

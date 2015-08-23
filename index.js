@@ -162,12 +162,20 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
     // the change is appended to a last change info object when both are 'added' and have indexes next to each other
     // here I presume that ko is sending changes in monotonic order (in index variable) which happens to be true, tested with push and splice with multiple pushed values
     if (isAdditionAdjacentToLast(i, changeSet)) {
-      var lastAdded = changeMap.added[changeMap.added.length - 1];
-      if (!lastAdded.isBatch) {
-        lastAdded.value = [lastAdded.value];
-        lastAdded.isBatch = true;
+      var batchValues = changeMap.added[changeMap.added.length - 1].values;
+      if (!batchValues) {
+        // transform the last addition into a batch addition object
+        var lastAddition = changeMap.added.pop();
+        var batchAddition = {
+          isBatch: true,
+          status: 'added',
+          index: lastAddition.index,
+          values: [lastAddition.value]
+        };
+        batchValues = batchAddition.values;
+        changeMap.added.push(batchAddition);
       }
-      lastAdded.value.push(changeSet[i].value);
+      batchValues.push(changeSet[i].value);
     } else {
       changeMap[changeSet[i].status].push(changeSet[i]);
     }
@@ -211,7 +219,7 @@ FastForEach.prototype.processQueue = function () {
 // Process a changeItem with {status: 'added', ...}
 FastForEach.prototype.added = function (changeItem) {
   var index = changeItem.index;
-  var valuesToAdd = changeItem.isBatch ? changeItem.value : [changeItem.value];
+  var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value];
   var referenceElement = this.lastNodesList[index - 1] || null;
   // gather all childnodes for a possible batch insertion
   var allChildNodes = [];
