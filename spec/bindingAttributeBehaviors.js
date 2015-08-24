@@ -598,4 +598,140 @@ describe('Binding attribute syntax', function() {
             expect(testNode).toContainHtml('<p>replaced</p><template>test</template><p>replaced</p>');
         });
     });
+
+
+    describe("Function binding handlers", function () {
+        it("constructs the element with appropriate params", function () {
+            var obj = { 'canary': 42 },
+                viewModel = {param: obj};
+            ko.bindingHandlers.fnHandler = function (params) {
+                expect(params.value).toEqual(obj)
+                expect(params.element).toEqual(testNode.children[0])
+                expect(params.$data).toEqual(viewModel)
+                expect(params.$context).toEqual(
+                    ko.contextFor(testNode.children[0]))
+                expect(params.allBindings()['bx']).toEqual(43)
+                expect(params.allBindings.get('bx')).toEqual(43)
+            }
+            testNode.innerHTML = "<p data-bind='fnHandler: param, bx: 43'>";
+            ko.applyBindings(viewModel, testNode)
+        });
+
+        it("calls the `fn::dispose` when cleaned up", function () {
+            var viewModel = { x: ko.observable(true) },
+                instance = null,
+                disposeCalled = 0;
+            ko.bindingHandlers.fnHandler = function (params) {
+                instance = this;
+            };
+            ko.bindingHandlers.fnHandler.prototype = {
+                dispose: function () {
+                    disposeCalled++;
+                    expect(this).toEqual(instance);
+                }
+            };
+            testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>';
+            ko.applyBindings(viewModel, testNode);
+            expect(disposeCalled).toEqual(0);
+            viewModel.x(false);
+            expect(disposeCalled).toEqual(1);
+        });
+
+        it("does not error without a `dispose` property", function () {
+            var viewModel = { x: ko.observable(true) };
+            ko.bindingHandlers.fnHandler = function (params) {};
+            testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>';
+            ko.applyBindings(viewModel, testNode);
+            viewModel.x(false);
+        });
+
+        it("virtual elements via fn::allowVirtualElements", function () {
+            var called = 0
+            ko.bindingHandlers.fnHandler = function () { called++; };
+            ko.bindingHandlers.fnHandler.prototype = {
+                allowVirtualElements: true
+            };
+            testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>';
+            ko.applyBindings({}, testNode);
+            expect(called).toEqual(1);
+        });
+
+        it("virtual elements via fn.allowVirtualElements", function () {
+            var called = 0
+            ko.bindingHandlers.fnHandler = function () { called++};
+            ko.bindingHandlers.fnHandler.allowVirtualElements = true;
+            testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>';
+            ko.applyBindings({}, testNode);
+            expect(called).toEqual(1);
+        });
+
+        it("errors when allowVirtualElements is not set", function () {
+            ko.bindingHandlers.fnHandler = function () { called++; };
+            testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>';
+
+            expect(function () {
+                ko.applyBindings({}, testNode);
+            }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements");
+        });
+
+        it("has a .computed() property with the node's lifecycle", function () {
+            var instance;
+            var xCalls = 0,
+                yCalls = 0;
+            ko.bindingHandlers.fnHandler = function () {
+                var v = this.v = ko.observable(0);
+                instance = this;
+                this.x = this.computed(function () {
+                    xCalls++;
+                    v();  // Add a dependency.
+                    expect(this).toEqual(instance);
+                    return 'x';
+                });
+                this.y = this.computed({
+                    read: function () {
+                        yCalls++;
+                        v();
+                        expect(this).toEqual(instance);
+                        return 'y';
+                    }
+                });
+            };
+            testNode.innerHTML = '<i data-bind="fnHandler"></i>';
+            ko.applyBindings({}, testNode);
+            expect(xCalls).toEqual(1);
+            expect(yCalls).toEqual(1);
+            expect(instance.x()).toEqual('x');
+            expect(instance.y()).toEqual('y');
+            expect(xCalls).toEqual(1);
+            expect(yCalls).toEqual(1);
+            instance.v(1);
+            expect(xCalls).toEqual(2);
+            expect(yCalls).toEqual(2);
+
+            ko.cleanNode(testNode);
+            instance.v(2);
+            // Re-computations have stopped.
+            expect(xCalls).toEqual(2);
+            expect(yCalls).toEqual(2);
+        });
+
+        it("has a .subscribe property with the node's lifecycle", function () {
+            var obs = ko.observable(),
+                handlerInstance;
+            ko.bindingHandlers.fnHandler = function () {
+                handlerInstance = this;
+                this.subscribe(obs, this.cb);
+            };
+            ko.bindingHandlers.fnHandler.prototype = {
+                cb: function () {
+                    expect(this).toEqual(handlerInstance);
+                }
+            };
+            testNode.innerHTML = "<i data-bind='fnHandler'></i>";
+            ko.applyBindings({}, testNode);
+            expect(obs.getSubscriptionsCount()).toEqual(1);
+            ko.cleanNode(testNode);
+            expect(obs.getSubscriptionsCount()).toEqual(0);
+        });
+    });
 });

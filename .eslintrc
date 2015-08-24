@@ -9,11 +9,13 @@ rules:
     - 2
     - unix
   semi:
-    - 2
+    - 0  # Temp
     - always
+  indent: 0  # Temp
   strict: 0
   dot-notation: 0
   no-underscore-dangle: 0
+  no-use-before-define: 0
   eol-last: 0
   curly: 0
   quotes: 0
@@ -26,13 +28,13 @@ globals:
   jQueryInstance: true
   DEBUG: true
 
-  # jasmine global variables
-  jasmine: true
-  describe: true
-  it: true
-  iit: true
-  ddescribe: true
+  # Jasmine global variables
   afterEach: true
   beforeEach: true
+  ddescribe: true
+  describe: true
   expect: true
+  iit: true
+  it: true
+  jasmine: true
   testNode: true

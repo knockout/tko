@@ -189,7 +189,16 @@
     }
 
     function validateThatBindingIsAllowedForVirtualElements(bindingName) {
-        var validator = ko.virtualElements.allowedBindings[bindingName];
+        var bindingHandler = ko.bindingHandlers[bindingName],
+            validator;
+        if (typeof bindingHandler === 'function') {
+            validator = bindingHandler.allowVirtualElements || (
+                typeof bindingHandler.prototype === 'object' &&
+                Boolean(bindingHandler.prototype.allowVirtualElements)
+            )
+        } else {
+            validator = ko.virtualElements.allowedBindings[bindingName];
+        }
         if (!validator)
             throw new Error("The binding '" + bindingName + "' cannot be used with virtual elements");
     }
@@ -283,6 +292,118 @@
         return result;
     }
 
+    // This is called when the bindingHandler is an object (with `init` and/or
+    // `update` methods)
+    function execObjectBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccessor, allBindings, bindingContext, reportBindingError) {
+        var handlerInitFn = bindingKeyAndHandler.handler["init"],
+            handlerUpdateFn = bindingKeyAndHandler.handler["update"],
+            bindingKey = bindingKeyAndHandler.key,
+            controlsDescendantBindings = false;
+
+        // Run init, ignoring any dependencies
+        if (typeof handlerInitFn === "function") {
+            try {
+                ko.dependencyDetection.ignore(function() {
+                    var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+
+                    // If this binding handler claims to control descendant bindings, make a note of this
+                    if (initResult && initResult['controlsDescendantBindings']) {
+                        controlsDescendantBindings = true
+                    }
+                });
+            } catch(ex) {
+                reportBindingError('init', ex);
+            }
+        }
+
+        // Run update in its own computed wrapper
+        if (typeof handlerUpdateFn === "function") {
+            ko.dependentObservable(
+                function() {
+                    try {
+                        handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+                    } catch (ex) {
+                        reportBindingError('update', ex)
+                    }
+                },
+                null,
+                { disposeWhenNodeIsRemoved: node }
+            );
+        }
+        return controlsDescendantBindings;
+    }
+
+    // This is called when the bindingHandler is a function (or ES6 class).
+    // Node that these will work only for browsers with Object.defineProperty,
+    // i.e. IE9+.
+    function execNewBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccessor, allBindings, bindingContext, reportBindingError) {
+        var bindingKey = bindingKeyAndHandler.key,
+            handlerParams = {
+                element: node,
+                $data: bindingContext['$data'],
+                $context: bindingContext,
+                allBindings: allBindings
+            },
+            handlerConstructor = bindingKeyAndHandler.handler,
+            handlerInstance,
+            subscriptions = [];
+
+        Object.defineProperty(handlerParams, 'value', {
+            get: function () { return getValueAccessor(bindingKey)() }
+        });
+
+        function handlerConstructorWrapper() {
+            handlerInstance = this;
+
+            // The handler instance will have properties `computed` and
+            // `subscribe`, which are almost the same as the `ko.-` equivalent
+            // except their lifecycle is limited to that of the node (i.e.
+            // they are automatically disposed).
+            this.computed = function handlerInstanceComputed(functionOrObject) {
+                var options = typeof functionOrObject === 'function' ?
+                    { read: functionOrObject, write: functionOrObject } :
+                    functionOrObject;
+                ko.utils.extend(options, {
+                    owner: handlerInstance,
+                    disposeWhenNodeIsRemoved: node
+                });
+                return ko.computed(options);
+            };
+
+            this.subscribe = function handlerInstanceSubscription(subscribable, callback, eventType) {
+                subscriptions.push(
+                    subscribable.subscribe(callback, handlerInstance, eventType)
+                );
+            };
+
+            handlerConstructor.call(this, handlerParams)
+        }
+
+        // We have to wrap the handler instance in this "subclass" because
+        // it's the only way to define this.computed/subscribe before the
+        // handlerConstructor is called, and one would expect those
+        // utilities to be available in the constructor.
+        ko.utils.extend(handlerConstructorWrapper, handlerConstructor)
+        handlerConstructorWrapper.prototype = handlerConstructor.prototype;
+
+        try {
+            new handlerConstructorWrapper();
+        } catch(ex) {
+            reportBindingError('construction', ex)
+        }
+
+        ko.utils.domNodeDisposal.addDisposeCallback(node, function () {
+            if (typeof handlerInstance.dispose === "function") {
+                handlerInstance.dispose.call(handlerInstance);
+            }
+            ko.utils.arrayForEach(subscriptions, function (subs) {
+                subs.dispose()
+            })
+        })
+
+        return handlerConstructor.controlsDescendantBindings || handlerInstance.controlsDescendantBindings;
+    }
+
     function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindingContextMayDifferFromDomParentElement) {
         // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
         var alreadyBound = ko.utils.domData.get(node, boundElementDomDataKey);
@@ -361,11 +482,11 @@
 
             // Go through the sorted bindings, calling init and update for each
             ko.utils.arrayForEach(orderedBindings, function(bindingKeyAndHandler) {
-                // Note that topologicalSortBindings has already filtered out any nonexistent binding handlers,
-                // so bindingKeyAndHandler.handler will always be nonnull.
-                var handlerInitFn = bindingKeyAndHandler.handler["init"],
-                    handlerUpdateFn = bindingKeyAndHandler.handler["update"],
-                    bindingKey = bindingKeyAndHandler.key;
+                var bindingKey = bindingKeyAndHandler.key,
+                    controlsDescendantBindings,
+                    execBindingFunction = typeof bindingKeyAndHandler.handler === 'function' ?
+                        execNewBindingHandlerOnNode :
+                        execObjectBindingHandlerOnNode;
 
                 if (node.nodeType === 8) {
                     validateThatBindingIsAllowedForVirtualElements(bindingKey);
@@ -384,39 +505,16 @@
                     });
                 }
 
-                try {
-                    // Run init, ignoring any dependencies
-                    if (typeof handlerInitFn == "function") {
-                        ko.dependencyDetection.ignore(function() {
-                            var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+                // Note that topologicalSortBindings has already filtered out any nonexistent binding handlers,
+                // so bindingKeyAndHandler.handler will always be nonnull.
+                controlsDescendantBindings = execBindingFunction(
+                    bindingKeyAndHandler, node, getValueAccessor,
+                    allBindings, bindingContext, reportBindingError)
 
-                            // If this binding handler claims to control descendant bindings, make a note of this
-                            if (initResult && initResult['controlsDescendantBindings']) {
-                                if (bindingHandlerThatControlsDescendantBindings !== undefined)
-                                    throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + bindingKey + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
-                                bindingHandlerThatControlsDescendantBindings = bindingKey;
-                            }
-                        });
-                    }
-                } catch (ex) {
-                    reportBindingError('init', ex);
-                }
-
-                // Run update in its own computed wrapper
-                if (typeof handlerUpdateFn == "function") {
-                    ko.computed(
-                        function updatedValueAccessor() {
-                            try {
-                                handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
-                            } catch (ex) {
-                                reportBindingError('update', ex);
-                            }
-
-                        },
-                        null, {
-                            disposeWhenNodeIsRemoved: node
-                        }
-                    );
+                if (controlsDescendantBindings) {
+                    if (bindingHandlerThatControlsDescendantBindings !== undefined)
+                        throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + bindingKey + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
+                    bindingHandlerThatControlsDescendantBindings = bindingKey;
                 }
             });
         }
