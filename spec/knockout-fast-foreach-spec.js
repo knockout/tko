@@ -1,4 +1,4 @@
-
+/* eslint semi: 0 */
 /*
 
   Knockout Else --- Tests
@@ -9,7 +9,6 @@
 //   Unit Tests
 //
 
-mocha.setup('bdd')
 assert = chai.assert;
 
 // Make the frame animation synchronous; simplifies testing.
@@ -134,11 +133,10 @@ describe("applying bindings", function () {
 
 describe("observable array changes", function () {
   setupSynchronousFrameAnimation();
-  var div, div2, obs, view;
+  var div, obs, view;
 
   beforeEach(function () {
     div = $("<div data-bind='fastForEach: obs'><i data-bind='text: $data'></i></div>");
-    div2 = $("<div data-bind='fastForEach: obs'><i data-bind='text: $data'></i></div>");
     obs = ko.observableArray();
     view = {obs: obs};
   })
@@ -168,6 +166,34 @@ describe("observable array changes", function () {
     ko.applyBindings(view, div[0]);
     obs.splice(1, 0, 'c')
     assert.equal(div.text(), 'acb')
+  })
+
+  it("splices items at the beginning of a pre-existing list", function () {
+    obs(['a', 'b', 'c'])
+    ko.applyBindings(view, div[0]);
+    obs.splice(0, 1, 'd')
+    assert.equal(div.text(), 'dbc')
+  })
+
+  it("removes items at the middle of a pre-existing list", function () {
+    obs(['a', 'b', 'c'])
+    ko.applyBindings(view, div[0]);
+    obs.splice(0, 1)
+    assert.equal(div.text(), 'bc')
+  })
+
+  it("splices items at the middle of a pre-existing list", function () {
+    obs(['a', 'b', 'c'])
+    ko.applyBindings(view, div[0]);
+    obs.splice(1, 1, 'D')
+    assert.equal(div.text(), 'aDc')
+  })
+
+  it("splices items at the end of a pre-existing list", function () {
+    obs(['a', 'b', 'c'])
+    ko.applyBindings(view, div[0]);
+    obs.splice(2, 1, 'D')
+    assert.equal(div.text(), 'abD')
   })
 
   it("deletes the last item", function () {
@@ -225,7 +251,7 @@ describe("observable array changes", function () {
     assert.equal(div.text(), 'bc')
   })
 
-  it("deletes from the end", function () {
+  it("deletes from the beginning", function () {
     obs(['a', 'b', 'c'])
     ko.applyBindings(view, div[0]);
     obs.pop()
@@ -278,23 +304,6 @@ describe("observable array changes", function () {
     assert.equal(div.text(), 'abc')
   })
 
-  it("processes numerous changes when bound to more elements", function () {
-    ko.applyBindings(view, div[0]);
-    ko.applyBindings(view, div2[0]);
-    obs([5, 6, 7, 8, 9])
-    assert.equal(div.text(), '56789')
-    assert.equal(div2.text(), '56789')
-    obs([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    assert.equal(div.text(), '0123456789')
-    assert.equal(div2.text(), '0123456789')
-    obs([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-    assert.equal(div.text(), '0123456789101112')
-    assert.equal(div2.text(), '0123456789101112')
-    obs(['a', 'b', 'c'])
-    assert.equal(div.text(), 'abc')
-    assert.equal(div2.text(), 'abc')
-  })
-
   it("accepts changes via a computed observable", function() {
     var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
     var toggle = ko.observable(true);
@@ -308,6 +317,70 @@ describe("observable array changes", function () {
     assert.equal(target.text(), "123456")
   })
 
-})
+  describe("$index", function () {
+    it("is present on the children", function () {
+      var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+      var list = ['a', 'b', 'c'];
+      ko.applyBindings(list, target[0])
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+      assert.equal(ko.contextFor(target.children()[1]).$index(), 1)
+      assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
+    })
 
-mocha.run();
+    it("updates the first list item", function () {
+      var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+      var list = ko.observableArray([]);
+      ko.applyBindings(list, target[0])
+      list.push('a')
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+    })
+
+    it("updates on append", function () {
+      var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+      var list = ko.observableArray(['a', 'b', 'c']);
+      ko.applyBindings(list, target[0])
+      list.push('d')
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+      assert.equal(ko.contextFor(target.children()[1]).$index(), 1)
+      assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
+      assert.equal(ko.contextFor(target.children()[3]).$index(), 3)
+    })
+
+    it("updates on prepend", function () {
+      var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+      var list = ko.observableArray(['a', 'b', 'c']);
+      ko.applyBindings(list, target[0])
+      list.unshift('e')
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+      assert.equal(ko.contextFor(target.children()[1]).$index(), 1)
+      assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
+      assert.equal(ko.contextFor(target.children()[3]).$index(), 3)
+    })
+
+    it("updates on splice", function () {
+      var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+      var list = ko.observableArray(['a', 'b', 'c']);
+      ko.applyBindings(list, target[0])
+      // Delete 2 at 1, insert 2
+      list.splice(1, 2, 'r', 'q')
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+      assert.equal(ko.contextFor(target.children()[1]).$index(), 1)
+      assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
+    })
+
+    it("is disabled with noIndex", function () {
+      var target = $("<ul data-bind='fastForEach: {data: $data, noIndex: true}'><li data-bind='text: $data'></li></div>");
+      var list = ko.observableArray(['a']);
+      ko.applyBindings(list, target[0])
+      assert.equal(ko.contextFor(target.children()[0]).$index, undefined)
+    })
+
+    it("is present with noContext", function () {
+      var target = $("<ul data-bind='fastForEach: {data: $data, noContext: true}'><li data-bind='text: $data'></li></div>");
+      var list = ko.observableArray(['a', 'b']);
+      ko.applyBindings(list, target[0])
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+      assert.equal(ko.contextFor(target.children()[1]).$index(), 1)
+    })
+  })
+})

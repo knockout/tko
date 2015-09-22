@@ -1,10 +1,11 @@
 {
   "name": "knockout-fast-foreach",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Knockout Fast Foreach",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run --browsers Chrome,PhantomJS,Firefox",
+    "watch": "./node_modules/karma/bin/karma start --browsers PhantomJS",
     "test_win": "node_modules\\.bin\\karma.cmd start --single-run --browsers Chrome,PhantomJS,Firefox"
   },
   "repository": {

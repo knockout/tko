@@ -20,7 +20,10 @@ for other browsers supported by Karma.
 
 Changes
 ---
-16 Jul 2015 - 🌕  - 0.4.1
+22 Sep 2015 – 🐝 0.5.0
+  - add `$index()` support (disable by passing `noIndex: true`)
+
+16 Jul 2015 - 🌕  0.4.1
   - fix `push.apply` not working on `NodeList` in older Webkit versions
 
 14 Jul 2015 – 🎂 0.4.0

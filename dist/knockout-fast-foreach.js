@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.4.1 (2015-07-17T14:06:15.974Z)
+  Knockout Fast Foreach v0.5.0 (2015-09-22T18:25:56.983Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -23,6 +23,7 @@
 // --------
 
 //      Utilities
+var MAX_LIST_SIZE = 9007199254740991;
 
 // from https://github.com/jonschlinkert/is-plain-object
 function isPlainObject(o) {
@@ -126,6 +127,7 @@ function FastForEach(spec) {
   this.data = spec.data;
   this.as = spec.as;
   this.noContext = spec.noContext;
+  this.noIndex = spec.noIndex;
   this.templateNode = makeTemplateNode(
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
@@ -213,6 +215,7 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 FastForEach.prototype.processQueue = function () {
   var self = this;
+  var lowestIndexChanged = MAX_LIST_SIZE;
 
   // Callback so folks can do things before the queue flush.
   if (typeof this.beforeQueueFlush === 'function') {
@@ -220,16 +223,30 @@ FastForEach.prototype.processQueue = function () {
   }
 
   ko.utils.arrayForEach(this.changeQueue, function (changeItem) {
+    if (typeof changeItem.index === 'number') {
+      lowestIndexChanged = Math.min(lowestIndexChanged, changeItem.index);
+    }
     // console.log(self.data(), "CI", JSON.stringify(changeItem, null, 2), JSON.stringify($(self.element).text()))
     self[changeItem.status](changeItem);
     // console.log("  ==> ", JSON.stringify($(self.element).text()))
   });
   this.rendering_queued = false;
+
+  // Update our indexes.
+  if (!this.noIndex) {
+    this.updateIndexes(lowestIndexChanged);
+  }
+
   // Callback so folks can do things.
   if (typeof this.afterQueueFlush === 'function') {
     this.afterQueueFlush(this.changeQueue);
   }
   this.changeQueue = [];
+};
+
+
+function extendWithIndex(context) {
+  context.$index = ko.observable();
 };
 
 
@@ -247,10 +264,11 @@ FastForEach.prototype.added = function (changeItem) {
 
     if (this.noContext) {
       childContext = this.$context.extend({
-        '$item': valuesToAdd[i]
+        $item: valuesToAdd[i],
+        $index: this.noIndex ? undefined : ko.observable()
       });
     } else {
-      childContext = this.$context.createChildContext(valuesToAdd[i], this.as || null);
+      childContext = this.$context.createChildContext(valuesToAdd[i], this.as || null, this.noIndex ? undefined : extendWithIndex);
     }
 
     // apply bindings first, and then process child nodes, because bindings can add childnodes
@@ -272,7 +290,7 @@ FastForEach.prototype.deleted = function (changeItem) {
   var ptr = this.lastNodesList[index],
       // We use this.element because that will be the last previous node
       // for virtual element lists.
-      lastNode = this.lastNodesList[index - 1] || this.element;
+    lastNode = this.lastNodesList[index - 1] || this.element;
   do {
     ptr = ptr.previousSibling;
     ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
@@ -296,6 +314,22 @@ FastForEach.prototype.clearDeletedIndexes = function () {
 };
 
 
+FastForEach.prototype.updateIndexes = function (fromIndex) {
+  var ctx;
+  for (var i = fromIndex, len = this.lastNodesList.length; i < len; ++i) {
+    if (i === 0) {
+      if (this.element.childNodes.length > 0) {
+        ctx = ko.contextFor(this.element.childNodes[0]);
+      }
+    } else {
+      // Get the first sibling for this element
+      ctx = ko.contextFor(this.lastNodesList[i - 1].nextSibling);
+    }
+    if (ctx) { ctx.$index(i); }
+  }
+};
+
+
 ko.bindingHandlers.fastForEach = {
   // Valid valueAccessors:
   //    []
@@ -304,8 +338,7 @@ ko.bindingHandlers.fastForEach = {
   //    ko.computed
   //    {data: array, name: string, as: string}
   init: function init(element, valueAccessor, bindings, vm, context) {
-    var value = valueAccessor(),
-        ffe;
+    var ffe, value = valueAccessor();
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
