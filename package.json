@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/brianmhunt/knockout-fast-foreach",
   "devDependencies": {
+    "eslint": "^1.5.0",
     "gulp": "^3.8.8",
     "gulp-bump": "^0.1.11",
     "gulp-filter": "^1.0.2",

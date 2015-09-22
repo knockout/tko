@@ -255,7 +255,7 @@ FastForEach.prototype.deleted = function (changeItem) {
   var ptr = this.lastNodesList[index],
       // We use this.element because that will be the last previous node
       // for virtual element lists.
-      lastNode = this.lastNodesList[index - 1] || this.element;
+    lastNode = this.lastNodesList[index - 1] || this.element;
   do {
     ptr = ptr.previousSibling;
     ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
@@ -287,8 +287,7 @@ ko.bindingHandlers.fastForEach = {
   //    ko.computed
   //    {data: array, name: string, as: string}
   init: function init(element, valueAccessor, bindings, vm, context) {
-    var value = valueAccessor(),
-        ffe;
+    var ffe, value = valueAccessor();
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
