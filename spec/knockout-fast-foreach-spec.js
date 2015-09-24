@@ -327,6 +327,16 @@ describe("observable array changes", function () {
       assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
     })
 
+    it("is present when template starts with a text node", function() {
+      var target = document.createElement('ul')
+      target.innerHTML = "<ul data-bind='fastForEach: $data'>" +
+          " <li data-bind='text: $index()'></li>" +
+        "</ul>"
+      var list = ['a', 'b', 'c'];
+      ko.applyBindings(list, target)
+      assert.equal($(target).text(), ' 0 1 2')
+    })
+
     it("updates the first list item", function () {
       var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
       var list = ko.observableArray([]);

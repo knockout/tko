@@ -20,6 +20,9 @@ for other browsers supported by Karma.
 
 Changes
 ---
+23 Sep 2015 - 👽 0.5.1
+  - fix `$index` not working when template starts with a text node
+
 22 Sep 2015 – 🐝 0.5.0
   - add `$index()` support (disable by passing `noIndex: true`)
 
