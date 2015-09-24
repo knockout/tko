@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.5.0 (2015-09-22T18:25:56.983Z)
+  Knockout Fast Foreach v0.5.2 (2015-09-24T00:28:10.357Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -314,16 +314,24 @@ FastForEach.prototype.clearDeletedIndexes = function () {
 };
 
 
+FastForEach.prototype.getContextStartingFrom = function(node) {
+  var ctx;
+  while (node) {
+    ctx = ko.contextFor(node);
+    if (ctx) { return ctx; }
+    node = node.nextSibling;
+  }
+};
+
+
 FastForEach.prototype.updateIndexes = function (fromIndex) {
   var ctx;
   for (var i = fromIndex, len = this.lastNodesList.length; i < len; ++i) {
     if (i === 0) {
-      if (this.element.childNodes.length > 0) {
-        ctx = ko.contextFor(this.element.childNodes[0]);
-      }
+      ctx = this.getContextStartingFrom(this.element.childNodes[0])
     } else {
       // Get the first sibling for this element
-      ctx = ko.contextFor(this.lastNodesList[i - 1].nextSibling);
+      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling)
     }
     if (ctx) { ctx.$index(i); }
   }
