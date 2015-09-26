@@ -20,6 +20,9 @@ for other browsers supported by Karma.
 
 Changes
 ---
+25 Sep 2015 – 🍭 0.5.3
+  - fix `$index` when list is made from virtual elements
+
 23 Sep 2015 - 👽 0.5.2
   - fix `$index` not working when template starts with a text node
 

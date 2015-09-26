@@ -311,10 +311,12 @@ FastForEach.prototype.updateIndexes = function (fromIndex) {
   var ctx;
   for (var i = fromIndex, len = this.lastNodesList.length; i < len; ++i) {
     if (i === 0) {
-      ctx = this.getContextStartingFrom(this.element.childNodes[0])
+      ctx = this.getContextStartingFrom(
+        ko.virtualElements.childNodes(this.element)[0]
+      );
     } else {
       // Get the first sibling for this element
-      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling)
+      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling);
     }
     if (ctx) { ctx.$index(i); }
   }

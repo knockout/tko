@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.5.2 (2015-09-24T00:28:10.357Z)
+  Knockout Fast Foreach v0.5.3 (2015-09-26T02:24:59.410Z)
   By: Brian M Hunt (C) 2015
   License: MIT
 
@@ -328,10 +328,12 @@ FastForEach.prototype.updateIndexes = function (fromIndex) {
   var ctx;
   for (var i = fromIndex, len = this.lastNodesList.length; i < len; ++i) {
     if (i === 0) {
-      ctx = this.getContextStartingFrom(this.element.childNodes[0])
+      ctx = this.getContextStartingFrom(
+        ko.virtualElements.childNodes(this.element)[0]
+      );
     } else {
       // Get the first sibling for this element
-      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling)
+      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling);
     }
     if (ctx) { ctx.$index(i); }
   }

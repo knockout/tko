@@ -327,6 +327,17 @@ describe("observable array changes", function () {
       assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
     })
 
+    it("is present on children of virtual nodes", function () {
+      var target = $("<div><!-- ko fastForEach: $data -->" +
+        "<b data-bind='text: $data'></b>" +
+        "<!-- /ko --></div>");
+      var list = ['a', 'b', 'c'];
+      ko.applyBindings(list, target[0])
+      assert.equal(ko.contextFor(target.children()[0]).$index(), 0)
+      assert.equal(ko.contextFor(target.children()[1]).$index(), 1)
+      assert.equal(ko.contextFor(target.children()[2]).$index(), 2)
+    })
+
     it("is present when template starts with a text node", function() {
       var target = document.createElement('ul')
       target.innerHTML = "<ul data-bind='fastForEach: $data'>" +
