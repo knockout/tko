@@ -1,8 +1,7 @@
 header: |
   /*!
     Knockout Fast Foreach v<%=pkg.version%> (<%=now.toISOString()%>)
-    By: Brian M Hunt (C) 2015
-    License: MIT
+    By: Brian M Hunt (C) 2015 | License: MIT
 
     Adds `fastForEach` to `ko.bindingHandlers`.
   */
@@ -19,6 +18,9 @@ header: |
 
 footer: |
   }));
+
+uglify:
+  preserveComments: license
 
 webserver:
   port: 4054

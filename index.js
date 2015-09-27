@@ -48,43 +48,6 @@ function makeTemplateNode(sourceNode) {
   return container;
 }
 
-function insertAllAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode) {
-  var frag, len, i;
-  // poor man's node and array check, should be enough for this
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
-    throw new Error("Expected a single node or a node array");
-  }
-
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
-    ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
-    return;
-  }
-
-  if (nodeOrNodeArrayToInsert.length === 1) {
-    ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert[0], insertAfterNode);
-    return;
-  }
-
-  if (supportsDocumentFragment) {
-    frag = document.createDocumentFragment();
-
-    for (i = 0, len = nodeOrNodeArrayToInsert.length; i !== len; ++i) {
-      frag.appendChild(nodeOrNodeArrayToInsert[i]);
-    }
-    ko.virtualElements.insertAfter(containerNode, frag, insertAfterNode);
-  } else {
-    // Nodes are inserted in reverse order - pushed down immediately after
-    // the last node for the previous item or as the first node of element.
-    for (i = nodeOrNodeArrayToInsert.length - 1; i >= 0; --i) {
-      var child = nodeOrNodeArrayToInsert[i];
-      if (!child) {
-        return;
-      }
-      ko.virtualElements.insertAfter(containerNode, child, insertAfterNode);
-    }
-  }
-}
-
 // Mimic a KO change item 'add'
 function valueToChangeAddItem(value, index) {
   return {
@@ -111,6 +74,8 @@ function FastForEach(spec) {
   this.as = spec.as;
   this.noContext = spec.noContext;
   this.noIndex = spec.noIndex;
+  this.afterAdd = spec.afterAdd;
+  this.beforeRemove = spec.beforeRemove;
   this.templateNode = makeTemplateNode(
     spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
   );
@@ -263,20 +228,79 @@ FastForEach.prototype.added = function (changeItem) {
     this.lastNodesList.splice(index + i, 0, childNodes[childNodes.length - 1]);
   }
 
-  insertAllAfter(this.element, allChildNodes, referenceElement);
+  if (typeof this.afterAdd === 'function') {
+    this.afterAdd({
+      nodeOrArrayInserted: this.insertAllAfter(allChildNodes, referenceElement),
+      foreachInstance: this}
+    );
+  } else {
+    this.insertAllAfter(allChildNodes, referenceElement);
+  }
+};
+
+
+FastForEach.prototype.insertAllAfter = function(nodeOrNodeArrayToInsert, insertAfterNode) {
+  var frag, len, i,
+    containerNode = this.element;
+
+  // poor man's node and array check, should be enough for this
+  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
+    throw new Error("Expected a single node or a node array");
+  }
+  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
+    ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
+    return [nodeOrNodeArrayToInsert];
+  } else if (nodeOrNodeArrayToInsert.length === 1) {
+    ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert[0], insertAfterNode);
+  } else if (supportsDocumentFragment) {
+    frag = document.createDocumentFragment();
+
+    for (i = 0, len = nodeOrNodeArrayToInsert.length; i !== len; ++i) {
+      frag.appendChild(nodeOrNodeArrayToInsert[i]);
+    }
+    ko.virtualElements.insertAfter(containerNode, frag, insertAfterNode);
+  } else {
+    // Nodes are inserted in reverse order - pushed down immediately after
+    // the last node for the previous item or as the first node of element.
+    for (i = nodeOrNodeArrayToInsert.length - 1; i >= 0; --i) {
+      var child = nodeOrNodeArrayToInsert[i];
+      if (!child) { break; }
+      ko.virtualElements.insertAfter(containerNode, child, insertAfterNode);
+    }
+  }
+  return nodeOrNodeArrayToInsert;
 };
 
 
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (changeItem) {
-  var index = changeItem.index;
-  var ptr = this.lastNodesList[index],
+  var index = changeItem.index,
+    beforeRemoveReturn,
+    nodeToRemove,
+    ptr = this.lastNodesList[index],
       // We use this.element because that will be the last previous node
       // for virtual element lists.
     lastNode = this.lastNodesList[index - 1] || this.element;
   do {
     ptr = ptr.previousSibling;
-    ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
+    nodeToRemove = (ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element);
+    if (this.beforeRemove && nodeToRemove) {
+      beforeRemoveReturn = this.beforeRemove({
+        nodeToRemove: nodeToRemove, foreachInstance: this
+      }) || {};
+      // If beforeRemove returns a `then`–able e.g. a Promise, we remove
+      // the nodes when that thenable completes.  We pass any errors to
+      // ko.onError.
+      if (typeof beforeRemoveReturn.then === 'function') {
+        beforeRemoveReturn
+          .then(
+            function () { ko.removeNode(nodeToRemove); },
+            ko.onError ? ko.onError : undefined
+          );
+      }
+    } else if (nodeToRemove) {
+      ko.removeNode(nodeToRemove);
+    }
   } while (ptr && ptr !== lastNode);
   // The "last node" in the DOM from which we begin our delets of the next adjacent node is
   // now the sibling that preceded the first node of this item.

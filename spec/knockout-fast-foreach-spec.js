@@ -317,6 +317,73 @@ describe("observable array changes", function () {
     assert.equal(target.text(), "123456")
   })
 
+  describe('afterAdd', function () {
+    it("emits on changes to an observable array", function () {
+      var calls = 0;
+      var nodes = 0
+      var arr = ko.observableArray([])
+      function cb(v) { calls++; nodes += v.nodeOrArrayInserted.length }
+      var target = $("<ul data-bind='fastForEach: { data: arr, afterAdd: cb }'><li data-bind='text: $data'></li></div>");
+      ko.applyBindings({arr: arr, cb: cb}, target[0])
+      assert.equal(calls, 0)
+      assert.equal(nodes, 0)
+      arr.push('x')
+      assert.equal(calls, 1)
+      assert.equal(nodes, 1)
+      arr([2,3,4])
+      assert.equal(calls, 2)
+      assert.equal(nodes, 4, 'n4')
+    })
+
+    it("is called with initial data", function () {
+      var calls = 0;
+      var nodes = 0
+      var arr = ko.observableArray(['a', 'b', 'c'])
+      function cb(v) { calls++; nodes += v.nodeOrArrayInserted.length }
+      var target = $("<ul data-bind='fastForEach: { data: arr, afterAdd: cb }'><li data-bind='text: $data'></li></div>");
+      ko.applyBindings({arr: arr, cb: cb}, target[0])
+      assert.equal(calls, 1)
+      assert.equal(nodes, 3)
+    })
+
+  })
+
+  describe('beforeRemove', function () {
+    it("emits on remove", function () {
+      var cbi = 0;
+      var arr = ko.observableArray(['a1', 'b1', 'c1'])
+      function cb(v) { ko.removeNode(v.nodeToRemove); cbi++; }
+      var target = $("<ul data-bind='fastForEach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>");
+      ko.applyBindings({arr: arr, cb: cb}, target[0])
+      assert.equal(cbi, 0)
+      assert.equal(target.text(), 'a1b1c1')
+      arr.pop()
+      assert.equal(target.text(), 'a1b1')
+      assert.equal(cbi, 1)
+      arr([])
+      assert.equal(cbi, 3)
+      assert.equal(target.text(), '')
+    })
+
+    it("removes an element if a `then`-able is passed", function () {
+      var cbi = 0;
+      var arr = ko.observableArray(['a2', 'b2', 'c2'])
+      var p
+      function cb(v) { cbi++; return {then: function (cb) { cb() }} }
+      var target = $("<ul data-bind='fastForEach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>");
+      ko.applyBindings({arr: arr, cb: cb}, target[0])
+      assert.equal(cbi, 0)
+      assert.equal(target.text(), 'a2b2c2')
+      arr.pop()
+      assert.equal(target.text(), 'a2b2')
+      assert.equal(cbi, 1)
+      arr([])
+      assert.equal(cbi, 3)
+      assert.equal(target.text(), '')
+    })
+  })
+
+
   describe("$index", function () {
     it("is present on the children", function () {
       var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");

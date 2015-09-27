@@ -36,7 +36,7 @@ gulp.task('js', function () {
     .pipe(plugins.footer(config.footer))
     .pipe(plugins.rename("knockout-fast-foreach.js"))
     .pipe(gulp.dest('./dist'))
-    .pipe(plugins.uglify())
+    .pipe(plugins.uglify(config.uglify))
     .pipe(plugins.rename("knockout-fast-foreach.min.js"))
     .pipe(gulp.dest('./dist'));
 });
