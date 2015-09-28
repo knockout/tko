@@ -304,6 +304,16 @@ describe("observable array changes", function () {
     assert.equal(div.text(), 'abc')
   })
 
+  it("processes numerous changes with splice", function () {
+    ko.applyBindings(view, div[0]);
+    obs([5, 6, 7, 8, 9])
+    assert.equal(div.text(), '56789')
+    obs.splice(1, 2, 16, 17);
+    assert.equal(div.text(), '5161789')
+    obs.splice(0, 5, 'a', 'b', 'c');
+    assert.equal(div.text(), 'abc')
+  })
+
   it("accepts changes via a computed observable", function() {
     var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
     var toggle = ko.observable(true);
@@ -315,6 +325,37 @@ describe("observable array changes", function () {
     assert.equal(target.text(), "123")
     toggle(false)
     assert.equal(target.text(), "123456")
+  })
+
+  describe("isAdditionAdjacentToLast", function () {
+    it("is false for a deletion", function () {
+      assert.notOk(isAdditionAdjacentToLast(0, [{status: 'deleted'}]))
+    })
+
+    it("is false for a single addition", function () {
+      assert.notOk(isAdditionAdjacentToLast(0, [{status: 'added'}]))
+    })
+
+    it("is true for two adjacent additions", function () {
+      assert.ok(isAdditionAdjacentToLast(1,
+        [{status: 'added', index: 0}, {status: 'added', index: 1}]))
+    })
+
+    it("is true for adds separated by a del", function () {
+      assert.ok(isAdditionAdjacentToLast(2, [
+        {status: 'added', index: 0},
+        {status: 'deleted', index: 1},
+        {status: 'added', index: 1},
+      ]))
+    })
+
+    it("is false for adds with differing del index", function () {
+      assert.notOk(isAdditionAdjacentToLast(2, [
+        {status: 'added', index: 0},
+        {status: 'deleted', index: 0},
+        {status: 'added', index: 1},
+      ]))
+    })
   })
 
   describe('afterAdd', function () {

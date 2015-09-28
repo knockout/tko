@@ -20,6 +20,9 @@ for other browsers supported by Karma.
 
 Changes
 ---
+27 Sep 2015 – 📇 0.5.5
+  - Improved batch addition (closes #30)
+
 27 Sep 2015 - ⛵️  0.5.4
   - add `afterAdd` and `beforeRemove`
 

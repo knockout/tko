@@ -57,13 +57,45 @@ function valueToChangeAddItem(value, index) {
   };
 }
 
+/*
+  There are two common cases when we should treat additions as adjacent:
+
+    1. two adjacent additions (i.e. contiguous indexes);
+    2. two additions separated by a deletion.
+
+  The second case shall occur, perhaps often, when using the splice method or
+  redefining an array.
+
+  One could theoretically walk backwards through the changes and form a longest-
+  contiguous list of additions, but that *could* be O(n)ish worst case (though
+  average case is probably quite good).
+  */
 function isAdditionAdjacentToLast(changeIndex, arrayChanges) {
-  return changeIndex > 0 &&
-    changeIndex < arrayChanges.length &&
-    arrayChanges[changeIndex].status === "added" &&
-    arrayChanges[changeIndex - 1].status === "added" &&
-    arrayChanges[changeIndex - 1].index === arrayChanges[changeIndex].index - 1;
+  var change = arrayChanges[changeIndex];
+  var prevChange = arrayChanges[changeIndex - 1];
+
+  if (changeIndex === 0 ||
+      changeIndex >= arrayChanges.length ||
+      change.status !== 'added'
+    ) { return false; }
+
+  // Add-Add
+  if (prevChange.status === 'added' && prevChange.index === change.index - 1) {
+    return true;
+  }
+
+  // Add-Del-Add
+  var prevPrevChange = arrayChanges[changeIndex - 2];
+  if (prevPrevChange &&
+    prevChange.status === 'deleted' &&
+    prevChange.index === change.index &&
+    prevPrevChange.status === "added" &&
+    prevPrevChange.index === change.index - 1
+  ) { return true; }
+
+  return false;
 }
+
 
 function FastForEach(spec) {
   this.element = spec.element;
