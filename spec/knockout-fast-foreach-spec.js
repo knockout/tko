@@ -393,7 +393,10 @@ describe("observable array changes", function () {
     it("emits on remove", function () {
       var cbi = 0;
       var arr = ko.observableArray(['a1', 'b1', 'c1'])
-      function cb(v) { ko.removeNode(v.nodeToRemove); cbi++; }
+      function cb(v) {
+        ko.utils.arrayForEach(v.nodesToRemove, function (n) { ko.removeNode(n); });
+        cbi++;
+      }
       var target = $("<ul data-bind='fastForEach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>");
       ko.applyBindings({arr: arr, cb: cb}, target[0])
       assert.equal(cbi, 0)

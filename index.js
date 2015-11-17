@@ -114,8 +114,7 @@ function FastForEach(spec) {
   this.afterQueueFlush = spec.afterQueueFlush;
   this.beforeQueueFlush = spec.beforeQueueFlush;
   this.changeQueue = [];
-  this.firstNodesList = [];
-  this.lastNodesList = [];
+  this.firstLastNodesList = [];
   this.indexesToDelete = [];
   this.rendering_queued = false;
 
@@ -235,7 +234,7 @@ function extendWithIndex(context) {
 FastForEach.prototype.added = function (changeItem) {
   var index = changeItem.index;
   var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value];
-  var referenceElement = this.lastNodesList[index - 1] || null;
+  var referenceElement = this.getLastNodeBeforeIndex(index);
   // gather all childnodes for a possible batch insertion
   var allChildNodes = [];
 
@@ -258,8 +257,7 @@ FastForEach.prototype.added = function (changeItem) {
     var childNodes = ko.virtualElements.childNodes(templateClone);
     // Note discussion at https://github.com/angular/angular.js/issues/7851
     allChildNodes.push.apply(allChildNodes, Array.prototype.slice.call(childNodes));
-    this.firstNodesList.splice(index + i, 0, childNodes[0]);
-    this.lastNodesList.splice(index + i, 0, childNodes[childNodes.length - 1]);
+    this.firstLastNodesList.splice(index + i, 0, { first: childNodes[0], last: childNodes[childNodes.length - 1] });
   }
 
   if (typeof this.afterAdd === 'function') {
@@ -273,6 +271,23 @@ FastForEach.prototype.added = function (changeItem) {
   }
 };
 
+FastForEach.prototype.getNodesForIndex = function (index) {
+  var result = [],
+    ptr = this.firstLastNodesList[index].first,
+    last = this.firstLastNodesList[index].last;
+  result.push(ptr);
+  while (ptr && ptr !== last) {
+    ptr = ptr.nextSibling;
+    result.push(ptr);
+  }
+  return result;
+}
+
+FastForEach.prototype.getLastNodeBeforeIndex = function (index) {
+  if (index < 1 || index - 1 >= this.firstLastNodesList.length)
+    return null;
+  return this.firstLastNodesList[index - 1].last;
+}
 
 FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfterNode) {
   var frag, len, i,
@@ -309,37 +324,28 @@ FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insert
 
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (changeItem) {
-  var index = changeItem.index, beforeRemoveReturn;
-  var firstNode = this.firstNodesList[index],
-      lastNode = this.lastNodesList[index];
-  var nodesToRemove = [firstNode];
-  if (firstNode != lastNode) {
-    var ptr = firstNode.nextSibling;
-    while (ptr != lastNode.nextSibling) {
-      (function (_ptr) { nodesToRemove.push(_ptr); })(ptr);
-      ptr = ptr.nextSibling;
-    }
-  }
+  var index = changeItem.index,
+    beforeRemoveReturn,
+    nodesToRemove = this.getNodesForIndex(index);
 
-  for (var i = 0; i != nodesToRemove.length; ++i) {
-    var nodeToRemove = nodesToRemove[i];
-    if (this.beforeRemove && nodeToRemove) {
-      beforeRemoveReturn = this.beforeRemove({
-        nodeToRemove: nodeToRemove, foreachInstance: this
-      }) || {};
-      // If beforeRemove returns a `then`–able e.g. a Promise, we remove
-      // the nodes when that thenable completes.  We pass any errors to
-      // ko.onError.
-      if (typeof beforeRemoveReturn.then === 'function') {
-        beforeRemoveReturn
-          .then(
-            function () { ko.removeNode(nodeToRemove); },
-            ko.onError ? ko.onError : undefined
-          );
-      }
-    } else if (nodeToRemove) {
-      ko.removeNode(nodeToRemove);
+  var removeFn = function () {
+    ko.utils.arrayForEach(nodesToRemove, function (n) {
+      ko.removeNode(n);
+    });
+  };
+
+  if (this.beforeRemove && nodesToRemove.length) {
+    beforeRemoveReturn = this.beforeRemove({
+      nodesToRemove: nodesToRemove, foreachInstance: this
+    }) || {};
+    // If beforeRemove returns a `then`–able e.g. a Promise, we remove
+    // the nodes when that thenable completes.  We pass any errors to
+    // ko.onError.
+    if (typeof beforeRemoveReturn.then === 'function') {
+      beforeRemoveReturn.then(removeFn, ko.onError ? ko.onError : undefined);
     }
+  } else if (nodesToRemove.length) {
+    removeFn();
   }
 
   this.indexesToDelete.push(index);
@@ -352,8 +358,7 @@ FastForEach.prototype.clearDeletedIndexes = function () {
   // We iterate in reverse on the presumption (following the unit tests) that KO's diff engine
   // processes diffs (esp. deletes) monotonically ascending i.e. from index 0 -> N.
   for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
-    this.firstNodesList.splice(this.indexesToDelete[i], 1);
-    this.lastNodesList.splice(this.indexesToDelete[i], 1);
+    this.firstLastNodesList.splice(this.indexesToDelete[i], 1);
   }
   this.indexesToDelete = [];
 };
@@ -371,15 +376,8 @@ FastForEach.prototype.getContextStartingFrom = function (node) {
 
 FastForEach.prototype.updateIndexes = function (fromIndex) {
   var ctx;
-  for (var i = fromIndex, len = this.lastNodesList.length; i < len; ++i) {
-    if (i === 0) {
-      ctx = this.getContextStartingFrom(
-        ko.virtualElements.childNodes(this.element)[0]
-      );
-    } else {
-      // Get the first sibling for this element
-      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling);
-    }
+  for (var i = fromIndex, len = this.firstLastNodesList.length; i < len; ++i) {
+    ctx = this.getContextStartingFrom(this.firstLastNodesList[i].first);
     if (ctx) { ctx.$index(i); }
   }
 };
