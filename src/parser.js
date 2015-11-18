@@ -67,7 +67,7 @@ Parser = (function () {
     var name = '';
     this.white();
 
-    ch = this.ch;
+    var ch = this.ch;
 
     while (ch) {
       if (ch === ':' || ch <= ' ' || ch === ',') {
@@ -524,7 +524,7 @@ Parser = (function () {
       return null;
     }
 
-    result = this.bindings();
+    var result = this.bindings();
 
     this.white();
     if (this.ch) {
