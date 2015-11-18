@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.5.2 - 2015-03-12
+/*! knockout-secure-binding - v0.5.3 - 2015-11-18
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2015 Brian M Hunt; License: MIT */
 ;(function(factory) {
@@ -450,7 +450,7 @@ Parser = (function () {
     var name = '';
     this.white();
 
-    ch = this.ch;
+    var ch = this.ch;
 
     while (ch) {
       if (ch === ':' || ch <= ' ' || ch === ',') {
@@ -907,7 +907,7 @@ Parser = (function () {
       return null;
     }
 
-    result = this.bindings();
+    var result = this.bindings();
 
     this.white();
     if (this.ch) {

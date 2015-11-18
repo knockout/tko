@@ -136,7 +136,7 @@ gulp.task('connect', function () {
       'dist/',
       'spec/',
     ],
-    port: 7777,
+    port: 4445,
     livereload: {
       port: 36551
     },

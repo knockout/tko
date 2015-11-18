@@ -1,9 +1,10 @@
 {
-  "version": "0.5.2",
+  "version": "0.5.3",
   "author": {
     "name": "Brian M Hunt",
     "email": "brianmhunt@gmail.com"
   },
+  "license": "MIT",
   "name": "knockout-secure-binding",
   "devDependencies": {
     "chai": "*",

@@ -1,5 +1,10 @@
-### 0.5.1 (2014-10-07)
+### 0.5.3 (2015-11-18)
+* **memory**: Fix global memory leaks
 
+### 0.5.2 (no-change)
+
+### 0.5.1 (2014-10-07)
+* **parser**: Add check for pre-`components` Knockout
 
 #### Bug Fixes
 
