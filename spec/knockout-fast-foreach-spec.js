@@ -24,6 +24,7 @@ function setupSynchronousFrameAnimation () {
 }
 
 describe("applying bindings", function () {
+  FastForEach.DEBUG = true;
   setupSynchronousFrameAnimation()
 
   it("works with a static list", function () {
@@ -327,36 +328,204 @@ describe("observable array changes", function () {
     assert.equal(target.text(), "123456")
   })
 
-  describe("isAdditionAdjacentToLast", function () {
-    it("is false for a deletion", function () {
-      assert.notOk(isAdditionAdjacentToLast(0, [{status: 'deleted'}]))
+  describe("DOM move capabilities", function() {
+    it("sorting complex data moves 1 DOM node", function() {
+      div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      obs([{ id: 4, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }])
+      var nodes = div.children().each(function(i) { this.id = i; }).toArray()
+      assert.equal(div.text(), 'ABC')
+      obs.sort(function(a, b) { return a.id - b.id; })
+      var nodes2 = div.children().toArray()
+      assert.equal(nodes[1].id, nodes2[2].id)
+      assert.equal(nodes[2].id, nodes2[0].id)
+      assert.equal(nodes[0].id, nodes2[1].id)
+      assert.equal(div.text(), 'CAB')
     })
 
-    it("is false for a single addition", function () {
-      assert.notOk(isAdditionAdjacentToLast(0, [{status: 'added'}]))
+    it("sorting complex data moves all DOM nodes", function() {
+      div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      obs([{ id: 7, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }, { id: 9, testHtml: '<span>D</span>' }])
+      var nodes = div.children().each(function(i) { this.id = i; }).toArray()
+      assert.equal(div.text(), 'ABCD')
+      obs.reverse();
+      var nodes2 = div.children().toArray()
+      assert.equal(nodes[0].id, nodes2[3].id)
+      assert.equal(nodes[1].id, nodes2[2].id)
+      assert.equal(nodes[2].id, nodes2[1].id)
+      assert.equal(nodes[3].id, nodes2[0].id)
+      assert.equal(div.text(), 'DCBA')
     })
 
-    it("is true for two adjacent additions", function () {
-      assert.ok(isAdditionAdjacentToLast(1,
-        [{status: 'added', index: 0}, {status: 'added', index: 1}]))
+    it("sorting complex data recreates DOM nodes if move disabled", function() {
+      div = $("<div data-bind='fastForEach: { data: obs, allowMoveNodes: false }'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      obs([{ id: 7, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }])
+      var nodes = div.children().each(function(i) { this.id = i; }).toArray()
+      assert.equal(div.text(), 'ABC')
+      obs.sort(function(a, b) { return a.id - b.id; })
+      var nodes2 = div.children().toArray()
+      assert.equal(div.text(), 'CBA')
+      assert.notEqual(nodes[1].id, nodes2[2].id)
+      assert.notEqual(nodes[2].id, nodes2[0].id)
+      assert.notEqual(nodes[0].id, nodes2[1].id)
     })
 
-    it("is true for adds separated by a del", function () {
-      assert.ok(isAdditionAdjacentToLast(2, [
-        {status: 'added', index: 0},
-        {status: 'deleted', index: 1},
-        {status: 'added', index: 1},
-      ]))
+    it("Sort large complex array makes correct DOM moves", function() {
+      this.timeout(50000);
+      var itemNumber = 1000;
+      div = $("<div data-bind='fastForEach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
+      ko.applyBindings(view, div[0]);
+      var arr = [], i;
+      for (i = 0; i != itemNumber; ++i) {
+        arr.push({ id: Math.floor(Math.random() * itemNumber), testHtml: '<span>Item ' + i + '</span>' });
+      }
+      obs(arr)
+      assert.equal(div.children().length, itemNumber)
+      div.children().prop("testprop", 10)
+      console.time("with move");
+      obs.sort(function(a, b) { return a.id - b.id; })
+      console.timeEnd("with move");
+      for (i = 0; i != itemNumber; ++i) {
+        arr[i].num = i;
+      }
+      assert.equal(div.children().length, itemNumber)
+      assert.equal(div.children().filter(function() { return this.testprop == 10; }).length, itemNumber)
+      div.children().each(function(index) {
+        assert.equal(index, ko.dataFor(this).num)
+      })
     })
 
-    it("is false for adds with differing del index", function () {
-      assert.notOk(isAdditionAdjacentToLast(2, [
-        {status: 'added', index: 0},
-        {status: 'deleted', index: 0},
-        {status: 'added', index: 1},
-      ]))
+    it("Sort large complex array makes correct DOM order without move", function() {
+      this.timeout(50000);
+      var itemNumber = 1000;
+      div = $("<div data-bind='fastForEach: { data: obs, allowMoveNodes: false }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
+      ko.applyBindings(view, div[0]);
+      var arr = [], i;
+      for (i = 0; i != itemNumber; ++i) {
+        arr.push({ id: Math.floor(Math.random() * itemNumber), testHtml: '<span>Item ' + i + '</span>' });
+      }
+      obs(arr)
+      assert.equal(div.children().length, itemNumber)
+      div.children().prop("testprop", 10)
+      console.time("without move");
+      obs.sort(function(a, b) { return a.id - b.id; })
+      console.timeEnd("without move");
+      for (i = 0; i != itemNumber; ++i) {
+        arr[i].num = i;
+      }
+      assert.equal(div.children().length, itemNumber)
+      div.children().each(function(index) {
+        assert.equal(index, ko.dataFor(this).num)
+      })
+    })
+
+    it("processes duplicate data 1", function () {
+      div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      var itemA = { id: 4, testHtml: '<span>A</span>' };
+      var itemB = { id: 6, testHtml: '<span>B</span>' };
+      obs([itemB, itemA, itemA, itemA])
+      var nodes = div.children().toArray()
+      assert.equal(div.text(), 'BAAA')
+      obs([itemA, itemB])
+      var nodes2 = div.children().toArray()
+      assert.equal(nodes[3], nodes2[0])
+      assert.equal(nodes[0], nodes2[1])
+      assert.equal(div.text(), 'AB')
+    })
+
+    it("processes duplicate data 2", function () {
+      div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      var itemA = { id: 4, testHtml: '<span>A</span>' };
+      var itemB = { id: 6, testHtml: '<span>B</span>' };
+      var others = [1, 2, 3, 4].map(function(e) { return { id: e, testHtml: '' } });
+      obs([itemB, others[0], others[1], others[2], others[3], itemA, itemA])
+      var nodes = div.children().each(function() { this.test = 1; }).toArray()
+      assert.equal(div.text(), 'BAA')
+      obs([itemB, itemA, itemA, itemA, itemA, others[0], others[1], others[2], others[3]])
+      var nodes2 = div.children().toArray()
+      // reuses two 'A' node set
+      assert.equal(div.children().filter(function () { return this.test == 1; }).length, 7)
+      // ... and creates two new
+      assert.equal(div.children().filter(function () { return this.test === undefined; }).length, 2)
+      assert.equal(div.text(), "BAAAA")
+    })
+
+    it("processes changes from more changesets 1", function () {
+      div = $("<div data-bind='fastForEach: { data: obs, manualProcessChangeQueue: true }'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      var itemA = { id: 4, testHtml: '<span>A</span>' };
+      var others = [11, 12, 13, 14].map(function (e) { return { id: e, testHtml: 'C'+e } });
+      obs([itemA, others[0], others[1], others[2], others[3]])
+      div[0].ffe.processQueue();
+      var nodes = div.children().each(function () { this.test = 1; }).toArray()
+      assert.equal(div.text(), "AC11C12C13C14")
+      obs([others[0], others[1], others[2], others[3], itemA])
+      obs([others[1], itemA, others[2], others[3]])
+      obs.sort(function (a, b) { return b.id - a.id; });
+      assert.equal(div.text(), "AC11C12C13C14")
+      div[0].ffe.processQueue();
+      assert.equal(div.text(), "C14C13C12A")
+      // moved all five nodes around
+      assert.equal(div.children().filter(function () { return this.test == 1; }).length, 4)
+    })
+
+    it("processes changes from more changesets 2", function () {
+      div = $("<div data-bind='fastForEach: { data: obs, manualProcessChangeQueue: true }'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      var itemA = { id: 4, testHtml: '<span>A</span>' };
+      var itemB = { id: 5, testHtml: '<span>B</span>' };
+      obs([itemA, itemB])
+      div[0].ffe.processQueue();
+      var nodes = div.children().each(function () { this.test = 1; }).toArray()
+      assert.equal(div.text(), "AB")
+      obs.remove(itemB)
+      obs.push(itemB)
+      obs.remove(itemB)
+      obs.push(itemB)
+      obs.remove(itemB)
+      obs.push(itemB)
+      assert.equal(div.text(), "AB")
+      div[0].ffe.processQueue();
+      assert.equal(div.text(), "AB")
+      // moved all five nodes around
+      assert.equal(div.children().filter(function () { return this.test == 1; }).length, 2)
     })
   })
+
+  //describe("isAdditionAdjacentToLast", function () {
+  //  it("is false for a deletion", function () {
+  //    assert.notOk(isAdditionAdjacentToLast(0, [{status: 'deleted'}]))
+  //  })
+
+  //  it("is false for a single addition", function () {
+  //    assert.notOk(isAdditionAdjacentToLast(0, [{status: 'added'}]))
+  //  })
+
+  //  it("is true for two adjacent additions", function () {
+  //    assert.ok(isAdditionAdjacentToLast(1,
+  //      [{status: 'added', index: 0}, {status: 'added', index: 1}]))
+  //  })
+
+  //  it("is true for adds separated by a del", function () {
+  //    assert.ok(isAdditionAdjacentToLast(2, [
+  //      {status: 'added', index: 0},
+  //      {status: 'deleted', index: 1},
+  //      {status: 'added', index: 1},
+  //    ]))
+  //  })
+
+  //  it("is false for adds with differing del index", function () {
+  //    assert.notOk(isAdditionAdjacentToLast(2, [
+  //      {status: 'added', index: 0},
+  //      {status: 'deleted', index: 0},
+  //      {status: 'added', index: 1},
+  //    ]))
+  //  })
+  //})
 
   describe('afterAdd', function () {
     it("emits on changes to an observable array", function () {
