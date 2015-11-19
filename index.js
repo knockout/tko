@@ -95,8 +95,11 @@ function FastForEach(spec) {
   this.rendering_queued = false;
   this.pendingDeletes = [];
   // for testability purposes only
-  if (FastForEach.DEBUG)
+  if (FastForEach.DEBUG) {
     this.manualProcessChangeQueue = spec.manualProcessChangeQueue;
+    // expose our symbol for tests
+    FastForEach.PENDING_DELETE_INDEX_KEY = PENDING_DELETE_INDEX_KEY;
+  }
 
   // Remove existing content.
   ko.virtualElements.emptyNode(this.element);
@@ -395,9 +398,9 @@ FastForEach.prototype.flushPendingDeletes = function () {
   for (var i = 0; i != this.pendingDeletes.length; ++i) {
     while (this.pendingDeletes[i].nodesets.length) {
       this.removeNodes(this.pendingDeletes[i].nodesets.pop());
-      if (this.pendingDeletes[i].data && typeof this.pendingDeletes[i].data[PENDING_DELETE_INDEX_KEY] !== "undefined")
-        delete this.pendingDeletes[i].data[PENDING_DELETE_INDEX_KEY];
     }
+    if (this.pendingDeletes[i].data && typeof this.pendingDeletes[i].data[PENDING_DELETE_INDEX_KEY] !== "undefined")
+      delete this.pendingDeletes[i].data[PENDING_DELETE_INDEX_KEY];
   }
   arrayClear(this.pendingDeletes);
 }

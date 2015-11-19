@@ -494,6 +494,24 @@ describe("observable array changes", function () {
       // moved all five nodes around
       assert.equal(div.children().filter(function () { return this.test == 1; }).length, 2)
     })
+
+    it("cleans data objects", function () {
+      div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
+      ko.applyBindings(view, div[0]);
+      var itemA = { id: 4, testHtml: '<span>A</span>' };
+      var itemB = { id: 6, testHtml: '<span>B</span>' };
+      var itemC = { id: 6, testHtml: '<span>C</span>' };
+      obs([itemA, itemB, itemC, itemA])
+      var nodes = div.children().toArray()
+      assert.equal(div.text(), 'ABCA')
+      obs([itemC, itemA, itemB])
+      var nodes2 = div.children().toArray()
+      assert.equal(itemA[FastForEach.PENDING_DELETE_INDEX_KEY], undefined)
+      assert.equal(itemB[FastForEach.PENDING_DELETE_INDEX_KEY], undefined)
+      assert.equal(itemC[FastForEach.PENDING_DELETE_INDEX_KEY], undefined)
+      assert.equal(nodes[0], nodes2[1])
+      assert.equal(div.text(), 'CAB')
+    })
   })
 
   //describe("isAdditionAdjacentToLast", function () {
