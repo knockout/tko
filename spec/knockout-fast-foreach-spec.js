@@ -373,8 +373,10 @@ describe("observable array changes", function () {
     })
 
     it("Sort large complex array makes correct DOM moves", function() {
-      this.timeout(50000);
-      var itemNumber = 1000;
+      // for performance testing
+      //this.timeout(50000);
+      //var itemNumber = 1000;
+      var itemNumber = 100;
       div = $("<div data-bind='fastForEach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
       ko.applyBindings(view, div[0]);
       var arr = [], i;
@@ -398,8 +400,10 @@ describe("observable array changes", function () {
     })
 
     it("Sort large complex array makes correct DOM order without move", function() {
-      this.timeout(50000);
-      var itemNumber = 1000;
+      // for performance testing
+      //this.timeout(50000);
+      //var itemNumber = 1000;
+      var itemNumber = 100;
       div = $("<div data-bind='fastForEach: { data: obs, allowMoveNodes: false }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
       ko.applyBindings(view, div[0]);
       var arr = [], i;
@@ -513,37 +517,6 @@ describe("observable array changes", function () {
       assert.equal(div.text(), 'CAB')
     })
   })
-
-  //describe("isAdditionAdjacentToLast", function () {
-  //  it("is false for a deletion", function () {
-  //    assert.notOk(isAdditionAdjacentToLast(0, [{status: 'deleted'}]))
-  //  })
-
-  //  it("is false for a single addition", function () {
-  //    assert.notOk(isAdditionAdjacentToLast(0, [{status: 'added'}]))
-  //  })
-
-  //  it("is true for two adjacent additions", function () {
-  //    assert.ok(isAdditionAdjacentToLast(1,
-  //      [{status: 'added', index: 0}, {status: 'added', index: 1}]))
-  //  })
-
-  //  it("is true for adds separated by a del", function () {
-  //    assert.ok(isAdditionAdjacentToLast(2, [
-  //      {status: 'added', index: 0},
-  //      {status: 'deleted', index: 1},
-  //      {status: 'added', index: 1},
-  //    ]))
-  //  })
-
-  //  it("is false for adds with differing del index", function () {
-  //    assert.notOk(isAdditionAdjacentToLast(2, [
-  //      {status: 'added', index: 0},
-  //      {status: 'deleted', index: 0},
-  //      {status: 'added', index: 1},
-  //    ]))
-  //  })
-  //})
 
   describe('afterAdd', function () {
     it("emits on changes to an observable array", function () {
