@@ -1,4 +1,4 @@
-// index.js
+﻿// index.js
 // --------
 // Fast For Each
 //
@@ -297,7 +297,7 @@ FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insert
     containerNode = this.element;
 
   // poor man's node and array check, should be enough for this
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
+  if (typeof nodeOrNodeArrayToInsert.nodeType === "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
     throw new Error("Expected a single node or a node array");
   }
   if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
@@ -326,7 +326,7 @@ FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insert
 
 // checks if the deleted data item should be handled with delay for a possible reuse at additions
 FastForEach.prototype.shouldDelayDeletion = function (data) {
-  return this.allowMoveNodes && typeof data === "object" || typeof data === "function";
+  return this.allowMoveNodes && (typeof data === "object" || typeof data === "function");
 }
 
 // get the cached index from the data item which points to its pendind deletion info
