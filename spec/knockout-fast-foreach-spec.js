@@ -333,13 +333,13 @@ describe("observable array changes", function () {
       div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
       ko.applyBindings(view, div[0]);
       obs([{ id: 4, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }])
-      var nodes = div.children().each(function(i) { this.id = i; }).toArray()
+      var nodes = div.children().toArray()
       assert.equal(div.text(), 'ABC')
       obs.sort(function(a, b) { return a.id - b.id; })
       var nodes2 = div.children().toArray()
-      assert.equal(nodes[1].id, nodes2[2].id)
-      assert.equal(nodes[2].id, nodes2[0].id)
-      assert.equal(nodes[0].id, nodes2[1].id)
+      assert.strictEqual(nodes[1], nodes2[2])
+      assert.strictEqual(nodes[2], nodes2[0])
+      assert.strictEqual(nodes[0], nodes2[1])
       assert.equal(div.text(), 'CAB')
     })
 
@@ -347,35 +347,35 @@ describe("observable array changes", function () {
       div = $("<div data-bind='fastForEach: obs'><div data-bind='html: testHtml'></div></div>");
       ko.applyBindings(view, div[0]);
       obs([{ id: 7, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }, { id: 9, testHtml: '<span>D</span>' }])
-      var nodes = div.children().each(function(i) { this.id = i; }).toArray()
+      var nodes = div.children().toArray()
       assert.equal(div.text(), 'ABCD')
       obs.reverse();
       var nodes2 = div.children().toArray()
-      assert.equal(nodes[0].id, nodes2[3].id)
-      assert.equal(nodes[1].id, nodes2[2].id)
-      assert.equal(nodes[2].id, nodes2[1].id)
-      assert.equal(nodes[3].id, nodes2[0].id)
+      assert.strictEqual(nodes[0], nodes2[3])
+      assert.strictEqual(nodes[1], nodes2[2])
+      assert.strictEqual(nodes[2], nodes2[1])
+      assert.strictEqual(nodes[3], nodes2[0])
       assert.equal(div.text(), 'DCBA')
     })
 
-    it("sorting complex data recreates DOM nodes if move disabled", function() {
-      div = $("<div data-bind='fastForEach: { data: obs, allowMoveNodes: false }'><div data-bind='html: testHtml'></div></div>");
+    it("sorting complex data recreates DOM nodes if move disabled", function () {
+      var originalShouldDelayDeletion = FastForEach.prototype.shouldDelayDeletion;
+      FastForEach.prototype.shouldDelayDeletion = function(data) { return false; }
+      div = $("<div data-bind='fastForEach: { data: obs }'><div data-bind='html: testHtml'></div></div>");
       ko.applyBindings(view, div[0]);
       obs([{ id: 7, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }])
-      var nodes = div.children().each(function(i) { this.id = i; }).toArray()
+      var nodes = div.children().toArray()
       assert.equal(div.text(), 'ABC')
       obs.sort(function(a, b) { return a.id - b.id; })
       var nodes2 = div.children().toArray()
       assert.equal(div.text(), 'CBA')
-      assert.notEqual(nodes[1].id, nodes2[2].id)
-      assert.notEqual(nodes[2].id, nodes2[0].id)
-      assert.notEqual(nodes[0].id, nodes2[1].id)
+      assert.notStrictEqual(nodes[1], nodes2[2])
+      assert.notStrictEqual(nodes[2], nodes2[0])
+      assert.notStrictEqual(nodes[0], nodes2[1])
+      FastForEach.prototype.shouldDelayDeletion = originalShouldDelayDeletion;
     })
 
     it("Sort large complex array makes correct DOM moves", function() {
-      // for performance testing
-      //this.timeout(50000);
-      //var itemNumber = 1000;
       var itemNumber = 100;
       div = $("<div data-bind='fastForEach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
       ko.applyBindings(view, div[0]);
@@ -400,11 +400,10 @@ describe("observable array changes", function () {
     })
 
     it("Sort large complex array makes correct DOM order without move", function() {
-      // for performance testing
-      //this.timeout(50000);
-      //var itemNumber = 1000;
+      var originalShouldDelayDeletion = FastForEach.prototype.shouldDelayDeletion;
+      FastForEach.prototype.shouldDelayDeletion = function (data) { return false; }
       var itemNumber = 100;
-      div = $("<div data-bind='fastForEach: { data: obs, allowMoveNodes: false }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
+      div = $("<div data-bind='fastForEach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
       ko.applyBindings(view, div[0]);
       var arr = [], i;
       for (i = 0; i != itemNumber; ++i) {
@@ -412,10 +411,7 @@ describe("observable array changes", function () {
       }
       obs(arr)
       assert.equal(div.children().length, itemNumber)
-      div.children().prop("testprop", 10)
-      console.time("without move");
       obs.sort(function(a, b) { return a.id - b.id; })
-      console.timeEnd("without move");
       for (i = 0; i != itemNumber; ++i) {
         arr[i].num = i;
       }
@@ -423,6 +419,7 @@ describe("observable array changes", function () {
       div.children().each(function(index) {
         assert.equal(index, ko.dataFor(this).num)
       })
+      FastForEach.prototype.shouldDelayDeletion = originalShouldDelayDeletion;
     })
 
     it("processes duplicate data 1", function () {
@@ -435,8 +432,8 @@ describe("observable array changes", function () {
       assert.equal(div.text(), 'BAAA')
       obs([itemA, itemB])
       var nodes2 = div.children().toArray()
-      assert.equal(nodes[3], nodes2[0])
-      assert.equal(nodes[0], nodes2[1])
+      assert.strictEqual(nodes[3], nodes2[0])
+      assert.strictEqual(nodes[0], nodes2[1])
       assert.equal(div.text(), 'AB')
     })
 
@@ -459,7 +456,9 @@ describe("observable array changes", function () {
     })
 
     it("processes changes from more changesets 1", function () {
-      div = $("<div data-bind='fastForEach: { data: obs, manualProcessChangeQueue: true }'><div data-bind='html: testHtml'></div></div>");
+      var originalAnimateFrame = FastForEach.animateFrame;
+      FastForEach.animateFrame = function() { };
+      div = $("<div data-bind='fastForEach: { data: obs }'><div data-bind='html: testHtml'></div></div>");
       ko.applyBindings(view, div[0]);
       var itemA = { id: 4, testHtml: '<span>A</span>' };
       var others = [11, 12, 13, 14].map(function (e) { return { id: e, testHtml: 'C'+e } });
@@ -475,10 +474,13 @@ describe("observable array changes", function () {
       assert.equal(div.text(), "C14C13C12A")
       // moved all five nodes around
       assert.equal(div.children().filter(function () { return this.test == 1; }).length, 4)
+      FastForEach.animateFrame = originalAnimateFrame;
     })
 
     it("processes changes from more changesets 2", function () {
-      div = $("<div data-bind='fastForEach: { data: obs, manualProcessChangeQueue: true }'><div data-bind='html: testHtml'></div></div>");
+      var originalAnimateFrame = FastForEach.animateFrame;
+      FastForEach.animateFrame = function () { };
+      div = $("<div data-bind='fastForEach: { data: obs }'><div data-bind='html: testHtml'></div></div>");
       ko.applyBindings(view, div[0]);
       var itemA = { id: 4, testHtml: '<span>A</span>' };
       var itemB = { id: 5, testHtml: '<span>B</span>' };
@@ -495,8 +497,8 @@ describe("observable array changes", function () {
       assert.equal(div.text(), "AB")
       div[0].ffe.processQueue();
       assert.equal(div.text(), "AB")
-      // moved all five nodes around
       assert.equal(div.children().filter(function () { return this.test == 1; }).length, 2)
+      FastForEach.animateFrame = originalAnimateFrame;
     })
 
     it("cleans data objects", function () {
