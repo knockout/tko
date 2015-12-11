@@ -351,7 +351,9 @@ FastForEach.prototype.deleted = function (changeItem) {
 
 // removes a set of nodes from the DOM
 FastForEach.prototype.removeNodes = function (nodes) {
-  if (!nodes.length) return;
+  if (!nodes.length) {
+    return;
+  }
 
   var removeFn = function () {
     ko.utils.arrayForEach(nodes, function (n) { ko.removeNode(n); });
@@ -384,7 +386,7 @@ FastForEach.prototype.flushPendingDeletes = function () {
     if (pd.data && pd.data[PENDING_DELETE_INDEX_KEY] !== undefined)
       delete pd.data[PENDING_DELETE_INDEX_KEY];
   }
-  this.pendingDeletes.length = 0;
+  this.pendingDeletes = [];
 }
 
 // We batch our deletion of item indexes in our parallel array.
