@@ -77,7 +77,7 @@ function FastForEach(spec) {
   this.afterAdd = spec.afterAdd;
   this.beforeRemove = spec.beforeRemove;
   this.templateNode = makeTemplateNode(
-    spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
+    spec.templateNode || (spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element)
   );
   this.afterQueueFlush = spec.afterQueueFlush;
   this.beforeQueueFlush = spec.beforeQueueFlush;
@@ -283,10 +283,10 @@ FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insert
     containerNode = this.element;
 
   // poor man's node and array check, should be enough for this
-  if (typeof nodeOrNodeArrayToInsert.nodeType === "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
+  if (nodeOrNodeArrayToInsert.nodeType === undefined && nodeOrNodeArrayToInsert.length === undefined) {
     throw new Error("Expected a single node or a node array");
   }
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
+  if (nodeOrNodeArrayToInsert.nodeType !== undefined) {
     ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
     return [nodeOrNodeArrayToInsert];
   } else if (nodeOrNodeArrayToInsert.length === 1) {
@@ -318,7 +318,7 @@ FastForEach.prototype.shouldDelayDeletion = function (data) {
 // gets the pending deletion info for this data item
 FastForEach.prototype.getPendingDeleteFor = function (data) {
   var index = data && data[PENDING_DELETE_INDEX_KEY];
-  if (typeof index === "undefined") return null;
+  if (index === undefined) return null;
   return this.pendingDeletes[index];
 }
 
@@ -381,7 +381,7 @@ FastForEach.prototype.flushPendingDeletes = function () {
     while (pd.nodesets.length) {
       this.removeNodes(pd.nodesets.pop());
     }
-    if (pd.data && typeof pd.data[PENDING_DELETE_INDEX_KEY] !== "undefined")
+    if (pd.data && pd.data[PENDING_DELETE_INDEX_KEY] !== undefined)
       delete pd.data[PENDING_DELETE_INDEX_KEY];
   }
   this.pendingDeletes.length = 0;
@@ -438,8 +438,7 @@ ko.bindingHandlers.fastForEach = {
         $context: context
       });
     }
-    if (FastForEach.DEBUG)
-      element.ffe = ffe;
+    
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       ffe.dispose();
     });

@@ -24,7 +24,6 @@ function setupSynchronousFrameAnimation () {
 }
 
 describe("applying bindings", function () {
-  FastForEach.DEBUG = true;
   setupSynchronousFrameAnimation()
 
   it("works with a static list", function () {
@@ -458,19 +457,30 @@ describe("observable array changes", function () {
     it("processes changes from more changesets 1", function () {
       var originalAnimateFrame = FastForEach.animateFrame;
       FastForEach.animateFrame = function() { };
-      div = $("<div data-bind='fastForEach: { data: obs }'><div data-bind='html: testHtml'></div></div>");
-      ko.applyBindings(view, div[0]);
+      div = $("<div data-bind='visible: true'></div>");
+      ko.applyBindings({}, div[0]);
+
       var itemA = { id: 4, testHtml: '<span>A</span>' };
       var others = [11, 12, 13, 14].map(function (e) { return { id: e, testHtml: 'C'+e } });
       obs([itemA, others[0], others[1], others[2], others[3]])
-      div[0].ffe.processQueue();
+
+      // manual initialization to be able to access processQueue method
+      var ffe = new FastForEach({
+        element: div[0],
+        data: obs,
+        $context: ko.contextFor(div[0]),
+        templateNode: $("<script type='text/html'><div data-bind='html: testHtml'></div></script>")[0]
+      });
+
+      ffe.processQueue();
       var nodes = div.children().each(function () { this.test = 1; }).toArray()
       assert.equal(div.text(), "AC11C12C13C14")
       obs([others[0], others[1], others[2], others[3], itemA])
       obs([others[1], itemA, others[2], others[3]])
       obs.sort(function (a, b) { return b.id - a.id; });
       assert.equal(div.text(), "AC11C12C13C14")
-      div[0].ffe.processQueue();
+
+      ffe.processQueue();
       assert.equal(div.text(), "C14C13C12A")
       // moved all five nodes around
       assert.equal(div.children().filter(function () { return this.test == 1; }).length, 4)
@@ -480,12 +490,22 @@ describe("observable array changes", function () {
     it("processes changes from more changesets 2", function () {
       var originalAnimateFrame = FastForEach.animateFrame;
       FastForEach.animateFrame = function () { };
-      div = $("<div data-bind='fastForEach: { data: obs }'><div data-bind='html: testHtml'></div></div>");
-      ko.applyBindings(view, div[0]);
+      div = $("<div data-bind='visible: true'></div>");
+      ko.applyBindings({}, div[0]);
+
       var itemA = { id: 4, testHtml: '<span>A</span>' };
       var itemB = { id: 5, testHtml: '<span>B</span>' };
       obs([itemA, itemB])
-      div[0].ffe.processQueue();
+
+      // manual initialization to be able to access processQueue method
+      var ffe = new FastForEach({
+        element: div[0],
+        data: obs,
+        $context: ko.contextFor(div[0]),
+        templateNode: $("<script type='text/html'><div data-bind='html: testHtml'></div></script>")[0]
+      });
+
+      ffe.processQueue();
       var nodes = div.children().each(function () { this.test = 1; }).toArray()
       assert.equal(div.text(), "AB")
       obs.remove(itemB)
@@ -495,7 +515,8 @@ describe("observable array changes", function () {
       obs.remove(itemB)
       obs.push(itemB)
       assert.equal(div.text(), "AB")
-      div[0].ffe.processQueue();
+
+      ffe.processQueue();
       assert.equal(div.text(), "AB")
       assert.equal(div.children().filter(function () { return this.test == 1; }).length, 2)
       FastForEach.animateFrame = originalAnimateFrame;
