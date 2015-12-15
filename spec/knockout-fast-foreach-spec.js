@@ -469,7 +469,7 @@ describe("observable array changes", function () {
         element: div[0],
         data: obs,
         $context: ko.contextFor(div[0]),
-        templateNode: $("<script type='text/html'><div data-bind='html: testHtml'></div></script>")[0]
+        templateNode: $("<template><div data-bind='html: testHtml'></div></template>")[0]
       });
 
       ffe.processQueue();
