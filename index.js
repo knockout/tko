@@ -86,7 +86,7 @@ function FastForEach(spec) {
   this.indexesToDelete = [];
   this.rendering_queued = false;
   this.pendingDeletes = [];
-  
+
   // Remove existing content.
   ko.virtualElements.emptyNode(this.element);
 
@@ -270,13 +270,13 @@ FastForEach.prototype.getNodesForIndex = function (index) {
     result.push(ptr);
   }
   return result;
-}
+};
 
 FastForEach.prototype.getLastNodeBeforeIndex = function (index) {
   if (index < 1 || index - 1 >= this.firstLastNodesList.length)
     return null;
   return this.firstLastNodesList[index - 1].last;
-}
+};
 
 FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfterNode) {
   var frag, len, i,
@@ -313,14 +313,14 @@ FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insert
 // checks if the deleted data item should be handled with delay for a possible reuse at additions
 FastForEach.prototype.shouldDelayDeletion = function (data) {
   return data && (typeof data === "object" || typeof data === "function");
-}
+};
 
 // gets the pending deletion info for this data item
 FastForEach.prototype.getPendingDeleteFor = function (data) {
   var index = data && data[PENDING_DELETE_INDEX_KEY];
   if (index === undefined) return null;
   return this.pendingDeletes[index];
-}
+};
 
 // tries to find the existing pending delete info for this data item, and if it can't, it registeres one
 FastForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
@@ -335,7 +335,7 @@ FastForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
   data[PENDING_DELETE_INDEX_KEY] = this.pendingDeletes.length;
   this.pendingDeletes.push(pd);
   return pd;
-}
+};
 
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (changeItem) {
@@ -372,7 +372,7 @@ FastForEach.prototype.removeNodes = function (nodes) {
   } else {
     removeFn();
   }
-}
+};
 
 // flushes the pending delete info store
 // this should be called after queue processing has finished, so that data items and remaining (not reused) nodesets get cleaned up
@@ -387,7 +387,7 @@ FastForEach.prototype.flushPendingDeletes = function () {
       delete pd.data[PENDING_DELETE_INDEX_KEY];
   }
   this.pendingDeletes = [];
-}
+};
 
 // We batch our deletion of item indexes in our parallel array.
 // See brianmhunt/knockout-fast-foreach#6/#8
@@ -440,7 +440,7 @@ ko.bindingHandlers.fastForEach = {
         $context: context
       });
     }
-    
+
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       ffe.dispose();
     });

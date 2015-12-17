@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.5.5 (2015-09-28T01:49:13.068Z)
+  Knockout Fast Foreach v0.6.0 (2015-12-17T02:29:56.923Z)
   By: Brian M Hunt (C) 2015 | License: MIT
 
   Adds `fastForEach` to `ko.bindingHandlers`.
@@ -73,45 +73,13 @@ function valueToChangeAddItem(value, index) {
   };
 }
 
-/*
-  There are two common cases when we should treat additions as adjacent:
-
-    1. two adjacent additions (i.e. contiguous indexes);
-    2. two additions separated by a deletion.
-
-  The second case shall occur, perhaps often, when using the splice method or
-  redefining an array.
-
-  One could theoretically walk backwards through the changes and form a longest-
-  contiguous list of additions, but that *could* be O(n)ish worst case (though
-  average case is probably quite good).
-  */
-function isAdditionAdjacentToLast(changeIndex, arrayChanges) {
-  var change = arrayChanges[changeIndex];
-  var prevChange = arrayChanges[changeIndex - 1];
-
-  if (changeIndex === 0 ||
-      changeIndex >= arrayChanges.length ||
-      change.status !== 'added'
-    ) { return false; }
-
-  // Add-Add
-  if (prevChange.status === 'added' && prevChange.index === change.index - 1) {
-    return true;
-  }
-
-  // Add-Del-Add
-  var prevPrevChange = arrayChanges[changeIndex - 2];
-  if (prevPrevChange &&
-    prevChange.status === 'deleted' &&
-    prevChange.index === change.index &&
-    prevPrevChange.status === "added" &&
-    prevPrevChange.index === change.index - 1
-  ) { return true; }
-
-  return false;
+// KO 3.4 doesn't seem to export this utility function so it's here just to be sure
+function createSymbolOrString(identifier) {
+  return typeof Symbol === 'function' ? Symbol(identifier) : identifier;
 }
 
+// store a symbol for caching the pending delete info index in the data item objects
+var PENDING_DELETE_INDEX_KEY = createSymbolOrString("_ko_ffe_pending_delete_index");
 
 function FastForEach(spec) {
   this.element = spec.element;
@@ -125,14 +93,15 @@ function FastForEach(spec) {
   this.afterAdd = spec.afterAdd;
   this.beforeRemove = spec.beforeRemove;
   this.templateNode = makeTemplateNode(
-    spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
+    spec.templateNode || (spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element)
   );
   this.afterQueueFlush = spec.afterQueueFlush;
   this.beforeQueueFlush = spec.beforeQueueFlush;
   this.changeQueue = [];
-  this.lastNodesList = [];
+  this.firstLastNodesList = [];
   this.indexesToDelete = [];
   this.rendering_queued = false;
+  this.pendingDeletes = [];
 
   // Remove existing content.
   ko.virtualElements.emptyNode(this.element);
@@ -147,22 +116,24 @@ function FastForEach(spec) {
   if (ko.isObservable(this.data)) {
     if (!this.data.indexOf) {
       // Make sure the observable is trackable.
-      this.data = this.data.extend({trackArrayChanges: true});
+      this.data = this.data.extend({ trackArrayChanges: true });
     }
     this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
   }
 }
 
+FastForEach.PENDING_DELETE_INDEX_KEY = PENDING_DELETE_INDEX_KEY;
 
 FastForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
-  function(cb) { return window.setTimeout(cb, 1000 / 60); };
+  function (cb) { return window.setTimeout(cb, 1000 / 60); };
 
 
 FastForEach.prototype.dispose = function () {
   if (this.changeSubs) {
     this.changeSubs.dispose();
   }
+  this.flushPendingDeletes();
 };
 
 
@@ -173,31 +144,39 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
     added: [],
     deleted: []
   };
+
+  // knockout array change notification index handling:
+  // - sends the original array indexes for deletes
+  // - sends the new array indexes for adds
+  // - sorts them all by index in ascending order
+  // because of this, when checking for possible batch additions, any delete can be between to adds with neighboring indexes, so only additions should be checked
   for (var i = 0, len = changeSet.length; i < len; i++) {
-    // the change is appended to a last change info object when both are 'added' and have indexes next to each other
-    // here I presume that ko is sending changes in monotonic order (in index variable) which happens to be true, tested with push and splice with multiple pushed values
-    if (isAdditionAdjacentToLast(i, changeSet)) {
-      var batchValues = changeMap.added[changeMap.added.length - 1].values;
-      if (!batchValues) {
-        // transform the last addition into a batch addition object
-        var lastAddition = changeMap.added.pop();
-        var batchAddition = {
-          isBatch: true,
-          status: 'added',
-          index: lastAddition.index,
-          values: [lastAddition.value]
-        };
-        batchValues = batchAddition.values;
-        changeMap.added.push(batchAddition);
+
+    if (changeMap.added.length && changeSet[i].status == 'added') {
+      var lastAdd = changeMap.added[changeMap.added.length - 1];
+      var lastIndex = lastAdd.isBatch ? lastAdd.index + lastAdd.values.length - 1 : lastAdd.index;
+      if (lastIndex + 1 == changeSet[i].index) {
+        if (!lastAdd.isBatch) {
+          // transform the last addition into a batch addition object
+          lastAdd = {
+            isBatch: true,
+            status: 'added',
+            index: lastAdd.index,
+            values: [lastAdd.value]
+          };
+          changeMap.added.splice(changeMap.added.length - 1, 1, lastAdd);
+        }
+        lastAdd.values.push(changeSet[i].value);
+        continue;
       }
-      batchValues.push(changeSet[i].value);
-    } else {
-      changeMap[changeSet[i].status].push(changeSet[i]);
     }
+
+    changeMap[changeSet[i].status].push(changeSet[i]);
   }
+
   if (changeMap.deleted.length > 0) {
     this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
-    this.changeQueue.push({status: 'clearDeletedIndexes'});
+    this.changeQueue.push({ status: 'clearDeletedIndexes' });
   }
   this.changeQueue.push.apply(this.changeQueue, changeMap.added);
   // Once a change is registered, the ticking count-down starts for the processQueue.
@@ -226,6 +205,7 @@ FastForEach.prototype.processQueue = function () {
     self[changeItem.status](changeItem);
     // console.log("  ==> ", JSON.stringify($(self.element).text()))
   });
+  this.flushPendingDeletes();
   this.rendering_queued = false;
 
   // Update our indexes.
@@ -250,52 +230,79 @@ function extendWithIndex(context) {
 FastForEach.prototype.added = function (changeItem) {
   var index = changeItem.index;
   var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value];
-  var referenceElement = this.lastNodesList[index - 1] || null;
+  var referenceElement = this.getLastNodeBeforeIndex(index);
   // gather all childnodes for a possible batch insertion
   var allChildNodes = [];
 
   for (var i = 0, len = valuesToAdd.length; i < len; ++i) {
-    var templateClone = this.templateNode.cloneNode(true);
-    var childContext;
+    var childNodes;
 
-    if (this.noContext) {
-      childContext = this.$context.extend({
-        $item: valuesToAdd[i],
-        $index: this.noIndex ? undefined : ko.observable()
-      });
+    // we check if we have a pending delete with reusable nodesets for this data, and if yes, we reuse one nodeset
+    var pendingDelete = this.getPendingDeleteFor(valuesToAdd[i]);
+    if (pendingDelete && pendingDelete.nodesets.length) {
+      childNodes = pendingDelete.nodesets.pop();
     } else {
-      childContext = this.$context.createChildContext(valuesToAdd[i], this.as || null, this.noIndex ? undefined : extendWithIndex);
+      var templateClone = this.templateNode.cloneNode(true);
+      var childContext;
+
+      if (this.noContext) {
+        childContext = this.$context.extend({
+          $item: valuesToAdd[i],
+          $index: this.noIndex ? undefined : ko.observable()
+        });
+      } else {
+        childContext = this.$context.createChildContext(valuesToAdd[i], this.as || null, this.noIndex ? undefined : extendWithIndex);
+      }
+
+      // apply bindings first, and then process child nodes, because bindings can add childnodes
+      ko.applyBindingsToDescendants(childContext, templateClone);
+
+      childNodes = ko.virtualElements.childNodes(templateClone);
     }
 
-    // apply bindings first, and then process child nodes, because bindings can add childnodes
-    ko.applyBindingsToDescendants(childContext, templateClone);
-
-    var childNodes = ko.virtualElements.childNodes(templateClone);
     // Note discussion at https://github.com/angular/angular.js/issues/7851
     allChildNodes.push.apply(allChildNodes, Array.prototype.slice.call(childNodes));
-    this.lastNodesList.splice(index + i, 0, childNodes[childNodes.length - 1]);
+    this.firstLastNodesList.splice(index + i, 0, { first: childNodes[0], last: childNodes[childNodes.length - 1] });
   }
 
   if (typeof this.afterAdd === 'function') {
     this.afterAdd({
       nodeOrArrayInserted: this.insertAllAfter(allChildNodes, referenceElement),
-      foreachInstance: this}
+      foreachInstance: this
+    }
     );
   } else {
     this.insertAllAfter(allChildNodes, referenceElement);
   }
 };
 
+FastForEach.prototype.getNodesForIndex = function (index) {
+  var result = [],
+    ptr = this.firstLastNodesList[index].first,
+    last = this.firstLastNodesList[index].last;
+  result.push(ptr);
+  while (ptr && ptr !== last) {
+    ptr = ptr.nextSibling;
+    result.push(ptr);
+  }
+  return result;
+};
 
-FastForEach.prototype.insertAllAfter = function(nodeOrNodeArrayToInsert, insertAfterNode) {
+FastForEach.prototype.getLastNodeBeforeIndex = function (index) {
+  if (index < 1 || index - 1 >= this.firstLastNodesList.length)
+    return null;
+  return this.firstLastNodesList[index - 1].last;
+};
+
+FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfterNode) {
   var frag, len, i,
     containerNode = this.element;
 
   // poor man's node and array check, should be enough for this
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined" && typeof nodeOrNodeArrayToInsert.length === "undefined") {
+  if (nodeOrNodeArrayToInsert.nodeType === undefined && nodeOrNodeArrayToInsert.length === undefined) {
     throw new Error("Expected a single node or a node array");
   }
-  if (typeof nodeOrNodeArrayToInsert.nodeType !== "undefined") {
+  if (nodeOrNodeArrayToInsert.nodeType !== undefined) {
     ko.virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
     return [nodeOrNodeArrayToInsert];
   } else if (nodeOrNodeArrayToInsert.length === 1) {
@@ -319,43 +326,84 @@ FastForEach.prototype.insertAllAfter = function(nodeOrNodeArrayToInsert, insertA
   return nodeOrNodeArrayToInsert;
 };
 
+// checks if the deleted data item should be handled with delay for a possible reuse at additions
+FastForEach.prototype.shouldDelayDeletion = function (data) {
+  return data && (typeof data === "object" || typeof data === "function");
+};
+
+// gets the pending deletion info for this data item
+FastForEach.prototype.getPendingDeleteFor = function (data) {
+  var index = data && data[PENDING_DELETE_INDEX_KEY];
+  if (index === undefined) return null;
+  return this.pendingDeletes[index];
+};
+
+// tries to find the existing pending delete info for this data item, and if it can't, it registeres one
+FastForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
+  var pd = this.getPendingDeleteFor(data);
+  if (pd) {
+    return pd;
+  }
+  pd = {
+    data: data,
+    nodesets: []
+  };
+  data[PENDING_DELETE_INDEX_KEY] = this.pendingDeletes.length;
+  this.pendingDeletes.push(pd);
+  return pd;
+};
 
 // Process a changeItem with {status: 'deleted', ...}
 FastForEach.prototype.deleted = function (changeItem) {
-  var index = changeItem.index,
-    beforeRemoveReturn,
-    nodeToRemove,
-    ptr = this.lastNodesList[index],
-      // We use this.element because that will be the last previous node
-      // for virtual element lists.
-    lastNode = this.lastNodesList[index - 1] || this.element;
-  do {
-    ptr = ptr.previousSibling;
-    nodeToRemove = (ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element);
-    if (this.beforeRemove && nodeToRemove) {
-      beforeRemoveReturn = this.beforeRemove({
-        nodeToRemove: nodeToRemove, foreachInstance: this
-      }) || {};
-      // If beforeRemove returns a `then`–able e.g. a Promise, we remove
-      // the nodes when that thenable completes.  We pass any errors to
-      // ko.onError.
-      if (typeof beforeRemoveReturn.then === 'function') {
-        beforeRemoveReturn
-          .then(
-            function () { ko.removeNode(nodeToRemove); },
-            ko.onError ? ko.onError : undefined
-          );
-      }
-    } else if (nodeToRemove) {
-      ko.removeNode(nodeToRemove);
-    }
-  } while (ptr && ptr !== lastNode);
-  // The "last node" in the DOM from which we begin our delets of the next adjacent node is
-  // now the sibling that preceded the first node of this item.
-  this.lastNodesList[index] = this.lastNodesList[index - 1];
-  this.indexesToDelete.push(index);
+  // if we should delay the deletion of this data, we add the nodeset to the pending delete info object
+  if (this.shouldDelayDeletion(changeItem.value)) {
+    var pd = this.getOrCreatePendingDeleteFor(changeItem.value);
+    pd.nodesets.push(this.getNodesForIndex(changeItem.index));
+  } else { // simple data, just remove the nodes
+    this.removeNodes(this.getNodesForIndex(changeItem.index));
+  }
+  this.indexesToDelete.push(changeItem.index);
 };
 
+// removes a set of nodes from the DOM
+FastForEach.prototype.removeNodes = function (nodes) {
+  if (!nodes.length) {
+    return;
+  }
+
+  var removeFn = function () {
+    ko.utils.arrayForEach(nodes, function (n) { ko.removeNode(n); });
+  };
+
+  if (this.beforeRemove) {
+    var beforeRemoveReturn = this.beforeRemove({
+      nodesToRemove: nodes, foreachInstance: this
+    }) || {};
+    // If beforeRemove returns a `then`–able e.g. a Promise, we remove
+    // the nodes when that thenable completes.  We pass any errors to
+    // ko.onError.
+    if (typeof beforeRemoveReturn.then === 'function') {
+      beforeRemoveReturn.then(removeFn, ko.onError ? ko.onError : undefined);
+    }
+  } else {
+    removeFn();
+  }
+};
+
+// flushes the pending delete info store
+// this should be called after queue processing has finished, so that data items and remaining (not reused) nodesets get cleaned up
+// we also call it on dispose not to leave any mess
+FastForEach.prototype.flushPendingDeletes = function () {
+  for (var i = 0, len = this.pendingDeletes.length; i != len; ++i) {
+    var pd = this.pendingDeletes[i];
+    while (pd.nodesets.length) {
+      this.removeNodes(pd.nodesets.pop());
+    }
+    if (pd.data && pd.data[PENDING_DELETE_INDEX_KEY] !== undefined)
+      delete pd.data[PENDING_DELETE_INDEX_KEY];
+  }
+  this.pendingDeletes = [];
+};
 
 // We batch our deletion of item indexes in our parallel array.
 // See brianmhunt/knockout-fast-foreach#6/#8
@@ -363,13 +411,13 @@ FastForEach.prototype.clearDeletedIndexes = function () {
   // We iterate in reverse on the presumption (following the unit tests) that KO's diff engine
   // processes diffs (esp. deletes) monotonically ascending i.e. from index 0 -> N.
   for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
-    this.lastNodesList.splice(this.indexesToDelete[i], 1);
+    this.firstLastNodesList.splice(this.indexesToDelete[i], 1);
   }
   this.indexesToDelete = [];
 };
 
 
-FastForEach.prototype.getContextStartingFrom = function(node) {
+FastForEach.prototype.getContextStartingFrom = function (node) {
   var ctx;
   while (node) {
     ctx = ko.contextFor(node);
@@ -381,15 +429,8 @@ FastForEach.prototype.getContextStartingFrom = function(node) {
 
 FastForEach.prototype.updateIndexes = function (fromIndex) {
   var ctx;
-  for (var i = fromIndex, len = this.lastNodesList.length; i < len; ++i) {
-    if (i === 0) {
-      ctx = this.getContextStartingFrom(
-        ko.virtualElements.childNodes(this.element)[0]
-      );
-    } else {
-      // Get the first sibling for this element
-      ctx = this.getContextStartingFrom(this.lastNodesList[i - 1].nextSibling);
-    }
+  for (var i = fromIndex, len = this.firstLastNodesList.length; i < len; ++i) {
+    ctx = this.getContextStartingFrom(this.firstLastNodesList[i].first);
     if (ctx) { ctx.$index(i); }
   }
 };
@@ -415,10 +456,11 @@ ko.bindingHandlers.fastForEach = {
         $context: context
       });
     }
+
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       ffe.dispose();
     });
-    return {controlsDescendantBindings: true};
+    return { controlsDescendantBindings: true };
   },
 
   // Export for testing, debugging, and overloading.
