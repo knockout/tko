@@ -11,7 +11,7 @@
     "url": "https://github.com/knockout/knockout.git"
   },
   "scripts": {
-    "test": "gulp test:phantomjs"
+    "test": "gulp test:phantomjs --once"
   },
   "bugs": "https://github.com/knockout/knockout/issues",
   "licenses": [
@@ -45,7 +45,8 @@
     "karma-chrome-launcher": "^0.2.0",
     "karma-jasmine": "^0.1.6",
     "karma-phantomjs-launcher": "^0.2.1",
-    "karma-sauce-launcher": "^0.2.14",
+    "karma-sauce-launcher": "^0.3.0",
+    "phantomjs": "^1.9.19",
     "promise": "^7.0.4",
     "through": "^2.3.8"
   }
