@@ -9,7 +9,7 @@ banner: |
    */
 
 # knockout-latest[.debug].js goes here when compiled
-buildDir: build/output/
+buildDir: dist/
 build:
   main: knockout-latest.js
   debug: knockout-latest.debug.js

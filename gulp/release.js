@@ -28,8 +28,8 @@ module.exports = function(gulp, plugins, config) {
           push_tags: "git push origin master --tags"
         };
 
-      // Create dest/ and copies build/output/knockout.js and
-      // build/output/knockout-latest.debug.js to dest/
+      // Create dest/  and copy
+      // knockout-latest.debug.js to dest/
       try {
           fs.mkdirSync(config.distDir)
       } catch (e) {} // ignore directory-exists

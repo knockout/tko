@@ -1,11 +1,13 @@
 
-### Knockout
+### TKO (“Technically Knockout”)
 
 [![Build Status](https://travis-ci.org/brianmhunt/knockout.svg?branch=1039-build-for-bower)](https://travis-ci.org/brianmhunt/knockout)
 
 [![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
+
+**TKO** is an experimental fork of Knockout.
 
 **Knockout** is a JavaScript [MVVM](http://en.wikipedia.org/wiki/Model_View_ViewModel) (a modern variant of MVC) library that makes it easier to create rich, desktop-like user interfaces with JavaScript and HTML. It uses *observers* to make your UI automatically stay in sync with an underlying data model, along with a powerful and extensible set of *declarative bindings* to enable productive development.
 
@@ -47,7 +49,7 @@ If you prefer to build the library yourself:
 
         $ gulp build
 
-    Now you'll find the built files in `build/output/`.
+    Now you'll find the built files in `dist/`.
 
     The default minifier is `uglify`. You can change it to the closure compiler by either
     setting the environment variable `MINIFIER=closure` or changing the `minifier` option
