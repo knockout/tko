@@ -227,7 +227,7 @@ karma:
   logLevel: INFO  # from karma/lib/constants.js
   autoWatch: true
   browsers: []  # Set dynamically in gulp/test.js
-  captureTimeout: 120000
+  captureTimeout: 360000
   singleRun: false
   frameworks:
     - jasmine
@@ -288,10 +288,6 @@ sauceLauncherGroups:
       platform: Linux
       version: '24'
 
-  #
-  # firefox_4:
-  #   browserName: firefox
-  #   version: '4'
   safari:
     safari_8:
       browserName: safari
@@ -303,13 +299,25 @@ sauceLauncherGroups:
       platform: OS X 10.9
       version: '7.0'
 
-  mobile:
+  ios:
     # iOS
-    ios_safari:
-      browserName: iphone
-      platform: OS X 10.10
-      version: '8.2'
+    ios_9_2:
+      browserName: Safari
+      appiumVersion: 1.4.16
+      deviceName: iPhone Simulator
+      deviceOrientation: portrait
+      platformVersion: "9.2"
+      platformName: iOS
 
+    ios_8_0:
+      browserName: Safari
+      appiumVersion: 1.4.16
+      deviceName: iPhone Simulator
+      deviceOrientation: portrait
+      platformVersion: "8.0"
+      platformName: iOS
+
+  android:
     # Android
     android_5_1:
       browserName: android
