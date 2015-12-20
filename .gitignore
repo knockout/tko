@@ -17,5 +17,6 @@ npm-debug.log
 node_modules
 
 # Knockout built files
-dist
+dist/
 _repo
+coverage/

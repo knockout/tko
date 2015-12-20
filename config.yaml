@@ -247,6 +247,11 @@ karma:
   reporters:
     # - progress
     - dots
+    - coverage
+    - coveralls
+  coverageReporter:
+    type: lcov
+    dir: coverage/
 
 # These are libraries that can be loaded to test variants.
 # Run with e.g. --jquery, --modernizr, ...
