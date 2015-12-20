@@ -290,6 +290,11 @@ sauceLauncherGroups:
       version: '24'
 
   safari:
+    safari_9:
+      browserName: safari
+      platform: OS X 10.11
+      version: "9.0"
+
     safari_8:
       browserName: safari
       platform: OS X 10.10

@@ -17,6 +17,7 @@ test:
   - gulp test:sauce --chrome
   - sleep 15 && gulp test:sauce --firefox
   - sleep 15 && gulp test:sauce --ios
+  - sleep 15 && gulp test:sauce --safari
   - sleep 15 && gulp test:sauce --android
   - sleep 15 && gulp test:sauce --ie
 general:
