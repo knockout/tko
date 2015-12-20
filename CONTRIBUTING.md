@@ -32,13 +32,12 @@ A good pull request might include:
 
 1. Thoughtfully worded, well-structured tests in the `spec/` folder that pass for all supported browsers
 2. Inline documentation
-3. Commit messages that follow the Atom style (from [Atom](https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages)):
+3. Commit messages that follow the style (from [Atom](https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages)):
 
 - Use the present tense ("Add feature" not "Added feature")
 - Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 - Limit the first line to 72 characters or less
 - Reference issues and pull requests liberally
-- When only changing documentation, include [ci skip] in the commit description
 - Consider starting the commit message with an applicable emoji:
   - :art: when improving the format/structure of the code
   - :racehorse: when improving performance
