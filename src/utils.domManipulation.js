@@ -24,10 +24,6 @@
             'optgroup': select,
             'param': object
         },
-        tagWithDashRegex = /<(?:area|col|colgroup|caption|legend|thead|tbody|tfoot|tr|td|th|option|optgroup|param)-/i,
-
-        // This is needed for old IE if you're *not* using either jQuery or innerShiv. Doesn't affect other cases.
-        mayRequireCreateElementHack = ko.utils.ieVersion <= 8,
 
         // The canonical way to test that the HTML5 <template> tag is supported
         supportsTemplateTag = 'content' in document.createElement('template');
@@ -63,17 +59,7 @@
             // somehow shims the native APIs so it just works anyway)
             div.appendChild(windowContext['innerShiv'](markup));
         } else {
-            if (mayRequireCreateElementHack) {
-                // The document.createElement('my-element') trick to enable custom elements in IE6-8
-                // only works if we assign innerHTML on an element associated with that document.
-                documentContext.appendChild(div);
-            }
-
             div.innerHTML = markup;
-
-            if (mayRequireCreateElementHack) {
-                div.parentNode.removeChild(div);
-            }
         }
 
         // Move to the right depth
@@ -117,13 +103,13 @@
 
     ko.utils.parseHtmlFragment = function(html, documentContext) {
         return supportsTemplateTag ? templateHtmlParse(html, documentContext) :
-        // We may prefer not to use jQuery's HTML parsing as it fails on element names like tr-*, even
-        // on the latest browsers (not even just on IE). But we retain use of jQuery HTML parsing for most cases, to avoid breaking compatibility with parsing edge-cases. Strangely, jQuery's HTML parsing
-        // works OK on elements named tr-* on old IE browsers.
-            (jQueryInstance && !tagWithDashRegex.test(html) ?
-            jQueryHtmlParse(html, documentContext) :   // As below, benefit from jQuery's optimisations where possible
+            // Note jQuery's HTML parsing fails on element names like tr-*.
+            // See: https://github.com/jquery/jquery/pull/1988
+            (jQueryInstance ? jQueryHtmlParse(html, documentContext) :
+            // Benefit from jQuery's on old browsers, where possible
 
-            simpleHtmlParse(html, documentContext));  // ... otherwise, this simple logic will do in most common cases.
+            simpleHtmlParse(html, documentContext));
+            // ... otherwise, this simple logic will do in most common cases.
     };
 
     ko.utils.setHtml = function(node, html) {
@@ -133,7 +119,7 @@
         html = ko.utils.unwrapObservable(html);
 
         if ((html !== null) && (html !== undefined)) {
-            if (typeof html != 'string')
+            if (typeof html !== 'string')
                 html = html.toString();
 
             // jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,

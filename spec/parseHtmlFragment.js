@@ -12,8 +12,7 @@ describe('Parse HTML fragment', function() {
     });
 
     // See: https://github.com/knockout/knockout/issues/1880
-    ko.utils.arrayForEach(
-    [
+    ko.utils.arrayForEach([
         { html: '<tr-component></tr-component>', parsed: ['<tr-component></tr-component>'] },
         { html: '<thead><tr><th><thcomponent>hello</thcomponent></th></tr></thead>', parsed: ['<thead><tr><th><thcomponent>hello</thcomponent></th></tr></thead>'], ignoreRedundantTBody: true },
         { html: '<tbody-component>world</tbody-component>', parsed: ['<tbody-component>world</tbody-component>'], minSupportedIEVersion: 8 },
@@ -114,5 +113,5 @@ describe('Parse HTML fragment', function() {
         expect(parsedNodes1[0]).toNotEqual(parsedNodes2[0]);
         // We need to test for deep inequality
         expect(parsedNodes1[0].children[0]).toNotEqual(parsedNodes2[0].children[0]);
-    })
+    });
 });
