@@ -222,12 +222,13 @@ spec_files:
 # https://github.com/karma-runner/karma-sauce-launcher/issues/40
 karma:
   basePath: ''
-  port: 9875
+  # Port from https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+FAQS
+  port: 7774
   colors: true
   logLevel: INFO  # from karma/lib/constants.js
   autoWatch: true
   browsers: []  # Set dynamically in gulp/test.js
-  captureTimeout: 360000
+  captureTimeout: 120000
   singleRun: false
   frameworks:
     - jasmine
