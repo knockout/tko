@@ -1,7 +1,6 @@
 
 ### TKO (“Technically Knockout”)
 
-[![NPM version][npm-image]][npm-url] 
 [![Join the chat at https://gitter.im/knockout/knockout](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/knockout/knockout?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
 [![devDependency Status](https://david-dm.org/knockout/tko/dev-status.svg)](https://david-dm.org/knockout/tko#info=devDependencies)
