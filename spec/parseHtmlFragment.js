@@ -13,10 +13,15 @@ describe('Parse HTML fragment', function() {
 
     // See: https://github.com/knockout/knockout/issues/1880
     ko.utils.arrayForEach([
-        { html: '<tr-component></tr-component>', parsed: ['<tr-component></tr-component>'] },
-        { html: '<thead><tr><th><thcomponent>hello</thcomponent></th></tr></thead>', parsed: ['<thead><tr><th><thcomponent>hello</thcomponent></th></tr></thead>'], ignoreRedundantTBody: true },
-        { html: '<tbody-component>world</tbody-component>', parsed: ['<tbody-component>world</tbody-component>'], minSupportedIEVersion: 8 },
-        { html: '<tfoot-component>foo</tfoot-component>', parsed: ['<tfoot-component>foo</tfoot-component>'] },
+        { html: '<tr-component></tr-component>',
+          parsed: ['<tr-component></tr-component>'],
+          OldjQueryFails: true },
+        { html: '<thead><tr><th><thcomponent>hello</thcomponent></th></tr></thead>', parsed: ['<thead><tr><th><thcomponent>hello</thcomponent></th></tr></thead>'] },
+        { html: '<tbody-component>world</tbody-component>',
+          parsed: ['<tbody-component>world</tbody-component>'],
+          OldjQueryFails: true },
+        { html: '<tfoot-component>foo</tfoot-component>', parsed: ['<tfoot-component>foo</tfoot-component>'],
+          OldjQueryFails: true },
         { html: '<div></div>', parsed: ['<div></div>'] },
         { html: '<custom-component></custom-component>', parsed: ['<custom-component></custom-component>'] },
         { html: '<tr></tr>', parsed: ['<tr></tr>'] },
@@ -38,58 +43,14 @@ describe('Parse HTML fragment', function() {
         { html: '<!-- v --><thead></thead><!-- vv -->', parsed: ['<!-- v -->', '<thead></thead>', '<!-- vv -->'], simpleParserFails: true }
     ], function (data) {
         it('should parse ' + data.html + ' correctly', function () {
-            // Early out if Simple HTML parser is known to fail for this data
-            if (data.simpleParserFails &&
-                !supportsTemplateTag &&
-                !jQueryInstance) {
-                return;
-            }
-            // IE 6-8 has a lot of trouble with custom elements. We have several strategies for dealing with
-            // this, each involving different (awkward) requirements for the application.
-            // [1] If you use KO alone, then the document.createElement('my-element') hack is sufficient.
-            //     However, most people don't use KO alone if they target IE 6-8 - typically they will use
-            //     at least jQuery or innerShiv as well.
-            // [2] If you use jQuery, then your custom elements must be preregistered as *KO components*
-            //     before you make the browser parse any HTML containing them. Just document.createElement
-            //     alone is not enough, because jQuery's HTML parsing runs in a separate document context.
-            //     KO hooks into this especially for registered components.
-            // [3] If you use innerShiv, then you have the same requirement as [2] (because innerShiv uses
-            //     the same createDocumentFragment technique as jQuery), but additionally you cannot modify
-            //     the set of custom elements after innerShiv runs for the first time, because innerShiv
-            //     caches and reuses its document fragment. For this test, we deal with this by using a
-            //     modified version of innerShiv that supports a 'reset' method. In production code, people
-            //     should not use 'reset' like this - instead ensure that all custom elements are preregistered.
-            // None of this mess affects other browsers.
-            if (jasmine.ieVersion <= 8) {
-                data.html.replace(/\<([a-z0-9\-]+)/g, function(ignored, foundTagName) {
-                    if (!ko.components.isRegistered(foundTagName)) {
-                        temporarilyRegisteredComponents.push(foundTagName);
-                        ko.components.register(foundTagName, {});
-                    }
-                });
-
-                if (window.innerShiv) {
-                    window.innerShiv.reset();
-                }
-
-                // Out of all the combinations above, there is still one edge case we can't support without
-                // dropping jQuery HTML parsing altogether. That is, if you're using jQuery, its parser fails
-                // on elements named 'tbody-*', on IE 6 and 7 (but it works on IE 8+). This is such an extreme
-                // edge case that it's preferable to leave this element name unsupported.
-                if (jasmine.ieVersion < data.minSupportedIEVersion) {
-                    return;
-                }
+            // Early out if Simple HTML parser is known to fail for this data.
+            if (!supportsTemplateTag) {
+                if (!jQueryInstance && data.simpleParserFails) { return; }
+                if (jQueryInstance && jQueryInstance.fn.jquery[0] < 3
+                    && data.OldjQueryFails) { return; }
             }
 
             var parsedNodes = ko.utils.parseHtmlFragment(data.html, document);
-
-            // Normalise the output
-            if (jasmine.ieVersion <= 8 && data.ignoreRedundantTBody) {
-                if (parsedNodes[parsedNodes.length - 1].tagName === 'TBODY') {
-                    // IE 7 adds a tbody tag; ignore it for the purpose of the test
-                    parsedNodes.pop();
-                }
-            }
 
             // Assert that we have the expected collection of elements (not just the correct .innerHTML string)
             expect(parsedNodes.length).toEqual(data.parsed.length);

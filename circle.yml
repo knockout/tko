@@ -12,6 +12,7 @@ test:
   # - gulp test:phantomjs --once --jquery3
   # ^^^ Fails
   # DOM node disposal If jQuery is referenced, should clear jQuery data when a node is cleaned FAILED
+  # The problem is `jQuery.cleanData` does not appear to work as expected ATM.
   - gulp test:phantomjs --once --jquery3-compat
   # Multiple Browsers
   - gulp test:sauce --chrome

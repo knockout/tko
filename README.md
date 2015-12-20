@@ -8,7 +8,7 @@
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
 
-**TKO** is an experimental fork of Knockout.
+**TKO** is an experimental fork of Knockout (version 3.4.0).
 
 **Knockout** is a JavaScript [MVVM](http://en.wikipedia.org/wiki/Model_View_ViewModel) (a modern variant of MVC) library that makes it easier to create rich, desktop-like user interfaces with JavaScript and HTML. It uses *observers* to make your UI automatically stay in sync with an underlying data model, along with a powerful and extensible set of *declarative bindings* to enable productive development.
 
@@ -70,25 +70,16 @@ You can run tests as follows:
 
 By default the test runner will monitor files for changes and re-run tests when they are detected. To run tests once, use the `--once` flag.
 
-Other flags include `--jquery`, `--modernizr`, `--json2` and `--innershiv`, to respective load those libraries before the Knockout source is loaded. They may be combined at will.
+You can also run the tests with `--jquery`, `--jquery3`, and `--jquery3-compat`.
 
 The configuration for karma is in the section `karma:` in `config.yaml`.
 
 #### SauceLabs
 
-**FIXME**
+With a SauceLabs account, set your environment variables `SAUCE_USERNAME` and
+`SAUCE_ACCESS_KEY` appropriately, then run `gulp test:saucelabs`.
 
-To run the tests with Sauce Labs you will need an Sauce Labs account. Once you have an account, you can run the tests with:
-
-    $ export SAUCE_USERNAME=<<username>>
-    $ export SAUCE_ACCESS_KEY=<<access key>>
-    $ gulp test:saucelabs
-
-You can also limit the tests to matching browser/platform name, for example:
-
-    $ gulp test:saucelabs --only firefox
-    $ gulp test:saucelabs --only explorer:10
-    $ gulp test:saucelabs --only linux
+You can add arguments limiting the browsers tested with e.g. `--firefox`.  Look at `config.yaml` for a list of the Sauce Labs tests.
 
 ## License
 
