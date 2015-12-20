@@ -6,15 +6,16 @@ machine:
     CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
 test:
   override:
+  # Inetractions with jQuery
   - gulp test:phantomjs --once
   - gulp test:phantomjs --once --jquery
+  - gulp test:phantomjs --once --jquery3
   - gulp test:phantomjs --once --jquery3-compat
+  # Multiple Browsers
   - gulp test:sauce --chrome
-  - sleep 10 && gulp test:sauce --firefox
-  - sleep 10 && gulp test:sauce --mobile
-  - sleep 10 && gulp test:sauce --opera
-  - sleep 10 && gulp test:sauce --ie
-  - sleep 10 && gulp test:sauce --ie-legacy --innershiv --json2
+  - sleep 15 && gulp test:sauce --firefox
+  - sleep 15 && gulp test:sauce --mobile
+  - sleep 15 && gulp test:sauce --ie
 general:
   branches:
     ignore:

@@ -227,6 +227,7 @@ karma:
   logLevel: INFO  # from karma/lib/constants.js
   autoWatch: true
   browsers: []  # Set dynamically in gulp/test.js
+  captureTimeout: 120000,
   singleRun: false
   frameworks:
     - jasmine
@@ -252,17 +253,10 @@ test_alt_libs:
   jquery: ./spec/helpers/jquery.js
   jquery3-compat: ./spec/helpers/jquery3-compat.js
   jquery3: ./spec/helpers/jquery3.js
-  modernizr: ./spec/helpers/modernizr.js
-  json2: ./spec/helpers/json2.js
 
-  # Note: innerShiv is deprecated in favour of html5shiv (https://github.com/aFarkas/html5shiv)
-  # KO retains back-compatible support for innershiv, but we will consider dropping this and
-  # supporting only html5shiv as of the next major version of KO (unless KO itself drops support
-  # for IE 6-8 in the next major version, in which case this is all irrelevant).
-  # It doesn't really matter very much, because essentially everyone who targets IE6-8 is also
-  # using jQuery, and if you are using jQuery then you don't need innerShiv.
-  innershiv: ./spec/helpers/innershiv.js
 
+# Sauce Labs
+# ----------
 # These are the browsers that'll get tested by SauceLabs.
 # These are bucketed together in groups of no more than 3, because of
 #   https://github.com/karma-runner/karma-sauce-launcher/issues/40
@@ -282,11 +276,6 @@ sauceLauncherGroups:
       platform: Linux
       version: '35'
 
-    chrome_24:
-      browserName: chrome
-      platform: Linux
-      version: '26'
-
   firefox:
     # Firefox
     firefox_38:
@@ -299,10 +288,6 @@ sauceLauncherGroups:
       platform: Linux
       version: '24'
 
-    firefox_17:
-      browserName: firefox
-      platform: Linux
-      version: '17'
   #
   # firefox_4:
   #   browserName: firefox
@@ -317,11 +302,6 @@ sauceLauncherGroups:
       browserName: safari
       platform: OS X 10.9
       version: '7.0'
-
-    safari_6:
-      browserName: safari
-      platform: OS X 10.8
-      version: '6.0'
 
   mobile:
     # iOS
@@ -359,20 +339,3 @@ sauceLauncherGroups:
       browserName: internet explorer
       platform: Windows 7
       version: "9.0"
-
-  ie-legacy:
-    ie_8:
-      browserName: internet explorer
-      platform: Windows 7
-      version: "8.0"
-
-    ie_7:
-      browserName: internet explorer
-      platform: Windows XP
-      version: '7.0'
-
-  opera:
-    opera_12_12:
-      browserName: opera
-      platform: Windows XP
-      version: '12.12'
