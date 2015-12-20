@@ -227,7 +227,7 @@ karma:
   logLevel: INFO  # from karma/lib/constants.js
   autoWatch: true
   browsers: []  # Set dynamically in gulp/test.js
-  captureTimeout: 120000,
+  captureTimeout: 120000
   singleRun: false
   frameworks:
     - jasmine
