@@ -3,7 +3,7 @@
 #
 banner: |
   /*!
-   * Knockout JavaScript library v<%= pkg.version %>
+   * <%=pkg.name%> v<%= pkg.version %>
    * (c) The Knockout Team - <%= pkg.homepage %>
    * License: <%= pkg.licenses[0].type %> (<%= pkg.licenses[0].url %>)
    */

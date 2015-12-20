@@ -25,3 +25,7 @@ general:
   branches:
     ignore:
     - gh-pages # list of branches to ignore
+notify:
+# Don't forget to set COVERALLS_PARALLEL=true
+  webhooks:
+    - url: https://coveralls.io/webhook?repo_token=$COVERALLS_REPO_TOKEN
