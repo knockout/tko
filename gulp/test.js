@@ -30,13 +30,13 @@ module.exports = function(gulp, plugins, config) {
 
         new karma.Server(options, process.exit)
             .on('browser_complete', function(browser, results) {
-                console.log(browser.name.cyan, "Complete.".green)
+                console.log(browser.name.cyan, "✅  Complete.".green)
             })
             .on('browser_error', function(browser, error) {
-                console.log(browser.name.cyan, "Error:".red, error)
+                console.log(browser.name.cyan, "🚨  Error:".red, error)
             })
             .on('run_complete', function(browsers, results) {
-                console.log("Run complete.".green)
+                console.log("🏁  Run complete.".green)
             })
             .start()
     }
