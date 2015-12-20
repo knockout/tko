@@ -111,7 +111,7 @@
                 };
             }
         }
-    }
+    };
 
     // Extend the binding context hierarchy with a new view model object. If the parent context is watching
     // any observables, the new child context will automatically get a dependency on the parent context.
@@ -191,7 +191,7 @@
     function validateThatBindingIsAllowedForVirtualElements(bindingName) {
         var validator = ko.virtualElements.allowedBindings[bindingName];
         if (!validator)
-            throw new Error("The binding '" + bindingName + "' cannot be used with virtual elements")
+            throw new Error("The binding '" + bindingName + "' cannot be used with virtual elements");
     }
 
     function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement) {
@@ -288,7 +288,13 @@
         var alreadyBound = ko.utils.domData.get(node, boundElementDomDataKey);
         if (!sourceBindings) {
             if (alreadyBound) {
-                throw Error("You cannot apply bindings multiple times to the same element.");
+                ko.onBindingError({
+                    during: 'apply',
+                    errorCaptured: new Error("You cannot apply bindings multiple times to the same element."),
+                    element: node,
+                    bindingContext: bindingContext
+                });
+                return false;
             }
             ko.utils.domData.set(node, boundElementDomDataKey, true);
         }
@@ -365,6 +371,19 @@
                     validateThatBindingIsAllowedForVirtualElements(bindingKey);
                 }
 
+                function reportBindingError(during, errorCaptured) {
+                    ko.onBindingError({
+                        during: during,
+                        errorCaptured: errorCaptured,
+                        element: node,
+                        bindingKey: bindingKey,
+                        bindings: bindings,
+                        allBindings: allBindings,
+                        valueAccessor: getValueAccessor(bindingKey),
+                        bindingContext: bindingContext
+                    });
+                }
+
                 try {
                     // Run init, ignoring any dependencies
                     if (typeof handlerInitFn == "function") {
@@ -379,20 +398,25 @@
                             }
                         });
                     }
-
-                    // Run update in its own computed wrapper
-                    if (typeof handlerUpdateFn == "function") {
-                        ko.dependentObservable(
-                            function() {
-                                handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
-                            },
-                            null,
-                            { disposeWhenNodeIsRemoved: node }
-                        );
-                    }
                 } catch (ex) {
-                    ex.message = "Unable to process binding \"" + bindingKey + ": " + bindings[bindingKey] + "\"\nMessage: " + ex.message;
-                    throw ex;
+                    reportBindingError('init', ex);
+                }
+
+                // Run update in its own computed wrapper
+                if (typeof handlerUpdateFn == "function") {
+                    ko.computed(
+                        function updatedValueAccessor() {
+                            try {
+                                handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+                            } catch (ex) {
+                                reportBindingError('update', ex);
+                            }
+
+                        },
+                        null, {
+                            disposeWhenNodeIsRemoved: node
+                        }
+                    );
                 }
             });
         }
@@ -411,7 +435,7 @@
         } else {
             return ko.utils.domData.get(node, storedBindingContextDomDataKey);
         }
-    }
+    };
 
     function getBindingContext(viewModelOrBindingContext) {
         return viewModelOrBindingContext && (viewModelOrBindingContext instanceof ko.bindingContext)
@@ -466,6 +490,27 @@
         return context ? context['$data'] : undefined;
     };
 
+    ko.onBindingError = function onBindingError(spec) {
+        var error, bindingText;
+        if (spec.bindingKey) {
+            // During: 'init' or initial 'update'
+            error = spec.errorCaptured;
+            bindingText = ko.bindingProvider['instance']['getBindingsString'](spec.element);
+            error.message = "Unable to process binding \"" + spec.bindingKey
+                + "\" in binding \"" + bindingText
+                + "\"\nMessage: " + error.message;
+        } else {
+            // During: 'apply'
+            error = spec.errorCaptured;
+        }
+        ko.utils.extend(error, spec);
+        if (typeof ko.onError === 'function') {
+            ko.onError(error);
+        } else {
+            throw error;
+        }
+    };
+
     ko.exportSymbol('bindingHandlers', ko.bindingHandlers);
     ko.exportSymbol('applyBindings', ko.applyBindings);
     ko.exportSymbol('applyBindingsToDescendants', ko.applyBindingsToDescendants);
@@ -473,4 +518,5 @@
     ko.exportSymbol('applyBindingsToNode', ko.applyBindingsToNode);
     ko.exportSymbol('contextFor', ko.contextFor);
     ko.exportSymbol('dataFor', ko.dataFor);
+    ko.exportSymbol('onBindingError', ko.onBindingError);
 })();

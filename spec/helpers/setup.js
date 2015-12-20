@@ -11,7 +11,6 @@ window.jQueryInstance = window.jQuery;
 
 jasmine.updateInterval = 500;
 
-
 /*
     Some helper functions for jasmine on the browser
  */
