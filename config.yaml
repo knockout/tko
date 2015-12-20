@@ -149,7 +149,6 @@ sources:
   - src/binding/editDetection/compareArrays.js
   - src/binding/editDetection/arrayToDomNodeChildren.js
   - src/templating/native/nativeTemplateEngine.js
-  - src/templating/jquery.tmpl/jqueryTmplTemplateEngine.js
 
 spec_files:
   # Note: There are some side-effects in the specs, so the order of these
@@ -249,6 +248,9 @@ karma:
     - dots
     - coverage
     - coveralls
+  preprocessors:
+    'src/**/*.js':
+      - coverage
   coverageReporter:
     type: lcov
     dir: coverage/
