@@ -228,6 +228,9 @@ karma:
   autoWatch: true
   browsers: []  # Set dynamically in gulp/test.js
   captureTimeout: 120000
+  browserDisconnectTimeout: 7000
+  browserDisconnectTolerance: 2
+  browserNoActivityTimeout: 20000
   singleRun: false
   frameworks:
     - jasmine
