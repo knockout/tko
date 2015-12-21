@@ -1,7 +1,6 @@
 
 ### TKO (“Technically Knockout”)
 
-[![Github version](https://img.shields.io/github/release/knockout/tko.svg)](https://github.com/knockout/tko)
 [![npm version](https://badge.fury.io/js/tko.svg)](https://badge.fury.io/js/tko)
 [![Join the chat at https://gitter.im/knockout/knockout](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/knockout/knockout?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
