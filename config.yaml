@@ -359,6 +359,12 @@ sauceLauncherGroups:
       platform: Windows 8
       version: "10.0"
 
+    # IE9 arbitrarly and unpredictable sometimes fails a number of tests,
+    # including:
+    # - Binding: Hasfocus Should set a non-observable value to be true on focus and false on blur
+    # - Tasks scheduler Should process tasks asynchronously
+    # - Tasks scheduler Should run only once for a set of tasks
+    # See: knockout/knockout#736
     ie_9:
       browserName: internet explorer
       platform: Windows 7

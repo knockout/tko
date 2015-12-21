@@ -295,7 +295,11 @@ describe('Tasks', function() {
 });
 
 describe('Tasks scheduler', function() {
-    beforeEach(function() { waits(1); }); // Workaround for timing-related issues in IE8
+    if (ko.utils.ieVersion) {
+        beforeEach(function() { waits(100); });
+        // Workaround for timing-related issues in IE9, where the first few
+        // tasks will not actually run asynchronously (and therefore fail).
+    }
 
     it('Should process tasks asynchronously', function() {
         var runCount = 0;
