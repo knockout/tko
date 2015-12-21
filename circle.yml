@@ -16,11 +16,11 @@ test:
   - gulp test:phantomjs --once --jquery3-compat
   # Multiple Browsers
   - gulp test:sauce --chrome
-  - sleep 8 && gulp test:sauce --firefox
-  - sleep 8 && gulp test:sauce --ios
-  - sleep 8 && gulp test:sauce --safari
-  - sleep 8 && gulp test:sauce --android
-  - sleep 8 && gulp test:sauce --ie
+  - sleep 10 && gulp test:sauce --firefox
+  - sleep 10 && gulp test:sauce --ios
+  - sleep 10 && gulp test:sauce --safari
+  - sleep 10 && gulp test:sauce --android
+  - sleep 10 && gulp test:sauce --ie
 general:
   branches:
     ignore:
