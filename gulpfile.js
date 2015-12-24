@@ -7,10 +7,10 @@
 
  */
 var gulp = require('gulp'),
-    yaml = require('js-yaml'),
-    fs = require('fs'),
-    config = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8')),
-    plugins = require('gulp-load-plugins')();
+  yaml = require('js-yaml'),
+  fs = require('fs'),
+  config = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8')),
+  plugins = require('gulp-load-plugins')();
 
 // from https://github.com/ikari-pl/gulp-tag-version
 // function inc(importance) {
@@ -40,5 +40,9 @@ gulp.task('js', function () {
     .pipe(plugins.rename("knockout-fast-foreach.min.js"))
     .pipe(gulp.dest('./dist'));
 });
+
+gulp.task('watch', function () {
+  gulp.watch('./index.js', ['js'])
+})
 
 gulp.task('default', ['js'])

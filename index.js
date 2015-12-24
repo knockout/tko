@@ -351,12 +351,14 @@ FastForEach.prototype.deleted = function (changeItem) {
 
 // removes a set of nodes from the DOM
 FastForEach.prototype.removeNodes = function (nodes) {
-  if (!nodes.length) {
-    return;
-  }
+  if (!nodes.length) { return; }
 
   var removeFn = function () {
-    ko.utils.arrayForEach(nodes, function (n) { ko.removeNode(n); });
+    var parent = nodes[0].parentNode;
+    for (var i = nodes.length - 1; i >= 0; --i) {
+      ko.cleanNode(nodes[i]);
+      parent.removeChild(nodes[i]);
+    }
   };
 
   if (this.beforeRemove) {

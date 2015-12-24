@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.6.0 (2015-12-17T02:29:56.923Z)
+  Knockout Fast Foreach v0.6.0 (2015-12-24T03:08:52.576Z)
   By: Brian M Hunt (C) 2015 | License: MIT
 
   Adds `fastForEach` to `ko.bindingHandlers`.
@@ -367,12 +367,14 @@ FastForEach.prototype.deleted = function (changeItem) {
 
 // removes a set of nodes from the DOM
 FastForEach.prototype.removeNodes = function (nodes) {
-  if (!nodes.length) {
-    return;
-  }
+  if (!nodes.length) { return; }
 
   var removeFn = function () {
-    ko.utils.arrayForEach(nodes, function (n) { ko.removeNode(n); });
+    var parent = nodes[0].parentNode;
+    for (var i = nodes.length - 1; i >= 0; --i) {
+      ko.cleanNode(nodes[i]);
+      parent.removeChild(nodes[i]);
+    }
   };
 
   if (this.beforeRemove) {
