@@ -1,6 +1,8 @@
 //
 // Array utilities
 //
+import { unwrap, peekObservable } from './obs.js'
+
 
 export function arrayForEach(array, action) {
     for (var i = 0, j = array.length; i < j; i++)
@@ -25,7 +27,7 @@ export function arrayFirst(array, predicate, predicateOwner) {
 }
 
 export function arrayRemoveItem(array, itemToRemove) {
-    var index = ko.utils.arrayIndexOf(array, itemToRemove);
+    var index = arrayIndexOf(array, itemToRemove);
     if (index > 0) {
         array.splice(index, 1);
     }
@@ -38,7 +40,7 @@ export function arrayGetDistinctValues(array) {
     array = array || [];
     var result = [];
     for (var i = 0, j = array.length; i < j; i++) {
-        if (ko.utils.arrayIndexOf(result, array[i]) < 0)
+        if (arrayIndexOf(result, array[i]) < 0)
             result.push(array[i]);
     }
     return result;
@@ -71,7 +73,7 @@ export function arrayPushAll(array, valuesToPush) {
 }
 
 export function addOrRemoveItem(array, value, included) {
-    var existingEntryIndex = ko.utils.arrayIndexOf(ko.utils.peekObservable(array), value);
+    var existingEntryIndex = arrayIndexOf(peekObservable(array), value);
     if (existingEntryIndex < 0) {
         if (included)
             array.push(value);
@@ -92,8 +94,8 @@ export function makeArray(arrayLikeObject) {
 
 
 export function range(min, max) {
-    min = ko.utils.unwrapObservable(min);
-    max = ko.utils.unwrapObservable(max);
+    min = unwrap(min);
+    max = unwrap(max);
     var result = [];
     for (var i = min; i <= max; i++)
         result.push(i);
