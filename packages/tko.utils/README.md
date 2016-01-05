@@ -1,2 +1,1 @@
-# tko.util
-Knockout Utilities (Javascript)
+# tko.utils
