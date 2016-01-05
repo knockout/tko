@@ -1,6 +1,7 @@
 //
 // -- init -- task
 //
+require('colors')
 var fs = require('fs')
 var path = require('path')
 var child_process = require('child_process')
@@ -17,12 +18,13 @@ var template_dir = path.join(__dirname, '../templates')
 // the /templates directory
 var FILES = {
   LICENSE: 'LICENSE',
-  'config.yaml': 'config.yaml',
+  // 'config.yaml': 'config.yaml',
   'circle.yml': 'circle.yml',
   eslintrc: '.eslintrc',
   editorconfig: '.editorconfig',
   gitignore: '.gitignore',
   npmignore: '.npmignore',
+  'README.md': 'README.md',
 }
 
 // Template variables
@@ -35,10 +37,9 @@ gulp.task('init', function () {
     throw new Error(`tko.tools cannot init ${pkg.name} because it is blacklisted in package.json.`)
   }
 
-  var modified_files_cmd = `git ls-files -mo ${_.values(FILES).join(" ")}`
+  var modified_files_cmd = `git ls-files -mo --exclude-standard ${_.values(FILES).join(" ")}`
   var modified_files = child_process.execSync(
     modified_files_cmd, {encoding: 'utf8'})
-  console.log("MFC", modified_files_cmd)
 
   if (modified_files !== '') {
     throw new Error(`There are modified files: ${modified_files}`)
@@ -65,7 +66,9 @@ function write_template_file(dst_filename, src_filename) {
   var compiled = _.template(template)({ pkg: pkg, now: new Date() })
 
   if (exists(dst_path)) {
-    console.log(`Overwriting ${dst_path.underline}.`)
+    console.log(`Overwriting ${dst_path.magenta}.`)
+  } else {
+    console.log(`Creating ${dst_path.green}.`)
   }
   fs.writeFileSync(dst_path, compiled)
 }
