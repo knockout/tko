@@ -1,0 +1,29 @@
+{
+  "name": "tko.util",
+  "version": "0.1.0",
+  "description": "TKO Utilities",
+  "main": "dist/tko.utils.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.util.git"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "ko"
+  ],
+  "author": "Knockout",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.util/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.util#readme",
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gulp-rollup": "^1.6.0",
+    "rollup": "^0.24.0"
+  }
+}
