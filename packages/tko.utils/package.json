@@ -1,5 +1,5 @@
 {
-  "name": "tko.util",
+  "name": "tko.utils",
   "version": "0.1.0",
   "description": "TKO Utilities",
   "main": "dist/tko.utils.js",
