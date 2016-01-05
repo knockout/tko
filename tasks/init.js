@@ -1,17 +1,14 @@
 //
 // -- init -- task
 //
-require('colors')
 var fs = require('fs')
 var path = require('path')
 var child_process = require('child_process')
 
 var _ = require('lodash')
-var gulp = require('gulp')
+var gulp = global.__tko_gulp
 var inquirer = require('inquirer')
 
-var cwd = process.cwd()
-var pkg = require(`${cwd}/package.json`)
 var template_dir = path.join(__dirname, '../templates')
 
 // The following are files created/updated in the package directory, from
@@ -31,10 +28,10 @@ var FILES = {
 // License: {{ year }} / {{ pkg.author }}
 // README.md: ...
 
-gulp.task('init', function () {
+gulp.task('init', 'Create the common tko package files', function () {
   // Gather bits of info first.
-  if (_.get(pkg, 'tko.blacklist')) {
-    throw new Error(`tko.tools cannot init ${pkg.name} because it is blacklisted in package.json.`)
+  if (_.get(global.pkg, 'tko.blacklist')) {
+    throw new Error(`tko.tools cannot init ${global.pkg.name} because it is blacklisted in package.json.`)
   }
 
   var modified_files_cmd = `git ls-files -mo --exclude-standard ${_.values(FILES).join(" ")}`
@@ -46,6 +43,8 @@ gulp.task('init', function () {
   }
 
   _.each(FILES, write_template_file)
+}, {
+  description: `Files created: ${_.values(FILES).join(' ')}`
 })
 
 function exists(path) {
@@ -60,10 +59,12 @@ function exists(path) {
 
 
 function write_template_file(dst_filename, src_filename) {
-  var dst_path = path.join(cwd, dst_filename)
+  var dst_path = path.join(process.cwd(), dst_filename)
   var src_path = path.join(template_dir, src_filename)
   var template = fs.readFileSync(src_path, {encoding: 'utf8'})
-  var compiled = _.template(template)({ pkg: pkg, now: new Date() })
+  var compiled = _.template(template)({
+    pkg: global.pkg, now: new Date()
+  })
 
   if (exists(dst_path)) {
     console.log(`Overwriting ${dst_path.magenta}.`)
@@ -72,5 +73,3 @@ function write_template_file(dst_filename, src_filename) {
   }
   fs.writeFileSync(dst_path, compiled)
 }
-
-gulp.start('init')
