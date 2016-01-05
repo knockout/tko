@@ -1,0 +1,26 @@
+{
+  "name": "tko.tools",
+  "version": "0.1.0",
+  "description": "TKO Tools (Gulp tasks, etc.)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "tko",
+    "knockout",
+    "tools",
+    "gulp"
+  ],
+  "author": "Knockout",
+  "license": "MIT",
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "gulp": "^3.9.0",
+    "inquirer": "^0.11.1",
+    "lodash": "^3.10.1"
+  },
+  "tko": {
+    "blacklist": true
+  }
+}
