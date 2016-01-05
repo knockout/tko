@@ -7,7 +7,6 @@ var child_process = require('child_process')
 
 var _ = require('lodash')
 var gulp = global.__tko_gulp
-var inquirer = require('inquirer')
 
 var template_dir = path.join(__dirname, '../templates')
 
@@ -17,9 +16,11 @@ var FILES = {
   LICENSE: 'LICENSE',
   // 'config.yaml': 'config.yaml',
   'circle.yml': 'circle.yml',
+  'config.yaml': 'config.yaml',
   eslintrc: '.eslintrc',
   editorconfig: '.editorconfig',
   gitignore: '.gitignore',
+  'karma.conf.js': 'karma.conf.js',
   npmignore: '.npmignore',
   'README.md': 'README.md',
 }
