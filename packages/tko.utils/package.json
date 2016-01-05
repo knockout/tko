@@ -21,7 +21,7 @@
     "url": "https://github.com/knockout/tko.util/issues"
   },
   "homepage": "https://github.com/knockout/tko.util#readme",
-  "dependencies": {
+  "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-rollup": "^1.6.0",
     "rollup": "^0.24.0"
