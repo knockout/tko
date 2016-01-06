@@ -3,6 +3,13 @@
 // ---
 // Produce a UMD version of the source in dist/
 //
+// Note we can resolve "external" includes with e.g.
+// resolveExternal: function ( id ) {
+//         return path.resolve( __dirname, id );
+//     }
+// per https://github.com/rollup/rollup/issues/104
+//
+
 
 var gulp = global.__tko_gulp
 var rollup = require('rollup')
