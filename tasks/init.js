@@ -53,9 +53,7 @@ function exists(path) {
   try {
     fs.accessSync(path, fs.F_OK);
     return true
-  } catch (e) {
-    return false
-  }
+  } catch (e) { return false }
 }
 
 
@@ -68,7 +66,11 @@ function write_template_file(dst_filename, src_filename) {
   })
 
   if (exists(dst_path)) {
-    console.log(`Overwriting ${dst_path.magenta}.`)
+    if (_.includes(process.argv, "--force")) {
+      console.log(`Overwriting ${dst_path.magenta}.`)
+    } else {
+      console.log(`Skipping ${dst_path.blue}. (use --force to overwrite)`)
+    }
   } else {
     console.log(`Creating ${dst_path.green}.`)
   }
