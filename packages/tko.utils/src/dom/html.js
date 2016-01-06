@@ -1,10 +1,11 @@
 //
 // HTML-based manipulation
 //
-import {stringTrim} from '../string.js'
-import {makeArray} from '../array.js'
-import {unwrap} from '../obs.js'
-import {emptyDomNode} from './manipulation.js'
+import { stringTrim } from '../string.js'
+import { makeArray } from '../array.js'
+import { unwrap } from '../obs.js'
+import { emptyDomNode } from './manipulation.js'
+import { jQueryInstance } from '../jquery.js'
 
 var none = [0, "", ""],
     table = [1, "<table>", "</table>"],
@@ -89,11 +90,11 @@ function templateHtmlParse(html, documentContext) {
 
 function jQueryHtmlParse(html, documentContext) {
     // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
-    if (jQueryInstance['parseHTML']) {
-        return jQueryInstance['parseHTML'](html, documentContext) || []; // Ensure we always return an array and never null
+    if (jQueryInstance.parseHTML) {
+        return jQueryInstance.parseHTML(html, documentContext) || []; // Ensure we always return an array and never null
     } else {
         // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-        var elems = jQueryInstance['clean']([html], documentContext);
+        var elems = jQueryInstance.clean([html], documentContext);
 
         // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
         // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
@@ -139,7 +140,7 @@ export function setHtml(node, html) {
         // for example <tr> elements which are not normally allowed to exist on their own.
         // If you've referenced jQuery we'll use that rather than duplicating its code.
         if (jQueryInstance) {
-            jQueryInstance(node)['html'](html);
+            jQueryInstance(node).html(html);
         } else {
             // ... otherwise, use KO's own parsing logic.
             var parsedNodes = parseHtmlFragment(html, node.ownerDocument);

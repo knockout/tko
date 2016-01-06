@@ -17,6 +17,7 @@ export * from './src/proto.js'
 export * from './src/string.js'
 export * from './src/symbol.js'
 export * from './src/css.js'
+export { jQuerySetInstance } from './src/jquery.js'
 
 // DOM
 export * from './src/dom/info.js'

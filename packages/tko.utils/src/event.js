@@ -3,6 +3,8 @@
 //
 
 import { objectForEach } from './object.js'
+import { jQueryInstance} from './jquery.js'
+
 
 // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
 var knownEvents = {},

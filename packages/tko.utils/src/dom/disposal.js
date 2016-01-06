@@ -3,12 +3,15 @@
 //
 import * as domData from './data.js'
 import {arrayRemoveItem, arrayPushAll} from '../array.js'
+import {jQueryInstance} from '../jquery.js'
 
 var domDataKey = domData.nextKey();
-var cleanableNodeTypes = { 1: true, 8: true, 9: true };       // Element, Comment, Document
-var cleanableNodeTypesWithDescendants = { 1: true, 9: true }; // Element, Document
-var jQueryCleanNodeFn = jQueryInstance
-    ? jQueryInstance['cleanData'] : null;
+// Node types:
+// 1: Element
+// 8: Comment
+// 9: Document
+var cleanableNodeTypes = { 1: true, 8: true, 9: true };
+var cleanableNodeTypesWithDescendants = { 1: true, 9: true };
 
 function getDisposeCallbacksCollection(node, createIfNotFound) {
     var allDisposeCallbacks = domData.get(node, domDataKey);
@@ -95,6 +98,10 @@ export function cleanExternalData (node) {
     // Special support for jQuery here because it's so commonly used.
     // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
     // so notify it to tear down any resources associated with the node & descendants here.
+
+    var jQueryCleanNodeFn = jQueryInstance
+        ? jQueryInstance.cleanData : null;
+
     if (jQueryCleanNodeFn) {
         jQueryCleanNodeFn([node]);
     }

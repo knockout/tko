@@ -5,6 +5,70 @@
 }(this, function (exports) { 'use strict';
 
   //
+  // ES6 Symbols
+  //
+
+  var useSymbols = typeof Symbol === 'function';
+
+  function createSymbolOrString(identifier) {
+      return useSymbols ? Symbol(identifier) : identifier;
+  }
+
+  var uniqueId = 0;
+  var dataStoreKeyExpandoPropertyName = createSymbolOrString("__ko__data_store");
+  var dataStore = {};
+
+
+  function getAll(node, createIfNotFound) {
+      var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
+      var hasExistingDataStore = dataStoreKey && (dataStoreKey !== "null") && dataStore[dataStoreKey];
+      if (!hasExistingDataStore) {
+          if (!createIfNotFound)
+              return undefined;
+          dataStoreKey = node[dataStoreKeyExpandoPropertyName] = "ko" + uniqueId++;
+          dataStore[dataStoreKey] = {};
+      }
+      return dataStore[dataStoreKey];
+  }
+
+  function get(node, key) {
+      var allDataForNode = getAll(node, false);
+      return allDataForNode === undefined ? undefined : allDataForNode[key];
+  }
+
+  function set(node, key, value) {
+      if (value === undefined) {
+          // Make sure we don't actually create a new domData key if we are actually deleting a value
+          if (getAll(node, false) === undefined)
+              return;
+      }
+      var allDataForNode = getAll(node, true);
+      allDataForNode[key] = value;
+  }
+
+  function clear(node) {
+      var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
+      if (dataStoreKey) {
+          delete dataStore[dataStoreKey];
+          node[dataStoreKeyExpandoPropertyName] = null;
+          return true; // Exposing "did clean" flag purely so specs can infer whether things have been cleaned up as intended
+      }
+      return false;
+  }
+
+  function nextKey() {
+      return (uniqueId++) + dataStoreKeyExpandoPropertyName;
+  }
+
+
+  var domData = Object.freeze({
+      get: get,
+      set: set,
+      clear: clear,
+      nextKey: nextKey
+  });
+
+  //
   // Observables
   //
 
@@ -119,75 +183,18 @@
   }
 
   //
-  // ES6 Symbols
+  // jQuery
   //
 
-  var useSymbols = !DEBUG && typeof Symbol === 'function';
+  var jQueryInstance = window && window.jQuery
 
-
-  function createSymbolOrString(identifier) {
-      return useSymbols ? Symbol(identifier) : identifier;
+  function jQuerySetInstance(jquery) {
+      jQueryInstance = jquery
   }
-
-  var uniqueId = 0;
-  var dataStoreKeyExpandoPropertyName = createSymbolOrString("__ko__data_store");
-  var dataStore = {};
-
-
-  function getAll(node, createIfNotFound) {
-      var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
-      var hasExistingDataStore = dataStoreKey && (dataStoreKey !== "null") && dataStore[dataStoreKey];
-      if (!hasExistingDataStore) {
-          if (!createIfNotFound)
-              return undefined;
-          dataStoreKey = node[dataStoreKeyExpandoPropertyName] = "ko" + uniqueId++;
-          dataStore[dataStoreKey] = {};
-      }
-      return dataStore[dataStoreKey];
-  }
-
-  function get(node, key) {
-      var allDataForNode = getAll(node, false);
-      return allDataForNode === undefined ? undefined : allDataForNode[key];
-  }
-
-  function set(node, key, value) {
-      if (value === undefined) {
-          // Make sure we don't actually create a new domData key if we are actually deleting a value
-          if (getAll(node, false) === undefined)
-              return;
-      }
-      var allDataForNode = getAll(node, true);
-      allDataForNode[key] = value;
-  }
-
-  function clear(node) {
-      var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
-      if (dataStoreKey) {
-          delete dataStore[dataStoreKey];
-          node[dataStoreKeyExpandoPropertyName] = null;
-          return true; // Exposing "did clean" flag purely so specs can infer whether things have been cleaned up as intended
-      }
-      return false;
-  }
-
-  function nextKey() {
-      return (uniqueId++) + dataStoreKeyExpandoPropertyName;
-  }
-
-
-  var domDataImport = Object.freeze({
-      get: get,
-      set: set,
-      clear: clear,
-      nextKey: nextKey
-  });
 
   var domDataKey = nextKey();
   var cleanableNodeTypes = { 1: true, 8: true, 9: true };       // Element, Comment, Document
-  var cleanableNodeTypesWithDescendants = { 1: true, 9: true }; // Element, Document
-  var jQueryCleanNodeFn = jQueryInstance
-      ? jQueryInstance['cleanData'] : null;
+  var cleanableNodeTypesWithDescendants = { 1: true, 9: true };
 
   function getDisposeCallbacksCollection(node, createIfNotFound) {
       var allDisposeCallbacks = get(node, domDataKey);
@@ -274,6 +281,11 @@
       // Special support for jQuery here because it's so commonly used.
       // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
       // so notify it to tear down any resources associated with the node & descendants here.
+
+      // Element, Document
+      var jQueryCleanNodeFn = jQueryInstance
+          ? jQueryInstance.cleanData : null;
+
       if (jQueryCleanNodeFn) {
           jQueryCleanNodeFn([node]);
       }
@@ -562,7 +574,7 @@
   }
 
 
-  var veImport = Object.freeze({
+  var virtualElements = Object.freeze({
       isStartComment: isStartComment,
       isEndComment: isEndComment,
       getVirtualChildren: getVirtualChildren,
@@ -580,8 +592,8 @@
   });
 
   if (!Function.prototype['bind']) {
-      // Function.prototype.bind is a standard part of ECMAScript 5th Edition (December 2009, http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf)
-      // In case the browser doesn't implement it natively, provide a JavaScript implementation. This implementation is based on the one in prototype.js
+      // Shim/polyfill JavaScript Function.bind.
+      // This implementation is based on the one in prototype.js
       Function.prototype['bind'] = function (object) {
           var originalFunction = this;
           if (arguments.length === 1) {
@@ -1017,11 +1029,11 @@
 
   function jQueryHtmlParse(html, documentContext) {
       // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
-      if (jQueryInstance['parseHTML']) {
-          return jQueryInstance['parseHTML'](html, documentContext) || []; // Ensure we always return an array and never null
+      if (jQueryInstance.parseHTML) {
+          return jQueryInstance.parseHTML(html, documentContext) || []; // Ensure we always return an array and never null
       } else {
           // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-          var elems = jQueryInstance['clean']([html], documentContext);
+          var elems = jQueryInstance.clean([html], documentContext);
 
           // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
           // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
@@ -1067,7 +1079,7 @@
           // for example <tr> elements which are not normally allowed to exist on their own.
           // If you've referenced jQuery we'll use that rather than duplicating its code.
           if (jQueryInstance) {
-              jQueryInstance(node)['html'](html);
+              jQueryInstance(node).html(html);
           } else {
               // ... otherwise, use KO's own parsing logic.
               var parsedNodes = parseHtmlFragment(html, node.ownerDocument);
@@ -1077,11 +1089,9 @@
       }
   };
 
-  var virtualElements = veImport
-  var domData = domDataImport
-
   exports.virtualElements = virtualElements;
   exports.domData = domData;
+  exports.jQuerySetInstance = jQuerySetInstance;
   exports.arrayForEach = arrayForEach;
   exports.arrayIndexOf = arrayIndexOf;
   exports.arrayFirst = arrayFirst;

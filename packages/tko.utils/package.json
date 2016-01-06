@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "TKO Utilities",
   "main": "dist/tko.utils.js",
+  "jsnext:main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,7 +24,8 @@
   "homepage": "https://github.com/knockout/tko.util#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
-    "js-yaml": "^3.4.6"
+    "js-yaml": "^3.4.6",
+    "tko.tools": "^0.1.0"
   },
   "dependencies": {
   }
