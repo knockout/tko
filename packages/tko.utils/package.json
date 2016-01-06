@@ -23,7 +23,8 @@
   "homepage": "https://github.com/knockout/tko.util#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-rollup": "^1.6.0",
-    "rollup": "^0.24.0"
+    "js-yaml": "^3.4.6"
+  },
+  "dependencies": {
   }
 }

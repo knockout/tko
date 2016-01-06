@@ -26,8 +26,7 @@ export * from './src/dom/html.js'
 export * from './src/dom/disposal.js'
 
 
-import * as veImport from './src/dom/virtualElements.js'
-import * as domDataImport from './src/dom/data.js'
+import * as virtualElements from './src/dom/virtualElements.js'
+import * as domData from './src/dom/data.js'
 
-export var virtualElements = veImport
-export var domData = domDataImport
+export {virtualElements, domData}

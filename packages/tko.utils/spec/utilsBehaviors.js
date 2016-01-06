@@ -1,3 +1,8 @@
+import * as utils from '../index.js'
+
+var ko = ko || {}
+ko.utils = utils
+
 describe('unwrapObservable', function() {
     it('Should return the underlying value of observables', function() {
         var someObject = { abc: 123 },

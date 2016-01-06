@@ -9,8 +9,8 @@ rules:
     - 2
     - unix
   semi:
-    - 2
-    - always
+    - 0
+#    - always
   strict: 0
   dot-notation: 0
   no-underscore-dangle: 0
