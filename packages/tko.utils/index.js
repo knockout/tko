@@ -8,6 +8,7 @@
 import './src/bind-shim.js'
 
 export * from './src/array.js'
+export * from './src/async.js'
 export * from './src/error.js'
 export * from './src/event.js'
 export * from './src/ie.js'
