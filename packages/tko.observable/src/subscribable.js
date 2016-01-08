@@ -1,10 +1,12 @@
 
 import {
     setPrototypeOfOrExtend, arrayRemoveItem, objectForEach,
-    canSetPrototype, setPrototypeOf, isObservable
+    canSetPrototype, setPrototypeOf
 } from 'tko.utils';
-import * as dependencyDetection from './dependencyDetection';
-import { applyExtenders } from './extenders';
+import * as dependencyDetection from './dependencyDetection.js';
+import { applyExtenders } from './extenders.js';
+import { isObservable } from './observable.js';
+
 
 export function subscription(target, callback, disposeCallback) {
     this._target = target;
@@ -153,7 +155,7 @@ var ko_subscribable_fn = {
         return !this['equalityComparer'] || !this['equalityComparer'](oldValue, newValue);
     },
 
-    extend: applyExtenders,
+    extend: applyExtenders
 };
 
 
