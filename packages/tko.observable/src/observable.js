@@ -6,10 +6,11 @@ import {
     createSymbolOrString, canSetPrototype, extend, setPrototypeOfOrExtend,
     setPrototypeOf, hasPrototype
 } from 'tko.utils';
+
 import * as dependencyDetection from './dependencyDetection.js';
+import { deferUpdates } from './defer.js';
 import { subscribable } from './subscribable.js';
-import { valuesArePrimitiveAndEqual } from 'extenders.js';
-import * as extenders from './extenders.js';
+import { valuesArePrimitiveAndEqual } from './extenders.js';
 
 var observableLatestValue = createSymbolOrString('_latestValue');
 
@@ -47,7 +48,7 @@ export function observable(initialValue) {
     setPrototypeOfOrExtend(observable, observableFn);
 
     if (ko.options['deferUpdates']) {
-        extenders.deferred(observable, true);
+        deferUpdates(observable);
     }
 
     return observable;

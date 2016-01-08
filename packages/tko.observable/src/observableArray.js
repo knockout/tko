@@ -7,7 +7,7 @@ import {
     arrayForEach
 } from 'tko.utils';
 
-import { observable, isObservable } from './observables.js';
+import { observable, isObservable } from './observable.js';
 
 
 export function observableArray(initialValues) {
