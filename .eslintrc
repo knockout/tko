@@ -20,6 +20,8 @@ rules:
   curly: 0
   quotes: 0
   camelcase: 0
+ecmaFeatures:
+  modules: true
 env:
   browser: true
 globals:

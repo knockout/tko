@@ -23,6 +23,8 @@
   "devDependencies": {
     "closure-compiler": "^0.2.7",
     "colors": "^1.1.2",
+    "eslint-config-import": "^0.9.1",
+    "eslint-plugin-import": "^0.12.1",
     "extend": "^3.0.0",
     "figlet": "^1.1.1",
     "gulp": "^3.9.0",
@@ -51,5 +53,8 @@
     "phantomjs": "^1.9.19",
     "promise": "^7.0.4",
     "through": "^2.3.8"
+  },
+  "dependencies": {
+    "tko.utils": "^0.1.0"
   }
 }
