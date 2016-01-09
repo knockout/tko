@@ -11,7 +11,7 @@ import {
 import { defaultEvent } from './subscribable.js';
 
 
-var arrayChangeEventName = 'arrayChange';
+export var arrayChangeEventName = 'arrayChange';
 
 
 export function trackArrayChanges(target, options) {
@@ -41,6 +41,7 @@ export function trackArrayChanges(target, options) {
             trackChanges();
         }
     };
+
     // Watch "dispose" calls, and for array change events, ensure change tracking is disabled when all are disposed
     target.afterSubscriptionRemove = function (event) {
         if (underlyingAfterSubscriptionRemoveFunction)

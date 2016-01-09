@@ -18,7 +18,7 @@ export function observableArray(initialValues) {
 
     var result = observable(initialValues);
     setPrototypeOfOrExtend(result, observableArray.fn);
-    return result.extend({'trackArrayChanges':true});
+    return result.extend({ trackArrayChanges: true });
 }
 
 observableArray.fn = {
