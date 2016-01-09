@@ -28,10 +28,10 @@ describe('unwrapObservable', function() {
         expect(ko.utils.unwrapObservable(undefined)).toBe(undefined);
     });
 
-    it('Should be aliased as ko.unwrap', function() {
-        expect(ko.unwrap).toBe(ko.utils.unwrapObservable);
-        expect(ko.unwrap(ko.observable('some value'))).toBe('some value');
-    });
+    // it('Should be aliased as ko.unwrap', function() {
+    //     expect(ko.unwrap).toBe(ko.utils.unwrapObservable);
+    //     expect(ko.unwrap(ko.observable('some value'))).toBe('some value');
+    // });
 });
 
 describe('arrayForEach', function () {
@@ -239,7 +239,7 @@ describe('arrayFilter', function () {
     });
 
     it('Should copy the array before returning it', function () {
-        var alwaysTrue = function(x) {
+        var alwaysTrue = function() {
             return true;
         }
 

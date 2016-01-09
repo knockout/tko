@@ -3,7 +3,6 @@
 //
 
 import { unwrap } from  './obs.js'
-import { tagNameLower } from './dom/info.js'
 
 
 export function stringTrim (string) {

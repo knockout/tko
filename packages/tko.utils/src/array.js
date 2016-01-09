@@ -88,7 +88,7 @@ export function makeArray(arrayLikeObject) {
     var result = [];
     for (var i = 0, j = arrayLikeObject.length; i < j; i++) {
         result.push(arrayLikeObject[i]);
-    };
+    }
     return result;
 }
 

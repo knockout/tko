@@ -7,3 +7,4 @@
 //
 export var unwrapObservable
 export var peekObservable
+export { unwrapObservable as unwrap }

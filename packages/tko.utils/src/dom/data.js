@@ -1,10 +1,10 @@
 //
 // DOM node data
 //
-import {createSymbolOrString} from '../symbol.js'
+// import {createSymbolOrString} from '../symbol.js'
 
 var uniqueId = 0;
-var dataStoreKeyExpandoPropertyName = createSymbolOrString("__ko__data_store");
+var dataStoreKeyExpandoPropertyName = "__ko__data" + new Date();
 var dataStore = {};
 
 
