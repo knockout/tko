@@ -1,3 +1,10 @@
+import './helper.js'
+import * as utils from '../index.js'
+
+var ko = ko || {}
+ko.utils = utils
+
+
 describe('Tasks', function() {
     beforeEach(function() {
         jasmine.Clock.useMockForTasks();

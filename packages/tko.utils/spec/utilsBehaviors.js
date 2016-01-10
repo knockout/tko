@@ -1,7 +1,10 @@
+import './helper.js'
 import * as utils from '../index.js'
 
 var ko = ko || {}
 ko.utils = utils
+ko.tasks = utils.tasks
+
 
 describe('unwrapObservable', function() {
     it('Should return the underlying value of observables', function() {
@@ -27,11 +30,6 @@ describe('unwrapObservable', function() {
         expect(ko.utils.unwrapObservable(null)).toBe(null);
         expect(ko.utils.unwrapObservable(undefined)).toBe(undefined);
     });
-
-    // it('Should be aliased as ko.unwrap', function() {
-    //     expect(ko.unwrap).toBe(ko.utils.unwrapObservable);
-    //     expect(ko.unwrap(ko.observable('some value'))).toBe('some value');
-    // });
 });
 
 describe('arrayForEach', function () {

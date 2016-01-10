@@ -1,7 +1,11 @@
+import './helper.js'
+
 import * as utils from '../index.js'
 
 var ko = ko || {}
 ko.utils = utils
+
+
 
 describe('setTextContent', function () {
     var element;
