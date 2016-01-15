@@ -27,8 +27,9 @@ export * from './src/dom/fixes.js'
 export * from './src/dom/html.js'
 export * from './src/dom/disposal.js'
 
+import * as memoization from './src/memoization'
 import * as tasks from './src/tasks.js'
 import * as virtualElements from './src/dom/virtualElements.js'
 import * as domData from './src/dom/data.js'
 
-export {tasks, virtualElements, domData}
+export {tasks, virtualElements, domData, memoization}
