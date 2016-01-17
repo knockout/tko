@@ -2,8 +2,13 @@
 // DOM Events
 //
 
-import { objectForEach } from './object.js'
-import { jQueryInstance} from './jquery.js'
+import { objectForEach } from '../object.js'
+import { jQueryInstance } from '../jquery.js'
+import { ieVersion } from '../ie.js'
+import { catchFunctionErrors } from '../error.js'
+
+import { tagNameLower } from './info.js'
+import { addDisposeCallback } from './disposal.js'
 
 
 // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
@@ -28,7 +33,7 @@ objectForEach(knownEvents, function(eventType, knownEventsForType) {
 
 
 function isClickOnCheckableElement(element, eventType) {
-    if ((ko.utils.tagNameLower(element) !== "input") || !element.type) return false;
+    if ((tagNameLower(element) !== "input") || !element.type) return false;
     if (eventType.toLowerCase() != "click") return false;
     var inputType = element.type;
     return (inputType == "checkbox") || (inputType == "radio");
@@ -39,7 +44,7 @@ function isClickOnCheckableElement(element, eventType) {
 var eventsThatMustBeRegisteredUsingAttachEvent = { 'propertychange': true };
 
 export function registerEventHandler(element, eventType, handler) {
-    var wrappedHandler = ko.utils.catchFunctionErrors(handler);
+    var wrappedHandler = catchFunctionErrors(handler);
 
     var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType];
     if (!ko.options['useOnlyNativeEvents'] && !mustUseAttachEvent && jQueryInstance) {
@@ -53,7 +58,7 @@ export function registerEventHandler(element, eventType, handler) {
 
         // IE does not dispose attachEvent handlers automatically (unlike with addEventListener)
         // so to avoid leaks, we have to remove them manually. See bug #856
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        addDisposeCallback(element, function() {
             element.detachEvent(attachEventName, attachEventHandler);
         });
     } else

@@ -1,9 +1,10 @@
 //
 // DOM manipulation
 //
-import { unwrap } from '../obs.js'
 import { makeArray } from '../array.js'
+import { ieVersion } from '../ie.js'
 import { cleanNode, removeNode } from './disposal.js'
+import { forceRefresh } from './fixes.js'
 import * as virtualElements from './virtualElements.js'
 
 export function moveCleanedNodesToContainerElement(nodes) {
@@ -42,8 +43,8 @@ export function replaceDomNodes (nodeToReplaceOrNodeArray, newNodesArray) {
         var parent = insertionPoint.parentNode;
         for (var i = 0, j = newNodesArray.length; i < j; i++)
             parent.insertBefore(newNodesArray[i], insertionPoint);
-        for (var i = 0, j = nodesToReplaceArray.length; i < j; i++) {
-            kremoveNode(nodesToReplaceArray[i]);
+        for (i = 0, j = nodesToReplaceArray.length; i < j; i++) {
+            removeNode(nodesToReplaceArray[i]);
         }
     }
 }
@@ -63,7 +64,7 @@ export function setElementName(element, name) {
 }
 
 export function setTextContent(element, textContent) {
-    var value = unwrap(textContent);
+    var value = typeof textContent === 'function' ? textContent() : textContent;
     if ((value === null) || (value === undefined))
         value = "";
 

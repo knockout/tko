@@ -1,10 +1,11 @@
 import './helper.js'
 
 import * as utils from '../index.js'
+import { registerEventHandler } from '../index.js'
 
 var ko = ko || {}
 ko.utils = utils
-
+ko.options = {}
 
 
 describe('setTextContent', function () {
@@ -59,7 +60,7 @@ describe('registerEventHandler', function() {
         ko.options.useOnlyNativeEvents = false;
 
         // Verify jQuery is used in event binding.
-        ko.utils.registerEventHandler(element, 'click', function(eventArgs) {
+        registerEventHandler(element, 'click', function(eventArgs) {
             eventFired = true;
             jQueryModified = !!eventArgs.originalEvent;
         });
@@ -87,7 +88,7 @@ describe('registerEventHandler', function() {
         ko.options.useOnlyNativeEvents = true;
 
         // Verify jQuery is not used in event binding.
-        ko.utils.registerEventHandler(element, 'click', function(eventArgs) {
+        registerEventHandler(element, 'click', function(eventArgs) {
             eventFired = true;
             jQueryModified = !!eventArgs.originalEvent;
         });

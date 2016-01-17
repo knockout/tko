@@ -1,7 +1,7 @@
 //
 //  DOM node manipulation
 //
-
+import { ieVersion } from '../ie.js'
 
 export function fixUpContinuousNodeArray(continuousNodeArray, parentNode) {
     // Before acting on a set of nodes that were previously outputted by a template function, we have to reconcile
