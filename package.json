@@ -24,7 +24,7 @@
     "karma": "^0.13.19",
     "karma-jasmine": "^0.1.6",
     "karma-phantomjs2-launcher": "^0.4.0",
-    "karma-rollup-preprocessor": "brianmhunt/karma-rollup-preprocessor",
+    "karma-rollup-preprocessor": "^2.0.1",
     "lodash": "^3.10.1",
     "rollup": "^0.24.1",
     "rollup-plugin-npm": "^1.2.1"
