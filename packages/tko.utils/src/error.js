@@ -1,26 +1,29 @@
 //
 // Error handling
 //
+export var onError
 
 export function catchFunctionErrors(delegate) {
-    return ko.onError ? function () {
+    return onError ? function () {
         try {
             return delegate.apply(this, arguments);
         } catch (e) {
-            ko.onError && ko.onError(e);
+            onError && onError(e);
             throw e;
         }
     } : delegate;
 }
 
 export function deferError(error) {
-    setTimeout(function () {
-        ko.onError && ko.onError(error);
+    safeSetTimeout(function () {
+        onError && onError(error);
         throw error;
     }, 0);
 }
 
 
-export function setTimeout(handler, timeout) {
+function safeSetTimeout(handler, timeout) {
     return setTimeout(catchFunctionErrors(handler), timeout);
 }
+
+export { safeSetTimeout as setTimeout }

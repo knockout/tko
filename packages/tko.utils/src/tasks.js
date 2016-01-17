@@ -2,6 +2,8 @@
 //  Tasks Micro-scheduler
 //  ===
 //
+import { deferError } from './error.js'
+
 var scheduler,
     taskQueue = [],
     taskQueueLength = 0,
@@ -47,7 +49,7 @@ function processTasks() {
                 if (nextIndexToProcess > mark) {
                     if (++countMarks >= 5000) {
                         nextIndexToProcess = taskQueueLength;   // skip all tasks remaining in the queue since any of them could be causing the recursion
-                        ko.utils.deferError(Error("'Too much recursion' after processing " + countMarks + " task groups."));
+                        deferError(Error("'Too much recursion' after processing " + countMarks + " task groups."));
                         break;
                     }
                     mark = taskQueueLength;
@@ -55,7 +57,7 @@ function processTasks() {
                 try {
                     task();
                 } catch (ex) {
-                    ko.utils.deferError(ex);
+                    deferError(ex);
                 }
             }
         }
@@ -72,7 +74,6 @@ function scheduledProcess() {
 function scheduleTaskProcessing() {
     scheduler(scheduledProcess);
 }
-
 
 
 export function schedule(func) {
