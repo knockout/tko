@@ -9,6 +9,7 @@ import { catchFunctionErrors } from '../error.js'
 
 import { tagNameLower } from './info.js'
 import { addDisposeCallback } from './disposal.js'
+import options from '../options.js'
 
 
 // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
@@ -20,8 +21,8 @@ var keyEventTypeName = (navigator && /Firefox\/2/i.test(navigator.userAgent)) ? 
 knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress'];
 
 knownEvents['MouseEvents'] = [
-  'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseover',
-  'mouseout', 'mouseenter', 'mouseleave'];
+    'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseover',
+    'mouseout', 'mouseenter', 'mouseleave'];
 
 
 objectForEach(knownEvents, function(eventType, knownEventsForType) {
@@ -47,11 +48,11 @@ export function registerEventHandler(element, eventType, handler) {
     var wrappedHandler = catchFunctionErrors(handler);
 
     var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType];
-    if (!ko.options['useOnlyNativeEvents'] && !mustUseAttachEvent && jQueryInstance) {
-        jQueryInstance(element)['bind'](eventType, wrappedHandler);
+    if (!options.useOnlyNativeEvents && !mustUseAttachEvent && jQueryInstance) {
+        jQueryInstance(element).bind(eventType, wrappedHandler);
     } else if (!mustUseAttachEvent && typeof element.addEventListener == "function")
         element.addEventListener(eventType, wrappedHandler, false);
-    else if (typeof element.attachEvent != "undefined") {
+    else if (typeof element.attachEvent !== "undefined") {
         var attachEventHandler = function (event) { wrappedHandler.call(element, event); },
             attachEventName = "on" + eventType;
         element.attachEvent(attachEventName, attachEventHandler);
@@ -75,8 +76,8 @@ export function triggerEvent(element, eventType) {
     // In both cases, we'll use the click method instead.
     var useClickWorkaround = isClickOnCheckableElement(element, eventType);
 
-    if (!ko.options['useOnlyNativeEvents'] && jQueryInstance && !useClickWorkaround) {
-        jQueryInstance(element)['trigger'](eventType);
+    if (!options.useOnlyNativeEvents && jQueryInstance && !useClickWorkaround) {
+        jQueryInstance(element).trigger(eventType);
     } else if (typeof document.createEvent == "function") {
         if (typeof element.dispatchEvent == "function") {
             var eventCategory = knownEventTypesByEventName[eventType] || "HTMLEvents";

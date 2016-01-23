@@ -2,10 +2,11 @@ import './helper.js'
 
 import * as utils from '../index.js'
 import { registerEventHandler } from '../index.js'
+import options from '../src/options.js'
 
 var ko = ko || {}
 ko.utils = utils
-ko.options = {}
+ko.options = options
 
 
 describe('setTextContent', function () {
