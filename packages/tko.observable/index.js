@@ -4,6 +4,7 @@
 //
 // The following are added to the root `[t]ko` object.
 //
+import { unwrap, peek } from './src/observable';
 export {
     observable, isObservable, unwrap, peek,
     isWriteableObservable, isWritableObservable
@@ -22,5 +23,6 @@ export { extenders, dependencyDetection };
 
 // Attach unwrap/peek-Observable to tko.utils
 import * as utils from 'tko.utils';
-utils.unwrapObservable = unwrap
-utils.peekObservable = peek
+
+utils.setUnwrapObservableFn(unwrap);
+utils.setPeekObservableFn(peek);

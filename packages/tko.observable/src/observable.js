@@ -4,7 +4,7 @@
 //
 import {
     createSymbolOrString, canSetPrototype, extend, setPrototypeOfOrExtend,
-    setPrototypeOf, hasPrototype
+    setPrototypeOf, hasPrototype, options
 } from 'tko.utils';
 
 import * as dependencyDetection from './dependencyDetection.js';
@@ -47,7 +47,7 @@ export function observable(initialValue) {
     // Inherit from 'observable'
     setPrototypeOfOrExtend(observable, observableFn);
 
-    if (ko.options['deferUpdates']) {
+    if (options.deferUpdates) {
         deferUpdates(observable);
     }
 
