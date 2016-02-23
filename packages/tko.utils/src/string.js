@@ -2,8 +2,6 @@
 // String (and JSON)
 //
 
-import { unwrap } from  './obs.js'
-
 
 export function stringTrim (string) {
     return string === null || string === undefined ? '' :
@@ -37,7 +35,7 @@ export function parseJson (jsonString) {
 export function stringifyJson (data, replacer, space) {   // replacer and space are optional
     if (!JSON || !JSON.stringify)
         throw new Error("Cannot find JSON.stringify(). Some browsers (e.g., IE < 8) don't support it natively, but you can overcome this by adding a script reference to json2.js, downloadable from http://www.json.org/json2.js");
-    return JSON.stringify(unwrap(data), replacer, space);
+    return JSON.stringify(typeof data === 'function' ? data() : data, replacer, space);
 }
 
 

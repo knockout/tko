@@ -73,7 +73,7 @@ export function arrayPushAll(array, valuesToPush) {
 }
 
 export function addOrRemoveItem(array, value, included) {
-    var existingEntryIndex = arrayIndexOf(peekObservable(array), value);
+    var existingEntryIndex = arrayIndexOf(typeof array.peek === 'function' ? array.peek() : array, value);
     if (existingEntryIndex < 0) {
         if (included)
             array.push(value);
@@ -94,8 +94,8 @@ export function makeArray(arrayLikeObject) {
 
 
 export function range(min, max) {
-    min = unwrap(min);
-    max = unwrap(max);
+    min = typeof min === 'function' ? min() : min;
+    max = typeof max === 'function' ? max() : max;
     var result = [];
     for (var i = min; i <= max; i++)
         result.push(i);
