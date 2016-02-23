@@ -38,7 +38,7 @@ function test(extra_config) {
     if (process.argv.indexOf("--once") >= 0) { options.singleRun = true; }
     if (process.argv.indexOf("--watch") >= 0) { options.singleRun = false; }
 
-    console.log("KARMA ", options)
+    // console.log("KARMA ", options)
     new karma.Server(options)
       .on('browser_complete', function(browser, results) {
           console.log(browser.name.cyan, " ✅  Complete.".green)
