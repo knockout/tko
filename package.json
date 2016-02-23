@@ -31,7 +31,9 @@
   "tko": {
     "blacklist": true
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "rollup-plugin-npm": "^1.4.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com//knockout/tko.tools.git"
