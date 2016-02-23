@@ -1,0 +1,25 @@
+{
+  "name": "tko.bind",
+  "version": "1.0.0",
+  "description": "TKO DOM-Observable Binding",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "tko.tools": "^0.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.bind.git"
+  },
+  "author": "Knockout Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.bind/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.bind#readme"
+}
