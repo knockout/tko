@@ -1,0 +1,24 @@
+{
+  "name": "tko.components",
+  "version": "1.0.0",
+  "description": "TKO WebComponents",
+  "main": "index.js",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "tko.tools": "^0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.component.git"
+  },
+  "author": "Knockout Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.component/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.component#readme"
+}
