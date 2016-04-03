@@ -15,7 +15,7 @@
 module.exports = function(config) {
   config.set({
     frameworks: ['mocha', 'sinon', 'chai'],
-    browsers: ['PhantomJS2'],
+    browsers: ['PhantomJS'],
     // customHeaders:  {
     //     "Content-Security-Policy": CSP,
     // },

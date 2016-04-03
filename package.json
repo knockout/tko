@@ -25,11 +25,11 @@
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-mocha": "^0.2.2",
-    "karma-phantomjs2-launcher": "^0.5.0",
+    "karma-phantomjs-launcher": "^1.0.0",
     "karma-sinon": "^1.0.4",
-    "knockout": "^3.4.0",
     "lodash": "^4.7.0",
     "mocha": "*",
+    "phantomjs-prebuilt": "^2.1.7",
     "sinon": "~1.17.x"
   },
   "main": "dist/knockout-secure-binding.js",
@@ -43,7 +43,7 @@
     "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
   },
   "dependencies": {
-    "knockout": "^3.4.0"
+    "knockout": "^3.0.0"
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run"
