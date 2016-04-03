@@ -1,5 +1,5 @@
 {
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": {
     "name": "Brian M Hunt",
     "email": "brianmhunt@gmail.com"
@@ -9,24 +9,28 @@
   "devDependencies": {
     "chai": "*",
     "colors": "*",
-    "conventional-changelog": "~0.0.x",
-    "gulp": "~3.8.x",
-    "gulp-bump": "~0.1.x",
-    "gulp-concat": "~2.1.x",
-    "gulp-connect": "^2.0.6",
-    "gulp-exec": "~1.0.x",
-    "gulp-header": "~1.0.x",
-    "gulp-jshint": "~1.3.x",
-    "gulp-uglify": "~0.2.x",
-    "gulp-util": "~2.2.x",
-    "gulp-watch": "~0.5.x",
+    "conventional-changelog": "~1.1.x",
+    "gulp": "~3.9.x",
+    "gulp-bump": "~2.1.x",
+    "gulp-concat": "~2.6.x",
+    "gulp-connect": "^3.2.2",
+    "gulp-exec": "~2.1.x",
+    "gulp-footer": "^1.0.5",
+    "gulp-header": "~1.7.x",
+    "gulp-uglify": "~1.5.x",
+    "gulp-util": "~3.0.x",
+    "gulp-watch": "~4.3.x",
     "js-yaml": "^3.1.0",
-    "jshint-stylish": "~0.1.x",
-    "lodash": "^2.4.1",
+    "jshint-stylish": "~2.1.x",
+    "karma": "^0.13.22",
+    "karma-chai": "^0.1.0",
+    "karma-mocha": "^0.2.2",
+    "karma-phantomjs2-launcher": "^0.5.0",
+    "karma-sinon": "^1.0.4",
+    "knockout": "^3.4.0",
+    "lodash": "^4.7.0",
     "mocha": "*",
-    "q": "^1.0.1",
-    "sinon": "~1.7.x",
-    "wd": "^0.3.4"
+    "sinon": "~1.17.x"
   },
   "main": "dist/knockout-secure-binding.js",
   "homepage": "https://github.com/brianmhunt/knockout-secure-binding",
@@ -38,9 +42,10 @@
     "type": "git",
     "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "knockout": "^3.4.0"
+  },
   "scripts": {
-    "start": "gulp connect",
-    "test": "gulp test"
+    "test": "./node_modules/karma/bin/karma start --single-run"
   }
 }

@@ -1,6 +1,6 @@
-/*! knockout-secure-binding - v0.5.3 - 2015-11-18
+/*! knockout-secure-binding - v0.5.4 - 2016-04-03
  *  https://github.com/brianmhunt/knockout-secure-binding
- *  Copyright (c) 2013 - 2015 Brian M Hunt; License: MIT */
+ *  Copyright (c) 2013 - 2016 Brian M Hunt; License: MIT */
 ;(function(factory) {
     //AMD
     if (typeof define === "function" && define.amd) {
@@ -18,6 +18,10 @@
     }
     return item;
   }
+
+  // We re-use the cache/parsing from the original binding provider,
+  // in nodeParamsToObject (ala. getComponentParamsFromCustomElement)
+  var originalBindingProviderInstance = new ko.bindingProvider();
 
   // The following are also in ko.*, but not exposed.
   function _object_map(source, mapping) {
@@ -974,19 +978,39 @@ function getBindingsString(node) {
     }
 }
 
-function nodeParamRawMapper(param) {
-    return param();
-}
-
+// This mirrors ko's native getComponentParamsFromCustomElement
 function nodeParamsToObject(node, parser) {
     var accessors = parser.parse(node.getAttribute('params'));
     if (!accessors || Object.keys(accessors).length === 0) {
         return {$raw: {}};
     }
-    var $raw = _object_map(accessors, nodeParamRawMapper);
-    var params = _object_map($raw, ko.unwrap);
+    var rawParamComputedValues = _object_map(accessors,
+        function(paramValue, paramName) {
+            return ko.computed(paramValue, null,
+                { disposeWhenNodeIsRemoved: node }
+            );
+        }
+    );
+    var params = _object_map(rawParamComputedValues,
+        function(paramValueComputed, paramName) {
+            var paramValue = paramValueComputed.peek();
+            if (!paramValueComputed.isActive()) {
+                return paramValue;
+            } else {
+                return ko.computed({
+                    read: function() {
+                        return ko.unwrap(paramValueComputed());
+                    },
+                    write: ko.isWriteableObservable(paramValue) && function(value) {
+                        paramValueComputed()(value);
+                    },
+                    disposeWhenNodeIsRemoved: node
+                });
+            }
+        }
+    );
     if (!params.hasOwnProperty('$raw')) {
-        params.$raw = $raw;
+        params.$raw = rawParamComputedValues;
     }
     return params;
 }
@@ -1037,10 +1061,8 @@ ko.utils.extend(secureBindingsProvider.prototype, {
     nodeParamsToObject: nodeParamsToObject,
     Parser: Parser
 });
-
     if (!exports) {
         ko.secureBindingsProvider = secureBindingsProvider;
     }
-
     return secureBindingsProvider;
 }));

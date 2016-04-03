@@ -200,7 +200,11 @@ Automated tests with `chromedriver` can be initiated with
 You will need to independently start `chromedriver` with
 `chromedriver --url-base=/wd/hub --port=4445`.
 
-You can compile with [`gulp`](http://gulpjs.com/), and run a test server with `gulp live`. [Install `gulp`](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) with `npm install -g gulp`.
+- Compile with [`gulp`](http://gulpjs.com/).
+- Run a test server with `./node_modules/karma/bin/karma start`.
+- Run tests with `npm test`
+
+Make sure you have [installed `gulp`](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) with `npm install -g gulp`.
 
 Requires
 ---

@@ -23,7 +23,7 @@ describe("Knockout Secure Binding", function () {
        csp_rex = /Content Security Policy|blocked by CSP/;
 
     beforeEach(function () {
-        instance = new ko.secureBindingsProvider();
+        instance = new secureBindingsProvider();
         Parser = instance.Parser,
         Identifier = Parser.Identifier,
         Expression = Parser.Expression,
@@ -34,11 +34,6 @@ describe("Knockout Secure Binding", function () {
 
     it("has loaded knockout", function () {
         assert.property(window, 'ko')
-    })
-
-    it("secureBindingsProvider exist on 'ko'", function () {
-        // note that it could alternatively be exported with `require`
-        assert.property(ko, 'secureBindingsProvider')
     })
 
    // The following mucks up our test runner because even though a CSP is not
@@ -94,7 +89,7 @@ describe("getBindingAccessors with string arg", function() {
     var div;
 
     beforeEach(function() {
-        ko.bindingProvider.instance = new ko.secureBindingsProvider()
+        ko.bindingProvider.instance = new secureBindingsProvider()
         div = document.createElement("div");
         instance.bindings.alpha = {
             init: sinon.spy(),
@@ -148,7 +143,7 @@ describe("getBindingAccessors with function arg", function () {
     var div;
 
     beforeEach(function() {
-        ko.bindingProvider.instance = new ko.secureBindingsProvider()
+        ko.bindingProvider.instance = new secureBindingsProvider()
         div = document.createElement("div");
         div.setAttribute("data-sbind", 'alpha: x');
         instance.bindings.alpha = {
@@ -181,7 +176,7 @@ describe("getBindingAccessors with function arg", function () {
 
 describe("changing Knockout's bindings to KSB", function () {
     beforeEach(function () {
-        ko.bindingProvider.instance = new ko.secureBindingsProvider()
+        ko.bindingProvider.instance = new secureBindingsProvider()
     })
 
     it("binds Text with data-sbind", function () {
@@ -598,7 +593,7 @@ describe("Identifier", function () {
                     moby: 'dick'
                 };
             div.setAttribute("data-sbind", "text: $data.fn()")
-            ko.bindingProvider.instance = new ko.secureBindingsProvider()
+            ko.bindingProvider.instance = new secureBindingsProvider()
             ko.applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'ahab')
         })
@@ -618,7 +613,7 @@ describe("Identifier", function () {
                     }
                 };
             div.setAttribute("data-sbind", "text: fn()")
-            ko.bindingProvider.instance = new ko.secureBindingsProvider({ globals: globals })
+            ko.bindingProvider.instance = new secureBindingsProvider({ globals: globals })
             ko.applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'sigtext')
         })
@@ -947,7 +942,7 @@ describe("array accessors - []", function () {
 
 describe("Virtual elements", function() {
     beforeEach(function () {
-        ko.bindingProvider.instance = new ko.secureBindingsProvider();
+        ko.bindingProvider.instance = new secureBindingsProvider();
     })
 
     it("binds to a raw comment", function () {
@@ -984,7 +979,7 @@ describe("Components", function () {
   describe("custom elements", function () {
     // Note: knockout/spec/components
     beforeEach(function () {
-       ko.bindingProvider.instance = new ko.secureBindingsProvider();
+       ko.bindingProvider.instance = new secureBindingsProvider();
     });
 
     it("inserts templates into custom elements", function (done) {
@@ -1027,6 +1022,59 @@ describe("Components", function () {
           assert.equal(called, true);
           done()
        }, 1)
+    });
+
+    it("does not unwrap observables (#44)", function (done) {
+      // Per https://plnkr.co/edit/EzpJD3yXd01aqPbuOq1X
+      function AppViewModel(value) {
+        this.appvalue = ko.observable(value);
+      }
+
+      function ParentViewModel(params) {
+        this.parentvalue = params.value;
+      }
+
+      function ChildViewModel(params) {
+        assert.ok(ko.isObservable(params.value))
+        this.cvalue = params.value
+      }
+
+      var ps = document.createElement('script')
+      ps.setAttribute('id', 'parent-44')
+      ps.setAttribute('type', 'text/html')
+      ps.innerHTML = '<div>Parent: <span data-bind="text: parentvalue"></span></div>' +
+          '<child params="value: parentvalue"></child>'
+      document.body.appendChild(ps)
+
+      cs = document.createElement('script')
+      cs.setAttribute('id', 'child-44')
+      cs.setAttribute('type', 'text/html')
+      cs.innerHTML = ''
+      document.body.appendChild(cs)
+
+      var div = document.createElement('div')
+      div.innerHTML = '<div data-bind="text: appvalue"></div>' +
+        '<parent params="value: appvalue"></parent>'
+
+      var viewModel = new AppViewModel("hello");
+      ko.components.register("parent", {
+          template: { element: "parent-44" },
+          viewModel: ParentViewModel
+      });
+      ko.components.register("child", {
+          template: { element: "child-44" },
+          viewModel: ChildViewModel
+      });
+      var options = {
+          attribute: "data-bind",
+          globals: window,
+          bindings: ko.bindingHandlers,
+          noVirtualElements: false
+      };
+      // ko.bindingProvider.instance = new original_provider()
+      ko.bindingProvider.instance = new secureBindingsProvider(options);
+      ko.applyBindings(viewModel, div);
+      setTimeout(function () { done() }, 50)
     });
 
     it("uses empty params={$raw:{}} if the params attr is whitespace", function (done) {
@@ -1081,7 +1129,7 @@ describe("Components", function () {
                value: "42.99"
             }
          };
-         assert.deepEqual(nodeParamsToObject(node, parser), expect);
+         assert.deepEqual(ko.toJS(nodeParamsToObject(node, parser)), expect);
       });
 
       it("returns unwrapped params", function () {
@@ -1089,8 +1137,8 @@ describe("Components", function () {
          var node = document.createElement("div");
          node.setAttribute('params', 'type: fe');
          var paramsObject = nodeParamsToObject(node, parser);
-         assert.equal(paramsObject.type, "Iron")
-         assert.equal(paramsObject.$raw.type(), "Iron")
+         assert.equal(paramsObject.type(), "Iron")
+         assert.equal(paramsObject.$raw.type()(), "Iron")
       });
    });
 });

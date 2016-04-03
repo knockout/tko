@@ -1,12 +1,3 @@
-;(function(factory) {
-    //AMD
-    if (typeof define === "function" && define.amd) {
-        define(["knockout", "exports"], factory);
-        //normal script tag
-    } else {
-        factory(ko);
-    }
-}(function(ko, exports, undefined) {
   var Identifier, Expression, Parser, Node;
 
   function value_of(item) {
@@ -15,6 +6,10 @@
     }
     return item;
   }
+
+  // We re-use the cache/parsing from the original binding provider,
+  // in nodeParamsToObject (ala. getComponentParamsFromCustomElement)
+  var originalBindingProviderInstance = new ko.bindingProvider();
 
   // The following are also in ko.*, but not exposed.
   function _object_map(source, mapping) {
