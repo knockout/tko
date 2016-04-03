@@ -2,6 +2,7 @@ Knockout Secure Binding
 =======================
 
  [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
+ [![Circle CI](https://circleci.com/gh/brianmhunt/knockout-secure-binding.svg?style=svg)](https://circleci.com/gh/brianmhunt/knockout-secure-binding)
 
 Tested with multiple browsers with [BrowserStack](https://browserstack.com).
 
