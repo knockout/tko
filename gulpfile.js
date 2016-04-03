@@ -20,7 +20,6 @@ var fs = require('fs'),
       'src/expression.js',
       'src/parser.js',
       'src/provider.js',
-      'src/tail.js'
     ],
 
     banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
@@ -61,6 +60,7 @@ gulp.task('minify', function () {
       .pipe(concat("knockout-secure-binding.min.js"))
       .pipe(uglify())
       .pipe(header(banner, { pkg: pkg, today: now }))
+      .pipe(footer(tail))
       .pipe(gulp.dest("./dist"))
 })
 

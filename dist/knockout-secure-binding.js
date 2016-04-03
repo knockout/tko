@@ -1,4 +1,4 @@
-/*! knockout-secure-binding - v0.5.4 - 2016-04-03
+/*! knockout-secure-binding - v0.5.5 - 2016-04-03
  *  https://github.com/brianmhunt/knockout-secure-binding
  *  Copyright (c) 2013 - 2016 Brian M Hunt; License: MIT */
 ;(function(factory) {
