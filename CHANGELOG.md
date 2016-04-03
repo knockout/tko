@@ -1,5 +1,8 @@
+### 0.5.5 (2015-11-18)
+* **build**: Fix bad minification/minified version
+
 ### 0.5.4 (2015-11-18)
-* *parser*: Fix #44 - mimic KO component param behaviour
+* **parser**: Fix #44 - mimic KO component param behaviour
 
 ### 0.5.3 (2015-11-18)
 * **memory**: Fix global memory leaks
