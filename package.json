@@ -1,5 +1,5 @@
 {
-  "name": "tko.tools",
+  "name": "tko-policy",
   "version": "0.1.0",
   "description": "TKO Tools (Gulp tasks, etc.)",
   "main": "index.js",
@@ -9,7 +9,7 @@
   "keywords": [
     "tko",
     "knockout",
-    "tools",
+    "policy",
     "gulp"
   ],
   "author": "Knockout",
@@ -37,6 +37,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com//knockout/tko.tools.git"
+    "url": "https://github.com//knockout/tko-policy.git"
   }
 }
