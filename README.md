@@ -28,7 +28,7 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
  
 When complete, the hope is that Knockout will become an *opinionated expression* of TKO, in other words, Knockout will simply be a set of popular and sensible choices from a list of TKO-based HTML-bindings, utilities, observables, and other plugins e.g.:
 
-- [tko.tools](https://github.com/knockout/tko.tools) — Tools for every TKO-based package
+- [tko-policy](https://github.com/knockout/tko.tools) — Tools and settings for every TKO-based package
 - [tko.bind](https://github.com/knockout/tko.bind) — HTML bindings
 - [tko.observable](https://github.com/knockout/tko.observable) — Observable variables
 - [tko.computed](https://github.com/knockout/tko.computed) — Computed/dependant observable variables
