@@ -32,3 +32,20 @@ export function tagNameLower(element) {
     // we don't need to do the .toLowerCase() as it will always be lower case anyway.
     return element && element.tagName && element.tagName.toLowerCase();
 }
+
+export function isDomElement(obj) {
+    if (window.HTMLElement) {
+        return obj instanceof HTMLElement;
+    } else {
+        return obj && obj.tagName && obj.nodeType === 1;
+    }
+}
+
+export function isDocumentFragment(obj) {
+    if (window.DocumentFragment) {
+        return obj instanceof DocumentFragment;
+    } else {
+        return obj && obj.nodeType === 11;
+    }
+}
+

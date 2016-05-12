@@ -33,3 +33,8 @@ export function objectMap(source, mapping) {
     }
     return target;
 }
+
+
+export function getObjectOwnProperty(obj, propName) {
+    return obj.hasOwnProperty(propName) ? obj[propName] : undefined;
+}
