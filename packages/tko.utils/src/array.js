@@ -1,8 +1,7 @@
 //
 // Array utilities
 //
-import { unwrap, peekObservable } from './obs.js'
-
+/* eslint no-cond-assign: 0 */
 
 export function arrayForEach(array, action) {
     for (var i = 0, j = array.length; i < j; i++)

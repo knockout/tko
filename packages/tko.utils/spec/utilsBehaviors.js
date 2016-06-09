@@ -1,9 +1,9 @@
-import './helper.js'
-import * as utils from '../index.js'
+import * as utils from '../index.js';
+import './helper.js';
 
-var ko = ko || {}
-ko.utils = utils
-ko.tasks = utils.tasks
+var ko = ko || {};
+ko.utils = utils;
+ko.tasks = utils.tasks;
 
 
 describe('arrayForEach', function () {
@@ -26,6 +26,7 @@ describe('arrayForEach', function () {
         expect(callback).not.toHaveBeenCalled();
     });
 });
+
 
 describe('arrayIndexOf', function () {
     it('Should return the index if the element is found in the input array', function () {
@@ -180,7 +181,7 @@ describe('arrayMap', function () {
     it('Should copy the array before returning it', function () {
         var identityFunction = function(x) {
             return x;
-        }
+        };
 
         var input = ["a", "b", "c"];
         var result = ko.utils.arrayMap(input, identityFunction);
@@ -213,7 +214,7 @@ describe('arrayFilter', function () {
     it('Should copy the array before returning it', function () {
         var alwaysTrue = function() {
             return true;
-        }
+        };
 
         var input = ["a", "b", "c"];
         var result = ko.utils.arrayFilter(input, alwaysTrue);

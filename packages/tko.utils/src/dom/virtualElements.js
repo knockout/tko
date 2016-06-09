@@ -1,3 +1,4 @@
+/* eslint no-cond-assign: 0 */
 //
 // Virtual Elements
 //
@@ -13,9 +14,10 @@
 // IE 9 cannot reliably read the "nodeValue" property of a comment node (see https://github.com/SteveSanderson/knockout/issues/186)
 // but it does give them a nonstandard alternative property called "text" that it can read reliably. Other browsers don't have that property.
 // So, use node.text where available, and node.nodeValue elsewhere
-import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation.js'
-import { removeNode } from './disposal.js'
-import { tagNameLower } from './info.js'
+import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation.js';
+import { removeNode } from './disposal.js';
+import { tagNameLower } from './info.js';
+
 
 var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
 
@@ -84,8 +86,8 @@ function getUnbalancedChildTags(node) {
     return captureRemaining;
 }
 
-export var allowedBindings = {}
-export var hasBindingValue = isStartComment
+export var allowedBindings = {};
+export var hasBindingValue = isStartComment;
 
 export function childNodes(node) {
     return isStartComment(node) ? getVirtualChildren(node) : node.childNodes;

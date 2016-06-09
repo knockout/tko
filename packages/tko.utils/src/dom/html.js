@@ -1,11 +1,10 @@
 //
 // HTML-based manipulation
 //
-import { stringTrim } from '../string.js'
-import { makeArray } from '../array.js'
-import { unwrap } from '../obs.js'
-import { emptyDomNode } from './manipulation.js'
-import { jQueryInstance } from '../jquery.js'
+import { stringTrim } from '../string.js';
+import { makeArray } from '../array.js';
+import { emptyDomNode } from './manipulation.js';
+import { jQueryInstance } from '../jquery.js';
 
 var none = [0, "", ""],
     table = [1, "<table>", "</table>"],
@@ -123,14 +122,17 @@ export function parseHtmlFragment(html, documentContext) {
 
         simpleHtmlParse(html, documentContext));
         // ... otherwise, this simple logic will do in most common cases.
-};
+}
 
 
 export function setHtml(node, html) {
     emptyDomNode(node);
 
-    // There's no legitimate reason to display a stringified observable without unwrapping it, so we'll unwrap it
-    html = unwrap(html);
+    // There's few cases where we would want to display a stringified
+    // function, so we unwrap it.
+    if (typeof html === 'function') {
+        html = html();
+    }
 
     if ((html !== null) && (html !== undefined)) {
         if (typeof html !== 'string')
@@ -148,4 +150,4 @@ export function setHtml(node, html) {
                 node.appendChild(parsedNodes[i]);
         }
     }
-};
+}
