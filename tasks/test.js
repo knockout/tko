@@ -25,7 +25,7 @@ function test(extra_config) {
     }
     options.rollupPreprocessor = {
       rollup: {},
-      bundle: { sourceMap: 'inline' },
+      bundle: { /* sourceMap: 'inline' */ },
     }
 
     if (process.argv.indexOf('--debug') >= 0) {
