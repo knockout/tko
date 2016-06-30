@@ -15,17 +15,19 @@ const SPEC_DIR = path.join(process.cwd(), 'spec')
 function test(extra_config) {
     var options = Object.assign({}, config.karma, extra_config)
 
-    options.files = _(fs.readdirSync(SPEC_DIR))
-      .filter((dir) => dir.endsWith('.js'))
-      .map((filename) => path.join('spec', filename))
-      .value()
+    options.files = [
+      "spec/helpers/*.js",
+      "spec/*.js",
+      {pattern:"src/*.js",included: false, watched: true},
+    ]
 
     options.preprocessors = {
       'spec/*.js': ['rollup'],
     }
+
     options.rollupPreprocessor = {
       rollup: {},
-      bundle: { /* sourceMap: 'inline' */ },
+      bundle: { sourceMap: 'inline' },
     }
 
     if (process.argv.indexOf('--debug') >= 0) {
