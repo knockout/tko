@@ -5,7 +5,6 @@ var ko = ko || {};
 ko.utils = utils;
 ko.tasks = utils.tasks;
 
-
 describe('arrayForEach', function () {
     it('Should go call the callback for each element of the array, in order', function () {
         var callback = jasmine.createSpy('callback');

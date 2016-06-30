@@ -1,6 +1,6 @@
 # --- TKO GENERATED --- start
 # Do not modify.
-# 
+#
 __tko_karma__: &__tko_karma__
   basePath: ''
   port: 7777
@@ -11,8 +11,11 @@ __tko_karma__: &__tko_karma__
     - PhantomJS
   singleRun: false
   files:
-    - spec/helpers/setup.js
-    - spec/*.js
+    # - spec/helpers/setup.js
+    # - 'spec/*.js'
+    #- pattern: 'src/**/*.js'
+    #  included: false
+    #  watched: true
   reporters:
     - progress
   client:

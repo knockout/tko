@@ -28,7 +28,8 @@ describe('setTextContent', function () {
         ko.utils.setTextContent(element, 'test');
         expect(element.innerHTML).toEqual('test');
 
-        ko.utils.setTextContent(element, ko.observable('change'));
+        // We use a function as a proxy for an obsevrable
+        ko.utils.setTextContent(element, function () { return 'change'; });
         expect(element.innerHTML).toEqual('change');
     });
 
