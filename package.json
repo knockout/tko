@@ -33,6 +33,7 @@
     "blacklist": true
   },
   "devDependencies": {
+    "karma-chrome-launcher": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "rollup-plugin-npm": "^2.0.0"
   },

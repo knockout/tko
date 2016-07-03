@@ -55,11 +55,14 @@ function test(extra_config) {
 }
 
 gulp.task('test', 'Run Karma tests', function () {
-  test({browsers: ['PhantomJS2']})
+  var runner = process.argv.indexOf('--chrome') ? 'Chrome' : ""
+
+  test({browsers: [runner]})
 }, {
   options: {
     'once': 'Run the test once, then quit.',
     'watch': 'Watch for changes, re-testing on change.',
-    'debug': 'Print task debugging.'
+    'debug': 'Print task debugging.',
+    'chrome': 'Use Chrome test runner'
   }
 })
