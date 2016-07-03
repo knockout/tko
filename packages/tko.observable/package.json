@@ -27,6 +27,7 @@
     "tko.utils": "^0.1.0"
   },
   "devDependencies": {
-    "gulp": "^3.9.0"
+    "gulp": "^3.9.0",
+    "tko-policy": "^0.1.0"
   }
 }
