@@ -2,8 +2,7 @@
 // dependencyDetection
 // ---
 //
-// Depending on the circumstances (i.e. legacy), this may be imported
-// as `computedContext` or `dependencyDetection`
+// In KO 3.x, dependencyDetection was also known as computedContext.
 //
 import { isSubscribable } from './subscribable.js';
 
