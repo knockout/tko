@@ -2,7 +2,7 @@
 // Observable extenders
 // ---
 //
-import { objectForEach } from 'tko.utils';
+import { onError, objectForEach } from 'tko.utils';
 
 
 var primitiveTypes = {
@@ -23,6 +23,8 @@ export function applyExtenders(requestedExtenders) {
             var extenderHandler = extenders[key];
             if (typeof extenderHandler == 'function') {
                 target = extenderHandler(target, value) || target;
+            } else {
+                onError("Extender not found: " + key);
             }
         });
     }
