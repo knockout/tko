@@ -4,6 +4,12 @@
   "description": "TKO Utilities",
   "main": "dist/tko.utils.js",
   "jsnext:main": "index.js",
+  "files": [
+      "dist/",
+      "src/",
+      "index.js",
+      "./*.ya?ml"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
