@@ -1,29 +1,32 @@
 
+
+import {
+    observable, isSubscribable, isObservable,
+    isWriteableObservable, isWritableObservable, subscribable,
+    unwrap
+} from '../index.js';
+
+
 describe('Observable', function() {
     it('Should be subscribable', function () {
-        var instance = new ko.observable();
-        expect(ko.isSubscribable(instance)).toEqual(true);
+        var instance = new observable();
+        expect(isSubscribable(instance)).toEqual(true);
     });
 
     it('Should advertise that instances are observable', function () {
-        var instance = new ko.observable();
-        expect(ko.isObservable(instance)).toEqual(true);
-    });
-
-    it('Should advertise that instances are not pure computed', function () {
-        var instance = ko.observable();
-        expect(ko.isPureComputed(instance)).toEqual(false);
+        var instance = new observable();
+        expect(isObservable(instance)).toEqual(true);
     });
 
     it('Should be able to write values to it', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         instance(123);
     });
 
     it('Should be able to write to multiple observable properties on a model object using chaining syntax', function() {
         var model = {
-            prop1: new ko.observable(),
-            prop2: new ko.observable()
+            prop1: new observable(),
+            prop2: new observable()
         };
         model.prop1('A').prop2('B');
 
@@ -32,7 +35,7 @@ describe('Observable', function() {
     });
 
     it('Should be able to use Function.prototype methods to access/update', function() {
-        var instance = ko.observable('A');
+        var instance = observable('A');
         var obj = {};
 
         expect(instance.call(null)).toEqual('A');
@@ -41,30 +44,30 @@ describe('Observable', function() {
     });
 
     it('Should advertise that instances can have values written to them', function () {
-        var instance = new ko.observable(function () { });
-        expect(ko.isWriteableObservable(instance)).toEqual(true);
-        expect(ko.isWritableObservable(instance)).toEqual(true);
+        var instance = new observable(function () { });
+        expect(isWriteableObservable(instance)).toEqual(true);
+        expect(isWritableObservable(instance)).toEqual(true);
     });
 
     it('Should be able to read back most recent value', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         instance(123);
         instance(234);
         expect(instance()).toEqual(234);
     });
 
     it('Should initially have undefined value', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         expect(instance()).toEqual(undefined);
     });
 
     it('Should be able to set initial value as constructor param', function () {
-        var instance = new ko.observable('Hi!');
+        var instance = new observable('Hi!');
         expect(instance()).toEqual('Hi!');
     });
 
     it('Should notify subscribers about each new value', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         var notifiedValues = [];
         instance.subscribe(function (value) {
             notifiedValues.push(value);
@@ -79,7 +82,7 @@ describe('Observable', function() {
     });
 
     it('Should be able to tell it that its value has mutated, at which point it notifies subscribers', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         var notifiedValues = [];
         instance.subscribe(function (value) {
             notifiedValues.push(value.childProperty);
@@ -97,7 +100,7 @@ describe('Observable', function() {
     });
 
     it('Should notify "beforeChange" subscribers before each new value', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         var notifiedValues = [];
         instance.subscribe(function (value) {
             notifiedValues.push(value);
@@ -112,7 +115,7 @@ describe('Observable', function() {
     });
 
     it('Should be able to tell it that its value will mutate, at which point it notifies "beforeChange" subscribers', function () {
-        var instance = new ko.observable();
+        var instance = new observable();
         var notifiedValues = [];
         instance.subscribe(function (value) {
             notifiedValues.push(value ? value.childProperty : value);
@@ -134,7 +137,7 @@ describe('Observable', function() {
     });
 
     it('Should ignore writes when the new value is primitive and strictly equals the old value', function() {
-        var instance = new ko.observable();
+        var instance = new observable();
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
 
@@ -150,7 +153,7 @@ describe('Observable', function() {
     });
 
     it('Should ignore writes when both the old and new values are strictly null', function() {
-        var instance = new ko.observable(null);
+        var instance = new observable(null);
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
         instance(null);
@@ -158,7 +161,7 @@ describe('Observable', function() {
     });
 
     it('Should ignore writes when both the old and new values are strictly undefined', function() {
-        var instance = new ko.observable(undefined);
+        var instance = new observable(undefined);
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
         instance(undefined);
@@ -169,7 +172,7 @@ describe('Observable', function() {
         // Because we can't tell whether something further down the object graph has changed, we regard
         // all objects as new values. To override this, set an "equalityComparer" callback
         var constantObject = {};
-        var instance = new ko.observable(constantObject);
+        var instance = new observable(constantObject);
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
         instance(constantObject);
@@ -177,7 +180,7 @@ describe('Observable', function() {
     });
 
     it('Should notify subscribers of a change even when an identical primitive is written if you\'ve set the equality comparer to null', function() {
-        var instance = new ko.observable("A");
+        var instance = new observable("A");
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
 
@@ -192,9 +195,9 @@ describe('Observable', function() {
     });
 
     it('Should ignore writes when the equalityComparer callback states that the values are equal', function() {
-        var instance = new ko.observable();
+        var instance = new observable();
         instance.equalityComparer = function(a, b) {
-            return !(a && b) ? a === b : a.id == b.id
+            return !(a && b) ? a === b : a.id == b.id;
         };
 
         var notifiedValues = [];
@@ -229,7 +232,7 @@ describe('Observable', function() {
     });
 
     it('Should expose a "notify" extender that can configure the observable to notify on all writes, even if the value is unchanged', function() {
-        var instance = new ko.observable();
+        var instance = new observable();
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
 
@@ -252,9 +255,9 @@ describe('Observable', function() {
     });
 
     it('Should be possible to replace notifySubscribers with a custom handler', function() {
-        var instance = new ko.observable(123);
+        var instance = new observable(123);
         var interceptedNotifications = [];
-        instance.subscribe(function() { throw new Error("Should not notify subscribers by default once notifySubscribers is overridden") });
+        instance.subscribe(function() { throw new Error("Should not notify subscribers by default once notifySubscribers is overridden"); });
         instance.notifySubscribers = function(newValue, eventName) {
             interceptedNotifications.push({ eventName: eventName || "None", value: newValue });
         };
@@ -267,18 +270,18 @@ describe('Observable', function() {
         expect(interceptedNotifications[1].value).toEqual(456);
     });
 
-    it('Should inherit any properties defined on ko.subscribable.fn or ko.observable.fn', function() {
+    it('Should inherit any properties defined on subscribable.fn or observable.fn', function() {
         this.after(function() {
-            delete ko.subscribable.fn.customProp;       // Will be able to reach this
-            delete ko.subscribable.fn.customFunc;       // Overridden on ko.observable.fn
-            delete ko.observable.fn.customFunc;         // Will be able to reach this
+            delete subscribable.fn.customProp;       // Will be able to reach this
+            delete subscribable.fn.customFunc;       // Overridden on observable.fn
+            delete observable.fn.customFunc;         // Will be able to reach this
         });
 
-        ko.subscribable.fn.customProp = 'subscribable value';
-        ko.subscribable.fn.customFunc = function() { throw new Error('Shouldn\'t be reachable') };
-        ko.observable.fn.customFunc = function() { return this(); };
+        subscribable.fn.customProp = 'subscribable value';
+        subscribable.fn.customFunc = function() { throw new Error('Shouldn\'t be reachable'); };
+        observable.fn.customFunc = function() { return this(); };
 
-        var instance = ko.observable(123);
+        var instance = observable(123);
         expect(instance.customProp).toEqual('subscribable value');
         expect(instance.customFunc()).toEqual(123);
     });
@@ -290,17 +293,17 @@ describe('Observable', function() {
         }
 
         this.after(function() {
-            delete ko.subscribable.fn.customFunction1;
-            delete ko.observable.fn.customFunction2;
+            delete subscribable.fn.customFunction1;
+            delete observable.fn.customFunction2;
         });
 
-        var observable = ko.observable();
+        var observable = observable();
 
         var customFunction1 = function () {};
         var customFunction2 = function () {};
 
-        ko.subscribable.fn.customFunction1 = customFunction1;
-        ko.observable.fn.customFunction2 = customFunction2;
+        subscribable.fn.customFunction1 = customFunction1;
+        observable.fn.customFunction2 = customFunction2;
 
         expect(observable.customFunction1).toBe(customFunction1);
         expect(observable.customFunction2).toBe(customFunction2);
@@ -308,28 +311,13 @@ describe('Observable', function() {
 });
 
 
-describe('utils.unwrapObservable', function() {
-    it('Should return the underlying value of observables', function() {
-        var someObject = { abc: 123 },
-            observablePrimitiveValue = ko.observable(123),
-            observableObjectValue = ko.observable(someObject),
-            observableNullValue = ko.observable(null),
-            observableUndefinedValue = ko.observable(undefined),
-            computedValue = ko.computed(function() { return observablePrimitiveValue() + 1; });
-
-        expect(ko.utils.unwrapObservable(observablePrimitiveValue)).toBe(123);
-        expect(ko.utils.unwrapObservable(observableObjectValue)).toBe(someObject);
-        expect(ko.utils.unwrapObservable(observableNullValue)).toBe(null);
-        expect(ko.utils.unwrapObservable(observableUndefinedValue)).toBe(undefined);
-        expect(ko.utils.unwrapObservable(computedValue)).toBe(124);
-    });
-
+describe('unwrap', function() {
     it('Should return the supplied value for non-observables', function() {
         var someObject = { abc: 123 };
 
-        expect(ko.utils.unwrapObservable(123)).toBe(123);
-        expect(ko.utils.unwrapObservable(someObject)).toBe(someObject);
-        expect(ko.utils.unwrapObservable(null)).toBe(null);
-        expect(ko.utils.unwrapObservable(undefined)).toBe(undefined);
+        expect(unwrap(123)).toBe(123);
+        expect(unwrap(someObject)).toBe(someObject);
+        expect(unwrap(null)).toBe(null);
+        expect(unwrap(undefined)).toBe(undefined);
     });
 });

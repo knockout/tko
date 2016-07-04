@@ -1,4 +1,4 @@
-
+/* eslint no-cond-assign: 0 */
 import {
     setPrototypeOfOrExtend, arrayRemoveItem, objectForEach,
     canSetPrototype, setPrototypeOf
@@ -50,8 +50,8 @@ var ko_subscribable_fn = {
         event = event || defaultEvent;
         var boundCallback = callbackTarget ? callback.bind(callbackTarget) : callback;
 
-        var subscription = new subscription(self, boundCallback, function () {
-            arrayRemoveItem(self._subscriptions[event], subscription);
+        var subscriptionInstance = new subscription(self, boundCallback, function () {
+            arrayRemoveItem(self._subscriptions[event], subscriptionInstance);
             if (self.afterSubscriptionRemove)
                 self.afterSubscriptionRemove(event);
         });
@@ -61,9 +61,9 @@ var ko_subscribable_fn = {
 
         if (!self._subscriptions[event])
             self._subscriptions[event] = [];
-        self._subscriptions[event].push(subscription);
+        self._subscriptions[event].push(subscriptionInstance);
 
-        return subscription;
+        return subscriptionInstance;
     },
 
     notifySubscribers: function (valueToNotify, event) {
@@ -74,11 +74,11 @@ var ko_subscribable_fn = {
         if (this.hasSubscriptionsForEvent(event)) {
             try {
                 dependencyDetection.begin(); // Begin suppressing dependency detection (by setting the top frame to undefined)
-                for (var a = this._subscriptions[event].slice(0), i = 0, subscription; subscription = a[i]; ++i) {
+                for (var a = this._subscriptions[event].slice(0), i = 0, subscriptionInstance; subscriptionInstance = a[i]; ++i) {
                     // In case a subscription was disposed during the arrayForEach cycle, check
                     // for isDisposed on each subscription before invoking its callback
-                    if (!subscription.isDisposed)
-                        subscription.callback(valueToNotify);
+                    if (!subscriptionInstance.isDisposed)
+                        subscriptionInstance.callback(valueToNotify);
                 }
             } finally {
                 dependencyDetection.end(); // End suppressing dependency detection

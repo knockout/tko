@@ -9,6 +9,7 @@ import {
 
 import { observable, isObservable } from './observable.js';
 
+import { trackArrayChanges } from './observableArray.changeTracking.js';
 
 export function observableArray(initialValues) {
     initialValues = initialValues || [];
@@ -18,7 +19,9 @@ export function observableArray(initialValues) {
 
     var result = observable(initialValues);
     setPrototypeOfOrExtend(result, observableArray.fn);
-    return result.extend({ trackArrayChanges: true });
+    trackArrayChanges(result);
+        // ^== result.extend({ trackArrayChanges: true })
+    return result;
 }
 
 observableArray.fn = {
@@ -100,6 +103,7 @@ observableArray.fn = {
         }
     }
 };
+
 
 // Note that for browsers that don't support proto assignment, the
 // inheritance chain is created manually in the ko.observableArray constructor

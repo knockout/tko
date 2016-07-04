@@ -1,7 +1,16 @@
+
+import {
+    compareArrays
+} from 'tko.utils';
+
+import {
+    observableArray, observable
+} from '../index.js';
+
 describe('Observable Array change tracking', function() {
 
     it('Supplies changelists to subscribers', function() {
-        var myArray = ko.observableArray(['Alpha', 'Beta', 'Gamma']),
+        var myArray = observableArray(['Alpha', 'Beta', 'Gamma']),
             changelist;
 
         myArray.subscribe(function(changes) {
@@ -19,7 +28,7 @@ describe('Observable Array change tracking', function() {
 
     it('Only computes diffs when there\'s at least one active arrayChange subscription', function() {
         captureCompareArraysCalls(function(callLog) {
-            var myArray = ko.observableArray(['Alpha', 'Beta', 'Gamma']),
+            var myArray = observableArray(['Alpha', 'Beta', 'Gamma']),
                 changelist;
 
             // Nobody has yet subscribed for arrayChange notifications, so
@@ -56,7 +65,7 @@ describe('Observable Array change tracking', function() {
 
     it('Reuses cached diff results', function() {
         captureCompareArraysCalls(function(callLog) {
-            var myArray = ko.observableArray(['Alpha', 'Beta', 'Gamma']),
+            var myArray = observableArray(['Alpha', 'Beta', 'Gamma']),
                 changelist1,
                 changelist2;
 
@@ -86,7 +95,7 @@ describe('Observable Array change tracking', function() {
 
     it('Skips the diff algorithm when the array mutation is a known operation', function() {
         captureCompareArraysCalls(function(callLog) {
-            var myArray = ko.observableArray(['Alpha', 'Beta', 'Gamma']),
+            var myArray = observableArray(['Alpha', 'Beta', 'Gamma']),
                 browserSupportsSpliceWithoutDeletionCount = [1, 2].splice(1).length === 1;
 
             // Make sure there is one subscription, or we short-circuit cacheDiffForKnownOperation.
@@ -112,7 +121,7 @@ describe('Observable Array change tracking', function() {
             });
 
             // Pop empty array
-            testKnownOperation(ko.observableArray([]), 'pop', {
+            testKnownOperation(observableArray([]), 'pop', {
                 args: [], result: [], changes: undefined
             });
 
@@ -126,7 +135,7 @@ describe('Observable Array change tracking', function() {
             });
 
             // Shift empty array
-            testKnownOperation(ko.observableArray([]), 'shift', {
+            testKnownOperation(observableArray([]), 'shift', {
                 args: [], result: [], changes: undefined
             });
 
@@ -227,7 +236,7 @@ describe('Observable Array change tracking', function() {
     });
 
     it('Should support tracking of any observable using extender', function() {
-        var myArray = ko.observable(['Alpha', 'Beta', 'Gamma']).extend({trackArrayChanges:true}),
+        var myArray = observable(['Alpha', 'Beta', 'Gamma']).extend({trackArrayChanges:true}),
             changelist;
 
         myArray.subscribe(function(changes) {
@@ -267,7 +276,7 @@ describe('Observable Array change tracking', function() {
 
     // Per: https://github.com/knockout/knockout/issues/1503
     it('Should clean up a single arrayChange dependency', function() {
-        var source = ko.observableArray();
+        var source = observableArray();
         var arrayChange = source.subscribe(function() {}, null, "arrayChange");
         expect(source.getSubscriptionsCount("arrayChange")).toBe(1);
         arrayChange.dispose();
@@ -275,7 +284,7 @@ describe('Observable Array change tracking', function() {
     });
 
     it('Should support tracking of a computed observable using extender', function() {
-        var myArray = ko.observable(['Alpha', 'Beta', 'Gamma']),
+        var myArray = observable(['Alpha', 'Beta', 'Gamma']),
             myComputed = ko.computed(function() {
                 return myArray().slice(-2);
             }).extend({trackArrayChanges:true}),
@@ -300,7 +309,7 @@ describe('Observable Array change tracking', function() {
     });
 
     it('Should support tracking of a pure computed observable using extender', function() {
-        var myArray = ko.observable(['Alpha', 'Beta', 'Gamma']),
+        var myArray = observable(['Alpha', 'Beta', 'Gamma']),
             myComputed = ko.pureComputed(function() {
                 return myArray().slice(-2);
             }).extend({trackArrayChanges:true}),
@@ -337,7 +346,7 @@ describe('Observable Array change tracking', function() {
                 { name: "1.3", nodes: [] }
             ]
         };
-        var list = ko.observableArray([]);
+        var list = observableArray([]);
 
         // This adds all descendent nodes to the list when a node is added
         list.subscribe(function (events) {
@@ -345,8 +354,8 @@ describe('Observable Array change tracking', function() {
             for (var i = 0; i < events.length; i++) {
                 var event = events[i];
                 switch (event.status) {
-                    case "added":
-                        list.push.apply(list, event.value.nodes);
+                case "added":
+                    list.push.apply(list, event.value.nodes);
                     break;
                 }
             }
@@ -365,7 +374,7 @@ describe('Observable Array change tracking', function() {
         var array1 = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
         var array2 = [1, 2, 3, 4, "T", 6, 7, 8, 9, 10];
 
-        var myArray = ko.observableArray(array1),
+        var myArray = observableArray(array1),
             changelist;
 
         myArray.subscribe(function(changes) {
@@ -407,7 +416,7 @@ describe('Observable Array change tracking', function() {
     // inspect the runtime to work out the private name(s) for it, and intercept them all.
     // Then undo it all afterwards.
     function captureCompareArraysCalls(callback) {
-        var origCompareArrays = ko.utils.compareArrays,
+        var origCompareArrays = compareArrays,
             interceptedCompareArrays = function() {
                 callLog.push(Array.prototype.slice.call(arguments, 0));
                 return origCompareArrays.apply(this, arguments);

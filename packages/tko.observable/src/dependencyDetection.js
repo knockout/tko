@@ -5,6 +5,8 @@
 // Depending on the circumstances (i.e. legacy), this may be imported
 // as `computedContext` or `dependencyDetection`
 //
+import { isSubscribable } from './subscribable.js';
+
 
 var outerFrames = [],
     currentFrame,
@@ -32,7 +34,7 @@ export function end() {
 
 export function registerDependency(subscribable) {
     if (currentFrame) {
-        if (!ko.isSubscribable(subscribable))
+        if (!isSubscribable(subscribable))
             throw new Error("Only subscribable things can act as dependencies");
         currentFrame.callback.call(currentFrame.callbackTarget, subscribable, subscribable._id || (subscribable._id = getId()));
     }

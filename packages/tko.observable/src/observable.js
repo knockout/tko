@@ -16,46 +16,46 @@ var observableLatestValue = createSymbolOrString('_latestValue');
 
 
 export function observable(initialValue) {
-    function observable() {
+    function obsFn() {
         if (arguments.length > 0) {
             // Write
 
             // Ignore writes if the value hasn't changed
-            if (observable.isDifferent(observable[observableLatestValue], arguments[0])) {
-                observable.valueWillMutate();
-                observable[observableLatestValue] = arguments[0];
-                observable.valueHasMutated();
+            if (obsFn.isDifferent(obsFn[observableLatestValue], arguments[0])) {
+                obsFn.valueWillMutate();
+                obsFn[observableLatestValue] = arguments[0];
+                obsFn.valueHasMutated();
             }
             return this; // Permits chained assignments
         }
         else {
             // Read
-            dependencyDetection.registerDependency(observable); // The caller only needs to be notified of changes if they did a "read" operation
-            return observable[observableLatestValue];
+            dependencyDetection.registerDependency(obsFn); // The caller only needs to be notified of changes if they did a "read" operation
+            return obsFn[observableLatestValue];
         }
     }
 
-    observable[observableLatestValue] = initialValue;
+    obsFn[observableLatestValue] = initialValue;
 
     // Inherit from 'subscribable'
     if (!canSetPrototype) {
         // 'subscribable' won't be on the prototype chain unless we put it there directly
-        extend(observable, subscribable.fn);
+        extend(obsFn, subscribable.fn);
     }
-    subscribable.fn.init(observable);
+    subscribable.fn.init(obsFn);
 
     // Inherit from 'observable'
-    setPrototypeOfOrExtend(observable, observableFn);
+    setPrototypeOfOrExtend(obsFn, observable.fn);
 
     if (options.deferUpdates) {
-        deferUpdates(observable);
+        deferUpdates(obsFn);
     }
 
-    return observable;
+    return obsFn;
 }
 
 // Define prototype for observables
-var observableFn = {
+observable.fn = {
     equalityComparer: valuesArePrimitiveAndEqual,
     peek: function() { return this[observableLatestValue]; },
     valueHasMutated: function () { this.notifySubscribers(this[observableLatestValue]); },
@@ -67,11 +67,11 @@ var observableFn = {
 // Note that for browsers that don't support proto assignment, the
 // inheritance chain is created manually in the observable constructor
 if (canSetPrototype) {
-    setPrototypeOf(observableFn, subscribable.fn);
+    setPrototypeOf(observable.fn, subscribable.fn);
 }
 
-var protoProperty = observable.protoProperty = '__ko_proto__';
-observableFn[protoProperty] = observable;
+var protoProperty = observable.protoProperty = options.protoProperty;
+observable.fn[protoProperty] = observable;
 
 export function isObservable(instance) {
     return hasPrototype(instance, observable);

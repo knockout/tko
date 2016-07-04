@@ -10,6 +10,12 @@
     "type": "git",
     "url": "git+https://github.com/knockout/tko.observable.git"
   },
+  "files": [
+      "dist/",
+      "src/",
+      "index.js",
+      "./*.ya?ml"
+  ],
   "keywords": [
     "knockout",
     "observable",
@@ -24,10 +30,10 @@
   },
   "homepage": "https://github.com/knockout/tko.observable#readme",
   "dependencies": {
-    "tko.utils": "^0.1.0"
+    "tko.utils": "knockout/tko.utils"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "tko-policy": "^0.1.0"
+    "tko-policy": "knockout/tko-policy"
   }
 }

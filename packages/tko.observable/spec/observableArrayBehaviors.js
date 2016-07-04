@@ -1,7 +1,13 @@
 
+import {
+    observableArray, observable, isObservable, subscribable
+} from '../index.js';
+
 describe('Observable Array', function() {
+    var testObservableArray, notifiedValues, beforeNotifiedValues;
+
     beforeEach(function () {
-        testObservableArray = new ko.observableArray([1, 2, 3]);
+        testObservableArray = new observableArray([1, 2, 3]);
         notifiedValues = [];
         testObservableArray.subscribe(function (value) {
             notifiedValues.push(value ? value.slice(0) : value);
@@ -13,23 +19,23 @@ describe('Observable Array', function() {
     });
 
     it('Should be observable', function () {
-        expect(ko.isObservable(testObservableArray)).toEqual(true);
+        expect(isObservable(testObservableArray)).toEqual(true);
     });
 
     it('Should initialize to empty array if you pass no args to constructor', function() {
-        var instance = new ko.observableArray();
+        var instance = new observableArray();
         expect(instance().length).toEqual(0);
     });
 
     it('Should require constructor arg, if given, to be array-like or null or undefined', function() {
         // Try non-array-like args
-        expect(function () { ko.observableArray(1); }).toThrow();
-        expect(function () { ko.observableArray({}); }).toThrow();
+        expect(function () { observableArray(1); }).toThrow();
+        expect(function () { observableArray({}); }).toThrow();
 
         // Try allowed args
-        expect((new ko.observableArray([1,2,3]))().length).toEqual(3);
-        expect((new ko.observableArray(null))().length).toEqual(0);
-        expect((new ko.observableArray(undefined))().length).toEqual(0);
+        expect((new observableArray([1,2,3]))().length).toEqual(3);
+        expect((new observableArray(null))().length).toEqual(0);
+        expect((new observableArray(undefined))().length).toEqual(0);
     });
 
     it('Should be able to write values to it', function () {
@@ -59,7 +65,7 @@ describe('Observable Array', function() {
     });
 
     it('Should be able to mark observable items as destroyed', function() {
-        var x = ko.observable(), y = ko.observable();
+        var x = observable(), y = observable();
         testObservableArray([x, y]);
         testObservableArray.destroy(y);
         expect(testObservableArray().length).toEqual(2);
@@ -171,7 +177,7 @@ describe('Observable Array', function() {
         var originalArray = ["Alpha", "Beta", "Gamma"];
         testObservableArray(originalArray);
         notifiedValues = [];
-        var removed = testObservableArray.remove("Beta");
+        testObservableArray.remove("Beta");
         expect(originalArray).toEqual(["Alpha", "Gamma"]);
     });
 
@@ -179,12 +185,12 @@ describe('Observable Array', function() {
         var originalArray = ["Alpha", "Beta", "Gamma"];
         testObservableArray(originalArray);
         notifiedValues = [];
-        var removed = testObservableArray.removeAll();
+        testObservableArray.removeAll();
         expect(originalArray).toEqual([]);
     });
 
     it('Should remove matching observable items', function() {
-        var x = ko.observable(), y = ko.observable();
+        var x = observable(), y = observable();
         testObservableArray([x, y]);
         notifiedValues = [];
         var removed = testObservableArray.remove(y);
@@ -210,7 +216,7 @@ describe('Observable Array', function() {
     it('Should notify subscribers after marking items as destroyed', function () {
         var x = {}, y = {}, didNotify = false;
         testObservableArray([x, y]);
-        testObservableArray.subscribe(function(value) {
+        testObservableArray.subscribe(function(/* value */) {
             expect(x._destroy).toEqual(undefined);
             expect(y._destroy).toEqual(true);
             didNotify = true;
@@ -222,7 +228,7 @@ describe('Observable Array', function() {
     it('Should notify "beforeChange" subscribers before marking items as destroyed', function () {
         var x = {}, y = {}, didNotify = false;
         testObservableArray([x, y]);
-        testObservableArray.subscribe(function(value) {
+        testObservableArray.subscribe(function(/* value */) {
             expect(x._destroy).toEqual(undefined);
             expect(y._destroy).toEqual(undefined);
             didNotify = true;
@@ -245,38 +251,6 @@ describe('Observable Array', function() {
         expect(testObservableArray().length).toEqual(3);
     });
 
-    it('Should be able to call standard mutators without creating a subscription', function() {
-        var timesEvaluated = 0,
-            newArray = ko.observableArray(["Alpha", "Beta", "Gamma"]);
-
-        var computed = ko.computed(function() {
-            // Make a few standard mutations
-            newArray.push("Delta");
-            newArray.remove("Beta");
-            newArray.splice(2, 1);
-
-            // Peek to ensure we really had the intended effect
-            expect(newArray.peek()).toEqual(["Alpha", "Gamma"]);
-
-            // Also make use of the KO delete/destroy functions to check they don't cause subscriptions
-            newArray([{ someProp: 123 }]);
-            newArray.destroyAll();
-            expect(newArray.peek()[0]._destroy).toEqual(true);
-            newArray.removeAll();
-            expect(newArray.peek()).toEqual([]);
-
-            timesEvaluated++;
-        });
-
-        // Verify that we haven't caused a subscription
-        expect(timesEvaluated).toEqual(1);
-        expect(newArray.getSubscriptionsCount()).toEqual(0);
-
-        // Don't just trust getSubscriptionsCount - directly verify that mutating newArray doesn't cause a re-eval
-        newArray.push("Another");
-        expect(timesEvaluated).toEqual(1);
-    });
-
     it('Should return the observableArray reference from "sort" and "reverse"', function() {
         expect(testObservableArray.reverse()).toBe(testObservableArray);
         expect(testObservableArray.sort()).toBe(testObservableArray);
@@ -285,24 +259,24 @@ describe('Observable Array', function() {
         expect(notifiedValues).toEqual([ [3, 2, 1], [1, 2, 3] ]);
     });
 
-    it('Should inherit any properties defined on ko.subscribable.fn, ko.observable.fn, or ko.observableArray.fn', function() {
+    it('Should inherit any properties defined on subscribable.fn, observable.fn, or observableArray.fn', function() {
         this.after(function() {
-            delete ko.subscribable.fn.subscribableProp; // Will be able to reach this
-            delete ko.subscribable.fn.customProp;       // Overridden on ko.observable.fn
-            delete ko.subscribable.fn.customFunc;       // Overridden on ko.observableArray.fn
-            delete ko.observable.fn.customProp;         // Overridden on ko.observableArray.fn
-            delete ko.observable.fn.customFunc;         // Will be able to reach this
-            delete ko.observableArray.fn.customProp;    // Will be able to reach this
+            delete subscribable.fn.subscribableProp; // Will be able to reach this
+            delete subscribable.fn.customProp;       // Overridden on observable.fn
+            delete subscribable.fn.customFunc;       // Overridden on observableArray.fn
+            delete observable.fn.customProp;         // Overridden on observableArray.fn
+            delete observable.fn.customFunc;         // Will be able to reach this
+            delete observableArray.fn.customProp;    // Will be able to reach this
         });
 
-        ko.subscribable.fn.subscribableProp = 'subscribable value';
-        ko.subscribable.fn.customProp = 'subscribable value - will be overridden';
-        ko.subscribable.fn.customFunc = function() { throw new Error('Shouldn\'t be reachable') };
-        ko.observable.fn.customProp = 'observable prop value - will be overridden';
-        ko.observable.fn.customFunc = function() { return this(); };
-        ko.observableArray.fn.customProp = 'observableArray value';
+        subscribable.fn.subscribableProp = 'subscribable value';
+        subscribable.fn.customProp = 'subscribable value - will be overridden';
+        subscribable.fn.customFunc = function() { throw new Error('Shouldn\'t be reachable'); };
+        observable.fn.customProp = 'observable prop value - will be overridden';
+        observable.fn.customFunc = function() { return this(); };
+        observableArray.fn.customProp = 'observableArray value';
 
-        var instance = ko.observableArray([123]);
+        var instance = observableArray([123]);
         expect(instance.subscribableProp).toEqual('subscribable value');
         expect(instance.customProp).toEqual('observableArray value');
         expect(instance.customFunc()).toEqual([123]);
@@ -315,19 +289,19 @@ describe('Observable Array', function() {
         }
 
         this.after(function() {
-            delete ko.observable.fn.customFunction1;
-            delete ko.observableArray.fn.customFunction2;
+            delete observable.fn.customFunction1;
+            delete observableArray.fn.customFunction2;
         });
 
-        var observableArray = ko.observableArray();
+        var observableArray = observableArray();
 
         var customFunction1 = function () {};
         var customFunction2 = function () {};
 
-        ko.observable.fn.customFunction1 = customFunction1;
-        ko.observableArray.fn.customFunction2 = customFunction2;
+        observable.fn.customFunction1 = customFunction1;
+        observableArray.fn.customFunction2 = customFunction2;
 
         expect(observableArray.customFunction1).toBe(customFunction1);
         expect(observableArray.customFunction2).toBe(customFunction2);
     });
-})
+});
