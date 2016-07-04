@@ -5,8 +5,6 @@
 
 */
 
-import './src/bind-shim.js';
-
 export * from './src/array.js';
 export * from './src/async.js';
 export * from './src/error.js';
