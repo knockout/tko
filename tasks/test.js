@@ -7,6 +7,8 @@ var path = require('path')
 var _ = require('lodash')
 var figlet = require('figlet')
 var karma = require('karma')
+var nodeResolve = require('rollup-plugin-node-resolve');
+
 
 var gulp = global.__tko_gulp
 
@@ -26,7 +28,11 @@ function test(extra_config) {
     }
 
     options.rollupPreprocessor = {
-      rollup: {},
+      rollup: {
+        plugins: [
+          nodeResolve({ jsnext: true, })
+        ]
+      },
       bundle: { sourceMap: 'inline' },
     }
 

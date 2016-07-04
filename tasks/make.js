@@ -13,7 +13,7 @@
 
 var gulp = global.__tko_gulp
 var rollup = require('rollup')
-var npm = require('rollup-plugin-node-resolve');
+var nodeResolve = require('rollup-plugin-node-resolve');
 
 gulp.task('make', 'Run rollup to make UMD files in dist/', function () {
   var dest = `dist/${global.pkg.name}.js`
@@ -21,7 +21,7 @@ gulp.task('make', 'Run rollup to make UMD files in dist/', function () {
   rollup.rollup({
     entry: 'index.js',
     plugins: [
-      npm({ jsnext: true })
+      nodeResolve({ jsnext: true })
     ],
   }).then(function(bundle) {
     return bundle.write({
