@@ -13,7 +13,7 @@
 
 var gulp = global.__tko_gulp
 var rollup = require('rollup')
-var npm = require('rollup-plugin-npm');
+var npm = require('rollup-plugin-node-resolve');
 
 gulp.task('make', 'Run rollup to make UMD files in dist/', function () {
   var dest = `dist/${global.pkg.name}.js`
