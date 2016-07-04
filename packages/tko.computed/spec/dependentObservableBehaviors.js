@@ -10,6 +10,21 @@ describe('Dependent Observable', function() {
         expect(ko.isObservable(instance)).toEqual(true);
     });
 
+    it('Should unwrap the underlying value of observables', function() {
+        var someObject = { abc: 123 },
+            observablePrimitiveValue = observable(123),
+            observableObjectValue = observable(someObject),
+            observableNullValue = observable(null),
+            observableUndefinedValue = observable(undefined),
+            computedValue = ko.computed(function() { return observablePrimitiveValue() + 1; });
+
+        expect(unwrap(observablePrimitiveValue)).toBe(123);
+        expect(unwrap(observableObjectValue)).toBe(someObject);
+        expect(unwrap(observableNullValue)).toBe(null);
+        expect(unwrap(observableUndefinedValue)).toBe(undefined);
+        expect(unwrap(computedValue)).toBe(124);
+    });
+
     it('Should advertise that instances are computed', function () {
         var instance = ko.computed(function () { });
         expect(ko.isComputed(instance)).toEqual(true);
@@ -498,6 +513,31 @@ describe('Dependent Observable', function() {
         expect(notifiedValues).toEqual([1]);
     });
 
+
+    it('Should support array tracking using extender', function() {
+        var myArray = observable(['Alpha', 'Beta', 'Gamma']),
+            myComputed = computed(function() {
+                return myArray().slice(-2);
+            }).extend({trackArrayChanges:true}),
+            changelist;
+
+        expect(myComputed()).toEqual(['Beta', 'Gamma']);
+
+        var arrayChange = myComputed.subscribe(function(changes) {
+            changelist = changes;
+        }, null, 'arrayChange');
+
+        myArray(['Alpha', 'Beta', 'Gamma', 'Delta']);
+        expect(myComputed()).toEqual(['Gamma', 'Delta']);
+        expect(changelist).toEqual([
+            { status : 'deleted', value : 'Beta', index : 0 },
+            { status : 'added', value : 'Delta', index : 1 }
+        ]);
+
+        // Should clean up all subscriptions when arrayChange subscription is disposed
+        arrayChange.dispose();
+        expect(myComputed.getSubscriptionsCount()).toBe(0);
+    });
     // Borrowed from haberman/knockout (see knockout/knockout#359)
     it('Should allow long chains without overflowing the stack', function() {
         // maximum with previous code (when running this test only): Chrome 28: 1310, IE 10: 2200; FF 23: 103
@@ -688,6 +728,40 @@ describe('Dependent Observable', function() {
 
             // value outside of computed is undefined
             expect(ko.computedContext.getDependenciesCount()).toBeUndefined();
+        });
+    });
+
+    describe("observableArray properties", function () {
+        it('Should be able to call standard mutators without creating a subscription', function() {
+            var timesEvaluated = 0,
+                newArray = observableArray(["Alpha", "Beta", "Gamma"]);
+
+            var computed = ko.computed(function() {
+                // Make a few standard mutations
+                newArray.push("Delta");
+                newArray.remove("Beta");
+                newArray.splice(2, 1);
+
+                // Peek to ensure we really had the intended effect
+                expect(newArray.peek()).toEqual(["Alpha", "Gamma"]);
+
+                // Also make use of the KO delete/destroy functions to check they don't cause subscriptions
+                newArray([{ someProp: 123 }]);
+                newArray.destroyAll();
+                expect(newArray.peek()[0]._destroy).toEqual(true);
+                newArray.removeAll();
+                expect(newArray.peek()).toEqual([]);
+
+                timesEvaluated++;
+            });
+
+            // Verify that we haven't caused a subscription
+            expect(timesEvaluated).toEqual(1);
+            expect(newArray.getSubscriptionsCount()).toEqual(0);
+
+            // Don't just trust getSubscriptionsCount - directly verify that mutating newArray doesn't cause a re-eval
+            newArray.push("Another");
+            expect(timesEvaluated).toEqual(1);
         });
     });
 });

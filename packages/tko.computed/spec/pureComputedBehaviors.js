@@ -327,6 +327,35 @@ describe('Pure Computed', function() {
         expect(computed.getDependenciesCount()).toEqual(0);
     });
 
+    it('Should support array tracking using extender', function() {
+        var myArray = observable(['Alpha', 'Beta', 'Gamma']),
+            myComputed = ko.pureComputed(function() {
+                return myArray().slice(-2);
+            }).extend({trackArrayChanges:true}),
+            changelist;
+
+        expect(myComputed()).toEqual(['Beta', 'Gamma']);
+        // The pure computed doesn't yet subscribe to the observable (it's still sleeping)
+        expect(myArray.getSubscriptionsCount()).toBe(0);
+
+        var arrayChange = myComputed.subscribe(function(changes) {
+            changelist = changes;
+        }, null, 'arrayChange');
+        expect(myArray.getSubscriptionsCount()).toBe(1);
+
+        myArray(['Alpha', 'Beta', 'Gamma', 'Delta']);
+        expect(myComputed()).toEqual(['Gamma', 'Delta']);
+        expect(changelist).toEqual([
+            { status : 'deleted', value : 'Beta', index : 0 },
+            { status : 'added', value : 'Delta', index : 1 }
+        ]);
+
+        // It releases subscriptions when the arrayChange subscription is disposed
+        arrayChange.dispose();
+        expect(myArray.getSubscriptionsCount()).toBe(0);
+    });
+
+
     describe('Should maintain order of subscriptions', function () {
         var data, dataPureComputed;
 
