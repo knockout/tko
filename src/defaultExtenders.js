@@ -65,10 +65,3 @@ export function deferred(target, options) {
 
     deferUpdates(target)
 }
-
-
-export function notify(target, notifyWhen) {
-    target.equalityComparer = notifyWhen == "always" ?
-        null :  // null equalityComparer means to always notify
-        extenders.valuesArePrimitiveAndEqual;
-}

@@ -55,6 +55,10 @@
     "through": "^2.3.8"
   },
   "dependencies": {
-    "tko.utils": "^0.1.0"
+    "tko.utils": "knockout/tko.utils",
+    "tko.observable": "knockout/tko.observable",
+    "tko.computed": "knockout/tko.computed",
+    "tko.bind": "knockout/tko.bind",
+    "tko.components": "knockout/tko.components"
   }
 }
