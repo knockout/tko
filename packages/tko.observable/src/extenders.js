@@ -29,4 +29,15 @@ export function applyExtenders(requestedExtenders) {
     return target;
 }
 
-export var extenders = {};
+
+// Change when notifications are published.
+export function notify(target, notifyWhen) {
+    target.equalityComparer = notifyWhen == "always" ?
+        null :  // null equalityComparer means to always notify
+        extenders.valuesArePrimitiveAndEqual;
+}
+
+
+export var extenders = {
+    notify: notify
+};
