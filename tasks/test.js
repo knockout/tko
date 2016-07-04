@@ -55,7 +55,7 @@ function test(extra_config) {
 }
 
 gulp.task('test', 'Run Karma tests', function () {
-  var runner = process.argv.indexOf('--chrome') ? 'Chrome' : ""
+  var runner = process.argv.indexOf('--chrome') >= 0 ? 'Chrome' : "PhantomJS"
 
   test({browsers: [runner]})
 }, {
