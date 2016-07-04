@@ -10,7 +10,7 @@ import {
     throttle as throttleFn, debounce as debounceFn
 } from 'tko.utils';
 import {
-    extenders, deferUpdates, trackArrayChanges
+    extenders, deferUpdates
 } from 'tko.observables';
 
 import { computed } from 'tko.computed';
@@ -72,6 +72,3 @@ export function notify(target, notifyWhen) {
         null :  // null equalityComparer means to always notify
         extenders.valuesArePrimitiveAndEqual;
 }
-
-
-export { trackArrayChanges }
