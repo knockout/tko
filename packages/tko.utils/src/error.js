@@ -1,15 +1,16 @@
 //
 // Error handling
+// ---
 //
-export var onError
+// The default onError handler is to re-throw.
+export var onError = function (e) { throw(e); };
 
 export function catchFunctionErrors(delegate) {
     return onError ? function () {
         try {
             return delegate.apply(this, arguments);
         } catch (e) {
-            onError && onError(e);
-            throw e;
+            onError(e);
         }
     } : delegate;
 }
@@ -26,4 +27,4 @@ function safeSetTimeout(handler, timeout) {
     return setTimeout(catchFunctionErrors(handler), timeout);
 }
 
-export { safeSetTimeout as setTimeout }
+export { safeSetTimeout as safeSetTimeout };
