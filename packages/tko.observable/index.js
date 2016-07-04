@@ -15,7 +15,7 @@ export { trackArrayChanges, arrayChangeEventName } from './src/observableArray.c
 export { toJS, toJSON } from './src/mappingHelpers';
 export { deferUpdates } from './src/defer.js';
 
-import * as extenders from './src/extenders';
+export { valuesArePrimitiveAndEqual, applyExtenders, extenders } from './src/extenders';
 import * as dependencyDetection from './src/dependencyDetection';
 
-export { extenders, dependencyDetection };
+export { dependencyDetection };

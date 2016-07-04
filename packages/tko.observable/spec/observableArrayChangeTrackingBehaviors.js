@@ -1,11 +1,43 @@
 
 import {
-    compareArrays
-} from 'tko.utils';
-
-import {
     observableArray, observable
 } from '../index.js';
+
+import {
+    trackArrayChanges
+} from '../src/observableArray.changeTracking.js';
+
+
+function captureCompareArraysCalls(callback) {
+    var origCompareArrays = trackArrayChanges.compareArrays,
+        interceptedCompareArrays = function() {
+            callLog.push(Array.prototype.slice.call(arguments, 0));
+            return origCompareArrays.apply(this, arguments);
+        },
+        // aliases = [],
+        callLog = [];
+
+    trackArrayChanges.compareArrays = interceptedCompareArrays;
+
+    // Find and intercept all the aliases
+    // for (var key in ko.utils) {
+    //     if (ko.utils[key] === origCompareArrays) {
+    //         aliases.push(key);
+    //         ko.utils[key] = interceptedCompareArrays;
+    //     }
+    // }
+
+    try {
+        callback(callLog);
+    } finally {
+        // Undo the interceptor
+        trackArrayChanges.compareArrays = origCompareArrays;
+        // for (var i = 0; i < aliases.length; i++) {
+        //     ko.utils[aliases[i]] = origCompareArrays;
+        // }
+    }
+}
+
 
 describe('Observable Array change tracking', function() {
 
@@ -236,7 +268,7 @@ describe('Observable Array change tracking', function() {
     });
 
     it('Should support tracking of any observable using extender', function() {
-        var myArray = observable(['Alpha', 'Beta', 'Gamma']).extend({trackArrayChanges:true}),
+        var myArray = observable(['Alpha', 'Beta', 'Gamma']).extend({trackArrayChanges: true}),
             changelist;
 
         myArray.subscribe(function(changes) {
@@ -281,59 +313,6 @@ describe('Observable Array change tracking', function() {
         expect(source.getSubscriptionsCount("arrayChange")).toBe(1);
         arrayChange.dispose();
         expect(source.getSubscriptionsCount()).toBe(0);
-    });
-
-    it('Should support tracking of a computed observable using extender', function() {
-        var myArray = observable(['Alpha', 'Beta', 'Gamma']),
-            myComputed = ko.computed(function() {
-                return myArray().slice(-2);
-            }).extend({trackArrayChanges:true}),
-            changelist;
-
-        expect(myComputed()).toEqual(['Beta', 'Gamma']);
-
-        var arrayChange = myComputed.subscribe(function(changes) {
-            changelist = changes;
-        }, null, 'arrayChange');
-
-        myArray(['Alpha', 'Beta', 'Gamma', 'Delta']);
-        expect(myComputed()).toEqual(['Gamma', 'Delta']);
-        expect(changelist).toEqual([
-            { status : 'deleted', value : 'Beta', index : 0 },
-            { status : 'added', value : 'Delta', index : 1 }
-        ]);
-
-        // Should clean up all subscriptions when arrayChange subscription is disposed
-        arrayChange.dispose();
-        expect(myComputed.getSubscriptionsCount()).toBe(0);
-    });
-
-    it('Should support tracking of a pure computed observable using extender', function() {
-        var myArray = observable(['Alpha', 'Beta', 'Gamma']),
-            myComputed = ko.pureComputed(function() {
-                return myArray().slice(-2);
-            }).extend({trackArrayChanges:true}),
-            changelist;
-
-        expect(myComputed()).toEqual(['Beta', 'Gamma']);
-        // The pure computed doesn't yet subscribe to the observable (it's still sleeping)
-        expect(myArray.getSubscriptionsCount()).toBe(0);
-
-        var arrayChange = myComputed.subscribe(function(changes) {
-            changelist = changes;
-        }, null, 'arrayChange');
-        expect(myArray.getSubscriptionsCount()).toBe(1);
-
-        myArray(['Alpha', 'Beta', 'Gamma', 'Delta']);
-        expect(myComputed()).toEqual(['Gamma', 'Delta']);
-        expect(changelist).toEqual([
-            { status : 'deleted', value : 'Beta', index : 0 },
-            { status : 'added', value : 'Delta', index : 1 }
-        ]);
-
-        // It releases subscriptions when the arrayChange subscription is disposed
-        arrayChange.dispose();
-        expect(myArray.getSubscriptionsCount()).toBe(0);
     });
 
     it('Should support recursive updates (modify array within arrayChange callback)', function() {
@@ -410,35 +389,5 @@ describe('Observable Array change tracking', function() {
 
     function compareChangeListItems(a, b) {
         return (a.index - b.index) || a.status.localeCompare(b.status);
-    }
-
-    // There's no public API for intercepting ko.utils.compareArrays, so we'll have to
-    // inspect the runtime to work out the private name(s) for it, and intercept them all.
-    // Then undo it all afterwards.
-    function captureCompareArraysCalls(callback) {
-        var origCompareArrays = compareArrays,
-            interceptedCompareArrays = function() {
-                callLog.push(Array.prototype.slice.call(arguments, 0));
-                return origCompareArrays.apply(this, arguments);
-            },
-            aliases = [],
-            callLog = [];
-
-        // Find and intercept all the aliases
-        for (var key in ko.utils) {
-            if (ko.utils[key] === origCompareArrays) {
-                aliases.push(key);
-                ko.utils[key] = interceptedCompareArrays;
-            }
-        }
-
-        try {
-            callback(callLog);
-        } finally {
-            // Undo the interceptors
-            for (var i = 0; i < aliases.length; i++) {
-                ko.utils[aliases[i]] = origCompareArrays;
-            }
-        }
     }
 });

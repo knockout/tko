@@ -9,6 +9,7 @@ import {
 } from 'tko.utils';
 
 import { defaultEvent } from './subscribable.js';
+import { extenders } from './extenders.js';
 
 
 export var arrayChangeEventName = 'arrayChange';
@@ -20,7 +21,7 @@ export function trackArrayChanges(target, options) {
     if (options && typeof options == "object") {
         extend(target.compareArrayOptions, options);
     }
-    target.compareArrayOptions['sparse'] = true;
+    target.compareArrayOptions.sparse = true;
 
     // Only modify the target observable once
     if (target.cacheDiffForKnownOperation) {
@@ -99,7 +100,7 @@ export function trackArrayChanges(target, options) {
         // plugin, which without this check would not be compatible with arrayChange notifications. Normally,
         // notifications are issued immediately so we wouldn't be queueing up more than one.
         if (!cachedDiff || pendingNotifications > 1) {
-            cachedDiff = compareArrays(previousContents, currentContents, target.compareArrayOptions);
+            cachedDiff = trackArrayChanges.compareArrays(previousContents, currentContents, target.compareArrayOptions);
         }
 
         return cachedDiff;
@@ -160,3 +161,12 @@ export function trackArrayChanges(target, options) {
         cachedDiff = diff;
     };
 }
+
+
+// Expose compareArrays for testing.
+trackArrayChanges.compareArrays = compareArrays;
+
+
+// Add the trackArrayChanges extender so we can use
+// obs.extend({ trackArrayChanges: true })
+extenders.trackArrayChanges = trackArrayChanges;
