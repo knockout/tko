@@ -1,5 +1,10 @@
 
 describe('Pure Computed', function() {
+    it('Observables should advertise that instances are not pure computed', function () {
+        var instance = observable();
+        expect(ko.isPureComputed(instance)).toEqual(false);
+    });
+
     it('Should advertise that instances are computed', function () {
         var computed = ko.pureComputed(function () { });
         expect(ko.isComputed(computed)).toEqual(true);
