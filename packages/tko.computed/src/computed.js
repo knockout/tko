@@ -15,13 +15,13 @@ import {
     removeDisposeCallback,
     safeSetTimeout,
     setPrototypeOf,
+    hasPrototype,
     setPrototypeOfOrExtend
 } from 'tko.utils';
 
 import {
     dependencyDetection,
     extenders,
-    hasPrototype,
     observable,
     subscribable
 } from 'tko.observable';
@@ -29,7 +29,7 @@ import {
 
 var computedState = createSymbolOrString('_state');
 
-function computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
+export function computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
     if (typeof evaluatorFunctionOrOptions === "object") {
         // Single-parameter syntax - everything is on this "options" param
         options = evaluatorFunctionOrOptions;
@@ -92,7 +92,7 @@ function computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) 
     subscribable.fn.init(computedObservable);
 
     // Inherit from 'computed'
-    setPrototypeOfOrExtend(computedObservable, computedFn);
+    setPrototypeOfOrExtend(computedObservable, computed.fn);
 
     if (options.pure) {
         state.pure = true;
@@ -106,7 +106,7 @@ function computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) 
         extenders.deferred(computedObservable, true);
     }
 
-    if (DEBUG) {
+    if (tko_options.debug) {
         // #1731 - Aid debugging by exposing the computed's options
         computedObservable._options = options;
     }
@@ -167,8 +167,8 @@ function computedBeginDependencyDetectionCallback(subscribable, id) {
     }
 }
 
-var computedFn = {
-    "equalityComparer": extenders.valuesArePrimitiveAndEqual,
+computed.fn = {
+    equalityComparer: extenders.valuesArePrimitiveAndEqual,
     getDependenciesCount: function () {
         return this[computedState].dependenciesCount;
     },
@@ -457,13 +457,13 @@ var deferEvaluationOverrides = {
 // Note that for browsers that don't support proto assignment, the
 // inheritance chain is created manually in the ko.computed constructor
 if (canSetPrototype) {
-    setPrototypeOf(computedFn, subscribable.fn);
+    setPrototypeOf(computed.fn, subscribable.fn);
 }
 
 // Set the proto chain values for ko.hasPrototype
 var protoProp = observable.protoProperty; // == "__ko_proto__"
 computed[protoProp] = observable;
-computedFn[protoProp] = computed;
+computed.fn[protoProp] = computed;
 
 export function isComputed(instance) {
     return hasPrototype(instance, computed);

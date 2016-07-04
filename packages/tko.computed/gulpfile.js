@@ -1,1 +1,1 @@
-require('tko.tools')(require('gulp'))
+require('tko-policy')(require('gulp'))

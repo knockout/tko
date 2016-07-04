@@ -10,4 +10,4 @@ export {
     isComputed,
     isPureComputed,
     pureComputed
-} from './src/computed';
+} from './src/computed.js';

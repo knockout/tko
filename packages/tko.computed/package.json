@@ -4,10 +4,13 @@
   "description": "TKO Computed Observables",
   "main": "index.js",
   "dependencies": {
-    "gulp": "^3.9.1",
-    "tko.tools": "^0.1.0"
+    "tko.utils": "knockout/tko.utils",
+    "tko.observable": "knockout/tko.observable"
   },
-  "devDependencies": {},
+  "devDependencies": {
+      "gulp": "^3.9.1",
+      "tko-policy": "knockout/tko-policy"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
