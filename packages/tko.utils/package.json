@@ -17,6 +17,7 @@
     "ko"
   ],
   "author": "Knockout",
+  "jsnext:main": "./index.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/knockout/tko.util/issues"
