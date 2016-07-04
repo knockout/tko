@@ -2,7 +2,9 @@
 // Prototype Functions
 //
 import { extend } from './object.js';
-import { protoProperty } from './options.js';
+import options from './options.js';
+
+var protoProperty = options.protoProperty;
 
 export var canSetPrototype = ({ __proto__: [] } instanceof Array);
 
