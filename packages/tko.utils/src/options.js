@@ -7,5 +7,6 @@
 export default {
     deferUpdates: false,
     useOnlyNativeEvents: false,
-    protoProperty: '__ko_proto__'
+    protoProperty: '__ko_proto__',
+    debug: false
 };
