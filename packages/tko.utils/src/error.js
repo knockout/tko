@@ -3,23 +3,21 @@
 // ---
 //
 // The default onError handler is to re-throw.
-export var onError = function (e) { throw(e); };
+import options from './options.js';
+
 
 export function catchFunctionErrors(delegate) {
-    return onError ? function () {
+    return options.onError ? function () {
         try {
             return delegate.apply(this, arguments);
         } catch (e) {
-            onError(e);
+            options.onError(e);
         }
     } : delegate;
 }
 
 export function deferError(error) {
-    safeSetTimeout(function () {
-        onError && onError(error);
-        throw error;
-    }, 0);
+    safeSetTimeout(function () { options.onError(error); }, 0);
 }
 
 

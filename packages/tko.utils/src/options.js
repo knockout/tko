@@ -8,5 +8,6 @@ export default {
     deferUpdates: false,
     useOnlyNativeEvents: false,
     protoProperty: '__ko_proto__',
-    debug: false
+    debug: false,
+    onError: function (e) { throw e; }
 };
