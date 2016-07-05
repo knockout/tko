@@ -4,7 +4,7 @@
 import {
     virtualElements, makeArray, cloneNodes, domNodeDisposal
 } from 'tko.utils';
-import computed from 'tko.computed';
+import { computed } from 'tko.computed';
 import unwrap from 'tko.observable';
 import applyBindingsToDescendants from 'tko.bind';
 

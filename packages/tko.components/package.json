@@ -3,11 +3,22 @@
   "version": "1.0.0",
   "description": "TKO WebComponents",
   "main": "index.js",
-  "dependencies": {
+  "devDependencies": {
     "gulp": "^3.9.1",
-    "tko.tools": "^0.1.0"
+    "tko-policy": "knockout/tko-policy"
   },
-  "devDependencies": {},
+  "dependencies": {
+      "tko.utils": "knockout/tko.utils",
+      "tko.observable": "knockout/tko.observable",
+      "tko.computed": "knockout/tko.computed",
+      "tko.bind": "knockout/tko.bind"
+  },
+  "files": [
+      "dist/",
+      "src/",
+      "index.js",
+      "./*.ya?ml"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
