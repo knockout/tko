@@ -22,6 +22,12 @@
     "knockout",
     "tko"
   ],
+  "files": [
+      "dist/",
+      "src/",
+      "index.js",
+      "./*.ya?ml"
+  ],
   "author": "Knockout Team",
   "license": "MIT",
   "bugs": {
