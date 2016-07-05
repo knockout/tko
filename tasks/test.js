@@ -9,8 +9,8 @@ var figlet = require('figlet')
 var karma = require('karma')
 var nodeResolve = require('rollup-plugin-node-resolve');
 
-
 var gulp = global.__tko_gulp
+
 
 const SPEC_DIR = path.join(process.cwd(), 'spec')
 
@@ -18,13 +18,13 @@ function test(extra_config) {
     var options = Object.assign({}, config.karma, extra_config)
 
     options.files = [
+      { pattern: "src/*.js", included: false, watched: true },
       "spec/helpers/*.js",
-      "spec/*.js",
-      {pattern:"src/*.js",included: false, watched: true},
+      { pattern: "spec/*.js" },
     ]
 
     options.preprocessors = {
-      'spec/*.js': ['rollup'],
+      '**/*.js': ['rollup'],
     }
 
     options.rollupPreprocessor = {
@@ -35,6 +35,9 @@ function test(extra_config) {
       },
       bundle: { sourceMap: 'inline' },
     }
+
+    // If src/*.js changes, we want to recompile.
+    options.restartOnFileChange = true
 
     if (process.argv.indexOf('--debug') >= 0) {
       options.logLevel = 'DEBUG'
@@ -47,7 +50,7 @@ function test(extra_config) {
     if (process.argv.indexOf("--watch") >= 0) { options.singleRun = false; }
 
     // console.log("KARMA ", options)
-    new karma.Server(options)
+    var server = new karma.Server(options)
       .on('browser_complete', function(browser, results) {
           console.log(browser.name.cyan, " ✅  Complete.".green)
       })
@@ -57,7 +60,8 @@ function test(extra_config) {
       .on('run_complete', function(browsers, results) {
           console.log(" 🏁  Run complete.".green)
       })
-      .start()
+
+    server.start()
 }
 
 gulp.task('test', 'Run Karma tests', function () {
