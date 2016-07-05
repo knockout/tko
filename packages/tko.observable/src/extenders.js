@@ -48,7 +48,7 @@ export function notify(target, notifyWhen) {
 }
 
 
-export function defer(target, option) {
+export function deferred(target, option) {
     if (option !== true) {
         throw new Error('The \'deferred\' extender only accepts the value \'true\', because it is not supported to turn deferral off once enabled.');
     }
@@ -79,6 +79,6 @@ export function rateLimit(target, options) {
 
 export var extenders = {
     notify: notify,
-    defer: defer,
+    deferred: deferred,
     rateLimit: rateLimit
 };
