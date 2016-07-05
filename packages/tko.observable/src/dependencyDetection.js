@@ -58,4 +58,4 @@ export function isInitial() {
         return currentFrame.isInitial;
 }
 
-export {ignore as ignoreDependencies};
+export { ignore as ignoreDependencies };

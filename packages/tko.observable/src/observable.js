@@ -9,7 +9,7 @@ import {
 
 import * as dependencyDetection from './dependencyDetection.js';
 import { deferUpdates } from './defer.js';
-import { subscribable } from './subscribable.js';
+import { subscribable, defaultEvent } from './subscribable.js';
 import { valuesArePrimitiveAndEqual } from './extenders.js';
 
 var observableLatestValue = createSymbolOrString('_latestValue');
@@ -63,6 +63,57 @@ observable.fn = {
         this.notifySubscribers(this[observableLatestValue], 'beforeChange');
     }
 };
+
+
+
+// Moved out of "limit" to avoid the extra closure
+function limitNotifySubscribers(value, event) {
+    if (!event || event === defaultEvent) {
+        this._limitChange(value);
+    } else if (event === 'beforeChange') {
+        this._limitBeforeChange(value);
+    } else {
+        this._origNotifySubscribers(value, event);
+    }
+}
+
+// Add `limit` function to the subscribable prototype
+subscribable.fn.limit = function limit(limitFunction) {
+    var self = this, selfIsObservable = isObservable(self),
+        ignoreBeforeChange, previousValue, pendingValue, beforeChange = 'beforeChange';
+
+    if (!self._origNotifySubscribers) {
+        self._origNotifySubscribers = self.notifySubscribers;
+        self.notifySubscribers = limitNotifySubscribers;
+    }
+
+    var finish = limitFunction(function() {
+        self._notificationIsPending = false;
+
+        // If an observable provided a reference to itself, access it to get the latest value.
+        // This allows computed observables to delay calculating their value until needed.
+        if (selfIsObservable && pendingValue === self) {
+            pendingValue = self();
+        }
+        ignoreBeforeChange = false;
+        if (self.isDifferent(previousValue, pendingValue)) {
+            self._origNotifySubscribers(previousValue = pendingValue);
+        }
+    });
+
+    self._limitChange = function(value) {
+        self._notificationIsPending = ignoreBeforeChange = true;
+        pendingValue = value;
+        finish();
+    };
+    self._limitBeforeChange = function(value) {
+        if (!ignoreBeforeChange) {
+            previousValue = value;
+            self._origNotifySubscribers(value, beforeChange);
+        }
+    };
+};
+
 
 // Note that for browsers that don't support proto assignment, the
 // inheritance chain is created manually in the observable constructor

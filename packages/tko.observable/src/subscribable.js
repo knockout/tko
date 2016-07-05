@@ -3,9 +3,9 @@ import {
     setPrototypeOfOrExtend, arrayRemoveItem, objectForEach,
     canSetPrototype, setPrototypeOf
 } from 'tko.utils';
-import * as dependencyDetection from './dependencyDetection.js';
+
 import { applyExtenders } from './extenders.js';
-import { isObservable } from './observable.js';
+import * as dependencyDetection from './dependencyDetection.js';
 
 
 export function subscription(target, callback, disposeCallback) {
@@ -27,16 +27,6 @@ export function subscribable() {
 
 export var defaultEvent = "change";
 
-// Moved out of "limit" to avoid the extra closure
-function limitNotifySubscribers(value, event) {
-    if (!event || event === defaultEvent) {
-        this._limitChange(value);
-    } else if (event === 'beforeChange') {
-        this._limitBeforeChange(value);
-    } else {
-        this._origNotifySubscribers(value, event);
-    }
-}
 
 var ko_subscribable_fn = {
     init: function(instance) {
@@ -98,42 +88,6 @@ var ko_subscribable_fn = {
         ++this._versionNumber;
     },
 
-    limit: function(limitFunction) {
-        var self = this, selfIsObservable = isObservable(self),
-            ignoreBeforeChange, previousValue, pendingValue, beforeChange = 'beforeChange';
-
-        if (!self._origNotifySubscribers) {
-            self._origNotifySubscribers = self["notifySubscribers"];
-            self["notifySubscribers"] = limitNotifySubscribers;
-        }
-
-        var finish = limitFunction(function() {
-            self._notificationIsPending = false;
-
-            // If an observable provided a reference to itself, access it to get the latest value.
-            // This allows computed observables to delay calculating their value until needed.
-            if (selfIsObservable && pendingValue === self) {
-                pendingValue = self();
-            }
-            ignoreBeforeChange = false;
-            if (self.isDifferent(previousValue, pendingValue)) {
-                self._origNotifySubscribers(previousValue = pendingValue);
-            }
-        });
-
-        self._limitChange = function(value) {
-            self._notificationIsPending = ignoreBeforeChange = true;
-            pendingValue = value;
-            finish();
-        };
-        self._limitBeforeChange = function(value) {
-            if (!ignoreBeforeChange) {
-                previousValue = value;
-                self._origNotifySubscribers(value, beforeChange);
-            }
-        };
-    },
-
     hasSubscriptionsForEvent: function(event) {
         return this._subscriptions[event] && this._subscriptions[event].length;
     },
@@ -171,5 +125,5 @@ subscribable.fn = ko_subscribable_fn;
 
 
 export function isSubscribable(instance) {
-    return instance != null && typeof instance.subscribe == "function" && typeof instance["notifySubscribers"] == "function";
+    return instance != null && typeof instance.subscribe == "function" && typeof instance.notifySubscribers == "function";
 }

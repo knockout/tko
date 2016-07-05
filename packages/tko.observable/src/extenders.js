@@ -2,7 +2,7 @@
 // Observable extenders
 // ---
 //
-import { onError, objectForEach } from 'tko.utils';
+import { options, objectForEach } from 'tko.utils';
 
 
 var primitiveTypes = {
@@ -24,7 +24,7 @@ export function applyExtenders(requestedExtenders) {
             if (typeof extenderHandler == 'function') {
                 target = extenderHandler(target, value) || target;
             } else {
-                onError("Extender not found: " + key);
+                options.onError(new Error("Extender not found: " + key));
             }
         });
     }
@@ -36,7 +36,7 @@ export function applyExtenders(requestedExtenders) {
 export function notify(target, notifyWhen) {
     target.equalityComparer = notifyWhen == "always" ?
         null :  // null equalityComparer means to always notify
-        extenders.valuesArePrimitiveAndEqual;
+        valuesArePrimitiveAndEqual;
 }
 
 
