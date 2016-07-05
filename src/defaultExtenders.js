@@ -9,6 +9,7 @@ import {
     setTimeout,
     throttle as throttleFn, debounce as debounceFn
 } from 'tko.utils';
+
 import {
     extenders, deferUpdates
 } from 'tko.observables';
