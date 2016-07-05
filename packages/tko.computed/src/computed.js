@@ -22,6 +22,7 @@ import {
 import {
     dependencyDetection,
     extenders,
+    valuesArePrimitiveAndEqual,
     observable,
     subscribable
 } from 'tko.observable';
@@ -168,7 +169,7 @@ function computedBeginDependencyDetectionCallback(subscribable, id) {
 }
 
 computed.fn = {
-    equalityComparer: extenders.valuesArePrimitiveAndEqual,
+    equalityComparer: valuesArePrimitiveAndEqual,
     getDependenciesCount: function () {
         return this[computedState].dependenciesCount;
     },
