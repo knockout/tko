@@ -27,14 +27,14 @@ export function addBindingsForCustomElement(allBindings, node, bindingContext, v
             // It does represent a component, so add a component binding for it
             allBindings = allBindings || {};
 
-            if (allBindings['component']) {
+            if (allBindings.component) {
                 // Avoid silently overwriting some other 'component' binding that may already be on the element
                 throw new Error('Cannot use the "component" binding on a custom element matching a component');
             }
 
             var componentBindingValue = { 'name': componentName, 'params': getComponentParamsFromCustomElement(node, bindingContext) };
 
-            allBindings['component'] = valueAccessors
+            allBindings.component = valueAccessors
                 ? function() { return componentBindingValue; }
                 : componentBindingValue;
         }
@@ -43,13 +43,41 @@ export function addBindingsForCustomElement(allBindings, node, bindingContext, v
     return allBindings;
 }
 
+// Extend the default binding provider
+
+bindingProvider.prototype.nodeHasBindings = function(node) {
+    switch (node.nodeType) {
+    case 1: // Element
+    return node.getAttribute(defaultBindingAttributeName) != null
+            || ko.components.getComponentNameForNode(node);
+    case 8: // Comment node
+        return virtualElements.hasBindingValue(node);
+    default: return false;
+}
+
+var nativeGetBindings = bindingProvider.prototype.getBindings
+bindingProvider.prototype.getBindings = function getBindings(node, bindingContext) {
+    return addBindingsForCustomElement(
+        nativeGetBindings(node, bindingContext),
+        node, bindingContext, /* valueAccessors */ false);
+}
+
+var nativeGetBindingAccessors = bindingProvider.prototype.nativeGetBindingAccessors;
+bindingProvider.prototype.getBindingAccessors = function getBindingAccessors(node, bindingContext) {
+    return addBindingsForCustomElement(
+        nativeGetBindingAccessors(node, bindingContext),
+        node, bindingContext, /* valueAccessors */ true);
+}
+
+
+
 var nativeBindingProviderInstance = new bindingProvider();
 
 function getComponentParamsFromCustomElement(elem, bindingContext) {
     var paramsAttribute = elem.getAttribute('params');
 
     if (paramsAttribute) {
-        var params = nativeBindingProviderInstance['parseBindingsString'](paramsAttribute, bindingContext, elem, { 'valueAccessors': true, 'bindingParams': true }),
+        var params = nativeBindingProviderInstance.parseBindingsString(paramsAttribute, bindingContext, elem, { 'valueAccessors': true, 'bindingParams': true }),
             rawParamComputedValues = objectMap(params, function(paramValue /*, paramName */) {
                 return computed(paramValue, null, { disposeWhenNodeIsRemoved: elem });
             }),
