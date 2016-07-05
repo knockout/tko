@@ -16,42 +16,42 @@ var observableLatestValue = createSymbolOrString('_latestValue');
 
 
 export function observable(initialValue) {
-    function obsFn() {
+    function Observable() {
         if (arguments.length > 0) {
             // Write
 
             // Ignore writes if the value hasn't changed
-            if (obsFn.isDifferent(obsFn[observableLatestValue], arguments[0])) {
-                obsFn.valueWillMutate();
-                obsFn[observableLatestValue] = arguments[0];
-                obsFn.valueHasMutated();
+            if (Observable.isDifferent(Observable[observableLatestValue], arguments[0])) {
+                Observable.valueWillMutate();
+                Observable[observableLatestValue] = arguments[0];
+                Observable.valueHasMutated();
             }
             return this; // Permits chained assignments
         }
         else {
             // Read
-            dependencyDetection.registerDependency(obsFn); // The caller only needs to be notified of changes if they did a "read" operation
-            return obsFn[observableLatestValue];
+            dependencyDetection.registerDependency(Observable); // The caller only needs to be notified of changes if they did a "read" operation
+            return Observable[observableLatestValue];
         }
     }
 
-    obsFn[observableLatestValue] = initialValue;
+    Observable[observableLatestValue] = initialValue;
 
     // Inherit from 'subscribable'
     if (!canSetPrototype) {
         // 'subscribable' won't be on the prototype chain unless we put it there directly
-        extend(obsFn, subscribable.fn);
+        extend(Observable, subscribable.fn);
     }
-    subscribable.fn.init(obsFn);
+    subscribable.fn.init(Observable);
 
     // Inherit from 'observable'
-    setPrototypeOfOrExtend(obsFn, observable.fn);
+    setPrototypeOfOrExtend(Observable, observable.fn);
 
     if (options.deferUpdates) {
-        deferUpdates(obsFn);
+        deferUpdates(Observable);
     }
 
-    return obsFn;
+    return Observable;
 }
 
 // Define prototype for observables

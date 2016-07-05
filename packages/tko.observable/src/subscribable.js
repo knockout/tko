@@ -152,7 +152,8 @@ var ko_subscribable_fn = {
     },
 
     isDifferent: function(oldValue, newValue) {
-        return !this['equalityComparer'] || !this['equalityComparer'](oldValue, newValue);
+        return !this.equalityComparer ||
+               !this.equalityComparer(oldValue, newValue);
     },
 
     extend: applyExtenders
