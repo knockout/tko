@@ -11,3 +11,8 @@ export {
     isPureComputed,
     pureComputed
 } from './src/computed.js';
+
+
+export {
+    throttleExtender
+} from './src/throttleExtender';

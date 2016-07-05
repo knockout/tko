@@ -600,7 +600,7 @@ describe('Dependent Observable', function() {
         var customFunction2 = function () {};
 
         subscribable.fn.customFunction1 = customFunction1;
-        computedInstance.fn.customFunction2 = customFunction2;
+        computed.fn.customFunction2 = customFunction2;
 
         expect(computedInstance.customFunction1).toBe(customFunction1);
         expect(computedInstance.customFunction2).toBe(customFunction2);
