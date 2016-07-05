@@ -21,8 +21,6 @@ export function deferError(error) {
 }
 
 
-function safeSetTimeout(handler, timeout) {
+export function safeSetTimeout(handler, timeout) {
     return setTimeout(catchFunctionErrors(handler), timeout);
 }
-
-export { safeSetTimeout as safeSetTimeout };

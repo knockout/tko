@@ -1,12 +1,13 @@
 //
 // Asynchronous functionality
 // ---
+import { safeSetTimeout } from './error.js';
 
-function throttle(callback, timeout) {
+export function throttle(callback, timeout) {
     var timeoutInstance;
     return function () {
         if (!timeoutInstance) {
-            timeoutInstance = ko.utils.setTimeout(function () {
+            timeoutInstance = safeSetTimeout(function () {
                 timeoutInstance = undefined;
                 callback();
             }, timeout);
@@ -14,11 +15,10 @@ function throttle(callback, timeout) {
     };
 }
 
-function debounce(callback, timeout) {
+export function debounce(callback, timeout) {
     var timeoutInstance;
     return function () {
         clearTimeout(timeoutInstance);
-        timeoutInstance = ko.utils.setTimeout(callback, timeout);
+        timeoutInstance = safeSetTimeout(callback, timeout);
     };
 }
-

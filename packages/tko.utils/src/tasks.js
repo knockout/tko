@@ -2,7 +2,8 @@
 //  Tasks Micro-scheduler
 //  ===
 //
-import { deferError } from './error.js'
+/* eslint no-cond-assign: 0 */
+import { deferError } from './error.js';
 
 var scheduler,
     taskQueue = [],

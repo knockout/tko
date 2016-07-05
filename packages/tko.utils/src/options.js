@@ -9,5 +9,6 @@ export default {
     useOnlyNativeEvents: false,
     protoProperty: '__ko_proto__',
     debug: false,
+    $: window && window.jQuery,
     onError: function (e) { throw e; }
 };

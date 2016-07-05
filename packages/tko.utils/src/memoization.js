@@ -1,7 +1,7 @@
 //
 // Memoization
 //
-import { arrayPushAll } from './array.js'
+import { arrayPushAll } from './array.js';
 
 var memos = {};
 

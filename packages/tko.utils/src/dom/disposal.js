@@ -1,9 +1,10 @@
 //
 // DOM node disposal
 //
-import * as domData from './data.js'
-import {arrayRemoveItem, arrayPushAll} from '../array.js'
-import {jQueryInstance} from '../jquery.js'
+/* eslint no-cond-assign: 0 */
+import * as domData from './data.js';
+import {arrayRemoveItem, arrayPushAll} from '../array.js';
+import {jQueryInstance} from '../jquery.js';
 
 var domDataKey = domData.nextKey();
 // Node types:

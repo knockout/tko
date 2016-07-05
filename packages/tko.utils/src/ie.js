@@ -1,6 +1,7 @@
 //
 // Detection and Workarounds for Internet Explorer
 //
+/* eslint no-empty: 0 */
 
 // Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
 // Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
@@ -21,4 +22,4 @@ var isIe6 = ieVersion === 6;
 var isIe7 = ieVersion === 7;
 
 
-export { ieVersion, isIe6, isIe7 }
+export { ieVersion, isIe6, isIe7 };

@@ -1,7 +1,7 @@
 //
 // Information about the DOM
 //
-import { arrayFirst } from '../array.js'
+import { arrayFirst } from '../array.js';
 
 export function domNodeIsContainedBy (node, containedByNode) {
     if (node === containedByNode)
@@ -23,7 +23,7 @@ export function domNodeIsAttachedToDocument (node) {
 }
 
 export function anyDomNodeIsAttachedToDocument(nodes) {
-    return !!arrayFirst(nodes, ko.utils.domNodeIsAttachedToDocument);
+    return !!arrayFirst(nodes, domNodeIsAttachedToDocument);
 }
 
 export function tagNameLower(element) {
@@ -48,4 +48,3 @@ export function isDocumentFragment(obj) {
         return obj && obj.nodeType === 11;
     }
 }
-

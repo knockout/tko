@@ -1,4 +1,4 @@
-import './helper.js'
+import '../helpers/jasmine-13-helper.js'
 
 import { tasks, ieVersion } from '../index.js'
 

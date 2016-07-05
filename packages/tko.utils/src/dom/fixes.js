@@ -1,7 +1,7 @@
 //
 //  DOM node manipulation
 //
-import { ieVersion } from '../ie.js'
+import { ieVersion } from '../ie.js';
 
 export function fixUpContinuousNodeArray(continuousNodeArray, parentNode) {
     // Before acting on a set of nodes that were previously outputted by a template function, we have to reconcile
@@ -75,10 +75,4 @@ export function ensureSelectElementIsRenderedCorrectly(selectElement) {
         selectElement.style.width = 0;
         selectElement.style.width = originalWidth;
     }
-}
-
-
-export function getFormFields() {
-    // Use e.g. $(":input")
-    throw new Error("DEPRECATED")
 }

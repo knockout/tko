@@ -1,5 +1,5 @@
 import * as utils from '../index.js';
-import './helper.js';
+import '../helpers/jasmine-13-helper.js';
 
 var ko = ko || {};
 ko.utils = utils;

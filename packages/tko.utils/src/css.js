@@ -2,7 +2,7 @@
 // DOM - CSS
 //
 
-import { arrayForEach, addOrRemoveItem } from './array.js'
+import { arrayForEach, addOrRemoveItem } from './array.js';
 
 // For details on the pattern for changing node classes
 // see: https://github.com/knockout/knockout/issues/1597
@@ -11,7 +11,7 @@ var cssClassNameRegex = /\S+/g;
 
 function toggleDomNodeCssClass(node, classNames, shouldHaveClass) {
     var addOrRemoveFn;
-    if (!classNames) { return }
+    if (!classNames) { return; }
     if (typeof node.classList === 'object') {
         addOrRemoveFn = node.classList[shouldHaveClass ? 'add' : 'remove'];
         arrayForEach(classNames.match(cssClassNameRegex), function(className) {
@@ -37,4 +37,4 @@ function toggleObjectClassPropertyString(obj, prop, classNames, shouldHaveClass)
 }
 
 
-export { toggleDomNodeCssClass }
+export { toggleDomNodeCssClass };
