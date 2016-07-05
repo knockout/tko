@@ -7,7 +7,8 @@ import {
     isObservable, isWriteableObservable
 } from 'tko.observable';
 
-import { getBindingHandler } from './bindingAttributeSyntax';
+import { getBindingHandler } from './bindingAttributeSyntax.js';
+
 
 var javaScriptReservedWords = ["true", "false", "null", "undefined"];
 

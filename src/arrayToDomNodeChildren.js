@@ -4,15 +4,13 @@ import { computed } from 'tko.computed';
 import {
     fixUpContinuousNodeArray, replaceDomNodes, arrayPushAll,
     anyDomNodeIsAttachedToDocument, domData, arrayMap, arrayForEach,
-    virtualElements, extend, cleanNode, removeNode
+    virtualElements, extend, cleanNode, removeNode, compareArrays
 } from 'tko.utils';
 
 import {
     dependencyDetection, observable
 } from 'tko.observable';
 
-
-import { compareArrays } from './compareArrays';
 
 // Objective:
 // * Given an input array, a container DOM node, and a function from array elements to arrays of DOM nodes,

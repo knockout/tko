@@ -3,9 +3,9 @@
 
 import {
     extend, anyDomNodeIsAttachedToDocument, objectMap, virtualElements,
-    domNodeDisposal, arrayRemoveItem, tagNameLower, domData, objectForEach,
-    arrayIndexOf, arrayForEach
-} from 'tko.util';
+    addDisposeCallback, arrayRemoveItem, tagNameLower, domData, objectForEach,
+    arrayIndexOf, arrayForEach, options
+} from 'tko.utils';
 
 import {
     unwrap, isObservable, dependencyDetection
@@ -121,7 +121,7 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
             nodes = [];
             subscribable._addNode = function(node) {
                 nodes.push(node);
-                domNodeDisposal.addDisposeCallback(node, function(node) {
+                addDisposeCallback(node, function(node) {
                     arrayRemoveItem(nodes, node);
                     if (!nodes.length) {
                         subscribable.dispose();
@@ -412,7 +412,7 @@ function execNewBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccesso
         reportBindingError('construction', ex);
     }
 
-    domNodeDisposal.addDisposeCallback(node, function () {
+    addDisposeCallback(node, function () {
         if (typeof handlerInstance.dispose === "function") {
             handlerInstance.dispose.call(handlerInstance);
         }
@@ -624,9 +624,5 @@ function onBindingError(spec) {
         error = spec.errorCaptured;
     }
     extend(error, spec);
-    if (typeof knockout.onError === 'function') {
-        knockout.onError(error);
-    } else {
-        throw error;
-    }
+    options.onError(error);
 }

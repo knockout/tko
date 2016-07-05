@@ -16,8 +16,7 @@ extend(bindingProvider.prototype, {
     nodeHasBindings: function(node) {
         switch (node.nodeType) {
         case 1: // Element
-            return node.getAttribute(defaultBindingAttributeName) != null
-                || ko.components.getComponentNameForNode(node);
+            return node.getAttribute(defaultBindingAttributeName) != null;
         case 8: // Comment node
             return virtualElements.hasBindingValue(node);
         default: return false;
@@ -27,13 +26,13 @@ extend(bindingProvider.prototype, {
     getBindings: function(node, bindingContext) {
         var bindingsString = this.getBindingsString(node, bindingContext),
             parsedBindings = bindingsString ? this.parseBindingsString(bindingsString, bindingContext, node) : null;
-        return ko.components.addBindingsForCustomElement(parsedBindings, node, bindingContext, /* valueAccessors */ false);
+        return parsedBindings;
     },
 
     getBindingAccessors: function(node, bindingContext) {
         var bindingsString = this.getBindingsString(node, bindingContext),
             parsedBindings = bindingsString ? this.parseBindingsString(bindingsString, bindingContext, node, { valueAccessors: true }) : null;
-        return ko.components.addBindingsForCustomElement(parsedBindings, node, bindingContext, /* valueAccessors */ true);
+        return parsedBindings;
     },
 
     // The following function is only used internally by this default provider.
