@@ -12,6 +12,9 @@ import {
 } from '../index.js';
 
 
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
+
 /* eslint semi: 0, no-empty: 0 */
 describe('Binding attribute syntax', function() {
     beforeEach(jasmine.prepareTestNode);

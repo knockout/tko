@@ -1,6 +1,4 @@
 /* eslint no-cond-assign: 0 */
-import { computed } from 'tko.computed';
-
 import {
     fixUpContinuousNodeArray, replaceDomNodes, arrayPushAll,
     anyDomNodeIsAttachedToDocument, domData, arrayMap, arrayForEach,
@@ -10,6 +8,8 @@ import {
 import {
     dependencyDetection, observable
 } from 'tko.observable';
+
+import { computed } from 'tko.computed';
 
 
 // Objective:
