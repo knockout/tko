@@ -8,6 +8,7 @@ var _ = require('lodash')
 var figlet = require('figlet')
 var karma = require('karma')
 var nodeResolve = require('rollup-plugin-node-resolve');
+
 var stub = require('rollup-plugin-stub');
 
 var gulp = global.__tko_gulp
@@ -38,9 +39,6 @@ function test(extra_config) {
       bundle: { sourceMap: 'inline' },
     }
 
-    // If src/*.js changes, we want to recompile.
-    options.restartOnFileChange = true
-
     if (process.argv.indexOf('--debug') >= 0) {
       options.logLevel = 'DEBUG'
     }
@@ -51,19 +49,14 @@ function test(extra_config) {
     if (process.argv.indexOf("--once") >= 0) { options.singleRun = true; }
     if (process.argv.indexOf("--watch") >= 0) { options.singleRun = false; }
 
-    // console.log("KARMA ", options)
-    var server = new karma.Server(options)
-      .on('browser_complete', function(browser, results) {
-          console.log(browser.name.cyan, " ✅  Complete.".green)
-      })
+    new karma.Server(options)
       .on('browser_error', function(browser, error) {
           console.log(browser.name.cyan, " 🚨  Error:".red, error)
       })
       .on('run_complete', function(browsers, results) {
           console.log(" 🏁  Run complete.".green)
       })
-
-    server.start()
+      .start()
 }
 
 gulp.task('test', 'Run Karma tests', function () {

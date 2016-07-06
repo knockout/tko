@@ -24,6 +24,7 @@ module.exports = function(gulp) {
   var tasks_path = __dirname + "/tasks"
 
   fs.readdirSync(tasks_path)
+    .filter((file) => file.endsWith('.js'))
     .forEach((file) => require(`${tasks_path}/${file}`))
 
   gulp.task('default', false, ['help'])
