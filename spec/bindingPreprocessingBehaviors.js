@@ -1,8 +1,8 @@
+<<<<<<< HEAD
 import {
-    bindingHandlers, expressionRewriting,
     stub_getBindingHandler, reset_getBindingHandler
+    bindingHandlers, preProcessBindings
 } from '../index.js';
-
 
 describe('Binding preprocessing', function() {
     it('Should allow binding to modify value through "preprocess" method', function() {
@@ -13,7 +13,7 @@ describe('Binding preprocessing', function() {
                 return value || "false";
             }
         };
-        var rewritten = expressionRewriting.preProcessBindings("a: 1, b");
+        var rewritten = preProcessBindings("a: 1, b");
         var parsedRewritten = eval("({" + rewritten + "})");
         expect(parsedRewritten.a).toEqual(1);
         expect(parsedRewritten.b).toEqual(false);
@@ -33,7 +33,7 @@ describe('Binding preprocessing', function() {
                 addBinding(key+"2", value);
             }
         };
-        var rewritten = expressionRewriting.preProcessBindings("a: 1, b: 2");
+        var rewritten = preProcessBindings("a: 1, b: 2");
         var parsedRewritten = eval("({" + rewritten + "})");
 
         expect(parsedRewritten.a).toEqual(1);
@@ -56,7 +56,7 @@ describe('Binding preprocessing', function() {
                 return '' + (+value + 1);
             }
         };
-        var rewritten = expressionRewriting.preProcessBindings("a: 2");
+        var rewritten = preProcessBindings("a: 2");
         var parsedRewritten = eval("({" + rewritten + "})");
         expect(parsedRewritten.a).toBeUndefined();
         expect(parsedRewritten.b).toEqual(3);
@@ -71,7 +71,7 @@ describe('Binding preprocessing', function() {
             };
         });
         this.after(reset_getBindingHandler);
-        var rewritten = expressionRewriting.preProcessBindings("a: 1");
+        var rewritten = preProcessBindings("a: 1");
         var parsedRewritten = eval("({" + rewritten + "})");
         expect(parsedRewritten.a).toEqual(12);
     });
