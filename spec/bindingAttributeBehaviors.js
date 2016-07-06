@@ -7,10 +7,11 @@ import {
 } from 'tko.observable';
 
 import {
-    bindingHandlers, applyBindings, bindingProvider,
-    applyBindingsToDescendants, applyBindingsToNode
+    bindingHandlers, applyBindings, bindingProvider, dataFor,
+    applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../index.js';
 
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 /* eslint semi: 0, no-empty: 0 */
 describe('Binding attribute syntax', function() {
@@ -322,12 +323,12 @@ describe('Binding attribute syntax', function() {
         var vm = { sub: {} };
         applyBindings(vm, testNode);
         expect(testNode).toContainText("my value");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$customProp).toEqual("my value");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toEqual(undefined); // Should not affect original binding context
+        expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$customProp).toEqual("my value");
+        expect(contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toEqual(undefined); // Should not affect original binding context
 
         // vale of $data and $parent should be unchanged in extended context
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data).toEqual(vm.sub);
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$parent).toEqual(vm);
+        expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data).toEqual(vm.sub);
+        expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$parent).toEqual(vm);
     });
 
     it('Binding contexts should inherit any custom properties from ancestor binding contexts', function() {
@@ -349,16 +350,16 @@ describe('Binding attribute syntax', function() {
         expect(testNode.childNodes[0].childNodes[0]).toContainText("Bert");
 
         // Can't get binding context for unbound nodes
-        expect(ko.dataFor(testNode)).toEqual(undefined);
-        expect(ko.contextFor(testNode)).toEqual(undefined);
+        expect(dataFor(testNode)).toEqual(undefined);
+        expect(contextFor(testNode)).toEqual(undefined);
 
         // Can get binding context for directly bound nodes
-        expect(ko.dataFor(testNode.childNodes[0]).name).toEqual("Bert");
-        expect(ko.contextFor(testNode.childNodes[0]).$data.name).toEqual("Bert");
+        expect(dataFor(testNode.childNodes[0]).name).toEqual("Bert");
+        expect(contextFor(testNode.childNodes[0]).$data.name).toEqual("Bert");
 
         // Can get binding context for descendants of directly bound nodes
-        expect(ko.dataFor(testNode.childNodes[0].childNodes[0]).name).toEqual("Bert");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual("Bert");
+        expect(dataFor(testNode.childNodes[0].childNodes[0]).name).toEqual("Bert");
+        expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual("Bert");
     });
 
     it('Should not be allowed to use containerless binding syntax for bindings other than whitelisted ones', function() {
@@ -455,7 +456,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "Hello <!-- ko bindChildrenWithCustomContext: true --><div>Some text</div><!-- /ko --> Goodbye"
         applyBindings(null, testNode);
 
-        expect(ko.dataFor(testNode.childNodes[2]).myCustomData).toEqual(123);
+        expect(dataFor(testNode.childNodes[2]).myCustomData).toEqual(123);
     });
 
     it('Should be able to set and access correct context in nested containerless binding', function() {
@@ -471,8 +472,8 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "Hello <div data-bind='bindChildrenWithCustomContext: true'><!-- ko nonexistentHandler: 123 --><div>Some text</div><!-- /ko --></div> Goodbye"
         applyBindings(null, testNode);
 
-        expect(ko.dataFor(testNode.childNodes[1].childNodes[0]).myCustomData).toEqual(123);
-        expect(ko.dataFor(testNode.childNodes[1].childNodes[1]).myCustomData).toEqual(123);
+        expect(dataFor(testNode.childNodes[1].childNodes[0]).myCustomData).toEqual(123);
+        expect(dataFor(testNode.childNodes[1].childNodes[1]).myCustomData).toEqual(123);
     });
 
     it('Should be able to access custom context variables in child context', function() {
@@ -488,10 +489,10 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "Hello <div data-bind='bindChildrenWithCustomContext: true'><!-- ko with: myCustomData --><div>Some text</div><!-- /ko --></div> Goodbye"
         applyBindings(null, testNode);
 
-        expect(ko.contextFor(testNode.childNodes[1].childNodes[0]).customValue).toEqual('xyz');
-        expect(ko.dataFor(testNode.childNodes[1].childNodes[1])).toEqual(123);
-        expect(ko.contextFor(testNode.childNodes[1].childNodes[1]).$parent.myCustomData).toEqual(123);
-        expect(ko.contextFor(testNode.childNodes[1].childNodes[1]).$parentContext.customValue).toEqual('xyz');
+        expect(contextFor(testNode.childNodes[1].childNodes[0]).customValue).toEqual('xyz');
+        expect(dataFor(testNode.childNodes[1].childNodes[1])).toEqual(123);
+        expect(contextFor(testNode.childNodes[1].childNodes[1]).$parent.myCustomData).toEqual(123);
+        expect(contextFor(testNode.childNodes[1].childNodes[1]).$parentContext.customValue).toEqual('xyz');
     });
 
     it('Should be able to use value-less binding in containerless binding', function() {
@@ -623,7 +624,7 @@ describe('Binding attribute syntax', function() {
                 expect(params.element).toEqual(testNode.children[0])
                 expect(params.$data).toEqual(viewModel)
                 expect(params.$context).toEqual(
-                    ko.contextFor(testNode.children[0]))
+                    contextFor(testNode.children[0]))
                 expect(params.allBindings()['bx']).toEqual(43)
                 expect(params.allBindings.get('bx')).toEqual(43)
             }
@@ -689,7 +690,7 @@ describe('Binding attribute syntax', function() {
             }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements");
         });
 
-        it("has a .computed() property with the node's lifecycle", function () {
+        iit("has a .computed() property with the node's lifecycle", function () {
             var instance;
             var xCalls = 0,
                 yCalls = 0;
