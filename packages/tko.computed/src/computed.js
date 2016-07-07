@@ -11,7 +11,7 @@ import {
     domNodeIsAttachedToDocument,
     extend,
     objectForEach,
-    options as tko_options,
+    options as koOptions,
     removeDisposeCallback,
     safeSetTimeout,
     setPrototypeOf,
@@ -103,11 +103,11 @@ export function computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, op
         extend(computedObservable, deferEvaluationOverrides);
     }
 
-    if (tko_options.deferUpdates) {
+    if (koOptions.deferUpdates) {
         extenders.deferred(computedObservable, true);
     }
 
-    if (tko_options.debug) {
+    if (koOptions.debug) {
         // #1731 - Aid debugging by exposing the computed's options
         computedObservable._options = options;
     }
@@ -382,6 +382,10 @@ computed.fn = {
         state.isStale = false;
         state.isSleeping = false;
         state.disposeWhenNodeIsRemoved = null;
+        state.readFunction = null;
+        if (koOptions.debug) {
+            this._options = null;
+        }
     }
 };
 
