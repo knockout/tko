@@ -1,11 +1,11 @@
-<<<<<<< HEAD
+
 import {
-    stub_getBindingHandler, reset_getBindingHandler
+    // stub_getBindingHandler, reset_getBindingHandler
     bindingHandlers, preProcessBindings
 } from '../index.js';
 
 describe('Binding preprocessing', function() {
-    it('Should allow binding to modify value through "preprocess" method', function() {
+    iit('Should allow binding to modify value through "preprocess" method', function() {
         delete bindingHandlers.a;
         // create binding that has a default value of false
         bindingHandlers.b = {

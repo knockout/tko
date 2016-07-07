@@ -7,11 +7,14 @@ import {
 } from 'tko.observable';
 
 import {
+    computed as koComputed
+} from 'tko.computed';
+
+import {
     bindingHandlers, applyBindings, bindingProvider, dataFor,
     applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../index.js';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -693,20 +696,20 @@ describe('Binding attribute syntax', function() {
             }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements");
         });
 
-        iit("has a .computed() property with the node's lifecycle", function () {
+        it("has a .computed() property with the node's lifecycle", function () {
             var instance;
             var xCalls = 0,
                 yCalls = 0;
             bindingHandlers.fnHandler = function () {
                 var v = this.v = koObservable(0);
                 instance = this;
-                this.x = this.computed(function () {
+                this.x = koComputed(function () {
                     xCalls++;
                     v();  // Add a dependency.
                     expect(this).toEqual(instance);
                     return 'x';
                 });
-                this.y = this.computed({
+                this.y = koComputed({
                     read: function () {
                         yCalls++;
                         v();

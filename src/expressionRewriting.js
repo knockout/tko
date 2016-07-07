@@ -129,7 +129,7 @@ export function preProcessBindings(bindingsStringOrKeyValueArray, bindingOptions
     function processKeyValue(key, val) {
         var writableVal;
         function callPreprocessHook(obj) {
-            return (obj && obj['preprocess']) ? (val = obj['preprocess'](val, key, processKeyValue)) : true;
+            return (obj && obj.preprocess) ? (val = obj.preprocess(val, key, processKeyValue)) : true;
         }
         if (!bindingParams) {
             if (!callPreprocessHook(getBindingHandler(key)))
