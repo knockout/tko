@@ -11,7 +11,7 @@ var scheduler,
     nextHandle = 1,
     nextIndexToProcess = 0;
 
-if (window['MutationObserver']) {
+if (window.MutationObserver && !(window.navigator && window.navigator.standalone)) {
     // Chrome 27+, Firefox 14+, IE 11+, Opera 15+, Safari 6.1+
     // From https://github.com/petkaantonov/bluebird * Copyright (c) 2014 Petka Antonov * License: MIT
     scheduler = (function (callback) {
