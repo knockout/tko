@@ -1,4 +1,4 @@
-
+/* eslint semi: 0 */
 
 import {
     removeNode, triggerEvent, extend
@@ -15,7 +15,8 @@ import {
 
 
 import {
-    bindingHandlers, applyBindings, contextFor, bindingProvider
+    bindingHandlers, applyBindings, contextFor, bindingProvider,
+    applyBindingsToDescendants
 } from '../index.js';
 
 

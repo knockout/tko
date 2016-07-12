@@ -84,7 +84,7 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
         if (extendCallback)
             extendCallback(self, parentContext, dataItem);
 
-        return self['$data'];
+        return self.$data;
     }
     function disposeWhen() {
         return nodes && !anyDomNodeIsAttachedToDocument(nodes);
@@ -95,7 +95,7 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
         nodes,
         subscribable;
 
-    if (options && options['exportDependencies']) {
+    if (options && options.exportDependencies) {
         // The "exportDependencies" option means that the calling code will track any dependencies and re-create
         // the binding context when they change.
         updateContext();
@@ -110,7 +110,7 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
             self._subscribable = subscribable;
 
             // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
-            subscribable['equalityComparer'] = null;
+            subscribable.equalityComparer = null;
 
             // We need to be able to dispose of this computed observable when it's no longer needed. This would be
             // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
@@ -156,16 +156,16 @@ bindingContext.prototype.createChildContext = function (dataItemOrAccessor, data
 bindingContext.prototype.extend = function(properties) {
     // If the parent context references an observable view model, "_subscribable" will always be the
     // latest view model object. If not, "_subscribable" isn't set, and we can use the static "$data" value.
-    return new bindingContext(this._subscribable || this['$data'], this, null, function(self, parentContext) {
+    return new bindingContext(this._subscribable || this.$data, this, null, function(self, parentContext) {
         // This "child" context doesn't directly track a parent observable view model,
         // so we need to manually set the $rawData value to match the parent.
-        self['$rawData'] = parentContext['$rawData'];
+        self.$rawData = parentContext.$rawData;
         extend(self, typeof(properties) == "function" ? properties() : properties);
     });
 };
 
 bindingContext.prototype.createStaticChildContext = function (dataItemOrAccessor, dataItemAlias) {
-    return this['createChildContext'](dataItemOrAccessor, dataItemAlias, null, { "exportDependencies": true });
+    return this.createChildContext(dataItemOrAccessor, dataItemAlias, null, { "exportDependencies": true });
 };
 
 // Returns the valueAccesor function for a binding value
@@ -205,7 +205,7 @@ function makeBindingAccessors(bindings, context, node) {
 // This function is used if the binding provider doesn't include a getBindingAccessors function.
 // It must be called with 'this' set to the provider instance.
 function getBindingsAndMakeAccessors(node, context) {
-    return makeAccessorsFromFunction(this['getBindings'].bind(this, node, context));
+    return makeAccessorsFromFunction(this.getBindings.bind(this, node, context));
 }
 
 function validateThatBindingIsAllowedForVirtualElements(bindingName) {
@@ -263,7 +263,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
     var shouldApplyBindings = (isElement && bindingContextMayDifferFromDomParentElement)             // Case (1)
                            || bindingProvider.instance.nodeHasBindings(nodeVerified);       // Case (2)
     if (shouldApplyBindings)
-        shouldBindDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement)['shouldBindDescendants'];
+        shouldBindDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement).shouldBindDescendants;
 
     if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
         // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
@@ -289,9 +289,9 @@ function topologicalSortBindings(bindings) {
             var binding = getBindingHandler(bindingKey);
             if (binding) {
                 // First add dependencies (if any) of the current binding
-                if (binding['after']) {
+                if (binding.after) {
                     cyclicDependencyStack.push(bindingKey);
-                    arrayForEach(binding['after'], function(bindingDependencyKey) {
+                    arrayForEach(binding.after, function(bindingDependencyKey) {
                         if (bindings[bindingDependencyKey]) {
                             if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
                                 throw Error("Cannot combine the following bindings, because they have a cyclic dependency: " + cyclicDependencyStack.join(", "));
@@ -324,10 +324,10 @@ function execObjectBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAcce
     if (typeof handlerInitFn === "function") {
         try {
             dependencyDetection.ignore(function() {
-                var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+                var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext.$data, bindingContext);
 
                 // If this binding handler claims to control descendant bindings, make a note of this
-                if (initResult && initResult['controlsDescendantBindings']) {
+                if (initResult && initResult.controlsDescendantBindings) {
                     controlsDescendantBindings = true;
                 }
             });
@@ -341,7 +341,7 @@ function execObjectBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAcce
         computed(
             function() {
                 try {
-                    handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+                    handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext.$data, bindingContext);
                 } catch (ex) {
                     reportBindingError('update', ex);
                 }
@@ -360,7 +360,7 @@ function execNewBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccesso
     var bindingKey = bindingKeyAndHandler.key,
         handlerParams = {
             element: node,
-            $data: bindingContext['$data'],
+            $data: bindingContext.$data,
             $context: bindingContext,
             allBindings: allBindings
         },
@@ -465,7 +465,7 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
         bindings = sourceBindings;
     } else {
         var provider = bindingProvider.instance,
-            getBindings = provider['getBindingAccessors'] || getBindingsAndMakeAccessors;
+            getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors;
 
         // Get the binding from the provider within a computed observable so that we can update the bindings whenever
         // the binding context is updated or if the binding provider accesses observables.
@@ -580,8 +580,8 @@ export function applyBindingsToDescendants(viewModelOrBindingContext, rootNode) 
 
 export function applyBindings(viewModelOrBindingContext, rootNode) {
     // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
-    if (!jQueryInstance && window['jQuery']) {
-        jQueryInstance = window['jQuery'];
+    if (!options.jQuery === undefined && window.jQuery) {
+        options.jQuery = window.jQuery;
     }
 
     if (rootNode && (rootNode.nodeType !== 1) && (rootNode.nodeType !== 8))
