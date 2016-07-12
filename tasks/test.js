@@ -29,14 +29,12 @@ function test(extra_config) {
     }
 
     options.rollupPreprocessor = {
-      rollup: {
-        plugins: [
-          // stub(),  see:
-          //  https://github.com/eventualbuddha/rollup-plugin-stub/issues/2
-          nodeResolve({ jsnext: true, }),
-        ]
-      },
-      bundle: { sourceMap: 'inline' },
+      plugins: [
+        // stub(),  see:
+        //  https://github.com/eventualbuddha/rollup-plugin-stub/issues/2
+        nodeResolve({ jsnext: true, }),
+      ],
+      sourceMap: 'inline',
     }
 
     if (process.argv.indexOf('--debug') >= 0) {
