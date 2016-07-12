@@ -1,0 +1,21 @@
+*.suo
+*.swp
+*.csproj.user
+bin
+obj
+*.pdb
+_ReSharper*
+*.ReSharper.user
+*.ReSharper
+desktop.ini
+.eprj
+perf/*
+*.orig
+*.bak
+.DS_Store
+npm-debug.log
+node_modules
+
+# Knockout built files
+dist
+_repo

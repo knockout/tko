@@ -1,0 +1,40 @@
+{
+  "name": "tko.binding.core",
+  "version": "0.1.0",
+  "description": "TKO Core bindings",
+  "main": "dist/tko.bindings.core.js",
+  "jsnext:main": "./index.js",
+  "files": [
+    "dist/",
+    "src/",
+    "helpers/",
+    "index.js",
+    "./*.ya?ml"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.binding.core.git"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "ko"
+  ],
+  "author": "Knockout",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.util/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.util#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "js-yaml": "^3.4.6",
+    "tko-policy": "knockout/tko-policy"
+  },
+  "dependencies": {
+    "tko.bind": "github:knockout/tko.bind"
+  }
+}
