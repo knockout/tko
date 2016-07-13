@@ -1,17 +1,29 @@
-var classesWrittenByBindingKey = '__ko__cssValue';
-ko.bindingHandlers['class'] = ko.bindingHandlers['css'] = {
-    'update': function (element, valueAccessor) {
-        var value = ko.utils.unwrapObservable(valueAccessor());
+
+import {
+    createSymbolOrString, toggleDomNodeCssClass, objectForEach, stringTrim
+} from 'tko.utils';
+
+import {
+    unwrap
+} from 'tko.observable';
+
+
+
+export var css = {
+    aliases: ['class'],
+    update: function (element, valueAccessor) {
+        var value = unwrap(valueAccessor());
         if (value !== null && typeof value == "object") {
-            ko.utils.objectForEach(value, function(className, shouldHaveClass) {
-                shouldHaveClass = ko.utils.unwrapObservable(shouldHaveClass);
-                ko.utils.toggleDomNodeCssClass(element, className, shouldHaveClass);
+            objectForEach(value, function(className, shouldHaveClass) {
+                shouldHaveClass = unwrap(shouldHaveClass);
+                toggleDomNodeCssClass(element, className, shouldHaveClass);
             });
         } else {
-            value = ko.utils.stringTrim(String(value || '')); // Make sure we don't try to store or set a non-string value
-            ko.utils.toggleDomNodeCssClass(element, element[classesWrittenByBindingKey], false);
-            element[classesWrittenByBindingKey] = value;
-            ko.utils.toggleDomNodeCssClass(element, value, true);
+            value = stringTrim(String(value || '')); // Make sure we don't try to store or set a non-string value
+            toggleDomNodeCssClass(element, element[css.classesWrittenByBindingKey], false);
+            element[css.classesWrittenByBindingKey] = value;
+            toggleDomNodeCssClass(element, value, true);
         }
-    }
+    },
+    classesWrittenByBindingKey: createSymbolOrString('__ko__cssValue');
 };

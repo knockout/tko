@@ -1,15 +1,21 @@
-ko.bindingHandlers['enable'] = {
-    'update': function (element, valueAccessor) {
-        var value = ko.utils.unwrapObservable(valueAccessor());
-        if (value && element.disabled)
+
+import {
+    unwrap
+} from 'tko.observable';
+
+export var enable = {
+    update: function (element, valueAccessor) {
+        var value = unwrap(valueAccessor());
+        if (value && element.disabled) {
             element.removeAttribute("disabled");
-        else if ((!value) && (!element.disabled))
+        } else if ((!value) && (!element.disabled)) {
             element.disabled = true;
+        }
     }
 };
 
-ko.bindingHandlers['disable'] = {
-    'update': function (element, valueAccessor) {
-        ko.bindingHandlers['enable']['update'](element, function() { return !ko.utils.unwrapObservable(valueAccessor()) });
+export var disable = {
+    update: function (element, valueAccessor) {
+        enable.update(element, function() { return !unwrap(valueAccessor()) });
     }
 };
