@@ -1,4 +1,21 @@
-(function () {
+
+import {
+    domData, registerEventHandler, ieVersion, safeSetTimeout, options,
+    arrayForEach, tagNameLower
+} from 'tko.utils';
+
+import {
+    unwrap
+} from 'tko.observable';
+
+import {
+    computed
+} from 'tko.computed';
+
+import {
+    writeValueToProperty
+} from 'tko.bind';
+
 
 if (window && window.navigator) {
     var parseVersion = function (matches) {
@@ -20,28 +37,29 @@ if (window && window.navigator) {
 // fired at the document level only and doesn't directly indicate which element changed. We
 // set up just one event handler for the document and use 'activeElement' to determine which
 // element was changed.
-if (ko.utils.ieVersion < 10) {
-    var selectionChangeRegisteredName = ko.utils.domData.nextKey(),
-        selectionChangeHandlerName = ko.utils.domData.nextKey();
+if (ieVersion < 10) {
+    var selectionChangeRegisteredName = domData.nextKey(),
+        selectionChangeHandlerName = domData.nextKey();
     var selectionChangeHandler = function(event) {
         var target = this.activeElement,
-            handler = target && ko.utils.domData.get(target, selectionChangeHandlerName);
+            handler = target && domData.get(target, selectionChangeHandlerName);
         if (handler) {
             handler(event);
         }
     };
     var registerForSelectionChangeEvent = function (element, handler) {
         var ownerDoc = element.ownerDocument;
-        if (!ko.utils.domData.get(ownerDoc, selectionChangeRegisteredName)) {
-            ko.utils.domData.set(ownerDoc, selectionChangeRegisteredName, true);
-            ko.utils.registerEventHandler(ownerDoc, 'selectionchange', selectionChangeHandler);
+        if (!domData.get(ownerDoc, selectionChangeRegisteredName)) {
+            domData.set(ownerDoc, selectionChangeRegisteredName, true);
+            registerEventHandler(ownerDoc, 'selectionchange', selectionChangeHandler);
         }
-        ko.utils.domData.set(element, selectionChangeHandlerName, handler);
+        domData.set(element, selectionChangeHandlerName, handler);
     };
 }
 
-ko.bindingHandlers['textInput'] = {
-    'init': function (element, valueAccessor, allBindings) {
+export var textInput = {
+    aliases: 'textinput',
+    init: function (element, valueAccessor, allBindings) {
 
         var previousElementValue = element.value,
             timeoutHandle,
@@ -54,9 +72,9 @@ ko.bindingHandlers['textInput'] = {
             var elementValue = element.value;
             if (previousElementValue !== elementValue) {
                 // Provide a way for tests to know exactly which event was processed
-                if (DEBUG && event) element['_ko_textInputProcessedEvent'] = event.type;
+                if (options.debug && event) element['_ko_textInputProcessedEvent'] = event.type;
                 previousElementValue = elementValue;
-                ko.expressionRewriting.writeValueToProperty(valueAccessor(), allBindings, 'textInput', elementValue);
+                writeValueToProperty(valueAccessor(), allBindings, 'textInput', elementValue);
             }
         };
 
@@ -67,24 +85,24 @@ ko.bindingHandlers['textInput'] = {
                 // updates that are from the previous state of the element, usually due to techniques
                 // such as rateLimit. Such updates, if not ignored, can cause keystrokes to be lost.
                 elementValueBeforeEvent = element.value;
-                var handler = DEBUG ? updateModel.bind(element, {type: event.type}) : updateModel;
-                timeoutHandle = ko.utils.setTimeout(handler, 4);
+                var handler = options.debug ? updateModel.bind(element, {type: event.type}) : updateModel;
+                timeoutHandle = safeSetTimeout(handler, 4);
             }
         };
 
         // IE9 will mess up the DOM if you handle events synchronously which results in DOM changes (such as other bindings);
         // so we'll make sure all updates are asynchronous
-        var ieUpdateModel = ko.utils.ieVersion == 9 ? deferUpdateModel : updateModel;
+        var ieUpdateModel = ieVersion == 9 ? deferUpdateModel : updateModel;
 
         var updateView = function () {
-            var modelValue = ko.utils.unwrapObservable(valueAccessor());
+            var modelValue = unwrap(valueAccessor());
 
             if (modelValue === null || modelValue === undefined) {
                 modelValue = '';
             }
 
             if (elementValueBeforeEvent !== undefined && modelValue === elementValueBeforeEvent) {
-                ko.utils.setTimeout(updateView, 4);
+                safeSetTimeout(updateView, 4);
                 return;
             }
 
@@ -97,12 +115,12 @@ ko.bindingHandlers['textInput'] = {
         };
 
         var onEvent = function (event, handler) {
-            ko.utils.registerEventHandler(element, event, handler);
+            registerEventHandler(element, event, handler);
         };
 
-        if (DEBUG && ko.bindingHandlers['textInput']['_forceUpdateOn']) {
+        if (options.debug && textInput._forceUpdateOn) {
             // Provide a way for tests to specify exactly which events are bound
-            ko.utils.arrayForEach(ko.bindingHandlers['textInput']['_forceUpdateOn'], function(eventName) {
+            arrayForEach(textInput._forceUpdateOn, function(eventName) {
                 if (eventName.slice(0,5) == 'after') {
                     onEvent(eventName.slice(5), deferUpdateModel);
                 } else {
@@ -110,7 +128,7 @@ ko.bindingHandlers['textInput'] = {
                 }
             });
         } else {
-            if (ko.utils.ieVersion < 10) {
+            if (ieVersion < 10) {
                 // Internet Explorer <= 8 doesn't support the 'input' event, but does include 'propertychange' that fires whenever
                 // any property of an element changes. Unlike 'input', it also fires if a property is changed from JavaScript code,
                 // but that's an acceptable compromise for this binding. IE 9 does support 'input', but since it doesn't fire it
@@ -121,14 +139,14 @@ ko.bindingHandlers['textInput'] = {
                     }
                 });
 
-                if (ko.utils.ieVersion == 8) {
+                if (ieVersion == 8) {
                     // IE 8 has a bug where it fails to fire 'propertychange' on the first update following a value change from
                     // JavaScript code. It also doesn't fire if you clear the entire value. To fix this, we bind to the following
                     // events too.
                     onEvent('keyup', updateModel);      // A single keystoke
                     onEvent('keydown', updateModel);    // The first character when a key is held down
                 }
-                if (ko.utils.ieVersion >= 8) {
+                if (ieVersion >= 8) {
                     // Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
                     // the backspace, delete, or ctrl-x keys, clicking the 'x' to clear the input, dragging text
                     // out of the field, and cutting or deleting text using the context menu. 'selectionchange'
@@ -142,7 +160,7 @@ ko.bindingHandlers['textInput'] = {
                 // through the user interface.
                 onEvent('input', updateModel);
 
-                if (safariVersion < 5 && ko.utils.tagNameLower(element) === "textarea") {
+                if (safariVersion < 5 && tagNameLower(element) === "textarea") {
                     // Safari <5 doesn't fire the 'input' event for <textarea> elements (it does fire 'textInput'
                     // but only when typing). So we'll just catch as much as we can with keydown, cut, and paste.
                     onEvent('keydown', deferUpdateModel);
@@ -166,17 +184,15 @@ ko.bindingHandlers['textInput'] = {
         // Bind to the change event so that we can catch programmatic updates of the value that fire this event.
         onEvent('change', updateModel);
 
-        ko.computed(updateView, null, { disposeWhenNodeIsRemoved: element });
-    }
-};
-ko.expressionRewriting.twoWayBindings['textInput'] = true;
-
-// textinput is an alias for textInput
-ko.bindingHandlers['textinput'] = {
-    // preprocess is the only way to set up a full alias
-    'preprocess': function (value, name, addBinding) {
-        addBinding('textInput', value);
-    }
+        computed(updateView, null, { disposeWhenNodeIsRemoved: element });
+    },
+    twoWayBinding: true
 };
 
-})();
+// // textinput is an alias for textInput
+// ko.bindingHandlers['textinput'] = {
+//     // preprocess is the only way to set up a full alias
+//     'preprocess': function (value, name, addBinding) {
+//         addBinding('textInput', value);
+//     }
+// };

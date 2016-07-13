@@ -1,7 +1,22 @@
-var hasfocusUpdatingProperty = '__ko_hasfocusUpdating';
-var hasfocusLastValue = '__ko_hasfocusLastValue';
-ko.bindingHandlers['hasfocus'] = {
-    'init': function(element, valueAccessor, allBindings) {
+
+import {
+    createSymbolOrString, triggerEvent, registerEventHandler
+} from 'tko.utils';
+
+import {
+    unwrap, dependencyDetection
+} from 'tko.observable';
+
+import {
+    writeValueToProperty
+} from 'tko.bind';
+
+var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating');
+var hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue');
+
+export var hasfocus = {
+    aliases: ['hasFocus'],
+    init: function(element, valueAccessor, allBindings) {
         var handleElementFocusChange = function(isFocused) {
             // Where possible, ignore which event was raised and determine focus state using activeElement,
             // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
@@ -22,7 +37,7 @@ ko.bindingHandlers['hasfocus'] = {
                 isFocused = (active === element);
             }
             var modelValue = valueAccessor();
-            ko.expressionRewriting.writeValueToProperty(modelValue, allBindings, 'hasfocus', isFocused, true);
+            writeValueToProperty(modelValue, allBindings, 'hasfocus', isFocused, true);
 
             //cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
             element[hasfocusLastValue] = isFocused;
@@ -31,13 +46,13 @@ ko.bindingHandlers['hasfocus'] = {
         var handleElementFocusIn = handleElementFocusChange.bind(null, true);
         var handleElementFocusOut = handleElementFocusChange.bind(null, false);
 
-        ko.utils.registerEventHandler(element, "focus", handleElementFocusIn);
-        ko.utils.registerEventHandler(element, "focusin", handleElementFocusIn); // For IE
-        ko.utils.registerEventHandler(element, "blur",  handleElementFocusOut);
-        ko.utils.registerEventHandler(element, "focusout",  handleElementFocusOut); // For IE
+        registerEventHandler(element, "focus", handleElementFocusIn);
+        registerEventHandler(element, "focusin", handleElementFocusIn); // For IE
+        registerEventHandler(element, "blur",  handleElementFocusOut);
+        registerEventHandler(element, "focusout",  handleElementFocusOut); // For IE
     },
-    'update': function(element, valueAccessor) {
-        var value = !!ko.utils.unwrapObservable(valueAccessor());
+    update: function(element, valueAccessor) {
+        var value = !!unwrap(valueAccessor());
 
         if (!element[hasfocusUpdatingProperty] && element[hasfocusLastValue] !== value) {
             value ? element.focus() : element.blur();
@@ -50,11 +65,8 @@ ko.bindingHandlers['hasfocus'] = {
             }
 
             // For IE, which doesn't reliably fire "focus" or "blur" events synchronously
-            ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, value ? "focusin" : "focusout"]);
+            dependencyDetection.ignore(triggerEvent, null, [element, value ? "focusin" : "focusout"]);
         }
-    }
+    },
+    twoWayBinding: true,
 };
-ko.expressionRewriting.twoWayBindings['hasfocus'] = true;
-
-ko.bindingHandlers['hasFocus'] = ko.bindingHandlers['hasfocus']; // Make "hasFocus" an alias
-ko.expressionRewriting.twoWayBindings['hasFocus'] = true;

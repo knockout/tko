@@ -11,5 +11,5 @@ export var text = {
     update: function (element, valueAccessor) {
         setTextContent(element, valueAccessor());
     },
-    allowVirtual: true
+    allowVirtualElements: true
 };
