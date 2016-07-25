@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.6.0 (2015-12-24T03:08:52.576Z)
+  Knockout Fast Foreach v0.6.0 (2016-07-25T07:44:03.191Z)
   By: Brian M Hunt (C) 2015 | License: MIT
 
   Adds `fastForEach` to `ko.bindingHandlers`.
@@ -109,7 +109,7 @@ function FastForEach(spec) {
   // Prime content
   var primeData = ko.unwrap(this.data);
   if (primeData.map) {
-    this.onArrayChange(primeData.map(valueToChangeAddItem));
+    this.onArrayChange(primeData.map(valueToChangeAddItem), true);
   }
 
   // Watch for changes
@@ -138,7 +138,7 @@ FastForEach.prototype.dispose = function () {
 
 
 // If the array changes we register the change.
-FastForEach.prototype.onArrayChange = function (changeSet) {
+FastForEach.prototype.onArrayChange = function (changeSet, isInitial) {
   var self = this;
   var changeMap = {
     added: [],
@@ -182,7 +182,10 @@ FastForEach.prototype.onArrayChange = function (changeSet) {
   // Once a change is registered, the ticking count-down starts for the processQueue.
   if (this.changeQueue.length > 0 && !this.rendering_queued) {
     this.rendering_queued = true;
-    FastForEach.animateFrame.call(window, function () { self.processQueue(); });
+    if (isInitial)
+      self.processQueue();
+    else
+      FastForEach.animateFrame.call(window, function () { self.processQueue(); });
   }
 };
 
