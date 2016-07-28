@@ -1,5 +1,5 @@
 /*!
-  Knockout Fast Foreach v0.6.0 (2016-07-25T07:44:03.191Z)
+  Knockout Fast Foreach v0.6.0 (2016-07-28T11:02:54.197Z)
   By: Brian M Hunt (C) 2015 | License: MIT
 
   Adds `fastForEach` to `ko.bindingHandlers`.
@@ -182,10 +182,11 @@ FastForEach.prototype.onArrayChange = function (changeSet, isInitial) {
   // Once a change is registered, the ticking count-down starts for the processQueue.
   if (this.changeQueue.length > 0 && !this.rendering_queued) {
     this.rendering_queued = true;
-    if (isInitial)
+    if (isInitial) {
       self.processQueue();
-    else
+    } else {
       FastForEach.animateFrame.call(window, function () { self.processQueue(); });
+    }
   }
 };
 

@@ -166,10 +166,11 @@ FastForEach.prototype.onArrayChange = function (changeSet, isInitial) {
   // Once a change is registered, the ticking count-down starts for the processQueue.
   if (this.changeQueue.length > 0 && !this.rendering_queued) {
     this.rendering_queued = true;
-    if (isInitial)
+    if (isInitial) {
       self.processQueue();
-    else
+    } else {
       FastForEach.animateFrame.call(window, function () { self.processQueue(); });
+    }
   }
 };
 

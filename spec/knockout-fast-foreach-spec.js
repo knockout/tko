@@ -21,10 +21,11 @@ function setupSynchronousFrameAnimation () {
   afterEach(function () {
     FastForEach.animateFrame = originalAnimateFrame;
   })
+  return originalAnimateFrame;
 }
 
 describe("applying bindings", function () {
-  setupSynchronousFrameAnimation()
+  var originalAnimateFrame = setupSynchronousFrameAnimation()
 
   it("works with a static list", function () {
     var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
@@ -52,6 +53,34 @@ describe("applying bindings", function () {
     var list = [1, 2, 3];
     ko.applyBindings(ko.computed({read: function () { return list }}), target[0])
     assert.equal($(target).find("li").length, 3)
+  })
+
+  it("processes initial data synchronously", function () {
+    // reset to the defailt animateFrame
+    var currentAnimateFrame = FastForEach.animateFrame;
+    FastForEach.animateFrame = originalAnimateFrame;
+    var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+    var list = [1, 2, 3];
+    ko.applyBindings(ko.computed({ read: function () { return list } }), target[0])
+    assert.equal($(target).find("li").length, 3)
+    FastForEach.animateFrame = currentAnimateFrame;
+  })
+
+  it("processes initial data synchronously but is later asynchronous", function () {
+    // reset to the defailt animateFrame
+    var currentAnimateFrame = FastForEach.animateFrame;
+    FastForEach.animateFrame = originalAnimateFrame;
+    var target = $("<ul data-bind='fastForEach: $data'><li data-bind='text: $data'></li></div>");
+    var list = ko.observableArray([1, 2, 3]);
+    ko.applyBindings(list, target[0])
+    assert.equal($(target).find("li").length, 3)
+
+    list.push(4);
+    assert.equal($(target).find("li").length, 3)
+
+    // TODO: add logic to test if the update really happened
+
+    FastForEach.animateFrame = currentAnimateFrame;
   })
 
   it("applies bindings to the immediate child", function () {
