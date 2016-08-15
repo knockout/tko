@@ -20,7 +20,7 @@ for other browsers supported by Karma.
 
 Changes
 ---
-16 Dec 2016 – 🔭 0.6.0
+16 Dec 2015 – 🔭 0.6.0
   - Reuse DOM nodes when array items move [#33, #34]
   - Improve internal nodes handling [#31, #32]
 
