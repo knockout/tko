@@ -1,6 +1,6 @@
 
 import {
-    arrayIndexOf, stringTrim, arrayForEach, createSymbolOrString
+    arrayIndexOf, stringTrim, arrayForEach
 } from 'tko.utils';
 
 import {

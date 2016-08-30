@@ -30,7 +30,6 @@ describe('Binding dependencies', function() {
         bindingHandlers.set(coreBindings.bindings);
     })
 
-
     it('If the binding handler depends on an observable, invokes the init handler once and the update handler whenever a new value is available', function () {
         var observable = new observableConstructor();
         var initPassedValues = [], updatePassedValues = [];
