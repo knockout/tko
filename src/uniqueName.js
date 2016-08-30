@@ -1,7 +1,7 @@
 
-from {
+import {
     setElementName
-} import 'tko.utils';
+} from 'tko.utils';
 
 export var uniqueName = {
     init: function (element, valueAccessor) {
