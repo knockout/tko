@@ -112,15 +112,21 @@ export function parseObjectLiteral(objectLiteralString) {
     return result;
 }
 
+// Two Way Bindings
+// ----
+//
+// Employed if a bindingHandler has a truthy `twoWayBinding` property.
+//
 // Two-way bindings include a write function that allow the handler to update the value even if it's not an observable.
 // Making bindings explicitly declare themselves as "two way" isn't ideal in the long term (it would be better if
 // all bindings could use an official 'property writer' API without needing to declare that they might). However,
 // since this is not, and has never been, a public API (_ko_property_writers was never documented), it's acceptable
 // as an internal implementation detail in the short term.
+//
+// FIXME:?
 // For those developers who rely on _ko_property_writers in their custom bindings, we expose _twoWayBindings as an
 // undocumented feature that makes it relatively easy to upgrade to KO 3.0. However, this is still not an official
 // public API, and we reserve the right to remove it at any time if we create a real public property writers API.
-export var twoWayBindings = {};
 export var bindingRewriteValidators = [];
 
 export function preProcessBindings(bindingsStringOrKeyValueArray, bindingOptions) {
@@ -128,14 +134,19 @@ export function preProcessBindings(bindingsStringOrKeyValueArray, bindingOptions
 
     function processKeyValue(key, val) {
         var writableVal;
+        var bindingHandler = getBindingHandler(key);
+        var isTwoWay = bindingHandler && bindingHandler.twoWayBinding;
+
         function callPreprocessHook(obj) {
             return (obj && obj.preprocess) ? (val = obj.preprocess(val, key, processKeyValue)) : true;
         }
-        if (!bindingParams) {
-            if (!callPreprocessHook(getBindingHandler(key)))
-                return;
 
-            if (twoWayBindings[key] && (writableVal = getWriteableValue(val))) {
+        if (!bindingParams) {
+            if (!callPreprocessHook(bindingHandler)) {
+                return;
+            }
+
+            if (isTwoWay && (writableVal = getWriteableValue(val))) {
                 // For two-way bindings, provide a write method in case the value
                 // isn't a writable observable.
                 propertyAccessorResultStrings.push("'" + key + "':function(_z){" + writableVal + "=_z}");
@@ -159,8 +170,9 @@ export function preProcessBindings(bindingsStringOrKeyValueArray, bindingOptions
         processKeyValue(keyValue.key || keyValue['unknown'], keyValue.value);
     });
 
-    if (propertyAccessorResultStrings.length)
+    if (propertyAccessorResultStrings.length) {
         processKeyValue('_ko_property_writers', "{" + propertyAccessorResultStrings.join(",") + " }");
+    }
 
     return resultStrings.join(",");
 }

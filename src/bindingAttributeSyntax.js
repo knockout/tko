@@ -17,8 +17,35 @@ import {
 
 import { bindingProvider } from './bindingProvider';
 
-
 export var bindingHandlers = {};
+
+// bindingHandlers.set(nameOrObject, value)
+// ---
+// Examples:
+// bindingHandlers.set('text', textBinding)
+// bindingHandlers.set({ text: textBinding, input: inputBinding })
+Object.defineProperty(bindingHandlers, 'set', {
+    get: function () {
+        return function setBindingHandler(nameOrObject, value) {
+            var bindingsToAdd = {};
+            if (typeof nameOrObject === 'string') {
+                bindingsToAdd[nameOrObject] = value;
+            } else if (typeof nameOrObject === 'object') {
+                if (value !== undefined) {
+                    options.onError(
+                        new Error("Given extraneous `value` parameter (first param should be a string, but it was an object)." + nameOrObject));
+                }
+                extend(bindingsToAdd, nameOrObject);
+            } else {
+                options.onError(
+                    new Error("Given a bad binding handler type" + nameOrObject));
+            }
+            extend(bindingHandlers, bindingsToAdd);
+        };
+    }
+});
+
+
 export var knockout;  // Must be set when `ko` is fully formed.
 
 // The following element types will not be recursed into during binding.

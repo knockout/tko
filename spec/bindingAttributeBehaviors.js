@@ -1,8 +1,9 @@
 import {
-    domData, cleanNode, options
+    domData, cleanNode, options, virtualElements
 } from 'tko.utils';
 
 import {
+    unwrap,
     observable as koObservable
 } from 'tko.observable';
 
@@ -15,13 +16,20 @@ import {
     applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../index.js';
 
+import * as coreBindings from 'tko.binding.core';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 
 /* eslint semi: 0, no-empty: 0 */
 describe('Binding attribute syntax', function() {
+
     beforeEach(jasmine.prepareTestNode);
+
+    beforeEach(function () {
+        // Set up the default binding handlers.
+        bindingHandlers.set(coreBindings.bindings);
+    })
 
     it('applyBindings should accept no parameters and then act on document.body with undefined model', function() {
         this.after(function () { domData.clear(document.body); });     // Just to avoid interfering with other specs
@@ -127,7 +135,7 @@ describe('Binding attribute syntax', function() {
         options.onError = function (spec) {
             obe_calls++;
             expect(spec.during).toEqual('init');
-            expect(spec.errorCaptured.message).toEqual('A moth!');
+            expect(spec.errorCaptured.message).toMatch(/Message: A moth!$/);
             expect(spec.bindingKey).toEqual('test')
             expect(spec.valueAccessor()).toEqual(64728)
             expect(spec.element).toEqual(testNode.children[0])
@@ -152,7 +160,7 @@ describe('Binding attribute syntax', function() {
         options.onError = function (spec) {
             obe_calls++;
             expect(spec.during).toEqual('update');
-            expect(spec.errorCaptured.message).toEqual('A beetle!');
+            expect(spec.errorCaptured.message).toMatch(/A beetle!$/);
             expect(spec.bindingKey).toEqual('test')
             expect(spec.valueAccessor()).toEqual(64729)
             expect(spec.element).toEqual(testNode.children[0])
@@ -179,7 +187,7 @@ describe('Binding attribute syntax', function() {
         options.onError = function (spec) {
             obe_calls++;
             expect(spec.during).toEqual('update');
-            expect(spec.errorCaptured.message).toEqual('Observable: 42');
+            expect(spec.errorCaptured.message).toMatch(/Observable: 42$/);
             expect(spec.bindingKey).toEqual('test');
             expect(spec.valueAccessor()).toEqual(64725);
             expect(spec.element).toEqual(testNode.children[0]);
@@ -209,17 +217,17 @@ describe('Binding attribute syntax', function() {
     it("Calls options.onError, if it is defined", function () {
         var oe_calls = 0
         var oxy = koObservable()
-        this.after(function () { options.onError = undefined })
-        options.onError = function (err) {
+        this.after(function () { options.set('onError', undefined) })
+        options.set('onError', function (err) {
             expect(err.message.indexOf('turtle')).toNotEqual(-1)
             // Check for the `spec` properties
             expect(err.bindingKey).toEqual('test')
             oe_calls++
-        }
+        })
         bindingHandlers.test = {
             init: function () { throw new Error("A turtle!") },
             update: function (e, oxy) {
-                ko.unwrap(oxy());  // Create dependency.
+                unwrap(oxy());  // Create dependency.
                 throw new Error("Two turtles!")
             }
         }
@@ -332,7 +340,7 @@ describe('Binding attribute syntax', function() {
         expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$customProp).toEqual("my value");
         expect(contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toEqual(undefined); // Should not affect original binding context
 
-        // vale of $data and $parent should be unchanged in extended context
+        // value of $data and $parent should be unchanged in extended context
         expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data).toEqual(vm.sub);
         expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$parent).toEqual(vm);
     });
@@ -378,7 +386,7 @@ describe('Binding attribute syntax', function() {
     it('Should be able to set a custom binding to use containerless binding', function() {
         var initCalls = 0;
         bindingHandlers.test = { init: function () { initCalls++ } };
-        ko.virtualElements.allowedBindings['test'] = true;
+        virtualElements.allowedBindings['test'] = true;
 
         testNode.innerHTML = "Hello <!-- ko test: false -->Some text<!-- /ko --> Goodbye";
         applyBindings(null, testNode);
@@ -406,14 +414,14 @@ describe('Binding attribute syntax', function() {
         bindingHandlers.test = {
             init: function (element /*, valueAccessor */) {
                 // Counts the number of virtual children, and overwrites the text contents of any text nodes
-                for (var node = ko.virtualElements.firstChild(element); node; node = ko.virtualElements.nextSibling(node)) {
+                for (var node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
                     countNodes++;
                     if (node.nodeType === 3)
                         node.data = 'new text';
                 }
             }
         };
-        ko.virtualElements.allowedBindings['test'] = true;
+        virtualElements.allowedBindings['test'] = true;
 
         testNode.innerHTML = "Hello <!-- ko test: false -->Some text<!-- /ko --> Goodbye"
         applyBindings(null, testNode);
@@ -425,7 +433,7 @@ describe('Binding attribute syntax', function() {
     it('Should only bind containerless binding once inside template', function() {
         var initCalls = 0;
         bindingHandlers.test = { init: function () { initCalls++ } };
-        ko.virtualElements.allowedBindings['test'] = true;
+        virtualElements.allowedBindings['test'] = true;
 
         testNode.innerHTML = "Hello <!-- ko if: true --><!-- ko test: false -->Some text<!-- /ko --><!-- /ko --> Goodbye"
         applyBindings(null, testNode);
@@ -457,7 +465,7 @@ describe('Binding attribute syntax', function() {
                 return { 'controlsDescendantBindings': true };
             }
         };
-        ko.virtualElements.allowedBindings['bindChildrenWithCustomContext'] = true;
+        virtualElements.allowedBindings['bindChildrenWithCustomContext'] = true;
 
         testNode.innerHTML = "Hello <!-- ko bindChildrenWithCustomContext: true --><div>Some text</div><!-- /ko --> Goodbye"
         applyBindings(null, testNode);
@@ -504,7 +512,7 @@ describe('Binding attribute syntax', function() {
     it('Should be able to use value-less binding in containerless binding', function() {
         var initCalls = 0;
         bindingHandlers.test = { init: function () { initCalls++ } };
-        ko.virtualElements.allowedBindings['test'] = true;
+        virtualElements.allowedBindings['test'] = true;
 
         testNode.innerHTML = "Hello <!-- ko test -->Some text<!-- /ko --> Goodbye";
         applyBindings(null, testNode);
