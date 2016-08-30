@@ -10,6 +10,21 @@
        These make for shorthands throughout the tests.
 
 */
+/* eslint indent: 0, semi: 0 */
+
+import { observable, unwrap, isObservable } from 'tko.observable';
+
+import {
+  applyBindings, bindingProvider, contextFor, dataFor
+} from 'tko.bind';
+
+
+import {
+  Provider
+} from '../index.js';
+
+
+
 
 describe("Knockout Secure Binding", function () {
    var instance,
@@ -17,59 +32,20 @@ describe("Knockout Secure Binding", function () {
        Expression,
        Identifier,
        Node,
-       nodeParamsToObject,
-       operators,
-       original_provider = ko.bindingProvider,
-       csp_rex = /Content Security Policy|blocked by CSP/;
+       operators;
 
     beforeEach(function () {
-        instance = new secureBindingsProvider();
+        instance = new Provider();
         Parser = instance.Parser,
         Identifier = Parser.Identifier,
         Expression = Parser.Expression,
         Node = Parser.Node,
-        nodeParamsToObject = instance.nodeParamsToObject,
         operators = Node.operators;
     })
 
     it("has loaded knockout", function () {
         assert.property(window, 'ko')
     })
-
-   // The following mucks up our test runner because even though a CSP is not
-   // respected, we still want to know whether KSB works -- i.e. it is not a
-   // failure of KSB if a browser does not support CSP.
-   //
-   //  describe("the Knockout bindingProvider", function () {
-   //      it("uses the original binding provider", function () {
-   //          assert.equal(ko.bindingProvider, original_provider);
-   //      })
-    //
-   //      it("has eval or new Function throw a CSP error", function () {
-   //          var efn = function () { return eval("true") },
-   //              nfn = function () { new Function("return true") };
-    //
-   //          console.log("Expecting a CSP violation ...")
-   //          assert.throw(efn, csp_rex)
-   //          console.log("Expecting a CSP violation ...")
-   //          assert.throw(nfn, csp_rex)
-   //      })
-    //
-   //      it("will throw an CSP error with regular bindings", function () {
-   //          var div = document.createElement("div"),
-   //          fn = function () {
-   //              ko.applyBindings({obs: 1}, div)
-   //          };
-    //
-   //          // Although we cannot disable the CSP-violations, printing to the
-   //          // console, we can print a lead-in that makes it appear to be
-   //          // expected.
-   //          console.log("Expecting a CSP violation ...")
-   //          div.setAttribute("data-bind", "text: obs"),
-   //          ko.bindingProvider.instance = new original_provider();
-   //          assert.throw(fn, csp_rex)
-   //      })
-   //  })
 
 describe("nodeHasBindings", function() {
     it("identifies elements with data-sbind", function () {
@@ -89,7 +65,7 @@ describe("getBindingAccessors with string arg", function() {
     var div;
 
     beforeEach(function() {
-        ko.bindingProvider.instance = new secureBindingsProvider()
+        bindingProvider.instance = new Provider()
         div = document.createElement("div");
         instance.bindings.alpha = {
             init: sinon.spy(),
@@ -126,7 +102,7 @@ describe("getBindingAccessors with string arg", function() {
         var i_spy = instance.bindings.alpha.init,
             u_spy = instance.bindings.alpha.update,
             args;
-        ko.applyBindings({vm: true}, div);
+        applyBindings({vm: true}, div);
         assert.equal(i_spy.callCount, 1, "i_spy cc");
         assert.equal(u_spy.callCount, 1, "u_spy cc");
         args = i_spy.getCall(0).args;
@@ -143,7 +119,7 @@ describe("getBindingAccessors with function arg", function () {
     var div;
 
     beforeEach(function() {
-        ko.bindingProvider.instance = new secureBindingsProvider()
+        bindingProvider.instance = new Provider()
         div = document.createElement("div");
         div.setAttribute("data-sbind", 'alpha: x');
         instance.bindings.alpha = {
@@ -162,7 +138,7 @@ describe("getBindingAccessors with function arg", function () {
         var i_spy = instance.bindings.alpha.init,
             u_spy = instance.bindings.alpha.update,
             args;
-        ko.applyBindings({x: 0xDEADBEEF}, div);
+        applyBindings({x: 0xDEADBEEF}, div);
         assert.equal(i_spy.callCount, 1, "i_spy cc");
         assert.equal(u_spy.callCount, 1, "u_spy cc");
         args = i_spy.getCall(0).args;
@@ -176,13 +152,13 @@ describe("getBindingAccessors with function arg", function () {
 
 describe("changing Knockout's bindings to KSB", function () {
     beforeEach(function () {
-        ko.bindingProvider.instance = new secureBindingsProvider()
+        bindingProvider.instance = new Provider()
     })
 
     it("binds Text with data-sbind", function () {
         var div = document.createElement("div");
         div.setAttribute("data-sbind", "text: obs")
-        ko.applyBindings({obs: ko.observable("a towel")}, div)
+        applyBindings({obs: observable("a towel")}, div)
         assert.equal(div.textContent || div.innerText, "a towel")
     })
 
@@ -190,15 +166,15 @@ describe("changing Knockout's bindings to KSB", function () {
         var div = document.createElement("div"),
             context = { aTitle: "petunia plant" };
         div.setAttribute("data-sbind", "attr: { title: aTitle }")
-        ko.applyBindings(context, div)
+        applyBindings(context, div)
         assert.equal(div.getAttribute("title"), context.aTitle)
     })
 
     it("sets attributes to observables in objects", function () {
         var div = document.createElement("div"),
-            context = { aTitle: ko.observable("petunia plant") };
+            context = { aTitle: observable("petunia plant") };
         div.setAttribute("data-sbind", "attr: { title: aTitle }")
-        ko.applyBindings(context, div)
+        applyBindings(context, div)
         assert.equal(div.getAttribute("title"), context.aTitle())
     })
 
@@ -207,7 +183,7 @@ describe("changing Knockout's bindings to KSB", function () {
             called = false,
             context = { cb: function () { called = true; } };
         div.setAttribute("data-sbind", "click: cb")
-        ko.applyBindings(context, div)
+        applyBindings(context, div)
         assert.equal(called, false, "not called")
         div.click()
         assert.equal(called, true)
@@ -215,9 +191,9 @@ describe("changing Knockout's bindings to KSB", function () {
 
     it("sets an input `value` binding ", function () {
         var input = document.createElement("input"),
-            context = { vobs: ko.observable('273-9164') };
+            context = { vobs: observable('273-9164') };
         input.setAttribute("data-sbind", "value: vobs")
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
         assert.equal(input.value, '273-9164')
         context.vobs("Area code 415")
         assert.equal(input.value, 'Area code 415')
@@ -226,9 +202,9 @@ describe("changing Knockout's bindings to KSB", function () {
     it("reads an input `value` binding", function () {
         var input = document.createElement("input"),
             evt = new CustomEvent("change"),
-            context = { vobs: ko.observable() };
+            context = { vobs: observable() };
         input.setAttribute("data-sbind", "value: vobs")
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
         input.value = '273-9164'
         input.dispatchEvent(evt)
         assert.equal(context.vobs(), '273-9164')
@@ -239,13 +215,13 @@ describe("changing Knockout's bindings to KSB", function () {
         // and http://stackoverflow.com/questions/21580173
         var input = document.createElement("input"),
             evt = new CustomEvent("change"),
-            obs = ko.observable(),
+            obs = observable(),
             context = { };
         Object.defineProperty(context, 'pobs', {
             configurable: true, enumerable: true, get: obs, set: obs
         });
         input.setAttribute("data-sbind", "value: pobs")
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
         input.value = '273-9164'
         input.dispatchEvent(evt)
         assert.equal(context.pobs, '273-9164')
@@ -253,15 +229,15 @@ describe("changing Knockout's bindings to KSB", function () {
 
     it("writes an input `value` binding for a defineProperty", function () {
         var input = document.createElement("input"),
-            evt = new CustomEvent("change"),
-            obs = ko.observable(),
+            // evt = new CustomEvent("change"),
+            obs = observable(),
             context = { };
         Object.defineProperty(context, 'pobs', {
             configurable: true, enumerable: true, get: obs, set: obs
         });
         input.setAttribute("data-sbind", "value: pobs")
         context.pobs = '273-9164'
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
         assert.equal(context.pobs, obs())
         assert.equal(input.value, context.pobs)
         context.pobs = '415-273-9164'
@@ -271,16 +247,16 @@ describe("changing Knockout's bindings to KSB", function () {
 
     it("writes an input object defineProperty", function () {
         var input = document.createElement("input"),
-            evt = new CustomEvent("change"),
-            obs = ko.observable(),
-            context = { obj: {} };
+          // evt = new CustomEvent("change"),
+          obs = observable(),
+          context = { obj: {} };
         Object.defineProperty(context.obj, 'sobs', {
             configurable: true, enumerable: true, get: obs, set: obs
         });
         // apply the binding with a value
         input.setAttribute("data-sbind", "value: obj.sobs")
         context.obj.sobs = '273-9164'
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
 
         // make sure the element is updated
         assert.equal(context.obj.sobs, obs())
@@ -294,11 +270,11 @@ describe("changing Knockout's bindings to KSB", function () {
 
     it("writes nested defineProperties", function () {
         var input = document.createElement("input"),
-            evt = new CustomEvent("change"),
-            obs = ko.observable(),
-            context = {},
-            obj = {},
-            oo = ko.observable(obj);  // es5 wraps obj in an observable
+          // evt = new CustomEvent("change"),
+          obs = observable(),
+          context = {},
+          obj = {},
+          oo = observable(obj);  // es5 wraps obj in an observable
 
         Object.defineProperty(context, 'obj', {
             configurable: true, enumerable: true, get: oo, set: oo
@@ -310,7 +286,7 @@ describe("changing Knockout's bindings to KSB", function () {
 
         input.setAttribute("data-sbind", "value: obj.ddobs")
         context.obj.ddobs = '555-2368'  // who ya gonna call?
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
 
         assert.equal(context.obj.ddobs, obs())
         assert.equal(input.value, context.obj.ddobs)
@@ -322,8 +298,8 @@ describe("changing Knockout's bindings to KSB", function () {
     it("reads a nested defineProperty", function () {
         var input = document.createElement("input"),
             evt = new CustomEvent("change"),
-            obs = ko.observable(),
-            oo = ko.observable({}),
+            obs = observable(),
+            oo = observable({}),
             context = {};
 
         Object.defineProperty(context, 'obj', {
@@ -335,7 +311,7 @@ describe("changing Knockout's bindings to KSB", function () {
         })
 
         input.setAttribute("data-sbind", "value: obj.drobs")
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
         input.value = '273.9164'
         input.dispatchEvent(evt)
         assert.equal(context.obj.drobs, '273.9164')
@@ -344,9 +320,9 @@ describe("changing Knockout's bindings to KSB", function () {
     it("reads a multi-nested defineProperty", function () {
         var input = document.createElement("input"),
             evt = new CustomEvent("change"),
-            o0 = ko.observable({}),
-            o1 = ko.observable({}),
-            o2 = ko.observable({}),
+            o0 = observable({}),
+            o1 = observable({}),
+            o2 = observable({}),
             context = {};
 
         Object.defineProperty(context, 'o0', {
@@ -366,7 +342,7 @@ describe("changing Knockout's bindings to KSB", function () {
         })
 
         input.setAttribute("data-sbind", "value: o0.o1.o2.oN")
-        ko.applyBindings(context, input)
+        applyBindings(context, input)
         input.value = '1.7724'
         input.dispatchEvent(evt)
         assert.equal(context.o0.o1.o2.oN, '1.7724')
@@ -413,6 +389,7 @@ describe("The lookup of variables (get_lookup_root)", function () {
 
     it("does not have access to `window` globals", function () {
         var binding = "x: window, y: global, z: document",
+            context = {},
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.x(), undefined)
         assert.equal(bindings.y(), undefined)
@@ -454,7 +431,7 @@ describe("The lookup of variables (get_lookup_root)", function () {
         var binding = "a: z",
             context = {},
             bindings = new Parser(null, context).parse(binding),
-            obs = ko.observable();
+            obs = observable();
 
         Object.defineProperty(context, 'z', {
             configurable: true,
@@ -472,6 +449,7 @@ describe("The lookup of variables (get_lookup_root)", function () {
         var binding = "a: z",
             globals_1 = {z: 168},
             globals_2 = {},
+            context = {},
             bindings_1 = new Parser(null, context,
                 globals_1).parse(binding),
             bindings_2 = new Parser(null, context,
@@ -513,7 +491,7 @@ describe("the build_tree function", function () {
             operators['+'],
             'c', operators['*'], 'd', operators['*'], 'e',
             operators['>'],
-            'f', operators['+'], 'g', operators['%'], 'h',
+            'f', operators['+'], 'g', operators['%'], 'h'
             ],
             root = nodes_to_tree(nodes.slice(0));
         assert.equal(root.op, operators['>'], '>')
@@ -537,7 +515,7 @@ describe("the build_tree function", function () {
     })
 
     it("converts function calls (a())", function () {
-        var context = { x: ko.observable(0x0F) },
+        var context = { x: observable(0x0F) },
             parser, nodes, root;
             parser = new Parser(null, context);
             nodes = [
@@ -593,28 +571,28 @@ describe("Identifier", function () {
                     moby: 'dick'
                 };
             div.setAttribute("data-sbind", "text: $data.fn()")
-            ko.bindingProvider.instance = new secureBindingsProvider()
-            ko.applyBindings(context, div)
+            bindingProvider.instance = new Provider()
+            applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'ahab')
         })
 
         it("sets `this` of a top-level item to {$data, $context, globals, node}", function () {
             var div = document.createElement("div"),
-                globals = { Ramanujan: "1729" };
+                globals = { Ramanujan: "1729" },
                 context = {
                     fn: function () {
                         assert.isObject(this)
-                        assert.equal(ko.contextFor(div), this.$context,
+                        assert.equal(contextFor(div), this.$context,
                             '$context')
-                        assert.equal(ko.dataFor(div), this.$data, '$data')
+                        assert.equal(dataFor(div), this.$data, '$data')
                         assert.equal(div, this.$element, 'div')
                         assert.deepEqual(globals, this.globals, 'globals')
                         return 'sigtext'
                     }
                 };
             div.setAttribute("data-sbind", "text: fn()")
-            ko.bindingProvider.instance = new secureBindingsProvider({ globals: globals })
-            ko.applyBindings(context, div)
+            bindingProvider.instance = new Provider({ globals: globals })
+            applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'sigtext')
         })
 
@@ -710,21 +688,21 @@ describe("the bindings parser", function () {
 
     it("parses object: attr: {name: value}", function () {
         var binding = "attr: { klass: kValue }",
-            context = { kValue: 'Sam' }
+            context = { kValue: 'Sam' },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().klass, 'Sam')
     })
 
-    it("parses object: attr: {name: ko.observable(value)}", function () {
+    it("parses object: attr: {name: observable(value)}", function () {
         var binding = "attr : { klass: kValue }",
-            context = { kValue: ko.observable('Gollum') }
+            context = { kValue: observable('Gollum') },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().klass(), 'Gollum')
     })
 
     it("parses object: attr: {n1: v1, n2: v2}", function () {
         var binding = "attr : { a: x, b: y }",
-            context = { x: 'Real', y: 'Imaginary' }
+            context = { x: 'Real', y: 'Imaginary' },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr().a, 'Real')
         assert.equal(bindings.attr().b, 'Imaginary')
@@ -740,8 +718,8 @@ describe("the bindings parser", function () {
 
     it("parses string+var+string", function () {
         // re issue #27
-        var binding = "text: 'prefix'+name+'postfix'"
-            context = { name: ko.observable('mike') },
+        var binding = "text: 'prefix'+name+'postfix'",
+            context = { name: observable('mike') },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.text(), 'prefixmikepostfix')
     })
@@ -750,7 +728,7 @@ describe("the bindings parser", function () {
 describe("the parsing of expressions", function () {
     it("works with explicit braces ( )", function () {
         var binding = "attr : (x)",
-            context = { x: 'spot' }
+            context = { x: 'spot' },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.attr(), 'spot')
     })
@@ -764,7 +742,7 @@ describe("the parsing of expressions", function () {
 
     it("computes obs(a) + obs(b)", function () {
         var binding = "text: a + b",
-            context = { a: ko.observable(1), b: ko.observable(2) },
+            context = { a: observable(1), b: observable(2) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.text(), 3);
     })
@@ -778,7 +756,7 @@ describe("the parsing of expressions", function () {
 
     it("compares a + 3 > b * obs(c)", function () {
         var binding = "text: a + 3 > b * c",
-            context = { a: 1, b: 2, c: ko.observable(4) },
+            context = { a: 1, b: 2, c: observable(4) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.text(), 1 + 3 > 2 * 4);
     })
@@ -799,7 +777,7 @@ describe("the parsing of expressions", function () {
 
     it("recalculates observables", function () {
         var binding = "text: a - b",
-            context = { a: ko.observable(1), b: ko.observable(2) },
+            context = { a: observable(1), b: observable(2) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.text(), -1);
         context.a(2)
@@ -808,7 +786,7 @@ describe("the parsing of expressions", function () {
 
     it("sets properties of objects", function () {
         var binding = "text: { x: 3 < 1, y: a < b }",
-            context = { a: ko.observable(1), b: ko.observable(2) },
+            context = { a: observable(1), b: observable(2) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.text().x, false);
         assert.equal(bindings.text().y, true);
@@ -818,7 +796,7 @@ describe("the parsing of expressions", function () {
 
     it("has working logic operations", function () {
         var binding = "text: a || b",
-            context = { a: ko.observable(false), b: ko.observable(false) },
+            context = { a: observable(false), b: observable(false) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.text(), false);
         context.a(true)
@@ -831,9 +809,9 @@ describe("the parsing of expressions", function () {
 
     it("does not unwrap a single observable argument", function () {
         var binding = "text: a",
-            context = { a: ko.observable() },
+            context = { a: observable() },
             bindings = new Parser(null, context).parse(binding);
-        assert.ok(ko.isObservable(bindings.text()))
+        assert.ok(isObservable(bindings.text()))
     })
 
     it("parses a string of functions a().b()", function () {
@@ -849,7 +827,7 @@ describe("the parsing of expressions", function () {
 describe("unary operations", function () {
     it("include the negation operator", function () {
         var binding = "neg: !a",
-            context = { a: ko.observable(false) },
+            context = { a: observable(false) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), true)
         context.a(true);
@@ -858,7 +836,7 @@ describe("unary operations", function () {
 
     it("does the double negative", function () {
         var binding = "neg: !!a",
-            context = { a: ko.observable(false) },
+            context = { a: observable(false) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), false)
         context.a(true);
@@ -867,7 +845,7 @@ describe("unary operations", function () {
 
     it("works in an object", function () {
         var binding = "neg: { x: !a, y: !!a }",
-            context = { a: ko.observable(false) },
+            context = { a: observable(false) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg().x, true)
         assert.equal(bindings.neg().y, false)
@@ -878,7 +856,7 @@ describe("unary operations", function () {
 
     it("negates an expression eg !(a || b)"/*, function () {
         var binding = 'ne: !(a || b)',
-            context = { a: ko.observable(true), b: ko.observable(false) },
+            context = { a: observable(true), b: observable(false) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.ne(), false)
         context.a(false)
@@ -904,7 +882,7 @@ describe("array accessors - []", function () {
     it("works for [ observable ]", function () {
         // make sure observables can be keys to objects.
         var binding = "neg: a[ x ]",
-            x = ko.observable(0),
+            x = observable(0),
             context = { a: {}, x: x },
             bindings;
             context.a[x] = 12;
@@ -914,7 +892,7 @@ describe("array accessors - []", function () {
 
     it("works for [ observable() ]", function () {
         var binding = "neg: a[ x() ]",
-            context = { a: [ 123, 456 ], x: ko.observable(1) },
+            context = { a: [ 123, 456 ], x: observable(1) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), 456)
         context.x(0)
@@ -923,7 +901,7 @@ describe("array accessors - []", function () {
 
     it("works off a function e.g. f()[1]", function () {
         var binding = "neg: f()[3]",
-            f = function () { return [3, 4, 5, 6]}
+            f = function () { return [3, 4, 5, 6] },
             context = { f: f },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.neg(), 6)
@@ -931,7 +909,7 @@ describe("array accessors - []", function () {
 
     it("unwraps Identifier/Expression contents"/*, function () {
         var binding = "arr: [a, a && b]",
-            context = { a: ko.observable(true), b: ko.observable(false) },
+            context = { a: observable(true), b: observable(false) },
             bindings = new Parser(null, context).parse(binding);
         assert.equal(bindings.arr()[0], true)
         assert.equal(bindings.arr()[1], false)
@@ -942,7 +920,7 @@ describe("array accessors - []", function () {
 
 describe("Virtual elements", function() {
     beforeEach(function () {
-        ko.bindingProvider.instance = new secureBindingsProvider();
+        bindingProvider.instance = new Provider();
     })
 
     it("binds to a raw comment", function () {
@@ -957,191 +935,24 @@ describe("Virtual elements", function() {
 
     it("binds text in virtual element", function () {
        var cmt = document.createComment("ko text: obs"),
-         context =  { obs: ko.observable("a towel") },
+         context =  { obs: observable("a towel") },
          bindings;
        bindings = instance.getBindingAccessors(cmt, context)
        assert.isObject(bindings)
        assert.isFunction(bindings.text)
-       assert.equal(ko.unwrap(bindings.text()), context.obs())
+       assert.equal(unwrap(bindings.text()), context.obs())
    })
 
     it("binds a sub-element comment", function () {
         var div = document.createElement("div"),
-        context = { obs: ko.observable("a sperm whale") };
+        context = { obs: observable("a sperm whale") };
         div.appendChild(document.createComment("ko text: obs"));
         div.appendChild(document.createComment("/ko"));
-        ko.applyBindings(context, div);
+        applyBindings(context, div);
         assert.include(div.textContent || div.innerText, context.obs())
     })
 })
 
-describe("Components", function () {
-  describe("custom elements", function () {
-    // Note: knockout/spec/components
-    beforeEach(function () {
-       ko.bindingProvider.instance = new secureBindingsProvider();
-    });
-
-    it("inserts templates into custom elements", function (done) {
-       ko.components.register('helium', {
-          template: 'X<i data-sbind="text: 123"></i>'
-       });
-       var initialMarkup = 'He: <helium></helium>';
-       var root = document.createElement("div");
-       root.innerHTML = initialMarkup;
-
-       // Since components are loaded asynchronously, it doesn't show up synchronously
-       ko.applyBindings(null, root);
-       assert.equal(root.innerHTML, initialMarkup);
-       setTimeout(function () {
-          window.root = root;
-          assert.equal(root.innerHTML,
-             'He: <helium>X<i data-sbind="text: 123">123</i></helium>'
-          );
-          done();
-       }, 1);
-    });
-
-    it("interprets the params of custom elements", function (done) {
-       var called = false;
-       ko.components.register("argon", {
-          viewModel: function(params) {
-             this.delta = 'G2k'
-             called = true;
-          },
-          template: "<b>sXZ <u data-sbind='text: delta'></u></b>"
-       });
-       var ce = document.createElement("argon");
-       ce.setAttribute("params",
-          "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
-       );
-       ko.applyBindings({delta: 'QxE'}, ce);
-       setTimeout(function () {
-          assert.equal(ce.innerHTML,
-             '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
-          assert.equal(called, true);
-          done()
-       }, 1)
-    });
-
-    it("does not unwrap observables (#44)", function (done) {
-      // Per https://plnkr.co/edit/EzpJD3yXd01aqPbuOq1X
-      function AppViewModel(value) {
-        this.appvalue = ko.observable(value);
-      }
-
-      function ParentViewModel(params) {
-        this.parentvalue = params.value;
-      }
-
-      function ChildViewModel(params) {
-        assert.ok(ko.isObservable(params.value))
-        this.cvalue = params.value
-      }
-
-      var ps = document.createElement('script')
-      ps.setAttribute('id', 'parent-44')
-      ps.setAttribute('type', 'text/html')
-      ps.innerHTML = '<div>Parent: <span data-bind="text: parentvalue"></span></div>' +
-          '<child params="value: parentvalue"></child>'
-      document.body.appendChild(ps)
-
-      cs = document.createElement('script')
-      cs.setAttribute('id', 'child-44')
-      cs.setAttribute('type', 'text/html')
-      cs.innerHTML = ''
-      document.body.appendChild(cs)
-
-      var div = document.createElement('div')
-      div.innerHTML = '<div data-bind="text: appvalue"></div>' +
-        '<parent params="value: appvalue"></parent>'
-
-      var viewModel = new AppViewModel("hello");
-      ko.components.register("parent", {
-          template: { element: "parent-44" },
-          viewModel: ParentViewModel
-      });
-      ko.components.register("child", {
-          template: { element: "child-44" },
-          viewModel: ChildViewModel
-      });
-      var options = {
-          attribute: "data-bind",
-          globals: window,
-          bindings: ko.bindingHandlers,
-          noVirtualElements: false
-      };
-      // ko.bindingProvider.instance = new original_provider()
-      ko.bindingProvider.instance = new secureBindingsProvider(options);
-      ko.applyBindings(viewModel, div);
-      setTimeout(function () { done() }, 50)
-    });
-
-    it("uses empty params={$raw:{}} if the params attr is whitespace", function (done) {
-      var called = false;
-      ko.components.register("lithium", {
-        viewModel: function(params) {
-          assert.deepEqual(params, {$raw:{}})
-          done()
-        },
-        template: "hello"
-      });
-      var ce = document.createElement("lithium");
-      ce.setAttribute("params", "   ");
-      ko.applyBindings({delta: 'QxE'}, ce);
-      // No error raised.
-    })
-
-    it('parses `text: "alpha"` on a custom element', function (done) {
-      // re brianmhunt/knockout-secure-binding#38
-      ko.components.register("neon", {
-        viewModel: function (params) {
-          assert.equal(params.text, "Knights of Ne.");
-          done();
-        },
-        template: "A noble gas and less noble car."
-      })
-      var ne = document.createElement("neon");
-      ne.setAttribute("params", 'text: "Knights of Ne."')
-      ko.applyBindings({}, ne);
-      // No error raised.
-    })
-  });
-
-   describe("nodeParamsToObject", function () {
-      var parser = null;
-      beforeEach(function () {
-
-      });
-      it("returns {$raw:{}} when there is no params attribute", function () {
-         var parser = bindings = new Parser(null, {});
-         var node = document.createElement("div");
-         assert.deepEqual(nodeParamsToObject(node, parser), {$raw:{}});
-      });
-
-      it("returns the params items", function () {
-         var parser = new Parser(null, {});
-         var node = document.createElement("div");
-         node.setAttribute('params', 'value: "42.99"')
-         var expect = {
-            value: "42.99",
-            $raw: {
-               value: "42.99"
-            }
-         };
-         assert.deepEqual(ko.toJS(nodeParamsToObject(node, parser)), expect);
-      });
-
-      it("returns unwrapped params", function () {
-         var parser = new Parser(null, {fe: ko.observable('Iron')});
-         var node = document.createElement("div");
-         node.setAttribute('params', 'type: fe');
-         var paramsObject = nodeParamsToObject(node, parser);
-         assert.equal(paramsObject.type(), "Iron")
-         assert.equal(paramsObject.$raw.type()(), "Iron")
-      });
-   });
-});
 
 describe("compound expressions", function () {
     var d = 42,
@@ -1158,7 +969,7 @@ describe("compound expressions", function () {
         F2 = function () {
             return { G: function () { return 'R2' }}
         },
-        obs = ko.observable({ d: d }),
+        obs = observable({ d: d }),
         context = { a: a, F1: F1, F2: F2, x: x, obs: obs, z: z };
 
     // a property of the observable (not the observable's value)
