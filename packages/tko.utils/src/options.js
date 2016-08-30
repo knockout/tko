@@ -4,16 +4,30 @@
 //
 // This is the root 'options', which must be extended by others.
 
-export default {
+var options = {
     deferUpdates: false,
+
     useOnlyNativeEvents: false,
+
     protoProperty: '__ko_proto__',
 
     // jQuery will be automatically set to window.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
-    jQuery: undefined,
+    jQuery: window && window.jQuery,
+
     debug: false,
-    $: window && window.jQuery,
-    onError: function (e) { throw e; }
+
+    onError: function (e) { throw e; },
+
+    set: function (name, value) {
+        options[name] = value;
+    }
 };
+
+Object.defineProperty(options, '$', {
+    get: function () { return options.jQuery; }
+});
+
+
+export default options;
