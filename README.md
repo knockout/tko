@@ -1,17 +1,17 @@
-Knockout Secure Binding
+tko.provider
 =======================
 
  [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
  [![Circle CI](https://circleci.com/gh/brianmhunt/knockout-secure-binding.svg?style=svg)](https://circleci.com/gh/brianmhunt/knockout-secure-binding)
 
-Tested with multiple browsers with [BrowserStack](https://browserstack.com).
 
-Knockout Secure Binding (KSB) is a binding provider for [Knockout](http://knockoutjs.com) that can be used with a [Content Security Policy](http://www.w3.org/TR/CSP/) that disables `eval` and `new Function`.
+tko.provider is a binding provider for [Knockout](http://knockoutjs.com), namely it parses HTML attributes and converts them to handlers of bidirectional updates.
 
-This project exists because Knockout's default binder uses `new Function` to
-parse bindings, as discussed in [knockout/knockout#903](https://github.com/knockout/knockout/issues/903), which violates the CSP eval prohibition.
+tko.provider can be used with a [Content Security Policy](http://www.w3.org/TR/CSP/).
 
-I have written a [blog post about KSB as well](http://brianmhunt.github.io/articles/knockout-plus-content-security-policy/).
+This provider differs from Knockout's 3.X and prior default binder, which uses `new Function` to parse bindings, as discussed in [knockout/knockout#903](https://github.com/knockout/knockout/issues/903).
+
+For more information, see the [blog post about knockout-secure-binding](http://brianmhunt.github.io/articles/knockout-plus-content-security-policy/).
 
 Getting started
 ---
