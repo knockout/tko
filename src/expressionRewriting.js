@@ -1,6 +1,6 @@
 
 import {
-    arrayIndexOf, stringTrim, arrayForEach
+    arrayIndexOf, stringTrim, arrayForEach, createSymbolOrString
 } from 'tko.utils';
 
 import {
@@ -177,12 +177,6 @@ export function preProcessBindings(bindingsStringOrKeyValueArray, bindingOptions
     return resultStrings.join(",");
 }
 
-export function keyValueArrayContainsKey(keyValueArray, key) {
-    for (var i = 0; i < keyValueArray.length; i++)
-        if (keyValueArray[i]['key'] == key)
-            return true;
-    return false;
-}
 
 // Internal, private KO utility for updating model properties from within bindings
 // property:            If the property being updated is (or might be) an observable, pass it here
