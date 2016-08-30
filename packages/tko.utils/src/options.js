@@ -11,6 +11,16 @@ var options = {
 
     protoProperty: '__ko_proto__',
 
+    // Modify the default attribute from `data-bind`.
+    defaultBindingAttribute: 'data-bind',
+
+    // Enable/disable <!-- ko binding: ... -> style bindings
+    allowVirtualElements: true,
+
+    // Global variables that can be accessed from bindings.
+
+    bindingGlobals: {},
+
     // jQuery will be automatically set to window.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
