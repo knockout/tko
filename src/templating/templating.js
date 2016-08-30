@@ -1,4 +1,11 @@
 (function () {
+    function keyValueArrayContainsKey(keyValueArray, key) {
+        for (var i = 0; i < keyValueArray.length; i++)
+            if (keyValueArray[i]['key'] == key)
+                return true;
+        return false;
+    }
+
     var _templateEngine;
     ko.setTemplateEngine = function (templateEngine) {
         if ((templateEngine != undefined) && !(templateEngine instanceof ko.templateEngine))
@@ -289,7 +296,7 @@
         if ((parsedBindingValue.length == 1) && parsedBindingValue[0]['unknown'])
             return null; // It looks like a string literal, not an object literal, so treat it as a named template (which is allowed for rewriting)
 
-        if (ko.expressionRewriting.keyValueArrayContainsKey(parsedBindingValue, "name"))
+        if (keyValueArrayContainsKey(parsedBindingValue, "name"))
             return null; // Named templates can be rewritten, so return "no error"
         return "This template engine does not support anonymous templates nested within its templates";
     };
