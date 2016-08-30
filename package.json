@@ -4,9 +4,10 @@
   "description": "TKO DOM-Observable Binding",
   "main": "index.js",
   "dependencies": {
-    "tko.utils": "knockout/tko.utils",
+    "tko.provider": "github:knockout/tko.provider",
+    "tko.computed": "knockout/tko.computed",
     "tko.observable": "knockout/tko.observable",
-    "tko.computed": "knockout/tko.computed"
+    "tko.utils": "knockout/tko.utils"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

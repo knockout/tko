@@ -1,13 +1,16 @@
 
 
-import {
-    Provider
-} from 'tko.provider';
-
+import { options } from 'tko.utils';
 
 export var bindingProvider = {
-    instance: new Provider()
+    instance: options.bindingProviderInstance
 };
+
+// import {
+//     Provider
+// } from 'tko.provider';
+//
+//
 
 // import {
 //     extend, virtualElements
