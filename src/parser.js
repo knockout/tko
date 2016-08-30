@@ -4,7 +4,7 @@
  */
 
 import {
-  onError, objectForEach
+  options, objectForEach
 } from 'tko.utils';
 
 import Expression from './expression.js';
@@ -122,7 +122,7 @@ Parser.prototype.number = function () {
   }
   number = +string;
   if (!isFinite(number)) {
-    onError(new Error("Bad number: " + number + " in " + string));
+    options.onError(new Error("Bad number: " + number + " in " + string));
   } else {
     return number;
   }

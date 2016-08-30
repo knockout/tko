@@ -12,7 +12,9 @@
 */
 /* eslint indent: 0, semi: 0 */
 
-import { observable, unwrap, isObservable } from 'tko.observable';
+import {
+  observable, unwrap, isObservable
+} from 'tko.observable';
 
 import {
   applyBindings, bindingProvider, contextFor, dataFor

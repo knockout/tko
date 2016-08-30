@@ -1,3 +1,4 @@
 
 
-export * from './src/provider.js';
+import Provider from './src/provider.js';
+export { Provider }; 
