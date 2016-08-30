@@ -8,7 +8,7 @@ import {
 } from 'tko.observable';
 
 import {
-    computed, pureComputed, computedContext
+    computed, pureComputed
 } from 'tko.computed';
 
 import {
@@ -36,7 +36,7 @@ export var checked = {
                 elemValue = useCheckedValue ? checkedValue() : isChecked;
 
             // When we're first setting up this computed, don't change any model state.
-            if (computedContext.isInitial()) {
+            if (dependencyDetection.isInitial()) {
                 return;
             }
 

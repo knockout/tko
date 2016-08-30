@@ -4,11 +4,11 @@ import {
 } from 'tko.utils';
 
 import {
-    unwrap
+    unwrap, dependencyDetection
 } from 'tko.observable';
 
 import {
-    computed, computedContext
+    computed
 } from 'tko.computed';
 
 import {
@@ -31,7 +31,7 @@ function makeWithIfBinding(isWith, isNot, makeContextCallback) {
 
                 if (needsRefresh) {
                     // Save a copy of the inner nodes on the initial update, but only if we have dependencies.
-                    if (isFirstRender && computedContext.getDependenciesCount()) {
+                    if (isFirstRender && dependencyDetection.getDependenciesCount()) {
                         savedNodes = cloneNodes(virtualElements.childNodes(element), true /* shouldCleanNodes */);
                     }
 

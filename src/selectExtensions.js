@@ -1,6 +1,5 @@
 
-import { tagNameLower } from './dom/info';
-import { domData } from './dom/data';
+import { domData, tagNameLower } from 'tko.utils';
 
 
 var hasDomDataExpandoProperty = '__ko__hasDomDataOptionValue__';

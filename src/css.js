@@ -25,5 +25,5 @@ export var css = {
             toggleDomNodeCssClass(element, value, true);
         }
     },
-    classesWrittenByBindingKey: createSymbolOrString('__ko__cssValue');
+    classesWrittenByBindingKey: createSymbolOrString('__ko__cssValue')
 };

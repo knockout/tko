@@ -2,12 +2,16 @@
 import {
     tagNameLower, arrayFilter, arrayMap, setTextContent, arrayIndexOf,
     setOptionNodeSelectionState, triggerEvent, domData,
-    setDomNodeChildrenFromArrayMapping, ensureSelectElementIsRenderedCorrectly
+    ensureSelectElementIsRenderedCorrectly
 } from 'tko.utils';
 
 import {
     unwrap, dependencyDetection
 } from 'tko.observable';
+
+import {
+    setDomNodeChildrenFromArrayMapping
+} from 'tko.bind';
 
 import {
     selectExtensions
