@@ -29,4 +29,4 @@ karma:
   <<: *__tko_karma__
   # Add any changes to the karma settings, below.
   frameworks:
-  - jasmine
+  - mocha
