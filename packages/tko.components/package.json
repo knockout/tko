@@ -11,7 +11,8 @@
       "tko.utils": "knockout/tko.utils",
       "tko.observable": "knockout/tko.observable",
       "tko.computed": "knockout/tko.computed",
-      "tko.bind": "knockout/tko.bind"
+      "tko.bind": "knockout/tko.bind",
+      "tko.provider": "knockout/tko.provider"
   },
   "files": [
       "dist/",
