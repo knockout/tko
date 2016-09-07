@@ -1,10 +1,10 @@
 
 
-import { options } from 'tko.utils';
-
-export var bindingProvider = {
-    instance: options.bindingProviderInstance
-};
+// import { options } from 'tko.utils';
+//
+// export var bindingProvider = {
+//     instance: options.bindingProviderInstance
+// };
 
 // import {
 //     Provider

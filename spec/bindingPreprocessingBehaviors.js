@@ -1,10 +1,14 @@
 
+import { options } from 'tko.utils';
+
 import {
     // stub_getBindingHandler, reset_getBindingHandler
-    bindingHandlers, preProcessBindings
+    preProcessBindings
 } from '../index.js';
 
 describe('Binding preprocessing', function() {
+    var bindingHandlers = options.bindingProviderInstance.bindingHandlers;
+    
     it('Should allow binding to modify value through "preprocess" method', function() {
         delete bindingHandlers.a;
         // create binding that has a default value of false

@@ -15,34 +15,6 @@ import {
     computed
 } from 'tko.computed';
 
-import { bindingProvider } from './bindingProvider';
-
-export var bindingHandlers = {};
-
-
-// bindingHandlers.set(nameOrObject, value)
-// ---
-// Examples:
-// bindingHandlers.set('name', bindingDefinition)
-// bindingHandlers.set({ text: textBinding, input: inputBinding })
-Object.defineProperty(bindingHandlers, 'set', {
-    get: function () {
-        return function setBindingHandler(nameOrObject, value) {
-            if (typeof nameOrObject === 'string') {
-                bindingHandlers[nameOrObject] = value;
-            } else if (typeof nameOrObject === 'object') {
-                if (value !== undefined) {
-                    options.onError(
-                        new Error("Given extraneous `value` parameter (first param should be a string, but it was an object)." + nameOrObject));
-                }
-                extend(bindingHandlers, nameOrObject);
-            } else {
-                options.onError(
-                    new Error("Given a bad binding handler type" + nameOrObject));
-            }
-        };
-    }
-});
 
 
 export var knockout;  // Must be set when `ko` is fully formed.
@@ -61,7 +33,7 @@ var bindingDoesNotRecurseIntoElementTypes = {
 
 // Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
 export function getBindingHandler(bindingKey) {
-    return bindingHandlers[bindingKey];
+    return options.bindingProviderInstance.bindingHandlers[bindingKey];
 }
 
 // The bindingContext constructor is only called directly to create the root context. For child
@@ -235,7 +207,7 @@ function getBindingsAndMakeAccessors(node, context) {
 }
 
 function validateThatBindingIsAllowedForVirtualElements(bindingName) {
-    var bindingHandler = bindingHandlers[bindingName],
+    var bindingHandler = options.bindingProviderInstance.bindingHandlers[bindingName],
         validator;
     if (typeof bindingHandler === 'function') {
         validator = bindingHandler.allowVirtualElements || (
@@ -252,7 +224,7 @@ function validateThatBindingIsAllowedForVirtualElements(bindingName) {
 function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement) {
     var currentChild,
         nextInQueue = virtualElements.firstChild(elementOrVirtualElement),
-        provider = bindingProvider.instance,
+        provider = options.bindingProviderInstance,
         preprocessNode = provider.preprocessNode;
 
     // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
@@ -287,7 +259,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
         virtualElements.normaliseVirtualElementDomStructure(nodeVerified);
 
     var shouldApplyBindings = (isElement && bindingContextMayDifferFromDomParentElement)             // Case (1)
-                           || bindingProvider.instance.nodeHasBindings(nodeVerified);       // Case (2)
+                           || options.bindingProviderInstance.nodeHasBindings(nodeVerified);       // Case (2)
     if (shouldApplyBindings)
         shouldBindDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement).shouldBindDescendants;
 
@@ -490,7 +462,7 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
     if (sourceBindings && typeof sourceBindings !== 'function') {
         bindings = sourceBindings;
     } else {
-        var provider = bindingProvider.instance,
+        var provider = options.bindingProviderInstance,
             getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors;
 
         // Get the binding from the provider within a computed observable so that we can update the bindings whenever
@@ -641,7 +613,7 @@ function onBindingError(spec) {
     if (spec.bindingKey) {
         // During: 'init' or initial 'update'
         error = spec.errorCaptured;
-        bindingText = bindingProvider.instance.getBindingsString(spec.element);
+        bindingText = options.bindingProviderInstance.getBindingsString(spec.element);
         error.message = "Unable to process binding \"" + spec.bindingKey
             + "\" in binding \"" + bindingText
             + "\"\nMessage: " + error.message;
