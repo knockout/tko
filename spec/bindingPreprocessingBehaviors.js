@@ -1,13 +1,16 @@
 
-import { options } from 'tko.utils';
+import { Provider } from 'tko.provider';
 
 import {
-    // stub_getBindingHandler, reset_getBindingHandler
     preProcessBindings
 } from '../index.js';
 
 describe('Binding preprocessing', function() {
-    var bindingHandlers = options.bindingProviderInstance.bindingHandlers;
+    var bindingHandlers;
+
+    beforeEach(function () {
+        bindingHandlers = new Provider().bindingHandlers;
+    });
 
     it('Should allow binding to modify value through "preprocess" method', function() {
         delete bindingHandlers.a;
@@ -67,17 +70,17 @@ describe('Binding preprocessing', function() {
     });
 
     // FIXME -- stub getBindingHandler
-    // it('Should be able to get a dynamically created binding handler during preprocessing', function() {
-    //     stub_getBindingHandler(function(/* bindingKey */) {
-    //         return {
-    //             preprocess: function(value) {
-    //                 return value + '2';
-    //             }
-    //         };
-    //     });
-    //     this.after(reset_getBindingHandler);
-    //     var rewritten = preProcessBindings("a: 1");
-    //     var parsedRewritten = eval("({" + rewritten + "})");
-    //     expect(parsedRewritten.a).toEqual(12);
-    // });
+    it('Should be able to get a dynamically created binding handler during preprocessing', function() {
+        getBindingHandler(function(/* bindingKey */) {
+            return {
+                preprocess: function(value) {
+                    return value + '2';
+                }
+            };
+        });
+        this.after(reset_getBindingHandler);
+        var rewritten = preProcessBindings("a: 1");
+        var parsedRewritten = eval("({" + rewritten + "})");
+        expect(parsedRewritten.a).toEqual(12);
+    });
 });

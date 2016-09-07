@@ -1,6 +1,10 @@
 /* eslint semi: 0 */
 
 import {
+    options
+} from 'tko.utils';
+
+import {
     removeNode, triggerEvent, extend
 } from 'tko.utils';
 
@@ -13,9 +17,12 @@ import {
     computed as computedConstructor
 } from 'tko.computed';
 
+import {
+    Provider
+} from 'tko.provider';
 
 import {
-    bindingHandlers, applyBindings, contextFor, bindingProvider,
+    applyBindings, contextFor,
     applyBindingsToDescendants
 } from '../index.js';
 
@@ -23,9 +30,12 @@ import * as coreBindings from 'tko.binding.core';
 
 
 describe('Binding dependencies', function() {
+    var bindingHandlers
+
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function () {
+        bindingHandlers = new Provider().bindingHandlers
         // Set up the default binding handlers.
         bindingHandlers.set(coreBindings.bindings);
     })
@@ -251,12 +261,12 @@ describe('Binding dependencies', function() {
     });
 
     it('Should track observables accessed within the binding provider\'s "getBindingAccessor" function', function() {
-        this.restoreAfter(bindingProvider, 'instance');
+        this.restoreAfter(options, 'bindingProviderInstance');
 
         var observable = observableConstructor('substitute'),
-            originalBindingProvider = bindingProvider.instance;
+            originalBindingProvider = options.bindingProviderInstance;
 
-        bindingProvider.instance = {
+        options.bindingProviderInstance = {
             nodeHasBindings: originalBindingProvider.nodeHasBindings,
             getBindingAccessors: function(node, bindingContext) {
                 var bindings = originalBindingProvider.getBindingAccessors(node, bindingContext);

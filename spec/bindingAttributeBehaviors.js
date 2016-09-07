@@ -12,7 +12,11 @@ import {
 } from 'tko.computed';
 
 import {
-    bindingHandlers, applyBindings, bindingProvider, dataFor,
+    Provider
+} from 'tko.provider';
+
+import {
+    applyBindings, dataFor,
     applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../index.js';
 
@@ -23,11 +27,13 @@ import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 /* eslint semi: 0, no-empty: 0 */
 describe('Binding attribute syntax', function() {
+    var bindingHandlers
 
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function () {
         // Set up the default binding handlers.
+        bindingHandlers = new Provider().bindingHandlers
         bindingHandlers.set(coreBindings.bindings);
     })
 
@@ -569,7 +575,7 @@ describe('Binding attribute syntax', function() {
 
     describe('Should not bind against text content inside restricted elements', function() {
         this.beforeEach(function() {
-            this.restoreAfter(bindingProvider, 'instance');
+            this.restoreAfter(options, 'bindingProviderInstance');
 
             // Developers won't expect or want binding to mutate the contents of <script> or <textarea>
             // elements. Historically this wasn't a problem because the default binding provider only
@@ -579,8 +585,8 @@ describe('Binding attribute syntax', function() {
             // First replace the binding provider with one that's hardcoded to replace all text
             // content with a special message, via a binding handler that operates on text nodes
 
-            var originalBindingProvider = bindingProvider.instance;
-            bindingProvider.instance = {
+            var originalBindingProvider = options.bindingProviderInstance;
+            options.bindingProviderInstance = {
                 nodeHasBindings: function(node) {
                     // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                     // This will still prove that the binding provider was not executed on the children of a restricted element.
