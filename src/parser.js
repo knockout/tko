@@ -442,7 +442,7 @@ Parser.prototype.identifier = function () {
   return new Identifier(this, token, dereferences);
 };
 
-Parser.prototype.bindings = function () {
+Parser.prototype.readBindings = function () {
   var key,
     bindings = {},
     sep,
@@ -492,11 +492,12 @@ Parser.prototype.convert_to_accessors = function (result) {
         return value.get_value();
       };
 
-      if (ko.expressionRewriting._twoWayBindings[name]) {
-        propertyWriters[name] = function(new_value) {
-          value.set_value(new_value);
-        };
-      }
+      // FIXME
+      // if (ko.expressionRewriting._twoWayBindings[name]) {
+      //   propertyWriters[name] = function(new_value) {
+      //     value.set_value(new_value);
+      //   };
+      // }
     } else if (value instanceof Expression) {
       result[name] = function expressionAccessor() {
         return value.get_value();
@@ -531,7 +532,7 @@ Parser.prototype.parse = function (source) {
     return null;
   }
 
-  var result = this.bindings();
+  var result = this.readBindings();
 
   this.white();
   if (this.ch) {

@@ -4,10 +4,6 @@ import {
 } from 'tko.utils';
 
 
-import {
-  bindingHandlers
-} from 'tko.bind';
-
 
 import Parser from './parser.js';
 
@@ -22,7 +18,33 @@ export default function Provider(options) {
 
   // the binding classes -- defaults to the bind's
   // bindingsHandlers
-  this.bindings = options.bindings || bindingHandlers;
+  var bindingHandlers = this.bindingHandlers = {};
+
+
+  // bindingHandlers.set(nameOrObject, value)
+  // ---
+  // Examples:
+  // bindingHandlers.set('name', bindingDefinition)
+  // bindingHandlers.set({ text: textBinding, input: inputBinding })
+  Object.defineProperty(bindingHandlers, 'set', {
+    get: function () {
+      return function setBindingHandler(nameOrObject, value) {
+        if (typeof nameOrObject === 'string') {
+          bindingHandlers[nameOrObject] = value;
+        } else if (typeof nameOrObject === 'object') {
+          if (value !== undefined) {
+            options.onError(
+              new Error("Given extraneous `value` parameter (first param should be a string, but it was an object)." + nameOrObject));
+          }
+          extend(bindingHandlers, nameOrObject);
+        } else {
+          options.onError(
+            new Error("Given a bad binding handler type" + nameOrObject));
+        }
+      };
+    }
+  });
+
 
   // Cache the result of parsing binding strings.
   // TODO

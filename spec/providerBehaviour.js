@@ -13,11 +13,15 @@
 /* eslint indent: 0, semi: 0 */
 
 import {
+  options
+} from 'tko.utils';
+
+import {
   observable, unwrap, isObservable
 } from 'tko.observable';
 
 import {
-  applyBindings, bindingProvider, contextFor, dataFor
+  applyBindings, contextFor, dataFor
 } from 'tko.bind';
 
 
@@ -27,8 +31,7 @@ import {
 
 
 
-
-describe("Knockout Secure Binding", function () {
+describe("tko.provider", function () {
    var instance,
        Parser,
        Expression,
@@ -45,21 +48,11 @@ describe("Knockout Secure Binding", function () {
         operators = Node.operators;
     })
 
-    it("has loaded knockout", function () {
-        assert.property(window, 'ko')
-    })
-
 describe("nodeHasBindings", function() {
-    it("identifies elements with data-sbind", function () {
-        var div = document.createElement("div")
-        div.setAttribute("data-sbind", "x")
-        assert.ok(instance.nodeHasBindings(div))
-    })
-
-    it("does not identify elements without data-sbind", function () {
+    it("identifies elements with data-bind", function () {
         var div = document.createElement("div")
         div.setAttribute("data-bind", "x")
-        assert.notOk(instance.nodeHasBindings(div))
+        assert.ok(instance.nodeHasBindings(div))
     })
 })
 
@@ -67,7 +60,7 @@ describe("getBindingAccessors with string arg", function() {
     var div;
 
     beforeEach(function() {
-        bindingProvider.instance = new Provider()
+        options.bindingProviderInstance = new Provider()
         div = document.createElement("div");
         instance.bindings.alpha = {
             init: sinon.spy(),
@@ -76,7 +69,7 @@ describe("getBindingAccessors with string arg", function() {
     });
 
     it("reads multiple bindings", function () {
-        div.setAttribute("data-sbind", 'a: 123, b: "456"')
+        div.setAttribute("data-bind", 'a: 123, b: "456"')
         var bindings = instance.getBindingAccessors(div);
         assert.equal(Object.keys(bindings).length, 2, 'len')
         assert.equal(bindings['a'](), 123, 'a')
@@ -84,7 +77,7 @@ describe("getBindingAccessors with string arg", function() {
     });
 
     it("escapes strings", function () {
-        div.setAttribute("data-sbind", 'a: "a\\"b", b: \'c\\\'d\'')
+        div.setAttribute("data-bind", 'a: "a\\"b", b: \'c\\\'d\'')
         var bindings = instance.getBindingAccessors(div);
         assert.equal(Object.keys(bindings).length, 2, 'len')
         assert.equal(bindings['a'](), "a\"b", 'a')
@@ -92,7 +85,7 @@ describe("getBindingAccessors with string arg", function() {
     })
 
     it("returns a name/valueAccessor pair", function () {
-        div.setAttribute("data-sbind", 'alpha: "122.9"');
+        div.setAttribute("data-bind", 'alpha: "122.9"');
         var bindings = instance.getBindingAccessors(div);
         assert.equal(Object.keys(bindings).length, 1, 'len')
         assert.isFunction(bindings['alpha'], 'is accessor')
@@ -100,7 +93,7 @@ describe("getBindingAccessors with string arg", function() {
     });
 
     it("becomes the valueAccessor", function () {
-        div.setAttribute("data-sbind", 'alpha: "122.9"');
+        div.setAttribute("data-bind", 'alpha: "122.9"');
         var i_spy = instance.bindings.alpha.init,
             u_spy = instance.bindings.alpha.update,
             args;
@@ -121,9 +114,9 @@ describe("getBindingAccessors with function arg", function () {
     var div;
 
     beforeEach(function() {
-        bindingProvider.instance = new Provider()
+        options.bindingProviderInstance = new Provider()
         div = document.createElement("div");
-        div.setAttribute("data-sbind", 'alpha: x');
+        div.setAttribute("data-bind", 'alpha: x');
         instance.bindings.alpha = {
             init: sinon.spy(),
             update: sinon.spy()
@@ -154,12 +147,12 @@ describe("getBindingAccessors with function arg", function () {
 
 describe("changing Knockout's bindings to KSB", function () {
     beforeEach(function () {
-        bindingProvider.instance = new Provider()
+        options.bindingProviderInstance = new Provider()
     })
 
-    it("binds Text with data-sbind", function () {
+    it("binds Text with data-bind", function () {
         var div = document.createElement("div");
-        div.setAttribute("data-sbind", "text: obs")
+        div.setAttribute("data-bind", "text: obs")
         applyBindings({obs: observable("a towel")}, div)
         assert.equal(div.textContent || div.innerText, "a towel")
     })
@@ -167,7 +160,7 @@ describe("changing Knockout's bindings to KSB", function () {
     it("sets attributes to constants", function () {
         var div = document.createElement("div"),
             context = { aTitle: "petunia plant" };
-        div.setAttribute("data-sbind", "attr: { title: aTitle }")
+        div.setAttribute("data-bind", "attr: { title: aTitle }")
         applyBindings(context, div)
         assert.equal(div.getAttribute("title"), context.aTitle)
     })
@@ -175,7 +168,7 @@ describe("changing Knockout's bindings to KSB", function () {
     it("sets attributes to observables in objects", function () {
         var div = document.createElement("div"),
             context = { aTitle: observable("petunia plant") };
-        div.setAttribute("data-sbind", "attr: { title: aTitle }")
+        div.setAttribute("data-bind", "attr: { title: aTitle }")
         applyBindings(context, div)
         assert.equal(div.getAttribute("title"), context.aTitle())
     })
@@ -184,7 +177,7 @@ describe("changing Knockout's bindings to KSB", function () {
         var div = document.createElement("div"),
             called = false,
             context = { cb: function () { called = true; } };
-        div.setAttribute("data-sbind", "click: cb")
+        div.setAttribute("data-bind", "click: cb")
         applyBindings(context, div)
         assert.equal(called, false, "not called")
         div.click()
@@ -194,7 +187,7 @@ describe("changing Knockout's bindings to KSB", function () {
     it("sets an input `value` binding ", function () {
         var input = document.createElement("input"),
             context = { vobs: observable('273-9164') };
-        input.setAttribute("data-sbind", "value: vobs")
+        input.setAttribute("data-bind", "value: vobs")
         applyBindings(context, input)
         assert.equal(input.value, '273-9164')
         context.vobs("Area code 415")
@@ -205,7 +198,7 @@ describe("changing Knockout's bindings to KSB", function () {
         var input = document.createElement("input"),
             evt = new CustomEvent("change"),
             context = { vobs: observable() };
-        input.setAttribute("data-sbind", "value: vobs")
+        input.setAttribute("data-bind", "value: vobs")
         applyBindings(context, input)
         input.value = '273-9164'
         input.dispatchEvent(evt)
@@ -222,7 +215,7 @@ describe("changing Knockout's bindings to KSB", function () {
         Object.defineProperty(context, 'pobs', {
             configurable: true, enumerable: true, get: obs, set: obs
         });
-        input.setAttribute("data-sbind", "value: pobs")
+        input.setAttribute("data-bind", "value: pobs")
         applyBindings(context, input)
         input.value = '273-9164'
         input.dispatchEvent(evt)
@@ -237,7 +230,7 @@ describe("changing Knockout's bindings to KSB", function () {
         Object.defineProperty(context, 'pobs', {
             configurable: true, enumerable: true, get: obs, set: obs
         });
-        input.setAttribute("data-sbind", "value: pobs")
+        input.setAttribute("data-bind", "value: pobs")
         context.pobs = '273-9164'
         applyBindings(context, input)
         assert.equal(context.pobs, obs())
@@ -256,7 +249,7 @@ describe("changing Knockout's bindings to KSB", function () {
             configurable: true, enumerable: true, get: obs, set: obs
         });
         // apply the binding with a value
-        input.setAttribute("data-sbind", "value: obj.sobs")
+        input.setAttribute("data-bind", "value: obj.sobs")
         context.obj.sobs = '273-9164'
         applyBindings(context, input)
 
@@ -286,7 +279,7 @@ describe("changing Knockout's bindings to KSB", function () {
             configurable: true, enumerable: true, get: obs, set: obs
         })
 
-        input.setAttribute("data-sbind", "value: obj.ddobs")
+        input.setAttribute("data-bind", "value: obj.ddobs")
         context.obj.ddobs = '555-2368'  // who ya gonna call?
         applyBindings(context, input)
 
@@ -312,7 +305,7 @@ describe("changing Knockout's bindings to KSB", function () {
             configurable: true, enumerable: true, get: obs, set: obs
         })
 
-        input.setAttribute("data-sbind", "value: obj.drobs")
+        input.setAttribute("data-bind", "value: obj.drobs")
         applyBindings(context, input)
         input.value = '273.9164'
         input.dispatchEvent(evt)
@@ -343,7 +336,7 @@ describe("changing Knockout's bindings to KSB", function () {
             configurable: true, enumerable: true, get: o1, set: o1
         })
 
-        input.setAttribute("data-sbind", "value: o0.o1.o2.oN")
+        input.setAttribute("data-bind", "value: o0.o1.o2.oN")
         applyBindings(context, input)
         input.value = '1.7724'
         input.dispatchEvent(evt)
@@ -572,8 +565,8 @@ describe("Identifier", function () {
                     },
                     moby: 'dick'
                 };
-            div.setAttribute("data-sbind", "text: $data.fn()")
-            bindingProvider.instance = new Provider()
+            div.setAttribute("data-bind", "text: $data.fn()")
+            options.bindingProviderInstance = new Provider()
             applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'ahab')
         })
@@ -592,8 +585,8 @@ describe("Identifier", function () {
                         return 'sigtext'
                     }
                 };
-            div.setAttribute("data-sbind", "text: fn()")
-            bindingProvider.instance = new Provider({ globals: globals })
+            div.setAttribute("data-bind", "text: fn()")
+            options.bindingProviderInstance = new Provider({ globals: globals })
             applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'sigtext')
         })
@@ -922,7 +915,7 @@ describe("array accessors - []", function () {
 
 describe("Virtual elements", function() {
     beforeEach(function () {
-        bindingProvider.instance = new Provider();
+        options.bindingProviderInstance = new Provider();
     })
 
     it("binds to a raw comment", function () {

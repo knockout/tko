@@ -34,7 +34,6 @@
     "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
   },
   "dependencies": {
-    "tko.bind": "github:knockout/tko.bind",
     "tko.observable": "github:knockout/tko.observable",
     "tko.utils": "github:knockout/tko.utils"
   },

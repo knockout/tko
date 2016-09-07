@@ -30,3 +30,5 @@ karma:
   # Add any changes to the karma settings, below.
   frameworks:
   - mocha
+  - chai
+  - sinon
