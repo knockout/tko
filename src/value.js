@@ -2,7 +2,7 @@
 import {
     arrayPushAll, arrayGetDistinctValues, ieVersion, arrayIndexOf,
     registerEventHandler, stringStartsWith, safeSetTimeout,
-    tagNameLower, triggerEvent
+    tagNameLower, triggerEvent, arrayForEach
 } from 'tko.utils';
 
 import {
