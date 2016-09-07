@@ -62,7 +62,7 @@ describe("getBindingAccessors with string arg", function() {
     beforeEach(function() {
         options.bindingProviderInstance = new Provider()
         div = document.createElement("div");
-        instance.bindings.alpha = {
+        instance.bindingHandlers.alpha = {
             init: sinon.spy(),
             update: sinon.spy()
         }
@@ -94,8 +94,8 @@ describe("getBindingAccessors with string arg", function() {
 
     it("becomes the valueAccessor", function () {
         div.setAttribute("data-bind", 'alpha: "122.9"');
-        var i_spy = instance.bindings.alpha.init,
-            u_spy = instance.bindings.alpha.update,
+        var i_spy = instance.bindingHandlers.alpha.init,
+            u_spy = instance.bindingHandlers.alpha.update,
             args;
         applyBindings({vm: true}, div);
         assert.equal(i_spy.callCount, 1, "i_spy cc");
@@ -117,7 +117,7 @@ describe("getBindingAccessors with function arg", function () {
         options.bindingProviderInstance = new Provider()
         div = document.createElement("div");
         div.setAttribute("data-bind", 'alpha: x');
-        instance.bindings.alpha = {
+        instance.bindingHandlers.alpha = {
             init: sinon.spy(),
             update: sinon.spy()
         }
@@ -130,8 +130,8 @@ describe("getBindingAccessors with function arg", function () {
     });
 
     it("becomes the valueAccessor", function () {
-        var i_spy = instance.bindings.alpha.init,
-            u_spy = instance.bindings.alpha.update,
+        var i_spy = instance.bindingHandlers.alpha.init,
+            u_spy = instance.bindingHandlers.alpha.update,
             args;
         applyBindings({x: 0xDEADBEEF}, div);
         assert.equal(i_spy.callCount, 1, "i_spy cc");
