@@ -489,9 +489,12 @@ Parser.prototype.convert_to_accessors = function (result) {
       // the value of the identifier, otherwise sets the
       // value of the identifier to the first given argument.
       Object.defineProperty(result, name, {
-        value: function (optionalValue) {
+        value: function (optionalValue, options) {
           if (arguments.length === 0) {
             return value.get_value();
+          }
+          if (options && options.onlyIfChanged && optionalValue === value.get_value()) {
+            return;
           }
           return value.set_value(optionalValue);
         }
