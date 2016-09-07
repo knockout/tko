@@ -2,7 +2,7 @@
   "name": "tko.binding.core",
   "version": "0.2.0",
   "description": "TKO Core bindings",
-  "main": "dist/tko.bindings.core.js",
+  "main": "dist/tko.binding.core.js",
   "jsnext:main": "./index.js",
   "files": [
     "dist/",
