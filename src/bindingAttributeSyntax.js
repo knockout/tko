@@ -215,7 +215,7 @@ function validateThatBindingIsAllowedForVirtualElements(bindingName) {
             Boolean(bindingHandler.prototype.allowVirtualElements)
         );
     } else {
-        validator = virtualElements.allowedBindings[bindingName];
+        validator = bindingHandler.allowVirtualElements || virtualElements.allowedBindings[bindingName];
     }
     if (!validator)
         throw new Error("The binding '" + bindingName + "' cannot be used with virtual elements");

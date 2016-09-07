@@ -8,7 +8,7 @@ import {
 
 describe('Binding preprocessing', function() {
     var bindingHandlers = options.bindingProviderInstance.bindingHandlers;
-    
+
     it('Should allow binding to modify value through "preprocess" method', function() {
         delete bindingHandlers.a;
         // create binding that has a default value of false
