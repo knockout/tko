@@ -49,7 +49,8 @@ export var value = {
             propertyChangedFired = false;
             var modelValue = valueAccessor();
             var elementValue = selectExtensions.readValue(element);
-            writeValueToProperty(modelValue, allBindings, 'value', elementValue);
+            valueAccessor(elementValue);
+            // writeValueToProperty(modelValue, allBindings, 'value', elementValue);
         }
 
         // Workaround for https://github.com/SteveSanderson/knockout/issues/122
