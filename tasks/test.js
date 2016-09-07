@@ -25,7 +25,8 @@ function test(extra_config) {
     ]
 
     options.preprocessors = {
-      '**/*.js': ['rollup'],
+      'src/**/*.js': ['rollup'],
+      'spec/**/*.js': ['rollup'],
     }
 
     options.rollupPreprocessor = {
