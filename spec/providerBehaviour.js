@@ -575,8 +575,8 @@ describe("Identifier", function () {
         })
 
         it("sets `this` of a top-level item to {$data, $context, globals, node}", function () {
+            options.bindingGlobals = { Ramanujan: "1729" }
             var div = document.createElement("div"),
-                globals = { Ramanujan: "1729" },
                 context = {
                     fn: function () {
                         assert.isObject(this)
@@ -584,12 +584,13 @@ describe("Identifier", function () {
                             '$context')
                         assert.equal(dataFor(div), this.$data, '$data')
                         assert.equal(div, this.$element, 'div')
-                        assert.deepEqual(globals, this.globals, 'globals')
+                        assert.deepEqual(options.bindingGlobals, this.globals, 'globals')
                         return 'sigtext'
                     }
                 };
             div.setAttribute("data-bind", "text: fn()")
-            options.bindingProviderInstance = new Provider({ globals: globals })
+            options.bindingProviderInstance = new Provider()
+            options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
             applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'sigtext')
         })

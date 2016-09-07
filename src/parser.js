@@ -427,7 +427,6 @@ Parser.prototype.identifier = function () {
   case 'true': return true;
   case 'false': return false;
   case 'null': return null;
-  // we use `void 0` because `undefined` can be redefined.
   case 'undefined': return void 0;
   default:
   }
@@ -483,21 +482,20 @@ Parser.prototype.readBindings = function () {
 * expressionAccessor.
 */
 Parser.prototype.convert_to_accessors = function (result) {
-  var propertyWriters = {};
+
   objectForEach(result, function (name, value) {
     if (value instanceof Identifier) {
-      // use _twoWayBindings so the binding can update Identifier
-      // See http://stackoverflow.com/questions/21580173
-      result[name] = function () {
-        return value.get_value();
-      };
-
-      // FIXME
-      // if (ko.expressionRewriting._twoWayBindings[name]) {
-      //   propertyWriters[name] = function(new_value) {
-      //     value.set_value(new_value);
-      //   };
-      // }
+      // Return a function that, with no arguments returns
+      // the value of the identifier, otherwise sets the
+      // value of the identifier to the first given argument.
+      Object.defineProperty(result, name, {
+        value: function (optionalValue) {
+          if (arguments.length === 0) {
+            return value.get_value();
+          }
+          return value.set_value(optionalValue);
+        }
+      });
     } else if (value instanceof Expression) {
       result[name] = function expressionAccessor() {
         return value.get_value();
@@ -508,12 +506,6 @@ Parser.prototype.convert_to_accessors = function (result) {
       };
     }
   });
-
-  if (Object.keys(propertyWriters).length > 0) {
-    result._ko_property_writers = function () {
-      return propertyWriters;
-    };
-  }
 
   return result;
 };

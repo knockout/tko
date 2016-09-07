@@ -1,6 +1,10 @@
 
 import Node from './node.js';
 
+import {
+  isWriteableObservable
+} from 'tko.observable';
+
 
 export default function Identifier(parser, token, dereferences) {
   this.token = token;
@@ -97,6 +101,16 @@ Identifier.prototype.get_value = function (parent) {
   return this.dereference(this.lookup_value(parent));
 };
 
+
+Identifier.prototype.assign = function assign(object, property, value) {
+  if (isWriteableObservable(object[property])) {
+    object[property](value);
+  } else {
+    object[property] = value;
+  }
+};
+
+
 /**
  * Set the value of the Identifier.
  *
@@ -126,7 +140,8 @@ Identifier.prototype.set_value = function (new_value) {
   // Degenerate case. {$data|$context|global}[leaf] = something;
   n = refs.length;
   if (n === 0) {
-    root[leaf] = new_value;
+    this.assign(root, leaf, new_value);
+    return;
   }
 
   // First dereference is {$data|$context|global}[token].
@@ -149,7 +164,9 @@ Identifier.prototype.set_value = function (new_value) {
   }
 
   // Call the setter for the leaf.
-  root[value_of(refs[i])] = new_value;
+  if (refs[i]) {
+    this.assign(root, value_of(refs[i]), new_value);
+  }
 };
 
 
