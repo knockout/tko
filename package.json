@@ -13,8 +13,8 @@
     "karma-sinon": "^1.0.5",
     "mocha": "^3.0.2",
     "sinon": "^1.17.5",
-    "tko-policy": "^0.1.0",
-    "tko.bind": "^1.0.0"
+    "tko-policy": "knockout/tko-policy",
+    "tko.bind": "knockout/tko.bind"
   },
   "files": [
     "dist/",
