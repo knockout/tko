@@ -14,7 +14,8 @@
     "mocha": "^3.0.2",
     "sinon": "^1.17.5",
     "tko-policy": "knockout/tko-policy",
-    "tko.bind": "knockout/tko.bind"
+    "tko.bind": "knockout/tko.bind",
+    "tko.binding.core": "github:knockout/tko.binding.core"
   },
   "files": [
     "dist/",

@@ -29,6 +29,7 @@ import {
   Provider
 } from '../index.js';
 
+import * as coreBindings from 'tko.binding.core';
 
 
 describe("tko.provider", function () {
@@ -148,6 +149,7 @@ describe("getBindingAccessors with function arg", function () {
 describe("all bindings", function () {
     beforeEach(function () {
         options.bindingProviderInstance = new Provider()
+        options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
     })
 
     it("binds Text with data-bind", function () {
@@ -567,6 +569,7 @@ describe("Identifier", function () {
                 };
             div.setAttribute("data-bind", "text: $data.fn()")
             options.bindingProviderInstance = new Provider()
+            options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
             applyBindings(context, div)
             assert.equal(div.textContent || div.innerText, 'ahab')
         })
@@ -943,6 +946,7 @@ describe("Virtual elements", function() {
         context = { obs: observable("a sperm whale") };
         div.appendChild(document.createComment("ko text: obs"));
         div.appendChild(document.createComment("/ko"));
+        options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
         applyBindings(context, div);
         assert.include(div.textContent || div.innerText, context.obs())
     })
