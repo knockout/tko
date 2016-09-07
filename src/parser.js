@@ -7,9 +7,9 @@ import {
   options, objectForEach
 } from 'tko.utils';
 
-import Expression from './expression.js';
-import Identifier from './identifier.js';
-
+import Expression from './expression';
+import Identifier from './identifier';
+import Node from './node';
 
 var escapee = {
     "'": "'",
@@ -22,7 +22,7 @@ var escapee = {
     r:    '\r',
     t:    '\t'
   },
-  operators = Expression.operators;
+  operators = Node.operators;
 
 /**
  * Construct a new Parser instance with new Parser(node, context)
@@ -136,7 +136,7 @@ Parser.prototype.number = function () {
  *                         function it is unwrapped as a property.
  */
 Parser.prototype.object_add_value = function (object, key, value) {
-  if (value instanceof Identifier || value instanceof Expression) {
+  if (value[Node.isExpressionOrIdentifierSymbol]) {
     Object.defineProperty(object, key, {
       get: function () {
         return value.get_value();

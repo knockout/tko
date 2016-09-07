@@ -1,5 +1,5 @@
 
-import Expression from './expression.js';
+import Node from './node.js';
 
 
 export default function Identifier(parser, token, dereferences) {
@@ -10,7 +10,7 @@ export default function Identifier(parser, token, dereferences) {
 
 
 export function value_of(item) {
-  if (item instanceof Identifier || item instanceof Expression) {
+  if (item[Node.isExpressionOrIdentifierSymbol]) {
     return item.get_value();
   }
   return item;
@@ -151,3 +151,6 @@ Identifier.prototype.set_value = function (new_value) {
   // Call the setter for the leaf.
   root[value_of(refs[i])] = new_value;
 };
+
+
+Identifier.prototype[Node.isExpressionOrIdentifierSymbol] = true;

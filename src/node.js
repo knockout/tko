@@ -1,10 +1,11 @@
 
 import {
+  createSymbolOrString
+} from 'tko.utils';
+
+import {
   unwrap
 } from 'tko.observable';
-
-import Expression from './Expression';
-import Identifier from './Identifier';
 
 
 export default function Node(lhs, op, rhs) {
@@ -94,7 +95,7 @@ Node.prototype.get_leaf_value = function (leaf, member_of) {
   }
 
   // Identifiers and Expressions
-  if (leaf instanceof Identifier || leaf instanceof Expression) {
+  if (leaf[Node.isExpressionOrIdentifierSymbol]) {
     // lhs is passed in as the parent of the leaf. It will be defined in
     // cases like a.b.c as 'a' for 'b' then as 'b' for 'c'.
     return unwrap(leaf.get_value(member_of));
@@ -119,3 +120,6 @@ Node.prototype.get_node_value = function () {
   return this.op(this.get_leaf_value(this.lhs),
                  this.get_leaf_value(this.rhs));
 };
+
+
+Node.isExpressionOrIdentifierSymbol = createSymbolOrString("isExpressionOrIdentifierSymbol");

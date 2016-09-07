@@ -60,7 +60,7 @@ describe("getBindingAccessors with string arg", function() {
     var div;
 
     beforeEach(function() {
-        options.bindingProviderInstance = new Provider()
+        instance = options.bindingProviderInstance = new Provider()
         div = document.createElement("div");
         instance.bindingHandlers.alpha = {
             init: sinon.spy(),
@@ -114,7 +114,7 @@ describe("getBindingAccessors with function arg", function () {
     var div;
 
     beforeEach(function() {
-        options.bindingProviderInstance = new Provider()
+        instance = options.bindingProviderInstance = new Provider()
         div = document.createElement("div");
         div.setAttribute("data-bind", 'alpha: x');
         instance.bindingHandlers.alpha = {
@@ -145,7 +145,7 @@ describe("getBindingAccessors with function arg", function () {
         })
 })
 
-describe("changing Knockout's bindings to KSB", function () {
+describe("all bindings", function () {
     beforeEach(function () {
         options.bindingProviderInstance = new Provider()
     })

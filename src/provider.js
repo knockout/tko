@@ -95,7 +95,7 @@ function getBindingAccessors(node, context) {
     bindings = parser.parse(sbind_string || '');
   }
 
-  arrayForEach(this.otherProviders, function(p) {
+  arrayForEach(otherProviders, function(p) {
     extend(bindings, p.getBindingAccessors(node, context, parser));
   });
 

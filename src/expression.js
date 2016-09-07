@@ -1,5 +1,5 @@
 
-
+import Node from './node';
 
 export default function Expression(nodes) {
   this.nodes = nodes;
@@ -43,9 +43,17 @@ Expression.prototype.build_tree = function (nodes) {
   return root;
 }; // build_tree
 
+
+/**
+ * Return the value of `this` Expression instance.
+ *
+ */
 Expression.prototype.get_value = function () {
   if (!this.root) {
     this.root = this.build_tree(this.nodes);
   }
   return this.root.get_node_value();
 };
+
+
+Expression.prototype[Node.isExpressionOrIdentifierSymbol] = true;
