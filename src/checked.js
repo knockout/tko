@@ -11,10 +11,6 @@ import {
     computed, pureComputed
 } from 'tko.computed';
 
-import {
-    writeValueToProperty
-} from 'tko.bind';
-
 export var checked = {
     after: ['value', 'attr'],
     init: function (element, valueAccessor, allBindings) {
@@ -68,7 +64,7 @@ export var checked = {
                     modelValue(writableValue);
                 }
             } else {
-                writeValueToProperty(modelValue, allBindings, 'checked', elemValue, true);
+                valueAccessor(elemValue, {onlyIfChanged: true});
             }
         };
 
@@ -113,9 +109,7 @@ export var checked = {
         computed(updateView, null, { disposeWhenNodeIsRemoved: element });
 
         rawValue = undefined;
-    },
-
-    twoWayBinding: true
+    }
 };
 
 export var checkedValue = {

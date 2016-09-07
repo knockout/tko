@@ -7,10 +7,6 @@ import {
     unwrap, dependencyDetection
 } from 'tko.observable';
 
-import {
-    writeValueToProperty
-} from 'tko.bind';
-
 var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating');
 var hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue');
 
@@ -37,7 +33,7 @@ export var hasfocus = {
                 isFocused = (active === element);
             }
             var modelValue = valueAccessor();
-            writeValueToProperty(modelValue, allBindings, 'hasfocus', isFocused, true);
+            valueAccessor(isFocused, {onlyIfChanged: true});
 
             //cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
             element[hasfocusLastValue] = isFocused;
@@ -67,6 +63,5 @@ export var hasfocus = {
             // For IE, which doesn't reliably fire "focus" or "blur" events synchronously
             dependencyDetection.ignore(triggerEvent, null, [element, value ? "focusin" : "focusout"]);
         }
-    },
-    twoWayBinding: true,
+    }
 };

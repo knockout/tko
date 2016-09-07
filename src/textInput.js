@@ -12,10 +12,6 @@ import {
     computed
 } from 'tko.computed';
 
-import {
-    writeValueToProperty
-} from 'tko.bind';
-
 
 if (window && window.navigator) {
     var parseVersion = function (matches) {
@@ -74,7 +70,7 @@ export var textInput = {
                 // Provide a way for tests to know exactly which event was processed
                 if (options.debug && event) element['_ko_textInputProcessedEvent'] = event.type;
                 previousElementValue = elementValue;
-                writeValueToProperty(valueAccessor(), allBindings, 'textInput', elementValue);
+                valueAccessor(elementValue);
             }
         };
 
@@ -185,8 +181,7 @@ export var textInput = {
         onEvent('change', updateModel);
 
         computed(updateView, null, { disposeWhenNodeIsRemoved: element });
-    },
-    twoWayBinding: true
+    }
 };
 
 // // textinput is an alias for textInput

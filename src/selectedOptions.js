@@ -9,10 +9,6 @@ import {
 } from 'tko.observable';
 
 import {
-    writeValueToProperty
-} from 'tko.bind';
-
-import {
     selectExtensions
 } from './selectExtensions';
 
@@ -27,7 +23,7 @@ export var selectedOptions = {
                 if (node.selected)
                     valueToWrite.push(ko.selectExtensions.readValue(node));
             });
-            ko.expressionRewriting.writeValueToProperty(value, allBindings, 'selectedOptions', valueToWrite);
+            valueAccessor(valueToWrite);
         });
     },
 
@@ -48,6 +44,5 @@ export var selectedOptions = {
         }
 
         element.scrollTop = previousScrollTop;
-    },
-    twoWayBinding: true
+    }
 };

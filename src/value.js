@@ -14,7 +14,7 @@ import {
 } from 'tko.computed';
 
 import {
-    applyBindingAccessorsToNode, writeValueToProperty
+    applyBindingAccessorsToNode
 } from 'tko.bind';
 
 import {
@@ -50,7 +50,6 @@ export var value = {
             var modelValue = valueAccessor();
             var elementValue = selectExtensions.readValue(element);
             valueAccessor(elementValue);
-            // writeValueToProperty(modelValue, allBindings, 'value', elementValue);
         }
 
         // Workaround for https://github.com/SteveSanderson/knockout/issues/122
@@ -125,6 +124,5 @@ export var value = {
         };
 
         computed(updateFromModel, null, { disposeWhenNodeIsRemoved: element });
-    },
-    twoWayBinding: true
+    }
 };
