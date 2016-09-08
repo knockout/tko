@@ -16,7 +16,7 @@ var gulp = global.__tko_gulp
 
 const SPEC_DIR = path.join(process.cwd(), 'spec')
 
-function test(extra_config) {
+function test(extra_config, done) {
     var options = Object.assign({}, config.karma, extra_config)
 
     options.files = [
@@ -48,7 +48,7 @@ function test(extra_config) {
     if (process.argv.indexOf("--once") >= 0) { options.singleRun = true; }
     if (process.argv.indexOf("--watch") >= 0) { options.singleRun = false; }
 
-    new karma.Server(options)
+    new karma.Server(options, done)
       .on('browser_error', function(browser, error) {
           console.log(browser.name.cyan, " 🚨  Error:".red, error)
       })
@@ -58,10 +58,10 @@ function test(extra_config) {
       .start()
 }
 
-gulp.task('test', 'Run Karma tests', function () {
+gulp.task('test', 'Run Karma tests', function (done) {
   var runner = process.argv.indexOf('--chrome') >= 0 ? 'Chrome' : "PhantomJS"
 
-  test({browsers: [runner]})
+  test({browsers: [runner]}, done)
 }, {
   options: {
     'once': 'Run the test once, then quit.',
