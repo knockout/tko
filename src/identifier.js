@@ -47,8 +47,11 @@ Identifier.prototype.lookup_value = function (parent) {
   case '$data': return $data;
   default:
   }
+  if (token in $data) { return $data[token]; }
+  if (token in $context) { return $context[token]; }
+  if (token in globals) { return globals[token]; }
 
-  return $data[token] || $context[token] || globals[token];
+  throw new Error("The variable \"" + token + "\" was not found on $data, $context, or knockout options.bindingGlobals.");
 };
 
 /**

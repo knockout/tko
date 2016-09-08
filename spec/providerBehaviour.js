@@ -384,13 +384,13 @@ describe("The lookup of variables (get_lookup_root)", function () {
         assert.equal(bindings.x().y.z, 11)
     })
 
-    it("does not have access to `window` globals", function () {
+    it("can be denied access to `window` globals", function () {
         var binding = "x: window, y: global, z: document",
             context = {},
             bindings = new Parser(null, context).parse(binding);
-        assert.equal(bindings.x(), undefined)
-        assert.equal(bindings.y(), undefined)
-        assert.equal(bindings.z(), undefined)
+        assert.throws(bindings.x, "not found")
+        assert.throws(bindings.y, "not found")
+        assert.throws(bindings.z, "not found")
     })
 
     it("recognizes $context", function () {
@@ -445,7 +445,7 @@ describe("The lookup of variables (get_lookup_root)", function () {
     it("does not bleed globals", function () {
         var binding = "a: z",
             globals_1 = {z: 168},
-            globals_2 = {},
+            globals_2 = {z: undefined},
             context = {},
             bindings_1 = new Parser(null, context,
                 globals_1).parse(binding),
@@ -970,7 +970,7 @@ describe("compound expressions", function () {
             return { G: function () { return 'R2' }}
         },
         obs = observable({ d: d }),
-        context = { a: a, F1: F1, F2: F2, x: x, obs: obs, z: z };
+        context = { a: a, F1: F1, F2: F2, x: x, obs: obs, z: z, u: undefined };
 
     // a property of the observable (not the observable's value)
     obs.P = y;
@@ -1003,6 +1003,12 @@ describe("compound expressions", function () {
 
     it("plucks 'u' (undefined)", function () {
         expect_equal('u', undefined)
+    })
+
+    it("throws 'missing'", function () {
+        assert.throws(function () {
+          new Parser(null, context).parse("v: missing").v()
+        }, 'not found')
     })
 
     it("throws when 'r' is not on u", function () {
