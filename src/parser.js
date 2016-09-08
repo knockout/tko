@@ -71,13 +71,28 @@ Parser.prototype.error = function (m) {
 
 Parser.prototype.name = function () {
   // A name of a binding
-  var name = '';
+  var name = '',
+    enclosed_by;
   this.white();
 
   var ch = this.ch;
 
+  if (ch === "'" || ch === '"') {
+    enclosed_by = ch;
+    ch = this.next();
+  }
+
   while (ch) {
-    if (ch === ':' || ch <= ' ' || ch === ',') {
+    if (enclosed_by && ch === enclosed_by) {
+      this.white();
+      ch = this.next();
+      if (ch !== ':' && ch !== ',') {
+        this.error(
+          "Object name: " + name + " missing closing " + enclosed_by
+        );
+      }
+      return name;
+    } else if (ch === ':' || ch <= ' ' || ch === ',' ) {
       return name;
     }
     name += ch;

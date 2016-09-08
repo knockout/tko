@@ -1,11 +1,12 @@
 
 import {
-  extend, virtualElements, arrayForEach, options
+  extend, virtualElements, arrayForEach, options, objectForEach
 } from 'tko.utils';
 
 
 
 import Parser from './parser.js';
+import parseObjectLiteral from './preparse';
 
 
 // The list of other objects that have the functions that detect and return
@@ -20,36 +21,51 @@ export default function Provider(options) {
   // bindingsHandlers
   var bindingHandlers = this.bindingHandlers = {};
 
-
-  // bindingHandlers.set(nameOrObject, value)
-  // ---
-  // Examples:
-  // bindingHandlers.set('name', bindingDefinition)
-  // bindingHandlers.set({ text: textBinding, input: inputBinding })
-  Object.defineProperty(bindingHandlers, 'set', {
-    get: function () {
-      return function setBindingHandler(nameOrObject, value) {
-        if (typeof nameOrObject === 'string') {
-          bindingHandlers[nameOrObject] = value;
-        } else if (typeof nameOrObject === 'object') {
-          if (value !== undefined) {
-            options.onError(
-              new Error("Given extraneous `value` parameter (first param should be a string, but it was an object)." + nameOrObject));
-          }
-          extend(bindingHandlers, nameOrObject);
-        } else {
-          options.onError(
-            new Error("Given a bad binding handler type" + nameOrObject));
-        }
-      };
-    }
-  });
-
+  addGetterSetter(bindingHandlers);
 
   // Cache the result of parsing binding strings.
   // TODO
   // this.cache = {};
 }
+
+
+/** Add non-enumerable `get` and `set` properties.
+ */
+// bindingHandlers.set(nameOrObject, value)
+// ---
+// Examples:
+//
+// bindingHandlers.set('name', bindingDefinition)
+// bindingHandlers.set({ text: textBinding, input: inputBinding })
+function addGetterSetter(bindingHandlersObject) {
+  Object.defineProperties(bindingHandlersObject, {
+    'set': {
+      configurable: true,
+      value: function setBindingHandler(nameOrObject, value) {
+        if (typeof nameOrObject === 'string') {
+          bindingHandlersObject[nameOrObject] = value;
+        } else if (typeof nameOrObject === 'object') {
+          if (value !== undefined) {
+            options.onError(
+              new Error("Given extraneous `value` parameter (first param should be a string, but it was an object)." + nameOrObject));
+          }
+          extend(bindingHandlersObject, nameOrObject);
+        } else {
+          options.onError(
+            new Error("Given a bad binding handler type" + nameOrObject));
+        }
+      }
+    },
+    'get': {
+      configurable: true,
+      value: function getBindingHandler(name) {
+        // NOTE: Strict binding checking ought to occur here.
+        return bindingHandlersObject[name];
+      }
+    }
+  });
+}
+
 
 
 function nodeHasBindings(node) {
@@ -89,18 +105,57 @@ function getBindingsString(node) {
 function getBindingAccessors(node, context) {
   var bindings = {},
     parser = new Parser(node, context, options.bindingGlobals),
-    sbind_string = this.getBindingsString(node);
+    binding_string = this.getBindingsString(node);
 
-  if (sbind_string) {
-    bindings = parser.parse(sbind_string || '');
+  binding_string = this.preProcessBindings(binding_string);
+
+  if (binding_string) {
+    bindings = parser.parse(binding_string || '');
   }
 
   arrayForEach(otherProviders, function(p) {
     extend(bindings, p.getBindingAccessors(node, context, parser));
   });
 
+  objectForEach(bindings, this.preProcessBindings.bind(this));
+
   return bindings;
 }
+
+
+/** Call bindingHandler.preprocess on each respective binding string.
+ *
+ * The `preprocess` property of bindingHandler must be a static
+ * function (i.e. on the object or constructor).
+ */
+function preProcessBindings(bindingString) {
+  var results = [];
+  var bindingHandlers = this.bindingHandlers;
+
+  function addBinding(name, value) {
+    results.push("'" + name + "':" + value);
+  }
+
+  function processBinding(key, value) {
+    var handler = bindingHandlers.get(key);
+
+    if (handler && typeof handler.preprocess === 'function') {
+      value = handler.preprocess(value, key, processBinding);
+    }
+
+    addBinding(key, value);
+  }
+
+  arrayForEach(parseObjectLiteral(bindingString), function(keyValueItem) {
+    processBinding(
+      keyValueItem.key || keyValueItem.unknown,
+      keyValueItem.value
+    );
+  });
+
+  return results.join(',');
+}
+
 
 
 // addProvider(provider instance)
@@ -118,5 +173,6 @@ extend(Provider.prototype, {
   getBindingAccessors: getBindingAccessors,
   getBindingsString: getBindingsString,
   addProvider: addProvider,
-  Parser: Parser
+  Parser: Parser,
+  preProcessBindings: preProcessBindings
 });
