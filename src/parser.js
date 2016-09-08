@@ -548,7 +548,7 @@ Parser.prototype.parse = function (source) {
     options.onError(
       "Unable to parse bindings." +
       "\nBinding value: " + this.text +
-      "\nMessage: " + e
+      "\nMessage: <" + e.name + "> " + e.message
     );
   }
 
