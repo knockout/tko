@@ -8,6 +8,7 @@
   "name": "tko.provider",
   "devDependencies": {
     "chai": "^3.5.0",
+    "gulp": "^3.9.1",
     "karma-chai": "^0.1.0",
     "karma-mocha": "^1.1.1",
     "karma-sinon": "^1.0.5",
