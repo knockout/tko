@@ -3,8 +3,14 @@ import {
 } from 'tko.utils';
 
 import {
-    observable, observableArray
+    observable
 } from 'tko.observable';
+
+import {
+    Provider
+} from 'tko.provider';
+
+import { bindings } from 'tko.binding.core';
 
 import {
     applyBindings
@@ -15,9 +21,8 @@ describe('Node preprocessing', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function() {
-        var preprocessingBindingProvider = function() { };
-        preprocessingBindingProvider.prototype = options.bindingProviderInstance;
-        options.bindingProviderInstance = new preprocessingBindingProvider();
+        options.bindingProviderInstance = new Provider();
+        options.bindingProviderInstance.bindingHandlers.set(bindings);
     });
 
     it('Can leave the nodes unchanged by returning a falsey value', function() {
@@ -78,40 +83,5 @@ describe('Node preprocessing', function() {
         // Check that updating the observable has the expected effect
         someValue('goodbye');
         expect(testNode).toContainText('the value is goodbye.');
-    });
-
-    it('Can modify the set of top-level nodes in a foreach loop', function() {
-        options.bindingProviderInstance.preprocessNode = function(node) {
-            // Replace <data /> with <span data-bind="text: $data"></span>
-            if (node.tagName && node.tagName.toLowerCase() === "data") {
-                var newNode = document.createElement("span");
-                newNode.setAttribute("data-bind", "text: $data");
-                node.parentNode.insertBefore(newNode, node);
-                node.parentNode.removeChild(node);
-                return [newNode];
-            }
-
-            // Delete any <button> elements
-            if (node.tagName && node.tagName.toLowerCase() === "button") {
-                node.parentNode.removeChild(node);
-                return [];
-            }
-        };
-        testNode.innerHTML = "<div data-bind='foreach: items'>"
-                               + "<button>DeleteMe</button>"
-                               + "<data></data>"
-                               + "<!-- ko text: $data --><!-- /ko -->"
-                               + "<button>DeleteMe</button>" // Tests that we can remove the last node even when the preceding node is a virtual element rather than a single node
-                           + "</div>";
-        var items = observableArray(["Alpha", "Beta"]);
-
-        applyBindings({ items: items }, testNode);
-        expect(testNode).toContainText('AlphaAlphaBetaBeta');
-
-        // Check that modifying the observable array has the expected effect
-        items.splice(0, 1);
-        expect(testNode).toContainText('BetaBeta');
-        items.push('Gamma');
-        expect(testNode).toContainText('BetaBetaGammaGamma');
     });
 });

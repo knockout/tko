@@ -12,12 +12,10 @@ __tko_karma__: &__tko_karma__
   singleRun: false
   files:
     - spec/helpers/setup.js
-    - spec/*.js
-    # - pattern: src/*
-    #   watched: true
-    #   included: false
-    #   served: false
-    #   nocache: false
+    - pattern: spec/*.js
+      included: false
+    - pattern: src/*
+      included: false
   reporters:
     - progress
   client:
