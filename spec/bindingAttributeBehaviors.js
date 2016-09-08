@@ -16,7 +16,7 @@ import {
 } from 'tko.provider';
 
 import {
-    applyBindings, dataFor,
+    applyBindings, dataFor, bindingContext,
     applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../index.js';
 
@@ -33,7 +33,9 @@ describe('Binding attribute syntax', function() {
 
     beforeEach(function () {
         // Set up the default binding handlers.
-        bindingHandlers = new Provider().bindingHandlers
+        var provider = new Provider()
+        options.bindingProviderInstance = provider
+        bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings.bindings);
     })
 
@@ -119,7 +121,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "<div data-bind='test: (1;2)'></div>";
         expect(function () {
             applyBindings(null, testNode);
-        }).toThrowContaining("Unable to parse bindings.\nBindings value: test: (1;2)\nMessage:");
+        }).toThrowContaining("Unable to parse bindings.\nBindings value: 'test':(1;2)\nMessage:");
     });
 
     it('Should produce a meaningful error if a binding value doesn\'t exist', function() {
@@ -328,7 +330,9 @@ describe('Binding attribute syntax', function() {
 
     it('Should use properties on the view model in preference to properties on the binding context', function() {
         testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>";
-        applyBindings({ '$data': { someProp: 'Inner value'}, someProp: 'Outer value' }, testNode);
+        var context = new bindingContext({ someProp: 'Outer value' })
+        var viewModel = new bindingContext({ someProp: "Inner value" }, context)
+        applyBindings(viewModel, testNode);
         expect(testNode).toContainText("Inner value");
     });
 

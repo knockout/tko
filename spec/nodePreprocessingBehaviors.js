@@ -1,23 +1,34 @@
+import {
+    options
+} from 'tko.utils';
+
+import {
+    observable, observableArray
+} from 'tko.observable';
+
+import {
+    applyBindings
+} from '../index';
+
+
 describe('Node preprocessing', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function() {
-        this.restoreAfter(ko.bindingProvider, 'instance');
-
         var preprocessingBindingProvider = function() { };
-        preprocessingBindingProvider.prototype = ko.bindingProvider.instance;
-        ko.bindingProvider.instance = new preprocessingBindingProvider();
+        preprocessingBindingProvider.prototype = options.bindingProviderInstance;
+        options.bindingProviderInstance = new preprocessingBindingProvider();
     });
 
     it('Can leave the nodes unchanged by returning a falsey value', function() {
-        ko.bindingProvider.instance.preprocessNode = function(node) { return null; };
+        options.bindingProviderInstance.preprocessNode = function(/* node */) { return null; };
         testNode.innerHTML = "<p data-bind='text: someValue'></p>";
-        ko.applyBindings({ someValue: 'hello' }, testNode);
+        applyBindings({ someValue: 'hello' }, testNode);
         expect(testNode).toContainText('hello');
     });
 
     it('Can replace a node with some other node', function() {
-        ko.bindingProvider.instance.preprocessNode = function(node) {
+        options.bindingProviderInstance.preprocessNode = function(node) {
             // Example: replace <mySpecialNode /> with <span data-bind='text: someValue'></span>
             // This technique could be the basis for implementing custom element types that render templates
             if (node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
@@ -29,8 +40,8 @@ describe('Node preprocessing', function() {
             }
         };
         testNode.innerHTML = "<span>a</span><mySpecialNode></mySpecialNode><span>b</span>";
-        var someValue = ko.observable('hello');
-        ko.applyBindings({ someValue: someValue }, testNode);
+        var someValue = observable('hello');
+        applyBindings({ someValue: someValue }, testNode);
         expect(testNode).toContainText('ahellob');
 
         // Check that updating the observable has the expected effect
@@ -39,7 +50,7 @@ describe('Node preprocessing', function() {
     });
 
     it('Can replace a node with multiple new nodes', function() {
-        ko.bindingProvider.instance.preprocessNode = function(node) {
+        options.bindingProviderInstance.preprocessNode = function(node) {
             // Example: Replace {{ someValue }} with text from that property.
             // This could be generalized to full support for string interpolation in text nodes.
             if (node.nodeType === 3 && node.data.indexOf("{{ someValue }}") >= 0) {
@@ -60,8 +71,8 @@ describe('Node preprocessing', function() {
             }
         };
         testNode.innerHTML = "the value is {{ someValue }}.";
-        var someValue = ko.observable('hello');
-        ko.applyBindings({ someValue: someValue }, testNode);
+        var someValue = observable('hello');
+        applyBindings({ someValue: someValue }, testNode);
         expect(testNode).toContainText('the value is hello.');
 
         // Check that updating the observable has the expected effect
@@ -70,7 +81,7 @@ describe('Node preprocessing', function() {
     });
 
     it('Can modify the set of top-level nodes in a foreach loop', function() {
-        ko.bindingProvider.instance.preprocessNode = function(node) {
+        options.bindingProviderInstance.preprocessNode = function(node) {
             // Replace <data /> with <span data-bind="text: $data"></span>
             if (node.tagName && node.tagName.toLowerCase() === "data") {
                 var newNode = document.createElement("span");
@@ -92,9 +103,9 @@ describe('Node preprocessing', function() {
                                + "<!-- ko text: $data --><!-- /ko -->"
                                + "<button>DeleteMe</button>" // Tests that we can remove the last node even when the preceding node is a virtual element rather than a single node
                            + "</div>";
-        var items = ko.observableArray(["Alpha", "Beta"]);
+        var items = observableArray(["Alpha", "Beta"]);
 
-        ko.applyBindings({ items: items }, testNode);
+        applyBindings({ items: items }, testNode);
         expect(testNode).toContainText('AlphaAlphaBetaBeta');
 
         // Check that modifying the observable array has the expected effect

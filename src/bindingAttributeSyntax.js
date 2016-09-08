@@ -33,7 +33,7 @@ var bindingDoesNotRecurseIntoElementTypes = {
 
 // Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
 export function getBindingHandler(bindingKey) {
-    return options.bindingProviderInstance.bindingHandlers[bindingKey];
+    return options.bindingProviderInstance.bindingHandlers.get(bindingKey);
 }
 
 // The bindingContext constructor is only called directly to create the root context. For child
