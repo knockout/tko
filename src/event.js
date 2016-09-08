@@ -15,10 +15,10 @@ export function makeEventHandlerShortcut(eventName) {
             };
             event.init.call(this, element, newValueAccessor, allBindings, viewModel, bindingContext);
         }
-    }
+    };
 }
 
-export var event = {
+export default {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         var eventsToHandle = valueAccessor() || {};
         objectForEach(eventsToHandle, function(eventName) {
