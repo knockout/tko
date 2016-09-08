@@ -4,6 +4,10 @@ machine:
   environment:
     CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
     CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
+dependencies:
+  pre:
+    - npm install -g rollup
+
 test:
   override:
   - gulp test --once
