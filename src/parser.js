@@ -456,7 +456,7 @@ Parser.prototype.identifier = function () {
   return new Identifier(this, token, dereferences);
 };
 
-Parser.prototype.readBindings = function () {
+Parser.prototype.read_bindings = function () {
   var key,
     bindings = {},
     sep,
@@ -542,7 +542,15 @@ Parser.prototype.parse = function (source) {
     return null;
   }
 
-  var result = this.readBindings();
+  try {
+    var result = this.read_bindings();
+  } catch (e) {
+    options.onError(
+      "Unable to parse bindings." +
+      "\nBinding value: " + this.text +
+      "\nMessage: " + e
+    );
+  }
 
   this.white();
   if (this.ch) {
