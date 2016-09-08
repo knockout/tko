@@ -11,7 +11,7 @@ __tko_karma__: &__tko_karma__
     - PhantomJS
   singleRun: false
   files:
-    - spec/helpers/setup.js
+    # - spec/helpers/setup.js
     - spec/*.js
     # - pattern: src/*
     #   watched: true
