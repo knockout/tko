@@ -1,6 +1,6 @@
 machine:
   node:
-    version: 5.1.0
+    version: 6.1.0
   environment:
     CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
     CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
