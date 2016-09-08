@@ -25,48 +25,57 @@
 //     If you don't want to allow that, you can set the property 'allowTemplateRewriting' to false (like ko.nativeTemplateEngine does)
 //     and then you don't need to override 'createJavaScriptEvaluatorBlock'.
 
-ko.templateEngine = function () { };
+import {
+  extend, options
+} from 'tko.utils';
 
-ko.templateEngine.prototype['renderTemplateSource'] = function (templateSource, bindingContext, options, templateDocument) {
-    throw new Error("Override renderTemplateSource");
-};
 
-ko.templateEngine.prototype['createJavaScriptEvaluatorBlock'] = function (script) {
-    throw new Error("Override createJavaScriptEvaluatorBlock");
-};
+function templateEngine() { };
 
-ko.templateEngine.prototype['makeTemplateSource'] = function(template, templateDocument) {
-    // Named template
-    if (typeof template == "string") {
-        templateDocument = templateDocument || document;
-        var elem = templateDocument.getElementById(template);
-        if (!elem)
-            throw new Error("Cannot find template with ID " + template);
-        return new ko.templateSources.domElement(elem);
-    } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
-        // Anonymous template
-        return new ko.templateSources.anonymousTemplate(template);
-    } else
-        throw new Error("Unknown template type: " + template);
-};
+extend(templateEngine.prototype, {
+  renderTemplateSource: function (templateSource, bindingContext, options, templateDocument) {
+      options.onError("Override renderTemplateSource");
+  },
 
-ko.templateEngine.prototype['renderTemplate'] = function (template, bindingContext, options, templateDocument) {
-    var templateSource = this['makeTemplateSource'](template, templateDocument);
-    return this['renderTemplateSource'](templateSource, bindingContext, options, templateDocument);
-};
+  createJavaScriptEvaluatorBlock: function (script) {
+      options.onError("Override createJavaScriptEvaluatorBlock");
+  },
 
-ko.templateEngine.prototype['isTemplateRewritten'] = function (template, templateDocument) {
-    // Skip rewriting if requested
-    if (this['allowTemplateRewriting'] === false)
-        return true;
-    return this['makeTemplateSource'](template, templateDocument)['data']("isRewritten");
-};
+  makeTemplateSource: function(template, templateDocument) {
+      // Named template
+      if (typeof template == "string") {
+          templateDocument = templateDocument || document;
+          var elem = templateDocument.getElementById(template);
+          if (!elem)
+              options.onError("Cannot find template with ID " + template);
+          return new ko.templateSources.domElement(elem);
+      } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
+          // Anonymous template
+          return new ko.templateSources.anonymousTemplate(template);
+      } else
+          options.onError("Unknown template type: " + template);
+  },
 
-ko.templateEngine.prototype['rewriteTemplate'] = function (template, rewriterCallback, templateDocument) {
-    var templateSource = this['makeTemplateSource'](template, templateDocument);
-    var rewritten = rewriterCallback(templateSource['text']());
-    templateSource['text'](rewritten);
-    templateSource['data']("isRewritten", true);
-};
+  renderTemplate: function (template, bindingContext, options, templateDocument) {
+      var templateSource = this['makeTemplateSource'](template, templateDocument);
+      return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument);
+  },
 
-ko.exportSymbol('templateEngine', ko.templateEngine);
+  isTemplateRewritten: function (template, templateDocument) {
+      // Skip rewriting if requested
+      if (this.allowTemplateRewriting === false)
+          return true;
+      return this.makeTemplateSource(template, templateDocument).data("isRewritten");
+  },
+
+  rewriteTemplate: function (template, rewriterCallback, templateDocument) {
+      var templateSource = this['makeTemplateSource'](template, templateDocument);
+      var rewritten = rewriterCallback(templateSource['text']());
+      templateSource.text(rewritten);
+      templateSource.data("isRewritten", true);
+  }
+})
+
+
+
+export default templateEngine;
