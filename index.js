@@ -4,7 +4,7 @@ import {checked, checkedValue} from './src/checked.js';
 import {click} from './src/click.js';
 import {css} from './src/css.js';
 import {enable, disable} from './src/enableDisable.js';
-import {$event} from './src/event.js';
+import $event from './src/event.js';
 import {hasfocus} from './src/hasfocus.js';
 import {html} from './src/html.js';
 import $let from './src/let.js';
