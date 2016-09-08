@@ -131,6 +131,14 @@ function getBindingAccessors(node, context) {
 function preProcessBindings(bindingString) {
   var results = [];
   var bindingHandlers = this.bindingHandlers;
+  var preprocessed;
+
+  // Check for a Provider.preprocessNode property
+  if (typeof this.preprocessNode === 'function') {
+    preprocessed = this.preprocessNode(bindingString);
+    if (preprocessed) { bindingString = preprocessed; }
+  }
+
 
   function addBinding(name, value) {
     results.push("'" + name + "':" + value);
