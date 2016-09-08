@@ -6,7 +6,9 @@ machine:
     CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
 dependencies:
   pre:
-    - npm install -g rollup
+    # Need npm v3 for flat node_modules dependencies.
+    - npm install -g npm
+    - npm install -g rollup gulp
 
 test:
   override:
