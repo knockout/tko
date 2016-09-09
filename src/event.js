@@ -13,7 +13,7 @@ export function makeEventHandlerShortcut(eventName) {
                 result[eventName] = valueAccessor();
                 return result;
             };
-            event.init.call(this, element, newValueAccessor, allBindings, viewModel, bindingContext);
+            eventBinding.init.call(this, element, newValueAccessor, allBindings, viewModel, bindingContext);
         }
     };
 }
