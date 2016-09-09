@@ -13,6 +13,7 @@ This provider differs from Knockout's 3.X and prior default binder, which uses `
 
 For more information, see the [blog post about knockout-secure-binding](http://brianmhunt.github.io/articles/knockout-plus-content-security-policy/).
 
+
 Getting started
 ---
 
