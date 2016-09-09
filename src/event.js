@@ -18,7 +18,7 @@ export function makeEventHandlerShortcut(eventName) {
     };
 }
 
-export default {
+export var eventBinding = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         var eventsToHandle = valueAccessor() || {};
         objectForEach(eventsToHandle, function(eventName) {
