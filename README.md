@@ -1,8 +1,7 @@
 tko.provider
 ============
 
- [![Build Status](https://secure.travis-ci.org/brianmhunt/knockout-secure-binding.png?branch=master)](https://travis-ci.org/brianmhunt/knockout-secure-binding)
- [![Circle CI](https://circleci.com/gh/brianmhunt/knockout-secure-binding.svg?style=svg)](https://circleci.com/gh/brianmhunt/knockout-secure-binding)
+ [![CircleCI](https://circleci.com/gh/knockout/tko.provider.svg?style=svg)](https://circleci.com/gh/knockout/tko.provider)
 
 
 tko.provider is a binding provider for [Knockout](http://knockoutjs.com), namely it parses HTML attributes and converts them to handlers of bidirectional updates.
