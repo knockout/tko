@@ -1,23 +1,47 @@
+import {
+    applyBindings
+} from 'tko.bind';
+
+import {
+    Provider
+} from 'tko.provider';
+
+import {
+    options
+} from 'tko.utils';
+
+import * as coreBindings from '../index.js';
+
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
 describe('Binding: HTML', function() {
     beforeEach(jasmine.prepareTestNode);
+
+    beforeEach(function(){
+        var provider = new Provider()
+        options.bindingProviderInstance = provider
+        bindingHandlers = provider.bindingHandlers
+        bindingHandlers.set(coreBindings.bindings);
+    })
+
 
     it('Should assign the value to the node without HTML-encoding the value', function () {
         var model = { textProp: "My <span>HTML-containing</span> value" };
         testNode.innerHTML = "<span data-bind='html:textProp'></span>";
-        ko.applyBindings(model, testNode);
+        applyBindings(model, testNode);
         expect(testNode.childNodes[0].innerHTML.toLowerCase()).toEqual(model.textProp.toLowerCase());
         expect(testNode.childNodes[0].childNodes[1].innerHTML).toEqual("HTML-containing");
     });
 
     it('Should assign an empty string as value if the model value is null', function () {
         testNode.innerHTML = "<span data-bind='html:(null)' ></span>";
-        ko.applyBindings(null, testNode);
+        applyBindings(null, testNode);
         expect(testNode.childNodes[0].innerHTML).toEqual("");
     });
 
     it('Should assign an empty string as value if the model value is undefined', function () {
         testNode.innerHTML = "<span data-bind='html:undefined' ></span>";
-        ko.applyBindings(null, testNode);
+        applyBindings(null, testNode);
         expect(testNode.childNodes[0].innerHTML).toEqual("");
     });
 
@@ -27,7 +51,7 @@ describe('Binding: HTML', function() {
         // if you try to write a <P> tag inside an existing <P> tag, for example.
         var model = { textProp: "<p>hello</p><p>this isn't semantically correct</p>" };
         testNode.innerHTML = "<p data-bind='html:textProp'></p>";
-        ko.applyBindings(model, testNode);
+        applyBindings(model, testNode);
         expect(testNode.childNodes[0]).toContainHtml(model.textProp);
     });
 
@@ -37,7 +61,7 @@ describe('Binding: HTML', function() {
         // The most common examples relate to tables.
         var model = { textProp: "<tr><td>hello</td></tr>" };
         testNode.innerHTML = "<table data-bind='html:textProp'></table>";
-        ko.applyBindings(model, testNode);
+        applyBindings(model, testNode);
 
         // Accept either of the following outcomes - there may or may not be an implicitly added <tbody>.
         var tr = testNode.childNodes[0].childNodes[0];
