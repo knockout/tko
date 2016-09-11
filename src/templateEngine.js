@@ -29,8 +29,11 @@ import {
   extend, options
 } from 'tko.utils';
 
+import {
+  domElement, anonymousTemplate
+} from './templateSources';
 
-function templateEngine() { };
+export function templateEngine() { };
 
 extend(templateEngine.prototype, {
   renderTemplateSource: function (templateSource, bindingContext, options, templateDocument) {
@@ -48,10 +51,10 @@ extend(templateEngine.prototype, {
           var elem = templateDocument.getElementById(template);
           if (!elem)
               options.onError("Cannot find template with ID " + template);
-          return new ko.templateSources.domElement(elem);
+          return new domElement(elem);
       } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
           // Anonymous template
-          return new ko.templateSources.anonymousTemplate(template);
+          return new anonymousTemplate(template);
       } else
           options.onError("Unknown template type: " + template);
   },
@@ -75,7 +78,3 @@ extend(templateEngine.prototype, {
       templateSource.data("isRewritten", true);
   }
 })
-
-
-
-export default templateEngine;
