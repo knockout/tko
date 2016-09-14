@@ -20,7 +20,7 @@ import {
 } from 'tko.utils';
 
 import {
-    bindings, renderTemplate, anonymousTemplate, templateEngine, setTemplateEngine,
+    bindings as templateBindings, renderTemplate, anonymousTemplate, templateEngine, setTemplateEngine,
     nativeTemplateEngine
 } from '../index.js';
 
@@ -120,10 +120,13 @@ describe('Templating', function() {
 
     beforeEach(function () {
         // Set up the default binding handlers.
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
+        var bindings = {};
+        extend(bindings, coreBindings.bindings);
+        extend(bindings, templateBindings);
+        bindingHandlers.set(bindings);
         dummyTemplateEngine.prototype = new templateEngine();
     })
 

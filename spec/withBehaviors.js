@@ -28,10 +28,13 @@ describe('Binding: With', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(Object.assign(coreBindings.bindings, templateBindings.bindings));
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
+        var bindings = {};
+        extend(bindings, coreBindings.bindings);
+        extend(bindings, templateBindings.bindings);
+        bindingHandlers.set(bindings);
     });
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsey', function() {
@@ -210,7 +213,7 @@ describe('Binding: With', function() {
         expect(testNode).toContainHtml("hello <!-- ko with: topitem --><!-- /ko -->");
     });
 
-    /*it('Should provide access to an observable viewModel through $rawData', function() {
+    it('Should provide access to an observable viewModel through $rawData', function() {
         testNode.innerHTML = "<div data-bind='with: item'><input data-bind='value: $rawData'/></div>";
         var item = observable('one');
         applyBindings({ item: item }, testNode);
@@ -225,5 +228,5 @@ describe('Binding: With', function() {
         // Should update the input when the observable changes
         item('three');
         expect(testNode.childNodes[0]).toHaveValues(['three']);
-    });*/
+    });
 });

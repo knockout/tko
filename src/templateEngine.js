@@ -62,19 +62,5 @@ extend(templateEngine.prototype, {
   renderTemplate: function (template, bindingContext, options, templateDocument) {
       var templateSource = this['makeTemplateSource'](template, templateDocument);
       return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument);
-  },
-
-  isTemplateRewritten: function (template, templateDocument) {
-      // Skip rewriting if requested
-      if (this.allowTemplateRewriting === false)
-          return true;
-      return this.makeTemplateSource(template, templateDocument).data("isRewritten");
-  },
-
-  rewriteTemplate: function (template, rewriterCallback, templateDocument) {
-      var templateSource = this['makeTemplateSource'](template, templateDocument);
-      var rewritten = rewriterCallback(templateSource['text']());
-      templateSource.text(rewritten);
-      templateSource.data("isRewritten", true);
   }
 })

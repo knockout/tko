@@ -18,7 +18,7 @@ import {
     options
 } from 'tko.utils';
 
-import {bindings, renderTemplate, anonymousTemplate} from '../index.js';
+import {bindings as templateBindings, renderTemplate, anonymousTemplate} from '../index.js';
 
 import * as coreBindings from 'tko.binding.core'
 
@@ -40,10 +40,13 @@ describe('Native template engine', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(Object.assign(coreBindings.bindings, bindings));
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
+        var bindings = {};
+        extend(bindings, coreBindings.bindings);
+        extend(bindings, templateBindings);
+        bindingHandlers.set(bindings);
     });
 
     describe('Named templates', function () {

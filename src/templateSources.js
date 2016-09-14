@@ -118,7 +118,3 @@ anonymousTemplate.prototype.text = function(/* valueToWrite */) {
         setTemplateDomData(this.domElement, {textData: valueToWrite});
     }
 };
-
-//ko.exportSymbol('templateSources', ko.templateSources);
-//ko.exportSymbol('templateSources.domElement', ko.templateSources.domElement);
-//ko.exportSymbol('templateSources.anonymousTemplate', ko.templateSources.anonymousTemplate);
