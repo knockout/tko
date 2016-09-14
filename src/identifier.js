@@ -47,7 +47,8 @@ Identifier.prototype.lookup_value = function (parent) {
   case '$data': return $data;
   default:
   }
-  if (token in $data) { return $data[token]; }
+  // instanceof Object covers 1. {}, 2. [], 3. function() {}, 4. new *;  it excludes undefined, null, primitives.
+  if ($data instanceof Object && token in $data) { return $data[token]; }
   if (token in $context) { return $context[token]; }
   if (token in globals) { return globals[token]; }
 

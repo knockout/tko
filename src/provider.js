@@ -107,9 +107,8 @@ function getBindingAccessors(node, context) {
     parser = new Parser(node, context, options.bindingGlobals),
     binding_string = this.getBindingsString(node);
 
-  binding_string = this.preProcessBindings(binding_string);
-
   if (binding_string) {
+    binding_string = this.preProcessBindings(binding_string);
     bindings = parser.parse(binding_string || '');
   }
 
