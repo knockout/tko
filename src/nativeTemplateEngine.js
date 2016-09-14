@@ -12,7 +12,6 @@ import {
 } from './templating'
 
 export function nativeTemplateEngine () {
-    this.allowTemplateRewriting = false;
 }
 
 nativeTemplateEngine.prototype = new templateEngine();
