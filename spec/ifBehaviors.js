@@ -44,7 +44,7 @@ describe('Binding: If', function() {
         expect(testNode.childNodes[0].childNodes.length).toEqual(0);
     });
 
-    /*it('Should leave descendant nodes in the document (and bind them) if the value is truthy, independently of the active template engine', function() {
+    it('Should leave descendant nodes in the document (and bind them) if the value is truthy, independently of the active template engine', function() {
         this.after(function() { setTemplateEngine(new nativeTemplateEngine()); });
 
         setTemplateEngine(new templateEngine()); // This template engine will just throw errors if you try to use it
@@ -53,7 +53,7 @@ describe('Binding: If', function() {
         applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode);
         expect(testNode.childNodes[0].childNodes.length).toEqual(1);
         expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
-    });*/
+    });
 
     it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function() {
         var someItem = observable(true);
