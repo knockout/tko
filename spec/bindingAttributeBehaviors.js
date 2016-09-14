@@ -406,7 +406,7 @@ describe('Binding attribute syntax', function() {
         expect(initCalls).toEqual(1);
         expect(testNode).toContainText("Hello Some text Goodbye");
     });
-    //TODO: FAIL
+
     it('Should be allowed to express containerless bindings with arbitrary internal whitespace and newlines', function() {
         testNode.innerHTML = "Hello <!-- ko\n" +
                              "    with\n" +
@@ -417,7 +417,7 @@ describe('Binding attribute syntax', function() {
                              "   \t --><span data-bind='text: personName'></span><!-- \n" +
                              "     /ko \n" +
                              "-->, Goodbye";
-        applyBindings(null, testNode);
+        applyBindings({personName: "Bert"}, testNode);
         expect(testNode).toContainText('Hello Bert, Goodbye');
     });
 
@@ -658,7 +658,7 @@ describe('Binding attribute syntax', function() {
             testNode.innerHTML = "<p data-bind='fnHandler: param, bx: 43'>";
             applyBindings(viewModel, testNode)
         });
-        //TODO: FAIL
+
         it("calls the `fn::dispose` when cleaned up", function () {
             var viewModel = { x: koObservable(true) },
                 instance = null,
