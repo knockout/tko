@@ -12,7 +12,8 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "tko-policy": "knockout/tko-policy",
-    "tko.binding.core": "knockout/tko.binding.core"
+    "tko.binding.core": "knockout/tko.binding.core",
+    "tko.binding.template": "knockout/tko.binding.template"
   },
   "files": [
     "dist/",

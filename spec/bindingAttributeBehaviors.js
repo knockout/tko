@@ -21,6 +21,7 @@ import {
 } from '../index.js';
 
 import * as coreBindings from 'tko.binding.core';
+import * as templateBindings from 'tko.binding.template';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -37,6 +38,7 @@ describe('Binding attribute syntax', function() {
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings.bindings);
+        options.onError = function (e) { throw e; };
     })
 
     it('applyBindings should accept no parameters and then act on document.body with undefined model', function() {
@@ -335,7 +337,7 @@ describe('Binding attribute syntax', function() {
         applyBindings(viewModel, testNode);
         expect(testNode).toContainText("Inner value");
     });
-
+    //TODO: ERROR
     it('Should be able to extend a binding context, adding new custom properties, without mutating the original binding context', function() {
         bindingHandlers.addCustomProperty = {
             init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -404,7 +406,7 @@ describe('Binding attribute syntax', function() {
         expect(initCalls).toEqual(1);
         expect(testNode).toContainText("Hello Some text Goodbye");
     });
-
+    //TODO: FAIL
     it('Should be allowed to express containerless bindings with arbitrary internal whitespace and newlines', function() {
         testNode.innerHTML = "Hello <!-- ko\n" +
                              "    with\n" +
@@ -422,7 +424,7 @@ describe('Binding attribute syntax', function() {
     it('Should be able to access virtual children in custom containerless binding', function() {
         var countNodes = 0;
         bindingHandlers.test = {
-            init: function (element /*, valueAccessor */) {
+            init: function (element ) {
                 // Counts the number of virtual children, and overwrites the text contents of any text nodes
                 for (var node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
                     countNodes++;
@@ -499,7 +501,7 @@ describe('Binding attribute syntax', function() {
         expect(dataFor(testNode.childNodes[1].childNodes[0]).myCustomData).toEqual(123);
         expect(dataFor(testNode.childNodes[1].childNodes[1]).myCustomData).toEqual(123);
     });
-
+    //TODO: FAIL
     it('Should be able to access custom context variables in child context', function() {
         bindingHandlers.bindChildrenWithCustomContext = {
             init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -609,7 +611,8 @@ describe('Binding attribute syntax', function() {
                     } else {
                         return originalBindingProvider.getBindingAccessors(node, bindingContext);
                     }
-                }
+                },
+                bindingHandlers: originalBindingProvider.bindingHandlers
             };
             bindingHandlers.replaceTextNodeContent = {
                 update: function(textNode, valueAccessor) { textNode.data = valueAccessor(); }
@@ -655,12 +658,12 @@ describe('Binding attribute syntax', function() {
             testNode.innerHTML = "<p data-bind='fnHandler: param, bx: 43'>";
             applyBindings(viewModel, testNode)
         });
-
+        //TODO: FAIL
         it("calls the `fn::dispose` when cleaned up", function () {
             var viewModel = { x: koObservable(true) },
                 instance = null,
                 disposeCalled = 0;
-            bindingHandlers.fnHandler = function (/* params */) {
+            bindingHandlers.fnHandler = function () {
                 instance = this;
             };
             bindingHandlers.fnHandler.prototype = {
@@ -678,7 +681,7 @@ describe('Binding attribute syntax', function() {
 
         it("does not error without a `dispose` property", function () {
             var viewModel = { x: koObservable(true) };
-            bindingHandlers.fnHandler = function (/* params */) {};
+            bindingHandlers.fnHandler = function () {};
             testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>';
             applyBindings(viewModel, testNode);
             viewModel.x(false);
@@ -713,7 +716,7 @@ describe('Binding attribute syntax', function() {
                 applyBindings({}, testNode);
             }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements");
         });
-
+        //TODO: FAIL
         it("has a .computed() property with the node's lifecycle", function () {
             var instance;
             var xCalls = 0,

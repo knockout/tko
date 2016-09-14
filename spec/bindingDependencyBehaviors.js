@@ -28,6 +28,7 @@ import {
 
 import * as coreBindings from 'tko.binding.core';
 
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding dependencies', function() {
     var bindingHandlers
@@ -35,8 +36,9 @@ describe('Binding dependencies', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function () {
-        bindingHandlers = new Provider().bindingHandlers
-        // Set up the default binding handlers.
+        var provider = new Provider()
+        options.bindingProviderInstance = provider
+        bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings.bindings);
     })
 
@@ -267,6 +269,7 @@ describe('Binding dependencies', function() {
             originalBindingProvider = options.bindingProviderInstance;
 
         options.bindingProviderInstance = {
+            bindingHandlers: originalBindingProvider.bindingHandlers,
             nodeHasBindings: originalBindingProvider.nodeHasBindings,
             getBindingAccessors: function(node, bindingContext) {
                 var bindings = originalBindingProvider.getBindingAccessors(node, bindingContext);
