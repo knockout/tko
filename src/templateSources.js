@@ -23,8 +23,8 @@
 // using and overriding "makeTemplateSource" to return an instance of your custom template source.
 
 import {
-  
-} '';
+    tagNameLower as tagNameLowerFn, setHtml, domData
+} from 'tko.utils';
 
 
 // ---- ko.templateSources.domElement -----
@@ -39,7 +39,7 @@ export function domElement(element) {
     this.domElement = element;
 
     if (!element) { return; }
-    var tagNameLower = ko.utils.tagNameLower(element);
+    var tagNameLower = tagNameLowerFn(element);
     this.templateType =
         tagNameLower === "script" ? templateScript :
         tagNameLower === "textarea" ? templateTextArea :
@@ -58,27 +58,27 @@ domElement.prototype.text = function(/* valueToWrite */) {
     } else {
         var valueToWrite = arguments[0];
         if (elemContentsProperty === "innerHTML")
-            ko.utils.setHtml(this.domElement, valueToWrite);
+            setHtml(this.domElement, valueToWrite);
         else
             this.domElement[elemContentsProperty] = valueToWrite;
     }
 };
 
-var dataDomDataPrefix = ko.utils.domData.nextKey() + "_";
+var dataDomDataPrefix = domData.nextKey() + "_";
 domElement.prototype.data = function(key /*, valueToWrite */) {
     if (arguments.length === 1) {
-        return ko.utils.domData.get(this.domElement, dataDomDataPrefix + key);
+        return domData.get(this.domElement, dataDomDataPrefix + key);
     } else {
-        ko.utils.domData.set(this.domElement, dataDomDataPrefix + key, arguments[1]);
+        domData.set(this.domElement, dataDomDataPrefix + key, arguments[1]);
     }
 };
 
-var templatesDomDataKey = ko.utils.domData.nextKey();
+var templatesDomDataKey = domData.nextKey();
 function getTemplateDomData(element) {
-    return ko.utils.domData.get(element, templatesDomDataKey) || {};
+    return domData.get(element, templatesDomDataKey) || {};
 }
 function setTemplateDomData(element, data) {
-    ko.utils.domData.set(element, templatesDomDataKey, data);
+    domData.set(element, templatesDomDataKey, data);
 }
 
 domElement.prototype.nodes = function(/* valueToWrite */) {
@@ -118,7 +118,3 @@ anonymousTemplate.prototype.text = function(/* valueToWrite */) {
         setTemplateDomData(this.domElement, {textData: valueToWrite});
     }
 };
-
-ko.exportSymbol('templateSources', ko.templateSources);
-ko.exportSymbol('templateSources.domElement', ko.templateSources.domElement);
-ko.exportSymbol('templateSources.anonymousTemplate', ko.templateSources.anonymousTemplate);
