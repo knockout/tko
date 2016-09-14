@@ -1,20 +1,47 @@
+import {
+    applyBindings
+} from 'tko.bind';
+
+import {
+    observable, observableArray
+} from 'tko.observable';
+
+import {
+    Provider
+} from 'tko.provider';
+
+import {
+    options, triggerEvent
+} from 'tko.utils';
+
+import * as coreBindings from '../index.js';
+
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
 describe('Binding: Selected Options', function() {
     beforeEach(jasmine.prepareTestNode);
+
+    beforeEach(function(){
+        var provider = new Provider()
+        options.bindingProviderInstance = provider
+        bindingHandlers = provider.bindingHandlers
+        bindingHandlers.set(coreBindings.bindings);
+    })
 
     it('Should only be applicable to SELECT nodes', function () {
         var threw = false;
         testNode.innerHTML = "<input data-bind='selectedOptions:[]' />";
-        try { ko.applyBindings({}, testNode); }
+        try { applyBindings({}, testNode); }
         catch (ex) { threw = true; }
         expect(threw).toEqual(true);
     });
 
     it('Should set selection in the SELECT node to match the model', function () {
         var bObject = {};
-        var values = new ko.observableArray(["A", bObject, "C"]);
-        var selection = new ko.observableArray([bObject]);
+        var values = new observableArray(["A", bObject, "C"]);
+        var selection = new observableArray([bObject]);
         testNode.innerHTML = "<select multiple='multiple' data-bind='options:myValues, selectedOptions:mySelection'></select>";
-        ko.applyBindings({ myValues: values, mySelection: selection }, testNode);
+        applyBindings({ myValues: values, mySelection: selection }, testNode);
 
         expect(testNode.childNodes[0]).toHaveSelectedValues([bObject]);
         selection.push("C");
@@ -31,16 +58,16 @@ describe('Binding: Selected Options', function() {
         }
 
         var cObject = {};
-        var values = new ko.observableArray(["A", "B", cObject]);
-        var selection = new ko.observableArray(["B"]);
+        var values = new observableArray(["A", "B", cObject]);
+        var selection = new observableArray(["B"]);
         testNode.innerHTML = "<select multiple='multiple' data-bind='options:myValues, selectedOptions:mySelection'></select>";
-        ko.applyBindings({ myValues: values, mySelection: selection }, testNode);
+        applyBindings({ myValues: values, mySelection: selection }, testNode);
 
         expect(selection()).toEqual(["B"]);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0], true);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[1], false);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[2], true);
-        ko.utils.triggerEvent(testNode.childNodes[0], "change");
+        triggerEvent(testNode.childNodes[0], "change");
 
         expect(selection()).toEqual(["A", cObject]);
         expect(selection()[1] === cObject).toEqual(true); // Also check with strict equality, because we don't want to falsely accept [object Object] == cObject
@@ -56,17 +83,17 @@ describe('Binding: Selected Options', function() {
         }
 
         var cObject = {};
-        var values = new ko.observableArray(["A", "B", cObject]);
+        var values = new observableArray(["A", "B", cObject]);
         var selection = ["B"];
         var myModel = { myValues: values, mySelection: selection };
         testNode.innerHTML = "<select multiple='multiple' data-bind='options:myValues, selectedOptions:mySelection'></select>";
-        ko.applyBindings(myModel, testNode);
+        applyBindings(myModel, testNode);
 
         expect(myModel.mySelection).toEqual(["B"]);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0], true);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[1], false);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[2], true);
-        ko.utils.triggerEvent(testNode.childNodes[0], "change");
+        triggerEvent(testNode.childNodes[0], "change");
 
         expect(myModel.mySelection).toEqual(["A", cObject]);
         expect(myModel.mySelection[1] === cObject).toEqual(true); // Also check with strict equality, because we don't want to falsely accept [object Object] == cObject
@@ -81,24 +108,24 @@ describe('Binding: Selected Options', function() {
                 optionElement.selected = state;
         }
 
-        var selection = new ko.observableArray([]);
+        var selection = new observableArray([]);
         testNode.innerHTML = "<select multiple='multiple' data-bind='selectedOptions:mySelection'><optgroup label='group'><option value='a'>a-text</option><option value='b'>b-text</option><option value='c'>c-text</option></optgroup></select>";
-        ko.applyBindings({ mySelection: selection }, testNode);
+        applyBindings({ mySelection: selection }, testNode);
 
         expect(selection()).toEqual([]);
 
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0].childNodes[0], true);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0].childNodes[1], false);
         setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0].childNodes[2], true);
-        ko.utils.triggerEvent(testNode.childNodes[0], "change");
+        triggerEvent(testNode.childNodes[0], "change");
 
         expect(selection()).toEqual(['a', 'c']);
     });
 
     it('Should set selection in the SELECT node inside an optgroup to match the model', function () {
-        var selection = new ko.observableArray(['a']);
+        var selection = new observableArray(['a']);
         testNode.innerHTML = "<select multiple='multiple' data-bind='selectedOptions:mySelection'><optgroup label='group'><option value='a'>a-text</option><option value='b'>b-text</option><option value='c'>c-text</option></optgroup><optgroup label='group2'><option value='d'>d-text</option></optgroup></select>";
-        ko.applyBindings({ mySelection: selection }, testNode);
+        applyBindings({ mySelection: selection }, testNode);
 
         expect(testNode.childNodes[0].childNodes[0]).toHaveSelectedValues(['a']);
         expect(testNode.childNodes[0].childNodes[1]).toHaveSelectedValues([]);
@@ -111,13 +138,13 @@ describe('Binding: Selected Options', function() {
     });
 
     it('Should not change the scroll position when updating the view', function() {
-        var selection = ko.observableArray(), data = [];
+        var selection = observableArray(), data = [];
         for (var i = 1; i < 101; i++) {
             data.push({ code: '0000' + i, name: 'Item ' + i });
         }
 
         testNode.innerHTML = "<select multiple=\"multiple\" data-bind=\"options: data, optionsText: 'name', optionsValue: 'code', selectedOptions: selectedItems\"></select>";
-        ko.applyBindings({ selectedItems: selection, data: data }, testNode);
+        applyBindings({ selectedItems: selection, data: data }, testNode);
 
         var selectElem = testNode.childNodes[0];
         expect(selectElem.scrollTop).toBe(0);

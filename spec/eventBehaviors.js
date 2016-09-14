@@ -1,5 +1,32 @@
+import {
+    applyBindings
+} from 'tko.bind';
+
+import {
+    triggerEvent
+} from 'tko.utils';
+
+import {
+    Provider
+} from 'tko.provider';
+
+import {
+    options
+} from 'tko.utils';
+
+import * as coreBindings from '../index.js';
+
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
 describe('Binding: Event', function() {
     beforeEach(jasmine.prepareTestNode);
+
+    beforeEach(function(){
+        var provider = new Provider()
+        options.bindingProviderInstance = provider
+        bindingHandlers = provider.bindingHandlers
+        bindingHandlers.set(coreBindings.bindings);
+    })
 
     it('Should invoke the supplied function when the event occurs, using model as \'this\' param and first arg, and event as second arg', function () {
         var model = {
@@ -24,19 +51,19 @@ describe('Binding: Event', function() {
             }
         };
         testNode.innerHTML = "<button data-bind='event:{click:firstHandler, mouseover:secondHandler, mouseout:null}'>hey</button>";
-        ko.applyBindings(model, testNode);
-        ko.utils.triggerEvent(testNode.childNodes[0], "click");
+        applyBindings(model, testNode);
+        triggerEvent(testNode.childNodes[0], "click");
         expect(model.firstWasCalled).toEqual(true);
         expect(model.secondWasCalled).toEqual(false);
-        ko.utils.triggerEvent(testNode.childNodes[0], "mouseover");
+        triggerEvent(testNode.childNodes[0], "mouseover");
         expect(model.secondWasCalled).toEqual(true);
-        ko.utils.triggerEvent(testNode.childNodes[0], "mouseout"); // Shouldn't do anything (specifically, shouldn't throw)
+        triggerEvent(testNode.childNodes[0], "mouseout"); // Shouldn't do anything (specifically, shouldn't throw)
     });
 
     it('Should prevent default action', function () {
         testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: function() { } }'>hey</button>";
-        ko.applyBindings(null, testNode);
-        ko.utils.triggerEvent(testNode.childNodes[0], "click");
+        applyBindings(null, testNode);
+        triggerEvent(testNode.childNodes[0], "click");
         // Assuming we haven't been redirected to http://www.example.com/, this spec has now passed
     });
 
@@ -46,8 +73,8 @@ describe('Binding: Event', function() {
             outerWasCalled: false, outerDoCall: function () { this.outerWasCalled = true; }
         };
         testNode.innerHTML = "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}'>hey</button></div>";
-        ko.applyBindings(model, testNode);
-        ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "click");
+        applyBindings(model, testNode);
+        triggerEvent(testNode.childNodes[0].childNodes[0], "click");
         expect(model.innerWasCalled).toEqual(true);
         expect(model.outerWasCalled).toEqual(true);
     });
@@ -58,8 +85,8 @@ describe('Binding: Event', function() {
             outerWasCalled: false, outerDoCall: function () { this.outerWasCalled = true; }
         };
         testNode.innerHTML = "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}, clickBubble:false'>hey</button></div>";
-        ko.applyBindings(model, testNode);
-        ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "click");
+        applyBindings(model, testNode);
+        triggerEvent(testNode.childNodes[0].childNodes[0], "click");
         expect(model.innerWasCalled).toEqual(true);
         expect(model.outerWasCalled).toEqual(false);
     });
@@ -84,8 +111,8 @@ describe('Binding: Event', function() {
         };
         testNode.innerHTML = "<button data-bind='event:{ mouseover: myHandler.bind(someObj, 123, \"another\", { something: true }) }'>hey</button>";
         var viewModel = { myHandler: myHandler, someObj: someObj };
-        ko.applyBindings(viewModel, testNode);
-        ko.utils.triggerEvent(testNode.childNodes[0], "mouseover");
+        applyBindings(viewModel, testNode);
+        triggerEvent(testNode.childNodes[0], "mouseover");
         expect(didCallHandler).toEqual(true);
     });
 });
