@@ -10,7 +10,9 @@ import {
     Provider
 } from 'tko.provider';
 
-import { bindings } from 'tko.binding.core';
+import {
+    bindings
+} from 'tko.binding.core';
 
 import {
     applyBindings

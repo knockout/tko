@@ -21,7 +21,7 @@ import {
 } from '../index.js';
 
 import * as coreBindings from 'tko.binding.core';
-import * as templateBindings from 'tko.binding.template';
+// import * as templateBindings from 'tko.binding.template';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -337,7 +337,7 @@ describe('Binding attribute syntax', function() {
         applyBindings(viewModel, testNode);
         expect(testNode).toContainText("Inner value");
     });
-    //TODO: ERROR
+
     it('Should be able to extend a binding context, adding new custom properties, without mutating the original binding context', function() {
         bindingHandlers.addCustomProperty = {
             init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
