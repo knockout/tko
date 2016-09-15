@@ -724,13 +724,13 @@ describe('Binding attribute syntax', function() {
             bindingHandlers.fnHandler = function () {
                 var v = this.v = koObservable(0);
                 instance = this;
-                this.x = koComputed(function () {
+                this.x = this.computed(function () {
                     xCalls++;
                     v();  // Add a dependency.
                     expect(this).toEqual(instance);
                     return 'x';
                 });
-                this.y = koComputed({
+                this.y = this.computed({
                     read: function () {
                         yCalls++;
                         v();
