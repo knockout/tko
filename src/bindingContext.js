@@ -1,6 +1,6 @@
 import {
     extend, options, anyDomNodeIsAttachedToDocument, addDisposeCallback,
-    arrayRemoveItem
+    arrayRemoveItem, domData
 } from 'tko.utils';
 
 import {
@@ -10,6 +10,9 @@ import {
 import {
     unwrap, isObservable
 } from 'tko.observable';
+
+
+var storedBindingContextDomDataKey = domData.nextKey();
 
 
 
@@ -144,3 +147,35 @@ bindingContext.prototype.extend = function(properties) {
 bindingContext.prototype.createStaticChildContext = function (dataItemOrAccessor, dataItemAlias) {
     return this.createChildContext(dataItemOrAccessor, dataItemAlias, null, { "exportDependencies": true });
 };
+
+
+export function storedBindingContextForNode(node, bindingContext) {
+    if (arguments.length == 2) {
+        domData.set(node, storedBindingContextDomDataKey, bindingContext);
+        if (bindingContext._subscribable)
+            bindingContext._subscribable._addNode(node);
+    } else {
+        return domData.get(node, storedBindingContextDomDataKey);
+    }
+}
+
+
+// Retrieving binding context from arbitrary nodes
+export function contextFor(node) {
+    // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
+    switch (node.nodeType) {
+    case 1:
+    case 8:
+        var context = storedBindingContextForNode(node);
+        if (context) return context;
+        if (node.parentNode) return contextFor(node.parentNode);
+        break;
+    }
+    return undefined;
+}
+
+
+export function dataFor(node) {
+    var context = contextFor(node);
+    return context ? context.$data : undefined;
+}

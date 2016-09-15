@@ -16,7 +16,7 @@ import {
 } from 'tko.computed';
 
 import {
-    bindingContext
+    bindingContext, storedBindingContextForNode
 } from './bindingContext';
 
 
@@ -416,16 +416,6 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
     };
 }
 
-var storedBindingContextDomDataKey = domData.nextKey();
-export function storedBindingContextForNode(node, bindingContext) {
-    if (arguments.length == 2) {
-        domData.set(node, storedBindingContextDomDataKey, bindingContext);
-        if (bindingContext._subscribable)
-            bindingContext._subscribable._addNode(node);
-    } else {
-        return domData.get(node, storedBindingContextDomDataKey);
-    }
-}
 
 function getBindingContext(viewModelOrBindingContext) {
     return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)
@@ -460,25 +450,6 @@ export function applyBindings(viewModelOrBindingContext, rootNode) {
     rootNode = rootNode || window.document.body; // Make "rootNode" parameter optional
 
     applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true);
-}
-
-// Retrieving binding context from arbitrary nodes
-export function contextFor(node) {
-    // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
-    switch (node.nodeType) {
-    case 1:
-    case 8:
-        var context = storedBindingContextForNode(node);
-        if (context) return context;
-        if (node.parentNode) return contextFor(node.parentNode);
-        break;
-    }
-    return undefined;
-}
-
-export function dataFor(node) {
-    var context = contextFor(node);
-    return context ? context.$data : undefined;
 }
 
 function onBindingError(spec) {

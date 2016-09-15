@@ -17,7 +17,7 @@ import {
 } from '../index.js';
 
 import * as coreBindings from 'tko.binding.core';
-// import * as templateBindings from 'tko.binding.template';
+import * as templateBindings from 'tko.binding.template';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -34,6 +34,7 @@ describe('Binding attribute syntax', function() {
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings.bindings);
+        bindingHandlers.set(templateBindings.bindings);
         options.onError = function (e) { throw e; };
     })
 
