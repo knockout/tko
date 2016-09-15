@@ -16,6 +16,12 @@ import {
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
 export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, settings) {
+
+    var self = this,
+        isFunc = typeof(dataItemOrAccessor) == "function" && !isObservable(dataItemOrAccessor),
+        nodes,
+        subscribable;
+
     // The binding context object includes static properties for the current, parent, and root view models.
     // If a view model is actually stored in an observable, the corresponding binding context object, and
     // any child contexts, must be updated when the view model is changed.
@@ -60,50 +66,47 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
 
         return self.$data;
     }
+
     function disposeWhen() {
         return nodes && !anyDomNodeIsAttachedToDocument(nodes);
     }
-
-    var self = this,
-        isFunc = typeof(dataItemOrAccessor) == "function" && !isObservable(dataItemOrAccessor),
-        nodes,
-        subscribable;
 
     if (settings && settings.exportDependencies) {
         // The "exportDependencies" option means that the calling code will track any dependencies and re-create
         // the binding context when they change.
         updateContext();
-    } else {
-        subscribable = computed(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true });
+        return;
+    }
 
-        // At this point, the binding context has been initialized, and the "subscribable" computed observable is
-        // subscribed to any observables that were accessed in the process. If there is nothing to track, the
-        // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
-        // the context object.
-        if (subscribable.isActive()) {
-            self._subscribable = subscribable;
+    subscribable = computed(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true });
 
-            // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
-            subscribable.equalityComparer = null;
+    // At this point, the binding context has been initialized, and the "subscribable" computed observable is
+    // subscribed to any observables that were accessed in the process. If there is nothing to track, the
+    // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
+    // the context object.
+    if (subscribable.isActive()) {
+        self._subscribable = subscribable;
 
-            // We need to be able to dispose of this computed observable when it's no longer needed. This would be
-            // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
-            // we cannot assume that those nodes have any relation to each other. So instead we track any node that
-            // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
+        // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
+        subscribable.equalityComparer = null;
 
-            // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
-            nodes = [];
-            subscribable._addNode = function(node) {
-                nodes.push(node);
-                addDisposeCallback(node, function(node) {
-                    arrayRemoveItem(nodes, node);
-                    if (!nodes.length) {
-                        subscribable.dispose();
-                        self._subscribable = subscribable = undefined;
-                    }
-                });
-            };
-        }
+        // We need to be able to dispose of this computed observable when it's no longer needed. This would be
+        // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
+        // we cannot assume that those nodes have any relation to each other. So instead we track any node that
+        // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
+
+        // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
+        nodes = [];
+        subscribable._addNode = function(node) {
+            nodes.push(node);
+            addDisposeCallback(node, function(node) {
+                arrayRemoveItem(nodes, node);
+                if (!nodes.length) {
+                    subscribable.dispose();
+                    self._subscribable = subscribable = undefined;
+                }
+            });
+        };
     }
 }
 
@@ -134,7 +137,7 @@ bindingContext.prototype.extend = function(properties) {
         // This "child" context doesn't directly track a parent observable view model,
         // so we need to manually set the $rawData value to match the parent.
         self.$rawData = parentContext.$rawData;
-        extend(self, typeof(properties) == "function" ? properties() : properties);
+        extend(self, typeof(properties) === "function" ? properties() : properties);
     });
 };
 
