@@ -8,10 +8,6 @@ import {
 } from 'tko.observable';
 
 import {
-    computed as koComputed
-} from 'tko.computed';
-
-import {
     Provider
 } from 'tko.provider';
 
