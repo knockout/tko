@@ -8,8 +8,7 @@ var _ = require('lodash')
 var figlet = require('figlet')
 var karma = require('karma')
 var nodeResolve = require('rollup-plugin-node-resolve');
-
-var stub = require('rollup-plugin-stub');
+var nodeDirect = require('rollup-plugin-node-direct');
 
 var gulp = global.__tko_gulp
 
@@ -31,8 +30,10 @@ function test(extra_config, done) {
 
     options.rollupPreprocessor = {
       plugins: [
-        // stub(),  see:
-        //  https://github.com/eventualbuddha/rollup-plugin-stub/issues/2
+        nodeDirect({
+          paths: [ path.join(SPEC_DIR, '../..') ],
+          // verbose: true
+        }),
         nodeResolve({ jsnext: true, }),
       ],
       sourceMap: 'inline',
