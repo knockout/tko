@@ -29,6 +29,8 @@ function test(extra_config, done) {
     }
 
     options.rollupPreprocessor = {
+      format: 'iife',
+      moduleName: "tko-tests",
       plugins: [
         nodeDirect({
           paths: [ path.join(SPEC_DIR, '../..') ],
