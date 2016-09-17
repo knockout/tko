@@ -14,6 +14,7 @@ window.amdRequire = window.require;
 // window.jQuery with 'undefined' on IE < 9
 window.jQueryInstance = window.jQuery;
 
+export var testNode;
 jasmine.updateInterval = 500;
 
 /*
