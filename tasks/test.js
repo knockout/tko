@@ -36,7 +36,7 @@ function test(extra_config, done) {
         }),
         nodeResolve({ jsnext: true, }),
       ],
-      sourceMap: 'inline',
+      sourceMap: process.argv.includes('--no-sourcemap') ? false : 'inline',
     }
 
     if (process.argv.indexOf('--debug') >= 0) {
@@ -68,6 +68,7 @@ gulp.task('test', 'Run Karma tests', function (done) {
     'once': 'Run the test once, then quit.',
     'watch': 'Watch for changes, re-testing on change.',
     'debug': 'Print task debugging.',
-    'chrome': 'Use Chrome test runner'
+    'chrome': 'Use Chrome test runner',
+    'no-sourcemap': 'Disable sourcemap generation'
   }
 })
