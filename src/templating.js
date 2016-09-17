@@ -25,14 +25,6 @@ import {
 
 import { anonymousTemplate } from './templateSources';
 
-function keyValueArrayContainsKey(keyValueArray, key) {
-    for (var i = 0; i < keyValueArray.length; i++)
-        if (keyValueArray[i]['key'] == key)
-            return true;
-    return false;
-}
-
-
 var _templateEngine;
 
 export function setTemplateEngine(tEngine) {
@@ -126,17 +118,17 @@ function executeTemplate(targetNodeOrNodeArray, renderMode, template, bindingCon
 
     var haveAddedNodesToParent = false;
     switch (renderMode) {
-        case "replaceChildren":
-            virtualElements.setDomNodeChildren(targetNodeOrNodeArray, renderedNodesArray);
-            haveAddedNodesToParent = true;
-            break;
-        case "replaceNode":
-            replaceDomNodes(targetNodeOrNodeArray, renderedNodesArray);
-            haveAddedNodesToParent = true;
-            break;
-        case "ignoreTargetNode": break;
-        default:
-            throw new Error("Unknown renderMode: " + renderMode);
+    case "replaceChildren":
+        virtualElements.setDomNodeChildren(targetNodeOrNodeArray, renderedNodesArray);
+        haveAddedNodesToParent = true;
+        break;
+    case "replaceNode":
+        replaceDomNodes(targetNodeOrNodeArray, renderedNodesArray);
+        haveAddedNodesToParent = true;
+        break;
+    case "ignoreTargetNode": break;
+    default:
+        throw new Error("Unknown renderMode: " + renderMode);
     }
 
     if (haveAddedNodesToParent) {
@@ -160,13 +152,6 @@ function resolveTemplateName(template, data, context) {
         // 3. A string
         return template;
     }
-}
-
-function keyValueArrayContainsKey(keyValueArray, key) {
-    for (var i = 0; i < keyValueArray.length; i++)
-        if (keyValueArray[i]['key'] == key)
-            return true;
-    return false;
 }
 
 export function renderTemplate(template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode) {
@@ -205,15 +190,15 @@ export function renderTemplate(template, dataOrBindingContext, options, targetNo
             renderTemplate(template, dataOrBindingContext, options, domNode, "replaceNode");
         });
     }
-};
+}
 
-export default renderTemplateForEach = function (template, arrayOrObservableArray, options, targetNode, parentBindingContext) {
+export default function renderTemplateForEach(template, arrayOrObservableArray, options, targetNode, parentBindingContext) {
     // Since setDomNodeChildrenFromArrayMapping always calls executeTemplateForArrayItem and then
     // activateBindingsCallback for added items, we can store the binding context in the former to use in the latter.
     var arrayItemContext;
 
     // This will be called by setDomNodeChildrenFromArrayMapping to get the nodes to add to targetNode
-    var executeTemplateForArrayItem = function (arrayValue, index) {
+    function executeTemplateForArrayItem(arrayValue, index) {
         // Support selecting template as a function of the data being rendered
         arrayItemContext = parentBindingContext['createChildContext'](arrayValue, options['as'], function(context) {
             context['$index'] = index;
@@ -224,7 +209,7 @@ export default renderTemplateForEach = function (template, arrayOrObservableArra
     }
 
     // This will be called whenever setDomNodeChildrenFromArrayMapping has added nodes to targetNode
-    var activateBindingsCallback = function(arrayValue, addedNodesArray, index) {
+    var activateBindingsCallback = function(arrayValue, addedNodesArray /*, index */) {
         activateBindingsOnContinuousNodeArray(addedNodesArray, arrayItemContext);
         if (options['afterRender'])
             options['afterRender'](addedNodesArray, arrayValue);
@@ -249,7 +234,7 @@ export default renderTemplateForEach = function (template, arrayOrObservableArra
         dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, filteredArray, executeTemplateForArrayItem, options, activateBindingsCallback]);
 
     }, null, { disposeWhenNodeIsRemoved: targetNode });
-};
+}
 
 var templateComputedDomDataKey = domData.nextKey();
 function disposeOldComputedAndStoreNewOne(element, newComputed) {
@@ -260,7 +245,8 @@ function disposeOldComputedAndStoreNewOne(element, newComputed) {
 }
 
 export var template = {
-    'init': function(element, valueAccessor) {
+    init: function(element, valueAccessor) {
+        var container;
         // Support anonymous templates
         var bindingValue = unwrap(valueAccessor());
         if (typeof bindingValue == "string" || bindingValue['name']) {
@@ -275,13 +261,13 @@ export var template = {
             if (isObservable(nodes)) {
                 throw new Error('The "nodes" option must be a plain, non-observable array.');
             }
-            var container = moveCleanedNodesToContainerElement(nodes); // This also removes the nodes from their current parent
+            container = moveCleanedNodesToContainerElement(nodes); // This also removes the nodes from their current parent
             new anonymousTemplate(element)['nodes'](container);
         } else {
             // It's an anonymous template - store the element contents, then clear the element
-            var templateNodes = virtualElements.childNodes(element),
-                container = moveCleanedNodesToContainerElement(templateNodes); // This also removes the nodes from their current parent
-            new anonymousTemplate(element)['nodes'](container);
+            var templateNodes = virtualElements.childNodes(element);
+            container = moveCleanedNodesToContainerElement(templateNodes); // This also removes the nodes from their current parent
+            new anonymousTemplate(element).nodes(container);
         }
         return { 'controlsDescendantBindings': true };
     },
