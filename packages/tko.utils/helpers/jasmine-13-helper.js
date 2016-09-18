@@ -3,7 +3,7 @@
  */
 
 import {
-  arrayMap, arrayFilter, ieVersion, options
+  arrayMap, arrayFilter, ieVersion
 } from '../index.js';
 
 
@@ -36,7 +36,7 @@ jasmine.Clock.mockScheduler = function (callback) {
 };
 
 
-export function useMockForTasks() {
+export function useMockForTasks(options) {
     jasmine.Clock.useMock();
 
     // Make sure tasks is using setTimeout so that it uses the mock clock

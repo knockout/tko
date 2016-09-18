@@ -5,7 +5,7 @@ import { tasks, options, ieVersion } from '../index.js';
 
 describe('Tasks', function() {
     beforeEach(function() {
-        useMockForTasks();
+        useMockForTasks(options);
     });
 
     afterEach(function() {
