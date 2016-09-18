@@ -1,11 +1,11 @@
-import '../helpers/jasmine-13-helper.js'
+import { useMockForTasks } from '../helpers/jasmine-13-helper.js';
 
-import { tasks, ieVersion } from '../index.js'
+import { tasks, options, ieVersion } from '../index.js';
 
 
 describe('Tasks', function() {
     beforeEach(function() {
-        jasmine.Clock.useMockForTasks();
+        useMockForTasks();
     });
 
     afterEach(function() {
@@ -299,7 +299,7 @@ describe('Tasks', function() {
     });
 });
 
-describe('Tasks scheduler', function() {
+describe('Tasks options.taskScheduler', function() {
     if (ieVersion) {
         beforeEach(function() { waits(100); });
         // Workaround for timing-related issues in IE9, where the first few
@@ -333,8 +333,8 @@ describe('Tasks scheduler', function() {
         var counts = [0, 0];    // scheduler, tasks
 
         jasmine.Clock.useMock();
-        this.restoreAfter(tasks, 'scheduler');
-        tasks.scheduler = function (callback) {
+        this.restoreAfter(options, 'taskScheduler');
+        options.taskScheduler = function (callback) {
             ++counts[0];
             setTimeout(callback, 0);
         };

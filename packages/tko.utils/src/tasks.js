@@ -3,10 +3,10 @@
 //  ===
 //
 /* eslint no-cond-assign: 0 */
+import options from './options';
 import { deferError } from './error.js';
 
-var scheduler,
-    taskQueue = [],
+var taskQueue = [],
     taskQueueLength = 0,
     nextHandle = 1,
     nextIndexToProcess = 0;
@@ -14,7 +14,7 @@ var scheduler,
 if (window.MutationObserver && !(window.navigator && window.navigator.standalone)) {
     // Chrome 27+, Firefox 14+, IE 11+, Opera 15+, Safari 6.1+
     // From https://github.com/petkaantonov/bluebird * Copyright (c) 2014 Petka Antonov * License: MIT
-    scheduler = (function (callback) {
+    options.taskScheduler = (function (callback) {
         var div = document.createElement("div");
         new MutationObserver(callback).observe(div, {attributes: true});
         return function () { div.classList.toggle("foo"); };
@@ -22,7 +22,7 @@ if (window.MutationObserver && !(window.navigator && window.navigator.standalone
 } else if (document && "onreadystatechange" in document.createElement("script")) {
     // IE 6-10
     // From https://github.com/YuzuJS/setImmediate * Copyright (c) 2012 Barnesandnoble.com, llc, Donavon West, and Domenic Denicola * License: MIT
-    scheduler = function (callback) {
+    options.taskScheduler = function (callback) {
         var script = document.createElement("script");
         script.onreadystatechange = function () {
             script.onreadystatechange = null;
@@ -33,7 +33,7 @@ if (window.MutationObserver && !(window.navigator && window.navigator.standalone
         document.documentElement.appendChild(script);
     };
 } else {
-    scheduler = function (callback) {
+    options.taskScheduler = function (callback) {
         setTimeout(callback, 0);
     };
 }
@@ -73,7 +73,7 @@ function scheduledProcess() {
 }
 
 function scheduleTaskProcessing() {
-    scheduler(scheduledProcess);
+    options.taskScheduler(scheduledProcess);
 }
 
 
@@ -100,4 +100,4 @@ export function resetForTesting() {
     return length;
 }
 
-export {scheduler, processTasks as runEarly};
+export {processTasks as runEarly};

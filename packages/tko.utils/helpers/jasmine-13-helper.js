@@ -3,7 +3,7 @@
  */
 
 import {
-  tasks, arrayMap, arrayFilter, ieVersion
+  arrayMap, arrayFilter, ieVersion, options
 } from '../index.js';
 
 
@@ -35,15 +35,16 @@ jasmine.Clock.mockScheduler = function (callback) {
     setTimeout(callback, 0);
 };
 
-jasmine.Clock.useMockForTasks = function() {
+
+export function useMockForTasks() {
     jasmine.Clock.useMock();
 
     // Make sure tasks is using setTimeout so that it uses the mock clock
-    if (tasks.scheduler != jasmine.Clock.mockScheduler) {
-        jasmine.getEnv().currentSpec.restoreAfter(tasks, 'scheduler');
-        tasks.scheduler = jasmine.Clock.mockScheduler;
+    if (options.taskScheduler != jasmine.Clock.mockScheduler) {
+        jasmine.getEnv().currentSpec.restoreAfter(options, 'taskScheduler');
+        options.taskScheduler = jasmine.Clock.mockScheduler;
     }
-};
+}
 
 jasmine.Spec.prototype.restoreAfter = function(object, propertyName) {
     var originalValue = object[propertyName];

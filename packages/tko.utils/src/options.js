@@ -28,6 +28,8 @@ var options = {
     // disable automatically setting jQuery.
     jQuery: window && window.jQuery,
 
+    taskScheduler: null,
+
     debug: false,
 
     onError: function (e) { throw e; },
