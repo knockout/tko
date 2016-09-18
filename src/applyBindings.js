@@ -360,12 +360,12 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
         // Return the value accessor for a given binding. When bindings are static (won't be updated because of a binding
         // context update), just return the value accessor from the binding. Otherwise, return a function that always gets
         // the latest binding value and registers a dependency on the binding updater.
-        var getValueAccessor = bindingsUpdater
+        var getValueAccessor = /*bindingsUpdater
             ? function(bindingKey) {
                 return function() {
                     return evaluateValueAccessor(bindingsUpdater()[bindingKey]);
                 };
-            } : function(bindingKey) {
+            } :*/ function(bindingKey) {
                 return bindings[bindingKey];
             };
 

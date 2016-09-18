@@ -28,7 +28,9 @@ import {
 
 import * as coreBindings from 'tko.binding.core';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import {
+    testNode
+} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding dependencies', function() {
     var bindingHandlers
@@ -293,7 +295,7 @@ describe('Binding dependencies', function() {
     });
 
     describe('Observable view models', function() {
-        it('Should update bindings (including callbacks)', function() {
+        iit('Should update bindings (including callbacks)', function() {
             var vm = observableConstructor(), clickedVM;
             function checkVM(data) {
                 clickedVM = data;

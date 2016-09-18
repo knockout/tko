@@ -19,7 +19,9 @@ import {
 import * as coreBindings from 'tko.binding.core';
 import * as templateBindings from 'tko.binding.template';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import {
+    testNode
+} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 
 /* eslint semi: 0, no-empty: 0 */
@@ -328,10 +330,11 @@ describe('Binding attribute syntax', function() {
     });
 
     it('Should use properties on the view model in preference to properties on the binding context', function() {
+        // In KO 3.5 this test relied on a bit of duck-typing (it has a $data).
         testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>";
-        var context = new bindingContext({ someProp: 'Outer value' })
-        var viewModel = new bindingContext({ someProp: "Inner value" }, context)
-        applyBindings(viewModel, testNode);
+        var outer = new bindingContext({ someProp: 'Outer value' })
+        var inner = new bindingContext({ someProp: 'Inner value' }, outer)
+        applyBindings(inner, testNode);
         expect(testNode).toContainText("Inner value");
     });
 
