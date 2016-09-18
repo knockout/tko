@@ -107,9 +107,9 @@ describe('Dependent Observable', function() {
     it('Should use options.owner as "this" when invoking the "write" callback, and can pass multiple parameters', function() {
         var invokedWriteWithArgs, invokedWriteWithThis;
         var someOwner = {};
-        var obs = observable()
+        var obs = observable();
         var instance = computed({
-            read: function() { return obs() },
+            read: function() { return obs(); },
             write: function() { obs(null); invokedWriteWithArgs = Array.prototype.slice.call(arguments, 0); invokedWriteWithThis = this; },
             owner: someOwner
         });
@@ -265,7 +265,7 @@ describe('Dependent Observable', function() {
     it('Should accept "owner" parameter to define the object on which the evaluator function should be called', function () {
         var model = new (function () {
             this.greeting = "hello";
-            this.fullMessageWithoutOwner = computed(function () { return this.greeting + " world"; });
+            this.fullMessageWithoutOwner = computed(function () { return (this || {}).greeting + " world"; });
             this.fullMessageWithOwner = computed(function () { return this.greeting + " world"; }, this);
         })();
         expect(model.fullMessageWithoutOwner()).toEqual("undefined world");

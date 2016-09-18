@@ -21,7 +21,9 @@ import {
     pureComputed as koPureComputed
 } from '../index.js';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import {
+    useMockForTasks
+} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe("Throttled observables", function() {
     beforeEach(function() { waits(1); }); // Workaround for spurious timing-related failures on IE8 (issue #736)
@@ -640,7 +642,7 @@ describe('Rate-limited', function() {
 
 describe('Deferred', function() {
     beforeEach(function() {
-        jasmine.Clock.useMockForTasks();
+        useMockForTasks(options);
     });
 
     afterEach(function() {
