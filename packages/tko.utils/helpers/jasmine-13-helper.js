@@ -14,7 +14,7 @@ window.amdRequire = window.require;
 // window.jQuery with 'undefined' on IE < 9
 window.jQueryInstance = window.jQuery;
 
-export var testNode;
+// export var testNode;
 jasmine.updateInterval = 500;
 
 /*
@@ -26,9 +26,9 @@ jasmine.prepareTestNode = function() {
     var existingNode = document.getElementById("testNode");
     if (existingNode !== null)
         existingNode.parentNode.removeChild(existingNode);
-    testNode = document.createElement("div");
-    testNode.id = "testNode";
-    document.body.appendChild(testNode);
+    window.testNode = document.createElement("div");
+    window.testNode.id = "testNode";
+    document.body.appendChild(window.testNode);
 };
 
 jasmine.Clock.mockScheduler = function (callback) {
