@@ -1,12 +1,39 @@
+import {
+    applyBindings
+} from 'tko.bind';
+
+import {
+    observable
+} from 'tko.observable';
+
+import {
+    Provider
+} from 'tko.provider';
+
+import {
+    options
+} from 'tko.utils';
+
+
+import * as coreBindings from '../index.js';
+
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: CSS classes', function() {
     beforeEach(jasmine.prepareTestNode);
 
+    beforeEach(function(){
+        var provider = new Provider()
+        options.bindingProviderInstance = provider
+        bindingHandlers = provider.bindingHandlers
+        bindingHandlers.set(coreBindings.bindings);
+    })
+
     it('Should give the element the specific CSS class only when the specified value is true', function () {
-        var observable1 = new ko.observable();
-        var observable2 = new ko.observable(true);
+        var observable1 = observable();
+        var observable2 = observable(true);
         testNode.innerHTML = "<div class='unrelatedClass1 unrelatedClass2' data-bind='css: { myRule: someModelProperty, anotherRule: anotherModelProperty }'>Hallo</div>";
-        ko.applyBindings({ someModelProperty: observable1, anotherModelProperty: observable2 }, testNode);
+        applyBindings({ someModelProperty: observable1, anotherModelProperty: observable2 }, testNode);
 
         expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 unrelatedClass2 anotherRule");
         observable1(true);
@@ -16,9 +43,9 @@ describe('Binding: CSS classes', function() {
     });
 
     it('Should give the element a single CSS class without a leading space when the specified value is true', function() {
-        var observable1 = new ko.observable();
+        var observable1 = observable();
         testNode.innerHTML = "<div data-bind='css: { myRule: someModelProperty }'>Hallo</div>";
-        ko.applyBindings({ someModelProperty: observable1 }, testNode);
+        applyBindings({ someModelProperty: observable1 }, testNode);
 
         expect(testNode.childNodes[0].className).toEqual("");
         observable1(true);
@@ -26,9 +53,9 @@ describe('Binding: CSS classes', function() {
     });
 
     it('Should toggle multiple CSS classes if specified as a single string separated by spaces', function() {
-        var observable1 = new ko.observable();
+        var observable1 = observable();
         testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: { \"myRule _another-Rule123\": someModelProperty }'>Hallo</div>";
-        ko.applyBindings({ someModelProperty: observable1 }, testNode);
+        applyBindings({ someModelProperty: observable1 }, testNode);
 
         expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
         observable1(true);
@@ -38,9 +65,9 @@ describe('Binding: CSS classes', function() {
     });
 
     it('Should set/change dynamic CSS class(es) if string is specified', function() {
-        var observable1 = new ko.observable("");
+        var observable1 = observable("");
         testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>";
-        ko.applyBindings({ someModelProperty: observable1 }, testNode);
+        applyBindings({ someModelProperty: observable1 }, testNode);
 
         expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
         observable1("my-Rule");
@@ -55,9 +82,9 @@ describe('Binding: CSS classes', function() {
 
     it('Should work with any arbitrary class names', function() {
         // See https://github.com/SteveSanderson/knockout/issues/704
-        var observable1 = new ko.observable();
+        var observable1 = observable();
         testNode.innerHTML = "<div data-bind='css: { \"complex/className complex.className\" : someModelProperty }'>Something</div>";
-        ko.applyBindings({ someModelProperty: observable1 }, testNode);
+        applyBindings({ someModelProperty: observable1 }, testNode);
 
         expect(testNode.childNodes[0].className).toEqual("");
         observable1(true);
@@ -80,20 +107,20 @@ describe('Binding: CSS classes', function() {
 
     it("should update the class of an SVG tag", function () {
         if (svgTag) {
-            var observable = ko.observable();
+            var myObservable = observable();
             testNode.innerHTML = "<svg class='Y' data-bind='css: {x: someModelProperty}'></svg>";
-            ko.applyBindings({someModelProperty: observable}, testNode);
+            applyBindings({someModelProperty: myObservable}, testNode);
             expect(testNode.childNodes[0].getAttribute('class')).toEqual("Y");
-            observable(true);
+            myObservable(true);
             expect(testNode.childNodes[0].getAttribute('class')).toEqual("Y x");
         }
     });
 
     it('Should change dynamic CSS class(es) if null is specified', function() {
         // See https://github.com/knockout/knockout/issues/1468
-        var observable1 = new ko.observable({});
+        var observable1 = observable({});
         testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>";
-        ko.applyBindings({ someModelProperty: observable1 }, testNode);
+        applyBindings({ someModelProperty: observable1 }, testNode);
         expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
         observable1("my-Rule");
         expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 my-Rule");
@@ -104,18 +131,18 @@ describe('Binding: CSS classes', function() {
     });
 
     it('Should be aliased as class as well as css', function() {
-        expect(ko.bindingHandlers['class']).toEqual(ko.bindingHandlers.css);
+        expect(bindingHandlers['class']).toEqual(bindingHandlers.css);
     });
 
     it('Should be able to combine "class" and "css" bindings with dynamic and static classes', function () {
         // This test doesn't cover cases where the static and dynamic bindings try to set or unset the same class name
         // because the behavior for that scenario isn't defined.
 
-        var booleanProp = new ko.observable(false);
-        var stringProp = new ko.observable("");
+        var booleanProp = observable(false);
+        var stringProp = observable("");
         testNode.innerHTML = "<div class='unrelatedClass' data-bind='css: { staticClass: booleanProp }, class: stringProp'></div>";
 
-        ko.applyBindings({ booleanProp: booleanProp, stringProp: stringProp }, testNode);
+        applyBindings({ booleanProp: booleanProp, stringProp: stringProp }, testNode);
         expect(testNode.childNodes[0].className).toEqual("unrelatedClass");
 
         booleanProp(true);

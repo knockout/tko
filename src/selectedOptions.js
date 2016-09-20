@@ -21,7 +21,7 @@ export var selectedOptions = {
             var value = valueAccessor(), valueToWrite = [];
             arrayForEach(element.getElementsByTagName("option"), function(node) {
                 if (node.selected)
-                    valueToWrite.push(ko.selectExtensions.readValue(node));
+                    valueToWrite.push(selectExtensions.readValue(node));
             });
             valueAccessor(valueToWrite);
         });
@@ -36,7 +36,7 @@ export var selectedOptions = {
 
         if (newValue && typeof newValue.length == "number") {
             arrayForEach(element.getElementsByTagName("option"), function(node) {
-                var isSelected = arrayIndexOf(newValue, ko.selectExtensions.readValue(node)) >= 0;
+                var isSelected = arrayIndexOf(newValue, selectExtensions.readValue(node)) >= 0;
                 if (node.selected != isSelected) {      // This check prevents flashing of the select element in IE
                     setOptionNodeSelectionState(node, isSelected);
                 }

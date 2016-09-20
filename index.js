@@ -4,7 +4,7 @@ import {checked, checkedValue} from './src/checked.js';
 import {click} from './src/click.js';
 import {css} from './src/css.js';
 import {enable, disable} from './src/enableDisable.js';
-import $event from './src/event.js';
+import {eventHandler} from './src/event.js';
 import {hasfocus} from './src/hasfocus.js';
 import {html} from './src/html.js';
 import $let from './src/let.js';
@@ -25,7 +25,7 @@ export var bindings = {
     click: click,
     css: css, 'class': css,
     enable: enable,
-    'event': $event,
+    'event': eventHandler,
     disable: disable,
     hasfocus: hasfocus, hasFocus: hasfocus,
     html: html,
