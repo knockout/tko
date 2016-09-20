@@ -293,7 +293,7 @@ describe('Binding dependencies', function() {
     });
 
     describe('Observable view models', function() {
-        iit('Should update bindings (including callbacks)', function() {
+        it('Should update bindings (including callbacks)', function() {
             var vm = observableConstructor(), clickedVM;
             function checkVM(data) {
                 clickedVM = data;

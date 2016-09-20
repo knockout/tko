@@ -9,6 +9,7 @@ dependencies:
     # Need npm v3 for flat node_modules dependencies.
     - npm install -g npm
     - npm install -g rollup gulp
+    - npm update
 
 test:
   override:
