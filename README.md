@@ -28,12 +28,20 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
  
 When complete, the hope is that Knockout will become an *opinionated expression* of TKO, in other words, Knockout will simply be a set of popular and sensible choices from a list of TKO-based HTML-bindings, utilities, observables, and other plugins e.g.:
 
-- [tko-policy](https://github.com/knockout/tko.tools) — Tools and settings for every TKO-based package
-- [tko.bind](https://github.com/knockout/tko.bind) — HTML bindings
-- [tko.observable](https://github.com/knockout/tko.observable) — Observable variables
-- [tko.computed](https://github.com/knockout/tko.computed) — Computed/dependant observable variables
-- [tko.components](https://github.com/knockout/tko.components) — Web-components
-- [tko.utils](https://github.com/knockout/tko.utils) — Common TKO Utilities
+| Package  | Build Status |
+| -------  | ------------ |
+| [tko-policy](/knockout/tko-policy) | [![CircleCI](https://circleci.com/gh/knockout/tko-policy.svg?style=shield)](https://circleci.com/gh/knockout/tko-policy) |
+| [tko.utils](/knockout/tko.utils) | [![CircleCI](https://circleci.com/gh/knockout/tko.utils.svg?style=shield)](https://circleci.com/gh/knockout/tko.utils)
+| [tko.observable](/knockout/tko.observable) | [![CircleCI](https://circleci.com/gh/knockout/tko.observable.svg?style=shield)](https://circleci.com/gh/knockout/tko.observable) |
+| [tko.computed](/knockout/tko.computed) | [![CircleCI](https://circleci.com/gh/knockout/tko.computed.svg?style=shield)](https://circleci.com/gh/knockout/tko.computed) |
+| [tko.provider](/knockout/tko.provider) | [![CircleCI](https://circleci.com/gh/knockout/tko.provider.svg?style=shield)](https://circleci.com/gh/knockout/tko.provider) |
+| [tko.bind](/knockout/tko.bind) | [![CircleCI](https://circleci.com/gh/knockout/tko.bind.svg?style=shield)](https://circleci.com/gh/knockout/tko.bind) |
+| [tko.binding.core](/knockout/tko.binding.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.core) |
+| [tko.binding.template](/knockout/tko.binding.template) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.template.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.template) |
+| [tko.extender.core](/knockout/tko.extender.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.extender.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.extender.core) |
+| [tko.components](/knockout/tko.components) | [![CircleCI](https://circleci.com/gh/knockout/tko.components.svg?style=shield)](https://circleci.com/gh/knockout/tko.components) |
+| [tko](/knockout/tko) | [![CircleCI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko) |
+
 
 ## Next steps
 
