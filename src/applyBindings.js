@@ -46,8 +46,12 @@ function makeValueAccessor(value) {
 }
 
 // Returns the value of a valueAccessor function
-function evaluateValueAccessor(valueAccessor) {
-    return valueAccessor();
+function evaluateValueAccessor(valueAccessor, optionalValue) {
+    if (arguments.length > 1) {
+        return valueAccessor(optionalValue);
+    } else {
+        return valueAccessor();
+    }
 }
 
 // Given a function that returns bindings, create and return a new object that contains
@@ -337,7 +341,6 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
         var provider = options.bindingProviderInstance,
             getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors;
 
-
         // Get the binding from the provider within a computed observable so that we can update the bindings whenever
         // the binding context is updated or if the binding provider accesses observables.
         var bindingsUpdater = computed(
@@ -360,12 +363,10 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
         // Return the value accessor for a given binding. When bindings are static (won't be updated because of a binding
         // context update), just return the value accessor from the binding. Otherwise, return a function that always gets
         // the latest binding value and registers a dependency on the binding updater.
-        var getValueAccessor = /*bindingsUpdater
+        var getValueAccessor = bindingsUpdater
             ? function(bindingKey) {
-                return function() {
-                    return evaluateValueAccessor(bindingsUpdater()[bindingKey]);
-                };
-            } :*/ function(bindingKey) {
+                return evaluateValueAccessor.bind(null, bindingsUpdater()[bindingKey]);
+            } : function(bindingKey) {
                 return bindings[bindingKey];
             };
 

@@ -26,7 +26,7 @@ import {
     applyBindingsToDescendants
 } from '../index.js';
 
-import * as coreBindings from 'tko.binding.core';
+import {bindings as coreBindings} from 'tko.binding.core';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -39,7 +39,7 @@ describe('Binding dependencies', function() {
         var provider = new Provider()
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
+        bindingHandlers.set(coreBindings);
     })
 
     it('If the binding handler depends on an observable, invokes the init handler once and the update handler whenever a new value is available', function () {
