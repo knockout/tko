@@ -34,7 +34,7 @@ function test(extra_config, done) {
       plugins: [
         nodeDirect({
           paths: [ path.join(SPEC_DIR, '../..') ],
-          // verbose: true
+          verbose: process.argv.includes('--debug')
         }),
         nodeResolve({ jsnext: true, }),
       ],
