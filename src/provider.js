@@ -52,7 +52,7 @@ function addGetterSetter(bindingHandlersObject) {
           extend(bindingHandlersObject, nameOrObject);
         } else {
           options.onError(
-            new Error("Given a bad binding handler type" + nameOrObject));
+            new Error("Given a bad binding handler type: " + nameOrObject));
         }
       }
     },

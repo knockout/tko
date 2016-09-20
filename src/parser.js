@@ -151,7 +151,7 @@ Parser.prototype.number = function () {
  *                         function it is unwrapped as a property.
  */
 Parser.prototype.object_add_value = function (object, key, value) {
-  if (value[Node.isExpressionOrIdentifierSymbol]) {
+  if (value && value[Node.isExpressionOrIdentifierSymbol]) {
     Object.defineProperty(object, key, {
       get: function () {
         return value.get_value();
@@ -545,11 +545,11 @@ Parser.prototype.parse = function (source) {
   try {
     var result = this.read_bindings();
   } catch (e) {
-    options.onError(
+    options.onError(new Error(
       "Unable to parse bindings." +
       "\nBindings value: " + this.text +
       "\nMessage: <" + e.name + "> " + e.message
-    );
+    ));
   }
 
   this.white();
