@@ -28,9 +28,7 @@ import {
 
 import * as coreBindings from 'tko.binding.core';
 
-import {
-    testNode
-} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding dependencies', function() {
     var bindingHandlers

@@ -19,9 +19,7 @@ import {
 import * as coreBindings from 'tko.binding.core';
 import * as templateBindings from 'tko.binding.template';
 
-import {
-    testNode
-} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 
 /* eslint semi: 0, no-empty: 0 */
