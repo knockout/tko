@@ -16,6 +16,6 @@ export var enable = {
 
 export var disable = {
     update: function (element, valueAccessor) {
-        enable.update(element, function() { return !unwrap(valueAccessor()) });
+        enable.update(element, function() { return !unwrap(valueAccessor()); });
     }
 };

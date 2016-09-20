@@ -55,7 +55,7 @@ if (ieVersion < 10) {
 
 export var textInput = {
     aliases: 'textinput',
-    init: function (element, valueAccessor, allBindings) {
+    init: function (element, valueAccessor) {
 
         var previousElementValue = element.value,
             timeoutHandle,

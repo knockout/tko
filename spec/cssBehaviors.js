@@ -15,19 +15,22 @@ import {
 } from 'tko.utils';
 
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
+
 describe('Binding: CSS classes', function() {
+    var bindingHandlers;
+
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-    })
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
+        bindingHandlers.set(coreBindings);
+    });
 
     it('Should give the element the specific CSS class only when the specified value is true', function () {
         var observable1 = observable();

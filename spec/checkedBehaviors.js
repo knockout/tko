@@ -2,7 +2,7 @@ import {
     registerEventHandler,
     triggerEvent,
     removeNode
-} from 'tko.utils'
+} from 'tko.utils';
 
 import {
     applyBindings
@@ -26,7 +26,8 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import { bindings as coreBindings } from '../index.js';
+import { bindings as templateBindings } from 'tko.binding.template';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -34,11 +35,11 @@ describe('Binding: Checked', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-    })
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+        provider.bindingHandlers.set(templateBindings);
+    });
 
     it('Triggering a click should toggle a checkbox\'s checked state before the event handler fires', function() {
         // This isn't strictly to do with the checked binding, but if this doesn't work, the rest of the specs aren't meaningful
@@ -47,7 +48,7 @@ describe('Binding: Checked', function() {
         registerEventHandler(testNode.childNodes[0], "click", function() {
             clickHandlerFireCount++;
             expect(testNode.childNodes[0].checked).toEqual(expectedCheckedStateInHandler);
-        })
+        });
         expect(testNode.childNodes[0].checked).toEqual(false);
         expectedCheckedStateInHandler = true;
         triggerEvent(testNode.childNodes[0], "click");
@@ -84,7 +85,7 @@ describe('Binding: Checked', function() {
     it('Should only notify observable properties on the underlying model *once* even if the checkbox change events fire multiple times', function () {
         var myobservable = new observable();
         var timesNotified = 0;
-        myobservable.subscribe(function() { timesNotified++ });
+        myobservable.subscribe(function() { timesNotified++; });
         testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
         applyBindings({ someProp: myobservable }, testNode);
 
@@ -133,7 +134,7 @@ describe('Binding: Checked', function() {
     it('Should only notify observable properties on the underlying model *once* even if the radio button change/click events fire multiple times', function () {
         var myobservable = new observable("original value");
         var timesNotified = 0;
-        myobservable.subscribe(function() { timesNotified++ });
+        myobservable.subscribe(function() { timesNotified++; });
         testNode.innerHTML = "<input type='radio' value='this radio button value' data-bind='checked:someProp' /><input type='radio' value='different value' data-bind='checked:someProp' />";
         applyBindings({ someProp: myobservable }, testNode);
 

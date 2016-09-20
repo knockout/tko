@@ -22,18 +22,19 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: TextInput', function() {
+    var bindingHandlers;
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
+        bindingHandlers.set(coreBindings);
     });
 
     it('Should assign the value to the node', function () {
@@ -128,7 +129,7 @@ describe('Binding: TextInput', function() {
     });
 
     it('Should ignore node changes when bound to a read-only observable', function() {
-        var computedValue = computed(function() { return 'zzz' });
+        var computedValue = computed(function() { return 'zzz'; });
         var vm = { prop: computedValue };
 
         testNode.innerHTML = "<input data-bind='textInput: prop' />";

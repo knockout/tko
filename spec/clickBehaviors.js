@@ -1,6 +1,6 @@
 import {
-    triggerEvent,
-} from 'tko.utils'
+    triggerEvent
+} from 'tko.utils';
 
 import {
     applyBindings
@@ -14,7 +14,7 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import { bindings as coreBindings } from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -23,10 +23,9 @@ describe('Binding: Click', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
     });
 
     it('Should invoke the supplied function on click, using model as \'this\' param and first arg, and event as second arg', function () {
