@@ -60,8 +60,8 @@ describe('Binding: Event', function() {
     });
 
     it('Should prevent default action', function () {
-        testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: function() { } }'>hey</button>";
-        applyBindings(null, testNode);
+        testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: noop }'>hey</button>";
+        applyBindings({ noop: function () {} }, testNode);
         triggerEvent(testNode.childNodes[0], "click");
         // Assuming we haven't been redirected to http://www.example.com/, this spec has now passed
     });
