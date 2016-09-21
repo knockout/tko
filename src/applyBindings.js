@@ -46,12 +46,8 @@ function makeValueAccessor(value) {
 }
 
 // Returns the value of a valueAccessor function
-function evaluateValueAccessor(valueAccessor, optionalValue) {
-    if (arguments.length > 1) {
-        return valueAccessor(optionalValue);
-    } else {
-        return valueAccessor();
-    }
+function evaluateValueAccessor(valueAccessor) {
+    return valueAccessor();
 }
 
 // Given a function that returns bindings, create and return a new object that contains
@@ -364,11 +360,16 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
         // context update), just return the value accessor from the binding. Otherwise, return a function that always gets
         // the latest binding value and registers a dependency on the binding updater.
         var getValueAccessor = bindingsUpdater
-            ? function(bindingKey) {
-                return evaluateValueAccessor.bind(null, bindingsUpdater()[bindingKey]);
-            } : function(bindingKey) {
-                return bindings[bindingKey];
-            };
+            ? function (bindingKey) {
+                return function(optionalValue) {
+                    var valueAccessor = bindingsUpdater()[bindingKey];
+                    if (arguments.length === 0) {
+                        return evaluateValueAccessor(valueAccessor);
+                    } else {
+                        return valueAccessor(optionalValue);
+                    }
+                };
+            } : function (bindingKey) { return bindings[bindingKey]; };
 
         // First put the bindings into the right order
         var orderedBindings = topologicalSortBindings(bindings);
