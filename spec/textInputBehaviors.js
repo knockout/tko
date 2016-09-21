@@ -265,9 +265,14 @@ describe('Binding: TextInput', function() {
 
         describe('Event processing', function () {
             beforeEach(function() {
+                options.debug = true;
                 this.restoreAfter(bindingHandlers.textInput, '_forceUpdateOn');
                 bindingHandlers.textInput._forceUpdateOn = ['afterkeydown'];
                 jasmine.Clock.useMock();
+            });
+
+            afterEach(function () {
+                options.debug = false;
             });
 
             it('Should update observable asynchronously', function () {

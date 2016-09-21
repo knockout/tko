@@ -88,7 +88,7 @@ export var textInput = {
 
         // IE9 will mess up the DOM if you handle events synchronously which results in DOM changes (such as other bindings);
         // so we'll make sure all updates are asynchronous
-        var ieUpdateModel = ieVersion == 9 ? deferUpdateModel : updateModel;
+        var ieUpdateModel = ieVersion === 9 ? deferUpdateModel : updateModel;
 
         var updateView = function () {
             var modelValue = unwrap(valueAccessor());

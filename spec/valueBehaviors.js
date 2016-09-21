@@ -23,7 +23,7 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -33,11 +33,10 @@ describe('Binding: Value', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-    })
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+    });
 
     it('Should assign the value to the node', function () {
         testNode.innerHTML = "<input data-bind='value:123' />";
@@ -128,7 +127,7 @@ describe('Binding: Value', function() {
     });
 
     it('Should ignore node changes when bound to a read-only observable', function() {
-        var computedValue = computed(function() { return 'zzz' });
+        var computedValue = computed(function() { return 'zzz'; });
         var vm = { prop: computedValue };
 
         testNode.innerHTML = "<input data-bind='value: prop' />";
@@ -304,7 +303,7 @@ describe('Binding: Value', function() {
         if (isOldIE) {
             var myObservable = observable(123).extend({ notify: 'always' });
             var numUpdates = 0;
-            myObservable.subscribe(function() { numUpdates++ });
+            myObservable.subscribe(function() { numUpdates++; });
             testNode.innerHTML = "<input data-bind='value:someProp' />";
             applyBindings({ someProp: myObservable }, testNode);
 

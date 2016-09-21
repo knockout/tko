@@ -14,7 +14,7 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -22,12 +22,10 @@ describe('Binding: Let', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-    })
-
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+    });
 
     it('Should be able to add custom properties that will be available to all child contexts', function() {
         testNode.innerHTML = "<div data-bind=\"let: { '$customProp': 'my value' }\"><div data-bind='with: true'><div data-bind='text: $customProp'></div></div></div>";

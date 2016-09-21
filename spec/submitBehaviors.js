@@ -14,7 +14,7 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -22,10 +22,9 @@ describe('Binding: Submit', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
     });
 
     it('Should invoke the supplied function on submit and prevent default action, using model as \'this\' param and the form node as a param to the handler', function () {

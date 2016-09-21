@@ -24,15 +24,16 @@ import * as coreBindings from '../index.js';
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: Hasfocus', function() {
+    var bindingHandlers;
+
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings.bindings);
-    })
-
+    });
 
     if (ieVersion) {
         // Workaround for spurious focus-timing-related failures on IE8
@@ -42,11 +43,11 @@ describe('Binding: Hasfocus', function() {
 
     it('Should respond to changes on an observable value by blurring or focusing the element', function() {
         var currentState;
-        var model = { myVal: observable() }
+        var model = { myVal: observable() };
         testNode.innerHTML = "<input data-bind='hasfocus: myVal' /><input />";
         applyBindings(model, testNode);
-        registerEventHandler(testNode.childNodes[0], "focusin", function() { currentState = true });
-        registerEventHandler(testNode.childNodes[0], "focusout",  function() { currentState = false });
+        registerEventHandler(testNode.childNodes[0], "focusin", function() { currentState = true; });
+        registerEventHandler(testNode.childNodes[0], "focusout",  function() { currentState = false; });
 
         // When the value becomes true, we focus
         model.myVal(true);
@@ -58,7 +59,7 @@ describe('Binding: Hasfocus', function() {
     });
 
     it('Should set an observable value to be true on focus and false on blur', function() {
-        var model = { myVal: observable() }
+        var model = { myVal: observable() };
         testNode.innerHTML = "<input data-bind='hasfocus: myVal' /><input />";
         applyBindings(model, testNode);
 
@@ -77,13 +78,13 @@ describe('Binding: Hasfocus', function() {
         // If the model value becomes true after a blur, we re-focus the element
         // (Represents issue #672, where this wasn't working)
         var didFocusExpectedElement = false;
-        registerEventHandler(testNode.childNodes[0], "focusin", function() { didFocusExpectedElement = true });
+        registerEventHandler(testNode.childNodes[0], "focusin", function() { didFocusExpectedElement = true; });
         model.myVal(true);
         expect(didFocusExpectedElement).toEqual(true);
     });
 
     it('Should set a non-observable value to be true on focus and false on blur', function() {
-        var model = { myVal: null }
+        var model = { myVal: null };
         testNode.innerHTML = "<input data-bind='hasfocus: myVal' /><input />";
         applyBindings(model, testNode);
 
@@ -110,7 +111,7 @@ describe('Binding: Hasfocus', function() {
         // The elem is already focused, so changing the model value to a different truthy value
         // shouldn't cause any additional focus events
         var didFocusAgain = false;
-        registerEventHandler(testNode.childNodes[0], "focusin", function() { didFocusAgain = true });
+        registerEventHandler(testNode.childNodes[0], "focusin", function() { didFocusAgain = true; });
         model.isFocused.valueHasMutated();
         expect(didFocusAgain).toEqual(false);
 
@@ -118,7 +119,7 @@ describe('Binding: Hasfocus', function() {
         // falsey value shouldn't cause any additional blur events
         model.isFocused(false);
         var didBlurAgain = false;
-        registerEventHandler(testNode.childNodes[0], "focusout", function() { didBlurAgain = true });
+        registerEventHandler(testNode.childNodes[0], "focusout", function() { didBlurAgain = true; });
         model.isFocused(null);
         expect(didBlurAgain).toEqual(false);
     });

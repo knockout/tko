@@ -36,6 +36,7 @@ export var bindings = {
     submit: submit,
     text: text,
     textInput: textInput,
+    textinput: textInput,
     uniqueName: uniqueName,
     value: value,
     visible: visible

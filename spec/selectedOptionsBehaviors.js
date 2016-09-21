@@ -3,7 +3,7 @@ import {
 } from 'tko.bind';
 
 import {
-    observable, observableArray
+    observableArray
 } from 'tko.observable';
 
 import {
@@ -14,19 +14,25 @@ import {
     options, triggerEvent
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
+import {
+    matchers
+} from '../src/test-helper';
+
 
 describe('Binding: Selected Options', function() {
     beforeEach(jasmine.prepareTestNode);
 
-    beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-    })
+    beforeEach(function() {
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+
+        this.addMatchers(matchers);
+    });
 
     it('Should only be applicable to SELECT nodes', function () {
         var threw = false;

@@ -1,5 +1,5 @@
 import {
-    registerEvent
+    registerEventHandler
 } from 'tko.utils';
 
 import {
@@ -18,19 +18,24 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
-
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
+import {
+    matchers
+} from '../src/test-helper';
+
 
 describe('Binding: Options', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+
+        this.addMatchers(matchers);
     });
 
     it('Should only be applicable to SELECT nodes', function () {
@@ -64,8 +69,11 @@ describe('Binding: Options', function() {
             { name: 'bob', job: 'manager' },
             { name: 'frank', job: 'coder & tester' }
         ]);
-        testNode.innerHTML = "<select data-bind='options:myValues, optionsText: function (v) { return v[\"name\"] + \" (\" + v[\"job\"] + \")\"; }'><option>should be deleted</option></select>";
-        applyBindings({ myValues: modelValues }, testNode);
+        testNode.innerHTML = "<select data-bind='options:myValues, optionsText: textFn'><option>should be deleted</option></select>";
+        applyBindings({
+            myValues: modelValues,
+            textFn: function (v) { return v.name + " (" + v.job + ")"; }
+        }, testNode);
         expect(testNode.childNodes[0]).toHaveTexts(["bob (manager)", "frank (coder & tester)"]);
     });
 
@@ -74,8 +82,11 @@ describe('Binding: Options', function() {
             { name: 'bob', job: 'manager' },
             { name: 'frank', job: 'coder & tester' }
         ]);
-        testNode.innerHTML = "<select data-bind='options: myValues, optionsValue: function (v) { return v.name + \" (\" + v.job + \")\"; }'><option>should be deleted</option></select>";
-        applyBindings({ myValues: modelValues }, testNode);
+        testNode.innerHTML = "<select data-bind='options: myValues, optionsValue: optionsFn'><option>should be deleted</option></select>";
+        applyBindings({
+            myValues: modelValues,
+            optionsFn: function (v) { return v.name + " (" + v.job + ")"; }
+        }, testNode);
         expect(testNode.childNodes[0]).toHaveValues(["bob (manager)", "frank (coder & tester)"]);
         expect(testNode.childNodes[0]).toHaveTexts(["bob (manager)", "frank (coder & tester)"]);
     });
@@ -254,9 +265,9 @@ describe('Binding: Options', function() {
     });
 
     it('Should not include the caption if the optionsCaption value is undefined', function() {
-      testNode.innerHTML = "<select data-bind='options: [\"A\", \"B\"], optionsCaption: test'></select>";
-      applyBindings({ test: observable() }, testNode);
-      expect(testNode.childNodes[0]).toHaveTexts(['A', 'B']);
+        testNode.innerHTML = "<select data-bind='options: [\"A\", \"B\"], optionsCaption: test'></select>";
+        applyBindings({ test: observable() }, testNode);
+        expect(testNode.childNodes[0]).toHaveTexts(['A', 'B']);
     });
 
     it('Should include a caption even if it\'s blank', function() {

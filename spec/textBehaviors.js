@@ -19,12 +19,14 @@ import * as coreBindings from '../index.js';
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: Text', function() {
+    var bindingHandlers;
+
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings.bindings);
     });
 
@@ -84,7 +86,7 @@ describe('Binding: Text', function() {
         // content with a special message, via a binding handler that operates on text nodes
         var originalBindingProvider = options.bindingProviderInstance;
         options.bindingProviderInstance = {
-            nodeHasBindings: function(node, bindingContext) {
+            nodeHasBindings: function(/*node, bindingContext */) {
                 /*// IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                 // This will still prove that the binding provider was not executed on the children of a restricted element.
                 if (node.nodeType === 3 && jasmine.ieVersion < 9) {

@@ -10,7 +10,7 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import {bindings as coreBindings} from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -18,12 +18,10 @@ describe('Binding: HTML', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider()
-        options.bindingProviderInstance = provider
-        bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-    })
-
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+    });
 
     it('Should assign the value to the node without HTML-encoding the value', function () {
         var model = { textProp: "My <span>HTML-containing</span> value" };

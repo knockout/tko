@@ -11,8 +11,7 @@ var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating');
 var hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue');
 
 export var hasfocus = {
-    aliases: ['hasFocus'],
-    init: function(element, valueAccessor, allBindings) {
+    init: function(element, valueAccessor /*, allBindings */) {
         var handleElementFocusChange = function(isFocused) {
             // Where possible, ignore which event was raised and determine focus state using activeElement,
             // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
@@ -32,7 +31,7 @@ export var hasfocus = {
                 }
                 isFocused = (active === element);
             }
-            var modelValue = valueAccessor();
+            // var modelValue = valueAccessor();
             valueAccessor(isFocused, {onlyIfChanged: true});
 
             //cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
