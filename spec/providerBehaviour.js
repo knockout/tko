@@ -35,7 +35,7 @@ import * as coreBindings from 'tko.binding.core';
 
 var instance,
   Parser,
-  Expression,
+  // Expression,
   Identifier,
   Arguments,
   Node,
@@ -45,7 +45,7 @@ beforeEach(function() {
   instance = new Provider();
   Parser = instance.Parser,
     Identifier = Parser.Identifier,
-    Expression = Parser.Expression,
+    // Expression = Parser.Expression,
     Arguments = Parser.Arguments,
     Node = Parser.Node,
     operators = Node.operators;
@@ -550,11 +550,11 @@ describe("The lookup of variables (get_lookup_root)", function() {
   })
 })
 
-describe("the build_tree function", function() {
+describe("the create_root function", function() {
   var nodes_to_tree;
 
   beforeEach(function() {
-    nodes_to_tree = Expression.prototype.build_tree;
+    nodes_to_tree = Node.create_root;
   })
 
   it("converts a simple array to a tree", function() {

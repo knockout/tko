@@ -147,8 +147,6 @@ describe("the bindings parser", function() {
       bindings = new Parser(null, context).parse(binding);
     assert.equal(bindings.text(), 'prefixmikepostfix')
   })
-
-  it.skip("parses interpolated backtick strings (`abc ${var}`)")
 })
 
 describe("the parsing of expressions", function() {
@@ -446,6 +444,60 @@ describe("Virtual elements", function() {
     assert.include(div.textContent || div.innerText, context.obs())
   })
 })
+
+
+describe("ES6-style interpolated strings", function () {
+  function expect_equal(binding, context, expect) {
+    var bindings = new Parser(null, context).parse("v: " + binding)
+    assert.equal(bindings.v(), expect)
+  }
+
+  it("parses a plain string", function () {
+    expect_equal("`abc`", {}, "abc")
+  })
+
+  it("ignores $xyz", function () {
+    expect_equal("`a $b $$`", {}, "a $b $$")
+  })
+
+  it("interpolates ${x} primitive", function () {
+    expect_equal("`a${x}c`", {x: "B"}, "aBc")
+  })
+
+  it("interpolates spacey ${  x  } primitive", function () {
+    expect_equal("`a${  x  }cd`", {x: "B"}, "aBcd")
+  })
+
+  it("interpolates multiple primitives", function () {
+    var ctx = {w: "W", x: "X", y: "Y", z: "Z"}
+    expect_equal("`${w}a${x}c${y}d${z}`", ctx, "WaXcYdZ")
+  })
+
+  it("interpolates a function", function () {
+    var ctx = {foo: function () { return '123' }}
+    expect_equal("`A${foo()}B`", ctx, "A123B")
+  })
+
+  it("interpolates an observable", function () {
+    var ctx = { foo: observable("444") }
+    expect_equal("`A${foo()}B`", ctx, "A444B")
+  })
+
+  it("automatically unwraps an observable", function () {
+    var ctx = { foo: observable("444") }
+    expect_equal("`A${foo}B`", ctx, "A444B")
+  })
+
+  it("looks up complex expressions", function () {
+    var ctx = { a: function() { return { b: [0, 0, {c: 4}] } } }
+    expect_equal("`A${a().b[2].c}B`", ctx, "A4B")
+  })
+
+  it("skips escaped \\${}", function () {
+    expect_equal("`a\\${E}c`", {}, "a${E}c")
+  })
+})
+
 
 
 describe("compound expressions", function() {

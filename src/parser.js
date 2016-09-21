@@ -15,8 +15,10 @@ import Node from './node';
 var escapee = {
     "'": "'",
     '"':  '"',
+    "`":  "`",
     '\\': '\\',
     '/':  '/',
+    '$':  '$',
     b:    '\b',
     f:    '\f',
     n:    '\n',
@@ -178,7 +180,7 @@ Parser.prototype.object = function () {
       return object;
     }
     while (ch) {
-      if (ch === '"' || ch === "'") {
+      if (ch === '"' || ch === "'" || ch === "`") {
         key = this.string();
       } else {
         key = this.name();
@@ -212,15 +214,20 @@ Parser.prototype.object = function () {
  */
 Parser.prototype.read_string = function (delim) {
   var string = '',
+    nodes = [''],
+    plus_op = operators['+'],
     hex,
     i,
     uffff,
+    interpolate = delim === "`",
     ch = this.next();
 
   while (ch) {
     if (ch === delim) {
       ch = this.next();
-      return string;
+      if (interpolate) { nodes.push(plus_op); }
+      nodes.push(string);
+      return nodes;
     }
     if (ch === '\\') {
       ch = this.next();
@@ -239,6 +246,19 @@ Parser.prototype.read_string = function (delim) {
       } else {
         break;
       }
+    } else if (interpolate && ch === "$") {
+      ch = this.next();
+      if (ch === '{') {
+        this.next('{');
+        nodes.push(plus_op);
+        nodes.push(string);
+        nodes.push(plus_op);
+        nodes.push(this.expression());
+        string = '';
+        // this.next('}');
+      } else {
+        string += "$" + ch;
+      }
     } else {
       string += ch;
     }
@@ -248,12 +268,15 @@ Parser.prototype.read_string = function (delim) {
   this.error("Bad string");
 };
 
+
 Parser.prototype.string = function () {
   var ch = this.ch;
   if (ch === '"') {
-    return this.read_string('"');
+    return this.read_string('"').join('');
   } else if (ch === "'") {
-    return this.read_string("'");
+    return this.read_string("'").join('');
+  } else if (ch === "`") {
+    return Node.create_root(this.read_string("`"));
   }
 
   this.error("Bad string");
@@ -291,7 +314,7 @@ Parser.prototype.value = function () {
   switch (ch) {
   case '{': return this.object();
   case '[': return this.array();
-  case '"': case "'": return this.string();
+  case '"': case "'": case "`": return this.string();
   case '-': return this.number();
   default:
     return ch >= '0' && ch <= '9' ? this.number() : this.identifier();
@@ -312,7 +335,7 @@ Parser.prototype.operator = function () {
   while (ch) {
     if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
         ch === '"' || ch === "'" || ch === '{' || ch === '[' ||
-        ch === '(') {
+        ch === '(' || ch === "`") {
       break;
     }
     op += ch;
@@ -362,7 +385,7 @@ Parser.prototype.expression = function () {
     }
     ch = this.white();
     if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
-        ch === ')' || ch === '') {
+        ch === ')' || ch === '' || ch === '`') {
       break;
     }
     // infix operators
@@ -540,6 +563,10 @@ Parser.prototype.convert_to_accessors = function (result) {
     } else if (value instanceof Expression) {
       result[name] = function expressionAccessor() {
         return value.get_value();
+      };
+    } else if (value instanceof Node) {
+      result[name] = function nodeAccessor() {
+        return value.get_node_value();
       };
     } else if (typeof(value) != 'function') {
       result[name] = function constAccessor() {
