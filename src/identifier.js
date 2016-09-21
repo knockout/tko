@@ -3,7 +3,7 @@ import Node from './node';
 import Arguments from './arguments';
 
 import {
-  isWriteableObservable
+  isWriteableObservable, isObservable
 } from 'tko.observable';
 
 
@@ -106,7 +106,7 @@ Identifier.prototype.get_value = function (parent) {
 Identifier.prototype.assign = function assign(object, property, value) {
   if (isWriteableObservable(object[property])) {
     object[property](value);
-  } else {
+  } else if (!isObservable(object[property])) {
     object[property] = value;
   }
 };
@@ -152,7 +152,7 @@ Identifier.prototype.set_value = function (new_value) {
   // the ES5 setter we have to call `obj[leaf] = new_value`
   for (i = 0; i < n - 1; ++i) {
     leaf = refs[i];
-    if (leaf === true) {
+    if (leaf instanceof Arguments) {
       root = root();
     } else {
       root = root[Node.value_of(leaf)];
