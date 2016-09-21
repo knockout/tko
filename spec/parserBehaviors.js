@@ -147,6 +147,8 @@ describe("the bindings parser", function() {
       bindings = new Parser(null, context).parse(binding);
     assert.equal(bindings.text(), 'prefixmikepostfix')
   })
+
+  it.skip("parses interpolated backtick strings (`abc ${var}`)")
 })
 
 describe("the parsing of expressions", function() {
@@ -488,9 +490,12 @@ describe("compound expressions", function() {
         }
       }
     },
+    context,
     obs = observable({
       d: d
-    }),
+    });
+
+  beforeEach(function () {
     context = {
       a: a,
       F1: F1,
@@ -500,6 +505,7 @@ describe("compound expressions", function() {
       z: z,
       u: undefined
     };
+  })
 
   // a property of the observable (not the observable's value)
   obs.P = y;
@@ -582,5 +588,50 @@ describe("compound expressions", function() {
 
   it("gets obs['P']", function() {
     expect_equal("obs['P']", obs.P)
+  })
+
+  describe("function expressions", function () {
+    function R() { return arguments }
+    function R0() { return arguments[0] }
+    function B() { return { self: this, args: arguments } }
+    beforeEach(function () { context = { R: R, B: B, R0: R0 } })
+
+    it("calls the function with an argument", function () {
+      expect_deep_equal("R(123)", R(123))
+    })
+
+    it("calls the function with two arguments", function () {
+      expect_deep_equal("R('x', 'y')", R('x', 'y'))
+    })
+
+    it("calls the function with nested functions", function () {
+      expect_deep_equal("R(R('xe'))", R(R('xe')))
+    })
+
+    it("calls the function with primitives", function () {
+      expect_deep_equal(
+        "R([123], null, false, true, undefined)",
+        R([123], null, false, true, undefined)
+      )
+    })
+
+    it("chains argument arrays return", function () {
+      expect_deep_equal("R0(['x'])[0]", 'x')
+    })
+
+    it("exposes argument object return", function () {
+      expect_deep_equal("R0({xee: 'xe'}).xee", 'xe')
+    })
+
+    it("chains function calls with arguments", function () {
+      expect_deep_equal(
+        "R0(R0([R0({x: R0('1i3')})]))[0].x",
+        '1i3'
+      )
+    })
+
+    it.skip("calls functions with .bind", function () {
+      expect_deep_equal("B.bind('x')()", { self: 'x', args: [] })
+    })
   })
 }); //  compound functions

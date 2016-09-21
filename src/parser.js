@@ -9,6 +9,7 @@ import {
 
 import Expression from './expression';
 import Identifier from './identifier';
+import Arguments from './arguments';
 import Node from './node';
 
 var escapee = {
@@ -37,9 +38,10 @@ export default function Parser(node, context, globals) {
   this.globals = globals || {};
 }
 
-// exported for testing.
+// Exposed for testing.
 Parser.Expression = Expression;
 Parser.Identifier = Identifier;
+Parser.Arguments = Arguments;
 Parser.Node = Node;
 
 Parser.prototype.white = function () {
@@ -382,6 +384,31 @@ Parser.prototype.expression = function () {
   return new Expression(nodes);
 };
 
+
+/**
+ * Parse the arguments to a function, returning an Array.
+ *
+ */
+Parser.prototype.func_arguments = function () {
+  var args = [],
+    ch = this.next('(');
+
+  while(ch) {
+    ch = this.white();
+    if (ch === ')') {
+      this.next(')');
+      return new Arguments(this, args);
+    } else {
+      args.push(this.expression());
+      ch = this.white();
+    }
+    if (ch !== ')') { this.next(','); }
+  }
+
+  this.error("Bad arguments to function");
+};
+
+
 /**
  * A dereference applies to an identifer, being either a function
  * call "()" or a membership lookup with square brackets "[member]".
@@ -394,11 +421,8 @@ Parser.prototype.dereference = function () {
 
   while (ch) {
     if (ch === '(') {
-      // a() function call
-      this.next('(');
-      this.white();
-      this.next(')');
-      return true;  // in Identifier::dereference we check this
+      // a(...) function call
+      return this.func_arguments();
     } else if (ch === '[') {
       // a[x] membership
       this.next('[');

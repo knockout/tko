@@ -37,6 +37,7 @@ var instance,
   Parser,
   Expression,
   Identifier,
+  Arguments,
   Node,
   operators;
 
@@ -45,6 +46,7 @@ beforeEach(function() {
   Parser = instance.Parser,
     Identifier = Parser.Identifier,
     Expression = Parser.Expression,
+    Arguments = Parser.Arguments,
     Node = Parser.Node,
     operators = Node.operators;
 })
@@ -609,9 +611,10 @@ describe("the build_tree function", function() {
       },
       parser, nodes, root;
     parser = new Parser(null, context);
+    var fake_args = new Arguments(null, [])
     nodes = [
       // the third argument is the same as _deref_call
-      new Identifier(parser, 'x', [true]),
+      new Identifier(parser, 'x', [fake_args]),
       operators['|'],
       0x80
     ];
@@ -643,13 +646,16 @@ describe("Identifier", function() {
         ident = new Identifier({}, 'x', refs);
       assert.equal(ident.dereference('1'), 1)
     })
+
     it("does nothing with empty array references", function() {
       var refs = [],
         ident = new Identifier({}, 'x', refs);
       assert.equal(ident.dereference('1'), 1)
     })
+
     it("applies the functions of the refs to the value", function() {
-      var refs = [true, true],
+      var fake_args = new Arguments(null, []),
+        refs = [fake_args, fake_args],
         ident = new Identifier({}, 'x', refs),
         g = function() {
           return '42'
@@ -707,7 +713,8 @@ describe("Identifier", function() {
         f: f
       },
       parser = new Parser(null, context),
-      derefs = [true];
+      fake_args = new Arguments(null, []),
+      derefs = [fake_args];
     assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
   })
 })

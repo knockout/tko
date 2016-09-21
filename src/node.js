@@ -122,4 +122,16 @@ Node.prototype.get_node_value = function () {
 };
 
 
+
+//
+// Class variables.
+//
 Node.isExpressionOrIdentifierSymbol = createSymbolOrString("isExpressionOrIdentifierSymbol");
+
+
+Node.value_of = function value_of(item) {
+  if (item && item[Node.isExpressionOrIdentifierSymbol]) {
+    return item.get_value();
+  }
+  return item;
+};

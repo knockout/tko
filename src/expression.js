@@ -19,9 +19,7 @@ Expression.Node = Node;
 Expression.prototype.build_tree = function (nodes) {
   var root, leaf, op, value;
 
-  // console.log("build_tree", nodes.slice(0))
-
-  // primer
+  // Prime the leaf = root node.
   leaf = root = new Node(nodes.shift(), nodes.shift(), nodes.shift());
 
   while (nodes) {
@@ -49,6 +47,9 @@ Expression.prototype.build_tree = function (nodes) {
  *
  */
 Expression.prototype.get_value = function () {
+  if ('degenerate_value' in this) {
+    return this.degenerate_value;
+  }
   if (!this.root) {
     this.root = this.build_tree(this.nodes);
   }

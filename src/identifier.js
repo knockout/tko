@@ -1,5 +1,6 @@
 
-import Node from './node.js';
+import Node from './node';
+import Arguments from './arguments';
 
 import {
   isWriteableObservable
@@ -12,13 +13,6 @@ export default function Identifier(parser, token, dereferences) {
   this.parser = parser;
 }
 
-
-export function value_of(item) {
-  if (item[Node.isExpressionOrIdentifierSymbol]) {
-    return item.get_value();
-  }
-  return item;
-}
 
 
 /**
@@ -37,7 +31,7 @@ Identifier.prototype.lookup_value = function (parent) {
     globals = parser.globals || {};
 
   if (parent) {
-    return value_of(parent)[token];
+    return Node.value_of(parent)[token];
   }
 
   // short circuits
@@ -79,13 +73,16 @@ Identifier.prototype.dereference = function (value) {
     i, n;
 
   for (i = 0, n = refs.length; i < n; ++i) {
-    member = refs[i];
-    if (member === true) {
-      value = value.call(last_value || self);
+    member = Node.value_of(refs[i]);
+
+    if (typeof value === 'function' && refs[i] instanceof Arguments) {
+      // fn(args)
+      value = value.apply(last_value || self, member);
       last_value = value;
     } else {
+      // obj[x] or obj.x dereference.  Note that obj may be a function.
       last_value = value;
-      value = value[value_of(member)];
+      value = Node.value_of(value[member]);
     }
   }
   return value;
@@ -158,7 +155,7 @@ Identifier.prototype.set_value = function (new_value) {
     if (leaf === true) {
       root = root();
     } else {
-      root = root[value_of(leaf)];
+      root = root[Node.value_of(leaf)];
     }
   }
 
@@ -169,7 +166,7 @@ Identifier.prototype.set_value = function (new_value) {
 
   // Call the setter for the leaf.
   if (refs[i]) {
-    this.assign(root, value_of(refs[i]), new_value);
+    this.assign(root, Node.value_of(refs[i]), new_value);
   }
 };
 
