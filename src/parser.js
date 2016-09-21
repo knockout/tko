@@ -60,7 +60,6 @@ Parser.prototype.next = function (c) {
 };
 
 Parser.prototype.error = function (m) {
-  // console.trace()
   throw {
     name:    'SyntaxError',
     message: m,
