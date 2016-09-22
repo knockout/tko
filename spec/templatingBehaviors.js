@@ -20,8 +20,7 @@ import {
 
 import {
     bindings as templateBindings, renderTemplate,
-    templateEngine, setTemplateEngine,
-    nativeTemplateEngine
+    setTemplateEngine, nativeTemplateEngine
 } from '../index.js';
 
 import {bindings as coreBindings} from 'tko.binding.core';
@@ -44,7 +43,6 @@ describe('Templating', function() {
         provider.bindingHandlers.set(templateBindings);
 
         bindingHandlers = provider.bindingHandlers;
-        dummyTemplateEngine.prototype = new templateEngine();
     });
 
     afterEach(function() {

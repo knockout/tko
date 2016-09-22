@@ -100,3 +100,6 @@ export function dummyTemplateEngine(templates) {
     };
     this.createJavaScriptEvaluatorBlock = function (script) { return "[js:" + script + "]"; };
 }
+
+
+dummyTemplateEngine.prototype = new templateEngine();
