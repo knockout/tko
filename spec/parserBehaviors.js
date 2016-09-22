@@ -319,7 +319,18 @@ describe("unary operations", function() {
     assert.equal(bindings.neg().y, true)
   })
 
-  it("negates an expression eg !(a || b)"
+  it("prefix increments on lookup", function () {
+    var binding = "neg: ++a",
+      context = {
+        a: observable(4)
+      },
+      bindings = new Parser(null, context).parse(binding);
+    assert.equal(bindings.neg(), 5)
+    context.a(3);
+    assert.equal(bindings.neg(), 4)
+  })
+
+  it.skip("negates an expression eg !(a || b)"
     /*, function () {
             var binding = 'ne: !(a || b)',
                 context = { a: observable(true), b: observable(false) },

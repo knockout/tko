@@ -18,6 +18,8 @@ var operators = {
   // unary
   '!': function not(a, b) { return !b; },
   '!!': function notnot(a, b) { return !!b; },
+  '++': function preinc(a, b) { return ++b; },
+  '--': function preinc(a, b) { return --b; },
   // mul/div
   '*': function mul(a, b) { return a * b; },
   '/': function div(a, b) { return a / b; },
@@ -78,6 +80,9 @@ operators['|'].precedence = 12;
   // logic
 operators['&&'].precedence = 13;
 operators['||'].precedence = 14;
+  // Prefix inc/dec
+operators['++'].precedence = 15;
+operators['--'].precedence = 15;
 
 Node.operators = operators;
 
