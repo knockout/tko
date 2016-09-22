@@ -55,10 +55,13 @@
     "through": "^2.3.8"
   },
   "dependencies": {
-    "tko.utils": "knockout/tko.utils",
-    "tko.observable": "knockout/tko.observable",
-    "tko.computed": "knockout/tko.computed",
     "tko.bind": "knockout/tko.bind",
-    "tko.components": "knockout/tko.components"
+    "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.binding.template": "github:knockout/tko.binding.template",
+    "tko.components": "knockout/tko.components",
+    "tko.computed": "knockout/tko.computed",
+    "tko.observable": "knockout/tko.observable",
+    "tko.provider": "github:knockout/tko.provider",
+    "tko.utils": "knockout/tko.utils"
   }
 }
