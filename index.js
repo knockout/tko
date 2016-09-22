@@ -47,7 +47,9 @@ import {
 } from 'tko.binding.core';
 
 import {
+    anonymousTemplate,
     bindings as templateBindings,
+    domElement,
     nativeTemplateEngine,
     setTemplateEngine,
     templateEngine,
@@ -120,8 +122,8 @@ export default ko = {
     peek: peek,
     subscribable: subscribable,
     unwrap: unwrap,
-    toJS: utils.toJS,
-    toJSON: utils.toJSON,
+    toJS: toJS,
+    toJSON: toJSON,
 
     // ... Computed ...
     computed: computed,
@@ -138,8 +140,10 @@ export default ko = {
     renderTemplate: renderTemplate,
     setTemplateEngine: setTemplateEngine,
     templateEngine: templateEngine,
-    templateSources: templateSources,
-
+    templateSources: {
+        domElement: domElement,
+        anonymousTemplate: anonymousTemplate,
+    },
 
     // --- Binding ---
     applyBindingAccessorsToNode: applyBindingAccessorsToNode,
