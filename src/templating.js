@@ -27,8 +27,8 @@ import { anonymousTemplate } from './templateSources';
 
 var _templateEngine;
 
-export function setTemplateEngine(tEngine, ignoreInheritanceError) {
-    if ((tEngine != undefined) && !(tEngine instanceof templateEngine) && !ignoreInheritanceError)
+export function setTemplateEngine(tEngine) {
+    if ((tEngine != undefined) && !(tEngine instanceof templateEngine))
         //TODO: ko.templateEngine to appropriate name
         throw new Error("templateEngine must inherit from ko.templateEngine");
     _templateEngine = tEngine;
