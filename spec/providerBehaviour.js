@@ -640,6 +640,18 @@ describe("Identifier", function() {
     assert.equal(new Identifier(parser, "f").get_value(), f)
   })
 
+  it("returns null as expected", function () {
+    var context = { $data: null },
+      parser = new Parser(null, context);
+    assert.equal(new Identifier(parser, "$data").lookup_value(), null)
+  })
+
+  it("returns undefined as expected", function () {
+    var context = { $data: undefined },
+      parser = new Parser(null, context);
+    assert.equal(new Identifier(parser, "$data").lookup_value(), undefined)
+  })
+
   describe("the dereference function", function() {
     it("does nothing with no references", function() {
       var refs = undefined,
