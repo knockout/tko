@@ -39,7 +39,9 @@ function cleanSingleNode(node) {
     domData.clear(node);
 
     // Perform cleanup needed by external libraries (currently only jQuery, but can be extended)
-    cleanExternalData(node);
+    for (var i = 0, j = otherNodeCleanerFunctions.length; i < j; ++i) {
+        otherNodeCleanerFunctions[i](node);
+    }
 
     // Clear any immediate-child comment nodes, as these wouldn't have been found by
     // node.getElementsByTagName("*") in cleanNode() (comment nodes aren't elements)
@@ -95,11 +97,15 @@ export function removeNode(node) {
         node.parentNode.removeChild(node);
 }
 
-export function cleanExternalData (node) {
-    // Special support for jQuery here because it's so commonly used.
-    // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
-    // so notify it to tear down any resources associated with the node & descendants here.
 
+// Expose supplemental node cleaning functions.
+export var otherNodeCleanerFunctions = [];
+
+
+// Special support for jQuery here because it's so commonly used.
+// Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
+// so notify it to tear down any resources associated with the node & descendants here.
+export function cleanjQueryData(node) {
     var jQueryCleanNodeFn = jQueryInstance
         ? jQueryInstance.cleanData : null;
 
@@ -107,3 +113,6 @@ export function cleanExternalData (node) {
         jQueryCleanNodeFn([node]);
     }
 }
+
+
+otherNodeCleanerFunctions.push(cleanjQueryData);
