@@ -2,16 +2,12 @@ rules:
   indent:
     - 2
     - 4
-  quotes:
-    - 2
-    - single
   linebreak-style:
     - 2
     - unix
   semi:
     - 0  # Temp
     - always
-  indent: 0  # Temp
   strict: 0
   dot-notation: 0
   no-underscore-dangle: 0
