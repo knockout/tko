@@ -38,6 +38,7 @@ globals:
   jasmine: true
   describe: true
   it: true
+  xit: true
   iit: true
   ddescribe: true
   afterEach: true

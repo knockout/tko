@@ -109,8 +109,8 @@ function executeTemplate(targetNodeOrNodeArray, renderMode, template, bindingCon
     options = options || {};
     var firstTargetNode = targetNodeOrNodeArray && getFirstNodeFromPossibleArray(targetNodeOrNodeArray);
     var templateDocument = (firstTargetNode || template || {}).ownerDocument;
-    var templateEngineToUse = (options['templateEngine'] || _templateEngine);
-    var renderedNodesArray = templateEngineToUse['renderTemplate'](template, bindingContext, options, templateDocument);
+    var templateEngineToUse = (options.templateEngine || _templateEngine);
+    var renderedNodesArray = templateEngineToUse.renderTemplate(template, bindingContext, options, templateDocument);
 
     // Loosely check result is an array of DOM nodes
     if ((typeof renderedNodesArray.length != "number") || (renderedNodesArray.length > 0 && typeof renderedNodesArray[0].nodeType != "number"))
@@ -156,7 +156,7 @@ function resolveTemplateName(template, data, context) {
 
 export function renderTemplate(template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode) {
     options = options || {};
-    if ((options['templateEngine'] || _templateEngine) == undefined)
+    if ((options.templateEngine || _templateEngine) === undefined)
         throw new Error("Set a template engine before calling renderTemplate");
     renderMode = renderMode || "replaceChildren";
 
@@ -271,7 +271,7 @@ export var template = {
         }
         return { 'controlsDescendantBindings': true };
     },
-    'update': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         var value = valueAccessor(),
             options = unwrap(value),
             shouldDisplay = true,
@@ -307,7 +307,6 @@ export var template = {
 
         // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
         disposeOldComputedAndStoreNewOne(element, templateComputed);
-    }
+    },
+    allowVirtualElements: true
 };
-
-virtualElements.allowedBindings['template'] = true;
