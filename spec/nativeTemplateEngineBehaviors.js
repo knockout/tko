@@ -25,7 +25,7 @@ import {
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
-ddescribe('Native template engine', function() {
+describe('Native template engine', function() {
     function ensureNodeExistsAndIsEmpty(id, tagName, type) {
         var existingNode = document.getElementById(id);
         if (existingNode != null)

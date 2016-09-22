@@ -121,7 +121,7 @@ function dummyTemplateEngine(templates) {
     this.createJavaScriptEvaluatorBlock = function (script) { return "[js:" + script + "]"; };
 }
 
-ddescribe('Templating', function() {
+describe('Templating', function() {
     var bindingHandlers;
 
     beforeEach(jasmine.prepareTestNode);

@@ -18,9 +18,9 @@ import {
     options, triggerEvent
 } from 'tko.utils';
 
-import * as templateBindings from '../index.js';
+import {bindings as templateBindings} from '../index.js';
+import {bindings as coreBindings} from 'tko.binding.core';
 
-import * as coreBindings from 'tko.binding.core'
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -28,13 +28,10 @@ describe('Binding: With', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
-        options.bindingProviderInstance = provider;
-        bindingHandlers = provider.bindingHandlers;
-        var bindings = {};
-        extend(bindings, coreBindings.bindings);
-        extend(bindings, templateBindings.bindings);
-        bindingHandlers.set(bindings);
+      var provider = new Provider();
+      options.bindingProviderInstance = provider;
+      provider.bindingHandlers.set(coreBindings);
+      provider.bindingHandlers.set(templateBindings);
     });
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsey', function() {

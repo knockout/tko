@@ -18,23 +18,23 @@ import {
     options, extend
 } from 'tko.utils';
 
-import * as templateBindings from '../index.js';
-
-import * as coreBindings from 'tko.binding.core'
+import {bindings as templateBindings} from '../index.js';
+import {bindings as coreBindings} from 'tko.binding.core';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+
+
 //virtualEvents, removeNode
 describe('Binding: Foreach', function() {
     beforeEach(jasmine.prepareTestNode);
+    var bindingHandlers;
 
     beforeEach(function(){
         var provider = new Provider();
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
-        var bindings = {};
-        extend(bindings, coreBindings.bindings);
-        extend(bindings, templateBindings.bindings);
-        bindingHandlers.set(bindings);
+        bindingHandlers.set(coreBindings);
+        bindingHandlers.set(templateBindings);
     });
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsey', function() {

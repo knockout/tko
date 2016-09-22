@@ -1,9 +1,6 @@
-import {
-    arrayForEach
-} from 'tko.utils';
 
 import {
-    applyBindings, contextFor, dataFor
+    applyBindings, contextFor
 } from 'tko.bind';
 
 import {
@@ -15,12 +12,16 @@ import {
 } from 'tko.provider';
 
 import {
-    options, extend
+    options
 } from 'tko.utils';
 
-import * as templateBindings from '../index.js';
-
-import * as coreBindings from 'tko.binding.core'
+import {
+  bindings as templateBindings,
+  setTemplateEngine,
+  templateEngine,
+  nativeTemplateEngine
+} from '../index.js';
+import {bindings as coreBindings} from 'tko.binding.core';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
@@ -30,11 +31,8 @@ describe('Binding: Ifnot', function() {
     beforeEach(function(){
         var provider = new Provider();
         options.bindingProviderInstance = provider;
-        bindingHandlers = provider.bindingHandlers;
-        var bindings = {};
-        extend(bindings, coreBindings.bindings);
-        extend(bindings, templateBindings.bindings);
-        bindingHandlers.set(bindings);
+        provider.bindingHandlers.set(coreBindings);
+        provider.bindingHandlers.set(templateBindings);
     });
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is truey', function() {
