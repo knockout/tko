@@ -1,1 +1,0 @@
-jquery-compat-3.0.0-alpha1.js
