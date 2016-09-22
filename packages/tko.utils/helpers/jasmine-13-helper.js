@@ -3,7 +3,7 @@
  */
 
 import {
-  arrayMap, arrayFilter, ieVersion
+  arrayMap, ieVersion
 } from '../index.js';
 
 
@@ -102,13 +102,6 @@ matchers.toHaveValues = function (expectedValues) {
     var values = arrayMap(this.actual.childNodes, function (node) { return node.value; });
     this.actual = values;   // Fix explanatory message
     return this.env.equals_(values, expectedValues);
-};
-
-matchers.toHaveSelectedValues = function (expectedValues) {
-    var selectedNodes = arrayFilter(this.actual.childNodes, function (node) { return node.selected; }),
-        selectedValues = arrayMap(selectedNodes, function (node) { return this.selectExtensions.readValue(node); });
-    this.actual = selectedValues;   // Fix explanatory message
-    return this.env.equals_(selectedValues, expectedValues);
 };
 
 matchers.toThrowContaining = function(expected) {
