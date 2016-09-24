@@ -1,10 +1,13 @@
 
 import {
+    options
+} from 'tko.utils';
+
+import {
     observable, isObservable
 } from 'tko.observable';
 
 import {
-    options,
     applyBindings
 } from 'tko.bind';
 
@@ -13,6 +16,8 @@ import {
 } from 'tko.provider';
 
 import * as components from '../index.js';
+
+import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 
 describe("Components", function() {

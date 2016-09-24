@@ -1,3 +1,15 @@
+
+import {
+    observable
+} from 'tko.observable';
+
+import {
+    computed
+} from 'tko.computed';
+
+import components from '../index';
+
+
 describe('Components: Loader registry', function() {
     var testAsyncDelay = 20,
         testComponentName = 'test-component',
@@ -6,26 +18,26 @@ describe('Components: Loader registry', function() {
         loaderThatDoesNotReturnAnything = {
             getConfig: function(name, callback) {
                 expect(name).toBe(testComponentName);
-                setTimeout(function() { callback(null) }, testAsyncDelay);
+                setTimeout(function() { callback(null); }, testAsyncDelay);
             },
             loadComponent: function(name, config, callback) {
                 expect(name).toBe(testComponentName);
                 expect(config).toBe(testComponentConfig);
-                setTimeout(function() { callback(null) }, testAsyncDelay);
+                setTimeout(function() { callback(null); }, testAsyncDelay);
             }
         },
         loaderThatHasNoHandlers = {},
         loaderThatReturnsConfig = {
             getConfig: function(name, callback) {
                 expect(name).toBe(testComponentName);
-                setTimeout(function() { callback(testComponentConfig) }, testAsyncDelay);
+                setTimeout(function() { callback(testComponentConfig); }, testAsyncDelay);
             }
         },
         loaderThatReturnsDefinition = {
             loadComponent: function(name, config, callback) {
                 expect(name).toBe(testComponentName);
                 expect(config).toBe(testComponentConfig);
-                setTimeout(function() { callback(testComponentDefinition) }, testAsyncDelay);
+                setTimeout(function() { callback(testComponentDefinition); }, testAsyncDelay);
             }
         },
         loaderThatShouldNeverBeCalled = {
@@ -40,13 +52,13 @@ describe('Components: Loader registry', function() {
             }
         },
         testLoaderChain = function(spec, chain, options) {
-            spec.restoreAfter(ko.components, 'loaders');
+            spec.restoreAfter(components, 'loaders');
 
             // Set up a chain of loaders, then query it
-            ko.components.loaders = chain;
+            components.loaders = chain;
 
             var loadedDefinition = "Not yet loaded";
-            ko.components.get(testComponentName, function(definition) {
+            components.get(testComponentName, function(definition) {
                 loadedDefinition = definition;
             });
 
@@ -65,17 +77,17 @@ describe('Components: Loader registry', function() {
                 onLoaded();
             } else {
                 // Will complete asynchronously
-                waitsFor(function() { return loadedDefinition !== "Not yet loaded"; }, 300);
+                window.waitsFor(function() { return loadedDefinition !== "Not yet loaded"; }, 300);
                 runs(onLoaded);
             }
         };
 
     afterEach(function() {
-        ko.components.unregister(testComponentName);
+        components.unregister(testComponentName);
     });
 
     it('Exposes the list of loaders as an array', function() {
-        expect(ko.components.loaders instanceof Array).toBe(true);
+        expect(components.loaders instanceof Array).toBe(true);
     });
 
     it('Obtains component config and component definition objects by invoking each loader in turn, asynchronously, until one supplies a value', function() {
@@ -162,7 +174,7 @@ describe('Components: Loader registry', function() {
     });
 
     it('Ensures that the loading process completes asynchronously, even if the loader completed synchronously', function() {
-        // This behavior is for consistency. Developers calling ko.components.get shouldn't have to
+        // This behavior is for consistency. Developers calling components.get shouldn't have to
         // be concerned about whether the callback fires before or after their next line of code.
 
         var wasAsync = false;
@@ -179,12 +191,12 @@ describe('Components: Loader registry', function() {
 
     it('Supplies component definition synchronously if the "synchronous" flag is provided and the loader completes synchronously', function() {
         // Set up a synchronous loader that returns a component marked as synchronous
-        this.restoreAfter(ko.components, 'loaders');
+        this.restoreAfter(components, 'loaders');
         var testSyncComponentConfig = { synchronous: true },
             testSyncComponentDefinition = { },
             syncComponentName = 'my-sync-component',
             getConfigCallCount = 0;
-        ko.components.loaders = [{
+        components.loaders = [{
             getConfig: function(name, callback) {
                 getConfigCallCount++;
                 callback(testSyncComponentConfig);
@@ -197,7 +209,7 @@ describe('Components: Loader registry', function() {
 
         // See that the initial load can complete synchronously
         var initialLoadCompletedSynchronously = false;
-        ko.components.get(syncComponentName, function(definition) {
+        components.get(syncComponentName, function(definition) {
             expect(definition).toBe(testSyncComponentDefinition);
             initialLoadCompletedSynchronously = true;
         });
@@ -206,14 +218,14 @@ describe('Components: Loader registry', function() {
 
         // See that subsequent cached loads can complete synchronously
         var cachedLoadCompletedSynchronously = false;
-        ko.components.get(syncComponentName, function(definition) {
+        components.get(syncComponentName, function(definition) {
             expect(definition).toBe(testSyncComponentDefinition);
             cachedLoadCompletedSynchronously = true;
         });
         expect(cachedLoadCompletedSynchronously).toBe(true);
         expect(getConfigCallCount).toBe(1); // Was cached, so no extra loads
 
-        // See that, if you use ko.components.get synchronously from inside a computed,
+        // See that, if you use components.get synchronously from inside a computed,
         // it ignores dependencies read inside the callback. That is, the callback only
         // fires once even if something it accesses changes.
         // This represents @lavimc's comment on https://github.com/knockout/knockout/commit/ee6df1398e08e9cc85a7a90497b6d043562d0ed0
@@ -223,13 +235,13 @@ describe('Components: Loader registry', function() {
         // if the component isn't yet loaded, then their computed would die early. The argument for
         // this behavior, then, is that it prevents a really obscure and hard-to-repro race condition
         // bug by stopping developers from relying on synchronous dependency detection here at all.
-        var someObservable = ko.observable('Initial'),
+        var someObservable = observable('Initial'),
             callbackCount = 0;
-        ko.computed(function() {
-            ko.components.get(syncComponentName, function(definition) {
+        computed(function() {
+            components.get(syncComponentName, function(/*definition*/) {
                 callbackCount++;
                 someObservable();
-            })
+            });
         });
         expect(callbackCount).toBe(1);
         someObservable('Modified');
@@ -238,10 +250,10 @@ describe('Components: Loader registry', function() {
 
     it('Supplies component definition synchronously if the "synchronous" flag is provided and definition is already cached', function() {
         // Set up an asynchronous loader chain that returns a component marked as synchronous
-        this.restoreAfter(ko.components, 'loaders');
+        this.restoreAfter(components, 'loaders');
         this.after(function() { delete testComponentConfig.synchronous; });
         testComponentConfig.synchronous = "trueish value";
-        ko.components.loaders = [loaderThatReturnsConfig, loaderThatReturnsDefinition];
+        components.loaders = [loaderThatReturnsConfig, loaderThatReturnsDefinition];
 
         // Perform an initial load to prime the cache. Also verify it's set up to be async.
         var initialLoadWasAsync = false;
@@ -252,7 +264,7 @@ describe('Components: Loader registry', function() {
             // Perform a subsequent load and verify it completes synchronously, because
             // the component config has the 'synchronous' flag
             var cachedLoadWasSynchronous = false;
-            ko.components.get(testComponentName, function(cachedDefinition) {
+            components.get(testComponentName, function(cachedDefinition) {
                 cachedLoadWasSynchronous = true;
                 expect(cachedDefinition).toBe(testComponentDefinition);
             });
@@ -262,21 +274,21 @@ describe('Components: Loader registry', function() {
     });
 
     it('By default, contains only the default loader', function() {
-        expect(ko.components.loaders.length).toBe(1);
-        expect(ko.components.loaders[0]).toBe(ko.components.defaultLoader);
+        expect(components.loaders.length).toBe(1);
+        expect(components.loaders[0]).toBe(components.defaultLoader);
     });
 
     it('Caches and reuses loaded component definitions', function() {
         // Ensure we leave clean state after the test
         this.after(function() {
-            ko.components.unregister('some-component');
-            ko.components.unregister('other-component');
+            components.unregister('some-component');
+            components.unregister('other-component');
         });
 
-        ko.components.register('some-component', {
+        components.register('some-component', {
             viewModel: function() { this.isTheTestComponent = true; }
         });
-        ko.components.register('other-component', {
+        components.register('other-component', {
             viewModel: function() { this.isTheOtherComponent = true; }
         });
 
@@ -300,14 +312,14 @@ describe('Components: Loader registry', function() {
 
         // See we can choose to force a refresh by clearing a cache entry before fetching a definition.
         // This facility probably won't be used by most applications, but it is helpful for tests.
-        runs(function() { ko.components.clearCachedDefinition('some-component'); });
+        runs(function() { components.clearCachedDefinition('some-component'); });
         getComponentDefinition('some-component', function(definition3) {
             expect(definition3).not.toBe(definition1);
             expect(definition3.createViewModel().isTheTestComponent).toBe(true);
         });
 
         // See that unregistering a component implicitly clears the cache entry too
-        runs(function() { ko.components.unregister('some-component'); });
+        runs(function() { components.unregister('some-component'); });
         getComponentDefinition('some-component', function(definition4) {
             expect(definition4).toBe(null);
         });
@@ -324,11 +336,11 @@ describe('Components: Loader registry', function() {
             setTimeout(function() { callback(someComponentModule); }, 80);
         };
 
-        ko.components.register(testComponentName, { require: 'path/testcomponent' });
+        components.register(testComponentName, { require: 'path/testcomponent' });
 
         // Begin loading the module; see it synchronously made a request to the module loader
         var definition1 = undefined;
-        ko.components.get(testComponentName, function(loadedDefinition) {
+        components.get(testComponentName, function(loadedDefinition) {
             definition1 = loadedDefinition;
         });
         expect(requireCallLog).toEqual([['path/testcomponent']]);
@@ -340,7 +352,7 @@ describe('Components: Loader registry', function() {
             expect(definition1).toBe(undefined);
 
             // ... but let's make a second request for the same module
-            ko.components.get(testComponentName, function(loadedDefinition) {
+            components.get(testComponentName, function(loadedDefinition) {
                 definition2 = loadedDefinition;
             });
 
@@ -349,7 +361,7 @@ describe('Components: Loader registry', function() {
         });
 
         // And when the loading eventually completes, both requests are satisfied with the same definition
-        waitsFor(function() { return definition1 }, 300);
+        window.waitsFor(function() { return definition1; }, 300);
         runs(function() {
             expect(definition1.template).toBe(someModuleTemplate);
             expect(definition2).toBe(definition1);
@@ -366,13 +378,13 @@ describe('Components: Loader registry', function() {
         var loadedDefinition,
             hasCompleted = false;
         runs(function() {
-            ko.components.get(componentName, function(definition) {
+            components.get(componentName, function(definition) {
                 loadedDefinition = definition;
                 hasCompleted = true;
             });
             expect(hasCompleted).toBe(false); // Should always complete asynchronously
         });
-        waitsFor(function() { return hasCompleted; });
+        window.waitsFor(function() { return hasCompleted; });
         runs(function() { assertionCallback(loadedDefinition); });
     }
 });

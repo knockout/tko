@@ -5,7 +5,7 @@ import {
 } from 'tko.utils';
 
 import {
-    registry, clearCachedDefinition, _getFirstResultFromLoaders
+    registry
 } from './loaderRegistry';
 
 
@@ -39,7 +39,7 @@ export function isRegistered(componentName) {
 
 export function unregister(componentName) {
     delete defaultConfigRegistry[componentName];
-    clearCachedDefinition(componentName);
+    registry.clearCachedDefinition(componentName);
 }
 
 export var defaultLoader = {
@@ -87,7 +87,7 @@ function resolveConfig(componentName, errorCallback, config, callback) {
 
     if (templateConfig) {
         possiblyGetConfigFromAmd(errorCallback, templateConfig, function(loadedConfig) {
-            _getFirstResultFromLoaders('loadTemplate', [componentName, loadedConfig], function(resolvedTemplate) {
+            registry._getFirstResultFromLoaders('loadTemplate', [componentName, loadedConfig], function(resolvedTemplate) {
                 result['template'] = resolvedTemplate;
                 tryIssueCallback();
             });
@@ -98,7 +98,7 @@ function resolveConfig(componentName, errorCallback, config, callback) {
 
     if (viewModelConfig) {
         possiblyGetConfigFromAmd(errorCallback, viewModelConfig, function(loadedConfig) {
-            _getFirstResultFromLoaders('loadViewModel', [componentName, loadedConfig], function(resolvedViewModel) {
+            registry._getFirstResultFromLoaders('loadViewModel', [componentName, loadedConfig], function(resolvedViewModel) {
                 result[createViewModelKey] = resolvedViewModel;
                 tryIssueCallback();
             });

@@ -3,7 +3,7 @@ import { tagNameLower, objectMap } from 'tko.utils';
 import { unwrap, isWriteableObservable } from 'tko.observable';
 import { computed } from 'tko.computed';
 
-import isRegistered from './defaultLoader';
+import { isRegistered } from './defaultLoader';
 
 
 
@@ -47,7 +47,7 @@ export function addBindingsForCustomElement(allBindings, node, bindingContext, v
 // Extend the default binding provider
 
 
-function getComponentParamsFromCustomElement(node, parser) {
+export function getComponentParamsFromCustomElement(node, parser) {
     var accessors = parser.parse(node.getAttribute('params'));
     if (!accessors || Object.keys(accessors).length === 0) {
         return {

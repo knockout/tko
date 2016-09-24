@@ -17,7 +17,9 @@ import {
     applyBindingsToDescendants
 } from 'tko.bind';
 
-import components from './loaderRegistry';
+import {
+    registry
+} from './loaderRegistry';
 
 
 var componentLoadingOperationUniqueId = 0;
@@ -47,7 +49,7 @@ function createViewModel(componentDefinition, element, originalChildNodes, compo
 }
 
 
-export default {
+export var componentBinding = {
     init: function(element, valueAccessor, ignored1, ignored2, bindingContext) {
         var currentViewModel,
             currentLoadingOperationId,
@@ -80,7 +82,7 @@ export default {
             }
 
             var loadingOperationId = currentLoadingOperationId = ++componentLoadingOperationUniqueId;
-            components.get(componentName, function(componentDefinition) {
+            registry.get(componentName, function(componentDefinition) {
                 // If this is not the current load operation for this element, ignore it.
                 if (currentLoadingOperationId !== loadingOperationId) {
                     return;
@@ -105,5 +107,6 @@ export default {
         }, null, { disposeWhenNodeIsRemoved: element });
 
         return { 'controlsDescendantBindings': true };
-    }
+    },
+    allowVirtualElements: true
 };

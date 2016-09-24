@@ -5,11 +5,8 @@
 
 
 import {
-    Provider
-} from 'tko.provider';
-
-
-import { getComponentNameForNode, getComponentParamsFromCustomElement } from './customElements';
+    getComponentNameForNode, getComponentParamsFromCustomElement
+} from './customElements';
 
 
 // getBindingAccessors
@@ -33,9 +30,3 @@ export function getBindingAccessors(node, _, parser) {
         component: function() { return componentBindingValue; }
     };
 }
-
-
-Provider.addProvider({
-    nodeHasBindings: getComponentNameForNode,
-    getBindingAccessors: getBindingAccessors
-});

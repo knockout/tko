@@ -1,49 +1,56 @@
-describe('Components: Default loader', function() {
+import {
+    parseHtmlFragment
+} from 'tko.utils';
 
+import components from '../index';
+
+
+describe('Components: Default loader', function() {
+    var waitsFor = window.waitsFor;
     var testComponentName = 'test-component';
 
     afterEach(function() {
-        ko.components.unregister(testComponentName);
+        components.unregister(testComponentName);
     });
 
     it('Allows registration of arbitrary component config objects, reports that they are registered, and allows unregistration', function() {
-        ko.components.register(testComponentName, {});
+        components.register(testComponentName, {});
 
-        expect(ko.components.isRegistered(testComponentName)).toBe(true);
-        expect(ko.components.isRegistered('other-component')).toBe(false);
+        expect(components.isRegistered(testComponentName)).toBe(true);
+        expect(components.isRegistered('other-component')).toBe(false);
 
-        ko.components.unregister(testComponentName, {});
-        ko.components.unregister('nonexistent-component', {}); // No error - it's just a no-op, since it's harmless
+        components.unregister(testComponentName, {});
+        components.unregister('nonexistent-component', {}); // No error - it's just a no-op, since it's harmless
 
-        expect(ko.components.isRegistered(testComponentName)).toBe(false);
+        expect(components.isRegistered(testComponentName)).toBe(false);
     });
 
     it('Allows registering component names that may conflict with properties on Object.prototype', function() {
         var prototypeProperty = 'toString';
 
-        expect(ko.components.isRegistered(prototypeProperty)).toBe(false);
-        ko.components.register(prototypeProperty, {});
-        expect(ko.components.isRegistered(prototypeProperty)).toBe(true);
+        expect(components.isRegistered(prototypeProperty)).toBe(false);
+        components.register(prototypeProperty, {});
+        expect(components.isRegistered(prototypeProperty)).toBe(true);
 
-        ko.components.unregister(prototypeProperty);
-        expect(ko.components.isRegistered(prototypeProperty)).toBe(false);
+        components.unregister(prototypeProperty);
+        expect(components.isRegistered(prototypeProperty)).toBe(false);
     });
 
     it('Throws if you try to register a component that is already registered', function() {
-        ko.components.register(testComponentName, {});
+        components.register(testComponentName, {});
 
         expect(function() {
-            ko.components.register(testComponentName, {});
+            components.register(testComponentName, {});
         }).toThrow();
     });
 
     it('Throws if you try to register a falsey value', function() {
         expect(function() {
-            ko.components.register(testComponentName, null);
+            components.register(testComponentName, null);
         }).toThrow();
 
         expect(function() {
-            ko.components.register(testComponentName, undefined);
+            components.register(testComponentName, undefined);
         }).toThrow();
     });
 
@@ -51,50 +58,58 @@ describe('Components: Default loader', function() {
         var expectedConfig = {},
             didComplete = false;
 
-        ko.components.register(testComponentName, expectedConfig);
-        ko.components.defaultLoader.getConfig(testComponentName, function(actualConfig) {
+        components.register(testComponentName, expectedConfig);
+        components.defaultLoader.getConfig(testComponentName, function(actualConfig) {
             expect(actualConfig).toBe(expectedConfig);
             didComplete = true;
         });
 
-        waitsFor(function() { return didComplete; }, 100);
+        waitsFor(function() {
+            return didComplete;
+        }, 100);
     });
 
     it('getConfig supplies null for unknown components', function() {
         var didComplete = false;
 
-        ko.components.defaultLoader.getConfig(testComponentName, function(actualConfig) {
+        components.defaultLoader.getConfig(testComponentName, function(actualConfig) {
             expect(actualConfig).toBe(null);
             didComplete = true;
         });
 
-        waitsFor(function() { return didComplete; }, 100);
+        waitsFor(function() {
+            return didComplete;
+        }, 100);
     });
 
     it('Can load a template and viewmodel simultaneously', function() {
         // Set up a configuration in which both template and viewmodel have to be loaded asynchronously
         var templateProviderCallback,
             viewModelProviderCallback,
-            createViewModelFunction = function() { },
+            createViewModelFunction = function() {},
             domNodeArray = [],
             didResolveDefinition = false,
             config = {
-                template: { require: 'path/templateModule' },
-                viewModel: { require: 'path/viewModelModule' }
+                template: {
+                    require: 'path/templateModule'
+                },
+                viewModel: {
+                    require: 'path/viewModelModule'
+                }
             };
 
         this.restoreAfter(window, 'require');
         window.require = function(modules, callback) {
             expect(modules.length).toBe(1);
             switch (modules[0]) {
-                case 'path/templateModule':
-                    templateProviderCallback = callback;
-                    break;
-                case 'path/viewModelModule':
-                    viewModelProviderCallback = callback;
-                    break;
-                default:
-                    throw new Error('Unexpected requirement for module ' + modules[0]);
+            case 'path/templateModule':
+                templateProviderCallback = callback;
+                break;
+            case 'path/viewModelModule':
+                viewModelProviderCallback = callback;
+                break;
+            default:
+                throw new Error('Unexpected requirement for module ' + modules[0]);
             }
         };
 
@@ -110,7 +125,9 @@ describe('Components: Default loader', function() {
         expect(typeof viewModelProviderCallback).toBe('function');
 
         // When the first one completes, nothing else happens
-        viewModelProviderCallback({ createViewModel: createViewModelFunction });
+        viewModelProviderCallback({
+            createViewModel: createViewModelFunction
+        });
         expect(didResolveDefinition).toBe(false);
 
         // When the other one completes, the definition is supplied
@@ -124,8 +141,12 @@ describe('Components: Default loader', function() {
         //  - viewModel is a further module which supplies a constructor
         mockAmdEnvironment(this, {
             componentmodule: {
-                template: { require: 'templatemodule' },
-                viewModel: { require: 'viewmodelmodule' }
+                template: {
+                    require: 'templatemodule'
+                },
+                viewModel: {
+                    require: 'viewmodelmodule'
+                }
             },
             templatemodule: '<div>Hello world</div>',
             viewmodelmodule: {
@@ -133,14 +154,18 @@ describe('Components: Default loader', function() {
                     this.receivedValue = params.suppliedValue;
                 }
             }
-        })
+        });
 
         // Resolve it all
-        testConfigObject({ require: 'componentmodule' }, function(definition) {
+        testConfigObject({
+            require: 'componentmodule'
+        }, function(definition) {
             expect(definition.template.length).toBe(1);
             expect(definition.template[0]).toContainText('Hello world');
 
-            var viewModel = definition.createViewModel({ suppliedValue: 12.3 }, null /* componentInfo */);
+            var viewModel = definition.createViewModel({
+                suppliedValue: 12.3
+            }, null /* componentInfo */ );
             expect(viewModel.receivedValue).toBe(12.3);
         });
     });
@@ -148,7 +173,7 @@ describe('Components: Default loader', function() {
     it('Can be asked to resolve a template directly', function() {
         var templateConfig = '<span>Markup string</span><div>More</div>',
             didLoad = false;
-        ko.components.defaultLoader.loadTemplate('any-component', templateConfig, function(result) {
+        components.defaultLoader.loadTemplate('any-component', templateConfig, function(result) {
             expect(result.length).toBe(2);
             expect(result[0].tagName).toBe('SPAN');
             expect(result[1].tagName).toBe('DIV');
@@ -160,12 +185,14 @@ describe('Components: Default loader', function() {
     });
 
     it('Can be asked to resolve a viewmodel directly', function() {
-        var testConstructor = function(params) { this.suppliedParams = params; },
+        var testConstructor = function(params) {
+                this.suppliedParams = params;
+            },
             didLoad = false;
-        ko.components.defaultLoader.loadViewModel('any-component', testConstructor, function(result) {
+        components.defaultLoader.loadViewModel('any-component', testConstructor, function(result) {
             // Result is of the form: function(params, componentInfo) { ... }
             var testParams = {},
-                resultInstance = result(testParams, null /* componentInfo */);
+                resultInstance = result(testParams, null /* componentInfo */ );
             expect(resultInstance instanceof testConstructor).toBe(true);
             expect(resultInstance.suppliedParams).toBe(testParams);
             didLoad = true;
@@ -178,7 +205,7 @@ describe('Components: Default loader', function() {
             loadTemplate: function(componentName, templateConfig, callback) {
                 expect(componentName).toBe(testComponentName);
                 expect(templateConfig.customThing).toBe(123);
-                callback(ko.utils.parseHtmlFragment('<div>Hello world</div>'));
+                callback(parseHtmlFragment('<div>Hello world</div>'));
             },
             loadViewModel: function(componentName, viewModelConfig, callback) {
                 // Fall through to other loaders
@@ -186,12 +213,16 @@ describe('Components: Default loader', function() {
             }
         };
 
-        this.restoreAfter(ko.components, 'loaders');
-        ko.components.loaders = [testLoader, ko.components.defaultLoader];
+        this.restoreAfter(components, 'loaders');
+        components.loaders = [testLoader, components.defaultLoader];
 
         var config = {
-            template: { customThing: 123 }, // The custom loader understands this format and will handle it
-            viewModel: { instance: {} }     // The default loader understands this format and will handle it
+            template: {
+                customThing: 123
+            }, // The custom loader understands this format and will handle it
+            viewModel: {
+                instance: {}
+            } // The default loader understands this format and will handle it
         };
         testConfigObject(config, function(definition) {
             expect(definition.template.length).toBe(1);
@@ -203,7 +234,9 @@ describe('Components: Default loader', function() {
     });
 
     it('Will load viewmodels via \'loadViewModel\' on any other registered loader that precedes it', function() {
-        var testParams = {}, testComponentInfo = {}, testViewModel = {};
+        var testParams = {},
+            testComponentInfo = {},
+            testViewModel = {};
         var testLoader = {
             loadTemplate: function(componentName, templateConfig, callback) {
                 // Fall through to other loaders
@@ -220,12 +253,14 @@ describe('Components: Default loader', function() {
             }
         };
 
-        this.restoreAfter(ko.components, 'loaders');
-        ko.components.loaders = [testLoader, ko.components.defaultLoader];
+        this.restoreAfter(components, 'loaders');
+        components.loaders = [testLoader, components.defaultLoader];
 
         var config = {
             template: '<div>Hello world</div>', // The default loader understands this format and will handle it
-            viewModel: { customThing: 456 }     // The custom loader understands this format and will handle it
+            viewModel: {
+                customThing: 456
+            } // The custom loader understands this format and will handle it
         };
         testConfigObject(config, function(definition) {
             expect(definition.template.length).toBe(1);
@@ -240,8 +275,10 @@ describe('Components: Default loader', function() {
         describe('Templates are normalised to arrays of DOM nodes', function() {
 
             it('Can be configured as a DOM node array', function() {
-                var domNodeArray = [ document.createElement('div'), document.createElement('p') ];
-                testConfigObject({ template: domNodeArray }, function(definition) {
+                var domNodeArray = [document.createElement('div'), document.createElement('p')];
+                testConfigObject({
+                    template: domNodeArray
+                }, function(definition) {
                     expect(definition.template).toBe(domNodeArray);
                 });
             });
@@ -250,13 +287,17 @@ describe('Components: Default loader', function() {
                 var docFrag = document.createDocumentFragment(),
                     elem = document.createElement('div');
                 docFrag.appendChild(elem);
-                testConfigObject({ template: docFrag }, function(definition) {
+                testConfigObject({
+                    template: docFrag
+                }, function(definition) {
                     expect(definition.template).toEqual([elem]);
                 });
             });
 
             it('Can be configured as a string of markup', function() {
-                testConfigObject({ template: '<p>Some text</p><div>More stuff</div>' }, function(definition) {
+                testConfigObject({
+                    template: '<p>Some text</p><div>More stuff</div>'
+                }, function(definition) {
                     // Converts to standard array-of-DOM-nodes format
                     expect(definition.template.length).toBe(2);
                     expect(definition.template[0].tagName).toBe('P');
@@ -313,10 +354,16 @@ describe('Components: Default loader', function() {
             });
 
             it('Can be configured as an AMD module whose value is a DOM node array', function() {
-                var domNodeArray = [ document.createElement('div'), document.createElement('p') ];
-                mockAmdEnvironment(this, { 'some/module/path': domNodeArray });
+                var domNodeArray = [document.createElement('div'), document.createElement('p')];
+                mockAmdEnvironment(this, {
+                    'some/module/path': domNodeArray
+                });
 
-                testConfigObject({ template: { require: 'some/module/path' } }, function(definition) {
+                testConfigObject({
+                    template: {
+                        require: 'some/module/path'
+                    }
+                }, function(definition) {
                     expect(definition.template).toBe(domNodeArray);
                 });
             });
@@ -325,17 +372,29 @@ describe('Components: Default loader', function() {
                 var docFrag = document.createDocumentFragment(),
                     elem = document.createElement('div');
                 docFrag.appendChild(elem);
-                mockAmdEnvironment(this, { 'some/module/path': docFrag });
+                mockAmdEnvironment(this, {
+                    'some/module/path': docFrag
+                });
 
-                testConfigObject({ template: { require: 'some/module/path' } }, function(definition) {
+                testConfigObject({
+                    template: {
+                        require: 'some/module/path'
+                    }
+                }, function(definition) {
                     expect(definition.template).toEqual([elem]);
                 });
             });
 
             it('Can be configured as an AMD module whose value is markup', function() {
-                mockAmdEnvironment(this, { 'some/module/path': '<div>Hello world</div><p>The end</p>' });
+                mockAmdEnvironment(this, {
+                    'some/module/path': '<div>Hello world</div><p>The end</p>'
+                });
 
-                testConfigObject({ template: { require: 'some/module/path' } }, function(definition) {
+                testConfigObject({
+                    template: {
+                        require: 'some/module/path'
+                    }
+                }, function(definition) {
                     expect(definition.template.length).toBe(2);
                     expect(definition.template[0].tagName).toBe('DIV');
                     expect(definition.template[0]).toContainText('Hello world');
@@ -351,18 +410,28 @@ describe('Components: Default loader', function() {
 
         describe('Viewmodels', function() {
             it('Can be configured as a createViewModel function', function() {
-                var createViewModel = function() { };
+                var createViewModel = function() {};
 
-                testConfigObject({ viewModel: { createViewModel: createViewModel } }, function(definition) {
+                testConfigObject({
+                    viewModel: {
+                        createViewModel: createViewModel
+                    }
+                }, function(definition) {
                     expect(definition.createViewModel).toBe(createViewModel);
                 });
             });
 
             it('Can be configured as a constructor function', function() {
-                var myConstructor = function(params) { this.receivedValue = params.suppliedValue; };
+                var myConstructor = function(params) {
+                    this.receivedValue = params.suppliedValue;
+                };
 
-                testConfigObject({ viewModel: myConstructor }, function(definition) {
-                    var viewModel = definition.createViewModel({ suppliedValue: 123 }, null /* componentInfo */);
+                testConfigObject({
+                    viewModel: myConstructor
+                }, function(definition) {
+                    var viewModel = definition.createViewModel({
+                        suppliedValue: 123
+                    }, null /* componentInfo */ );
                     expect(viewModel.receivedValue).toBe(123);
                 });
             });
@@ -370,37 +439,71 @@ describe('Components: Default loader', function() {
             it('Can be configured as an object instance', function() {
                 var myInstance = {};
 
-                testConfigObject({ viewModel: { instance: myInstance } }, function(definition) {
-                    var viewModel = definition.createViewModel(null /* params */, null /* componentInfo */);
+                testConfigObject({
+                    viewModel: {
+                        instance: myInstance
+                    }
+                }, function(definition) {
+                    var viewModel = definition.createViewModel(null /* params */ , null /* componentInfo */ );
                     expect(viewModel).toBe(myInstance);
                 });
             });
 
             it('Can be configured as an AMD module that supplies a createViewModel factory', function() {
-                var createViewModel = function() { };
-                mockAmdEnvironment(this, { 'some/module/path': { createViewModel: createViewModel } });
+                var createViewModel = function() {};
+                mockAmdEnvironment(this, {
+                    'some/module/path': {
+                        createViewModel: createViewModel
+                    }
+                });
 
-                testConfigObject({ viewModel: { require: 'some/module/path' } }, function(definition) {
+                testConfigObject({
+                    viewModel: {
+                        require: 'some/module/path'
+                    }
+                }, function(definition) {
                     expect(definition.createViewModel).toBe(createViewModel);
                 });
             });
 
             it('Can be configured as an AMD module that is a constructor function', function() {
-                var myConstructor = function(params) { this.receivedValue = params.suppliedValue; };
-                mockAmdEnvironment(this, { 'some/module/path': myConstructor });
+                var myConstructor = function(params) {
+                    this.receivedValue = params.suppliedValue;
+                };
+                mockAmdEnvironment(this, {
+                    'some/module/path': myConstructor
+                });
 
-                testConfigObject({ viewModel: { require: 'some/module/path' } }, function(definition) {
-                    var viewModel = definition.createViewModel({ suppliedValue: 234 }, null /* componentInfo */);
+                testConfigObject({
+                    viewModel: {
+                        require: 'some/module/path'
+                    }
+                }, function(definition) {
+                    var viewModel = definition.createViewModel({
+                        suppliedValue: 234
+                    }, null /* componentInfo */ );
                     expect(viewModel.receivedValue).toBe(234);
                 });
             });
 
             it('Can be configured as an AMD module that supplies a viewmodel configuration', function() {
-                var myConstructor = function(params) { this.receivedValue = params.suppliedValue; };
-                mockAmdEnvironment(this, { 'some/module/path': { viewModel: myConstructor } });
+                var myConstructor = function(params) {
+                    this.receivedValue = params.suppliedValue;
+                };
+                mockAmdEnvironment(this, {
+                    'some/module/path': {
+                        viewModel: myConstructor
+                    }
+                });
 
-                testConfigObject({ viewModel: { require: 'some/module/path' } }, function(definition) {
-                    var viewModel = definition.createViewModel({ suppliedValue: 345 }, null /* componentInfo */);
+                testConfigObject({
+                    viewModel: {
+                        require: 'some/module/path'
+                    }
+                }, function(definition) {
+                    var viewModel = definition.createViewModel({
+                        suppliedValue: 345
+                    }, null /* componentInfo */ );
                     expect(viewModel.receivedValue).toBe(345);
                 });
             });
@@ -409,16 +512,24 @@ describe('Components: Default loader', function() {
         describe('Combined viewmodel/templates', function() {
             it('Can be configured as an AMD module', function() {
                 var moduleObject = {
-                        // The module can have any values that are valid as the input to the whole resolution process
-                        template: [],
-                        viewModel: function(params) { this.receivedValue = params.suppliedValue; }
-                    };
-                mockAmdEnvironment(this, { 'some/module/path': moduleObject });
+                    // The module can have any values that are valid as the input to the whole resolution process
+                    template: [],
+                    viewModel: function(params) {
+                        this.receivedValue = params.suppliedValue;
+                    }
+                };
+                mockAmdEnvironment(this, {
+                    'some/module/path': moduleObject
+                });
 
-                testConfigObject({ require: 'some/module/path' }, function(definition) {
+                testConfigObject({
+                    require: 'some/module/path'
+                }, function(definition) {
                     expect(definition.template).toBe(moduleObject.template);
 
-                    var viewModel = definition.createViewModel({ suppliedValue: 567 }, null /* componentInfo */);
+                    var viewModel = definition.createViewModel({
+                        suppliedValue: 567
+                    }, null /* componentInfo */ );
                     expect(viewModel.receivedValue).toBe(567);
                 });
             });
@@ -426,16 +537,18 @@ describe('Components: Default loader', function() {
     });
 
     function testConfigObject(configObject, assertionCallback) {
-        ko.components.unregister(testComponentName);
-        ko.components.register(testComponentName, configObject);
+        components.unregister(testComponentName);
+        components.register(testComponentName, configObject);
 
         var didComplete = false;
-        ko.components.get(testComponentName, function(definition) {
+        components.get(testComponentName, function(definition) {
             assertionCallback(definition);
             didComplete = true;
         });
 
-        waitsFor(function() { return didComplete; }, 1000);
+        waitsFor(function() {
+            return didComplete;
+        }, 1000);
     }
 
     function testTemplateFromElement(wrapperMarkup, elementId, extraAssertsCallback) {
@@ -451,7 +564,11 @@ describe('Components: Default loader', function() {
         var templateElem = testElem.childNodes[1],
             templateConfigValue = elementId || templateElem;
 
-        testConfigObject({ template: { element: templateConfigValue } }, function(definition) {
+        testConfigObject({
+            template: {
+                element: templateConfigValue
+            }
+        }, function(definition) {
             // Converts to standard array-of-DOM-nodes format
             expect(definition.template.length).toBe(2);
             expect(definition.template[0].tagName).toBe('P');

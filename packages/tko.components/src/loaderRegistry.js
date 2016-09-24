@@ -107,8 +107,7 @@ function getFirstResultFromLoaders(methodName, argsExceptCallback, callback, can
     }
 }
 
-
-export default {
+export var registry = {
     get: function(componentName, callback) {
         var cachedDefinition = getObjectOwnProperty(loadedDefinitionsCache, componentName);
         if (cachedDefinition) {
