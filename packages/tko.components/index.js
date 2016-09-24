@@ -4,10 +4,10 @@
 // ko.bindingHandlers.component
 //
 
-import bindingHandler from 'src/componentBinding';
+import * as bindingHandler from './src/componentBinding';
 import registry from './src/loaderRegistry';
-import elements from './src/customElements';
-import loader from './src/defaultLoader';
+import * as elements from './src/customElements';
+import * as loader from './src/defaultLoader';
 
 
 export default {

@@ -19,7 +19,7 @@ import {
 // 1. To supply configuration objects from some other source (e.g., conventions)
 // 2. Or, to resolve configuration objects by loading viewmodels/templates via arbitrary logic.
 
-var defaultConfigRegistry = {};
+export var defaultConfigRegistry = {};
 
 export function register(componentName, config) {
     if (!config) {

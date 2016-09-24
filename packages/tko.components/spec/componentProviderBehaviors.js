@@ -1,17 +1,33 @@
 
-import { bindingProvider, applyBindings } from 'tko.bind';
-import { Provider } from 'tko.provider';
+import {
+    observable, isObservable
+} from 'tko.observable';
+
+import {
+    options,
+    applyBindings
+} from 'tko.bind';
+
+import {
+    Provider
+} from 'tko.provider';
+
+import * as components from '../index.js';
 
 
 describe("Components", function() {
+    var assert = window.assert;
+    var bindingHandlers;
+
     describe("custom elements", function() {
         // Note: knockout/spec/components
         beforeEach(function() {
-            bindingProvider.instance = new Provider();
+            options.bindingProviderInstance = new Provider();
+            bindingHandlers.set({ component: components.bindingHandler });
         });
 
         it("inserts templates into custom elements", function(done) {
-            ko.components.register('helium', {
+            components.register('helium', {
                 template: 'X<i data-sbind="text: 123"></i>'
             });
             var initialMarkup = 'He: <helium></helium>';
@@ -32,9 +48,9 @@ describe("Components", function() {
 
         it("interprets the params of custom elements", function(done) {
             var called = false;
-            ko.components.register("argon", {
-                viewModel: function(params) {
-                    this.delta = 'G2k'
+            components.register("argon", {
+                viewModel: function(/* params */) {
+                    this.delta = 'G2k';
                     called = true;
                 },
                 template: "<b>sXZ <u data-sbind='text: delta'></u></b>"
@@ -50,8 +66,8 @@ describe("Components", function() {
                 assert.equal(ce.innerHTML,
                     '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
                 assert.equal(called, true);
-                done()
-            }, 1)
+                done();
+            }, 1);
         });
 
         it("does not unwrap observables (#44)", function(done) {
@@ -65,35 +81,35 @@ describe("Components", function() {
             }
 
             function ChildViewModel(params) {
-                assert.ok(ko.isObservable(params.value))
-                this.cvalue = params.value
+                assert.ok(isObservable(params.value));
+                this.cvalue = params.value;
             }
 
-            var ps = document.createElement('script')
-            ps.setAttribute('id', 'parent-44')
-            ps.setAttribute('type', 'text/html')
+            var ps = document.createElement('script');
+            ps.setAttribute('id', 'parent-44');
+            ps.setAttribute('type', 'text/html');
             ps.innerHTML = '<div>Parent: <span data-bind="text: parentvalue"></span></div>' +
-                '<child params="value: parentvalue"></child>'
-            document.body.appendChild(ps)
+                '<child params="value: parentvalue"></child>';
+            document.body.appendChild(ps);
 
-            var cs = document.createElement('script')
-            cs.setAttribute('id', 'child-44')
-            cs.setAttribute('type', 'text/html')
-            cs.innerHTML = ''
-            document.body.appendChild(cs)
+            var cs = document.createElement('script');
+            cs.setAttribute('id', 'child-44');
+            cs.setAttribute('type', 'text/html');
+            cs.innerHTML = '';
+            document.body.appendChild(cs);
 
-            var div = document.createElement('div')
+            var div = document.createElement('div');
             div.innerHTML = '<div data-bind="text: appvalue"></div>' +
-                '<parent params="value: appvalue"></parent>'
+                '<parent params="value: appvalue"></parent>';
 
             var viewModel = new AppViewModel("hello");
-            ko.components.register("parent", {
+            components.register("parent", {
                 template: {
                     element: "parent-44"
                 },
                 viewModel: ParentViewModel
             });
-            ko.components.register("child", {
+            components.register("child", {
                 template: {
                     element: "child-44"
                 },
@@ -102,24 +118,24 @@ describe("Components", function() {
             var options = {
                 attribute: "data-bind",
                 globals: window,
-                bindings: ko.bindingHandlers,
+                bindings: bindingHandlers,
                 noVirtualElements: false
             };
-            bindingProvider.instance = new Provider(options);
+            options.bindingProviderInstance = new Provider(options);
             applyBindings(viewModel, div);
             setTimeout(function() {
-                done()
-            }, 50)
+                done();
+            }, 50);
         });
 
         it("uses empty params={$raw:{}} if the params attr is whitespace", function(done) {
-            var called = false;
-            ko.components.register("lithium", {
+            // var called = false;
+            components.register("lithium", {
                 viewModel: function(params) {
                     assert.deepEqual(params, {
                         $raw: {}
-                    })
-                    done()
+                    });
+                    done();
                 },
                 template: "hello"
             });
@@ -129,31 +145,31 @@ describe("Components", function() {
                 delta: 'QxE'
             }, ce);
             // No error raised.
-        })
+        });
 
         it('parses `text: "alpha"` on a custom element', function(done) {
             // re brianmhunt/knockout-secure-binding#38
-            ko.components.register("neon", {
+            components.register("neon", {
                 viewModel: function(params) {
                     assert.equal(params.text, "Knights of Ne.");
                     done();
                 },
                 template: "A noble gas and less noble car."
-            })
+            });
             var ne = document.createElement("neon");
-            ne.setAttribute("params", 'text: "Knights of Ne."')
+            ne.setAttribute("params", 'text: "Knights of Ne."');
             applyBindings({}, ne);
             // No error raised.
-        })
+        });
     });
 
-    describe("nodeParamsToObject", function() {
-        var parser = null;
+    /*describe("nodeParamsToObject", function() {
+        // var parser = null;
         beforeEach(function() {
 
         });
         it("returns {$raw:{}} when there is no params attribute", function() {
-            var parser = bindings = new Parser(null, {});
+            var parser = new Parser(null, {});
             var node = document.createElement("div");
             assert.deepEqual(nodeParamsToObject(node, parser), {
                 $raw: {}
@@ -163,14 +179,14 @@ describe("Components", function() {
         it("returns the params items", function() {
             var parser = new Parser(null, {});
             var node = document.createElement("div");
-            node.setAttribute('params', 'value: "42.99"')
+            node.setAttribute('params', 'value: "42.99"');
             var expect = {
                 value: "42.99",
                 $raw: {
                     value: "42.99"
                 }
             };
-            assert.deepEqual(ko.toJS(nodeParamsToObject(node, parser)), expect);
+            assert.deepEqual(toJS(nodeParamsToObject(node, parser)), expect);
         });
 
         it("returns unwrapped params", function() {
@@ -180,8 +196,8 @@ describe("Components", function() {
             var node = document.createElement("div");
             node.setAttribute('params', 'type: fe');
             var paramsObject = nodeParamsToObject(node, parser);
-            assert.equal(paramsObject.type(), "Iron")
-            assert.equal(paramsObject.$raw.type()(), "Iron")
+            assert.equal(paramsObject.type(), "Iron");
+            assert.equal(paramsObject.$raw.type()(), "Iron");
         });
-    });
+    }); // */
 });

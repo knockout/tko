@@ -2,13 +2,22 @@
 // Binding Handler for Components
 //
 import {
-    virtualElements, makeArray, cloneNodes, domNodeDisposal
+    virtualElements, makeArray, cloneNodes, addDisposeCallback
 } from 'tko.utils';
-import { computed } from 'tko.computed';
-import unwrap from 'tko.observable';
-import applyBindingsToDescendants from 'tko.bind';
 
-import components from './components';
+import {
+    computed
+} from 'tko.computed';
+
+import {
+    unwrap
+} from 'tko.observable';
+
+import {
+    applyBindingsToDescendants
+} from 'tko.bind';
+
+import components from './loaderRegistry';
 
 
 var componentLoadingOperationUniqueId = 0;
@@ -53,7 +62,7 @@ export default {
             },
             originalChildNodes = makeArray(virtualElements.childNodes(element));
 
-        domNodeDisposal.addDisposeCallback(element, disposeAssociatedComponentViewModel);
+        addDisposeCallback(element, disposeAssociatedComponentViewModel);
 
         computed(function () {
             var value = unwrap(valueAccessor()),

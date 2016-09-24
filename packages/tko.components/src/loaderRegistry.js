@@ -2,7 +2,7 @@
 import { subscribable, dependencyDetection } from 'tko.observable';
 import { getObjectOwnProperty, tasks } from 'tko.utils';
 
-import loaders from './loaderRegistry';
+var loaders = [];
 
 
 var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
@@ -134,5 +134,5 @@ export default {
 
     _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-    loaders: []
+    loaders: loaders
 };
