@@ -31,8 +31,6 @@ env:
   es6: true
 
 globals:
-  ko: true
-  koExports: true
   jQueryInstance: true
   DEBUG: true
 
@@ -46,3 +44,5 @@ globals:
   beforeEach: true
   expect: true
   testNode: true
+  waits: true
+  runs: true
