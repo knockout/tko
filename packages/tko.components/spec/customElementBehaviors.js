@@ -19,6 +19,13 @@ import {
     applyBindings, dataFor
 } from 'tko.bind';
 
+import {
+    bindings as coreBindings
+} from 'tko.binding.core';
+
+import {
+    bindings as templateBindings
+} from 'tko.binding.template';
 
 import components from '../index';
 
@@ -28,16 +35,20 @@ import {
 
 
 
-describe('Components: Custom elements', function() {
+ddescribe('Components: Custom elements', function() {
     beforeEach(function() {
         jasmine.prepareTestNode();
         useMockForTasks(options);
-        options.bindingProviderInstance = new Provider();
-        options.bindingProviderInstance.bindingHandlers.set({
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+
+        provider.bindingHandlers.set({
             component: components.bindingHandler
         });
+        provider.bindingHandlers.set(templateBindings);
+        provider.bindingHandlers.set(coreBindings);
 
-        Provider.addProvider(components.bindingProvider);
+        provider.addProvider(components.bindingProvider);
     });
 
     afterEach(function() {
@@ -95,6 +106,8 @@ describe('Components: Custom elements', function() {
     });
 
     it('Is possible to override getComponentNameForNode to determine which component goes into which element', function() {
+        // SKIP because it is no longer possible to override this; we'd
+        // have to do some redesign.
         components.register('test-component', { template: 'custom element'});
         this.restoreAfter(components, 'getComponentNameForNode');
 
@@ -153,8 +166,9 @@ describe('Components: Custom elements', function() {
         components.register('test-component', { template: 'custom element'});
         testNode.innerHTML = '<test-component data-bind="component: {}"></test-component>';
 
-        expect(function() { applyBindings(null, testNode); })
-            .toThrowContaining('Cannot use the "component" binding on a custom element matching a component');
+        expect(function() {
+            applyBindings(null, testNode);
+        }).toThrowContaining('Cannot use the "component" binding on a custom element matching a component');
     });
 
     it('Is possible to pass literal values', function() {

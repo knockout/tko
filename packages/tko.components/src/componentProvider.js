@@ -4,9 +4,7 @@
 
 
 
-import {
-    getComponentNameForNode, getComponentParamsFromCustomElement
-} from './customElements';
+import { addBindingsForCustomElement } from './customElements';
 
 
 // getBindingAccessors
@@ -15,18 +13,6 @@ import {
 // `<cust-ele params='...'>` becomes
 // `<cust-ele data-bind='component: {name: "cust-ele", params: ...}'>`
 //
-export function getBindingAccessors(node, _, parser) {
-    if (node.nodeType !== node.ELEMENT_NODE) { return; }
-
-    var component_name = getComponentNameForNode(node);
-    if (!component_name) { return; }
-
-    var componentBindingValue = {
-        'name': component_name,
-        'params': getComponentParamsFromCustomElement(node, parser)
-    };
-
-    return {
-        component: function() { return componentBindingValue; }
-    };
+export function getBindingAccessors(node, context, parser, bindings) {
+    return addBindingsForCustomElement(bindings, node, context, /* valueAccessors */ true, parser);
 }

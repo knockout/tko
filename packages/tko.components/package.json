@@ -5,20 +5,22 @@
   "main": "index.js",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "tko-policy": "knockout/tko-policy"
+    "tko-policy": "knockout/tko-policy",
+    "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.binding.template": "github:knockout/tko.binding.template"
   },
   "dependencies": {
-      "tko.utils": "knockout/tko.utils",
-      "tko.observable": "knockout/tko.observable",
-      "tko.computed": "knockout/tko.computed",
-      "tko.bind": "knockout/tko.bind",
-      "tko.provider": "knockout/tko.provider"
+    "tko.utils": "knockout/tko.utils",
+    "tko.observable": "knockout/tko.observable",
+    "tko.computed": "knockout/tko.computed",
+    "tko.bind": "knockout/tko.bind",
+    "tko.provider": "knockout/tko.provider"
   },
   "files": [
-      "dist/",
-      "src/",
-      "index.js",
-      "./*.ya?ml"
+    "dist/",
+    "src/",
+    "index.js",
+    "./*.ya?ml"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

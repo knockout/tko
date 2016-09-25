@@ -6,10 +6,9 @@ import { computed } from 'tko.computed';
 import { isRegistered } from './defaultLoader';
 
 
-
 // Overridable API for determining which component name applies to a given node. By overriding this,
 // you can for example map specific tagNames to components that are not preregistered.
-export function getComponentNameForNode(node) {
+export function defaultGetComponentNameForNode(node) {
     if (node.nodeType !== node.ELEMENT_NODE) { return; }
     var _tagNameLower = tagNameLower(node);
     if (isRegistered(_tagNameLower)) {
@@ -20,7 +19,15 @@ export function getComponentNameForNode(node) {
     }
 }
 
-export function addBindingsForCustomElement(allBindings, node, bindingContext, valueAccessors) {
+export var getComponentNameForNode = defaultGetComponentNameForNode;
+
+
+export function setComponentNameForNodeGetter(fn) {
+    getComponentNameForNode = fn;
+}
+
+
+export function addBindingsForCustomElement(allBindings, node, bindingContext, valueAccessors, parser) {
     // Determine if it's really a custom element matching a component
     if (node.nodeType === 1) {
         var componentName = getComponentNameForNode(node);
@@ -33,7 +40,10 @@ export function addBindingsForCustomElement(allBindings, node, bindingContext, v
                 throw new Error('Cannot use the "component" binding on a custom element matching a component');
             }
 
-            var componentBindingValue = { 'name': componentName, 'params': getComponentParamsFromCustomElement(node, bindingContext) };
+            var componentBindingValue = {
+                'name': componentName,
+                'params': getComponentParamsFromCustomElement(node, bindingContext, parser)
+            };
 
             allBindings.component = valueAccessors
                 ? function() { return componentBindingValue; }
@@ -44,10 +54,8 @@ export function addBindingsForCustomElement(allBindings, node, bindingContext, v
     return allBindings;
 }
 
-// Extend the default binding provider
 
-
-export function getComponentParamsFromCustomElement(node, parser) {
+export function getComponentParamsFromCustomElement(node, context, parser) {
     var accessors = parser.parse(node.getAttribute('params'));
     if (!accessors || Object.keys(accessors).length === 0) {
         return {
