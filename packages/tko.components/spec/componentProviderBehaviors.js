@@ -15,20 +15,30 @@ import {
     Provider
 } from 'tko.provider';
 
-import * as components from '../index.js';
+import {
+    bindings as coreBindings
+} from 'tko.binding.core';
+
+import components from '../index.js';
 
 import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
 
 
-describe("Components", function() {
-    var assert = window.assert;
+describe("Components: Provider", function() {
     var bindingHandlers;
 
     describe("custom elements", function() {
         // Note: knockout/spec/components
         beforeEach(function() {
-            options.bindingProviderInstance = new Provider();
+            var provider = new Provider();
+            options.bindingProviderInstance = provider;
+            bindingHandlers = provider.bindingHandlers;
+
             bindingHandlers.set({ component: components.bindingHandler });
+            bindingHandlers.set(coreBindings);
+
+            provider.clearProviders();
+            provider.addProvider(components.bindingProvider);
         });
 
         it("inserts templates into custom elements", function(done) {
@@ -41,10 +51,10 @@ describe("Components", function() {
 
             // Since components are loaded asynchronously, it doesn't show up synchronously
             applyBindings(null, root);
-            assert.equal(root.innerHTML, initialMarkup);
+            expect(root.innerHTML).toEqual(initialMarkup);
             setTimeout(function() {
                 window.root = root;
-                assert.equal(root.innerHTML,
+                expect(root.innerHTML).toEqual(
                     'He: <helium>X<i data-sbind="text: 123">123</i></helium>'
                 );
                 done();
@@ -68,9 +78,9 @@ describe("Components", function() {
                 delta: 'QxE'
             }, ce);
             setTimeout(function() {
-                assert.equal(ce.innerHTML,
+                expect(ce.innerHTML).toEqual(
                     '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
-                assert.equal(called, true);
+                expect(called).toEqual(true);
                 done();
             }, 1);
         });
@@ -86,7 +96,7 @@ describe("Components", function() {
             }
 
             function ChildViewModel(params) {
-                assert.ok(isObservable(params.value));
+                expect(isObservable(params.value)).toEqual(true);
                 this.cvalue = params.value;
             }
 
@@ -137,7 +147,7 @@ describe("Components", function() {
             // var called = false;
             components.register("lithium", {
                 viewModel: function(params) {
-                    assert.deepEqual(params, {
+                    expect(params).toEqual({
                         $raw: {}
                     });
                     done();
@@ -156,7 +166,7 @@ describe("Components", function() {
             // re brianmhunt/knockout-secure-binding#38
             components.register("neon", {
                 viewModel: function(params) {
-                    assert.equal(params.text, "Knights of Ne.");
+                    expect(params.text).toEqual("Knights of Ne.");
                     done();
                 },
                 template: "A noble gas and less noble car."
