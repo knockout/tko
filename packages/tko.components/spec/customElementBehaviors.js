@@ -35,7 +35,7 @@ import {
 
 
 
-ddescribe('Components: Custom elements', function() {
+describe('Components: Custom elements', function() {
     beforeEach(function() {
         jasmine.prepareTestNode();
         useMockForTasks(options);
@@ -48,6 +48,7 @@ ddescribe('Components: Custom elements', function() {
         provider.bindingHandlers.set(templateBindings);
         provider.bindingHandlers.set(coreBindings);
 
+        provider.clearProviders();
         provider.addProvider(components.bindingProvider);
     });
 

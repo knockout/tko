@@ -15,6 +15,14 @@ import {
     applyBindings, dataFor
 } from 'tko.bind';
 
+import {
+    bindings as coreBindings
+} from 'tko.binding.core';
+
+import {
+    bindings as templateBindings
+} from 'tko.binding.template';
+
 import components from '../index';
 
 import {
@@ -38,10 +46,17 @@ describe('Components: Component binding', function() {
         outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true };
         testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"></div>';
 
-        options.bindingProviderInstance = new Provider();
-        options.bindingProviderInstance.bindingHandlers.set({
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+
+        provider.bindingHandlers.set(templateBindings);
+        provider.bindingHandlers.set(coreBindings);
+        provider.bindingHandlers.set({
             component: components.bindingHandler
         });
+
+        provider.clearProviders();
+        provider.addProvider(components.bindingProvider);
     });
 
     afterEach(function() {
