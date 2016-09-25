@@ -8,7 +8,6 @@ import { componentBinding } from './src/componentBinding';
 import { registry } from './src/loaderRegistry';
 import * as elements from './src/customElements';
 import * as loader from './src/defaultLoader';
-import { getBindingAccessors } from './src/componentProvider';
 
 
 var components = {
@@ -26,16 +25,13 @@ var components = {
 
     // -- Custom elements --
     addBindingsForCustomElement: elements.addBindingsForCustomElement,
-    getComponentNameForNode: elements.getComponentNameForNode,
 
     // -- Binding handler --
     bindingHandler: componentBinding,
 
     // -- Extend the Binding Provider --
-    bindingProvider: {
-        nodeHasBindings: elements.getComponentNameForNode,
-        getBindingAccessors: getBindingAccessors
-    }
+    // to recognize and bind <custom-element>'s.
+    bindingProvider: elements.bindingProvider
 };
 
 

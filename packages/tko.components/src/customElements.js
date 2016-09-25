@@ -8,7 +8,7 @@ import { isRegistered } from './defaultLoader';
 
 // Overridable API for determining which component name applies to a given node. By overriding this,
 // you can for example map specific tagNames to components that are not preregistered.
-export function defaultGetComponentNameForNode(node) {
+export function getComponentNameForNode(node) {
     if (node.nodeType !== node.ELEMENT_NODE) { return; }
     var _tagNameLower = tagNameLower(node);
     if (isRegistered(_tagNameLower)) {
@@ -19,18 +19,22 @@ export function defaultGetComponentNameForNode(node) {
     }
 }
 
-export var getComponentNameForNode = defaultGetComponentNameForNode;
 
-
-export function setComponentNameForNodeGetter(fn) {
-    getComponentNameForNode = fn;
+// getBindingAccessors
+// ---
+// Return the binding accessors for custom elements i.e.
+// `<cust-ele params='...'>` becomes
+// `<cust-ele data-bind='component: {name: "cust-ele", params: ...}'>`
+//
+export function getBindingAccessors(node, context, parser, bindings) {
+    return addBindingsForCustomElement(bindings, node, context, /* valueAccessors */ true, parser);
 }
 
 
 export function addBindingsForCustomElement(allBindings, node, bindingContext, valueAccessors, parser) {
     // Determine if it's really a custom element matching a component
     if (node.nodeType === 1) {
-        var componentName = getComponentNameForNode(node);
+        var componentName = bindingProvider.getComponentNameForNode(node);
         if (componentName) {
             // It does represent a component, so add a component binding for it
             allBindings = allBindings || {};
@@ -105,3 +109,12 @@ export function getComponentParamsFromCustomElement(node, context, parser) {
     }
     return params;
 }
+
+
+export var bindingProvider = {
+    nodeHasBindings: function (node) {
+        return bindingProvider.getComponentNameForNode(node);
+    },
+    getBindingAccessors: getBindingAccessors,
+    getComponentNameForNode: getComponentNameForNode
+};

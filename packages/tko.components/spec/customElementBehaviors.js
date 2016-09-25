@@ -107,18 +107,18 @@ describe('Components: Custom elements', function() {
     });
 
     it('Is possible to override getComponentNameForNode to determine which component goes into which element', function() {
-        // SKIP because it is no longer possible to override this; we'd
-        // have to do some redesign.
         components.register('test-component', { template: 'custom element'});
-        this.restoreAfter(components, 'getComponentNameForNode');
+        this.restoreAfter(components.bindingProvider, 'getComponentNameForNode');
 
-        // Set up a getComponentNameForNode function that maps "A" tags to test-component
+
+        // Set up a getComponentNameForNode function that maps "A" tags to
+        // test-component.
         testNode.innerHTML = '<div>hello <a>&nbsp;</a> <b>ignored</b></div>';
-        components.getComponentNameForNode = function(node) {
+        components.bindingProvider.getComponentNameForNode = function(node) {
             return node.tagName === 'A' ? 'test-component' : null;
         };
 
-        // See the component show up
+        // See the component show up.
         applyBindings(null, testNode);
         jasmine.Clock.tick(1);
         expect(testNode).toContainHtml('<div>hello <a>custom element</a> <b>ignored</b></div>');
