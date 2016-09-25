@@ -2,8 +2,6 @@
 import { subscribable, dependencyDetection } from 'tko.observable';
 import { getObjectOwnProperty, tasks } from 'tko.utils';
 
-var loaders = [];
-
 
 var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
     loadedDefinitionsCache = {};    // Tracks component loads that have already completed
@@ -63,7 +61,7 @@ function beginLoadingComponent(componentName, callback) {
 function getFirstResultFromLoaders(methodName, argsExceptCallback, callback, candidateLoaders) {
     // On the first call in the stack, start with the full set of loaders
     if (!candidateLoaders) {
-        candidateLoaders = loaders.slice(0); // Use a copy, because we'll be mutating this array
+        candidateLoaders = registry.loaders.slice(0); // Use a copy, because we'll be mutating this array
     }
 
     // Try the next candidate
@@ -133,5 +131,5 @@ export var registry = {
 
     _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-    loaders: loaders
+    loaders: []
 };

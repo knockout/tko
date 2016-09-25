@@ -10,10 +10,10 @@ import * as elements from './src/customElements';
 import * as loader from './src/defaultLoader';
 import { getBindingAccessors } from './src/componentProvider';
 
-export default {
+
+var components = {
     // -- Registry --
     get: registry.get,
-    loaders: registry.loaders,
     clearCachedDefinition: registry.clearCachedDefinition,
 
     // -- Loader --
@@ -37,3 +37,14 @@ export default {
         getBindingAccessors: getBindingAccessors
     }
 };
+
+
+// This is to ensure that "component.loaders = [a,b,c]" works as expected.
+Object.defineProperty(components, 'loaders', {
+    enumerable: true,
+    get: function () { return registry.loaders; },
+    set: function (loaders) { registry.loaders = loaders; }
+});
+
+
+export default components;
