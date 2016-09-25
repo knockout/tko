@@ -113,7 +113,7 @@ function getBindingAccessors(node, context) {
   }
 
   arrayForEach(otherProviders, function(p) {
-    extend(bindings, p.getBindingAccessors(node, context, parser));
+    extend(bindings, p.getBindingAccessors(node, context, parser, bindings));
   });
 
   objectForEach(bindings, this.preProcessBindings.bind(this));
@@ -173,13 +173,14 @@ function preProcessBindings(bindingString) {
 // `getBindingAccessors` function.
 //
 function addProvider(p) { otherProviders.push(p); }
-
+function clearProviders() { otherProviders.length = 0; }
 
 extend(Provider.prototype, {
   nodeHasBindings: nodeHasBindings,
   getBindingAccessors: getBindingAccessors,
   getBindingsString: getBindingsString,
   addProvider: addProvider,
+  clearProviders: clearProviders,
   Parser: Parser,
   preProcessBindings: preProcessBindings
 });
