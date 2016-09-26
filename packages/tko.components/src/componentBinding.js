@@ -68,9 +68,20 @@ export function componentBinding(params) {
     // will still be async. (So multiple binding context updates will be
     // merged into one, but also successive updates will have consistently
     // async behaviour)
-    this.childBindingContext = this.computed(this.makeChildBindingContext).extend({deferred: true});
+    this.childBindingContext = this.computed(this.makeChildBindingContext);
 
     this.subscribe(this.childBindingContext, this.rebuildComponent.bind(this));
+
+    if (this.childBindingContext()) {
+        // The binding context will only be created at this point if the
+        // component has synchronous: true, meaning we want to build it
+        // immediately.
+        this.rebuildComponent(this.childBindingContext());
+    } else {
+        // If it's an asynchronous component, for consistency we want
+        // updates to the binding context to be reflected asynchronously too.
+        this.childBindingContext.extend({ deferred: true });
+    }
 }
 
 
@@ -96,7 +107,7 @@ extend(componentBinding.prototype, {
         return { name: componentName, params: componentParams };
     },
 
-    // Asynchgonously acquire the definition for the given component.
+    // Asynchronously acquire the definition for the given component.
     getComponentDefinition: function (componentArgs) {
         if (!componentArgs) { return; }
         registry.get(componentArgs.name, this.componentDefinition);
@@ -112,10 +123,6 @@ extend(componentBinding.prototype, {
             options.onError(
                 new Error('Unknown component \'' + componentArgs.name + '\'')
             );
-        }
-
-        if (componentDefinition.synchronous) {
-            this.childBindingContext = this.computed(this.makeChildBindingContext);
         }
 
         var componentName = componentArgs.name,
