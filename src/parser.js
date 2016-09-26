@@ -4,7 +4,7 @@
  */
 
 import {
-  options, objectForEach
+  options, objectForEach, clonePlainObjectDeep
 } from 'tko.utils';
 
 import Expression from './expression';
@@ -534,6 +534,7 @@ Parser.prototype.read_bindings = function () {
   return bindings;
 };
 
+
 /**
 * Convert result[name] from a value to a function (i.e. `valueAccessor()`)
 * @param  {object} result [Map of top-level names to values]
@@ -570,7 +571,7 @@ Parser.prototype.convert_to_accessors = function (result) {
       };
     } else if (typeof(value) != 'function') {
       result[name] = function constAccessor() {
-        return value;
+        return clonePlainObjectDeep(value);
       };
     }
   });
