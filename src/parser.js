@@ -539,8 +539,8 @@ Parser.prototype.read_bindings = function () {
 * @param  {object} result [Map of top-level names to values]
 * @return {object}        [Map of top-level names to functions]
 *
-* Accessors may be one of constAccessor (below), identifierAccessor or
-* expressionAccessor.
+* Accessors may be one of (below) constAccessor, identifierAccessor,
+* expressionAccessor, or nodeAccessor.
 */
 Parser.prototype.convert_to_accessors = function (result) {
 
