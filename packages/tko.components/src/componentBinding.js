@@ -2,15 +2,15 @@
 // Binding Handler for Components
 //
 import {
-    virtualElements, makeArray, cloneNodes, addDisposeCallback
+    virtualElements, makeArray, cloneNodes, options, extend
 } from 'tko.utils';
 
-import {
-    computed
-} from 'tko.computed';
+// import {
+//     computed
+// } from 'tko.computed';
 
 import {
-    unwrap
+    unwrap, observable
 } from 'tko.observable';
 
 import {
@@ -23,11 +23,6 @@ import {
 
 
 var componentLoadingOperationUniqueId = 0;
-
-// We are presuming here that the bindingHandler registration will
-// be `component`; with the new-style binding handlers this can be
-// an innate property (i.e. {..., allowVirtual: true}
-virtualElements.allowedBindings.component = true;
 
 
 function cloneTemplateIntoElement(componentName, componentDefinition, element) {
@@ -42,71 +37,185 @@ function cloneTemplateIntoElement(componentName, componentDefinition, element) {
 
 
 function createViewModel(componentDefinition, element, originalChildNodes, componentParams) {
-    var componentViewModelFactory = componentDefinition['createViewModel'];
+    var componentViewModelFactory = componentDefinition.createViewModel;
     return componentViewModelFactory
         ? componentViewModelFactory.call(componentDefinition, componentParams, { 'element': element, 'templateNodes': originalChildNodes })
         : componentParams; // Template-only component
 }
 
 
-export var componentBinding = {
-    init: function(element, valueAccessor, ignored1, ignored2, bindingContext) {
-        var currentViewModel,
-            currentLoadingOperationId,
-            disposeAssociatedComponentViewModel = function () {
-                var currentViewModelDispose = currentViewModel && currentViewModel['dispose'];
-                if (typeof currentViewModelDispose === 'function') {
-                    currentViewModelDispose.call(currentViewModel);
-                }
-                currentViewModel = null;
-                // Any in-flight loading operation is no longer relevant, so make sure we ignore its completion
-                currentLoadingOperationId = null;
-            },
-            originalChildNodes = makeArray(virtualElements.childNodes(element));
+export function componentBinding(params) {
+    this.element = params.element;
+    this.bindingContext = params.$context;
+    this.currentViewModel;
 
-        addDisposeCallback(element, disposeAssociatedComponentViewModel);
+    this.originalChildNodes = makeArray(virtualElements.childNodes(this.element));
 
-        computed(function () {
-            var value = unwrap(valueAccessor()),
-                componentName, componentParams;
+    // The componentDefinition comes (asynchronously) from the component
+    // registry.
+    this.componentDefinition = observable();
 
-            if (typeof value === 'string') {
-                componentName = value;
-            } else {
-                componentName = unwrap(value['name']);
-                componentParams = unwrap(value['params']);
-            }
+    // When the args are updated, we update (async) the registry.
+    this.componentArgs = this.computed(this.getComponentArgs);
 
-            if (!componentName) {
-                throw new Error('No component name specified');
-            }
+    // Prime the first definition.
+    this.getComponentDefinition(this.componentArgs());
 
-            var loadingOperationId = currentLoadingOperationId = ++componentLoadingOperationUniqueId;
-            registry.get(componentName, function(componentDefinition) {
-                // If this is not the current load operation for this element, ignore it.
-                if (currentLoadingOperationId !== loadingOperationId) {
-                    return;
-                }
+    // Rebuild definition on changes to the params/name.
+    this.subscribe(this.componentArgs, this.getComponentDefinition.bind(this));
 
-                // Clean up previous state
-                disposeAssociatedComponentViewModel();
+    // We defer this so that when the bindingContext is updated, the rebuild
+    // will still be async. (So multiple binding context updates will be
+    // merged into one, but also successive updates will have consistently
+    // async behaviour)
+    this.childBindingContext = this.computed(this.makeChildBindingContext).extend({deferred: true});
 
-                // Instantiate and bind new component. Implicitly this cleans any old DOM nodes.
-                if (!componentDefinition) {
-                    throw new Error('Unknown component \'' + componentName + '\'');
-                }
-                cloneTemplateIntoElement(componentName, componentDefinition, element);
-                var componentViewModel = createViewModel(componentDefinition, element, originalChildNodes, componentParams),
-                    childBindingContext = bindingContext['createChildContext'](componentViewModel, /* dataItemAlias */ void 0, function(ctx) {
-                        ctx['$component'] = componentViewModel;
-                        ctx['$componentTemplateNodes'] = originalChildNodes;
-                    });
-                currentViewModel = componentViewModel;
-                applyBindingsToDescendants(childBindingContext, element);
-            });
-        }, null, { disposeWhenNodeIsRemoved: element });
+    this.subscribe(this.childBindingContext, this.rebuildComponent.bind(this));
+}
 
-        return { 'controlsDescendantBindings': true };
+
+extend(componentBinding.prototype, {
+    allowVirtualElements: true,
+    controlsDescendantBindings: true,
+
+    getComponentArgs: function () {
+        var value = this.value(),
+            componentName, componentParams;
+        if (typeof value === 'string') {
+            componentName = value;
+        } else {
+            componentName = unwrap(value.name);
+            componentParams = unwrap(value.params);
+        }
+
+        if (!componentName) {
+            options.onError(new Error('No component name specified'));
+            return null;
+        }
+
+        return { name: componentName, params: componentParams };
     },
-    allowVirtualElements: true
-};
+
+    // Asynchgonously acquire the definition for the given component.
+    getComponentDefinition: function (componentArgs) {
+        if (!componentArgs) { return; }
+        registry.get(componentArgs.name, this.componentDefinition);
+    },
+
+    makeChildBindingContext: function () {
+        var componentArgs = this.componentArgs(),
+            componentDefinition = this.componentDefinition();
+
+        if (!componentArgs || componentDefinition === undefined) { return; }
+
+        if (componentDefinition === null) {
+            options.onError(
+                new Error('Unknown component \'' + componentArgs.name + '\'')
+            );
+        }
+
+        if (componentDefinition.synchronous) {
+            this.childBindingContext = this.computed(this.makeChildBindingContext);
+        }
+
+        var componentName = componentArgs.name,
+            componentParams = componentArgs.params,
+            originalChildNodes = this.originalChildNodes;
+
+        // Clean up previous state
+        this.disposeAssociatedComponentViewModel();
+
+        // Instantiate and bind new component. Implicitly this cleans any old DOM nodes.
+        if (!componentDefinition) {
+            throw new Error('Unknown component \'' + componentName + '\'');
+        }
+        cloneTemplateIntoElement(componentName, componentDefinition, this.element);
+
+        var componentViewModel = createViewModel(componentDefinition, this.element, this.originalChildNodes, componentParams),
+            childBindingContext = this.bindingContext.createChildContext(componentViewModel, /* dataItemAlias */ void 0, function(ctx) {
+                ctx.$component = componentViewModel;
+                ctx.$componentTemplateNodes = originalChildNodes;
+            });
+        this.currentViewModel = componentViewModel;
+        return childBindingContext;
+    },
+
+    rebuildComponent: function (childBindingContext) {
+        applyBindingsToDescendants(childBindingContext, this.element);
+    },
+
+    dispose: function () {
+        this.disposeAssociatedComponentViewModel();
+    },
+
+    disposeAssociatedComponentViewModel: function() {
+        var currentViewModelDispose = this.currentViewModel && this.currentViewModel.dispose;
+        if (typeof currentViewModelDispose === 'function') {
+            currentViewModelDispose.call(this.currentViewModel);
+        }
+        this.currentViewModel = null;
+        // Any in-flight loading operation is no longer relevant, so make sure we ignore its completion
+        this.currentLoadingOperationId = null;
+    }
+});
+
+
+
+// var currentViewModel,
+//     currentLoadingOperationId,
+//     originalChildNodes = makeArray(virtualElements.childNodes(element));
+//
+// addDisposeCallback(element, disposeAssociatedComponentViewModel);
+//
+// function rebuild(componentName, componentParams, componentDefinition) {
+//     if (!componentDefinition) { return; }
+//     // if (lastComponentDefinition === componentDefinition) { return; }
+//     // lastComponentDefinition = componentDefinition;
+//
+//     // var loadingOperationId = currentLoadingOperationId = ++componentLoadingOperationUniqueId;
+//
+//     // Clean up previous state
+//     disposeAssociatedComponentViewModel();
+//
+//     // Instantiate and bind new component. Implicitly this cleans any old DOM nodes.
+//     if (!componentDefinition) {
+//         throw new Error('Unknown component \'' + componentName + '\'');
+//     }
+//     cloneTemplateIntoElement(componentName, componentDefinition, element);
+//     var componentViewModel = createViewModel(componentDefinition, element, originalChildNodes, componentParams),
+//         childBindingContext = bindingContext['createChildContext'](componentViewModel, /* dataItemAlias */ void 0, function(ctx) {
+//             ctx['$component'] = componentViewModel;
+//             ctx['$componentTemplateNodes'] = originalChildNodes;
+//         });
+//     currentViewModel = componentViewModel;
+//     applyBindingsToDescendants(childBindingContext, element);
+// }
+//
+//
+// computed(function () {
+//     var value = unwrap(valueAccessor()),
+//         componentName, componentParams;
+//
+//     if (typeof value === 'string') {
+//         componentName = value;
+//     } else {
+//         componentName = unwrap(value['name']);
+//         componentParams = unwrap(value['params']);
+//     }
+//
+//     if (!componentName) {
+//         options.onError('No component name specified');
+//     }
+//
+//     // Registry.get is async.
+//     registry.get(componentName, currentComponentDefinition);
+//
+//     rebuild(componentName, componentParams, currentComponentDefinition());
+    //  function(componentDefinition) {
+    //     // If this is not the current load operation for this element, ignore it.
+    //     if (currentLoadingOperationId !== loadingOperationId) {
+    //         return;
+    //     }
+    //
+    // });
+// }, null, { disposeWhenNodeIsRemoved: element });

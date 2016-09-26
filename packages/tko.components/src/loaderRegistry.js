@@ -15,7 +15,7 @@ function loadComponentAndNotify(componentName, callback) {
         _subscribable.subscribe(callback);
 
         beginLoadingComponent(componentName, function(definition, config) {
-            var isSynchronousComponent = !!(config && config['synchronous']);
+            var isSynchronousComponent = !!(config && config.synchronous);
             loadedDefinitionsCache[componentName] = { definition: definition, isSynchronousComponent: isSynchronousComponent };
             delete loadingSubscribablesCache[componentName];
 
@@ -91,7 +91,7 @@ function getFirstResultFromLoaders(methodName, argsExceptCallback, callback, can
                 // Method to suppress exceptions will remain undocumented. This is only to keep
                 // KO's specs running tidily, since we can observe the loading got aborted without
                 // having exceptions cluttering up the console too.
-                if (!currentCandidateLoader['suppressLoaderExceptions']) {
+                if (!currentCandidateLoader.suppressLoaderExceptions) {
                     throw new Error('Component loaders must supply values by invoking the callback, not by returning values synchronously.');
                 }
             }
