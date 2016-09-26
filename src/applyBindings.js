@@ -266,6 +266,10 @@ function execNewBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccesso
             );
         };
 
+        this.value = this.computed(function () {
+            return getValueAccessor(bindingKey)();
+        });
+
         handlerConstructor.call(this, handlerParams);
     }
 
