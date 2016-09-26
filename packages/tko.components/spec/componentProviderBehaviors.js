@@ -41,9 +41,10 @@ describe("Components: Provider", function() {
             provider.addProvider(components.bindingProvider);
         });
 
-        it("inserts templates into custom elements", function(done) {
+        it("inserts templates into custom elements", function() {
             components.register('helium', {
-                template: 'X<i data-sbind="text: 123"></i>'
+                template: 'X<i data-bind="text: 123"></i>',
+                synchronous: true
             });
             var initialMarkup = 'He: <helium></helium>';
             var root = document.createElement("div");
@@ -51,24 +52,21 @@ describe("Components: Provider", function() {
 
             // Since components are loaded asynchronously, it doesn't show up synchronously
             applyBindings(null, root);
-            expect(root.innerHTML).toEqual(initialMarkup);
-            setTimeout(function() {
-                window.root = root;
-                expect(root.innerHTML).toEqual(
-                    'He: <helium>X<i data-sbind="text: 123">123</i></helium>'
-                );
-                done();
-            }, 1);
+            // expect(root.innerHTML).toEqual(initialMarkup);
+            expect(root.innerHTML).toEqual(
+                'He: <helium>X<i data-bind="text: 123">123</i></helium>'
+            );
         });
 
-        it("interprets the params of custom elements", function(done) {
+        it("interprets the params of custom elements", function() {
             var called = false;
             components.register("argon", {
                 viewModel: function(/* params */) {
                     this.delta = 'G2k';
                     called = true;
                 },
-                template: "<b>sXZ <u data-sbind='text: delta'></u></b>"
+                template: "<b>sXZ <u data-bind='text: delta'></u></b>",
+                synchronous: true
             });
             var ce = document.createElement("argon");
             ce.setAttribute("params",
@@ -77,15 +75,12 @@ describe("Components: Provider", function() {
             applyBindings({
                 delta: 'QxE'
             }, ce);
-            setTimeout(function() {
-                expect(ce.innerHTML).toEqual(
-                    '<b>sXZ <u data-sbind="text: delta">G2k</u></b>');
-                expect(called).toEqual(true);
-                done();
-            }, 1);
+            expect(ce.innerHTML).toEqual(
+                '<b>sXZ <u data-bind="text: delta">G2k</u></b>');
+            expect(called).toEqual(true);
         });
 
-        it("does not unwrap observables (#44)", function(done) {
+        it("does not unwrap observables (#44)", function() {
             // Per https://plnkr.co/edit/EzpJD3yXd01aqPbuOq1X
             function AppViewModel(value) {
                 this.appvalue = observable(value);
@@ -122,13 +117,15 @@ describe("Components: Provider", function() {
                 template: {
                     element: "parent-44"
                 },
-                viewModel: ParentViewModel
+                viewModel: ParentViewModel,
+                synchronous: true
             });
             components.register("child", {
                 template: {
                     element: "child-44"
                 },
-                viewModel: ChildViewModel
+                viewModel: ChildViewModel,
+                synchronous: true
             });
             var options = {
                 attribute: "data-bind",
@@ -138,21 +135,18 @@ describe("Components: Provider", function() {
             };
             options.bindingProviderInstance = new Provider(options);
             applyBindings(viewModel, div);
-            setTimeout(function() {
-                done();
-            }, 50);
         });
 
-        it("uses empty params={$raw:{}} if the params attr is whitespace", function(done) {
+        it("uses empty params={$raw:{}} if the params attr is whitespace", function() {
             // var called = false;
             components.register("lithium", {
                 viewModel: function(params) {
                     expect(params).toEqual({
                         $raw: {}
                     });
-                    done();
                 },
-                template: "hello"
+                template: "hello",
+                synchronous: true
             });
             var ce = document.createElement("lithium");
             ce.setAttribute("params", "   ");
@@ -162,14 +156,14 @@ describe("Components: Provider", function() {
             // No error raised.
         });
 
-        it('parses `text: "alpha"` on a custom element', function(done) {
+        it('parses `text: "alpha"` on a custom element', function() {
             // re brianmhunt/knockout-secure-binding#38
             components.register("neon", {
                 viewModel: function(params) {
                     expect(params.text).toEqual("Knights of Ne.");
-                    done();
                 },
-                template: "A noble gas and less noble car."
+                template: "A noble gas and less noble car.",
+                synchronous: true
             });
             var ne = document.createElement("neon");
             ne.setAttribute("params", 'text: "Knights of Ne."');

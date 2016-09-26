@@ -36,17 +36,18 @@ import {
 
 
 describe('Components: Custom elements', function() {
+    var bindingHandlers;
+
     beforeEach(function() {
         jasmine.prepareTestNode();
         useMockForTasks(options);
         var provider = new Provider();
         options.bindingProviderInstance = provider;
 
-        provider.bindingHandlers.set({
-            component: components.bindingHandler
-        });
-        provider.bindingHandlers.set(templateBindings);
-        provider.bindingHandlers.set(coreBindings);
+        bindingHandlers = provider.bindingHandlers;
+        bindingHandlers.set({ component: components.bindingHandler });
+        bindingHandlers.set(templateBindings);
+        bindingHandlers.set(coreBindings);
 
         provider.clearProviders();
         provider.addProvider(components.bindingProvider);
@@ -224,18 +225,20 @@ describe('Components: Custom elements', function() {
     });
 
     it('Should not confuse parameters with bindings', function() {
-        this.restoreAfter(ko, 'getBindingHandler');
-        var bindings = [];
-        ko.getBindingHandler = function(bindingKey) {
-            bindings.push(bindingKey);
-        };
+        var called = false;
+        bindingHandlers.set({
+            donotcall: function () { called = true; }
+        });
 
-        components.register('test-component', {});
-        testNode.innerHTML = '<test-component params="value: value"></test-component>';
+        components.register('test-component', {
+            template: "Ignore",
+            synchronous: true
+        });
+        testNode.innerHTML = '<test-component params="donotcall: value"></test-component>';
         applyBindings({value: 123}, testNode);
 
         // The only binding it should look up is "component"
-        expect(bindings).toEqual(['component']);
+        expect(called).toBe(false);
     });
 
     it('Should update component when observable view model changes', function() {
