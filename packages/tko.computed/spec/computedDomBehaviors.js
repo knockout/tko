@@ -10,7 +10,7 @@ import {
     computed as Computed
 } from '../index';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import 'tko.utils/helpers/jasmine-13-helper.js';
 
 
 describe('Dependent Observable DOM', function() {

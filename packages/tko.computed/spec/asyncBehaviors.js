@@ -23,7 +23,7 @@ import {
 
 import {
     useMockForTasks
-} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+} from 'tko.utils/helpers/jasmine-13-helper.js';
 
 describe("Throttled observables", function() {
     beforeEach(function() { waits(1); }); // Workaround for spurious timing-related failures on IE8 (issue #736)
