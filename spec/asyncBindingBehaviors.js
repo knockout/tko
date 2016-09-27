@@ -22,7 +22,7 @@ import {
 
 import {
     useMockForTasks
-} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+} from 'tko.utils/helpers/jasmine-13-helper.js';
 
 
 describe("Deferred bindings", function() {
