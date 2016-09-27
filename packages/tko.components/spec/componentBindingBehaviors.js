@@ -27,7 +27,7 @@ import components from '../index';
 
 import {
     useMockForTasks
-} from '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+} from 'tko.utils/helpers/jasmine-13-helper.js';
 
 
 
