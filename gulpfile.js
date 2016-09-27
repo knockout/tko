@@ -1,23 +1,48 @@
  /* globals require */
- /* eslint semi:0, no-unised-vars:0*/
+ /* eslint semi:0, no-console: 0 */
+
+const cp = require('child_process')
+
 var gulp = require('gulp')
 require('tko-policy')(gulp)
 
+const S_INHERIT = { encoding: 'utf8', stdio: 'inherit' }
 
 
+function repoUrl(project) {
+    if (!project.includes('/')) {
+        // Project is "plain"; being loaded from npm.
+        return
+    }
+    if (!project.startsWith('https:') && !project.startsWith('git@')) {
+        project = project.replace(/^github:/, "")
+        if (!project.endsWith('.git')) { project += '.git' }
+        return `https://github.com/` + project
+    }
+    return project
+}
 
-// require('colors')
-//
-// var fs = require('fs'),
-//     gulp = require('gulp-help')(require('gulp')),
-//     plugins = require("gulp-load-plugins")(),
-//     yaml = require("js-yaml");
-//
-// var config = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8'));
-//
-// require('./gulp/release')(gulp, plugins, config)
-// require('./gulp/build')(gulp, plugins, config)
-// require('./gulp/test')(gulp, plugins, config)
-// require('./gulp/lint')(gulp, plugins, config)
-//
-// gulp.task('default', "Show the help", ['help'])
+
+gulp.task("submodules", () => {
+    let pkg = require('./package.json');
+    for (let subpackage in pkg.dependencies) {
+        var project = repoUrl(pkg.dependencies[subpackage]);
+        if (!project) {
+            console.log(`Skipping non-repo: ${subpackage}.`)
+            continue
+        }
+        let args = ["submodule", "add", repoUrl(project)]
+        console.log("  $ ", `git ${args.join(" ")}`)
+        cp.spawnSync("git", args, S_INHERIT)
+    }
+})
+
+
+gulp.task("submodules:update", () => {
+    let args = [
+        "submodules",
+        "update",
+        "--remote"
+    ]
+    cp.spawnSync("git", args)
+})

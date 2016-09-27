@@ -1,0 +1,24 @@
+[submodule "tko.bind"]
+	path = tko.bind
+	url = https://github.com/knockout/tko.bind
+[submodule "tko.components"]
+	path = tko.components
+	url = https://github.com/knockout/tko.components
+[submodule "tko.computed"]
+	path = tko.computed
+	url = https://github.com/knockout/tko.computed
+[submodule "tko.observable"]
+	path = tko.observable
+	url = https://github.com/knockout/tko.observable
+[submodule "tko.utils"]
+	path = tko.utils
+	url = https://github.com/knockout/tko.utils
+[submodule "tko.provider"]
+	path = tko.provider
+	url = https://github.com/knockout/tko.provider.git
+[submodule "tko.binding.core"]
+	path = tko.binding.core
+	url = https://github.com/knockout/tko.binding.core.git
+[submodule "tko.binding.template"]
+	path = tko.binding.template
+	url = https://github.com/knockout/tko.binding.template.git

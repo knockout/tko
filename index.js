@@ -1,4 +1,4 @@
-
+/* eslint semi: 0 */
 import * as utils from 'tko.utils'
 
 import {
@@ -56,6 +56,7 @@ import {
     templateSources,
 } from 'tko.binding.template';
 
+import components from 'tko.components'
 
 // --- TODO ---
 // Component
@@ -155,6 +156,9 @@ export default ko = {
     dataFor: dataFor,
     getBindingHandler: getBindingHandler,
     virtualElements: utils.virtualElements,
+
+    // --- Components ---
+    components: components
 }
 
 

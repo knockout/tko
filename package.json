@@ -23,7 +23,7 @@
   "devDependencies": {
     "gulp": "^3.9.0",
     "js-yaml": "^3.4.0",
-    "tko-policy": "^0.1.0"
+    "tko-policy": "knockout/tko-policy"
   },
   "dependencies": {
     "tko.bind": "knockout/tko.bind",
