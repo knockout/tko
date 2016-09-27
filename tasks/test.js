@@ -18,12 +18,12 @@ const SPEC_DIR = path.join(process.cwd(), 'spec')
 function test(extra_config, done) {
     var options = Object.assign({}, config.karma, extra_config)
 
-    options.files = [
+    options.files = options.files || [
       { pattern: "src/*.js", included: false, watched: true },
       { pattern: "spec/*.js" },
     ]
 
-    options.preprocessors = {
+    options.preprocessors = options.preprocessors || {
       'src/**/*.js': ['rollup'],
       'spec/**/*.js': ['rollup'],
     }
