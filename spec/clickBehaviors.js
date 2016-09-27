@@ -16,7 +16,7 @@ import {
 
 import { bindings as coreBindings } from '../index.js';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import 'tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: Click', function() {
     // This is just a special case of the "event" binding, so not necessary to respecify all its behaviours

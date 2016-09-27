@@ -29,7 +29,7 @@ import {
 import { bindings as coreBindings } from '../index.js';
 import { bindings as templateBindings } from 'tko.binding.template';
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import 'tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: Checked', function() {
     beforeEach(jasmine.prepareTestNode);

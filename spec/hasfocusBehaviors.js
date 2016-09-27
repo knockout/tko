@@ -21,7 +21,7 @@ import {
 import * as coreBindings from '../index.js';
 
 
-import '../node_modules/tko.utils/helpers/jasmine-13-helper.js';
+import 'tko.utils/helpers/jasmine-13-helper.js';
 
 describe('Binding: Hasfocus', function() {
     var bindingHandlers;
