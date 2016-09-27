@@ -13,7 +13,7 @@ import {
 
 import {
     dummyTemplateEngine
-} from '../node_modules/tko.binding.template/helpers/dummyTemplateEngine';
+} from 'tko.binding.template/helpers/dummyTemplateEngine';
 
 import {
     renderTemplate, setTemplateEngine, templateEngine
