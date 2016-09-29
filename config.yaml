@@ -10,12 +10,6 @@ __tko_karma__: &__tko_karma__
   browsers:
     - PhantomJS
   singleRun: false
-  files:
-    - spec/helpers/setup.js
-    - pattern: spec/*.js
-      included: false
-    - pattern: src/*
-      included: false
   reporters:
     - progress
   client:

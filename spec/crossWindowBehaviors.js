@@ -12,10 +12,6 @@ import {
 } from 'tko.bind';
 
 import {
-    dummyTemplateEngine
-} from 'tko.binding.template/helpers/dummyTemplateEngine';
-
-import {
     renderTemplate, setTemplateEngine, templateEngine
 } from 'tko.binding.template';
 
@@ -23,8 +19,18 @@ import {
     Provider
 } from 'tko.provider';
 
-import {bindings as coreBindings} from 'tko.binding.core';
-import {bindings as templateBindings} from 'tko.binding.template';
+import {
+    bindings as coreBindings
+} from 'tko.binding.core';
+
+import {
+    bindings as templateBindings
+} from 'tko.binding.template';
+
+
+import {
+    dummyTemplateEngine
+} from '../../tko.binding.template/helpers/dummyTemplateEngine.js';
 
 
 describe('Cross-window support', function() {

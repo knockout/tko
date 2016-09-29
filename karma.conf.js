@@ -1,3 +1,5 @@
+/* eslint semi: 0, indent: 0 */
+/* globals require, module, __dirname */
 // Karma configuration
 // ---
 // Make `karma` usable from the command line.
@@ -6,10 +8,10 @@
 //
 var fs = require('fs')
 var yaml = require('js-yaml')
-var path = require('path')
 
 module.exports = function(karmaConfig) {
   var config = yaml.load(fs.readFileSync('./config.yaml')).karma
+  config.resolve = config.resolve || {}
   config.resolve.root = __dirname
   karmaConfig.set(config)
 }
