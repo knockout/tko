@@ -32,6 +32,10 @@ var options = {
 
     debug: false,
 
+    // Filters for bindings
+    //   data-bind="expression | filter_1 | filter_2"
+    filters: {},
+
     onError: function (e) { throw e; },
 
     set: function (name, value) {
