@@ -99,7 +99,13 @@ utils.arrayForEach([
     coreUtils[coreUtil] = utils[coreUtil]
 })
 
-coreUtils.setDomNodeChildrenFromArrayMapping = setDomNodeChildrenFromArrayMapping
+
+utils.extend(coreUtils, {
+    setDomNodeChildrenFromArrayMapping:  setDomNodeChildrenFromArrayMapping,
+    unwrapObservable: unwrap,
+    peekObservable: peek
+})
+
 
 // Create the binding provider and default bindings.
 var provider = new Provider();
