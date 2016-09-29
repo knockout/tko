@@ -30,7 +30,7 @@ import {
 
 import {
     dummyTemplateEngine
-} from '../../tko.binding.template/helpers/dummyTemplateEngine.js';
+} from 'tko.binding.template/helpers/dummyTemplateEngine.js';
 
 
 describe('Cross-window support', function() {
