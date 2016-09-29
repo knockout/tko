@@ -63,6 +63,10 @@ Parser.prototype.next = function (c) {
   return this.ch;
 };
 
+Parser.prototype.lookahead = function() {
+  return this.text[this.at];
+};
+
 Parser.prototype.error = function (m) {
   throw {
     name:    'SyntaxError',
@@ -354,6 +358,50 @@ Parser.prototype.operator = function () {
 };
 
 /**
+ * Filters
+ * Returns what the Node interprets as an "operator".
+ * e.g.
+ *   <span data-bind="text: name | fit:20 | uppercase"></span>
+ */
+Parser.prototype.filter = function() {
+  var ch = this.next(),
+    args = [],
+    next_filter = function(v) { return v; },
+    name = this.name();
+
+  if (!options.filters[name]) {
+    options.onError("Cannot find filter by the name of: " + name);
+  }
+
+  while (ch) {
+    if (ch === ':') {
+      this.next();
+      args.push(this.expression());
+    }
+    if (ch === '|') {
+      next_filter = this.filter();
+      break;
+    }
+    ch = this.white();
+  }
+
+  var filter = function(value) {
+    var arg_values = [value];
+
+    for (var i = 0, j = args.length; i < j; ++i) {
+      arg_values.push(Node.value_of(args[i]));
+    }
+
+    return next_filter(options.filters[name].apply(null, arg_values));
+  };
+
+  // Lowest precedence.
+  filter.precedence = 100;
+  return filter;
+};
+
+
+/**
  * Parse an expression – builds an operator tree, in something like
  * Shunting-Yard.
  *   See: http://en.wikipedia.org/wiki/Shunting-yard_algorithm
@@ -361,10 +409,10 @@ Parser.prototype.operator = function () {
  * @return {function}   A function that computes the value of the expression
  *                      when called or a primitive.
  */
-Parser.prototype.expression = function () {
+Parser.prototype.expression = function (filterable) {
   var op,
     nodes = [],
-    node_value,
+    filters = [],
     ch = this.white();
 
   while (ch) {
@@ -380,12 +428,17 @@ Parser.prototype.expression = function () {
       nodes.push(this.expression());
       this.next(')');
     } else {
-      node_value = this.value();
-      nodes.push(node_value);
+      nodes.push(this.value());
     }
     ch = this.white();
     if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
         ch === ')' || ch === '' || ch === '`') {
+      break;
+    }
+    // filters
+    if (ch === '|' && this.lookahead() !== '|' && filterable) {
+      nodes.push(this.filter());
+      nodes.push(undefined);
       break;
     }
     // infix operators
@@ -404,7 +457,7 @@ Parser.prototype.expression = function () {
     return nodes[0];
   }
 
-  return new Expression(nodes);
+  return new Expression(nodes, filters);
 };
 
 
@@ -522,7 +575,7 @@ Parser.prototype.read_bindings = function () {
       bindings[key] = null;
     } else {
       ch = this.next(':');
-      bindings[key] = this.expression();
+      bindings[key] = this.expression(true);
       this.white();
       if (this.ch) {
         ch = this.next(',');
