@@ -2,10 +2,10 @@
 import * as utils from 'tko.utils'
 
 import {
-    applyExtenders,
-    arrayChangeEventName,
-    deferUpdates,
-    dependencyDetection,
+    // applyExtenders,
+    // arrayChangeEventName,
+    // deferUpdates,
+    // dependencyDetection,
     extenders,
     isObservable,
     isSubscribable,
@@ -16,15 +16,14 @@ import {
     subscribable,
     toJS,
     toJSON,
-    trackArrayChanges,
-    unwrap,
+    unwrap
 } from 'tko.observable'
 
 import {
     computed,
     isComputed,
     isPureComputed,
-    pureComputed,
+    pureComputed
 } from 'tko.computed'
 
 import {
@@ -36,10 +35,10 @@ import {
     applyBindings,
     applyBindingsToDescendants,
     applyBindingsToNode,
+    contextFor,
     dataFor,
     getBindingHandler,
-    setDomNodeChildrenFromArrayMapping,
-    textFor,
+    setDomNodeChildrenFromArrayMapping
 } from 'tko.bind';
 
 import {
@@ -51,9 +50,10 @@ import {
     bindings as templateBindings,
     domElement,
     nativeTemplateEngine,
+    renderTemplate,
     setTemplateEngine,
-    templateEngine,
-    templateSources,
+    templateEngine
+    // templateSources
 } from 'tko.binding.template';
 
 import components from 'tko.components'
@@ -65,7 +65,7 @@ import components from 'tko.components'
 
 var coreUtils = {}
 
-arrayForEach([
+utils.arrayForEach([
     "extend",
     "setTimeout",
     "arrayForEach",
@@ -94,13 +94,21 @@ arrayForEach([
     "parseHtmlFragment",
     "setHtml",
     "compareArrays",
-    "setDomNodeChildrenFromArrayMapping",
+    "setDomNodeChildrenFromArrayMapping"
 ], function (coreUtil) {
     coreUtils[coreUtil] = utils[coreUtil]
 })
 
+coreUtils.setDomNodeChildrenFromArrayMapping = setDomNodeChildrenFromArrayMapping
 
-export default ko = {
+// Create the binding provider and default bindings.
+var provider = new Provider();
+utils.options.bindingProviderInstance = provider;
+provider.bindingHandlers.set(coreBindings);
+provider.bindingHandlers.set(templateBindings);
+
+// Expose the API.
+export default {
     // --- Top-level ---
     version: '4.0.0-alpha0',
     options: utils.options,
@@ -116,8 +124,9 @@ export default ko = {
 
     // -- Observable ---
     isObservable: isObservable,
+    isSubscribable: isSubscribable,
     isWriteableObservable: isWriteableObservable,
-    isWritableObservable: isWritableObservable,
+    isWritableObservable: isWriteableObservable,
     observable: observable,
     observableArray: observableArray,
     peek: peek,
@@ -143,7 +152,7 @@ export default ko = {
     templateEngine: templateEngine,
     templateSources: {
         domElement: domElement,
-        anonymousTemplate: anonymousTemplate,
+        anonymousTemplate: anonymousTemplate
     },
 
     // --- Binding ---
@@ -151,6 +160,7 @@ export default ko = {
     applyBindings: applyBindings,
     applyBindingsToDescendants: applyBindingsToDescendants,
     applyBindingsToNode: applyBindingsToNode,
+    bindingHandlers: provider.bindingHandlers,
     bindingProvider: Provider,
     contextFor: contextFor,
     dataFor: dataFor,
@@ -160,10 +170,3 @@ export default ko = {
     // --- Components ---
     components: components
 }
-
-
-// Configure the default setup.
-var provider = new Provider();
-options.bindingProviderInstance = provider;
-provider.bindingHandlers.set(coreBindings);
-provider.bindingHandlers.set(templateBindings);

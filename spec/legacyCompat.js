@@ -277,11 +277,11 @@ var API = {
     "renderTemplate": "function",
     "nativeTemplateEngine": "function",
     "jqueryTmplTemplateEngine": "function"
-}
+};
 
 
 describe("Compared to Knockout 3.4", function() {
     it("matches the expected API", function() {
-
-    })
-})
+        /* FIXME */
+    });
+});
