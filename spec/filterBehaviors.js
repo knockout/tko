@@ -25,8 +25,8 @@ describe("filters", function () {
     return v.toUpperCase();
   }
 
-  options.filters.tail = function (v, str) {
-    return v + (str || "tail");
+  options.filters.tail = function (v, str, str2) {
+    return v + (str || "tail") + (str2 || '');
   }
 
   function trial(context, binding, expect) {
@@ -42,8 +42,29 @@ describe("filters", function () {
     trial({v: "t"}, "v | uppercase | tail", "Ttail")
   })
 
-  it("passes arguments", function () {
+  it("passes an argument", function () {
     trial({ v: "t" }, "v|tail:'XOO'", "tXOO")
+  })
+
+  it("passes multiple arguments", function () {
+    trial({ v: "t" }, "v|tail:'X':'y'", "tXy")
+  })
+
+  it("passes a looked value", function () {
+    trial({ v: "t" }, "v|tail:v", "tt")
+  })
+
+  it("passes an expression", function () {
+    trial({ v: "t" }, "v|tail: 1 + 5", "t6")
+  })
+
+  it("passes an unwrapped observable", function () {
+    trial({ v: observable("te") }, "v|tail:v()", "tete")
+    trial({ v: observable("tg") }, "v|tail:@v", "tgtg")
+  })
+
+  it("passes a called function", function () {
+    trial({ v: function () { return "tf" } }, "@v|tail:@v", "tftf")
   })
 
   it("modifies expressions", function () {

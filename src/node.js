@@ -14,8 +14,19 @@ export default function Node(lhs, op, rhs) {
   this.rhs = rhs;
 }
 
+/**
+ * @ operator - call the identifier if a function; and unwrap any result
+ * @param  {operand} a ignored
+ * @param  {operand} b The variable to be called (if a function) and unwrapped
+ * @return {value}   The result.
+ */
+function unwrapOrCall(a, b) {
+  return unwrap(typeof b === 'function' ? b() : b);
+}
+
 var operators = {
   // unary
+  '@': unwrapOrCall,
   '!': function not(a, b) { return !b; },
   '!!': function notnot(a, b) { return !!b; },
   '++': function preinc(a, b) { return ++b; },
@@ -51,6 +62,10 @@ var operators = {
 /* In order of precedence, see:
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
 */
+
+// Our operator - unwrap/call
+operators['@'].precedence = 1;
+
   // logical not
 operators['!'].precedence = 4;
 operators['!!'].precedence = 4; // explicit double-negative
