@@ -15,13 +15,14 @@ export default function Node(lhs, op, rhs) {
 }
 
 /**
- * @ operator - call the identifier if a function; and unwrap any result
+ * @ operator - recursively call the identifier if it's a function
  * @param  {operand} a ignored
  * @param  {operand} b The variable to be called (if a function) and unwrapped
  * @return {value}   The result.
  */
 function unwrapOrCall(a, b) {
-  return unwrap(typeof b === 'function' ? b() : b);
+  while (typeof b === 'function') { b = b(); }
+  return b;
 }
 
 var operators = {
@@ -50,6 +51,9 @@ var operators = {
   '!=': function ne(a, b) { return a !== b; },
   '===': function sequal(a, b) { return a === b; },
   '!==': function sne(a, b) { return a !== b; },
+  // Fuzzy (bad) equality
+  '~==': function equal(a, b) { return a == b; },
+  '~!=': function ne(a, b) { return a != b; },
   // bitwise
   '&': function bit_and(a, b) { return a & b; },
   '^': function xor(a, b) { return a ^ b; },
@@ -88,6 +92,10 @@ operators['=='].precedence = 9;
 operators['!='].precedence = 9;
 operators['==='].precedence = 9;
 operators['!=='].precedence = 9;
+// Fuzzy operators for backwards compat with the "evil twins"
+//    http://stackoverflow.com/questions/359494
+operators['~=='].precedence = 9;
+operators['~!='].precedence = 9;
   // bitwise
 operators['&'].precedence = 10;
 operators['^'].precedence = 11;
