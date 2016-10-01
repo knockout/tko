@@ -4,7 +4,7 @@
  */
 
 import {
-  options, objectForEach, clonePlainObjectDeep
+  options, objectForEach, clonePlainObjectDeep, extend
 } from 'tko.utils';
 
 import Expression from './expression';
@@ -99,7 +99,7 @@ Parser.prototype.name = function () {
         );
       }
       return name;
-    } else if (ch === ':' || ch <= ' ' || ch === ',' ) {
+    } else if (ch === ':' || ch <= ' ' || ch === ',') {
       return name;
     }
     name += ch;
@@ -559,11 +559,13 @@ Parser.prototype.read_bindings = function () {
   var key,
     bindings = {},
     sep,
+    expr,
     ch = this.ch;
 
   while (ch) {
     key = this.name();
     sep = this.white();
+
     if (!sep || sep === ',') {
       if (sep) {
         ch = this.next(',');
@@ -573,9 +575,41 @@ Parser.prototype.read_bindings = function () {
       // A "bare" binding e.g. "text"; substitute value of 'null'
       // so it becomes "text: null".
       bindings[key] = null;
+
     } else {
-      ch = this.next(':');
-      bindings[key] = this.expression(true);
+
+      if (key.indexOf('.') !== -1) {
+        // Namespaced – i.e.
+        //    `attr.css: x` becomes `attr: { css: x }`
+        //     ^^^ - key
+        key = key.split('.');
+        bindings[key[0]] = bindings[key[0]] || {};
+
+        if (key.length !== 2) {
+          options.onError("Binding " + key + " should have two parts (a.b).");
+        } else if (bindings[key[0]].constructor !== Object) {
+          options.onError("Binding " + key[0] + "." + key[1] + " paired with a non-object.");
+        }
+
+        ch = this.next(':');
+        this.object_add_value(bindings[key[0]], key[1], this.expression(true));
+
+      } else {
+        ch = this.next(':');
+        if (bindings[key] && typeof bindings[key] === 'object' && bindings[key].constructor === Object) {
+          // Extend a namespaced bindings e.g. we've previously seen
+          // on.x, now we're seeing on: { 'abc' }.
+          expr = this.expression(true);
+          if (typeof expr !== 'object' || expr.constructor !== Object) {
+            options.onError("Expected plain object for " + key + " value.");
+          } else {
+            extend(bindings[key], expr);
+          }
+        } else {
+          bindings[key] = this.expression(true);
+        }
+      }
+
       this.white();
       if (this.ch) {
         ch = this.next(',');
@@ -622,7 +656,7 @@ Parser.prototype.convert_to_accessors = function (result) {
       result[name] = function nodeAccessor() {
         return value.get_node_value();
       };
-    } else if (typeof(value) != 'function') {
+    } else if (typeof(value) !== 'function') {
       result[name] = function constAccessor() {
         return clonePlainObjectDeep(value);
       };
@@ -649,10 +683,12 @@ Parser.prototype.parse = function (source) {
   try {
     var result = this.read_bindings();
   } catch (e) {
+    var emsg = typeof e === Error ?
+        "\nMessage: <" + e.name + "> " + e.message : e ;
     options.onError(new Error(
       "Unable to parse bindings." +
       "\nBindings value: " + this.text +
-      "\nMessage: <" + e.name + "> " + e.message
+      "\n" + emsg
     ));
   }
 

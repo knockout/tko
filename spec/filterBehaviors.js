@@ -12,15 +12,13 @@ import {
   Provider
 } from '../index.js';
 
+var instance, Parser;
+beforeEach(function () {
+  instance = new Provider();
+  Parser = instance.Parser;
+})
 
 describe("filters", function () {
-  var instance, Parser
-
-  beforeEach(function () {
-    instance = new Provider();
-    Parser = instance.Parser;
-  })
-
   options.filters.uppercase = function (v) {
     return v.toUpperCase();
   }
