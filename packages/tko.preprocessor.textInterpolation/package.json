@@ -1,0 +1,40 @@
+{
+  "name": "tko.preprocessor.textInterpolation",
+  "version": "0.1.0",
+  "description": "Interpolate text/node attributes {{ }}",
+  "main": "dist/tko.preprocessor.textInterpolation.js",
+  "jsnext:main": "index.js",
+  "files": [
+      "dist/",
+      "src/",
+      "helpers/",
+      "index.js",
+      "./*.ya?ml"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.preprocessor.textInterpolation.git"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "ko"
+  ],
+  "author": "Knockout",
+  "jsnext:main": "./index.js",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.preprocessor.textInterpolation/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.preprocessor.textInterpolation#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "js-yaml": "^3.4.6",
+    "tko-policy": "knockout/tko-policy"
+  },
+  "dependencies": {
+  }
+}

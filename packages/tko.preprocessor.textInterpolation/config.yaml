@@ -1,0 +1,24 @@
+# --- TKO GENERATED --- start
+# Do not modify.
+#
+__tko_karma__: &__tko_karma__
+  basePath: ''
+  port: 7777
+  colors: true
+  logLevel: INFO
+  autoWatch: true
+  browsers:
+    - PhantomJS
+  singleRun: false
+  reporters:
+    - progress
+  client:
+    captureConsole: true
+
+# --- TKO GENERATED --- end
+
+karma:
+  <<: *__tko_karma__
+  # Add any changes to the karma settings, below.
+  frameworks:
+  - jasmine
