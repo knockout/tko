@@ -1,6 +1,10 @@
 /* eslint semi: 0 */
 
 import {
+    options
+} from 'tko.utils';
+
+import {
     applyBindings
 } from 'tko.bind';
 
@@ -9,13 +13,34 @@ import {
 } from 'tko.observable';
 
 import {
+    Provider
+} from 'tko.provider';
+
+import {
+    bindings as coreBindings
+} from 'tko.binding.core';
+
+import {
+    bindings as templateBindings
+} from 'tko.binding.template';
+
+
+import {
     preprocessors
 } from '../index.js';
+
+
+import 'tko.utils/helpers/jasmine-13-helper.js';
 
 var interpolationMarkup = preprocessors[0]
 
 
 describe("Interpolation Markup preprocessor", function() {
+    beforeEach(function () {
+        var provider = new Provider();
+        provider.bindingHandlers.set(coreBindings);
+    })
+
     it('Should do nothing when there are no expressions', function() {
         var result = interpolationMarkup.preprocessor(document.createTextNode("some text"));
         expect(result).toBeUndefined();
@@ -154,11 +179,18 @@ describe("Interpolation Markup preprocessor", function() {
 });
 
 describe("Interpolation Markup bindings", function() {
+    var bindingHandlers;
+
     beforeEach(jasmine.prepareTestNode);
 
-    var savePreprocessNode = ko.bindingProvider.instance.preprocessNode;
-    beforeEach(interpolationMarkup.enable);
-    afterEach(function() { ko.bindingProvider.instance.preprocessNode = savePreprocessNode; });
+    beforeEach(function(){
+        var provider = new Provider();
+        provider.addPreprocessor(interpolationMarkup.preprocessor);
+        options.bindingProviderInstance = provider;
+        bindingHandlers = provider.bindingHandlers;
+        bindingHandlers.set(coreBindings);
+        bindingHandlers.set(templateBindings);
+    });
 
     it('Should replace {{...}} expression with virtual text binding', function() {
         jasmine.setNodeText(testNode, "hello {{'name'}}!");

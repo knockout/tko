@@ -1,6 +1,6 @@
 
 import {
-    arrayPushAll, options
+    arrayPushAll
 } from 'tko.utils';
 
 var dataBind = 'data-bind';
@@ -103,7 +103,7 @@ function wrapExpression(expressionText_, node) {
 }
 
 
-function attributeInterpolationMarkerPreprocessor(node) {
+function attributeInterpolationMarkerPreprocessor(node, provider) {
     function addText(text) {
         if (text) {
             parts.push('"' + text.replace(/"/g, '\\"') + '"');
@@ -131,7 +131,7 @@ function attributeInterpolationMarkerPreprocessor(node) {
 
                 if (attrValue) {
                     var attrName = attr.name.toLowerCase();
-                    var attrBinding = attributeInterpolationMarkup.attributeBinding(attrName, attrValue, node) || attributeBinding(attrName, attrValue, node);
+                    var attrBinding = attributeInterpolationMarkup.attributeBinding(attrName, attrValue, provider) || attributeBinding(attrName, attrValue, provider);
                     if (!dataBindAttribute) {
                         dataBindAttribute = attrBinding;
                     } else {
@@ -147,8 +147,8 @@ function attributeInterpolationMarkerPreprocessor(node) {
     }
 }
 
-function attributeBinding(name, value /*, node */) {
-    if (options.bindingProviderInstance.bindingHandlers.get(name)) {
+function attributeBinding(name, value, provider) {
+    if (provider.bindingHandlers.get(name)) {
         return name + ':' + value;
     } else {
         return 'attr.' + name + ':' + value;
