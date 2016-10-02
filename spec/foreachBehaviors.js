@@ -1,5 +1,5 @@
 import {
-    arrayForEach, domData, setHtml, triggerEvent, removeNode, virtualElements
+    domData, setHtml, triggerEvent, removeNode, virtualElements
 } from 'tko.utils';
 
 import {
@@ -15,7 +15,7 @@ import {
 } from 'tko.provider';
 
 import {
-    options, extend
+    options
 } from 'tko.utils';
 
 import {bindings as templateBindings} from '../index.js';
@@ -185,8 +185,8 @@ describe('Binding: Foreach', function() {
         var afterAddCallbackData = [], beforeRemoveCallbackData = [];
         applyBindings({
             someItems: someItems,
-            myAfterAdd: function(elem, index, value) { afterAddCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }) },
-            myBeforeRemove: function(elem, index, value) { beforeRemoveCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }) }
+            myAfterAdd: function(elem, index, value) { afterAddCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }); },
+            myBeforeRemove: function(elem, index, value) { beforeRemoveCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }); }
         }, testNode);
 
         expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">first child</span>');
@@ -680,14 +680,14 @@ describe('Binding: Foreach', function() {
             { name: observable('Moon') },
             { name: observable('Ceres') }
         ]), beforeRemove = function(elem) {
-            if (elem.nodeType === 1) {
-                setTimeout(function() {
-                    removeNode(elem);
-                }, 1);
-            } else {
-                removeNode(elem);
-            }
-        };
+              if (elem.nodeType === 1) {
+                  setTimeout(function() {
+                      removeNode(elem);
+                  }, 1);
+              } else {
+                  removeNode(elem);
+              }
+            };
         applyBindings({ planets: planets, beforeRemove: beforeRemove }, testNode);
         expect(testNode).toContainText('--Mercury++--Venus++--Earth++--Moon++--Ceres++');
 
