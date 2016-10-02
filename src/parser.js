@@ -660,6 +660,10 @@ Parser.prototype.convert_to_accessors = function (result) {
       result[name] = function constAccessor() {
         return clonePlainObjectDeep(value);
       };
+    } else if (value === 'function') {
+      result[name] = function functionAccessor() {
+        return value();
+      };
     }
   });
 

@@ -25,9 +25,20 @@ function unwrapOrCall(a, b) {
   return b;
 }
 
+/**
+ * Create a => expr lambda.
+ * @param  {undefined} a
+ * @param  {Node|Expression|Identifier|constant} b The item to become a lambda
+ * @return {any}   Return value of the function.
+ */
+function lambda(a, b) {
+  return function() { return b; };
+}
+
 var operators = {
   // unary
   '@': unwrapOrCall,
+  '=>': lambda,
   '!': function not(a, b) { return !b; },
   '!!': function notnot(a, b) { return !!b; },
   '++': function preinc(a, b) { return ++b; },
@@ -106,6 +117,9 @@ operators['||'].precedence = 14;
   // Prefix inc/dec
 operators['++'].precedence = 15;
 operators['--'].precedence = 15;
+
+  // lambda
+operators['=>'].precedence = 20;
 
 Node.operators = operators;
 

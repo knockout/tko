@@ -351,6 +351,27 @@ describe("unary operations", function() {
             assert.equal(bindings.ne(), true)
         }*/
   )
+
+  describe("lambdas (=>)", function () {
+    it("evaluates the expression when called", function() {
+      var binding = "x: => y(true)",
+        context = { y: observable() },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(context.y(), undefined)
+      bindings.x()()
+      assert.equal(context.y(), true)
+    })
+
+    it("calls a function with arguments", function() {
+      var binding = "x: => yfn(146)",
+        obs = observable(),
+        context = { yfn: function(n) { obs(n) } },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(obs(), undefined)
+      bindings.x()()
+      assert.equal(obs(), 146)
+    })
+  })
 })
 
 describe("array accessors - []", function() {
