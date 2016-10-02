@@ -14,6 +14,10 @@ import parseObjectLiteral from './preparse';
 var otherProviders = [];
 
 
+// Preprocessors, functions run on every node.
+var preprocessors = [];
+
+
 export default function Provider(options) {
   options = options || {};
 
@@ -134,10 +138,14 @@ function preProcessBindings(bindingString) {
 
   // Check for a Provider.preprocessNode property
   if (typeof this.preprocessNode === 'function') {
-    preprocessed = this.preprocessNode(bindingString);
+    preprocessed = this.preprocessNode(bindingString, this);
     if (preprocessed) { bindingString = preprocessed; }
   }
 
+  for (var i = 0, j = preprocessors.length; i < j; ++i) {
+    preprocessed = preprocessors[i](bindingString, this);
+    if (preprocessed) { bindingString = preprocessed; }
+  }
 
   function addBinding(name, value) {
     results.push("'" + name + "':" + value);
@@ -175,12 +183,18 @@ function preProcessBindings(bindingString) {
 function addProvider(p) { otherProviders.push(p); }
 function clearProviders() { otherProviders.length = 0; }
 
+function addPreprocessor(fn) { preprocessors.push(fn); }
+function clearPreprocessors() { preprocessors.length = 0; }
+
+
 extend(Provider.prototype, {
   nodeHasBindings: nodeHasBindings,
   getBindingAccessors: getBindingAccessors,
   getBindingsString: getBindingsString,
   addProvider: addProvider,
+  addPreprocessor: addPreprocessor,
   clearProviders: clearProviders,
+  clearPreprocessors: clearPreprocessors,
   Parser: Parser,
   preProcessBindings: preProcessBindings
 });
