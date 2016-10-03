@@ -17,6 +17,7 @@ import {textInput} from './src/textInput.js';
 import {uniqueName} from './src/uniqueName.js';
 import {value} from './src/value.js';
 import {visible} from './src/visible.js';
+import {using} from './src/using.js';
 
 export var bindings = {
     attr: attr,
@@ -38,6 +39,7 @@ export var bindings = {
     textInput: textInput,
     textinput: textInput,
     uniqueName: uniqueName,
+    using: using,
     value: value,
     visible: visible
 };
