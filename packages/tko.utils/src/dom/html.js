@@ -113,18 +113,38 @@ function jQueryHtmlParse(html, documentContext) {
 }
 
 
+/**
+ * parseHtmlFragment converts a string into an array of DOM Nodes.
+ * If supported, it uses <template>-tag parsing, falling back on
+ * jQuery parsing (if jQuery is present), and finally on a
+ * straightforward parser.
+ *
+ * @param  {string} html            To be parsed.
+ * @param  {Object} documentContext That owns the executing code.
+ * @return {[DOMNode]}              Parsed DOM Nodes
+ */
 export function parseHtmlFragment(html, documentContext) {
+    // Prefer <template>-tag based HTML parsing.
     return supportsTemplateTag ? templateHtmlParse(html, documentContext) :
-        // Note jQuery's HTML parsing fails on element names like tr-*.
+
+        // Benefit from jQuery's on old browsers, where possible
+        // NOTE: jQuery's HTML parsing fails on element names like tr-*.
         // See: https://github.com/jquery/jquery/pull/1988
         (jQueryInstance ? jQueryHtmlParse(html, documentContext) :
-        // Benefit from jQuery's on old browsers, where possible
 
-        simpleHtmlParse(html, documentContext));
         // ... otherwise, this simple logic will do in most common cases.
+        simpleHtmlParse(html, documentContext));
 }
 
 
+/**
+  * setHtml empties the node's contents, unwraps the HTML, and
+  * sets the node's HTML using jQuery.html or parseHtmlFragment
+  *
+  * @param {DOMNode} node Node in which HTML needs to be set
+  * @param {DOMNode} html HTML to be inserted in node
+  * @returns undefined
+  */
 export function setHtml(node, html) {
     emptyDomNode(node);
 
@@ -138,10 +158,13 @@ export function setHtml(node, html) {
         if (typeof html !== 'string')
             html = html.toString();
 
-        // jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
+        // If the browser supports <template> tags, prefer that, as
+        // it obviates all the complex workarounds of jQuery.
+        //
+        // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
         // for example <tr> elements which are not normally allowed to exist on their own.
-        // If you've referenced jQuery we'll use that rather than duplicating its code.
-        if (jQueryInstance) {
+        // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
+        if (jQueryInstance && !supportsTemplateTag) {
             jQueryInstance(node).html(html);
         } else {
             // ... otherwise, use KO's own parsing logic.
