@@ -1,5 +1,9 @@
 import {
-    applyBindings, contextFor, options, triggerEvent
+    triggerEvent, options
+} from 'tko.utils';
+
+import {
+    applyBindings, contextFor
 } from 'tko.bind';
 
 import {
