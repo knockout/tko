@@ -1,9 +1,5 @@
 import {
-    arrayForEach
-} from 'tko.utils';
-
-import {
-    applyBindings, contextFor, dataFor
+    applyBindings, contextFor, options, triggerEvent
 } from 'tko.bind';
 
 import {
@@ -14,9 +10,6 @@ import {
     Provider
 } from 'tko.provider';
 
-import {
-    options, triggerEvent
-} from 'tko.utils';
 
 import {bindings as templateBindings} from '../index.js';
 import {bindings as coreBindings} from 'tko.binding.core';
@@ -28,10 +21,10 @@ describe('Binding: With', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-      var provider = new Provider();
-      options.bindingProviderInstance = provider;
-      provider.bindingHandlers.set(coreBindings);
-      provider.bindingHandlers.set(templateBindings);
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+        provider.bindingHandlers.set(templateBindings);
     });
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsey', function() {
@@ -95,7 +88,7 @@ describe('Binding: With', function() {
         var countedClicks = 0;
         var someItem = observable({
             childProp: observable('Hello'),
-            handleClick: function() { countedClicks++ }
+            handleClick: function() { countedClicks++; }
         });
 
         testNode.innerHTML = "<div data-bind='with: someItem'><span data-bind='text: childProp, click: handleClick'></span></div>";
