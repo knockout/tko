@@ -12,3 +12,10 @@ export var visible = {
             element.style.display = "none";
     }
 };
+
+export var hidden = {
+    update: function (element, valueAccessor) {
+        visible.update.call(this, element, function () { return !unwrap(valueAccessor()) });
+    }
+};
+

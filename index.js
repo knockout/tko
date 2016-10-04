@@ -16,7 +16,7 @@ import {text} from './src/text.js';
 import {textInput} from './src/textInput.js';
 import {uniqueName} from './src/uniqueName.js';
 import {value} from './src/value.js';
-import {visible} from './src/visible.js';
+import {visible, hidden} from './src/visible.js';
 import {using} from './src/using.js';
 
 export var bindings = {
@@ -29,6 +29,7 @@ export var bindings = {
     'event': eventHandler,
     disable: disable,
     hasfocus: hasfocus, hasFocus: hasfocus,
+    hidden: hidden,
     html: html,
     'let': $let,
     options: options,
