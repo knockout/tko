@@ -15,7 +15,6 @@ export var visible = {
 
 export var hidden = {
     update: function (element, valueAccessor) {
-        visible.update.call(this, element, function () { return !unwrap(valueAccessor()) });
+        visible.update.call(this, element, function () { return !unwrap(valueAccessor()); });
     }
 };
-
