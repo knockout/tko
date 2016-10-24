@@ -158,11 +158,11 @@ function attributeBinding(name, value, provider) {
 
 // Exports
 export var interpolationMarkup = {
-    preprocessor: interpolationMarkupPreprocessor,
+    nodePreProcessor: interpolationMarkupPreprocessor,
     wrapExpression: wrapExpression
 };
 
 export var attributeInterpolationMarkup = {
-    preprocessor: attributeInterpolationMarkerPreprocessor,
+    nodePreProcessor: attributeInterpolationMarkerPreprocessor,
     attributeBinding: attributeBinding
 };
