@@ -136,6 +136,8 @@ Node.prototype.get_leaf_value = function (leaf, member_of) {
     return member_of ? member_of[leaf] : leaf;
   }
 
+  if (leaf === null) { return leaf; }
+
   // Identifiers and Expressions
   if (leaf[Node.isExpressionOrIdentifierSymbol]) {
     // lhs is passed in as the parent of the leaf. It will be defined in

@@ -372,6 +372,38 @@ describe("unary operations", function() {
       assert.equal(obs(), 146)
     })
   })
+
+  describe("@ lookup/unwrap", function () {
+    it("unwraps an observable", function () {
+      var binding = 'x: @obs',
+        context = { obs: observable(129) },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), 129)
+    })
+
+    it("calls a function", function () {
+      var binding = 'x: @fn',
+        context = { fn: function () { return 122 } },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), 122)
+    })
+
+    it("returns a static item", function () {
+      var binding = 'x: @"123", y: @1245, z: @null, q: @undefined, p:@`rz${1}x`',
+        bindings = new Parser(null, {}).parse(binding);
+      assert.equal(bindings.x(), "123")
+      assert.equal(bindings.y(), 1245)
+      assert.equal(bindings.z(), null)
+      assert.equal(bindings.q(), undefined)
+      assert.equal(bindings.p(), "rz1x")
+    })
+
+    it("parses the textInterpolation attribute markup", function() {
+      var binding = '\'attr.title\':""+"hello "+@"name"+"!"',
+        bindings = new Parser(null, {}).parse(binding);
+      assert.equal(bindings['attr']().title, "hello name!")
+    })
+  })
 })
 
 describe("array accessors - []", function() {

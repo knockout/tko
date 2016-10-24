@@ -344,6 +344,12 @@ Parser.prototype.operator = function () {
     }
     op += ch;
     ch = this.next();
+
+    // An infix followed by the prefix e.g. a + @b
+    // TODO: other prefix unary operators
+    if (ch === '@') {
+      break;
+    }
   }
 
   if (op !== '') {

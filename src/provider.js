@@ -9,17 +9,11 @@ import Parser from './parser.js';
 import parseObjectLiteral from './preparse';
 
 
-// The list of other objects that have the functions that detect and return
-// binding handlers from nodes.
-var otherProviders = [];
-
-
-// Preprocessors, functions run on every node.
-var preprocessors = [];
-
-
 export default function Provider(options) {
   options = options || {};
+  this.otherProviders = options.otherProviders || [];
+  this.bindingPreProcessors = options.bindingPreProcessors || [];
+  this.nodePreProcessors = options.preprocessors || [];
 
   // the binding classes -- defaults to the bind's
   // bindingsHandlers
@@ -80,8 +74,8 @@ function nodeHasBindings(node) {
     if (virtualElements.isStartComment(node)) { return true; }
   }
 
-  for (var i = 0, j = otherProviders.length; i < j; i++) {
-    if (otherProviders[i].nodeHasBindings(node)) { return true; }
+  for (var i = 0, j = this.otherProviders.length; i < j; i++) {
+    if (this.otherProviders[i].nodeHasBindings(node)) { return true; }
   }
 
   return false;
@@ -116,7 +110,7 @@ function getBindingAccessors(node, context) {
     bindings = parser.parse(binding_string || '');
   }
 
-  arrayForEach(otherProviders, function(p) {
+  arrayForEach(this.otherProviders, function(p) {
     extend(bindings, p.getBindingAccessors(node, context, parser, bindings));
   });
 
@@ -142,8 +136,8 @@ function preProcessBindings(bindingString) {
     if (preprocessed) { bindingString = preprocessed; }
   }
 
-  for (var i = 0, j = preprocessors.length; i < j; ++i) {
-    preprocessed = preprocessors[i](bindingString, this);
+  for (var i = 0, j = this.bindingPreProcessors.length; i < j; ++i) {
+    preprocessed = this.bindingPreProcessors[i](bindingString, this);
     if (preprocessed) { bindingString = preprocessed; }
   }
 
@@ -172,6 +166,24 @@ function preProcessBindings(bindingString) {
 }
 
 
+/**
+ * Run the preprocessors on a given node
+ * @param  {HTMLElement} node The node to be modified/preprocessed.
+ * @return {Array<HTMLElement>}     An array of nodes.
+ *
+ * FIXME: This only lets one node preprocessor modify the nodes; more
+ * generically we want to be able to have a nested node->nodes for each
+ * preprocessor, eventually flattening a tree-like result.
+ */
+function preprocessNode(node, startingPreprocessorIndex) {
+  var newNodes;
+  for (var i = startingPreprocessorIndex || 0, j = this.nodePreProcessors.length; i < j; i++) {
+    newNodes = this.nodePreProcessors[i].call(this, node, this);
+    if (newNodes) { return newNodes; }
+  }
+  return;
+}
+
 
 // addProvider(provider instance)
 // ---
@@ -180,21 +192,28 @@ function preProcessBindings(bindingString) {
 // call.  Each provider is expected to have a `nodeHasBindings` and a
 // `getBindingAccessors` function.
 //
-function addProvider(p) { otherProviders.push(p); }
-function clearProviders() { otherProviders.length = 0; }
+function addProvider(p) { this.otherProviders.push(p); }
+function clearProviders() { this.otherProviders.length = 0; }
 
-function addPreprocessor(fn) { preprocessors.push(fn); }
-function clearPreprocessors() { preprocessors.length = 0; }
+function addBindingPreprocessor(fn) { this.bindingPreProcessors.push(fn); }
+function clearBindingPreprocessors() { this.bindingPreProcessors.length = 0; }
+
+function addNodePreprocessor(fn) { this.nodePreProcessors.push(fn); }
+function clearNodePreprocessors() { this.nodePreProcessors.length = 0; }
 
 
 extend(Provider.prototype, {
   nodeHasBindings: nodeHasBindings,
   getBindingAccessors: getBindingAccessors,
   getBindingsString: getBindingsString,
-  addProvider: addProvider,
-  addPreprocessor: addPreprocessor,
-  clearProviders: clearProviders,
-  clearPreprocessors: clearPreprocessors,
   Parser: Parser,
-  preProcessBindings: preProcessBindings
+  preProcessBindings: preProcessBindings,
+  preprocessNode: preprocessNode,
+
+  addProvider: addProvider,
+  addBindingPreprocessor: addBindingPreprocessor,
+  clearProviders: clearProviders,
+  clearBindingPreprocessors: clearBindingPreprocessors,
+  addNodePreprocessor: addNodePreprocessor,
+  clearNodePreprocessors: clearNodePreprocessors,
 });

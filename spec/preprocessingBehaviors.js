@@ -80,7 +80,7 @@ describe('Binding preprocessing', function() {
           }
         };
       }
-    })
+    });
     var rewritten = preProcessBindings("a: 1");
     var parsedRewritten = eval("({" + rewritten + "})");
     expect(parsedRewritten.a).to.equal(12);
