@@ -31,65 +31,67 @@ import {
 
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
+import '../helpers/jasmine-interpolation-helpers.js';
 
 var interpolationMarkup = preprocessors[0]
 
 
 describe("Interpolation Markup preprocessor", function() {
+
     beforeEach(function () {
         var provider = new Provider();
         provider.bindingHandlers.set(coreBindings);
     })
 
     it('Should do nothing when there are no expressions', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("some text"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some text"));
         expect(result).toBeUndefined();
     });
 
     it('Should do nothing when empty', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode(""));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode(""));
         expect(result).toBeUndefined();
     });
 
     it('Should not parse unclosed binding', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("some {{ text"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{ text"));
         expect(result).toBeUndefined();
     });
 
     it('Should not parse unopened binding', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("some }} text"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some }} text"));
         expect(result).toBeUndefined();
     });
 
     it('Should create binding from {{...}} expression', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("some {{ expr }} text"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{ expr }} text"));
         expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
         expect(result[1].nodeValue).toEqual('ko text:expr');
         expect(result[2].nodeValue).toEqual('/ko');
     });
 
     it('Should ignore unmatched delimiters', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("some {{ expr }} }} text"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{ expr }} }} text"));
         expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
         expect(result[1].nodeValue).toEqual('ko text:expr }}');
     });
 
     it('Should support two expressions', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("some {{ expr1 }} middle {{ expr2 }} text"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{ expr1 }} middle {{ expr2 }} text"));
         expect(result).toHaveNodeTypes([3, 8, 8, 3, 8, 8, 3]);   // text, comment, comment, text, comment, comment, text
         expect(result[1].nodeValue).toEqual('ko text:expr1');
         expect(result[4].nodeValue).toEqual('ko text:expr2');
     });
 
     it('Should skip empty text', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("{{ expr1 }}{{ expr2 }}"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("{{ expr1 }}{{ expr2 }}"));
         expect(result).toHaveNodeTypes([8, 8, 8, 8]);   // comment, comment, comment, comment
         expect(result[0].nodeValue).toEqual('ko text:expr1');
         expect(result[2].nodeValue).toEqual('ko text:expr2');
     });
 
     it('Should support more than two expressions', function() {
-        var result = interpolationMarkup.preprocessor(document.createTextNode("x {{ expr1 }} y {{ expr2 }} z {{ expr3 }}"));
+        var result = interpolationMarkup.nodePreProcessor(document.createTextNode("x {{ expr1 }} y {{ expr2 }} z {{ expr3 }}"));
         expect(result).toHaveNodeTypes([3, 8, 8, 3, 8, 8, 3, 8, 8]);   // text, comment, comment, text, comment, comment, text, comment, comment
         expect(result[1].nodeValue).toEqual('ko text:expr1');
         expect(result[4].nodeValue).toEqual('ko text:expr2');
@@ -98,30 +100,30 @@ describe("Interpolation Markup preprocessor", function() {
 
     describe("Using unescaped HTML syntax", function() {
         it('Should not parse unclosed binding', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{{ text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{{ text"));
             expect(result).toBeUndefined();
         });
 
         it('Should not parse unopened binding', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some }}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some }}} text"));
             expect(result).toBeUndefined();
         });
 
         it('Should create binding from {{{...}}} expression', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{{ expr }}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{{ expr }}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko html:expr');
             expect(result[2].nodeValue).toEqual('/ko');
         });
 
         it('Should ignore unmatched delimiters', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{{ expr }}} }}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{{ expr }}} }}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko html:expr }}}');
         });
 
         it('Should support two expressions', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{{ expr1 }}} middle {{{ expr2 }}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{{ expr1 }}} middle {{{ expr2 }}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3, 8, 8, 3]);   // text, comment, comment, text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko html:expr1');
             expect(result[4].nodeValue).toEqual('ko html:expr2');
@@ -130,47 +132,47 @@ describe("Interpolation Markup preprocessor", function() {
 
     describe("Using block syntax", function() {
         it('Should create binding from {{#....}}{{/....}} expression', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{#binding:value}}{{/binding}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{#binding:value}}{{/binding}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko binding:value');
             expect(result[2].nodeValue).toEqual('/ko');
         });
 
         it('Should tolerate spaces around expressions from {{ #.... }}{{ /.... }} expression', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{ #binding:value }}{{ /binding }} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{ #binding:value }}{{ /binding }} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko binding:value');
             expect(result[2].nodeValue).toEqual('/ko');
         });
 
         it('Should tolerate spaces around various components', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{# binding : value }}{{/ binding }} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{# binding : value }}{{/ binding }} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko  binding : value');
             expect(result[2].nodeValue).toEqual('/ko');
         });
 
         it('Should insert semicolon if missing', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{#binding value}}{{/binding}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{#binding value}}{{/binding}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko binding:value');
         });
 
         it('Should not insert semicolon if binding has no value', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{#binding}}{{/binding}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{#binding}}{{/binding}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko binding');
         });
 
         it('Should support self-closing syntax', function() {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{#binding:value/}} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{#binding:value/}} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko binding:value');
             expect(result[2].nodeValue).toEqual('/ko');
         });
 
         it("Should tolerate space around self-closing syntax", function () {
-            var result = interpolationMarkup.preprocessor(document.createTextNode("some {{ # binding:value / }} text"));
+            var result = interpolationMarkup.nodePreProcessor(document.createTextNode("some {{ # binding:value / }} text"));
             expect(result).toHaveNodeTypes([3, 8, 8, 3]);   // text, comment, comment, text
             expect(result[1].nodeValue).toEqual('ko  binding:value ');
             expect(result[2].nodeValue).toEqual('/ko');
@@ -185,7 +187,7 @@ describe("Interpolation Markup bindings", function() {
 
     beforeEach(function(){
         var provider = new Provider();
-        provider.addPreprocessor(interpolationMarkup.preprocessor);
+        provider.addNodePreprocessor(interpolationMarkup.nodePreProcessor);
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings);
@@ -205,8 +207,8 @@ describe("Interpolation Markup bindings", function() {
         expect(testNode).toContainText("hello name!");
     });
 
-    it('Should support any content of expression, including functions and {{}}', function() {
-        jasmine.setNodeText(testNode, "hello {{ (function(){return '{{name}}'}()) }}!");
+    it('Should support lambdas (=>) and {{}}', function() {
+        jasmine.setNodeText(testNode, "hello {{ => '{{name}}' }}!");
         applyBindings(null, testNode);
         expect(testNode).toContainText("hello {{name}}!");
     });
@@ -282,8 +284,8 @@ describe("Interpolation Markup bindings", function() {
             expect(testNode.childNodes[2].nodeName.toLowerCase()).toEqual('b');
         });
 
-        it('Should support any content of expression, including functions and {{{}}}', function() {
-            jasmine.setNodeText(testNode, "hello {{{ (function(){return '<b>{{{name}}}</b>'}()) }}}!");
+        it('Should support lambdas and {{{}}}', function() {
+            jasmine.setNodeText(testNode, "hello {{{ => '<b>{{{name}}}</b>' }}}!");
             applyBindings(null, testNode);
             expect(testNode).toContainText("hello {{{name}}}!");
             expect(testNode.childNodes[2].nodeName.toLowerCase()).toEqual('b');
