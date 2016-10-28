@@ -464,13 +464,20 @@ function onBindingError(spec) {
         // During: 'init' or initial 'update'
         error = spec.errorCaptured;
         bindingText = options.bindingProviderInstance.getBindingsString(spec.element);
-        error.message = "Unable to process binding \"" + spec.bindingKey
+        spec.message = "Unable to process binding \"" + spec.bindingKey
             + "\" in binding \"" + bindingText
             + "\"\nMessage: " + error.message;
     } else {
         // During: 'apply'
         error = spec.errorCaptured;
     }
-    extend(error, spec);
+    try {
+        extend(error, spec);
+    } catch (e) {
+        // Read-only error e.g. a DOMEXception.
+        spec.stack = error.stack;
+        error = new Error(error.message);
+        extend(error, spec);
+    }
     options.onError(error);
 }
