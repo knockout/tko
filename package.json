@@ -32,6 +32,7 @@
     "tko.components": "knockout/tko.components",
     "tko.computed": "knockout/tko.computed",
     "tko.observable": "knockout/tko.observable",
+    "tko.preprocessor.textInterpolation": "knockout/tko.preprocessor.textInterpolation",
     "tko.provider": "github:knockout/tko.provider",
     "tko.utils": "knockout/tko.utils"
   }

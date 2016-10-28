@@ -56,6 +56,10 @@ import {
     // templateSources
 } from 'tko.binding.template';
 
+import {
+    preprocessors as textInterpolation
+} from 'tko.preprocessors.textInterpolation';
+
 import components from 'tko.components'
 
 // --- TODO ---
@@ -112,6 +116,9 @@ var provider = new Provider();
 utils.options.bindingProviderInstance = provider;
 provider.bindingHandlers.set(coreBindings);
 provider.bindingHandlers.set(templateBindings);
+provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
+provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
+
 
 // Expose the API.
 export default {
