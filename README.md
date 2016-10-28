@@ -2,7 +2,7 @@
 ### TKO (“Technically Knockout”)
 
 [![npm version](https://badge.fury.io/js/tko.svg)](https://badge.fury.io/js/tko)
-[![Join the chat at https://gitter.im/knockout/knockout](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/knockout/knockout?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
++[![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
 [![devDependency Status](https://david-dm.org/knockout/tko/dev-status.svg)](https://david-dm.org/knockout/tko#info=devDependencies)
 [![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
@@ -39,6 +39,7 @@ When complete, the hope is that Knockout will become an *opinionated expression*
 | [tko.binding.core](/knockout/tko.binding.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.core) |
 | [tko.binding.template](/knockout/tko.binding.template) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.template.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.template) |
 | [tko.components](/knockout/tko.components) | [![CircleCI](https://circleci.com/gh/knockout/tko.components.svg?style=shield)](https://circleci.com/gh/knockout/tko.components) |
+| [tko.preprocessor.textInterpolation](/knockout/tko.preprocessor.textInterpolation) | [![CircleCI](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation.svg?style=shield)](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation) |
 | [tko](/knockout/tko) | [![CircleCI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko) |
 
 
