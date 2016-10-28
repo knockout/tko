@@ -1,5 +1,6 @@
 /* eslint semi: 0 */
 import * as utils from 'tko.utils'
+import { options } from 'tko.utils'
 
 import {
     // applyExtenders,
@@ -113,7 +114,7 @@ utils.extend(coreUtils, {
 
 // Create the binding provider and default bindings.
 var provider = new Provider();
-utils.options.bindingProviderInstance = provider;
+options.bindingProviderInstance = provider;
 provider.bindingHandlers.set(coreBindings);
 provider.bindingHandlers.set(templateBindings);
 provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
@@ -124,7 +125,7 @@ provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
 export default {
     // --- Top-level ---
     version: '4.0.0-alpha0',
-    options: utils.options,
+    options: options,
 
 
     // --- Utilities ---
