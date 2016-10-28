@@ -39,6 +39,7 @@
     "tko.provider": "github:knockout/tko.provider"
   },
   "dependencies": {
+    "tko.binding.template": "knockout/tko.binding.template",
     "tko.utils": "knockout/tko.utils"
   }
 }
