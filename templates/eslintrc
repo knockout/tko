@@ -39,6 +39,8 @@ globals:
   describe: true
   it: true
   iit: true
+  xit: true
+  xdescribe: true
   ddescribe: true
   afterEach: true
   beforeEach: true
