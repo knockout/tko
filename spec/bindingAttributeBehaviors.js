@@ -120,7 +120,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "<div data-bind='test: (1;2)'></div>";
         expect(function () {
             applyBindings(null, testNode);
-        }).toThrowContaining("Unable to parse bindings.\nBindings value: 'test':(1;2)\nMessage:");
+        }).toThrowContaining("SyntaxError Bad operator:");
     });
 
     it('Should produce a meaningful error if a binding value doesn\'t exist', function() {
