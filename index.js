@@ -58,7 +58,7 @@ import {
 
 import {
     preprocessors as textInterpolation
-} from 'tko.preprocessors.textInterpolation';
+} from 'tko.preprocessor.textInterpolation';
 
 import components from 'tko.components'
 
