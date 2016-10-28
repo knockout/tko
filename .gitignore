@@ -20,3 +20,5 @@ node_modules
 dist/
 _repo
 coverage/
+
+yarn.lock
