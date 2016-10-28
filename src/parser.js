@@ -698,7 +698,7 @@ Parser.prototype.parse = function (source) {
         'at' in e ?  // parsing error
         "\n" + e.name + " " + e.message + " of \n"
           + "   " + e.text + "\n"
-          + Array(2 + e.at).join(" ") + "🔥\n"
+          + Array(e.at).join(" ") + "_/ 🔥 \\_\n"
         : e;
     options.onError(new Error(emsg));
   }
