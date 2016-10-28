@@ -694,12 +694,13 @@ Parser.prototype.parse = function (source) {
     var result = this.read_bindings();
   } catch (e) {
     var emsg = typeof e === Error ?
-        "\nMessage: <" + e.name + "> " + e.message : e ;
-    options.onError(new Error(
-      "Unable to parse bindings." +
-      "\nBindings value: " + this.text +
-      "\n" + emsg
-    ));
+        "\nMessage: <" + e.name + "> " + e.message :
+        'at' in e ?  // parsing error
+        "\n" + e.name + " " + e.message + " of \n"
+          + "   " + e.text + "\n"
+          + Array(2 + e.at).join(" ") + "🔥\n"
+        : e;
+    options.onError(new Error(emsg));
   }
 
   this.white();
