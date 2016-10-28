@@ -5,6 +5,8 @@ import { stringTrim } from '../string.js';
 import { makeArray } from '../array.js';
 import { emptyDomNode } from './manipulation.js';
 import { jQueryInstance } from '../jquery.js';
+import * as virtualElements from './virtualElements';
+
 
 var none = [0, "", ""],
     table = [1, "<table>", "</table>"],
@@ -169,8 +171,17 @@ export function setHtml(node, html) {
         } else {
             // ... otherwise, use KO's own parsing logic.
             var parsedNodes = parseHtmlFragment(html, node.ownerDocument);
-            for (var i = 0; i < parsedNodes.length; i++)
-                node.appendChild(parsedNodes[i]);
+
+            if (node.nodeType === 8) {
+                if (html === null) {
+                    virtualElements.emptyNode(node);
+                } else {
+                    virtualElements.setDomNodeChildren(node, parsedNodes);
+                }
+            } else {
+                for (var i = 0; i < parsedNodes.length; i++)
+                    node.appendChild(parsedNodes[i]);
+            }
         }
     }
 }
