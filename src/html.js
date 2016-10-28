@@ -17,17 +17,6 @@ export var html = {
     // Modify internal, per ko.punches and :
     //      http://stackoverflow.com/a/15348139
     update: function(element, valueAccessor) {
-        if (element.nodeType === 8) {
-            var html = unwrap(valueAccessor());
-            if (html !== null) {
-                var parsedNodes = parseHtmlFragment('' + html);
-                virtualElements.setDomNodeChildren(element, parsedNodes);
-            } else {
-                virtualElements.emptyNode(element);
-            }
-        }
-
-        // setHtml will unwrap the value if needed
         setHtml(element, valueAccessor());
     },
     allowVirtualElements: true
