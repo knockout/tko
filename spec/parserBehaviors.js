@@ -362,6 +362,16 @@ describe("unary operations", function() {
       assert.equal(context.y(), true)
     })
 
+    it.skip("evaluates the lambda in canonical '() =>' form", function() {
+      // FIXME
+      var binding = "x: () => y(true)",
+        context = { y: observable() },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(context.y(), undefined)
+      bindings.x()()
+      assert.equal(context.y(), true)
+    })
+
     it("calls a function with arguments", function() {
       var binding = "x: => yfn(146)",
         obs = observable(),
@@ -402,6 +412,59 @@ describe("unary operations", function() {
       var binding = '\'attr.title\':""+"hello "+@"name"+"!"',
         bindings = new Parser(null, {}).parse(binding);
       assert.equal(bindings['attr']().title, "hello name!")
+    })
+  })
+
+  describe("Ternary prop ? then : else", function () {
+    it("computes a ? b : c", function () {
+      var binding = "x: a ? 6 : 42",
+        obs = observable(false),
+        context = { a: obs },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), 42)
+      obs(true)
+      assert.equal(bindings.x(), 6)
+      obs(false)
+      assert.equal(bindings.x(), 42)
+    })
+
+    it("computes nested a ? b ? c : d : e", function () {
+      var binding = "x: a ? b ? 'c' : 'd' : 'e'",
+        a = observable(false),
+        b = observable(false),
+        context = { a: a, b: b },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), a() ? b() ? 'c' : 'd' : 'e', '-')
+      a(true)
+      assert.equal(bindings.x(), a() ? b() ? 'c' : 'd' : 'e', 'a')
+      b(true)
+      assert.equal(bindings.x(), a() ? b() ? 'c' : 'd' : 'e', 'ab')
+      a(false)
+      assert.equal(bindings.x(), a() ? b() ? 'c' : 'd' : 'e', 'b')
+    })
+
+    it("computes nested a ? b : c ? d : e", function () {
+      var binding = "x: a ? 'b' : c ? 'd' : 'e'",
+        a = observable(false),
+        c = observable(false),
+        context = { a: a, c: c },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), a() ? 'b' : c() ? 'd' : 'e', '-')
+      a(true)
+      assert.equal(bindings.x(), a() ? 'b' : c() ? 'd' : 'e', 'a')
+      c(true)
+      assert.equal(bindings.x(), a() ? 'b' : c() ? 'd' : 'e', 'ac')
+      a(false)
+      assert.equal(bindings.x(), a() ? 'b' : c() ? 'd' : 'e', 'c')
+    })
+
+    it("computes a ? 1 + 1 : 2 + 2", function () {
+      var binding = "x: a ? 1+1 : 2+2",
+        context = { a: observable(false) },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), 4);
+      context.a(true);
+      assert.equal(bindings.x(), 2);
     })
   })
 })

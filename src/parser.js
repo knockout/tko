@@ -10,6 +10,7 @@ import {
 import Expression from './expression';
 import Identifier from './identifier';
 import Arguments from './arguments';
+import Ternary from './ternary';
 import Node from './node';
 
 var escapee = {
@@ -391,7 +392,7 @@ Parser.prototype.filter = function() {
     ch = this.white();
   }
 
-  var filter = function(value) {
+  var filter = function filter(value) {
     var arg_values = [value];
 
     for (var i = 0, j = args.length; i < j; ++i) {
@@ -402,7 +403,7 @@ Parser.prototype.filter = function() {
   };
 
   // Lowest precedence.
-  filter.precedence = 100;
+  filter.precedence = 1;
   return filter;
 };
 
@@ -449,7 +450,11 @@ Parser.prototype.expression = function (filterable) {
     }
     // infix operators
     op = this.operator();
-    if (op) {
+
+    if (op === operators['?']) {
+      this.ternary(nodes);
+      break;
+    } else if (op) {
       nodes.push(op);
     }
     ch = this.white();
@@ -466,6 +471,15 @@ Parser.prototype.expression = function (filterable) {
   return new Expression(nodes, filters);
 };
 
+
+Parser.prototype.ternary = function(nodes) {
+  var ternary = new Ternary();
+  ternary.yes = this.expression();
+  this.next(":");
+  ternary.no = this.expression();
+  nodes.push(operators['?']);
+  nodes.push(ternary);
+};
 
 /**
  * Parse the arguments to a function, returning an Array.

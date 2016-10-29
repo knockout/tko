@@ -71,55 +71,70 @@ var operators = {
   '|': function bit_or(a, b) { return a | b; },
   // logic
   '&&': function logic_and(a, b) { return a && b; },
-  '||': function logic_or(a, b) { return a || b; }
+  '||': function logic_or(a, b) { return a || b; },
+  // conditional/ternary
+  '?': function ternary(a, b) { return Node.value_of(a ? b.yes : b.no); }
 };
 
-/* In order of precedence, see:
+/* Order of precedence from:
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
 */
 
-// Our operator - unwrap/call
-operators['@'].precedence = 1;
-
-  // logical not
-operators['!'].precedence = 4;
-operators['!!'].precedence = 4; // explicit double-negative
-  // multiply/divide/mod
-operators['*'].precedence = 5;
-operators['/'].precedence = 5;
-operators['%'].precedence = 5;
-  // add/sub
-operators['+'].precedence = 6;
-operators['-'].precedence = 6;
-  // relational
-operators['<'].precedence = 8;
-operators['<='].precedence = 8;
-operators['>'].precedence = 8;
-operators['>='].precedence = 8;
-// operators['in'].precedence = 8;
-// operators['instanceof'].precedence = 8;
-  // equality
-operators['=='].precedence = 9;
-operators['!='].precedence = 9;
-operators['==='].precedence = 9;
-operators['!=='].precedence = 9;
-// Fuzzy operators for backwards compat with the "evil twins"
-//    http://stackoverflow.com/questions/359494
-operators['~=='].precedence = 9;
-operators['~!='].precedence = 9;
-  // bitwise
-operators['&'].precedence = 10;
-operators['^'].precedence = 11;
-operators['|'].precedence = 12;
-  // logic
-operators['&&'].precedence = 13;
-operators['||'].precedence = 14;
-  // Prefix inc/dec
-operators['++'].precedence = 15;
-operators['--'].precedence = 15;
+  // Our operator - unwrap/call
+operators['@'].precedence = 21;
 
   // lambda
 operators['=>'].precedence = 20;
+
+  // Logical not
+operators['!'].precedence = 16;
+operators['!!'].precedence = 16; // explicit double-negative
+
+  // Prefix inc/dec
+operators['++'].precedence = 16;
+operators['--'].precedence = 16;
+
+  // logic
+operators['||'].precedence = 14;
+operators['&&'].precedence = 13;
+
+  // mul/div/remainder
+operators['%'].precedence = 14;
+operators['*'].precedence = 14;
+operators['/'].precedence = 14;
+
+  // add/sub
+operators['+'].precedence = 13;
+operators['-'].precedence = 13;
+
+  // bitwise
+operators['|'].precedence = 12;
+operators['^'].precedence = 11;
+operators['&'].precedence = 10;
+
+  // comparison
+operators['<'].precedence = 11;
+operators['<='].precedence = 11;
+operators['>'].precedence = 11;
+operators['>='].precedence = 11;
+
+  // operators['in'].precedence = 8;
+  // operators['instanceof'].precedence = 8;
+  // equality
+operators['=='].precedence = 10;
+operators['!='].precedence = 10;
+operators['==='].precedence = 10;
+operators['!=='].precedence = 10;
+
+  // Fuzzy operators for backwards compat with the "evil twins"
+  //    http://stackoverflow.com/questions/359494
+operators['~=='].precedence = 10;
+operators['~!='].precedence = 10;
+
+  // Conditional/ternary
+operators['?'].precedence = 4;
+
+
 
 Node.operators = operators;
 
@@ -198,7 +213,7 @@ Node.create_root = function create_root(nodes) {
     if (!op) {
       break;
     }
-    if (op.precedence > root.op.precedence) {
+    if (op.precedence < root.op.precedence) {
       // rebase
       root = new Node(root, op, value);
       leaf = root;
