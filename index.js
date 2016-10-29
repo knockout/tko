@@ -104,6 +104,13 @@ utils.arrayForEach([
     coreUtils[coreUtil] = utils[coreUtil]
 })
 
+coreUtils.domNodeDisposal = {
+    addDisposeCallback: utils.addDisposeCallback,
+    otherNodeCleanerFunctions: utils.otherNodeCleanerFunctions,
+    removeDisposeCallback: utils.removeDisposeCallback,
+    removeNode: utils.removeNode,
+}
+
 
 utils.extend(coreUtils, {
     setDomNodeChildrenFromArrayMapping:  setDomNodeChildrenFromArrayMapping,
@@ -180,6 +187,7 @@ export default {
     dataFor: dataFor,
     getBindingHandler: getBindingHandler,
     virtualElements: utils.virtualElements,
+    domNodeDisposal: utils.domNodeDisposal,
 
     // --- Components ---
     components: components
