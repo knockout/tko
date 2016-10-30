@@ -142,11 +142,25 @@ export function insertAfter(containerNode, nodeToInsert, insertAfterNode) {
 }
 
 export function firstChild(node) {
-    if (!isStartComment(node))
+    if (!isStartComment(node)) {
         return node.firstChild;
-    if (!node.nextSibling || isEndComment(node.nextSibling))
+    }
+    if (!node.nextSibling || isEndComment(node.nextSibling)) {
         return null;
+    }
     return node.nextSibling;
+}
+
+
+export function lastChild(node) {
+    var nextChild = firstChild(node),
+        lastChildNode;
+
+    do {
+        lastChildNode = nextChild;
+    } while (nextChild = nextSibling(nextChild));
+
+    return lastChildNode;
 }
 
 export function nextSibling(node) {
@@ -155,6 +169,24 @@ export function nextSibling(node) {
     if (node.nextSibling && isEndComment(node.nextSibling))
         return null;
     return node.nextSibling;
+}
+
+export function previousSibling(node) {
+    var depth = 0;
+    do {
+        if (node.nodeType === 8) {
+            if (isStartComment(node)) {
+                if (--depth === 0) {
+                    return node;
+                }
+            } else if (isEndComment(node)) {
+                depth++;
+            }
+        } else {
+            if (depth === 0) { return node; }
+        }
+    } while (node = node.previousSibling);
+    return;
 }
 
 export function virtualNodeBindingValue(node) {
