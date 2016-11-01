@@ -1,0 +1,44 @@
+{
+  "name": "tko.binding.if",
+  "version": "0.2.0",
+  "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
+  "main": "dist/tko.binding.if.js",
+  "jsnext:main": "./index.js",
+  "files": [
+    "dist/",
+    "src/",
+    "helpers/",
+    "index.js",
+    "./*.ya?ml"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.binding.if.git"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "ko"
+  ],
+  "author": "Knockout",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.util/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.util#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "js-yaml": "^3.4.6",
+    "tko-policy": "knockout/tko-policy",
+    "tko.binding.core": "github:knockout/tko.binding.core"
+  },
+  "dependencies": {
+    "tko.bind": "github:knockout/tko.bind",
+    "tko.computed": "github:knockout/tko.computed",
+    "tko.observable": "github:knockout/tko.observable",
+    "tko.utils": "github:knockout/tko.utils"
+  }
+}
