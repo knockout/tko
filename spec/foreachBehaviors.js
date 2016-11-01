@@ -19,6 +19,7 @@ import {
 } from 'tko.utils';
 
 import {bindings as templateBindings} from '../index.js';
+import {bindings as ifBindings} from 'tko.binding.if';
 import {bindings as coreBindings} from 'tko.binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
@@ -35,6 +36,7 @@ describe('Binding: Foreach', function() {
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings);
         bindingHandlers.set(templateBindings);
+        bindingHandlers.set(ifBindings);
     });
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsey', function() {
