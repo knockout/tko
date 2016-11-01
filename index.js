@@ -58,6 +58,10 @@ import {
 } from 'tko.binding.template';
 
 import {
+    bindings as ifBindings
+} from 'tko.binding.if';
+
+import {
     preprocessors as textInterpolation
 } from 'tko.preprocessor.textInterpolation';
 
@@ -95,7 +99,6 @@ utils.arrayForEach([
     "addOrRemoveItem",
     "setTextContent",
     "domData",
-    "domNodeDisposal",
     "parseHtmlFragment",
     "setHtml",
     "compareArrays",
@@ -124,6 +127,7 @@ var provider = new Provider();
 options.bindingProviderInstance = provider;
 provider.bindingHandlers.set(coreBindings);
 provider.bindingHandlers.set(templateBindings);
+provider.bindingHandlers.set(ifBindings);
 provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
 provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
 
@@ -187,7 +191,7 @@ export default {
     dataFor: dataFor,
     getBindingHandler: getBindingHandler,
     virtualElements: utils.virtualElements,
-    domNodeDisposal: utils.domNodeDisposal,
+    domNodeDisposal: coreUtils.domNodeDisposal,
 
     // --- Components ---
     components: components
