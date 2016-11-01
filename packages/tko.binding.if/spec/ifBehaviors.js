@@ -26,7 +26,6 @@ import {bindings as coreBindings} from 'tko.binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
-
 describe('Binding: If', function() {
     beforeEach(jasmine.prepareTestNode);
 

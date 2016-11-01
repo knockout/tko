@@ -635,12 +635,15 @@
   }
 
   function firstChild(node) {
-      if (!isStartComment(node))
+      if (!isStartComment(node)) {
           return node.firstChild;
-      if (!node.nextSibling || isEndComment(node.nextSibling))
+      }
+      if (!node.nextSibling || isEndComment(node.nextSibling)) {
           return null;
+      }
       return node.nextSibling;
   }
+
 
   function nextSibling(node) {
       if (isStartComment(node))
@@ -648,6 +651,24 @@
       if (node.nextSibling && isEndComment(node.nextSibling))
           return null;
       return node.nextSibling;
+  }
+
+  function previousSibling(node) {
+      var depth = 0;
+      do {
+          if (node.nodeType === 8) {
+              if (isStartComment(node)) {
+                  if (--depth === 0) {
+                      return node;
+                  }
+              } else if (isEndComment(node)) {
+                  depth++;
+              }
+          } else {
+              if (depth === 0) { return node; }
+          }
+      } while (node = node.previousSibling);
+      return;
   }
 
   function normaliseVirtualElementDomStructure(elementVerified) {
@@ -2531,6 +2552,25 @@
       };
   }
 
+  /**
+   * Return any conditional that precedes the given node.
+   * @param  {HTMLElement} node To find the preceding conditional of
+   * @return {object}      { elseChainSatisfied: observable }
+   */
+  function getPrecedingConditional(node) {
+      do {
+          node = node.previousSibling;
+      } while(node && node.nodeType !== 1 && node.nodeType !== 8);
+      
+      if (!node) { return; }
+      
+      if (node.nodeType === 8) {
+          node = previousSibling(node);
+      }
+      
+      return get(node, 'conditional');
+  }
+
 
   /**
    * Create a DOMbinding that controls DOM nodes presence
@@ -2544,7 +2584,7 @@
    * </div>
    * 
    * 2. Virtual elements
-   * 
+   *
    * <!-- ko if: x -->
    * <!-- else -->
    * <!-- /ko -->
@@ -2556,20 +2596,38 @@
   function makeWithIfBinding(isWith, isNot, isElse, makeContextCallback) {
       return {
           init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-      
+
               var didDisplayOnLastUpdate,
                   hasElse = detectElse(element),
-                  ifElseNodes;
-      
+                  completesElseChain = observable(),
+                  ifElseNodes,
+                  precedingConditional;
+
+              set(element, "conditional", {
+                  elseChainSatisfied: completesElseChain,
+              });
+
+              if (isElse) {
+                  precedingConditional = getPrecedingConditional(element);
+              }
+
               computed(function() {
                   var rawValue = valueAccessor(),
                       dataValue = unwrap(rawValue),
-                      shouldDisplayIf = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
+                      shouldDisplayIf = !isNot !== !dataValue || (isElse && rawValue === undefined), // equivalent to (isNot ? !dataValue : !!dataValue) || isElse && rawValue === undefined
                       isFirstRender = !ifElseNodes,
                       needsRefresh = isFirstRender || isWith || (shouldDisplayIf !== didDisplayOnLastUpdate);
-                  
+
+                  if (precedingConditional && precedingConditional.elseChainSatisfied()) {
+                      needsRefresh = shouldDisplayIf !== false;
+                      shouldDisplayIf = false;
+                      completesElseChain(true);
+                  } else {
+                      completesElseChain(shouldDisplayIf);
+                  }
+
                   if (!needsRefresh) { return; }
-                  
+
                   if (isFirstRender && (getDependenciesCount() || hasElse)) {
                       ifElseNodes = cloneIfElseNodes(element, hasElse);
                   }
@@ -2588,7 +2646,7 @@
 
                   didDisplayOnLastUpdate = shouldDisplayIf;
               }, null, { disposeWhenNodeIsRemoved: element });
-      
+
               return { 'controlsDescendantBindings': true };
           },
           allowVirtualElements: true,
@@ -2603,14 +2661,15 @@
                                    /* isWith, isNot */
   var $if =   makeWithIfBinding(false, false, false);
   var ifnot = makeWithIfBinding(false, true, false);
+  var $else = makeWithIfBinding(false, false, true);
   var $with = makeWithIfBinding(true, false, false, withContextCallback);
 
   var bindings = {
       'if': $if,
       'with': $with,
       ifnot: ifnot, unless: ifnot,
-  //    'else': $else,
-  //    'elseif': $else
+      'else': $else,
+      'elseif': $else
   };
 
   exports.bindings = bindings;

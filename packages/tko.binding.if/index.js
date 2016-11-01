@@ -5,6 +5,6 @@ export var bindings = {
     'if': $if,
     'with': $with,
     ifnot: ifnot, unless: ifnot,
-//    'else': $else,
-//    'elseif': $else
+    'else': $else,
+    'elseif': $else
 };

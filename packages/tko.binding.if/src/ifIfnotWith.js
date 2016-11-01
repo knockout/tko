@@ -1,10 +1,10 @@
 
 import {
-    cloneNodes, virtualElements, cleanNode
+    cloneNodes, virtualElements, cleanNode, domData
 } from 'tko.utils';
 
 import {
-    unwrap, dependencyDetection
+    unwrap, dependencyDetection, observable
 } from 'tko.observable';
 
 import {
@@ -63,6 +63,25 @@ function cloneIfElseNodes(element, hasElse) {
     };
 }
 
+/**
+ * Return any conditional that precedes the given node.
+ * @param  {HTMLElement} node To find the preceding conditional of
+ * @return {object}      { elseChainSatisfied: observable }
+ */
+function getPrecedingConditional(node) {
+    do {
+        node = node.previousSibling;
+    } while(node && node.nodeType !== 1 && node.nodeType !== 8);
+    
+    if (!node) { return; }
+    
+    if (node.nodeType === 8) {
+        node = virtualElements.previousSibling(node);
+    }
+    
+    return domData.get(node, 'conditional');
+}
+
 
 /**
  * Create a DOMbinding that controls DOM nodes presence
@@ -76,7 +95,7 @@ function cloneIfElseNodes(element, hasElse) {
  * </div>
  * 
  * 2. Virtual elements
- * 
+ *
  * <!-- ko if: x -->
  * <!-- else -->
  * <!-- /ko -->
@@ -88,20 +107,38 @@ function cloneIfElseNodes(element, hasElse) {
 function makeWithIfBinding(isWith, isNot, isElse, makeContextCallback) {
     return {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    
+
             var didDisplayOnLastUpdate,
                 hasElse = detectElse(element),
-                ifElseNodes;
-    
+                completesElseChain = observable(),
+                ifElseNodes,
+                precedingConditional;
+
+            domData.set(element, "conditional", {
+                elseChainSatisfied: completesElseChain,
+            });
+
+            if (isElse) {
+                precedingConditional = getPrecedingConditional(element);
+            }
+
             computed(function() {
                 var rawValue = valueAccessor(),
                     dataValue = unwrap(rawValue),
-                    shouldDisplayIf = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
+                    shouldDisplayIf = !isNot !== !dataValue || (isElse && rawValue === undefined), // equivalent to (isNot ? !dataValue : !!dataValue) || isElse && rawValue === undefined
                     isFirstRender = !ifElseNodes,
                     needsRefresh = isFirstRender || isWith || (shouldDisplayIf !== didDisplayOnLastUpdate);
-                
+
+                if (precedingConditional && precedingConditional.elseChainSatisfied()) {
+                    needsRefresh = shouldDisplayIf !== false;
+                    shouldDisplayIf = false;
+                    completesElseChain(true);
+                } else {
+                    completesElseChain(shouldDisplayIf);
+                }
+
                 if (!needsRefresh) { return; }
-                
+
                 if (isFirstRender && (dependencyDetection.getDependenciesCount() || hasElse)) {
                     ifElseNodes = cloneIfElseNodes(element, hasElse);
                 }
@@ -120,7 +157,7 @@ function makeWithIfBinding(isWith, isNot, isElse, makeContextCallback) {
 
                 didDisplayOnLastUpdate = shouldDisplayIf;
             }, null, { disposeWhenNodeIsRemoved: element });
-    
+
             return { 'controlsDescendantBindings': true };
         },
         allowVirtualElements: true,
