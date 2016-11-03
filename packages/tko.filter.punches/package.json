@@ -35,7 +35,6 @@
     "tko-policy": "knockout/tko-policy"
   },
   "dependencies": {
-    "tko.utils": "github:knockout/tko.utils",
     "tko.observable": "github:knockout/tko.observable"
   }
 }
