@@ -1,0 +1,40 @@
+{
+  "name": "tko.filter.punches",
+  "version": "0.2.0",
+  "description": "TKO filters from knockout punches",
+  "main": "dist/tko.filter.punches.js",
+  "jsnext:main": "./index.js",
+  "files": [
+    "dist/",
+    "src/",
+    "helpers/",
+    "index.js",
+    "./*.ya?ml"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.filter.punches.git"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "ko"
+  ],
+  "author": "Knockout",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  },
+  "homepage": "https://github.com/knockout/tko#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "js-yaml": "^3.4.6",
+    "tko-policy": "knockout/tko-policy"
+  },
+  "dependencies": {
+    "tko.utils": "github:knockout/tko.utils"
+  }
+}
