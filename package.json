@@ -30,6 +30,7 @@
     "tko.binding.core": "github:knockout/tko.binding.core",
     "tko.binding.template": "github:knockout/tko.binding.template",
     "tko.binding.if": "github:knockout/tko.binding.if",
+    "tko.filter.punches": "github:knockout/tko.filter.punches",
     "tko.components": "knockout/tko.components",
     "tko.computed": "knockout/tko.computed",
     "tko.observable": "knockout/tko.observable",

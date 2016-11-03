@@ -65,6 +65,10 @@ import {
     preprocessors as textInterpolation
 } from 'tko.preprocessor.textInterpolation';
 
+import {
+    filters as punchesFilters
+} from 'tko.filter.punches';
+
 import components from 'tko.components'
 
 // --- TODO ---
@@ -131,12 +135,17 @@ provider.bindingHandlers.set(ifBindings);
 provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
 provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
 
+utils.extend(options.filters, punchesFilters);
+
 
 // Expose the API.
 export default {
     // --- Top-level ---
     version: '4.0.0-alpha0',
     options: options,
+
+    extenders: extenders,
+    filters: options.filters,
 
 
     // --- Utilities ---
@@ -165,9 +174,6 @@ export default {
     isComputed: isComputed,
     isPureComputed: isPureComputed,
     pureComputed: pureComputed,
-
-    // Extenders
-    extenders: extenders,
 
 
     // --- Templates ---
