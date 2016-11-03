@@ -1,6 +1,6 @@
 
 import {
-  'unwrap', 'toJS'
+  unwrap, toJS
 } from 'tko.utils';
 
 var sproto = String.prototype;
