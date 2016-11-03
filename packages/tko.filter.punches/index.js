@@ -1,7 +1,11 @@
 
 import {
-  unwrap, toJS
+  toJS
 } from 'tko.utils';
+
+import {
+    unwrap
+} from 'tko.observable';
 
 var sproto = String.prototype;
 
