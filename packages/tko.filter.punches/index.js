@@ -61,7 +61,7 @@ filters.fit = function(value, length, replacement, trimWhere) {
 // Convert a model object to JSON
 filters.json = function(rootObject, space, replacer) {
        // replacer and space are optional
-    return JSON.stringify(ko.toJS(rootObject), replacer, space);
+    return JSON.stringify(toJS(rootObject), replacer, space);
 };
 
 // Format a number using the browser's toLocaleString
