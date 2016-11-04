@@ -70,8 +70,10 @@ function nodeHasBindings(node) {
   if (node.nodeType === node.ELEMENT_NODE) {
     if (node.getAttribute(options.defaultBindingAttribute)) { return true; }
   } else if (node.nodeType === node.COMMENT_NODE) {
-    if (!options.allowVirtualElements) { return false; }
-    if (virtualElements.isStartComment(node)) { return true; }
+    if (options.allowVirtualElements &&
+        virtualElements.isStartComment(node)) {
+      return true;
+    }
   }
 
   for (var i = 0, j = this.otherProviders.length; i < j; i++) {
