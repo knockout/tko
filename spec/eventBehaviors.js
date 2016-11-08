@@ -11,6 +11,10 @@ import {
 } from 'tko.provider';
 
 import {
+    observable
+} from 'tko.observable';
+
+import {
     options
 } from 'tko.utils';
 
@@ -113,5 +117,25 @@ describe('Binding: Event', function() {
         applyBindings(viewModel, testNode);
         triggerEvent(testNode.childNodes[0], "mouseover");
         expect(didCallHandler).toEqual(true);
+    });
+});
+
+
+describe("Binding: On", function () {
+    beforeEach(jasmine.prepareTestNode);
+
+    beforeEach(function(){
+        var provider = new Provider();
+        options.bindingProviderInstance = provider;
+        provider.bindingHandlers.set(coreBindings);
+    });
+
+    it('invokes argument as a function on event', function () {
+        var obs = observable(false);
+        testNode.innerHTML = "<button data-bind='on.click: obs(true)'>hey</button>";
+        applyBindings({ obs: obs }, testNode);
+        expect(obs()).toEqual(false);
+        triggerEvent(testNode.childNodes[0], "click");
+        expect(obs()).toEqual(true);
     });
 });

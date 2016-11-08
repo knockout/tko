@@ -55,3 +55,12 @@ export var eventHandler = {
         });
     }
 };
+
+
+export var onHandler = {
+    init: eventHandler.init,
+    preprocess: function (value /*, key, processBinding */) {
+        // Change `on.click: xyz` to `on.click: => xyz`
+        return " => " + value;
+    }
+};
