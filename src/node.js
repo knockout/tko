@@ -32,7 +32,7 @@ function unwrapOrCall(a, b) {
  * @return {any}   Return value of the function.
  */
 function lambda(a, b) {
-  return function() { return b; };
+  return function() { return b(); };
 }
 
 var operators = {
@@ -173,11 +173,20 @@ Node.prototype.get_leaf_value = function (leaf, member_of) {
  * @param  {array} ops  The operations to perform
  * @return {function}   The function that calculates the expression.
  *
- * Exported for testing.
+ * Note that for a lambda, we do not evaluate the RHS expression until
+ * the lambda is called.
  */
 Node.prototype.get_node_value = function () {
-  return this.op(this.get_leaf_value(this.lhs),
-                 this.get_leaf_value(this.rhs));
+  var node = this;
+
+  if (node.op === lambda) {
+    return node.op(undefined, function () {
+      return node.get_leaf_value(node.rhs);
+    });
+  }
+
+  return node.op(node.get_leaf_value(node.lhs),
+                 node.get_leaf_value(node.rhs));
 };
 
 

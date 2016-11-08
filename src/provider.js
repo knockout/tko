@@ -148,7 +148,8 @@ function preProcessBindings(bindingString) {
   }
 
   function processBinding(key, value) {
-    var handler = bindingHandlers.get(key);
+    // Get the "on" binding from "on.click"
+    var handler = bindingHandlers.get(key.split('.')[0]);
 
     if (handler && typeof handler.preprocess === 'function') {
       value = handler.preprocess(value, key, processBinding);

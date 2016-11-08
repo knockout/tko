@@ -426,7 +426,7 @@ Parser.prototype.expression = function (filterable) {
     // unary prefix operators
     op = this.operator();
     if (op) {
-      nodes.push(undefined);  // padding.
+      nodes.push(undefined);  // LHS Tree node.
       nodes.push(op);
     }
 
