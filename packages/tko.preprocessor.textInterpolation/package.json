@@ -35,6 +35,7 @@
     "tko-policy": "knockout/tko-policy",
     "tko.bind": "github:knockout/tko.bind",
     "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.binding.if": "github:knockout/tko.binding.if",
     "tko.observable": "github:knockout/tko.observable",
     "tko.provider": "github:knockout/tko.provider"
   },
