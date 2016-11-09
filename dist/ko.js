@@ -3232,6 +3232,7 @@
     throw new Error("The variable \"" + token + "\" was not found on $data, $context, or knockout options.bindingGlobals.");
   };
 
+
   /**
    * Apply all () and [] functions on the identifier to the lhs value e.g.
    * a()[3] has deref functions that are essentially this:
@@ -3239,6 +3240,19 @@
    *
    * @param  {mixed} value  Should be an object.
    * @return {mixed}        The dereferenced value.
+   *
+   * [1] We want to bind any function that is a method of an object, but not
+   *     corrupt any values (e.g. computed()s).   e.g. Running x.bind(obj) where
+   *     we're given `data-bind='binding: obj.x'` and x is a computed will
+   *     break the computed's `this` and it will stop working as expected.
+   *
+   *     The test `member in last_value && !last_value.hasOwnProperty(member)`
+   *     distinguishes between functions on the prototype chain (prototypal
+   *     members) and value-members added directly to the object.  This may
+   *     not be the canonical test for this relationship, but it succeeds
+   *     in the known test cases.
+   *
+   *     See: `this` tests of our dereference function.
    */
   Identifier.prototype.dereference = function (value) {
     var member,
@@ -3269,8 +3283,9 @@
       }
     }
 
-    // With obj.x, make `obj = this`
-    if (typeof value === 'function' && n > 0 && last_value !== value) {
+    // [1] See note above.
+    if (typeof value === 'function' && n > 0 && last_value !== value &&
+        member in last_value && !last_value.hasOwnProperty(member)) {
       return value.bind(last_value);
     }
 
