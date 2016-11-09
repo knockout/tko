@@ -378,6 +378,8 @@ describe("unary operations", function() {
         context = { yfn: function(n) { obs(n) } },
         bindings = new Parser(null, context).parse(binding);
       assert.equal(obs(), undefined)
+      bindings.x() // does not evaluate on lookup
+      assert.equal(obs(), undefined)
       bindings.x()()
       assert.equal(obs(), 146)
     })
@@ -412,6 +414,13 @@ describe("unary operations", function() {
       var binding = '\'attr.title\':""+"hello "+@"name"+"!"',
         bindings = new Parser(null, {}).parse(binding);
       assert.equal(bindings['attr']().title, "hello name!")
+    })
+
+    it("unwraps after a function is called", function () {
+      var binding = 'x: "a" + @ fn() + "b"',
+        context = { fn: function () { return observable('14x') } },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), 'a14xb')
     })
   })
 
@@ -465,6 +474,16 @@ describe("unary operations", function() {
       assert.equal(bindings.x(), 4);
       context.a(true);
       assert.equal(bindings.x(), 2);
+    })
+
+    it("computes unwrapped elements first", function () {
+      var binding = "x: 'string' + @(a() ? 'a' : '!a')",
+        obs = observable(true),
+        context = { a: function () { return obs() } },
+        bindings = new Parser(null, context).parse(binding);
+      assert.equal(bindings.x(), 'stringa');
+      obs(false);
+      assert.equal(bindings.x(), 'string!a');
     })
   })
 })

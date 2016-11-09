@@ -428,6 +428,7 @@ Parser.prototype.expression = function (filterable) {
     if (op) {
       nodes.push(undefined);  // LHS Tree node.
       nodes.push(op);
+      ch = this.white();
     }
 
     if (ch === '(') {
