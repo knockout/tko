@@ -70,35 +70,35 @@ describe("Attribute Interpolation Markup preprocessor", function() {
         testNode.setAttribute('title', "some {{expr}} text");
         attributeInterpolationMarkup.nodePreProcessor(testNode, provider);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@expr+" text"');
+        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr)+" text"');
     });
 
     it('Should ignore unmatched delimiters', function() {
         testNode.setAttribute('title', "some {{expr1}}expr2}} text");
         attributeInterpolationMarkup.nodePreProcessor(testNode, provider);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@expr1}}expr2+" text"');
+        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr1}}expr2)+" text"');
     });
 
     it('Should support two expressions', function() {
         testNode.setAttribute('title', "some {{expr1}} middle {{expr2}} text");
         attributeInterpolationMarkup.nodePreProcessor(testNode, provider);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@expr1+" middle "+@expr2+" text"');
+        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr1)+" middle "+@(expr2)+" text"');
     });
 
     it('Should skip empty text', function() {
         testNode.setAttribute('title', "{{expr1}}{{expr2}}");
         attributeInterpolationMarkup.nodePreProcessor(testNode, provider);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+@expr1+@expr2');
+        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+@(expr1)+@(expr2)');
     });
 
     it('Should support more than two expressions', function() {
         testNode.setAttribute('title', "x {{expr1}} y {{expr2}} z {{expr3}}");
         attributeInterpolationMarkup.nodePreProcessor(testNode, provider);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"x "+@expr1+" y "+@expr2+" z "+@expr3');
+        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"x "+@(expr1)+" y "+@(expr2)+" z "+@(expr3)');
     });
 
     it('Should create simple binding for single expression', function() {

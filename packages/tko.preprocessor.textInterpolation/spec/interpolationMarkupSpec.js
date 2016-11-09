@@ -24,6 +24,10 @@ import {
     bindings as templateBindings
 } from 'tko.binding.template';
 
+import {
+    bindings as ifBindings
+} from 'tko.binding.if';
+
 
 import {
     preprocessors
@@ -192,6 +196,7 @@ describe("Interpolation Markup bindings", function() {
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings);
         bindingHandlers.set(templateBindings);
+        bindingHandlers.set(ifBindings);
     });
 
     it('Should replace {{...}} expression with virtual text binding', function() {

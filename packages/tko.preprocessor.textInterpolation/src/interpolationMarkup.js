@@ -113,7 +113,7 @@ function attributeInterpolationMarkerPreprocessor(node, provider) {
     function addExpr(expressionText) {
         if (expressionText) {
             attrValue = expressionText;
-            parts.push('@' + expressionText);
+            parts.push('@(' + expressionText + ")");
         }
     }
 
