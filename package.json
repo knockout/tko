@@ -16,7 +16,9 @@
     "sinon": "^1.17.5",
     "tko-policy": "knockout/tko-policy",
     "tko.bind": "knockout/tko.bind",
-    "tko.binding.core": "github:knockout/tko.binding.core"
+    "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.computed": "github:knockout/tko.computed",
+    "tko.observable": "github:knockout/tko.observable"
   },
   "files": [
     "dist/",

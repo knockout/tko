@@ -21,6 +21,10 @@ import {
 } from 'tko.observable';
 
 import {
+  computed
+} from 'tko.computed';
+
+import {
   applyBindings,
   contextFor,
   dataFor
@@ -711,6 +715,26 @@ describe("Identifier", function() {
       triggerEvent(div, 'click')
       assert.strictEqual(thisIs(), context.p)
     })
+
+
+    it("does not break `this`/prototype of observable/others", function () {
+      var div = document.createElement('div'),
+        comp = computed(function () { return 'rrr' }),
+        Fn = function ffn() { this.comp = comp },
+        context = {
+          instance: new Fn()
+        };
+      div.setAttribute('data-bind', 'check: instance.comp')
+      options.bindingProviderInstance = new Provider()
+      options.bindingProviderInstance.bindingHandlers.set({
+        check: function (params) {
+          assert.equal(params.value.peek(), 'rrr')
+        }
+      })
+      applyBindings(context, div)
+      triggerEvent(div, 'click')
+    })
+
 
     it("sets `this` of a top-level item to {$data, $context, globals, node}", function() {
       options.bindingGlobals = {
