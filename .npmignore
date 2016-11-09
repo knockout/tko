@@ -1,4 +1,0 @@
-# Only package the build output for npm.
-# Developers who want sources/tests can get them from the KO repo.
-*
-!dist

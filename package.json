@@ -13,6 +13,9 @@
   "scripts": {
     "test": "gulp test:phantomjs --once"
   },
+  "files": [
+    "dist/"
+  ],
   "bugs": "https://github.com/knockout/knockout/issues",
   "licenses": [
     {
