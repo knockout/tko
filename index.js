@@ -134,6 +134,9 @@ provider.bindingHandlers.set(templateBindings);
 provider.bindingHandlers.set(ifBindings);
 provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
 provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
+provider.bindingHandlers.set({ component: components.bindingHandler });
+provider.addProvider(components.bindingProvider);
+
 
 utils.extend(options.filters, punchesFilters);
 
