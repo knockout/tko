@@ -3268,6 +3268,12 @@
         value = Node.value_of(value[member]);
       }
     }
+
+    // With obj.x, make `obj = this`
+    if (typeof value === 'function' && n > 0) {
+      return value.bind(last_value);
+    }
+
     return value;
   };
 

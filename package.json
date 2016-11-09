@@ -25,6 +25,7 @@
   ],
   "devDependencies": {
     "gulp": "^3.9.0",
+    "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "js-yaml": "^3.4.0",
     "tko-policy": "knockout/tko-policy"
