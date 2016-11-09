@@ -87,7 +87,7 @@ Identifier.prototype.dereference = function (value) {
   }
 
   // With obj.x, make `obj = this`
-  if (typeof value === 'function' && n > 0) {
+  if (typeof value === 'function' && n > 0 && last_value !== value) {
     return value.bind(last_value);
   }
 
