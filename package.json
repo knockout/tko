@@ -1,5 +1,5 @@
 {
-  "name": "ko",
+  "name": "tko",
   "description": "TKO is an experimental fork of Knockout",
   "homepage": "http://knockoutjs.com/",
   "version": "4.0.0-alpha0",
@@ -25,6 +25,7 @@
   ],
   "devDependencies": {
     "gulp": "^3.9.0",
+    "gulp-replace": "^0.5.4",
     "js-yaml": "^3.4.0",
     "tko-policy": "knockout/tko-policy"
   },
