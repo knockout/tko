@@ -1,3 +1,6 @@
+##  🏹  Alpha-1  (... Work in progress ... )
+
+* Make sure `obj.x` uses `this` of `obj` where `x` is a function (e.g. `click: model.onClick` has `this` of `model`)
 
 ##  🐚   Alpha-0  (9 Nov 2016)
 
