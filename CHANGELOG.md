@@ -1,5 +1,5 @@
 
-##  🐚   Alpha-1  (WIP/Not yet released)
+##  🐚   Alpha-0  (9 Nov 2016)
 
 For TODO see https://github.com/knockout/tko/issues/1
 
