@@ -5,6 +5,7 @@
 * Honour explicit references to `this` (as `$data`)
 * Ensure bindings with multiple filters work as expected
 * If available, use a WeakMap for DOM node data (resolves knockout/knockout#2141)
+* Fix filters not separated by whitespace (e.g. `value|filter1|filter2`)
 
 ##  🐚   Alpha-0  (9 Nov 2016)
 
