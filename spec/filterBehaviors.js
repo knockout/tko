@@ -76,4 +76,11 @@ describe("filters", function () {
   it("Does not intefere with expressions", function () {
     trial({}, "(4 | 1)", "5")
   })
+
+  it("multiple variables with filters", function () {
+    var p = new Parser(null, {v: "tt"})
+      .parse("b: v|tail:'e':'y', c: v|tail:'e':'z'")
+    assert.equal(p.b(), "ttey")
+    assert.equal(p.c(), "ttez")
+  })
 })
