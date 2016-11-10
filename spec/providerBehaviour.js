@@ -715,6 +715,18 @@ describe("Identifier", function() {
       assert.strictEqual(thisIs(), context.p)
     })
 
+    it("uses `$data` as explicit `this` reference", function () {
+      var div = document.createElement('div'),
+        obs = observable(),
+        context = { fn: obs };
+      div.setAttribute('data-bind', 'click: => fn(this)')
+      options.bindingProviderInstance = new Provider()
+      options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
+      applyBindings(context, div)
+      assert.equal(obs(), undefined)
+      triggerEvent(div, 'click')
+      assert.strictEqual(obs(), context)
+    })
 
     it("does not break `this`/prototype of observable/others", function () {
       var div = document.createElement('div'),
