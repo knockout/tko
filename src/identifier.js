@@ -63,7 +63,7 @@ Identifier.prototype.lookup_value = function (parent) {
  *     we're given `data-bind='binding: obj.x'` and x is a computed will
  *     break the computed's `this` and it will stop working as expected.
  *
- *     The test `member in last_value && !last_value.hasOwnProperty(member)`
+ *     The test `!last_value.hasOwnProperty(member)`
  *     distinguishes between functions on the prototype chain (prototypal
  *     members) and value-members added directly to the object.  This may
  *     not be the canonical test for this relationship, but it succeeds
@@ -102,7 +102,7 @@ Identifier.prototype.dereference = function (value) {
 
   // [1] See note above.
   if (typeof value === 'function' && n > 0 && last_value !== value &&
-      member in last_value && !last_value.hasOwnProperty(member)) {
+      !last_value.hasOwnProperty(member)) {
     return value.bind(last_value);
   }
 
