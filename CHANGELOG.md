@@ -11,6 +11,8 @@
 
 For TODO see https://github.com/knockout/tko/issues/1
 
+* various new [`options`](https://github.com/knockout/tko.utils/blob/master/src/options.js)
+
 * rewritten as ES6 in multiple packages, so it can be mixed/matched
   * e.g. observables are usable independently from knockout/tko.observable
 
