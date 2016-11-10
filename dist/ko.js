@@ -3269,7 +3269,7 @@
     switch (token) {
     case '$element': return parser.node;
     case '$context': return $context;
-    case '$data': return $context.$data;
+    case 'this': case '$data': return $context.$data;
     default:
     }
     // instanceof Object covers 1. {}, 2. [], 3. function() {}, 4. new *;  it excludes undefined, null, primitives.
