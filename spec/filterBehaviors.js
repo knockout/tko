@@ -36,8 +36,12 @@ describe("filters", function () {
     trial({v: "t"}, "v | uppercase", "T")
   })
 
-  it("chains input", function () {
+  it("chains input with whitespace", function () {
     trial({v: "t"}, "v | uppercase | tail", "Ttail")
+  })
+
+  it("chains flush input", function () {
+    trial({v: "t"}, "v|uppercase|tail", "Ttail")
   })
 
   it("passes an argument", function () {

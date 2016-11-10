@@ -100,7 +100,7 @@ Parser.prototype.name = function () {
         );
       }
       return name;
-    } else if (ch === ':' || ch <= ' ' || ch === ',') {
+    } else if (ch === ':' || ch <= ' ' || ch === ',' || ch === '|') {
       return name;
     }
     name += ch;
