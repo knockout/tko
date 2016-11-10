@@ -1,4 +1,4 @@
-##  🏹  Alpha-1  (... Work in progress ... )
+##  🏹  Alpha-1  ( Work in progress on the `master` branch )
 
 * Make sure `obj.x` uses `this` of `obj` where `x` is a function (e.g. `click: model.onClick` has `this` of `model`)
 * Ensure `obj.x` only uses `obj` as `this` when `x` is a prototypal method (and not just a value)
