@@ -38,6 +38,8 @@ When complete, the hope is that Knockout will become an *opinionated expression*
 | [tko.bind](/knockout/tko.bind) | [![CircleCI](https://circleci.com/gh/knockout/tko.bind.svg?style=shield)](https://circleci.com/gh/knockout/tko.bind) |
 | [tko.binding.core](/knockout/tko.binding.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.core) |
 | [tko.binding.template](/knockout/tko.binding.template) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.template.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.template) |
+| [tko.binding.if](/knockout/tko.binding.if) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.if.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.if) |
+| [tko.filter.punches](/knockout/tko.filter.punches) | [![CircleCI](https://circleci.com/gh/knockout/tko.filter.punches.svg?style=shield)](https://circleci.com/gh/knockout/tko.filter.punches) |
 | [tko.components](/knockout/tko.components) | [![CircleCI](https://circleci.com/gh/knockout/tko.components.svg?style=shield)](https://circleci.com/gh/knockout/tko.components) |
 | [tko.preprocessor.textInterpolation](/knockout/tko.preprocessor.textInterpolation) | [![CircleCI](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation.svg?style=shield)](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation) |
 | [tko](/knockout/tko) | [![CircleCI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko) |
