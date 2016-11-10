@@ -26,7 +26,6 @@ import {
 
 import {
   applyBindings,
-  contextFor,
   dataFor
 } from 'tko.bind';
 
@@ -736,7 +735,7 @@ describe("Identifier", function() {
     })
 
 
-    it("sets `this` of a top-level item to {$data, $context, globals, node}", function() {
+    it("sets `this` of a top-level item to $data", function() {
       options.bindingGlobals = {
         Ramanujan: "1729"
       }
@@ -744,10 +743,7 @@ describe("Identifier", function() {
         context = {
           fn: function() {
             assert.isObject(this)
-            assert.equal(contextFor(div), this.$context, '$context')
-            assert.equal(dataFor(div), this.$data, '$data')
-            assert.equal(div, this.$element, 'div')
-            assert.deepEqual(options.bindingGlobals, this.globals, 'globals')
+            assert.strictEqual(dataFor(div), this, '$data')
             return 'sigtext'
           }
         };

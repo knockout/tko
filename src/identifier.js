@@ -77,12 +77,6 @@ Identifier.prototype.dereference = function (value) {
     parser = this.parser,
     $context = parser.context || {},
     $data = $context.$data || {},
-    self = { // top-level `this` in function calls
-      $context: $context,
-      $data: $data,
-      globals: parser.globals || {},
-      $element: parser.node
-    },
     last_value,  // becomes `this` in function calls to object properties.
     i, n;
 
@@ -91,7 +85,7 @@ Identifier.prototype.dereference = function (value) {
 
     if (typeof value === 'function' && refs[i] instanceof Arguments) {
       // fn(args)
-      value = value.apply(last_value || self, member);
+      value = value.apply(last_value || $data, member);
       last_value = value;
     } else {
       // obj[x] or obj.x dereference.  Note that obj may be a function.
