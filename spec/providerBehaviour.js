@@ -13,12 +13,16 @@
 /* eslint semi: 0 */
 
 import {
-  options
+  options, triggerEvent
 } from 'tko.utils';
 
 import {
   observable
 } from 'tko.observable';
+
+import {
+  computed
+} from 'tko.computed';
 
 import {
   applyBindings,
@@ -695,6 +699,43 @@ describe("Identifier", function() {
       assert.equal(div.textContent || div.innerText, 'ahab')
     })
 
+    it("sets `this` of a called function", function () {
+      var div = document.createElement('div'),
+        P = function () {},
+        thisIs = observable(),
+        context = {
+          p: new P()
+        };
+      P.prototype.fn = function p_fn() { thisIs(this) }
+      div.setAttribute('data-bind', 'click: p.fn')
+      options.bindingProviderInstance = new Provider()
+      options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
+      applyBindings(context, div)
+      assert.equal(thisIs(), undefined)
+      triggerEvent(div, 'click')
+      assert.strictEqual(thisIs(), context.p)
+    })
+
+
+    it("does not break `this`/prototype of observable/others", function () {
+      var div = document.createElement('div'),
+        comp = computed(function () { return 'rrr' }),
+        Fn = function ffn() { this.comp = comp },
+        context = {
+          instance: new Fn()
+        };
+      div.setAttribute('data-bind', 'check: instance.comp')
+      options.bindingProviderInstance = new Provider()
+      options.bindingProviderInstance.bindingHandlers.set({
+        check: function (params) {
+          assert.equal(params.value.peek(), 'rrr')
+        }
+      })
+      applyBindings(context, div)
+      triggerEvent(div, 'click')
+    })
+
+
     it("sets `this` of a top-level item to {$data, $context, globals, node}", function() {
       options.bindingGlobals = {
         Ramanujan: "1729"
@@ -703,8 +744,7 @@ describe("Identifier", function() {
         context = {
           fn: function() {
             assert.isObject(this)
-            assert.equal(contextFor(div), this.$context,
-              '$context')
+            assert.equal(contextFor(div), this.$context, '$context')
             assert.equal(dataFor(div), this.$data, '$data')
             assert.equal(div, this.$element, 'div')
             assert.deepEqual(options.bindingGlobals, this.globals, 'globals')

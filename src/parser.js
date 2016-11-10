@@ -432,8 +432,9 @@ Parser.prototype.expression = function (filterable) {
     // unary prefix operators
     op = this.operator();
     if (op) {
-      nodes.push(undefined);  // padding.
+      nodes.push(undefined);  // LHS Tree node.
       nodes.push(op);
+      ch = this.white();
     }
 
     if (ch === '(') {
@@ -713,10 +714,11 @@ Parser.prototype.parse = function (source) {
   try {
     var result = this.read_bindings();
   } catch (e) {
+    // `e` may be 1.) a proper Error; 2.) a parsing error; or 3.) a string.
     var emsg = typeof e === Error ?
-        "\nMessage: <" + e.name + "> " + e.message :
-        'at' in e ?  // parsing error
-        "\n" + e.name + " " + e.message + " of \n"
+          "\nMessage: <" + e.name + "> " + e.message :
+        typeof e === 'object' && 'at' in e ?
+          "\n" + e.name + " " + e.message + " of \n"
           + "   " + e.text + "\n"
           + Array(e.at).join(" ") + "_/ 🔥 \\_\n"
         : e;

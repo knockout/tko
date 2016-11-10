@@ -70,8 +70,10 @@ function nodeHasBindings(node) {
   if (node.nodeType === node.ELEMENT_NODE) {
     if (node.getAttribute(options.defaultBindingAttribute)) { return true; }
   } else if (node.nodeType === node.COMMENT_NODE) {
-    if (!options.allowVirtualElements) { return false; }
-    if (virtualElements.isStartComment(node)) { return true; }
+    if (options.allowVirtualElements &&
+        virtualElements.isStartComment(node)) {
+      return true;
+    }
   }
 
   for (var i = 0, j = this.otherProviders.length; i < j; i++) {
@@ -146,7 +148,8 @@ function preProcessBindings(bindingString) {
   }
 
   function processBinding(key, value) {
-    var handler = bindingHandlers.get(key);
+    // Get the "on" binding from "on.click"
+    var handler = bindingHandlers.get(key.split('.')[0]);
 
     if (handler && typeof handler.preprocess === 'function') {
       value = handler.preprocess(value, key, processBinding);

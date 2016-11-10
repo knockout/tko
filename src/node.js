@@ -14,6 +14,10 @@ export default function Node(lhs, op, rhs) {
   this.rhs = rhs;
 }
 
+
+/* Just a placeholder */
+function LAMBDA() {}
+
 /**
  * @ operator - recursively call the identifier if it's a function
  * @param  {operand} a ignored
@@ -25,20 +29,11 @@ function unwrapOrCall(a, b) {
   return b;
 }
 
-/**
- * Create a => expr lambda.
- * @param  {undefined} a
- * @param  {Node|Expression|Identifier|constant} b The item to become a lambda
- * @return {any}   Return value of the function.
- */
-function lambda(a, b) {
-  return function() { return b; };
-}
 
 var operators = {
   // unary
   '@': unwrapOrCall,
-  '=>': lambda,
+  '=>': LAMBDA,
   '!': function not(a, b) { return !b; },
   '!!': function notnot(a, b) { return !!b; },
   '++': function preinc(a, b) { return ++b; },
@@ -173,11 +168,18 @@ Node.prototype.get_leaf_value = function (leaf, member_of) {
  * @param  {array} ops  The operations to perform
  * @return {function}   The function that calculates the expression.
  *
- * Exported for testing.
+ * Note that for a lambda, we do not evaluate the RHS expression until
+ * the lambda is called.
  */
 Node.prototype.get_node_value = function () {
-  return this.op(this.get_leaf_value(this.lhs),
-                 this.get_leaf_value(this.rhs));
+  var node = this;
+
+  if (node.op === LAMBDA) {
+    return function () { return node.get_leaf_value(node.rhs); };
+  }
+
+  return node.op(node.get_leaf_value(node.lhs),
+                 node.get_leaf_value(node.rhs));
 };
 
 
