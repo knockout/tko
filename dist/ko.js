@@ -3751,15 +3751,21 @@
       options.onError("Cannot find filter by the name of: " + name);
     }
 
+    ch = this.white();
+
     while (ch) {
       if (ch === ':') {
-        this.next();
+        ch = this.next();
         args.push(this.expression());
       }
+
       if (ch === '|') {
         next_filter = this.filter();
         break;
       }
+
+      if (ch === ',') { break; }
+
       ch = this.white();
     }
 
