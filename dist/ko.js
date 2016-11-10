@@ -541,13 +541,17 @@
   //
   // DOM node data
   //
-  // import {createSymbolOrString} from '../symbol.js'
-
-  var uniqueId = 0;
+  //
   var dataStoreKeyExpandoPropertyName = "__ko__data" + new Date();
-  var dataStore = {};
+  var dataStore;
+  var uniqueId = 0;
+  var get;
+  var set;
+  var clear;
 
-
+  /**
+   * --- Legacy getter/setter (may cause memory leaks) ---
+   */
   function getAll(node, createIfNotFound) {
       var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
       var hasExistingDataStore = dataStoreKey && (dataStoreKey !== "null") && dataStore[dataStoreKey];
@@ -560,12 +564,12 @@
       return dataStore[dataStoreKey];
   }
 
-  function get(node, key) {
+  function legacyGet(node, key) {
       var allDataForNode = getAll(node, false);
       return allDataForNode === undefined ? undefined : allDataForNode[key];
   }
 
-  function set(node, key, value) {
+  function legacySet(node, key, value) {
       if (value === undefined) {
           // Make sure we don't actually create a new domData key if we are actually deleting a value
           if (getAll(node, false) === undefined)
@@ -575,7 +579,7 @@
       allDataForNode[key] = value;
   }
 
-  function clear(node) {
+  function legacyClear(node) {
       var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
       if (dataStoreKey) {
           delete dataStore[dataStoreKey];
@@ -585,16 +589,60 @@
       return false;
   }
 
+  /**
+   * WeakMap get/set/clear
+   */
+
+  function wmGet(node, key) {
+      return (dataStore.get(node) || {})[key];
+  }
+
+  function wmSet(node, key, value) {
+      var dataForNode;
+      if (dataStore.has(node)) {
+          dataForNode = dataStore.get(node);
+      } else {
+          dataForNode = {};
+          dataStore.set(node, dataForNode);
+      }
+      dataForNode[key] = value;
+  }
+
+  function wmClear(node) {
+      dataStore.set(node, {});
+  }
+
+
+  if ('WeakMap' in window) {
+      dataStore = new WeakMap();
+      get = wmGet;
+      set = wmSet;
+      clear = wmClear;
+  } else {
+      dataStore = {};
+      get = legacyGet;
+      set = legacySet;
+      clear = legacyClear;
+  }
+
+
+
+  /**
+   * Create a unique key-string identifier.
+   * FIXME: This should be deprecated.
+   */
   function nextKey() {
       return (uniqueId++) + dataStoreKeyExpandoPropertyName;
   }
 
 
+
+
   var domData = Object.freeze({
-      get: get,
-      set: set,
-      clear: clear,
-      nextKey: nextKey
+      nextKey: nextKey,
+      get get () { return get; },
+      get set () { return set; },
+      get clear () { return clear; }
   });
 
   var domDataKey = nextKey();
@@ -3246,7 +3294,7 @@
    *     we're given `data-bind='binding: obj.x'` and x is a computed will
    *     break the computed's `this` and it will stop working as expected.
    *
-   *     The test `member in last_value && !last_value.hasOwnProperty(member)`
+   *     The test `!last_value.hasOwnProperty(member)`
    *     distinguishes between functions on the prototype chain (prototypal
    *     members) and value-members added directly to the object.  This may
    *     not be the canonical test for this relationship, but it succeeds
@@ -3285,7 +3333,7 @@
 
     // [1] See note above.
     if (typeof value === 'function' && n > 0 && last_value !== value &&
-        member in last_value && !last_value.hasOwnProperty(member)) {
+        !last_value.hasOwnProperty(member)) {
       return value.bind(last_value);
     }
 
