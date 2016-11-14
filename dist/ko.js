@@ -1898,6 +1898,18 @@
           return currentFrame.isInitial;
   }
 
+
+
+  var dependencyDetection = Object.freeze({
+      begin: begin,
+      end: end,
+      registerDependency: registerDependency,
+      ignore: ignore,
+      getDependenciesCount: getDependenciesCount,
+      isInitial: isInitial,
+      ignoreDependencies: ignore
+  });
+
   var observableLatestValue = createSymbolOrString('_latestValue');
 
 
@@ -7695,6 +7707,7 @@
       removeNode: removeNode,
       tasks: tasks,
       utils: coreUtils,
+      dependencyDetection: dependencyDetection,
 
 
       // -- Observable ---

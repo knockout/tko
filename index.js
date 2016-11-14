@@ -6,7 +6,7 @@ import {
     // applyExtenders,
     // arrayChangeEventName,
     // deferUpdates,
-    // dependencyDetection,
+    dependencyDetection,
     extenders,
     isObservable,
     isSubscribable,
@@ -157,6 +157,7 @@ export default {
     removeNode: utils.removeNode,
     tasks: utils.tasks,
     utils: coreUtils,
+    dependencyDetection: dependencyDetection,
 
 
     // -- Observable ---
