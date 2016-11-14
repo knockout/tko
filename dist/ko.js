@@ -6524,6 +6524,12 @@
   var template = {
       init: function(element, valueAccessor) {
           var container;
+          
+          // Expose 'conditional' for `else` chaining.
+          set(element, 'conditional', {
+              elseChainSatisfied: observable(true)
+          });
+          
           // Support anonymous templates
           var bindingValue = unwrap(valueAccessor());
           if (typeof bindingValue == "string" || bindingValue['name']) {
@@ -6553,6 +6559,7 @@
               options = unwrap(value),
               shouldDisplay = true,
               templateComputed = null,
+              elseChainSatisfied = get(element, 'conditional').elseChainSatisfied,
               templateName;
 
           if (typeof options == "string") {
@@ -6572,14 +6579,18 @@
               // Render once for each data point (treating data set as empty if shouldDisplay==false)
               var dataArray = (shouldDisplay && options['foreach']) || [];
               templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext);
+              
+              elseChainSatisfied((unwrap(dataArray) || []).length !== 0);
           } else if (!shouldDisplay) {
               emptyNode(element);
+              elseChainSatisfied(false);
           } else {
               // Render once for this single data point (or use the viewModel if no data was provided)
               var innerBindingContext = ('data' in options) ?
                   bindingContext.createStaticChildContext(options['data'], options['as']) :  // Given an explitit 'data' value, we create a child binding context for it
                   bindingContext;                                                        // Given no explicit 'data' value, we retain the same binding context
               templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element);
+              elseChainSatisfied(true);
           }
 
           // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
@@ -6641,7 +6652,7 @@
   // "foreach: someExpression" is equivalent to "template: { foreach: someExpression }"
   // "foreach: { data: someExpression, afterAdd: myfn }" is equivalent to "template: { foreach: someExpression, afterAdd: myfn }"
   var foreach = {
-      init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+      init: function(element, valueAccessor) {
           return getBindingHandler('template').init(element, makeTemplateValueAccessor(valueAccessor));
       },
       update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
