@@ -23,7 +23,9 @@ import {
     setTemplateEngine, nativeTemplateEngine
 } from '../index.js';
 
-import {bindings as coreBindings} from 'tko.binding.core';
+import {
+  bindings as coreBindings
+} from 'tko.binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 import {
@@ -1011,7 +1013,7 @@ describe('Templating', function() {
             }).toThrowContaining("This template engine does not support");
         });
     });
-
+    
     it('Data binding syntax should permit nested templates using virtual containers (with arbitrary internal whitespace and newlines)', function() {
         setTemplateEngine(new dummyTemplateEngine({
             outerTemplate: "Outer <!-- ko template: " +
@@ -1117,5 +1119,69 @@ describe('Templating', function() {
         expect(testDocFrag.childNodes.length).toEqual(1);
         expect(testDocFrag.childNodes[0].tagName).toEqual("P");
         expect(testDocFrag.childNodes[0]).toContainHtml("myval: 123");
+    });
+    
+    describe("The `condition` exposed via the domData for `else` chaining", function () {
+        
+        it("is false iff the `if` is false", function () {
+            var condition = observable(true);
+
+            testNode.innerHTML = '<!-- ko template: {if: condition} -->True<!-- /ko -->';
+            
+            applyBindings({condition: condition}, testNode);
+            
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true);
+
+            condition(false);
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
+        });
+        
+        it("is false iff the `ifnot` is true", function () {
+            var condition = observable(true);
+
+            testNode.innerHTML = '<!-- ko template: {ifnot: condition} -->True<!-- /ko -->';
+            
+            applyBindings({condition: condition}, testNode);
+            
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
+
+            condition(false);
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true);
+
+        });
+        
+        it("is false iff the `foreach` is empty", function () {
+            var items = observable();
+
+            testNode.innerHTML = '<!-- ko template: {foreach: items} -->True<!-- /ko -->';
+            
+            applyBindings({items: items}, testNode);
+            
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
+
+            items([]);
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
+
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
+
+            items([123]);
+            expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true);
+        });
+        
+        it("is false iff the `if` is false, on a DOM node", function () {
+            var condition = observable(true);
+            
+            testNode.setAttribute('data-bind', 'template: {if: condition}');
+            testNode.innerHTML = 'True';
+            
+            applyBindings({condition: condition}, testNode);
+            
+            expect(domData.get(testNode, 'conditional')
+              .elseChainSatisfied()).toEqual(true);
+
+            condition(false);
+            expect(domData.get(testNode, 'conditional')
+              .elseChainSatisfied()).toEqual(false);
+        });   
     });
 });

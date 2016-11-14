@@ -42,7 +42,7 @@ export function makeTemplateValueAccessor(valueAccessor) {
 // "foreach: someExpression" is equivalent to "template: { foreach: someExpression }"
 // "foreach: { data: someExpression, afterAdd: myfn }" is equivalent to "template: { foreach: someExpression, afterAdd: myfn }"
 export var foreach = {
-    init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    init: function(element, valueAccessor) {
         return getBindingHandler('template').init(element, makeTemplateValueAccessor(valueAccessor));
     },
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {

@@ -16,7 +16,7 @@ import {
 } from 'tko.computed';
 
 import {
-    isObservable, dependencyDetection, unwrap
+    isObservable, dependencyDetection, unwrap, observable
 } from 'tko.observable';
 
 import {
@@ -247,6 +247,12 @@ function disposeOldComputedAndStoreNewOne(element, newComputed) {
 export var template = {
     init: function(element, valueAccessor) {
         var container;
+        
+        // Expose 'conditional' for `else` chaining.
+        domData.set(element, 'conditional', {
+            elseChainSatisfied: observable(true)
+        });
+        
         // Support anonymous templates
         var bindingValue = unwrap(valueAccessor());
         if (typeof bindingValue == "string" || bindingValue['name']) {
@@ -276,6 +282,7 @@ export var template = {
             options = unwrap(value),
             shouldDisplay = true,
             templateComputed = null,
+            elseChainSatisfied = domData.get(element, 'conditional').elseChainSatisfied,
             templateName;
 
         if (typeof options == "string") {
@@ -295,14 +302,18 @@ export var template = {
             // Render once for each data point (treating data set as empty if shouldDisplay==false)
             var dataArray = (shouldDisplay && options['foreach']) || [];
             templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext);
+            
+            elseChainSatisfied((unwrap(dataArray) || []).length !== 0);
         } else if (!shouldDisplay) {
             virtualElements.emptyNode(element);
+            elseChainSatisfied(false);
         } else {
             // Render once for this single data point (or use the viewModel if no data was provided)
             var innerBindingContext = ('data' in options) ?
                 bindingContext.createStaticChildContext(options['data'], options['as']) :  // Given an explitit 'data' value, we create a child binding context for it
                 bindingContext;                                                        // Given no explicit 'data' value, we retain the same binding context
             templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element);
+            elseChainSatisfied(true);
         }
 
         // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
