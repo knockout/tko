@@ -1,3 +1,6 @@
+For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
+
+
 ##  🏹  Alpha-1  ( Work in progress on the `master` branch )
 
 * Make the `template` binding expose a conditional for else-binding
@@ -11,7 +14,7 @@
 
 ##  🐚   Alpha-0  (9 Nov 2016)
 
-For TODO see https://github.com/knockout/tko/issues/1
+The following are short-hands for the changes from Knockout 3.4(.1).
 
 * various new [`options`](https://github.com/knockout/tko.utils/blob/master/src/options.js)
 
