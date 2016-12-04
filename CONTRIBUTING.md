@@ -6,7 +6,7 @@ When thinking of contributing, the most important thing is to use your best judg
 
 Knockout is maintained by volunteers whose time is limited, so the more you can do up front, the faster something will get analyzed and fixed.
 
-This project adheres to the [Contributor Covenant code of conduct](/knockout/tko/blob/master/CODE_OF_CONDUCT.md). By participating, you are agreeing to uphold this code. 
+This project adheres to the [Contributor Covenant code of conduct](/CODE_OF_CONDUCT.md). By participating, you are agreeing to uphold this code. 
 
 ## How to Contribute
 

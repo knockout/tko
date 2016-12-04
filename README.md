@@ -30,19 +30,19 @@ When complete, the hope is that Knockout will become an *opinionated expression*
 
 | Package  | Build Status |
 | -------  | ------------ |
-| [tko-policy](/knockout/tko-policy) | [![CircleCI](https://circleci.com/gh/knockout/tko-policy.svg?style=shield)](https://circleci.com/gh/knockout/tko-policy) |
-| [tko.utils](/knockout/tko.utils) | [![CircleCI](https://circleci.com/gh/knockout/tko.utils.svg?style=shield)](https://circleci.com/gh/knockout/tko.utils)
-| [tko.observable](/knockout/tko.observable) | [![CircleCI](https://circleci.com/gh/knockout/tko.observable.svg?style=shield)](https://circleci.com/gh/knockout/tko.observable) |
-| [tko.computed](/knockout/tko.computed) | [![CircleCI](https://circleci.com/gh/knockout/tko.computed.svg?style=shield)](https://circleci.com/gh/knockout/tko.computed) |
-| [tko.provider](/knockout/tko.provider) | [![CircleCI](https://circleci.com/gh/knockout/tko.provider.svg?style=shield)](https://circleci.com/gh/knockout/tko.provider) |
-| [tko.bind](/knockout/tko.bind) | [![CircleCI](https://circleci.com/gh/knockout/tko.bind.svg?style=shield)](https://circleci.com/gh/knockout/tko.bind) |
-| [tko.binding.core](/knockout/tko.binding.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.core) |
-| [tko.binding.template](/knockout/tko.binding.template) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.template.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.template) |
-| [tko.binding.if](/knockout/tko.binding.if) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.if.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.if) |
-| [tko.filter.punches](/knockout/tko.filter.punches) | [![CircleCI](https://circleci.com/gh/knockout/tko.filter.punches.svg?style=shield)](https://circleci.com/gh/knockout/tko.filter.punches) |
-| [tko.components](/knockout/tko.components) | [![CircleCI](https://circleci.com/gh/knockout/tko.components.svg?style=shield)](https://circleci.com/gh/knockout/tko.components) |
-| [tko.preprocessor.textInterpolation](/knockout/tko.preprocessor.textInterpolation) | [![CircleCI](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation.svg?style=shield)](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation) |
-| [tko](/knockout/tko) | [![CircleCI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko) |
+| [tko-policy](../../../tko-policy) | [![CircleCI](https://circleci.com/gh/knockout/tko-policy.svg?style=shield)](https://circleci.com/gh/knockout/tko-policy) |
+| [tko.utils](../../../tko.utils) | [![CircleCI](https://circleci.com/gh/knockout/tko.utils.svg?style=shield)](https://circleci.com/gh/knockout/tko.utils)
+| [tko.observable](../../../tko.observable) | [![CircleCI](https://circleci.com/gh/knockout/tko.observable.svg?style=shield)](https://circleci.com/gh/knockout/tko.observable) |
+| [tko.computed](../../../tko.computed) | [![CircleCI](https://circleci.com/gh/knockout/tko.computed.svg?style=shield)](https://circleci.com/gh/knockout/tko.computed) |
+| [tko.provider](../../../tko.provider) | [![CircleCI](https://circleci.com/gh/knockout/tko.provider.svg?style=shield)](https://circleci.com/gh/knockout/tko.provider) |
+| [tko.bind](../../../tko.bind) | [![CircleCI](https://circleci.com/gh/knockout/tko.bind.svg?style=shield)](https://circleci.com/gh/knockout/tko.bind) |
+| [tko.binding.core](../../../tko.binding.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.core) |
+| [tko.binding.template](../../../tko.binding.template) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.template.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.template) |
+| [tko.binding.if](../../..//tko.binding.if) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.if.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.if) |
+| [tko.filter.punches](../../..//tko.filter.punches) | [![CircleCI](https://circleci.com/gh/knockout/tko.filter.punches.svg?style=shield)](https://circleci.com/gh/knockout/tko.filter.punches) |
+| [tko.components](../../..//tko.components) | [![CircleCI](https://circleci.com/gh/knockout/tko.components.svg?style=shield)](https://circleci.com/gh/knockout/tko.components) |
+| [tko.preprocessor.textInterpolation](../../..//tko.preprocessor.textInterpolation) | [![CircleCI](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation.svg?style=shield)](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation) |
+| [tko](../../..//tko) | [![CircleCI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko) |
 
 
 ## Next steps
