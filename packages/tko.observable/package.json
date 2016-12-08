@@ -11,10 +11,10 @@
     "url": "git+https://github.com/knockout/tko.observable.git"
   },
   "files": [
-      "dist/",
-      "src/",
-      "index.js",
-      "./*.ya?ml"
+    "dist/",
+    "src/",
+    "index.js",
+    "./*.ya?ml"
   ],
   "keywords": [
     "knockout",
