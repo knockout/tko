@@ -19,25 +19,24 @@
     "figlet": "^1.1.1",
     "gulp": "^3.9.0",
     "gulp-help": "^1.6.1",
-    "inquirer": "^1.0.3",
+    "inquirer": "^2.0.0",
     "js-yaml": "^3.4.6",
     "karma": "^1.1.0",
+    "karma-chrome-launcher": "^2.0.0",
     "karma-jasmine": "^0.1.0",
     "karma-phantomjs-launcher": "^1.0.1",
-    "karma-rollup-plugin": "^0.1.11",
+    "karma-rollup-plugin": "^0.2.4",
     "lodash": "^4.13.1",
-    "rollup": "^0.33.0",
+    "phantomjs-prebuilt": "^2.1.13",
+    "rollup": "^0.36.4",
     "rollup-plugin-node-direct": "^1.0.0",
-    "rollup-plugin-node-resolve": "^1.2.1",
+    "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-stub": "^1.1.0"
   },
   "tko": {
     "blacklist": true
   },
-  "devDependencies": {
-    "karma-chrome-launcher": "^1.0.1",
-    "karma-jasmine": "^1.0.2"
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com//knockout/tko-policy.git"
