@@ -13,7 +13,7 @@ import {
 } from 'tko.computed';
 
 
-if (window && window.navigator) {
+if (window.navigator) {
     var parseVersion = function (matches) {
         if (matches) {
             return parseFloat(matches[1]);
