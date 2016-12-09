@@ -47,7 +47,7 @@ function cloneIfElseNodes(element, hasElse) {
         ifNodes = [],
         elseNodes = [],
         target = ifNodes;
-      
+
     for (var i = 0, j = children.length; i < j; ++i) {
         if (hasElse && isElseNode(children[i])) {
             target = elseNodes;
@@ -56,7 +56,7 @@ function cloneIfElseNodes(element, hasElse) {
             target.push(cleanNode(children[i].cloneNode(true)));
         }
     }
-    
+
     return {
         ifNodes: ifNodes,
         elseNodes: elseNodes
@@ -72,13 +72,13 @@ function getPrecedingConditional(node) {
     do {
         node = node.previousSibling;
     } while(node && node.nodeType !== 1 && node.nodeType !== 8);
-    
+
     if (!node) { return; }
-    
+
     if (node.nodeType === 8) {
         node = virtualElements.previousSibling(node);
     }
-    
+
     return domData.get(node, 'conditional');
 }
 
@@ -89,11 +89,11 @@ function getPrecedingConditional(node) {
  * Covers e.g.
  *
  * 1. DOM Nodes contents
- * 
+ *
  * <div data-bind='if: x'>
  * <!-- else --> ... an optional "if"
  * </div>
- * 
+ *
  * 2. Virtual elements
  *
  * <!-- ko if: x -->
@@ -130,7 +130,7 @@ function makeWithIfBinding(isWith, isNot, isElse, makeContextCallback) {
                     needsRefresh = isFirstRender || isWith || (shouldDisplayIf !== didDisplayOnLastUpdate);
 
                 if (precedingConditional && precedingConditional.elseChainSatisfied()) {
-                    needsRefresh = shouldDisplayIf !== false;
+                    needsRefresh = isFirstRender || shouldDisplayIf !== false;
                     shouldDisplayIf = false;
                     completesElseChain(true);
                 } else {
