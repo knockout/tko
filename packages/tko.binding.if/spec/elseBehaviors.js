@@ -185,4 +185,20 @@ describe("Else binding", function () {
         expect(testNode.innerText).toEqual("else")
     })
 
+    it("ends the if-chain", function () {
+        testNode.innerHTML = "<!-- ko if: x -->x<!-- /ko -->" +
+            "<!-- ko else -->!X<!-- /ko -->" +
+            "<!-- ko if: y -->y<!-- /ko -->"
+        var x = observable(false)
+        var y = observable(false)
+        applyBindings({ x: x, y: y }, testNode);
+        expect(testNode.innerText).toEqual("!X")
+        y(true)
+        expect(testNode.innerText).toEqual("!Xy")
+        x(true)
+        expect(testNode.innerText).toEqual("xy")
+        y(false)
+        expect(testNode.innerText).toEqual("x")
+    })
+
 })
