@@ -3,6 +3,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ##  🏹  Alpha-1  ( Work in progress on the `master` branch )
 
+* Updated Rollup - changes order of compilation, smaller output
+* Fix issue with first rendering of an elseif binding
 * Make the `template` binding expose a conditional for else-binding
 * Expose ko.dependencyDetection
 * Make sure `obj.x` uses `this` of `obj` where `x` is a function (e.g. `click: model.onClick` has `this` of `model`)

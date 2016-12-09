@@ -33,11 +33,11 @@
   "dependencies": {
     "tko.bind": "knockout/tko.bind",
     "tko.binding.core": "github:knockout/tko.binding.core",
-    "tko.binding.template": "github:knockout/tko.binding.template",
     "tko.binding.if": "github:knockout/tko.binding.if",
-    "tko.filter.punches": "github:knockout/tko.filter.punches",
+    "tko.binding.template": "github:knockout/tko.binding.template",
     "tko.components": "knockout/tko.components",
     "tko.computed": "knockout/tko.computed",
+    "tko.filter.punches": "github:knockout/tko.filter.punches",
     "tko.observable": "knockout/tko.observable",
     "tko.preprocessor.textInterpolation": "knockout/tko.preprocessor.textInterpolation",
     "tko.provider": "github:knockout/tko.provider",
