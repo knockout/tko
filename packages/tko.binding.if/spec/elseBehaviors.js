@@ -157,7 +157,8 @@ describe("Else binding", function () {
 
     it("elseif after if condition, initially true/true", function () {
         testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
-            "<!-- ko elseif: y -->b<!-- /ko -->";
+            "<!-- ko elseif: y -->b<!-- /ko -->" +
+            "<!-- ko else -->c<!-- /ko -->"
         var x = observable(true)
         var y = observable(true)
         applyBindings({ x: x, y: y }, testNode);
@@ -172,18 +173,43 @@ describe("Else binding", function () {
         expect(testNode.innerText).toEqual("a")
         x(false)
         expect(testNode.innerText).toEqual("b")
+        y(false)
+        expect(testNode.innerText).toEqual("c")
     })
 
     it("elseif after if condition, initially true/false", function () {
         testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
-            "<!-- ko elseif: y -->b<!-- /ko -->";
+            "<!-- ko elseif: y -->b<!-- /ko -->" +
+            "<!-- ko else -->c<!-- /ko -->";
         var x = observable(true)
         var y = observable(false)
         applyBindings({ x: x, y: y }, testNode);
         expect(testNode.innerText).toEqual("a")
         x(false)
+        expect(testNode.innerText).toEqual("c")
+        y(true)
+        expect(testNode.innerText).toEqual("b")
+        x(false)
+        y(false)
+        expect(testNode.innerText).toEqual("c")
+        y(true)
+        expect(testNode.innerText).toEqual("b")
+        x(true)
+        expect(testNode.innerText).toEqual("a")
+    })
+
+    it("elseif after if condition, initially false/true", function () {
+        testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
+            "<!-- ko elseif: y -->b<!-- /ko -->";
+        var x = observable(false)
+        var y = observable(true)
+        applyBindings({ x: x, y: y }, testNode);
+        expect(testNode.innerText).toEqual("b")
+        y(false)
         expect(testNode.innerText).toEqual("")
         x(true)
+        expect(testNode.innerText).toEqual("a")
+        y(false)
         expect(testNode.innerText).toEqual("a")
         x(false)
         y(true)
@@ -194,7 +220,7 @@ describe("Else binding", function () {
         expect(testNode.innerText).toEqual("a")
     })
 
-    it("elseif + else after if condition", function () {
+    it("elseif + else after if condition, initially false/false", function () {
         testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             "<!-- ko elseif: y -->b<!-- /ko -->" +
             "<!-- ko else -->z<!-- /ko -->"
@@ -206,7 +232,6 @@ describe("Else binding", function () {
         expect(testNode.innerText).toEqual("b")
         x(true)
         expect(testNode.innerText).toEqual("a")
-        // Test refresh
         x(false)
         expect(testNode.innerText).toEqual("b")
         y(false)

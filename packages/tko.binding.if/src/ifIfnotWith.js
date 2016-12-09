@@ -130,8 +130,8 @@ function makeWithIfBinding(isWith, isNot, isElse, makeContextCallback) {
                     needsRefresh = isFirstRender || isWith || (shouldDisplayIf !== didDisplayOnLastUpdate);
 
                 if (precedingConditional && precedingConditional.elseChainSatisfied()) {
-                    needsRefresh = isFirstRender || shouldDisplayIf !== false;
                     shouldDisplayIf = false;
+                    needsRefresh = isFirstRender || didDisplayOnLastUpdate;
                     completesElseChain(true);
                 } else {
                     completesElseChain(shouldDisplayIf);
