@@ -5982,6 +5982,26 @@ var text = {
     allowVirtualElements: true
 };
 
+var parseVersion;
+var operaVersion;
+var userAgent;
+var safariVersion;
+var firefoxVersion;
+
+if (window.navigator) {
+    parseVersion = function (matches) {
+        if (matches) {
+            return parseFloat(matches[1]);
+        }
+    };
+
+    // Detect various browser versions because some old versions don't fully support the 'input' event
+    operaVersion = window.opera && window.opera.version && parseInt(window.opera.version()),
+        userAgent = window.navigator.userAgent,
+        safariVersion = parseVersion(userAgent.match(/^(?:(?!chrome).)*version\/([^ ]*) safari/i)),
+        firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/));
+}
+
 // IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
 // But it does fire the 'selectionchange' event on many of those, presumably because the
 // cursor is moving and that counts as the selection changing. The 'selectionchange' event is
