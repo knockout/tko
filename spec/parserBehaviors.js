@@ -712,7 +712,8 @@ describe("compound expressions", function() {
       x: x,
       obs: obs,
       z: z,
-      u: undefined
+      u: undefined,
+      False: observable(false),
     };
   })
 
@@ -798,6 +799,37 @@ describe("compound expressions", function() {
   it("gets obs['P']", function() {
     expect_equal("obs['P']", obs.P)
   })
+
+  it("gets (false || {x: 3.14}).x", function () {
+    expect_equal("(false || {x: 3.14}).x", 3.14)
+  })
+
+  it("gets (False || {x: 3.14}).x", function () {
+    expect_equal("(False || {x: 3.14}).x", 3.14)
+  })
+
+  it("gets (False() || {x: 3.14}).x", function () {
+    expect_equal("(False() || {x: 3.14}).x", 3.14)
+  })
+
+  it("gets (False() || {x: 3.14})['x']", function () {
+    expect_equal("(False() || {x: 3.14})['x']", 3.14)
+  })
+
+  it("gets (false || {x: 3.14})[{a: 'x'}.a]", function () {
+    expect_equal("(False() || {x: 3.14})[{a: 'x'}.a]", 3.14)
+  })
+
+  it.skip("gets (false || F1)()", function () {
+    // TODO
+    expect_equal("(false || F1)()", 'R1')
+  })
+
+  it.skip("gets (F2()).G()", function () {
+    // TODO
+    expect_equal("(F2()).G()", 'R2')
+  })
+
 
   describe("function expressions", function () {
     function R() { return arguments }

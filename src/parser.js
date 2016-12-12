@@ -332,17 +332,22 @@ Parser.prototype.value = function () {
  * precedence having a higher number.
  * @return {function} The function that performs the infix operation
  */
-Parser.prototype.operator = function () {
+Parser.prototype.operator = function (not_an_array) {
   var op = '',
     op_fn,
     ch = this.white();
 
   while (ch) {
     if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
-        ch === '"' || ch === "'" || ch === '{' || ch === '[' ||
-        ch === '(' || ch === "`") {
+        ch === '"' || ch === "'" || ch === '{' || ch === '(' ||
+        ch === "`") {
       break;
     }
+
+    if (!not_an_array && ch === '[') {
+      break;
+    }
+
     op += ch;
     ch = this.next();
 
@@ -425,7 +430,6 @@ Parser.prototype.filter = function() {
 Parser.prototype.expression = function (filterable) {
   var op,
     nodes = [],
-    filters = [],
     ch = this.white();
 
   while (ch) {
@@ -456,15 +460,26 @@ Parser.prototype.expression = function (filterable) {
       break;
     }
     // infix operators
-    op = this.operator();
+    op = this.operator(true);
 
     if (op === operators['?']) {
       this.ternary(nodes);
       break;
+    } else if (op === operators['.']) {
+      nodes.push(op);
+      nodes.push(this.member());
+    } else if (op === operators['[']) {
+      nodes.push(op);
+      nodes.push(this.expression());
+      ch = this.next(']');
     } else if (op) {
       nodes.push(op);
     }
+
     ch = this.white();
+
+    // Inside a parent expression that's dereferencing
+    if (ch === ']') { break; }
   }
 
   if (nodes.length === 0) {
@@ -475,7 +490,7 @@ Parser.prototype.expression = function (filterable) {
     return nodes[0];
   }
 
-  return new Expression(nodes, filters);
+  return new Expression(nodes, this.dereferences());
 };
 
 
@@ -513,6 +528,23 @@ Parser.prototype.func_arguments = function () {
 
 
 /**
+ * The literal string reference `abc` in an `x.abc` expression.
+ */
+Parser.prototype.member = function () {
+  var member = '',
+    ch = this.white();
+  while (ch) {
+    if (!is_identifier_char(ch)) {
+      break;
+    }
+    member += ch;
+    ch = this.next();
+  }
+  return member;
+};
+
+
+/**
  * A dereference applies to an identifer, being either a function
  * call "()" or a membership lookup with square brackets "[member]".
  * @return {fn or undefined}  Dereference function to be applied to the
@@ -536,17 +568,8 @@ Parser.prototype.dereference = function () {
       return member;
     } else if (ch === '.') {
       // a.x membership
-      member = '';
       this.next('.');
-      ch = this.white();
-      while (ch) {
-        if (!is_identifier_char(ch)) {
-          break;
-        }
-        member += ch;
-        ch = this.next();
-      }
-      return member;
+      return this.member();
     } else {
       break;
     }
@@ -554,8 +577,25 @@ Parser.prototype.dereference = function () {
   return;
 };
 
+Parser.prototype.dereferences = function () {
+  var ch = this.white(),
+    dereferences = [],
+    deref;
+
+  while (ch) {
+    deref = this.dereference();
+    if (deref !== undefined) {
+      dereferences.push(deref);
+    } else {
+      break;
+    }
+  }
+  return dereferences;
+};
+
+
 Parser.prototype.identifier = function () {
-  var token = '', ch, deref, dereferences = [];
+  var token = '', ch;
   ch = this.white();
   while (ch) {
     if (!is_identifier_char(ch)) {
@@ -569,17 +609,8 @@ Parser.prototype.identifier = function () {
   case 'false': return false;
   case 'null': return null;
   case 'undefined': return void 0;
-  default:
   }
-  while (ch) {
-    deref = this.dereference();
-    if (deref !== undefined) {
-      dereferences.push(deref);
-    } else {
-      break;
-    }
-  }
-  return new Identifier(this, token, dereferences);
+  return new Identifier(this, token, this.dereferences());
 };
 
 Parser.prototype.read_bindings = function () {

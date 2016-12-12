@@ -67,6 +67,9 @@ var operators = {
   // logic
   '&&': function logic_and(a, b) { return a && b; },
   '||': function logic_or(a, b) { return a || b; },
+  // Access
+  '.': function member(a, b) { return a[b]; },
+  '[': function member(a, b) { return a[b]; },
   // conditional/ternary
   '?': function ternary(a, b) { return Node.value_of(a ? b.yes : b.no); }
 };
@@ -80,6 +83,10 @@ operators['@'].precedence = 21;
 
   // lambda
 operators['=>'].precedence = 20;
+
+  // Member
+operators['.'].precedence = 19;
+operators['['].precedence = 19;
 
   // Logical not
 operators['!'].precedence = 16;
@@ -159,7 +166,9 @@ Node.prototype.get_leaf_value = function (leaf, member_of) {
     return leaf.get_node_value(member_of);
   }
 
-  throw new Error("Invalid type of leaf node: " + leaf);
+  // Plain object/class.
+  return leaf;
+  // throw new Error("Invalid type of leaf node: " + leaf);
 };
 
 /**
