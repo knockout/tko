@@ -52,6 +52,10 @@ describe("filters", function () {
     trial({ v: "t" }, "v|tail:'X':'y'", "tXy")
   })
 
+  it("passes multiple adjacent arguments", function () {
+    trial({ v: "t" }, "v|tail:'X':'y'|tail:'Z'", "tXyZ")
+  })
+
   it("passes a looked value", function () {
     trial({ v: "t" }, "v|tail:v", "tt")
   })

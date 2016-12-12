@@ -390,7 +390,7 @@ Parser.prototype.filter = function() {
   while (ch) {
     if (ch === ':') {
       ch = this.next();
-      args.push(this.expression());
+      args.push(this.expression('|'));
     }
 
     if (ch === '|') {
@@ -449,16 +449,19 @@ Parser.prototype.expression = function (filterable) {
       nodes.push(this.value());
     }
     ch = this.white();
+
     if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
-        ch === ')' || ch === '' || ch === '`') {
+        ch === ')' || ch === '' || ch === '`' || (ch === '|' && filterable === '|')) {
       break;
     }
+
     // filters
     if (ch === '|' && this.lookahead() !== '|' && filterable) {
       nodes.push(this.filter());
       nodes.push(undefined);
       break;
     }
+
     // infix operators
     op = this.operator(true);
 
