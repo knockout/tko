@@ -52,6 +52,36 @@ Parser.prototype.white = function () {
   while (ch && ch <= ' ') {
     ch = this.next();
   }
+  return this.comment(ch);
+};
+
+/**
+ * Slurp any C or C++ style comments
+ */
+Parser.prototype.comment = function (ch) {
+  if (ch !== '/') { return ch; }
+  var p = this.at;
+  var second = this.lookahead();
+  if (second === '/') {
+    while(ch) {
+      ch = this.next();
+      if (ch === '\n' || ch === '\r') { break; }
+    }
+    ch = this.next();
+  } else if (second === '*') {
+    while(ch) {
+      ch = this.next();
+      if (ch === '*' && this.lookahead() === '/') {
+        this.next();
+        break;
+      }
+    }
+    if (!ch) {
+      this.error("Unclosed comment, starting at character " + p);
+    }
+    this.next();
+    return this.white();
+  }
   return ch;
 };
 

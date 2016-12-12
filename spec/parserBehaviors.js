@@ -147,6 +147,40 @@ describe("the bindings parser", function() {
       bindings = new Parser(null, context).parse(binding);
     assert.equal(bindings.text(), 'prefixmikepostfix')
   })
+
+  it('parses object literals with C++ style comments', function() {
+    // From https://github.com/knockout/knockout/issues/1524
+    var binding = "model: v, //wiring the router\n" +
+      "afterCompose: 'ac', //wiring the router\n" +
+      "//transition:'entrance', //use the 'entrance' transition when switching views\n" +
+      "skipTransitionOnSameViewId: true,//Transition entrance is disabled for better perfomance\n" +
+      "cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)\n",
+      context = { v: observable('rx') },
+      bindings = new Parser(null, context).parse(binding);
+
+    assert.equal(unwrap(bindings.model()), 'rx')
+    assert.equal(bindings.afterCompose(), 'ac')
+    assert.equal(bindings.transition, undefined)
+    assert.equal(bindings.skipTransitionOnSameViewId(), true)
+    assert.equal(bindings.cacheViews(), true)
+  });
+
+  it('parses object literals with C style comments', function() {
+    var binding = "a: xxx, /* First comment */\n" +
+      "b: 'yyy', /* Comment that comments-out the next whole next line\n" +
+      "x: 'nothing', //this is also skipped */\n" +
+      "c: 'zzz', /***Comment with extra * at various parts****/\n" +
+      "d: /**/'empty comment'",
+      context = { xxx: observable('rex') },
+      bindings = new Parser(null, context).parse(binding);
+
+    assert.equal(unwrap(bindings.a()), 'rex')
+    assert.equal(bindings.b(), 'yyy')
+    assert.equal(bindings.x, undefined)
+    assert.equal(bindings.c(), 'zzz')
+    assert.equal(bindings.d(), 'empty comment')
+  });
+
 })
 
 describe("the parsing of expressions", function() {
