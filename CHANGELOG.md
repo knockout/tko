@@ -3,6 +3,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ##  🏹  Alpha-1  ( Work in progress on the `master` branch )
 
+* Parser – correct behaviour with dereferencing members of expressions (e.g. `(x || y).z` or `(abc || {x: null})['x']`)
 * Updated Rollup - changes order of compilation, smaller output
 * Fix issue with first rendering of an elseif binding
 * Make the `template` binding expose a conditional for else-binding
