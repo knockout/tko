@@ -3189,7 +3189,10 @@ var operators$1 = {
   '.': function member(a, b) { return a[b]; },
   '[': function member(a, b) { return a[b]; },
   // conditional/ternary
-  '?': function ternary(a, b) { return Node.value_of(a ? b.yes : b.no); }
+  '?': function ternary(a, b) { return Node.value_of(a ? b.yes : b.no); },
+
+  // Function-Call
+  'call': function (a, b) { return a.apply(null, b); },
 };
 
 /* Order of precedence from:
@@ -3253,6 +3256,9 @@ operators$1['~!='].precedence = 10;
 
   // Conditional/ternary
 operators$1['?'].precedence = 4;
+
+  // Call a function
+operators$1['call'].precedence = 1;
 
 
 
@@ -3355,9 +3361,8 @@ Node.create_root = function create_root(nodes) {
   return root;
 };
 
-function Expression(nodes, dereferences) {
+function Expression(nodes) {
   this.nodes = nodes;
-  this.dereferences = dereferences;
   this.root = Node.create_root(nodes);
 }
 
@@ -3438,7 +3443,6 @@ Identifier.prototype.lookup_value = function (parent) {
 
   throw new Error("The variable \"" + token + "\" was not found on $data, $context, or knockout options.bindingGlobals.");
 };
-
 
 /**
  * Apply all () and [] functions on the identifier to the lhs value e.g.
@@ -3629,6 +3633,36 @@ Parser.prototype.white = function () {
   var ch = this.ch;
   while (ch && ch <= ' ') {
     ch = this.next();
+  }
+  return this.comment(ch);
+};
+
+/**
+ * Slurp any C or C++ style comments
+ */
+Parser.prototype.comment = function (ch) {
+  if (ch !== '/') { return ch; }
+  var p = this.at;
+  var second = this.lookahead();
+  if (second === '/') {
+    while(ch) {
+      ch = this.next();
+      if (ch === '\n' || ch === '\r') { break; }
+    }
+    ch = this.next();
+  } else if (second === '*') {
+    while(ch) {
+      ch = this.next();
+      if (ch === '*' && this.lookahead() === '/') {
+        this.next();
+        break;
+      }
+    }
+    if (!ch) {
+      this.error("Unclosed comment, starting at character " + p);
+    }
+    this.next();
+    return this.white();
   }
   return ch;
 };
@@ -3918,7 +3952,7 @@ Parser.prototype.operator = function (not_an_array) {
   while (ch) {
     if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
         ch === '"' || ch === "'" || ch === '{' || ch === '(' ||
-        ch === "`") {
+        ch === "`" || ch === ')') {
       break;
     }
 
@@ -3968,7 +4002,7 @@ Parser.prototype.filter = function() {
   while (ch) {
     if (ch === ':') {
       ch = this.next();
-      args.push(this.expression());
+      args.push(this.expression('|'));
     }
 
     if (ch === '|') {
@@ -4027,16 +4061,19 @@ Parser.prototype.expression = function (filterable) {
       nodes.push(this.value());
     }
     ch = this.white();
+
     if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
-        ch === ')' || ch === '' || ch === '`') {
+        ch === ')' || ch === '' || ch === '`' || (ch === '|' && filterable === '|')) {
       break;
     }
+
     // filters
     if (ch === '|' && this.lookahead() !== '|' && filterable) {
       nodes.push(this.filter());
       nodes.push(undefined);
       break;
     }
+
     // infix operators
     op = this.operator(true);
 
@@ -4046,29 +4083,42 @@ Parser.prototype.expression = function (filterable) {
     } else if (op === operators['.']) {
       nodes.push(op);
       nodes.push(this.member());
+      op = null;
     } else if (op === operators['[']) {
       nodes.push(op);
       nodes.push(this.expression());
       ch = this.next(']');
+      op = null;
     } else if (op) {
       nodes.push(op);
     }
 
     ch = this.white();
 
-    // Inside a parent expression that's dereferencing
-    if (ch === ']') { break; }
+    if (ch === ']' || (!op && ch === '(')) { break; }
   }
 
   if (nodes.length === 0) {
     return undefined;
   }
 
-  if (nodes.length === 1) {
+  var dereferences = this.dereferences();
+
+  if (nodes.length === 1 && !dereferences.length) {
     return nodes[0];
   }
 
-  return new Expression(nodes, this.dereferences());
+  for (var i = 0, j = dereferences.length; i < j; ++i) {
+    var deref = dereferences[i];
+    if (deref.constructor === Arguments) {
+      nodes.push(operators.call);
+    } else {
+      nodes.push(operators['.']);
+    }
+    nodes.push(deref);
+  }
+
+  return new Expression(nodes);
 };
 
 
@@ -4187,9 +4237,40 @@ Parser.prototype.identifier = function () {
   case 'false': return false;
   case 'null': return null;
   case 'undefined': return void 0;
+  case 'function':
+    throw new Error("Knockout: Anonymous functions are no longer supported, but `=>` lambas are.");
+    //return this.anonymous_fn();
   }
   return new Identifier(this, token, this.dereferences());
 };
+
+
+/* Parse an anomymous function () {} ...
+
+ NOTE: Anonymous functions are not supported, primarily because
+ this is not a full Javascript parser.  While a subset of anonymous
+ functions can (and may) be supported, notably lambda-like (a single
+ statement), at this time an error is raised to indiate that the binding
+ has failed and the => lambda workaround.
+
+Parser.prototype.anonymous_fn = function () {
+  var expr;
+  this.white();
+  this.next("(");
+  this.white();
+  this.next(")");
+  this.white();
+  this.next("{");
+  this.white();
+  if (this.text.substr(this.at - 1, 6) === 'return') {
+    this.at = this.at + 5;
+  }
+  this.next();
+  expr = this.expression();
+  this.next("}");
+  return function () { return expr.get_value(); };
+};
+*/
 
 Parser.prototype.read_bindings = function () {
   var key,
@@ -4296,10 +4377,8 @@ Parser.prototype.convert_to_accessors = function (result) {
       result[name] = function constAccessor() {
         return clonePlainObjectDeep(value);
       };
-    } else if (value === 'function') {
-      result[name] = function functionAccessor() {
-        return value();
-      };
+    } else if (typeof value === 'function') {
+      result[name] = value;
     }
   });
 
