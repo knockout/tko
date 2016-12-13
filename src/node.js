@@ -71,7 +71,10 @@ var operators = {
   '.': function member(a, b) { return a[b]; },
   '[': function member(a, b) { return a[b]; },
   // conditional/ternary
-  '?': function ternary(a, b) { return Node.value_of(a ? b.yes : b.no); }
+  '?': function ternary(a, b) { return Node.value_of(a ? b.yes : b.no); },
+
+  // Function-Call
+  'call': function (a, b) { return a.apply(null, b); },
 };
 
 /* Order of precedence from:
@@ -135,6 +138,9 @@ operators['~!='].precedence = 10;
 
   // Conditional/ternary
 operators['?'].precedence = 4;
+
+  // Call a function
+operators['call'].precedence = 1;
 
 
 

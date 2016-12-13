@@ -49,7 +49,6 @@ Identifier.prototype.lookup_value = function (parent) {
   throw new Error("The variable \"" + token + "\" was not found on $data, $context, or knockout options.bindingGlobals.");
 };
 
-
 /**
  * Apply all () and [] functions on the identifier to the lhs value e.g.
  * a()[3] has deref functions that are essentially this:

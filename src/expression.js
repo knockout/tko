@@ -1,9 +1,8 @@
 
 import Node from './node';
 
-export default function Expression(nodes, dereferences) {
+export default function Expression(nodes) {
   this.nodes = nodes;
-  this.dereferences = dereferences;
   this.root = Node.create_root(nodes);
 }
 

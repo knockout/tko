@@ -239,7 +239,6 @@ describe("the parsing of expressions", function() {
     var binding = "text: 2 * (3 + 4)",
       bindings = new Parser(null, {}).parse(binding);
     assert.equal(bindings.text(), 2 * (3 + 4))
-
   })
 
   it("computes complex arithematic as expected", function() {
@@ -521,6 +520,25 @@ describe("unary operations", function() {
     })
   })
 })
+
+
+describe("anonymous functions", function () {
+  it("raises an error", function () {
+    var binding = "x: function () { return v() }";
+    function b() { new Parser(null, {}).parse(binding) }
+    assert.throws(b, 'Anonymous functions are no longer')
+  })
+
+  it.skip("parses a function () { return v }", function () {
+    var binding = "x: function () { return v() }",
+      val = observable(125),
+      context = { v: function () { return val(val() +1) } },
+      bindings = new Parser(null, context).parse(binding);
+    assert.equal(typeof bindings.x()(), '126')
+    assert.equal(val(), 126);
+  })
+})
+
 
 describe("array accessors - []", function() {
   it("works for [ int ]", function() {
@@ -854,13 +872,11 @@ describe("compound expressions", function() {
     expect_equal("(False() || {x: 3.14})[{a: 'x'}.a]", 3.14)
   })
 
-  it.skip("gets (false || F1)()", function () {
-    // TODO
+  it("gets (false || F1)()", function () {
     expect_equal("(false || F1)()", 'R1')
   })
 
-  it.skip("gets (F2()).G()", function () {
-    // TODO
+  it("gets (F2()).G()", function () {
     expect_equal("(F2()).G()", 'R2')
   })
 

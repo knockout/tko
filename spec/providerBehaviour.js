@@ -746,7 +746,6 @@ describe("Identifier", function() {
       triggerEvent(div, 'click')
     })
 
-
     it("sets `this` of a top-level item to $data", function() {
       options.bindingGlobals = {
         Ramanujan: "1729"

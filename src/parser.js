@@ -501,29 +501,42 @@ Parser.prototype.expression = function (filterable) {
     } else if (op === operators['.']) {
       nodes.push(op);
       nodes.push(this.member());
+      op = null;
     } else if (op === operators['[']) {
       nodes.push(op);
       nodes.push(this.expression());
       ch = this.next(']');
+      op = null;
     } else if (op) {
       nodes.push(op);
     }
 
     ch = this.white();
 
-    // Inside a parent expression that's dereferencing
-    if (ch === ']') { break; }
+    if (ch === ']' || (!op && ch === '(')) { break; }
   }
 
   if (nodes.length === 0) {
     return undefined;
   }
 
-  if (nodes.length === 1) {
+  var dereferences = this.dereferences();
+
+  if (nodes.length === 1 && !dereferences.length) {
     return nodes[0];
   }
 
-  return new Expression(nodes, this.dereferences());
+  for (var i = 0, j = dereferences.length; i < j; ++i) {
+    var deref = dereferences[i];
+    if (deref.constructor === Arguments) {
+      nodes.push(operators.call);
+    } else {
+      nodes.push(operators['.']);
+    }
+    nodes.push(deref);
+  }
+
+  return new Expression(nodes);
 };
 
 
@@ -642,9 +655,40 @@ Parser.prototype.identifier = function () {
   case 'false': return false;
   case 'null': return null;
   case 'undefined': return void 0;
+  case 'function':
+    throw new Error("Knockout: Anonymous functions are no longer supported, but `=>` lambas are.");
+    //return this.anonymous_fn();
   }
   return new Identifier(this, token, this.dereferences());
 };
+
+
+/* Parse an anomymous function () {} ...
+
+ NOTE: Anonymous functions are not supported, primarily because
+ this is not a full Javascript parser.  While a subset of anonymous
+ functions can (and may) be supported, notably lambda-like (a single
+ statement), at this time an error is raised to indiate that the binding
+ has failed and the => lambda workaround.
+
+Parser.prototype.anonymous_fn = function () {
+  var expr;
+  this.white();
+  this.next("(");
+  this.white();
+  this.next(")");
+  this.white();
+  this.next("{");
+  this.white();
+  if (this.text.substr(this.at - 1, 6) === 'return') {
+    this.at = this.at + 5;
+  }
+  this.next();
+  expr = this.expression();
+  this.next("}");
+  return function () { return expr.get_value(); };
+};
+*/
 
 Parser.prototype.read_bindings = function () {
   var key,
@@ -751,10 +795,8 @@ Parser.prototype.convert_to_accessors = function (result) {
       result[name] = function constAccessor() {
         return clonePlainObjectDeep(value);
       };
-    } else if (value === 'function') {
-      result[name] = function functionAccessor() {
-        return value();
-      };
+    } else if (typeof value === 'function') {
+      result[name] = value;
     }
   });
 
