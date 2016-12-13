@@ -395,7 +395,7 @@ describe("unary operations", function() {
       assert.equal(context.y(), true)
     })
 
-    it.skip("evaluates the lambda in canonical '() =>' form", function() {
+    it("evaluates the lambda in canonical '() =>' form", function() {
       // FIXME
       var binding = "x: () => y(true)",
         context = { y: observable() },

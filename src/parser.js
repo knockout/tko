@@ -370,7 +370,7 @@ Parser.prototype.operator = function (not_an_array) {
   while (ch) {
     if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
         ch === '"' || ch === "'" || ch === '{' || ch === '(' ||
-        ch === "`") {
+        ch === "`" || ch === ')') {
       break;
     }
 
