@@ -241,6 +241,22 @@ describe("the parsing of expressions", function() {
     assert.equal(bindings.text(), 2 * (3 + 4))
   })
 
+  it("respects && and == precedence", function () {
+    var binding = "text: x && y == z",
+      context = { x : observable(), y: observable(), z: observable() },
+      bindings = new Parser(null, context).parse(binding);
+    assert.equal(bindings.text(), true)
+    context.x(true)
+    assert.equal(bindings.text(), true)
+    context.x(false)
+    assert.equal(bindings.text(), false)
+    context.x(true)
+    context.z(1)
+    assert.equal(bindings.text(), false)
+    context.y(1)
+    assert.equal(bindings.text(), true)
+  })
+
   it("computes complex arithematic as expected", function() {
     var binding = "text: 1 * 4 % 3 + 11 * 99 / (8 - 14)",
       bindings = new Parser(null, {}).parse(binding);
