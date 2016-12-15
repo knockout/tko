@@ -40,18 +40,14 @@ var instance,
   Parser,
   // Expression,
   Identifier,
-  Arguments,
-  Node,
-  operators;
+  Arguments;
 
 beforeEach(function() {
   instance = new Provider();
   Parser = instance.Parser,
     Identifier = Parser.Identifier,
     // Expression = Parser.Expression,
-    Arguments = Parser.Arguments,
-    Node = Parser.Node,
-    operators = Node.operators;
+    Arguments = Parser.Arguments;
 })
 
 describe("nodeHasBindings", function() {
@@ -553,79 +549,7 @@ describe("The lookup of variables (get_lookup_root)", function() {
   })
 })
 
-describe("the create_root function", function() {
-  var nodes_to_tree;
 
-  beforeEach(function() {
-    nodes_to_tree = Node.create_root;
-  })
-
-  it("converts a simple array to a tree", function() {
-    var nodes = ['a', operators['*'], 'b'],
-      tree = nodes_to_tree(nodes.slice(0));
-    // we use nodes.slice(0) to make a copy.
-    assert.equal(tree.lhs, 'a');
-    assert.equal(tree.rhs, 'b');
-    assert.equal(tree.op, operators['*']);
-  })
-
-  it("converts multiple * to a tree", function() {
-    var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
-      tree = nodes_to_tree(nodes.slice(0));
-    assert.equal(tree.lhs, 'a');
-    assert.equal(tree.op, operators['*']);
-    assert.equal(tree.rhs.lhs, 'b');
-    assert.equal(tree.rhs.op, operators['/']);
-    assert.equal(tree.rhs.rhs, 'c');
-  })
-
-  it("converts a complex set as expected", function() {
-    var nodes = [
-        'a', operators['*'], 'b',
-        operators['+'],
-        'c', operators['*'], 'd', operators['*'], 'e',
-        operators['>'],
-        'f', operators['+'], 'g', operators['%'], 'h'
-      ],
-      root = nodes_to_tree(nodes.slice(0));
-    assert.equal(root.op, operators['>'], '>')
-
-    assert.equal(root.lhs.op, operators['+'], '+')
-    assert.equal(root.lhs.lhs.op, operators['*'], '*')
-    assert.equal(root.lhs.lhs.lhs, 'a')
-    assert.equal(root.lhs.lhs.rhs, 'b')
-
-    assert.equal(root.lhs.rhs.op, operators['*'], '*')
-    assert.equal(root.lhs.rhs.lhs, 'c')
-    assert.equal(root.lhs.rhs.rhs.lhs, 'd')
-    assert.equal(root.lhs.rhs.rhs.rhs, 'e')
-
-    assert.equal(root.rhs.op, operators['+'], 'rhs +')
-    assert.equal(root.rhs.lhs, 'f')
-
-    assert.equal(root.rhs.rhs.op, operators['%'])
-    assert.equal(root.rhs.rhs.lhs, 'g')
-    assert.equal(root.rhs.rhs.rhs, 'h')
-  })
-
-  it("converts function calls (a())", function() {
-    var context = {
-        x: observable(0x0F)
-      },
-      parser, nodes, root;
-    parser = new Parser(null, context);
-    var fake_args = new Arguments(null, [])
-    nodes = [
-      // the third argument is the same as _deref_call
-      new Identifier(parser, 'x', [fake_args]),
-      operators['|'],
-      0x80
-    ];
-    root = nodes_to_tree(nodes.slice(0));
-
-    assert.equal(root.get_node_value(), 0x8F)
-  })
-})
 
 describe("Identifier", function() {
   var c = 'Z',
@@ -775,28 +699,5 @@ describe("Identifier", function() {
       fake_args = new Arguments(null, []),
       derefs = [fake_args];
     assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
-  })
-})
-
-describe("Node", function() {
-  it("traverses the tree 19 * -2 + 4", function() {
-    var root = new Node();
-    root.op = operators['+']
-    root.lhs = new Node(19, operators['*'], -2)
-    root.rhs = 4
-    assert.equal(root.get_node_value(), 19 * -2 + 4)
-  })
-
-  it("looks up identifiers", function() {
-    var root = new Node(),
-      context = {
-        x: 19
-      },
-      parser = new Parser(null, context),
-      ident = new Identifier(parser, 'x');
-    root.op = operators['+']
-    root.lhs = ident
-    root.rhs = 23
-    assert.equal(root.get_node_value(), 23 + 19)
   })
 })

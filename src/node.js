@@ -99,10 +99,6 @@ operators['!!'].precedence = 16; // explicit double-negative
 operators['++'].precedence = 16;
 operators['--'].precedence = 16;
 
-  // logic
-operators['||'].precedence = 14;
-operators['&&'].precedence = 13;
-
   // mul/div/remainder
 operators['%'].precedence = 14;
 operators['*'].precedence = 14;
@@ -135,6 +131,10 @@ operators['!=='].precedence = 10;
   //    http://stackoverflow.com/questions/359494
 operators['~=='].precedence = 10;
 operators['~!='].precedence = 10;
+
+  // logic
+operators['&&'].precedence = 6;
+operators['||'].precedence = 5;
 
   // Conditional/ternary
 operators['?'].precedence = 4;
