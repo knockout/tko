@@ -245,16 +245,16 @@ describe("the parsing of expressions", function() {
     var binding = "text: x && y == z",
       context = { x : observable(), y: observable(), z: observable() },
       bindings = new Parser(null, context).parse(binding);
-    assert.equal(bindings.text(), true)
+    assert.equal(bindings.text(), undefined, 'a')
     context.x(true)
-    assert.equal(bindings.text(), true)
+    assert.equal(bindings.text(), true, 'b')
     context.x(false)
-    assert.equal(bindings.text(), false)
+    assert.equal(bindings.text(), false, 'c')
     context.x(true)
     context.z(1)
-    assert.equal(bindings.text(), false)
+    assert.equal(bindings.text(), false, 'd')
     context.y(1)
-    assert.equal(bindings.text(), true)
+    assert.equal(bindings.text(), true, 'e')
   })
 
   it("computes complex arithematic as expected", function() {
