@@ -3217,10 +3217,6 @@ operators$1['!!'].precedence = 16; // explicit double-negative
 operators$1['++'].precedence = 16;
 operators$1['--'].precedence = 16;
 
-  // logic
-operators$1['||'].precedence = 14;
-operators$1['&&'].precedence = 13;
-
   // mul/div/remainder
 operators$1['%'].precedence = 14;
 operators$1['*'].precedence = 14;
@@ -3253,6 +3249,10 @@ operators$1['!=='].precedence = 10;
   //    http://stackoverflow.com/questions/359494
 operators$1['~=='].precedence = 10;
 operators$1['~!='].precedence = 10;
+
+  // logic
+operators$1['&&'].precedence = 6;
+operators$1['||'].precedence = 5;
 
   // Conditional/ternary
 operators$1['?'].precedence = 4;

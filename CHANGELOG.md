@@ -9,6 +9,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
   * Support C & C++ style comments (knockout/knockout#1524)
   * Fix filter/or ambiguity on pipe `|`
   * Raise an error with anonymous functions
+  * Fix && and || operator precedence
   
 * Updated Rollup - changes order of compilation, smaller output
 * Fix issue with first rendering of an elseif binding
