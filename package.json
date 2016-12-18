@@ -33,7 +33,6 @@
     "gulp": "^3.9.0",
     "js-yaml": "^3.4.6",
     "tko-policy": "knockout/tko-policy",
-    "tko.binding.core": "knockout/tko.binding.core",
     "tko.binding.template": "github:knockout/tko.binding.template"
   },
   "dependencies": {
