@@ -12,16 +12,17 @@ import {
     computed
 } from 'tko.computed';
 
+var parseVersion, operaVersion, userAgent, safariVersion, firefoxVersion;
 
-if (window && window.navigator) {
-    var parseVersion = function (matches) {
+if (window.navigator) {
+    parseVersion = function (matches) {
         if (matches) {
             return parseFloat(matches[1]);
         }
     };
 
     // Detect various browser versions because some old versions don't fully support the 'input' event
-    var operaVersion = window.opera && window.opera.version && parseInt(window.opera.version()),
+    operaVersion = window.opera && window.opera.version && parseInt(window.opera.version()),
         userAgent = window.navigator.userAgent,
         safariVersion = parseVersion(userAgent.match(/^(?:(?!chrome).)*version\/([^ ]*) safari/i)),
         firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/));
