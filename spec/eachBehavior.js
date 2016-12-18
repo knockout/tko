@@ -44,21 +44,12 @@ beforeEach(function(){
 });
 
 
-// Make the frame animation synchronous; simplifies testing.
-function setupSynchronousFrameAnimation () {
-  var originalAnimateFrame = ForEach.animateFrame;
-  beforeEach(function () {
-    originalAnimateFrame = ForEach.animateFrame;
-    ForEach.animateFrame = function(frame) { frame() };
-  })
-  afterEach(function () {
-    ForEach.animateFrame = originalAnimateFrame;
-  })
-  return originalAnimateFrame;
-}
+beforeEach(function () {
+  foreach.setSync(true)
+})
+
 
 describe("applying bindings", function () {
-  var originalAnimateFrame = setupSynchronousFrameAnimation()
 
   it("works with a static list", function () {
     var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
@@ -89,20 +80,17 @@ describe("applying bindings", function () {
   })
 
   it("processes initial data synchronously", function () {
-    // reset to the defailt animateFrame
-    var currentAnimateFrame = ForEach.animateFrame;
-    ForEach.animateFrame = originalAnimateFrame;
+    foreach.setSync(false)
     var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
     var list = [1, 2, 3];
     applyBindings(computed({ read: function () { return list } }), target[0])
     assert.equal($(target).find("li").length, 3)
-    ForEach.animateFrame = currentAnimateFrame;
   })
 
   it("processes initial data synchronously but is later asynchronous", function () {
-    // reset to the defailt animateFrame
-    var currentAnimateFrame = ForEach.animateFrame;
-    ForEach.animateFrame = originalAnimateFrame;
+    foreach.setSync(false)
+    // reset to the default async animateFrame
+    // foreac
     var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
     var list = observableArray([1, 2, 3]);
     applyBindings(list, target[0])
@@ -112,8 +100,6 @@ describe("applying bindings", function () {
     assert.equal($(target).find("li").length, 3)
 
     // TODO: add logic to test if the update really happened
-
-    ForEach.animateFrame = currentAnimateFrame;
   })
 
   it("applies bindings to the immediate child", function () {
@@ -194,7 +180,6 @@ describe("applying bindings", function () {
 })
 
 describe("observable array changes", function () {
-  setupSynchronousFrameAnimation();
   var div, obs, view;
 
   beforeEach(function () {

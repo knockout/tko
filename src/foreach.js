@@ -112,10 +112,6 @@ export function ForEach(spec) {
 
 ForEach.PENDING_DELETE_INDEX_KEY = PENDING_DELETE_INDEX_KEY;
 
-ForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
-  window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
-  function (cb) { return window.setTimeout(cb, 1000 / 60); };
-
 
 ForEach.prototype.dispose = function () {
   if (this.changeSubs) {
@@ -429,6 +425,21 @@ ForEach.prototype.updateIndexes = function (fromIndex) {
 };
 
 
+/**
+ * Set whether the binding is synchronous.
+ * Useful during testing.
+ */
+function setSync(toggle) {
+  if (toggle) {
+    ForEach.animateFrame = function (frame) { frame(); };
+  } else {
+    ForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
+      function (cb) { return window.setTimeout(cb, 1000 / 60); };
+  }
+}
+
+
 export var foreach = {
   // Valid valueAccessors:
   //    []
@@ -455,6 +466,8 @@ export var foreach = {
     });
     return { controlsDescendantBindings: true };
   },
+
+  setSync: setSync,
 
   allowVirtualElements: true,
 
