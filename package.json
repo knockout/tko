@@ -4,10 +4,7 @@
   "description": "Knockout Foreach Binding",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run --browsers Chrome,PhantomJS,Firefox",
-    "watch": "./node_modules/karma/bin/karma start --browsers PhantomJS",
-    "test_win": "node_modules\\.bin\\karma.cmd start --single-run --browsers Chrome,PhantomJS,Firefox",
-    "test_win_chrome_debug": "node_modules\\.bin\\karma.cmd start --auto-watch --browsers Chrome"
+     "test": "./node_modules/karma/bin/karma start --single-run"
   },
   "repository": {
     "type": "git",
