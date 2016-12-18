@@ -1,28 +1,29 @@
-header: |
-  /*!
-    Knockout Fast Foreach v<%=pkg.version%> (<%=now.toISOString()%>)
-    By: Brian M Hunt (C) 2015 | License: MIT
+# --- TKO GENERATED --- start
+# Do not modify.
+#
+__tko_karma__: &__tko_karma__
+  basePath: ''
+  port: 7777
+  colors: true
+  logLevel: INFO
+  autoWatch: true
+  browsers:
+    - PhantomJS
+  singleRun: false
+  files:
+    - node_modules/jquery/dist/jquery.js
+    - spec/*.js
+  reporters:
+    - progress
+  client:
+    captureConsole: true
 
-    Adds `fastForEach` to `ko.bindingHandlers`.
-  */
-  (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-      define(['knockout'], factory);
-    } else if (typeof exports === 'object') {
-      module.exports = factory(require('knockout'));
-    } else {
-      root.KnockoutFastForeach = factory(root.ko);
-    }
-  }(this, function (ko) {
-    "use strict";
+# --- TKO GENERATED --- end
 
-footer: |
-  }));
-
-uglify:
-  preserveComments: license
-
-watch:
-  index.js
-  spec/*
-  config.yaml
+karma:
+  <<: *__tko_karma__
+  # Add any changes to the karma settings, below.
+  frameworks:
+  - mocha
+  - chai
+  - sinon

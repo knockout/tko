@@ -25,9 +25,22 @@
   },
   "homepage": "https://github.com/brianmhunt/tko.binding.foreach",
   "devDependencies": {
+    "chai": "^3.5.0",
     "gulp": "^3.9.0",
-    "tko-policy": "knockout/tko-policy"
+    "jquery": "^3.1.1",
+    "karma-chai": "^0.1.0",
+    "karma-mocha": "^1.3.0",
+    "karma-sinon": "^1.0.5",
+    "mocha": "^3.2.0",
+    "sinon": "^1.17.6",
+    "tko-policy": "knockout/tko-policy",
+    "tko.computed": "knockout/tko.computed"
   },
   "peerDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "tko.bind": "knockout/tko.bind",
+    "tko.observable": "knockout/tko.observable",
+    "tko.provider": "knockout/tko.provider",
+    "tko.utils": "knockout/tko.utils"
+  }
 }

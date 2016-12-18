@@ -6,7 +6,7 @@
 // --------
 
 import {
-  virtualElements, arrayForEach, addDisposeCallback, cleanNode, options,
+  arrayForEach, addDisposeCallback, cleanNode, options, virtualElements,
   createSymbolOrString
 } from 'tko.utils';
 
@@ -17,7 +17,6 @@ import {
 import {
   contextFor, applyBindingsToDescendants
 } from 'tko.bind';
-
 
 
 //      Utilities
@@ -70,9 +69,9 @@ function valueToChangeAddItem(value, index) {
 // store a symbol for caching the pending delete info index in the data item objects
 var PENDING_DELETE_INDEX_KEY = createSymbolOrString("_ko_ffe_pending_delete_index");
 
-function FastForEach(spec) {
+export function ForEach(spec) {
   this.element = spec.element;
-  this.container = virtualElements.isVirtualNode(this.element) ?
+  this.container = virtualElements.isStartComment(this.element) ?
                    this.element.parentNode : this.element;
   this.$context = spec.$context;
   this.data = spec.data;
@@ -111,14 +110,14 @@ function FastForEach(spec) {
   }
 }
 
-FastForEach.PENDING_DELETE_INDEX_KEY = PENDING_DELETE_INDEX_KEY;
+ForEach.PENDING_DELETE_INDEX_KEY = PENDING_DELETE_INDEX_KEY;
 
-FastForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
+ForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
   function (cb) { return window.setTimeout(cb, 1000 / 60); };
 
 
-FastForEach.prototype.dispose = function () {
+ForEach.prototype.dispose = function () {
   if (this.changeSubs) {
     this.changeSubs.dispose();
   }
@@ -127,7 +126,7 @@ FastForEach.prototype.dispose = function () {
 
 
 // If the array changes we register the change.
-FastForEach.prototype.onArrayChange = function (changeSet, isInitial) {
+ForEach.prototype.onArrayChange = function (changeSet, isInitial) {
   var self = this;
   var changeMap = {
     added: [],
@@ -174,14 +173,14 @@ FastForEach.prototype.onArrayChange = function (changeSet, isInitial) {
     if (isInitial) {
       self.processQueue();
     } else {
-      FastForEach.animateFrame.call(window, function () { self.processQueue(); });
+      ForEach.animateFrame.call(window, function () { self.processQueue(); });
     }
   }
 };
 
 
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
-FastForEach.prototype.processQueue = function () {
+ForEach.prototype.processQueue = function () {
   var self = this;
   var lowestIndexChanged = MAX_LIST_SIZE;
 
@@ -216,24 +215,23 @@ FastForEach.prototype.processQueue = function () {
 
 function extendWithIndex(context) {
   context.$index = observable();
-};
+}
 
 
 // Process a changeItem with {status: 'added', ...}
-FastForEach.prototype.added = function (changeItem) {
+ForEach.prototype.added = function (changeItem) {
   var index = changeItem.index;
   var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value];
   var referenceElement = this.getLastNodeBeforeIndex(index);
   // gather all childnodes for a possible batch insertion
   var allChildNodes = [];
+  var children;
 
   for (var i = 0, len = valuesToAdd.length; i < len; ++i) {
-    var childNodes;
-
     // we check if we have a pending delete with reusable nodesets for this data, and if yes, we reuse one nodeset
     var pendingDelete = this.getPendingDeleteFor(valuesToAdd[i]);
     if (pendingDelete && pendingDelete.nodesets.length) {
-      childNodes = pendingDelete.nodesets.pop();
+      children = pendingDelete.nodesets.pop();
     } else {
       var templateClone = this.templateNode.cloneNode(true);
       var childContext;
@@ -250,12 +248,12 @@ FastForEach.prototype.added = function (changeItem) {
       // apply bindings first, and then process child nodes, because bindings can add childnodes
       applyBindingsToDescendants(childContext, templateClone);
 
-      childNodes = virtualElements.childNodes(templateClone);
+      children = virtualElements.childNodes(templateClone);
     }
 
     // Note discussion at https://github.com/angular/angular.js/issues/7851
-    allChildNodes.push.apply(allChildNodes, Array.prototype.slice.call(childNodes));
-    this.firstLastNodesList.splice(index + i, 0, { first: childNodes[0], last: childNodes[childNodes.length - 1] });
+    allChildNodes.push.apply(allChildNodes, Array.prototype.slice.call(children));
+    this.firstLastNodesList.splice(index + i, 0, { first: children[0], last: children[children.length - 1] });
   }
 
   if (typeof this.afterAdd === 'function') {
@@ -269,7 +267,7 @@ FastForEach.prototype.added = function (changeItem) {
   }
 };
 
-FastForEach.prototype.getNodesForIndex = function (index) {
+ForEach.prototype.getNodesForIndex = function (index) {
   var result = [],
     ptr = this.firstLastNodesList[index].first,
     last = this.firstLastNodesList[index].last;
@@ -281,13 +279,13 @@ FastForEach.prototype.getNodesForIndex = function (index) {
   return result;
 };
 
-FastForEach.prototype.getLastNodeBeforeIndex = function (index) {
+ForEach.prototype.getLastNodeBeforeIndex = function (index) {
   if (index < 1 || index - 1 >= this.firstLastNodesList.length)
     return null;
   return this.firstLastNodesList[index - 1].last;
 };
 
-FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfterNode) {
+ForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfterNode) {
   var frag, len, i,
     containerNode = this.element;
 
@@ -320,19 +318,19 @@ FastForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insert
 };
 
 // checks if the deleted data item should be handled with delay for a possible reuse at additions
-FastForEach.prototype.shouldDelayDeletion = function (data) {
+ForEach.prototype.shouldDelayDeletion = function (data) {
   return data && (typeof data === "object" || typeof data === "function");
 };
 
 // gets the pending deletion info for this data item
-FastForEach.prototype.getPendingDeleteFor = function (data) {
+ForEach.prototype.getPendingDeleteFor = function (data) {
   var index = data && data[PENDING_DELETE_INDEX_KEY];
   if (index === undefined) return null;
   return this.pendingDeletes[index];
 };
 
 // tries to find the existing pending delete info for this data item, and if it can't, it registeres one
-FastForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
+ForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
   var pd = this.getPendingDeleteFor(data);
   if (pd) {
     return pd;
@@ -347,7 +345,7 @@ FastForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
 };
 
 // Process a changeItem with {status: 'deleted', ...}
-FastForEach.prototype.deleted = function (changeItem) {
+ForEach.prototype.deleted = function (changeItem) {
   // if we should delay the deletion of this data, we add the nodeset to the pending delete info object
   if (this.shouldDelayDeletion(changeItem.value)) {
     var pd = this.getOrCreatePendingDeleteFor(changeItem.value);
@@ -359,7 +357,7 @@ FastForEach.prototype.deleted = function (changeItem) {
 };
 
 // removes a set of nodes from the DOM
-FastForEach.prototype.removeNodes = function (nodes) {
+ForEach.prototype.removeNodes = function (nodes) {
   if (!nodes.length) { return; }
 
   var removeFn = function () {
@@ -388,7 +386,7 @@ FastForEach.prototype.removeNodes = function (nodes) {
 // flushes the pending delete info store
 // this should be called after queue processing has finished, so that data items and remaining (not reused) nodesets get cleaned up
 // we also call it on dispose not to leave any mess
-FastForEach.prototype.flushPendingDeletes = function () {
+ForEach.prototype.flushPendingDeletes = function () {
   for (var i = 0, len = this.pendingDeletes.length; i != len; ++i) {
     var pd = this.pendingDeletes[i];
     while (pd.nodesets.length) {
@@ -402,7 +400,7 @@ FastForEach.prototype.flushPendingDeletes = function () {
 
 // We batch our deletion of item indexes in our parallel array.
 // See brianmhunt/knockout-fast-foreach#6/#8
-FastForEach.prototype.clearDeletedIndexes = function () {
+ForEach.prototype.clearDeletedIndexes = function () {
   // We iterate in reverse on the presumption (following the unit tests) that KO's diff engine
   // processes diffs (esp. deletes) monotonically ascending i.e. from index 0 -> N.
   for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
@@ -412,7 +410,7 @@ FastForEach.prototype.clearDeletedIndexes = function () {
 };
 
 
-FastForEach.prototype.getContextStartingFrom = function (node) {
+ForEach.prototype.getContextStartingFrom = function (node) {
   var ctx;
   while (node) {
     ctx = contextFor(node);
@@ -422,7 +420,7 @@ FastForEach.prototype.getContextStartingFrom = function (node) {
 };
 
 
-FastForEach.prototype.updateIndexes = function (fromIndex) {
+ForEach.prototype.updateIndexes = function (fromIndex) {
   var ctx;
   for (var i = fromIndex, len = this.firstLastNodesList.length; i < len; ++i) {
     ctx = this.getContextStartingFrom(this.firstLastNodesList[i].first);
@@ -443,9 +441,9 @@ export var foreach = {
     if (isPlainObject(value)) {
       value.element = value.element || element;
       value.$context = context;
-      ffe = new FastForEach(value);
+      ffe = new ForEach(value);
     } else {
-      ffe = new FastForEach({
+      ffe = new ForEach({
         element: element,
         data: unwrap(context.$rawData) === value ? context.$rawData : value,
         $context: context
@@ -461,5 +459,5 @@ export var foreach = {
   allowVirtualElements: true,
 
   // Export for testing, debugging, and overloading.
-  FastForEach: FastForEach
+  ForEach: ForEach
 };
