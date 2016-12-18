@@ -33,6 +33,7 @@
   "dependencies": {
     "tko.bind": "knockout/tko.bind",
     "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.binding.foreach": "knockout/tko.binding.foreach",
     "tko.binding.if": "github:knockout/tko.binding.if",
     "tko.binding.template": "github:knockout/tko.binding.template",
     "tko.components": "knockout/tko.components",

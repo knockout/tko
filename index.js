@@ -62,6 +62,10 @@ import {
 } from 'tko.binding.if';
 
 import {
+    bindings as foreachBindings
+} from 'tko.binding.foreach';
+
+import {
     preprocessors as textInterpolation
 } from 'tko.preprocessor.textInterpolation';
 
@@ -132,6 +136,8 @@ options.bindingProviderInstance = provider;
 provider.bindingHandlers.set(coreBindings);
 provider.bindingHandlers.set(templateBindings);
 provider.bindingHandlers.set(ifBindings);
+provider.bindingHandlers.set(foreachBindings);
+provider.bindingHandlers.set({ each: foreachBindings.foreach });
 provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
 provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
 provider.bindingHandlers.set({ component: components.bindingHandler });
