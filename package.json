@@ -4,7 +4,7 @@
   "description": "Knockout Foreach Binding",
   "main": "index.js",
   "scripts": {
-     "test": "./node_modules/karma/bin/karma start --single-run"
+    "test": "gulp test --once"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "mocha": "^3.2.0",
     "sinon": "^1.17.6",
     "tko-policy": "knockout/tko-policy",
+    "tko.binding.core": "knockout/tko.binding.core",
     "tko.computed": "knockout/tko.computed"
   },
   "peerDependencies": {},
