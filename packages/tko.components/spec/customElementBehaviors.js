@@ -27,6 +27,11 @@ import {
     bindings as templateBindings
 } from 'tko.binding.template';
 
+import {
+    bindings as ifBindings
+} from 'tko.binding.if';
+
+
 import components from '../index';
 
 import {
@@ -48,6 +53,7 @@ describe('Components: Custom elements', function() {
         bindingHandlers.set({ component: components.bindingHandler });
         bindingHandlers.set(templateBindings);
         bindingHandlers.set(coreBindings);
+        bindingHandlers.set(ifBindings);
 
         provider.clearProviders();
         provider.addProvider(components.bindingProvider);

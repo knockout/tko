@@ -7,14 +7,15 @@
     "gulp": "^3.9.1",
     "tko-policy": "knockout/tko-policy",
     "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.binding.if": "knockout/tko.binding.if",
     "tko.binding.template": "github:knockout/tko.binding.template"
   },
   "dependencies": {
-    "tko.utils": "knockout/tko.utils",
-    "tko.observable": "knockout/tko.observable",
-    "tko.computed": "knockout/tko.computed",
     "tko.bind": "knockout/tko.bind",
-    "tko.provider": "knockout/tko.provider"
+    "tko.computed": "knockout/tko.computed",
+    "tko.observable": "knockout/tko.observable",
+    "tko.provider": "knockout/tko.provider",
+    "tko.utils": "knockout/tko.utils"
   },
   "files": [
     "dist/",

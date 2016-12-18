@@ -23,6 +23,11 @@ import {
     bindings as templateBindings
 } from 'tko.binding.template';
 
+import {
+    bindings as ifBindings
+} from 'tko.binding.if';
+
+
 import components from '../index';
 
 import {
@@ -50,6 +55,7 @@ describe('Components: Component binding', function() {
         options.bindingProviderInstance = provider;
 
         provider.bindingHandlers.set(templateBindings);
+        provider.bindingHandlers.set(ifBindings);
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set({
             component: components.bindingHandler

@@ -19,7 +19,7 @@ __tko_karma__: &__tko_karma__
     #   served: false
     #   nocache: false
   reporters:
-    - progress
+    - dots
   client:
     captureConsole: true
 
