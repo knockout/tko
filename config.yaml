@@ -11,7 +11,7 @@ __tko_karma__: &__tko_karma__
     - PhantomJS
   singleRun: false
   reporters:
-    - progress
+    - dots 
   client:
     captureConsole: true
 

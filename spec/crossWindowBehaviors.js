@@ -27,6 +27,9 @@ import {
     bindings as templateBindings
 } from 'tko.binding.template';
 
+import {
+    bindings as ifBindings
+} from 'tko.binding.if';
 
 import {
     dummyTemplateEngine
@@ -41,6 +44,7 @@ describe('Cross-window support', function() {
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set(templateBindings);
+        provider.bindingHandlers.set(ifBindings);
 
         // The dummyTemplateEngine prototype test will fail if we let it just
         // use the one in dummyTemplateEngine.js, because that's imported from

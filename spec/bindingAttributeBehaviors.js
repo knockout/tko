@@ -16,8 +16,9 @@ import {
     applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../index.js';
 
-import * as coreBindings from 'tko.binding.core';
-import * as templateBindings from 'tko.binding.template';
+import { bindings as coreBindings } from 'tko.binding.core';
+import { bindings as templateBindings } from 'tko.binding.template';
+import { bindings as ifBindings } from 'tko.binding.if';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
@@ -33,8 +34,9 @@ describe('Binding attribute syntax', function() {
         var provider = new Provider()
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
-        bindingHandlers.set(coreBindings.bindings);
-        bindingHandlers.set(templateBindings.bindings);
+        bindingHandlers.set(coreBindings);
+        bindingHandlers.set(templateBindings);
+        bindingHandlers.set(ifBindings);
         options.onError = function (e) { throw e; };
     })
 
@@ -103,7 +105,7 @@ describe('Binding attribute syntax', function() {
     });
 
     it('Should tolerate arbitrary literals as the values for a handler', function () {
-        testNode.innerHTML = "<div data-bind='stringLiteral: \"hello\", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: function() { }, nullLiteral: null, undefinedLiteral: undefined'></div>";
+        testNode.innerHTML = "<div data-bind='stringLiteral: \"hello\", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, lambdaLiteral: => null, nullLiteral: null, undefinedLiteral: undefined'></div>";
         applyBindings(null, testNode); // No exception means success
     });
 
@@ -713,7 +715,9 @@ describe('Binding attribute syntax', function() {
             expect(function () {
                 applyBindings({}, testNode);
             }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements");
+            expect(called).toEqual(0)
         });
+
         //TODO: FAIL
         it("has a .computed() property with the node's lifecycle", function () {
             var instance;
