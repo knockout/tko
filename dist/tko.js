@@ -7635,6 +7635,9 @@ var bindings$3 = {
   foreach: foreach$1
 };
 
+// By default, foreach will be async.
+foreach$1.setSync(false);
+
 var dataBind = 'data-bind';
 
 
