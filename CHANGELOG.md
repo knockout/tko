@@ -3,6 +3,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ##  🏹  Alpha-1  ( Work in progress on the `master` branch )
 
+* Fix negation operator (-) application - integers `-1` work, as well as variables `-x` and expressions `-(x + y)`
 * Use tko.binding.foreach for the `foreach` binding (based on brianmhunt/knockout-fast-foreach)
 * Add `each` as an alias of `foreach`
 
