@@ -150,7 +150,7 @@ utils.extend(options.filters, punchesFilters);
 // Expose the API.
 export default {
     // --- Top-level ---
-    version: '4.0.0-alpha0',
+    version: '4.0.0-alpha1',
     options: options,
 
     extenders: extenders,

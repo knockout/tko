@@ -8514,7 +8514,7 @@ extend(options.filters, filters);
 // Expose the API.
 var index = {
     // --- Top-level ---
-    version: '4.0.0-alpha0',
+    version: '4.0.0-alpha1',
     options: options,
 
     extenders: extenders,
