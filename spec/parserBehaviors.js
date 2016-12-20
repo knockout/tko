@@ -154,7 +154,7 @@ describe("the bindings parser", function() {
       "afterCompose: 'ac', //wiring the router\n" +
       "//transition:'entrance', //use the 'entrance' transition when switching views\n" +
       "skipTransitionOnSameViewId: true,//Transition entrance is disabled for better perfomance\n" +
-      "cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)\n",
+      "cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)",
       context = { v: observable('rx') },
       bindings = new Parser(null, context).parse(binding);
 
