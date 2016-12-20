@@ -492,7 +492,7 @@ Parser.prototype.expression = function (filterable) {
       break;
     }
 
-    // infix operators
+    // infix or postfix operators
     op = this.operator(true);
 
     if (op === operators['?']) {

@@ -34,11 +34,13 @@ beforeEach(function () {
 
 describe("the bindings parser", function() {
   it("parses bindings with JSON values", function() {
-    var binding_string = 'a: "A", b: 1, c: 2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
+    var binding_string = 'a: "A", b: 1, b_: -1, c: 2.1, c_:-2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
       value = new Parser(null, {}).parse(binding_string);
     assert.equal(value.a(), "A", "string");
     assert.equal(value.b(), 1, "int");
+    assert.equal(value.b_(), -1, "-int");
     assert.equal(value.c(), 2.1, "float");
+    assert.equal(value.c_(), -2.1, "-float");
     assert.deepEqual(value.d(), ["X", "Y"], "array");
     assert.deepEqual(value.e(), {
       "R": "V"
@@ -46,6 +48,18 @@ describe("the bindings parser", function() {
     assert.equal(value.t(), true, "true");
     assert.equal(value.f(), false, "false");
     assert.equal(value.n(), null, "null");
+  })
+
+  it("applies negation (-)", function () {
+    var binding_string = 'a: -1, b: -2, c: -10.09, x: -x, y: -y, z: -(4 + 4)',
+      context = { x: 2, y: observable(4) },
+      value = new Parser(null, context).parse(binding_string);
+    assert.equal(value.a(), -1);
+    assert.equal(value.b(), -2);
+    assert.equal(value.c(), -10.09);
+    assert.equal(value.x(), -2);
+    assert.equal(unwrap(value.y()), -4);
+    assert.equal(value.z(), -8)
   })
 
   it("parses an array of JSON values", function() {

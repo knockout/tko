@@ -44,7 +44,7 @@ var operators = {
   '%': function mod(a, b) { return a % b; },
   // sub/add
   '+': function add(a, b) { return a + b; },
-  '-': function sub(a, b) { return a - b; },
+  '-': function sub(a, b) { return (a || 0) - (b || 0); },
   // relational
   '<': function lt(a, b) { return a < b; },
   '<=': function le(a, b) { return a <= b; },
