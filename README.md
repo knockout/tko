@@ -1,24 +1,8 @@
-﻿knockout-fast-foreach
-=====================
+# TKO `foreach` binding
 
-An experiment in faster foreach binding.
-
-Include in your project in the usual ways, then instead of `foreach` use
-`fastForEach`.
-
-[Demo on JSBin](http://jsbin.com/dakihezega/2)
-
-Testing
----
-
-Run tests from the command line with `npm test`, or on Windows `npm run test_win`.
+This is the default `foreach` binding for [`tko`](https://github.com/knockout/tko).  It is based on [`knockout-fast-foreach`](https://github.com/brianmhunt/knockout-fast-foreach)
 
 
-Run tests in Chrome by installing `karma-chrome-launcher` then
-`$ ./node_modules/karma/bin/karma start --browsers Chrome`; the same applies
-for other browsers supported by Karma.
-
-Changes
 ---
 16 Dec 2015 – 🔭 0.6.0
   - Reuse DOM nodes when array items move [#33, #34]
