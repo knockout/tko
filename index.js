@@ -164,6 +164,7 @@ export default {
     tasks: utils.tasks,
     utils: coreUtils,
     dependencyDetection: dependencyDetection,
+    ignoreDependencies: dependencyDetection.ignore,
 
 
     // -- Observable ---
