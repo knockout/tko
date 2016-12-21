@@ -2,7 +2,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ## 🐋   Alpha-2  ( Work in progress on the `master` branch )
 
-* TODO.
+* (API) Expose `dependencyDetection.ignore` as `ignoreDependencies`
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 
