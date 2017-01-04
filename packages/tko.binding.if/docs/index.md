@@ -2,6 +2,6 @@
 
 Bindings for TKO:
 
-- [if][if-binding.md]
-- [ifnot][ifnot-binding.md]
-- [with][with-binding.md]
+- [if](if-binding)
+- [ifnot](ifnot-binding)
+- [with](with-binding)
