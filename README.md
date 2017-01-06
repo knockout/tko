@@ -4,6 +4,12 @@ This is the default `foreach` binding for [`tko`](https://github.com/knockout/tk
 
 
 ---
+6 Jan 2017 – 🚡  TKO - master
+
+ - Make compatible with tko style packages.
+ - Deprecate `noContext`; if `as` is provided, then the current context is extended.
+ - Improve performance of the context generator.
+
 16 Dec 2015 – 🔭 0.6.0
   - Reuse DOM nodes when array items move [#33, #34]
   - Improve internal nodes handling [#31, #32]

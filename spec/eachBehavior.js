@@ -740,12 +740,56 @@ describe("observable array changes", function () {
       assert.equal(contextFor(target.children()[0]).$index, undefined)
     })
 
-    it("is present with noContext", function () {
-      var target = $("<ul data-bind='foreach: {data: $data, noContext: true}'><li data-bind='text: $data'></li></div>");
+    it("is present with `as`", function () {
+      var target = $("<ul data-bind='foreach: {data: $data, as: \"$item\"}'><li data-bind='text: $item'></li></div>");
       var list = observableArray(['a', 'b']);
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index(), 0)
       assert.equal(contextFor(target.children()[1]).$index(), 1)
     })
+  })
+
+  describe('`as` parameter', function () {
+    it("is used when present", function () {
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></div>");
+      var list = ['a', 'b', 'c'];
+      applyBindings(list, target[0])
+      assert.equal(target.text(), 'abc')
+    })
+
+    it("each item has the same $data as its parent", function () {
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></div>");
+      var list = ['a', 'b', 'c'];
+      applyBindings(list, target[0])
+      assert.strictEqual(dataFor(target.children()[0]).$data, dataFor(target))
+      assert.strictEqual(dataFor(target.children()[1]).$data, dataFor(target))
+      assert.strictEqual(dataFor(target.children()[2]).$data, dataFor(target))
+    })
+
+    it("has an $index", function () {
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></div>");
+      var list = ['a', 'b', 'c'];
+      applyBindings(list, target[0])
+      assert.equal(contextFor(target.children()[0]).$index(), 0)
+      assert.equal(contextFor(target.children()[1]).$index(), 1)
+      assert.equal(contextFor(target.children()[2]).$index(), 2)
+    })
+
+    it("respects `noIndex`", function () {
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\", noIndex: true }'><li data-bind='text: xyz'></li></div>");
+      var list = ['a', 'b', 'c'];
+      applyBindings(list, target[0])
+      assert.equal(contextFor(target.children()[0]).$index, undefined)
+      assert.equal(contextFor(target.children()[1]).$index, undefined)
+      assert.equal(contextFor(target.children()[2]).$index, undefined)
+    })
+
+    it("reads `as` from peer binding parameters", function () {
+      var target = $("<ul data-bind='foreach: $data, as: \"xyz\"'><li data-bind='text: xyz'></li></div>");
+      var list = ['a', 'b', 'c'];
+      applyBindings(list, target[0])
+      assert.equal(target.text(), 'abc')
+    })
+
   })
 })
