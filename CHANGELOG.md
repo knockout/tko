@@ -3,6 +3,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 ## 🐋   Alpha-2  ( Work in progress on the `master` branch )
 
 * (API) Expose `dependencyDetection.ignore` as `ignoreDependencies`
+* (foreach binding) When using the `as` parameter, the `$data` remains unchanged (i.e. the context inside a `foreach` is no longer a "child" context, but an extension of the current context); this deprecates the `noContext` parameter
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 
