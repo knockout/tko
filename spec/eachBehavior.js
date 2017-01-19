@@ -7,7 +7,7 @@
 /* globals $ */
 
 import {
-  removeNode, arrayForEach, options
+  removeNode, arrayForEach, options, domData
 } from 'tko.utils';
 
 import {
@@ -49,7 +49,7 @@ beforeEach(function () {
 })
 
 
-describe("applying bindings", function () {
+describe("each binding", function () {
 
   it("works with a static list", function () {
     var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
@@ -177,7 +177,70 @@ describe("applying bindings", function () {
                                 "Z<!-- ko text: $data-->H2<!--/ko-->");
     $template.remove();
   })
+
 })
+
+
+describe("is empty/conditional", function () {
+  it("sets `elseChainSatisfied` to false for an empty array", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = [];
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), false)
+  })
+
+  it("sets `elseChainSatisfied` to false for an undefined obs array", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = observableArray();
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), false)
+  })
+
+  it("sets `elseChainSatisfied` to false for an empty obs array", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = observableArray([]);
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), false)
+  })
+
+  it("sets `elseChainSatisfied` to true for a non-empty array", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = [1,2,3];
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), true)
+  })
+
+  it("sets `elseChainSatisfied` to true for a non-empty obs array", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = observableArray([1,2,3]);
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), true)
+  })
+
+  it("sets `elseChainSatisfied` to true after array is filled", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = observableArray([]);
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    obs([1, 2, 3])
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), true)
+  })
+
+  it("sets `elseChainSatisfied` to false after array is emptied", function () {
+    var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>");
+    var obs = observableArray([1, 2, 3]);
+    var view = {obs: obs};
+    applyBindings(view, div[0]);
+    obs([])
+    assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), false)
+  })
+})
+
 
 describe("observable array changes", function () {
   var div, obs, view;

@@ -4,6 +4,9 @@ This is the default `foreach` binding for [`tko`](https://github.com/knockout/tk
 
 
 ---
+19 Jan 2017 — 🐉  4.0.0
+  - Expose the `conditional` for `elseChainSatisfied` so the `else` binding will now work with this as expected i.e. when the foreach data is empty, the `else` binding will be rendered.
+
 6 Jan 2017 – 🚡  TKO - master
 
  - Make compatible with tko style packages.

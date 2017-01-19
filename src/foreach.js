@@ -7,7 +7,7 @@
 
 import {
   arrayForEach, addDisposeCallback, cleanNode, options, virtualElements,
-  createSymbolOrString
+  createSymbolOrString, domData
 } from 'tko.utils';
 
 import {
@@ -89,6 +89,13 @@ export function ForEach(spec) {
   this.indexesToDelete = [];
   this.rendering_queued = false;
   this.pendingDeletes = [];
+
+  // Expose the conditional so that if the `foreach` data is empty, successive
+  // 'else' bindings will appear.
+  this.isNotEmpty = observable(Boolean(unwrap(this.data).length));
+  domData.set(this.element, 'conditional', {
+    elseChainSatisfied: this.isNotEmpty
+  });
 
   // Remove existing content.
   virtualElements.emptyNode(this.element);
@@ -177,6 +184,7 @@ ForEach.prototype.onArrayChange = function (changeSet, isInitial) {
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 ForEach.prototype.processQueue = function () {
   var self = this;
+  var isEmpty = !unwrap(this.data).length;
   var lowestIndexChanged = MAX_LIST_SIZE;
 
   // Callback so folks can do things before the queue flush.
@@ -201,6 +209,11 @@ ForEach.prototype.processQueue = function () {
     this.afterQueueFlush(this.changeQueue);
   }
   this.changeQueue = [];
+
+  // Update the conditional exposed on the domData
+  if (isEmpty !== !this.isNotEmpty()) {
+    this.isNotEmpty(!isEmpty);
+  }
 };
 
 
