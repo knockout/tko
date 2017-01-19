@@ -7246,6 +7246,13 @@ function ForEach(spec) {
   this.rendering_queued = false;
   this.pendingDeletes = [];
 
+  // Expose the conditional so that if the `foreach` data is empty, successive
+  // 'else' bindings will appear.
+  this.isNotEmpty = observable(Boolean(unwrap(this.data).length));
+  set(this.element, 'conditional', {
+    elseChainSatisfied: this.isNotEmpty
+  });
+
   // Remove existing content.
   emptyNode(this.element);
 
@@ -7333,6 +7340,7 @@ ForEach.prototype.onArrayChange = function (changeSet, isInitial) {
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 ForEach.prototype.processQueue = function () {
   var self = this;
+  var isEmpty = !unwrap(this.data).length;
   var lowestIndexChanged = MAX_LIST_SIZE;
 
   // Callback so folks can do things before the queue flush.
@@ -7357,6 +7365,11 @@ ForEach.prototype.processQueue = function () {
     this.afterQueueFlush(this.changeQueue);
   }
   this.changeQueue = [];
+
+  // Update the conditional exposed on the domData
+  if (isEmpty !== !this.isNotEmpty()) {
+    this.isNotEmpty(!isEmpty);
+  }
 };
 
 
@@ -7499,28 +7512,28 @@ ForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfte
 };
 
 // checks if the deleted data item should be handled with delay for a possible reuse at additions
-ForEach.prototype.shouldDelayDeletion = function (data) {
-  return data && (typeof data === "object" || typeof data === "function");
+ForEach.prototype.shouldDelayDeletion = function (data$$1) {
+  return data$$1 && (typeof data$$1 === "object" || typeof data$$1 === "function");
 };
 
 // gets the pending deletion info for this data item
-ForEach.prototype.getPendingDeleteFor = function (data) {
-  var index = data && data[PENDING_DELETE_INDEX_KEY];
+ForEach.prototype.getPendingDeleteFor = function (data$$1) {
+  var index = data$$1 && data$$1[PENDING_DELETE_INDEX_KEY];
   if (index === undefined) return null;
   return this.pendingDeletes[index];
 };
 
 // tries to find the existing pending delete info for this data item, and if it can't, it registeres one
-ForEach.prototype.getOrCreatePendingDeleteFor = function (data) {
-  var pd = this.getPendingDeleteFor(data);
+ForEach.prototype.getOrCreatePendingDeleteFor = function (data$$1) {
+  var pd = this.getPendingDeleteFor(data$$1);
   if (pd) {
     return pd;
   }
   pd = {
-    data: data,
+    data: data$$1,
     nodesets: []
   };
-  data[PENDING_DELETE_INDEX_KEY] = this.pendingDeletes.length;
+  data$$1[PENDING_DELETE_INDEX_KEY] = this.pendingDeletes.length;
   this.pendingDeletes.push(pd);
   return pd;
 };
