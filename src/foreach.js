@@ -218,8 +218,9 @@ ForEach.prototype.processQueue = function () {
 
 
 // Extend the given context with a $index (passed in via the createChildContext)
-function extendWithIndex($context) {
-  $context.$index = observable();
+function extend$context(include$index, $context) {
+  if (include$index) { $context.$index = observable(); }
+  $context.$list = this.data;
 }
 
 
@@ -238,24 +239,24 @@ ForEach.prototype.createContextGenerator = function (as, index) {
   switch ((as && 1) | (index && 2)) {
   case 0: // no-as & no-index
     return function(v) {
-      return $context.createChildContext(v, null, undefined);
+      return $context.createChildContext(v, null, extend$context.bind(this, false));
     };
 
   case 1: // as + no-index
     return function(v) {
-      var obj = { $index: undefined };
+      var obj = { $index: undefined, $list: this.data };
       obj[as] = v;
       return $context.extend(obj);
     };
 
   case 2: // no-as + index
     return function(v) {
-      return $context.createChildContext(v, null, extendWithIndex);
+      return $context.createChildContext(v, null, extend$context.bind(this, true));
     };
 
   case 3: // as + index
     return function(v) {
-      var obj = { $index: observable() };
+      var obj = { $index: observable(), $list: this.data };
       obj[as] = v;
       return $context.extend(obj);
     };
@@ -500,7 +501,8 @@ export var foreach = {
         element: element,
         data: unwrap(context.$rawData) === value ? context.$rawData : value,
         $context: context,
-        as: bindings.get('as')
+        as: bindings.get('as'),
+        noIndex: bindings.get('noIndex')
       });
     }
 

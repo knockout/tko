@@ -847,12 +847,68 @@ describe("observable array changes", function () {
       assert.equal(contextFor(target.children()[2]).$index, undefined)
     })
 
+    it("respects `noIndex` on allBindings", function () {
+      var target = $("<ul data-bind='foreach: $data, as: \"xyz\", noIndex: true'><li data-bind='text: xyz'></li></div>");
+      var list = ['a', 'b', 'c'];
+      applyBindings(list, target[0])
+      assert.equal(contextFor(target.children()[0]).$index, undefined)
+      assert.equal(contextFor(target.children()[1]).$index, undefined)
+      assert.equal(contextFor(target.children()[2]).$index, undefined)
+    })
+
     it("reads `as` from peer binding parameters", function () {
       var target = $("<ul data-bind='foreach: $data, as: \"xyz\"'><li data-bind='text: xyz'></li></div>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(target.text(), 'abc')
     })
+  })
+})
 
+
+describe("$list", function () {
+  it("exposes a list", function () {
+    var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+    var list = ['a', 'b', 'c'];
+    applyBindings(list, target[0])
+    assert.strictEqual(
+      contextFor(target.children()[1]).$list, list
+    )
+  })
+
+  it("exposes an observable array", function () {
+    var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+    var list = observableArray(['a', 'b', 'c']);
+    applyBindings(list, target[0])
+    assert.strictEqual(
+      contextFor(target.children()[1]).$list, list
+    )
+  })
+
+  it("exposes an observable array with `as`", function () {
+    var target = $("<ul data-bind='foreach: $data, as: \"x\"'><li data-bind='text: x'></li></div>");
+    var list = observableArray(['a', 'b', 'c']);
+    applyBindings(list, target[0])
+    assert.strictEqual(
+      contextFor(target.children()[1]).$list, list
+    )
+  })
+
+  it("exposes an observable array with `as` + noIndex", function () {
+    var target = $("<ul data-bind='foreach: $data, as: \"x\", noIndex: true'><li data-bind='text: x'></li></div>");
+    var list = observableArray(['a', 'b', 'c']);
+    applyBindings(list, target[0])
+    assert.strictEqual(
+      contextFor(target.children()[1]).$list, list
+    )
+  })
+
+  it("exposes an observable array with noIndex", function () {
+    var target = $("<ul data-bind='foreach: $data, noIndex: true'><li data-bind='text: $data'></li></div>");
+    var list = observableArray(['a', 'b', 'c']);
+    applyBindings(list, target[0])
+    assert.strictEqual(
+      contextFor(target.children()[1]).$list, list
+    )
   })
 })
