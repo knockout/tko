@@ -1,7 +1,7 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global.tko = factory());
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.tko = factory());
 }(this, (function () { 'use strict';
 
 //
@@ -4833,7 +4833,7 @@ var bindingDoesNotRecurseIntoElementTypes = {
 };
 
 // Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
-function getBindingHandler$1(bindingKey) {
+function getBindingHandler(bindingKey) {
     return options.bindingProviderInstance.bindingHandlers.get(bindingKey);
 }
 
@@ -4956,7 +4956,7 @@ function topologicalSortBindings(bindings) {
         cyclicDependencyStack = []; // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
     objectForEach(bindings, function pushBinding(bindingKey) {
         if (!bindingsConsidered[bindingKey]) {
-            var binding = getBindingHandler$1(bindingKey);
+            var binding = getBindingHandler(bindingKey);
             if (binding) {
                 // First add dependencies (if any) of the current binding
                 if (binding.after) {
@@ -6981,10 +6981,10 @@ function makeTemplateValueAccessor(valueAccessor) {
 // "foreach: { data: someExpression, afterAdd: myfn }" is equivalent to "template: { foreach: someExpression, afterAdd: myfn }"
 var foreach = {
     init: function(element, valueAccessor) {
-        return getBindingHandler$1('template').init(element, makeTemplateValueAccessor(valueAccessor));
+        return getBindingHandler('template').init(element, makeTemplateValueAccessor(valueAccessor));
     },
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext$$1) {
-        return getBindingHandler$1('template').update(element, makeTemplateValueAccessor(valueAccessor), allBindings, viewModel, bindingContext$$1);
+        return getBindingHandler('template').update(element, makeTemplateValueAccessor(valueAccessor), allBindings, viewModel, bindingContext$$1);
     },
     allowVirtualElements: true,
     bindingRewriteValidator: false
@@ -7374,8 +7374,9 @@ ForEach.prototype.processQueue = function () {
 
 
 // Extend the given context with a $index (passed in via the createChildContext)
-function extendWithIndex($context) {
-  $context.$index = observable();
+function extend$context(include$index, $context) {
+  if (include$index) { $context.$index = observable(); }
+  $context.$list = this.data;
 }
 
 
@@ -7394,24 +7395,24 @@ ForEach.prototype.createContextGenerator = function (as, index) {
   switch ((as && 1) | (index && 2)) {
   case 0: // no-as & no-index
     return function(v) {
-      return $context.createChildContext(v, null, undefined);
+      return $context.createChildContext(v, null, extend$context.bind(this, false));
     };
 
   case 1: // as + no-index
     return function(v) {
-      var obj = { $index: undefined };
+      var obj = { $index: undefined, $list: this.data };
       obj[as] = v;
       return $context.extend(obj);
     };
 
   case 2: // no-as + index
     return function(v) {
-      return $context.createChildContext(v, null, extendWithIndex);
+      return $context.createChildContext(v, null, extend$context.bind(this, true));
     };
 
   case 3: // as + index
     return function(v) {
-      var obj = { $index: observable() };
+      var obj = { $index: observable(), $list: this.data };
       obj[as] = v;
       return $context.extend(obj);
     };
@@ -7656,7 +7657,8 @@ var foreach$1 = {
         element: element,
         data: unwrap(context.$rawData) === value ? context.$rawData : value,
         $context: context,
-        as: bindings.get('as')
+        as: bindings.get('as'),
+        noIndex: bindings.get('noIndex')
       });
     }
 
@@ -8613,7 +8615,7 @@ var index = {
     bindingProvider: Provider,
     contextFor: contextFor,
     dataFor: dataFor,
-    getBindingHandler: getBindingHandler$1,
+    getBindingHandler: getBindingHandler,
     virtualElements: virtualElements,
     domNodeDisposal: coreUtils.domNodeDisposal,
 

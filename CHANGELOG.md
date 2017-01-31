@@ -5,6 +5,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (API) Expose `dependencyDetection.ignore` as `ignoreDependencies`
 * (foreach binding) When using the `as` parameter, the `$data` remains unchanged (i.e. the context inside a `foreach` is no longer a "child" context, but an extension of the current context); this deprecates the `noContext` parameter
 * (foreach binding) Expose the `conditional` on the `domData` for use by the `else` binding (when the array is empty, the `else` binding will be rendered)
+* (foreach binding) Expose `$list` inside the foreach
+* (foreach binding) Allow `noIndex` as a peer binding parameter (e.g. `foreach: items, noIndex: true`)
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 
