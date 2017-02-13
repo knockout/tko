@@ -5276,7 +5276,7 @@ function onBindingError(spec) {
     } catch (e) {
         // Read-only error e.g. a DOMEXception.
         spec.stack = error.stack;
-        error = new Error(error.message);
+        error = new Error(error.message ? error.message : error);
         extend(error, spec);
     }
     options.onError(error);

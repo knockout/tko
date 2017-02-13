@@ -7,6 +7,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (foreach binding) Expose the `conditional` on the `domData` for use by the `else` binding (when the array is empty, the `else` binding will be rendered)
 * (foreach binding) Expose `$list` inside the foreach
 * (foreach binding) Allow `noIndex` as a peer binding parameter (e.g. `foreach: items, noIndex: true`)
+* (bind) String errors on binding are now propagated
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 
