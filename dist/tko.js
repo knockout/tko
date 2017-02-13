@@ -5266,7 +5266,7 @@ function onBindingError(spec) {
         bindingText = options.bindingProviderInstance.getBindingsString(spec.element);
         spec.message = "Unable to process binding \"" + spec.bindingKey
             + "\" in binding \"" + bindingText
-            + "\"\nMessage: " + error.message;
+            + "\"\nMessage: " + (error.message ? error.message : error);
     } else {
         // During: 'apply'
         error = spec.errorCaptured;
