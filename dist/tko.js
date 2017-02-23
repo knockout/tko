@@ -3773,9 +3773,12 @@ Parser.prototype.number = function () {
 Parser.prototype.object_add_value = function (object, key, value) {
   if (value && value[Node.isExpressionOrIdentifierSymbol]) {
     Object.defineProperty(object, key, {
-      get: function () {
-        return value.get_value();
-      },
+      get: function () { return value.get_value(); },
+      enumerable: true
+    });
+  } else if (value instanceof Node) {
+    Object.defineProperty(object, key, {
+      get: function () { return value.get_node_value(); },
       enumerable: true
     });
   } else {

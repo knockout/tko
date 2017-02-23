@@ -8,6 +8,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (foreach binding) Expose `$list` inside the foreach
 * (foreach binding) Allow `noIndex` as a peer binding parameter (e.g. `foreach: items, noIndex: true`)
 * (bind) String errors on binding are now propagated
+* (provider) Fix dereferencing of namespaced items e.g. attr.title: `${v}`
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 
