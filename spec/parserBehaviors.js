@@ -703,6 +703,18 @@ describe("ES6-style interpolated strings", function () {
     expect_equal("`a${x}c`", {x: "B"}, "aBc")
   })
 
+  it("interpolates a string starting with a variable", function () {
+    expect_equal("`${x}c`", {x: "B"}, "Bc")
+  })
+
+  it("interpolates a string with only a variable", function () {
+    expect_equal("`${x}`", {x: "B"}, "B")
+  })
+
+  it("interpolates a string with multiple variables", function () {
+    expect_equal("`${x}${y}`", {x: "B", y:"C"}, "BC")
+  })
+
   it("interpolates spacey ${  x  } primitive", function () {
     expect_equal("`a${  x  }cd`", {x: "B"}, "aBcd")
   })
