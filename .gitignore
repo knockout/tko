@@ -20,5 +20,6 @@ node_modules
 dist/
 _repo
 coverage/
+work/
 
 yarn.lock

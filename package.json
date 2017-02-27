@@ -42,6 +42,6 @@
     "tko.observable": "knockout/tko.observable",
     "tko.preprocessor.textInterpolation": "knockout/tko.preprocessor.textInterpolation",
     "tko.provider": "github:knockout/tko.provider",
-    "tko.utils": "knockout/tko.utils"
+    "tko.utils": "githib:knockout/tko.utils"
   }
 }
