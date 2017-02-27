@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knockout/tko.component.git"
+    "url": "git+https://github.com/knockout/tko.components.git"
   },
   "author": "Knockout Team",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/knockout/tko.component/issues"
+    "url": "https://github.com/knockout/tko.components/issues"
   },
-  "homepage": "https://github.com/knockout/tko.component#readme"
+  "homepage": "https://github.com/knockout/tko.components#readme"
 }
