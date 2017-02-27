@@ -26,9 +26,9 @@
   "author": "Knockout",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/knockout/tko.util/issues"
+    "url": "https://github.com/knockout/tko.binding.if/issues"
   },
-  "homepage": "https://github.com/knockout/tko.util#readme",
+  "homepage": "https://github.com/knockout/tko.binding.if#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
     "js-yaml": "^3.4.6",
