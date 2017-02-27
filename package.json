@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/brianmhunt/tko.binding.foreach.git"
+    "url": "https://github.com/knockout/tko.binding.foreach.git"
   },
   "keywords": [
     "knockout",
@@ -18,9 +18,9 @@
   "author": "Brian M Hunt",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brianmhunt/tko.binding.foreach/issues"
+    "url": "https://github.com/knockout/tko.binding.foreach/issues"
   },
-  "homepage": "https://github.com/brianmhunt/tko.binding.foreach",
+  "homepage": "https://github.com/knockout/tko.binding.foreach",
   "devDependencies": {
     "chai": "^3.5.0",
     "gulp": "^3.9.0",
