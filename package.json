@@ -2,7 +2,7 @@
   "version": "0.5.5",
   "author": {
     "name": "Brian M Hunt",
-    "email": "brianmhunt@gmail.com"
+    "email": "knockout@gmail.com"
   },
   "license": "MIT",
   "name": "tko.provider",
@@ -28,14 +28,14 @@
   ],
   "main": "dist/tko.provider.js",
   "jsnext:main": "index.js",
-  "homepage": "https://github.com/brianmhunt/knockout-secure-binding",
+  "homepage": "https://github.com/knockout/tko.provider",
   "licenses": {
     "type": "MIT",
     "url": "http://brianmhunt.mit-license.org/"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/brianmhunt/knockout-secure-binding.git"
+    "url": "git://github.com/knockout/tko.provider.git"
   },
   "dependencies": {
     "tko.observable": "github:knockout/tko.observable",
