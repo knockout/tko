@@ -44,6 +44,10 @@ describe("Parser Namespace", function () {
     trial({v: "t"}, "on.p: v, on: { r: 123 }", { p: "t", r: 123 })
   })
 
+  it("dereferences a Node result", function () {
+    trial({v: "t"}, "on.p: `${v}`", { p: "t" })
+  })
+
   it("throws an error with { x: identifier, x.y: val }", function () {
     assert.throws(function () {
       trial({}, "on.p: '1', on: '2'", {})
