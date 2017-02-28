@@ -28,20 +28,20 @@
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "js-yaml": "^3.4.0",
-    "tko-policy": "knockout/tko-policy"
+    "tko-policy": "github:knockout/tko-policy"
   },
   "dependencies": {
-    "tko.bind": "knockout/tko.bind",
+    "tko.bind": "github:knockout/tko.bind",
     "tko.binding.core": "github:knockout/tko.binding.core",
-    "tko.binding.foreach": "knockout/tko.binding.foreach",
+    "tko.binding.foreach": "github:knockout/tko.binding.foreach",
     "tko.binding.if": "github:knockout/tko.binding.if",
     "tko.binding.template": "github:knockout/tko.binding.template",
-    "tko.components": "knockout/tko.components",
-    "tko.computed": "knockout/tko.computed",
+    "tko.components": "github:knockout/tko.components",
+    "tko.computed": "github:knockout/tko.computed",
     "tko.filter.punches": "github:knockout/tko.filter.punches",
-    "tko.observable": "knockout/tko.observable",
-    "tko.preprocessor.textInterpolation": "knockout/tko.preprocessor.textInterpolation",
+    "tko.observable": "github:knockout/tko.observable",
+    "tko.preprocessor.textInterpolation": "github:knockout/tko.preprocessor.textInterpolation",
     "tko.provider": "github:knockout/tko.provider",
-    "tko.utils": "githib:knockout/tko.utils"
+    "tko.utils": "github:knockout/tko.utils"
   }
 }
