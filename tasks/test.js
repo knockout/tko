@@ -1,19 +1,18 @@
 //
 // Test task
 //
-var fs = require('fs')
-var path = require('path')
+const fs = require('fs')
+const path = require('path')
 
-var _ = require('lodash')
-var figlet = require('figlet')
-var karma = require('karma')
-var nodeResolve = require('rollup-plugin-node-resolve');
-var nodeDirect = require('rollup-plugin-node-direct');
+const _ = require('lodash')
+const figlet = require('figlet')
+const karma = require('karma')
+const nodeResolve = require('rollup-plugin-node-resolve');
+const nodeDirect = require('rollup-plugin-node-direct');
 
-var gulp = global.__tko_gulp
-
-
+const gulp = global.__tko_gulp
 const SPEC_DIR = path.join(process.cwd(), 'spec')
+
 
 function test(extra_config, done) {
     var options = Object.assign({}, config.karma, extra_config)
@@ -33,7 +32,7 @@ function test(extra_config, done) {
       moduleName: "tko-tests",
       plugins: [
         nodeDirect({
-          paths: [ path.join(SPEC_DIR, '../..') ],
+          paths: [ 'work', '..' ],
           verbose: process.argv.includes('--debug')
         }),
         nodeResolve({ jsnext: true, }),

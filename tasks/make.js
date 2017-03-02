@@ -11,24 +11,29 @@
 //
 
 
-var gulp = global.__tko_gulp
-var rollup = require('rollup')
-var nodeResolve = require('rollup-plugin-node-resolve');
+const gulp = global.__tko_gulp
+const rollup = require('rollup')
+const nodeResolve = require('rollup-plugin-node-resolve');
+const nodeDirect = require('rollup-plugin-node-direct')
+
 
 gulp.task('make', 'Run rollup to make UMD files in dist/', function () {
   var dest = `dist/${global.pkg.name}.js`
   console.log(`🔨  Compiling index.js -> ${dest.green}`)
-  rollup.rollup({
-    entry: 'index.js',
-    plugins: [
-      nodeResolve({ jsnext: true })
-    ],
-  }).then(function(bundle) {
-    return bundle.write({
-      format: 'umd',
-      moduleName: global.pkg.name,
-      dest: dest,
+  return rollup.rollup({
+      entry: 'index.js',
+      plugins: [
+        nodeDirect({
+          paths: [ 'work', '..' ],
+          verbose: process.argv.includes('--debug')
+        }),
+        nodeResolve({ jsnext: true })
+      ],
+    }).then(function(bundle) {
+      return bundle.write({
+        format: 'umd',
+        moduleName: global.pkg.name,
+        dest: dest,
+      })
     })
-  })
-  .catch(console.error)
 })

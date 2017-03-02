@@ -2,7 +2,7 @@
 const _ = require('lodash')
 const fs = require('fs')
 const resolve = require('resolve')
-const {execSync} = require('child_process')
+const {execSync, exec} = require('child_process')
 
 const UTF = { encoding: 'utf-8' }
 const WORK_DIR = 'work/'
@@ -11,6 +11,7 @@ const gulp = global.__tko_gulp
 const work = global.config.work || {
   packages: /tko\..*/
 }
+var PATHS
 
 function throwIfErr(err) {
   if (err) { throw err }
@@ -85,7 +86,7 @@ const DIFF_CMD = 'git diff HEAD'
 const AHEAD_BEHIND_CMD = 'git rev-list --left-right --count master...origin/master'
 
 gulp.task('work:status', () => {
-  const PATHS = fs.readdirSync(WORK_DIR)
+  PATHS = fs.readdirSync(WORK_DIR)
   const longest = _.maxBy(PATHS, (p) => p.length).length
   
   return PATHS.forEach((path) => {
@@ -104,6 +105,49 @@ gulp.task('work:status', () => {
       console.log(`${pathStr[mColor]} ${texts}`)
     })
 })
+
+
+function execPromise(cmd, opts) {
+  return new Promise((res, rej) => {
+    exec(cmd, opts, (err, ...stdoe) => {
+      if (err) { return rej(err) }
+      res(stdoe) // [stdout, stderr]
+    })
+  })
+}
+
+
+function linkTo(pkg) {
+  return Promise.all(
+    PATHS
+      .concat('..')
+      .map((path) => {
+        console.log(`     🖇  ${path.magenta}$ yarn link ${pkg}  `)
+        return execPromise(`yarn link ${pkg}`, {cwd: WORK_DIR + path})
+      })
+  )
+}
+
+
+function createLink(path) {
+  console.log(` 🔗  ${path.red}$ yarn link`)
+  execSync('yarn link', {cwd: WORK_DIR + path})
+  return linkTo(path)
+}
+
+
+gulp.task('work:link', 'Run `yarn link` in/against each work directory', () => {
+  PATHS = fs.readdirSync(WORK_DIR)
+  const paths = [...PATHS]
+  function link() {
+    const p = paths.pop()
+    if (!p) { return }
+    return createLink(p).then(link)
+  }
+
+  link().catch(console.error)
+})
+
 
 
 // gulp.task('work:prune', ['work:mkdir'], () => {
