@@ -344,6 +344,12 @@ describe("the parsing of expressions", function() {
       bindings = new Parser(null, context).parse(binding);
     assert.ok(bindings.ref(), 'Cee')
   })
+
+  it("parses negative numbers", function () {
+    var binding = "text: -30 - 20",
+      bindings = new Parser(null, {}).parse(binding)
+    assert.equal(bindings.text(), -50)
+  })
 })
 
 describe("unary operations", function() {

@@ -365,7 +365,7 @@ Parser.prototype.value = function () {
  * precedence having a higher number.
  * @return {function} The function that performs the infix operation
  */
-Parser.prototype.operator = function (not_an_array) {
+Parser.prototype.operator = function (opts) {
   var op = '',
     op_fn,
     ch = this.white();
@@ -377,7 +377,7 @@ Parser.prototype.operator = function (not_an_array) {
       break;
     }
 
-    if (!not_an_array && ch === '[') {
+    if (!opts.not_an_array && ch === '[') {
       break;
     }
 
@@ -392,6 +392,7 @@ Parser.prototype.operator = function (not_an_array) {
   }
 
   if (op !== '') {
+    if (opts.prefix && op === '-') { op = '&-'; }
     op_fn = operators[op];
 
     if (!op_fn) {
@@ -467,7 +468,7 @@ Parser.prototype.expression = function (filterable) {
 
   while (ch) {
     // unary prefix operators
-    op = this.operator();
+    op = this.operator({ prefix: true });
     if (op) {
       nodes.push(undefined);  // LHS Tree node.
       nodes.push(op);
@@ -496,7 +497,7 @@ Parser.prototype.expression = function (filterable) {
     }
 
     // infix or postfix operators
-    op = this.operator(true);
+    op = this.operator({ not_an_array: true });
 
     if (op === operators['?']) {
       this.ternary(nodes);

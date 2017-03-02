@@ -45,6 +45,7 @@ var operators = {
   // sub/add
   '+': function add(a, b) { return a + b; },
   '-': function sub(a, b) { return (a || 0) - (b || 0); },
+  '&-': function neg(a, b) { return -1 * b; },
   // relational
   '<': function lt(a, b) { return a < b; },
   '<=': function le(a, b) { return a <= b; },
@@ -98,6 +99,7 @@ operators['!!'].precedence = 16; // explicit double-negative
   // Prefix inc/dec
 operators['++'].precedence = 16;
 operators['--'].precedence = 16;
+operators['&-'].precedence = 16;
 
   // mul/div/remainder
 operators['%'].precedence = 14;
