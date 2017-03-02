@@ -3163,6 +3163,7 @@ var operators$1 = {
   // sub/add
   '+': function add(a, b) { return a + b; },
   '-': function sub(a, b) { return (a || 0) - (b || 0); },
+  '&-': function neg(a, b) { return -1 * b; },
   // relational
   '<': function lt(a, b) { return a < b; },
   '<=': function le(a, b) { return a <= b; },
@@ -3216,6 +3217,7 @@ operators$1['!!'].precedence = 16; // explicit double-negative
   // Prefix inc/dec
 operators$1['++'].precedence = 16;
 operators$1['--'].precedence = 16;
+operators$1['&-'].precedence = 16;
 
   // mul/div/remainder
 operators$1['%'].precedence = 14;
@@ -3947,7 +3949,7 @@ Parser.prototype.value = function () {
  * precedence having a higher number.
  * @return {function} The function that performs the infix operation
  */
-Parser.prototype.operator = function (not_an_array) {
+Parser.prototype.operator = function (opts) {
   var op = '',
     op_fn,
     ch = this.white();
@@ -3959,7 +3961,7 @@ Parser.prototype.operator = function (not_an_array) {
       break;
     }
 
-    if (!not_an_array && ch === '[') {
+    if (!opts.not_an_array && ch === '[') {
       break;
     }
 
@@ -3974,6 +3976,7 @@ Parser.prototype.operator = function (not_an_array) {
   }
 
   if (op !== '') {
+    if (opts.prefix && op === '-') { op = '&-'; }
     op_fn = operators[op];
 
     if (!op_fn) {
@@ -4049,7 +4052,7 @@ Parser.prototype.expression = function (filterable) {
 
   while (ch) {
     // unary prefix operators
-    op = this.operator();
+    op = this.operator({ prefix: true });
     if (op) {
       nodes.push(undefined);  // LHS Tree node.
       nodes.push(op);
@@ -4078,7 +4081,7 @@ Parser.prototype.expression = function (filterable) {
     }
 
     // infix or postfix operators
-    op = this.operator(true);
+    op = this.operator({ not_an_array: true });
 
     if (op === operators['?']) {
       this.ternary(nodes);
