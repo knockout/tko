@@ -4,6 +4,9 @@ This is the default `foreach` binding for [`tko`](https://github.com/knockout/tk
 
 
 ---
+2 Apr 2017 – 🐦  4.0.0-alpha2
+  - Preserve the focus of elements deleted/added (moved) in a single the animation frame / queue processing.
+
 19 Jan 2017 — 🐉  4.0.0-alpha1
   - Expose the `conditional` for `elseChainSatisfied` so the `else` binding will now work with this as expected i.e. when the foreach data is empty, the `else` binding will be rendered.
 

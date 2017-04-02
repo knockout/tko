@@ -726,7 +726,7 @@ describe("observable array changes", function () {
 
   describe("$index", function () {
     it("is present on the children", function () {
-      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index(), 0)
@@ -756,7 +756,7 @@ describe("observable array changes", function () {
     })
 
     it("updates the first list item", function () {
-      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>");
       var list = observableArray([]);
       applyBindings(list, target[0])
       list.push('a')
@@ -764,7 +764,7 @@ describe("observable array changes", function () {
     })
 
     it("updates on append", function () {
-      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>");
       var list = observableArray(['a', 'b', 'c']);
       applyBindings(list, target[0])
       list.push('d')
@@ -775,7 +775,7 @@ describe("observable array changes", function () {
     })
 
     it("updates on prepend", function () {
-      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>");
       var list = observableArray(['a', 'b', 'c']);
       applyBindings(list, target[0])
       list.unshift('e')
@@ -786,7 +786,7 @@ describe("observable array changes", function () {
     })
 
     it("updates on splice", function () {
-      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
+      var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>");
       var list = observableArray(['a', 'b', 'c']);
       applyBindings(list, target[0])
       // Delete 2 at 1, insert 2
@@ -797,14 +797,14 @@ describe("observable array changes", function () {
     })
 
     it("is disabled with noIndex", function () {
-      var target = $("<ul data-bind='foreach: {data: $data, noIndex: true}'><li data-bind='text: $data'></li></div>");
+      var target = $("<ul data-bind='foreach: {data: $data, noIndex: true}'><li data-bind='text: $data'></li></ul>");
       var list = observableArray(['a']);
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index, undefined)
     })
 
     it("is present with `as`", function () {
-      var target = $("<ul data-bind='foreach: {data: $data, as: \"$item\"}'><li data-bind='text: $item'></li></div>");
+      var target = $("<ul data-bind='foreach: {data: $data, as: \"$item\"}'><li data-bind='text: $item'></li></ul>");
       var list = observableArray(['a', 'b']);
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index(), 0)
@@ -814,14 +814,14 @@ describe("observable array changes", function () {
 
   describe('`as` parameter', function () {
     it("is used when present", function () {
-      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></div>");
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(target.text(), 'abc')
     })
 
     it("each item has the same $data as its parent", function () {
-      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></div>");
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.strictEqual(dataFor(target.children()[0]).$data, dataFor(target))
@@ -830,7 +830,7 @@ describe("observable array changes", function () {
     })
 
     it("has an $index", function () {
-      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></div>");
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index(), 0)
@@ -839,7 +839,7 @@ describe("observable array changes", function () {
     })
 
     it("respects `noIndex`", function () {
-      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\", noIndex: true }'><li data-bind='text: xyz'></li></div>");
+      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\", noIndex: true }'><li data-bind='text: xyz'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index, undefined)
@@ -848,7 +848,7 @@ describe("observable array changes", function () {
     })
 
     it("respects `noIndex` on allBindings", function () {
-      var target = $("<ul data-bind='foreach: $data, as: \"xyz\", noIndex: true'><li data-bind='text: xyz'></li></div>");
+      var target = $("<ul data-bind='foreach: $data, as: \"xyz\", noIndex: true'><li data-bind='text: xyz'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(contextFor(target.children()[0]).$index, undefined)
@@ -857,13 +857,104 @@ describe("observable array changes", function () {
     })
 
     it("reads `as` from peer binding parameters", function () {
-      var target = $("<ul data-bind='foreach: $data, as: \"xyz\"'><li data-bind='text: xyz'></li></div>");
+      var target = $("<ul data-bind='foreach: $data, as: \"xyz\"'><li data-bind='text: xyz'></li></ul>");
       var list = ['a', 'b', 'c'];
       applyBindings(list, target[0])
       assert.equal(target.text(), 'abc')
     })
   })
 })
+
+
+describe("focus", function () {
+  var $target
+  beforeEach(function() {
+    $target = $("<div data-bind='foreach: $data'>"
+      + "<input />"
+      + "</div>")
+      .appendTo(document.body);
+    foreach.setSync(false)
+  })
+
+  afterEach(function () {
+    $target.remove()
+  })
+
+  it('does not preserve the target on apply bindings', function (done) {
+    var list = ['a', 'b', 'c'];
+    $target.find(":input").focus()
+    applyBindings(list, $target[0])
+    setTimeout(function () {
+      assert.strictEqual(document.activeElement, document.body)
+      done()
+    }, 50)
+  })
+
+  it("does not preserves primitive targets when re-ordering", function (done) {
+    var list = observableArray(['a', 'b', 'c']);
+    applyBindings(list, $target[0])
+    $target.find(":input").first().focus()
+    assert.strictEqual(document.activeElement, $target.find(":input")[0])
+
+    list.remove('a')
+    list.push('a')
+    setTimeout(function () {
+      assert.strictEqual(document.activeElement, document.body)
+      done()
+    }, 50)
+  })
+
+  it("preserves objects when re-ordering", function (done) {
+    var o0 = {}
+    var list = observableArray([o0, 'b', 'c']);
+    applyBindings(list, $target[0])
+    $target.find(":input").first().focus()
+    assert.strictEqual(document.activeElement, $target.find(":input")[0], "a")
+
+    list.remove(o0)
+    list.push(o0)
+    setTimeout(function () {
+      assert.strictEqual(document.activeElement, $target.find(":input")[2], "o")
+      done()
+    }, 50)
+  })
+
+  it("preserves objects when re-ordering multiple identical", function (done) {
+    var o0 = {}
+    var list = observableArray([o0, 'b', 'c']);
+    applyBindings(list, $target[0])
+    $target.find(":input").first().focus()
+    assert.strictEqual(document.activeElement, $target.find(":input")[0], "a")
+
+    list.remove(o0)
+    list.push('x')
+    list.push(o0)
+    list.push('y')
+
+    setTimeout(function () {
+      assert.strictEqual(document.activeElement, $target.find(":input")[3], "o")
+      done()
+    }, 50)
+  })
+
+  it("preserves objects when re-ordering multiple identical", function (done) {
+    var o0 = {}
+    var list = observableArray([o0, 'b', 'c']);
+    applyBindings(list, $target[0])
+    $target.find(":input").first().focus()
+    assert.strictEqual(document.activeElement, $target.find(":input")[0], "a")
+
+    list.remove(o0)
+    list.push(o0) // focused
+    list.push(o0)
+
+    setTimeout(function () {
+      assert.strictEqual(document.activeElement, $target.find(":input")[2], "o")
+      done()
+    }, 50)
+  })
+})
+
 
 
 describe("$list", function () {

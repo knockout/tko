@@ -1,6 +1,6 @@
 {
   "name": "tko.binding.foreach",
-  "version": "4.0.0-alpha1",
+  "version": "4.0.0-alpha2",
   "description": "Knockout Foreach Binding",
   "main": "index.js",
   "scripts": {

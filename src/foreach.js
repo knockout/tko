@@ -7,7 +7,7 @@
 
 import {
   arrayForEach, addDisposeCallback, cleanNode, options, virtualElements,
-  createSymbolOrString, domData
+  createSymbolOrString, domData, domNodeIsContainedBy
 } from 'tko.utils';
 
 import {
@@ -181,16 +181,29 @@ ForEach.prototype.onArrayChange = function (changeSet, isInitial) {
 };
 
 
+ForEach.prototype.startQueueFlush = function () {
+  // Callback so folks can do things before the queue flush.
+  if (typeof this.beforeQueueFlush === 'function') {
+    this.beforeQueueFlush(this.changeQueue);
+  }
+};
+
+
+ForEach.prototype.endQueueFlush = function () {
+  // Callback so folks can do things.
+  if (typeof this.afterQueueFlush === 'function') {
+    this.afterQueueFlush(this.changeQueue);
+  }
+};
+
+
 // Reflect all the changes in the queue in the DOM, then wipe the queue.
 ForEach.prototype.processQueue = function () {
   var self = this;
   var isEmpty = !unwrap(this.data).length;
   var lowestIndexChanged = MAX_LIST_SIZE;
 
-  // Callback so folks can do things before the queue flush.
-  if (typeof this.beforeQueueFlush === 'function') {
-    this.beforeQueueFlush(this.changeQueue);
-  }
+  this.startQueueFlush();
 
   arrayForEach(this.changeQueue, function (changeItem) {
     if (typeof changeItem.index === 'number') {
@@ -204,10 +217,7 @@ ForEach.prototype.processQueue = function () {
   // Update our indexes.
   if (this.updateIndexes) { this.updateIndexes(lowestIndexChanged); }
 
-  // Callback so folks can do things.
-  if (typeof this.afterQueueFlush === 'function') {
-    this.afterQueueFlush(this.changeQueue);
-  }
+  this.endQueueFlush();
   this.changeQueue = [];
 
   // Update the conditional exposed on the domData
@@ -306,6 +316,7 @@ ForEach.prototype.added = function (changeItem) {
   }
 };
 
+
 ForEach.prototype.getNodesForIndex = function (index) {
   var result = [],
     ptr = this.firstLastNodesList[index].first,
@@ -318,29 +329,45 @@ ForEach.prototype.getNodesForIndex = function (index) {
   return result;
 };
 
+
 ForEach.prototype.getLastNodeBeforeIndex = function (index) {
   if (index < 1 || index - 1 >= this.firstLastNodesList.length)
     return null;
   return this.firstLastNodesList[index - 1].last;
 };
 
+
+/**
+ * Get the active (focused) node, if it's a child of the given node.
+ */
+ForEach.prototype.activeChildElement = function (node) {
+  var active = document.activeElement;
+  if (domNodeIsContainedBy(active, node)) {
+    return active;
+  }
+};
+
+
 ForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfterNode) {
   var frag, len, i,
+    active = null,
     containerNode = this.element;
 
-  // poor man's node and array check, should be enough for this
+  // Poor man's node and array check.
   if (nodeOrNodeArrayToInsert.nodeType === undefined && nodeOrNodeArrayToInsert.length === undefined) {
     throw new Error("Expected a single node or a node array");
   }
   if (nodeOrNodeArrayToInsert.nodeType !== undefined) {
+    active = this.activeChildElement(nodeOrNodeArrayToInsert);
     virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert, insertAfterNode);
     return [nodeOrNodeArrayToInsert];
   } else if (nodeOrNodeArrayToInsert.length === 1) {
+    active = this.activeChildElement(nodeOrNodeArrayToInsert[0]);
     virtualElements.insertAfter(containerNode, nodeOrNodeArrayToInsert[0], insertAfterNode);
   } else if (supportsDocumentFragment) {
     frag = document.createDocumentFragment();
-
     for (i = 0, len = nodeOrNodeArrayToInsert.length; i !== len; ++i) {
+      active = active || this.activeChildElement(nodeOrNodeArrayToInsert[i]);
       frag.appendChild(nodeOrNodeArrayToInsert[i]);
     }
     virtualElements.insertAfter(containerNode, frag, insertAfterNode);
@@ -348,11 +375,15 @@ ForEach.prototype.insertAllAfter = function (nodeOrNodeArrayToInsert, insertAfte
     // Nodes are inserted in reverse order - pushed down immediately after
     // the last node for the previous item or as the first node of element.
     for (i = nodeOrNodeArrayToInsert.length - 1; i >= 0; --i) {
+      active = active || this.activeChildElement(nodeOrNodeArrayToInsert[i]);
       var child = nodeOrNodeArrayToInsert[i];
       if (!child) { break; }
       virtualElements.insertAfter(containerNode, child, insertAfterNode);
     }
   }
+
+  if (active) { active.focus(); }
+
   return nodeOrNodeArrayToInsert;
 };
 
