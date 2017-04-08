@@ -11,6 +11,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (provider) Fix dereferencing of namespaced items e.g. attr.title: `${v}`
 * (parser) Fix unary negation
 * (foreach) Preserve focus when items are deleted and re-added (i.e. moved) in the same animation frame.
+* (observable array) Incorporate 3.4 fix for memory leak
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 

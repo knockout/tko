@@ -1636,6 +1636,7 @@ var tasks = Object.freeze({
   tko.util
   ===
 
+
 */
 
 // Sub-Modules;
@@ -2183,7 +2184,10 @@ function trackArrayChanges(target, options$$1) {
         if (underlyingAfterSubscriptionRemoveFunction)
             underlyingAfterSubscriptionRemoveFunction.call(target, event);
         if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
-            arrayChangeSubscription.dispose();
+            if (arrayChangeSubscription) {
+                arrayChangeSubscription.dispose();
+            }
+            arrayChangeSubscription = null;
             trackingChanges = false;
         }
     };
