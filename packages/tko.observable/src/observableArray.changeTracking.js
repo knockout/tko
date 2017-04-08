@@ -48,7 +48,10 @@ export function trackArrayChanges(target, options) {
         if (underlyingAfterSubscriptionRemoveFunction)
             underlyingAfterSubscriptionRemoveFunction.call(target, event);
         if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
-            arrayChangeSubscription.dispose();
+            if (arrayChangeSubscription) {
+                arrayChangeSubscription.dispose();
+            }
+            arrayChangeSubscription = null;
             trackingChanges = false;
         }
     };
