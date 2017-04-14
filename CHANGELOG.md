@@ -12,6 +12,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (parser) Fix unary negation
 * (foreach) Preserve focus when items are deleted and re-added (i.e. moved) in the same animation frame.
 * (observable array) Incorporate 3.4 fix for memory leak
+* (parser) Fix array values not being unwrapped/called e.g. `data-bind="x: [f(), observable, 1 + 6, `a ${x} c`]"`
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 

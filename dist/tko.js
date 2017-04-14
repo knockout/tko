@@ -3330,6 +3330,8 @@ Node.isExpressionOrIdentifierSymbol = createSymbolOrString("isExpressionOrIdenti
 Node.value_of = function value_of(item) {
   if (item && item[Node.isExpressionOrIdentifierSymbol]) {
     return item.get_value();
+  } else if (item instanceof Node) {
+    return item.get_node_value();
   }
   return item;
 };
@@ -4381,6 +4383,10 @@ Parser.prototype.convert_to_accessors = function (result) {
     } else if (value instanceof Node) {
       result[name] = function nodeAccessor() {
         return value.get_node_value();
+      };
+    } else if (Array.isArray(value)) {
+      result[name] = function arrayAccessor() {
+        return value.map(function(v, i) { return Node.value_of(v) })
       };
     } else if (typeof(value) !== 'function') {
       result[name] = function constAccessor() {
