@@ -1,3 +1,6 @@
+### 0.5.6 (2017-04-14)
+* Fix unwrapping values inside arrays
+
 ### 0.5.5 (2015-11-18)
 * **build**: Fix bad minification/minified version
 

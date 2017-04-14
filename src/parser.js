@@ -795,6 +795,10 @@ Parser.prototype.convert_to_accessors = function (result) {
       result[name] = function nodeAccessor() {
         return value.get_node_value();
       };
+    } else if (Array.isArray(value)) {
+      result[name] = function arrayAccessor() {
+        return value.map(function(v, i) { return Node.value_of(v) })
+      }
     } else if (typeof(value) !== 'function') {
       result[name] = function constAccessor() {
         return clonePlainObjectDeep(value);

@@ -637,6 +637,15 @@ describe("array accessors - []", function() {
     assert.equal(bindings.neg(), 6)
   })
 
+  it("returns values in an inline array", function () {
+    var binding = "neg: [1, o, 'z', f(), `a${o}c`]",
+      f = function() { return "E" },
+      o = observable('O'),
+      context = { f: f, o: o },
+      bindings = new Parser(null, context).parse(binding);
+    assert.deepEqual(bindings.neg(), [1, o, 'z', 'E', 'aOc'])
+  })
+
   it("unwraps Identifier/Expression contents"
     /*, function () {
             var binding = "arr: [a, a && b]",
