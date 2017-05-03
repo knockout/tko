@@ -1,6 +1,6 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 🐋   Alpha-2  ( Work in progress on the `master` branch )
+## 🐋   Alpha-2  (3 May 2017)
 
 * (API) Expose `dependencyDetection.ignore` as `ignoreDependencies`
 * (foreach binding) When using the `as` parameter, the `$data` remains unchanged (i.e. the context inside a `foreach` is no longer a "child" context, but an extension of the current context); this deprecates the `noContext` parameter
@@ -13,6 +13,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (foreach) Preserve focus when items are deleted and re-added (i.e. moved) in the same animation frame.
 * (observable array) Incorporate 3.4 fix for memory leak
 * (parser) Fix array values not being unwrapped/called e.g. `data-bind="x: [f(), observable, 1 + 6, `a ${x} c`]"`
+* (parser) Fix interpretation of unicode characters as identifiers / variables
 
 ##  🏹  Alpha-1  (20 Dec 2016)
 
