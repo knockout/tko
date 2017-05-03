@@ -368,12 +368,13 @@ Parser.prototype.value = function () {
 Parser.prototype.operator = function (opts) {
   var op = '',
     op_fn,
-    ch = this.white();
+    ch = this.white(),
+    is_identifier_char = Identifier.is_valid_start_char;
 
   while (ch) {
     if (is_identifier_char(ch) || ch <= ' ' || ch === '' ||
         ch === '"' || ch === "'" || ch === '{' || ch === '(' ||
-        ch === "`" || ch === ')') {
+        ch === "`" || ch === ')' || (ch <= '9' && ch >= '0')) {
       break;
     }
 
@@ -389,6 +390,8 @@ Parser.prototype.operator = function (opts) {
     if (ch === '@') {
       break;
     }
+
+    is_identifier_char = Identifier.is_valid_continue_char;
   }
 
   if (op !== '') {
@@ -582,13 +585,16 @@ Parser.prototype.func_arguments = function () {
  */
 Parser.prototype.member = function () {
   var member = '',
-    ch = this.white();
+    ch = this.white(),
+    is_identifier_char = Identifier.is_valid_start_char;
+
   while (ch) {
     if (!is_identifier_char(ch)) {
       break;
     }
     member += ch;
     ch = this.next();
+    is_identifier_char = Identifier.is_valid_continue_char;
   }
   return member;
 };
@@ -645,7 +651,10 @@ Parser.prototype.dereferences = function () {
 
 
 Parser.prototype.identifier = function () {
-  var token = '', ch;
+  var token = '',
+    ch,
+    is_identifier_char = Identifier.is_valid_start_char;
+
   ch = this.white();
   while (ch) {
     if (!is_identifier_char(ch)) {
@@ -653,6 +662,7 @@ Parser.prototype.identifier = function () {
     }
     token += ch;
     ch = this.next();
+    is_identifier_char = Identifier.is_valid_continue_char;
   }
   switch (token) {
   case 'true': return true;
@@ -797,8 +807,8 @@ Parser.prototype.convert_to_accessors = function (result) {
       };
     } else if (Array.isArray(value)) {
       result[name] = function arrayAccessor() {
-        return value.map(function(v, i) { return Node.value_of(v) })
-      }
+        return value.map(function(v/*, i*/) { return Node.value_of(v); });
+      };
     } else if (typeof(value) !== 'function') {
       result[name] = function constAccessor() {
         return clonePlainObjectDeep(value);
@@ -846,20 +856,3 @@ Parser.prototype.parse = function (source) {
 
   return this.convert_to_accessors(result);
 };
-
-
-/**
- * Determine if a character is a valid item in an identifier.
- * Note that we do not check whether the first item is a number, nor do we
- * support unicode identifiers here.
- *
- * See: http://docstore.mik.ua/orelly/webprog/jscript/ch02_07.htm
- * @param  {String}  ch  The character
- * @return {Boolean}     True if [A-Za-z0-9_]
- */
-function is_identifier_char(ch) {
-  return (ch >= 'A' && ch <= 'Z') ||
-         (ch >= 'a' && ch <= 'z') ||
-         (ch >= '0' && ch <= 9) ||
-          ch === '_' || ch === '$';
-}

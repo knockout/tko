@@ -50,6 +50,19 @@ describe("the bindings parser", function() {
     assert.equal(value.n(), null, "null");
   })
 
+  it("works with alphanumerics ä and å (unicode < 0x0100)", function() {
+    var binding_string = 'a: å, b: ä'
+    var value = new Parser(null, { å: 135, ä: 955 }).parse(binding_string);
+    assert.equal(value.a(), 135, "å");
+    assert.equal(value.b(), 955, "ä");
+  })
+
+  it("works with alphanumeric π (unicode > 0x0100)", function() {
+    var binding_string = 'a: π'
+    var value = new Parser(null, { π: 3.14 }).parse(binding_string);
+    assert.equal(value.a(), 3.14, "π");
+  })
+
   it("applies negation (-)", function () {
     var binding_string = 'a: -1, b: -2, c: -10.09, x: -x, y: -y, z: -(4 + 4)',
       context = { x: 2, y: observable(4) },
