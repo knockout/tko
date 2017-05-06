@@ -74,6 +74,7 @@ gulp.task('work:clone', ['work:mkdir'], () => {
 
 gulp.task('work:pull', ['work:mkdir'], () => {
   return fs.readdirSync(WORK_DIR)
+    .filter((path) => fs.lstatSync(WORK_DIR + path).isDirectory())
     .forEach((pkgName) =>
       gitAction('⬆️', 'pull', pkgName,
         Object.assign({cwd: WORK_DIR + pkgName})
