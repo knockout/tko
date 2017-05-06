@@ -5,10 +5,11 @@ const fs = require('fs')
 const path = require('path')
 
 const _ = require('lodash')
-const figlet = require('figlet')
 const karma = require('karma')
 const nodeResolve = require('rollup-plugin-node-resolve');
 const nodeDirect = require('rollup-plugin-node-direct');
+const commonjs = require('rollup-plugin-commonjs')
+const babel = require('./rollup-babel')
 
 const gulp = global.__tko_gulp
 const SPEC_DIR = path.join(process.cwd(), 'spec')
@@ -31,13 +32,15 @@ function test(extra_config, done) {
       format: 'iife',
       moduleName: "tko-tests",
       plugins: [
+        commonjs(),
         nodeDirect({
           paths: [ 'work', '..' ],
           verbose: process.argv.includes('--debug')
         }),
         nodeResolve({ jsnext: true, }),
+        babel.plugin(babel.options),
       ],
-      sourceMap: process.argv.includes('--no-sourcemap') ? false : 'inline',
+      sourceMap: process.argv.includes('--sourcemap') ? 'inline': false,
     }
 
     if (process.argv.indexOf('--debug') >= 0) {
@@ -70,6 +73,6 @@ gulp.task('test', 'Run Karma tests', function (done) {
     'watch': 'Watch for changes, re-testing on change.',
     'debug': 'Print task debugging.',
     'chrome': 'Use Chrome test runner',
-    'no-sourcemap': 'Disable sourcemap generation'
+    'sourcemap': 'Enable sourcemap generation'
   }
 })

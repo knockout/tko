@@ -12,31 +12,22 @@
 
 
 const gulp = global.__tko_gulp
+const _ = require('lodash')
 
 const rollup = require('rollup')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const nodeDirect = require('rollup-plugin-node-direct')
-const babel = require('rollup-plugin-babel')
 const replace = require('rollup-plugin-replace')
-const _ = require('lodash')
+
+const babel = require('./rollup-babel')
 
 const pkg_name = _.get(config, 'package.name', global.pkg.name)
 
 
-const babelOptions = {
-  exclude: 'node_modules/**',
-  presets: [
-    [require.resolve('babel-preset-es2015'), { modules: false }],
-    require.resolve('babel-preset-stage-0'),
-  ],
-  plugins: [
-    require.resolve('babel-plugin-external-helpers'),
-    [require.resolve('babel-plugin-transform-es2015-classes'), { loose: true }],
-    require.resolve('babel-plugin-transform-proto-to-assign')
-  ],
-  babelrc: false
-}
 
+/**
+ * Replace {{VERSION}} with package.json's `version`
+ */
 const REPLACE_CONFIG = {
   delimiters: ['{{', '}}'],
   VERSION: `"${global.pkg.version}"`
@@ -71,7 +62,7 @@ function compile(name, suffix, plugins=[]) {
 
 
 gulp.task("make:js", () => {
-  return compile(pkg_name, "js", [babel(babelOptions)])
+  return compile(pkg_name, "js", [babel.plugin(babel.options)])
 })
 
 

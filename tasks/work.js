@@ -46,8 +46,7 @@ function alreadyCloned(pkgName) {
 }
 
 
-function gitAction(icon, action, pkgName, opts) {
-  const repoUrl = canonRepoUrl(repoPkg(pkgName).repository.url)
+function gitAction(icon, action, pkgName, repoUrl, opts) {
   const cmd = `git ${action} ${repoUrl}`
   console.log(`${icon}  ${action}    ${pkgName.blue} at ${repoUrl}`)
   return execSync(cmd, opts)
@@ -67,7 +66,7 @@ gulp.task('work:clone', ['work:mkdir'], () => {
       work.packages.test(pkgName) && !alreadyCloned(pkgName)
     )
     .each((remote, pkgName) =>
-      gitAction('🌻', 'clone', pkgName, GIT_OPTS)
+      gitAction('🌻', 'clone', pkgName, remote, GIT_OPTS)
     )
 })
 
@@ -77,6 +76,7 @@ gulp.task('work:pull', ['work:mkdir'], () => {
     .filter((path) => fs.lstatSync(WORK_DIR + path).isDirectory())
     .forEach((pkgName) =>
       gitAction('⬆️', 'pull', pkgName,
+        canonRepoUrl(repoPkg(pkgName).repository.url),
         Object.assign({cwd: WORK_DIR + pkgName})
       )
     )
