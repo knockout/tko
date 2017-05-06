@@ -1,0 +1,29 @@
+machine:
+  node:
+    version: 6.1.0
+  environment:
+    CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
+    CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
+dependencies:
+  pre:
+    # Need npm v3 for flat node_modules dependencies.
+    - npm install -g npm
+    - npm install -g rollup gulp
+  post:
+    - npm update
+
+test:
+  override:
+  - gulp test --once
+#  - gulp test:phantomjs --once --jquery
+#  - gulp test:phantomjs --once --jquery3-compat
+#  - gulp test:sauce --chrome
+#  - sleep 10 && gulp test:sauce --firefox
+#  - sleep 10 && gulp test:sauce --mobile
+#  - sleep 10 && gulp test:sauce --opera
+#  - sleep 10 && gulp test:sauce --ie
+#  - sleep 10 && gulp test:sauce --ie-legacy --innershiv --json2
+general:
+  branches:
+    ignore:
+    - gh-pages # list of branches to ignore

@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "core-js": "^2.4.1",
+    "tko.computed": "knockout/tko.computed",
+    "tko.utils": "knockout/tko.utils"
+  },
+  "devDependencies": {
+    "tko-policy": "knockout/tko-policy",
+    "tko.observable": "knockout/tko.observable"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "index.js",
+    "./*.ya?ml"
+  ],
+  "name": "tko.lifecycle",
+  "version": "1.0.0",
+  "description": "Knockout LifeCycle for object instances",
+  "main": "dist/tko.lifecycle.js",
+  "jsnext:main": "index.js",
+  "repository": "git@github.com:knockout/tko.lifecycle.git",
+  "author": "Knockout Team",
+  "license": "MIT"
+}
