@@ -19,6 +19,10 @@ import {
     bindingContext, storedBindingContextForNode
 } from './bindingContext';
 
+import {
+    getBindingHandlerClass
+} from './BindingHandler'
+
 
 // The following element types will not be recursed into during binding.
 var bindingDoesNotRecurseIntoElementTypes = {
@@ -78,20 +82,6 @@ function getBindingsAndMakeAccessors(node, context) {
     return makeAccessorsFromFunction(this.getBindings.bind(this, node, context));
 }
 
-function validateThatBindingIsAllowedForVirtualElements(bindingName) {
-    var bindingHandler = options.bindingProviderInstance.bindingHandlers[bindingName],
-        validator;
-    if (typeof bindingHandler === 'function') {
-        validator = bindingHandler.allowVirtualElements || (
-            typeof bindingHandler.prototype === 'object' &&
-            Boolean(bindingHandler.prototype.allowVirtualElements)
-        );
-    } else {
-        validator = bindingHandler.allowVirtualElements || virtualElements.allowedBindings[bindingName];
-    }
-    if (!validator)
-        throw new Error("The binding '" + bindingName + "' cannot be used with virtual elements");
-}
 
 function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement) {
     var currentChild,
@@ -156,161 +146,32 @@ function topologicalSortBindings(bindings) {
         cyclicDependencyStack = []; // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
     objectForEach(bindings, function pushBinding(bindingKey) {
         if (!bindingsConsidered[bindingKey]) {
-            var binding = getBindingHandler(bindingKey);
-            if (binding) {
-                // First add dependencies (if any) of the current binding
-                if (binding.after) {
-                    cyclicDependencyStack.push(bindingKey);
-                    arrayForEach(binding.after, function(bindingDependencyKey) {
-                        if (bindings[bindingDependencyKey]) {
-                            if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
-                                throw Error("Cannot combine the following bindings, because they have a cyclic dependency: " + cyclicDependencyStack.join(", "));
-                            } else {
-                                pushBinding(bindingDependencyKey);
-                            }
-                        }
-                    });
-                    cyclicDependencyStack.length--;
-                }
-                // Next add the current binding
-                result.push({ key: bindingKey, handler: binding });
+            const binding = getBindingHandler(bindingKey);
+            if (!binding) { return }
+            // First add dependencies (if any) of the current binding
+            if (binding.after) {
+                cyclicDependencyStack.push(bindingKey);
+                arrayForEach(binding.after, function(bindingDependencyKey) {
+                    if (!bindings[bindingDependencyKey]) { return }
+                    if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
+                        throw Error("Cannot combine the following bindings, because they have a cyclic dependency: " + cyclicDependencyStack.join(", "));
+                    } else {
+                        pushBinding(bindingDependencyKey);
+                    }
+                });
+                cyclicDependencyStack.length--;
             }
-            bindingsConsidered[bindingKey] = true;
+            // Next add the current binding
+            result.push({ key: bindingKey, handler: binding });
         }
+        bindingsConsidered[bindingKey] = true;
     });
 
     return result;
 }
 
-// This is called when the bindingHandler is an object (with `init` and/or
-// `update` methods)
-function execObjectBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccessor, allBindings, bindingContext, reportBindingError) {
-    var handlerInitFn = bindingKeyAndHandler.handler["init"],
-        handlerUpdateFn = bindingKeyAndHandler.handler["update"],
-        bindingKey = bindingKeyAndHandler.key,
-        controlsDescendantBindings = false;
-
-    // Run init, ignoring any dependencies
-    if (typeof handlerInitFn === "function") {
-        try {
-            dependencyDetection.ignore(function() {
-                var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext.$data, bindingContext);
-
-                // If this binding handler claims to control descendant bindings, make a note of this
-                if (initResult && initResult.controlsDescendantBindings) {
-                    controlsDescendantBindings = true;
-                }
-            });
-        } catch(ex) {
-            reportBindingError('init', ex);
-        }
-    }
-
-    // Run update in its own computed wrapper
-    if (typeof handlerUpdateFn === "function") {
-        computed(
-            function() {
-                try {
-                    handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext.$data, bindingContext);
-                } catch (ex) {
-                    reportBindingError('update', ex);
-                }
-            },
-            null,
-            { disposeWhenNodeIsRemoved: node }
-        );
-    }
-    return controlsDescendantBindings;
-}
-
-// This is called when the bindingHandler is a function (or ES6 class).
-// Node that these will work only for browsers with Object.defineProperty,
-// i.e. IE9+.
-function execNewBindingHandlerOnNode(bindingKeyAndHandler, node, getValueAccessor, allBindings, bindingContext, reportBindingError) {
-    var bindingKey = bindingKeyAndHandler.key,
-        handlerParams = {
-            element: node,
-            $data: bindingContext.$data,
-            $context: bindingContext,
-            allBindings: allBindings
-        },
-        handlerConstructor = bindingKeyAndHandler.handler,
-        handlerInstance,
-        subscriptions = [];
-
-    Object.defineProperty(handlerParams, 'value', {
-        get: function () { return getValueAccessor(bindingKey)(); }
-    });
-
-    function handlerConstructorWrapper() {
-        handlerInstance = this;
-
-        // The handler instance will have properties `computed` and
-        // `subscribe`, which are almost the same as the `ko.-` equivalent
-        // except their lifecycle is limited to that of the node (i.e.
-        // they are automatically disposed).
-        this.computed = function handlerInstanceComputed(functionOrObject) {
-            var settings = typeof functionOrObject === 'function' ?
-                { read: functionOrObject, write: functionOrObject } :
-                functionOrObject;
-            extend(settings, {
-                owner: handlerInstance,
-                disposeWhenNodeIsRemoved: node
-            });
-            return computed(settings);
-        };
-
-        this.subscribe = function handlerInstanceSubscription(subscribable, callback, eventType) {
-            subscriptions.push(
-                subscribable.subscribe(callback, handlerInstance, eventType)
-            );
-        };
-
-        this.value = this.computed(function () {
-            return getValueAccessor(bindingKey)();
-        });
-
-        handlerConstructor.call(this, handlerParams);
-    }
-
-    // We have to wrap the handler instance in this "subclass" because
-    // it's the only way to define this.computed/subscribe before the
-    // handlerConstructor is called, and one would expect those
-    // utilities to be available in the constructor.
-    extend(handlerConstructorWrapper, handlerConstructor);
-    handlerConstructorWrapper.prototype = handlerConstructor.prototype;
-
-    try {
-        new handlerConstructorWrapper();
-    } catch(ex) {
-        reportBindingError('construction', ex);
-    }
-
-    addDisposeCallback(node, function () {
-        if (typeof handlerInstance.dispose === "function") {
-            handlerInstance.dispose.call(handlerInstance);
-        }
-        arrayForEach(subscriptions, function (subs) {
-            subs.dispose();
-        });
-    });
-
-    return handlerConstructor.controlsDescendantBindings || handlerInstance.controlsDescendantBindings;
-}
 
 function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindingContextMayDifferFromDomParentElement) {
-
-    // Use of allBindings as a function is maintained for backwards compatibility, but its use is deprecated
-    function allBindings() {
-        return objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor);
-    }
-    // The following is the 3.x allBindings API
-    allBindings.get = function(key) {
-        return bindings[key] && evaluateValueAccessor(getValueAccessor(key));
-    };
-    allBindings.has = function(key) {
-        return key in bindings;
-    };
 
     // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
     var alreadyBound = domData.get(node, boundElementDomDataKey);
@@ -360,59 +221,69 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
 
     var bindingHandlerThatControlsDescendantBindings;
     if (bindings) {
+        const allBindingHandlers = {}
+        domData.set(node, 'bindingHandlers', allBindingHandlers)
+
         // Return the value accessor for a given binding. When bindings are static (won't be updated because of a binding
         // context update), just return the value accessor from the binding. Otherwise, return a function that always gets
         // the latest binding value and registers a dependency on the binding updater.
-        var getValueAccessor = bindingsUpdater
-            ? function (bindingKey) {
-                return function(optionalValue) {
-                    var valueAccessor = bindingsUpdater()[bindingKey];
-                    if (arguments.length === 0) {
-                        return evaluateValueAccessor(valueAccessor);
-                    } else {
-                        return valueAccessor(optionalValue);
-                    }
-                };
-            } : function (bindingKey) { return bindings[bindingKey]; };
+        const getValueAccessor = bindingsUpdater
+            ? (bindingKey) => function (optionalValue) {
+                var valueAccessor = bindingsUpdater()[bindingKey];
+                if (arguments.length === 0) {
+                    return evaluateValueAccessor(valueAccessor);
+                } else {
+                    return valueAccessor(optionalValue);
+                }
+            } : (bindingKey) => bindings[bindingKey]
 
-        // First put the bindings into the right order
-        var orderedBindings = topologicalSortBindings(bindings);
+        // Use of allBindings as a function is maintained for backwards compatibility, but its use is deprecated
+        function allBindings() {
+            return objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor);
+        }
+        // The following is the 3.x allBindings API
+        allBindings.has = (key) => key in bindings
+        allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
+
 
         // Go through the sorted bindings, calling init and update for each
-        arrayForEach(orderedBindings, function(bindingKeyAndHandler) {
-            var bindingKey = bindingKeyAndHandler.key,
-                controlsDescendantBindings,
-                execBindingFunction = typeof bindingKeyAndHandler.handler === 'function' ?
-                    execNewBindingHandlerOnNode :
-                    execObjectBindingHandlerOnNode;
-
-            if (node.nodeType === 8) {
-                validateThatBindingIsAllowedForVirtualElements(bindingKey);
-            }
-
+        topologicalSortBindings(bindings).forEach((bindingKeyAndHandler) => {
             function reportBindingError(during, errorCaptured) {
                 onBindingError({
-                    during: during,
-                    errorCaptured: errorCaptured,
+                    during, errorCaptured, bindingKey, bindings, allBindings,
+                    bindingContext,
                     element: node,
-                    bindingKey: bindingKey,
-                    bindings: bindings,
-                    allBindings: allBindings,
-                    valueAccessor: getValueAccessor(bindingKey),
-                    bindingContext: bindingContext
+                    valueAccessor: getValueAccessor(key),
                 });
             }
 
-            // Note that topologicalSortBindings has already filtered out any nonexistent binding handlers,
-            // so bindingKeyAndHandler.handler will always be nonnull.
-            controlsDescendantBindings = execBindingFunction(
-                bindingKeyAndHandler, node, getValueAccessor,
-                allBindings, bindingContext, reportBindingError);
+            const {handler, key} = bindingKeyAndHandler,
+                bindingKey = key,
+                BindingHandlerClass = getBindingHandlerClass(handler, key, reportBindingError)
 
-            if (controlsDescendantBindings) {
-                if (bindingHandlerThatControlsDescendantBindings !== undefined)
-                    throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + bindingKey + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
-                bindingHandlerThatControlsDescendantBindings = bindingKey;
+
+            if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
+                throw new Error(`The binding [${key}] cannot be used with virtual elements`);
+            }
+
+            try {
+                const bindingHandler = new BindingHandlerClass({
+                    allBindings,
+                    $element: node,
+                    $context: bindingContext,
+                    valueAccessor(...v) { return getValueAccessor(key)(...v) }
+                })
+
+                // Expose the bindings via domData.
+                allBindingHandlers[key] = bindingHandler
+
+                if (bindingHandler.controlsDescendants) {
+                    if (bindingHandlerThatControlsDescendantBindings !== undefined)
+                        throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + key + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
+                    bindingHandlerThatControlsDescendantBindings = key;
+                }
+            } catch (err) {
+                reportBindingError('creation', err)
             }
         });
     }

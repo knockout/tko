@@ -30,6 +30,7 @@ import {bindings as coreBindings} from 'tko.binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
+
 describe('Binding dependencies', function() {
     var bindingHandlers
 
@@ -271,6 +272,7 @@ describe('Binding dependencies', function() {
         options.bindingProviderInstance = {
             bindingHandlers: originalBindingProvider.bindingHandlers,
             nodeHasBindings: originalBindingProvider.nodeHasBindings,
+            otherProviders: [],
             getBindingAccessors: function(node, bindingContext) {
                 var bindings = originalBindingProvider.getBindingAccessors(node, bindingContext);
                 if (bindings && bindings['text']) {

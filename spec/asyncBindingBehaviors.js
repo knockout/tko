@@ -24,6 +24,8 @@ import {
     useMockForTasks
 } from 'tko.utils/helpers/jasmine-13-helper.js';
 
+import 'core-js/fn/object/assign'
+
 
 describe("Deferred bindings", function() {
     var bindingSpy, bindingHandlers;

@@ -189,6 +189,7 @@ describe('Binding attribute syntax', function() {
         var saved_obe = options.onError,
             obe_calls = 0,
             observable = koObservable();
+
         this.after(function () {
             options.onError = saved_obe;
         });
@@ -222,6 +223,20 @@ describe('Binding attribute syntax', function() {
         try { observable(42); } catch (e) {}
         expect(obe_calls).toEqual(2);
     });
+
+    // * This is probably poor policy, but it only applies to legacy handlers. *
+    it("Calls the `update` even if `init` fails", function () {
+        var cc = false
+        this.after(function () { options.set('onError', undefined) })
+        options.set('onError', function(){})
+        bindingHandlers.test = {
+            init() { throw new Error("X") },
+            update() { cc = true }
+        }
+        testNode.innerHTML = "<div data-bind='test: 64725'></div>";
+        applyBindings('0xef', testNode);
+        expect(cc).toEqual(true)
+    })
 
     it("Calls options.onError, if it is defined", function () {
         var oe_calls = 0
@@ -392,7 +407,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "Hello <!-- ko visible: false -->Some text<!-- /ko --> Goodbye"
         expect(function () {
             applyBindings(null, testNode);
-        }).toThrow("The binding 'visible' cannot be used with virtual elements");
+        }).toThrow("The binding [visible] cannot be used with virtual elements");
     });
 
     it('Should be able to set a custom binding to use containerless binding', function() {
@@ -641,142 +656,4 @@ describe('Binding attribute syntax', function() {
         });
     });
 
-
-    describe("Function binding handlers", function () {
-        it("constructs the element with appropriate params", function () {
-            var obj = { 'canary': 42 },
-                viewModel = {param: obj};
-            bindingHandlers.fnHandler = function (params) {
-                expect(params.value).toEqual(obj)
-                expect(params.element).toEqual(testNode.children[0])
-                expect(params.$data).toEqual(viewModel)
-                expect(params.$context).toEqual(
-                    contextFor(testNode.children[0]))
-                expect(params.allBindings()['bx']).toEqual(43)
-                expect(params.allBindings.get('bx')).toEqual(43)
-            }
-            testNode.innerHTML = "<p data-bind='fnHandler: param, bx: 43'>";
-            applyBindings(viewModel, testNode)
-        });
-
-        it("calls the `fn::dispose` when cleaned up", function () {
-            var viewModel = { x: koObservable(true) },
-                instance = null,
-                disposeCalled = 0;
-            bindingHandlers.fnHandler = function () {
-                instance = this;
-            };
-            bindingHandlers.fnHandler.prototype = {
-                dispose: function () {
-                    disposeCalled++;
-                    expect(this).toEqual(instance);
-                }
-            };
-            testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>';
-            applyBindings(viewModel, testNode);
-            expect(disposeCalled).toEqual(0);
-            viewModel.x(false);
-            expect(disposeCalled).toEqual(1);
-        });
-
-        it("does not error without a `dispose` property", function () {
-            var viewModel = { x: koObservable(true) };
-            bindingHandlers.fnHandler = function () {};
-            testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>';
-            applyBindings(viewModel, testNode);
-            viewModel.x(false);
-        });
-
-        it("virtual elements via fn::allowVirtualElements", function () {
-            var called = 0
-            bindingHandlers.fnHandler = function () { called++; };
-            bindingHandlers.fnHandler.prototype = {
-                allowVirtualElements: true
-            };
-            testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>';
-            applyBindings({}, testNode);
-            expect(called).toEqual(1);
-        });
-
-        it("virtual elements via fn.allowVirtualElements", function () {
-            var called = 0
-            bindingHandlers.fnHandler = function () { called++};
-            bindingHandlers.fnHandler.allowVirtualElements = true;
-            testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>';
-            applyBindings({}, testNode);
-            expect(called).toEqual(1);
-        });
-
-        it("errors when allowVirtualElements is not set", function () {
-            var called = 0
-            bindingHandlers.fnHandler = function () { called++; };
-            testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>';
-
-            expect(function () {
-                applyBindings({}, testNode);
-            }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements");
-            expect(called).toEqual(0)
-        });
-
-        //TODO: FAIL
-        it("has a .computed() property with the node's lifecycle", function () {
-            var instance;
-            var xCalls = 0,
-                yCalls = 0;
-            bindingHandlers.fnHandler = function () {
-                var v = this.v = koObservable(0);
-                instance = this;
-                this.x = this.computed(function () {
-                    xCalls++;
-                    v();  // Add a dependency.
-                    expect(this).toEqual(instance);
-                    return 'x';
-                });
-                this.y = this.computed({
-                    read: function () {
-                        yCalls++;
-                        v();
-                        expect(this).toEqual(instance);
-                        return 'y';
-                    }
-                });
-            };
-            testNode.innerHTML = '<i data-bind="fnHandler"></i>';
-            applyBindings({}, testNode);
-            expect(xCalls).toEqual(1);
-            expect(yCalls).toEqual(1);
-            expect(instance.x()).toEqual('x');
-            expect(instance.y()).toEqual('y');
-            expect(xCalls).toEqual(1);
-            expect(yCalls).toEqual(1);
-            instance.v(1);
-            expect(xCalls).toEqual(2);
-            expect(yCalls).toEqual(2);
-
-            cleanNode(testNode);
-            instance.v(2);
-            // Re-computations have stopped.
-            expect(xCalls).toEqual(2);
-            expect(yCalls).toEqual(2);
-        });
-
-        it("has a .subscribe property with the node's lifecycle", function () {
-            var obs = koObservable(),
-                handlerInstance;
-            bindingHandlers.fnHandler = function () {
-                handlerInstance = this;
-                this.subscribe(obs, this.cb);
-            };
-            bindingHandlers.fnHandler.prototype = {
-                cb: function () {
-                    expect(this).toEqual(handlerInstance);
-                }
-            };
-            testNode.innerHTML = "<i data-bind='fnHandler'></i>";
-            applyBindings({}, testNode);
-            expect(obs.getSubscriptionsCount()).toEqual(1);
-            cleanNode(testNode);
-            expect(obs.getSubscriptionsCount()).toEqual(0);
-        });
-    });
 });
