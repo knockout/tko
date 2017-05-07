@@ -36,6 +36,9 @@ when:
 
 Upon the end of the cycle, subscriptions and computeds are disposed and DOM event handlers are removed.
 
+Note that for `computed`, once `anchorTo` has been called with a `node`, upon that node's removal from the DOM tree, the next evaluation of the `computed` will dipose of it.  (i.e. after `anchorTo` is called, any call to `computed` will be passed with `disposeWhenNodeIsRemoved` set to the anchored node).
+
+
 ## Methods
 
 It exposes alternatives to native/ko functions, such as:

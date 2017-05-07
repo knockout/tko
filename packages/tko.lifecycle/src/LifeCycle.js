@@ -11,6 +11,7 @@ import {
 
 
 const SUBSCRIPTIONS = createSymbolOrString('LifeCycle Subscriptions List')
+const ANCHOR_NODE = createSymbolOrString('LifeCycle Anchor Node')
 
 
 export default class LifeCycle {
@@ -28,12 +29,15 @@ export default class LifeCycle {
 
   computed(params) {
     if (typeof params === 'string') {
-      params = this[params].bind(this)
+      params = { read: this[params], write: this[params], owner: this }
     } else if (typeof params === 'object') {
       // Pass directly.
-    } else if (typeof params !== 'function') {
+    } else if (typeof params === 'function') {
+      params = { read: params, write: params }
+    } else {
       throw new Error("LifeCycle::computed not given a valid type.")
     }
+    params.disposeWhenNodeIsRemoved = this[ANCHOR_NODE]
     return this.addDisposable(computed(params))
   }
 
@@ -47,6 +51,7 @@ export default class LifeCycle {
 
   anchorTo(node) {
     addDisposeCallback(node, () => this.dispose())
+    this[ANCHOR_NODE] = node
   }
 
   dispose() {
