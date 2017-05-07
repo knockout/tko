@@ -51,6 +51,7 @@ It exposes alternatives to native/ko functions, such as:
 
 where `fn-name` is the name of a method of the current instance i.e.
 
+
 ```
 fn = this[fn-name]
 ```
@@ -65,7 +66,7 @@ It also exposes:
 |  `.anchorTo(node)` | .dispose is called upon ko.remove/cleanNode(node).
 |  `.addDisposable(obj)` | obj.dispose is called when cleaning up.
 
-
+Once `anchorTo` has been called, then the `node` argument to `this.addEventListener` can be omitted as the anchor node will be used.  If `node` is provided to `addEventListener` it is preferred to the anchor, and will be disposed at the first of the anchor or the event node being removed.
 
 
 LICENSE

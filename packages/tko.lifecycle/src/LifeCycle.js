@@ -41,10 +41,16 @@ export default class LifeCycle {
     return this.addDisposable(computed(params))
   }
 
-  addEventListener(node, event_name, action, options) {
-    if (typeof action === 'string') { action = this[action].bind(this) }
-    node.addEventListener(event_name, action, options)
-    function dispose() { node.removeEventListener(event_name, action) }
+  addEventListener(...args) {
+    const node = args[0].nodeType ? args.shift() : this[ANCHOR_NODE]
+    const [type, act, options] = args
+    const handler = typeof act === 'string' ? this[act].bind(this) : act
+    this.__addEventListener(node, type, handler, options)
+  }
+
+  __addEventListener(node, event_type, handler, options) {
+    node.addEventListener(event_type, action, options)
+    function dispose() { node.removeEventListener(event_type, action) }
     addDisposeCallback(node, dispose)
     this.addDisposable({ dispose })
   }
@@ -58,6 +64,8 @@ export default class LifeCycle {
     const subscriptions = this[SUBSCRIPTIONS] || []
     subscriptions.forEach(s => s.dispose())
     this[SUBSCRIPTIONS] = []
+    this[ANCHOR_NODE] = null
+
   }
 
   addDisposable(subscription) {
