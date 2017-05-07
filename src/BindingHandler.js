@@ -102,9 +102,13 @@ export function getBindingHandlerClass(handler, key, onError) {
     }
 
     if (typeof handler === 'function') {
-        const [init, dispose] = [handler, handler.dispose]
+        const [initFn, disposeFn] = [handler, handler.dispose]
         return class extends LegacyBindingHandler {
-            get handler() { return { init: init.bind(this), dispose, onError } }
+            get handler() {
+                const init = initFn.bind(this)
+                const dispose = disposeFn ? disposeFn.bind(this) : null
+                return { init, dispose, onError }
+            }
             static get allowVirtualElements() {
                 return handler.allowVirtualElements || virtualElements.allowedBindings[key]
             }
