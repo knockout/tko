@@ -663,7 +663,7 @@ describe("Identifier", function() {
       options.bindingProviderInstance = new Provider()
       options.bindingProviderInstance.bindingHandlers.set({
         check: function (params) {
-          assert.equal(params.value.peek(), 'rrr')
+          assert.equal(this.value.peek(), 'rrr')
         }
       })
       applyBindings(context, div)
