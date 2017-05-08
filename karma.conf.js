@@ -27,7 +27,7 @@ const preprocessors = {
 }
 
 const ROLLUP_CONFIG = {
-  RESOLVE: {jsnext: true}, //, customResolveOptions: {moduleDirectory: "packages"}},
+  RESOLVE: {jsnext: true},
   BABEL: {},
   COMMONJS: {include: 'node_modules/**'},
 }
