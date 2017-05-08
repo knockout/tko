@@ -1,0 +1,35 @@
+{
+  "name": "tko",
+  "description": "TKO is an experimental fork of Knockout",
+  "homepage": "http://knockoutjs.com/",
+  "version": "4.0.0-alpha2",
+  "license": "MIT",
+  "author": "The Knockout.js Team",
+  "main": "dist/knockout-latest.debug.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knockout/knockout.git"
+  },
+  "scripts": {
+    "test": "gulp test:phantomjs --once"
+  },
+  "files": [
+    "dist/"
+  ],
+  "bugs": "https://github.com/knockout/knockout/issues",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "js-yaml": "^3.4.0",
+    "lerna": "^2.0.0-rc.4",
+    "tko-policy": "github:knockout/tko-policy"
+  },
+  "dependencies": {}
+}
