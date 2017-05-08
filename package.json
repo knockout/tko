@@ -23,13 +23,29 @@
       "url": "http://www.opensource.org/licenses/mit-license.php"
     }
   ],
+  "standard": {
+    "globals": [
+      "it",
+      "iit",
+      "ddescribe",
+      "describe",
+      "jasmine",
+      "afterEach",
+      "beforeEach",
+      "expect",
+      "testNode",
+      "waits",
+      "runs"
+    ]
+  },
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "js-yaml": "^3.4.0",
     "lerna": "^2.0.0-rc.4",
-    "tko-policy": "github:knockout/tko-policy"
+    "standard": "^10.0.2"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }

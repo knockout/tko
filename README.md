@@ -10,6 +10,9 @@
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
 
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
+
 **TKO** is an experimental fork of [Knockout](https://github.com/knockout/knockout) (version 3.4.0).
 
 TKO aims to become a base for future versions of Knockout.  The objectives include:
