@@ -1,0 +1,42 @@
+{
+  "version": "0.5.6",
+  "author": {
+    "name": "Brian M Hunt",
+    "email": "knockout@gmail.com"
+  },
+  "license": "MIT",
+  "name": "tko.provider",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "tko-policy": "knockout/tko-policy",
+    "tko.bind": "knockout/tko.bind",
+    "tko.binding.core": "github:knockout/tko.binding.core",
+    "tko.computed": "github:knockout/tko.computed",
+    "tko.observable": "github:knockout/tko.observable"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "index.js",
+    "./*.ya?ml"
+  ],
+  "main": "dist/tko.provider.js",
+  "jsnext:main": "index.js",
+  "homepage": "https://github.com/knockout/tko.provider",
+  "licenses": {
+    "type": "MIT",
+    "url": "http://brianmhunt.mit-license.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/knockout/tko.provider.git"
+  },
+  "dependencies": {
+    "core-js": "^2.4.1",
+    "tko.observable": "github:knockout/tko.observable",
+    "tko.utils": "github:knockout/tko.utils"
+  },
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start --single-run"
+  }
+}
