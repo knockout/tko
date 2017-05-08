@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/knockout/tko.computed/issues"
   },
-  "homepage": "https://github.com/knockout/tko.computed#readme"
+  "homepage": "https://github.com/knockout/tko.computed#readme",
+  "karma": {
+    "frameworks": ["jasmine"]
+  }
 }

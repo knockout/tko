@@ -4,10 +4,6 @@
     "tko.computed": "knockout/tko.computed",
     "tko.utils": "knockout/tko.utils"
   },
-  "devDependencies": {
-    "tko-policy": "knockout/tko-policy",
-    "tko.observable": "knockout/tko.observable"
-  },
   "files": [
     "dist/",
     "src/",
@@ -21,5 +17,8 @@
   "jsnext:main": "index.js",
   "repository": "git@github.com:knockout/tko.lifecycle.git",
   "author": "Knockout Team",
-  "license": "MIT"
+  "license": "MIT",
+  "karma": {
+    "frameworks": ["mocha", "chai"]
+  }
 }

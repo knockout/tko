@@ -27,5 +27,8 @@
     "tko.observable": "knockout/tko.observable",
     "tko.provider": "knockout/tko.provider",
     "tko.utils": "knockout/tko.utils"
+  },
+  "karma": {
+    "frameworks": ["mocha", "chai", "sinon"]
   }
 }

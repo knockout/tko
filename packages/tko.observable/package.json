@@ -31,5 +31,8 @@
   "homepage": "https://github.com/knockout/tko.observable#readme",
   "dependencies": {
     "tko.utils": "knockout/tko.utils"
+  },
+  "karma": {
+    "frameworks": ["jasmine"]
   }
 }

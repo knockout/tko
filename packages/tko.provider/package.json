@@ -30,5 +30,8 @@
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run"
+  },
+  "karma": {
+    "frameworks": ["mocha", "chai", "sinon"]
   }
 }

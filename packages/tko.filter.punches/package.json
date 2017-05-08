@@ -29,5 +29,8 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://github.com/knockout/tko#readme",
-  "dependencies": {}
+  "dependencies": {},
+  "karma": {
+    "frameworks": ["jasmine"]
+  }
 }

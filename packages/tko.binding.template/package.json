@@ -34,5 +34,8 @@
     "tko.computed": "github:knockout/tko.computed",
     "tko.observable": "github:knockout/tko.observable",
     "tko.utils": "github:knockout/tko.utils"
+  },
+  "karma": {
+    "frameworks": ["jasmine"]
   }
 }

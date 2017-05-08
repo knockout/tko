@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/knockout/tko.bind/issues"
   },
-  "homepage": "https://github.com/knockout/tko.bind#readme"
+  "homepage": "https://github.com/knockout/tko.bind#readme",
+  "karma": {
+    "frameworks": ["jasmine"]
+  }
 }
