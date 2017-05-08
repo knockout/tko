@@ -1,0 +1,12 @@
+{
+  "exclude": "node_modules/**",
+  "presets": [
+    ["babel-preset-es2015", { "modules": false }],
+    "babel-preset-stage-0",
+  ],
+  "plugins": [
+    "babel-plugin-external-helpers",
+    ["babel-plugin-transform-es2015-classes", { "loose": true }],
+    "babel-plugin-transform-proto-to-assign"
+  ]
+}
