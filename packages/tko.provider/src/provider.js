@@ -1,7 +1,4 @@
 
-import 'core-js/fn/object/assign'
-
-
 import {
   extend, virtualElements, arrayForEach, options, objectForEach
 } from 'tko.utils';

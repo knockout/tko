@@ -12,6 +12,7 @@
 */
 /* eslint semi: 0 */
 
+
 import {
   options, triggerEvent
 } from 'tko.utils';

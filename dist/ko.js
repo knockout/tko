@@ -1690,6 +1690,7 @@ var tasks = Object.freeze({
   tko.util
   ===
 
+
 */
 
 // Sub-Modules;
@@ -5169,8 +5170,8 @@ function getBindingHandlerClass(handler, key, onError) {
 
     if (typeof handler === 'function') {
         var _ref = [handler, handler.dispose],
-            init = _ref[0],
-            dispose = _ref[1];
+            initFn = _ref[0],
+            disposeFn = _ref[1];
 
         return function (_LegacyBindingHandler) {
             inherits(_class, _LegacyBindingHandler);
@@ -5183,7 +5184,9 @@ function getBindingHandlerClass(handler, key, onError) {
             createClass(_class, [{
                 key: 'handler',
                 get: function get$$1() {
-                    return { init: init.bind(this), dispose: dispose, onError: onError };
+                    var init = initFn.bind(this);
+                    var dispose = disposeFn ? disposeFn.bind(this) : null;
+                    return { init: init, dispose: dispose, onError: onError };
                 }
             }], [{
                 key: 'allowVirtualElements',
@@ -8840,3 +8843,4 @@ var index = {
 return index;
 
 })));
+//# sourceMappingURL=ko.js.map

@@ -1,5 +1,5 @@
 {
-  "name": "tko",
+  "name": "ko",
   "description": "TKO is an experimental fork of Knockout",
   "homepage": "http://knockoutjs.com/",
   "version": "4.0.0-alpha2",
@@ -14,8 +14,8 @@
     "test": "lerna run test",
     "lint": "standard",
     "build": "npm run build.es6; npm run build.js",
-    "build.es6": "rollup -c rollup.config.js > dist/ko.es6",
-    "build.js": "USE_BABEL=1 rollup -c rollup.config.js > dist/ko.js"
+    "build.es6": "rollup -c rollup.config.js -o dist/ko.es6",
+    "build.js": "USE_BABEL=1 rollup -c rollup.config.js -o dist/ko.js"
   },
   "files": [
     "dist/"
@@ -76,9 +76,7 @@
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-stub": "^1.2.0",
     "sinon": "^2.2.0",
-    "standard": "^10.0.2",
-    "rollup-plugin-node-direct": "^1.0.0"
+    "standard": "^10.0.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
