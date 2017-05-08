@@ -1,18 +1,20 @@
 
 console.log("WHEREAMI", process.cwd())
 
+import fs from 'fs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import rollupBabel from 'rollup-plugin-babel'
 // const nodeDirect = require('rollup-plugin-node-direct')
 
+const pkg = JSON.parse(fs.readFileSync("package.json"))
 
 /**
- * Replace {{VERSION}} with package.json's `version`
+ * Replace {{VERSION}} with pkg.json's `version`
  */
 const REPLACE_CONFIG = {
   delimiters: ['{{', '}}'],
-  VERSION: `"${global.pkg.version}"`
+  VERSION: pkg.version
 }
 
 // const DIRECT_CONFIG = {
@@ -40,4 +42,5 @@ export default {
   plugins,
   entry: 'index.js',
   format: 'umd',
+  moduleName: pkg.name,
 }
