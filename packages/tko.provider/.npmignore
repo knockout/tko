@@ -1,8 +1,0 @@
-# Only package the build output for npm.
-# Developers who want sources/tests can get them from the KO repo.
-*
-# UMD export
-!dist
-# ES6 exports
-!index.js
-!src
