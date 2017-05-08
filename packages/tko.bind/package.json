@@ -1,0 +1,40 @@
+{
+  "name": "tko.bind",
+  "version": "1.0.0",
+  "description": "TKO DOM-Observable Binding",
+  "main": "index.js",
+  "dependencies": {
+    "tko.computed": "knockout/tko.computed",
+    "tko.observable": "knockout/tko.observable",
+    "tko.provider": "github:knockout/tko.provider",
+    "tko.utils": "knockout/tko.utils",
+    "tko.lifecycle": "knockout/tko.lifecycle"
+  },
+  "devDependencies": {
+    "core-js": "^2.4.1",
+    "gulp": "^3.9.1",
+    "tko-policy": "knockout/tko-policy",
+    "tko.binding.core": "knockout/tko.binding.core",
+    "tko.binding.if": "knockout/tko.binding.if",
+    "tko.binding.template": "knockout/tko.binding.template"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "index.js",
+    "./*.ya?ml"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.bind.git"
+  },
+  "author": "Knockout Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko.bind/issues"
+  },
+  "homepage": "https://github.com/knockout/tko.bind#readme"
+}
