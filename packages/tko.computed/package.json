@@ -7,10 +7,6 @@
     "tko.utils": "knockout/tko.utils",
     "tko.observable": "knockout/tko.observable"
   },
-  "devDependencies": {
-      "gulp": "^3.9.1",
-      "tko-policy": "knockout/tko-policy"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,10 +19,10 @@
     "tko"
   ],
   "files": [
-      "dist/",
-      "src/",
-      "index.js",
-      "./*.ya?ml"
+    "dist/",
+    "src/",
+    "index.js",
+    "./*.ya?ml"
   ],
   "author": "Knockout Team",
   "license": "MIT",

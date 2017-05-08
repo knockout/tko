@@ -29,12 +29,6 @@
     "url": "https://github.com/knockout/tko.util/issues"
   },
   "homepage": "https://github.com/knockout/tko.util#readme",
-  "devDependencies": {
-    "gulp": "^3.9.0",
-    "js-yaml": "^3.4.6",
-    "tko-policy": "knockout/tko-policy",
-    "tko.binding.template": "github:knockout/tko.binding.template"
-  },
   "dependencies": {
     "tko.bind": "github:knockout/tko.bind",
     "tko.computed": "github:knockout/tko.computed",

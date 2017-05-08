@@ -31,9 +31,5 @@
   "homepage": "https://github.com/knockout/tko.observable#readme",
   "dependencies": {
     "tko.utils": "knockout/tko.utils"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.0",
-    "tko-policy": "knockout/tko-policy"
   }
 }

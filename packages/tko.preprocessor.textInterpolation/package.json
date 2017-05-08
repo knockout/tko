@@ -29,16 +29,6 @@
     "url": "https://github.com/knockout/tko.preprocessor.textInterpolation/issues"
   },
   "homepage": "https://github.com/knockout/tko.preprocessor.textInterpolation#readme",
-  "devDependencies": {
-    "gulp": "^3.9.0",
-    "js-yaml": "^3.4.6",
-    "tko-policy": "knockout/tko-policy",
-    "tko.bind": "github:knockout/tko.bind",
-    "tko.binding.core": "github:knockout/tko.binding.core",
-    "tko.binding.if": "github:knockout/tko.binding.if",
-    "tko.observable": "github:knockout/tko.observable",
-    "tko.provider": "github:knockout/tko.provider"
-  },
   "dependencies": {
     "tko.binding.template": "knockout/tko.binding.template",
     "tko.utils": "knockout/tko.utils"

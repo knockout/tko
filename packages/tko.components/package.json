@@ -3,13 +3,6 @@
   "version": "1.0.0",
   "description": "TKO WebComponents",
   "main": "index.js",
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "tko-policy": "knockout/tko-policy",
-    "tko.binding.core": "github:knockout/tko.binding.core",
-    "tko.binding.if": "knockout/tko.binding.if",
-    "tko.binding.template": "github:knockout/tko.binding.template"
-  },
   "dependencies": {
     "tko.bind": "knockout/tko.bind",
     "tko.computed": "knockout/tko.computed",

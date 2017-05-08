@@ -10,14 +10,6 @@
     "tko.utils": "knockout/tko.utils",
     "tko.lifecycle": "knockout/tko.lifecycle"
   },
-  "devDependencies": {
-    "core-js": "^2.4.1",
-    "gulp": "^3.9.1",
-    "tko-policy": "knockout/tko-policy",
-    "tko.binding.core": "knockout/tko.binding.core",
-    "tko.binding.if": "knockout/tko.binding.if",
-    "tko.binding.template": "knockout/tko.binding.template"
-  },
   "files": [
     "dist/",
     "src/",
