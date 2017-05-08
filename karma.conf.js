@@ -45,6 +45,7 @@ const rollupPreprocessor = Object.assign({}, {
 
 module.exports = (config) => {
   config.set({
+    basePath: process.cwd(),
     files,
     preprocessors,
     rollupPreprocessor,

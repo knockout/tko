@@ -15,6 +15,30 @@
 
 **TKO** is an experimental fork of [Knockout](https://github.com/knockout/knockout) (version 3.4.0).
 
+
+### Getting Started & Commands
+
+| Command | Effect |
+| ------- | ------ |
+| $ `git clone git@github.com:knockout/tko` | Clone the repository.
+| $ `npm install -g rollup karma-cli lerna yarn` otherwise | Ensure rollup, karma-cli, lerna, and yarn are all globally available
+| $ `yarn` | Install local node packages
+| $ `lerna bootstrap` | Link local `packages/` to each other
+| $ `npm test` | Run all tests
+| $ `npm build` | Make the `dist/ko.{js/es6}` files
+| $ `rollup` | Make the `dist/ko.es6` file
+
+In each individual `packages/*/` directory, you can also run:
+
+| Command | Effect |
+| --- | --- |
+| $ `karma COMMAND ../../karma.conf.js `  | Test the local package, where COMMAND is e.g. `start` or `run`
+| $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/`
+
+
+
+### Objectives
+
 TKO aims to become a base for future versions of Knockout.  The objectives include:
 
 - Modularization into ES6 and separate projects, with compilation using an ES6 compiler like [Rollup](http://rollupjs.org/).  This solves several problems with Knockout, including:
@@ -28,7 +52,7 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
   - What should be simple plugins (e.g. binding handlers or providers) are complex, including:
     - Built-ins have first-class access to quite a bit of good Knockout code, but plugins generally have second-class access and often have to duplicate Knockout internals
     - Quality plugins have lots of boilerplate for compilation, release, documentation, and testing
- 
+
 When complete, the hope is that Knockout will become an *opinionated expression* of TKO, in other words, Knockout will simply be a set of popular and sensible choices from a list of TKO-based HTML-bindings, utilities, observables, and other plugins e.g.:
 
 | Package  | Build Status |

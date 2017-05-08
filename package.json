@@ -11,7 +11,7 @@
     "url": "https://github.com/knockout/knockout.git"
   },
   "scripts": {
-    "test": "lerna run test",
+    "test": "lerna exec karma start ../../karma.conf.js --once",
     "lint": "standard",
     "build": "npm run build.es6; npm run build.js",
     "build.es6": "rollup -c rollup.config.js -o dist/ko.es6",
@@ -76,7 +76,8 @@
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-stub": "^1.2.0",
     "sinon": "^2.2.0",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "karma-jasmine": "^0.3.8"
   },
   "dependencies": {}
 }

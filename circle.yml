@@ -8,6 +8,8 @@ machine:
 dependencies:
   pre:
     - curl -o- -L https://yarnpkg.com/install.sh | bash
+    - npm install -g lerna
+    - lerna bootstrap
 
   cache_directories:
     - ~/.yarn-cache
