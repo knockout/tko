@@ -1,5 +1,4 @@
 {
-  "exclude": "node_modules/**",
   "presets": [
     ["babel-preset-es2015", { "modules": false }],
     "babel-preset-stage-0",

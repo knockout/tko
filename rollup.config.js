@@ -1,46 +1,34 @@
 
-console.log("WHEREAMI", process.cwd())
-
 import fs from 'fs'
 import nodeResolve from 'rollup-plugin-node-resolve'
+import nodeDirect from 'rollup-plugin-node-direct'
 import replace from 'rollup-plugin-replace'
 import rollupBabel from 'rollup-plugin-babel'
-// const nodeDirect = require('rollup-plugin-node-direct')
 
 const pkg = JSON.parse(fs.readFileSync("package.json"))
 
-/**
- * Replace {{VERSION}} with pkg.json's `version`
- */
-const REPLACE_CONFIG = {
-  delimiters: ['{{', '}}'],
-  VERSION: pkg.version
-}
-
-// const DIRECT_CONFIG = {
-//   paths: [ 'work', '..' ],
-//   verbose: process.argv.includes('--debug')
-// }
-
-const RESOLVE_CONFIG = {
-  jsnext: true
+const CONFIG = {
+  /* Replace {{VERSION}} with pkg.json's `version` */
+  REPLACE: { delimiters: ['{{', '}}'], VERSION: `"${pkg.version}"` },
+  RESOLVE: { jsnext: true, customResolveOptions: {moduleDirectory: "packages"} },
+  DIRECT: { paths: ['packages'], verbose: process.argv.includes('--debug') },
+  BABEL: { exclude: 'node_modules/**' }
 }
 
 const plugins = [
-  replace(REPLACE_CONFIG),
-  // nodeDirect(DIRECT_CONFIG),
-  nodeResolve(RESOLVE_CONFIG),
+  replace(CONFIG.REPLACE),
+  nodeResolve(CONFIG.RESOLVE),
+  // nodeDirect(CONFIG.DIRECT)
 ]
 
-if (process.env.TKO_BABEL) {
-  plugins.push(rollupBabel())
+if (process.env.USE_BABEL) {
+  plugins.push(rollupBabel(CONFIG.BABEL))
 }
-
-console.log("ROLLING ", process.cwd())
 
 export default {
   plugins,
   entry: 'index.js',
   format: 'umd',
   moduleName: pkg.name,
+  sourceMap: true,
 }
