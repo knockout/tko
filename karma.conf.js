@@ -6,6 +6,8 @@ const path = require('path')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const rollupCommonJs = require('rollup-plugin-commonjs')
 const rollupBabel = require('rollup-plugin-babel')
+const rollupVisualizer = require('rollup-plugin-visualizer')
+const includePaths = require('rollup-plugin-includepaths')
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
@@ -27,18 +29,22 @@ const preprocessors = {
 }
 
 const ROLLUP_CONFIG = {
+  INCLUDE_PATHS: { paths: [ path.join(root, "../..") ] },
   RESOLVE: {jsnext: true},
   BABEL: {},
   COMMONJS: {},
+  VISUALIZER: { filename: './visual.html' },
 }
 
 const rollupPreprocessor = Object.assign({}, {
   format: 'iife',
   moduleName: pkg.name,
   plugins: [
+      includePaths(ROLLUP_CONFIG.INCLUDE_PATHS),
       nodeResolve(ROLLUP_CONFIG.RESOLVE),
       rollupCommonJs(ROLLUP_CONFIG.COMMONJS),
       rollupBabel(ROLLUP_CONFIG.BABEL),
+      rollupVisualizer(ROLLUP_CONFIG.VISUALIZER),
   ],
   sourceMap: process.argv.includes('--sourcemap') ? 'inline': false,
 })

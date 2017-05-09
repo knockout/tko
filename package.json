@@ -75,14 +75,15 @@
     "phantomjs-prebuilt": "^2.1.14",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-babili": "^3.0.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-stub": "^1.2.0",
     "sinon": "^2.2.0",
     "standard": "^10.0.2",
-    "rollup-plugin-babili": "^3.0.0"
+    "rollup-plugin-includepaths": "^0.2.2",
+    "rollup-plugin-visualizer": "^0.2.1"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

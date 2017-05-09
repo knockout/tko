@@ -32,9 +32,13 @@ In each individual `packages/*/` directory, you can also run:
 
 | Command | Effect |
 | --- | --- |
-| $ `karma COMMAND ../../karma.conf.js `  | Test the local package, where COMMAND is e.g. `start` or `run`
+| $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run`
 | $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/`
 
+
+#### `visual.html`
+
+Note that running `karma` or `rollup` will create a `visual.html` file that shows the proportional size of imports into each package.
 
 
 ### Objectives
