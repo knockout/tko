@@ -11,7 +11,7 @@
     "url": "https://github.com/knockout/knockout.git"
   },
   "scripts": {
-    "test": "lerna exec --concurrency=1 -- karma start ../../karma.conf.js --once",
+    "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
     "lint": "standard",
     "lerna": "lerna bootstrap --hoist --npm-client yarn",
     "build": "npm run build.es6; npm run build.js",
