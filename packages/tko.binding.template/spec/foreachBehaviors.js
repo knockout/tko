@@ -22,6 +22,7 @@ import {bindings as templateBindings} from '../index.js';
 import {bindings as ifBindings} from 'tko.binding.if';
 import {bindings as coreBindings} from 'tko.binding.core';
 
+
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
 

@@ -34,6 +34,8 @@ import {
   ForEach, foreach
 } from '../src/foreach';
 
+import $ from 'jquery'
+
 
 beforeEach(function(){
   var provider = new Provider();
