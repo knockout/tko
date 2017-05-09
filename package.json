@@ -14,8 +14,10 @@
     "test": "lerna exec karma start ../../karma.conf.js --once",
     "lint": "standard",
     "build": "npm run build.es6; npm run build.js",
-    "build.es6": "rollup -c rollup.config.js -o dist/ko.es6",
-    "build.js": "USE_BABEL=1 rollup -c rollup.config.js -o dist/ko.js"
+    "build.es6": "rollup -c rollup.config.js -o dist/ko.es6.js",
+    "build.js": "USE_BABEL=1 rollup -c rollup.config.js -o dist/ko.js",
+    "minify.es6": "MINIFY=1 rollup -c rollup.config.js -o dist/ko.es6.min.js",
+    "minify.js": "MINIFY=1 USE_BABEL=1 rollup -c rollup.config.js -o dist/ko.min.js"
   },
   "files": [
     "dist/"
