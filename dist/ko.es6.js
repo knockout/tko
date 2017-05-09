@@ -4896,8 +4896,8 @@ class LifeCycle {
   }
 
   __addEventListener(node, event_type, handler, options$$1) {
-    node.addEventListener(event_type, action, options$$1);
-    function dispose() { node.removeEventListener(event_type, action); }
+    node.addEventListener(event_type, handler, options$$1);
+    function dispose() { node.removeEventListener(event_type, handler); }
     addDisposeCallback(node, dispose);
     this.addDisposable({ dispose });
   }
@@ -8749,4 +8749,4 @@ var index = {
 return index;
 
 })));
-//# sourceMappingURL=ko.es6.map
+//# sourceMappingURL=ko.es6.js.map

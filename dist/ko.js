@@ -5000,9 +5000,9 @@ var LifeCycle = function () {
   };
 
   LifeCycle.prototype.__addEventListener = function __addEventListener(node, event_type, handler, options$$1) {
-    node.addEventListener(event_type, action, options$$1);
+    node.addEventListener(event_type, handler, options$$1);
     function dispose() {
-      node.removeEventListener(event_type, action);
+      node.removeEventListener(event_type, handler);
     }
     addDisposeCallback(node, dispose);
     this.addDisposable({ dispose: dispose });
