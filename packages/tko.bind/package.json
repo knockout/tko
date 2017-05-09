@@ -6,7 +6,7 @@
   "dependencies": {
     "tko.computed": "knockout/tko.computed",
     "tko.observable": "knockout/tko.observable",
-    "tko.provider": "github:knockout/tko.provider",
+    "tko.provider": "knockout/tko.provider",
     "tko.utils": "knockout/tko.utils",
     "tko.lifecycle": "knockout/tko.lifecycle"
   },

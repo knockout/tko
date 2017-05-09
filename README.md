@@ -23,7 +23,7 @@
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
 | $ `npm install -g rollup karma-cli lerna yarn` otherwise | Ensure rollup, karma-cli, lerna, and yarn are all globally available
 | $ `yarn` | Install local node packages
-| $ `lerna bootstrap` | Link local `packages/` to each other
+| $ `lerna bootstrap --hoist` | Link local `packages/` to each other
 | $ `npm test` | Run all tests
 | $ `npm build` | Make the `dist/ko.{js/es6}` files
 | $ `rollup` | Make the `dist/ko.es6` file

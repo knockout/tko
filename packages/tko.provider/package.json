@@ -25,8 +25,11 @@
   },
   "dependencies": {
     "core-js": "^2.4.1",
-    "tko.observable": "github:knockout/tko.observable",
-    "tko.utils": "github:knockout/tko.utils"
+    "tko.observable": "knockout/tko.observable",
+    "tko.utils": "knockout/tko.utils"
+  },
+  "devDependencies": {
+    "tko.binding.core": "knockout/tko.binding.core"
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run"

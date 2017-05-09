@@ -30,10 +30,10 @@
   },
   "homepage": "https://github.com/knockout/tko.util#readme",
   "dependencies": {
-    "tko.bind": "github:knockout/tko.bind",
-    "tko.computed": "github:knockout/tko.computed",
-    "tko.observable": "github:knockout/tko.observable",
-    "tko.utils": "github:knockout/tko.utils"
+    "tko.bind": "knockout/tko.bind",
+    "tko.computed": "knockout/tko.computed",
+    "tko.observable": "knockout/tko.observable",
+    "tko.utils": "knockout/tko.utils"
   },
   "karma": {
     "frameworks": ["jasmine"]

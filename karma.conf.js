@@ -29,7 +29,7 @@ const preprocessors = {
 const ROLLUP_CONFIG = {
   RESOLVE: {jsnext: true},
   BABEL: {},
-  COMMONJS: {include: 'node_modules/**'},
+  COMMONJS: {},
 }
 
 const rollupPreprocessor = Object.assign({}, {
