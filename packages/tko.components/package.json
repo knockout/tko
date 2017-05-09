@@ -31,5 +31,8 @@
   "homepage": "https://github.com/knockout/tko.components#readme",
   "karma": {
     "frameworks": ["jasmine"]
+  },
+  "devDependencies": {
+    "tko.binding.if": "knockout/tko.binding.if"
   }
 }

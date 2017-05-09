@@ -37,5 +37,8 @@
   },
   "karma": {
     "frameworks": ["jasmine"]
+  },
+  "devDependencies": {
+    "tko.binding.if": "knockout/tko.binding.if"
   }
 }
