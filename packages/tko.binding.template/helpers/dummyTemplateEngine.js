@@ -37,31 +37,31 @@ export function dummyTemplateEngine(templates) {
             return new anonymousTemplate(template); // Anonymous template
     };
 
-    this.renderTemplateSource = function (templateSource, bindingContext, options, templateDocument) {
+    this.renderTemplateSource = function (templateSource, bindingContext, rt_options, templateDocument) {
         var data = bindingContext['$data'];
         if (data && typeof data.get_value === 'function') {
             // For cases when data is an Identifier/Expression.
             data = data.get_value();
         }
         templateDocument = templateDocument || document;
-        options = options || {};
+        rt_options = rt_options || {};
         var templateText = templateSource.text();
         if (typeof templateText == "function")
-            templateText = templateText(data, options);
+            templateText = templateText(data, rt_options);
 
-        templateText = options.showParams ? templateText + ", data=" + data + ", options=" + options : templateText;
+        templateText = rt_options.showParams ? templateText + ", data=" + data + ", options=" + rt_options : templateText;
         // var templateOptions = options.templateOptions; // Have templateOptions in scope to support [js:templateOptions.foo] syntax
 
         var result;
 
         data = data || {};
-        options.templateRenderingVariablesInScope = options.templateRenderingVariablesInScope || {};
+        rt_options.templateRenderingVariablesInScope = rt_options.templateRenderingVariablesInScope || {};
 
-        extend(data, options.templateRenderingVariablesInScope);
+        extend(data, rt_options.templateRenderingVariablesInScope);
 
         // Dummy [renderTemplate:...] syntax
         result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
-            return renderTemplate(templateName, data, options);
+            return renderTemplate(templateName, data, rt_options);
         });
 
 

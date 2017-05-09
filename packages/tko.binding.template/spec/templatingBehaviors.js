@@ -380,7 +380,7 @@ describe('Templating', function() {
 
     it('Data binding syntax should defer evaluation of variables until the end of template rendering (so bindings can take independent subscriptions to them)', function () {
         setTemplateEngine(new dummyTemplateEngine({
-            someTemplate: "<input data-bind='value:message' />[js: options.templateRenderingVariablesInScope.message = 'goodbye'; undefined; ]"
+            someTemplate: "<input data-bind='value:message' />[js: rt_options.templateRenderingVariablesInScope.message = 'goodbye'; undefined; ]"
         }));
         var viewModel = { message: "hello" };
         renderTemplate("someTemplate", viewModel, { templateRenderingVariablesInScope: viewModel }, testNode);
@@ -895,7 +895,7 @@ describe('Templating', function() {
                 { name: "Beta" }
             ])
         };
-        setTemplateEngine(new dummyTemplateEngine({myTemplate: "<div>Person [js:data.name] has additional property [js:options.templateOptions.myAdditionalProp]</div>"}));
+        setTemplateEngine(new dummyTemplateEngine({myTemplate: "<div>Person [js:data.name] has additional property [js:rt_options.templateOptions.myAdditionalProp]</div>"}));
         testNode.innerHTML = "<div data-bind='template: {name: \"myTemplate\", foreach: people, templateOptions: someAdditionalData }'></div>";
 
         applyBindings(myModel, testNode);
@@ -1013,7 +1013,7 @@ describe('Templating', function() {
             }).toThrowContaining("This template engine does not support");
         });
     });
-    
+
     it('Data binding syntax should permit nested templates using virtual containers (with arbitrary internal whitespace and newlines)', function() {
         setTemplateEngine(new dummyTemplateEngine({
             outerTemplate: "Outer <!-- ko template: " +
@@ -1120,43 +1120,43 @@ describe('Templating', function() {
         expect(testDocFrag.childNodes[0].tagName).toEqual("P");
         expect(testDocFrag.childNodes[0]).toContainHtml("myval: 123");
     });
-    
+
     describe("The `condition` exposed via the domData for `else` chaining", function () {
-        
+
         it("is false iff the `if` is false", function () {
             var condition = observable(true);
 
             testNode.innerHTML = '<!-- ko template: {if: condition} -->True<!-- /ko -->';
-            
+
             applyBindings({condition: condition}, testNode);
-            
+
             expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true);
 
             condition(false);
             expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
         });
-        
+
         it("is false iff the `ifnot` is true", function () {
             var condition = observable(true);
 
             testNode.innerHTML = '<!-- ko template: {ifnot: condition} -->True<!-- /ko -->';
-            
+
             applyBindings({condition: condition}, testNode);
-            
+
             expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
 
             condition(false);
             expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true);
 
         });
-        
+
         it("is false iff the `foreach` is empty", function () {
             var items = observable();
 
             testNode.innerHTML = '<!-- ko template: {foreach: items} -->True<!-- /ko -->';
-            
+
             applyBindings({items: items}, testNode);
-            
+
             expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false);
 
             items([]);
@@ -1167,21 +1167,21 @@ describe('Templating', function() {
             items([123]);
             expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true);
         });
-        
+
         it("is false iff the `if` is false, on a DOM node", function () {
             var condition = observable(true);
-            
+
             testNode.setAttribute('data-bind', 'template: {if: condition}');
             testNode.innerHTML = 'True';
-            
+
             applyBindings({condition: condition}, testNode);
-            
+
             expect(domData.get(testNode, 'conditional')
               .elseChainSatisfied()).toEqual(true);
 
             condition(false);
             expect(domData.get(testNode, 'conditional')
               .elseChainSatisfied()).toEqual(false);
-        });   
+        });
     });
 });
