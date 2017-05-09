@@ -77,7 +77,9 @@
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-stub": "^1.2.0",
     "sinon": "^2.2.0",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "rollup-plugin-babili": "^3.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
