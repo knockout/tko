@@ -1,21 +1,21 @@
 machine:
   node:
     version: 7
+
   environment:
     CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
     CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+
 
 dependencies:
-  pre:
-    - curl -o- -L https://yarnpkg.com/install.sh | bash
-
   cache_directories:
-    - ~/.yarn-cache
+    - ~/.cache/yarn
 
   override:
     - yarn
     - npm install -g lerna
-    - lerna bootstrap
+    - lerna bootstrap --hoist
 
 #  - gulp test:phantomjs --once --jquery
 #  - gulp test:phantomjs --once --jquery3-compat
@@ -25,6 +25,7 @@ dependencies:
 #  - sleep 10 && gulp test:sauce --opera
 #  - sleep 10 && gulp test:sauce --ie
 #  - sleep 10 && gulp test:sauce --ie-legacy --innershiv --json2
+
 
 general:
   branches:
