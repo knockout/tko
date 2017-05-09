@@ -1,6 +1,5 @@
 /* eslint semi: 0 */
 import * as utils from 'tko.utils'
-import { options } from 'tko.utils'
 
 import {
     // applyExtenders,
@@ -28,8 +27,16 @@ import {
 } from 'tko.computed'
 
 import {
-    Provider
-} from 'tko.provider';
+  DataBindProvider
+} from 'tko.provider.databind'
+
+import {
+  AttrProvider
+} from 'tko.provider.attr'
+
+import {
+    MultiProvider
+} from 'tko.provider.multi'
 
 import {
     applyBindingAccessorsToNode,
@@ -132,17 +139,22 @@ utils.extend(coreUtils, {
 
 
 // Create the binding provider and default bindings.
-var provider = new Provider();
-options.bindingProviderInstance = provider;
-provider.bindingHandlers.set(coreBindings);
-provider.bindingHandlers.set(templateBindings);
-provider.bindingHandlers.set(ifBindings);
-provider.bindingHandlers.set(foreachBindings);
-provider.bindingHandlers.set({ each: foreachBindings.foreach });
-provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor);
-provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor);
-provider.bindingHandlers.set({ component: components.bindingHandler });
-provider.addProvider(components.bindingProvider);
+const provider = new MultiProvider();
+
+provider.addProvider(new DataBindProvider())
+provider.addProvider(new AttrProvider())
+
+options.bindingProviderInstance = provider
+
+provider.bindingHandlers.set(coreBindings)
+provider.bindingHandlers.set(templateBindings)
+provider.bindingHandlers.set(ifBindings)
+provider.bindingHandlers.set(foreachBindings)
+provider.bindingHandlers.set({ each: foreachBindings.foreach })
+provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor)
+provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor)
+provider.bindingHandlers.set({ component: components.bindingHandler })
+provider.addProvider(components.bindingProvider)
 
 
 utils.extend(options.filters, punchesFilters);
@@ -151,7 +163,7 @@ utils.extend(options.filters, punchesFilters);
 // Expose the API.
 export default {
     // --- Top-level ---
-    version: {{VERSION}},
+    version: '{{VERSION}}',
     options: options,
 
     extenders: extenders,

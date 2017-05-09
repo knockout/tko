@@ -9,9 +9,6 @@ import {
     cleanNode
 } from 'tko.utils'
 
-// Polyfills needed.
-import 'core-js/fn/object/assign'
-
 
 describe('KO LifeCycle', function() {
   describe("mixInto", function () {

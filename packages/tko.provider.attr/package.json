@@ -1,0 +1,7 @@
+{
+  "name": "tko.provider.attr",
+  "version": "1.0.0",
+  "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
+  "main": "index.js",
+  "license": "MIT"
+}

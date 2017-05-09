@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "core-js": "^2.4.1",
     "tko.computed": "knockout/tko.computed",
     "tko.utils": "knockout/tko.utils"
   },

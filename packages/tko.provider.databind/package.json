@@ -1,0 +1,8 @@
+{
+  "name": "tko.provider.databind",
+  "version": "1.0.0",
+  "description": "Link HTML attributes based on a `data-bind` HTML attribute",
+  "main": "index.js",
+  "license": "MIT",
+  "karma": { "frameworks": ["mocha", "sinon", "chai"] }
+}

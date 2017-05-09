@@ -1,40 +1,8 @@
 {
-  "version": "0.5.6",
-  "author": {
-    "name": "Brian M Hunt",
-    "email": "knockout@gmail.com"
-  },
-  "license": "MIT",
-  "name": "tko.provider",
-  "files": [
-    "dist/",
-    "src/",
-    "index.js",
-    "./*.ya?ml"
-  ],
-  "main": "dist/tko.provider.js",
-  "jsnext:main": "index.js",
-  "homepage": "https://github.com/knockout/tko.provider",
-  "licenses": {
-    "type": "MIT",
-    "url": "http://brianmhunt.mit-license.org/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/knockout/tko.provider.git"
-  },
-  "dependencies": {
-    "core-js": "^2.4.1",
-    "tko.observable": "knockout/tko.observable",
-    "tko.utils": "knockout/tko.utils"
-  },
-  "devDependencies": {
-    "tko.binding.core": "knockout/tko.binding.core"
-  },
-  "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run"
-  },
-  "karma": {
-    "frameworks": ["mocha", "chai", "sinon"]
-  }
+  "name": "tko.provider.abstract",
+  "version": "1.0.0",
+  "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
+  "main": "index.js",
+  "author": "Knockout Team",
+  "license": "MIT"
 }
