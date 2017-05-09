@@ -8,18 +8,15 @@ machine:
 dependencies:
   pre:
     - curl -o- -L https://yarnpkg.com/install.sh | bash
-    - npm install -g lerna
-    - lerna bootstrap
 
   cache_directories:
     - ~/.yarn-cache
 
   override:
     - yarn
+    - npm install -g lerna
+    - lerna bootstrap
 
-test:
-  override:
-    # - karma ...
 #  - gulp test:phantomjs --once --jquery
 #  - gulp test:phantomjs --once --jquery3-compat
 #  - gulp test:sauce --chrome
@@ -28,6 +25,7 @@ test:
 #  - sleep 10 && gulp test:sauce --opera
 #  - sleep 10 && gulp test:sauce --ie
 #  - sleep 10 && gulp test:sauce --ie-legacy --innershiv --json2
+
 general:
   branches:
     ignore:

@@ -25,3 +25,7 @@ work/
 yarn.lock
 
 *-debug.log
+
+# Rollup Visualizer
+visual.html
+packages/*/visual.html

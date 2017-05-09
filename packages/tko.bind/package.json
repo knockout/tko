@@ -5,10 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "tko.computed": "knockout/tko.computed",
+    "tko.lifecycle": "knockout/tko.lifecycle",
     "tko.observable": "knockout/tko.observable",
     "tko.provider": "knockout/tko.provider",
-    "tko.utils": "knockout/tko.utils",
-    "tko.lifecycle": "knockout/tko.lifecycle"
+    "tko.utils": "knockout/tko.utils"
   },
   "files": [
     "dist/",
@@ -30,6 +30,8 @@
   },
   "homepage": "https://github.com/knockout/tko.bind#readme",
   "karma": {
-    "frameworks": ["jasmine"]
+    "frameworks": [
+      "jasmine"
+    ]
   }
 }
