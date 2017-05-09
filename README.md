@@ -2,33 +2,43 @@
 ### TKO (“Technical Knockout”)
 
 [![npm version](https://badge.fury.io/js/tko.svg)](https://badge.fury.io/js/tko)
-+[![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
 [![devDependency Status](https://david-dm.org/knockout/tko/dev-status.svg)](https://david-dm.org/knockout/tko#info=devDependencies)
 [![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 [![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt)
-
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+<!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt) -->
 
-**TKO** is an experimental fork of [Knockout](https://github.com/knockout/knockout) (version 3.4.0).
 
 
-### Getting Started & Commands
+**TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout).
+
+
+### Getting Started
+
+To install use one of the usual package managers e.g.
+
+- $ `yarn install tko`
+- $ `npm install tko`
+
+### Using the Monorepo
+
+The following commands are to get the build system set up.
 
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
-| $ `npm install -g rollup karma-cli lerna yarn` otherwise | Ensure rollup, karma-cli, lerna, and yarn are all globally available
+| $ `npm install -g yarn` otherwise | Ensure yarn is globally available
 | $ `yarn` | Install local node packages
-| $ `lerna bootstrap --hoist` | Link local `packages/` to each other
-| $ `npm test` | Run all tests
-| $ `npm build` | Make the `dist/ko.{js/es6}` files
-| $ `rollup` | Make the `dist/ko.es6` file
+| $ `yarn run lerna` | Link local `packages/` to each other
+| $ `yarn test` | Run all tests
+| $ `yarn run build` | Make the `dist/ko[.es6].js` files, where the `.es6` version has not been passed through Babel
 
-In each individual `packages/*/` directory, you can also run:
+Checkout `package.json` for more script commands that can be executed with `yarn run {command}`.
+
+In each individual `packages/*/` directory, you can also run (presuming `rollup` and `karma` are installed globally):
 
 | Command | Effect |
 | --- | --- |
@@ -56,25 +66,6 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
   - What should be simple plugins (e.g. binding handlers or providers) are complex, including:
     - Built-ins have first-class access to quite a bit of good Knockout code, but plugins generally have second-class access and often have to duplicate Knockout internals
     - Quality plugins have lots of boilerplate for compilation, release, documentation, and testing
-
-When complete, the hope is that Knockout will become an *opinionated expression* of TKO, in other words, Knockout will simply be a set of popular and sensible choices from a list of TKO-based HTML-bindings, utilities, observables, and other plugins e.g.:
-
-| Package  | Build Status |
-| -------  | ------------ |
-| [tko-policy](../../../tko-policy) | [![CircleCI](https://circleci.com/gh/knockout/tko-policy.svg?style=shield)](https://circleci.com/gh/knockout/tko-policy) |
-| [tko.utils](../../../tko.utils) | [![CircleCI](https://circleci.com/gh/knockout/tko.utils.svg?style=shield)](https://circleci.com/gh/knockout/tko.utils)
-| [tko.observable](../../../tko.observable) | [![CircleCI](https://circleci.com/gh/knockout/tko.observable.svg?style=shield)](https://circleci.com/gh/knockout/tko.observable) |
-| [tko.computed](../../../tko.computed) | [![CircleCI](https://circleci.com/gh/knockout/tko.computed.svg?style=shield)](https://circleci.com/gh/knockout/tko.computed) |
-| [tko.provider](../../../tko.provider) | [![CircleCI](https://circleci.com/gh/knockout/tko.provider.svg?style=shield)](https://circleci.com/gh/knockout/tko.provider) |
-| [tko.bind](../../../tko.bind) | [![CircleCI](https://circleci.com/gh/knockout/tko.bind.svg?style=shield)](https://circleci.com/gh/knockout/tko.bind) |
-| [tko.binding.core](../../../tko.binding.core) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.core.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.core) |
-| [tko.binding.template](../../../tko.binding.template) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.template.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.template) |
-| [tko.binding.if](../../../tko.binding.if) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.if.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.if) |
-| [tko.binding.foreach](../../../tko.binding.foreach) | [![CircleCI](https://circleci.com/gh/knockout/tko.binding.foreach.svg?style=shield)](https://circleci.com/gh/knockout/tko.binding.foreach) |
-| [tko.filter.punches](../../../tko.filter.punches) | [![CircleCI](https://circleci.com/gh/knockout/tko.filter.punches.svg?style=shield)](https://circleci.com/gh/knockout/tko.filter.punches) |
-| [tko.components](../../../tko.components) | [![CircleCI](https://circleci.com/gh/knockout/tko.components.svg?style=shield)](https://circleci.com/gh/knockout/tko.components) |
-| [tko.preprocessor.textInterpolation](../../../tko.preprocessor.textInterpolation) | [![CircleCI](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation.svg?style=shield)](https://circleci.com/gh/knockout/tko.preprocessor.textInterpolation) |
-| [tko](../../../tko) | [![CircleCI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko) |
 
 
 ## Next steps
