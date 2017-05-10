@@ -1,0 +1,8 @@
+{
+  "name": "tko.provider.bindingString",
+  "version": "1.0.0",
+  "description": "Abstract Base Class for providers that parse a binding string",
+  "main": "index.js",
+  "license": "MIT",
+  "karma": { "frameworks": ["mocha", "chai"]}
+}

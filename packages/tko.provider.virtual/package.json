@@ -1,0 +1,9 @@
+{
+  "name": "tko.provider.virtual",
+  "version": "1.0.0",
+  "description": "Binding provider for <!-- ko handler: ... --> virtual elements",
+  "main": "index.js",
+  "author": "Knockout Team",
+  "license": "MIT",
+  "karma": { "frameworks": ["mocha", "chai"]}
+}

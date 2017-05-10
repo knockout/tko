@@ -4,7 +4,7 @@ import {
 } from 'tko.provider'
 
 export default class MultiProvider extends Provider {
-  constructor (params={}) {
+  constructor (params = {}) {
     super(params)
     const providers = params.providers || []
     this.providers = []
@@ -14,10 +14,11 @@ export default class MultiProvider extends Provider {
   addProvider (provider) {
     this.providers.push(provider)
     provider.bindingHandlers = this.bindingHandlers
+    provider.globals = this.globals
   }
 
   nodeHasBindings (node) {
-    return this.providers.some(p => p.nodeHasBindings(p))
+    return this.providers.some(p => p.nodeHasBindings(node))
   }
 
   preprocessNode (node) {
@@ -25,16 +26,12 @@ export default class MultiProvider extends Provider {
       const newNodes = provider.preprocessNode(node)
       if (newNodes) { return newNodes }
     }
-    return node
   }
 
   getBindingAccessors (node, ctx) {
-    node = this.preprocessNode(node)
-    return this.providers
-      .reduce((acc, p) => this.reduceBindings(node, ctx, acc, p), {})
-  }
-
-  reduceBindings (node, ctx, bindings, p) {
-    return Object.assign(bindings, p.getBindingAccessors(node, ctx, bindings))
+    node = this.preprocessNode(node) || node
+    // `bindings` is e.g. {text: accessorFunction, visible: accessorFunction2}
+    const bindings = this.providers.map(p => p.getBindingAccessors(node, ctx))
+    return Object.assign({}, ...bindings)
   }
 }
