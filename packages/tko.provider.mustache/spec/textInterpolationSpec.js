@@ -13,8 +13,8 @@ import {
 } from 'tko.observable';
 
 import {
-    Provider
-} from 'tko.provider';
+  DataBindProvider
+} from 'tko.provider.databind'
 
 import {
     bindings as coreBindings
@@ -41,7 +41,7 @@ import '../helpers/jasmine-interpolation-helpers.js';
 describe("Interpolation Markup preprocessor", function() {
 
     beforeEach(function () {
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         provider.bindingHandlers.set(coreBindings);
     })
 
@@ -188,7 +188,7 @@ describe("Interpolation Markup bindings", function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         provider.addNodePreprocessor(interpolationMarkup.nodePreProcessor);
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
