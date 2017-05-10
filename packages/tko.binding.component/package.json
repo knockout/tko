@@ -1,0 +1,8 @@
+{
+  "name": "tko.binding.component",
+  "version": "1.0.0",
+  "description": "component: binding for web components",
+  "main": "index.js",
+  "license": "MIT",
+  "karma": { "frameworks": ["jasmine"]}
+}

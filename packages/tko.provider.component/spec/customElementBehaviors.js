@@ -11,9 +11,8 @@ import {
     isComputed
 } from 'tko.computed';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi'
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
     applyBindings, dataFor
@@ -29,10 +28,15 @@ import {
 
 import {
     bindings as ifBindings
-} from 'tko.binding.if';
+} from 'tko.binding.if'
 
+import components from 'tko.utils.component'
 
-import components from '../index';
+import {
+  bindings as componentBindings
+} from 'tko.binding.component'
+
+import {ComponentProvider} from '../index'
 
 import {
     useMockForTasks
@@ -46,17 +50,17 @@ describe('Components: Custom elements', function() {
     beforeEach(function() {
         jasmine.prepareTestNode();
         useMockForTasks(options);
-        var provider = new Provider();
-        options.bindingProviderInstance = provider;
+        var provider = new MultiProvider({
+          providers: [new DataBindProvider(), new ComponentProvider()]
+        })
+        options.bindingProviderInstance = provider
 
-        bindingHandlers = provider.bindingHandlers;
-        bindingHandlers.set({ component: components.bindingHandler });
-        bindingHandlers.set(templateBindings);
-        bindingHandlers.set(coreBindings);
-        bindingHandlers.set(ifBindings);
+        bindingHandlers = provider.bindingHandlers
+        bindingHandlers.set(componentBindings)
+        bindingHandlers.set(templateBindings)
+        bindingHandlers.set(coreBindings)
+        bindingHandlers.set(ifBindings)
 
-        provider.clearProviders();
-        provider.addProvider(components.bindingProvider);
     });
 
     afterEach(function() {
@@ -114,21 +118,23 @@ describe('Components: Custom elements', function() {
     });
 
     it('Is possible to override getComponentNameForNode to determine which component goes into which element', function() {
-        components.register('test-component', { template: 'custom element'});
-        this.restoreAfter(components.bindingProvider, 'getComponentNameForNode');
 
+      const cp = new ComponentProvider()
+      options.bindingProviderInstance = cp
+      cp.bindingHandlers.set(componentBindings)
+      cp.getComponentNameForNode = function(node) {
+          return node.tagName === 'A' ? 'test-component' : null;
+      }
+      components.register('test-component', { template: 'custom element'});
 
-        // Set up a getComponentNameForNode function that maps "A" tags to
-        // test-component.
-        testNode.innerHTML = '<div>hello <a>&nbsp;</a> <b>ignored</b></div>';
-        components.bindingProvider.getComponentNameForNode = function(node) {
-            return node.tagName === 'A' ? 'test-component' : null;
-        };
+      // Set up a getComponentNameForNode function that maps "A" tags to
+      // test-component.
+      testNode.innerHTML = '<div>hello <a>&nbsp;</a> <b>ignored</b></div>';
 
-        // See the component show up.
-        applyBindings(null, testNode);
-        jasmine.Clock.tick(1);
-        expect(testNode).toContainHtml('<div>hello <a>custom element</a> <b>ignored</b></div>');
+      // See the component show up.
+      applyBindings(null, testNode);
+      jasmine.Clock.tick(1);
+      expect(testNode).toContainHtml('<div>hello <a>custom element</a> <b>ignored</b></div>');
     });
 
     it('Is possible to have regular data-bind bindings on a custom element, as long as they don\'t attempt to control descendants', function() {
@@ -176,7 +182,7 @@ describe('Components: Custom elements', function() {
 
         expect(function() {
             applyBindings(null, testNode);
-        }).toThrowContaining('Cannot use the "component" binding on a custom element matching a component');
+        }).toThrowContaining('The binding "component" is duplicated by multiple providers');
     });
 
     it('Is possible to pass literal values', function() {

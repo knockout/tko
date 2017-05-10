@@ -11,15 +11,20 @@ import {
     applyBindings
 } from 'tko.bind';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi'
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core';
+} from 'tko.binding.core'
 
-import components from '../index.js';
+import {
+  bindings as componentBindings
+} from 'tko.binding.component'
+
+import components from 'tko.utils.component'
+
+import { ComponentProvider } from '../index.js'
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
@@ -30,15 +35,14 @@ describe("Components: Provider", function() {
     describe("custom elements", function() {
         // Note: knockout/spec/components
         beforeEach(function() {
-            var provider = new Provider();
-            options.bindingProviderInstance = provider;
-            bindingHandlers = provider.bindingHandlers;
+          var provider = new MultiProvider({
+            providers: [new DataBindProvider(), new ComponentProvider()]
+          })
+          options.bindingProviderInstance = provider;
+          bindingHandlers = provider.bindingHandlers;
 
-            bindingHandlers.set({ component: components.bindingHandler });
-            bindingHandlers.set(coreBindings);
-
-            provider.clearProviders();
-            provider.addProvider(components.bindingProvider);
+          bindingHandlers.set(componentBindings)
+          bindingHandlers.set(coreBindings)
         });
 
         it("inserts templates into custom elements", function() {
@@ -133,7 +137,7 @@ describe("Components: Provider", function() {
                 bindings: bindingHandlers,
                 noVirtualElements: false
             };
-            options.bindingProviderInstance = new Provider(options);
+            options.bindingProviderInstance = new DataBindProvider(options);
             applyBindings(viewModel, div);
         });
 

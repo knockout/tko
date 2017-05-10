@@ -1,0 +1,8 @@
+{
+  "name": "tko.utils.component",
+  "version": "1.0.0",
+  "description": "Registry and loading utilities for web components",
+  "main": "index.js",
+  "license": "MIT",
+  "karma": {"frameworks":["jasmine"]}
+}

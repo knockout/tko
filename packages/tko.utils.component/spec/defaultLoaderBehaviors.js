@@ -1,8 +1,10 @@
 import {
     parseHtmlFragment
-} from 'tko.utils';
+} from 'tko.utils'
 
-import components from '../index';
+import components from '../index'
+
+import 'tko.utils/helpers/jasmine-13-helper.js';
 
 
 describe('Components: Default loader', function() {

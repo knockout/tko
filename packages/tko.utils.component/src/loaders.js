@@ -2,12 +2,9 @@
 import {
     isDomElement, isDocumentFragment, tagNameLower, parseHtmlFragment,
     makeArray, cloneNodes
-} from 'tko.utils';
+} from 'tko.utils'
 
-import {
-    registry
-} from './loaderRegistry';
-
+import {registry} from './registry'
 
 // The default loader is responsible for two things:
 // 1. Maintaining the default in-memory registry of component configuration objects
@@ -19,7 +16,7 @@ import {
 // 1. To supply configuration objects from some other source (e.g., conventions)
 // 2. Or, to resolve configuration objects by loading viewmodels/templates via arbitrary logic.
 
-export var defaultConfigRegistry = {};
+export var defaultConfigRegistry = {}
 
 export function register(componentName, config) {
     if (!config) {
@@ -206,4 +203,4 @@ function makeErrorCallback(componentName) {
 
 
 // By default, the default loader is the only registered component loader
-registry.loaders.push(defaultLoader);
+registry.loaders.push(defaultLoader)

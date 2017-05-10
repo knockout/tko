@@ -7,33 +7,36 @@ import {
     observableArray, observable, isWritableObservable
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi'
+import { DataBindProvider } from 'tko.provider.databind'
+import { VirtualProvider } from 'tko.provider.virtual'
+import { ComponentProvider } from 'tko.provider.component'
 
 import {
     applyBindings, dataFor
-} from 'tko.bind';
+} from 'tko.bind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core';
+} from 'tko.binding.core'
 
 import {
     bindings as templateBindings
-} from 'tko.binding.template';
+} from 'tko.binding.template'
 
 import {
     bindings as ifBindings
-} from 'tko.binding.if';
+} from 'tko.binding.if'
 
+import {
+  bindings as componentBindings
+} from '../index'
 
-import components from '../index';
+import components from 'tko.utils.component'
 
 import {
     useMockForTasks
 } from 'tko.utils/helpers/jasmine-13-helper.js';
-
 
 
 describe('Components: Component binding', function() {
@@ -51,18 +54,19 @@ describe('Components: Component binding', function() {
         outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true };
         testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"></div>';
 
-        var provider = new Provider();
+        var provider = new MultiProvider({
+          providers: [
+            new DataBindProvider(),
+            new ComponentProvider(),
+            new VirtualProvider()
+          ]
+        })
         options.bindingProviderInstance = provider;
 
         provider.bindingHandlers.set(templateBindings);
         provider.bindingHandlers.set(ifBindings);
         provider.bindingHandlers.set(coreBindings);
-        provider.bindingHandlers.set({
-            component: components.bindingHandler
-        });
-
-        provider.clearProviders();
-        provider.addProvider(components.bindingProvider);
+        provider.bindingHandlers.set(componentBindings)
     });
 
     afterEach(function() {
@@ -557,11 +561,12 @@ describe('Components: Component binding', function() {
     });
 
     it('Disposes the viewmodel if the element is cleaned', function() {
-        function testViewModel() { }
-        testViewModel.prototype.dispose = function() { this.wasDisposed = true; };
+        class TestViewModel {
+          dispose () { this.wasDisposed = true }
+        }
 
         components.register(testComponentName, {
-            viewModel: testViewModel,
+            viewModel: TestViewModel,
             template: '<div>Ignored</div>'
         });
 
@@ -570,7 +575,7 @@ describe('Components: Component binding', function() {
         jasmine.Clock.tick(1);
         var firstTemplateNode = testNode.firstChild.firstChild,
             viewModelInstance = dataFor(firstTemplateNode);
-        expect(viewModelInstance instanceof testViewModel).toBe(true);
+        expect(viewModelInstance instanceof TestViewModel).toBe(true);
         expect(viewModelInstance.wasDisposed).not.toBe(true);
 
         // See that cleaning the associated element automatically disposes the viewmodel

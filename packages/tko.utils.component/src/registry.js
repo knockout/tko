@@ -1,7 +1,11 @@
 
-import { subscribable, dependencyDetection } from 'tko.observable';
-import { getObjectOwnProperty, tasks } from 'tko.utils';
+import {
+  subscribable, dependencyDetection
+} from 'tko.observable'
 
+import {
+  getObjectOwnProperty, tasks
+} from 'tko.utils'
 
 var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
     loadedDefinitionsCache = {};    // Tracks component loads that have already completed
@@ -106,30 +110,30 @@ function getFirstResultFromLoaders(methodName, argsExceptCallback, callback, can
 }
 
 export var registry = {
-    get: function(componentName, callback) {
-        var cachedDefinition = getObjectOwnProperty(loadedDefinitionsCache, componentName);
-        if (cachedDefinition) {
-            // It's already loaded and cached. Reuse the same definition object.
-            // Note that for API consistency, even cache hits complete asynchronously by default.
-            // You can bypass this by putting synchronous:true on your component config.
-            if (cachedDefinition.isSynchronousComponent) {
-                dependencyDetection.ignore(function() { // See comment in loaderRegistryBehaviors.js for reasoning
-                    callback(cachedDefinition.definition);
-                });
-            } else {
-                tasks.schedule(function() { callback(cachedDefinition.definition); });
-            }
-        } else {
-            // Join the loading process that is already underway, or start a new one.
-            loadComponentAndNotify(componentName, callback);
-        }
-    },
+  get (componentName, callback) {
+    var cachedDefinition = getObjectOwnProperty(loadedDefinitionsCache, componentName)
+    if (cachedDefinition) {
+      // It's already loaded and cached. Reuse the same definition object.
+      // Note that for API consistency, even cache hits complete asynchronously by default.
+      // You can bypass this by putting synchronous:true on your component config.
+      if (cachedDefinition.isSynchronousComponent) {
+        dependencyDetection.ignore(function() { // See comment in loaderRegistryBehaviors.js for reasoning
+            callback(cachedDefinition.definition);
+        });
+      } else {
+        tasks.schedule(function() { callback(cachedDefinition.definition); });
+      }
+    } else {
+      // Join the loading process that is already underway, or start a new one.
+      loadComponentAndNotify(componentName, callback);
+    }
+  },
 
-    clearCachedDefinition: function(componentName) {
-        delete loadedDefinitionsCache[componentName];
-    },
+  clearCachedDefinition (componentName) {
+    delete loadedDefinitionsCache[componentName]
+  },
 
-    _getFirstResultFromLoaders: getFirstResultFromLoaders,
+  _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-    loaders: []
+  loaders: []
 };
