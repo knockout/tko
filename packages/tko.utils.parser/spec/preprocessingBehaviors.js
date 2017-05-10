@@ -3,7 +3,7 @@ import {
 } from 'tko.provider.databind';
 
 
-describe.only('Binding preprocessing', function() {
+describe('Binding preprocessing', function() {
   var bindingHandlers,
     preProcessBindings;
 
@@ -27,7 +27,7 @@ describe.only('Binding preprocessing', function() {
     expect(parsedRewritten.b).to.equal(false);
   });
 
-  it.only('Should allow binding to add/replace bindings through "preprocess" method\'s "addBinding" callback', function() {
+  it('Should allow binding to add/replace bindings through "preprocess" method\'s "addBinding" callback', function() {
     bindingHandlers.a = {
       preprocess: function(value, key, addBinding) {
         // the a binding will be copied to a2

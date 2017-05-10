@@ -28,23 +28,31 @@ export default class DataBindProvider extends Provider {
    * The `preprocess` property of bindingHandler must be a static
    * function (i.e. on the object or constructor).
    */
-  processBinding (key, value) {
+  * processBinding (key, value) {
     // Get the "on" binding from "on.click"
     const [on, name] = key.split('.')
-    const handler = this.bindingHandlers.get(name || on)
+    const handlerName = name || on
+    const handler = this.bindingHandlers.get(handlerName)
+
     if (handler && handler.preprocess) {
-      value = handler.preprocess(value, key, this.processBinding.bind(this))
+      const bindingsAddedByHandler = []
+      const chainFn = (...args) => bindingsAddedByHandler.push(args)
+      value = handler.preprocess(value, key, chainFn)
+      for (const [key, value] of bindingsAddedByHandler) {
+        yield * this.processBinding(key, value)
+      }
     }
-    return `${name || on}:${value}`
+    yield `${handlerName}:${value}`
+  }
+
+  * generateBindingString (bindingString) {
+    for (const {key, unknown, value} of parseObjectLiteral(bindingString)) {
+      yield * this.processBinding(key || unknown, value)
+    }
   }
 
   preProcessBindings (bindingString) {
-    return parseObjectLiteral(bindingString)
-      .map((keyValueItem) => this.processBinding(
-          keyValueItem.key || keyValueItem.unknown,
-          keyValueItem.value
-        ))
-      .join(',')
+    return Array.from(this.generateBindingString(bindingString)).join(',')
   }
 
   nodeHasBindings (node) {

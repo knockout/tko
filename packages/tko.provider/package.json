@@ -4,5 +4,6 @@
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
   "main": "index.js",
   "author": "Knockout Team",
-  "license": "MIT"
+  "license": "MIT",
+  "karma" : { "frameworks": ["mocha", "chai"] }
 }
