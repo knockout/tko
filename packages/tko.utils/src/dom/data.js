@@ -68,8 +68,8 @@ function wmSet(node, key, value) {
     dataForNode[key] = value;
 }
 
-function wmClear(node) {
-    dataStore.set(node, {});
+function wmClear (node) {
+  return dataStore.delete(node)
 }
 
 
