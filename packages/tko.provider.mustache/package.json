@@ -1,5 +1,5 @@
 {
-  "name": "tko.preprocessor.textInterpolation",
+  "name": "tko.provider.mustache",
   "version": "0.1.0",
   "description": "Interpolate text/node attributes {{ }}",
   "main": "dist/tko.preprocessor.textInterpolation.js",

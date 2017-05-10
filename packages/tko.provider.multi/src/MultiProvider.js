@@ -28,10 +28,24 @@ export default class MultiProvider extends Provider {
     }
   }
 
+  * enumerateProviderBindings (node, ctx) {
+    for (const provider of this.providers) {
+      const bindings = provider.getBindingAccessors(node, ctx) || {}
+      for (const [key, accessor] of Object.entries(bindings || {})) {
+        yield [key, accessor]
+      }
+    }
+  }
+
   getBindingAccessors (node, ctx) {
     node = this.preprocessNode(node) || node
-    // `bindings` is e.g. {text: accessorFunction, visible: accessorFunction2}
-    const bindings = this.providers.map(p => p.getBindingAccessors(node, ctx))
-    return Object.assign({}, ...bindings)
+    const bindings = {}
+    for (const [key, accessor] of this.enumerateProviderBindings(node, ctx)) {
+      if (key in bindings) {
+        throw new Error(`The binding "${key}" is duplicated by multiple providers`)
+      }
+      bindings[key] = accessor
+    }
+    return bindings
   }
 }
