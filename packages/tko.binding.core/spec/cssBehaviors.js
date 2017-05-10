@@ -6,9 +6,7 @@ import {
     observable
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
+import { DataBindProvider } from 'tko.provider.databind';
 
 import {
     options
@@ -26,7 +24,7 @@ describe('Binding: CSS classes', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings);

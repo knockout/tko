@@ -7,9 +7,9 @@ import {
     observable as koObservable
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi'
+import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
     applyBindings, dataFor, bindingContext,
@@ -31,7 +31,10 @@ describe('Binding attribute syntax', function() {
 
     beforeEach(function () {
         // Set up the default binding handlers.
-        var provider = new Provider()
+        var provider = new MultiProvider({providers: [
+          new VirtualProvider(),
+          new DataBindProvider(),
+        ]})
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings);
@@ -473,7 +476,13 @@ describe('Binding attribute syntax', function() {
         delete bindingHandlers.nonexistentHandler;
         var initCalls = 0;
         bindingHandlers.test = { init: function () { initCalls++; } };
-        testNode.innerHTML = "<div data-bind='template: {\"if\":true}'>xxx<!-- ko nonexistentHandler: true --><span data-bind='test: true'></span><!-- /ko --></div>";
+        testNode.innerHTML = `
+          <div data-bind='template: { if: true }'>
+            xxx
+            <!-- ko nonexistentHandler: true -->
+              <span data-bind='test: true'></span>
+            <!-- /ko -->
+          </div>`
         applyBindings({}, testNode);
         expect(initCalls).toEqual(1);
     });

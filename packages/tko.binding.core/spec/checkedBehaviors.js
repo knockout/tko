@@ -17,10 +17,7 @@ import {
     computed
 } from 'tko.computed';
 
-
-import {
-    Provider
-} from 'tko.provider';
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
     options
@@ -35,7 +32,7 @@ describe('Binding: Checked', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set(templateBindings);

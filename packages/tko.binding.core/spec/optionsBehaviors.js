@@ -11,8 +11,8 @@ import {
 } from 'tko.observable';
 
 import {
-    Provider
-} from 'tko.provider';
+    DataBindProvider
+} from 'tko.provider.databind';
 
 import {
     options
@@ -31,7 +31,7 @@ describe('Binding: Options', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
 

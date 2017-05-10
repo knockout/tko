@@ -9,9 +9,7 @@ import {
     observableArray as ObservableArray
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {bindings as coreBindings} from 'tko.binding.core';
 import {bindings as templateBindings} from 'tko.binding.template';
@@ -32,7 +30,7 @@ describe("Deferred bindings", function() {
         jasmine.prepareTestNode();
         useMockForTasks(options);
         options.deferUpdates = true;
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings);

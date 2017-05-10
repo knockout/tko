@@ -10,9 +10,9 @@ import {
     observable, observableArray, isObservable
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi'
+import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
     options
@@ -38,13 +38,17 @@ describe('Templating', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function () {
-        // Set up the default binding handlers.
-        var provider = new Provider();
-        options.bindingProviderInstance = provider;
-        provider.bindingHandlers.set(coreBindings);
-        provider.bindingHandlers.set(templateBindings);
+      options.bindingGlobals = {}
+      // Set up the default binding handlers.
+      var provider = new MultiProvider({
+        providers: [new DataBindProvider(), new VirtualProvider()],
+        globals: options.bindingGlobals
+      })
+      options.bindingProviderInstance = provider;
+      provider.bindingHandlers.set(coreBindings);
+      provider.bindingHandlers.set(templateBindings);
 
-        bindingHandlers = provider.bindingHandlers;
+      bindingHandlers = provider.bindingHandlers;
     });
 
     afterEach(function() {
@@ -52,8 +56,6 @@ describe('Templating', function() {
     });
 
     it('Template engines can return an array of DOM nodes', function () {
-
-
         setTemplateEngine(new dummyTemplateEngine({ x: [document.createElement("div"), document.createElement("span")] }));
         renderTemplate("x", null);
     });
@@ -358,7 +360,7 @@ describe('Templating', function() {
         var data = observable('value');
         setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }));
 
-        options.bindingGlobals = { isObservable: isObservable };
+        options.bindingGlobals.isObservable = isObservable
         renderTemplate("someTemplate", data, null, testNode);
         expect(testNode.childNodes[0]).toContainText("true");
         expect(data.getSubscriptionsCount('change')).toEqual(1);    // only subscription is from the templating code
@@ -369,7 +371,7 @@ describe('Templating', function() {
         testNode.innerHTML = "<div data-bind='template: { name: \"someTemplate\", data: someProp }'></div>";
 
         // Expose to access isObservable
-        options.bindingGlobals = { isObservable: isObservable };
+        options.bindingGlobals.isObservable = isObservable
         var viewModel = { someProp: observable('value') };
 
         applyBindings(viewModel, testNode);
@@ -677,7 +679,7 @@ describe('Templating', function() {
             setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is <span data-bind='text: String($data)'></span>" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
-            options.bindingGlobals = { String: String };
+            options.bindingGlobals.String = String
             applyBindings({ myCollection: myArray }, testNode);
             expect(testNode.childNodes[0]).toContainHtml("the item is <span data-bind=\"text: string($data)\">undefined</span>the item is <span data-bind=\"text: string($data)\">null</span>");
         });
@@ -1059,33 +1061,34 @@ describe('Templating', function() {
     });
 
     it('Should be possible to combine template rewriting, foreach, and a node preprocessor', function() {
-        this.restoreAfter(options, 'bindingProviderInstance');
 
-        // This spec verifies that the use of fixUpContinuousNodeArray in templating.js correctly handles the scenario
-        // where a memoized comment node is the first node outputted by 'foreach', and it gets removed by unmemoization.
-        // In this case we rely on fixUpContinuousNodeArray to work out which remaining nodes correspond to the 'foreach'
-        // output so they can later be removed when the model array changes.
-        var originalBindingProvider = options.bindingProviderInstance,
-            preprocessingBindingProvider = function() { };
-        preprocessingBindingProvider.prototype = originalBindingProvider;
-        options.bindingProviderInstance = new preprocessingBindingProvider();
-        options.bindingProviderInstance.preprocessNode = function(node) {
-            // This preprocessor doesn't change the rendered nodes. But simply having a preprocessor means
-            // that templating.js has to recompute which DOM nodes correspond to the foreach output, since
-            // you might have modified that set.
-            return [node];
-        };
+      // This spec verifies that the use of fixUpContinuousNodeArray in templating.js correctly handles the scenario
+      // where a memoized comment node is the first node outputted by 'foreach', and it gets removed by unmemoization.
+      // In this case we rely on fixUpContinuousNodeArray to work out which remaining nodes correspond to the 'foreach'
+      // output so they can later be removed when the model array changes.
+      class TemplateTestProvider extends DataBindProvider {
+        preprocessNode(node) {
+          // This preprocessor doesn't change the rendered nodes. But simply having a preprocessor means
+          // that templating.js has to recompute which DOM nodes correspond to the foreach output, since
+          // you might have modified that set.
+          return [node]
+        }
+      }
 
-        setTemplateEngine(new dummyTemplateEngine({}));
-        testNode.innerHTML = "<div data-bind='template: { foreach: items }'><button data-bind='text: $data'></button> OK. </div>";
-        var items = observableArray(['Alpha', 'Beta']);
-        applyBindings({ items: items }, testNode);
-        expect(testNode).toContainText('Alpha OK. Beta OK. ');
+      options.bindingProviderInstance = new TemplateTestProvider()
+      options.bindingProviderInstance.bindingHandlers.set(templateBindings)
+      options.bindingProviderInstance.bindingHandlers.set(coreBindings)
 
-        // Check that 'foreach' knows which set of elements to remove when an item vanishes from the model array,
-        // even though the original 'foreach' output's first node, the memo comment, was removed during unmemoization.
-        items.shift();
-        expect(testNode).toContainText('Beta OK. ');
+      setTemplateEngine(new dummyTemplateEngine({}));
+      testNode.innerHTML = "<div data-bind='template: { foreach: items }'><button data-bind='text: $data'></button> OK. </div>";
+      var items = observableArray(['Alpha', 'Beta']);
+      applyBindings({ items: items }, testNode);
+      expect(testNode).toContainText('Alpha OK. Beta OK. ');
+
+      // Check that 'foreach' knows which set of elements to remove when an item vanishes from the model array,
+      // even though the original 'foreach' output's first node, the memo comment, was removed during unmemoization.
+      items.shift();
+      expect(testNode).toContainText('Beta OK. ');
     });
 
     it('Should not throw errors if trying to apply text to a non-rendered node', function() {

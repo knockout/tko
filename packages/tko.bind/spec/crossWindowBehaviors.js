@@ -16,8 +16,8 @@ import {
 } from 'tko.binding.template';
 
 import {
-    Provider
-} from 'tko.provider';
+    DataBindProvider
+} from 'tko.provider.databind';
 
 import {
     bindings as coreBindings
@@ -40,7 +40,7 @@ describe('Cross-window support', function() {
 
     beforeEach(function () {
         // Set up the default binding handlers.
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set(templateBindings);

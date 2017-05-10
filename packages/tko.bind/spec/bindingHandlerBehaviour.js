@@ -8,8 +8,16 @@ import {
 } from 'tko.observable';
 
 import {
-    Provider
-} from 'tko.provider';
+  MultiProvider
+} from 'tko.provider.multi';
+
+import {
+  VirtualProvider
+} from 'tko.provider.virtual'
+
+import {
+  DataBindProvider
+} from 'tko.provider.databind'
 
 import {
     applyBindings, dataFor, bindingContext, BindingHandler,
@@ -30,7 +38,10 @@ describe("BindingHandler behaviours", function () {
 
     beforeEach(function () {
         // Set up the default binding handlers.
-        var provider = new Provider()
+        var provider = new MultiProvider({providers: [
+          new VirtualProvider(),
+          new DataBindProvider(),
+        ]})
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings);

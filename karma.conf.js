@@ -4,6 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 const nodeResolve = require('rollup-plugin-node-resolve')
+const rollupCommonJS = require('rollup-plugin-commonjs')
 const rollupVisualizer = require('rollup-plugin-visualizer')
 const includePaths = require('rollup-plugin-includepaths')
 
@@ -15,19 +16,20 @@ const frameworks = pkg.karma.frameworks
 const browsers = ['Electron']
 
 const files = [
-  { pattern: "src/*.js", included: false, watched: true },
-  { pattern: "spec/*.js" },
+  { pattern: 'src/*.js', included: false, watched: true },
+  { pattern: 'spec/*.js' }
 ]
 
 const preprocessors = {
   'src/**/*.js': ['rollup'],
-  'spec/**/*.js': ['rollup'],
+  'spec/**/*.js': ['rollup']
 }
 
 const ROLLUP_CONFIG = {
-  INCLUDE_PATHS: { paths: [ path.join(root, "../..") ] },
+  INCLUDE_PATHS: { paths: [ path.join(root, '../..') ] },
   RESOLVE: {jsnext: true},
   VISUALIZER: { filename: './visual.html' },
+  COMMONJS: {}
 }
 
 // The following can be used to identify
@@ -40,7 +42,6 @@ const ROLLUP_CONFIG = {
 //   }
 // }
 
-
 const rollupPreprocessor = Object.assign({}, {
   format: 'iife',
   moduleName: pkg.name,
@@ -48,6 +49,7 @@ const rollupPreprocessor = Object.assign({}, {
     includePaths(ROLLUP_CONFIG.INCLUDE_PATHS),
     nodeResolve(ROLLUP_CONFIG.RESOLVE),
     rollupVisualizer(ROLLUP_CONFIG.VISUALIZER),
+    rollupCommonJS(ROLLUP_CONFIG.COMMONJS)
   ],
   sourceMap: process.argv.includes('--sourcemap') ? 'inline': false,
 })
@@ -62,7 +64,12 @@ module.exports = (config) => {
     browsers,
     resolve: { root },
     electronOpts: {
-      show: false
+      frame: false,
+      resizable: false,
+      focusable: false,
+      show: false,
+      fullscreenable: false,
+      hasShadow: false
     },
     singleRun: process.argv.includes('--once')
   })

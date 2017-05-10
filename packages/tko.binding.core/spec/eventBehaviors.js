@@ -6,9 +6,7 @@ import {
     triggerEvent
 } from 'tko.utils';
 
-import {
-    Provider
-} from 'tko.provider';
+import { DataBindProvider } from 'tko.provider.databind';
 
 import {
     observable
@@ -26,7 +24,7 @@ describe('Binding: Event', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
     });
@@ -125,7 +123,7 @@ describe("Binding: On", function () {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
     });

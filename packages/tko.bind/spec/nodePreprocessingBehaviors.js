@@ -1,17 +1,15 @@
 import {
     options
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
     observable
-} from 'tko.observable';
+} from 'tko.observable'
+
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
-    Provider
-} from 'tko.provider';
-
-import {
-    bindings
+    bindings as coreBindings
 } from 'tko.binding.core';
 
 import {
@@ -24,8 +22,8 @@ describe('Node preprocessing', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function() {
-        options.bindingProviderInstance = new Provider();
-        options.bindingProviderInstance.bindingHandlers.set(bindings);
+        options.bindingProviderInstance = new DataBindProvider();
+        options.bindingProviderInstance.bindingHandlers.set(coreBindings);
     });
 
     it('Can leave the nodes unchanged by returning a falsey value', function() {
@@ -58,7 +56,8 @@ describe('Node preprocessing', function() {
     });
 
     it('Can replace a node with multiple new nodes', function() {
-        options.bindingProviderInstance.preprocessNode = function(node) {
+      class TestProvider extends DataBindProvider {
+        preprocessNode(node) {
             // Example: Replace {{ someValue }} with text from that property.
             // This could be generalized to full support for string interpolation in text nodes.
             if (node.nodeType === 3 && node.data.indexOf("{{ someValue }}") >= 0) {
@@ -77,14 +76,19 @@ describe('Node preprocessing', function() {
                 node.parentNode.removeChild(node);
                 return newNodes;
             }
-        };
-        testNode.innerHTML = "the value is {{ someValue }}.";
-        var someValue = observable('hello');
-        applyBindings({ someValue: someValue }, testNode);
-        expect(testNode).toContainText('the value is hello.');
+        }
+      }
+      options.bindingProviderInstance = new TestProvider()
+      options.bindingProviderInstance.bindingHandlers.set(coreBindings)
 
-        // Check that updating the observable has the expected effect
-        someValue('goodbye');
-        expect(testNode).toContainText('the value is goodbye.');
+
+      testNode.innerHTML = "the value is <span data-bind='text: someValue'></span>.";
+      var someValue = observable('hello');
+      applyBindings({ someValue: someValue }, testNode);
+      expect(testNode).toContainText('the value is hello.');
+
+      // Check that updating the observable has the expected effect
+      someValue('goodbye');
+      expect(testNode).toContainText('the value is goodbye.');
     });
 });

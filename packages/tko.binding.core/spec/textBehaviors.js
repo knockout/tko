@@ -6,9 +6,9 @@ import {
     applyBindings
 } from 'tko.bind';
 
-import {
-    Provider
-} from 'tko.provider';
+import { DataBindProvider } from 'tko.provider.databind'
+import { VirtualProvider } from 'tko.provider.virtual'
+import { MultiProvider } from 'tko.provider.multi'
 
 import {
     options
@@ -24,7 +24,9 @@ describe('Binding: Text', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new MultiProvider({
+          providers: [ new DataBindProvider(), new VirtualProvider() ]
+        })
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings.bindings);

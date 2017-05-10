@@ -8,8 +8,8 @@ import {
 } from 'tko.observable';
 
 import {
-    Provider
-} from 'tko.provider';
+  DataBindProvider
+} from 'tko.provider.databind';
 
 import {
     options
@@ -21,6 +21,7 @@ import {
   // templateEngine,
   // nativeTemplateEngine
 } from '../index.js';
+
 import {bindings as coreBindings} from 'tko.binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
@@ -30,7 +31,7 @@ describe('Binding: Ifnot', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set(ifBindings);

@@ -10,9 +10,9 @@ import {
     observable, observableArray
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi'
+import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from 'tko.provider.databind'
 
 import {
     options
@@ -32,7 +32,9 @@ describe('Binding: Foreach', function() {
     var bindingHandlers;
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new MultiProvider({
+          providers: [new DataBindProvider(), new VirtualProvider()]
+        })
         options.bindingProviderInstance = provider;
         bindingHandlers = provider.bindingHandlers;
         bindingHandlers.set(coreBindings);

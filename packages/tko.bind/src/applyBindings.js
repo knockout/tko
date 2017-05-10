@@ -181,7 +181,7 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
                 during: 'apply',
                 errorCaptured: new Error("You cannot apply bindings multiple times to the same element."),
                 element: node,
-                bindingContext: bindingContext
+                bindingContext
             });
             return false;
         }
@@ -334,9 +334,8 @@ function onBindingError(spec) {
     if (spec.bindingKey) {
         // During: 'init' or initial 'update'
         error = spec.errorCaptured;
-        bindingText = options.bindingProviderInstance.getBindingsString(spec.element);
         spec.message = "Unable to process binding \"" + spec.bindingKey
-            + "\" in binding \"" + bindingText
+            + "\" in binding \"" + spec.bindingKey
             + "\"\nMessage: " + (error.message ? error.message : error);
     } else {
         // During: 'apply'

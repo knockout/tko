@@ -10,10 +10,9 @@ import {
     observable, observableArray
 } from 'tko.observable';
 
-import {
-    Provider
-} from 'tko.provider';
-
+import { DataBindProvider } from 'tko.provider.databind'
+import { VirtualProvider } from 'tko.provider.virtual'
+import { MultiProvider } from 'tko.provider.multi'
 
 import {bindings as templateBindings} from 'tko.binding.template';
 import {bindings as coreBindings} from 'tko.binding.core';
@@ -26,7 +25,12 @@ describe('Binding: Using', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new MultiProvider({
+          providers: [
+            new DataBindProvider(),
+            new VirtualProvider()
+          ]
+        })
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set(templateBindings);

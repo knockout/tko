@@ -7,8 +7,8 @@ import {
 } from 'tko.observable';
 
 import {
-    Provider
-} from 'tko.provider';
+  DataBindProvider
+} from 'tko.provider.databind';
 
 import {
     options
@@ -41,7 +41,7 @@ describe('Native template engine', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function() {
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
         provider.bindingHandlers.set(templateBindings);

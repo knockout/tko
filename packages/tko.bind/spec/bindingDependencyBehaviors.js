@@ -17,9 +17,9 @@ import {
     computed as computedConstructor
 } from 'tko.computed';
 
-import {
-    Provider
-} from 'tko.provider';
+import { MultiProvider } from 'tko.provider.multi';
+import { DataBindProvider } from 'tko.provider.databind';
+import { VirtualProvider } from 'tko.provider.virtual';
 
 import {
     applyBindings, contextFor,
@@ -37,7 +37,10 @@ describe('Binding dependencies', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function () {
-        var provider = new Provider()
+        var provider = new MultiProvider({providers: [
+          new DataBindProvider(),
+          new VirtualProvider()
+        ]})
         options.bindingProviderInstance = provider
         bindingHandlers = provider.bindingHandlers
         bindingHandlers.set(coreBindings);
@@ -264,24 +267,23 @@ describe('Binding dependencies', function() {
     });
 
     it('Should track observables accessed within the binding provider\'s "getBindingAccessor" function', function() {
-        this.restoreAfter(options, 'bindingProviderInstance');
 
-        var observable = observableConstructor('substitute'),
-            originalBindingProvider = options.bindingProviderInstance;
+        var observable = observableConstructor('substitute')
 
-        options.bindingProviderInstance = {
-            bindingHandlers: originalBindingProvider.bindingHandlers,
-            nodeHasBindings: originalBindingProvider.nodeHasBindings,
-            otherProviders: [],
-            getBindingAccessors: function(node, bindingContext) {
-                var bindings = originalBindingProvider.getBindingAccessors(node, bindingContext);
-                if (bindings && bindings['text']) {
-                    var newValue = observable();
-                    bindings['text'] = function () { return newValue; };
-                }
-                return bindings;
+        class TestProvider extends DataBindProvider {
+          getBindingAccessors (node, bindingContext) {
+            var bindings = super.getBindingAccessors(node, bindingContext)
+            if (bindings && bindings.text) {
+                var newValue = observable();
+                bindings.text = () => newValue
             }
-        };
+            return bindings
+          }
+        }
+
+        const provider = new TestProvider()
+        options.bindingProviderInstance = provider
+        provider.bindingHandlers.set(coreBindings)
 
         testNode.innerHTML = "<div data-bind='text: \"hello\"'></div>";
         applyBindings({}, testNode);

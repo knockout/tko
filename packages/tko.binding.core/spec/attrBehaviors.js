@@ -3,16 +3,14 @@ import {
 } from 'tko.utils';
 
 import {
+  observable
+} from 'tko.observable'
+
+import {
     applyBindings
 } from 'tko.bind';
 
-import {
-    observable
-} from 'tko.observable';
-
-import {
-    Provider
-} from 'tko.provider';
+import { DataBindProvider } from 'tko.provider.databind';
 
 import {
     options
@@ -26,7 +24,7 @@ describe('Binding: Attr', function() {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){
-        var provider = new Provider();
+        var provider = new DataBindProvider();
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings.bindings);
     });
