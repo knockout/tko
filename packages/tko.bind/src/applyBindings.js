@@ -2,8 +2,7 @@
 /* eslint no-cond-assign: 0 */
 
 import {
-    extend, objectMap, virtualElements,
-    addDisposeCallback, tagNameLower, domData, objectForEach,
+    extend, objectMap, virtualElements, tagNameLower, domData, objectForEach,
     arrayIndexOf, arrayForEach, options
 } from 'tko.utils';
 
@@ -139,35 +138,36 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
 var boundElementDomDataKey = domData.nextKey();
 
 
-function topologicalSortBindings(bindings) {
-    // Depth-first sort
-    var result = [],                // The list of key/handler pairs that we will return
-        bindingsConsidered = {},    // A temporary record of which bindings are already in 'result'
-        cyclicDependencyStack = []; // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
-    objectForEach(bindings, function pushBinding(bindingKey) {
-        if (!bindingsConsidered[bindingKey]) {
-            const binding = getBindingHandler(bindingKey);
-            if (!binding) { return }
-            // First add dependencies (if any) of the current binding
-            if (binding.after) {
-                cyclicDependencyStack.push(bindingKey);
-                arrayForEach(binding.after, function(bindingDependencyKey) {
-                    if (!bindings[bindingDependencyKey]) { return }
-                    if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
-                        throw Error("Cannot combine the following bindings, because they have a cyclic dependency: " + cyclicDependencyStack.join(", "));
-                    } else {
-                        pushBinding(bindingDependencyKey);
-                    }
-                });
-                cyclicDependencyStack.length--;
-            }
-            // Next add the current binding
-            result.push({ key: bindingKey, handler: binding });
-        }
-        bindingsConsidered[bindingKey] = true;
-    });
+function * topologicalSortBindings(bindings) {
+  const results = []
+  // Depth-first sort
+  const bindingsConsidered = {}    // A temporary record of which bindings are already in 'result'
+  const cyclicDependencyStack = [] // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
 
-    return result;
+  objectForEach(bindings, function pushBinding(bindingKey) {
+    if (!bindingsConsidered[bindingKey]) {
+        const binding = getBindingHandler(bindingKey);
+        if (!binding) { return }
+        // First add dependencies (if any) of the current binding
+        if (binding.after) {
+            cyclicDependencyStack.push(bindingKey);
+            arrayForEach(binding.after, function(bindingDependencyKey) {
+                if (!bindings[bindingDependencyKey]) { return }
+                if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
+                    throw Error("Cannot combine the following bindings, because they have a cyclic dependency: " + cyclicDependencyStack.join(", "));
+                } else {
+                    pushBinding(bindingDependencyKey);
+                }
+            });
+            cyclicDependencyStack.length--;
+        }
+        // Next add the current binding
+        results.push([ bindingKey, binding ]);
+    }
+    bindingsConsidered[bindingKey] = true;
+  });
+
+  for (const result of results) { yield result }
 }
 
 
@@ -245,47 +245,44 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
         allBindings.has = (key) => key in bindings
         allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
 
-
+        for (const [key, handler] of topologicalSortBindings(bindings)) {
         // Go through the sorted bindings, calling init and update for each
-        topologicalSortBindings(bindings).forEach((bindingKeyAndHandler) => {
-            function reportBindingError(during, errorCaptured) {
-                onBindingError({
-                    during, errorCaptured, bindingKey, bindings, allBindings,
-                    bindingContext,
-                    element: node,
-                    valueAccessor: getValueAccessor(key),
-                });
-            }
+          function reportBindingError(during, errorCaptured) {
+            onBindingError({
+                during, errorCaptured, bindings, allBindings,
+                bindingKey: key,
+                bindingContext,
+                element: node,
+                valueAccessor: getValueAccessor(key),
+            });
+          }
 
-            const {handler, key} = bindingKeyAndHandler,
-                bindingKey = key,
-                BindingHandlerClass = getBindingHandlerClass(handler, key, reportBindingError)
+          const BindingHandlerClass = getBindingHandlerClass(handler, key, reportBindingError)
 
+          if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
+              throw new Error(`The binding [${key}] cannot be used with virtual elements`);
+          }
 
-            if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
-                throw new Error(`The binding [${key}] cannot be used with virtual elements`);
-            }
+          try {
+              const bindingHandler = new BindingHandlerClass({
+                  allBindings,
+                  $element: node,
+                  $context: bindingContext,
+                  valueAccessor(...v) { return getValueAccessor(key)(...v) }
+              })
 
-            try {
-                const bindingHandler = new BindingHandlerClass({
-                    allBindings,
-                    $element: node,
-                    $context: bindingContext,
-                    valueAccessor(...v) { return getValueAccessor(key)(...v) }
-                })
+              // Expose the bindings via domData.
+              allBindingHandlers[key] = bindingHandler
 
-                // Expose the bindings via domData.
-                allBindingHandlers[key] = bindingHandler
-
-                if (bindingHandler.controlsDescendants) {
-                    if (bindingHandlerThatControlsDescendantBindings !== undefined)
-                        throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + key + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
-                    bindingHandlerThatControlsDescendantBindings = key;
-                }
-            } catch (err) {
-                reportBindingError('creation', err)
-            }
-        });
+              if (bindingHandler.controlsDescendants) {
+                  if (bindingHandlerThatControlsDescendantBindings !== undefined)
+                      throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + key + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
+                  bindingHandlerThatControlsDescendantBindings = key;
+              }
+          } catch (err) {
+              reportBindingError('creation', err)
+          }
+        }
     }
 
     return {
