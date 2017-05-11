@@ -25,87 +25,98 @@ import {
 } from 'tko.provider.databind'
 
 import {
-    MustacheProvider
+    AttributeMustacheProvider
 } from '../index.js';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
 
-describe("Attribute Interpolation Markup preprocessor", function() {
+ddescribe("Attribute Interpolation Markup Provider", function() {
     var testNode, provider;
 
     beforeEach(function () {
-        provider = new MustacheProvider()
+        provider = new AttributeMustacheProvider()
+        options.bindingProviderInstance = provider
         testNode = document.createElement("div");
         provider.bindingHandlers.set(coreBindings);
     });
 
+    function runAttributeInterpolation(testNode) {
+      applyBindings({}, testNode)
+    }
+
     it('Should do nothing when there are no expressions', function() {
         testNode.setAttribute('title', "some text");
-        provider.attributeInterpolation(testNode);
         expect(testNode.title).toEqual('some text');
-        expect(testNode.getAttribute('data-bind')).toBe(null);
+        expect(Object.keys(provider.getBindingAccessors).length).toBe(0)
     });
 
     it('Should do nothing when empty', function() {
         testNode.setAttribute('title', "");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toBe(null);
+        const bindings = provider.getBindingAccessors(testNode)
+        expect(Object.keys(bindings).length).toBe(0)
     });
 
     it('Should not parse unclosed binding', function() {
         testNode.setAttribute('title', "some {{text");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('some {{text');
-        expect(testNode.getAttribute('data-bind')).toBe(null);
+        const bindings = provider.getBindingAccessors(testNode)
+        expect(Object.keys(bindings).length).toBe(0)
     });
 
     it('Should not parse unopened binding', function() {
         testNode.setAttribute('title', "some}} text");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('some}} text');
-        expect(testNode.getAttribute('data-bind')).toBe(null);
+        const bindings = provider.getBindingAccessors(testNode)
+        expect(Object.keys(bindings).length).toBe(0)
     });
 
     it('Should create binding from {{...}} expression', function() {
         testNode.setAttribute('title', "some {{expr}} text");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr)+" text"');
+        const bindings = provider.getBindingAccessors(testNode)
+        expect(Object.keys(bindings).length).toBe(1)
+        expect(bindings.title).toBeDefined()
+
+        // expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr)+" text"');
     });
 
     it('Should ignore unmatched delimiters', function() {
         testNode.setAttribute('title', "some {{expr1}}expr2}} text");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
         expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr1}}expr2)+" text"');
     });
 
     it('Should support two expressions', function() {
         testNode.setAttribute('title', "some {{expr1}} middle {{expr2}} text");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
         expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr1)+" middle "+@(expr2)+" text"');
     });
 
     it('Should skip empty text', function() {
         testNode.setAttribute('title', "{{expr1}}{{expr2}}");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
         expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+@(expr1)+@(expr2)');
     });
 
     it('Should support more than two expressions', function() {
         testNode.setAttribute('title', "x {{expr1}} y {{expr2}} z {{expr3}}");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
         expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"x "+@(expr1)+" y "+@(expr2)+" z "+@(expr3)');
     });
 
     it('Should create simple binding for single expression', function() {
         testNode.setAttribute('title', "{{expr1}}");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
         expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1');
     });
@@ -113,14 +124,14 @@ describe("Attribute Interpolation Markup preprocessor", function() {
     it('Should append to existing data-bind', function() {
         testNode.setAttribute('title', "{{expr1}}");
         testNode.setAttribute('data-bind', "text:expr2");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.title).toEqual('');
         expect(testNode.getAttribute('data-bind')).toEqual('text:expr2,attr.title:expr1');
     });
 
     it('Should not match expressions in data-bind', function() {
         testNode.setAttribute('data-bind', "text:'{{xyz}}'");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.getAttribute('data-bind')).toEqual("text:'{{xyz}}'");
     });
 
@@ -129,7 +140,7 @@ describe("Attribute Interpolation Markup preprocessor", function() {
         testNode.setAttribute('class', "test");     // won't be in data-bind
         testNode.setAttribute('id', "{{expr2}}");
         testNode.setAttribute('data-test', "{{expr3}}");
-        provider.attributeInterpolation(testNode);
+        runAttributeInterpolation(testNode);
         expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2,attr.data-test:expr3'); // the order shouldn't matter
     });
 
@@ -138,7 +149,7 @@ describe("Attribute Interpolation Markup preprocessor", function() {
         input.type = 'checkbox';
         input.setAttribute('checked', "{{expr2}}");
         input.setAttribute('value', "{{expr1}}");
-        provider.attributeInterpolation(input);
+        runAttributeInterpolation(input);
         expect(input.getAttribute('data-bind')).toEqual('checked:expr2,value:expr1');
     });
 
@@ -161,20 +172,20 @@ describe("Attribute Interpolation Markup preprocessor", function() {
       testNode.setAttribute('title', "{{expr1}}")
       // This will use the custom handler
       testNode.setAttribute('ko-id', "{{expr2}}")
-      provider.attributeInterpolation(testNode)
+      runAttributeInterpolation(testNode)
       expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2')
     });
 });
 
 
-ddescribe("Attribute Interpolation Markup bindings", function() {
+describe("Attribute Interpolation Markup bindings", function() {
     beforeEach(jasmine.prepareTestNode);
 
     var bindingHandlers;
 
     beforeEach(function(){
       const providers = [
-        new MustacheProvider(),
+        new AttributeMustacheProvider(),
         new DataBindProvider()
       ]
       const provider = new MultiProvider({providers})
