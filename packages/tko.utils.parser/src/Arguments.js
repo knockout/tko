@@ -1,20 +1,19 @@
 
-import Node from './Node';
+import Node from './Node'
 
-
-export default function Arguments(parser, args) {
-  this.parser = parser;
-  this.args = args;
-}
-
-
-Arguments.prototype.get_value = function get_value(/* parent */) {
-  var dereffed_args = [];
-  for (var i = 0, j = this.args.length; i < j; ++i) {
-    dereffed_args.push(Node.value_of(this.args[i]));
+export default class Arguments {
+  constructor (parser, args) {
+    this.parser = parser
+    this.args = args
   }
-  return dereffed_args;
-};
 
+  get_value (parent, context, globals) {
+    var deReffedArgs = []
+    for (var i = 0, j = this.args.length; i < j; ++i) {
+      deReffedArgs.push(Node.value_of(this.args[i], context, globals))
+    }
+    return deReffedArgs
+  };
 
-Arguments.prototype[Node.isExpressionOrIdentifierSymbol] = true;
+  get [Node.isExpressionOrIdentifierSymbol] () { return true }
+}

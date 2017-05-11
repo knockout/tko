@@ -14,6 +14,11 @@ var operators = Node.operators
 var nodes_to_tree
 
 
+function ctxStub (ctx) {
+  return { lookup (v) { return ctx ? ctx[v] : null } }
+}
+
+
 beforeEach(function() {
   nodes_to_tree = Node.create_root;
 })
@@ -21,7 +26,7 @@ beforeEach(function() {
 
 describe("Operators", function () {
   function test(nodes, val, name) {
-    assert.equal(Node.create_root(nodes).get_node_value(), val, name);
+    assert.equal(Node.create_root(nodes).get_value(), val, name);
   }
 
   it("does simple arithmetic", function () {
@@ -130,27 +135,24 @@ describe("Node", function() {
     root.op = operators['+']
     root.lhs = new Node(19, operators['*'], -2)
     root.rhs = 4
-    assert.equal(root.get_node_value(), 19 * -2 + 4)
+    assert.equal(root.get_value(null, ctxStub()), 19 * -2 + 4)
   })
 
   it("looks up identifiers", function() {
     var root = new Node(),
-      context = { x: 19 },
-      parser = new Parser(null, context),
+      context = ctxStub({ x: 19 }),
+      parser = new Parser(),
       ident = new Identifier(parser, 'x');
     root.op = operators['+']
     root.lhs = ident
     root.rhs = 23
-    assert.equal(root.get_node_value(), 23 + 19)
+    assert.equal(root.get_value(null, context), 23 + 19)
   })
 
-
   it("converts function calls (a())", function() {
-    var context = {
-        x: observable(0x0F)
-      },
+    var context = ctxStub({ x: observable(0x0F) }),
       parser, nodes, root;
-    parser = new Parser(null, context);
+    parser = new Parser(null);
     var fake_args = new Arguments(null, [])
     nodes = [
       // the third argument is the same as _deref_call
@@ -160,6 +162,6 @@ describe("Node", function() {
     ];
     root = nodes_to_tree(nodes.slice(0));
 
-    assert.equal(root.get_node_value(), 0x8F)
+    assert.equal(root.get_value(undefined, context), 0x8F)
   })
 })

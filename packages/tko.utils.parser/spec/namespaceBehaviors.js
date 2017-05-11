@@ -24,10 +24,17 @@ import {
   Parser
 } from '../index.js';
 
+function ctxStub (ctx) {
+  return { lookup (v) { return ctx ? ctx[v] : null } }
+}
+
+function makeBindings (binding, context) {
+  return new Parser().parse(binding, ctxStub(context))
+}
 
 describe("Parser Namespace", function () {
   function trial(context, binding, expect) {
-    var p = new Parser(null, context).parse(binding)
+    var p = makeBindings(binding, context)
     assert.deepEqual(p.on(), expect)
   }
 
