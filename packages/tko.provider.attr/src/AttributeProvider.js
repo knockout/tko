@@ -10,7 +10,7 @@ import {
  * <div ko-visible='value'></div>
  */
 export default class AttrProvider extends Provider {
-  get PREFIX() { return 'ko-' }
+  get PREFIX () { return 'ko-' }
 
   getBindingAttributesList (node) {
     if (!node.hasAttributes()) { return [] }

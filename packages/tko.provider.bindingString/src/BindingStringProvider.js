@@ -19,8 +19,7 @@ export default class BindingStringProvider extends Provider {
    */
   * processBinding (key, value) {
     // Get the "on" binding from "on.click"
-    const [on, name] = key.split('.')
-    const handlerName = name || on
+    const [handlerName, property] = key.split('.')
     const handler = this.bindingHandlers.get(handlerName)
 
     if (handler && handler.preprocess) {
@@ -30,8 +29,11 @@ export default class BindingStringProvider extends Provider {
       for (const [key, value] of bindingsAddedByHandler) {
         yield * this.processBinding(key, value)
       }
+    } else if (property) {
+      value = `{${property}:${value}}`
     }
-    yield `${handlerName}:${name ? '=>' : ''}${value}`
+
+    yield `${handlerName}:${value}`
   }
 
   * generateBindingString (bindingString) {
@@ -44,15 +46,11 @@ export default class BindingStringProvider extends Provider {
     return Array.from(this.generateBindingString(bindingString)).join(',')
   }
 
-  makeParser (node, context) {
-    return new Parser(node, context, this.globals)
-  }
-
   getBindingAccessors (node, context) {
     const bindingString = node && this.getBindingString(node)
     if (!bindingString) { return }
-    return this.makeParser(node, context)
-      .parse(this.preProcessBindings(bindingString))
+    return new Parser()
+      .parse(this.preProcessBindings(bindingString), context, this.globals)
   }
 
   getBindingString () { throw new Error('Overload getBindingString.') }
