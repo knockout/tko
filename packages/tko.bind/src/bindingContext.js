@@ -113,6 +113,22 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
     }
 }
 
+bindingContext.prototype.lookup = function (token, globals) {
+  // short circuits
+  switch (token) {
+    case '$element': return this.$element
+    case '$context': return this
+    case 'this': case '$data': return this.$data
+  }
+  const $data = this.$data
+  // instanceof Object covers 1. {}, 2. [], 3. function() {}, 4. new *;  it excludes undefined, null, primitives.
+  if ($data instanceof Object && token in $data) { return $data[token] }
+  if (token in this) { return this[token] }
+  if (token in globals) { return globals[token] }
+
+  throw new Error(`The variable "${token}" was not found on $data, $context, or globals.`)
+}
+
 // Extend the binding context hierarchy with a new view model object. If the parent context is watching
 // any observables, the new child context will automatically get a dependency on the parent context.
 // But this does not mean that the $data value of the child context will also get updated. If the child
