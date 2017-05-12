@@ -411,20 +411,21 @@ describe('Templating', function() {
         // and external (non-rewritten) ones
         var originalBindingProvider = options.bindingProviderInstance;
         options.bindingProviderInstance = {
-            bindingHandlers: originalBindingProvider.bindingHandlers,
-            nodeHasBindings: function(node, bindingContext) {
-                return (node.tagName == 'EM') || originalBindingProvider.nodeHasBindings(node, bindingContext);
-            },
-            getBindingAccessors: function(node, bindingContext) {
-                if (node.tagName == 'EM') {
-                    return {
-                        text: function() {
-                            return ++model.numExternalBindings;
-                        }
-                    };
-                }
-                return originalBindingProvider.getBindingAccessors(node, bindingContext);
-            }
+          FOR_NODE_TYPES: [document.ELEMENT_NODE],
+          bindingHandlers: originalBindingProvider.bindingHandlers,
+          nodeHasBindings: function(node, bindingContext) {
+              return (node.tagName == 'EM') || originalBindingProvider.nodeHasBindings(node, bindingContext);
+          },
+          getBindingAccessors: function(node, bindingContext) {
+              if (node.tagName == 'EM') {
+                  return {
+                      text: function() {
+                          return ++model.numExternalBindings;
+                      }
+                  };
+              }
+              return originalBindingProvider.getBindingAccessors(node, bindingContext);
+          }
         };
 
         setTemplateEngine(new dummyTemplateEngine({

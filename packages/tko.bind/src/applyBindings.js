@@ -4,19 +4,19 @@
 import {
     extend, objectMap, virtualElements, tagNameLower, domData, objectForEach,
     arrayIndexOf, arrayForEach, options
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
     dependencyDetection
-} from 'tko.observable';
+} from 'tko.observable'
 
 import {
     computed
-} from 'tko.computed';
+} from 'tko.computed'
 
 import {
     bindingContext, storedBindingContextForNode
-} from './bindingContext';
+} from './bindingContext'
 
 import {
     getBindingHandlerClass
@@ -33,7 +33,7 @@ var bindingDoesNotRecurseIntoElementTypes = {
     'script': true,
     'textarea': true,
     'template': true
-};
+}
 
 // Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
 export function getBindingHandler(bindingKey) {
@@ -108,6 +108,11 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
     }
 }
 
+function hasBindings (node) {
+  const provider = options.bindingProviderInstance
+  return provider.FOR_NODE_TYPES.includes(node.nodeType) && provider.nodeHasBindings(node)
+}
+
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, bindingContextMayDifferFromDomParentElement) {
     var shouldBindDescendants = true;
 
@@ -117,10 +122,10 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
     // (2) It might have bindings (e.g., it has a data-bind attribute, or it's a marker for a containerless template)
     var isElement = (nodeVerified.nodeType === 1);
     if (isElement) // Workaround IE <= 8 HTML parsing weirdness
-        virtualElements.normaliseVirtualElementDomStructure(nodeVerified);
+        virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
 
-    var shouldApplyBindings = (isElement && bindingContextMayDifferFromDomParentElement)             // Case (1)
-                           || options.bindingProviderInstance.nodeHasBindings(nodeVerified);       // Case (2)
+    var shouldApplyBindings = (isElement && bindingContextMayDifferFromDomParentElement)            // Case (1)
+                           || hasBindings(nodeVerified)         // Case (2)
     if (shouldApplyBindings)
         shouldBindDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement).shouldBindDescendants;
 
@@ -199,24 +204,26 @@ function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindi
     if (sourceBindings && typeof sourceBindings !== 'function') {
         bindings = sourceBindings;
     } else {
-        var provider = options.bindingProviderInstance,
-            getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors;
+        const provider = options.bindingProviderInstance;
+        const getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors
 
-        // Get the binding from the provider within a computed observable so that we can update the bindings whenever
-        // the binding context is updated or if the binding provider accesses observables.
-        var bindingsUpdater = computed(
-            function() {
-                bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext);
-                // Register a dependency on the binding context to support observable view models.
-                if (bindings && bindingContext._subscribable)
-                    bindingContext._subscribable();
-                return bindings;
-            },
-            null, { disposeWhenNodeIsRemoved: node }
-        );
+        if (provider.FOR_NODE_TYPES.includes(node.nodeType)) {
+          // Get the binding from the provider within a computed observable so that we can update the bindings whenever
+          // the binding context is updated or if the binding provider accesses observables.
+          var bindingsUpdater = computed(
+              function() {
+                  bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext);
+                  // Register a dependency on the binding context to support observable view models.
+                  if (bindings && bindingContext._subscribable)
+                      bindingContext._subscribable();
+                  return bindings;
+              },
+              null, { disposeWhenNodeIsRemoved: node }
+          );
 
-        if (!bindings || !bindingsUpdater.isActive())
-            bindingsUpdater = null;
+          if (!bindings || !bindingsUpdater.isActive())
+              bindingsUpdater = null;
+        }
     }
 
     var bindingHandlerThatControlsDescendantBindings;

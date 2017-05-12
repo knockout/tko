@@ -15,7 +15,7 @@ import {
  *  Interpret {{ }} inside DOM attributes e.g. <div class='{{ classes }}'>
  */
 export default class AttributeMustacheProvider extends Provider {
-  static get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
+  get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
 
   constructor (params = {}) {
     super(params)

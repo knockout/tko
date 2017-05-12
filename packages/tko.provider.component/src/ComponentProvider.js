@@ -22,6 +22,8 @@ import {
 } from 'tko.utils.parser'
 
 export default class ComponentProvider extends Provider {
+  get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
+
   nodeHasBindings (node) {
     return Boolean(this.getComponentNameForNode(node))
   }

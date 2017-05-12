@@ -617,6 +617,7 @@ describe('Binding attribute syntax', function() {
 
             var originalBindingProvider = options.bindingProviderInstance;
             options.bindingProviderInstance = {
+              get FOR_NODE_TYPES() { return [3] },
                 nodeHasBindings: function(node) {
                     // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                     // This will still prove that the binding provider was not executed on the children of a restricted element.

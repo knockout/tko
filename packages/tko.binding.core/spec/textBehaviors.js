@@ -88,6 +88,7 @@ describe('Binding: Text', function() {
         // content with a special message, via a binding handler that operates on text nodes
         var originalBindingProvider = options.bindingProviderInstance;
         options.bindingProviderInstance = {
+          FOR_NODE_TYPES: [document.ELEMENT_NODE],
             nodeHasBindings: function(/*node, bindingContext */) {
                 /*// IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                 // This will still prove that the binding provider was not executed on the children of a restricted element.
