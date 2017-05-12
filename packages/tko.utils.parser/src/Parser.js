@@ -719,8 +719,6 @@ export default class Parser {
   }
 
   valueAsAccessor (value, context, globals, node) {
-    this.currentContextGlobals = [context, globals, node]
-
     if (!value) { return () => value }
     if (typeof value === 'function') { return value }
 
@@ -748,10 +746,7 @@ export default class Parser {
   * expressionAccessor, or nodeAccessor.
   */
   convertToAccessors (result, context, globals, node) {
-
     objectForEach(result, (name, value) => {
-      this.currentContextGlobals = [context, globals, node]
-
       if (value instanceof Identifier) {
         // Return a function that, with no arguments returns
         // the value of the identifier, otherwise sets the
@@ -772,7 +767,7 @@ export default class Parser {
     return result
   }
 
-  runParse(source, fn) {
+  runParse (source, fn) {
     this.text = (source || '').trim()
     this.at = 0
     this.ch = ' '
@@ -796,6 +791,7 @@ export default class Parser {
    */
   parse (source, context = {}, globals = {}, node) {
     if (!source) { return () => null }
+    this.currentContextGlobals = [context, globals, node]
     const parseFn = () => this.readBindings()
     const bindingAccessors = this.runParse(source, parseFn)
     return this.convertToAccessors(bindingAccessors, context, globals, node)
@@ -806,6 +802,7 @@ export default class Parser {
    */
   parseExpression (source, context = {}, globals = {}, node) {
     if (!source) { return () => '' }
+    this.currentContextGlobals = [context, globals, node]
     const parseFn = () => this.expression(true)
     const bindingAccessors = this.runParse(source, parseFn)
     return this.valueAsAccessor(bindingAccessors, context, globals, node)
