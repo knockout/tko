@@ -7,45 +7,12 @@ import {
 } from './mustacheParser'
 
 /**
- *  Interpret {{ }}, {{{ }}}, {{# /}}, and {{# }} ... {{/ }} inside text nodes
+ * Interpret {{ }}, {{{ }}}, {{# /}}, and {{# }} ... {{/ }} inside text nodes.
+ *
+ * This binding must come before the VirtualProvider.
  */
 export default class TextMustacheProvider extends Provider {
   static get FOR_NODE_TYPES () { return [document.TEXT_NODE] }
-
-  * wrapExpression (text, textNode) {
-    text = (text || '').trim()
-    const ownerDocument = textNode ? textNode.ownerDocument : document
-    const firstChar = text[0]
-    const lastChar = text[text.length - 1]
-    var closeComment = true
-    var binding
-
-    if (firstChar === '#') {
-      if (lastChar === '/') {
-        binding = text.slice(1, -1)
-      } else {
-        binding = text.slice(1)
-        closeComment = false
-      }
-      const matches = binding.match(/^([^,"'{}()/:[\]\s]+)\s+([^\s:].*)/)
-      if (matches) {
-        binding = matches[1] + ':' + matches[2]
-      }
-    } else if (firstChar === '/') {
-      // replace only with a closing comment
-    } else if (firstChar === '{' && lastChar === '}') {
-      binding = 'html:' + text.slice(1, -1).trim()
-    } else {
-      binding = 'text:' + text.trim()
-    }
-
-    if (binding) {
-      yield ownerDocument.createComment('ko ' + binding)
-    }
-    if (closeComment) {
-      yield ownerDocument.createComment('/ko')
-    }
-  }
 
   * textToNodes (textNode) {
     const parent = textNode.parentNode
@@ -54,12 +21,8 @@ export default class TextMustacheProvider extends Provider {
 
     if (!hasStash || isTextarea) { return }
 
-    for (const [type, value] of parseInterpolation(textNode.nodeValue)) {
-      if (type === 'text') {
-        yield document.createTextNode(value)
-      } else {
-        yield * this.wrapExpression(value, textNode)
-      }
+    for (const part of parseInterpolation(textNode.nodeValue)) {
+      yield * part.textNodeReplacement(textNode)
     }
   }
 
@@ -81,8 +44,15 @@ export default class TextMustacheProvider extends Provider {
   }
 
   /**
-   * We need to convert any {{# ... }} into <!-- ko : ... -->, so that the
-   * VirtualProvider can pick it up.
+   * We convert as follows:
+   *
+   *   {{# ... }} into <!-- ko ... -->
+   *   {{/ ... }} into <!-- /ko -->
+   *   {{# ... /}} into <!-- ko ... --><!-- /ko -->
+   *   {{ ... }} into <!-- ko text: ... --><!-- /ko -->
+   *   {{{ ... }}} into <!-- ko html: ... --><!-- /ko -->
+   *
+   * VirtualProvider can then pick up and do the actual binding.
    */
   preprocessNode (node) {
     return this.textInterpolation(node)

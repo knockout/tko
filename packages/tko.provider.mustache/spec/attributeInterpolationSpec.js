@@ -30,8 +30,10 @@ import {
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 
+function ctxStub (obj = {}) { return { lookup (v) { return obj[v] } } }
 
-ddescribe("Attribute Interpolation Markup Provider", function() {
+
+describe("Attribute Interpolation Markup Provider", function() {
     var testNode, provider;
 
     beforeEach(function () {
@@ -148,19 +150,18 @@ ddescribe("Attribute Interpolation Markup Provider", function() {
 
     it('Should support expressions in multiple attributes', function() {
         testNode.setAttribute('title', "{{expr1}}");
-        testNode.setAttribute('class', "test");     // won't be in data-bind
+        testNode.setAttribute('class', "test");  // skipped b/c not interpolated
         testNode.setAttribute('id', "{{expr2}}");
         testNode.setAttribute('data-test', "{{expr3}}");
         const bindings = Array.from(provider.bindingParts(testNode, {}))
-        expect(bindings.length).toBe(4)
+        expect(bindings.length).toBe(3)
         const [p0, p1, p2, p3] = bindings
-        const map = {
-          title: 'expr1', class: 'test', id: 'expr2', 'data-test': 'expr3'
-        }
+        const map = { title: 'expr1', id: 'expr2', 'data-test': 'expr3' }
         bindings.forEach(b => {
           const [handler, [part]] = b
-          expect(map[handler]).toEqual(part)
+          expect(map[handler]).toEqual(part.text)
         })
+        expect(testNode.getAttribute('class')).toEqual('test')
     });
 
     it('Should convert value and checked attributes to two-way bindings', function() {
@@ -168,12 +169,24 @@ ddescribe("Attribute Interpolation Markup Provider", function() {
         input.type = 'checkbox'
         input.setAttribute('checked', "{{expr2}}")
         input.setAttribute('value', "{{expr1}}")
-        runAttributeInterpolation(input)
-        expect(input.getAttribute('data-bind')).toEqual('checked:expr2,value:expr1');
+
+        const ctx = { expr1: Observable(), expr2: Observable() }
+        const bindings = Array.from(
+          provider.bindingObjects(testNode, ctxStub(ctx))
+        )
+        for (const binding of bindings) {
+          if (binding.checked) {
+            expect(binding.checked).toEqual(ctx.expr2)
+          } else if (binding.value) {
+            expect(binding.value).toEqual(ctx.expr1)
+          } else {
+            throw new Error("Unexpected bindings.")
+          }
+        }
     });
 
     it('Should support custom attribute binding using "attributeBinding" overloading', function() {
-      class KOAttr extends MustacheProvider {
+      class KOAttr extends AttributeMustacheProvider {
         attributeBinding (name, value) {
           const parsedName = name.match(/^ko-(.*)$/)
           if (parsedName) {
@@ -191,8 +204,15 @@ ddescribe("Attribute Interpolation Markup Provider", function() {
       testNode.setAttribute('title', "{{expr1}}")
       // This will use the custom handler
       testNode.setAttribute('ko-id', "{{expr2}}")
-      runAttributeInterpolation(testNode)
-      expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2')
+
+      const ctx = {expr1: 'x', expr2: 'y'}
+      const bindings = provider.getBindingAccessors(testNode, ctxStub(ctx))
+
+      expect(Object.keys(bindings).length).toEqual(2)
+      expect(bindings['attr.title']().title).toEqual('x')
+      expect(bindings['attr.id']().id).toEqual('y')
+
+      // expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2')
     });
 });
 
@@ -225,12 +245,10 @@ describe("Attribute Interpolation Markup bindings", function() {
         expect(testNode.childNodes[0].title).toEqual("hello name!");
     });
 
-    xit('Should support any content of expression, including functions and {{}}', function() {
-        // Disabled, since we can't properly `eval` the internals.
-        // TODO/FIXME: Check lambdas.
-        testNode.innerHTML = "<div title='hello {{ => \"{{name}}\" }}!'></div>";
-        applyBindings(null, testNode);
-        expect(testNode.childNodes[0].title).toEqual("hello {{name}}!");
+    it('Should support backtick interpolation', function() {
+        testNode.innerHTML = "<div title='hello {{ `a${name}b` }}!'></div>";
+        applyBindings({ name: 'n' }, testNode);
+        expect(testNode.childNodes[0].title).toEqual("hello anb!");
     });
 
     it('Should properly handle quotes in text sections', function() {

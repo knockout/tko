@@ -33,9 +33,10 @@ export default class AttributeMustacheProvider extends Provider {
     return !this.attributesToInterpolate(node.attributes).next().done
   }
 
-  partsTogether (parts, context, ...valueToWrite) {
+  partsTogether (parts, context, node, ...valueToWrite) {
     if (parts.length > 1) {
-      return parts.map(p => unwrap(p.asAttr(context, this.globals))).join('')
+      return parts
+        .map(p => unwrap(p.asAttr(context, this.globals, node))).join('')
     }
     // It may be a writeable observable e.g. value="{{ value }}".
     const part = parts[0].asAttr(context, this.globals)
@@ -43,10 +44,14 @@ export default class AttributeMustacheProvider extends Provider {
     return part
   }
 
+  attributeBinding (name, parts) {
+    return [name, parts]
+  }
+
   * bindingParts (node, context) {
     for (const attr of this.attributesToInterpolate(node.attributes)) {
       const parts = Array.from(parseInterpolation(attr.value))
-      if (parts.length) { yield [attr.name, parts] }
+      if (parts.length) { yield this.attributeBinding(attr.name, parts) }
     }
   }
 
@@ -55,8 +60,8 @@ export default class AttributeMustacheProvider extends Provider {
       const hasBinding = this.bindingHandlers.get(attrName)
       const handler = hasBinding ? attrName : `attr.${attrName}`
       const accessorFn = hasBinding
-        ? (...v) => this.partsTogether(parts, context, ...v)
-        : (...v) => ({[handler]: this.partsTogether(parts, context, ...v)})
+        ? (...v) => this.partsTogether(parts, context, node, ...v)
+        : (...v) => ({[attrName]: this.partsTogether(parts, context, node, ...v)})
       node.removeAttribute(attrName)
       yield { [handler]: accessorFn }
     }
