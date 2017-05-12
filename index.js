@@ -26,17 +26,14 @@ import {
     pureComputed
 } from 'tko.computed'
 
+import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from 'tko.provider.databind'
+import { ComponentProvider } from 'tko.provider.component'
+import { AttributeProvider } from 'tko.provider.attr'
+import { MultiProvider } from 'tko.provider.multi'
 import {
-  DataBindProvider
-} from 'tko.provider.databind'
-
-import {
-  AttrProvider
-} from 'tko.provider.attr'
-
-import {
-    MultiProvider
-} from 'tko.provider.multi'
+  TextMustacheProvider, AttributeMustacheProvider
+} from 'tko.provider.mustache'
 
 import {
     applyBindingAccessorsToNode,
@@ -74,156 +71,148 @@ import {
 } from 'tko.binding.foreach';
 
 import {
-    preprocessors as textInterpolation
-} from 'tko.preprocessor.textInterpolation';
-
-import {
-    filters as punchesFilters
+  filters as punchesFilters
 } from 'tko.filter.punches';
 
-import components from 'tko.components'
+import {
+  bindings as componentBindings
+} from 'tko.binding.component'
 
-// --- TODO ---
-// Component
-// Other extenders
-// Other bindings
+import components from 'tko.utils.component'
 
 var coreUtils = {}
 
 utils.arrayForEach([
-    "extend",
-    "setTimeout",
-    "arrayForEach",
-    "arrayFirst",
-    "arrayFilter",
-    "arrayGetDistinctValues",
-    "arrayIndexOf",
-    "arrayMap",
-    "arrayPushAll",
-    "arrayRemoveItem",
-    "getFormFields",
-    "peekObservable",
-    "postJson",
-    "parseJson",
-    "registerEventHandler",
-    "stringifyJson",
-    "range",
-    "toggleDomNodeCssClass",
-    "triggerEvent",
-    "unwrapObservable",
-    "objectForEach",
-    "addOrRemoveItem",
-    "setTextContent",
-    "domData",
-    "parseHtmlFragment",
-    "setHtml",
-    "compareArrays",
-    "setDomNodeChildrenFromArrayMapping"
+  'extend',
+  'setTimeout',
+  'arrayForEach',
+  'arrayFirst',
+  'arrayFilter',
+  'arrayGetDistinctValues',
+  'arrayIndexOf',
+  'arrayMap',
+  'arrayPushAll',
+  'arrayRemoveItem',
+  'getFormFields',
+  'peekObservable',
+  'postJson',
+  'parseJson',
+  'registerEventHandler',
+  'stringifyJson',
+  'range',
+  'toggleDomNodeCssClass',
+  'triggerEvent',
+  'unwrapObservable',
+  'objectForEach',
+  'addOrRemoveItem',
+  'setTextContent',
+  'domData',
+  'parseHtmlFragment',
+  'setHtml',
+  'compareArrays',
+  'setDomNodeChildrenFromArrayMapping'
 ], function (coreUtil) {
-    coreUtils[coreUtil] = utils[coreUtil]
+  coreUtils[coreUtil] = utils[coreUtil]
 })
 
 coreUtils.domNodeDisposal = {
-    addDisposeCallback: utils.addDisposeCallback,
-    otherNodeCleanerFunctions: utils.otherNodeCleanerFunctions,
-    removeDisposeCallback: utils.removeDisposeCallback,
-    removeNode: utils.removeNode,
+  addDisposeCallback: utils.addDisposeCallback,
+  otherNodeCleanerFunctions: utils.otherNodeCleanerFunctions,
+  removeDisposeCallback: utils.removeDisposeCallback,
+  removeNode: utils.removeNode
 }
 
-
 utils.extend(coreUtils, {
-    setDomNodeChildrenFromArrayMapping:  setDomNodeChildrenFromArrayMapping,
-    unwrapObservable: unwrap,
-    peekObservable: peek
+  setDomNodeChildrenFromArrayMapping: setDomNodeChildrenFromArrayMapping,
+  unwrapObservable: unwrap,
+  peekObservable: peek
 })
 
-
 // Create the binding provider and default bindings.
-const provider = new MultiProvider();
+const provider = new MultiProvider({
+  globals: utils.options.bindingGlobals,
+  providers: [
+    new AttributeMustacheProvider(),
+    new TextMustacheProvider(),
+    new ComponentProvider(),
+    new DataBindProvider(),
+    new VirtualProvider(),
+    new AttributeProvider()
+  ]
+})
 
-provider.addProvider(new DataBindProvider())
-provider.addProvider(new AttrProvider())
-
-options.bindingProviderInstance = provider
+utils.options.bindingProviderInstance = provider
 
 provider.bindingHandlers.set(coreBindings)
 provider.bindingHandlers.set(templateBindings)
 provider.bindingHandlers.set(ifBindings)
 provider.bindingHandlers.set(foreachBindings)
 provider.bindingHandlers.set({ each: foreachBindings.foreach })
-provider.addNodePreprocessor(textInterpolation[0].nodePreProcessor)
-provider.addNodePreprocessor(textInterpolation[1].nodePreProcessor)
-provider.bindingHandlers.set({ component: components.bindingHandler })
-provider.addProvider(components.bindingProvider)
+provider.bindingHandlers.set(componentBindings)
 
-
-utils.extend(options.filters, punchesFilters);
-
+utils.extend(utils.options.filters, punchesFilters);
 
 // Expose the API.
 export default {
     // --- Top-level ---
-    version: '{{VERSION}}',
-    options: options,
+  version: '{{VERSION}}',
+  options: utils.options,
 
-    extenders: extenders,
-    filters: options.filters,
-
+  extenders: extenders,
+  filters: utils.options.filters,
 
     // --- Utilities ---
-    cleanNode: utils.cleanNode,
-    memoization: utils.memoization,
-    removeNode: utils.removeNode,
-    tasks: utils.tasks,
-    utils: coreUtils,
-    dependencyDetection: dependencyDetection,
-    ignoreDependencies: dependencyDetection.ignore,
-
+  cleanNode: utils.cleanNode,
+  memoization: utils.memoization,
+  removeNode: utils.removeNode,
+  tasks: utils.tasks,
+  utils: coreUtils,
+  dependencyDetection: dependencyDetection,
+  ignoreDependencies: dependencyDetection.ignore,
 
     // -- Observable ---
-    isObservable: isObservable,
-    isSubscribable: isSubscribable,
-    isWriteableObservable: isWriteableObservable,
-    isWritableObservable: isWriteableObservable,
-    observable: observable,
-    observableArray: observableArray,
-    peek: peek,
-    subscribable: subscribable,
-    unwrap: unwrap,
-    toJS: toJS,
-    toJSON: toJSON,
+  isObservable: isObservable,
+  isSubscribable: isSubscribable,
+  isWriteableObservable: isWriteableObservable,
+  isWritableObservable: isWriteableObservable,
+  observable: observable,
+  observableArray: observableArray,
+  peek: peek,
+  subscribable: subscribable,
+  unwrap: unwrap,
+  toJS: toJS,
+  toJSON: toJSON,
 
     // ... Computed ...
-    computed: computed,
-    isComputed: isComputed,
-    isPureComputed: isPureComputed,
-    pureComputed: pureComputed,
-
+  computed: computed,
+  isComputed: isComputed,
+  isPureComputed: isPureComputed,
+  pureComputed: pureComputed,
 
     // --- Templates ---
-    nativeTemplateEngine: nativeTemplateEngine,
-    renderTemplate: renderTemplate,
-    setTemplateEngine: setTemplateEngine,
-    templateEngine: templateEngine,
-    templateSources: {
-        domElement: domElement,
-        anonymousTemplate: anonymousTemplate
-    },
+  nativeTemplateEngine: nativeTemplateEngine,
+  renderTemplate: renderTemplate,
+  setTemplateEngine: setTemplateEngine,
+  templateEngine: templateEngine,
+  templateSources: {
+    domElement: domElement,
+    anonymousTemplate: anonymousTemplate
+  },
 
     // --- Binding ---
-    applyBindingAccessorsToNode: applyBindingAccessorsToNode,
-    applyBindings: applyBindings,
-    applyBindingsToDescendants: applyBindingsToDescendants,
-    applyBindingsToNode: applyBindingsToNode,
-    bindingHandlers: provider.bindingHandlers,
-    bindingProvider: Provider,
-    contextFor: contextFor,
-    dataFor: dataFor,
-    getBindingHandler: getBindingHandler,
-    BindingHandler: BindingHandler,
-    virtualElements: utils.virtualElements,
-    domNodeDisposal: coreUtils.domNodeDisposal,
+  applyBindingAccessorsToNode: applyBindingAccessorsToNode,
+  applyBindings: applyBindings,
+  applyBindingsToDescendants: applyBindingsToDescendants,
+  applyBindingsToNode: applyBindingsToNode,
+  bindingHandlers: provider.bindingHandlers,
+  bindingProvider: provider,
+  contextFor: contextFor,
+  dataFor: dataFor,
+  getBindingHandler: getBindingHandler,
+  BindingHandler: BindingHandler,
+  virtualElements: utils.virtualElements,
+  domNodeDisposal: coreUtils.domNodeDisposal,
 
     // --- Components ---
-    components: components
+  components: components
 }
