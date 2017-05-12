@@ -110,6 +110,40 @@ var ko_subscribable_fn = {
                !this.equalityComparer(oldValue, newValue);
     },
 
+    once (cb) {
+      const subs = this.subscribe((nv) => {
+        subs.dispose()
+        cb(nv)
+      })
+    },
+
+    then (res, rej) { try { res(this) } catch (e) { rej(e) } },
+
+    when (test, returnValue) {
+      const current = this.peek()
+      const givenRv = arguments.length > 1
+      const testFn = typeof test === 'function' ? test : v => v === test
+      if (testFn(current)) {
+        return Promise.resolve(givenRv ? returnValue : current)
+      }
+      return new Promise((resolve, reject) => {
+        const subs = this.subscribe(newValue => {
+          if (testFn(newValue)) {
+            subs.dispose()
+            resolve(givenRv ? returnValue : newValue)
+          }
+        })
+      })
+    },
+
+    yet (test, ...args) {
+      const testFn = typeof test === 'function' ? test : v => v === test
+      const negated = v => !testFn(v)
+      return this.when(negated, ...args)
+    },
+
+    next () { return new Promise(resolve => this.once(resolve)) }
+
     extend: applyExtenders
 };
 

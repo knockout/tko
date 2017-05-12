@@ -7,7 +7,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (internal) Add the ES6 LifeCycle class (see tko.lifecycle)
 * (binding handlers) Add new-style ES6 Binding Handler class (see custom-bindings documentation and tko.bind/src/BindingHandler.js), descended from the LifeCycle class
 * (lifecycle) Fix error with event handler type
-
+* (provider) Add & document the Provider base class
+* (subscribable) Add the `once`, `then`, `when`, `yet`, and `next` functions
 
 ## 🐋   Alpha-2  (3 May 2017)
 
