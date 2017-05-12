@@ -77,62 +77,73 @@ ddescribe("Attribute Interpolation Markup Provider", function() {
 
     it('Should create binding from {{...}} expression', function() {
         testNode.setAttribute('title', "some {{expr}} text");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        const bindings = provider.getBindingAccessors(testNode)
-        expect(Object.keys(bindings).length).toBe(1)
-        expect(bindings.title).toBeDefined()
-
-        // expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr)+" text"');
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(1)
+        const [handler, parts] = bindings[0]
+        expect(handler).toEqual('title')
+        expect(parts.length).toBe(3)
+        expect(parts[0].text).toEqual('some ')
+        expect(parts[1].text).toEqual('expr')
+        expect(parts[2].text).toEqual(' text')
     });
 
     it('Should ignore unmatched delimiters', function() {
         testNode.setAttribute('title', "some {{expr1}}expr2}} text");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr1}}expr2)+" text"');
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(1)
+        const [handler, parts] = bindings[0]
+        expect(parts.length).toBe(3)
+        expect(parts[0].text).toEqual("some ")
+        expect(parts[1].text).toEqual("expr1}}expr2")
+        expect(parts[2].text).toEqual(" text")
     });
 
     it('Should support two expressions', function() {
         testNode.setAttribute('title', "some {{expr1}} middle {{expr2}} text");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"some "+@(expr1)+" middle "+@(expr2)+" text"');
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(1)
+        const [handler, parts] = bindings[0]
+        expect(parts.length).toBe(5)
+        const expected = ["some ", "expr1", " middle ", "expr2", " text"]
+        for (let i = 0; i < expected.length; ++i) {
+          expect(parts[i].text).toEqual(expected[i])
+        }
     });
 
     it('Should skip empty text', function() {
         testNode.setAttribute('title', "{{expr1}}{{expr2}}");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+@(expr1)+@(expr2)');
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(1)
+        const [handler, parts] = bindings[0]
+        expect(parts.length).toBe(2)
+        const expected = ["expr1", "expr2"]
+        for (let i = 0; i < expected.length; ++i) {
+          expect(parts[i].text).toEqual(expected[i])
+        }
     });
 
     it('Should support more than two expressions', function() {
         testNode.setAttribute('title', "x {{expr1}} y {{expr2}} z {{expr3}}");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:""+"x "+@(expr1)+" y "+@(expr2)+" z "+@(expr3)');
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(1)
+        const [handler, parts] = bindings[0]
+        expect(parts.length).toBe(6)
+        const expected = ['x ', "expr1", ' y ', "expr2", ' z ', 'expr3']
+        for (let i = 0; i < expected.length; ++i) {
+          expect(parts[i].text).toEqual(expected[i])
+        }
     });
 
     it('Should create simple binding for single expression', function() {
         testNode.setAttribute('title', "{{expr1}}");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1');
-    });
-
-    it('Should append to existing data-bind', function() {
-        testNode.setAttribute('title', "{{expr1}}");
-        testNode.setAttribute('data-bind', "text:expr2");
-        runAttributeInterpolation(testNode);
-        expect(testNode.title).toEqual('');
-        expect(testNode.getAttribute('data-bind')).toEqual('text:expr2,attr.title:expr1');
-    });
-
-    it('Should not match expressions in data-bind', function() {
-        testNode.setAttribute('data-bind', "text:'{{xyz}}'");
-        runAttributeInterpolation(testNode);
-        expect(testNode.getAttribute('data-bind')).toEqual("text:'{{xyz}}'");
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(1)
+        const [handler, parts] = bindings[0]
+        expect(parts.length).toBe(1)
+        const expected = ['expr1']
+        for (let i = 0; i < expected.length; ++i) {
+          expect(parts[i].text).toEqual(expected[i])
+        }
     });
 
     it('Should support expressions in multiple attributes', function() {
@@ -140,16 +151,24 @@ ddescribe("Attribute Interpolation Markup Provider", function() {
         testNode.setAttribute('class', "test");     // won't be in data-bind
         testNode.setAttribute('id', "{{expr2}}");
         testNode.setAttribute('data-test', "{{expr3}}");
-        runAttributeInterpolation(testNode);
-        expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2,attr.data-test:expr3'); // the order shouldn't matter
+        const bindings = Array.from(provider.bindingParts(testNode, {}))
+        expect(bindings.length).toBe(4)
+        const [p0, p1, p2, p3] = bindings
+        const map = {
+          title: 'expr1', class: 'test', id: 'expr2', 'data-test': 'expr3'
+        }
+        bindings.forEach(b => {
+          const [handler, [part]] = b
+          expect(map[handler]).toEqual(part)
+        })
     });
 
     it('Should convert value and checked attributes to two-way bindings', function() {
-        var input = document.createElement('input');
-        input.type = 'checkbox';
-        input.setAttribute('checked', "{{expr2}}");
-        input.setAttribute('value', "{{expr1}}");
-        runAttributeInterpolation(input);
+        var input = document.createElement('input')
+        input.type = 'checkbox'
+        input.setAttribute('checked', "{{expr2}}")
+        input.setAttribute('value', "{{expr1}}")
+        runAttributeInterpolation(input)
         expect(input.getAttribute('data-bind')).toEqual('checked:expr2,value:expr1');
     });
 

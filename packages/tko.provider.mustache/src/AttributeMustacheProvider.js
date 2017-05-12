@@ -43,21 +43,26 @@ export default class AttributeMustacheProvider extends Provider {
     return part
   }
 
-  * yieldBindings (node, context) {
+  * bindingParts (node, context) {
     for (const attr of this.attributesToInterpolate(node.attributes)) {
       const parts = Array.from(parseInterpolation(attr.value))
-      if (!parts.length) { continue }
-      const hasBinding = this.bindingHandlers.get(attr.name)
+      if (parts.length) { yield [attr.name, parts] }
+    }
+  }
+
+  * bindingObjects (node, context) {
+    for (const [attrName, parts] of this.bindingParts(node, context)) {
+      const hasBinding = this.bindingHandlers.get(attrName)
+      const handler = hasBinding ? attrName : `attr.${attrName}`
       const accessorFn = hasBinding
         ? (...v) => this.partsTogether(parts, context, ...v)
-        : (...v) => ({[attr.name]: this.partsTogether(parts, context, ...v)})
-      const binding = hasBinding ? attr.name : `attr.${attr.name}`
-      node.removeAttribute(attr)
-      yield { [binding]: accessorFn }
+        : (...v) => ({[handler]: this.partsTogether(parts, context, ...v)})
+      node.removeAttribute(attrName)
+      yield { [handler]: accessorFn }
     }
   }
 
   getBindingAccessors (node, context) {
-    return Object.assign({}, ...this.yieldBindings(node, context))
+    return Object.assign({}, ...this.bindingObjects(node, context))
   }
 }
