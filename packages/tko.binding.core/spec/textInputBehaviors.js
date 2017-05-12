@@ -1,18 +1,18 @@
 import {
     applyBindings
-} from 'tko.bind';
+} from 'tko.bind'
 
 import {
     computed
-} from 'tko.computed';
+} from 'tko.computed'
 
 import {
     observable
-} from 'tko.observable';
+} from 'tko.observable'
 
 import {
     triggerEvent
-} from 'tko.utils';
+} from 'tko.utils'
 
 import { DataBindProvider } from 'tko.provider.databind'
 

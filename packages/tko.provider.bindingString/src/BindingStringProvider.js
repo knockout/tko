@@ -49,8 +49,8 @@ export default class BindingStringProvider extends Provider {
   getBindingAccessors (node, context) {
     const bindingString = node && this.getBindingString(node)
     if (!bindingString) { return }
-    return new Parser()
-      .parse(this.preProcessBindings(bindingString), context, this.globals)
+    const processed = this.preProcessBindings(bindingString)
+    return new Parser().parse(processed, context, this.globals, node)
   }
 
   getBindingString () { throw new Error('Overload getBindingString.') }

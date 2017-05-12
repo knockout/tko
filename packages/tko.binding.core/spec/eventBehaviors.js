@@ -119,7 +119,7 @@ describe('Binding: Event', function() {
 });
 
 
-describe("Binding: On", function () {
+describe("Binding: on.", function () {
     beforeEach(jasmine.prepareTestNode);
 
     beforeEach(function(){

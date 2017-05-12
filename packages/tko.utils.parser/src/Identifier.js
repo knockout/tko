@@ -38,7 +38,7 @@ export default class Identifier {
    *
    *     See: `this` tests of our dereference function.
    */
-  dereference (value, $context, globals) {
+  dereference (value, $context, globals, node) {
     let member
     let refs = this.dereferences || []
     const $data = $context.$data || {}
@@ -46,7 +46,7 @@ export default class Identifier {
     let i, n
 
     for (i = 0, n = refs.length; i < n; ++i) {
-      member = Node.value_of(refs[i], $context, globals)
+      member = Node.value_of(refs[i], $context, globals, node)
 
       if (typeof value === 'function' && refs[i] instanceof Arguments) {
         // fn(args)
@@ -55,7 +55,7 @@ export default class Identifier {
       } else {
         // obj[x] or obj.x dereference.  Note that obj may be a function.
         lastValue = value
-        value = Node.value_of(value[member], $context, globals)
+        value = Node.value_of(value[member], $context, globals, node)
       }
     }
 
@@ -78,11 +78,11 @@ export default class Identifier {
    * @param  {object | Identifier | Expression} parent
    * @return {mixed}  Return the primitive or an accessor.
    */
-  get_value (parent, context, globals) {
+  get_value (parent, context, globals, node) {
     const intermediate = parent && !(parent instanceof Identifier)
-      ? Node.value_of(parent, context, globals)[this.token]
-      : context.lookup(this.token, globals)
-    return this.dereference(intermediate, context, globals)
+      ? Node.value_of(parent, context, globals, node)[this.token]
+      : context.lookup(this.token, globals, node)
+    return this.dereference(intermediate, context, globals, node)
   }
 
   assign (object, property, value) {
@@ -101,7 +101,7 @@ export default class Identifier {
   set_value (new_value, $context, globals) {
     const $data = $context.$data || {}
     const refs = this.dereferences || []
-    const leaf = this.token
+    let leaf = this.token
     let i, n, root
 
     if (Object.hasOwnProperty.call($data, leaf)) {

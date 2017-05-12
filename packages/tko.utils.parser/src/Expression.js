@@ -10,11 +10,11 @@ export default class Expression {
   /**
    * Return the value of `this` Expression instance.
    */
-  get_value (parent, context, globals) {
+  get_value (parent, context, globals, node) {
     if (!this.root) {
       this.root = Node.create_root(this.nodes)
     }
-    return this.root.get_value(parent, context, globals)
+    return this.root.get_value(parent, context, globals, node)
   }
 }
 

@@ -41,7 +41,7 @@ export function dummyTemplateEngine(templates) {
         var data = bindingContext['$data'];
         if (data && typeof data.get_value === 'function') {
             // For cases when data is an Identifier/Expression.
-            data = data.get_value();
+            data = data.get_value(data, bindingContext);
         }
         templateDocument = templateDocument || document;
         rt_options = rt_options || {};

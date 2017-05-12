@@ -48,7 +48,8 @@ export default class ComponentProvider extends Provider {
 
   getComponentParams (node, context) {
     const parser = new Parser(node, context, this.globals)
-    const accessors = parser.parse(node.getAttribute('params'))
+    const paramsString = (node.getAttribute('params') || '').trim()
+    const accessors = parser.parse(paramsString, context, node)
     if (!accessors || Object.keys(accessors).length === 0) {
       return { $raw: {} }
     }

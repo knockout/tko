@@ -113,10 +113,10 @@ export function bindingContext(dataItemOrAccessor, parentContext, dataItemAlias,
     }
 }
 
-bindingContext.prototype.lookup = function (token, globals) {
+bindingContext.prototype.lookup = function (token, globals, node) {
   // short circuits
   switch (token) {
-    case '$element': return this.$element
+    case '$element': return node
     case '$context': return this
     case 'this': case '$data': return this.$data
   }

@@ -182,6 +182,11 @@ export default class Parser {
         get: () => Node.value_of(value, ...this.currentContextGlobals),
         enumerable: true
       })
+    } else if (Array.isArray(value)) {
+      Object.defineProperty(object, key, {
+        get: () => value.map(v => Node.value_of(v, ...this.currentContextGlobals)),
+        enumerable: true
+      })
     } else {
     // primitives
       object[key] = value
@@ -421,11 +426,11 @@ export default class Parser {
       ch = this.white()
     }
 
-    var filter = function filter (value, ignored, context, globals) {
+    var filter = function filter (value, ignored, context, globals, node) {
       var argValues = [value]
 
       for (var i = 0, j = args.length; i < j; ++i) {
-        argValues.push(Node.value_of(args[i], context, globals))
+        argValues.push(Node.value_of(args[i], context, globals, node))
       }
 
       return nextFilter(options.filters[name].apply(null, argValues))
@@ -713,27 +718,22 @@ export default class Parser {
     return bindings
   }
 
-  /**
-   * Reduce all the values created by objectAddValue to their results
-   */
-  setValuesOfObject (object, context, globals) {
-    return clonePlainObjectDeep(object)
-  }
+  valueAsAccessor (value, context, globals, node) {
+    this.currentContextGlobals = [context, globals, node]
 
-  valueAsAccessor (value, context, globals) {
     if (!value) { return () => value }
     if (typeof value === 'function') { return value }
 
     if (value[Node.isExpressionOrIdentifierSymbol]) {
-      return () => Node.value_of(value, context, globals)
+      return () => Node.value_of(value, context, globals, node)
     }
 
     if (Array.isArray(value)) {
-      return () => value.map(v => Node.value_of(v, context, globals))
+      return () => value.map(v => Node.value_of(v, context, globals, node))
     }
 
     if (typeof (value) !== 'function') {
-      return () => this.setValuesOfObject(value, context, globals)
+      return () => clonePlainObjectDeep(value)
     }
 
     throw new Error('Value has cannot be converted to accessor: ' + value)
@@ -747,17 +747,18 @@ export default class Parser {
   * Accessors may be one of (below) constAccessor, identifierAccessor,
   * expressionAccessor, or nodeAccessor.
   */
-  convertToAccessors (result, context, globals) {
-    this.currentContextGlobals = [context, globals]
+  convertToAccessors (result, context, globals, node) {
 
     objectForEach(result, (name, value) => {
+      this.currentContextGlobals = [context, globals, node]
+
       if (value instanceof Identifier) {
         // Return a function that, with no arguments returns
         // the value of the identifier, otherwise sets the
         // value of the identifier to the first given argument.
         Object.defineProperty(result, name, {
           value: function (optionalValue, options) {
-            const currentValue = value.get_value(value, context, globals)
+            const currentValue = value.get_value(undefined, context, globals, node)
             if (arguments.length === 0) { return currentValue }
             const unchanged = optionalValue === currentValue
             if (options && options.onlyIfChanged && unchanged) { return }
@@ -793,20 +794,20 @@ export default class Parser {
    * @param  {string} source The binding string to parse.
    * @return {object}        Map of name to accessor function.
    */
-  parse (source, context = {}, globals = {}) {
+  parse (source, context = {}, globals = {}, node) {
     if (!source) { return () => null }
     const parseFn = () => this.readBindings()
     const bindingAccessors = this.runParse(source, parseFn)
-    return this.convertToAccessors(bindingAccessors, context, globals)
+    return this.convertToAccessors(bindingAccessors, context, globals, node)
   }
 
   /**
    * Return a function that evaluates and returns the result of the expression.
    */
-  parseExpression (source, context = {}, globals = {}) {
+  parseExpression (source, context = {}, globals = {}, node) {
     if (!source) { return () => '' }
     const parseFn = () => this.expression(true)
     const bindingAccessors = this.runParse(source, parseFn)
-    return this.valueAsAccessor(bindingAccessors, context, globals)
+    return this.valueAsAccessor(bindingAccessors, context, globals, node)
   }
 }

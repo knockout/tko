@@ -12,20 +12,21 @@
 
 import {
   options, triggerEvent
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
   observable
-} from 'tko.observable';
+} from 'tko.observable'
 
 import {
   computed
-} from 'tko.computed';
+} from 'tko.computed'
 
 import {
   applyBindings,
-  dataFor
-} from 'tko.bind';
+  dataFor,
+  bindingContext
+} from 'tko.bind'
 
 import {
   Parser, Identifier, Arguments
@@ -33,7 +34,7 @@ import {
 
 import {
   DataBindProvider
-} from '../index.js';
+} from '../index.js'
 
 import * as coreBindings from 'tko.binding.core';
 
@@ -399,12 +400,17 @@ describe("all bindings", function() {
 })
 
 describe("The lookup of variables (get_lookup_root)", function() {
+  function makeBindings(binding, context, globals, node) {
+    const ctx = new bindingContext(context)
+    return new Parser().parse(binding, ctx, globals, node)
+  }
+
   it("accesses the context", function() {
     var binding = "a: x",
       context = {
         x: 'y'
       },
-      bindings = new Parser(null, context).parse(binding);
+      bindings = makeBindings(binding, context)
     assert.equal(bindings.a(), "y");
   })
 
@@ -413,30 +419,24 @@ describe("The lookup of variables (get_lookup_root)", function() {
       globals = {
         z: "ZZ"
       },
-      bindings = new Parser(null, {}, globals).parse(binding);
+      bindings = makeBindings(binding, {}, globals)
     assert.equal(bindings.a(), globals.z)
   })
 
   it("accesses $data.value and value", function() {
     var binding = "x: $data.value, y: value",
       context = {
-        '$data': {
-          value: 42
-        }
+        value: 42
       },
-      bindings = new Parser(null, context).parse(binding);
+      bindings = makeBindings(binding, context)
     assert.equal(bindings.x(), 42)
     assert.equal(bindings.y(), 42)
   })
 
   it("ignores spaces", function() {
     var binding = "x: $data  .  value, y: $data\n\t\r . \t\r\nvalue",
-      context = {
-        '$data': {
-          value: 42
-        }
-      },
-      bindings = new Parser(null, context).parse(binding);
+      context = { value: 42 },
+      bindings = makeBindings(binding, context)
     assert.equal(bindings.x(), 42)
     assert.equal(bindings.y(), 42)
   })
@@ -450,47 +450,42 @@ describe("The lookup of variables (get_lookup_root)", function() {
           }
         }
       },
-      bindings = new Parser(null, context).parse(binding);
+      bindings = makeBindings(binding, context)
     assert.equal(bindings.x().y.z, 11)
   })
 
   it("can be denied access to `window` globals", function() {
     var binding = "x: window, y: global, z: document",
       context = {},
-      bindings = new Parser(null, context).parse(binding);
+      bindings = makeBindings(binding, context)
     assert.throws(bindings.x, "not found")
     assert.throws(bindings.y, "not found")
     assert.throws(bindings.z, "not found")
   })
 
-  it("recognizes $context", function() {
-    var binding = "x: $context.value, y: value",
+  it("only returns explicitly from $context", function() {
+    var binding = "x: $context.$data.value, y: $context.value, z: value",
       context = {
         value: 42
       },
-      bindings = new Parser(null, context).parse(binding);
+      bindings = makeBindings(binding, context)
     assert.equal(bindings.x(), 42)
-    assert.equal(bindings.y(), 42)
+    assert.equal(bindings.y(), undefined)
+    assert.equal(bindings.z(), 42)
   })
 
   it("recognizes $element", function() {
     var binding = "x: $element.id",
-      node = {
-        id: 42
-      },
-      bindings = new Parser(node, {}).parse(binding);
+      node = { id: 42 },
+      bindings = makeBindings(binding, {}, {}, node)
     assert.equal(bindings.x(), node.id)
   })
 
   it("accesses $data before $context", function() {
-    var binding = "x: value",
-      context = {
-        value: 21,
-        '$data': {
-          value: 42
-        }
-      },
-      bindings = new Parser(null, context).parse(binding);
+    const binding = "x: value"
+    const outerContext = new bindingContext({ value: 21 })
+    const innerContext = outerContext.createChildContext({ value: 42 })
+    const bindings = new Parser().parse(binding, innerContext)
     assert.equal(bindings.x(), 42)
   })
 
@@ -502,7 +497,7 @@ describe("The lookup of variables (get_lookup_root)", function() {
       globals = {
         z: 84
       },
-      bindings = new Parser(null, context, globals).parse(binding);
+      bindings = makeBindings(binding, context, globals)
     assert.equal(bindings.a(), 42)
   })
 
@@ -510,7 +505,7 @@ describe("The lookup of variables (get_lookup_root)", function() {
     // style of e.g. knockout-es5
     var binding = "a: z",
       context = {},
-      bindings = new Parser(null, context).parse(binding),
+      bindings = makeBindings(binding, context),
       obs = observable();
 
     Object.defineProperty(context, 'z', {
@@ -534,162 +529,9 @@ describe("The lookup of variables (get_lookup_root)", function() {
         z: undefined
       },
       context = {},
-      bindings_1 = new Parser(null, context,
-        globals_1).parse(binding),
-      bindings_2 = new Parser(null, context,
-        globals_2).parse(binding);
+      bindings_1 = makeBindings(binding, context, globals_1),
+      bindings_2 = makeBindings(binding, context, globals_2)
     assert.equal(bindings_1.a(), 168)
     assert.equal(bindings_2.a(), undefined)
-  })
-})
-
-
-
-describe("Identifier", function() {
-  var c = 'Z',
-    f = function() {
-      return 'Fv'
-    };
-
-  it("looks up values on the parser context", function() {
-    var context = {
-        c: c,
-        f: f
-      },
-      parser = new Parser(null, context);
-    assert.equal(new Identifier(parser, "c").get_value(), 'Z')
-    assert.equal(new Identifier(parser, "f").get_value(), f)
-  })
-
-  it("returns null as expected", function () {
-    var context = { $data: null },
-      parser = new Parser(null, context);
-    assert.equal(new Identifier(parser, "$data").lookup_value(), null)
-  })
-
-  it("returns undefined as expected", function () {
-    var context = { $data: undefined },
-      parser = new Parser(null, context);
-    assert.equal(new Identifier(parser, "$data").lookup_value(), undefined)
-  })
-
-  describe("the dereference function", function() {
-    it("does nothing with no references", function() {
-      var refs = undefined,
-        ident = new Identifier({}, 'x', refs);
-      assert.equal(ident.dereference('1'), 1)
-    })
-
-    it("does nothing with empty array references", function() {
-      var refs = [],
-        ident = new Identifier({}, 'x', refs);
-      assert.equal(ident.dereference('1'), 1)
-    })
-
-    it("applies the functions of the refs to the value", function() {
-      var fake_args = new Arguments(null, []),
-        refs = [fake_args, fake_args],
-        ident = new Identifier({}, 'x', refs),
-        g = function() {
-          return '42'
-        },
-        f = function() {
-          return g
-        };
-      assert.equal(ident.dereference(f), 42)
-    })
-
-    it("sets `this` to the parent member", function() {
-      var div = document.createElement("div"),
-        context = {
-          fn: function() {
-            assert.isObject(this)
-            assert.equal(this, context)
-            return 'ahab'
-          },
-          moby: 'dick'
-        };
-      div.setAttribute("data-bind", "text: $data.fn()")
-      options.bindingProviderInstance = new DataBindProvider()
-      options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
-      applyBindings(context, div)
-      assert.equal(div.textContent || div.innerText, 'ahab')
-    })
-
-    it("sets `this` of a called function", function () {
-      var div = document.createElement('div'),
-        P = function () {},
-        thisIs = observable(),
-        context = {
-          p: new P()
-        };
-      P.prototype.fn = function p_fn() { thisIs(this) }
-      div.setAttribute('data-bind', 'click: p.fn')
-      options.bindingProviderInstance = new DataBindProvider()
-      options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
-      applyBindings(context, div)
-      assert.equal(thisIs(), undefined)
-      triggerEvent(div, 'click')
-      assert.strictEqual(thisIs(), context.p)
-    })
-
-    it("uses `$data` as explicit `this` reference", function () {
-      var div = document.createElement('div'),
-        obs = observable(),
-        context = { fn: obs };
-      div.setAttribute('data-bind', 'click: => fn(this)')
-      options.bindingProviderInstance = new DataBindProvider()
-      options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
-      applyBindings(context, div)
-      assert.equal(obs(), undefined)
-      triggerEvent(div, 'click')
-      assert.strictEqual(obs(), context)
-    })
-
-    it("does not break `this`/prototype of observable/others", function () {
-      var div = document.createElement('div'),
-        comp = computed(function () { return 'rrr' }),
-        Fn = function ffn() { this.comp = comp },
-        context = {
-          instance: new Fn()
-        };
-      div.setAttribute('data-bind', 'check: instance.comp')
-      options.bindingProviderInstance = new DataBindProvider()
-      options.bindingProviderInstance.bindingHandlers.set({
-        check: function (params) {
-          assert.equal(this.value.peek(), 'rrr')
-        }
-      })
-      applyBindings(context, div)
-      triggerEvent(div, 'click')
-    })
-
-    it("sets `this` of a top-level item to $data", function() {
-      options.bindingGlobals = {
-        Ramanujan: "1729"
-      }
-      var div = document.createElement("div"),
-        context = {
-          fn: function() {
-            assert.isObject(this)
-            assert.strictEqual(dataFor(div), this, '$data')
-            return 'sigtext'
-          }
-        };
-      div.setAttribute("data-bind", "text: fn()")
-      options.bindingProviderInstance = new DataBindProvider()
-      options.bindingProviderInstance.bindingHandlers.set(coreBindings.bindings)
-      applyBindings(context, div)
-      assert.equal(div.textContent || div.innerText, 'sigtext')
-    })
-
-  })
-
-  it("dereferences values on the parser", function() {
-    var context = { f: f }
-    var parser = new Parser(null, context)
-    var fake_args = new Arguments(parser, [])
-    var derefs = [fake_args]
-    assert.equal(new Identifier(parser, 'f', derefs).get_value(), 'Fv')
   })
 })

@@ -1,5 +1,5 @@
 {
-  "name": "tko.provider.abstract",
+  "name": "tko.provider",
   "version": "1.0.0",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
   "main": "index.js",

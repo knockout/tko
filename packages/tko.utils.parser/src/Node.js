@@ -19,7 +19,7 @@ export default class Node {
 
   static get operators () { return operators }
 
-  get_leaf_value (leaf, context, globals) {
+  get_leaf_value (leaf, context, globals, node) {
     if (typeof leaf === 'function') {
       // Expressions on observables are nonsensical, so we unwrap any
       // function values (e.g. identifiers).
@@ -33,7 +33,7 @@ export default class Node {
     if (leaf[Node.isExpressionOrIdentifierSymbol]) {
       // lhs is passed in as the parent of the leaf. It will be defined in
       // cases like a.b.c as 'a' for 'b' then as 'b' for 'c'.
-      return unwrap(leaf.get_value(undefined, context, globals))
+      return unwrap(leaf.get_value(undefined, context, globals, node))
     }
 
     // Plain object/class.
@@ -49,15 +49,15 @@ export default class Node {
    * Note that for a lambda, we do not evaluate the RHS expression until
    * the lambda is called.
    */
-  get_value (notused, context, globals) {
+  get_value (notused, context, globals, node) {
     var node = this
 
     if (node.op === LAMBDA) {
-      return () => node.get_leaf_value(node.rhs, context, globals)
+      return () => node.get_leaf_value(node.rhs, context, globals, node)
     }
 
-    return node.op(node.get_leaf_value(node.lhs, context, globals),
-                   node.get_leaf_value(node.rhs, context, globals),
+    return node.op(node.get_leaf_value(node.lhs, context, globals, node),
+                   node.get_leaf_value(node.rhs, context, globals, node),
                    context, globals)
   }
 
@@ -67,9 +67,9 @@ export default class Node {
   static get isExpressionOrIdentifierSymbol () { return IS_EXPR_OR_IDENT }
   get [IS_EXPR_OR_IDENT] () { return true }
 
-  static value_of (item, context, globals) {
+  static value_of (item, context, globals, node) {
     if (item && item[Node.isExpressionOrIdentifierSymbol]) {
-      return item.get_value(item, context, globals)
+      return item.get_value(item, context, globals, node)
     }
     return item
   }
@@ -110,7 +110,7 @@ export default class Node {
  * Because of cyclical dependencies on operators <-> Node <-> value_of,
  * we need to patch this in here.
  */
-operators['?'] = function ternary (a, b, context, globals) {
-  return Node.value_of(a ? b.yes : b.no, context, globals)
+operators['?'] = function ternary (a, b, context, globals, node) {
+  return Node.value_of(a ? b.yes : b.no, context, globals, node)
 }
 operators['?'].precedence = 4
