@@ -157,4 +157,19 @@ describe('Subscribable', function() {
 
         expect(subscribable.customFunction).toBe(customFunction);
     });
+
+    it("the `once` callback is called one time", () => {
+      const s = new subscribable()
+      var nv = null
+      s.once(v => {
+        expect(nv).toEqual(null)
+        nv = v
+      })
+      expect(nv).toEqual(null)
+      s.notifySubscribers('123')
+      expect(nv).toEqual('123')
+      s.notifySubscribers('55')
+      expect(nv).toEqual('123')
+    })
+
 });

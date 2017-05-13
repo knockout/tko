@@ -120,8 +120,6 @@ var ko_subscribable_fn = {
     })
   },
 
-  then (res, rej) { try { res(this) } catch (e) { rej(e) } },
-
   when (test, returnValue) {
     const current = this.peek()
     const givenRv = arguments.length > 1

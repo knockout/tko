@@ -18,7 +18,6 @@ export function observable (initialValue) {
   function Observable () {
     if (arguments.length > 0) {
             // Write
-
             // Ignore writes if the value hasn't changed
       if (Observable.isDifferent(Observable[observableLatestValue], arguments[0])) {
         Observable.valueWillMutate()
@@ -59,7 +58,8 @@ observable.fn = {
   valueHasMutated () { this.notifySubscribers(this[observableLatestValue]) },
   valueWillMutate () {
     this.notifySubscribers(this[observableLatestValue], 'beforeChange')
-  }
+  },
+  then (res, rej) { try { res(this()) } catch (e) { rej(e) } },
 }
 
 // Moved out of "limit" to avoid the extra closure
