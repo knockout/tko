@@ -761,7 +761,7 @@ export default class Parser {
           }
         })
       } else {
-        result[name] = this.valueAsAccessor(value, context, globals)
+        result[name] = this.valueAsAccessor(value, context, globals, node)
       }
     })
     return result
