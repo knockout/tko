@@ -1,0 +1,9 @@
+{
+  "name": "knockout",
+  "version": "4.0.0-alpha3",
+  "description": "Simplify dynamic HTML with Model-View-View-Model pattern",
+  "main": "index.js",
+  "repository": "git@github.com:knockout/knockout",
+  "author": "The Knockout Team",
+  "license": "MIT"
+}
