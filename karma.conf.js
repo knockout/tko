@@ -12,6 +12,13 @@ const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 const root = path.join(process.cwd(), 'spec')
 
+if (!pkg.karma || !pkg.karma.frameworks) {
+  console.warn(`
+    ⚠️  package.json at ${process.cwd()} does not have "karma.frameworks"
+  `)
+  process.exit(0)
+}
+
 const frameworks = pkg.karma.frameworks
 const browsers = ['Electron']
 
@@ -51,7 +58,7 @@ const rollupPreprocessor = Object.assign({}, {
     rollupVisualizer(ROLLUP_CONFIG.VISUALIZER),
     rollupCommonJS(ROLLUP_CONFIG.COMMONJS)
   ],
-  sourceMap: process.argv.includes('--sourcemap') ? 'inline': false,
+  sourceMap: process.argv.includes('--sourcemap') ? 'inline' : false
 })
 
 module.exports = (config) => {
