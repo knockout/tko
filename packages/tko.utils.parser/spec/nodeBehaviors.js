@@ -8,35 +8,31 @@ import {
   Parser, Node, Arguments, Identifier
 } from '../index.js';
 
-
 var op = Node.operators
 var operators = Node.operators
 var nodes_to_tree
-
 
 function ctxStub (ctx) {
   return { lookup (v) { return ctx ? ctx[v] : null } }
 }
 
-
-beforeEach(function() {
+beforeEach(function () {
   nodes_to_tree = Node.create_root;
 })
 
-
-describe("Operators", function () {
-  function test(nodes, val, name) {
+describe('Operators', function () {
+  function test (nodes, val, name) {
     assert.equal(Node.create_root(nodes).get_value(), val, name);
   }
 
-  it("does simple arithmetic", function () {
+  it('does simple arithmetic', function () {
     test([1, op['+'], 1], 2);
     test([1, op['+'], 1, op['*'], 3], 4);
     test([2, op['*'], 1, op['+'], 3], 5);
     test([2, op['*'], 2, op['*'], 3], 12);
   });
 
-  it("performs binary logic", function () {
+  it('performs binary logic', function () {
     test([true, op['&&'], true], true);
     test([true, op['&&'], false], false);
     test([false, op['&&'], true], false);
@@ -47,7 +43,7 @@ describe("Operators", function () {
     test([false, op['||'], false], false);
   })
 
-  it("mixes binary logic and simple arithemtic", function () {
+  it('mixes binary logic and simple arithemtic', function () {
     test([0, op['||'], 1, op['+'], 2], 3, 'a');
     test([0, op['&&'], 1, op['+'], 2], 0, 'b');
     test([0, op['&&'], 0, op['+'], 2], 0, 'c');
@@ -59,7 +55,7 @@ describe("Operators", function () {
     test([1, op['+'], 2, op['&&'], 2], 2, 'h');
   })
 
-  it("mixes (in)equality and binary logic", function () {
+  it('mixes (in)equality and binary logic', function () {
     test([0, op['||'], 0, op['!=='], 2], true, 'a');
     test([1, op['||'], 0, op['!=='], 2], 1, 'b');
     test([0, op['&&'], 1, op['!=='], 2], false, 'c');
@@ -71,12 +67,23 @@ describe("Operators", function () {
     test([0, op['!=='], 0, op['||'], 1], 1, 'g');
   })
 
+  it('early outs from or- operator computations', function () {
+    // It's common to e.g. have `if: $data && $data.thing`, but that'll error with
+    // `cannot read property '$data' of undefined` unless we early-out.
+    var fakeContext = { lookup: function () {} }
+    var root = Node.create_root([123, op['||'], new Identifier(null, 'z', ['q'])])
+    assert.equal(root.get_value(null, fakeContext), 123)
+  })
+
+  it('early outs from and- operator computations', function () {
+    var fakeContext = { lookup: function () {} }
+    var root = Node.create_root([false, op['&&'], new Identifier(null, 'z', ['q'])])
+    assert.equal(root.get_value(null, fakeContext), false)
+  })
 });
 
-
-describe("the create_root function", function() {
-
-  it("converts a simple array to a tree", function() {
+describe('the create_root function', function () {
+  it('converts a simple array to a tree', function () {
     var nodes = ['a', operators['*'], 'b'],
       tree = nodes_to_tree(nodes.slice(0));
     // we use nodes.slice(0) to make a copy.
@@ -85,7 +92,7 @@ describe("the create_root function", function() {
     assert.equal(tree.op, operators['*']);
   })
 
-  it("converts multiple * to a tree", function() {
+  it('converts multiple * to a tree', function () {
     var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
       tree = nodes_to_tree(nodes.slice(0));
     assert.equal(tree.lhs, 'a');
@@ -95,7 +102,7 @@ describe("the create_root function", function() {
     assert.equal(tree.rhs.rhs, 'c');
   })
 
-  it("converts a complex set as expected", function() {
+  it('converts a complex set as expected', function () {
     var nodes = [
         'a', operators['*'], 'b',
         operators['+'],
@@ -125,12 +132,8 @@ describe("the create_root function", function() {
   })
 })
 
-
-
-
-describe("Node", function() {
-
-  it("traverses the tree 19 * -2 + 4", function() {
+describe('Node', function () {
+  it('traverses the tree 19 * -2 + 4', function () {
     var root = new Node();
     root.op = operators['+']
     root.lhs = new Node(19, operators['*'], -2)
@@ -138,7 +141,7 @@ describe("Node", function() {
     assert.equal(root.get_value(null, ctxStub()), 19 * -2 + 4)
   })
 
-  it("looks up identifiers", function() {
+  it('looks up identifiers', function () {
     var root = new Node(),
       context = ctxStub({ x: 19 }),
       parser = new Parser(),
@@ -149,7 +152,7 @@ describe("Node", function() {
     assert.equal(root.get_value(null, context), 23 + 19)
   })
 
-  it("converts function calls (a())", function() {
+  it('converts function calls (a())', function () {
     var context = ctxStub({ x: observable(0x0F) }),
       parser, nodes, root;
     parser = new Parser(null);

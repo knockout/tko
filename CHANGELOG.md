@@ -9,6 +9,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (lifecycle) Fix error with event handler type
 * (provider) Add & document the Provider base class
 * (subscribable) Add the `once`, `then`, `when`, `yet`, and `next` functions
+* (parser) Fix early-out for logical (&& / ||) operators
 
 ## 🐋   Alpha-2  (3 May 2017)
 
@@ -38,7 +39,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
   * Fix filter/or ambiguity on pipe `|`
   * Raise an error with anonymous functions
   * Fix && and || operator precedence
-  
+
 * Updated Rollup - changes order of compilation, smaller output
 * Fix issue with first rendering of an elseif binding
 * Make the `template` binding expose a conditional for else-binding

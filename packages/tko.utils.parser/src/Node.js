@@ -56,9 +56,13 @@ export default class Node {
       return () => node.get_leaf_value(node.rhs, context, globals, node)
     }
 
-    return node.op(node.get_leaf_value(node.lhs, context, globals, node),
-                   node.get_leaf_value(node.rhs, context, globals, node),
-                   context, globals)
+    const lhv = node.get_leaf_value(node.lhs, context, globals, node)
+    const earlyOut = node.op.earlyOut
+
+    if (earlyOut && earlyOut(lhv)) { return lhv }
+    const rhv = node.get_leaf_value(node.rhs, context, globals, node)
+
+    return node.op(lhv, rhv, context, globals)
   }
 
   //

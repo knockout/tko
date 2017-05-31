@@ -116,6 +116,9 @@ operators['!=='].precedence = 10
 operators['&&'].precedence = 6
 operators['||'].precedence = 5
 
+operators['&&'].earlyOut = (a) => !a
+operators['||'].earlyOut = (a) => a
+
   // Call a function
 operators['call'].precedence = 1
 
