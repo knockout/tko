@@ -1,8 +1,8 @@
-import { foreach } from './src/foreach.js';
+import { ForEachBinding } from './src/foreach.js'
 
 export var bindings = {
-  foreach: foreach
-};
+  foreach: ForEachBinding
+}
 
 // By default, foreach will be async.
-foreach.setSync(false);
+ForEachBinding.setSync(false)

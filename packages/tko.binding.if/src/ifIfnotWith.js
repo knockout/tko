@@ -1,19 +1,15 @@
 
 import {
     cloneNodes, virtualElements, cleanNode, domData
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
     unwrap, dependencyDetection, observable
-} from 'tko.observable';
+} from 'tko.observable'
 
 import {
-    computed
-} from 'tko.computed';
-
-import {
-    applyBindingsToDescendants
-} from 'tko.bind';
+    applyBindingsToDescendants, AsyncBindingHandler
+} from 'tko.bind'
 
 /**
  * Test a node for whether it represents an "else" condition.
@@ -22,19 +18,18 @@ import {
  *
  * Matches <!-- else -->
  */
-function isElseNode(node) {
-    return node.nodeType === 8 &&
-        node.nodeValue.trim().toLowerCase() === 'else';
+function isElseNode (node) {
+  return node.nodeType === 8 &&
+        node.nodeValue.trim().toLowerCase() === 'else'
 }
 
-function detectElse(element) {
-    var children = virtualElements.childNodes(element);
-    for (var i = 0, j = children.length; i < j; ++i) {
-        if (isElseNode(children[i])) { return true; }
-    }
-    return false;
+function detectElse (element) {
+  var children = virtualElements.childNodes(element)
+  for (var i = 0, j = children.length; i < j; ++i) {
+    if (isElseNode(children[i])) { return true }
+  }
+  return false
 }
-
 
 /**
  * Clone the nodes, returning `ifNodes`, `elseNodes`
@@ -42,46 +37,26 @@ function detectElse(element) {
  * @param  {boolean}    hasElse short-circuit to speed up the inner-loop.
  * @return {object}         Containing the cloned nodes.
  */
-function cloneIfElseNodes(element, hasElse) {
-    var children = virtualElements.childNodes(element),
-        ifNodes = [],
-        elseNodes = [],
-        target = ifNodes;
+function cloneIfElseNodes (element, hasElse) {
+  const children = virtualElements.childNodes(element)
+  const ifNodes = []
+  const elseNodes = []
+  let target = ifNodes
 
-    for (var i = 0, j = children.length; i < j; ++i) {
-        if (hasElse && isElseNode(children[i])) {
-            target = elseNodes;
-            hasElse = false;
-        } else {
-            target.push(cleanNode(children[i].cloneNode(true)));
-        }
+  for (var i = 0, j = children.length; i < j; ++i) {
+    if (hasElse && isElseNode(children[i])) {
+      target = elseNodes
+      hasElse = false
+    } else {
+      target.push(cleanNode(children[i].cloneNode(true)))
     }
+  }
 
-    return {
-        ifNodes: ifNodes,
-        elseNodes: elseNodes
-    };
+  return {
+    ifNodes: ifNodes,
+    elseNodes: elseNodes
+  }
 }
-
-/**
- * Return any conditional that precedes the given node.
- * @param  {HTMLElement} node To find the preceding conditional of
- * @return {object}      { elseChainSatisfied: observable }
- */
-function getPrecedingConditional(node) {
-    do {
-        node = node.previousSibling;
-    } while(node && node.nodeType !== 1 && node.nodeType !== 8);
-
-    if (!node) { return; }
-
-    if (node.nodeType === 8) {
-        node = virtualElements.previousSibling(node);
-    }
-
-    return domData.get(node, 'conditional');
-}
-
 
 /**
  * Create a DOMbinding that controls DOM nodes presence
@@ -104,73 +79,97 @@ function getPrecedingConditional(node) {
  * <div data-bind='if: x'></div>
  * <div data-bind='else'></div>
  */
-function makeWithIfBinding(isWith, isNot, isElse, makeContextCallback) {
-    return {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+class ConditionalBindingHandler extends AsyncBindingHandler {
+  constructor (params) {
+    super(params)
+    this.hasElse = detectElse(this.$element)
+    const elseChainSatisfied = this.completesElseChain = observable()
 
-            var didDisplayOnLastUpdate,
-                hasElse = detectElse(element),
-                completesElseChain = observable(),
-                ifElseNodes,
-                precedingConditional;
+    domData.set(this.$element, 'conditional', { elseChainSatisfied })
 
-            domData.set(element, "conditional", {
-                elseChainSatisfied: completesElseChain,
-            });
+    this.computed(this.render.bind(this))
+  }
 
-            if (isElse) {
-                precedingConditional = getPrecedingConditional(element);
-            }
+  get elseChainIsAlreadySatisfied () { return false }
+  get needsRefresh () {
+    return this.isFirstRender || this.shouldDisplayIf !== this.didDisplayOnLastUpdate
+  }
+  get shouldDisplayIf () { return !!unwrap(this.value) }
 
-            computed(function() {
-                var rawValue = valueAccessor(),
-                    dataValue = unwrap(rawValue),
-                    shouldDisplayIf = !isNot !== !dataValue || (isElse && rawValue === undefined), // equivalent to (isNot ? !dataValue : !!dataValue) || isElse && rawValue === undefined
-                    isFirstRender = !ifElseNodes,
-                    needsRefresh = isFirstRender || isWith || (shouldDisplayIf !== didDisplayOnLastUpdate);
+  render () {
+    const isFirstRender = !this.ifElseNodes
+    let shouldDisplayIf = this.shouldDisplayIf
+    let needsRefresh = this.needsRefresh
 
-                if (precedingConditional && precedingConditional.elseChainSatisfied()) {
-                    shouldDisplayIf = false;
-                    needsRefresh = isFirstRender || didDisplayOnLastUpdate;
-                    completesElseChain(true);
-                } else {
-                    completesElseChain(shouldDisplayIf);
-                }
+    if (this.elseChainIsAlreadySatisfied) {
+      shouldDisplayIf = false
+      needsRefresh = isFirstRender || this.didDisplayOnLastUpdate
+      this.completesElseChain(true)
+    } else {
+      this.completesElseChain(this.shouldDisplayIf)
+    }
 
-                if (!needsRefresh) { return; }
+    if (!needsRefresh) { return }
 
-                if (isFirstRender && (dependencyDetection.getDependenciesCount() || hasElse)) {
-                    ifElseNodes = cloneIfElseNodes(element, hasElse);
-                }
+    if (isFirstRender && (dependencyDetection.getDependenciesCount() || this.hasElse)) {
+      this.ifElseNodes = cloneIfElseNodes(this.$element, this.hasElse)
+    }
 
-                if (shouldDisplayIf) {
-                    if (!isFirstRender || hasElse) {
-                        virtualElements.setDomNodeChildren(element, cloneNodes(ifElseNodes.ifNodes));
-                    }
-                } else if (ifElseNodes) {
-                    virtualElements.setDomNodeChildren(element, cloneNodes(ifElseNodes.elseNodes));
-                } else {
-                    virtualElements.emptyNode(element);
-                }
+    if (shouldDisplayIf) {
+      if (!isFirstRender || this.hasElse) {
+        virtualElements.setDomNodeChildren(this.$element, cloneNodes(this.ifElseNodes.ifNodes))
+      }
+    } else if (this.ifElseNodes) {
+      virtualElements.setDomNodeChildren(this.$element, cloneNodes(this.ifElseNodes.elseNodes))
+    } else {
+      virtualElements.emptyNode(this.$element)
+    }
 
-                applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, rawValue) : bindingContext, element);
+    applyBindingsToDescendants(this.bindingContext, this.$element)
+      .then(this.completeBinding.bind(this))
 
-                didDisplayOnLastUpdate = shouldDisplayIf;
-            }, null, { disposeWhenNodeIsRemoved: element });
+    this.didDisplayOnLastUpdate = shouldDisplayIf
+  }
 
-            return { 'controlsDescendantBindings': true };
-        },
-        allowVirtualElements: true,
-        bindingRewriteValidator: false
-    };
+  get bindingContext () { return this.$context }
+  get controlsDescendants () { return true }
+  static get allowVirtualElements () { return true }
 }
 
-function withContextCallback(bindingContext, dataValue) {
-    return bindingContext.createStaticChildContext(dataValue);
+export class IfBindingHandler extends ConditionalBindingHandler {}
+
+export class UnlessBindingHandler extends ConditionalBindingHandler {
+  get shouldDisplayIf () { return !super.shouldDisplayIf }
 }
 
-                                 /* isWith, isNot */
-export var $if =   makeWithIfBinding(false, false, false);
-export var ifnot = makeWithIfBinding(false, true, false);
-export var $else = makeWithIfBinding(false, false, true);
-export var $with = makeWithIfBinding(true, false, false, withContextCallback);
+export class ElseBindingHandler extends ConditionalBindingHandler {
+  get shouldDisplayIf () { return super.shouldDisplayIf || this.value === undefined }
+
+  /**
+   * Return any conditional that precedes the given node.
+   * @return {object}      { elseChainSatisfied: observable }
+   */
+  get elseChainIsAlreadySatisfied () {
+    let node = this.$element
+    do {
+      node = node.previousSibling
+    } while (node && node.nodeType !== 1 && node.nodeType !== 8)
+
+    if (!node) { return false }
+
+    if (node.nodeType === 8) {
+      node = virtualElements.previousSibling(node)
+    }
+
+    const conditionObject = domData.get(node, 'conditional') || {}
+    return unwrap(conditionObject.elseChainSatisfied)
+  }
+}
+
+export class WithBindingHandler extends ConditionalBindingHandler {
+  get needsRefresh () { return true }
+  get bindingContext () {
+    return this.$context.createStaticChildContext(this.value)
+  }
+}
+

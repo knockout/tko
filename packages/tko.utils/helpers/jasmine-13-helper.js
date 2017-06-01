@@ -1,11 +1,11 @@
 /*
  * Configure the Jasmine testing framework.
  */
+ /* globals runs, waitsFor, jasmine */
 
 import {
   arrayMap, ieVersion
 } from '../index.js';
-
 
 window.DEBUG = true;
 window.amdRequire = window.require;
@@ -20,6 +20,12 @@ jasmine.updateInterval = 500;
 /*
     Some helper functions for jasmine on the browser
  */
+jasmine.resolve = function (promise) {
+  let complete = false
+  runs(() => promise.then((result) => { complete = result || true }))
+  waitsFor(() => complete)
+}
+
 jasmine.prepareTestNode = function() {
     // The bindings specs make frequent use of this utility function to set up
     // a clean new DOM node they can execute code against

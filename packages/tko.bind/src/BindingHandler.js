@@ -37,9 +37,32 @@ export class BindingHandler extends LifeCycle {
 
   static get allowVirtualElements () { return false }
 
+  /* Overload this for asynchronous bindings or bindings that recursively
+     apply bindings (e.g. components, foreach, template).
+
+     A binding should be complete when it has run through once, notably
+     in server-side bindings for pre-rendering.
+  */
+  get bindingCompleted () { return true }
+
   static registerAs (name, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, this)
   }
+}
+
+/**
+ * An AsyncBindingHandler shall call `completeBinding` when the binding
+ * is to be considered complete.
+ */
+export class AsyncBindingHandler extends BindingHandler {
+  constructor (params) {
+    super(params)
+    this.bindingCompletion = new Promise((resolve) => { this.bindingResolution = resolve })
+  }
+
+  completeBinding (param) { this.bindingResolution(param) }
+
+  get bindingCompleted () { return this.bindingCompletion }
 }
 
 class LegacyBindingHandler extends BindingHandler {

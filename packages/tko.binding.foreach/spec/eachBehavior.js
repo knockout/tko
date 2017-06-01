@@ -1,10 +1,8 @@
-/* eslint semi: 0 */
 /*
 
-  Knockout Else --- Tests
+  Knockout Each --- Tests
 
  */
-/* globals $ */
 
 import {
   removeNode, arrayForEach, options, domData
@@ -31,7 +29,7 @@ import {
 } from 'tko.binding.core';
 
 import {
-  ForEach, foreach
+  ForEachBinding
 } from '../src/foreach';
 
 import $ from 'jquery'
@@ -43,13 +41,13 @@ beforeEach(function(){
   })
   options.bindingProviderInstance = provider;
   provider.bindingHandlers.set(coreBindings);
-  provider.bindingHandlers.set({ foreach: foreach });
+  provider.bindingHandlers.set({ foreach: ForEachBinding });
   // provider.bindingHandlers.set(ifBindings);
 });
 
 
 beforeEach(function () {
-  foreach.setSync(true)
+  ForEachBinding.setSync(true)
 })
 
 
@@ -84,7 +82,7 @@ describe("each binding", function () {
   })
 
   it("processes initial data synchronously", function () {
-    foreach.setSync(false)
+    ForEachBinding.setSync(false)
     var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
     var list = [1, 2, 3];
     applyBindings(computed({ read: function () { return list } }), target[0])
@@ -92,7 +90,7 @@ describe("each binding", function () {
   })
 
   it("processes initial data synchronously but is later asynchronous", function () {
-    foreach.setSync(false)
+    ForEachBinding.setSync(false)
     // reset to the default async animateFrame
     // foreac
     var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></div>");
@@ -472,8 +470,8 @@ describe("observable array changes", function () {
     })
 
     it("sorting complex data recreates DOM nodes if move disabled", function () {
-      var originalShouldDelayDeletion = ForEach.prototype.shouldDelayDeletion;
-      ForEach.prototype.shouldDelayDeletion = function(/*data*/) { return false; }
+      var originalShouldDelayDeletion = ForEachBinding.prototype.shouldDelayDeletion;
+      ForEachBinding.prototype.shouldDelayDeletion = function(/*data*/) { return false; }
       div = $("<div data-bind='foreach: { data: obs }'><div data-bind='html: testHtml'></div></div>");
       applyBindings(view, div[0]);
       obs([{ id: 7, testHtml: '<span>A</span>' }, { id: 6, testHtml: '<span>B</span>' }, { id: 1, testHtml: '<span>C</span>' }])
@@ -485,7 +483,7 @@ describe("observable array changes", function () {
       assert.notStrictEqual(nodes[1], nodes2[2])
       assert.notStrictEqual(nodes[2], nodes2[0])
       assert.notStrictEqual(nodes[0], nodes2[1])
-      ForEach.prototype.shouldDelayDeletion = originalShouldDelayDeletion;
+      ForEachBinding.prototype.shouldDelayDeletion = originalShouldDelayDeletion;
     })
 
     it("Sort large complex array makes correct DOM moves", function() {
@@ -513,8 +511,8 @@ describe("observable array changes", function () {
     })
 
     it("Sort large complex array makes correct DOM order without move", function() {
-      var originalShouldDelayDeletion = ForEach.prototype.shouldDelayDeletion;
-      ForEach.prototype.shouldDelayDeletion = function (/*data*/) { return false; }
+      var originalShouldDelayDeletion = ForEachBinding.prototype.shouldDelayDeletion;
+      ForEachBinding.prototype.shouldDelayDeletion = function (/*data*/) { return false; }
       var itemNumber = 100;
       div = $("<div data-bind='foreach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>");
       applyBindings(view, div[0]);
@@ -532,7 +530,7 @@ describe("observable array changes", function () {
       div.children().each(function(index) {
         assert.equal(index, dataFor(this).num)
       })
-      ForEach.prototype.shouldDelayDeletion = originalShouldDelayDeletion;
+      ForEachBinding.prototype.shouldDelayDeletion = originalShouldDelayDeletion;
     })
 
     it("processes duplicate data 1", function () {
@@ -571,8 +569,9 @@ describe("observable array changes", function () {
     })
 
     it("processes changes from more changesets 1", function () {
-      var originalAnimateFrame = ForEach.animateFrame;
-      ForEach.animateFrame = function() { };
+      var originalAnimateFrame = ForEachBinding.animateFrame;
+      ForEachBinding.animateFrame = function() { };
+      ForEachBinding.setSync(false)
       div = $("<div data-bind='visible: true'></div>");
       applyBindings({}, div[0]);
 
@@ -581,11 +580,16 @@ describe("observable array changes", function () {
       obs([itemA, others[0], others[1], others[2], others[3]])
 
       // manual initialization to be able to access processQueue method
-      var ffe = new ForEach({
-        element: div[0],
-        data: obs,
+      var ffe = new ForEachBinding({
+        $element: div[0],
         $context: contextFor(div[0]),
-        templateNode: $("<template><div data-bind='html: testHtml'></div></template>")[0]
+        allBindings: { get () {} },
+        valueAccessor () {
+          return {
+            data: obs,
+            templateNode: $("<template><div data-bind='html: testHtml'></div></template>")[0]
+          }
+        }
       });
 
       ffe.processQueue();
@@ -601,12 +605,13 @@ describe("observable array changes", function () {
       assert.equal(div.text(), "C14C13C12A")
       // moved all five nodes around
       assert.equal(div.children().filter(function () { return this.test == 1; }).length, 4)
-      ForEach.animateFrame = originalAnimateFrame;
+      ForEachBinding.animateFrame = originalAnimateFrame;
     })
 
     it("processes changes from more changesets 2", function () {
-      var originalAnimateFrame = ForEach.animateFrame;
-      ForEach.animateFrame = function () { };
+      var originalAnimateFrame = ForEachBinding.animateFrame;
+      ForEachBinding.animateFrame = function () { };
+      ForEachBinding.setSync(false)
       div = $("<div data-bind='visible: true'></div>");
       applyBindings({}, div[0]);
 
@@ -615,11 +620,16 @@ describe("observable array changes", function () {
       obs([itemA, itemB])
 
       // manual initialization to be able to access processQueue method
-      var ffe = new ForEach({
-        element: div[0],
-        data: obs,
-        $context: contextFor(div[0]),
-        templateNode: $("<script type='text/html'><div data-bind='html: testHtml'></div></script>")[0]
+      var ffe = new ForEachBinding({
+        $element: div[0],
+        valueAccessor () {
+          return {
+            data: obs,
+            templateNode: $("<script type='text/html'><div data-bind='html: testHtml'></div></script>")[0]
+          }
+        },
+        allBindings: { get () {} },
+        $context: contextFor(div[0])
       });
 
       ffe.processQueue();
@@ -636,8 +646,8 @@ describe("observable array changes", function () {
 
       ffe.processQueue();
       assert.equal(div.text(), "AB")
-      assert.equal(div.children().filter(function () { return this.test == 1; }).length, 2)
-      ForEach.animateFrame = originalAnimateFrame;
+      assert.equal(div.children().filter(function () { return this.test === 1 }).length, 2)
+      ForEachBinding.animateFrame = originalAnimateFrame;
     })
 
     it("cleans data objects", function () {
@@ -651,9 +661,9 @@ describe("observable array changes", function () {
       assert.equal(div.text(), 'ABCA')
       obs([itemC, itemA, itemB])
       var nodes2 = div.children().toArray()
-      assert.equal(itemA[ForEach.PENDING_DELETE_INDEX_KEY], undefined)
-      assert.equal(itemB[ForEach.PENDING_DELETE_INDEX_KEY], undefined)
-      assert.equal(itemC[ForEach.PENDING_DELETE_INDEX_KEY], undefined)
+      assert.equal(itemA[ForEachBinding.PENDING_DELETE_INDEX_SYM], undefined)
+      assert.equal(itemB[ForEachBinding.PENDING_DELETE_INDEX_SYM], undefined)
+      assert.equal(itemC[ForEachBinding.PENDING_DELETE_INDEX_SYM], undefined)
       assert.equal(nodes[0], nodes2[1])
       assert.equal(div.text(), 'CAB')
     })
@@ -877,7 +887,7 @@ describe("focus", function () {
       + "<input />"
       + "</div>")
       .appendTo(document.body);
-    foreach.setSync(false)
+    ForEachBinding.setSync(false)
   })
 
   afterEach(function () {

@@ -11,14 +11,14 @@ import {
 } from 'tko.observable'
 
 import {
-    applyBindingsToDescendants, BindingHandler
+    applyBindingsToDescendants, AsyncBindingHandler
 } from 'tko.bind'
 
 import registry from 'tko.utils.component'
 
 var componentLoadingOperationUniqueId = 0
 
-export default class ComponentBinding extends BindingHandler {
+export default class ComponentBinding extends AsyncBindingHandler {
   constructor (params) {
     super(params)
     this.originalChildNodes = makeArray(
@@ -91,6 +91,7 @@ export default class ComponentBinding extends BindingHandler {
     const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
     applyBindingsToDescendants(childBindingContext, this.$element)
+      .then(this.completeBinding)
   }
 
   cleanUpState () {
