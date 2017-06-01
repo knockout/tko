@@ -17,17 +17,24 @@ export var attr = {
         objectForEach(value, function(attrName, attrValue) {
             attrValue = unwrap(attrValue);
 
+            // Find the namespace of this attribute, if any.
+            // Defaulting to `null` should be ok, as
+            //
+            //  element.setAttributeNS( null, name, value ) ~ element.setAttribute( name, value )
+            //  element.removetAttributeNS( null, name ) ~ element.removeAttribute( name )
+            //
+            var prefixLen = attrName.indexOf(':');
+            var namespace = prefixLen < 0 ? null : element.lookupNamespaceURI( attrName.substr(0, prefixLen) );
+
             // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
             // when someProp is a "no value"-like value (strictly null, false, or undefined)
             // (because the absence of the "checked" attr is how to mark an element as not checked, etc.)
             var toRemove = (attrValue === false) || (attrValue === null) || (attrValue === undefined);
 
             if (toRemove) {
-                element.removeAttribute(attrName);
-            }
-
-            if (!toRemove) {
-                element.setAttribute(attrName, attrValue.toString());
+                element.removeAttributeNS(namespace, attrName);
+            } else {
+                element.setAttributeNS(namespace, attrName, attrValue.toString());
             }
 
             // Treat "name" specially - although you can think of it as an attribute, it also needs
