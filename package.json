@@ -5,7 +5,7 @@
   "version": "4.0.0-alpha2",
   "license": "MIT",
   "author": "The Knockout.js Team",
-  "main": "dist/knockout-latest.debug.js",
+  "main": "dist/ko.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/knockout/knockout.git"
