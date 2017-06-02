@@ -24,10 +24,6 @@ export class BindingHandler extends LifeCycle {
     })
 
     this.anchorTo($element)
-
-    if (this.onValueChange) {
-      this.subscribe(this.computed(() => this.value), 'onValueChange')
-    }
   }
 
   get value () { return this.valueAccessor() }

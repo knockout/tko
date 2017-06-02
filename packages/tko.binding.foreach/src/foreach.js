@@ -66,33 +66,11 @@ function valueToChangeAddItem (value, index) {
 // store a symbol for caching the pending delete info index in the data item objects
 const PENDING_DELETE_INDEX_SYM = createSymbolOrString('_ko_ffe_pending_delete_index')
 
-export function ForEach (spec) {
-
-}
-
 // Extend the given context with a $index (passed in via the createChildContext)
 function extend$context (include$index, $context) {
   if (include$index) { $context.$index = observable() }
   $context.$list = this.data
 }
-
-// export var foreach = {
-//   init: function init (element, valueAccessor, bindings, vm, context) {
-//     var ffe, value = valueAccessor()
-//     if (isPlainObject(value)) {
-//       value.element = value.element || element
-//       value.$context = context
-//       ffe = new ForEach(value)
-//     } else {
-//       ffe = new ForEach({
-//         element: element,
-//         data: unwrap(context.$rawData) === value ? context.$rawData : value,
-//         $context: context,
-//         as: bindings.get('as'),
-//         noIndex: bindings.get('noIndex')
-//       })
-//     }
-// }
 
 export class ForEachBinding extends AsyncBindingHandler {
   // Valid valueAccessors:
@@ -126,7 +104,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     )
 
     ;['afterAdd', 'beforeRemove', 'afterQueueFlush', 'beforeQueueFlush']
-      .forEach(p => this[p] = settings[p] || this.allBindings.get(p))
+      .forEach(p => { this[p] = settings[p] || this.allBindings.get(p) })
 
     this.changeQueue = []
     this.firstLastNodesList = []
@@ -216,7 +194,7 @@ export class ForEachBinding extends AsyncBindingHandler {
       if (isInitial) {
         this.processQueue()
       } else {
-        ForEach.animateFrame.call(window, () => this.processQueue())
+        ForEachBinding.animateFrame.call(window, () => this.processQueue())
       }
     }
   }
@@ -531,9 +509,9 @@ export class ForEachBinding extends AsyncBindingHandler {
    */
   static setSync (toggle) {
     if (toggle) {
-      ForEach.animateFrame = function (frame) { frame() }
+      ForEachBinding.animateFrame = function (frame) { frame() }
     } else {
-      ForEach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
+      ForEachBinding.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
         function (cb) { return window.setTimeout(cb, 1000 / 60) }
     }

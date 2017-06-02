@@ -6,7 +6,7 @@ import {
 
 import {
     applyBindings, setDomNodeChildrenFromArrayMapping, AsyncBindingHandler,
-    bindingContext as bindingContextConstructor
+    bindingContext as BindingContextConstructor
 } from 'tko.bind'
 
 import {
@@ -22,13 +22,13 @@ import {
 } from './templateEngine'
 
 import {
-  anonymousTemplate
+  anonymousTemplate as AnonymousTemplate
 } from './templateSources'
 
 var _templateEngine
 
 export function setTemplateEngine (tEngine) {
-  if ((tEngine != undefined) && !(tEngine instanceof templateEngine)) {
+  if ((tEngine !== undefined) && !(tEngine instanceof templateEngine)) {
         // TODO: ko.templateEngine to appropriate name
     throw new Error('templateEngine must inherit from ko.templateEngine')
   }
@@ -36,7 +36,9 @@ export function setTemplateEngine (tEngine) {
 }
 
 function invokeForEachNodeInContinuousRange (firstNode, lastNode, action) {
-  var node, nextInQueue = firstNode, firstOutOfRangeNode = virtualElements.nextSibling(lastNode)
+  let node
+  let nextInQueue = firstNode
+  let firstOutOfRangeNode = virtualElements.nextSibling(lastNode)
   while (nextInQueue && ((node = nextInQueue) !== firstOutOfRangeNode)) {
     nextInQueue = virtualElements.nextSibling(node)
     action(node, nextInQueue)
@@ -158,19 +160,19 @@ export function renderTemplate (template, dataOrBindingContext, options, targetN
     var firstTargetNode = getFirstNodeFromPossibleArray(targetNodeOrNodeArray)
 
     var whenToDispose = function () { return (!firstTargetNode) || !domNodeIsAttachedToDocument(firstTargetNode) } // Passive disposal (on next evaluation)
-    var activelyDisposeWhenNodeIsRemoved = (firstTargetNode && renderMode == 'replaceNode') ? firstTargetNode.parentNode : firstTargetNode
+    var activelyDisposeWhenNodeIsRemoved = (firstTargetNode && renderMode === 'replaceNode') ? firstTargetNode.parentNode : firstTargetNode
 
     return computed( // So the DOM is automatically updated when any dependency changes
       function () {
           // Ensure we've got a proper binding context to work with
-        var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof bindingContextConstructor))
+        var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof BindingContextConstructor))
               ? dataOrBindingContext
-              : new bindingContextConstructor(dataOrBindingContext, null, null, null, { 'exportDependencies': true })
+              : new BindingContextConstructor(dataOrBindingContext, null, null, null, { 'exportDependencies': true })
 
-        var templateName = resolveTemplateName(template, bindingContext['$data'], bindingContext),
-          renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options, afterBindingCallback)
+        var templateName = resolveTemplateName(template, bindingContext.$data, bindingContext)
+        const renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options, afterBindingCallback)
 
-        if (renderMode == 'replaceNode') {
+        if (renderMode === 'replaceNode') {
           targetNodeOrNodeArray = renderedNodesArray
           firstTargetNode = getFirstNodeFromPossibleArray(targetNodeOrNodeArray)
         }
@@ -214,16 +216,15 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
 
   return computed(function () {
     var unwrappedArray = unwrap(arrayOrObservableArray) || []
-    if (typeof unwrappedArray.length === 'undefined') // Coerce single value into array
-          { unwrappedArray = [unwrappedArray] }
+    if (!Array.isArray(unwrappedArray)) { unwrappedArray = [unwrappedArray] }
 
-        // Filter out any entries marked as destroyed
+    // Filter out any entries marked as destroyed
     var filteredArray = arrayFilter(unwrappedArray, function (item) {
       return options['includeDestroyed'] || item === undefined || item === null || !unwrap(item['_destroy'])
     })
 
-        // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
-        // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
+    // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
+    // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
     dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, filteredArray, executeTemplateForArrayItem, options, activateBindingsCallback])
   }, null, { disposeWhenNodeIsRemoved: targetNode })
 }
@@ -240,6 +241,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     super(params)
 
     const element = this.$element
+    const bindingValue = unwrap(this.value)
     let container
 
     // Expose 'conditional' for `else` chaining.
@@ -248,8 +250,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     })
 
     // Support anonymous templates
-    var bindingValue = unwrap(this.value)
-    if (typeof bindingValue === 'string' || bindingValue['name']) {
+    if (typeof bindingValue === 'string' || bindingValue.name) {
             // It's a named template - clear the element
       virtualElements.emptyNode(element)
     } else if ('nodes' in bindingValue) {
@@ -257,17 +258,17 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
             // There is no known use case for the node array being an observable array (if the output
             // varies, put that behavior *into* your template - that's what templates are for), and
             // the implementation would be a mess, so assert that it's not observable.
-      var nodes = bindingValue['nodes'] || []
+      var nodes = bindingValue.nodes || []
       if (isObservable(nodes)) {
         throw new Error('The "nodes" option must be a plain, non-observable array.')
       }
       container = moveCleanedNodesToContainerElement(nodes) // This also removes the nodes from their current parent
-      new anonymousTemplate(element)['nodes'](container)
+      new AnonymousTemplate(element)['nodes'](container)
     } else {
             // It's an anonymous template - store the element contents, then clear the element
-      var templateNodes = virtualElements.childNodes(element)
+      const templateNodes = virtualElements.childNodes(element)
       container = moveCleanedNodesToContainerElement(templateNodes) // This also removes the nodes from their current parent
-      new anonymousTemplate(element).nodes(container)
+      new AnonymousTemplate(element).nodes(container)
     }
 
     this.computed(this.onValueChange.bind(this))
@@ -287,29 +288,34 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
       templateName = value
       options = {}
     } else {
-      templateName = options['name']
+      templateName = options.name
 
       // Support "if"/"ifnot" conditions
-      if ('if' in options) { shouldDisplay = unwrap(options['if']) }
-      if (shouldDisplay && 'ifnot' in options) { shouldDisplay = !unwrap(options['ifnot']) }
+      if ('if' in options) {
+        shouldDisplay = unwrap(options.if)
+      }
+
+      if (shouldDisplay && 'ifnot' in options) {
+        shouldDisplay = !unwrap(options.ifnot)
+      }
     }
 
     if ('foreach' in options) {
-            // Render once for each data point (treating data set as empty if shouldDisplay==false)
-      var dataArray = (shouldDisplay && options['foreach']) || []
+      // Render once for each data point (treating data set as empty if shouldDisplay==false)
+      var dataArray = (shouldDisplay && options.foreach) || []
       templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding)
 
       elseChainSatisfied((unwrap(dataArray) || []).length !== 0)
-    } else if (!shouldDisplay) {
-      virtualElements.emptyNode(element)
-      elseChainSatisfied(false)
-    } else {
-            // Render once for this single data point (or use the viewModel if no data was provided)
+    } else if (shouldDisplay) {
+      // Render once for this single data point (or use the viewModel if no data was provided)
       var innerBindingContext = ('data' in options)
-                ? bindingContext.createStaticChildContext(options['data'], options['as'])  // Given an explitit 'data' value, we create a child binding context for it
-                : bindingContext                                                        // Given no explicit 'data' value, we retain the same binding context
+        ? bindingContext.createStaticChildContext(options.data, options.as)  // Given an explitit 'data' value, we create a child binding context for it
+        : bindingContext                                                        // Given no explicit 'data' value, we retain the same binding context
       templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding)
       elseChainSatisfied(true)
+    } else {
+      virtualElements.emptyNode(element)
+      elseChainSatisfied(false)
     }
 
     // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
