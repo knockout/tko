@@ -57,10 +57,8 @@ export class BindingHandler extends LifeCycle {
 export class AsyncBindingHandler extends BindingHandler {
   constructor (params) {
     super(params)
-    this.bindingCompletion = new Promise((resolve) => { this.bindingResolution = resolve })
+    this.bindingCompletion = new Promise((resolve) => { this.completeBinding = resolve })
   }
-
-  completeBinding (param) { this.bindingResolution(param) }
 
   get bindingCompleted () { return this.bindingCompletion }
 }

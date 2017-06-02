@@ -126,7 +126,7 @@ class ConditionalBindingHandler extends AsyncBindingHandler {
     }
 
     applyBindingsToDescendants(this.bindingContext, this.$element)
-      .then(this.completeBinding.bind(this))
+      .then(this.completeBinding)
 
     this.didDisplayOnLastUpdate = shouldDisplayIf
   }

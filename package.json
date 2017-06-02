@@ -14,6 +14,7 @@
     "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
     "lint": "standard",
     "lerna": "lerna bootstrap --hoist --npm-client yarn",
+    "make": "npm run build; npm run minify",
     "build": "rollup -c rollup.config.js -o dist/ko.js",
     "minify": "MINIFY=1 rollup -c rollup.config.js -o dist/ko.min.js"
   },

@@ -297,7 +297,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     if ('foreach' in options) {
             // Render once for each data point (treating data set as empty if shouldDisplay==false)
       var dataArray = (shouldDisplay && options['foreach']) || []
-      templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding.bind(this))
+      templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding)
 
       elseChainSatisfied((unwrap(dataArray) || []).length !== 0)
     } else if (!shouldDisplay) {
@@ -308,7 +308,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
       var innerBindingContext = ('data' in options)
                 ? bindingContext.createStaticChildContext(options['data'], options['as'])  // Given an explitit 'data' value, we create a child binding context for it
                 : bindingContext                                                        // Given no explicit 'data' value, we retain the same binding context
-      templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding.bind(this))
+      templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding)
       elseChainSatisfied(true)
     }
 
