@@ -44,6 +44,7 @@ import {
     dataFor,
     getBindingHandler,
     BindingHandler,
+    AsyncBindingHandler,
     setDomNodeChildrenFromArrayMapping
 } from 'tko.bind';
 
@@ -150,7 +151,7 @@ provider.bindingHandlers.set(foreachBindings)
 provider.bindingHandlers.set({ each: foreachBindings.foreach })
 provider.bindingHandlers.set(componentBindings)
 
-utils.extend(utils.options.filters, punchesFilters);
+Object.assign(utils.options.filters, punchesFilters);
 
 // Expose the API.
 export default {
@@ -167,52 +168,50 @@ export default {
   removeNode: utils.removeNode,
   tasks: utils.tasks,
   utils: coreUtils,
-  dependencyDetection: dependencyDetection,
+  dependencyDetection,
   ignoreDependencies: dependencyDetection.ignore,
 
     // -- Observable ---
-  isObservable: isObservable,
-  isSubscribable: isSubscribable,
-  isWriteableObservable: isWriteableObservable,
+  isObservable,
+  isSubscribable,
+  isWriteableObservable,
   isWritableObservable: isWriteableObservable,
-  observable: observable,
-  observableArray: observableArray,
-  peek: peek,
-  subscribable: subscribable,
-  unwrap: unwrap,
-  toJS: toJS,
-  toJSON: toJSON,
+  observable,
+  observableArray,
+  peek,
+  subscribable,
+  unwrap,
+  toJS,
+  toJSON,
 
     // ... Computed ...
-  computed: computed,
-  isComputed: isComputed,
-  isPureComputed: isPureComputed,
-  pureComputed: pureComputed,
+  computed,
+  isComputed,
+  isPureComputed,
+  pureComputed,
 
     // --- Templates ---
-  nativeTemplateEngine: nativeTemplateEngine,
-  renderTemplate: renderTemplate,
-  setTemplateEngine: setTemplateEngine,
-  templateEngine: templateEngine,
-  templateSources: {
-    domElement: domElement,
-    anonymousTemplate: anonymousTemplate
-  },
+  nativeTemplateEngine,
+  renderTemplate,
+  setTemplateEngine,
+  templateEngine,
+  templateSources: { domElement, anonymousTemplate },
 
     // --- Binding ---
-  applyBindingAccessorsToNode: applyBindingAccessorsToNode,
-  applyBindings: applyBindings,
-  applyBindingsToDescendants: applyBindingsToDescendants,
-  applyBindingsToNode: applyBindingsToNode,
+  applyBindingAccessorsToNode,
+  applyBindings,
+  applyBindingsToDescendants,
+  applyBindingsToNode,
   bindingHandlers: provider.bindingHandlers,
   bindingProvider: provider,
-  contextFor: contextFor,
-  dataFor: dataFor,
-  getBindingHandler: getBindingHandler,
-  BindingHandler: BindingHandler,
+  contextFor,
+  dataFor,
+  getBindingHandler,
+  BindingHandler,
+  AsyncBindingHandler,
   virtualElements: utils.virtualElements,
   domNodeDisposal: coreUtils.domNodeDisposal,
 
     // --- Components ---
-  components: components
+  components
 }
