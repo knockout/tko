@@ -79,12 +79,11 @@ function getBindingsAndMakeAccessors (node, context) {
   return makeAccessorsFromFunction(this.getBindings.bind(this, node, context))
 }
 
-function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement) {
+function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement, asyncBindingsApplied) {
   var currentChild
   var nextInQueue = virtualElements.firstChild(elementOrVirtualElement)
   const provider = options.bindingProviderInstance
   const preprocessNode = provider.preprocessNode
-  const bindingResults = []
 
     // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
     // possible to insert new siblings after it, and/or replace the node with a different one. This can be used to
@@ -102,11 +101,8 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
   while (currentChild = nextInQueue) {
         // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
     nextInQueue = virtualElements.nextSibling(currentChild)
-    bindingResults.push(
-      applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, bindingContextsMayDifferFromDomParentElement)
-    )
+    applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, bindingContextsMayDifferFromDomParentElement, asyncBindingsApplied)
   }
-  return Promise.all(bindingResults)
 }
 
 function hasBindings (node) {
@@ -114,7 +110,7 @@ function hasBindings (node) {
   return provider.FOR_NODE_TYPES.includes(node.nodeType) && provider.nodeHasBindings(node)
 }
 
-function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, bindingContextMayDifferFromDomParentElement) {
+function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, bindingContextMayDifferFromDomParentElement, asyncBindingsApplied) {
   // Perf optimisation: Apply bindings only if...
   // (1) We need to store the binding context on this node (because it may differ from the DOM parent node's binding context)
   //     Note that we can't store binding contexts on non-elements (e.g., text nodes), as IE doesn't allow expando properties for those
@@ -127,11 +123,9 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
   var shouldApplyBindings = (isElement && bindingContextMayDifferFromDomParentElement) || // Case (1)
                              hasBindings(nodeVerified) // Case (2)
 
-  const {shouldBindDescendants, allBindingsApplied} = shouldApplyBindings
-    ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement)
-    : { shouldBindDescendants: true, allBindingsApplied: true }
-
-  const bindingCompletionPromises = [allBindingsApplied]
+  const {shouldBindDescendants} = shouldApplyBindings
+    ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement, asyncBindingsApplied)
+    : { shouldBindDescendants: true }
 
   if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
     // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
@@ -140,11 +134,8 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
     //  * For children of a *virtual* element, we can't be sure. Evaluating .parentNode on those children may
     //    skip over any number of intermediate virtual elements, any of which might define a custom binding context,
     //    hence bindingContextsMayDifferFromDomParentElement is true
-    bindingCompletionPromises.push(
-      applyBindingsToDescendantsInternal(bindingContext, nodeVerified, /* bindingContextsMayDifferFromDomParentElement: */ !isElement)
-    )
+    applyBindingsToDescendantsInternal(bindingContext, nodeVerified, /* bindingContextsMayDifferFromDomParentElement: */ !isElement, asyncBindingsApplied)
   }
-  return Promise.all(bindingCompletionPromises)
 }
 
 var boundElementDomDataKey = domData.nextKey()
@@ -181,10 +172,9 @@ function * topologicalSortBindings (bindings) {
   for (const result of results) { yield result }
 }
 
-function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bindingContextMayDifferFromDomParentElement) {
+function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bindingContextMayDifferFromDomParentElement, asyncBindingsApplied) {
     // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
   var alreadyBound = domData.get(node, boundElementDomDataKey)
-  const allBindingsApplied = []
   if (!sourceBindings) {
     if (alreadyBound) {
       onBindingError({
@@ -291,7 +281,9 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
           bindingHandlerThatControlsDescendantBindings = key
         }
 
-        allBindingsApplied.push(bindingHandler.bindingCompleted)
+        if (bindingHandler.bindingCompleted instanceof Promise) {
+          asyncBindingsApplied.add(bindingHandler.bindingCompleted)
+        }
       } catch (err) {
         reportBindingError('creation', err)
       }
@@ -299,8 +291,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
   }
 
   return {
-    shouldBindDescendants: bindingHandlerThatControlsDescendantBindings === undefined,
-    allBindingsApplied: Promise.all(allBindingsApplied)
+    shouldBindDescendants: bindingHandlerThatControlsDescendantBindings === undefined
   }
 }
 
@@ -310,26 +301,31 @@ function getBindingContext (viewModelOrBindingContext) {
     : new bindingContext(viewModelOrBindingContext)
 }
 
-export function applyBindingAccessorsToNode (node, bindings, viewModelOrBindingContext) {
+export function applyBindingAccessorsToNode (node, bindings, viewModelOrBindingContext, asyncBindingsApplied) {
   if (node.nodeType === 1) { // If it's an element, workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(node)
   }
-  return applyBindingsToNodeInternal(node, bindings, getBindingContext(viewModelOrBindingContext), true)
+  return applyBindingsToNodeInternal(node, bindings, getBindingContext(viewModelOrBindingContext), true, asyncBindingsApplied)
 }
 
 export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) {
+  const asyncBindingsApplied = new Set()
   var context = getBindingContext(viewModelOrBindingContext)
-  return applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context)
+  applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context, asyncBindingsApplied)
+  return Promise.all(asyncBindingsApplied)
 }
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
+  const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
-    return applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true)
+    applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true, asyncBindingsApplied)
   }
+  return Promise.all(asyncBindingsApplied)
 }
 
 export function applyBindings (viewModelOrBindingContext, rootNode) {
-    // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
+  const asyncBindingsApplied = new Set()
+  // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
   if (!options.jQuery === undefined && window.jQuery) {
     options.jQuery = window.jQuery
   }
@@ -337,7 +333,8 @@ export function applyBindings (viewModelOrBindingContext, rootNode) {
   if (rootNode && (rootNode.nodeType !== 1) && (rootNode.nodeType !== 8)) { throw new Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node') }
   rootNode = rootNode || window.document.body // Make "rootNode" parameter optional
 
-  return applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true)
+  applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true, asyncBindingsApplied)
+  return Promise.all(asyncBindingsApplied)
 }
 
 function onBindingError (spec) {

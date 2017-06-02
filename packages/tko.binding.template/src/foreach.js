@@ -21,11 +21,11 @@ export class TemplateForEachBindingHandler extends TemplateBindingHandler {
         // If unwrappedValue is the array, pass in the wrapped value on its own
         // The value will be unwrapped and tracked within the template binding
         // (See https://github.com/SteveSanderson/knockout/issues/523)
-    if ((!unwrappedValue) || typeof unwrappedValue.length === 'number') {
-      return { 'foreach': modelValue, 'templateEngine': nativeTemplateEngine.instance }
+    if (!unwrappedValue || typeof unwrappedValue.length === 'number') {
+      return { foreach: modelValue, templateEngine: nativeTemplateEngine.instance }
     }
 
-        // If unwrappedValue.data is the array, preserve all relevant options and unwrap again value so we get updates
+    // If unwrappedValue.data is the array, preserve all relevant options and unwrap again value so we get updates
     unwrap(modelValue)
     return {
       foreach: unwrappedValue.data,
@@ -40,5 +40,3 @@ export class TemplateForEachBindingHandler extends TemplateBindingHandler {
     }
   }
 }
-
-// ko.expressionRewriting.bindingRewriteValidators['foreach'] = false; // Can't rewrite control flow bindings
