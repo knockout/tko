@@ -11,6 +11,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (subscribable) Add the `once`, `then`, `when`, `yet`, and `next` functions
 * (parser) Fix early-out for logical (&& / ||) operators
 * (binding) `ko.applyBindings` now returns a Promise that resolves when bindings are completed
+* (attr) Support namespaced attributes with `attr` binding #27
 
 ## 🐋   Alpha-2  (3 May 2017)
 
