@@ -216,7 +216,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
 
   return computed(function () {
     var unwrappedArray = unwrap(arrayOrObservableArray) || []
-    if (!Array.isArray(unwrappedArray)) { unwrappedArray = [unwrappedArray] }
+    if (typeof unwrappedArray.length !== 'number') { unwrappedArray = [unwrappedArray] }
 
     // Filter out any entries marked as destroyed
     var filteredArray = arrayFilter(unwrappedArray, function (item) {
