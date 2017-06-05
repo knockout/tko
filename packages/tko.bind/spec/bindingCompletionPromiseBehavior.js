@@ -30,14 +30,14 @@ describe('Binding Application Promise', function () {
   }
 
   class AsyncBinding extends BindingHandler {
-    get bindingCompleted () { return Promise.resolve().then(() => this.value(true)) }
+    get bindingCompleted () { return options.Promise.resolve().then(() => this.value(true)) }
     static get allowVirtualElements () { return true }
   }
 
   class AsyncContainerBinding extends BindingHandler {
     constructor (params) {
       super(params)
-      this.bindingCompletion = Promise.resolve()
+      this.bindingCompletion = options.Promise.resolve()
         .then(() => applyBindingsToDescendants(this.$context, this.$element))
     }
 
@@ -68,7 +68,7 @@ describe('Binding Application Promise', function () {
   it('returns a promise', function () {
     const div = document.createElement('div')
     const abr = applyBindings({}, div)
-    expect(abr.constructor).toEqual(Promise)
+    expect(abr.constructor).toEqual(options.Promise)
   })
 
   it('completes immediately when there are no bindings', function () {

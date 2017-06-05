@@ -1,7 +1,7 @@
 /* eslint no-cond-assign: 0 */
 import {
     setPrototypeOfOrExtend, arrayRemoveItem, objectForEach,
-    canSetPrototype, setPrototypeOf
+    canSetPrototype, setPrototypeOf, options
 } from 'tko.utils'
 
 import { applyExtenders } from './extenders.js'
@@ -125,9 +125,9 @@ var ko_subscribable_fn = {
     const givenRv = arguments.length > 1
     const testFn = typeof test === 'function' ? test : v => v === test
     if (testFn(current)) {
-      return Promise.resolve(givenRv ? returnValue : current)
+      return options.Promise.resolve(givenRv ? returnValue : current)
     }
-    return new Promise((resolve, reject) => {
+    return new options.Promise((resolve, reject) => {
       const subs = this.subscribe(newValue => {
         if (testFn(newValue)) {
           subs.dispose()

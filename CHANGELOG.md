@@ -12,6 +12,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (parser) Fix early-out for logical (&& / ||) operators
 * (binding) `ko.applyBindings` now returns a Promise that resolves when bindings are completed
 * (attr) Support namespaced attributes with `attr` binding #27
+* (options) Add the `options.Promise`, so users can use a their own or a safe Promise variant of A+/Promises (defaults to `window.Promise`)
 
 ## 🐋   Alpha-2  (3 May 2017)
 

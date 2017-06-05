@@ -287,7 +287,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     var referenceElement = this.getLastNodeBeforeIndex(index)
     // gather all childnodes for a possible batch insertion
     const allChildNodes = []
-    const bindingResults = []
+    const asyncBindingResults = []
     var children
 
     for (var i = 0, len = valuesToAdd.length; i < len; ++i) {
@@ -297,14 +297,13 @@ export class ForEachBinding extends AsyncBindingHandler {
         children = pendingDelete.nodesets.pop()
       } else {
         var templateClone = this.templateNode.cloneNode(true)
-
         // Apply bindings first, and then process child nodes,
         // because bindings can add childnodes.
-        bindingResults.push(
-          applyBindingsToDescendants(
-            this.generateContext(valuesToAdd[i]), templateClone
-          )
+        const bindingResult = applyBindingsToDescendants(
+          this.generateContext(valuesToAdd[i]), templateClone
         )
+
+        asyncBindingResults.push(bindingResult)
 
         children = virtualElements.childNodes(templateClone)
       }
@@ -318,13 +317,12 @@ export class ForEachBinding extends AsyncBindingHandler {
       this.afterAdd({
         nodeOrArrayInserted: this.insertAllAfter(allChildNodes, referenceElement),
         foreachInstance: this
-      }
-      )
+      })
     } else {
       this.insertAllAfter(allChildNodes, referenceElement)
     }
 
-    this.completeBinding(Promise.all(bindingResults))
+    this.completeBinding(options.Promise.all(asyncBindingResults))
   }
 
   getNodesForIndex (index) {

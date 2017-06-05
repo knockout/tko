@@ -281,7 +281,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
           bindingHandlerThatControlsDescendantBindings = key
         }
 
-        if (bindingHandler.bindingCompleted instanceof Promise) {
+        if (bindingHandler.bindingCompleted instanceof options.Promise) {
           asyncBindingsApplied.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
@@ -312,7 +312,7 @@ export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) 
   const asyncBindingsApplied = new Set()
   var context = getBindingContext(viewModelOrBindingContext)
   applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context, asyncBindingsApplied)
-  return Promise.all(asyncBindingsApplied)
+  return options.Promise.all(asyncBindingsApplied)
 }
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
@@ -320,7 +320,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode)
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true, asyncBindingsApplied)
   }
-  return Promise.all(asyncBindingsApplied)
+  return options.Promise.all(asyncBindingsApplied)
 }
 
 export function applyBindings (viewModelOrBindingContext, rootNode) {
@@ -334,7 +334,7 @@ export function applyBindings (viewModelOrBindingContext, rootNode) {
   rootNode = rootNode || window.document.body // Make "rootNode" parameter optional
 
   applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true, asyncBindingsApplied)
-  return Promise.all(asyncBindingsApplied)
+  return options.Promise.all(asyncBindingsApplied)
 }
 
 function onBindingError (spec) {
