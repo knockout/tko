@@ -19,8 +19,8 @@ import {
 } from './bindingContext'
 
 import {
-    getBindingHandlerClass
-} from './BindingHandler'
+  LegacyBindingHandler
+} from './LegacyBindingHandler'
 
 // The following element types will not be recursed into during binding.
 var bindingDoesNotRecurseIntoElementTypes = {
@@ -36,7 +36,10 @@ var bindingDoesNotRecurseIntoElementTypes = {
 
 // Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
 export function getBindingHandler (bindingKey) {
-  return options.bindingProviderInstance.bindingHandlers.get(bindingKey)
+  const handler = options.bindingProviderInstance.bindingHandlers.get(bindingKey)
+  if (!handler) { return }
+  if (handler.isBindingHandlerClass) { return handler }
+  return LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
 }
 
 // Returns the valueAccesor function for a binding value
@@ -244,7 +247,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
     allBindings.has = (key) => key in bindings
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
 
-    for (const [key, handler] of topologicalSortBindings(bindings)) {
+    for (const [key, BindingHandlerClass] of topologicalSortBindings(bindings)) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {
         onBindingError({
@@ -259,8 +262,6 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
         })
       }
 
-      const BindingHandlerClass = getBindingHandlerClass(handler, key, reportBindingError)
-
       if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
         throw new Error(`The binding [${key}] cannot be used with virtual elements`)
       }
@@ -270,6 +271,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
           allBindings,
           $element: node,
           $context: bindingContext,
+          onError: reportBindingError,
           valueAccessor (...v) { return getValueAccessor(key)(...v) }
         })
 
