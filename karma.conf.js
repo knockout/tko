@@ -12,7 +12,7 @@ const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 const root = path.join(process.cwd(), 'spec')
 
-console.log(` 🏕  Karma being loaded at ${process.cwd()}.`)
+console.log(` 🏕  Karma being loaded at ${process.cwd()}`)
 
 if (!pkg.karma || !pkg.karma.frameworks) {
   console.warn(`

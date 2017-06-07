@@ -32,12 +32,8 @@ export class LegacyBindingHandler extends BindingHandler {
     }
 
     try {
-      dependencyDetection.ignore(() => {
-        this.initReturn = handler.init && handler.init(...this.legacyArgs)
-      })
-    } catch (e) {
-      params.onError('init', e)
-    }
+      this.initReturn = handler.init && handler.init(...this.legacyArgs)
+    } catch (e) { params.onError('init', e) }
 
     if (typeof handler.update === 'function') {
       this.computed(() => {

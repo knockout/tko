@@ -52,10 +52,7 @@ function cloneIfElseNodes (element, hasElse) {
     }
   }
 
-  return {
-    ifNodes: ifNodes,
-    elseNodes: elseNodes
-  }
+  return { ifNodes, elseNodes }
 }
 
 /**
@@ -150,6 +147,11 @@ export class ElseBindingHandler extends ConditionalBindingHandler {
    * @return {object}      { elseChainSatisfied: observable }
    */
   get elseChainIsAlreadySatisfied () {
+    if (!this._elseChain) { this._elseChain = this.readElseChain() }
+    return unwrap(this._elseChain.elseChainSatisfied)
+  }
+
+  readElseChain () {
     let node = this.$element
     do {
       node = node.previousSibling
@@ -161,8 +163,7 @@ export class ElseBindingHandler extends ConditionalBindingHandler {
       node = virtualElements.previousSibling(node)
     }
 
-    const conditionObject = domData.get(node, 'conditional') || {}
-    return unwrap(conditionObject.elseChainSatisfied)
+    return domData.get(node, 'conditional') || {}
   }
 }
 

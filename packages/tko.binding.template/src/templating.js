@@ -131,7 +131,7 @@ function executeTemplate (targetNodeOrNodeArray, renderMode, template, bindingCo
 
   if (haveAddedNodesToParent) {
     activateBindingsOnContinuousNodeArray(renderedNodesArray, bindingContext, afterBindingCallback)
-    if (options['afterRender']) { dependencyDetection.ignore(options['afterRender'], null, [renderedNodesArray, bindingContext['$data']]) }
+    if (options.afterRender) { dependencyDetection.ignore(options.afterRender, null, [renderedNodesArray, bindingContext['$data']]) }
   }
 
   return renderedNodesArray
@@ -140,13 +140,13 @@ function executeTemplate (targetNodeOrNodeArray, renderMode, template, bindingCo
 function resolveTemplateName (template, data, context) {
     // The template can be specified as:
   if (isObservable(template)) {
-        // 1. An observable, with string value
+    // 1. An observable, with string value
     return template()
   } else if (typeof template === 'function') {
-        // 2. A function of (data, context) returning a string
+    // 2. A function of (data, context) returning a string
     return template(data, context)
   } else {
-        // 3. A string
+    // 3. A string
     return template
   }
 }
@@ -164,7 +164,7 @@ export function renderTemplate (template, dataOrBindingContext, options, targetN
 
     return computed( // So the DOM is automatically updated when any dependency changes
       function () {
-          // Ensure we've got a proper binding context to work with
+        // Ensure we've got a proper binding context to work with
         var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof BindingContextConstructor))
               ? dataOrBindingContext
               : new BindingContextConstructor(dataOrBindingContext, null, null, null, { 'exportDependencies': true })
@@ -229,17 +229,11 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
   }, null, { disposeWhenNodeIsRemoved: targetNode })
 }
 
-var templateComputedDomDataKey = domData.nextKey()
-function disposeOldComputedAndStoreNewOne (element, newComputed) {
-  var oldComputed = domData.get(element, templateComputedDomDataKey)
-  if (oldComputed && (typeof (oldComputed.dispose) === 'function')) { oldComputed.dispose() }
-  domData.set(element, templateComputedDomDataKey, (newComputed && newComputed.isActive()) ? newComputed : undefined)
-}
+let templateComputedDomDataKey = domData.nextKey()
 
 export class TemplateBindingHandler extends AsyncBindingHandler {
   constructor (params) {
     super(params)
-
     const element = this.$element
     const bindingValue = unwrap(this.value)
     let container
@@ -270,7 +264,6 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
       container = moveCleanedNodesToContainerElement(templateNodes) // This also removes the nodes from their current parent
       new AnonymousTemplate(element).nodes(container)
     }
-
     this.computed(this.onValueChange.bind(this))
   }
 
@@ -319,7 +312,13 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     }
 
     // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
-    disposeOldComputedAndStoreNewOne(element, templateComputed)
+    this.disposeOldComputedAndStoreNewOne(element, templateComputed)
+  }
+
+  disposeOldComputedAndStoreNewOne (element, newComputed) {
+    let oldComputed = domData.get(element, templateComputedDomDataKey)
+    if (oldComputed && (typeof oldComputed.dispose === 'function')) { oldComputed.dispose() }
+    domData.set(element, templateComputedDomDataKey, (newComputed && newComputed.isActive()) ? newComputed : undefined)
   }
 
   get controlsDescendants () { return true }

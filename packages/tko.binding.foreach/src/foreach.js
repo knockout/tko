@@ -73,15 +73,15 @@ function extend$context (include$index, $context) {
 }
 
 export class ForEachBinding extends AsyncBindingHandler {
-  // Valid valueAccessors:
+  // NOTE: valid valueAccessors include:
   //    []
   //    observable([])
   //    observableArray([])
   //    computed
   //    {data: array, name: string, as: string}
+
   constructor (params) {
     super(params)
-
     const settings = {}
     if (isPlainObject(this.value)) {
       Object.assign(settings, this.value)
@@ -123,7 +123,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     virtualElements.emptyNode(this.$element)
 
     // Prime content
-    var primeData = unwrap(this.data)
+    const primeData = unwrap(this.data)
     if (primeData.map) {
       this.onArrayChange(primeData.map(valueToChangeAddItem), true)
     } else {

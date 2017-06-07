@@ -3,7 +3,7 @@ import {
 } from 'tko.bind';
 
 import {
-    observableArray
+    observable, observableArray
 } from 'tko.observable';
 
 import {
@@ -189,6 +189,34 @@ describe('Native template engine', function() {
             expect(testNode.childNodes[0].childNodes[0]).toContainText("(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)");
             expect(testNode.childNodes[0].childNodes[1]).toContainText("(Val: ANew, Invocations: 6, Parents: 2)(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)");
         });
+
+        it('re-renders nested templates', function () {
+            var node = document.createElement('div')
+            let inner = 0
+            let outer = 0
+            node.innerHTML = `
+              <div data-bind='template: { data: x }'>
+                <i data-bind='incrementInner'></i>
+                <div data-bind='template: { data: $parent.y }'>
+                  <i data-bind='incrementOuter'></i>
+                </div>
+              </div>
+            `
+            options.bindingProviderInstance.bindingHandlers.set('incrementOuter', () => outer++)
+            options.bindingProviderInstance.bindingHandlers.set('incrementInner', () => inner++)
+            const x = observable()
+            const y = observable()
+            applyBindings({ x, y }, node)
+            expect(inner).toEqual(1)
+            expect(outer).toEqual(1)
+            x('a')
+            expect(inner).toEqual(2)
+            expect(outer).toEqual(2)
+            y('a')
+            expect(inner).toEqual(2)
+            expect(outer).toEqual(3)
+        })
+
     });
 
     describe('Data-bind syntax', function() {

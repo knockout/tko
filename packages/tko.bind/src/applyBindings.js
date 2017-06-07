@@ -267,13 +267,15 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
       }
 
       try {
-        const bindingHandler = new BindingHandlerClass({
-          allBindings,
-          $element: node,
-          $context: bindingContext,
-          onError: reportBindingError,
-          valueAccessor (...v) { return getValueAccessor(key)(...v) }
-        })
+        const bindingHandler = dependencyDetection.ignore(() =>
+          new BindingHandlerClass({
+            allBindings,
+            $element: node,
+            $context: bindingContext,
+            onError: reportBindingError,
+            valueAccessor (...v) { return getValueAccessor(key)(...v) }
+          })
+        )
 
               // Expose the bindings via domData.
         allBindingHandlers[key] = bindingHandler
