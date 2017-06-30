@@ -28,3 +28,4 @@ yarn.lock
 # Rollup Visualizer
 visual.html
 packages/*/visual.html
+/package-lock.json
