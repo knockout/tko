@@ -55,13 +55,16 @@ export function dummyTemplateEngine(templates) {
         var result;
 
         data = data || {};
+         // Rollup mangles `data` to e.g. `data$$1`.  This workaround works
+         // as long as nomangle$data doesn't appear anywhere not in tests.
+        var nomangle$data = data
         rt_options.templateRenderingVariablesInScope = rt_options.templateRenderingVariablesInScope || {};
 
         extend(data, rt_options.templateRenderingVariablesInScope);
 
         // Dummy [renderTemplate:...] syntax
         result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
-            return renderTemplate(templateName, data, rt_options);
+          return renderTemplate(templateName, data, rt_options);
         });
 
 
