@@ -214,6 +214,16 @@ describe("Attribute Interpolation Markup Provider", function() {
 
       // expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2')
     });
+
+    it("should set the style attribute (when there is a `style` binding)", function () {
+      var obs = Observable()
+      testNode.innerHTML = '<div style="color: {{ obs }}"></div>'
+      var div = testNode.childNodes[0]
+      applyBindings({obs: obs}, testNode)
+      expect(div.getAttribute('style')).toEqual('color: ')
+      obs("red")
+      expect(div.getAttribute('style')).toEqual('color: red')
+    })
 });
 
 

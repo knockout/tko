@@ -12,6 +12,17 @@ import {
 } from './mustacheParser'
 
 /**
+ * These are bindings that are mapped specific attributes, such as
+ * two-way communication (value/checked) or which have anti-collision
+ * properties (css).
+ */
+const DEFAULT_ATTRIBUTE_BINDING_MAP = {
+  value: 'value',
+  checked: 'checked',
+  class: 'css'
+}
+
+/**
  *  Interpret {{ }} inside DOM attributes e.g. <div class='{{ classes }}'>
  */
 export default class AttributeMustacheProvider extends Provider {
@@ -20,6 +31,7 @@ export default class AttributeMustacheProvider extends Provider {
   constructor (params = {}) {
     super(params)
     this.ATTRIBUTES_TO_SKIP = new Set(params.attributesToSkip || ['data-bind'])
+    this.ATTRIBUTES_BINDING_MAP = params.attributesBindingMap || DEFAULT_ATTRIBUTE_BINDING_MAP
   }
 
   * attributesToInterpolate (attributes) {
@@ -55,11 +67,16 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
+  getPossibleDirectBinding (attrName) {
+    const bindingName = this.ATTRIBUTES_BINDING_MAP[attrName]
+    return bindingName && this.bindingHandlers.get(attrName)
+  }
+
   * bindingObjects (node, context) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
-      const hasBinding = this.bindingHandlers.get(attrName)
-      const handler = hasBinding ? attrName : `attr.${attrName}`
-      const accessorFn = hasBinding
+      const bindingForAttribute = this.getPossibleDirectBinding(attrName)
+      const handler = bindingForAttribute ? attrName : `attr.${attrName}`
+      const accessorFn = bindingForAttribute
         ? (...v) => this.partsTogether(parts, context, node, ...v)
         : (...v) => ({[attrName]: this.partsTogether(parts, context, node, ...v)})
       node.removeAttribute(attrName)

@@ -1,6 +1,6 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 🏰  Alpha-3 (... ongoing ...)
+## 🏰  Alpha-3 (30 June 2017)
 
 * (build) Compiles to `dist/ko.js` (via Babel) and `dist/ko.es6` (without transpilation)
 * (build) The `dist/tko.js` (that exported `tko`) has been deprecated/removed
@@ -13,6 +13,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (binding) `ko.applyBindings` now returns a Promise that resolves when bindings are completed
 * (attr) Support namespaced attributes with `attr` binding #27
 * (options) Add the `options.Promise`, so users can use a their own or a safe Promise variant of A+/Promises (defaults to `window.Promise`)
+* (attribute-interpolation) Fix interpolation of `styles` attribute (e.g. `style="color: {{color}}"`) in the `AttributeMustacheProvider`, by adding `attributesBindingMap` parameter.
 
 ## 🐋   Alpha-2  (3 May 2017)
 
