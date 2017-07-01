@@ -2,7 +2,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ## 🏰  Alpha-3 (30 June 2017)
 
-* (build) Compiles to `dist/ko.js` (via Babel) and `dist/ko.es6` (without transpilation)
+* (build) Compiles to `dist/ko.js` (via Babel) 
 * (build) The `dist/tko.js` (that exported `tko`) has been deprecated/removed
 * (internal) Add the ES6 LifeCycle class (see tko.lifecycle)
 * (binding handlers) Add new-style ES6 Binding Handler class (see custom-bindings documentation and tko.bind/src/BindingHandler.js), descended from the LifeCycle class
