@@ -25,7 +25,7 @@ To install use one of the usual package managers e.g.
 
 ### Using the Monorepo
 
-The following commands are to get the build system set up.
+The following commands are to get the build system set up. *Note:* you need to have [Git LFS](https://help.github.com/articles/installing-git-large-file-storage/) installed.
 
 | Command | Effect |
 | ------- | ------ |
