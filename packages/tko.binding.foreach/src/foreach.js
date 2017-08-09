@@ -26,7 +26,7 @@ function isPlainObject (o) {
   return !!o && typeof o === 'object' && o.constructor === Object
 }
 
-const supportsDocumentFragment = document && typeof document.createDocumentFragment === 'function'
+const supportsDocumentFragment = options.document && typeof options.document.createDocumentFragment === 'function'
 
 // Get a copy of the (possibly virtual) child nodes of the given element,
 // put them into a container, then empty the given node.
@@ -506,12 +506,13 @@ export class ForEachBinding extends AsyncBindingHandler {
    * Useful during testing.
    */
   static setSync (toggle) {
+    const w = options.global
     if (toggle) {
       ForEachBinding.animateFrame = function (frame) { frame() }
     } else {
-      ForEachBinding.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
-        function (cb) { return window.setTimeout(cb, 1000 / 60) }
+      ForEachBinding.animateFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame ||
+        w.mozRequestAnimationFrame || w.msRequestAnimationFrame ||
+        function (cb) { return w.setTimeout(cb, 1000 / 60) }
     }
   }
 

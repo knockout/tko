@@ -17,9 +17,9 @@
 import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation.js';
 import { removeNode } from './disposal.js';
 import { tagNameLower } from './info.js';
+import options from '../options'
 
-
-var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
+var commentNodesHaveTextProperty = options.document && options.document.createComment("test").text === "<!--test-->";
 
 export var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
 export var endCommentRegex =   commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/;

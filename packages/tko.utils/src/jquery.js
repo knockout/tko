@@ -3,8 +3,10 @@
 //
 // TODO: deprecate in favour of options.$
 
-export var jQueryInstance = window && window.jQuery;
+import options from './options'
+
+export var jQueryInstance = options.global && options.global.jQuery;
 
 export function jQuerySetInstance(jquery) {
-    jQueryInstance = jquery;
+    options.jQuery = jQueryInstance = jquery
 }

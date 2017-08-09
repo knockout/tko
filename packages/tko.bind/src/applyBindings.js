@@ -330,12 +330,12 @@ export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode)
 export function applyBindings (viewModelOrBindingContext, rootNode) {
   const asyncBindingsApplied = new Set()
   // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
-  if (!options.jQuery === undefined && window.jQuery) {
-    options.jQuery = window.jQuery
+  if (!options.jQuery === undefined && options.jQuery) {
+    options.jQuery = options.jQuery
   }
 
   if (rootNode && (rootNode.nodeType !== 1) && (rootNode.nodeType !== 8)) { throw new Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node') }
-  rootNode = rootNode || window.document.body // Make "rootNode" parameter optional
+  rootNode = rootNode || options.document.body // Make "rootNode" parameter optional
 
   applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true, asyncBindingsApplied)
   return options.Promise.all(asyncBindingsApplied)

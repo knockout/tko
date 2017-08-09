@@ -12,7 +12,7 @@ import {
  * This binding must come before the VirtualProvider.
  */
 export default class TextMustacheProvider extends Provider {
-  get FOR_NODE_TYPES () { return [document.TEXT_NODE] }
+  get FOR_NODE_TYPES () { return [ 3 ] } // document.TEXT_NODE
 
   * textToNodes (textNode) {
     const parent = textNode.parentNode

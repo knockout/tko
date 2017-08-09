@@ -1,6 +1,6 @@
 
 import {
-  virtualElements
+  virtualElements, options
 } from 'tko.utils'
 
 import {
@@ -19,7 +19,7 @@ import {
  *
  * ... so we have to keep track by way of a map.
  */
-const PossibleWeakMap = window.WeakMap || Map
+const PossibleWeakMap = options.global.WeakMap || Map
 const legacyBindingMap = new PossibleWeakMap()
 
 export class LegacyBindingHandler extends BindingHandler {

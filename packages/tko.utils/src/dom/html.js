@@ -6,6 +6,7 @@ import { makeArray } from '../array.js';
 import { emptyDomNode } from './manipulation.js';
 import { jQueryInstance } from '../jquery.js';
 import * as virtualElements from './virtualElements';
+import options from '../options'
 
 
 var none = [0, "", ""],
@@ -35,7 +36,7 @@ var none = [0, "", ""],
     },
 
     // The canonical way to test that the HTML5 <template> tag is supported
-    supportsTemplateTag = 'content' in document.createElement('template');
+    supportsTemplateTag = options.document && 'content' in options.document.createElement('template');
 
 
 function getWrap(tags) {

@@ -26,7 +26,7 @@ const DEFAULT_ATTRIBUTE_BINDING_MAP = {
  *  Interpret {{ }} inside DOM attributes e.g. <div class='{{ classes }}'>
  */
 export default class AttributeMustacheProvider extends Provider {
-  get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
+  get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
 
   constructor (params = {}) {
     super(params)

@@ -10,7 +10,7 @@ import {
  * <div ko-visible='value'></div>
  */
 export default class AttrProvider extends Provider {
-  get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
+  get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
 
   get PREFIX () { return 'ko-' }
 

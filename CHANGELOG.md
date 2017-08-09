@@ -1,5 +1,10 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+
+## 🚜  Alpha-4 (ongoing)
+
+* (options) Allow importing `ko` in node
+
 ## 🏰  Alpha-3 (30 June 2017)
 
 * (build) Compiles to `dist/ko.js` (via Babel) 

@@ -7,7 +7,7 @@ import {
 } from 'tko.provider.bindingString'
 
 export default class VirtualProvider extends BindingStringProvider {
-  get FOR_NODE_TYPES () { return [document.COMMENT_NODE] }
+  get FOR_NODE_TYPES () { return [ 8 ] } // document.COMMENT_NODE
 
   getBindingString (node) {
     if (node.nodeType === document.COMMENT_NODE) {

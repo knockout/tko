@@ -1,6 +1,8 @@
 //
 // DOM node data
 //
+import options from '../options'
+
 //
 var dataStoreKeyExpandoPropertyName = "__ko__data" + new Date();
 var dataStore;
@@ -73,7 +75,7 @@ function wmClear (node) {
 }
 
 
-if ('WeakMap' in window) {
+if ('WeakMap' in options.global) {
     dataStore = new WeakMap();
     get = wmGet;
     set = wmSet;

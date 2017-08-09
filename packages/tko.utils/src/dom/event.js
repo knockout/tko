@@ -14,9 +14,9 @@ import options from '../options.js';
 
 // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
 var knownEvents = {},
-    knownEventTypesByEventName = {};
+    knownEventTypesByEventName = {}
 
-var keyEventTypeName = (navigator && /Firefox\/2/i.test(navigator.userAgent)) ? 'KeyboardEvent' : 'UIEvents';
+var keyEventTypeName = (options.global.navigator && /Firefox\/2/i.test(options.global.navigator.userAgent)) ? 'KeyboardEvent' : 'UIEvents';
 
 knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress'];
 
@@ -82,7 +82,7 @@ export function triggerEvent(element, eventType) {
         if (typeof element.dispatchEvent == "function") {
             var eventCategory = knownEventTypesByEventName[eventType] || "HTMLEvents";
             var event = document.createEvent(eventCategory);
-            event.initEvent(eventType, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, element);
+            event.initEvent(eventType, true, true, options.global, 0, 0, 0, 0, 0, false, false, false, false, 0, element);
             element.dispatchEvent(event);
         }
         else
