@@ -7,15 +7,16 @@ import {
 } from 'tko.bind';
 
 import {
-    observable
+    observable, observableArray
 } from 'tko.observable';
 
 import { DataBindProvider } from 'tko.provider.databind'
 import { MultiProvider } from 'tko.provider.multi'
 import { VirtualProvider } from 'tko.provider.virtual'
 
-import {bindings as templateBindings} from '../index.js';
+import {bindings as withBindings} from '../index.js';
 import {bindings as coreBindings} from 'tko.binding.core';
+import {bindings as templateBindings} from 'tko.binding.template'
 
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
@@ -29,6 +30,7 @@ describe('Binding: With', function() {
         })
         options.bindingProviderInstance = provider;
         provider.bindingHandlers.set(coreBindings);
+        provider.bindingHandlers.set(withBindings);
         provider.bindingHandlers.set(templateBindings);
     });
 
@@ -224,4 +226,30 @@ describe('Binding: With', function() {
         item('three');
         expect(testNode.childNodes[0]).toHaveValues(['three']);
     });
+
+    it('should refresh on dependency update binding', function () {
+        // Note:
+        //  - knockout/knockout#2285
+        //  - http://jsfiddle.net/g15jphta/6/
+        testNode.innerHTML = `<!-- ko template: {foreach: items} -->
+                <div data-bind="text: x"></div>
+                <div data-bind="with: $root.getTotal.bind($data)">
+                  Total: <div data-bind="text: $data"></div>
+                </div>
+            <!-- /ko -->`
+
+        function ViewModel () {
+          var self = this;
+          self.items = observableArray([{ x: observable(4) }])
+          self.getTotal = function() {
+            return self.items()
+                .reduce(function (sum, value) { return sum + value.x() }, 0)
+          }
+        }
+
+        var model = new ViewModel();
+        applyBindings(model, testNode);
+
+        model.items.push({ x: observable(15) })
+    })
 });

@@ -3,6 +3,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ## 🚜  Alpha-4 (ongoing)
 
+* (with binding) Fix dependency count for function-arguments [knockout/knockout#2285]
 * (options) Allow importing `ko` in node
 
 ## 🏰  Alpha-3 (30 June 2017)

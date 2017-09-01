@@ -93,7 +93,16 @@ class ConditionalBindingHandler extends AsyncBindingHandler {
   }
   get shouldDisplayIf () { return !!unwrap(this.value) }
 
+  getIfElseNodes () {
+    if (this.ifElseNodes) { return this.ifElseNodes }
+    if (dependencyDetection.getDependenciesCount() || this.hasElse) {
+      return cloneIfElseNodes(this.$element, this.hasElse)
+    }
+  }
+
   render () {
+    // Create any dependencies on values created in value-functions.
+    if (typeof this.value === 'function') { this.value() }
     const isFirstRender = !this.ifElseNodes
     let shouldDisplayIf = this.shouldDisplayIf
     let needsRefresh = this.needsRefresh
@@ -108,9 +117,7 @@ class ConditionalBindingHandler extends AsyncBindingHandler {
 
     if (!needsRefresh) { return }
 
-    if (isFirstRender && (dependencyDetection.getDependenciesCount() || this.hasElse)) {
-      this.ifElseNodes = cloneIfElseNodes(this.$element, this.hasElse)
-    }
+    this.ifElseNodes = this.getIfElseNodes()
 
     if (shouldDisplayIf) {
       if (!isFirstRender || this.hasElse) {
