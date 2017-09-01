@@ -8,7 +8,7 @@
   "main": "dist/ko.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/knockout/knockout.git"
+    "url": "https://github.com/knockout/tko.git"
   },
   "scripts": {
     "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
@@ -21,7 +21,7 @@
   "files": [
     "dist/"
   ],
-  "bugs": "https://github.com/knockout/knockout/issues",
+  "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [
     {
       "type": "MIT",
