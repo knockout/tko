@@ -23,6 +23,10 @@ To install use one of the usual package managers e.g.
 - $ `yarn install tko`
 - $ `npm install tko`
 
+By CDN
+
+- Latest: https://unpkg.com/tko/dist/ko.js
+
 ### Using the Monorepo
 
 The following commands are to get the build system set up. *Note:* you need to have [Git LFS](https://help.github.com/articles/installing-git-large-file-storage/) installed.
