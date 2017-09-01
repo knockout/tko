@@ -1,6 +1,9 @@
 
 import {registry} from './src/registry'
 
+import { ComponentABC } from './src/ComponentABC'
+
+
 import {
   register,
   isRegistered,
@@ -10,6 +13,7 @@ import {
 } from './src/loaders'
 
 export default {
+  ComponentABC,
   // -- Registry --
   get: registry.get,
   clearCachedDefinition: registry.clearCachedDefinition,

@@ -161,6 +161,7 @@ export default {
 
   extenders: extenders,
   filters: utils.options.filters,
+  Component: components.ComponentABC,
 
     // --- Utilities ---
   cleanNode: utils.cleanNode,

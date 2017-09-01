@@ -14,6 +14,8 @@ import {
     applyBindingsToDescendants, AsyncBindingHandler
 } from 'tko.bind'
 
+import {LifeCycle} from 'tko.lifecycle'
+
 import registry from 'tko.utils.component'
 
 var componentLoadingOperationUniqueId = 0
@@ -83,6 +85,10 @@ export default class ComponentBinding extends AsyncBindingHandler {
 
     const componentViewModel = this.createViewModel(componentDefinition, element, this.originalChildNodes, componentParams)
 
+    if (componentViewModel instanceof LifeCycle) {
+      componentViewModel.anchorTo(this.$element)
+    }
+
     const ctxExtender = (ctx) => Object.assign(ctx, {
       $component: componentViewModel,
       $componentTemplateNodes: this.originalChildNodes
@@ -90,6 +96,7 @@ export default class ComponentBinding extends AsyncBindingHandler {
 
     const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
+
     applyBindingsToDescendants(childBindingContext, this.$element)
       .then(this.completeBinding)
   }

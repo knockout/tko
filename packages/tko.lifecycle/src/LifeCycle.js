@@ -48,6 +48,13 @@ export default class LifeCycle {
     return this.addDisposable(computed(params))
   }
 
+  /**
+   * Add an event listener for the given or anchored node.
+   * @param {node} [node] (optional) The target node (otherwise the anchored node)
+   * @param {string} [type] Event type
+   * @param {function|string} [action] Either call the given function or `this[action]`
+   * @param {object} [options] (optional) Passed as `options` to `node.addEventListener`
+   */
   addEventListener (...args) {
     const node = args[0].nodeType ? args.shift() : this[ANCHOR_NODE]
     const [type, act, options] = args
