@@ -33,6 +33,6 @@ export default {
   plugins,
   entry: 'index.js',
   format: 'umd',
-  moduleName: pkg.name,
+  moduleName: 'ko',
   sourceMap: true,
 }
