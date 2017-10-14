@@ -47,6 +47,8 @@
     "chai": "^4.1.0",
     "colors": "^1.1.2",
     "electron": "^1.6.11",
+    "eslint": "^4.9.0",
+    "eslint-config-standard": "^10.2.1",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.6.1",
