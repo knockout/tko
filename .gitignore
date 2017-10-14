@@ -19,7 +19,7 @@ node_modules
 # Knockout built files
 _repo
 coverage/
-work/
+dist/
 
 yarn.lock
 
