@@ -24,6 +24,7 @@ work/
 yarn.lock
 
 *-debug.log
+*-error.log
 
 # Rollup Visualizer
 visual.html
