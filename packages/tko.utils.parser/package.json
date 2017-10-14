@@ -1,9 +1,15 @@
 {
   "name": "tko.utils.parser",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
-  "main": "dist/tko.utils.parser.js",
-  "module": "src/index.js",
+  "module": "dist/tko.utils.parser.js",
+  "files": [
+    "dist/"
+  ],
   "license": "MIT",
+  "dependencies": {
+    "tko.observable": "4.0.0-alpha4",
+    "tko.utils": "4.0.0-alpha4"
+  },
   "karma": { "frameworks": ["mocha", "sinon", "chai"] }
 }

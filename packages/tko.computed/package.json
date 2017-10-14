@@ -1,15 +1,14 @@
 {
   "name": "tko.computed",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "TKO Computed Observables",
-  "main": "dist/tko.computed.js",
-  "module": "src/index.js",
+  "module": "dist/tko.computed.js",
+  "files": [
+    "dist/"
+  ],
   "dependencies": {
-    "tko.utils": "knockout/tko.utils",
-    "tko.observable": "knockout/tko.observable"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tko.utils": "4.0.0-alpha4",
+    "tko.observable": "4.0.0-alpha4"
   },
   "repository": {
     "type": "git",

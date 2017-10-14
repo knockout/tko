@@ -1,15 +1,10 @@
 {
   "name": "tko.filter.punches",
-  "version": "0.2.0",
+  "version": "4.0.0-alpha4",
   "description": "TKO filters from knockout punches",
-  "main": "dist/tko.filter.punches.js",
-  "module": "src/index.js",
+  "module": "dist/tko.filter.punches.js",
   "files": [
-    "dist/",
-    "src/",
-    "helpers/",
-    "index.js",
-    "./*.ya?ml"
+    "dist/"
   ],
   "scripts": {
     "test": "gulp test --once"
@@ -29,7 +24,9 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://github.com/knockout/tko#readme",
-  "dependencies": {},
+  "dependencies": {
+    "tko.observable": "4.0.0-alpha4"
+  },
   "karma": {
     "frameworks": ["jasmine"]
   }

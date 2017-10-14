@@ -1,21 +1,14 @@
 {
   "name": "tko.observable",
-  "version": "0.1.0",
+  "version": "4.0.0-alpha4",
   "description": "TKO subscribables and observables",
-  "main": "dist/tko.observable.js",
-  "module": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "module": "dist/tko.observable.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.observable.git"
   },
   "files": [
-    "dist/",
-    "src/",
-    "index.js",
-    "./*.ya?ml"
+    "dist/"
   ],
   "keywords": [
     "knockout",
@@ -31,7 +24,7 @@
   },
   "homepage": "https://github.com/knockout/tko.observable#readme",
   "dependencies": {
-    "tko.utils": "knockout/tko.utils"
+    "tko.utils": "4.0.0-alpha4"
   },
   "karma": {
     "frameworks": ["jasmine"]

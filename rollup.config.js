@@ -1,38 +1,42 @@
-
-import fs from 'fs'
+import * as fs from 'fs'
+import * as path from 'path'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
-import rollupBabili from 'rollup-plugin-babili'
 import rollupVisualizer from 'rollup-plugin-visualizer'
-import includePaths from 'rollup-plugin-includepaths'
 
-
-const pkg = JSON.parse(fs.readFileSync("package.json"))
+const pkg = JSON.parse(fs.readFileSync('package.json'))
+const { LERNA_PACKAGE_NAME, LERNA_ROOT_PATH } = process.env
+const PACKAGE_ROOT_PATH = path.join(LERNA_ROOT_PATH, 'packages', LERNA_PACKAGE_NAME)
+const IS_BROWSER_BUNDLE = LERNA_PACKAGE_NAME === 'tko'
 
 const CONFIG = {
+  EXTERNAL: IS_BROWSER_BUNDLE ? undefined : getTkoModules(),
+  FORMAT: IS_BROWSER_BUNDLE ? 'umd' : 'es',
+  INPUT: path.join(PACKAGE_ROOT_PATH, 'src/index.js'),
   /* Replace {{VERSION}} with pkg.json's `version` */
-  BABILI: {sourceMap: true},
-  INCLUDE_PATHS: { paths: [ "packages" ] },
-  REPLACE: {delimiters: ['{{', '}}'], VERSION: pkg.version},
-  RESOLVE: {jsnext: true, customResolveOptions: {moduleDirectory: "packages"}},
-  VISUALIZER: { filename: "visual.html" },
+  REPLACE: { delimiters: ['{{', '}}'], VERSION: pkg.version },
+  RESOLVE: { module: true },
+  VISUALIZER: { filename: 'visual.html' }
 }
 
 const plugins = [
-  includePaths(CONFIG.INCLUDE_PATHS),
   replace(CONFIG.REPLACE),
   nodeResolve(CONFIG.RESOLVE),
-  rollupVisualizer(CONFIG.VISUALIZER),
+  rollupVisualizer(CONFIG.VISUALIZER)
 ]
-
-if (process.env.MINIFY) {
-  plugins.push(rollupBabili(CONFIG.BABILI))
-}
 
 export default {
   plugins,
-  entry: 'index.js',
-  format: 'umd',
-  moduleName: 'ko',
-  sourceMap: true,
+  input: CONFIG.INPUT,
+  external: CONFIG.EXTERNAL,
+  output: {
+    file: path.join(PACKAGE_ROOT_PATH, 'dist', `${LERNA_PACKAGE_NAME}.js`),
+    format: CONFIG.FORMAT,
+    name: LERNA_PACKAGE_NAME
+  },
+  sourcemap: true
+}
+
+function getTkoModules () {
+  return fs.readdirSync(path.resolve(__dirname, 'packages'))
 }

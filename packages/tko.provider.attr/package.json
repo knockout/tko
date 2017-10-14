@@ -1,9 +1,14 @@
 {
   "name": "tko.provider.attr",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
-  "main": "dist/tko.provider.attr.js",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.attr.js",
+  "files": [
+    "dist/"
+  ],
   "license": "MIT",
-  "karma": {"frameworks":["mocha","chai"]}
+  "dependencies": {
+    "tko.provider": "4.0.0-alpha4"
+  },
+  "karma": {"frameworks":["mocha","chai"] }
 }

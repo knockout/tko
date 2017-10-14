@@ -1,10 +1,16 @@
 {
   "name": "tko.provider.virtual",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Binding provider for <!-- ko handler: ... --> virtual elements",
-  "main": "dist/tko.provider.virtual.js",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.virtual.js",
+  "files": [
+    "dist/"
+  ],
   "author": "Knockout Team",
   "license": "MIT",
-  "karma": { "frameworks": ["mocha", "chai"]}
+  "dependencies": {
+    "tko.utils": "4.0.0-alpha4",
+    "tko.provider.bindingString": "4.0.0-alpha4"
+  },
+  "karma": { "frameworks": ["mocha", "chai"] }
 }

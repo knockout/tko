@@ -1,9 +1,19 @@
 {
   "name": "tko.provider.component",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Bind custom web components e.g. <custom-binding>",
-  "main": "dist/tko.provider.component.js",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.component.js",
+  "files": [
+    "dist/"
+  ],
   "license": "MIT",
-  "karma": {"frameworks": ["jasmine"]}
+  "dependencies": {
+    "tko.computed": "4.0.0-alpha4",
+    "tko.observable": "4.0.0-alpha4",
+    "tko.provider": "4.0.0-alpha4",
+    "tko.utils": "4.0.0-alpha4",
+    "tko.utils.component": "4.0.0-alpha4",
+    "tko.utils.parser": "4.0.0-alpha4"
+  },
+  "karma": {"frameworks": ["jasmine"] }
 }

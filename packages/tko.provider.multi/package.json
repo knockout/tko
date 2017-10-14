@@ -1,9 +1,14 @@
 {
   "name": "tko.provider.multi",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Combine multiple other providers into one",
-  "main": "dist/tko.provider.multi.js",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.multi.js",
+  "files": [
+    "dist/"
+  ],
   "license": "MIT",
-  "karma":{"frameworks":["mocha", "chai"]}
+  "dependencies": {
+    "tko.provider": "4.0.0-alpha4"
+  },
+  "karma": { "frameworks": ["mocha", "chai"] }
 }
