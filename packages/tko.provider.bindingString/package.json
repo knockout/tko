@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Abstract Base Class for providers that parse a binding string",
   "main": "dist/tko.provider.bindingString.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "license": "MIT",
   "karma": { "frameworks": ["mocha", "chai"]}
 }

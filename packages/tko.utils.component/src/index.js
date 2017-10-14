@@ -1,7 +1,7 @@
 
-import {registry} from './src/registry'
+import {registry} from './registry'
 
-import { ComponentABC } from './src/ComponentABC'
+import { ComponentABC } from './ComponentABC'
 
 
 import {
@@ -10,7 +10,7 @@ import {
   unregister,
   defaultLoader,
   defaultConfigRegistry
-} from './src/loaders'
+} from './loaders'
 
 export default {
   ComponentABC,

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TKO DOM-Observable Binding",
   "main": "dist/tko.bind.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "dependencies": {
     "tko.computed": "knockout/tko.computed",
     "tko.lifecycle": "knockout/tko.lifecycle",

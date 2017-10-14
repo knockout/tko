@@ -1,11 +1,11 @@
 
 import {
   TemplateForEachBindingHandler
-} from './src/foreach'
+} from './foreach'
 
 import {
   TemplateBindingHandler
-} from './src/templating'
+} from './templating'
 //    'let': letBinding,
 //    template: template,
 
@@ -14,7 +14,7 @@ export const bindings = {
   template: TemplateBindingHandler
 }
 
-export * from './src/nativeTemplateEngine'
-export * from './src/templateEngine'
-export * from './src/templating'
-export * from './src/templateSources'
+export * from './nativeTemplateEngine'
+export * from './templateEngine'
+export * from './templating'
+export * from './templateSources'

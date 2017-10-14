@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "TKO Core bindings",
   "main": "dist/tko.binding.core.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "files": [
     "dist/",
     "src/",

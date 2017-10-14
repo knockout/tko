@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Interpolate text/node attributes {{ }}",
   "main": "dist/tko.preprocessor.mustache.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "files": [
     "dist/",
     "src/",

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
   "main": "dist/tko.utils.parser.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "license": "MIT",
   "karma": { "frameworks": ["mocha", "sinon", "chai"] }
 }

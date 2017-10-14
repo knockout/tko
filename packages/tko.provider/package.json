@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
   "main": "dist/tko.provider.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "author": "Knockout Team",
   "license": "MIT",
   "karma" : { "frameworks": ["mocha", "chai"] }

@@ -4,7 +4,7 @@ import {
   ElseBindingHandler,
   UnlessBindingHandler,
   WithBindingHandler
-} from './src/ifIfnotWith'
+} from './ifIfnotWith'
 
 export const bindings = {
   'if': IfBindingHandler,

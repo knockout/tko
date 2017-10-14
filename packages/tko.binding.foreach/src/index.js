@@ -1,4 +1,4 @@
-import { ForEachBinding } from './src/foreach.js'
+import { ForEachBinding } from './foreach.js'
 
 export var bindings = {
   foreach: ForEachBinding

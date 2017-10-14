@@ -1,12 +1,12 @@
 
 export {
   default as AttributeMustacheProvider
-} from './src/AttributeMustacheProvider'
+} from './AttributeMustacheProvider'
 
 export {
   default as TextMustacheProvider
-} from './src/TextMustacheProvider'
+} from './TextMustacheProvider'
 
 export {
   parseInterpolation
-} from './src/mustacheParser'
+} from './mustacheParser'

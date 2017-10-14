@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Registry and loading utilities for web components",
   "main": "dist/tko.utils.component.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "license": "MIT",
   "karma": {"frameworks":["jasmine"]}
 }

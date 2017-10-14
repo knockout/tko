@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bind custom web components e.g. <custom-binding>",
   "main": "dist/tko.provider.component.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "license": "MIT",
   "karma": {"frameworks": ["jasmine"]}
 }

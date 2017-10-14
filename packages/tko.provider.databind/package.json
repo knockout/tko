@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Link HTML attributes based on a `data-bind` HTML attribute",
   "main": "dist/tko.provider.databind.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "license": "MIT",
   "karma": { "frameworks": ["mocha", "sinon", "chai"] }
 }
