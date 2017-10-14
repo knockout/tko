@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "TKO filters from knockout punches",
   "main": "dist/tko.filter.punches.js",
-  "jsnext:main": "./index.js",
+  "module": "index.js",
   "files": [
     "dist/",
     "src/",

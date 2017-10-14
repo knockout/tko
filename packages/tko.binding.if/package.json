@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
   "main": "dist/tko.binding.if.js",
-  "jsnext:main": "./index.js",
+  "module": "index.js",
   "files": [
     "dist/",
     "src/",

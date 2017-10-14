@@ -2,7 +2,8 @@
   "name": "tko.computed",
   "version": "1.0.0",
   "description": "TKO Computed Observables",
-  "main": "index.js",
+  "main": "dist/tko.computed.js",
+  "module": "index.js",
   "dependencies": {
     "tko.utils": "knockout/tko.utils",
     "tko.observable": "knockout/tko.observable"

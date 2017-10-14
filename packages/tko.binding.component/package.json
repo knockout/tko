@@ -2,7 +2,8 @@
   "name": "tko.binding.component",
   "version": "1.0.0",
   "description": "component: binding for web components",
-  "main": "index.js",
+  "main": "dist/tko.binding.component.js",
+  "module": "index.js",
   "license": "MIT",
   "karma": { "frameworks": ["jasmine"]}
 }

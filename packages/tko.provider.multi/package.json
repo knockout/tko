@@ -2,7 +2,8 @@
   "name": "tko.provider.multi",
   "version": "1.0.0",
   "description": "Combine multiple other providers into one",
-  "main": "index.js",
+  "main": "dist/tko.provider.multi.js",
+  "module": "index.js",
   "license": "MIT",
   "karma":{"frameworks":["mocha", "chai"]}
 }

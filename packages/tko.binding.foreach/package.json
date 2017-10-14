@@ -2,7 +2,8 @@
   "name": "tko.binding.foreach",
   "version": "4.0.0-alpha2",
   "description": "Knockout Foreach Binding",
-  "main": "index.js",
+  "main": "dist/tko.binding.foreach.js",
+  "module": "index.js",
   "scripts": {
     "test": "gulp test --once"
   },

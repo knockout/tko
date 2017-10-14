@@ -2,7 +2,8 @@
   "name": "tko.bind",
   "version": "1.0.0",
   "description": "TKO DOM-Observable Binding",
-  "main": "index.js",
+  "main": "dist/tko.bind.js",
+  "module": "index.js",
   "dependencies": {
     "tko.computed": "knockout/tko.computed",
     "tko.lifecycle": "knockout/tko.lifecycle",

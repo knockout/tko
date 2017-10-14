@@ -13,7 +13,7 @@
   "version": "1.0.0",
   "description": "Knockout LifeCycle for object instances",
   "main": "dist/tko.lifecycle.js",
-  "jsnext:main": "index.js",
+  "module": "index.js",
   "repository": "git@github.com:knockout/tko.lifecycle.git",
   "author": "Knockout Team",
   "license": "MIT",
