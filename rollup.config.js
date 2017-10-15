@@ -3,6 +3,7 @@ import * as path from 'path'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import typescript from 'rollup-plugin-typescript'
+import uglify from 'rollup-plugin-uglify'
 import rollupVisualizer from 'rollup-plugin-visualizer'
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
@@ -11,38 +12,55 @@ const PACKAGE_ROOT_PATH = path.join(LERNA_ROOT_PATH, 'packages', LERNA_PACKAGE_N
 const IS_BROWSER_BUNDLE = LERNA_PACKAGE_NAME === 'tko'
 
 const CONFIG = {
-  EXTERNAL: IS_BROWSER_BUNDLE ? undefined : getTkoModules(),
-  FORMAT: IS_BROWSER_BUNDLE ? 'umd' : 'es',
   INPUT: path.join(PACKAGE_ROOT_PATH, 'src/index.js'),
-  /* Replace {{VERSION}} with pkg.json's `version` */
-  REPLACE: { delimiters: ['{{', '}}'], VERSION: pkg.version },
-  RESOLVE: { module: true },
-  VISUALIZER: { filename: 'visual.html' }
-}
+  OUTPUT: path.join(PACKAGE_ROOT_PATH, 'dist', `${LERNA_PACKAGE_NAME}.js`),
+  VISUALIZER: { filename: 'visual.html' },
 
-const plugins = [
-  typescript({
+  /* Use TypeScript instead of babel for transpilation for IE6 compat, plus it's faster */
+  TYPESCRIPT: {
     include: '**/*.js',
     exclude: 'node_modules',
     typescript: require('typescript')
-  }),
+  },
+
+  /* tko modules only supported w/ modern JS bundlers (ES2015) */
+  EXTERNAL: IS_BROWSER_BUNDLE ? undefined : getTkoModules(),
+  FORMAT: IS_BROWSER_BUNDLE ? 'umd' : 'es',
+  RESOLVE: { module: true },
+  
+  /* Replace {{VERSION}} with pkg.json's `version` */
+  REPLACE: { delimiters: ['{{', '}}'], VERSION: pkg.version },
+}
+
+const PLUGINS = [
+  typescript(CONFIG.TYPESCRIPT),
   replace(CONFIG.REPLACE),
   nodeResolve(CONFIG.RESOLVE),
-  rollupVisualizer(CONFIG.VISUALIZER)
+  ...(IS_BROWSER_BUNDLE ? [rollupVisualizer(CONFIG.VISUALIZER)] : [])
 ]
 
-export default {
-  plugins,
-  input: CONFIG.INPUT,
-  external: CONFIG.EXTERNAL,
-  output: {
-    file: path.join(PACKAGE_ROOT_PATH, 'dist', `${LERNA_PACKAGE_NAME}.js`),
-    format: CONFIG.FORMAT,
-    name: LERNA_PACKAGE_NAME
-  },
-  sourcemap: true
-}
+export default [
+  createRollupConfig({ minify: false }),
+  ...(IS_BROWSER_BUNDLE ? [createRollupConfig({ minify: true })] : [])
+]
 
 function getTkoModules () {
   return fs.readdirSync(path.resolve(__dirname, 'packages'))
+}
+
+function createRollupConfig ({ minify }) {
+  return {
+    plugins: [
+      ...PLUGINS,
+      ...(minify ? [uglify()] : [])
+    ],
+    input: CONFIG.INPUT,
+    external: CONFIG.EXTERNAL,
+    output: {
+      file: minify ? CONFIG.OUTPUT.replace('.js', '.min.js') : CONFIG.OUTPUT,
+      format: CONFIG.FORMAT,
+      name: LERNA_PACKAGE_NAME
+    },
+    sourcemap: true
+  }
 }
