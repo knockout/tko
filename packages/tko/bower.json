@@ -2,7 +2,7 @@
   "name": "knockout",
   "homepage": "http://knockoutjs.com/",
   "description": "Knockout makes it easier to create rich, responsive UIs with JavaScript",
-  "main": "dist/knockout.js",
+  "main": "dist/tko.js",
   "moduleType": [
     "amd",
     "globals",
