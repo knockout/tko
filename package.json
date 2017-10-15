@@ -9,6 +9,7 @@
   },
   "scripts": {
     "postinstall": "lerna bootstrap --hoist --npm-client yarn",
+    "prepublish": "npm run build",
     "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
     "build": "lerna exec --concurrency=1 --loglevel=warn -- rollup -c ../../rollup.config.js",
     "lint": "standard"
