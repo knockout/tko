@@ -25,7 +25,8 @@ To install use one of the usual package managers e.g.
 
 By CDN
 
-- Latest: https://unpkg.com/tko/packages/tko/dist/tko.js
+- Stable: https://unpkg.com/tko/dist/tko[.es6][.min].js
+- Latest (development only): https://rawgit.com/knockout/tko/master/packages/tko/dist/tko[.es6][.min].js
 
 ### Using the Monorepo
 
