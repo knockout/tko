@@ -10,6 +10,9 @@
     "tko.provider": "4.0.0-alpha4",
     "tko.utils": "4.0.0-alpha4"
   },
+  "devDependencies": {
+    "tko.binding.foreach": "4.0.0-alpha4"
+  },
   "files": [
     "dist/"
   ],

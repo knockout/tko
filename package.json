@@ -8,14 +8,11 @@
     "url": "https://github.com/knockout/tko.git"
   },
   "scripts": {
+    "postinstall": "lerna bootstrap --hoist --npm-client yarn",
     "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
     "build": "lerna exec --concurrency=1 --loglevel=warn -- rollup -c ../../rollup.config.js",
-    "lint": "standard",
-    "lerna": "lerna bootstrap --hoist --npm-client yarn"
+    "lint": "standard"
   },
-  "files": [
-    "dist/"
-  ],
   "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [
     {
@@ -55,9 +52,8 @@
     "js-yaml": "^3.9.1",
     "karma": "^1.7.0",
     "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^2.2.0",
     "karma-electron-launcher": "^0.2.0",
-    "karma-jasmine": "^1.1.0",
+    "karma-jasmine": "^0.1.0",
     "karma-mocha": "^1.3.0",
     "karma-rollup-preprocessor": "^5.0.1",
     "karma-sinon": "^1.0.5",

@@ -1,3 +1,6 @@
+import {
+    applyBindings
+} from '../src';
 
 import {
     cleanNode, options
@@ -6,10 +9,6 @@ import {
 import {
     observable
 } from 'tko.observable';
-
-import {
-    applyBindings
-} from 'tko.bind';
 
 import {
     renderTemplate, setTemplateEngine, templateEngine
