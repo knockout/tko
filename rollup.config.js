@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
+import typescript from 'rollup-plugin-typescript'
 import rollupVisualizer from 'rollup-plugin-visualizer'
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
@@ -20,6 +21,11 @@ const CONFIG = {
 }
 
 const plugins = [
+  typescript({
+    include: '**/*.js',
+    exclude: 'node_modules',
+    typescript: require('typescript')
+  }),
   replace(CONFIG.REPLACE),
   nodeResolve(CONFIG.RESOLVE),
   rollupVisualizer(CONFIG.VISUALIZER)

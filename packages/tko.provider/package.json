@@ -9,7 +9,13 @@
   "author": "Knockout Team",
   "license": "MIT",
   "dependencies": {
-    "tko.utils": "4.0.0-alpha4"
+    "tko.utils": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
   },
-  "karma" : { "frameworks": ["mocha", "chai"] }
+  "karma": {
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
+  }
 }

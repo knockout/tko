@@ -9,7 +9,8 @@
   "license": "MIT",
   "dependencies": {
     "tko.provider": "4.0.0-alpha4",
-    "tko.utils.parser": "4.0.0-alpha4"
+    "tko.utils.parser": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
   },
   "karma": { "frameworks": ["mocha", "chai"]}
 }

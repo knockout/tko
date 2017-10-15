@@ -22,6 +22,11 @@
   },
   "homepage": "https://github.com/knockout/tko.utils.readme",
   "karma": {
-    "frameworks": ["jasmine"]
+    "frameworks": [
+      "jasmine"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^1.8.0"
   }
 }

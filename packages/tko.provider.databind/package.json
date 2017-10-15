@@ -8,7 +8,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "tko.provider.bindingString": "4.0.0-alpha4"
+    "tko.provider.bindingString": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
   },
   "karma": { "frameworks": ["mocha", "sinon", "chai"] }
 }

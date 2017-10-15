@@ -10,7 +10,8 @@
     "tko.observable": "4.0.0-alpha4",
     "tko.provider": "4.0.0-alpha4",
     "tko.utils": "4.0.0-alpha4",
-    "tko.utils.component": "4.0.0-alpha4"
+    "tko.utils.component": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
   },
   "files": [
     "dist/"

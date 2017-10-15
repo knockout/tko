@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "tko.computed": "4.0.0-alpha4",
-    "tko.utils": "4.0.0-alpha4"
+    "tko.utils": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
   },
   "devDependencies": {
     "tko.observable": "4.0.0-alpha4"
@@ -17,6 +18,9 @@
   "author": "Knockout Team",
   "license": "MIT",
   "karma": {
-    "frameworks": ["mocha", "chai"]
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
   }
 }
