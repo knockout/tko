@@ -13,7 +13,7 @@ import {
 } from 'tko.utils';
 
 
-import {bindings as coreBindings} from '../index.js';
+import {bindings as coreBindings} from '../src';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 

@@ -1,7 +1,7 @@
 
 import {
     observableArray, observable, isObservable, subscribable
-} from '../index.js';
+} from '../src';
 
 describe('Observable Array', function() {
     var testObservableArray, notifiedValues, beforeNotifiedValues;

@@ -1,7 +1,7 @@
 
 import {
   MultiProvider
-} from '../index'
+} from '../src'
 
 
 describe("MultiProvider Behaviour", function () {

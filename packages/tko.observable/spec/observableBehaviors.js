@@ -4,7 +4,7 @@ import {
     observable, isSubscribable, isObservable,
     isWriteableObservable, isWritableObservable, subscribable,
     unwrap
-} from '../index.js';
+} from '../src';
 
 
 describe('Observable', function() {

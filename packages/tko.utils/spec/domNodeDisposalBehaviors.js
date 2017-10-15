@@ -1,7 +1,7 @@
 import {
     addDisposeCallback, removeDisposeCallback, cleanNode, removeNode, options,
     otherNodeCleanerFunctions, cleanjQueryData
-} from '../index';
+} from '../src';
 
 import '../helpers/jasmine-13-helper.js';
 

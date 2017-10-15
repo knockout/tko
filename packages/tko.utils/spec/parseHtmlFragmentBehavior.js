@@ -1,7 +1,7 @@
 
 import {
     arrayForEach, parseHtmlFragment
-} from '../index';
+} from '../src';
 
 import '../helpers/jasmine-13-helper.js';
 

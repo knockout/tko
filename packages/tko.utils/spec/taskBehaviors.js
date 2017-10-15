@@ -1,6 +1,6 @@
 import { useMockForTasks } from '../helpers/jasmine-13-helper.js';
 
-import { tasks, options, ieVersion } from '../index.js';
+import { tasks, options, ieVersion } from '../src';
 
 
 describe('Tasks', function() {

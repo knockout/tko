@@ -36,7 +36,7 @@ import {
   bindings as componentBindings
 } from 'tko.binding.component'
 
-import {ComponentProvider} from '../index'
+import {ComponentProvider} from '../src'
 
 import {
     useMockForTasks

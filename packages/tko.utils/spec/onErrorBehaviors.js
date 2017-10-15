@@ -1,6 +1,6 @@
 import {
     options, tasks
-} from '../index.js';
+} from '../src';
 
 
 describe('onError handler', function () {

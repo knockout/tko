@@ -14,7 +14,7 @@ import {
     options
 } from 'tko.utils';
 
-import * as coreBindings from '../index.js';
+import * as coreBindings from '../src';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 

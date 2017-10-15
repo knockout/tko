@@ -23,7 +23,7 @@ import {
 
 import {
   Parser
-} from '../index.js';
+} from '../src';
 
 function ctxStub (ctx) {
   return { lookup (v) { return ctx ? ctx[v] : null } }

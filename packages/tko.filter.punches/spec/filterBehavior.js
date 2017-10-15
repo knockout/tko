@@ -4,7 +4,7 @@ import {
   observable
 } from 'tko.observable'
 
-import { filters } from '../index'
+import { filters } from '../src'
 
 if (!Array.isArray) {
   Array.isArray = function(arg) {

@@ -6,7 +6,7 @@ const path = require('path')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const rollupCommonJS = require('rollup-plugin-commonjs')
 const rollupVisualizer = require('rollup-plugin-visualizer')
-const includePaths = require('rollup-plugin-includepaths')
+// const includePaths = require('rollup-plugin-includepaths')
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
@@ -22,21 +22,22 @@ if (!pkg.karma || !pkg.karma.frameworks) {
 }
 
 const frameworks = pkg.karma.frameworks
-const browsers = ['Electron']
+// const browsers = ['Electron']
+const browsers = ['Chrome']
 
 const files = [
-  { pattern: 'src/*.js', included: false, watched: true },
-  { pattern: 'spec/*.js' }
+  // { pattern: 'src/*.js', included: false, watched: true },
+  { pattern: 'spec/*.js', watched: false }
 ]
 
 const preprocessors = {
-  'src/**/*.js': ['rollup'],
+  // 'src/**/*.js': ['rollup'],
   'spec/**/*.js': ['rollup']
 }
 
 const ROLLUP_CONFIG = {
-  INCLUDE_PATHS: { paths: [ path.join(root, '../..') ] },
-  RESOLVE: {jsnext: true},
+  // INCLUDE_PATHS: { paths: [ path.join(root, '../..') ] },
+  RESOLVE: {module: true},
   VISUALIZER: { filename: './visual.html' },
   COMMONJS: {}
 }
@@ -53,14 +54,14 @@ const ROLLUP_CONFIG = {
 
 const rollupPreprocessor = Object.assign({}, {
   format: 'iife',
-  moduleName: pkg.name,
+  name: pkg.name,
   plugins: [
-    includePaths(ROLLUP_CONFIG.INCLUDE_PATHS),
+    // includePaths(ROLLUP_CONFIG.INCLUDE_PATHS),
     nodeResolve(ROLLUP_CONFIG.RESOLVE),
     rollupVisualizer(ROLLUP_CONFIG.VISUALIZER),
     rollupCommonJS(ROLLUP_CONFIG.COMMONJS)
   ],
-  sourceMap: process.argv.includes('--sourcemap') ? 'inline' : false
+  sourcemap: process.argv.includes('--sourcemap') ? 'inline' : false
 })
 
 module.exports = (config) => {
@@ -79,7 +80,7 @@ module.exports = (config) => {
       show: false,
       fullscreenable: false,
       hasShadow: false
-    },
-    singleRun: process.argv.includes('--once')
+    }
+    // singleRun: process.argv.includes('--once')
   })
 }

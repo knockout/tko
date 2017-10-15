@@ -1,5 +1,5 @@
 
-import { memoization } from '../index.js'
+import { memoization } from '../src'
 
 
 function parseMemoCommentHtml(commentHtml) {

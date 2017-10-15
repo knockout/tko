@@ -28,7 +28,7 @@ import {
 
 import {
   Identifier, Arguments
-} from '../index'
+} from '../src'
 
 
 describe("Identifier", function() {

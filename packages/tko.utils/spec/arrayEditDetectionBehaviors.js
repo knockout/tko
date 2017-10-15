@@ -1,6 +1,6 @@
 import {
     compareArrays
-} from '../index.js';
+} from '../src';
 
 
 describe('Compare Arrays', function() {

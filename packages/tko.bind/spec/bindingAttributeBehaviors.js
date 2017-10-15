@@ -14,7 +14,7 @@ import { DataBindProvider } from 'tko.provider.databind'
 import {
     applyBindings, dataFor, bindingContext,
     applyBindingsToDescendants, applyBindingsToNode, contextFor
-} from '../index.js';
+} from '../src';
 
 import { bindings as coreBindings } from 'tko.binding.core';
 import { bindings as templateBindings } from 'tko.binding.template';

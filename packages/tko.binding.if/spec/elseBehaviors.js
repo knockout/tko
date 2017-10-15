@@ -17,7 +17,7 @@ import {
 
 import {
     bindings as ifBindings,
-} from '../index.js';
+} from '../src';
 
 import {
     bindings as coreBindings

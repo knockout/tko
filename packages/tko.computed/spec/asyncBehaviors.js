@@ -19,7 +19,7 @@ import {
 import {
     computed as koComputed,
     pureComputed as koPureComputed
-} from '../index.js';
+} from '../src';
 
 import {
     useMockForTasks

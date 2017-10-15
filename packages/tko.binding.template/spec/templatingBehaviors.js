@@ -21,7 +21,7 @@ import {
 import {
     bindings as templateBindings, renderTemplate,
     setTemplateEngine, nativeTemplateEngine
-} from '../index.js';
+} from '../src';
 
 import {
   bindings as coreBindings

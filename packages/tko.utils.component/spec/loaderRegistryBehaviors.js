@@ -7,7 +7,7 @@ import {
     computed
 } from 'tko.computed';
 
-import components from '../index';
+import components from '../src';
 
 
 describe('Components: Loader registry', function() {

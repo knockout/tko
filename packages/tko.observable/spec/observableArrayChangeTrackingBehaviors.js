@@ -1,7 +1,7 @@
 
 import {
     observableArray, observable
-} from '../index.js';
+} from '../src';
 
 import {
     trackArrayChanges

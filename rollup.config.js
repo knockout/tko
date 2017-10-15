@@ -4,6 +4,9 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import rollupVisualizer from 'rollup-plugin-visualizer'
 
+console.log('HHHITTTTT')
+process.exit()
+
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 const { LERNA_PACKAGE_NAME, LERNA_ROOT_PATH } = process.env
 const PACKAGE_ROOT_PATH = path.join(LERNA_ROOT_PATH, 'packages', LERNA_PACKAGE_NAME)

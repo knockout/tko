@@ -6,7 +6,7 @@ import {
 
 import {
   Parser, Node, Arguments, Identifier
-} from '../index.js';
+} from '../src';
 
 var op = Node.operators
 var operators = Node.operators

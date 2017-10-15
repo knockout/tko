@@ -5,7 +5,7 @@
 
 import {
   arrayMap, ieVersion
-} from '../index.js';
+} from '../src';
 
 window.DEBUG = true;
 window.amdRequire = window.require;
