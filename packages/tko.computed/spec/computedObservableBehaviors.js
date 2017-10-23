@@ -6,7 +6,7 @@ import {
 
 import {
     computed, isPureComputed, isComputed
-} from '../index.js';
+} from '../src';
 
 describe('Dependent Observable', function() {
     it('Should be subscribable', function () {

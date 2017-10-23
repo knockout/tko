@@ -9,7 +9,7 @@ import {
 
 import {
     setDomNodeChildrenFromArrayMapping
-} from '../index';
+} from '../src';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 

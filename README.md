@@ -20,12 +20,13 @@
 
 To install use one of the usual package managers e.g.
 
-- $ `yarn install tko`
+- $ `yarn add tko`
 - $ `npm install tko`
 
 By CDN
 
-- Latest: https://unpkg.com/tko/dist/ko.js
+- Stable: https://unpkg.com/tko/dist/tko[.es6][.min].js
+- Latest (development only): https://rawgit.com/knockout/tko/master/packages/tko/dist/tko[.es6][.min].js
 
 ### Using the Monorepo
 
@@ -35,12 +36,12 @@ The following commands are to get the build system set up. *Note:* you need to h
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
 | $ `npm install -g yarn` otherwise | Ensure yarn is globally available
-| $ `yarn` | Install local node packages
-| $ `yarn run lerna` | Link local `packages/` to each other
+| $ `yarn` | Install local node packages and link tko modules
 | $ `yarn test` | Run all tests
-| $ `yarn run build` | Make the `dist/ko[.es6].js` files, where the `.es6` version has not been passed through Babel
+| $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled
+| $ `lerna publish` | Bump versions and publish to npm registry
 
-Checkout `package.json` for more script commands that can be executed with `yarn run {command}`.
+Checkout `package.json => scripts` for more commands that can be executed with `yarn {command}`.
 
 In each individual `packages/*/` directory, you can also run (presuming `rollup` and `karma` are installed globally):
 

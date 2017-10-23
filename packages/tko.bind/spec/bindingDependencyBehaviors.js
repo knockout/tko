@@ -24,7 +24,7 @@ import { VirtualProvider } from 'tko.provider.virtual';
 import {
     applyBindings, contextFor,
     applyBindingsToDescendants
-} from '../index.js';
+} from '../src';
 
 import {bindings as coreBindings} from 'tko.binding.core';
 

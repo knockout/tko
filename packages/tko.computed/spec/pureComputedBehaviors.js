@@ -4,7 +4,7 @@ import {
 
 import {
     isPureComputed, isComputed, computed, pureComputed
-} from '../index.js';
+} from '../src';
 
 
 describe('Pure Computed', function() {

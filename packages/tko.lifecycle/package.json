@@ -1,23 +1,26 @@
 {
   "dependencies": {
-    "tko.computed": "knockout/tko.computed",
-    "tko.utils": "knockout/tko.utils"
+    "tko.computed": "4.0.0-alpha4",
+    "tko.utils": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
+  },
+  "devDependencies": {
+    "tko.observable": "4.0.0-alpha4"
   },
   "files": [
-    "dist/",
-    "src/",
-    "index.js",
-    "./*.ya?ml"
+    "dist/"
   ],
   "name": "tko.lifecycle",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Knockout LifeCycle for object instances",
-  "main": "dist/tko.lifecycle.js",
-  "jsnext:main": "index.js",
+  "module": "dist/tko.lifecycle.js",
   "repository": "git@github.com:knockout/tko.lifecycle.git",
   "author": "Knockout Team",
   "license": "MIT",
   "karma": {
-    "frameworks": ["mocha", "chai"]
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
   }
 }

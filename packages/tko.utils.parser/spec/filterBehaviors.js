@@ -10,7 +10,7 @@ import {
 
 import {
   Parser
-} from '../index.js';
+} from '../src';
 
 function ctxStub (o) { return { lookup (p) { return o[p] } } }
 

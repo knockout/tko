@@ -1,9 +1,21 @@
 {
   "name": "tko.provider",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
-  "main": "index.js",
+  "module": "dist/tko.provider.js",
+  "files": [
+    "dist/"
+  ],
   "author": "Knockout Team",
   "license": "MIT",
-  "karma" : { "frameworks": ["mocha", "chai"] }
+  "dependencies": {
+    "tko.utils": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
+  },
+  "karma": {
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
+  }
 }

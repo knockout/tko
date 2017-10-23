@@ -1,7 +1,7 @@
 import '../helpers/jasmine-13-helper.js';
 
-import * as utils from '../index.js';
-import { registerEventHandler } from '../index.js';
+import * as utils from '../src';
+import { registerEventHandler } from '../src';
 import options from '../src/options.js';
 
 var ko = ko || {};

@@ -18,7 +18,7 @@ import {
     options
 } from 'tko.utils';
 
-import {bindings as templateBindings} from '../index.js';
+import {bindings as templateBindings} from '../src';
 import {bindings as ifBindings} from 'tko.binding.if';
 import {bindings as coreBindings} from 'tko.binding.core';
 

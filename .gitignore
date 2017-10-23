@@ -19,11 +19,13 @@ node_modules
 # Knockout built files
 _repo
 coverage/
-work/
+**/dist/*
+!packages/tko/dist/*
 
 yarn.lock
 
 *-debug.log
+*-error.log
 
 # Rollup Visualizer
 visual.html

@@ -18,7 +18,7 @@ import {
     bindings as templateBindings,
     renderTemplate,
     anonymousTemplate
-} from '../index.js';
+} from '../src';
 import {
     bindings as coreBindings
 } from 'tko.binding.core';

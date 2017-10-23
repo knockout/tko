@@ -1,0 +1,24 @@
+{
+  "name": "knockout",
+  "homepage": "http://knockoutjs.com/",
+  "description": "Knockout makes it easier to create rich, responsive UIs with JavaScript",
+  "main": "dist/tko.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "knockout",
+    "mvvm",
+    "mvc",
+    "spa"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "spec"
+  ]
+}

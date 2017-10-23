@@ -1,14 +1,15 @@
 {
   "name": "tko.computed",
-  "version": "1.0.0",
+  "version": "4.0.0-alpha4",
   "description": "TKO Computed Observables",
-  "main": "index.js",
+  "module": "dist/tko.computed.js",
+  "files": [
+    "dist/"
+  ],
   "dependencies": {
-    "tko.utils": "knockout/tko.utils",
-    "tko.observable": "knockout/tko.observable"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tko.observable": "4.0.0-alpha4",
+    "tko.utils": "4.0.0-alpha4",
+    "tslib": "^1.8.0"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,6 @@
     "knockout",
     "tko"
   ],
-  "files": [
-    "dist/",
-    "src/",
-    "index.js",
-    "./*.ya?ml"
-  ],
   "author": "Knockout Team",
   "license": "MIT",
   "bugs": {
@@ -31,6 +26,8 @@
   },
   "homepage": "https://github.com/knockout/tko.computed#readme",
   "karma": {
-    "frameworks": ["jasmine"]
+    "frameworks": [
+      "jasmine"
+    ]
   }
 }

@@ -1,7 +1,7 @@
 
 import {
   BindingStringProvider
-} from '../index'
+} from '../src'
 
 
 describe("Binding String Provider behaviour", function () {
