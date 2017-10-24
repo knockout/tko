@@ -30,8 +30,6 @@ By CDN
 
 ### Using the Monorepo
 
-The following commands are to get the build system set up. *Note:* you need to have [Git LFS](https://help.github.com/articles/installing-git-large-file-storage/) installed.
-
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
