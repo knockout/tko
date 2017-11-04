@@ -3,15 +3,12 @@ title: Introduction
 kind: Title
 ---
 
-## Welcome.
-
 This is the landing page and future home of the documentation for [`tko`](https://github.com/knockout/tko),
-candidate for Knockout 4.0.
+the foundation for Knockout 4.0 and more.
 
-This page is presently a work in progress.
+Please bear with us as this page is set up.
 
-
-<h2>Key Concepts</h2>
+<!-- <h2>Key Concepts</h2>
 <div class='pure-g'>
   <div class='pure-u-1 pure-u-sm-5-24 pad'>
     <i class='fa fa-link fa-4x'></i>
@@ -93,4 +90,4 @@ javascript: |-
   }
 
   ko.applyBindings(new TicketsViewModel());
-```
+``` -->

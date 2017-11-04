@@ -1,0 +1,14 @@
+{
+  "name": "tko.io",
+  "version": "1.0.0",
+  "description": "Landing page for tko.io",
+  "main": "index.js",
+  "author": "Knockout Team",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^4.0.2",
+    "js-yaml": "^3.10.0",
+    "markdown-it": "^8.4.0",
+    "markdown-it-front-matter": "^0.1.2"
+  }
+}

@@ -1,0 +1,28 @@
+# 
+# This is the Google App Engine standard config.
+# 
+# Deploy with the `gcloud` tool using:
+# 
+#    $ gcloud app deploy --project tko-io .
+# 
+runtime: python27
+api_version: 1
+threadsafe: true
+
+default_expiration: 30s
+
+handlers:
+
+- url: /
+  static_files: html/index.html
+  upload: html/index.html
+  # http_headers: ...
+
+- url: /static
+  static_dir: static/
+
+
+skip_files:
+  - node_modules
+  - ".*.yaml"
+  - ".*.lock"
