@@ -22,8 +22,6 @@ coverage/
 **/dist/*
 !packages/tko/dist/*
 
-yarn.lock
-
 *-debug.log
 *-error.log
 
