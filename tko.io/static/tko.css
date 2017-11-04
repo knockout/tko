@@ -1,0 +1,20 @@
+
+body {
+	display: grid;
+	grid-template-areas:
+		"head head"
+		"toc body";
+	padding: 20px;
+}
+
+.head {
+	grid-area: head;
+}
+
+.toc {
+	grid-area: toc;
+}
+
+.body {
+	grid-area: body;
+}

@@ -18,7 +18,7 @@ handlers:
   upload: html/index.html
   # http_headers: ...
 
-- url: /static
+- url: /
   static_dir: static/
 
 

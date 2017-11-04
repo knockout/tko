@@ -1,5 +1,5 @@
 
-dest: html/index.html
+dest: build/index.html
 sources:
 - ../packages/tko/docs/intro.md
 
