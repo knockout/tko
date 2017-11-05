@@ -1,11 +1,17 @@
 doctype html
 html(lang="en")
   head
-    title= TKO
+    title= "TKO"
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap-reboot.min.css" integrity="sha256-ZeIRHNBrNlXFlcfvaKsx9S1BOwWJ42hBund78iurMLw=" crossorigin="anonymous")
+    script(src="https://unpkg.com/tko@4.0.0-alpha3/dist/ko.js" integrity="sha384-W6Un9ta1JSOmCbK7YkdGGfyu+fDGY5e0II5CCyMKKXaYrpiJAt2q5YQH2ICQi4QA" crossorigin="anonymous")
+    script(src='tko-io.js')
+
     link(rel="stylesheet" href='tko.css')
   body
-    h1 TKO
+    h1.head TKO
 
     .toc TOC
-    .body !{body}
+    .body
+      each part in parts
+        h2 #{part.data.title}
+        | !{part.html}

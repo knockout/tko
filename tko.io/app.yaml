@@ -19,7 +19,7 @@ handlers:
   # http_headers: ...
 
 - url: /
-  static_dir: static/
+  static_dir: build/
 
 
 skip_files:

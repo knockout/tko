@@ -1,6 +1,7 @@
 
 body {
 	display: grid;
+    grid-template-columns: 200px 1fr;
 	grid-template-areas:
 		"head head"
 		"toc body";
