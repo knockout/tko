@@ -3,62 +3,51 @@ title: Introduction
 kind: Title
 ---
 
-This is the landing page and future home of the documentation for [`tko`](https://github.com/knockout/tko),
-the foundation for Knockout 4.0 and more.
+TKO is a web framework, and the foundation for Knockout 4.
 
-Please bear with us as this page is set up.
+With TKO you can:
 
-<!-- <h2>Key Concepts</h2>
-<div class='pure-g'>
-  <div class='pure-u-1 pure-u-sm-5-24 pad'>
-    <i class='fa fa-link fa-4x'></i>
-    <h4>Declarative bindings</h4>
-    Easily associate DOM elements with model data using a
-    concise, readable syntax
-  </div>
-  <div class='pure-u-1 pure-u-sm-1-4 pad'>
-    <i class='fa fa-refresh fa-4x'></i>
-    <h4>Automatic UI refresh</h4>
-    When your data model's state changes, your UI updates automatically
-  </div>
-  <div class='pure-u-1 pure-u-sm-1-4 pad'>
-    <i class='fa fa-code-fork fa-4x'></i>
-    <h4>Dependency Tracking</h4>
-    Implicitly set up chains of relationships between model data, to
-    transform and combine it
-  </div>
-  <div class='pure-u-1 pure-u-sm-1-4 pad'>
-    <i class='fa fa-newspaper-o fa-4x'></i>
-    <h4>Templating</h4>
-    Quickly generate sophisticated, nested UIs as a function of your
-    model data
-  </div>
-</div>
+- **Declare bindings**
+  Easily associate DOM elements with model data using a concise, readable syntax
+- **Two-way observables**
+  Data model and DOM stay in sync
+- **Computed observables**
+  Create chains of calculated variables dependencies
+- **Templating**
+  Create reusable components and sophisticated web applications
 
 
-<h2>Some ways to get started</h2>
 
-<div class='pure-g'>
-  <div class='pure-u-1 pure-u-sm-1-2'>
-    <a class='pure-button button-learn' href='http://learn.knockoutjs.com'>
-      <i class='fa fa-university fa-2x'></i>
-      Interactive tutorial
-      <small>&lt;learn.knockoutjs.com&gt;</small>
-    </a>
-  </div>
-  <div class='pure-u-1 pure-u-sm-1-2'>
-    <a href='books.html' class='pure-button button-literature'>
-      <i class='fa fa-2x fa-book'></i>
-      Literature
-      <small>Blogs, books, etc.</small>
-    </a>
-  </div>
-</div>
+## Getting started
 
+Include *alpha-3* with this `<script>`:
+
+```html
+<script src="https://unpkg.com/tko@4.0.0-alpha3/dist/ko.js"
+integrity="sha384-W6Un9ta1JSOmCbK7YkdGGfyu+fDGY5e0II5CCyMKKXaYrpiJAt2q5YQH2ICQi4QA"
+crossorigin="anonymous"></script>
+```
+
+or install the monorepo it locally with
+
+```bash
+$ npm install tko
+```
+
+Clone the code with
+
+```bash
+$ git clone git@github.com/knockout/tko
+```
+
+## Learning More
+
+<!-- tutorial -->
+<!-- books -->
 
 <h2>Live example</h2>
 
-```example
+```example-binding
 name: Introduction
 html: |-
   Choose a ticket class
@@ -90,4 +79,4 @@ javascript: |-
   }
 
   ko.applyBindings(new TicketsViewModel());
-``` -->
+```

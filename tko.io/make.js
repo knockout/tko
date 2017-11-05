@@ -6,10 +6,16 @@ const pug = require('pug')
 const debounce = require('lodash.debounce')
 var matter = require('gray-matter');
 
+function highlight(str, lang) {
+	if (lang === 'example-binding') {}
+	return ''
+}
+
 const md = require('markdown-it')({
 	html: true,
 	linkify: true,
-	typographer: true
+	typographer: true,
+	highlight
 })
 
 const ENC = {encoding: 'utf8'}
@@ -60,7 +66,7 @@ function make() {
 if (process.argv.includes('-w')) {
 	const ignored = "" ///(^|[\/\\])(\..|build\/*)/
 	require('chokidar')
-		.watch('src', {ignored})
+		.watch(['src', '../packages'], {ignored})
 		.on('all', debounce(make, 50))
 } else {
 	make()

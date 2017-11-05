@@ -5,17 +5,49 @@ body {
 	grid-template-areas:
 		"head head"
 		"toc body";
-	padding: 20px;
+	padding: 0px 20px;
 }
 
 .head {
 	grid-area: head;
+	background-color: #F8E8E8;
+}
+
+.head .title {
+	font-size: 2rem;
+	font-family: serif;
+	display: inline;
+}
+
+.head a {
+	font-size: 1.8rem;
+	margin: 0px 2em;
+	padding: 0px 1em;
+	border-radius: 16px;
+}
+
+.head a:hover {
+	text-decoration: none;
+	background-color: #E8D8D8;
 }
 
 .toc {
+	padding-top: 2ex;
 	grid-area: toc;
 }
 
 .body {
 	grid-area: body;
+}
+
+pre {
+	background-color: #E8D8D8;
+	padding: 1ex 1em;
+	margin-left: 1em;
+	border-radius: 8px;
+}
+
+code {
+	background-color: #E8D8D8;
+	font-size: 0.9rem;
 }

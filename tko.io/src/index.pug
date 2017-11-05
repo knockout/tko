@@ -8,10 +8,16 @@ html(lang="en")
 
     link(rel="stylesheet" href='tko.css')
   body
-    h1.head TKO
+    .head
+      .title TKO
+      a(href='https://github.com/knockout/tko') Github
+      a(href='https://patreon.com/brianmhunt') Patronage!
 
-    .toc TOC
+    .toc
+      each part in parts
+        a(href='#' + part.data.title) #{part.data.title}
+    
     .body
       each part in parts
-        h2 #{part.data.title}
+        h1(id=part.data.title) #{part.data.title}
         | !{part.html}
