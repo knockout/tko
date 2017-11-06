@@ -10,17 +10,33 @@ html(lang="en")
       script(src=script.src integrity=script.integrity crossorigin=script.crossorigin type=script.type || "application/javascript" async=script.async)
 
   body
-    .head
-      .title TKO
-      a(href='https://github.com/knockout/tko') Github
-      a(href='https://patreon.com/brianmhunt') Patronage!
+    nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark.bg-ribbed-dark.site-navbar
+      .navbar-brand TKO
+      nav.collapse.navbar-collapse
+        a.nav-item.nav-link(href='https://github.com/knockout/tko') Github
+        a.nav-item.nav-link(href='https://patreon.com/brianmhunt') Patronage!
 
-    .toc
-      each part in parts
-        div
-          a(href='#' + part.data.title) #{part.data.title}
+      //-     <nav class="collapse navbar-collapse">
+      //-   <div class="navbar-nav mr-auto d-none d-lg-flex">
+      //-     <a href="#try" id="try-link" class="nav-item nav-link" data-toggle="try">Try CoffeeScript</a>
+      //-     <a href="#language" class="nav-item nav-link" data-close="try">Language Reference</a>
+      //-     <a href="#resources" class="nav-item nav-link" data-close="try">Resources</a>
+      //-     <a href="https://github.com/jashkenas/coffeescript/" class="nav-item nav-link" data-close="try">GitHub
+      //-       </a>
+      //-   </div>
+      //- </nav>
+        //- .head
+        //-   .title TKO
+        //-   a(href='https://github.com/knockout/tko') Github
+        //-   a(href='https://patreon.com/brianmhunt') Patronage!
 
-    .body
-      each part in parts
-        h1(id=part.data.title) #{part.data.title}
-        | !{part.html}
+    .container-fluid
+      row.flex-nowrap
+        nav.sidebar.col-lg-3.bg-ribbed-light
+          each part in parts
+            div
+              a(href='#' + part.data.title) #{part.data.title}
+        main.main.col-lg-9.ml-auto
+          each part in parts
+            h1(id=part.data.title) #{part.data.title}
+            | !{part.html}
