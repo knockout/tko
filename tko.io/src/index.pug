@@ -17,7 +17,8 @@ html(lang="en")
 
     .toc
       each part in parts
-        a(href='#' + part.data.title) #{part.data.title}
+        div
+          a(href='#' + part.data.title) #{part.data.title}
 
     .body
       each part in parts

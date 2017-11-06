@@ -21,8 +21,8 @@ scripts:
 dest: build/index.html
 sources:
 - ../packages/tko/docs/intro.md
+- ../packages/tko.bind/docs/binding-context.md
 
- # - ../packages/tko.bind/docs/binding-context.md
  # - ../packages/tko.bind/docs/binding-preprocessing.md
  # - ../packages/tko.bind/docs/binding-syntax.md
  # - ../packages/tko.bind/docs/custom-bindings-controlling-descendant-bindings.md

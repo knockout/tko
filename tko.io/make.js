@@ -31,6 +31,7 @@ const config = yaml.load(fs.readFileSync('./settings.yaml'))
 
 function * genParts (sources) {
   for (const sourceMd of config.sources) {
+    console.log('   + ', sourceMd)
     const source = fs.readFileSync(sourceMd, ENC)
     const {content, data} = matter(source)
     const html = md.render(content)

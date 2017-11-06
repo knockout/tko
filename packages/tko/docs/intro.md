@@ -3,20 +3,22 @@ title: Introduction
 kind: Title
 ---
 
-TKO is a web framework, and the foundation for Knockout 4.
+TKO is a Javascript web framework, and the foundation for Knockout 4.
 
-With TKO you can:
+Knockout helps you create rich, responsive, maintainable applications built on a clean underlying data model. 
 
-- **Declare bindings**
-  Easily associate DOM elements with model data using a concise, readable syntax
+- **Simple data-html bindings**
+  Easily associate DOM elements with model data using a concise, readable syntax, like this: `<input data-bind='textInput: value'/>`
 - **Two-way observables**
-  Data model and DOM stay in sync
-- **Computed observables**
-  Create chains of calculated variables dependencies
+  Data model and DOM stay in sync, updating the UI whenever the data changes.
+- **Computed dependencies**
+  Create chains of calculated variables dependencies.
 - **Templating**
-  Create reusable components and sophisticated web applications
+  Create reusable components and sophisticated web applications.
+- **Extensible**
+  Implement custom behaviours and compartmentalized code.
 
-
+TKO has a comprehensive suite of tests that ensure its correct functioning and allow easy verification on different Javascript browsers and platforms.
 
 ## First Example
 
@@ -24,6 +26,13 @@ With TKO you can:
 
 <!-- tutorial -->
 <!-- books -->
+
+
+
+## Supported Platforms
+
+TKO & Knockout should work on all modern, and many antiquated browsers, as well as Javascript engines such as Node.js.
+
 
 ## Getting started
 
@@ -35,10 +44,11 @@ integrity="sha384-W6Un9ta1JSOmCbK7YkdGGfyu+fDGY5e0II5CCyMKKXaYrpiJAt2q5YQH2ICQi4
 crossorigin="anonymous"></script>
 ```
 
-or install the monorepo it locally with
+or install the monorepo it locally with one of
 
 ```bash
 $ npm install tko
+$ yarn add tko
 ```
 
 Clone the code with
