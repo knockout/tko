@@ -18,6 +18,13 @@ With TKO you can:
 
 
 
+## First Example
+
+<p data-height="265" data-theme-id="dark" data-slug-hash="jarpvY" data-default-tab="html,result" data-user="brianmhunt" data-embed-version="2" data-pen-title="Knockout.js First Example" class="codepen">See the Pen <a href="https://codepen.io/brianmhunt/pen/jarpvY/">Knockout.js First Example</a> by Brian M Hunt (<a href="https://codepen.io/brianmhunt">@brianmhunt</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+<!-- tutorial -->
+<!-- books -->
+
 ## Getting started
 
 Include *alpha-3* with this `<script>`:
@@ -38,45 +45,4 @@ Clone the code with
 
 ```bash
 $ git clone git@github.com/knockout/tko
-```
-
-## Learning More
-
-<!-- tutorial -->
-<!-- books -->
-
-<h2>Live example</h2>
-
-```example-binding
-name: Introduction
-html: |-
-  Choose a ticket class
-  <select data-bind='options: tickets,
-                     optionsCaption: "Choose ...",
-                     optionsText: "name",
-                     value: chosenTicket'></select>
-
-  <button data-bind='enable: chosenTicket,
-                     click: resetTicket'>Clear</button>
-
-  <p data-bind='with: chosenTicket'>
-    You have chosen <b data-bind='text: name'></b>
-    ($<span data-bind='text: price'></span>)
-  </p>
-
-
-javascript: |-
-  function TicketsViewModel() {
-    this.tickets = [
-      { name: "Economy", price: 199.95 },
-      { name: "Business", price: 449.22 },
-      { name: "First Class", price: 1199.99 }
-    ];
-    this.chosenTicket = ko.observable();
-    this.resetTicket = function () {
-      this.chosenTicket(null);
-    };
-  }
-
-  ko.applyBindings(new TicketsViewModel());
 ```

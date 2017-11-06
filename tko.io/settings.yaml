@@ -1,4 +1,23 @@
 
+links:
+- href: https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap-reboot.min.css
+  integrity: sha256-ZeIRHNBrNlXFlcfvaKsx9S1BOwWJ42hBund78iurMLw=
+
+- href: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css
+  integrity: sha384-zhIsEafzyQWHSoMCQ4BfT8ZlRXQyIFwAHAJn32PNdsb8n6tVysGZSLpEEIvCskw4
+
+- href: tko.css
+
+scripts:
+- src: https://unpkg.com/tko@4.0.0-alpha3/dist/ko.js
+  integrity: sha256-F8J/QUq35S+E/Ri8ahVGQxime/L5PCeXEmHTvkh1MV8=
+  crossorigin: anonymous
+
+- src: https://production-assets.codepen.io/assets/embed/ei.js
+
+- src: tko-io.js
+  type: module
+
 dest: build/index.html
 sources:
 - ../packages/tko/docs/intro.md

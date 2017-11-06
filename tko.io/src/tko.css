@@ -14,6 +14,7 @@ body {
 }
 
 .head .title {
+	padding: 7px;
 	font-size: 2rem;
 	font-family: serif;
 	display: inline;
@@ -50,4 +51,12 @@ pre {
 code {
 	background-color: #E8D8D8;
 	font-size: 0.9rem;
+}
+
+a {
+	color: #800000;
+}
+
+a:hover {
+	color: #A00000;
 }
