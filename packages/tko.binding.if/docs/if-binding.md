@@ -1,9 +1,5 @@
----
-kind: documentation
-title: if
-cat: 4
-subCat: Control flow
----
+
+# `if` Binding
 
 ### Purpose
 The `if` binding causes a section of markup to appear in your document (and to have its `data-bind` attributes applied), only if a specified expression evaluates to `true` (or a `true`-ish value such as a non-`null` object or nonempty string).

@@ -1,9 +1,4 @@
----
-kind: documentation
-title: disable
-cat: 4
-subCat: Working with form fields
----
+# `disable`
 
 ### Purpose
 The `disable` binding causes the associated DOM element to be disabled only when the parameter value is `true`. This is useful with form elements like `input`, `select`, and `textarea`.

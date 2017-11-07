@@ -240,6 +240,16 @@ code {
   color: #2f2625;
 }
 
+h1 {
+  margin-top: 1.5em;
+}
+
+h1 code {
+  background-color: transparent;
+  border: 3px solid #E8D8D8;
+  font-size: inherit;
+}
+
 pre {
  background-color: #E8D8D8;
  padding: 1ex 1em;

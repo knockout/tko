@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Using extenders to augment observables
-cat: 2
----
+
+# Observable Extenders
 
 Knockout observables provide the basic features necessary to support reading/writing values and notifying subscribers when that value changes. In some cases, though, you may wish to add additional functionality to an observable. This might include adding additional properties to the observable or intercepting writes by placing a writeable computed observable in front of the observable. Knockout extenders provide an easy and flexible way to do this type of augmentation to an observable.
 

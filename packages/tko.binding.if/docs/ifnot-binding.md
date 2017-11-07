@@ -1,9 +1,7 @@
----
-kind: documentation
-title: ifnot
-cat: 4
-subCat: Control flow
----
+
+# `ifnot`
+
+Alias: `unless`
 
 ### Purpose
 The `ifnot` binding is exactly the same as [the `if` binding](#if-binding), except that it inverts the result of whatever expression you pass to it. For more details, see documentation for [the `if` binding](#if-binding).

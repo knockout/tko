@@ -33,7 +33,7 @@ Support Knockout:
 
 ## First Example
 
-<p data-height="265" data-theme-id="dark" data-slug-hash="jarpvY" data-default-tab="html,result" data-user="brianmhunt" data-embed-version="2" data-pen-title="Knockout.js First Example" class="codepen">See the Pen <a href="https://codepen.io/brianmhunt/pen/jarpvY/">Knockout.js First Example</a> by Brian M Hunt (<a href="https://codepen.io/brianmhunt">@brianmhunt</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+<p data-height="465" data-theme-id="dark" data-slug-hash="jarpvY" data-default-tab="html,result" data-user="brianmhunt" data-embed-version="2" data-pen-title="Knockout.js First Example" class="codepen">See the Pen <a href="https://codepen.io/brianmhunt/pen/jarpvY/">Knockout.js First Example</a> by Brian M Hunt (<a href="https://codepen.io/brianmhunt">@brianmhunt</a>) on <a href="https://codepen.io">CodePen</a>.</p>
 
 <!-- tutorial -->
 
@@ -66,3 +66,13 @@ Clone the code with
 ```bash
 $ git clone git@github.com/knockout/tko
 ```
+
+# Community
+
+Find Knockout online at:
+
+- [Gitter knockout/tko](https://gitter.im/knockout/tko)
+- [Gitter knockout/knockout](https://gitter.im/knockout/knockout)
+- [Reddit /r/knockoutjs](https://www.reddit.com/r/knockoutjs/)
+- [Google Groups](https://groups.google.com/forum/#!forum/knockoutjs)
+- [StackOverflow [knockout.js]](http://stackoverflow.com/tags/knockout.js/info)

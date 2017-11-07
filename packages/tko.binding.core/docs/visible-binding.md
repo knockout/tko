@@ -1,9 +1,5 @@
----
-kind: documentation
-title: visible
-cat: 4
-subCat: Controlling text and appearance
----
+
+# `visible`
 
 ### Purpose
 The `visible` binding causes the associated DOM element to become hidden or visible according to the value you pass to the binding.

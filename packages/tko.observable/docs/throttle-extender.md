@@ -1,8 +1,4 @@
----
-kind: documentation
-title: The "throttle" extender
-cat: 2
----
+# Throttle extender
 
 *Note: This throttle API is deprecated as of Knockout 3.1.0. Please use the [`rateLimit` extender](#rateLimit-observable) for similar functionality.*
 

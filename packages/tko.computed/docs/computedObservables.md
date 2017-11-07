@@ -1,8 +1,4 @@
----
-kind: documentation
-title: Computed Observables
-cat: 2
----
+# Computed Observables Overview
 
 What if you've got an [observable](observables.html) for `firstName`, and another for `lastName`, and you want to display the full name? That's where *computed observables* come in - these are functions that are dependent on one or more other observables, and will automatically update whenever any of these dependencies change.
 

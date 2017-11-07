@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Writable computed observables
-cat: 2
----
+
+# Writeable Computeds
 
 *Beginners may wish to skip this section - writable computed observables are fairly advanced and are not necessary in most situations*
 

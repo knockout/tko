@@ -1,9 +1,5 @@
----
-kind: documentation
-title: foreach
-cat: 4
-subCat: Control flow
----
+
+# `foreach` Binding
 
 ### Purpose
 The `foreach` binding duplicates a section of markup for each entry in an array, and binds each copy of that markup to the corresponding array item. This is especially useful for rendering lists or tables.

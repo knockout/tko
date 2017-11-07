@@ -1,8 +1,5 @@
----
-kind: documentation
-title: The "rateLimit" extender
-cat: 2
----
+
+# Extender: `rateLimit`
 
 *Note: This rate-limit API was added in Knockout 3.1.0. For previous versions, the [`throttle` extender](throttle-extender.html) provides similar functionality.*
 

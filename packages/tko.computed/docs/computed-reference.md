@@ -1,9 +1,5 @@
----
-kind: documentation
-title: Computed Observable Reference
-cat: 3
-subCat: Components
----
+
+# Computed Observable Reference
 
 The following documentation describes how to construct and work with computed observables.
 

@@ -1,9 +1,5 @@
----
-kind: documentation
-title: checked
-cat: 4
-subCat: Working with form fields
----
+
+# `checked`
 
 ### Purpose
 The `checked` binding links a checkable form control &mdash; i.e., a checkbox (`<input type='checkbox'>`) or a radio button (`<input type='radio'>`) &mdash; with a property on your view model.

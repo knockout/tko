@@ -1,9 +1,4 @@
----
-kind: documentation
-title: event
-cat: 4
-subCat: Working with form fields
----
+# `event`
 
 ### Purpose
 The `event` binding allows you to add an event handler for a specified event so that your chosen JavaScript function will be invoked when that event is triggered for the associated DOM element. This can be used to bind to any event, such as `keypress`, `mouseover` or `mouseout`.

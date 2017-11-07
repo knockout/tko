@@ -85,10 +85,10 @@ sections:
   - title: Observables
     includes:
     - ../packages/tko.observable/docs/arraychange.md
-    - ../packages/tko.observable/docs/extenders.md
     - ../packages/tko.observable/docs/observableArrays.md
     - ../packages/tko.observable/docs/observables.md
     - ../packages/tko.observable/docs/rateLimit-observable.md
+    - ../packages/tko.observable/docs/extenders.md
     - ../packages/tko.observable/docs/throttle-extender.md
     - ../packages/tko/docs/json-data.md
 

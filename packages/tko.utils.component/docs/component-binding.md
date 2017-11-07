@@ -1,9 +1,5 @@
----
-kind: documentation
-title: component
-cat: 4
-subCat: Components
----
+
+# `component`
 
 The `component` binding injects a specified [component](component-overview.html) into an element, and optionally passes parameters to it.
 

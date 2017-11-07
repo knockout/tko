@@ -1,9 +1,5 @@
----
-kind: documentation
-title: selectedOptions
-cat: 4
-subCat: Working with form fields
----
+
+# `selectedOptions`
 
 ### Purpose
 The `selectedOptions` binding controls which elements in a multi-select list are currently selected. This is intended to be used in conjunction with a `<select>` element and the `options` binding.

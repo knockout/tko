@@ -1,9 +1,5 @@
----
-kind: documentation
-title: Pure computed observables
-cat: 2
-subCat: Components
----
+
+# Pure Computed Observables
 
 *Pure* computed observables, introduced in Knockout 3.2.0, provide performance and memory benefits over regular computed observables for most applications. This is because a *pure* computed observable doesn't maintain subscriptions to its dependencies when it has no subscribers itself. This feature:
 
@@ -58,7 +54,7 @@ In the following example of a simple wizard interface, the `fullName` *pure* com
 You should not use the *pure* feature for a computed observable that is meant to perform an action when its dependencies change. Examples include:
 
 * Using a computed observable to run a callback based on multiple observables.
-  
+
   ```javascript
   ko.computed(function () {
       var cleanData = ko.toJS(this);

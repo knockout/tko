@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Observables
-cat: 2
----
+
+# Observables Overview
 
 Knockout is built around three core features:
 

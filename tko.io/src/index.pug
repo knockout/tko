@@ -21,14 +21,13 @@ html(lang="en")
     .container-fluid
       row.flex-nowrap
         nav#toc.sidebar.col-lg-3.bg-ribbed-light
-          table-of-contents
+          nav.navbar.contents
+            nav.nav.flex-column(data-bind='each: contents')
+              a.nav-link(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')
+
         main.main.col-lg-9.ml-auto
           each section in sections
             .section
               .section-title #{section.title}
               .section-body !{section.html}
 
-    template#table-of-contents
-      nav.navbar.contents
-        nav.nav.flex-column(data-bind='each: contents')
-          a.nav-link(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')
