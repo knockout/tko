@@ -5,8 +5,6 @@ const yaml = require('js-yaml')
 const pug = require('pug')
 const debounce = require('lodash.debounce')
 const hljs = require('highlight.js')
-const matter = require('gray-matter')
-
 
 function highlight (str, lang) {
   if (!lang) { return '' }
@@ -27,40 +25,46 @@ const md = require('markdown-it')({
 
 const ENC = {encoding: 'utf8'}
 
-const config = yaml.load(fs.readFileSync('./settings.yaml'))
+function * genHtmlIncludes ({includes}, config) {
+  for (const sourcePath of includes || []) {
+    console.log('  |  ', sourcePath)
+    const source = fs.readFileSync(sourcePath, ENC)
+    if (sourcePath.endsWith('.md')) {
+      yield `<hr/><pre>${sourcePath}</pre>` + md.render(source)
+    } else if (sourcePath.endsWith('.pug')) {
+      yield pug.render(source, config)
+    } else {
+      throw new Error(`Bad extension: ${sourcePath} (not .md or .pug)`)
+    }
+  }
+}
 
-function * genParts (sources) {
-  for (const sourceMd of config.sources) {
-    console.log('   + ', sourceMd)
-    const source = fs.readFileSync(sourceMd, ENC)
-    const {content, data} = matter(source)
-    const html = md.render(content)
-    yield {html, data}
+function * genSections (config) {
+  for (const section of config.sections) {
+    console.log(`  |- ${section.title}`)
+    section.html = Array.from(genHtmlIncludes(section, config)).join('\n')
+    yield section
   }
 }
 
 function make () {
-  console.log("👲   Starting at ", new Date())
+  console.log('👲   Starting at ', new Date())
   /**
    * Make build/
    */
   fs.mkdirs('build/')
 
+  const styles = fs.readFileSync('src/tko.css')
+
   /**
    * Make build/index.html
    */
   console.log('  Making build/index.html')
-  const config = yaml.load(fs.readFileSync('./settings.yaml'))
-  const parts = Array.from(genParts(config.sources))
-  const locals = Object.assign(config, {parts})
+  const config = yaml.load(fs.readFileSync('./settings.yaml', ENC))
+  const sections = Array.from(genSections(config))
+  const locals = Object.assign(config, {sections, styles})
   const html = pug.renderFile('src/index.pug', locals)
   fs.writeFileSync(config.dest, html)
-
-  /**
-   * Make build/tko.css
-   */
-  console.log('  Making build/tko.css')
-  fs.copySync('src/tko.css', 'build/tko.css')
 
   /**
    * Make Legacy Javascript
@@ -80,7 +84,7 @@ if (process.argv.includes('-w')) {
 
       -w   Watch and rebuild on change
 
-    Run "dev_appserver.py ." to start the Google Cloud development server.
+    Run 'dev_appserver.py .' to start the Google Cloud development server.
   `)
   make()
 }

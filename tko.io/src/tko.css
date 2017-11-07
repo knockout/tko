@@ -1,80 +1,11 @@
-
-// body {
-// 	// display: grid;
-//  //    grid-template-columns: 200px 1fr;
-// 	// grid-template-areas:
-// 	// 	"head head"
-// 	// 	"toc body";
-// 	// padding: 0px 20px;
-// }
-
-// .head {
-// 	// top: 0px;
-// 	// position: sticky;
-// 	// grid-area: head;
-// 	// background-color: #b88888;
-// }
-
-// .head .title {
-// 	padding: 7px;
-// 	font-size: 2rem;
-// 	font-family: serif;
-// 	display: inline;
-// }
-
-// .head a {
-// 	font-size: 1.8rem;
-// 	margin: 0px 2em;
-// 	padding: 0px 1em;
-// 	border-radius: 16px;
-// }
-
-// .head a:hover {
-// 	text-decoration: none;
-// 	background-color: #E8D8D8;
-// }
-
-// .toc {
-// 	padding-top: 2ex;
-// 	grid-area: toc;
-// }
-
-// .body {
-// 	grid-area: body;
-// }
-
-// pre {
-// 	background-color: #E8D8D8;
-// 	padding: 1ex 1em;
-// 	margin-left: 1em;
-// 	border-radius: 8px;
-// }
-
-// code {
-// 	background-color: #E8D8D8;
-// 	font-size: 0.9rem;
-// }
-
-// a {
-// 	color: #800000;
-// }
-
-// a:hover {
-// 	color: #A00000;
-// }
-
-
-/* ---- */
-
 html,
 body {
   /* Prevent scroll on narrow devices */
   overflow-x: hidden;
+  font-family: 'Titillium Web', sans-serif;
 }
+
 body {
-  /* Required for Scrollspy */
-  position: relative;
-  /* Push below header bar */
   margin-top: 3.5rem;
 }
 
@@ -84,11 +15,11 @@ svg {
 }
 
 a {
-  color: #1b5e20;
+  color: #5e1b20;
   transition: 0.1s ease-in-out;
 }
 a:focus, a:hover, a:active {
-  color: #388e3c;
+  color: #8e383c;
   cursor: pointer;
   text-decoration: none;
 }
@@ -117,7 +48,6 @@ button:focus, .navbar-dark .navbar-toggler:focus {
  */
 .site-navbar {
   height: 3.5rem;
-  font-family: 'Lato';
   font-weight: 400;
   font-size: 1.1em;
 }
@@ -180,7 +110,6 @@ button:focus, .navbar-dark .navbar-toggler:focus {
 
 .contents {
   padding: 0.5em 0 0.5em 0.5em;
-  font-family: 'Alegreya Sans';
   font-weight: 400;
   font-size: 1.2em;
   align-items: normal;
@@ -209,6 +138,7 @@ button:focus, .navbar-dark .navbar-toggler:focus {
 .main {
   padding: 1.3em;
 }
+
 @media (min-width: 992px) {
   .main {
     padding-right: 2em;
@@ -225,7 +155,6 @@ button:focus, .navbar-dark .navbar-toggler:focus {
 }
 
 .main p, .main li, .main td, .main th {
-  font-family: Lato;
   font-weight: 300;
   font-size: 1.1em;
   line-height: 1.7;
@@ -253,7 +182,7 @@ button:focus, .navbar-dark .navbar-toggler:focus {
   font-weight: 400;
 }
 .main a:focus, .main a:hover, .main a:active {
-  border-bottom: 2px solid rgba(56, 142, 60, 0.2);
+  border-bottom: 2px solid rgba(142, 56, 60, 0.2);
 }
 .main blockquote pre {
   background-color: #f8f3f0;
@@ -280,8 +209,8 @@ pre code {
 h2, h3, h4 {
   margin-top: 1.3em;
   margin-bottom: 0.6em;
-  font-family: 'Alegreya Sans';
 }
+
 h2 {
   font-weight: 800;
 }
@@ -302,7 +231,6 @@ h3, h4, h2 time {
 }
 
 code, button {
-  font-family: 'Roboto Mono';
   font-weight: 400;
 }
 code, a > code {
@@ -312,234 +240,32 @@ code {
   color: #2f2625;
 }
 
-
-/*
- * Code examples
- */
-
-textarea {
-  position: absolute;
-  left: -99999px; /* Hide off canvas, while still remaining visible */
+pre {
+ background-color: #E8D8D8;
+ padding: 1ex 1em;
+ margin-left: 1em;
+ border-radius: 8px;
+ font-family: 'Source Code Pro', monospace;
 }
 
-.code-example {
-  background-color: #2f2625;
-  padding: 1em;
-  border-radius: 0.3em;
-  margin-bottom: 1em;
+code {
+ background-color: #E8D8D8;
+ font-size: 0.9rem;
 }
 
-.javascript-output-column {
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+.section-title {
+  font-size: 3rem;
+  font-weight: bold;
 }
 
-.btn-primary {
-  background-color: #69f0ae;
-  color: #0b140f;
-  border-color: #53d88f;
-  transition: 0.2s ease-in-out;
-  min-width: 3.125rem;
-}
-.btn-primary:active, .btn-primary:focus, .btn-primary:hover, .btn-primary:active:hover, .btn-primary:active:focus {
-  background-color: #61fea8;
-  color: #060a08;
-  border-color: #4de486;
-  outline: 0;
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 250px);
+  grid-gap: 10px;
+  justify-content: space-around;
 }
 
-.play-button {
-  height: 1em;
+.book-grid .card {
+  width: 250px;
 }
-
-.CodeMirror pre, pre.placeholder-code {
-  line-height: 1.4em;
-}
-
-.CodeMirror,
-.placeholder-code {
-  /* https://codemirror.net/demo/resize.html */
-  height: auto;
-  background: transparent;
-  font-family: 'Roboto Mono';
-  font-weight: 400;
-  line-height: 1.25;
-  font-size: 0.9em;
-}
-@media (min-width: 768px) {
-  .CodeMirror,
-  .placeholder-code {
-    font-size: 1em;
-  }
-}
-
-.CodeMirror-code:focus {
-  outline: none;
-}
-
-.javascript-output-column .CodeMirror-cursor {
-  /* https://github.com/codemirror/CodeMirror/issues/2568 */
-  display: none;
-}
-
-/*
- * Try CoffeeScript
- */
-.try-coffeescript {
-  position: fixed;
-  height: calc(100% - 3.5rem);
-  top: 3.5rem;
-  left: 0;
-  right: 0;
-  opacity: 0;
-  transition: opacity 0.15s ease-in-out;
-}
-.try-coffeescript.show {
-  opacity: 1;
-  z-index: 1001;
-}
-
-.try-coffeescript .CodeMirror {
-  height: calc(100vh - 7rem);
-  cursor: text;
-}
-
-.try-coffeescript .code-column {
-  overflow: hidden;
-  background-color: #2f2625;
-  color: #2f2625;
-}
-
-@media screen and (max-width: 767px) {
-  .try-coffeescript .code-column {
-    height: calc(50vh - 0.5 * 3.5rem);
-  }
-}
-@media screen and (min-width: 768px) {
-  .try-coffeescript .code-column {
-    padding-bottom: 100%;
-    margin-bottom: -100%;
-  }
-}
-
-.try-coffeescript button svg {
-  height: 1em;
-  transform: scale(1.3) translateY(0.1em);
-  fill: #0b140f;
-}
-
-@media screen and (max-width: 767px) {
-  .try-coffeescript .try-buttons {
-    position: absolute;
-    bottom: 1em;
-    z-index: 1002;
-  }
-}
-
-/* Adapted from https://github.com/FarhadG/code-mirror-themes/blob/master/themes/twilight.css */
-
-.CodeMirror,
-.placeholder-code {
-  letter-spacing: 0.3px;
-  color: #f8f8f8;
-  /* Prevent mobile Safari from zooming in on our code editors; the code is 16px naturally, but somehow being explicit about it prevents the zooming */
-  font-size: 16px;
-}
-@media (min-width: 768px) {
-  .CodeMirror,
-  .placeholder-code {
-    font-size: 90%; /* Matching Bootstrap’s font size for code, which calculates to 14.4px */
-  }
-}
-.CodeMirror-lines {
-  padding: 0.5em 0;
-}
-.placeholder-code {
-  padding: 0.5em 4px;
-  margin-bottom: 1.37em;
-  white-space: pre-wrap;
-}
-div.CodeMirror-cursor {
-  border-left: 3px solid #f8f8f8;
-}
-.CodeMirror-activeline-background {
-  background: #ffffff08;
-}
-.CodeMirror-selected {
-  background: #ddf0ff33;
-}
-.cm-comment,
-.placeholder-code .comment {
-  font-style: italic;
-  color: #5f5a60;
-}
-.cm-keyword,
-.placeholder-code .keyword {
-  color: #cda869;
-}
-.cm-string,
-.placeholder-code .string {
-  color: #8f9d6a;
-}
-.cm-property,
-.placeholder-code .attribute {
-  color: #dad085;
-}
-.cm-atom {
-  color: #dad085;
-}
-.cm-number,
-.placeholder-code .number,
-.placeholder-code .built_in,
-.placeholder-code .builtin-name,
-.placeholder-code .literal,
-.placeholder-code .type,
-/*.placeholder-code .params,*/
-.placeholder-code .meta,
-.placeholder-code .link {
-  color: #dad085;
-}
-.cm-operator,
-.placeholder-code .punctuation,
-.placeholder-code .symbol,
-.placeholder-code .bullet,
-.placeholder-code .addition,
-.placeholder-code .operator {
-  color: #cda869;
-}
-
-/* Uneditable code blocks are inverted, so use darker versions of the above */
-
-.uneditable-code-block .comment {
-  font-style: italic;
-  color: #837B85;
-}
-.uneditable-code-block .class,
-.uneditable-code-block .function,
-.uneditable-code-block .keyword,
-.uneditable-code-block .reserved,
-.uneditable-code-block .title {
-  color: #534328;
-}
-.uneditable-code-block .string
-.uneditable-code-block .value
-.uneditable-code-block .inheritance
-.uneditable-code-block .header {
-  color: #3A4029;
-}
-.uneditable-code-block .variable,
-.uneditable-code-block .literal,
-.uneditable-code-block .tag,
-.uneditable-code-block .regexp,
-.uneditable-code-block .subst,
-.uneditable-code-block .property {
-  color: #474429;
-}
-.uneditable-code-block .number,
-.uneditable-code-block .preprocessor,
-.uneditable-code-block .built_in,
-.uneditable-code-block .params,
-.uneditable-code-block .constant {
-  color: #474429;
-}
-
 

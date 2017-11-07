@@ -9,34 +9,26 @@ html(lang="en")
     each script in scripts
       script(src=script.src integrity=script.integrity crossorigin=script.crossorigin type=script.type || "application/javascript" async=script.async)
 
+    style(type='text/css')
+      | #{styles}
+
   body
     nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark.bg-ribbed-dark.site-navbar
       .navbar-brand TKO
-      nav.collapse.navbar-collapse
+      nav.collapse.navbar-collapse.navbar-nav
         a.nav-item.nav-link(href='https://github.com/knockout/tko') Github
-        a.nav-item.nav-link(href='https://patreon.com/brianmhunt') Patronage!
-
-      //-     <nav class="collapse navbar-collapse">
-      //-   <div class="navbar-nav mr-auto d-none d-lg-flex">
-      //-     <a href="#try" id="try-link" class="nav-item nav-link" data-toggle="try">Try CoffeeScript</a>
-      //-     <a href="#language" class="nav-item nav-link" data-close="try">Language Reference</a>
-      //-     <a href="#resources" class="nav-item nav-link" data-close="try">Resources</a>
-      //-     <a href="https://github.com/jashkenas/coffeescript/" class="nav-item nav-link" data-close="try">GitHub
-      //-       </a>
-      //-   </div>
-      //- </nav>
-        //- .head
-        //-   .title TKO
-        //-   a(href='https://github.com/knockout/tko') Github
-        //-   a(href='https://patreon.com/brianmhunt') Patronage!
 
     .container-fluid
       row.flex-nowrap
-        nav.sidebar.col-lg-3.bg-ribbed-light
-          each part in parts
-            div
-              a(href='#' + part.data.title) #{part.data.title}
+        nav#toc.sidebar.col-lg-3.bg-ribbed-light
+          table-of-contents
         main.main.col-lg-9.ml-auto
-          each part in parts
-            h1(id=part.data.title) #{part.data.title}
-            | !{part.html}
+          each section in sections
+            .section
+              .section-title #{section.title}
+              .section-body !{section.html}
+
+    template#table-of-contents
+      nav.navbar.contents
+        nav.nav.flex-column(data-bind='each: contents')
+          a.nav-link(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')

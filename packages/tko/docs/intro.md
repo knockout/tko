@@ -1,11 +1,13 @@
----
-title: Introduction
-kind: Title
----
+
+<div class='alert alert-danger text-center'>
+	<h5>This webpage is a work in progress.</h5>
+</div>
+
+# What is TKO?
 
 TKO is a Javascript web framework, and the foundation for Knockout 4.
 
-Knockout helps you create rich, responsive, maintainable applications built on a clean underlying data model. 
+Knockout helps you create rich, responsive, maintainable applications built on a clean underlying data model.
 
 - **Simple data-html bindings**
   Easily associate DOM elements with model data using a concise, readable syntax, like this: `<input data-bind='textInput: value'/>`
@@ -20,12 +22,20 @@ Knockout helps you create rich, responsive, maintainable applications built on a
 
 TKO has a comprehensive suite of tests that ensure its correct functioning and allow easy verification on different Javascript browsers and platforms.
 
+## Sponsors
+
+Support Knockout:
+
+<a class='btn btn-primary btn-lg btn-block' href='https://patreon.com/brianmhunt'>
+	via Patreon to Brian M Hunt
+</a>
+
+
 ## First Example
 
 <p data-height="265" data-theme-id="dark" data-slug-hash="jarpvY" data-default-tab="html,result" data-user="brianmhunt" data-embed-version="2" data-pen-title="Knockout.js First Example" class="codepen">See the Pen <a href="https://codepen.io/brianmhunt/pen/jarpvY/">Knockout.js First Example</a> by Brian M Hunt (<a href="https://codepen.io/brianmhunt">@brianmhunt</a>) on <a href="https://codepen.io">CodePen</a>.</p>
 
 <!-- tutorial -->
-<!-- books -->
 
 
 
