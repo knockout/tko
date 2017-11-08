@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/knockout/tko#readme",
   "dependencies": {
-    "tko.observable": "4.0.0-alpha4",
+    "tko.observable": "^4.0.0-alpha4",
     "tslib": "^1.8.0"
   },
   "karma": {

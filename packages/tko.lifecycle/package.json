@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "tko.computed": "4.0.0-alpha4",
-    "tko.utils": "4.0.0-alpha4",
+    "tko.computed": "^4.0.0-alpha4",
+    "tko.utils": "^4.0.0-alpha4",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "tko.observable": "4.0.0-alpha4"
+    "tko.observable": "^4.0.0-alpha4"
   },
   "files": [
     "dist/"

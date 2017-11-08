@@ -5,16 +5,20 @@
   "module": "src/index.js",
   "license": "MIT",
   "dependencies": {
-    "tko.bind": "4.0.0-alpha4",
-    "tko.lifecycle": "4.0.0-alpha4",
-    "tko.observable": "4.0.0-alpha4",
-    "tko.provider": "4.0.0-alpha4",
-    "tko.utils": "4.0.0-alpha4",
-    "tko.utils.component": "4.0.0-alpha4",
+    "tko.bind": "^4.0.0-alpha4",
+    "tko.lifecycle": "^4.0.0-alpha4",
+    "tko.observable": "^4.0.0-alpha4",
+    "tko.provider": "^4.0.0-alpha4",
+    "tko.utils": "^4.0.0-alpha4",
+    "tko.utils.component": "^4.0.0-alpha4",
     "tslib": "^1.8.0"
   },
   "files": [
     "dist/"
   ],
-  "karma": { "frameworks": ["jasmine"]}
+  "karma": {
+    "frameworks": [
+      "jasmine"
+    ]
+  }
 }
