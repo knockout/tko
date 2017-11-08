@@ -34,12 +34,19 @@ var bindingDoesNotRecurseIntoElementTypes = {
   'template': true
 }
 
-// Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
-export function getBindingHandler (bindingKey) {
-  const handler = options.bindingProviderInstance.bindingHandlers.get(bindingKey)
+function asProperHandlerClass (handler, bindingKey) {
   if (!handler) { return }
-  if (handler.isBindingHandlerClass) { return handler }
-  return LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
+  return handler.isBindingHandlerClass ? handler
+    : LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
+}
+
+function getBindingHandlerFromComponent (bindingKey, $component) {
+  if (!$component || typeof $component.getBindingHandler !== 'function') { return }
+  return asProperHandlerClass($component.getBindingHandler(bindingKey))
+}
+
+export function getBindingHandler (bindingKey) {
+  return asProperHandlerClass(options.bindingProviderInstance.bindingHandlers.get(bindingKey), bindingKey)
 }
 
 // Returns the valueAccesor function for a binding value
@@ -143,7 +150,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
 
 var boundElementDomDataKey = domData.nextKey()
 
-function * topologicalSortBindings (bindings) {
+function * topologicalSortBindings (bindings, $component) {
   const results = []
   // Depth-first sort
   const bindingsConsidered = {}    // A temporary record of which bindings are already in 'result'
@@ -151,7 +158,7 @@ function * topologicalSortBindings (bindings) {
 
   objectForEach(bindings, function pushBinding (bindingKey) {
     if (!bindingsConsidered[bindingKey]) {
-      const binding = getBindingHandler(bindingKey)
+      const binding = getBindingHandlerFromComponent(bindingKey, $component) || getBindingHandler(bindingKey)
       if (!binding) { return }
         // First add dependencies (if any) of the current binding
       if (binding.after) {
@@ -223,6 +230,8 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
 
   var bindingHandlerThatControlsDescendantBindings
   if (bindings) {
+    const $component = bindingContext.$component || {}
+
     const allBindingHandlers = {}
     domData.set(node, 'bindingHandlers', allBindingHandlers)
 
@@ -249,7 +258,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, bind
 
     // Note Array.from as workaround to Typescript 2.6 being broken:
     //    https://stackoverflow.com/questions/47183944
-    const bindingsArray = Array.from(topologicalSortBindings(bindings))
+    const bindingsArray = Array.from(topologicalSortBindings(bindings, $component))
     for (const [key, BindingHandlerClass] of bindingsArray) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {

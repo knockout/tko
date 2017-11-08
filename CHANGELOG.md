@@ -6,10 +6,12 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (components) Add `ko.Component`, an abstract base class that simplifies the Component creation and registration API (see `tko.utils.component/src/ComponentABC.js`)
 * (with binding) Fix dependency count for function-arguments [knockout/knockout#2285]
 * (options) Allow importing `ko` in node
+* (components) Add `getBindingHandler(key)` to use binding handlers local to a component
+* (docs) Add `/tko.io` with structure for building and deploying documentation website
 
 ## 🏰  Alpha-3 (30 June 2017)
 
-* (build) Compiles to `dist/ko.js` (via Babel) 
+* (build) Compiles to `dist/ko.js` (via Babel)
 * (build) The `dist/tko.js` (that exported `tko`) has been deprecated/removed
 * (internal) Add the ES6 LifeCycle class (see tko.lifecycle)
 * (binding handlers) Add new-style ES6 Binding Handler class (see custom-bindings documentation and tko.bind/src/BindingHandler.js), descended from the LifeCycle class

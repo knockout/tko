@@ -707,6 +707,30 @@ describe('Components: Component binding', function() {
         expect(testNode).toContainText('Hello! Your param is 456 Goodbye.');
     });
 
+    describe('Component `bindingHandlers`', function () {
+      it("overloads existing and provides new bindings", function () {
+        const calls = []
+        testNode.innerHTML = `<with-my-bindings></with-my-bindings>`
+
+        class ViewModel {
+          getBindingHandler (bindingKey) {
+            return {
+              text: () => calls.push('text'),
+              text2: () => calls.push('text2')
+            }[bindingKey]
+          }
+        }
+
+        const template = `
+          <span data-bind='text: "123"'></span>
+          <span data-bind='text2: "123"'></span>`
+
+        components.register('with-my-bindings', {viewModel: ViewModel, template, synchronous: true})
+        applyBindings({}, testNode)
+        expect(calls).toEqual(['text', 'text2'])
+      })
+    })
+
     describe('Does not automatically subscribe to any observables you evaluate during createViewModel or a viewmodel constructor', function() {
         // This clarifies that, if a developer wants to react when some observable parameter
         // changes, then it's their responsibility to subscribe to it or use a computed.
