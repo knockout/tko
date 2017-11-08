@@ -1,9 +1,5 @@
----
-kind: documentation
-title: Custom Component Elements
-cat: 3
-subCat: Components
----
+
+# Custom Component Elements
 
 Custom elements provide a convenient way of injecting [components](#component-overview) into your views.
 

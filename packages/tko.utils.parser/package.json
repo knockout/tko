@@ -2,7 +2,7 @@
   "name": "tko.utils.parser",
   "version": "4.0.0-alpha4",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
-  "module": "dist/tko.utils.parser.js",
+  "module": "src/index.js",
   "files": [
     "dist/"
   ],

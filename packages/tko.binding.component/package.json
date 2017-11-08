@@ -2,7 +2,7 @@
   "name": "tko.binding.component",
   "version": "4.0.0-alpha4",
   "description": "component: binding for web components",
-  "module": "dist/tko.binding.component.js",
+  "module": "src/index.js",
   "license": "MIT",
   "dependencies": {
     "tko.bind": "4.0.0-alpha4",

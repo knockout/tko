@@ -1,10 +1,5 @@
----
-kind: documentation
-title: textInput
-cat: 4
-subCat: Working with form fields
----
 
+# `textInput`
 
 
 ### Purpose

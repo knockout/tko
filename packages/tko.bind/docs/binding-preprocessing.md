@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Binding preprocessing
-cat: 3
----
+
+# Binding Preprocessing
 
 *Note: Extending the binding syntax using preprocessing is an advanced technique, typically used only when creating libraries of reusable bindings or extended syntaxes. It's not something you'll normally need to do when building applications with Knockout.*
 

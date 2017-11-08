@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Creating custom bindings
-cat: 3
----
+
+# Creating Custom Bindings
 
 You're not limited to using the built-in bindings like `click`, `value`, and so on --- you can create your own ones. This is how to control how observables interact with DOM elements, and gives you a lot of flexibility to encapsulate sophisticated behaviors in an easy-to-reuse way.
 

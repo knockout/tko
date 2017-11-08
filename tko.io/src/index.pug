@@ -1,0 +1,33 @@
+doctype html
+html(lang="en")
+  head
+    title= "TKO"
+
+    each link in links
+      link(rel='stylesheet' href=link.href integrity=link.integrity crossorigin='anonymous')
+
+    each script in scripts
+      script(src=script.src integrity=script.integrity crossorigin=script.crossorigin type=script.type || "application/javascript" async=script.async)
+
+    style(type='text/css')
+      | #{styles}
+
+  body
+    nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark.bg-ribbed-dark.site-navbar
+      .navbar-brand TKO
+      nav.collapse.navbar-collapse.navbar-nav
+        a.nav-item.nav-link(href='https://github.com/knockout/tko') Github
+
+    .container-fluid
+      row.flex-nowrap
+        nav#toc.sidebar.col-lg-3.bg-ribbed-light
+          nav.navbar.contents
+            nav.nav.flex-column(data-bind='each: contents')
+              a.nav-link(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')
+
+        main.main.col-lg-9.ml-auto
+          each section in sections
+            .section
+              .section-title #{section.title}
+              .section-body !{section.html}
+

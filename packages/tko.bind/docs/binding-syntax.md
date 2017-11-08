@@ -1,8 +1,5 @@
----
-kind: documentation
-title: The "data-bind" syntax
-cat: 2
----
+
+# The `data-bind` Syntax
 
 Knockout's declarative binding system provides a concise and powerful way to link data to the UI. It's generally easy and obvious to bind to simple data properties or to use a single binding. For more complex bindings, it helps to better understand the behavior and syntax of Knockout's binding system.
 

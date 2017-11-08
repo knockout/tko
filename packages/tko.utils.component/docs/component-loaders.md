@@ -1,9 +1,5 @@
----
-kind: documentation
-title: Component loaders
-cat: 3
-subCat: Components
----
+
+# Component Loaders
 
 Whenever you inject a [component](component-overview.html) using the [`component` binding](component-binding.html) or a [custom element](component-custom-elements.html), Knockout fetches that component's template and viewmodel using one or more *component loaders*. The job of a component loader is to asynchronously supply a template/viewmodel pair for any given component name.
 

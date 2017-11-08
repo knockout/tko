@@ -1,9 +1,4 @@
----
-kind: documentation
-title: css
-cat: 4
-subCat: Controlling text and appearance
----
+# `css`
 
 ### Purpose
 The `css` binding adds or removes one or more named CSS classes to the associated DOM element. This is useful, for example, to highlight some value in red if it becomes negative.

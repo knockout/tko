@@ -1,9 +1,5 @@
----
-kind: documentation
-title: template
-cat: 4
-subCat: Rendering templates
----
+
+# `template` Binding
 
 ### Purpose
 The `template` binding populates the associated DOM element with the results of rendering a template. Templates are a simple and convenient way to build sophisticated UI structures - possibly with repeating or nested blocks - as a function of your view model data.

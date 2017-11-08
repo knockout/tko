@@ -1,9 +1,5 @@
----
-kind: documentation
-title: text
-cat: 4
-subCat: Controlling text and appearance
----
+
+# `text`
 
 ### Purpose
 The `text` binding causes the associated DOM element to display the text value of your parameter.

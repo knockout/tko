@@ -1,5 +1,3 @@
-/* eslint semi: 0 */
-
 const fs = require('fs')
 const path = require('path')
 
@@ -11,7 +9,10 @@ const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 const root = path.join(process.cwd(), 'spec')
 
-console.log(` 🏕  Karma being loaded at ${process.cwd()}`)
+console.log(`
+    🏕  Karma being loaded at:
+        ${process.cwd()}
+`)
 
 if (!pkg.karma || !pkg.karma.frameworks) {
   console.warn(`
@@ -37,16 +38,6 @@ const ROLLUP_CONFIG = {
   COMMONJS: {}
 }
 
-// The following can be used to identify
-// const seen = []
-// SEEN_PLUGIN = { name: 'inline',
-//   load(x) {
-//     if (seen.includes(x)) { return }
-//     seen.push(x)
-//     console.info(x.replace('/Users/bmh/Repos/tko/packages/',''))
-//   }
-// }
-
 const rollupPreprocessor = Object.assign({}, {
   format: 'iife',
   name: pkg.name,
@@ -54,6 +45,8 @@ const rollupPreprocessor = Object.assign({}, {
     nodeResolve(ROLLUP_CONFIG.RESOLVE),
     rollupVisualizer(ROLLUP_CONFIG.VISUALIZER),
     rollupCommonJS(ROLLUP_CONFIG.COMMONJS)
+    // Add the following to `plugins` to print every import.
+    // { name: 'display', load (...x) { console.log(...x) } }
   ],
   sourcemap: process.argv.includes('--sourcemap') ? 'inline' : false
 })

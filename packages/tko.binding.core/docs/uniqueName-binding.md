@@ -1,9 +1,5 @@
----
-kind: documentation
-title: uniqueName
-cat: 4
-subCat: Working with form fields
----
+
+# `uniqueName`
 
 ### Purpose
 The `uniqueName` binding ensures that the associated DOM element has a nonempty `name` attribute. If the DOM element did not have a `name` attribute, this binding gives it one and sets it to some unique string value.

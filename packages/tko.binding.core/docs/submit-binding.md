@@ -1,9 +1,5 @@
----
-kind: documentation
-title: submit
-cat: 4
-subCat: Working with form fields
----
+
+# `submit`
 
 ### Purpose
 The `submit` binding adds an event handler so that your chosen JavaScript function will be invoked when the associated DOM element is submitted. Typically you will only want to use this on `form` elements.

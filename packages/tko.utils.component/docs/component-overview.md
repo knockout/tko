@@ -1,9 +1,5 @@
----
-kind: documentation
-title: Component Overview
-cat: 3
-subCat: Components
----
+
+# Component Overview
 
 **Components** are a powerful, clean way of organizing your UI code into self-contained, reusable chunks. They:
 

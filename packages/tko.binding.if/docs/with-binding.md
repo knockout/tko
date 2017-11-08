@@ -1,9 +1,5 @@
----
-kind: documentation
-title: with
-cat: 4
-subCat: Control flow
----
+
+# `with` Binding
 
 ### Purpose
 The `with` binding creates a new [binding context](binding-context.html), so that descendant elements are bound in the context of a specified object.

@@ -1,9 +1,4 @@
----
-kind: documentation
-title: attr
-cat: 4
-subCat: Controlling text and appearance
----
+# `attr`
 
 ### Purpose
 The `attr` binding provides a generic way to set the value of any attribute for the associated DOM element.  This is useful, for example, when you need to set the `title` attribute of an element, the `src` of an `img` tag, or the `href` of a link based on values in your view model, with the attribute value being updated automatically whenever the corresponding model property changes.

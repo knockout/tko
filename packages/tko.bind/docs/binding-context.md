@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Binding context
-cat: 3
----
+
+# Binding Context
 
 A *binding context* is an object that holds data that you can reference from your bindings. While applying bindings, Knockout automatically creates and manages a hierarchy of binding contexts. The root level of the hierarchy refers to the `viewModel` parameter you supplied to `ko.applyBindings(viewModel)`. Then, each time you use a control flow binding such as [`with`](with-binding.html) or [`foreach`](foreach-binding.html), that creates a child binding context that refers to the nested view model data.
 

@@ -1,9 +1,5 @@
----
-kind: documentation
-title: enable
-cat: 4
-subCat: Working with form fields
----
+# `enable`
+
 
 ### Purpose
 The `enable` binding causes the associated DOM element to be enabled only when the parameter value is `true`. This is useful with form elements like `input`, `select`, and `textarea`.

@@ -1,8 +1,3 @@
----
-kind: documentation
-title: Asynchronous Module Definition (AMD) With RequireJs
-cat: 5
----
 
 ### Overview of AMD
 

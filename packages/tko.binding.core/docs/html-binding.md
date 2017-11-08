@@ -1,14 +1,18 @@
----
-kind: documentation
-title: html
-cat: 4
-subCat: Controlling text and appearance
----
+
+# `html`
 
 ### Purpose
 The `html` binding causes the associated DOM element to display the HTML specified by your parameter.
 
 Typically this is useful when values in your view model are actually strings of HTML markup that you want to render.
+
+<div class='alert alert-danger'>
+  <h4 class="alert-heading">Script Injection</h4>
+  <p>
+  	The `html` binding can be used to inject arbitrary code.  Without proper sanitization (which is notoriously difficult), or a strong Content Security Policy, you should be
+  	mindful of the <code>html</code> binding.
+  </p>
+</div>
 
 ### Example
 ```html

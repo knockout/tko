@@ -1,9 +1,5 @@
----
-kind: documentation
-title: How dependency tracking works
-cat: 2
-subCat: Components
----
+
+# Dependency Tracking
 
 *Beginners don't need to know about this, but more advanced developers will want to know why we keep making all these claims about KO automatically tracking dependencies and updating the right parts of the UI...*
 

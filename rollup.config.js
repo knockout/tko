@@ -5,7 +5,7 @@ import babelMinify from 'rollup-plugin-babel-minify'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import typescript from 'rollup-plugin-typescript'
-import uglify from 'rollup-plugin-uglify'
+// import uglify from 'rollup-plugin-uglify'
 import rollupVisualizer from 'rollup-plugin-visualizer'
 import * as tsconfig from './tsconfig.json'
 import * as pkg from './package.json'
@@ -22,10 +22,10 @@ const PLUGIN_CONFIGS = {
     exclude: 'node_modules',
     typescript: require('typescript')
   },
-  
+
   /* tko modules only supported w/ modern JS bundlers (ES2015) */
   RESOLVE: { module: true },
-  
+
   /* Replace {{VERSION}} with pkg.json's `version` */
   REPLACE: { delimiters: ['{{', '}}'], VERSION: pkg.version },
 
@@ -70,7 +70,7 @@ function getTkoES6Aliases () {
 
 function createRollupConfig ({ minify, transpile } = {}) {
   let filename = path.join(PACKAGE_ROOT_PATH, 'dist', LERNA_PACKAGE_NAME)
-  
+
   const plugins = [
     ...UNIVERSAL_PLUGINS // clone
   ]
@@ -84,7 +84,8 @@ function createRollupConfig ({ minify, transpile } = {}) {
   }
 
   if (minify) {
-    plugins.push(transpile ? uglify() : babelMinify({ comments: false }))
+    // plugins.push(transpile ? uglify() : babelMinify({ comments: false }))
+    plugins.push(babelMinify({ comments: false }))
     filename += '.min'
   }
 

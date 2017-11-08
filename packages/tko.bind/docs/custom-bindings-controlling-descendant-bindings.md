@@ -1,8 +1,4 @@
----
-kind: documentation
-title: Controlling descendant bindings
-cat: 3
----
+# Controlling Descendant Bindnings
 
 *Note: Creating custom bindings that control descendant binding is an advanced technique, typically used only when creating libraries of reusable bindings. It's not something you'll normally need to do when building applications with Knockout.*
 

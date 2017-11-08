@@ -1,9 +1,4 @@
----
-kind: documentation
-title: click
-cat: 4
-subCat: Working with form fields
----
+# `click`
 
 ### Purpose
 The `click` binding adds an event handler so that your chosen JavaScript function will be invoked when the associated DOM element is clicked. This is most commonly used with elements like `button`, `input`, and `a`, but actually works with any visible DOM element.

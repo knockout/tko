@@ -1,8 +1,5 @@
----
-kind: documentation
-title: Tracking array changes
-cat: 2
----
+
+# Tracking Array Changes
 
 Since [Knockout 3.0](http://blog.stevensanderson.com/2013/10/08/knockout-3-0-release-candidate-available/)
 there has been an `arrayChange` event that can be attached to an `observable`

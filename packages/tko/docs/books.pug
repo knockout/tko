@@ -1,0 +1,14 @@
+
+h1 Books
+
+.book-grid
+	each book in books
+		.card
+			img.card-img-top(src=(book.imageLinks || {}).thumbnail alt="Book cover image" style='width: 120px; margin: auto')
+			.card-body.text-center
+				h4.card-title #{book.title}
+				h6.mb-2.card-subtitle #{book.subtitle}
+				p.card-text
+					| By #{book.authors}, published #{book.publishedDate}
+				a.card-link(href=book.canonicalVolumeLink)
+					| More Information

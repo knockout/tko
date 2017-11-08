@@ -1,9 +1,4 @@
----
-kind: documentation
-title: hasFocus
-cat: 4
-subCat: Working with form fields
----
+# `hasFocus`
 
 ### Purpose
 The `hasFocus` binding links a DOM element's focus state with a viewmodel property. It is a two-way binding, so:

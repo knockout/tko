@@ -1,9 +1,5 @@
----
-kind: documentation
-title: value
-cat: 4
-subCat: Working with form fields
----
+
+# `value`
 
 *Note: The [`textInput`](#textInput-binding) binding can be used in many places instead of the `value` binding, providing broader support for many edge
   cases and textInput update the observables on a per-character change (as opposed to the default of `blur` for the `value` binding).*

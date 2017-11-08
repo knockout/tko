@@ -1,9 +1,5 @@
----
-kind: documentation
-title: Component registration
-cat: 3
-subCat: Components
----
+
+# Component Registration
 
 For Knockout to be able to load and instantiate your components, you must register them using `ko.components.register`, providing a configuration as described here.
 

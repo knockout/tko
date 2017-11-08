@@ -1,9 +1,4 @@
----
-kind: documentation
-title: options
-cat: 4
-subCat: Working with form fields
----
+# `options`
 
 ### Purpose
 The `options` binding controls what options should appear in a drop-down list (i.e., a `<select>` element) or multi-select list (e.g., `<select size='6'>`). This binding cannot be used with anything other than `<select>` elements.

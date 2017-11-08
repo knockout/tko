@@ -1,8 +1,4 @@
----
-kind: documentation
-title: Loading and Saving JSON data
-cat: 5
----
+## Loading and saving JSON data
 
 Knockout allows you to implement sophisticated client-side interactivity, but almost all web applications also need to exchange data with the server, or at least to serialize the data for local storage. The most convenient way to exchange or store data is in [JSON format](http://json.org/) - the format that the majority of Ajax applications use today.
 

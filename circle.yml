@@ -13,8 +13,10 @@ dependencies:
     - ~/.cache/yarn
 
   override:
+    - yarn config set workspaces-experimental true
     - yarn
-    - npm run lerna
+    - lerna bootstrap
+    - yarn test
 
 #  - gulp test:phantomjs --once --jquery
 #  - gulp test:phantomjs --once --jquery3-compat
@@ -29,4 +31,4 @@ dependencies:
 general:
   branches:
     ignore:
-    - gh-pages # list of branches to ignore
+    - gh-pages
