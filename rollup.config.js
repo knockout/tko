@@ -98,7 +98,7 @@ function createRollupConfig ({ minify, transpile } = {}) {
     output: {
       file: filename,
       format: IS_BROWSER_BUNDLE ? 'umd' : 'es',
-      name: LERNA_PACKAGE_NAME
+      name: LERNA_PACKAGE_NAME === 'tko' ? 'ko' : LERNA_PACKAGE_NAME
     },
     sourcemap: true
   }

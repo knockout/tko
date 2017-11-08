@@ -1,7 +1,11 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 
-## 🚜  Alpha-4 (ongoing)
+## 🚚  Alpha-4a (8 Nov 2017)
+
+* (build) Change the `tko` export to `global.ko` for backwards compatibility (instead of global.tko).
+
+## 🚜  Alpha-4 (8 Nov 2017)
 
 * (components) Add `ko.Component`, an abstract base class that simplifies the Component creation and registration API (see `tko.utils.component/src/ComponentABC.js`)
 * (with binding) Fix dependency count for function-arguments [knockout/knockout#2285]
