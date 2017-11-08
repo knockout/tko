@@ -325,8 +325,7 @@ var ieVersion = options.document && (function () {
 
     // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
   while (
-        div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
-        iElems[0]
+        div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->', iElems[0]
     ) {}
   return version > 4 ? version : undefined
 }());
@@ -4523,8 +4522,6 @@ class DataBindProvider extends BindingStringProvider {
   }
 }
 
-'use strict';
-
 const SUBSCRIPTIONS = createSymbolOrString('LifeCycle Subscriptions List');
 const ANCHOR_NODE = createSymbolOrString('LifeCycle Anchor Node');
 
@@ -5980,7 +5977,10 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext$$1, b
     allBindings.has = (key) => key in bindings;
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key));
 
-    for (const [key, BindingHandlerClass] of topologicalSortBindings(bindings)) {
+    // Note Array.from as workaround to Typescript 2.6 being broken:
+    //    https://stackoverflow.com/questions/47183944
+    const bindingsArray = Array.from(topologicalSortBindings(bindings));
+    for (const [key, BindingHandlerClass] of bindingsArray) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {
         onBindingError({
@@ -6938,10 +6938,7 @@ if (w$1.navigator) {
     };
 
     // Detect various browser versions because some old versions don't fully support the 'input' event
-    operaVersion = w$1.opera && w$1.opera.version && parseInt(w$1.opera.version()),
-        userAgent = w$1.navigator.userAgent,
-        safariVersion = parseVersion(userAgent.match(/^(?:(?!chrome).)*version\/([^ ]*) safari/i)),
-        firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/));
+    operaVersion = w.opera && w.opera.version && parseInt(w.opera.version()), userAgent = w.navigator.userAgent, safariVersion = parseVersion(userAgent.match(/^(?:(?!chrome).)*version\/([^ ]*) safari/i)), firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/));
 }
 
 // IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.

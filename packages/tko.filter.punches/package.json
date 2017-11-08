@@ -2,7 +2,7 @@
   "name": "tko.filter.punches",
   "version": "4.0.0-alpha4",
   "description": "TKO filters from knockout punches",
-  "module": "dist/tko.filter.punches.js",
+  "module": "src/index.js",
   "files": [
     "dist/"
   ],

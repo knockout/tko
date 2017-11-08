@@ -22,10 +22,10 @@ const PLUGIN_CONFIGS = {
     exclude: 'node_modules',
     typescript: require('typescript')
   },
-  
+
   /* tko modules only supported w/ modern JS bundlers (ES2015) */
   RESOLVE: { module: true },
-  
+
   /* Replace {{VERSION}} with pkg.json's `version` */
   REPLACE: { delimiters: ['{{', '}}'], VERSION: pkg.version },
 
@@ -70,7 +70,7 @@ function getTkoES6Aliases () {
 
 function createRollupConfig ({ minify, transpile } = {}) {
   let filename = path.join(PACKAGE_ROOT_PATH, 'dist', LERNA_PACKAGE_NAME)
-  
+
   const plugins = [
     ...UNIVERSAL_PLUGINS // clone
   ]

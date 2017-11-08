@@ -16,7 +16,7 @@ import {bindings as templateBindings} from 'tko.binding.template';
 
 import {
     applyBindings
-} from '../src';
+} from 'tko.bind';
 
 import {
     useMockForTasks

@@ -57,7 +57,10 @@ export function dummyTemplateEngine(templates) {
         data = data || {};
          // Rollup mangles `data` to e.g. `data$$1`.  This workaround works
          // as long as nomangle$data doesn't appear anywhere not in tests.
-        var nomangle$data = data
+        const nomangle$data = data
+        window.__prevent_tree_shaking__ = nomangle$data
+        delete window.__prevent_tree_shaking__
+
         rt_options.templateRenderingVariablesInScope = rt_options.templateRenderingVariablesInScope || {};
 
         extend(data, rt_options.templateRenderingVariablesInScope);

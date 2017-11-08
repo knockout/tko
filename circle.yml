@@ -13,6 +13,7 @@ dependencies:
     - ~/.cache/yarn
 
   override:
+    - yarn config set workspaces-experimental true
     - yarn
     - npm run lerna
 
