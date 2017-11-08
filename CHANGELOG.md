@@ -8,6 +8,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (options) Allow importing `ko` in node
 * (components) Add `getBindingHandler(key)` to use binding handlers local to a component
 * (docs) Add `/tko.io` with structure for building and deploying documentation website
+* (npm) Publishing all packages as 4.0.0-alpha4
 
 ## 🏰  Alpha-3 (30 June 2017)
 

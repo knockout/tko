@@ -1,7 +1,7 @@
 
 import {
    BindingStringProvider
- } from 'tko.provider.bindingString'
+ } from 'tko.provider.bindingstring'
 
 export default class DataBindProvider extends BindingStringProvider {
   get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE

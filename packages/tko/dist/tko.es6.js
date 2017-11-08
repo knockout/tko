@@ -4502,7 +4502,57 @@ class VirtualProvider extends BindingStringProvider {
   }
 }
 
-class DataBindProvider extends BindingStringProvider {
+/**
+ * BindingStringProvider is an abstract base class parses a binding string.
+ *
+ * Children must implement `nodeHasBindings` and `getBindingString`.
+ */
+class BindingStringProvider$1 extends Provider {
+  /** Call bindingHandler.preprocess on each respective binding string.
+   *
+   * The `preprocess` property of bindingHandler must be a static
+   * function (i.e. on the object or constructor).
+   */
+  * processBinding (key, value) {
+    // Get the "on" binding from "on.click"
+    const [handlerName, property] = key.split('.');
+    const handler = this.bindingHandlers.get(handlerName);
+
+    if (handler && handler.preprocess) {
+      const bindingsAddedByHandler = [];
+      const chainFn = (...args) => bindingsAddedByHandler.push(args);
+      value = handler.preprocess(value, key, chainFn);
+      for (const [key, value] of bindingsAddedByHandler) {
+        yield * this.processBinding(key, value);
+      }
+    } else if (property) {
+      value = `{${property}:${value}}`;
+    }
+
+    yield `${handlerName}:${value}`;
+  }
+
+  * generateBindingString (bindingString) {
+    for (const {key, unknown, value} of parseObjectLiteral(bindingString)) {
+      yield * this.processBinding(key || unknown, value);
+    }
+  }
+
+  preProcessBindings (bindingString) {
+    return Array.from(this.generateBindingString(bindingString)).join(',')
+  }
+
+  getBindingAccessors (node, context) {
+    const bindingString = node && this.getBindingString(node);
+    if (!bindingString) { return }
+    const processed = this.preProcessBindings(bindingString);
+    return new Parser().parse(processed, context, this.globals, node)
+  }
+
+  getBindingString () { throw new Error('Overload getBindingString.') }
+}
+
+class DataBindProvider extends BindingStringProvider$1 {
   get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
 
   get BIND_ATTRIBUTE () {
@@ -5764,12 +5814,19 @@ var bindingDoesNotRecurseIntoElementTypes = {
   'template': true
 };
 
-// Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
-function getBindingHandler (bindingKey) {
-  const handler = options.bindingProviderInstance.bindingHandlers.get(bindingKey);
+function asProperHandlerClass (handler, bindingKey) {
   if (!handler) { return }
-  if (handler.isBindingHandlerClass) { return handler }
-  return LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
+  return handler.isBindingHandlerClass ? handler
+    : LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
+}
+
+function getBindingHandlerFromComponent (bindingKey, $component) {
+  if (!$component || typeof $component.getBindingHandler !== 'function') { return }
+  return asProperHandlerClass($component.getBindingHandler(bindingKey))
+}
+
+function getBindingHandler (bindingKey) {
+  return asProperHandlerClass(options.bindingProviderInstance.bindingHandlers.get(bindingKey), bindingKey)
 }
 
 // Returns the valueAccesor function for a binding value
@@ -5873,7 +5930,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext$$1, nodeVerif
 
 var boundElementDomDataKey = data.nextKey();
 
-function * topologicalSortBindings (bindings) {
+function * topologicalSortBindings (bindings, $component) {
   const results = [];
   // Depth-first sort
   const bindingsConsidered = {};    // A temporary record of which bindings are already in 'result'
@@ -5881,7 +5938,7 @@ function * topologicalSortBindings (bindings) {
 
   objectForEach(bindings, function pushBinding (bindingKey) {
     if (!bindingsConsidered[bindingKey]) {
-      const binding = getBindingHandler(bindingKey);
+      const binding = getBindingHandlerFromComponent(bindingKey, $component) || getBindingHandler(bindingKey);
       if (!binding) { return }
         // First add dependencies (if any) of the current binding
       if (binding.after) {
@@ -5953,6 +6010,8 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext$$1, b
 
   var bindingHandlerThatControlsDescendantBindings;
   if (bindings) {
+    const $component = bindingContext$$1.$component || {};
+
     const allBindingHandlers = {};
     data.set(node, 'bindingHandlers', allBindingHandlers);
 
@@ -5979,7 +6038,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext$$1, b
 
     // Note Array.from as workaround to Typescript 2.6 being broken:
     //    https://stackoverflow.com/questions/47183944
-    const bindingsArray = Array.from(topologicalSortBindings(bindings));
+    const bindingsArray = Array.from(topologicalSortBindings(bindings, $component));
     for (const [key, BindingHandlerClass] of bindingsArray) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {

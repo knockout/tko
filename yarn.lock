@@ -824,7 +824,7 @@ command-join@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/command-join/-/command-join-2.0.0.tgz#52e8b984f4872d952ff1bdc8b98397d27c7144cf"
 
-commander@2.11.0, commander@~2.11.0:
+commander@2.11.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
 
@@ -3799,12 +3799,6 @@ rollup-plugin-typescript@^0.8.1:
     tippex "^2.1.1"
     typescript "^1.8.9"
 
-rollup-plugin-uglify@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-uglify/-/rollup-plugin-uglify-2.0.1.tgz#67b37ad1efdafbd83af4c36b40c189ee4866c969"
-  dependencies:
-    uglify-js "^3.0.9"
-
 rollup-plugin-visualizer@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/rollup-plugin-visualizer/-/rollup-plugin-visualizer-0.3.1.tgz#651b93e1eda3df603ed7f80963539d1faf264f70"
@@ -4016,10 +4010,6 @@ source-map@^0.4.4:
 source-map@^0.5.3, source-map@^0.5.6, source-map@~0.5.1:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
-
-source-map@~0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
 
 spdx-correct@~1.0.0:
   version "1.0.2"
@@ -4387,13 +4377,6 @@ uglify-js@^2.6:
     yargs "~3.10.0"
   optionalDependencies:
     uglify-to-browserify "~1.0.0"
-
-uglify-js@^3.0.9:
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.1.8.tgz#780d08b4f6782fe36ea5484d952362eddaf1d7b8"
-  dependencies:
-    commander "~2.11.0"
-    source-map "~0.6.1"
 
 uglify-to-browserify@~1.0.0:
   version "1.0.2"
