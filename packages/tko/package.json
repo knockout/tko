@@ -1,6 +1,6 @@
 {
   "name": "tko",
-  "version": "4.0.0-alpha4",
+  "version": "4.0.0-alpha4a",
   "description": "Simplify dynamic HTML with Model-View-View-Model pattern",
   "main": "dist/tko.js",
   "repository": "git@github.com:knockout/tko",
