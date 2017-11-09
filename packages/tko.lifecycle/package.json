@@ -1,4 +1,5 @@
 {
+  "module": "dist/tko.lifecycle.js",
   "dependencies": {
     "tko.computed": "^4.0.0-alpha4",
     "tko.utils": "^4.0.0-alpha4",
@@ -13,7 +14,6 @@
   "name": "tko.lifecycle",
   "version": "4.0.0-alpha4",
   "description": "Knockout LifeCycle for object instances",
-  "module": "src/index.js",
   "repository": "git@github.com:knockout/tko.lifecycle.git",
   "author": "Knockout Team",
   "license": "MIT",

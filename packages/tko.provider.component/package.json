@@ -2,7 +2,7 @@
   "name": "tko.provider.component",
   "version": "4.0.0-alpha4",
   "description": "Bind custom web components e.g. <custom-binding>",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.component.js",
   "files": [
     "dist/"
   ],

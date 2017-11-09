@@ -2,7 +2,7 @@
   "name": "tko.utils",
   "version": "4.0.0-alpha4",
   "description": "TKO Utilities",
-  "module": "src/index.js",
+  "module": "dist/tko.utils.js",
   "files": [
     "dist/"
   ],

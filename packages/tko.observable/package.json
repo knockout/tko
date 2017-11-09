@@ -2,7 +2,7 @@
   "name": "tko.observable",
   "version": "4.0.0-alpha4",
   "description": "TKO subscribables and observables",
-  "module": "src/index.js",
+  "module": "dist/tko.observable.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.observable.git"

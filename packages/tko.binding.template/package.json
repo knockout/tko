@@ -2,7 +2,7 @@
   "name": "tko.binding.template",
   "version": "4.0.0-alpha4",
   "description": "TKO Template bindings",
-  "module": "src/index.js",
+  "module": "dist/tko.binding.template.js",
   "files": [
     "dist/"
   ],

@@ -2,7 +2,7 @@
   "name": "tko.provider",
   "version": "4.0.0-alpha4",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.js",
   "files": [
     "dist/"
   ],

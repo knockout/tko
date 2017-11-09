@@ -2,7 +2,7 @@
   "name": "tko.bind",
   "version": "4.0.0-alpha4",
   "description": "TKO DOM-Observable Binding",
-  "module": "src/index.js",
+  "module": "dist/tko.bind.js",
   "dependencies": {
     "tko.computed": "^4.0.0-alpha4",
     "tko.lifecycle": "^4.0.0-alpha4",

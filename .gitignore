@@ -29,3 +29,7 @@ coverage/
 visual.html
 packages/*/visual.html
 /package-lock.json
+/packages/tko/dist/tko.js
+/packages/tko/dist/tko.js.map
+/packages/tko/dist/tko.min.js
+/packages/tko/dist/tko.min.js.map

@@ -2,7 +2,7 @@
   "name": "tko.binding.if",
   "version": "4.0.0-alpha4",
   "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
-  "module": "src/index.js",
+  "module": "dist/tko.binding.if.js",
   "files": [
     "dist/"
   ],

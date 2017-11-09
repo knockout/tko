@@ -2,7 +2,7 @@
   "name": "tko.utils.component",
   "version": "4.0.0-alpha4",
   "description": "Registry and loading utilities for web components",
-  "module": "src/index.js",
+  "module": "dist/tko.utils.component.js",
   "files": [
     "dist/"
   ],

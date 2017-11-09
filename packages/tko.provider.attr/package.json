@@ -2,7 +2,7 @@
   "name": "tko.provider.attr",
   "version": "4.0.0-alpha4",
   "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.attr.js",
   "files": [
     "dist/"
   ],

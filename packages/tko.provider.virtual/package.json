@@ -2,7 +2,7 @@
   "name": "tko.provider.virtual",
   "version": "4.0.0-alpha4",
   "description": "Binding provider for <!-- ko handler: ... --> virtual elements",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.virtual.js",
   "files": [
     "dist/"
   ],

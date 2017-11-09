@@ -2,7 +2,7 @@
   "name": "tko.provider.bindingstring",
   "version": "4.0.0-alpha4",
   "description": "Abstract Base Class for providers that parse a binding string",
-  "module": "src/index.js",
+  "module": "dist/tko.provider.bindingString.js",
   "files": [
     "dist/"
   ],
