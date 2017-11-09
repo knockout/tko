@@ -17,6 +17,7 @@
 import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation.js';
 import { removeNode } from './disposal.js';
 import { tagNameLower } from './info.js';
+import * as domData from './data'
 import options from '../options'
 
 var commentNodesHaveTextProperty = options.document && options.document.createComment("test").text === "<!--test-->";
@@ -33,12 +34,19 @@ export function isEndComment(node) {
     return (node.nodeType == 8) && endCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
 }
 
+function isUnmatchedEndComment(node) {
+    return isEndComment(node) && !domData.get(node, matchedEndCommentDataKey)
+}
+
+const matchedEndCommentDataKey = '__ko_matchedEndComment__'
+
 export function getVirtualChildren(startComment, allowUnbalanced) {
     var currentNode = startComment;
     var depth = 1;
     var children = [];
     while (currentNode = currentNode.nextSibling) {
         if (isEndComment(currentNode)) {
+            domData.set(currentNode, matchedEndCommentDataKey, true)
             depth--;
             if (depth === 0)
                 return children;
@@ -143,12 +151,12 @@ export function insertAfter(containerNode, nodeToInsert, insertAfterNode) {
 
 export function firstChild(node) {
     if (!isStartComment(node)) {
-        return node.firstChild;
+        if (node.firstChild && isUnmatchedEndComment(node.firstChild)) {
+            throw new Error('Found end comment without opening comment, as first child of ' + node.outerHTML);
+        }
+        return node.firstChild
     }
-    if (!node.nextSibling || isEndComment(node.nextSibling)) {
-        return null;
-    }
-    return node.nextSibling;
+    return node.nextSibling
 }
 
 
@@ -164,11 +172,19 @@ export function lastChild(node) {
 }
 
 export function nextSibling(node) {
-    if (isStartComment(node))
-        node = getMatchingEndComment(node);
-    if (node.nextSibling && isEndComment(node.nextSibling))
-        return null;
-    return node.nextSibling;
+  if (isStartComment(node)) {
+    node = getMatchingEndComment(node);
+  }
+
+  if (node.nextSibling && isEndComment(node.nextSibling)) {
+    if (isUnmatchedEndComment(node.nextSibling)) {
+        throw Error('Found end comment without a matching opening comment, as next sibling of ' + node.outerHTML)
+    } else {
+        return null
+    }
+  } else {
+    return node.nextSibling
+  }
 }
 
 export function previousSibling(node) {

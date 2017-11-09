@@ -29,24 +29,6 @@ describe('Binding: Attr', function () {
     provider.bindingHandlers.set(coreBindings.bindings)
   })
 
-  it('Should be able to set namespaced attribute values', function () {
-    var model = { myValue: 'first value' }
-    testNode.innerHTML = [
-      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
-      '<g>',
-      '<a data-bind="attr: { \'xlink:href\': myValue }">',
-      '<text>foo</text>',
-      '</a>',
-      '</g>',
-      '</svg>'
-    ].join('')
-
-    applyBindings(model, testNode)
-    var anchor = testNode.childNodes[0]/* svg */.childNodes[0]/* g */.childNodes[0]/* a */
-    expect(anchor.getAttributeNode('xlink:href').value).toEqual('first value')
-    expect(anchor.getAttributeNode('xlink:href').namespaceURI).toEqual('http://www.w3.org/1999/xlink')
-  })
-
   it('Should be able to set arbitrary attribute values', function () {
     var model = { myValue: 'first value' }
     testNode.innerHTML = "<div data-bind='attr: {firstAttribute: myValue, \"second-attribute\": true}'></div>"
