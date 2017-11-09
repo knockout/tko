@@ -33,3 +33,7 @@ packages/*/visual.html
 /packages/tko/dist/tko.js.map
 /packages/tko/dist/tko.min.js
 /packages/tko/dist/tko.min.js.map
+/packages/tko/dist/tko.es6.js
+/packages/tko/dist/tko.es6.js.map
+/packages/tko/dist/tko.es6.min.js
+/packages/tko/dist/tko.es6.min.js.map
