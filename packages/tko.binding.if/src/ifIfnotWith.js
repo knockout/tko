@@ -180,4 +180,3 @@ export class WithBindingHandler extends ConditionalBindingHandler {
     return this.$context.createStaticChildContext(this.value)
   }
 }
-

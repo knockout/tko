@@ -1,96 +1,95 @@
 import {
     domData
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
     observable as Observable
-} from 'tko.observable';
+} from 'tko.observable'
 
 import {
     computed as Computed
-} from '../src';
+} from '../src'
 
-import 'tko.utils/helpers/jasmine-13-helper.js';
+import 'tko.utils/helpers/jasmine-13-helper.js'
 
+describe('Dependent Observable DOM', function () {
+  beforeEach(jasmine.prepareTestNode)
 
-describe('Dependent Observable DOM', function() {
-    beforeEach(jasmine.prepareTestNode);
-
-    it('Should register DOM node disposal callback only if active after the initial evaluation', function() {
+  it('Should register DOM node disposal callback only if active after the initial evaluation', function () {
         // Set up an active one
-        var nodeForActive = document.createElement('DIV'),
-            observable = Observable('initial'),
-            activeDependentObservable = Computed({
-                read: function() {
-                    return observable();
-                },
-                disposeWhenNodeIsRemoved: nodeForActive
-            });
-        var nodeForInactive = document.createElement('DIV');
-        var inactiveDependentObservable = Computed({
-            read: function() {
-                return 123;
-            },
-            disposeWhenNodeIsRemoved: nodeForInactive
-        });
+    var nodeForActive = document.createElement('DIV'),
+      observable = Observable('initial'),
+      activeDependentObservable = Computed({
+        read: function () {
+          return observable()
+        },
+        disposeWhenNodeIsRemoved: nodeForActive
+      })
+    var nodeForInactive = document.createElement('DIV')
+    var inactiveDependentObservable = Computed({
+      read: function () {
+        return 123
+      },
+      disposeWhenNodeIsRemoved: nodeForInactive
+    })
 
-        expect(activeDependentObservable.isActive()).toEqual(true);
-        expect(inactiveDependentObservable.isActive()).toEqual(false);
+    expect(activeDependentObservable.isActive()).toEqual(true)
+    expect(inactiveDependentObservable.isActive()).toEqual(false)
 
         // Infer existence of disposal callbacks from presence/absence of DOM data. This is really just an implementation detail,
         // and so it's unusual to rely on it in a spec. However, the presence/absence of the callback isn't exposed in any other way,
         // and if the implementation ever changes, this spec should automatically fail because we're checking for both the positive
         // and negative cases.
-        expect(domData.clear(nodeForActive)).toEqual(true); // There was a callback
-        expect(domData.clear(nodeForInactive)).toEqual(false); // There was no callback
-    });
+    expect(domData.clear(nodeForActive)).toEqual(true) // There was a callback
+    expect(domData.clear(nodeForInactive)).toEqual(false) // There was no callback
+  })
 
-    it('Should dispose when DOM node is removed from the document and computed is re-evaluated', function() {
+  it('Should dispose when DOM node is removed from the document and computed is re-evaluated', function () {
         // Create node and add it to the document
-        var node = document.createElement('DIV');
-        testNode.appendChild(node);
+    var node = document.createElement('DIV')
+    testNode.appendChild(node)
 
         // Create a computed that is disposed when the node is removed
-        var observable = Observable('initial'),
-            computed = Computed({
-                read: function() {
-                    return observable();
-                },
-                disposeWhenNodeIsRemoved: node
-            });
+    var observable = Observable('initial'),
+      computed = Computed({
+        read: function () {
+          return observable()
+        },
+        disposeWhenNodeIsRemoved: node
+      })
 
         // Update computed and check that it's still active
-        observable('second');
-        expect(computed.isActive()).toEqual(true);
+    observable('second')
+    expect(computed.isActive()).toEqual(true)
 
         // Remove the node, update the computed, and check that it was disposed
-        testNode.removeChild(node);
-        observable('third');
-        expect(computed.isActive()).toEqual(false);
-    });
+    testNode.removeChild(node)
+    observable('third')
+    expect(computed.isActive()).toEqual(false)
+  })
 
-    it('Should dispose when DOM node is removed from the document, but not before it\'s added', function() {
-        var node = document.createElement('DIV'),
-            observable = Observable('initial'),
-            computed = Computed({
-                read: function() {
-                    return observable();
-                },
-                disposeWhenNodeIsRemoved: node
-            });
+  it('Should dispose when DOM node is removed from the document, but not before it\'s added', function () {
+    var node = document.createElement('DIV'),
+      observable = Observable('initial'),
+      computed = Computed({
+        read: function () {
+          return observable()
+        },
+        disposeWhenNodeIsRemoved: node
+      })
 
         // Update computed and check that it's still active
-        observable('second');
-        expect(computed.isActive()).toEqual(true);
+    observable('second')
+    expect(computed.isActive()).toEqual(true)
 
         // Add the node, update the computed, and check that it is still active
-        testNode.appendChild(node);
-        observable('third');
-        expect(computed.isActive()).toEqual(true);
+    testNode.appendChild(node)
+    observable('third')
+    expect(computed.isActive()).toEqual(true)
 
         // Remove the node, update the computed, and check that it was disposed
-        testNode.removeChild(node);
-        observable('fourth');
-        expect(computed.isActive()).toEqual(false);
-    });
-});
+    testNode.removeChild(node)
+    observable('fourth')
+    expect(computed.isActive()).toEqual(false)
+  })
+})

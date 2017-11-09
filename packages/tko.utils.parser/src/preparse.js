@@ -1,6 +1,6 @@
 import {
   stringTrim
-} from 'tko.utils';
+} from 'tko.utils'
 
 /* eslint no-cond-assign: 0 */
 
@@ -33,32 +33,32 @@ var stringDouble = '"(?:[^"\\\\]|\\\\.)*"',
     'in': 1,
     'return': 1,
     'typeof': 1
-  };
+  }
 
 /**
  * Break a binding string (data-bind='x: val, y: ..') into a stable array
  * of {key: value}.
  */
-export default function parseObjectLiteral(objectLiteralString) {
+export default function parseObjectLiteral (objectLiteralString) {
   // Trim leading and trailing spaces from the string
-  var str = stringTrim(objectLiteralString);
+  var str = stringTrim(objectLiteralString)
 
   // Trim braces '{' surrounding the whole object literal
-  if (str.charCodeAt(0) === 123) str = str.slice(1, -1);
+  if (str.charCodeAt(0) === 123) str = str.slice(1, -1)
 
   // Split into tokens
   var result = [],
     toks = str.match(bindingToken),
     key, values = [],
-    depth = 0;
+    depth = 0
 
   if (!toks) { return [] }
 
   // Append a comma so that we don't need a separate code block to deal with the last item
-  toks.push(',');
+  toks.push(',')
 
   for (var i = 0, tok; tok = toks[i]; ++i) {
-    var c = tok.charCodeAt(0);
+    var c = tok.charCodeAt(0)
     // A comma signals the end of a key/value pair if depth is zero
     if (c === 44) { // ","
       if (depth <= 0) {
@@ -67,41 +67,41 @@ export default function parseObjectLiteral(objectLiteralString) {
           value: values.join('')
         } : {
           'unknown': key || values.join('')
-        });
-        key = depth = 0;
-        values = [];
-        continue;
+        })
+        key = depth = 0
+        values = []
+        continue
       }
       // Simply skip the colon that separates the name and value
     } else if (c === 58) { // ":"
       if (!depth && !key && values.length === 1) {
-        key = values.pop();
-        continue;
+        key = values.pop()
+        continue
       }
       // A set of slashes is initially matched as a regular expression, but could be division
     } else if (c === 47 && i && tok.length > 1) { // "/"
       // Look at the end of the previous token to determine if the slash is actually division
-      var match = toks[i - 1].match(divisionLookBehind);
+      var match = toks[i - 1].match(divisionLookBehind)
       if (match && !keywordRegexLookBehind[match[0]]) {
         // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
-        str = str.substr(str.indexOf(tok) + 1);
-        toks = str.match(bindingToken);
-        toks.push(',');
-        i = -1;
+        str = str.substr(str.indexOf(tok) + 1)
+        toks = str.match(bindingToken)
+        toks.push(',')
+        i = -1
         // Continue with just the slash
-        tok = '/';
+        tok = '/'
       }
       // Increment depth for parentheses, braces, and brackets so that interior commas are ignored
     } else if (c === 40 || c === 123 || c === 91) { // '(', '{', '['
-      ++depth;
+      ++depth
     } else if (c === 41 || c === 125 || c === 93) { // ')', '}', ']'
-      --depth;
+      --depth
       // The key will be the first token; if it's a string, trim the quotes
     } else if (!key && !values.length && (c === 34 || c === 39)) { // '"', "'"
-      tok = tok.slice(1, -1);
+      tok = tok.slice(1, -1)
     }
-    values.push(tok);
+    values.push(tok)
   }
 
-  return result;
+  return result
 }

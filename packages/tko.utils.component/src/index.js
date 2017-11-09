@@ -3,7 +3,6 @@ import {registry} from './registry'
 
 import { ComponentABC } from './ComponentABC'
 
-
 import {
   register,
   isRegistered,

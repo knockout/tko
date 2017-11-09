@@ -86,7 +86,7 @@ describe('KO LifeCycle', function () {
       var Ctr, c, o
       o = observable()
       Ctr = (function () {
-        function Ctr() {
+        function Ctr () {
           this.computed(o, 'comp')
         }
         Ctr.prototype.comp = function () {
@@ -106,7 +106,7 @@ describe('KO LifeCycle', function () {
       o = observable(0)
       div = document.createElement('div')
       Ctr = (function () {
-        function Ctr() {
+        function Ctr () {
           this.addEventListener(div, 'click', function () {
             return o(o() + 1)
           })
@@ -132,7 +132,7 @@ describe('KO LifeCycle', function () {
       var Ctr, c, div, o
       o = observable()
       Ctr = (function () {
-        function Ctr() {
+        function Ctr () {
           this.computed(o, 'comp')
         }
         Ctr.prototype.comp = function () {
@@ -148,7 +148,5 @@ describe('KO LifeCycle', function () {
       cleanNode(c)
       assert.equal(o.getSubscriptionsCount(), 0)
     })
-
   })
-
 })

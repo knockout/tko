@@ -476,8 +476,8 @@ export function isComputed (instance) {
 }
 
 export function isPureComputed (instance) {
-  return hasPrototype(instance, computed)
-        && instance[computedState] && instance[computedState].pure
+  return hasPrototype(instance, computed) &&
+        instance[computedState] && instance[computedState].pure
 }
 
 export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {

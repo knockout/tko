@@ -3,15 +3,15 @@ import {
   AttributeProvider
 } from '../src'
 
-describe("Attribute Provider Behaviour", function () {
+describe('Attribute Provider Behaviour', function () {
   describe('nodeHasBindings', function () {
-    it("is false if there is no ko-{binding} attribute", function () {
+    it('is false if there is no ko-{binding} attribute', function () {
       const provider = new AttributeProvider()
       const div = document.createElement('div')
       assert.notOk(provider.nodeHasBindings(div))
     })
 
-    it("is true if there is a ko-{*} attribute", function () {
+    it('is true if there is a ko-{*} attribute', function () {
       const provider = new AttributeProvider()
       const div = document.createElement('div')
       div.setAttribute('ko-text', '')
@@ -20,7 +20,7 @@ describe("Attribute Provider Behaviour", function () {
   })
 
   describe('getBindingAccessors', function () {
-    it("reads an attribute-value", function() {
+    it('reads an attribute-value', function () {
       const provider = new AttributeProvider()
       const div = document.createElement('div')
       div.setAttribute('ko-text', 'a')
@@ -29,5 +29,4 @@ describe("Attribute Provider Behaviour", function () {
       assert.equal(bindings.text(), '123')
     })
   })
-
 })

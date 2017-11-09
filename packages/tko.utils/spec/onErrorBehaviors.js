@@ -1,55 +1,52 @@
 import {
     options, tasks
-} from '../src';
-
+} from '../src'
 
 describe('onError handler', function () {
-    var koOnErrorCount = 0;
-    var windowOnErrorCount = 0;
-    var windowOnErrorOriginal = window.onerror;
-    var optionsOnErrorOriginal = options.onError
-    var lastSeenError = null;
+  var koOnErrorCount = 0
+  var windowOnErrorCount = 0
+  var windowOnErrorOriginal = window.onerror
+  var optionsOnErrorOriginal = options.onError
+  var lastSeenError = null
 
-    beforeEach(function () {
-        options.onError = function (error) {
-            lastSeenError = error;
-            koOnErrorCount++;
-        };
+  beforeEach(function () {
+    options.onError = function (error) {
+      lastSeenError = error
+      koOnErrorCount++
+    }
 
-        function ensureNodeExistsAndIsEmpty(id, tagName, type) {
-            var existingNode = document.getElementById(id);
-            if (existingNode != null)
-                existingNode.parentNode.removeChild(existingNode);
-            var resultNode = document.createElement(tagName || "div");
-            resultNode.id = id;
-            if (type)
-                resultNode.setAttribute("type", type);
-            document.body.appendChild(resultNode);
-            return resultNode;
-        }
+    function ensureNodeExistsAndIsEmpty (id, tagName, type) {
+      var existingNode = document.getElementById(id)
+      if (existingNode != null) { existingNode.parentNode.removeChild(existingNode) }
+      var resultNode = document.createElement(tagName || 'div')
+      resultNode.id = id
+      if (type) { resultNode.setAttribute('type', type) }
+      document.body.appendChild(resultNode)
+      return resultNode
+    }
 
-        window.testDivTemplate = ensureNodeExistsAndIsEmpty("testDivTemplate");
-        window.templateOutput = ensureNodeExistsAndIsEmpty("templateOutput");
+    window.testDivTemplate = ensureNodeExistsAndIsEmpty('testDivTemplate')
+    window.templateOutput = ensureNodeExistsAndIsEmpty('templateOutput')
 
-        koOnErrorCount = 0;
-        windowOnErrorCount = 0;
+    koOnErrorCount = 0
+    windowOnErrorCount = 0
 
-        window.onerror = function () {
-            windowOnErrorCount++;
+    window.onerror = function () {
+      windowOnErrorCount++
 
             // Don't spam the console, since these were triggered deliberately
             // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
             // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
-            var isPhantom = !!window._phantom;
-            return isPhantom ? false : true;
-        };
-    });
+      var isPhantom = !!window._phantom
+      return !isPhantom
+    }
+  })
 
-    afterEach(function () {
-        window.onerror = windowOnErrorOriginal;
-        options.onError = optionsOnErrorOriginal;
-        lastSeenError = null;
-    });
+  afterEach(function () {
+    window.onerror = windowOnErrorOriginal
+    options.onError = optionsOnErrorOriginal
+    lastSeenError = null
+  })
 
     // FIXME
     // it('does not fire on sync errors', function () {
@@ -105,21 +102,21 @@ describe('onError handler', function () {
     //     });
     // });
 
-    it('does not re-throw the error', function() {
-        var expectedInstance;
-        tasks.schedule(function() {
-            expectedInstance = new Error('Some error');
-            throw expectedInstance;
-        });
+  it('does not re-throw the error', function () {
+    var expectedInstance
+    tasks.schedule(function () {
+      expectedInstance = new Error('Some error')
+      throw expectedInstance
+    })
 
-        waitsFor(function () {
-            return koOnErrorCount > 0;
-        });
+    waitsFor(function () {
+      return koOnErrorCount > 0
+    })
 
-        runs(function () {
-            expect(koOnErrorCount).toBe(1);
-            expect(windowOnErrorCount).toBe(0);
-            expect(lastSeenError).toBe(expectedInstance);
-        })
-    });
-});
+    runs(function () {
+      expect(koOnErrorCount).toBe(1)
+      expect(windowOnErrorCount).toBe(0)
+      expect(lastSeenError).toBe(expectedInstance)
+    })
+  })
+})

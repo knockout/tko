@@ -5,8 +5,8 @@
 
 import options from './options'
 
-export var jQueryInstance = options.global && options.global.jQuery;
+export var jQueryInstance = options.global && options.global.jQuery
 
-export function jQuerySetInstance(jquery) {
-    options.jQuery = jQueryInstance = jquery
+export function jQuerySetInstance (jquery) {
+  options.jQuery = jQueryInstance = jquery
 }

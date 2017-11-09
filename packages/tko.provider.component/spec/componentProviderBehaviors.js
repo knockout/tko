@@ -1,15 +1,15 @@
 
 import {
     options
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
     observable, isObservable
-} from 'tko.observable';
+} from 'tko.observable'
 
 import {
     applyBindings
-} from 'tko.bind';
+} from 'tko.bind'
 
 import { MultiProvider } from 'tko.provider.multi'
 import { DataBindProvider } from 'tko.provider.databind'
@@ -26,157 +26,156 @@ import components from 'tko.utils.component'
 
 import { ComponentProvider } from '../src'
 
-import 'tko.utils/helpers/jasmine-13-helper.js';
+import 'tko.utils/helpers/jasmine-13-helper.js'
 
+describe('Components: Provider', function () {
+  var bindingHandlers
 
-describe("Components: Provider", function() {
-    var bindingHandlers;
-
-    describe("custom elements", function() {
+  describe('custom elements', function () {
         // Note: knockout/spec/components
-        beforeEach(function() {
-          var provider = new MultiProvider({
-            providers: [new DataBindProvider(), new ComponentProvider()]
-          })
-          options.bindingProviderInstance = provider;
-          bindingHandlers = provider.bindingHandlers;
+    beforeEach(function () {
+      var provider = new MultiProvider({
+        providers: [new DataBindProvider(), new ComponentProvider()]
+      })
+      options.bindingProviderInstance = provider
+      bindingHandlers = provider.bindingHandlers
 
-          bindingHandlers.set(componentBindings)
-          bindingHandlers.set(coreBindings)
-        });
+      bindingHandlers.set(componentBindings)
+      bindingHandlers.set(coreBindings)
+    })
 
-        it("inserts templates into custom elements", function() {
-            components.register('helium', {
-                template: 'X<i data-bind="text: 123"></i>',
-                synchronous: true
-            });
-            var initialMarkup = 'He: <helium></helium>';
-            var root = document.createElement("div");
-            root.innerHTML = initialMarkup;
+    it('inserts templates into custom elements', function () {
+      components.register('helium', {
+        template: 'X<i data-bind="text: 123"></i>',
+        synchronous: true
+      })
+      var initialMarkup = 'He: <helium></helium>'
+      var root = document.createElement('div')
+      root.innerHTML = initialMarkup
 
             // Since components are loaded asynchronously, it doesn't show up synchronously
-            applyBindings(null, root);
+      applyBindings(null, root)
             // expect(root.innerHTML).toEqual(initialMarkup);
-            expect(root.innerHTML).toEqual(
+      expect(root.innerHTML).toEqual(
                 'He: <helium>X<i data-bind="text: 123">123</i></helium>'
-            );
-        });
+            )
+    })
 
-        it("interprets the params of custom elements", function() {
-            var called = false;
-            components.register("argon", {
-                viewModel: function(/* params */) {
-                    this.delta = 'G2k';
-                    called = true;
-                },
-                template: "<b>sXZ <u data-bind='text: delta'></u></b>",
-                synchronous: true
-            });
-            var ce = document.createElement("argon");
-            ce.setAttribute("params",
-                "alpha: 1, beta: [2], charlie: {x: 3}, delta: delta"
-            );
-            applyBindings({
-                delta: 'QxE'
-            }, ce);
-            expect(ce.innerHTML).toEqual(
-                '<b>sXZ <u data-bind="text: delta">G2k</u></b>');
-            expect(called).toEqual(true);
-        });
+    it('interprets the params of custom elements', function () {
+      var called = false
+      components.register('argon', {
+        viewModel: function (/* params */) {
+          this.delta = 'G2k'
+          called = true
+        },
+        template: "<b>sXZ <u data-bind='text: delta'></u></b>",
+        synchronous: true
+      })
+      var ce = document.createElement('argon')
+      ce.setAttribute('params',
+                'alpha: 1, beta: [2], charlie: {x: 3}, delta: delta'
+            )
+      applyBindings({
+        delta: 'QxE'
+      }, ce)
+      expect(ce.innerHTML).toEqual(
+                '<b>sXZ <u data-bind="text: delta">G2k</u></b>')
+      expect(called).toEqual(true)
+    })
 
-        it("does not unwrap observables (#44)", function() {
+    it('does not unwrap observables (#44)', function () {
             // Per https://plnkr.co/edit/EzpJD3yXd01aqPbuOq1X
-            function AppViewModel(value) {
-                this.appvalue = observable(value);
-            }
+      function AppViewModel (value) {
+        this.appvalue = observable(value)
+      }
 
-            function ParentViewModel(params) {
-                this.parentvalue = params.value;
-            }
+      function ParentViewModel (params) {
+        this.parentvalue = params.value
+      }
 
-            function ChildViewModel(params) {
-                expect(isObservable(params.value)).toEqual(true);
-                this.cvalue = params.value;
-            }
+      function ChildViewModel (params) {
+        expect(isObservable(params.value)).toEqual(true)
+        this.cvalue = params.value
+      }
 
-            var ps = document.createElement('script');
-            ps.setAttribute('id', 'parent-44');
-            ps.setAttribute('type', 'text/html');
-            ps.innerHTML = '<div>Parent: <span data-bind="text: parentvalue"></span></div>' +
-                '<child params="value: parentvalue"></child>';
-            document.body.appendChild(ps);
+      var ps = document.createElement('script')
+      ps.setAttribute('id', 'parent-44')
+      ps.setAttribute('type', 'text/html')
+      ps.innerHTML = '<div>Parent: <span data-bind="text: parentvalue"></span></div>' +
+                '<child params="value: parentvalue"></child>'
+      document.body.appendChild(ps)
 
-            var cs = document.createElement('script');
-            cs.setAttribute('id', 'child-44');
-            cs.setAttribute('type', 'text/html');
-            cs.innerHTML = '';
-            document.body.appendChild(cs);
+      var cs = document.createElement('script')
+      cs.setAttribute('id', 'child-44')
+      cs.setAttribute('type', 'text/html')
+      cs.innerHTML = ''
+      document.body.appendChild(cs)
 
-            var div = document.createElement('div');
-            div.innerHTML = '<div data-bind="text: appvalue"></div>' +
-                '<parent params="value: appvalue"></parent>';
+      var div = document.createElement('div')
+      div.innerHTML = '<div data-bind="text: appvalue"></div>' +
+                '<parent params="value: appvalue"></parent>'
 
-            var viewModel = new AppViewModel("hello");
-            components.register("parent", {
-                template: {
-                    element: "parent-44"
-                },
-                viewModel: ParentViewModel,
-                synchronous: true
-            });
-            components.register("child", {
-                template: {
-                    element: "child-44"
-                },
-                viewModel: ChildViewModel,
-                synchronous: true
-            });
-            var options = {
-                attribute: "data-bind",
-                globals: window,
-                bindings: bindingHandlers,
-                noVirtualElements: false
-            };
-            options.bindingProviderInstance = new DataBindProvider(options);
-            applyBindings(viewModel, div);
-        });
+      var viewModel = new AppViewModel('hello')
+      components.register('parent', {
+        template: {
+          element: 'parent-44'
+        },
+        viewModel: ParentViewModel,
+        synchronous: true
+      })
+      components.register('child', {
+        template: {
+          element: 'child-44'
+        },
+        viewModel: ChildViewModel,
+        synchronous: true
+      })
+      var options = {
+        attribute: 'data-bind',
+        globals: window,
+        bindings: bindingHandlers,
+        noVirtualElements: false
+      }
+      options.bindingProviderInstance = new DataBindProvider(options)
+      applyBindings(viewModel, div)
+    })
 
-        it("uses empty params={$raw:{}} if the params attr is whitespace", function() {
+    it('uses empty params={$raw:{}} if the params attr is whitespace', function () {
             // var called = false;
-            components.register("lithium", {
-                viewModel: function(params) {
-                    expect(params).toEqual({
-                        $raw: {}
-                    });
-                },
-                template: "hello",
-                synchronous: true
-            });
-            var ce = document.createElement("lithium");
-            ce.setAttribute("params", "   ");
-            applyBindings({
-                delta: 'QxE'
-            }, ce);
+      components.register('lithium', {
+        viewModel: function (params) {
+          expect(params).toEqual({
+            $raw: {}
+          })
+        },
+        template: 'hello',
+        synchronous: true
+      })
+      var ce = document.createElement('lithium')
+      ce.setAttribute('params', '   ')
+      applyBindings({
+        delta: 'QxE'
+      }, ce)
             // No error raised.
-        });
+    })
 
-        it('parses `text: "alpha"` on a custom element', function() {
+    it('parses `text: "alpha"` on a custom element', function () {
             // re brianmhunt/knockout-secure-binding#38
-            components.register("neon", {
-                viewModel: function(params) {
-                    expect(params.text).toEqual("Knights of Ne.");
-                },
-                template: "A noble gas and less noble car.",
-                synchronous: true
-            });
-            var ne = document.createElement("neon");
-            ne.setAttribute("params", 'text: "Knights of Ne."');
-            applyBindings({}, ne);
+      components.register('neon', {
+        viewModel: function (params) {
+          expect(params.text).toEqual('Knights of Ne.')
+        },
+        template: 'A noble gas and less noble car.',
+        synchronous: true
+      })
+      var ne = document.createElement('neon')
+      ne.setAttribute('params', 'text: "Knights of Ne."')
+      applyBindings({}, ne)
             // No error raised.
-        });
-    });
+    })
+  })
 
-    /*describe("nodeParamsToObject", function() {
+    /* describe("nodeParamsToObject", function() {
         // var parser = null;
         beforeEach(function() {
 
@@ -213,4 +212,4 @@ describe("Components: Provider", function() {
             assert.equal(paramsObject.$raw.type()(), "Iron");
         });
     }); // */
-});
+})

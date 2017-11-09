@@ -27,40 +27,38 @@
 
 import {
   extend, options
-} from 'tko.utils';
+} from 'tko.utils'
 
 import {
   domElement, anonymousTemplate
-} from './templateSources';
+} from './templateSources'
 
-export function templateEngine() { };
+export function templateEngine () { };
 
 extend(templateEngine.prototype, {
   renderTemplateSource: function (templateSource, bindingContext, options, templateDocument) {
-      options.onError("Override renderTemplateSource");
+    options.onError('Override renderTemplateSource')
   },
 
   createJavaScriptEvaluatorBlock: function (script) {
-      options.onError("Override createJavaScriptEvaluatorBlock");
+    options.onError('Override createJavaScriptEvaluatorBlock')
   },
 
-  makeTemplateSource: function(template, templateDocument) {
+  makeTemplateSource: function (template, templateDocument) {
       // Named template
-      if (typeof template == "string") {
-          templateDocument = templateDocument || document;
-          var elem = templateDocument.getElementById(template);
-          if (!elem)
-              options.onError("Cannot find template with ID " + template);
-          return new domElement(elem);
-      } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
+    if (typeof template === 'string') {
+      templateDocument = templateDocument || document
+      var elem = templateDocument.getElementById(template)
+      if (!elem) { options.onError('Cannot find template with ID ' + template) }
+      return new domElement(elem)
+    } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
           // Anonymous template
-          return new anonymousTemplate(template);
-      } else
-          options.onError("Unknown template type: " + template);
+      return new anonymousTemplate(template)
+    } else { options.onError('Unknown template type: ' + template) }
   },
 
   renderTemplate: function (template, bindingContext, options, templateDocument) {
-      var templateSource = this['makeTemplateSource'](template, templateDocument);
-      return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument);
+    var templateSource = this['makeTemplateSource'](template, templateDocument)
+    return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }
 })

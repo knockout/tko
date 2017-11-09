@@ -10,9 +10,8 @@ export {
     isComputed,
     isPureComputed,
     pureComputed
-} from './computed.js';
-
+} from './computed.js'
 
 export {
     throttleExtender
-} from './throttleExtender';
+} from './throttleExtender'

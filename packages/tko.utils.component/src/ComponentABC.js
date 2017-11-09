@@ -13,7 +13,7 @@
  * instead of:
  *
  *   class CompX {}
- *   
+ *
  *   ko.components.register('comp-x', {
  *     viewModel: CompX,
  *     synchronous: false,
@@ -22,7 +22,7 @@
  *
  * As well, gain all the benefits of a LifeCycle, namely automated
  * event and subscription addition/removal.
- * 
+ *
  * NOTE: A Component created this way can add events to the component node
  * with `this.addEventListener(type, action)`.
  */
@@ -33,9 +33,9 @@ export class ComponentABC extends LifeCycle {
 	/**
 	 * @return {string} The custom node name of this component.
 	 */
-	static get elementName () {
-		throw new Error("[ComponentABC] `elementName` must be overloaded.")	
-	}
+  static get elementName () {
+    throw new Error('[ComponentABC] `elementName` must be overloaded.')
+  }
 
 	/**
 	 * Overload this to return:
@@ -45,7 +45,7 @@ export class ComponentABC extends LifeCycle {
 	 * 4. An AMD module (with `{require: 'some/template'}`)
 	 * @return {mixed} One of the accepted template types for the ComponentBinding.
 	 */
-	static get template () { return { element: this.element } }
+  static get template () { return { element: this.element } }
 
 	/**
 	 * This is called by the default `template`.  Overload this to return:
@@ -53,19 +53,19 @@ export class ComponentABC extends LifeCycle {
 	 * 2. A DOM node itself
 	 * @return {string|HTMLElement} either the element ID or actual element.
 	 */
-	static get element () {
-		throw new Error("[ComponentABC] `element` must be overloaded.")
-	}
+  static get element () {
+    throw new Error('[ComponentABC] `element` must be overloaded.')
+  }
 
 	/**
 	 * @return {bool} True if the component shall load synchronously
 	 */
-	static get sync () { return true }
+  static get sync () { return true }
 
-	static register (name = this.elementName) {
-		const viewModel = this
-		const {template} = this
-		const synchronous = this.sync
-		register(name, { viewModel, template, synchronous })
-	}
+  static register (name = this.elementName) {
+    const viewModel = this
+    const {template} = this
+    const synchronous = this.sync
+    register(name, { viewModel, template, synchronous })
+  }
 }

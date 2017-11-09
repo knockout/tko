@@ -39,9 +39,9 @@ export function applyExtenders (requestedExtenders) {
 
 // Change when notifications are published.
 export function notify (target, notifyWhen) {
-  target.equalityComparer = notifyWhen == 'always' ?
-        null :  // null equalityComparer means to always notify
-        valuesArePrimitiveAndEqual
+  target.equalityComparer = notifyWhen == 'always'
+        ? null  // null equalityComparer means to always notify
+        : valuesArePrimitiveAndEqual
 }
 
 export function deferred (target, option) {
