@@ -31,7 +31,7 @@ const files = [
 ]
 
 const preprocessors = {
-  // 'spec/**/*.js': ['rollup'] //, 'typescript']
+  'spec/**/*.js': ['rollup'] //, 'typescript']
 }
 
 const replacerPlugin = {
@@ -92,7 +92,7 @@ module.exports = (config) => {
     files,
     preprocessors,
     rollupPreprocessor,
-    typescriptPreprocessor, Waiting on https://stackoverflow.com/questions/47210133
+    // typescriptPreprocessor, // Waiting on https://stackoverflow.com/questions/47210133
     frameworks,
     browsers,
     resolve: { root },
