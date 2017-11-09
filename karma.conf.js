@@ -4,7 +4,6 @@ const path = require('path')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const rollupCommonJS = require('rollup-plugin-commonjs')
 const rollupVisualizer = require('rollup-plugin-visualizer')
-const rollupTypescript = require('rollup-plugin-typescript')
 const typescript = require('typescript')
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
@@ -32,7 +31,7 @@ const files = [
 ]
 
 const preprocessors = {
-  'spec/**/*.js': ['rollup']
+  'spec/**/*.js': ['rollup', 'typescript']
 }
 
 const replacerPlugin = {
@@ -58,22 +57,15 @@ const replacerPlugin = {
   }
 }
 
-const plugins = [
-  replacerPlugin,
-  nodeResolve({ module: true }),
-  rollupCommonJS(),
-  rollupVisualizer({ filename: './visual.html' }),
-  /* Depending on the browser, we may need to employ Typescript for the tests */
-  ...(argv.includes('typescript')
-    ? [rollupTypescript({ include: '**/*.js', exclude: 'node_modules', typescript })]
-    : []
-  )
-]
-
-const rollupPreprocessor = Object.assign({}, {
+const rollupPreprocessor = {
   format: 'iife',
   name: pkg.name,
-  plugins,
+  plugins: [
+    replacerPlugin,
+    nodeResolve({ module: true }),
+    rollupCommonJS(),
+    rollupVisualizer({ filename: './visual.html' })
+  ],
   /**
    * Source maps often link multiple files (e.g. tko.utils/src/object.js)
    * from different spec/ files.  This causes problems e.g. a breakpoints
@@ -83,7 +75,16 @@ const rollupPreprocessor = Object.assign({}, {
    * can be illuminating, so it's an option.
    */
   sourcemap: argv.includes('--sourcemap') ? 'inline' : false
-})
+}
+
+const typescriptPreprocessor = {
+  typescript,
+  options: {
+    target: 'ES5',
+    removeComments: false,
+    downlevelIteration: true
+  }
+}
 
 module.exports = (config) => {
   config.set({
@@ -91,6 +92,7 @@ module.exports = (config) => {
     files,
     preprocessors,
     rollupPreprocessor,
+    // typescriptPreprocessor, Waiting on https://stackoverflow.com/questions/47210133
     frameworks,
     browsers,
     resolve: { root },
