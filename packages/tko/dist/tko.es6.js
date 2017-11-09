@@ -6036,10 +6036,8 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext$$1, b
     allBindings.has = (key) => key in bindings;
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key));
 
-    // Note Array.from as workaround to Typescript 2.6 being broken:
-    //    https://stackoverflow.com/questions/47183944
-    const bindingsArray = Array.from(topologicalSortBindings(bindings, $component));
-    for (const [key, BindingHandlerClass] of bindingsArray) {
+    const bindingsGenerated = topologicalSortBindings(bindings, $component);
+    for (const [key, BindingHandlerClass] of bindingsGenerated) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {
         onBindingError({
