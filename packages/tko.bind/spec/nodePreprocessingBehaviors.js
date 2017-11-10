@@ -26,7 +26,7 @@ describe('Node preprocessing', function () {
     options.bindingProviderInstance.bindingHandlers.set(coreBindings)
   })
 
-  it('Can leave the nodes unchanged by returning a falsey value', function () {
+  it('Can leave the nodes unchanged by returning a falsy value', function () {
     options.bindingProviderInstance.preprocessNode = function (/* node */) { return null }
     testNode.innerHTML = "<p data-bind='text: someValue'></p>"
     applyBindings({ someValue: 'hello' }, testNode)

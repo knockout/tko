@@ -1,11 +1,13 @@
 
 import {
-    objectForEach
+    objectForEach, options
 } from 'tko.utils'
 
 import {
     unwrap
 } from 'tko.observable'
+
+const {jQueryInstance} = options
 
 export var style = {
   update: function (element, valueAccessor) {
@@ -14,11 +16,19 @@ export var style = {
       styleValue = unwrap(styleValue)
 
       if (styleValue === null || styleValue === undefined || styleValue === false) {
-                // Empty string removes the value, whereas null/undefined have no effect
+        // Empty string removes the value, whereas null/undefined have no effect
         styleValue = ''
       }
 
-      element.style[styleName] = styleValue
+      if (jQueryInstance) {
+        jQueryInstance(element).css(styleName, styleValue)
+      } else {
+        styleName = styleName.replace(/-(\w)/g, (all, letter) => letter.toUpperCase())
+        element.style[styleName] = styleValue
+        if (styleValue !== '' && element.style[styleName] === '' && !isNaN(styleValue)) {
+          element.style[styleName] = styleValue + 'px'
+        }
+      }
     })
   }
 }

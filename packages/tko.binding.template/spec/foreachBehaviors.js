@@ -40,7 +40,7 @@ describe('Binding: Foreach', function () {
     bindingHandlers.set(ifBindings)
   })
 
-  it('Should remove descendant nodes from the document (and not bind them) if the value is falsey', function () {
+  it('Should remove descendant nodes from the document (and not bind them) if the value is falsy', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItem'><span data-bind='text: someItem.nonExistentChildProp'></span></div>"
     expect(testNode.childNodes[0].childNodes.length).toEqual(1)
     applyBindings({ someItem: null }, testNode)

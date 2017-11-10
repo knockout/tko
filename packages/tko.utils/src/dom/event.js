@@ -38,13 +38,17 @@ function isClickOnCheckableElement (element, eventType) {
 
 // Workaround for an IE9 issue - https://github.com/SteveSanderson/knockout/issues/406
 var eventsThatMustBeRegisteredUsingAttachEvent = { 'propertychange': true }
+let jQueryEventAttachName
 
 export function registerEventHandler (element, eventType, handler) {
   var wrappedHandler = catchFunctionErrors(handler)
 
   var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType]
   if (!options.useOnlyNativeEvents && !mustUseAttachEvent && jQueryInstance) {
-    jQueryInstance(element).bind(eventType, wrappedHandler)
+    if (!jQueryEventAttachName) {
+      jQueryEventAttachName = (typeof jQueryInstance(element).on === 'function') ? 'on' : 'bind'
+    }
+    jQueryInstance(element)[jQueryEventAttachName](eventType, wrappedHandler)
   } else if (!mustUseAttachEvent && typeof element.addEventListener === 'function') { element.addEventListener(eventType, wrappedHandler, false) } else if (typeof element.attachEvent !== 'undefined') {
     var attachEventHandler = function (event) { wrappedHandler.call(element, event) },
       attachEventName = 'on' + eventType

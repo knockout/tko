@@ -9,7 +9,7 @@ import {
 
 import { isObservable } from './observable.js'
 
-var maxNestedObservableDepth = 10 // Escape the (unlikely) pathalogical case where an observable's current value is itself (or similar reference cycle)
+var maxNestedObservableDepth = 10 // Escape the (unlikely) pathological case where an observable's current value is itself (or similar reference cycle)
 
 export function toJS (rootObject) {
   if (arguments.length == 0) { throw new Error('When calling ko.toJS, pass the object you want to convert.') }

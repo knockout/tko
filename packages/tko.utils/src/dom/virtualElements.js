@@ -131,8 +131,8 @@ export function insertAfter (containerNode, nodeToInsert, insertAfterNode) {
 
 export function firstChild (node) {
   if (!isStartComment(node)) {
-    if (node.firstChild && isUnmatchedEndComment(node.firstChild)) {
-      throw new Error('Found end comment without opening comment, as first child of ' + node.outerHTML)
+    if (node.firstChild && isEndComment(node.firstChild)) {
+      throw new Error('Found invalid end comment, as the first child of ' + node.outerHTML)
     }
     return node.firstChild
   }

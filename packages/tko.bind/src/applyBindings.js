@@ -49,7 +49,7 @@ export function getBindingHandler (bindingKey) {
   return asProperHandlerClass(options.bindingProviderInstance.bindingHandlers.get(bindingKey), bindingKey)
 }
 
-// Returns the valueAccesor function for a binding value
+// Returns the valueAccessor function for a binding value
 function makeValueAccessor (value) {
   return function () {
     return value

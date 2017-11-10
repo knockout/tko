@@ -153,11 +153,11 @@ describe('Dependent Observable', function () {
 
   it('Should automatically update value when a dependency changes', function () {
     var observableInstance = new observable(1)
-    var depedentObservable = computed(function () { return observableInstance() + 1 })
-    expect(depedentObservable()).toEqual(2)
+    var dependantObservable = computed(function () { return observableInstance() + 1 })
+    expect(dependantObservable()).toEqual(2)
 
     observableInstance(50)
-    expect(depedentObservable()).toEqual(51)
+    expect(dependantObservable()).toEqual(51)
   })
 
   it('Should be able to use \'peek\' on an observable to avoid a dependency', function () {
@@ -185,12 +185,12 @@ describe('Dependent Observable', function () {
     var observableB = new observable('B')
     var observableToUse = 'A'
     var timesEvaluated = 0
-    var depedentObservable = computed(function () {
+    var dependantObservable = computed(function () {
       timesEvaluated++
       return observableToUse == 'A' ? observableA() : observableB()
     })
 
-    expect(depedentObservable()).toEqual('A')
+    expect(dependantObservable()).toEqual('A')
     expect(timesEvaluated).toEqual(1)
 
         // Changing an unrelated observable doesn't trigger evaluation
@@ -200,7 +200,7 @@ describe('Dependent Observable', function () {
         // Switch to other observable
     observableToUse = 'B'
     observableA('A2')
-    expect(depedentObservable()).toEqual('B2')
+    expect(dependantObservable()).toEqual('B2')
     expect(timesEvaluated).toEqual(2)
 
         // Now changing the first observable doesn't trigger evaluation
@@ -211,8 +211,8 @@ describe('Dependent Observable', function () {
   it('Should notify subscribers of changes', function () {
     var notifiedValue
     var observableInstance = new observable(1)
-    var depedentObservable = computed(function () { return observableInstance() + 1 })
-    depedentObservable.subscribe(function (value) { notifiedValue = value })
+    var dependantObservable = computed(function () { return observableInstance() + 1 })
+    dependantObservable.subscribe(function (value) { notifiedValue = value })
 
     expect(notifiedValue).toEqual(undefined)
     observableInstance(2)
@@ -222,20 +222,20 @@ describe('Dependent Observable', function () {
   it('Should notify "beforeChange" subscribers before changes', function () {
     var notifiedValue
     var observableInstance = new observable(1)
-    var depedentObservable = computed(function () { return observableInstance() + 1 })
-    depedentObservable.subscribe(function (value) { notifiedValue = value }, null, 'beforeChange')
+    var dependantObservable = computed(function () { return observableInstance() + 1 })
+    dependantObservable.subscribe(function (value) { notifiedValue = value }, null, 'beforeChange')
 
     expect(notifiedValue).toEqual(undefined)
     observableInstance(2)
     expect(notifiedValue).toEqual(2)
-    expect(depedentObservable()).toEqual(3)
+    expect(dependantObservable()).toEqual(3)
   })
 
   it('Should only update once when each dependency changes, even if evaluation calls the dependency multiple times', function () {
     var notifiedValues = []
     var observableInstance = new observable()
-    var depedentObservable = computed(function () { return observableInstance() * observableInstance() })
-    depedentObservable.subscribe(function (value) { notifiedValues.push(value) })
+    var dependantObservable = computed(function () { return observableInstance() * observableInstance() })
+    dependantObservable.subscribe(function (value) { notifiedValues.push(value) })
     observableInstance(2)
     expect(notifiedValues.length).toEqual(1)
     expect(notifiedValues[0]).toEqual(4)
@@ -494,7 +494,7 @@ describe('Dependent Observable', function () {
         }
       })
 
-        // Initially the computed evaluated sucessfully
+        // Initially the computed evaluated successfully
     expect(computedInstance()).toEqual(1)
 
     expect(function () {

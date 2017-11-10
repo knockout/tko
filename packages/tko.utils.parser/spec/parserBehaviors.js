@@ -169,7 +169,7 @@ describe('the bindings parser', function () {
     var binding = 'model: v, //wiring the router\n' +
       "afterCompose: 'ac', //wiring the router\n" +
       "//transition:'entrance', //use the 'entrance' transition when switching views\n" +
-      'skipTransitionOnSameViewId: true,//Transition entrance is disabled for better perfomance\n' +
+      'skipTransitionOnSameViewId: true,//Transition entrance is disabled for better performance\n' +
       'cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)',
       context = ctxStub({ v: observable('rx') }),
       bindings = new Parser().parse(binding, context);

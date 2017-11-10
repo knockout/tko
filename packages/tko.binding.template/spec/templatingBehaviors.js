@@ -535,7 +535,7 @@ describe('Templating', function () {
     expect(testNode.childNodes[0]).toContainText('[alpha][delta][gamma]')
   })
 
-  it('Should interpret "nodes: anyFalseyValue" as being equivalent to supplying an empty node array', function () {
+  it('Should interpret "nodes: anyfalsyValue" as being equivalent to supplying an empty node array', function () {
         // This behavior helps to avoid inconsistency if you're programmatically supplying a node array
         // but sometimes you might not have any nodes - you don't want the template binding to dynamically
         // switch over to "inline template" mode just because your 'nodes' value is null, for example.

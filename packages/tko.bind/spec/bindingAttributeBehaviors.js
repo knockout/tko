@@ -437,29 +437,37 @@ describe('Binding attribute syntax', function () {
     expect(testNode).toContainText('Hello Bert, Goodbye');
   });
 
-  it('Should reject closing virtual bindings, when found as first child', function () {
+  it('Should reject closing virtual bindings, when found as a first child', function () {
+    testNode.innerHTML = '<div><!-- /ko --></div>'
+    expect(function () {
+      ko.applyBindings(null, testNode)
+    }).toThrow()
+  })
+
+  it('Should reject closing virtual bindings, when found as first child at the top level', function () {
     testNode.innerHTML = '<!-- /ko -->';
-    expect(function () {applyBindings(null, testNode); }).toThrow();
+    testNode.innerHTML = '<!-- /ko -->';
+    expect(function () { applyBindings(null, testNode); }).toThrow();
   });
 
   it('Should reject closing virtual bindings without matching open, when found as a sibling', function () {
     testNode.innerHTML = '<div></div><!-- /ko -->';
-    expect(function () {applyBindings(null, testNode); }).toThrow();
+    expect(function () { applyBindings(null, testNode); }).toThrow();
   });
 
   it('Should reject duplicated closing virtual bindings', function () {
     testNode.innerHTML = '<!-- ko if: true --><div></div><!-- /ko --><!-- /ko -->';
-    expect(function () {applyBindings(null, testNode); }).toThrow();
+    expect(function () { applyBindings(null, testNode); }).toThrow();
   });
 
   it('Should reject opening virtual bindings that are not closed', function () {
     testNode.innerHTML = '<!-- ko if: true -->';
-    expect(function () {applyBindings(null, testNode); }).toThrow();
+    expect(function () { applyBindings(null, testNode); }).toThrow();
   });
 
   it('Should reject virtual bindings that are nested incorrectly', function () {
     testNode.innerHTML = '<!-- ko if: true --><div><!-- /ko --></div>';
-    expect(function () {applyBindings(null, testNode); }).toThrow();
+    expect(function () { applyBindings(null, testNode); }).toThrow();
   });
 
   it('Should be able to access virtual children in custom containerless binding', function () {
