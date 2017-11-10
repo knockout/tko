@@ -136,12 +136,15 @@ export function firstChild (node) {
     }
     return node.firstChild
   }
+  if (!node.nextSibling || isEndComment(node.nextSibling)) {
+    return null
+  }
   return node.nextSibling
 }
 
 export function lastChild (node) {
-  var nextChild = firstChild(node),
-    lastChildNode
+  let nextChild = firstChild(node)
+  let lastChildNode
 
   do {
     lastChildNode = nextChild
@@ -158,9 +161,8 @@ export function nextSibling (node) {
   if (node.nextSibling && isEndComment(node.nextSibling)) {
     if (isUnmatchedEndComment(node.nextSibling)) {
       throw Error('Found end comment without a matching opening comment, as next sibling of ' + node.outerHTML)
-    } else {
-      return null
     }
+    return null
   } else {
     return node.nextSibling
   }
