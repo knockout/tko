@@ -2,10 +2,11 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ## 🎩  Beta-1 (ongoing)
 
-* When supported, `observable.length` will now be undefined (was `0` before), and `observableArray.length` will now be the length of the wrapped array
-* `observableArray` is now iterable (has a `Symbol.iterator` property)
-* Several array utilities use native functions now (`arrayPushAll`, `arrayFilter`, `arrayGetDistinctValues`, `arrayFirst`, `arrayIndexOf`)
-* Various forward-ports per #5
+* (observable) When supported, `observable.length` will now be undefined (was `0` before), and `observableArray.length` will now be the length of the wrapped array
+* (observableArraty) `observableArray` is now iterable (has a `Symbol.iterator` property)
+* (utils) Several array utilities use native functions now (`arrayPushAll`, `arrayFilter`, `arrayGetDistinctValues`, `arrayFirst`, `arrayIndexOf`)
+* (various) forward-ports per #5
+* (components) Warn with custom-element names that cannot be used with custom elements re. #43 & knockout/knockout#1603
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 

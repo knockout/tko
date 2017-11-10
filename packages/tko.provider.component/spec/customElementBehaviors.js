@@ -86,7 +86,8 @@ describe('Components: Custom elements', function () {
     if (jasmine.ieVersion || window.HTMLUnknownElement) {   // Phantomjs 1.x doesn't include HTMLUnknownElement and will fail this test
       this.after(function () { components.unregister('somefaroutname') })
       components.register('somefaroutname', {
-        template: 'custom element <span data-bind="text: 123"></span>'
+        template: 'custom element <span data-bind="text: 123"></span>',
+        ignoreCustomElementWarning: true
       })
       var initialMarkup = '<div>hello <somefaroutname></somefaroutname></div>'
       testNode.innerHTML = initialMarkup
@@ -104,7 +105,8 @@ describe('Components: Custom elements', function () {
   it('Does not insert components into standard elements with matching names', function () {
     this.after(function () { components.unregister('em') })
     components.register('em', {
-      template: 'custom element <span data-bind="text: 123"></span>'
+      template: 'custom element <span data-bind="text: 123"></span>',
+      ignoreCustomElementWarning: true
     })
     var initialMarkup = '<div>hello <em></em></div>'
     testNode.innerHTML = initialMarkup
@@ -121,7 +123,9 @@ describe('Components: Custom elements', function () {
     cp.getComponentNameForNode = function (node) {
       return node.tagName === 'A' ? 'test-component' : null
     }
-    components.register('test-component', { template: 'custom element'})
+    components.register('test-component', {
+      template: 'custom element'
+    })
 
       // Set up a getComponentNameForNode function that maps "A" tags to
       // test-component.
@@ -134,7 +138,9 @@ describe('Components: Custom elements', function () {
   })
 
   it('Is possible to have regular data-bind bindings on a custom element, as long as they don\'t attempt to control descendants', function () {
-    components.register('test-component', { template: 'custom element'})
+    components.register('test-component', {
+      template: 'custom element'
+    })
     testNode.innerHTML = '<test-component data-bind="visible: shouldshow"></test-component>'
 
         // Bind with a viewmodel that controls visibility
@@ -151,7 +157,9 @@ describe('Components: Custom elements', function () {
   })
 
   it('Is not possible to have regular data-bind bindings on a custom element if they also attempt to control descendants', function () {
-    components.register('test-component', { template: 'custom element'})
+    components.register('test-component', {
+      template: 'custom element'
+    })
     testNode.innerHTML = '<test-component data-bind="if: true"></test-component>'
 
     expect(function () { applyBindings(null, testNode) })
@@ -162,7 +170,9 @@ describe('Components: Custom elements', function () {
   })
 
   it('Is possible to call applyBindings directly on a custom element', function () {
-    components.register('test-component', { template: 'custom element'})
+    components.register('test-component', {
+      template: 'custom element'
+    })
     testNode.innerHTML = '<test-component></test-component>'
     var customElem = testNode.childNodes[0]
     expect(customElem.tagName.toLowerCase()).toBe('test-component')
@@ -173,7 +183,9 @@ describe('Components: Custom elements', function () {
   })
 
   it('Throws if you try to duplicate the \'component\' binding on a custom element that matches a component', function () {
-    components.register('test-component', { template: 'custom element'})
+    components.register('test-component', {
+      template: 'custom element'
+    })
     testNode.innerHTML = '<test-component data-bind="component: {}"></test-component>'
 
     expect(function () {

@@ -27,6 +27,16 @@ export function register (componentName, config) {
     throw new Error('Component ' + componentName + ' is already registered')
   }
 
+  const ceok = componentName.includes('-') && componentName.toLowerCase() === componentName
+
+  if (!config.ignoreCustomElementWarning && !ceok) {
+    console.log(`
+🥊  Knockout warning: components for custom elements must be lowercase and contain a dash.  To ignore this warning, add to the 'config' of .register(componentName, config):
+
+          ignoreCustomElementWarning: true
+    `)
+  }
+
   defaultConfigRegistry[componentName] = config
 }
 

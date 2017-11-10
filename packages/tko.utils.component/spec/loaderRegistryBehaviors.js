@@ -89,6 +89,31 @@ describe('Components: Loader registry', function () {
     expect(components.loaders instanceof Array).toBe(true)
   })
 
+  it("issues a PEBKAC when a component name does not have a dash", function () {
+    const logs = []
+    const orlog = console.log
+    console.log = (v) => logs.push(v)
+
+    components.register('testname', { template: {} })
+    expect(logs.length).toEqual(1)
+    expect(logs[0]).toContain('Knockout warning')
+
+    console.log = orlog
+    components.unregister('testname')
+  })
+
+  it("does not issue a PEBCAK when `ignoreCustomElementWarning` is true", function () {
+    const logs = []
+    const orlog = console.log
+    console.log = (v) => logs.push(v)
+
+    components.register('testname', { template: {}, ignoreCustomElementWarning: true })
+    expect(logs.length).toEqual(0)
+
+    console.log = orlog
+    components.unregister('testname')
+  })
+
   it('Obtains component config and component definition objects by invoking each loader in turn, asynchronously, until one supplies a value', function () {
     var loaders = [
       loaderThatDoesNotReturnAnything,

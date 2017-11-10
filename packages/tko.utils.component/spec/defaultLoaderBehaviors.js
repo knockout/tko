@@ -30,7 +30,7 @@ describe('Components: Default loader', function () {
     var prototypeProperty = 'toString'
 
     expect(components.isRegistered(prototypeProperty)).toBe(false)
-    components.register(prototypeProperty, {})
+    components.register(prototypeProperty, { ignoreCustomElementWarning: true })
     expect(components.isRegistered(prototypeProperty)).toBe(true)
 
     components.unregister(prototypeProperty)

@@ -47,7 +47,8 @@ describe('Components: Provider', function () {
     it('inserts templates into custom elements', function () {
       components.register('helium', {
         template: 'X<i data-bind="text: 123"></i>',
-        synchronous: true
+        synchronous: true,
+        ignoreCustomElementWarning: true
       })
       var initialMarkup = 'He: <helium></helium>'
       var root = document.createElement('div')
@@ -69,7 +70,8 @@ describe('Components: Provider', function () {
           called = true
         },
         template: "<b>sXZ <u data-bind='text: delta'></u></b>",
-        synchronous: true
+        synchronous: true,
+        ignoreCustomElementWarning: true
       })
       var ce = document.createElement('argon')
       ce.setAttribute('params',
@@ -121,14 +123,16 @@ describe('Components: Provider', function () {
           element: 'parent-44'
         },
         viewModel: ParentViewModel,
-        synchronous: true
+        synchronous: true,
+        ignoreCustomElementWarning: true
       })
       components.register('child', {
         template: {
           element: 'child-44'
         },
         viewModel: ChildViewModel,
-        synchronous: true
+        synchronous: true,
+        ignoreCustomElementWarning: true
       })
       var options = {
         attribute: 'data-bind',
@@ -149,7 +153,8 @@ describe('Components: Provider', function () {
           })
         },
         template: 'hello',
-        synchronous: true
+        synchronous: true,
+        ignoreCustomElementWarning: true
       })
       var ce = document.createElement('lithium')
       ce.setAttribute('params', '   ')
@@ -166,7 +171,8 @@ describe('Components: Provider', function () {
           expect(params.text).toEqual('Knights of Ne.')
         },
         template: 'A noble gas and less noble car.',
-        synchronous: true
+        synchronous: true,
+        ignoreCustomElementWarning: true
       })
       var ne = document.createElement('neon')
       ne.setAttribute('params', 'text: "Knights of Ne."')
