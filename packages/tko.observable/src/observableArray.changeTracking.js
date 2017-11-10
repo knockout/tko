@@ -25,12 +25,13 @@ export function trackArrayChanges (target, options) {
   if (target.cacheDiffForKnownOperation) {
     return
   }
-  var trackingChanges = false,
-    cachedDiff = null,
-    arrayChangeSubscription,
-    pendingNotifications = 0,
-    underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd,
-    underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove
+  let trackingChanges = false
+  let cachedDiff = null
+  let arrayChangeSubscription
+  let pendingNotifications = 0
+  let underlyingNotifySubscribersFunction
+  let underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd
+  let underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove
 
     // Watch "subscribe" calls, and for array change events, ensure change tracking is enabled
   target.beforeSubscriptionAdd = function (event) {
@@ -44,6 +45,10 @@ export function trackArrayChanges (target, options) {
   target.afterSubscriptionRemove = function (event) {
     if (underlyingAfterSubscriptionRemoveFunction) { underlyingAfterSubscriptionRemoveFunction.call(target, event) }
     if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
+      if (underlyingNotifySubscribersFunction) {
+        target.notifySubscribers = underlyingNotifySubscribersFunction
+        underlyingNotifySubscribersFunction = undefined
+      }
       if (arrayChangeSubscription) {
         arrayChangeSubscription.dispose()
       }
@@ -61,7 +66,7 @@ export function trackArrayChanges (target, options) {
     trackingChanges = true
 
         // Intercept "notifySubscribers" to track how many times it was called.
-    var underlyingNotifySubscribersFunction = target['notifySubscribers']
+    underlyingNotifySubscribersFunction = target['notifySubscribers']
     target['notifySubscribers'] = function (valueToNotify, event) {
       if (!event || event === defaultEvent) {
         ++pendingNotifications

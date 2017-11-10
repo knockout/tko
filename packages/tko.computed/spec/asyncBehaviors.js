@@ -587,7 +587,6 @@ describe('Rate-limited', function () {
             // The computed should not be dependent on the second observable
       expect(computed.getDependenciesCount()).toEqual(1)
 
-
             // Updating the second observable shouldn't re-evaluate computed
       observableValue(2)
       expect(computed()).toEqual(1)
@@ -985,6 +984,31 @@ describe('Deferred', function () {
       a('x')
       jasmine.Clock.tick(1)
       expect(notifySpy.argsForCall).toEqual([['i(x,h(cx,g(ex,fx),d(bx,cx)),bx,fx)']])    // only one evaluation and notification
+    })
+
+    it('Should ignore recursive dirty events', function () {
+            // From https://github.com/knockout/knockout/issues/1943
+      this.restoreAfter(options, 'deferUpdates')
+      options.deferUpdates = true
+
+      var a = koObservable(),
+        b = koComputed({ read: function () { a(); return d() }, deferEvaluation: true }),
+        d = koComputed({ read: function () { a(); return b() }, deferEvaluation: true }),
+        bSpy = jasmine.createSpy('bSpy'),
+        dSpy = jasmine.createSpy('dSpy')
+
+      b.subscribe(bSpy, null, 'dirty')
+      d.subscribe(dSpy, null, 'dirty')
+
+      d()
+      expect(bSpy).not.toHaveBeenCalled()
+      expect(dSpy).not.toHaveBeenCalled()
+
+      a('something')
+      expect(bSpy.calls.length).toBe(2)  // 1 for a, and 1 for d
+      expect(dSpy.calls.length).toBe(2)  // 1 for a, and 1 for b
+
+      jasmine.Clock.tick(1)
     })
   })
 })

@@ -64,7 +64,7 @@ export function rateLimit (target, options) {
     // rateLimit supersedes deferred updates
   target._deferUpdates = false
 
-  limitFunction = method == 'notifyWhenChangesStop' ? debounceFn : throttleFn
+  limitFunction = method === 'notifyWhenChangesStop' ? debounceFn : throttleFn
 
   target.limit(function (callback) {
     return limitFunction(callback, timeout)

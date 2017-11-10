@@ -290,6 +290,14 @@ describe('Observable Array change tracking', function () {
     })
   })
 
+  it('should restore previous subscription notifications', function () {
+    var source = observableArray()
+    var notifySubscribers = source.notifySubscribers
+    var arrayChange = source.subscribe(function () { }, null, 'arrayChange')
+    arrayChange.dispose()
+    expect(source.notifySubscribers).toBe(notifySubscribers)
+  })
+
   it('Should support tracking of any observable using extender', function () {
     var myArray = observable(['Alpha', 'Beta', 'Gamma']).extend({trackArrayChanges: true}),
       changelist
