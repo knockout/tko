@@ -4,6 +4,8 @@
 // Note that the array functions may be called with
 // Array-like things, such as NodeList.
 
+const {isArray} = Array
+
 export function arrayForEach (array, action) {
   for (let i = 0, j = array.length; i < j; ++i) {
     action(array[i], i, array)
@@ -11,11 +13,11 @@ export function arrayForEach (array, action) {
 }
 
 export function arrayIndexOf (array, item) {
-  return (Array.isArray(array) ? array : [...array]).indexOf(item)
+  return (isArray(array) ? array : [...array]).indexOf(item)
 }
 
 export function arrayFirst (array, predicate, predicateOwner) {
-  return (Array.isArray(array) ? array : [...array])
+  return (isArray(array) ? array : [...array])
     .find(predicate, predicateOwner) || null
 }
 
@@ -34,16 +36,16 @@ export function arrayRemoveItem (array, itemToRemove) {
 
 export function arrayGetDistinctValues (array = []) {
   const seen = new Set()
-  return (Array.isArray(array) ? array : [...array])
+  return (isArray(array) ? array : [...array])
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
 export function arrayFilter (array, predicate) {
-  return (Array.isArray(array) ? array : [...array]).filter(predicate)
+  return (isArray(array) ? array : [...array]).filter(predicate)
 }
 
 export function arrayPushAll (array, valuesToPush) {
-  if (valuesToPush instanceof Array) {
+  if (isArray(valuesToPush)) {
     array.push.apply(array, valuesToPush)
   } else {
     for (var i = 0, j = valuesToPush.length; i < j; i++) { array.push(valuesToPush[i]) }

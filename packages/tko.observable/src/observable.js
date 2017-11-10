@@ -4,7 +4,7 @@
 //
 import {
     createSymbolOrString, canSetPrototype, extend, setPrototypeOfOrExtend,
-    setPrototypeOf, hasPrototype, options
+    setPrototypeOf, hasPrototype, options, overwriteLengthPropertyIfSupported
 } from 'tko.utils'
 
 import * as dependencyDetection from './dependencyDetection.js'
@@ -31,6 +31,8 @@ export function observable (initialValue) {
       return Observable[observableLatestValue]
     }
   }
+
+  overwriteLengthPropertyIfSupported(Observable, { value: undefined })
 
   Observable[observableLatestValue] = initialValue
 

@@ -389,14 +389,22 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0]).toContainText('added childfirst childhidden child')
   })
 
-  it('Should not double-unwrap the given value', function () {
-        // Previously an observable value was doubly-unwrapped: in the foreach handler and then in the template handler.
-        // This is now fixed so that the value is unwrapped just in the template handler and only peeked at in the foreach handler.
-        // See https://github.com/SteveSanderson/knockout/issues/523
+  it("Should double-unwrap if the internal is iterable", function () {
     testNode.innerHTML = "<div data-bind='foreach: myArray'><span data-bind='text: $data'></span></div>"
     var myArrayWrapped = observable(observableArray(['data value']))
     applyBindings({ myArray: myArrayWrapped }, testNode)
-        // Because the unwrapped value isn't an array, nothing gets rendered.
+    // Because the unwrapped value isn't an array, nothing gets rendered.
+    expect(testNode.childNodes[0]).toContainText('data value')
+  })
+
+  it('Should not triple-unwrap the given value', function () {
+    // Previously an observable value was doubly-unwrapped: in the foreach handler and then in the template handler.
+    // This is now fixed so that the value is unwrapped just in the template handler and only peeked at in the foreach handler.
+    // See https://github.com/SteveSanderson/knockout/issues/523
+    testNode.innerHTML = "<div data-bind='foreach: myArray'><span data-bind='text: $data'></span></div>"
+    var myArrayWrapped = observable(observable(observableArray(['data value'])))
+    applyBindings({ myArray: myArrayWrapped }, testNode)
+    // Because the unwrapped value isn't an array, nothing gets rendered.
     expect(testNode.childNodes[0]).toContainText('')
   })
 

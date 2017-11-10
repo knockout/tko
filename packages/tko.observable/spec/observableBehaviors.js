@@ -11,6 +11,10 @@ describe('Observable', function () {
     expect(isSubscribable(instance)).toEqual(true)
   })
 
+  it("should have an `undefined` length", function () {
+    expect(observable().length).toEqual(undefined)
+  })
+
   it('Should advertise that instances are observable', function () {
     var instance = new observable()
     expect(isObservable(instance)).toEqual(true)

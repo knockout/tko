@@ -215,8 +215,9 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
   }
 
   return computed(function () {
-    var unwrappedArray = unwrap(arrayOrObservableArray) || []
-    if (typeof unwrappedArray.length !== 'number') { unwrappedArray = [unwrappedArray] }
+    let unwrappedArray = unwrap(arrayOrObservableArray) || []
+    const unwrappedIsIterable = Symbol.iterator in unwrappedArray
+    if (!unwrappedIsIterable) { unwrappedArray = [unwrappedArray] }
 
     // Filter out any entries marked as destroyed
     var filteredArray = arrayFilter(unwrappedArray, function (item) {

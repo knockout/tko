@@ -22,6 +22,10 @@ describe('Observable Array', function () {
     expect(isObservable(testObservableArray)).toEqual(true)
   })
 
+  it("should be iterable", function () {
+    expect(Array.from(testObservableArray)).toEqual([1, 2, 3])
+  })
+
   it('Should initialize to empty array if you pass no args to constructor', function () {
     var instance = new observableArray()
     expect(instance().length).toEqual(0)
@@ -245,9 +249,9 @@ describe('Observable Array', function () {
     expect(testObservableArray.indexOf('fake')).toEqual(-1)
   })
 
-  it('Should return 0 when you call myArray.length, and the true length when you call myArray().length', function () {
+  it('Should return the correct myArray.length, and via myArray().length', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    expect(testObservableArray.length).toEqual(0) // Because JavaScript won't let us override "length" directly
+    expect(testObservableArray.length).toEqual(3)
     expect(testObservableArray().length).toEqual(3)
   })
 

@@ -4,7 +4,7 @@
 //
 import {
     setPrototypeOfOrExtend, arrayIndexOf, canSetPrototype, setPrototypeOf,
-    arrayForEach
+    arrayForEach, overwriteLengthPropertyIfSupported
 } from 'tko.utils'
 
 import { observable, isObservable } from './observable.js'
@@ -20,6 +20,7 @@ export function observableArray (initialValues) {
   setPrototypeOfOrExtend(result, observableArray.fn)
   trackArrayChanges(result)
         // ^== result.extend({ trackArrayChanges: true })
+  overwriteLengthPropertyIfSupported(result, { get: () => result().length })
   return result
 }
 
@@ -102,6 +103,10 @@ observableArray.fn = {
       this.peek()[index] = newItem
       this.valueHasMutated()
     }
+  },
+
+  [Symbol.iterator]: function * () {
+    for (const item of this()) { yield item }
   }
 }
 
