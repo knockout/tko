@@ -49,6 +49,10 @@ export function getDependenciesCount () {
   if (currentFrame) { return currentFrame.computed.getDependenciesCount() }
 }
 
+export function getDependencies () {
+  if (currentFrame) { return currentFrame.computed.getDependencies() }
+}
+
 export function isInitial () {
   if (currentFrame) { return currentFrame.isInitial }
 }

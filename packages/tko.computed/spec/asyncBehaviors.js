@@ -582,8 +582,11 @@ describe('Rate-limited', function () {
             // The value of the computed is now undefined, although currently it keeps the previous value
             // This should not try to re-evaluate and thus shouldn't throw an exception
       expect(computed()).toEqual(1)
+      expect(computed.getDependencies()).toEqual([observableSwitch])
+
             // The computed should not be dependent on the second observable
       expect(computed.getDependenciesCount()).toEqual(1)
+
 
             // Updating the second observable shouldn't re-evaluate computed
       observableValue(2)

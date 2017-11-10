@@ -105,6 +105,7 @@ describe('Pure Computed', function () {
 
         // getDependenciesCount returns the correct number
     expect(computedInstance.getDependenciesCount()).toEqual(1)
+    expect(computedInstance.getDependencies()).toEqual([data])
   })
 
   it('Should not evaluate after it has been disposed', function () {
@@ -133,6 +134,7 @@ describe('Pure Computed', function () {
     computedInstance.subscribe(function (value) { notifiedValues.push(value) })
     expect(data.getSubscriptionsCount()).toEqual(1)
     expect(computedInstance.getDependenciesCount()).toEqual(1)
+    expect(computedInstance.getDependencies()).toEqual([data])
 
         // The subscription should not have sent down the initial value
     expect(notifiedValues).toEqual([])
@@ -149,12 +151,14 @@ describe('Pure Computed', function () {
 
     expect(data.getSubscriptionsCount()).toEqual(1)
     expect(computedInstance.getDependenciesCount()).toEqual(1)
+    expect(computedInstance.getDependencies()).toEqual([data])
 
         // Dispose the subscription to the computed
     subscription.dispose()
         // It goes to sleep, disposing its subscription to the observable
     expect(data.getSubscriptionsCount()).toEqual(0)
     expect(computedInstance.getDependenciesCount()).toEqual(1)     // dependency count of computed doesn't change
+    expect(computedInstance.getDependencies()).toEqual([data])
   })
 
   it('Should fire "awake" and "asleep" events when changing state', function () {
@@ -195,6 +199,7 @@ describe('Pure Computed', function () {
     expect(computedInstance()).toEqual('A')
     expect(timesEvaluated).toEqual(1)
     expect(computedInstance.getDependenciesCount()).toEqual(1)
+    expect(computedInstance.getDependencies()).toEqual([data])
 
         // Subscribing to the computed adds a subscription to the dependency without re-evaluating
     subscription = computedInstance.subscribe(subscribeFunc)
@@ -325,12 +330,14 @@ describe('Pure Computed', function () {
     expect(computedInstance()).toEqual('A')
     expect(timesEvaluated).toEqual(1)
     expect(computedInstance.getDependenciesCount()).toEqual(2)
+    expect(computedInstance.getDependencies()).toEqual([observableToTriggerDisposal, observableGivingValue])
 
         // Now cause a disposal during evaluation
     observableToTriggerDisposal(true)
     expect(computedInstance()).toEqual('A')
     expect(timesEvaluated).toEqual(2)
     expect(computedInstance.getDependenciesCount()).toEqual(0)
+    expect(computedInstance.getDependencies()).toEqual([])
   })
 
   it('Should support array tracking using extender', function () {
@@ -439,25 +446,31 @@ describe('Pure Computed', function () {
         computedInstance = pureComputed(function () {
                     // no dependencies at first
           expect(dependencyDetection.getDependenciesCount()).toEqual(0)
+          expect(dependencyDetection.getDependencies()).toEqual([])
                     // add a single dependency
           observable1()
           expect(dependencyDetection.getDependenciesCount()).toEqual(1)
+          expect(dependencyDetection.getDependencies()).toEqual([observable1])
                     // add a second one
           observable2()
           expect(dependencyDetection.getDependenciesCount()).toEqual(2)
+          expect(dependencyDetection.getDependencies()).toEqual([observable1, observable2])
                     // accessing observable again doesn't affect count
           observable1()
           expect(dependencyDetection.getDependenciesCount()).toEqual(2)
+          expect(dependencyDetection.getDependencies()).toEqual([observable1, observable2])
 
           return ++evaluationCount
         })
 
       expect(computedInstance()).toEqual(1)     // single evaluation
       expect(computedInstance.getDependenciesCount()).toEqual(2) // matches value from context
+      expect(computedInstance.getDependencies()).toEqual([observable1, observable2])
 
       observable1(2)
       expect(computedInstance()).toEqual(2)     // second evaluation
       expect(computedInstance.getDependenciesCount()).toEqual(2) // matches value from context
+      expect(computedInstance.getDependencies()).toEqual([observable1, observable2])
     })
   })
 })
