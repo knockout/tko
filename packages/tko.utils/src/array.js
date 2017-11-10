@@ -1,26 +1,26 @@
 //
 // Array utilities
 //
-/* eslint no-cond-assign: 0 */
+// Note that the array functions may be called with
+// Array-like things, such as NodeList.
 
 export function arrayForEach (array, action) {
-  for (var i = 0, j = array.length; i < j; i++) { action(array[i], i) }
+  for (let i = 0, j = array.length; i < j; ++i) {
+    action(array[i], i, array)
+  }
 }
 
 export function arrayIndexOf (array, item) {
-    // IE9
-  if (typeof Array.prototype.indexOf === 'function') { return Array.prototype.indexOf.call(array, item) }
-  for (var i = 0, j = array.length; i < j; i++) {
-    if (array[i] === item) { return i }
-  }
-  return -1
+  return (Array.isArray(array) ? array : [...array]).indexOf(item)
 }
 
 export function arrayFirst (array, predicate, predicateOwner) {
-  for (var i = 0, j = array.length; i < j; i++) {
-    if (predicate.call(predicateOwner, array[i], i)) { return array[i] }
-  }
-  return null
+  return (Array.isArray(array) ? array : [...array])
+    .find(predicate, predicateOwner) || null
+}
+
+export function arrayMap (array = [], mapping) {
+  return Array.from(array, mapping)
 }
 
 export function arrayRemoveItem (array, itemToRemove) {
@@ -32,33 +32,20 @@ export function arrayRemoveItem (array, itemToRemove) {
   }
 }
 
-export function arrayGetDistinctValues (array) {
-  array = array || []
-  var result = []
-  for (var i = 0, j = array.length; i < j; i++) {
-    if (arrayIndexOf(result, array[i]) < 0) { result.push(array[i]) }
-  }
-  return result
-}
-
-export function arrayMap (array, mapping) {
-  array = array || []
-  var result = []
-  for (var i = 0, j = array.length; i < j; i++) { result.push(mapping(array[i], i)) }
-  return result
+export function arrayGetDistinctValues (array = []) {
+  const seen = new Set()
+  return (Array.isArray(array) ? array : [...array])
+    .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
 export function arrayFilter (array, predicate) {
-  array = array || []
-  var result = []
-  for (var i = 0, j = array.length; i < j; i++) {
-    if (predicate(array[i], i)) { result.push(array[i]) }
-  }
-  return result
+  return (Array.isArray(array) ? array : [...array]).filter(predicate)
 }
 
 export function arrayPushAll (array, valuesToPush) {
-  if (valuesToPush instanceof Array) { array.push.apply(array, valuesToPush) } else {
+  if (valuesToPush instanceof Array) {
+    array.push.apply(array, valuesToPush)
+  } else {
     for (var i = 0, j = valuesToPush.length; i < j; i++) { array.push(valuesToPush[i]) }
   }
   return array
@@ -74,11 +61,7 @@ export function addOrRemoveItem (array, value, included) {
 }
 
 export function makeArray (arrayLikeObject) {
-  var result = []
-  for (var i = 0, j = arrayLikeObject.length; i < j; i++) {
-    result.push(arrayLikeObject[i])
-  }
-  return result
+  return Array.from(arrayLikeObject)
 }
 
 export function range (min, max) {

@@ -12,9 +12,9 @@ describe('arrayForEach', function () {
     ko.utils.arrayForEach(['a', 'b', 'c'], callback)
 
     expect(callback.calls.length).toBe(3)
-    expect(callback.calls[0].args).toEqual(['a', 0])
-    expect(callback.calls[1].args).toEqual(['b', 1])
-    expect(callback.calls[2].args).toEqual(['c', 2])
+    expect(callback.calls[0].args).toEqual(['a', 0, ['a', 'b', 'c']])
+    expect(callback.calls[1].args).toEqual(['b', 1, ['a', 'b', 'c']])
+    expect(callback.calls[2].args).toEqual(['c', 2, ['a', 'b', 'c']])
   })
 
   it('Should do nothing with empty arrays', function () {
@@ -106,8 +106,8 @@ describe('arrayFirst', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchB)
 
     expect(matchB.calls.length).toBe(2)
-    expect(matchB.calls[0].args).toEqual(['a', 0])
-    expect(matchB.calls[1].args).toEqual(['b', 1])
+    expect(matchB.calls[0].args).toEqual(['a', 0, [ 'a', 'b', 'c' ]])
+    expect(matchB.calls[1].args).toEqual(['b', 1, [ 'a', 'b', 'c' ]])
   })
 
   it('Should return null if no element matches', function () {
@@ -120,9 +120,9 @@ describe('arrayFirst', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
 
     expect(matchD.calls.length).toBe(3)
-    expect(matchD.calls[0].args).toEqual(['a', 0])
-    expect(matchD.calls[1].args).toEqual(['b', 1])
-    expect(matchD.calls[2].args).toEqual(['c', 2])
+    expect(matchD.calls[0].args).toEqual(['a', 0, [ 'a', 'b', 'c' ]])
+    expect(matchD.calls[1].args).toEqual(['b', 1, [ 'a', 'b', 'c' ]])
+    expect(matchD.calls[2].args).toEqual(['c', 2, [ 'a', 'b', 'c' ]])
   })
 })
 
