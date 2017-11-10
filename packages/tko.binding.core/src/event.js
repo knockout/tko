@@ -18,40 +18,53 @@ export function makeEventHandlerShortcut (eventName) {
   }
 }
 
-export var eventHandler = {
+function makeDescriptor (handlerOrObject) {
+  return typeof handlerOrObject === 'function' ? { handler: handlerOrObject } : handlerOrObject || {}
+}
+
+export const eventHandler = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     var eventsToHandle = valueAccessor() || {}
-    objectForEach(eventsToHandle, function (eventName) {
-      if (typeof eventName === 'string') {
-        registerEventHandler(element, eventName, function (event) {
-          var handlerReturnValue
-          var handlerFunction = valueAccessor()[eventName]
-          if (!handlerFunction) { return }
+    objectForEach(eventsToHandle, function (eventName, descriptor) {
+      const {passive, capture, once} = makeDescriptor(descriptor)
+      const eventOptions = (capture || passive || once) && {capture, passive, once}
 
-          try {
-                        // Take all the event args, and prefix with the viewmodel
-            var argsForHandler = makeArray(arguments)
-            viewModel = bindingContext['$data']
-            argsForHandler.unshift(viewModel)
-            handlerReturnValue = handlerFunction.apply(viewModel, argsForHandler)
-          } finally {
-            if (handlerReturnValue !== true) { // Normally we want to prevent default action. Developer can override this be explicitly returning true.
-              if (event.preventDefault) { event.preventDefault() } else { event.returnValue = false }
+      const eventHandlerFn = (event, ...more) => {
+        var handlerReturnValue
+        const {handler, passive, bubble} = makeDescriptor(valueAccessor()[eventName])
+
+        try {
+          // Take all the event args, and prefix with the viewmodel
+          if (handler) {
+            const possiblyUpdatedViewModel = bindingContext.$data
+            const argsForHandler = [possiblyUpdatedViewModel, event, ...more]
+            handlerReturnValue = handler.apply(possiblyUpdatedViewModel, argsForHandler)
+          }
+        } finally {
+          if (handlerReturnValue !== true) {
+            // Normally we want to prevent default action. Developer can override this be explicitly returning true.
+            // preventDefault will throw an error if the event is passive.
+            if (event.preventDefault) {
+              if (!passive) { event.preventDefault() }
+            } else {
+              event.returnValue = false
             }
           }
+        }
 
-          var bubble = allBindings.get(eventName + 'Bubble') !== false
-          if (!bubble) {
-            event.cancelBubble = true
-            if (event.stopPropagation) { event.stopPropagation() }
-          }
-        })
+        const bubbleMark = allBindings.get(eventName + 'Bubble') !== false
+        if (bubble === false || !bubbleMark) {
+          event.cancelBubble = true
+          if (event.stopPropagation) { event.stopPropagation() }
+        }
       }
+
+      registerEventHandler(element, eventName, eventHandlerFn, eventOptions || false)
     })
   }
 }
 
-export var onHandler = {
+export const onHandler = {
   init: eventHandler.init,
   preprocess: function (value, key, addBinding) {
     addBinding(key.replace('on.', ''), '=>' + value)

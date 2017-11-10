@@ -120,6 +120,69 @@ describe('Binding: Event', function () {
     triggerEvent(testNode.childNodes[0], 'mouseover')
     expect(didCallHandler).toEqual(true)
   })
+
+  it("ordinarily bubbles and is neither passive nor capturing nore 'once'", function () {
+    let handlerCalls = 0
+    testNode.innerHTML = "<a data-bind='event: {click: { handler: fn }}'><b></b></a>"
+    const fn = (vm, evt) => {
+      handlerCalls++
+      expect(evt.eventPhase).toEqual(3) // bubbling
+    }
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(handlerCalls).toEqual(1)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(handlerCalls).toEqual(2)
+  })
+
+  it("prevents bubble", function () {
+    let handlerCalls = 0
+    testNode.innerHTML = "<a data-bind='click: fn'><b data-bind='event: {click: { bubble: false }}'></b></a>"
+    const fn = () => handlerCalls++
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(handlerCalls).toEqual(0)
+  })
+
+  it('respects the `once` param', function () {
+    let handlerCalls = 0
+    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, once: true}}'></a>"
+    const fn = () => handlerCalls++
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(handlerCalls).toEqual(1)
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(handlerCalls).toEqual(1)
+  })
+
+  it('respects the `capture` param', function () {
+    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, capture: true}}'><b></b></a>"
+    const fn = (vm, evt) => {
+      expect(evt.eventPhase).toEqual(1) // capturing
+    }
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+  })
+
+  xit('respects the `passive` param', function () {
+    /**
+     * This does not appear to be testable.  The evt.preventDefault below
+     * throws an uncatchable error in Chrome 63.
+     */
+    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, passive: true}}'><b></b></a>"
+    let preventDefaultThrows = false
+    const fn = (vm, evt) => {
+      // test passive
+      try {
+        evt.preventDefault()
+      } catch (e) {
+        preventDefaultThrows = true
+      }
+    }
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(preventDefaultThrows).toEqual(true)
+  })
 })
 
 describe('Binding: on.', function () {

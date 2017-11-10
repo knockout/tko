@@ -7,6 +7,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (utils) Several array utilities use native functions now (`arrayPushAll`, `arrayFilter`, `arrayGetDistinctValues`, `arrayFirst`, `arrayIndexOf`)
 * (various) forward-ports per #5
 * (components) Warn with custom-element names that cannot be used with custom elements re. #43 & knockout/knockout#1603
+* (`event` binding) Add object-based event handler e.g. `event.click: { handler: fn, once: true, capture: true, bubble: false, passive: false}`.  Also, bubbling can be prevented with `event.click: {bubble: false }` re #32
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 

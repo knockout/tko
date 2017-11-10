@@ -40,26 +40,31 @@ function isClickOnCheckableElement (element, eventType) {
 var eventsThatMustBeRegisteredUsingAttachEvent = { 'propertychange': true }
 let jQueryEventAttachName
 
-export function registerEventHandler (element, eventType, handler) {
-  var wrappedHandler = catchFunctionErrors(handler)
+export function registerEventHandler (element, eventType, handler, eventOptions = false) {
+  const wrappedHandler = catchFunctionErrors(handler)
+  const mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType]
+  const mustUseNative = Boolean(eventOptions)
 
-  var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType]
-  if (!options.useOnlyNativeEvents && !mustUseAttachEvent && jQueryInstance) {
+  if (!options.useOnlyNativeEvents && !mustUseAttachEvent && !mustUseNative && jQueryInstance) {
     if (!jQueryEventAttachName) {
       jQueryEventAttachName = (typeof jQueryInstance(element).on === 'function') ? 'on' : 'bind'
     }
     jQueryInstance(element)[jQueryEventAttachName](eventType, wrappedHandler)
-  } else if (!mustUseAttachEvent && typeof element.addEventListener === 'function') { element.addEventListener(eventType, wrappedHandler, false) } else if (typeof element.attachEvent !== 'undefined') {
-    var attachEventHandler = function (event) { wrappedHandler.call(element, event) },
-      attachEventName = 'on' + eventType
+  } else if (!mustUseAttachEvent && typeof element.addEventListener === 'function') {
+    element.addEventListener(eventType, wrappedHandler, eventOptions)
+  } else if (typeof element.attachEvent !== 'undefined') {
+    const attachEventHandler = function (event) { wrappedHandler.call(element, event) }
+    const attachEventName = 'on' + eventType
     element.attachEvent(attachEventName, attachEventHandler)
 
-        // IE does not dispose attachEvent handlers automatically (unlike with addEventListener)
-        // so to avoid leaks, we have to remove them manually. See bug #856
+    // IE does not dispose attachEvent handlers automatically (unlike with addEventListener)
+    // so to avoid leaks, we have to remove them manually. See bug #856
     addDisposeCallback(element, function () {
       element.detachEvent(attachEventName, attachEventHandler)
     })
-  } else { throw new Error("Browser doesn't support addEventListener or attachEvent") }
+  } else {
+    throw new Error("Browser doesn't support addEventListener or attachEvent")
+  }
 }
 
 export function triggerEvent (element, eventType) {
