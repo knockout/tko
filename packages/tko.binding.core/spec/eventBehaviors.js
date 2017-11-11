@@ -183,6 +183,44 @@ describe('Binding: Event', function () {
     triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
     expect(preventDefaultThrows).toEqual(true)
   })
+
+  it("respects the `debounce` property", function () {
+    jasmine.Clock.useMock()
+    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, debounce: 50}}'></a>"
+    var calls = 0
+    const fn = () => calls++
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(calls).toEqual(0)
+    jasmine.Clock.tick(500)
+    expect(calls).toEqual(1)
+  })
+
+  it("respects the `throttle` property", function () {
+    jasmine.Clock.useMock()
+    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, throttle: 50}}'></a>"
+    let calls = 0
+    const fn = () => calls++
+    applyBindings({ fn }, testNode)
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(calls).toEqual(0)
+    jasmine.Clock.tick(100)
+    expect(calls).toEqual(1)
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(calls).toEqual(1)
+    jasmine.Clock.tick(100)
+    expect(calls).toEqual(2)
+    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(calls).toEqual(2)
+    jasmine.Clock.tick(100)
+    expect(calls).toEqual(3)
+  })
 })
 
 describe('Binding: on.', function () {

@@ -5,11 +5,11 @@ import { safeSetTimeout } from './error.js'
 
 export function throttle (callback, timeout) {
   var timeoutInstance
-  return function () {
+  return function (...args) {
     if (!timeoutInstance) {
       timeoutInstance = safeSetTimeout(function () {
         timeoutInstance = undefined
-        callback()
+        callback(...args)
       }, timeout)
     }
   }
@@ -17,8 +17,8 @@ export function throttle (callback, timeout) {
 
 export function debounce (callback, timeout) {
   var timeoutInstance
-  return function () {
+  return function (...args) {
     clearTimeout(timeoutInstance)
-    timeoutInstance = safeSetTimeout(callback, timeout)
+    timeoutInstance = safeSetTimeout(() => callback(...args), timeout)
   }
 }

@@ -1,6 +1,7 @@
 
 import {
-    objectForEach, registerEventHandler, makeArray
+    objectForEach, registerEventHandler, makeArray,
+    throttle as throttleFn, debounce as debounceFn
 } from 'tko.utils'
 
 // For certain common events (currently just 'click'), allow a simplified data-binding syntax
@@ -26,10 +27,10 @@ export const eventHandler = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     var eventsToHandle = valueAccessor() || {}
     objectForEach(eventsToHandle, function (eventName, descriptor) {
-      const {passive, capture, once} = makeDescriptor(descriptor)
+      const {passive, capture, once, debounce, throttle} = makeDescriptor(descriptor)
       const eventOptions = (capture || passive || once) && {capture, passive, once}
 
-      const eventHandlerFn = (event, ...more) => {
+      let eventHandlerFn = (event, ...more) => {
         var handlerReturnValue
         const {handler, passive, bubble} = makeDescriptor(valueAccessor()[eventName])
 
@@ -58,6 +59,9 @@ export const eventHandler = {
           if (event.stopPropagation) { event.stopPropagation() }
         }
       }
+
+      if (debounce) { eventHandlerFn = debounceFn(eventHandlerFn, debounce) }
+      if (throttle) { eventHandlerFn = throttleFn(eventHandlerFn, throttle) }
 
       registerEventHandler(element, eventName, eventHandlerFn, eventOptions || false)
     })

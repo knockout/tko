@@ -8,6 +8,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (various) forward-ports per #5
 * (components) Warn with custom-element names that cannot be used with custom elements re. #43 & knockout/knockout#1603
 * (`event` binding) Add object-based event handler e.g. `event.click: { handler: fn, once: true, capture: true, bubble: false, passive: false}`.  Also, bubbling can be prevented with `event.click: {bubble: false }` re #32
+* (`event` binding) Add `throttle` and `debounce` parameters
+* The `throttle` and `debounce` utilities now pass arguments to the target functions
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 
