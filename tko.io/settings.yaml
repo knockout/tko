@@ -25,12 +25,20 @@ scripts:
   type: module
   async: true
 
-dest: build/index.html
-sections:
+3to4:
+  dest: build/3to4.html
+  sections:
+  - title: Knockout 3 to Knockout 4
+    includes:
+    - ../packages/tko/docs/3to4.md
+
+index:
+  dest: build/index.html
+  sections:
   - title: Introduction
     includes:
-      - ../packages/tko/docs/intro.md
-      - ../packages/tko/docs/books.pug
+    - ../packages/tko/docs/intro.md
+    - ../packages/tko/docs/books.pug
  # - ../packages/tko/docs/amd-loading.md
  # - ../packages/tko/docs/animated.md
  # - ../packages/tko/docs/api.md
@@ -42,81 +50,81 @@ sections:
  # - ../packages/tko/docs/links.md
  # - ../packages/tko/docs/plugins.md
 
-  - title: Binding DOM and Javascript
-    includes:
-     - ../packages/tko.bind/docs/binding-syntax.md
-     - ../packages/tko.bind/docs/binding-context.md
-     - ../packages/tko.provider.databind/docs/databind-parser.md
-     - ../packages/tko.provider/docs/provider.md
-     - ../packages/tko.bind/docs/binding-preprocessing.md
-     - ../packages/tko.bind/docs/custom-bindings.md
-     - ../packages/tko.bind/docs/custom-bindings-for-virtual-elements.md
-     - ../packages/tko.bind/docs/custom-bindings-controlling-descendant-bindings.md
-     - ../packages/tko.bind/docs/custom-bindings-disposal.md
+  # - title: Binding DOM and Javascript
+  #   includes:
+  #    - ../packages/tko.bind/docs/binding-syntax.md
+  #    - ../packages/tko.bind/docs/binding-context.md
+  #    - ../packages/tko.provider.databind/docs/databind-parser.md
+  #    - ../packages/tko.provider/docs/provider.md
+  #    - ../packages/tko.bind/docs/binding-preprocessing.md
+  #    - ../packages/tko.bind/docs/custom-bindings.md
+  #    - ../packages/tko.bind/docs/custom-bindings-for-virtual-elements.md
+  #    - ../packages/tko.bind/docs/custom-bindings-controlling-descendant-bindings.md
+  #    - ../packages/tko.bind/docs/custom-bindings-disposal.md
 
-  - title: Included bindings
-    includes:
-     - ../packages/tko.binding.core/docs/attr-binding.md
-     - ../packages/tko.binding.core/docs/checked-binding.md
-     - ../packages/tko.binding.core/docs/click-binding.md
-     - ../packages/tko.binding.core/docs/css-binding.md
-     - ../packages/tko.binding.core/docs/disable-binding.md
-     - ../packages/tko.binding.core/docs/enable-binding.md
-     - ../packages/tko.binding.core/docs/event-binding.md
-     - ../packages/tko.binding.core/docs/hasfocus-binding.md
-     - ../packages/tko.binding.core/docs/html-binding.md
-     - ../packages/tko.binding.core/docs/options-binding.md
-     - ../packages/tko.binding.core/docs/selectedOptions-binding.md
-     - ../packages/tko.binding.core/docs/style-binding.md
-     - ../packages/tko.binding.core/docs/submit-binding.md
-     - ../packages/tko.binding.core/docs/text-binding.md
-     - ../packages/tko.binding.core/docs/textInput-binding.md
-     - ../packages/tko.binding.core/docs/uniqueName-binding.md
-     - ../packages/tko.binding.core/docs/unobtrusive-event-handling.md
-     - ../packages/tko.binding.core/docs/value-binding.md
-     - ../packages/tko.binding.core/docs/visible-binding.md
-     - ../packages/tko.binding.if/docs/if-binding.md
-     - ../packages/tko.binding.if/docs/ifnot-binding.md
-     - ../packages/tko.binding.if/docs/index.md
-     - ../packages/tko.binding.if/docs/with-binding.md
-     - ../packages/tko.binding.template/docs/foreach-binding.md
-     - ../packages/tko.binding.template/docs/template-binding.md
+  # - title: Included bindings
+  #   includes:
+  #    - ../packages/tko.binding.core/docs/attr-binding.md
+  #    - ../packages/tko.binding.core/docs/checked-binding.md
+  #    - ../packages/tko.binding.core/docs/click-binding.md
+  #    - ../packages/tko.binding.core/docs/css-binding.md
+  #    - ../packages/tko.binding.core/docs/disable-binding.md
+  #    - ../packages/tko.binding.core/docs/enable-binding.md
+  #    - ../packages/tko.binding.core/docs/event-binding.md
+  #    - ../packages/tko.binding.core/docs/hasfocus-binding.md
+  #    - ../packages/tko.binding.core/docs/html-binding.md
+  #    - ../packages/tko.binding.core/docs/options-binding.md
+  #    - ../packages/tko.binding.core/docs/selectedOptions-binding.md
+  #    - ../packages/tko.binding.core/docs/style-binding.md
+  #    - ../packages/tko.binding.core/docs/submit-binding.md
+  #    - ../packages/tko.binding.core/docs/text-binding.md
+  #    - ../packages/tko.binding.core/docs/textInput-binding.md
+  #    - ../packages/tko.binding.core/docs/uniqueName-binding.md
+  #    - ../packages/tko.binding.core/docs/unobtrusive-event-handling.md
+  #    - ../packages/tko.binding.core/docs/value-binding.md
+  #    - ../packages/tko.binding.core/docs/visible-binding.md
+  #    - ../packages/tko.binding.if/docs/if-binding.md
+  #    - ../packages/tko.binding.if/docs/ifnot-binding.md
+  #    - ../packages/tko.binding.if/docs/index.md
+  #    - ../packages/tko.binding.if/docs/with-binding.md
+  #    - ../packages/tko.binding.template/docs/foreach-binding.md
+  #    - ../packages/tko.binding.template/docs/template-binding.md
 
-  - title: Observables
-    includes:
-    - ../packages/tko.observable/docs/arraychange.md
-    - ../packages/tko.observable/docs/observableArrays.md
-    - ../packages/tko.observable/docs/observables.md
-    - ../packages/tko.observable/docs/rateLimit-observable.md
-    - ../packages/tko.observable/docs/extenders.md
-    - ../packages/tko.observable/docs/throttle-extender.md
-    - ../packages/tko/docs/json-data.md
-
-
-  - title: Computed Observables
-    includes:
-    - ../packages/tko.computed/docs/computed-dependency-tracking.md
-    - ../packages/tko.computed/docs/computed-pure.md
-    - ../packages/tko.computed/docs/computed-reference.md
-    - ../packages/tko.computed/docs/computed-writable.md
-    - ../packages/tko.computed/docs/computedObservables.md
-
-  - title: Components & Custom Tags
-    includes:
-    - ../packages/tko.utils.component/docs/component-binding.md
-    - ../packages/tko.utils.component/docs/component-custom-elements.md
-    - ../packages/tko.utils.component/docs/component-loaders.md
-    - ../packages/tko.utils.component/docs/component-overview.md
-    - ../packages/tko.utils.component/docs/component-registration.md
+  # - title: Observables
+  #   includes:
+  #   - ../packages/tko.observable/docs/arraychange.md
+  #   - ../packages/tko.observable/docs/observableArrays.md
+  #   - ../packages/tko.observable/docs/observables.md
+  #   - ../packages/tko.observable/docs/rateLimit-observable.md
+  #   - ../packages/tko.observable/docs/extenders.md
+  #   - ../packages/tko.observable/docs/throttle-extender.md
+  #   - ../packages/tko/docs/json-data.md
 
 
-  - title: Life Cycles
-    includes:
-    - ../packages/tko.lifecycle/docs/life-cycle.md
+  # - title: Computed Observables
+  #   includes:
+  #   - ../packages/tko.computed/docs/computed-dependency-tracking.md
+  #   - ../packages/tko.computed/docs/computed-pure.md
+  #   - ../packages/tko.computed/docs/computed-reference.md
+  #   - ../packages/tko.computed/docs/computed-writable.md
+  #   - ../packages/tko.computed/docs/computedObservables.md
+
+  # - title: Components & Custom Tags
+  #   includes:
+  #   - ../packages/tko.utils.component/docs/component-binding.md
+  #   - ../packages/tko.utils.component/docs/component-custom-elements.md
+  #   - ../packages/tko.utils.component/docs/component-loaders.md
+  #   - ../packages/tko.utils.component/docs/component-overview.md
+  #   - ../packages/tko.utils.component/docs/component-registration.md
+
+
+  # - title: Life Cycles
+  #   includes:
+  #   - ../packages/tko.lifecycle/docs/life-cycle.md
 
   # - title: Plugins
 
-  - title: API
+  # - title: API
 
 
 # The following can be auto-generated from `volumeInfo` via

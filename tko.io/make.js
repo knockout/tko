@@ -5,6 +5,8 @@ const yaml = require('js-yaml')
 const pug = require('pug')
 const debounce = require('lodash.debounce')
 const hljs = require('highlight.js')
+const {spawn} = require('child_process')
+const {argv} = process
 
 function highlight (str, lang) {
   if (!lang) { return '' }
@@ -25,47 +27,56 @@ const md = require('markdown-it')({
 
 const ENC = {encoding: 'utf8'}
 
-function * genHtmlIncludes ({includes}, config) {
+function * genHtmlIncludes ({includes}, htmlSettings, config) {
   for (const sourcePath of includes || []) {
     console.log('  |  ', sourcePath)
     const source = fs.readFileSync(sourcePath, ENC)
     if (sourcePath.endsWith('.md')) {
       yield `<hr/><pre>${sourcePath}</pre>` + md.render(source)
     } else if (sourcePath.endsWith('.pug')) {
-      yield pug.render(source, config)
+      yield pug.render(source, Object.assign({}, htmlSettings, config))
     } else {
       throw new Error(`Bad extension: ${sourcePath} (not .md or .pug)`)
     }
   }
 }
 
-function * genSections (config) {
-  for (const section of config.sections) {
+function * genSections (htmlConfig, config) {
+  for (const section of htmlConfig.sections) {
     console.log(`  |- ${section.title}`)
-    section.html = Array.from(genHtmlIncludes(section, config)).join('\n')
+    section.html = Array.from(genHtmlIncludes(section, htmlConfig, config)).join('\n')
     yield section
   }
 }
 
+function makeHtml({htmlSettings, scripts, links, styles}, config) {
+  /**
+   * Make build/index.html
+   */
+  console.log(`  Making ${htmlSettings.dest}`)
+  Object.assign(htmlSettings, {scripts, links, styles}) // add links + scripts
+  const sections = Array.from(genSections(htmlSettings, config))
+  const locals = Object.assign(htmlSettings, {sections})
+  const html = pug.renderFile('src/index.pug', locals)
+  fs.writeFileSync(htmlSettings.dest, html)
+}
+
 function make () {
   console.log('👲   Starting at ', new Date())
+
   /**
    * Make build/
    */
   fs.mkdirs('build/')
 
   const styles = fs.readFileSync('src/tko.css')
-
-  /**
-   * Make build/index.html
-   */
-  console.log('  Making build/index.html')
   const config = yaml.load(fs.readFileSync('./settings.yaml', ENC))
-  const sections = Array.from(genSections(config))
-  const locals = Object.assign(config, {sections, styles})
-  const html = pug.renderFile('src/index.pug', locals)
-  fs.writeFileSync(config.dest, html)
+  const {scripts, links} = config
 
+  makeHtml({ htmlSettings: config.index, styles, scripts, links }, config)
+  makeHtml({ htmlSettings: config['3to4'], styles, scripts, links }, config)
+
+  console.log("🏁  Complete.", new Date())
   /**
    * Make Legacy Javascript
    */
@@ -73,18 +84,22 @@ function make () {
   // fs.copySync('src/tko-io.js', 'build/tko-io.js')
 }
 
-if (process.argv.includes('-w')) {
+if (argv.includes('-w')) {
   const ignored = '' // /(^|[\/\\])(\..|build\/*)/
   require('chokidar')
     .watch(['settings.yaml', 'src', '../packages'], {ignored})
     .on('all', debounce(make, 150))
 } else {
   console.log(`
-    make.js [-w]
+    Usage: make.js [-w] [-s]
 
       -w   Watch and rebuild on change
+      -s   Start the server with 'dev_appserver.py .' (from Google Cloud)
 
-    Run 'dev_appserver.py .' to start the Google Cloud development server.
   `)
   make()
+}
+
+if (argv.includes('-s')) {
+  spawn('dev_appserver.py', ['.'], {stdio: 'inherit'})
 }

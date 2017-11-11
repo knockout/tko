@@ -20,6 +20,10 @@ handlers:
   upload: build/index.html
   # http_headers: ...
 
+- url: /3to4
+  static_files: build/3to4.html
+  upload: build/3to4.html
+
 - url: /(.*\.js)$
   static_files: src/\1
   upload: src/.*$
