@@ -11,6 +11,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (`event` binding) Add `throttle` and `debounce` parameters
 * The `throttle` and `debounce` utilities now pass arguments to the target functions
 * (components) Allow Component-specific binding handlers from `component.prototype.getBindingHandler`
+* (components) Issue a warning if `ignoreCustomElementWarning` is not passed to a component registration and the component name is not usable for custom elements.
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 
