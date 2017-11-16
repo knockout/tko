@@ -16,6 +16,7 @@ export { toJS, toJSON } from './mappingHelpers'
 export { deferUpdates } from './defer.js'
 
 export { valuesArePrimitiveAndEqual, applyExtenders, extenders } from './extenders'
+
 import * as dependencyDetection from './dependencyDetection'
 
 export { dependencyDetection }

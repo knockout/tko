@@ -60,8 +60,7 @@ observable.fn = {
   valueHasMutated () { this.notifySubscribers(this[observableLatestValue]) },
   valueWillMutate () {
     this.notifySubscribers(this[observableLatestValue], 'beforeChange')
-  },
-  then (res, rej) { try { res(this()) } catch (e) { rej(e) } }
+  }
 }
 
 // Moved out of "limit" to avoid the extra closure

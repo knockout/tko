@@ -23,6 +23,7 @@ import {
     computed,
     isComputed,
     isPureComputed,
+    proxy,
     pureComputed
 } from 'tko.computed'
 
@@ -184,6 +185,7 @@ export default {
   unwrap,
   toJS,
   toJSON,
+  proxy,
 
     // ... Computed ...
   computed,

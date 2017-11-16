@@ -15,3 +15,7 @@ export {
 export {
     throttleExtender
 } from './throttleExtender'
+
+export {
+  proxy
+} from './proxy'
