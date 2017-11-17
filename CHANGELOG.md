@@ -13,7 +13,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (components) Allow Component-specific binding handlers from `component.prototype.getBindingHandler`
 * (components) Issue a warning if `ignoreCustomElementWarning` is not passed to a component registration and the component name is not usable for custom elements.
 * (observable) Removed `then` from `observable.fn` because it'll likely cause a lot of confusing issues with implicit unwrapping from `async` functions.
-* (observable) Add `ko.proxy` and related functions `ko.proxy.unproxy(obj)`, `ko.proxy.peek(obj, prop)`, `ko.proxy.isProxied(obj)`, `ko.proxy.getObservable(obj, prop)`.
+* (observable) Add `ko.proxy` and related functions `ko.proxy.peek(obj, prop)`, `ko.proxy.isProxied(obj)`, `ko.proxy.getObservable(obj, prop)`.
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 
