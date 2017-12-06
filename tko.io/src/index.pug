@@ -2,6 +2,7 @@ doctype html
 html(lang="en")
   head
     title= "TKO"
+    meta(charset="UTF-8")
 
     each link in links
       link(rel='stylesheet' href=link.href integrity=link.integrity crossorigin='anonymous')
@@ -13,28 +14,18 @@ html(lang="en")
       | #{styles}
 
   body
-    nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark.bg-ribbed-dark.site-navbar
-      .navbar-brand TKO
+    nav.top-bar
+      .tko TKO
+      a(href='/') Introduction
+      a(href='/3to4') Knockout 3 to 4 Guide
+      a.external(href='https://github.com/knockout/tko') Github
 
-      nav.collapse.navbar-collapse.navbar-nav
-        a.nav-item.nav-link(href='/') TKO
+    nav.sidebar
+      #toc.toc(data-bind='each: contents')
+        a(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')
 
-      nav.collapse.navbar-collapse.navbar-nav
-        a.nav-item.nav-link(href='/3to4') 3 to 4
-
-      nav.collapse.navbar-collapse.navbar-nav
-        a.nav-item.nav-link(href='https://github.com/knockout/tko') Github
-
-    .container-fluid
-      row.flex-nowrap
-        nav#toc.sidebar.col-lg-3.bg-ribbed-light
-          nav.navbar.contents
-            nav.nav.flex-column(data-bind='each: contents')
-              a.nav-link(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')
-
-        main.main.col-lg-9.ml-auto
-          each section in sections
-            .section
-              .section-title #{section.title}
-              .section-body !{section.html}
-
+    main
+      each section in sections
+        .section
+          .section-title #{section.title}
+          .section-body !{section.html}

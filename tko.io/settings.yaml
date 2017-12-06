@@ -3,11 +3,11 @@ links:
 - href: https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css
   integrity: sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M
 
-- href: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css
-  integrity: sha384-zhIsEafzyQWHSoMCQ4BfT8ZlRXQyIFwAHAJn32PNdsb8n6tVysGZSLpEEIvCskw4
+- href: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css
+  integrity: sha256-akwTLZec/XAFvgYgVH1T5/369lhA2Efr22xzCNl1nHs=
 
-- href: https://fonts.googleapis.com/css?family=Titillium+Web:300|Source+Code+Pro:300
-
+- href: https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css
+  integrity: sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN
 
 scripts:
 - src: https://unpkg.com/tko@4.0.0-alpha3/dist/ko.js
@@ -19,108 +19,108 @@ scripts:
   crossorigin: anonymous
 
 - src: https://production-assets.codepen.io/assets/embed/ei.js
-  async: true
+  async: async
 
 - src: tko-io.js
-  type: module
-  async: true
+  type: application/javascript
+  async: async
 
 3to4:
   dest: build/3to4.html
   sections:
-  - title: Knockout 3 to Knockout 4
+  - title: Knockout 3 to 4 Guide
     includes:
-    - ../packages/tko/docs/3to4.md
+    - tko/docs/3to4.md
 
 index:
   dest: build/index.html
   sections:
   - title: Introduction
     includes:
-    - ../packages/tko/docs/intro.md
-    - ../packages/tko/docs/books.pug
- # - ../packages/tko/docs/amd-loading.md
- # - ../packages/tko/docs/animated.md
- # - ../packages/tko/docs/api.md
- # - ../packages/tko/docs/browser-support.md
- # - ../packages/tko/docs/docs.md
- # - ../packages/tko/docs/fn.md
- # - ../packages/tko/docs/installation.md
- # - ../packages/tko/docs/intro.md
- # - ../packages/tko/docs/links.md
- # - ../packages/tko/docs/plugins.md
+    - tko/docs/intro.md
+    - tko/docs/books.pug
+ # - tko/docs/amd-loading.md
+ # - tko/docs/animated.md
+ # - tko/docs/api.md
+ # - tko/docs/browser-support.md
+ # - tko/docs/docs.md
+ # - tko/docs/fn.md
+ # - tko/docs/installation.md
+ # - tko/docs/intro.md
+ # - tko/docs/links.md
+ # - tko/docs/plugins.md
 
   # - title: Binding DOM and Javascript
   #   includes:
-  #    - ../packages/tko.bind/docs/binding-syntax.md
-  #    - ../packages/tko.bind/docs/binding-context.md
-  #    - ../packages/tko.provider.databind/docs/databind-parser.md
-  #    - ../packages/tko.provider/docs/provider.md
-  #    - ../packages/tko.bind/docs/binding-preprocessing.md
-  #    - ../packages/tko.bind/docs/custom-bindings.md
-  #    - ../packages/tko.bind/docs/custom-bindings-for-virtual-elements.md
-  #    - ../packages/tko.bind/docs/custom-bindings-controlling-descendant-bindings.md
-  #    - ../packages/tko.bind/docs/custom-bindings-disposal.md
+  #    - tko.bind/docs/binding-syntax.md
+  #    - tko.bind/docs/binding-context.md
+  #    - tko.provider.databind/docs/databind-parser.md
+  #    - tko.provider/docs/provider.md
+  #    - tko.bind/docs/binding-preprocessing.md
+  #    - tko.bind/docs/custom-bindings.md
+  #    - tko.bind/docs/custom-bindings-for-virtual-elements.md
+  #    - tko.bind/docs/custom-bindings-controlling-descendant-bindings.md
+  #    - tko.bind/docs/custom-bindings-disposal.md
 
   # - title: Included bindings
   #   includes:
-  #    - ../packages/tko.binding.core/docs/attr-binding.md
-  #    - ../packages/tko.binding.core/docs/checked-binding.md
-  #    - ../packages/tko.binding.core/docs/click-binding.md
-  #    - ../packages/tko.binding.core/docs/css-binding.md
-  #    - ../packages/tko.binding.core/docs/disable-binding.md
-  #    - ../packages/tko.binding.core/docs/enable-binding.md
-  #    - ../packages/tko.binding.core/docs/event-binding.md
-  #    - ../packages/tko.binding.core/docs/hasfocus-binding.md
-  #    - ../packages/tko.binding.core/docs/html-binding.md
-  #    - ../packages/tko.binding.core/docs/options-binding.md
-  #    - ../packages/tko.binding.core/docs/selectedOptions-binding.md
-  #    - ../packages/tko.binding.core/docs/style-binding.md
-  #    - ../packages/tko.binding.core/docs/submit-binding.md
-  #    - ../packages/tko.binding.core/docs/text-binding.md
-  #    - ../packages/tko.binding.core/docs/textInput-binding.md
-  #    - ../packages/tko.binding.core/docs/uniqueName-binding.md
-  #    - ../packages/tko.binding.core/docs/unobtrusive-event-handling.md
-  #    - ../packages/tko.binding.core/docs/value-binding.md
-  #    - ../packages/tko.binding.core/docs/visible-binding.md
-  #    - ../packages/tko.binding.if/docs/if-binding.md
-  #    - ../packages/tko.binding.if/docs/ifnot-binding.md
-  #    - ../packages/tko.binding.if/docs/index.md
-  #    - ../packages/tko.binding.if/docs/with-binding.md
-  #    - ../packages/tko.binding.template/docs/foreach-binding.md
-  #    - ../packages/tko.binding.template/docs/template-binding.md
+  #    - tko.binding.core/docs/attr-binding.md
+  #    - tko.binding.core/docs/checked-binding.md
+  #    - tko.binding.core/docs/click-binding.md
+  #    - tko.binding.core/docs/css-binding.md
+  #    - tko.binding.core/docs/disable-binding.md
+  #    - tko.binding.core/docs/enable-binding.md
+  #    - tko.binding.core/docs/event-binding.md
+  #    - tko.binding.core/docs/hasfocus-binding.md
+  #    - tko.binding.core/docs/html-binding.md
+  #    - tko.binding.core/docs/options-binding.md
+  #    - tko.binding.core/docs/selectedOptions-binding.md
+  #    - tko.binding.core/docs/style-binding.md
+  #    - tko.binding.core/docs/submit-binding.md
+  #    - tko.binding.core/docs/text-binding.md
+  #    - tko.binding.core/docs/textInput-binding.md
+  #    - tko.binding.core/docs/uniqueName-binding.md
+  #    - tko.binding.core/docs/unobtrusive-event-handling.md
+  #    - tko.binding.core/docs/value-binding.md
+  #    - tko.binding.core/docs/visible-binding.md
+  #    - tko.binding.if/docs/if-binding.md
+  #    - tko.binding.if/docs/ifnot-binding.md
+  #    - tko.binding.if/docs/index.md
+  #    - tko.binding.if/docs/with-binding.md
+  #    - tko.binding.template/docs/foreach-binding.md
+  #    - tko.binding.template/docs/template-binding.md
 
   # - title: Observables
   #   includes:
-  #   - ../packages/tko.observable/docs/arraychange.md
-  #   - ../packages/tko.observable/docs/observableArrays.md
-  #   - ../packages/tko.observable/docs/observables.md
-  #   - ../packages/tko.observable/docs/rateLimit-observable.md
-  #   - ../packages/tko.observable/docs/extenders.md
-  #   - ../packages/tko.observable/docs/throttle-extender.md
-  #   - ../packages/tko/docs/json-data.md
+  #   - tko.observable/docs/arraychange.md
+  #   - tko.observable/docs/observableArrays.md
+  #   - tko.observable/docs/observables.md
+  #   - tko.observable/docs/rateLimit-observable.md
+  #   - tko.observable/docs/extenders.md
+  #   - tko.observable/docs/throttle-extender.md
+  #   - tko/docs/json-data.md
 
 
   # - title: Computed Observables
   #   includes:
-  #   - ../packages/tko.computed/docs/computed-dependency-tracking.md
-  #   - ../packages/tko.computed/docs/computed-pure.md
-  #   - ../packages/tko.computed/docs/computed-reference.md
-  #   - ../packages/tko.computed/docs/computed-writable.md
-  #   - ../packages/tko.computed/docs/computedObservables.md
+  #   - tko.computed/docs/computed-dependency-tracking.md
+  #   - tko.computed/docs/computed-pure.md
+  #   - tko.computed/docs/computed-reference.md
+  #   - tko.computed/docs/computed-writable.md
+  #   - tko.computed/docs/computedObservables.md
 
   # - title: Components & Custom Tags
   #   includes:
-  #   - ../packages/tko.utils.component/docs/component-binding.md
-  #   - ../packages/tko.utils.component/docs/component-custom-elements.md
-  #   - ../packages/tko.utils.component/docs/component-loaders.md
-  #   - ../packages/tko.utils.component/docs/component-overview.md
-  #   - ../packages/tko.utils.component/docs/component-registration.md
+  #   - tko.utils.component/docs/component-binding.md
+  #   - tko.utils.component/docs/component-custom-elements.md
+  #   - tko.utils.component/docs/component-loaders.md
+  #   - tko.utils.component/docs/component-overview.md
+  #   - tko.utils.component/docs/component-registration.md
 
 
   # - title: Life Cycles
   #   includes:
-  #   - ../packages/tko.lifecycle/docs/life-cycle.md
+  #   - tko.lifecycle/docs/life-cycle.md
 
   # - title: Plugins
 

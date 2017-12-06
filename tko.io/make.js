@@ -28,11 +28,13 @@ const md = require('markdown-it')({
 const ENC = {encoding: 'utf8'}
 
 function * genHtmlIncludes ({includes}, htmlSettings, config) {
-  for (const sourcePath of includes || []) {
+  for (const relPath of includes || []) {
+    const sourcePath = '../packages/' + relPath
     console.log('  |  ', sourcePath)
     const source = fs.readFileSync(sourcePath, ENC)
     if (sourcePath.endsWith('.md')) {
-      yield `<hr/><pre>${sourcePath}</pre>` + md.render(source)
+      yield `<span data-bind='source: \"${relPath}\"'></span>
+      ${md.render(source)}`
     } else if (sourcePath.endsWith('.pug')) {
       yield pug.render(source, Object.assign({}, htmlSettings, config))
     } else {
