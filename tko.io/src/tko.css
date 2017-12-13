@@ -41,6 +41,17 @@ main a {
   border-bottom: 1px dashed #590c12;
 }
 
+td {
+  padding: 5px 1em;
+  border-bottom: 1px solid gray;
+}
+
+th {
+  padding: 5px 1em;
+  border-bottom: 1px solid black;
+}
+
+
 /* Codepen iFrames */
 iframe {
   padding: 0px 1em;

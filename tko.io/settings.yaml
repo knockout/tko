@@ -10,8 +10,8 @@ links:
   integrity: sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN
 
 scripts:
-- src: https://unpkg.com/tko@4.0.0-alpha3/dist/ko.js
-  integrity: sha256-F8J/QUq35S+E/Ri8ahVGQxime/L5PCeXEmHTvkh1MV8=
+- src: https://unpkg.com/tko@4.0.0-alpha4a/dist/tko.js
+  integrity: sha384-MJ/drYzT5bwJWdFxjHRDTJHTNccRZb70G7rQ9GeBnrSW/ssr3+A0kA1Ul7IHBZ/Y
   crossorigin: anonymous
 
 - src: https://production-assets.codepen.io/assets/embed/ei.js
