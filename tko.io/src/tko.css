@@ -123,10 +123,6 @@ iframe {
   padding: 4px 0.75em;
 }
 
-.sidebar::-webkit-scrollbar {
-  display: none;
-}
-
 .toc {
   position: sticky;
 }
@@ -134,12 +130,12 @@ iframe {
 .sidebar a {
   padding: 1ex 0.25rem;
   color: #931d0d;
+  border-radius: 4px;
 }
 
 .sidebar a:hover {
   color: black;
   background-color: #FFaFaFB0;
-  border-radius: 4px;
   transition: 0.4s background-color ease-in-out;
 }
 
@@ -154,7 +150,16 @@ iframe {
 }
 
 .sidebar .in-viewport {
-  font-weight: bold;
+}
+
+.sidebar .in-viewport::after {
+  position: absolute;
+  right: -22px;
+  background-color: #8F3F4F90;
+  width: 20px;
+  height: 20px;
+  border-radius: 12px;
+  content: ' ';
 }
 
 /**

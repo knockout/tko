@@ -5,6 +5,7 @@ const TITLE_QS = '.section-title, h1, h2'
 
 const titleNodeMap = new Map()
 
+ko.options.deferUpdates = true
 
 const titleObserver = new IntersectionObserver(entries => {
   entries.forEach(e => titleNodeMap.get(e.target)(e.isIntersecting))
@@ -31,10 +32,7 @@ class Title {
       viewportObservables.push(nodeInViewport)
     }
 
-    this.inViewport = ko.computed({
-      read () { return viewportObservables().some(niv => niv()) },
-      deferUpdates: true
-    })
+    this.inViewport = ko.computed(() => viewportObservables().some(o => o()))
   }
 
   * generateSiblingNodes () {
