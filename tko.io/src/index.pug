@@ -22,7 +22,7 @@ html(lang="en")
 
     nav.sidebar
       #toc.toc(data-bind='each: contents')
-        a(href='#\{{ navId }}' data-bind='template: { nodes: nodes }, class: css')
+        a(href='#\{{ navId }}' class='nav flex-column' data-bind='template: { nodes: nodes }, class: css, click: click')
 
     main
       each section in sections

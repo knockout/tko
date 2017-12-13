@@ -1,19 +1,89 @@
-const {$, ko} = window
+const {ko} = window
 
-const githubRoot = 'https://github.com/knockout/tko/blob/master/packages/'
+const GITHUB_ROOT = 'https://github.com/knockout/tko/blob/master/packages/'
+const TITLE_QS = '.section-title, h1, h2'
 
-const contents = ko.observableArray()
-let navIdNumber = 1
+const titleNodeMap = new Map()
 
-function addContent (i, documentNode) {
-  const docTag = documentNode.tagName
-  const tocNode = document.createElement('span')
-  tocNode.innerHTML = documentNode.innerHTML
-  const navId = `toc-${navIdNumber++}`
-  documentNode.setAttribute('id', navId)
-  const css = docTag === 'H1' ? { nav: true, 'flex-column': true } : {}
-  contents.push({ nodes: [tocNode], navId, css })
+
+const titleObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => titleNodeMap.get(e.target)(e.isIntersecting))
+})
+
+
+class Title {
+  constructor ({element, navIdNumber}) {
+    const navId = `toc-${navIdNumber}`
+    const depth = this.getDepth(element)
+    Object.assign(this, {element, navId, depth})
+    element.setAttribute('id', this.navId)
+
+    const viewportObservables = ko.observableArray([])
+
+    for (const node of this.generateSiblingNodes()) {
+      const nodeInViewport = ko.observable(false)
+      if (titleNodeMap.has(node)) {
+        viewportObservables.push(titleNodeMap.get(node))
+      } else {
+        titleNodeMap.set(node, nodeInViewport)
+        titleObserver.observe(node)
+      }
+      viewportObservables.push(nodeInViewport)
+    }
+
+    this.inViewport = ko.computed({
+      read () { return viewportObservables().some(niv => niv()) },
+      deferUpdates: true
+    })
+  }
+
+  * generateSiblingNodes () {
+    let atNode = this.element
+    yield atNode
+    while (atNode = atNode.nextSibling) {
+      if (atNode.nodeType !== atNode.ELEMENT_NODE) { continue }
+      if (this.getDepth(atNode) <= this.depth) { return }
+      yield atNode
+    }
+  }
+
+  getDepth (node) {
+    if (node.classList.contains('section-title')) { return 0 }
+    if (node.tagName === 'H1') { return 1 }
+    if (node.tagName === 'H2') { return 2 }
+    return 3
+  }
+
+  get css () {
+    const css = { 'in-viewport': this.inViewport }
+    switch (this.element.tagName) {
+      case 'DIV': Object.assign(css, { section: true }); break
+      case 'H2': Object.assign(css, { subheading: true }); break
+      case 'H1': Object.assign(css, { heading: true }); break
+    }
+    return css
+  }
+
+  get nodes () {
+    const node = document.createElement('span')
+    node.innerHTML = this.element.innerHTML
+    return [node]
+  }
+
+  click (vm, evt) {
+    this.element.scrollIntoView({ behavior: 'smooth' })
+    return false
+  }
 }
+
+function * generateTitles () {
+  let navIdNumber = 0
+  for (const element of document.querySelectorAll(TITLE_QS)) {
+    navIdNumber++
+    yield new Title({element, navIdNumber})
+  }
+}
+
 
 /**
  * Rely on some convention to map the source file to its parts / github origin.
@@ -21,7 +91,7 @@ function addContent (i, documentNode) {
 ko.bindingHandlers.set({
   source (element) {
     const origin = this.value // e.g. "../packages/tko/docs/intro.md"
-    const link = githubRoot + origin
+    const link = GITHUB_ROOT + origin
     const [pkg, file] = origin.split('/docs/')
 
     element.classList.add('source')
@@ -36,7 +106,7 @@ ko.bindingHandlers.set({
   }
 })
 
-$(() => {
-  $('.section-title, h1').each(addContent)
+window.addEventListener("load", () => {
+  const contents = ko.observableArray(Array.from(generateTitles()))
   ko.applyBindings({ contents })
 })

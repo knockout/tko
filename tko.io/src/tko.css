@@ -121,14 +121,30 @@ iframe {
 }
 
 .sidebar a {
+  padding: 1ex 0.25rem;
   color: #931d0d;
 }
 
 .sidebar a:hover {
   color: black;
-  text-shadow: 0 0 5px #931d0d, 0 0 10px #931d0d;
+  background-color: #FFaFaFB0;
+  border-radius: 4px;
+  transition: 0.4s background-color ease-in-out;
 }
 
+.sidebar .section {
+  font-size: 1.2rem;
+}
+
+.sidebar .subheading {
+  padding: 0.6ex 8px;
+  font-weight: normal;
+  margin-left: 1rem;
+}
+
+.sidebar .in-viewport {
+  font-weight: bold;
+}
 
 /**
  *          MAIN
@@ -207,6 +223,10 @@ pre code {
   font-size: 3rem;
   font-weight: bold;
 }
+
+
+
+
 
 /**
  *         Source linking
