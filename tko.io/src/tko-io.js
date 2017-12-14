@@ -69,7 +69,7 @@ class Title {
   }
 
   click (vm, evt) {
-    this.element.scrollIntoView({ behavior: 'smooth' })
+    this.element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     return false
   }
 }
@@ -101,6 +101,14 @@ ko.bindingHandlers.set({
         <i class='fa fa-fw fa-angle-right'></i>
         ${file}
       </a>`
+  },
+
+  highlightIfCurrent (element) {
+    for (const anchor of element.querySelectorAll('a[href]')) {
+      if (anchor.href === location.href) {
+        anchor.classList.add('current-page')
+      }
+    }
   }
 })
 

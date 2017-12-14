@@ -103,6 +103,10 @@ iframe {
   text-shadow: 0 0 5px #efff6c, 0 0 10px #efff6c;
 }
 
+.current-page {
+  background-color: #00000040;
+}
+
 /**
  *          SIDE-BAR
  */
@@ -149,8 +153,10 @@ iframe {
   margin-left: 1rem;
 }
 
-.sidebar .in-viewport {
-}
+ @keyframes popin {
+   from { transform: translateX(50%); }
+     to { transform: translateX(0%); }
+ }
 
 .sidebar .in-viewport::after {
   position: absolute;
@@ -160,6 +166,7 @@ iframe {
   height: 20px;
   border-radius: 12px;
   content: ' ';
+  animation: 0.25s ease-in 0s popin;
 }
 
 /**

@@ -14,7 +14,7 @@ html(lang="en")
       | #{styles}
 
   body
-    nav.top-bar
+    nav.top-bar(data-bind='highlightIfCurrent')
       .tko TKO
       a(href='/') Introduction
       a(href='/3to4') Knockout 3 to 4 Guide
