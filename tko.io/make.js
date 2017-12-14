@@ -98,6 +98,9 @@ if (argv.includes('-w')) {
       -w   Watch and rebuild on change
       -s   Start the server with 'dev_appserver.py .' (from Google Cloud)
 
+    Deploy with:
+	
+	$  gcloud app deploy --project tko-io .
   `)
   make()
 }
