@@ -23,7 +23,7 @@
 // using and overriding "makeTemplateSource" to return an instance of your custom template source.
 
 import {
-    tagNameLower as tagNameLowerFn, setHtml, domData
+    tagNameLower as tagNameLowerFn, setHtml, domData, parseHtmlForTemplateNodes
 } from 'tko.utils'
 
 // ---- ko.templateSources.domElement -----
@@ -80,12 +80,25 @@ function setTemplateDomData (element, data) {
 domElement.prototype.nodes = function (/* valueToWrite */) {
   var element = this.domElement
   if (arguments.length == 0) {
-    var templateData = getTemplateDomData(element),
-      containerData = templateData.containerData
-    return containerData || (
-            this.templateType === templateTemplate ? element.content
-            : this.templateType === templateElement ? element
-            : undefined)
+    const templateData = getTemplateDomData(element)
+    let nodes = templateData.containerData || (
+      this.templateType === templateTemplate ? element.content :
+      this.templateType === templateElement ? element :
+      undefined
+    )
+    if (!nodes || templateData.alwaysCheckText) {
+    // If the template is associated with an element that stores the template as text,
+    // parse and cache the nodes whenever there's new text content available. This allows
+    // the user to update the template content by updating the text of template node.
+      const text = this['text']()
+      if (text) {
+        nodes = parseHtmlForTemplateNodes(text, element.ownerDocument)
+        this['text']('')   // clear the text from the node
+        setTemplateDomData(element, {containerData: nodes, alwaysCheckText: true})
+      }
+    }
+
+    return nodes
   } else {
     var valueToWrite = arguments[0]
     setTemplateDomData(element, {containerData: valueToWrite})

@@ -3,7 +3,7 @@
 //
 import { stringTrim } from '../string.js'
 import { makeArray } from '../array.js'
-import { emptyDomNode } from './manipulation.js'
+import { emptyDomNode, moveCleanedNodesToContainerElement } from './manipulation.js'
 import { jQueryInstance } from '../jquery.js'
 import * as virtualElements from './virtualElements'
 import options from '../options'
@@ -128,6 +128,11 @@ export function parseHtmlFragment (html, documentContext) {
 
         // ... otherwise, this simple logic will do in most common cases.
         : simpleHtmlParse(html, documentContext))
+}
+
+export function parseHtmlForTemplateNodes (html, documentContext) {
+  const nodes = parseHtmlFragment(html, documentContext)
+  return (nodes.length && nodes[0].parentElement) || moveCleanedNodesToContainerElement(nodes)
 }
 
 /**
