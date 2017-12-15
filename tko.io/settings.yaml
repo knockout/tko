@@ -171,12 +171,12 @@ books:
     allowAnonLogging: false
     contentVersion: preview-1.0.0
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=ZPDnoQEACAAJ&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE73xh8xZACPIjOtB8rD5RE06-ElVbzgtH5e0nmkyo0UjgGwBZweLwET2ieAFeO_E6k4vI1gqVVxyRWIhOlXmxrprvBuMm-oQigjlTEfm9M9bABMXNcxwZKRTZvvdUBkP14nJ6MIp&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=ZPDnoQEACAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE717dECAVjOpJblfNu0EPHVMBQmgOOan5rn21GWN2OQhSbPiehsljCYRsxdJQ1wcejFwt0wBmNnRraYQUHHWPqjrHJW0kRSrXjobRrKukJDD-hhmn5DWwNGA--8nQVITS2vbv8t6&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=ZPDnoQEACAAJ&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE73xh8xZACPIjOtB8rD5RE06-ElVbzgtH5e0nmkyo0UjgGwBZweLwET2ieAFeO_E6k4vI1gqVVxyRWIhOlXmxrprvBuMm-oQigjlTEfm9M9bABMXNcxwZKRTZvvdUBkP14nJ6MIp&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=ZPDnoQEACAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE717dECAVjOpJblfNu0EPHVMBQmgOOan5rn21GWN2OQhSbPiehsljCYRsxdJQ1wcejFwt0wBmNnRraYQUHHWPqjrHJW0kRSrXjobRrKukJDD-hhmn5DWwNGA--8nQVITS2vbv8t6&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=ZPDnoQEACAAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=ZPDnoQEACAAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/Knockout_js.html?hl=&id=ZPDnoQEACAAJ
+    previewLink: https://books.google.ca/books?id=ZPDnoQEACAAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=ZPDnoQEACAAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/Knockout_js.html?hl=&id=ZPDnoQEACAAJ
 
   - title: Asp.net Mvc 5 With Bootstrap and Knockout.js
     subtitle: Building Dynamic, Responsive Web Applications
@@ -223,12 +223,12 @@ books:
     allowAnonLogging: false
     contentVersion: preview-1.0.0
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=try8oQEACAAJ&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE71NgZ3twak4WXm7mMrpPXQwM5LLeI3zeLgpf4CSBir_nKmU0mZJoh6Z5JPwwrMk_WjQE_j04VenoDv3PBQAY0yCp4w_tW5TM4BjdModKb6BhbGfnYR0Qt1Qmn6SmtV6WDNhsqd2&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=try8oQEACAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE71KQ8fmuM2sSfN0TOooxRRz51cBqbN-oSufwl2TKH6qSzuzhI_Sarc_I5dMWgvbKB1SmWvA3IREW1ByGHSRAnTsybrM8B4LxCKEjavv9Zq2VxVBR3pweSl2UWtLe4Oav0m5_S5G&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=try8oQEACAAJ&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE71NgZ3twak4WXm7mMrpPXQwM5LLeI3zeLgpf4CSBir_nKmU0mZJoh6Z5JPwwrMk_WjQE_j04VenoDv3PBQAY0yCp4w_tW5TM4BjdModKb6BhbGfnYR0Qt1Qmn6SmtV6WDNhsqd2&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=try8oQEACAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE71KQ8fmuM2sSfN0TOooxRRz51cBqbN-oSufwl2TKH6qSzuzhI_Sarc_I5dMWgvbKB1SmWvA3IREW1ByGHSRAnTsybrM8B4LxCKEjavv9Zq2VxVBR3pweSl2UWtLe4Oav0m5_S5G&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=try8oQEACAAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=try8oQEACAAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/Asp_net_Mvc_5_With_Bootstrap_and_Knockou.html?hl=&id=try8oQEACAAJ
+    previewLink: https://books.google.ca/books?id=try8oQEACAAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=try8oQEACAAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/Asp_net_Mvc_5_With_Bootstrap_and_Knockou.html?hl=&id=try8oQEACAAJ
 
   - title: Getting Started with Knockout.js for .NET Developers
     authors:
@@ -258,16 +258,16 @@ books:
     allowAnonLogging: false
     contentVersion: 0.1.1.0.preview.3
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE700Ur2bUx3-xG1lJ7dhXYNiVxT0TlvFTCLKBDmCgsc2s1pOb_YVZxtI6jUwv53hOOAMnvSH2j3GR2NKExvEev5ALEK68u7oLyrUTxA-4j5iwmH7jEV0USmCSJE8PE6Nke2aUWS2&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE72rh8mTdqUnmJDjLIi1wLaea_frTsNMmKGHxTa2lID6PyuW_qNH_XzvkxqDVn3QEa2LfnTsvAmj6Vq_Wd73Zl4Q9_gIQA0lmIwRfK0Zr17YFHAV9uSx-9q5bTOOepwmRpwG3fbG&source=gbs_api
-      small: http://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE71Y9WVxVSRTitqbcivBU-WgoXUCyyPTuNsjEn7uZ9oFTc7vKFCJekAx1vMoo_v4lV59_ehco3Lt8vcJTalPxGaIZj57lo1DPirPBwRhGu_kuQtALcu0khKaKimJdwj4Sp_kEIEj&source=gbs_api
-      medium: http://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE71n9MaRenbMt90bPtLsyELGmzZq6U4KEbYvVRl7e_kLBJD0QvZ36lTpLejO3BJ4i3WWHL-hzY10ThMf3Qg5vSGD4q3TFoHU62YmSImkw1obbyph6p04pfMutEekEHYXO6d-Yuc9&source=gbs_api
-      large: http://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE73BGDB8DqNQzhG2wE-jBgyb-JdjNtiNXeqazRtGxQUwrTnpjHSg2G5LSXaassUEItKLZbyrt8myz6fLL2dl5M_xvH-tZosq63njrzlZYkJuJqjhj2ZxNItqlkYShzh6C0jMklxu&source=gbs_api
-      extraLarge: http://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE72ntS5Ll1QmMWu-A2hwAdGAqTBeG9EEYgH4qlIvCZH3p5gaoPJO4XxPTCKfOZVpVzPN0gTVAoTclhd6v1Yrmk5dvyfX4032bvw9fEp9HP1AemUNgCh_Cjtgzcwma2HlyVG9n7jh&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE700Ur2bUx3-xG1lJ7dhXYNiVxT0TlvFTCLKBDmCgsc2s1pOb_YVZxtI6jUwv53hOOAMnvSH2j3GR2NKExvEev5ALEK68u7oLyrUTxA-4j5iwmH7jEV0USmCSJE8PE6Nke2aUWS2&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE72rh8mTdqUnmJDjLIi1wLaea_frTsNMmKGHxTa2lID6PyuW_qNH_XzvkxqDVn3QEa2LfnTsvAmj6Vq_Wd73Zl4Q9_gIQA0lmIwRfK0Zr17YFHAV9uSx-9q5bTOOepwmRpwG3fbG&source=gbs_api
+      small: https://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE71Y9WVxVSRTitqbcivBU-WgoXUCyyPTuNsjEn7uZ9oFTc7vKFCJekAx1vMoo_v4lV59_ehco3Lt8vcJTalPxGaIZj57lo1DPirPBwRhGu_kuQtALcu0khKaKimJdwj4Sp_kEIEj&source=gbs_api
+      medium: https://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE71n9MaRenbMt90bPtLsyELGmzZq6U4KEbYvVRl7e_kLBJD0QvZ36lTpLejO3BJ4i3WWHL-hzY10ThMf3Qg5vSGD4q3TFoHU62YmSImkw1obbyph6p04pfMutEekEHYXO6d-Yuc9&source=gbs_api
+      large: https://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE73BGDB8DqNQzhG2wE-jBgyb-JdjNtiNXeqazRtGxQUwrTnpjHSg2G5LSXaassUEItKLZbyrt8myz6fLL2dl5M_xvH-tZosq63njrzlZYkJuJqjhj2ZxNItqlkYShzh6C0jMklxu&source=gbs_api
+      extraLarge: https://books.google.ca/books/content?id=A-iuCQAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE72ntS5Ll1QmMWu-A2hwAdGAqTBeG9EEYgH4qlIvCZH3p5gaoPJO4XxPTCKfOZVpVzPN0gTVAoTclhd6v1Yrmk5dvyfX4032bvw9fEp9HP1AemUNgCh_Cjtgzcwma2HlyVG9n7jh&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=A-iuCQAAQBAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=A-iuCQAAQBAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/Getting_Started_with_Knockout_js_for_NET.html?hl=&id=A-iuCQAAQBAJ
+    previewLink: https://books.google.ca/books?id=A-iuCQAAQBAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=A-iuCQAAQBAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/Getting_Started_with_Knockout_js_for_NET.html?hl=&id=A-iuCQAAQBAJ
 
   - title: Mastering KnockoutJS
     authors:
@@ -297,16 +297,16 @@ books:
     allowAnonLogging: true
     contentVersion: 1.1.1.0.preview.3
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE71OGVtK3R39HAA3YPPexcAfdqkhHpK2qY2aqN2VwnuRbzJ5pWfCdPP_5p0KuPpod7GvQPI8wHYLAO8zssun_5j31mq5DrjNHULX097DHieG55cZxoF3R3nX4po7w9urdhoH83CT&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE70GS42a68O_DBLirScLduiYOUbk80jGntqSuuykg8RU1usaN5xdHy5Gl13pgEb2LdZYZ7b5sYtt4qmedX1FiwDuhbprf-X1ADNLHolZCVletNeHvoUvy0gFKPplc4eopBGHQnPG&source=gbs_api
-      small: http://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE72HypPfd5WB7VNPF5ovT8veIkql_616DZvT64hc5QPN8HhYCwP3F_XuPKD5D3euB0qJSau7qlRgyrp7VjnOACjsF10v9PekqqAw7fnOakZVnLGBJ3_tWNTl-GByWWxzTDi1rXrQ&source=gbs_api
-      medium: http://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE72bJ_PJ9fydBJC1A4b8n-F1x_VHnyeBSp9uRJTFYxQVcIyEO-hCcU51x-TmUrH4JOblv0J2g2OzpwxQK2oELDtzlE7qzE0a_D-KsqSqoFFPXLlPrL45r8fLLXvTRUubJNJy31No&source=gbs_api
-      large: http://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE70OgKfn3_48ic1MFdtFGQyoOBg8JHQwln0q5M1fKTYREAuugBOOtf5Q7m6_yD-DEN_n933Y5labtoiq-KM_BEWWukCgkOeJvT1Xr-XuATJrtXX9N-cq1Z-1qbfO3ncRz0yMo-_c&source=gbs_api
-      extraLarge: http://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE71OClJjx-G3VrcH4lga7AKeiw0CGOSwyAvjxfZ8ns3TKv_o8SLzY_p3_e5Q8kJgiVXA1GWpNT-kWgwNwHa5BYsVHbF5DXlGpqyLGxOT8fOXBlsBr8e_H375DucdcSP-0v7L1jF8&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE71OGVtK3R39HAA3YPPexcAfdqkhHpK2qY2aqN2VwnuRbzJ5pWfCdPP_5p0KuPpod7GvQPI8wHYLAO8zssun_5j31mq5DrjNHULX097DHieG55cZxoF3R3nX4po7w9urdhoH83CT&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE70GS42a68O_DBLirScLduiYOUbk80jGntqSuuykg8RU1usaN5xdHy5Gl13pgEb2LdZYZ7b5sYtt4qmedX1FiwDuhbprf-X1ADNLHolZCVletNeHvoUvy0gFKPplc4eopBGHQnPG&source=gbs_api
+      small: https://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE72HypPfd5WB7VNPF5ovT8veIkql_616DZvT64hc5QPN8HhYCwP3F_XuPKD5D3euB0qJSau7qlRgyrp7VjnOACjsF10v9PekqqAw7fnOakZVnLGBJ3_tWNTl-GByWWxzTDi1rXrQ&source=gbs_api
+      medium: https://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE72bJ_PJ9fydBJC1A4b8n-F1x_VHnyeBSp9uRJTFYxQVcIyEO-hCcU51x-TmUrH4JOblv0J2g2OzpwxQK2oELDtzlE7qzE0a_D-KsqSqoFFPXLlPrL45r8fLLXvTRUubJNJy31No&source=gbs_api
+      large: https://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE70OgKfn3_48ic1MFdtFGQyoOBg8JHQwln0q5M1fKTYREAuugBOOtf5Q7m6_yD-DEN_n933Y5labtoiq-KM_BEWWukCgkOeJvT1Xr-XuATJrtXX9N-cq1Z-1qbfO3ncRz0yMo-_c&source=gbs_api
+      extraLarge: https://books.google.ca/books/content?id=BoqbBQAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE71OClJjx-G3VrcH4lga7AKeiw0CGOSwyAvjxfZ8ns3TKv_o8SLzY_p3_e5Q8kJgiVXA1GWpNT-kWgwNwHa5BYsVHbF5DXlGpqyLGxOT8fOXBlsBr8e_H375DucdcSP-0v7L1jF8&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=BoqbBQAAQBAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=BoqbBQAAQBAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/Mastering_KnockoutJS.html?hl=&id=BoqbBQAAQBAJ
+    previewLink: https://books.google.ca/books?id=BoqbBQAAQBAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=BoqbBQAAQBAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/Mastering_KnockoutJS.html?hl=&id=BoqbBQAAQBAJ
 
   - title: Web App Testing Using Knockout.JS
     authors:
@@ -338,16 +338,16 @@ books:
     allowAnonLogging: false
     contentVersion: 1.1.1.0.preview.3
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE70A3vdwml0dXDKn1YCWpz8n0p8IKHaCN6FnhytFUt7ZiwPTttCa3_2-Q6ZRyyeCrTzWd3AvkTSQwvO31hHUZjEbUVKlNij50crBaQerevytbQWF6ZMvTW6qxlFH-DfN-AvUv6e2&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE71zzDoAJ8_68JqPI9sZ3Tlvyhyqxiyi_z0QwpVpjChRp5YC3bKNGiUBlDLThbtmQ3uIdVes5uGumrDrmUPlvGA_3PSqev9ZbCwthmLIjwEisbAwI1z2nJNzqwSHb7b-8uEekpvB&source=gbs_api
-      small: http://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE71Bq-gmv0FqD2RAIGkqGsnAMEI2VSAlzOme8QiPTpwA09b16Xx9fwBL7WAHIONiyVnFu6iACEO9SVQqZDGf9l56_gTMChhENAXWnM_ZnV5l-K4ouOHjqhAzx61yzxdj2OgmS7Bl&source=gbs_api
-      medium: http://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE72glYr_QFUGY7Xc2cBVMa1kXnEaRIn5W2ULqSu6McZlyOZLXhZ1Aw2EYxWmfIzkpr9Le6d8D0AmMCP2YI8RRAAkmrrtQxTO3ow44Gf_kINC2GIrZtLywg9ul7tGgtJNdqMLyfWi&source=gbs_api
-      large: http://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE72x5vBQpMoPigr6fGa246ERfQvakIU7pB6PpTEUbktcoWhXxik5WF8TohPvbPuOGXqG0Lzh1JmSy6N7PIVpqCJXIyHV2UIzOxz1u1SeyfQNatsajdpQ16rGp6uaJxPhT31o0JUy&source=gbs_api
-      extraLarge: http://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE73xjKYwV0fwumEQIryeYX8vFDu7KUe8WgpYN-QvZU8ZMbVU5b5Ua8cYnD_FBBGpDTf22w_tiYOC8G9BpvSOkHaO07HRV-YDM51FaVQWlXywSXL7UVgOWUaI0iG5xbY3M6CJWMOz&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE70A3vdwml0dXDKn1YCWpz8n0p8IKHaCN6FnhytFUt7ZiwPTttCa3_2-Q6ZRyyeCrTzWd3AvkTSQwvO31hHUZjEbUVKlNij50crBaQerevytbQWF6ZMvTW6qxlFH-DfN-AvUv6e2&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE71zzDoAJ8_68JqPI9sZ3Tlvyhyqxiyi_z0QwpVpjChRp5YC3bKNGiUBlDLThbtmQ3uIdVes5uGumrDrmUPlvGA_3PSqev9ZbCwthmLIjwEisbAwI1z2nJNzqwSHb7b-8uEekpvB&source=gbs_api
+      small: https://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE71Bq-gmv0FqD2RAIGkqGsnAMEI2VSAlzOme8QiPTpwA09b16Xx9fwBL7WAHIONiyVnFu6iACEO9SVQqZDGf9l56_gTMChhENAXWnM_ZnV5l-K4ouOHjqhAzx61yzxdj2OgmS7Bl&source=gbs_api
+      medium: https://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE72glYr_QFUGY7Xc2cBVMa1kXnEaRIn5W2ULqSu6McZlyOZLXhZ1Aw2EYxWmfIzkpr9Le6d8D0AmMCP2YI8RRAAkmrrtQxTO3ow44Gf_kINC2GIrZtLywg9ul7tGgtJNdqMLyfWi&source=gbs_api
+      large: https://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE72x5vBQpMoPigr6fGa246ERfQvakIU7pB6PpTEUbktcoWhXxik5WF8TohPvbPuOGXqG0Lzh1JmSy6N7PIVpqCJXIyHV2UIzOxz1u1SeyfQNatsajdpQ16rGp6uaJxPhT31o0JUy&source=gbs_api
+      extraLarge: https://books.google.ca/books/content?id=dZN1BQAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE73xjKYwV0fwumEQIryeYX8vFDu7KUe8WgpYN-QvZU8ZMbVU5b5Ua8cYnD_FBBGpDTf22w_tiYOC8G9BpvSOkHaO07HRV-YDM51FaVQWlXywSXL7UVgOWUaI0iG5xbY3M6CJWMOz&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=dZN1BQAAQBAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=dZN1BQAAQBAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/Web_App_Testing_Using_Knockout_JS.html?hl=&id=dZN1BQAAQBAJ
+    previewLink: https://books.google.ca/books?id=dZN1BQAAQBAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=dZN1BQAAQBAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/Web_App_Testing_Using_Knockout_JS.html?hl=&id=dZN1BQAAQBAJ
 
   - title: KnockoutJS Essentials
     authors:
@@ -378,16 +378,16 @@ books:
     allowAnonLogging: false
     contentVersion: 2.2.2.0.preview.3
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE73KcIEK76fLL4WMQf9A1CJTvx-SGdI5O2ezmLb54SZbJGzguyU7PjmjzBRqRYw0fFGHmcGBjfwozfYegr6gQ12u-c5vUhXf7szQkTjXEXWV5Y0KQcgDfg_OFQmKi9h-9cm-4zdb&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE72iT2HkL3gawhD9TqH0Ozcj5SZW5bchxnpKvWAjxtYdxh8HcnIKbul_cXzv6zK-EDmZh5QY29qCYf-JQQEGU6sjiaaVSoeGbbezRI32UgWJNVpiPu6kd2aeMSZa5Vamelt0nAda&source=gbs_api
-      small: http://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE72qNwfz7Ar9qbXS_7Z_y2lsYAYpWy2pEy37MmEtZSajj0E7AMzXnEHIk2EG6otNwbELtO63zSSVjiAs3jvlerXq_N-uD227lrRMSDt8-N2-rZr0d396FW0F0oukatK3HcBwkBzc&source=gbs_api
-      medium: http://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE72m6oGoEwL5xAbLyuU4C_334JN-IgaHkW70a4mFNRW58iirrlcuJaZ8hDEPGcADH_Qd1HeLukT2e_1gxJUEqOVGAqdTJopfflSRdEFSy_d3R3TFxvTCvrWqw2b9RBsbgnWL-vu2&source=gbs_api
-      large: http://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE727dgJxfT9K-HpbDFySw0YytRHfJV1Nr8z87ClKXeljh02ZGsv-9KyehOnyFMH11gXgyN7Rks3adufGjMDwsMgxCVvvsFQgX2LHt1_jeB7EoPeoVgRdKllAd6TqnHSvPYG5dePq&source=gbs_api
-      extraLarge: http://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE70WdC_9qZ_FtUczIwDq4_4XBZMUl-HwNXyucuOI0v4OCtyRxQAgvDM3m7jJDeXcrm83b-Bi5-TdzSkjxZu4RbpTzW4NL8mPDRAFUlMGPViNw4xMw-ebSHRkgWYsMriAUYjYp_OZ&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE73KcIEK76fLL4WMQf9A1CJTvx-SGdI5O2ezmLb54SZbJGzguyU7PjmjzBRqRYw0fFGHmcGBjfwozfYegr6gQ12u-c5vUhXf7szQkTjXEXWV5Y0KQcgDfg_OFQmKi9h-9cm-4zdb&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE72iT2HkL3gawhD9TqH0Ozcj5SZW5bchxnpKvWAjxtYdxh8HcnIKbul_cXzv6zK-EDmZh5QY29qCYf-JQQEGU6sjiaaVSoeGbbezRI32UgWJNVpiPu6kd2aeMSZa5Vamelt0nAda&source=gbs_api
+      small: https://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE72qNwfz7Ar9qbXS_7Z_y2lsYAYpWy2pEy37MmEtZSajj0E7AMzXnEHIk2EG6otNwbELtO63zSSVjiAs3jvlerXq_N-uD227lrRMSDt8-N2-rZr0d396FW0F0oukatK3HcBwkBzc&source=gbs_api
+      medium: https://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE72m6oGoEwL5xAbLyuU4C_334JN-IgaHkW70a4mFNRW58iirrlcuJaZ8hDEPGcADH_Qd1HeLukT2e_1gxJUEqOVGAqdTJopfflSRdEFSy_d3R3TFxvTCvrWqw2b9RBsbgnWL-vu2&source=gbs_api
+      large: https://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE727dgJxfT9K-HpbDFySw0YytRHfJV1Nr8z87ClKXeljh02ZGsv-9KyehOnyFMH11gXgyN7Rks3adufGjMDwsMgxCVvvsFQgX2LHt1_jeB7EoPeoVgRdKllAd6TqnHSvPYG5dePq&source=gbs_api
+      extraLarge: https://books.google.ca/books/content?id=HEXfBgAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE70WdC_9qZ_FtUczIwDq4_4XBZMUl-HwNXyucuOI0v4OCtyRxQAgvDM3m7jJDeXcrm83b-Bi5-TdzSkjxZu4RbpTzW4NL8mPDRAFUlMGPViNw4xMw-ebSHRkgWYsMriAUYjYp_OZ&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=HEXfBgAAQBAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=HEXfBgAAQBAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/KnockoutJS_Essentials.html?hl=&id=HEXfBgAAQBAJ
+    previewLink: https://books.google.ca/books?id=HEXfBgAAQBAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=HEXfBgAAQBAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/KnockoutJS_Essentials.html?hl=&id=HEXfBgAAQBAJ
 
   - title: KnockoutJS Blueprints
     authors:
@@ -416,13 +416,13 @@ books:
     allowAnonLogging: false
     contentVersion: 2.2.2.0.preview.3
     imageLinks:
-      smallThumbnail: http://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE73zg0-XBzMzQAcMQW_DYHtbhQovG3pLSICrTsQiuPtQjcoh0uUD8mixpJOoQ5Jyhx_Q39QcF8zNZW9vZxYpfOY2H-vNHZ1Q3F-RtZ4urPVrSSKQauMG9YeZOtFE_uyJhwPTkVmA&source=gbs_api
-      thumbnail: http://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE709pFQ7H1gOnU-LAndEX0z9bqHUPQAi5rRoYbighr68U9tTN7ONHq8sgiLrkmhFBO5isUK3dKydyNM1aWDgk4FqErfk2DSbjC2T_jd7nfsnQzXHcFCVEcD3rLNxV7n0pegmMoEy&source=gbs_api
-      small: http://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE70TIZJ2jb02xZbyrF-pi7rCkKtRbM9QNCKS-7PZfJcNhsqHXwROEZ1W6tasXaC0cOmDdIrUrgAVLgDmP6Yg6HGwxqeV_MyZdZeeJ8zbhL4R9M0jQpKGggoGGLzLzoJ39ID5dCIn&source=gbs_api
-      medium: http://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE714ZgU0oxMuFEtbSrhaZJwsYhvkBEr1D_wYVJsJyiy6NE80XQxdDKopHEcJtSOG-WVKnjsrgrvidnWoxo2kvauH97Nr4iE44nAJeTFsjlLOG0Xv8anJAMSd2_aA4KYAK5cXZ0u8&source=gbs_api
-      large: http://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE72zC_ZRz28WbKJAHvaFUB6LqLgItZOT3XobgdMZDn_fnYVVWIg8iv1gMPtNek1yrVlTFwWmWa061ZS5xZVFRxlkXRWPmxiroQjmhiAoCEQ7cjp2Gb6Tos7xcoH1rjVU7GCbMYhH&source=gbs_api
-      extraLarge: http://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE732FDrzmu-zRydUQ7jmyI9LnQxtWx49_kOuxlwgjW2jI95C_GWB_UWIg02hmKbYRHXbU7jtLw_VL38n-_DUntiCj_f9AG5Lswlq1KaXyjlwfCEXWTIsH82VkQeqnC77S3bqLkFV&source=gbs_api
+      smallThumbnail: https://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE73zg0-XBzMzQAcMQW_DYHtbhQovG3pLSICrTsQiuPtQjcoh0uUD8mixpJOoQ5Jyhx_Q39QcF8zNZW9vZxYpfOY2H-vNHZ1Q3F-RtZ4urPVrSSKQauMG9YeZOtFE_uyJhwPTkVmA&source=gbs_api
+      thumbnail: https://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE709pFQ7H1gOnU-LAndEX0z9bqHUPQAi5rRoYbighr68U9tTN7ONHq8sgiLrkmhFBO5isUK3dKydyNM1aWDgk4FqErfk2DSbjC2T_jd7nfsnQzXHcFCVEcD3rLNxV7n0pegmMoEy&source=gbs_api
+      small: https://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE70TIZJ2jb02xZbyrF-pi7rCkKtRbM9QNCKS-7PZfJcNhsqHXwROEZ1W6tasXaC0cOmDdIrUrgAVLgDmP6Yg6HGwxqeV_MyZdZeeJ8zbhL4R9M0jQpKGggoGGLzLzoJ39ID5dCIn&source=gbs_api
+      medium: https://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE714ZgU0oxMuFEtbSrhaZJwsYhvkBEr1D_wYVJsJyiy6NE80XQxdDKopHEcJtSOG-WVKnjsrgrvidnWoxo2kvauH97Nr4iE44nAJeTFsjlLOG0Xv8anJAMSd2_aA4KYAK5cXZ0u8&source=gbs_api
+      large: https://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE72zC_ZRz28WbKJAHvaFUB6LqLgItZOT3XobgdMZDn_fnYVVWIg8iv1gMPtNek1yrVlTFwWmWa061ZS5xZVFRxlkXRWPmxiroQjmhiAoCEQ7cjp2Gb6Tos7xcoH1rjVU7GCbMYhH&source=gbs_api
+      extraLarge: https://books.google.ca/books/content?id=5ljTBgAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE732FDrzmu-zRydUQ7jmyI9LnQxtWx49_kOuxlwgjW2jI95C_GWB_UWIg02hmKbYRHXbU7jtLw_VL38n-_DUntiCj_f9AG5Lswlq1KaXyjlwfCEXWTIsH82VkQeqnC77S3bqLkFV&source=gbs_api
     language: en
-    previewLink: http://books.google.ca/books?id=5ljTBgAAQBAJ&hl=&source=gbs_api
-    infoLink: http://books.google.ca/books?id=5ljTBgAAQBAJ&hl=&source=gbs_api
-    canonicalVolumeLink: http://books.google.ca/books/about/KnockoutJS_Blueprints.html?hl=&id=5ljTBgAAQBAJ
+    previewLink: https://books.google.ca/books?id=5ljTBgAAQBAJ&hl=&source=gbs_api
+    infoLink: https://books.google.ca/books?id=5ljTBgAAQBAJ&hl=&source=gbs_api
+    canonicalVolumeLink: https://books.google.ca/books/about/KnockoutJS_Blueprints.html?hl=&id=5ljTBgAAQBAJ
