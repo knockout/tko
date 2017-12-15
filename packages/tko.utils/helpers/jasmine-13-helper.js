@@ -4,7 +4,7 @@
  /* globals runs, waitsFor, jasmine */
 
 import {
-  arrayMap, arrayFilter, ieVersion, selectExtensions
+  arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty
 } from '../src/'
 
 
@@ -92,7 +92,7 @@ var matchers = {
   toHaveOwnProperties (expectedProperties) {
       var ownProperties = [];
       for (var prop in this.actual) {
-          if (this.actual.hasOwnProperty(prop)) {
+          if (hasOwnProperty(this.actual, prop)) {
               ownProperties.push(prop);
           }
       }

@@ -4,7 +4,7 @@
  */
 
 import {
-  options, objectForEach, clonePlainObjectDeep, extend
+  options, objectForEach, clonePlainObjectDeep, extend, hasOwnProperty
 } from 'tko.utils'
 
 import {default as Expression} from './Expression'
@@ -213,7 +213,7 @@ export default class Parser {
         }
         this.white()
         ch = this.next(':')
-        if (Object.hasOwnProperty.call(object, key)) {
+        if (hasOwnProperty(object, key)) {
           this.error('Duplicate key "' + key + '"')
         }
 

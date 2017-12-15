@@ -2,6 +2,8 @@
 import Node from './Node'
 import Arguments from './Arguments'
 
+import { hasOwnProperty } from 'tko.utils'
+
 import {
   isWriteableObservable, isObservable
 } from 'tko.observable'
@@ -61,7 +63,7 @@ export default class Identifier {
 
     // [1] See note above.
     if (typeof value === 'function' && n > 0 && lastValue !== value &&
-        !lastValue.hasOwnProperty(member)) {
+        !hasOwnProperty(lastValue, member)) {
       return value.bind(lastValue)
     }
 
@@ -104,11 +106,11 @@ export default class Identifier {
     let leaf = this.token
     let i, n, root
 
-    if (Object.hasOwnProperty.call($data, leaf)) {
+    if (hasOwnProperty($data, leaf)) {
       root = $data
-    } else if (Object.hasOwnProperty.call($context, leaf)) {
+    } else if (hasOwnProperty($context, leaf)) {
       root = $context
-    } else if (Object.hasOwnProperty.call(globals, leaf)) {
+    } else if (hasOwnProperty(globals, leaf)) {
       root = globals
     } else {
       throw new Error('Identifier::set_value -- ' +

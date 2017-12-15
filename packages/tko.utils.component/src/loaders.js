@@ -1,7 +1,7 @@
 
 import {
     isDomElement, isDocumentFragment, tagNameLower, parseHtmlFragment,
-    makeArray, cloneNodes
+    makeArray, cloneNodes, hasOwnProperty
 } from 'tko.utils'
 
 import {registry} from './registry'
@@ -41,7 +41,7 @@ export function register (componentName, config) {
 }
 
 export function isRegistered (componentName) {
-  return defaultConfigRegistry.hasOwnProperty(componentName)
+  return hasOwnProperty(defaultConfigRegistry, componentName)
 }
 
 export function unregister (componentName) {
@@ -51,7 +51,7 @@ export function unregister (componentName) {
 
 export var defaultLoader = {
   getConfig: function (componentName, callback) {
-    var result = defaultConfigRegistry.hasOwnProperty(componentName)
+    var result = hasOwnProperty(defaultConfigRegistry, componentName)
             ? defaultConfigRegistry[componentName]
             : null
     callback(result)

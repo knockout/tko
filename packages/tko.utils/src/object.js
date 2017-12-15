@@ -2,10 +2,14 @@
 // Object functions
 //
 
+export function hasOwnProperty(obj, propName) {
+  return Object.prototype.hasOwnProperty.call(obj, propName)
+}
+
 export function extend (target, source) {
   if (source) {
     for (var prop in source) {
-      if (source.hasOwnProperty(prop)) {
+      if (hasOwnProperty(source, prop)) {
         target[prop] = source[prop]
       }
     }
@@ -15,7 +19,7 @@ export function extend (target, source) {
 
 export function objectForEach (obj, action) {
   for (var prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
+    if (hasOwnProperty(obj, prop)) {
       action(prop, obj[prop])
     }
   }
@@ -25,15 +29,14 @@ export function objectMap (source, mapping) {
   if (!source) { return source }
   var target = {}
   for (var prop in source) {
-    if (source.hasOwnProperty(prop)) {
+    if (hasOwnProperty(source, prop)) {
       target[prop] = mapping(source[prop], prop, source)
     }
   }
   return target
 }
-
 export function getObjectOwnProperty (obj, propName) {
-  return obj.hasOwnProperty(propName) ? obj[propName] : undefined
+  return hasOwnProperty(obj, propName) ? obj[propName] : undefined
 }
 
 export function clonePlainObjectDeep (obj, seen) {
@@ -51,7 +54,7 @@ export function clonePlainObjectDeep (obj, seen) {
 
   var result = {}
   for (var prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
+    if (hasOwnProperty(obj, prop)) {
       result[prop] = clonePlainObjectDeep(obj[prop], seen)
     }
   }
