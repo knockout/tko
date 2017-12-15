@@ -93,6 +93,37 @@ describe('Pure Computed', function () {
     expect(timesEvaluated).toEqual(3)
   })
 
+  it('Should notify "spectator" subscribers whenever the value changes', function () {
+    var obs = new observable('A')
+    var computed = pureComputed(obs)
+    var computed2 = pureComputed(computed)
+    var notifiedValues = []
+
+    computed.subscribe(function (value) {
+      notifiedValues.push(value)
+      expect(computed()).toBe(value)
+      expect(computed2()).toBe(value)
+    }, null, 'spectate')
+
+    expect(notifiedValues).toEqual([])
+
+          // Reading the computed for the first time causes a notification
+    expect(computed()).toEqual('A')
+    expect(computed2()).toEqual('A')
+    expect(notifiedValues).toEqual(['A'])
+
+          // Reading it a second time doesn't
+    expect(computed()).toEqual('A')
+    expect(computed2()).toEqual('A')
+    expect(notifiedValues).toEqual(['A'])
+
+          // Changing the dependency doesn't, but reading the computed again does
+    obs('B')
+    expect(notifiedValues).toEqual(['A'])
+    expect(computed()).toEqual('B')
+    expect(notifiedValues).toEqual(['A', 'B'])
+  })
+
   it('Should not subscribe to dependencies while sleeping', function () {
     var data = observable('A'),
       computedInstance = pureComputed(data)

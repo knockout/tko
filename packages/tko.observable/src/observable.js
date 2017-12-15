@@ -57,7 +57,10 @@ export function observable (initialValue) {
 observable.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
   peek () { return this[observableLatestValue] },
-  valueHasMutated () { this.notifySubscribers(this[observableLatestValue]) },
+  valueHasMutated () {
+    this.notifySubscribers(this[observableLatestValue], 'spectate')
+    this.notifySubscribers(this[observableLatestValue])
+  },
   valueWillMutate () {
     this.notifySubscribers(this[observableLatestValue], 'beforeChange')
   }

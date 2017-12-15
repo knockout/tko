@@ -219,6 +219,19 @@ describe('Dependent Observable', function () {
     expect(notifiedValue).toEqual(3)
   })
 
+  it('Should notify "spectator" subscribers about changes', function () {
+    var obs = new observable()
+    var comp = computed(() => obs())
+    var notifiedValues = []
+    comp.subscribe(function (value) {
+      notifiedValues.push(value)
+    }, null, 'spectate')
+
+    obs('A')
+    obs('B')
+    expect(notifiedValues).toEqual([ 'A', 'B' ])
+  })
+
   it('Should notify "beforeChange" subscribers before changes', function () {
     var notifiedValue
     var observableInstance = new observable(1)
@@ -475,7 +488,7 @@ describe('Dependent Observable', function () {
     observableDependent(1)
         // there should still only be one dependency
     expect(computedInstance.getDependenciesCount()).toEqual(1)
-    expect(computedInstance.getDependencies()).toEqual([observableDependent]);
+    expect(computedInstance.getDependencies()).toEqual([observableDependent])
 
         // also test with a beforeChange subscription
     observableModified.subscribe(function () { observableIndependent() }, null, 'beforeChange')
