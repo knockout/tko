@@ -299,7 +299,7 @@ describe('Binding: Foreach', function () {
     var someItems = observableArray([ 'A', 'B', 'C' ]),
       callback = function (element, index, data) { if (data === 'D') throw 'Exception' }
 
-    applyBindings({someItems: someItems, callback: callback })
+    applyBindings({someItems: someItems, callback: callback }, testNode)
     expect(testNode.childNodes[0]).toContainText('ABC')
 
     expect(function () { someItems.push('D') }).toThrow('Exception')

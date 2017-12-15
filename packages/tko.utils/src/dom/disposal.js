@@ -76,10 +76,15 @@ export function cleanNode (node) {
 
         // ... then its descendants, where applicable
     if (cleanableNodeTypesWithDescendants[node.nodeType]) {
-            // Clone the descendants list in case it changes during iteration
-      var descendants = []
-      arrayPushAll(descendants, node.getElementsByTagName('*'))
-      for (var i = 0, j = descendants.length; i < j; i++) { cleanSingleNode(descendants[i]) }
+      // Clone the descendants list in case it changes during iteration
+      const descendants = node.getElementsByTagName('*')
+      for (let i = 0; i < descendants.length; ++i) {
+        let cleanedNode = descendants[i]
+        cleanSingleNode(cleanedNode)
+        if (descendants[i] !== cleanedNode) {
+          throw Error("ko.cleanNode: An already cleaned node was removed from the document")
+        }
+      }
     }
   }
   return node
