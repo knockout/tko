@@ -368,6 +368,29 @@ describe('Pure Computed', function () {
     expect(myArray.getSubscriptionsCount()).toBe(0)
   })
 
+  it('Should reevaluate if dependency was changed during awakening, but not otherwise', function () {
+    // See https://github.com/knockout/knockout/issues/1975
+    var data = observable(0),
+      isEven = pureComputed(function () { return !(data() % 2) }),
+      timesEvaluated = 0,
+      pureComputedInstance = pureComputed(function () { ++timesEvaluated; return isEven() }),
+      subscription
+
+    expect(pureComputedInstance()).toEqual(true)
+    expect(timesEvaluated).toEqual(1)
+
+    data(1)
+    subscription = isEven.subscribe(function () {})
+    expect(pureComputedInstance()).toEqual(false)
+    expect(timesEvaluated).toEqual(2)
+    subscription.dispose()
+
+    data(3)
+    subscription = isEven.subscribe(function () {})
+    expect(pureComputedInstance()).toEqual(false)
+    expect(timesEvaluated).toEqual(2)
+  })
+
   describe('Should maintain order of subscriptions', function () {
     var data, dataPureComputed
 
