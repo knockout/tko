@@ -201,7 +201,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     })
 
     var templateName = resolveTemplateName(template, arrayValue, arrayItemContext)
-    return executeTemplate(null, 'ignoreTargetNode', templateName, arrayItemContext, options, afterBindingCallback)
+    return executeTemplate(targetNode, 'ignoreTargetNode', templateName, arrayItemContext, options, afterBindingCallback)
   }
 
     // This will be called whenever setDomNodeChildrenFromArrayMapping has added nodes to targetNode
