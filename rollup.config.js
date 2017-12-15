@@ -6,6 +6,7 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import typescript from 'rollup-plugin-typescript'
 import rollupVisualizer from 'rollup-plugin-visualizer'
+import license from 'rollup-plugin-license'
 import * as pkg from './package.json'
 
 const { LERNA_PACKAGE_NAME, LERNA_ROOT_PATH } = process.env
@@ -13,6 +14,13 @@ const PACKAGE_ROOT_PATH = path.join(LERNA_ROOT_PATH, 'packages', LERNA_PACKAGE_N
 const IS_BROWSER_BUNDLE = LERNA_PACKAGE_NAME === 'tko'
 const INPUT_FILE = path.join(PACKAGE_ROOT_PATH, 'src/index.js')
 const TKO_MODULES = getTkoModules()
+
+const banner = `/*!
+ * <%= pkg.description %> 🥊  <%= pkg.name %>@${pkg.version}
+ * (c) The Knockout.js Team - ${pkg.homepage}
+ * License: ${pkg.licenses[0].type} (${pkg.licenses[0].url})
+ */
+`
 
   /* Use TypeScript instead of babel for transpilation for IE6 compat, plus it's faster */
 const TYPESCRIPT_CONFIG = {
@@ -26,7 +34,8 @@ const UNIVERSAL_PLUGINS = [
   /* Replace {{VERSION}} with pkg.json's `version` */
   replace({ delimiters: ['{{', '}}'], VERSION: pkg.version }),
   nodeResolve({ module: true }),
-  rollupVisualizer({ filename: 'visual.html' })
+  rollupVisualizer({ filename: 'visual.html' }),
+  license({ sourceMap: true, banner })
 ]
 
 export default [

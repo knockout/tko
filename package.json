@@ -1,5 +1,5 @@
 {
-  "homepage": "http://tko.io/",
+  "homepage": "https://tko.io/",
   "version": "4.0.0-alpha4",
   "license": "MIT",
   "author": "The Knockout.js Team",
@@ -59,10 +59,13 @@
     "rollup-plugin-visualizer": "^0.3.1",
     "sinon": "^4.1",
     "standard": "^10.0.2",
-    "typescript": "^2.6.0"
+    "typescript": "^2.6.0",
+    "rollup-plugin-license": "^0.5.0"
   },
   "workspaces": [
     "packages/*"
   ],
-  "private": true
+  "private": true,
+  "dependencies": {
+  }
 }
