@@ -29,7 +29,19 @@ import {
     subscribable
 } from 'tko.observable'
 
-var computedState = createSymbolOrString('_state')
+
+const computedState = createSymbolOrString('_state')
+const DISPOSED_STATE = {
+  dependencyTracking: null,
+  dependenciesCount: 0,
+  isDisposed: true,
+  isStale: false,
+  isDirty: false,
+  isSleeping: false,
+  disposeWhenNodeIsRemoved: null,
+  readFunction: null,
+  _options: null
+}
 
 export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
   if (typeof evaluatorFunctionOrOptions === 'object') {
@@ -50,6 +62,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
   var state = {
     latestValue: undefined,
     isStale: true,
+    isDirty: true,
     isBeingEvaluated: false,
     suppressDisposalUntilDisposeWhenReturnsFalse: false,
     isDisposed: false,
@@ -75,9 +88,9 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
       }
       return this // Permits chained assignments
     } else {
-            // Reading the value
+      // Reading the value
       dependencyDetection.registerDependency(computedObservable)
-      if (state.isStale || (state.isSleeping && computedObservable.haveDependenciesChanged())) {
+      if (state.isDirty || (state.isSleeping && computedObservable.haveDependenciesChanged())) {
         computedObservable.evaluateImmediate()
       }
       return state.latestValue
@@ -210,16 +223,19 @@ computed.fn = {
   markDirty () {
         // Process "dirty" events if we can handle delayed notifications
     if (this._evalDelayed && !this[computedState].isBeingEvaluated) {
-      this._evalDelayed()
+      this._evalDelayed(false /* notifyChange */)
     }
   },
   isActive () {
-    return this[computedState].isStale || this[computedState].dependenciesCount > 0
+    const state = this[computedState]
+    return state.isDirty || state.dependenciesCount > 0
   },
   respondToChange () {
         // Ignore "change" events if we've already scheduled a delayed notification
     if (!this._notificationIsPending) {
       this.evaluatePossiblyAsync()
+    } else if (this[computedState].isDirty) {
+      this[computedState].isStale = true
     }
   },
   subscribeToDependency (target) {
@@ -246,7 +262,7 @@ computed.fn = {
         computedObservable.evaluateImmediate(true /* notifyChange */)
       }, throttleEvaluationTimeout)
     } else if (computedObservable._evalDelayed) {
-      computedObservable._evalDelayed()
+      computedObservable._evalDelayed(true /* notifyChange */)
     } else {
       computedObservable.evaluateImmediate(true /* notifyChange */)
     }
@@ -366,29 +382,43 @@ computed.fn = {
         objectForEach(dependencyDetectionContext.disposalCandidates, computedDisposeDependencyCallback)
       }
 
-      state.isStale = false
+      state.isStale = state.isDirty = false
     }
   },
   peek () {
         // Peek won't re-evaluate, except while the computed is sleeping or to get the initial value when "deferEvaluation" is set.
-    var state = this[computedState]
-    if ((state.isStale && !state.dependenciesCount) || (state.isSleeping && this.haveDependenciesChanged())) {
+    const state = this[computedState]
+    if ((state.isDirty && !state.dependenciesCount) || (state.isSleeping && this.haveDependenciesChanged())) {
       this.evaluateImmediate()
     }
     return state.latestValue
   },
+
   limit (limitFunction) {
-        // Override the limit function with one that delays evaluation as well
+    const state = this[computedState]
+    // Override the limit function with one that delays evaluation as well
     subscribable.fn.limit.call(this, limitFunction)
-    this._evalDelayed = function () {
-      this._limitBeforeChange(this[computedState].latestValue)
+    Object.assign(this, {
+      _evalIfChanged () {
+        if (state.isStale) {
+          this.evaluateImmediate()
+        }
+        return state.latestValue
+      },
+      _evalDelayed (isChange) {
+        this._limitBeforeChange(state.latestValue)
 
-      this[computedState].isStale = true // Mark as dirty
+        // Mark as dirty
+        state.isDirty = true
+        if (isChange) {
+          state.isStale = true
+        }
 
-            // Pass the observable to the "limit" code, which will access it when
-            // it's time to do the notification.
-      this._limitChange(this)
-    }
+        // Pass the observable to the "limit" code, which will evaluate it when
+        // it's time to do the notification.
+        this._limitChange(this)
+      }
+    })
   },
   dispose () {
     var state = this[computedState]
@@ -402,16 +432,7 @@ computed.fn = {
     if (state.disposeWhenNodeIsRemoved && state.domNodeDisposalCallback) {
       removeDisposeCallback(state.disposeWhenNodeIsRemoved, state.domNodeDisposalCallback)
     }
-    state.dependencyTracking = null
-    state.dependenciesCount = 0
-    state.isDisposed = true
-    state.isStale = false
-    state.isSleeping = false
-    state.disposeWhenNodeIsRemoved = null
-    state.readFunction = null
-    if (koOptions.debug) {
-      this._options = null
-    }
+    Object.assign(state, DISPOSED_STATE)
   }
 }
 
@@ -425,7 +446,6 @@ var pureComputedOverrides = {
       if (state.isStale || computedObservable.haveDependenciesChanged()) {
         state.dependencyTracking = null
         state.dependenciesCount = 0
-        state.isStale = true
         if (computedObservable.evaluateImmediate()) {
           computedObservable.updateVersion()
         }

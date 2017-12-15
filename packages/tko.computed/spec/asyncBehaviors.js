@@ -1011,6 +1011,21 @@ describe('Deferred', function () {
       expect(notifySpy.argsForCall).toEqual([['i(x,h(cx,g(ex,fx),d(bx,cx)),bx,fx)']])    // only one evaluation and notification
     })
 
+    it('Should minimize evaluation when dependent computed doesn\'t actually change', function () {
+            // From https://github.com/knockout/knockout/issues/2174
+      this.restoreAfter(options, 'deferUpdates')
+      options.deferUpdates = true
+
+      const source = koObservable({ key: 'value' })
+      const c1 = koComputed(() => source()['key'])
+      let countEval = 0
+      const c2 = koComputed(() => ++countEval && c1())
+
+      source({ key: 'value' })
+      jasmine.Clock.tick(1)
+      expect(countEval).toEqual(1)
+    })
+
     it('Should ignore recursive dirty events', function () {
             // From https://github.com/knockout/knockout/issues/1943
       this.restoreAfter(options, 'deferUpdates')
