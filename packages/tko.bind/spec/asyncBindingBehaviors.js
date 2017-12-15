@@ -9,11 +9,15 @@ import {
     observableArray as ObservableArray
 } from 'tko.observable'
 
+import {
+  pureComputed
+} from 'tko.computed'
+
 import { DataBindProvider } from 'tko.provider.databind'
 
-import {bindings as coreBindings} from 'tko.binding.core'
-import {bindings as templateBindings} from 'tko.binding.template'
-
+import { bindings as coreBindings }     from 'tko.binding.core'
+import { bindings as templateBindings } from 'tko.binding.template'
+import { bindings as ifBindings }       from 'tko.binding.if'
 import {
     applyBindings
 } from 'tko.bind'
@@ -34,6 +38,7 @@ describe('Deferred bindings', function () {
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
     bindingHandlers.set(templateBindings)
+    bindingHandlers.set(ifBindings)
 
     bindingSpy = jasmine.createSpy('bindingSpy')
     bindingHandlers.test = {
@@ -166,5 +171,29 @@ describe('Deferred bindings', function () {
       jasmine.Clock.tick(1)
     }).not.toThrow()
     expect(observable()).not.toBeUndefined()       // The spec doesn't specify which of the two possible values is actually set
+  })
+
+  it('Should get latest value when conditionally included', function () {
+    // Test is based on example in https://github.com/knockout/knockout/issues/1975
+    testNode.innerHTML = '<div data-bind="if: show"><div data-bind="text: status"></div></div>'
+    var value = Observable(0),
+      is1 = pureComputed(function () { return value() == 1 }),
+      status = pureComputed(function () { return is1() ? 'ok' : 'error' }),
+      show = pureComputed(function () { return value() > 0 && is1() })
+
+    applyBindings({ status: status, show: show }, testNode)
+    expect(testNode.childNodes[0]).toContainHtml('')
+
+    value(1)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>')
+
+    value(0)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('')
+
+    value(1)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>')
   })
 })

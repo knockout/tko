@@ -414,8 +414,9 @@ var pureComputedOverrides = {
         state.dependenciesCount = 0
         state.isStale = true
         computedObservable.evaluateImmediate()
+        computedObservable.updateVersion()
       } else {
-                // First put the dependencies in order
+        // First put the dependencies in order
         var dependenciesOrder = []
         objectForEach(state.dependencyTracking, function (id, dependency) {
           dependenciesOrder[dependency._order] = id
