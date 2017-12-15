@@ -25,7 +25,7 @@ export function observableArray (initialValues) {
 }
 
 observableArray.fn = {
-  remove: function (valueOrPredicate) {
+  remove (valueOrPredicate) {
     var underlyingArray = this.peek()
     var removedValues = []
     var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
@@ -34,6 +34,9 @@ observableArray.fn = {
       if (predicate(value)) {
         if (removedValues.length === 0) {
           this.valueWillMutate()
+        }
+        if (underlyingArray[i] !== value) {
+          throw Error("Array modified during remove; cannot remove item")
         }
         removedValues.push(value)
         underlyingArray.splice(i, 1)
@@ -46,7 +49,7 @@ observableArray.fn = {
     return removedValues
   },
 
-  removeAll: function (arrayOfValues) {
+  removeAll (arrayOfValues) {
         // If you passed zero args, we remove everything
     if (arrayOfValues === undefined) {
       var underlyingArray = this.peek()
@@ -65,20 +68,20 @@ observableArray.fn = {
     })
   },
 
-  destroy: function (valueOrPredicate) {
+  destroy (valueOrPredicate) {
     var underlyingArray = this.peek()
     var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
     this.valueWillMutate()
     for (var i = underlyingArray.length - 1; i >= 0; i--) {
       var value = underlyingArray[i]
       if (predicate(value)) {
-        underlyingArray[i]['_destroy'] = true
+        value['_destroy'] = true
       }
     }
     this.valueHasMutated()
   },
 
-  destroyAll: function (arrayOfValues) {
+  destroyAll (arrayOfValues) {
         // If you passed zero args, we destroy everything
     if (arrayOfValues === undefined) { return this.destroy(function () { return true }) }
 
@@ -91,12 +94,11 @@ observableArray.fn = {
     })
   },
 
-  indexOf: function (item) {
-    var underlyingArray = this()
-    return arrayIndexOf(underlyingArray, item)
+  indexOf (item) {
+    return arrayIndexOf(this(), item)
   },
 
-  replace: function (oldItem, newItem) {
+  replace (oldItem, newItem) {
     var index = this.indexOf(oldItem)
     if (index >= 0) {
       this.valueWillMutate()
@@ -105,8 +107,16 @@ observableArray.fn = {
     }
   },
 
+  sorted (compareFn) {
+    return [...this()].sort(compareFn)
+  },
+
+  reversed () {
+    return [...this()].reverse()
+  },
+
   [Symbol.iterator]: function * () {
-    for (const item of this()) { yield item }
+    yield * this()
   }
 }
 
