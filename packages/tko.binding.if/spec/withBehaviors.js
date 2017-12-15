@@ -269,4 +269,20 @@ describe('Binding: With', function () {
     item('three')
     expect(testNode.childNodes[0]).toHaveValues(['three'])
   })
+
+  it('Should provide access to an observable viewModel through $rawData', function() {
+       testNode.innerHTML = "<div data-bind='with: item'><input data-bind='value: $rawData'/></div>";
+       var item = observable('one');
+       applyBindings({ item: item }, testNode);
+       expect(testNode.childNodes[0]).toHaveValues(['one']);
+
+       // Should update observable when input is changed
+       testNode.childNodes[0].childNodes[0].value = 'two';
+       triggerEvent(testNode.childNodes[0].childNodes[0], "change");
+       expect(item()).toEqual('two');
+
+       // Should update the input when the observable changes
+       item('three');
+       expect(testNode.childNodes[0]).toHaveValues(['three']);
+   });
 })

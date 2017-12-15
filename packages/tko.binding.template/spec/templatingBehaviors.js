@@ -380,6 +380,25 @@ describe('Templating', function () {
     expect(viewModel.someProp.getSubscriptionsCount('change')).toEqual(1)    // only subscription is from the templating code
   })
 
+  it('Data binding syntax should be able to use $rawData in binding value to refer to a top level template\'s view model observable', function() {
+    options.bindingGlobals.isObservable = isObservable
+    setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }));
+    renderTemplate("someTemplate", observable('value'), null, testNode);
+    expect(testNode.childNodes[0]).toContainText("true");
+});
+
+it('Data binding syntax should be able to use $rawData in binding value to refer to a data-bound template\'s view model observable', function() {
+    options.bindingGlobals.isObservable = isObservable
+    setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }));
+    testNode.innerHTML = "<div data-bind='template: { name: \"someTemplate\", data: someProp }'></div>";
+
+    const viewModel = { someProp: observable('value') };
+    applyBindings(viewModel, testNode);
+
+    expect(testNode.childNodes[0].childNodes[0]).toContainText("true");
+});
+
+
   it('Data binding syntax should defer evaluation of variables until the end of template rendering (so bindings can take independent subscriptions to them)', function () {
     setTemplateEngine(new dummyTemplateEngine({
       someTemplate: "<input data-bind='value:message' />[js: rt_options.templateRenderingVariablesInScope.message = 'goodbye'; undefined; ]"
