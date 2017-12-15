@@ -17,7 +17,6 @@ import {
 import {bindings as coreBindings} from '../src'
 
 import 'tko.utils/helpers/jasmine-13-helper.js'
-
 import {
     matchers
 } from '../src/test-helper'
@@ -29,7 +28,6 @@ describe('Binding: Selected Options', function () {
     var provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
-
     this.addMatchers(matchers)
   })
 

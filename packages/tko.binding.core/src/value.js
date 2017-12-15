@@ -2,7 +2,7 @@
 import {
     arrayPushAll, arrayGetDistinctValues, ieVersion, arrayIndexOf,
     registerEventHandler, stringStartsWith, safeSetTimeout,
-    tagNameLower, triggerEvent, arrayForEach
+    tagNameLower, triggerEvent, arrayForEach, selectExtensions
 } from 'tko.utils'
 
 import {
@@ -16,10 +16,6 @@ import {
 import {
     applyBindingAccessorsToNode
 } from 'tko.bind'
-
-import {
-    selectExtensions
-} from './selectExtensions'
 
 export var value = {
   after: ['options', 'foreach'],

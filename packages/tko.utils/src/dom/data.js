@@ -86,7 +86,7 @@ if ('WeakMap' in options.global) {
 
 /**
  * Create a unique key-string identifier.
- * FIXME: This should be deprecated.
+ * FIXME: This should be deprecated by using a Symbol.
  */
 export function nextKey () {
   return (uniqueId++) + dataStoreKeyExpandoPropertyName

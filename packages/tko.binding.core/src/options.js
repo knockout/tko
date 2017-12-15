@@ -2,7 +2,7 @@
 import {
     tagNameLower, arrayFilter, arrayMap, setTextContent, arrayIndexOf,
     setOptionNodeSelectionState, triggerEvent, domData,
-    ensureSelectElementIsRenderedCorrectly
+    ensureSelectElementIsRenderedCorrectly, selectExtensions
 } from 'tko.utils'
 
 import {
@@ -12,10 +12,6 @@ import {
 import {
     setDomNodeChildrenFromArrayMapping
 } from 'tko.bind'
-
-import {
-    selectExtensions
-} from './selectExtensions'
 
 var captionPlaceholder = {}
 
@@ -179,5 +175,3 @@ export var options = {
     if (previousScrollTop && Math.abs(previousScrollTop - element.scrollTop) > 20) { element.scrollTop = previousScrollTop }
   }
 }
-
-selectExtensions.optionValueDomDataKey = domData.nextKey()

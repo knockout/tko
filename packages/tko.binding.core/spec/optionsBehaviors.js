@@ -33,7 +33,6 @@ describe('Binding: Options', function () {
     var provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
-
     this.addMatchers(matchers)
   })
 

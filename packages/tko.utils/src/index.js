@@ -24,6 +24,7 @@ export * from './dom/manipulation.js'
 export * from './dom/fixes.js'
 export * from './dom/html.js'
 export * from './dom/disposal.js'
+export * from './dom/selectExtensions.js'
 
 // Sub-Modules;
 import * as memoization from './memoization'
