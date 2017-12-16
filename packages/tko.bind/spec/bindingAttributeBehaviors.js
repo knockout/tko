@@ -43,13 +43,13 @@ describe('Binding attribute syntax', function () {
   })
 
   it('applyBindings should accept no parameters and then act on document.body with undefined model', function () {
-    this.after(function () { domData.clear(document.body); });     // Just to avoid interfering with other specs
+    this.after(function () { cleanNode(document.body); });     // Just to avoid interfering with other specs
 
     var didInit = false;
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
         expect(element.id).toEqual('testElement');
-        expect(viewModel).toEqual(undefined);
+        expect(viewModel).toBeUndefined();
         didInit = true;
       }
     };
@@ -59,7 +59,7 @@ describe('Binding attribute syntax', function () {
   });
 
   it('applyBindings should accept one parameter and then act on document.body with parameter as model', function () {
-    this.after(function () { domData.clear(document.body); });     // Just to avoid interfering with other specs
+    this.after(function () { cleanNode(document.body); });     // Just to avoid interfering with other specs
 
     var didInit = false;
     var suppliedViewModel = {};
@@ -366,7 +366,7 @@ describe('Binding attribute syntax', function () {
     applyBindings(vm, testNode);
     expect(testNode).toContainText('my value');
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$customProp).toEqual('my value');
-    expect(contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toEqual(undefined); // Should not affect original binding context
+    expect(contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toBeUndefined(); // Should not affect original binding context
 
         // value of $data and $parent should be unchanged in extended context
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data).toEqual(vm.sub);
@@ -392,8 +392,8 @@ describe('Binding attribute syntax', function () {
     expect(testNode.childNodes[0].childNodes[0]).toContainText('Bert');
 
         // Can't get binding context for unbound nodes
-    expect(dataFor(testNode)).toEqual(undefined);
-    expect(contextFor(testNode)).toEqual(undefined);
+    expect(dataFor(testNode)).toBeUndefined();
+    expect(contextFor(testNode)).toBeUndefined();
 
         // Can get binding context for directly bound nodes
     expect(dataFor(testNode.childNodes[0]).name).toEqual('Bert');
@@ -402,6 +402,35 @@ describe('Binding attribute syntax', function () {
         // Can get binding context for descendants of directly bound nodes
     expect(dataFor(testNode.childNodes[0].childNodes[0]).name).toEqual('Bert');
     expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('Bert');
+
+    // Also test that a non-node object returns nothing and doesn't crash
+    expect(dataFor({})).toBeUndefined()
+    expect(contextFor({})).toBeUndefined()
+  });
+
+  it('Should not return a context object for unbound elements that are descendants of bound elements', function () {
+        // From https://github.com/knockout/knockout/issues/2148
+    testNode.innerHTML = '<div data-bind="visible: isVisible"><span>Some text</span><div data-bind="allowBindings: false"><input data-bind="value: someValue"></div></div>';
+
+    bindingHandlers.allowBindings = {
+      init: function (elem, valueAccessor) {
+                // Let bindings proceed as normal *only if* my value is false
+        var shouldAllowBindings = unwrap(valueAccessor());
+        return { controlsDescendantBindings: !shouldAllowBindings };
+      }
+    };
+    var vm = {isVisible: true};
+    applyBindings(vm, testNode);
+
+        // All of the bound nodes return the viewmodel
+    expect(dataFor(testNode.childNodes[0])).toBe(vm);
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).toBe(vm);
+    expect(dataFor(testNode.childNodes[0].childNodes[1])).toBe(vm);
+    expect(contextFor(testNode.childNodes[0].childNodes[1]).$data).toBe(vm);
+
+        // The unbound child node returns undefined
+    expect(dataFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined();
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined();
   });
 
   it('Should not be allowed to use containerless binding syntax for bindings other than whitelisted ones', function () {
