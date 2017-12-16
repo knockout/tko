@@ -26,6 +26,7 @@ import {
 } from './templateSources'
 
 var _templateEngine
+const cleanContainerDomDataKey = domData.nextKey();
 
 export function setTemplateEngine (tEngine) {
   if ((tEngine !== undefined) && !(tEngine instanceof templateEngine)) {
@@ -257,7 +258,15 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
       if (isObservable(nodes)) {
         throw new Error('The "nodes" option must be a plain, non-observable array.')
       }
-      container = moveCleanedNodesToContainerElement(nodes) // This also removes the nodes from their current parent
+
+      // If the nodes are already attached to a KO-generated container, we reuse that container without moving the
+      // elements to a new one (we check only the first node, as the nodes are always moved together)
+      let container = nodes[0] && nodes[0].parentNode;
+      if (!container || !domData.get(container,  cleanContainerDomDataKey)) {
+        container = moveCleanedNodesToContainerElement(nodes);
+        domData.set(container, cleanContainerDomDataKey, true);
+      }
+
       new AnonymousTemplate(element)['nodes'](container)
     } else {
             // It's an anonymous template - store the element contents, then clear the element
