@@ -605,6 +605,17 @@ describe('Binding: Value', function () {
         expect(select.selectedIndex).toEqual(0)
       })
 
+      it('Should display the caption when the model value changes to undefined after having no selection', function () {
+        var myObservable = observable('B')
+        testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable, valueAllowUnset:true'></select>"
+        applyBindings({ myObservable }, testNode)
+        var select = testNode.childNodes[0]
+
+        select.selectedIndex = -1
+        myObservable(undefined)
+        expect(select.selectedIndex).toEqual(0)
+      })
+
       it('Should select no option value if no option value matches the current model property value', function () {
         var myObservable = observable()
         testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable, valueAllowUnset:true'></select>"

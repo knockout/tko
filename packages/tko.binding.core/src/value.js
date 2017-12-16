@@ -123,7 +123,7 @@ export class value extends BindingHandler {
       return
     }
 
-    if (newValue === elementValue ) { return }
+    if (newValue === elementValue && elementValue !== undefined) { return }
 
     if (tagNameLower(element) === 'select') {
       const allowUnset = this.allBindings.get('valueAllowUnset')
