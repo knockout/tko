@@ -28,7 +28,7 @@ export var defaultEvent = 'change'
 
 var ko_subscribable_fn = {
   init (instance) {
-    instance._subscriptions = {}
+    instance._subscriptions = { change: [] }
     instance._versionNumber = 1
   },
 
@@ -63,9 +63,12 @@ var ko_subscribable_fn = {
       this.updateVersion()
     }
     if (this.hasSubscriptionsForEvent(event)) {
+      const subs = event === defaultEvent && this._changeSubscriptions
+        || [...this._subscriptions[event]];
+
       try {
         dependencyDetection.begin() // Begin suppressing dependency detection (by setting the top frame to undefined)
-        for (var a = this._subscriptions[event].slice(0), i = 0, subscriptionInstance; subscriptionInstance = a[i]; ++i) {
+        for (let i = 0, subscriptionInstance; subscriptionInstance = subs[i]; ++i) {
                     // In case a subscription was disposed during the arrayForEach cycle, check
                     // for isDisposed on each subscription before invoking its callback
           if (!subscriptionInstance.isDisposed) {

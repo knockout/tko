@@ -374,6 +374,28 @@ describe('Rate-limited', function () {
       expect(notifySpy).not.toHaveBeenCalled()
     })
 
+    it('Should not notify future subscribers', function () {
+      var observable = koObservable('a').extend({rateLimit: 500}),
+        notifySpy1 = jasmine.createSpy('notifySpy1'),
+        notifySpy2 = jasmine.createSpy('notifySpy2'),
+        notifySpy3 = jasmine.createSpy('notifySpy3')
+
+      observable.subscribe(notifySpy1)
+      observable('b')
+      observable.subscribe(notifySpy2)
+      observable('c')
+      observable.subscribe(notifySpy3)
+
+      expect(notifySpy1).not.toHaveBeenCalled()
+      expect(notifySpy2).not.toHaveBeenCalled()
+      expect(notifySpy3).not.toHaveBeenCalled()
+
+      jasmine.Clock.tick(500)
+      expect(notifySpy1).toHaveBeenCalledWith('c')
+      expect(notifySpy2).toHaveBeenCalledWith('c')
+      expect(notifySpy3).not.toHaveBeenCalled()
+    })
+
     it('Should delay update of dependent computed observable', function () {
       var observable = koObservable().extend({rateLimit: 500})
       var computed = koComputed(observable)
@@ -414,6 +436,21 @@ describe('Rate-limited', function () {
             // Advance clock; Change notification happens now using the latest value notified
       jasmine.Clock.tick(500)
       expect(computed()).toEqual('b')
+    })
+
+    it('Should not update dependent computed created after last update', function () {
+      var observable = koObservable('a').extend({rateLimit: 500})
+      observable('b')
+
+      var evalSpy = jasmine.createSpy('evalSpy')
+      var computed = koComputed(function () {
+        return evalSpy(observable())
+      })
+      expect(evalSpy).toHaveBeenCalledWith('b')
+      evalSpy.reset()
+
+      jasmine.Clock.tick(500)
+      expect(evalSpy).not.toHaveBeenCalled()
     })
   })
 
@@ -725,6 +762,43 @@ describe('Deferred', function () {
       jasmine.Clock.tick(1)
       expect(notifySpy).not.toHaveBeenCalled()
       expect(observable()).toEqual('original')
+    })
+
+    it('Should not notify future subscribers', function () {
+      var observable = koObservable('a').extend({deferred: true}),
+        notifySpy1 = jasmine.createSpy('notifySpy1'),
+        notifySpy2 = jasmine.createSpy('notifySpy2'),
+        notifySpy3 = jasmine.createSpy('notifySpy3')
+
+      observable.subscribe(notifySpy1)
+      observable('b')
+      observable.subscribe(notifySpy2)
+      observable('c')
+      observable.subscribe(notifySpy3)
+
+      expect(notifySpy1).not.toHaveBeenCalled()
+      expect(notifySpy2).not.toHaveBeenCalled()
+      expect(notifySpy3).not.toHaveBeenCalled()
+
+      jasmine.Clock.tick(1)
+      expect(notifySpy1).toHaveBeenCalledWith('c')
+      expect(notifySpy2).toHaveBeenCalledWith('c')
+      expect(notifySpy3).not.toHaveBeenCalled()
+    })
+
+    it('Should not update dependent computed created after last update', function () {
+      var observable = koObservable('a').extend({deferred: true})
+      observable('b')
+
+      var evalSpy = jasmine.createSpy('evalSpy')
+      var computed = koComputed(function () {
+        return evalSpy(observable())
+      })
+      expect(evalSpy).toHaveBeenCalledWith('b')
+      evalSpy.reset()
+
+      jasmine.Clock.tick(1)
+      expect(evalSpy).not.toHaveBeenCalled()
     })
 
     it('Is default behavior when "options.deferUpdates" is "true"', function () {

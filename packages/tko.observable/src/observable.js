@@ -104,6 +104,7 @@ subscribable.fn.limit = function limit (limitFunction) {
   })
 
   self._limitChange = function (value) {
+    self._changeSubscriptions = [...self._subscriptions[defaultEvent]]
     self._notificationIsPending = ignoreBeforeChange = true
     pendingValue = value
     finish()
