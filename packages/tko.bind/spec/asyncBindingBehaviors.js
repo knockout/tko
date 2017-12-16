@@ -15,9 +15,9 @@ import {
 
 import { DataBindProvider } from 'tko.provider.databind'
 
-import { bindings as coreBindings }     from 'tko.binding.core'
+import { bindings as coreBindings } from 'tko.binding.core'
 import { bindings as templateBindings } from 'tko.binding.template'
-import { bindings as ifBindings }       from 'tko.binding.if'
+import { bindings as ifBindings } from 'tko.binding.if'
 import {
     applyBindings
 } from 'tko.bind'
@@ -163,16 +163,6 @@ describe('Deferred bindings', function () {
     expect(testNode.childNodes[0].childNodes[targetIndex]).not.toBe(itemNode)    // node was create anew so it's not the same
   })
 
-  xit('Should not throw an exception for value binding on multiple select boxes', function () {
-    testNode.innerHTML = "<select data-bind=\"options: ['abc','def','ghi'], value: x\"></select><select data-bind=\"options: ['xyz','uvw'], value: x\"></select>"
-    var observable = Observable()
-    expect(function () {
-      applyBindings({ x: observable }, testNode)
-      jasmine.Clock.tick(1)
-    }).not.toThrow()
-    expect(observable()).not.toBeUndefined()       // The spec doesn't specify which of the two possible values is actually set
-  })
-
   it('Should get latest value when conditionally included', function () {
     // Test is based on example in https://github.com/knockout/knockout/issues/1975
     testNode.innerHTML = '<div data-bind="if: show"><div data-bind="text: status"></div></div>'
@@ -195,5 +185,26 @@ describe('Deferred bindings', function () {
     value(1)
     jasmine.Clock.tick(1)
     expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>')
+  })
+
+  it('Should update "if" binding before descendant bindings', function () {
+        // Based on example at http://stackoverflow.com/q/43341484/1287183
+    testNode.innerHTML = '<div data-bind="if: hasAddress()"><div data-bind="text: address().street"></div></div>'
+    var vm = {
+      address: Observable(),
+      hasAddress: pureComputed(function () { return vm.address() != null })
+    }
+
+    applyBindings(vm, testNode)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('')
+
+    vm.address({street: '123 my street'})
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: address().street">123 my street</div>')
+
+    vm.address(null)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('')
   })
 })
