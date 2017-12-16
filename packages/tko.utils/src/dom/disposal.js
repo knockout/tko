@@ -76,7 +76,6 @@ export function cleanNode (node) {
 
         // ... then its descendants, where applicable
     if (cleanableNodeTypesWithDescendants[node.nodeType]) {
-      // Clone the descendants list in case it changes during iteration
       const descendants = node.getElementsByTagName('*')
       for (let i = 0; i < descendants.length; ++i) {
         let cleanedNode = descendants[i]

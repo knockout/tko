@@ -42,6 +42,12 @@ export class value extends BindingHandler {
 
     arrayForEach(this.eventsToCatch, eventName => this.registerEvent(eventName))
 
+    if (this.isInput && this.$element.type === 'file') {
+      this.updateFromModel = this.updateFromModelForFile
+    } else {
+      this.updateFromModel = this.updateFromModelForValue
+    }
+
     this.computed('updateFromModel')
   }
 
@@ -49,7 +55,7 @@ export class value extends BindingHandler {
     const requestedEventsToCatch = this.allBindings.get('valueUpdate')
     const requestedEventsArray = typeof requestedEventsToCatch === 'string' ?
       [requestedEventsToCatch] : requestedEventsToCatch || []
-    return Array.from(new Set(['change', ...requestedEventsArray]))
+    return [...new Set(['change', ...requestedEventsArray])]
   }
 
   get isInput () {
@@ -95,14 +101,6 @@ export class value extends BindingHandler {
       eventName = eventName.substring(5 /* 'after'.length */)
     }
     this.addEventListener(eventName, handler)
-  }
-
-  updateFromModel () {
-    if (this.isInput && this.$element.type === 'file') {
-      this.updateFromModelForFile()
-    } else {
-      this.updateFromModelForValue()
-    }
   }
 
   updateFromModelForFile () {
