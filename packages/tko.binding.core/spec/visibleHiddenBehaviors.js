@@ -27,7 +27,7 @@ describe('Binding: Visible', function () {
     provider.bindingHandlers.set(coreBindings)
   })
 
-  it('Should display the node only when the value is true', function () {
+  it('Visible means the node only when the value is true', function () {
     var myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='visible:myModelProperty()' />"
     applyBindings({
@@ -39,7 +39,7 @@ describe('Binding: Visible', function () {
     expect(testNode.childNodes[0].style.display).toEqual('')
   })
 
-  it('Should unwrap observables implicitly', function () {
+  it('Visible should unwrap observables implicitly', function () {
     var myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='visible:myModelProperty' />"
     applyBindings({
