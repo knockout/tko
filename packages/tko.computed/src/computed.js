@@ -29,7 +29,6 @@ import {
     subscribable
 } from 'tko.observable'
 
-
 const computedState = createSymbolOrString('_state')
 const DISPOSED_STATE = {
   dependencyTracking: null,
@@ -172,13 +171,18 @@ function computedBeginDependencyDetectionCallback (subscribable, id) {
     state = computedObservable[computedState]
   if (!state.isDisposed) {
     if (this.disposalCount && this.disposalCandidates[id]) {
-            // Don't want to dispose this subscription, as it's still being used
+      // Don't want to dispose this subscription, as it's still being used
       computedObservable.addDependencyTracking(id, subscribable, this.disposalCandidates[id])
       this.disposalCandidates[id] = null // No need to actually delete the property - disposalCandidates is a transient object anyway
       --this.disposalCount
     } else if (!state.dependencyTracking[id]) {
-            // Brand new subscription - add it
+      // Brand new subscription - add it
       computedObservable.addDependencyTracking(id, subscribable, state.isSleeping ? { _target: subscribable } : computedObservable.subscribeToDependency(subscribable))
+    }
+    // If the observable we've accessed has a pending notification, ensure
+    // we get notified of the actual final value (bypass equality checks)
+    if (subscribable._notificationIsPending) {
+      subscribable._notifyNextChangeIfValueIsDifferent()
     }
   }
 }
@@ -366,10 +370,10 @@ computed.fn = {
     return changed
   },
   evaluateImmediate_CallReadThenEndDependencyDetection (state, dependencyDetectionContext) {
-        // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
-        // You'd never call it from anywhere else. Factoring it out means that evaluateImmediate_CallReadWithDependencyDetection
-        // can be independent of try/finally blocks, which contributes to saving about 40% off the CPU
-        // overhead of computed evaluation (on V8 at least).
+    // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
+    // You'd never call it from anywhere else. Factoring it out means that evaluateImmediate_CallReadWithDependencyDetection
+    // can be independent of try/finally blocks, which contributes to saving about 40% off the CPU
+    // overhead of computed evaluation (on V8 at least).
 
     try {
       var readFunction = state.readFunction
@@ -377,7 +381,7 @@ computed.fn = {
     } finally {
       dependencyDetection.end()
 
-            // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
+      // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
       if (dependencyDetectionContext.disposalCount && !state.isSleeping) {
         objectForEach(dependencyDetectionContext.disposalCandidates, computedDisposeDependencyCallback)
       }
@@ -385,10 +389,11 @@ computed.fn = {
       state.isStale = state.isDirty = false
     }
   },
-  peek () {
-        // Peek won't re-evaluate, except while the computed is sleeping or to get the initial value when "deferEvaluation" is set.
+  peek (forceEvaluate) {
+    // Peek won't ordinarily re-evaluate, except while the computed is sleeping
+    //  or to get the initial value when "deferEvaluation" is set.
     const state = this[computedState]
-    if ((state.isDirty && !state.dependenciesCount) || (state.isSleeping && this.haveDependenciesChanged())) {
+    if ((state.isDirty && (forceEvaluate || !state.dependenciesCount)) || (state.isSleeping && this.haveDependenciesChanged())) {
       this.evaluateImmediate()
     }
     return state.latestValue

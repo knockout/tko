@@ -82,7 +82,7 @@ subscribable.fn.limit = function limit (limitFunction) {
   var self = this
   var selfIsObservable = isObservable(self)
   var beforeChange = 'beforeChange'
-  var ignoreBeforeChange, previousValue, pendingValue
+  var ignoreBeforeChange, notifyNextChange, previousValue, pendingValue
 
   if (!self._origNotifySubscribers) {
     self._origNotifySubscribers = self.notifySubscribers
@@ -97,24 +97,33 @@ subscribable.fn.limit = function limit (limitFunction) {
     if (selfIsObservable && pendingValue === self) {
       pendingValue = self._evalIfChanged ? self._evalIfChanged() : self()
     }
-    ignoreBeforeChange = false
-    if (self.isDifferent(previousValue, pendingValue)) {
+    const shouldNotify = notifyNextChange ||
+      self.isDifferent(previousValue, pendingValue)
+    self._notifyNextChange = ignoreBeforeChange = false
+    if (shouldNotify) {
       self._origNotifySubscribers(previousValue = pendingValue)
     }
   })
 
-  self._limitChange = function (value) {
-    self._changeSubscriptions = [...self._subscriptions[defaultEvent]]
-    self._notificationIsPending = ignoreBeforeChange = true
-    pendingValue = value
-    finish()
-  }
-  self._limitBeforeChange = function (value) {
-    if (!ignoreBeforeChange) {
-      previousValue = value
-      self._origNotifySubscribers(value, beforeChange)
+  Object.assign(self, {
+    _limitChange  (value) {
+      self._changeSubscriptions = [...self._subscriptions[defaultEvent]]
+      self._notificationIsPending = ignoreBeforeChange = true
+      pendingValue = value
+      finish()
+    },
+    _limitBeforeChange (value) {
+      if (!ignoreBeforeChange) {
+        previousValue = value
+        self._origNotifySubscribers(value, beforeChange)
+      }
+    },
+    _notifyNextChangeIfValueIsDifferent () {
+      if (self.isDifferent(previousValue, self.peek(true /* evaluate */))) {
+        notifyNextChange = true
+      }
     }
-  }
+  })
 }
 
 // Note that for browsers that don't support proto assignment, the

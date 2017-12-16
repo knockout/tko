@@ -701,6 +701,37 @@ describe('Rate-limited', function () {
       jasmine.Clock.tick(500)
       expect(dependentComputed()).toEqual('b')
     })
+
+    it('Should not cause loss of updates when an intermediate value is read by a dependent computed observable', function () {
+    // From https://github.com/knockout/knockout/issues/1835
+      var one = koObservable(false),
+        onePointOne = koComputed(one).extend({rateLimit: 100}),
+        two = koObservable(false),
+        three = koComputed(function () { return onePointOne() || two() }),
+        threeNotifications = []
+
+      three.subscribe(function (val) {
+        threeNotifications.push(val)
+      })
+
+    // The loop shows that the same steps work continuously
+      for (var i = 0; i < 3; i++) {
+        expect(onePointOne() || two() || three()).toEqual(false)
+        threeNotifications = []
+
+        one(true)
+        expect(threeNotifications).toEqual([])
+        two(true)
+        expect(threeNotifications).toEqual([true])
+        two(false)
+        expect(threeNotifications).toEqual([true])
+        one(false)
+        expect(threeNotifications).toEqual([true])
+
+        jasmine.Clock.tick(100)
+        expect(threeNotifications).toEqual([true, false])
+      }
+    })
   })
 })
 
@@ -814,6 +845,36 @@ describe('Deferred', function () {
 
       jasmine.Clock.tick(1)
       expect(notifySpy.argsForCall).toEqual([ ['A'] ])
+    })
+
+    it('Should not cause loss of updates when an intermediate value is read by a dependent computed observable', function () {
+            // From https://github.com/knockout/knockout/issues/1835
+      var one = koObservable(false).extend({rateLimit: 100}),
+        two = koObservable(false),
+        three = koComputed(function () { return one() || two() }),
+        threeNotifications = []
+
+      three.subscribe(function (val) {
+        threeNotifications.push(val)
+      })
+
+            // The loop shows that the same steps work continuously
+      for (var i = 0; i < 3; i++) {
+        expect(one() || two() || three()).toEqual(false)
+        threeNotifications = []
+
+        one(true)
+        expect(threeNotifications).toEqual([])
+        two(true)
+        expect(threeNotifications).toEqual([true])
+        two(false)
+        expect(threeNotifications).toEqual([true])
+        one(false)
+        expect(threeNotifications).toEqual([true])
+
+        jasmine.Clock.tick(100)
+        expect(threeNotifications).toEqual([true, false])
+      }
     })
   })
 
