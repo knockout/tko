@@ -127,20 +127,12 @@ export class value extends BindingHandler {
 
     if (tagNameLower(element) === 'select') {
       const allowUnset = this.allBindings.get('valueAllowUnset')
-      var applyValueAction = function () {
-        selectExtensions.writeValue(element, newValue, allowUnset)
-      }
-      applyValueAction()
+      selectExtensions.writeValue(element, newValue, allowUnset)
 
       if (!allowUnset && newValue !== selectExtensions.readValue(element)) {
        // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
        // because you're not allowed to have a model value that disagrees with a visible UI selection.
         dependencyDetection.ignore(triggerEvent, null, [element, 'change'])
-      } else {
-        // Workaround for IE6 bug: It won't reliably apply values to SELECT nodes during the same execution thread
-        // right after you've changed the set of OPTION nodes on it. So for that node type, we'll schedule a second thread
-        // to apply the value as well.
-        safeSetTimeout(applyValueAction, 0)
       }
     } else {
       selectExtensions.writeValue(element, newValue)
