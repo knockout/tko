@@ -1018,8 +1018,26 @@ describe('Deferred', function () {
       expect(dependentComputed()).toEqual('C')
     })
 
+    it('Should *not* delay update of dependent deferred pure computed observable', function () {
+      var data = koObservable('A').extend({deferred: true}),
+        timesEvaluated = 0,
+        computed1 = koPureComputed(function () { return data() + 'X' }).extend({deferred: true}),
+        computed2 = koPureComputed(function () { timesEvaluated++; return computed1() + 'Y' }).extend({deferred: true})
+
+      expect(computed2()).toEqual('AXY')
+      expect(timesEvaluated).toEqual(1)
+
+      data('B')
+      expect(computed2()).toEqual('BXY')
+      expect(timesEvaluated).toEqual(2)
+
+      jasmine.Clock.tick(1)
+      expect(computed2()).toEqual('BXY')
+      expect(timesEvaluated).toEqual(2)      // Verify that the computed wasn't evaluated again unnecessarily
+    })
+
     it('Should *not* delay update of dependent deferred computed observable', function () {
-      var data = koObservable('A'),
+      var data = koObservable('A').extend({ deferred: true }),
         timesEvaluated = 0,
         computed1 = koComputed(function () { return data() + 'X' }).extend({deferred: true}),
         computed2 = koComputed(function () { timesEvaluated++; return computed1() + 'Y' }).extend({deferred: true}),

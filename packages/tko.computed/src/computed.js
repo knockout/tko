@@ -218,7 +218,7 @@ computed.fn = {
     for (id in dependencyTracking) {
       if (hasOwnProperty(dependencyTracking, id)) {
         dependency = dependencyTracking[id]
-        if (dependency._target.hasChanged(dependency._version)) {
+        if ((this._evalDelayed && dependency._target._notificationIsPending) || dependency._target.hasChanged(dependency._version)) {
           return true
         }
       }
