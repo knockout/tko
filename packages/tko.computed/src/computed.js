@@ -407,6 +407,8 @@ computed.fn = {
       _evalIfChanged () {
         if (state.isStale) {
           this.evaluateImmediate()
+        } else {
+          state.isDirty = false
         }
         return state.latestValue
       },
