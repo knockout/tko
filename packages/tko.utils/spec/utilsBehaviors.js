@@ -24,6 +24,13 @@ describe('arrayForEach', function () {
 
     expect(callback).not.toHaveBeenCalled()
   })
+
+  it('Should alter "this" context when defined as an argument', function () {
+    var expectedContext = {}
+    var actualContext = null
+    utils.arrayForEach(['a'], function () { actualContext = this }, expectedContext)
+    expect(actualContext).toBe(expectedContext)
+  })
 })
 
 describe('arrayIndexOf', function () {
@@ -187,6 +194,19 @@ describe('arrayMap', function () {
     expect(result).toEqual(input)
     expect(result).not.toBe(input)
   })
+
+  it('Should alter "this" context when defined as an argument', function () {
+    var expectedContext = {}
+    var actualContext = null
+    var identityFunction = function (x) {
+      actualContext = this
+      return x
+    }
+
+    utils.arrayMap(['a'], identityFunction, expectedContext)
+
+    expect(actualContext).toBe(expectedContext)
+  })
 })
 
 describe('arrayFilter', function () {
@@ -219,6 +239,19 @@ describe('arrayFilter', function () {
 
     expect(result).toEqual(input)
     expect(result).not.toBe(input)
+  })
+
+  it('Should alter "this" context when defined as an argument', function () {
+    var expectedContext = {}
+    var actualContext = null
+    var identityFunction = function (x) {
+      actualContext = this
+      return x
+    }
+
+    var result = utils.arrayFilter(['a'], identityFunction, expectedContext)
+
+    expect(expectedContext).toEqual(actualContext)
   })
 })
 
@@ -316,5 +349,20 @@ describe('Function.bind', function () {
     expect(bound1()).toEqual([object1])
     expect(bound2()).toEqual([object1, 'a'])
     expect(bound3()).toEqual([object1, 'b'])
+  })
+})
+
+describe('objectMap', function () {
+  it('Should alter "this" context when defined as an argument', function () {
+    var expectedContext = {}
+    var actualContext = null
+    var identityFunction = function (obj) {
+      actualContext = this
+      return {x: obj.x}
+    }
+
+    var result = ko.utils.objectMap({x: 1}, identityFunction, expectedContext)
+
+    expect(expectedContext).toEqual(actualContext)
   })
 })

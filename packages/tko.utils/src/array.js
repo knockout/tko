@@ -6,7 +6,8 @@
 
 const {isArray} = Array
 
-export function arrayForEach (array, action) {
+export function arrayForEach (array, action, thisArg) {
+  if (arguments.length > 2) { action = action.bind(thisArg) }
   for (let i = 0, j = array.length; i < j; ++i) {
     action(array[i], i, array)
   }
@@ -21,7 +22,8 @@ export function arrayFirst (array, predicate, predicateOwner) {
     .find(predicate, predicateOwner) || null
 }
 
-export function arrayMap (array = [], mapping) {
+export function arrayMap (array = [], mapping, thisArg) {
+  if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   return Array.from(array, mapping)
 }
 
@@ -40,7 +42,8 @@ export function arrayGetDistinctValues (array = []) {
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
-export function arrayFilter (array, predicate) {
+export function arrayFilter (array, predicate, thisArg) {
+  if (arguments.length > 2) { predicate = predicate.bind(thisArg) }
   return (isArray(array) ? array : [...array]).filter(predicate)
 }
 

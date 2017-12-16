@@ -25,8 +25,9 @@ export function objectForEach (obj, action) {
   }
 }
 
-export function objectMap (source, mapping) {
+export function objectMap (source, mapping, thisArg) {
   if (!source) { return source }
+  if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   var target = {}
   for (var prop in source) {
     if (hasOwnProperty(source, prop)) {
