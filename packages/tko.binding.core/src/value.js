@@ -109,7 +109,7 @@ export class value extends BindingHandler {
     if (newValue === null || newValue === undefined || newValue === '') {
       this.$element.value = ''
     } else {
-      dependencyDetection.ignore(this.valueUpdateHandler.bind(this))   // reset the model to match the element
+      dependencyDetection.ignore(this.valueUpdateHandler, this)   // reset the model to match the element
     }
   }
 
@@ -132,7 +132,7 @@ export class value extends BindingHandler {
       if (!allowUnset && newValue !== selectExtensions.readValue(element)) {
        // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
        // because you're not allowed to have a model value that disagrees with a visible UI selection.
-        dependencyDetection.ignore(this.valueUpdateHandler.bind(this))
+        dependencyDetection.ignore(this.valueUpdateHandler, this)
       }
     } else {
       selectExtensions.writeValue(element, newValue)

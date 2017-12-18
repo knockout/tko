@@ -33,17 +33,20 @@ export default class BindingStringProvider extends Provider {
       value = `{${property}:${value}}`
     }
 
-    yield `${handlerName}:${value}`
+    yield `'${handlerName}':${value}`
   }
 
-  * generateBindingString (bindingString) {
-    for (const {key, unknown, value} of parseObjectLiteral(bindingString)) {
+  * generateBindingString (bindingStringOrObjects) {
+    const bindingObjectsArray = typeof bindingStringOrObjects === 'string'
+      ? parseObjectLiteral(bindingStringOrObjects) : bindingStringOrObjects
+    for (const {key, unknown, value} of bindingObjectsArray) {
       yield * this.processBinding(key || unknown, value)
     }
   }
 
-  preProcessBindings (bindingString) {
-    return Array.from(this.generateBindingString(bindingString)).join(',')
+  preProcessBindings (bindingStringOrObjects) {
+    return Array.from(this.generateBindingString(bindingStringOrObjects))
+      .join(',')
   }
 
   getBindingAccessors (node, context) {
