@@ -11,7 +11,8 @@
     "prepublish": "yarn build",
     "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
     "build": "lerna exec --concurrency=1 --loglevel=warn -- rollup -c ../../rollup.config.js",
-    "lint": "standard"
+    "lint": "standard",
+    "repackage": "./.inject.json.js packages/shared.package.json packages/*/package.json"
   },
   "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [

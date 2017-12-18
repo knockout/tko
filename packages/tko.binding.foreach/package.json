@@ -4,7 +4,7 @@
   "description": "Knockout Foreach Binding",
   "module": "dist/tko.binding.foreach.js",
   "scripts": {
-    "test": "gulp test --once"
+    "test": "karma start ../../karma.conf.js"
   },
   "files": [
     "dist/"
@@ -36,6 +36,21 @@
       "mocha",
       "chai",
       "sinon"
+    ]
+  },
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json",
+  "standard": {
+    "globals": [
+      "beforeEach",
+      "before",
+      "after",
+      "afterEach",
+      "it",
+      "iit",
+      "xit",
+      "expect",
+      "describe",
+      "ddescribe"
     ]
   }
 }

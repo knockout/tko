@@ -29,5 +29,23 @@
     "frameworks": [
       "jasmine"
     ]
+  },
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json",
+  "standard": {
+    "globals": [
+      "beforeEach",
+      "before",
+      "after",
+      "afterEach",
+      "it",
+      "iit",
+      "xit",
+      "expect",
+      "describe",
+      "ddescribe"
+    ]
+  },
+  "scripts": {
+    "test": "karma start ../../karma.conf.js"
   }
 }
