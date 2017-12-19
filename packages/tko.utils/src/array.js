@@ -19,7 +19,7 @@ export function arrayIndexOf (array, item) {
 
 export function arrayFirst (array, predicate, predicateOwner) {
   return (isArray(array) ? array : [...array])
-    .find(predicate, predicateOwner) || null
+    .find(predicate, predicateOwner) || undefined
 }
 
 export function arrayMap (array = [], mapping, thisArg) {

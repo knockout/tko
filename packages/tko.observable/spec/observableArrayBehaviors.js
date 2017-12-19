@@ -7,7 +7,7 @@ describe('Observable Array', function () {
   var testObservableArray, notifiedValues, beforeNotifiedValues
 
   beforeEach(function () {
-    testObservableArray = new observableArray([1, 2, 3])
+    testObservableArray = observableArray([1, 2, 3])
     notifiedValues = []
     testObservableArray.subscribe(function (value) {
       notifiedValues.push(value ? value.slice(0) : value)
@@ -27,7 +27,7 @@ describe('Observable Array', function () {
   })
 
   it('Should initialize to empty array if you pass no args to constructor', function () {
-    var instance = new observableArray()
+    var instance = observableArray()
     expect(instance().length).toEqual(0)
   })
 
@@ -37,9 +37,9 @@ describe('Observable Array', function () {
     expect(function () { observableArray({}) }).toThrow()
 
         // Try allowed args
-    expect((new observableArray([1, 2, 3]))().length).toEqual(3)
-    expect((new observableArray(null))().length).toEqual(0)
-    expect((new observableArray(undefined))().length).toEqual(0)
+    expect((observableArray([1, 2, 3]))().length).toEqual(3)
+    expect((observableArray(null))().length).toEqual(0)
+    expect((observableArray(undefined))().length).toEqual(0)
   })
 
   it('Should be able to write values to it', function () {
@@ -208,7 +208,7 @@ describe('Observable Array', function () {
     notifiedValues = []
     expect(function () {
       testObservableArray.remove(function (value) {
-        if (value == 'Beta') {
+        if (value === 'Beta') {
           testObservableArray.splice(0, 1)
           return true
         }
@@ -286,6 +286,11 @@ describe('Observable Array', function () {
     expect(newArray).toEqual([ 1, 3, 5, 7 ])
     expect(newArray).not.toBe(testObservableArray())
 
+    const newArray2 = testObservableArray.sorted((a, b) => b - a)
+    expect(newArray2).toEqual([ 7, 5, 3, 1 ])
+    expect(newArray2).not.toBe(testObservableArray())
+    expect(newArray2).not.toBe(newArray)
+
     expect(notifiedValues).toEqual([])
   })
 
@@ -330,7 +335,7 @@ describe('Observable Array', function () {
       delete observableArray.fn.customFunction2
     })
 
-    var observableArray = observableArray()
+    const obsArr = observableArray()
 
     var customFunction1 = function () {}
     var customFunction2 = function () {}
@@ -338,7 +343,7 @@ describe('Observable Array', function () {
     observable.fn.customFunction1 = customFunction1
     observableArray.fn.customFunction2 = customFunction2
 
-    expect(observableArray.customFunction1).toBe(customFunction1)
-    expect(observableArray.customFunction2).toBe(customFunction2)
+    expect(obsArr.customFunction1).toBe(customFunction1)
+    expect(obsArr.customFunction2).toBe(customFunction2)
   })
 })

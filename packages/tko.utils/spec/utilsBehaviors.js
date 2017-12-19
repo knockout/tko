@@ -100,12 +100,12 @@ describe('arrayFirst', function () {
     expect(result).toBe('b')
   })
 
-  it('Should return null with empty arrays, and not call the predicate', function () {
+  it('Should return undefined with empty arrays, and not call the predicate', function () {
     var predicate = jasmine.createSpy('predicate')
 
     var result = ko.utils.arrayFirst([], predicate)
 
-    expect(result).toBe(null)
+    expect(result).toBe(undefined)
     expect(predicate).not.toHaveBeenCalled()
   })
 
@@ -117,10 +117,9 @@ describe('arrayFirst', function () {
     expect(matchB.calls[1].args).toEqual(['b', 1, [ 'a', 'b', 'c' ]])
   })
 
-  it('Should return null if no element matches', function () {
+  it('Should return undefined if no element matches', function () {
     var result = ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
-
-    expect(result).toBe(null)
+    expect(result).toBe(undefined)
   })
 
   it('Should test every element if no element matches', function () {
@@ -361,7 +360,7 @@ describe('objectMap', function () {
       return {x: obj.x}
     }
 
-    var result = ko.utils.objectMap({x: 1}, identityFunction, expectedContext)
+    ko.utils.objectMap({x: 1}, identityFunction, expectedContext)
 
     expect(expectedContext).toEqual(actualContext)
   })
