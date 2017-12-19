@@ -1,95 +1,84 @@
 //
 // DOM node data
 //
-import options from '../options'
+import { ieVersion } from '../ie'
 
-//
-var dataStoreKeyExpandoPropertyName = '__ko__data' + new Date()
+const datastoreTime = new Date().getTime()
+const dataStoreKeyExpandoPropertyName = `__ko__${datastoreTime}`
+const dataStoreSymbol = Symbol('Knockout data')
 var dataStore
-var uniqueId = 0
-var get
-var set
-var clear
+let uniqueId = 0
 
-/**
- * --- Legacy getter/setter (may cause memory leaks) ---
+/*
+ * We considered using WeakMap, but it has a problem in IE 11 and Edge that
+ * prevents using it cross-window, so instead we just store the data directly
+ * on the node. See https://github.com/knockout/knockout/issues/2141
  */
-function getAll (node, createIfNotFound) {
-  var dataStoreKey = node[dataStoreKeyExpandoPropertyName]
-  var hasExistingDataStore = dataStoreKey && (dataStoreKey !== 'null') && dataStore[dataStoreKey]
-  if (!hasExistingDataStore) {
-    if (!createIfNotFound) { return undefined }
-    dataStoreKey = node[dataStoreKeyExpandoPropertyName] = 'ko' + uniqueId++
-    dataStore[dataStoreKey] = {}
-  }
-  return dataStore[dataStoreKey]
-}
+const modern = {
+  getDataForNode (node, createIfNotFound) {
+    let dataForNode = node[dataStoreSymbol]
+    if (!dataForNode && createIfNotFound) {
+      dataForNode = node[dataStoreSymbol] = {}
+    }
+    return dataForNode
+  },
 
-function legacyGet (node, key) {
-  var allDataForNode = getAll(node, false)
-  return allDataForNode === undefined ? undefined : allDataForNode[key]
-}
-
-function legacySet (node, key, value) {
-  if (value === undefined) {
-        // Make sure we don't actually create a new domData key if we are actually deleting a value
-    if (getAll(node, false) === undefined) { return }
+  clear (node) {
+    if (node[dataStoreSymbol]) {
+      delete node[dataStoreSymbol]
+      return true
+    }
+    return false
   }
-  var allDataForNode = getAll(node, true)
-  allDataForNode[key] = value
-}
-
-function legacyClear (node) {
-  var dataStoreKey = node[dataStoreKeyExpandoPropertyName]
-  if (dataStoreKey) {
-    delete dataStore[dataStoreKey]
-    node[dataStoreKeyExpandoPropertyName] = null
-    return true // Exposing "did clean" flag purely so specs can infer whether things have been cleaned up as intended
-  }
-  return false
 }
 
 /**
- * WeakMap get/set/clear
+ * Old IE versions have memory issues if you store objects on the node, so we
+ * use a separate data storage and link to it from the node using a string key.
  */
+const IE = {
+  getDataforNode (node, createIfNotFound) {
+    let dataStoreKey = node[dataStoreKeyExpandoPropertyName]
+    const hasExistingDataStore = dataStoreKey && (dataStoreKey !== 'null') && dataStore[dataStoreKey]
+    if (!hasExistingDataStore) {
+      if (!createIfNotFound) {
+        return undefined
+      }
+      dataStoreKey = node[dataStoreKeyExpandoPropertyName] = 'ko' + uniqueId++
+      dataStore[dataStoreKey] = {}
+    }
+    return dataStore[dataStoreKey]
+  },
 
-function wmGet (node, key) {
-  return (dataStore.get(node) || {})[key]
-}
-
-function wmSet (node, key, value) {
-  var dataForNode
-  if (dataStore.has(node)) {
-    dataForNode = dataStore.get(node)
-  } else {
-    dataForNode = {}
-    dataStore.set(node, dataForNode)
+  clear (node) {
+    const dataStoreKey = node[dataStoreKeyExpandoPropertyName]
+    if (dataStoreKey) {
+      delete dataStore[dataStoreKey]
+      node[dataStoreKeyExpandoPropertyName] = null
+      return true // Exposing 'did clean' flag purely so specs can infer whether things have been cleaned up as intended
+    }
+    return false
   }
-  dataForNode[key] = value
 }
 
-function wmClear (node) {
-  return dataStore.delete(node)
-}
-
-if ('WeakMap' in options.global) {
-  dataStore = new WeakMap()
-  get = wmGet
-  set = wmSet
-  clear = wmClear
-} else {
-  dataStore = {}
-  get = legacyGet
-  set = legacySet
-  clear = legacyClear
-}
+const {getDataForNode, clear} = ieVersion ? IE : modern
 
 /**
  * Create a unique key-string identifier.
- * FIXME: This should be deprecated by using a Symbol.
  */
 export function nextKey () {
   return (uniqueId++) + dataStoreKeyExpandoPropertyName
+}
+
+function get (node, key) {
+  const dataForNode = getDataForNode(node, false)
+  return dataForNode && dataForNode[key]
+}
+
+function set (node, key, value) {
+  // Make sure we don't actually create a new domData key if we are actually deleting a value
+  var dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
+  dataForNode && (dataForNode[key] = value)
 }
 
 export { get, set, clear }

@@ -16,7 +16,7 @@ export var checked = {
   init: function (element, valueAccessor, allBindings) {
     var checkedValue = pureComputed(function () {
       // Treat "value" like "checkedValue" when it is included with "checked" binding
-      if (allBindings['has']('checkedValue')) {
+      if (allBindings.has('checkedValue')) {
         return unwrap(allBindings.get('checkedValue'))
       } else if (useElementValue) {
         if (allBindings.has('value')) {
