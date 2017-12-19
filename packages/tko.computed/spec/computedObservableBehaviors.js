@@ -361,13 +361,26 @@ describe('Dependent Observable', function () {
   it('Should describe itself as inactive if subsequent runs of the evaluator result in there being no dependencies', function () {
     var someObservable = observable('initial'),
       shouldHaveDependency = true,
-      computedInstance = computed(function () { return shouldHaveDependency && someObservable() })
+      computedInstance = computed(function () { shouldHaveDependency && someObservable() })
     expect(computedInstance.isActive()).toEqual(true)
 
         // Trigger a refresh
     shouldHaveDependency = false
     someObservable('modified')
     expect(computedInstance.isActive()).toEqual(false)
+  })
+
+  it('Should be inactive if it depends on an inactive computed', function () {
+    var someObservable = observable('initial'),
+      shouldHaveDependency = true,
+      computed1 = computed(function () { shouldHaveDependency && someObservable() }),
+      computed2 = computed(computed1)
+    expect(computed2.isActive()).toEqual(true)
+
+        // Trigger a refresh
+    shouldHaveDependency = false
+    someObservable('modified')
+    expect(computed2.isActive()).toEqual(false)
   })
 
   it('Should advertise that instances *can* have values written to them if you supply a "write" callback', function () {
