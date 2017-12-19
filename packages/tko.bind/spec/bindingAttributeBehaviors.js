@@ -1,6 +1,6 @@
 /* global testNode */
 import {
-    cleanNode, options, virtualElements
+    cleanNode, options, virtualElements, objectForEach
 } from 'tko.utils'
 
 import {
@@ -398,6 +398,18 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='addCustomProperty: true'><div data-bind='with: true'><div data-bind='text: $customProp'></div></div></div>"
     applyBindings(null, testNode)
     expect(testNode).toContainText('my value')
+  })
+
+  it('Binding context should hide or not minify extra internal properties', function () {
+    testNode.innerHTML = "<div data-bind='with: $data'><div></div></div>"
+    applyBindings({}, testNode)
+
+    var allowedProperties = ['$parents', '$root', 'ko', '$rawData', '$data', '$parentContext', '$parent']
+    if (typeof Symbol('') !== 'symbol') { // Test for shim
+      allowedProperties.push('_subscribable')
+    }
+    objectForEach(contextFor(testNode.childNodes[0].childNodes[0]),
+                  (prop) => expect(allowedProperties).toContain(prop))
   })
 
   it('Should be able to retrieve the binding context associated with any node', function () {

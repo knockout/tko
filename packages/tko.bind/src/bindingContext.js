@@ -13,8 +13,10 @@ import {
 
 export const boundElementDomDataKey = domData.nextKey()
 
+export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')
+
 // Unique stub to indicate inheritance.
-const inheritParentIndicator = {}
+const inheritParentIndicator = Symbol('Knockout Parent Indicator')
 
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
@@ -41,13 +43,15 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
     if (parentContext) {
             // When a "parent" context is given, register a dependency on the parent context. Thus whenever the
             // parent context is updated, this context will also be updated.
-      if (parentContext._subscribable) { parentContext._subscribable() }
+      if (parentContext[contextSubscribeSymbol]) {
+        parentContext[contextSubscribeSymbol]()
+      }
 
             // Copy $root and any custom properties from the parent context
       extend(self, parentContext)
 
             // Because the above copy overwrites our own properties, we need to reset them.
-      self._subscribable = subscribable
+      self[contextSubscribeSymbol] = subscribable
     } else {
       self.$parents = []
       self.$root = dataItem
@@ -93,7 +97,7 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
     // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
     // the context object.
   if (subscribable.isActive()) {
-    self._subscribable = subscribable
+    self[contextSubscribeSymbol] = subscribable
 
         // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
     subscribable.equalityComparer = null
@@ -111,7 +115,7 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
         arrayRemoveItem(nodes, node)
         if (!nodes.length) {
           subscribable.dispose()
-          self._subscribable = subscribable = undefined
+          self[contextSubscribeSymbol] = subscribable = undefined
         }
       })
     }

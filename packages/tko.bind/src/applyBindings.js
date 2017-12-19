@@ -15,7 +15,8 @@ import {
 } from 'tko.computed'
 
 import {
-    bindingContext, storedBindingContextForNode, boundElementDomDataKey
+    bindingContext, storedBindingContextForNode, boundElementDomDataKey,
+    contextSubscribeSymbol
 } from './bindingContext'
 
 import {
@@ -23,7 +24,7 @@ import {
 } from './LegacyBindingHandler'
 
 // The following element types will not be recursed into during binding.
-var bindingDoesNotRecurseIntoElementTypes = {
+const bindingDoesNotRecurseIntoElementTypes = {
     // Don't want bindings that operate on text nodes to mutate <script> and <textarea> contents,
     // because it's unexpected and a potential XSS issue.
     // Also bindings should not operate on <template> elements since this breaks in Internet Explorer
@@ -199,8 +200,8 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       return false
     }
     domData.set(node, boundElementDomDataKey, { context: bindingContext })
-    if (bindingContext._subscribable) {
-      bindingContext._subscribable._addNode(node)
+    if (bindingContext[contextSubscribeSymbol]) {
+      bindingContext[contextSubscribeSymbol]._addNode(node)
     }
   }
 
@@ -219,7 +220,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
               function () {
                 bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext)
                   // Register a dependency on the binding context to support observable view models.
-                if (bindings && bindingContext._subscribable) { bindingContext._subscribable() }
+                if (bindings && bindingContext[contextSubscribeSymbol]) { bindingContext[contextSubscribeSymbol]() }
                 return bindings
               },
               null, { disposeWhenNodeIsRemoved: node }
