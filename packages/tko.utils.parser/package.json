@@ -25,10 +25,13 @@
     ]
   },
   "scripts": {
-    "test": "karma start ../../karma.conf.js"
+    "test": "karma start ../../karma.conf.js --once",
+    "watch": "karma start ../../karma.conf.js"
   },
   "standard": {
     "globals": [
+      "assert",
+      "jasmine",
       "beforeEach",
       "before",
       "after",

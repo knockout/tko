@@ -4,7 +4,8 @@
   "description": "Knockout Foreach Binding",
   "module": "dist/tko.binding.foreach.js",
   "scripts": {
-    "test": "karma start ../../karma.conf.js"
+    "test": "karma start ../../karma.conf.js --once",
+    "watch": "karma start ../../karma.conf.js"
   },
   "files": [
     "dist/"
@@ -41,6 +42,8 @@
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json",
   "standard": {
     "globals": [
+      "assert",
+      "jasmine",
       "beforeEach",
       "before",
       "after",

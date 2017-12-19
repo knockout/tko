@@ -7,7 +7,8 @@
     "dist/"
   ],
   "scripts": {
-    "test": "karma start ../../karma.conf.js"
+    "test": "karma start ../../karma.conf.js --once",
+    "watch": "karma start ../../karma.conf.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,8 @@
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json",
   "standard": {
     "globals": [
+      "assert",
+      "jasmine",
       "beforeEach",
       "before",
       "after",
