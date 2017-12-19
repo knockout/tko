@@ -64,7 +64,7 @@ var ko_subscribable_fn = {
     }
     if (this.hasSubscriptionsForEvent(event)) {
       const subs = event === defaultEvent && this._changeSubscriptions
-        || [...this._subscriptions[event]];
+        || [...this._subscriptions[event]]
 
       try {
         dependencyDetection.begin() // Begin suppressing dependency detection (by setting the top frame to undefined)
@@ -147,6 +147,8 @@ var ko_subscribable_fn = {
   },
 
   next () { return new Promise(resolve => this.once(resolve)) },
+
+  toString () { return '[object Object]' },
 
   extend: applyExtenders
 }

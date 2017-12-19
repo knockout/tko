@@ -171,4 +171,9 @@ describe('Subscribable', function () {
     s.notifySubscribers('55')
     expect(nv).toEqual('123')
   })
+
+  it('Should return "[object Object]" with .toString', function() {
+    // Issue #2252: make sure .toString method does not throw error
+    expect(new subscribable().toString()).toBe('[object Object]')
+  })
 })
