@@ -364,6 +364,10 @@ computed.fn = {
       if (!state.isSleeping && notifyChange) {
         computedObservable.notifySubscribers(state.latestValue)
       }
+
+      if (computedObservable._recordUpdate) {
+        computedObservable._recordUpdate()
+      }
     }
 
     if (isInitial) {
@@ -426,7 +430,7 @@ computed.fn = {
 
         // Pass the observable to the "limit" code, which will evaluate it when
         // it's time to do the notification.
-        this._limitChange(this)
+        this._limitChange(this, !isChange /* isDirty */)
       }
     })
   },

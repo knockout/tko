@@ -82,7 +82,7 @@ subscribable.fn.limit = function limit (limitFunction) {
   var self = this
   var selfIsObservable = isObservable(self)
   var beforeChange = 'beforeChange'
-  var ignoreBeforeChange, notifyNextChange, previousValue, pendingValue
+  var ignoreBeforeChange, notifyNextChange, previousValue, pendingValue, didUpdate
 
   if (!self._origNotifySubscribers) {
     self._origNotifySubscribers = self.notifySubscribers
@@ -97,31 +97,41 @@ subscribable.fn.limit = function limit (limitFunction) {
     if (selfIsObservable && pendingValue === self) {
       pendingValue = self._evalIfChanged ? self._evalIfChanged() : self()
     }
-    const shouldNotify = notifyNextChange ||
-      self.isDifferent(previousValue, pendingValue)
-    self._notifyNextChange = ignoreBeforeChange = false
+    const shouldNotify = notifyNextChange || (
+      didUpdate && self.isDifferent(previousValue, pendingValue)
+    )
+    self._notifyNextChange = didUpdate = ignoreBeforeChange = false
     if (shouldNotify) {
       self._origNotifySubscribers(previousValue = pendingValue)
     }
   })
 
   Object.assign(self, {
-    _limitChange  (value) {
+    _limitChange  (value, isDirty) {
+      if (!isDirty || !self._notificationIsPending) {
+        didUpdate = !isDirty
+      }
       self._changeSubscriptions = [...self._subscriptions[defaultEvent]]
       self._notificationIsPending = ignoreBeforeChange = true
       pendingValue = value
       finish()
     },
+
     _limitBeforeChange (value) {
       if (!ignoreBeforeChange) {
         previousValue = value
         self._origNotifySubscribers(value, beforeChange)
       }
     },
+
     _notifyNextChangeIfValueIsDifferent () {
       if (self.isDifferent(previousValue, self.peek(true /* evaluate */))) {
         notifyNextChange = true
       }
+    },
+
+    _recordUpdate () {
+      didUpdate = true
     }
   })
 }
