@@ -365,3 +365,25 @@ describe('objectMap', function () {
     expect(expectedContext).toEqual(actualContext)
   })
 })
+
+describe('cloneNodes', function () {
+  beforeEach(jasmine.prepareTestNode)
+
+  it('should return clones', function () {
+    var newNodes = ko.utils.cloneNodes([testNode])
+    var isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
+    expect(isClone).toBe(true)
+  })
+
+  it('should clone deeply', function () {
+    var child = document.createElement('DIV')
+    testNode.appendChild(child)
+
+    var newNodes = ko.utils.cloneNodes([testNode])
+    var newChild = newNodes[0].children[0]
+
+    var childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
+
+    expect(childIsClone).toBe(true)
+  })
+})
