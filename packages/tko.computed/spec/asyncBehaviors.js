@@ -18,7 +18,8 @@ import {
 
 import {
     computed as koComputed,
-    pureComputed as koPureComputed
+    pureComputed as koPureComputed,
+    when
 } from '../src'
 
 import {
@@ -1234,6 +1235,58 @@ describe('Deferred', function () {
       obs(undefined)
       jasmine.Clock.tick(1)
       expect(notifySpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('ko.when', function () {
+    it('Runs callback in a sepearate task when predicate function becomes true, but only once', function () {
+      this.restoreAfter(options, 'deferUpdates')
+      options.deferUpdates = true
+
+      var x = koObservable(3),
+        called = 0
+
+      when(() => x() === 4, () => called++)
+
+      x(5)
+      expect(called).toBe(0)
+      expect(x.getSubscriptionsCount()).toBe(1)
+
+      x(4)
+      expect(called).toBe(0)
+
+      jasmine.Clock.tick(1)
+      expect(called).toBe(1)
+      expect(x.getSubscriptionsCount()).toBe(0)
+
+      x(3)
+      x(4)
+      jasmine.Clock.tick(1)
+      expect(called).toBe(1)
+      expect(x.getSubscriptionsCount()).toBe(0)
+    })
+
+    it('Runs callback in a sepearate task if predicate function is already true', function () {
+      this.restoreAfter(options, 'deferUpdates')
+      options.deferUpdates = true
+
+      var x = koObservable(4),
+        called = 0
+
+      when(() => x() === 4, () => called++)
+
+      expect(called).toBe(0)
+      expect(x.getSubscriptionsCount()).toBe(1)
+
+      jasmine.Clock.tick(1)
+      expect(called).toBe(1)
+      expect(x.getSubscriptionsCount()).toBe(0)
+
+      x(3)
+      x(4)
+      jasmine.Clock.tick(1)
+      expect(called).toBe(1)
+      expect(x.getSubscriptionsCount()).toBe(0)
     })
   })
 })

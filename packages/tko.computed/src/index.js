@@ -19,3 +19,7 @@ export {
 export {
   proxy
 } from './proxy'
+
+export {
+  when
+} from './when'
