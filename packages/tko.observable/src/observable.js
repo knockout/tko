@@ -4,7 +4,7 @@
 //
 import {
     createSymbolOrString, canSetPrototype, extend, setPrototypeOfOrExtend,
-    setPrototypeOf, hasPrototype, options, overwriteLengthPropertyIfSupported
+    setPrototypeOf, options, overwriteLengthPropertyIfSupported
 } from 'tko.utils'
 
 import * as dependencyDetection from './dependencyDetection.js'
@@ -63,7 +63,10 @@ observable.fn = {
   },
   valueWillMutate () {
     this.notifySubscribers(this[observableLatestValue], 'beforeChange')
-  }
+  },
+
+  // Some observables may not always be writeable, notably computeds.
+  isWriteable: true
 }
 
 // Moved out of "limit" to avoid the extra closure
@@ -145,8 +148,16 @@ if (canSetPrototype) {
 var protoProperty = observable.protoProperty = options.protoProperty
 observable.fn[protoProperty] = observable
 
+// Subclasses can add themselves to observableProperties so that
+// isObservable will be `true`.
+observable.observablePrototypes = new Set([observable])
+
 export function isObservable (instance) {
-  return hasPrototype(instance, observable)
+  const proto = typeof instance === 'function' && instance[protoProperty]
+  if (proto && !observable.observablePrototypes.has(proto)) {
+    throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
+  }
+  return !!proto
 }
 
 export function unwrap (value) {
@@ -158,16 +169,7 @@ export function peek (value) {
 }
 
 export function isWriteableObservable (instance) {
-    // Observable
-  if ((typeof instance === 'function') && instance[protoProperty] === observable) {
-    return true
-  }
-    // Writeable dependent observable
-  if ((typeof instance === 'function') /* && (instance[protoProperty] === ko.dependentObservable) */ && (instance.hasWriteFunction)) {
-    return true
-  }
-    // Anything else
-  return false
+  return isObservable(instance) && instance.isWriteable
 }
 
 export { isWriteableObservable as isWritableObservable }

@@ -1,3 +1,6 @@
+import {
+  arrayForEach
+} from 'tko.utils'
 
 import {
     isSubscribable, isObservable, observable, unwrap, dependencyDetection,
@@ -12,6 +15,10 @@ describe('Dependent Observable', function () {
   it('Should be subscribable', function () {
     var instance = computed(function () { })
     expect(isSubscribable(instance)).toEqual(true)
+  })
+
+  it('Should not advertise that ko.computed is observable', function () {
+    expect(isObservable(computed)).toEqual(false)
   })
 
   it('Should advertise that instances are observable', function () {
@@ -48,6 +55,18 @@ describe('Dependent Observable', function () {
     var instance = computed(function () { })
     expect(isWriteableObservable(instance)).toEqual(false)
     expect(isWritableObservable(instance)).toEqual(false)
+  })
+
+  it('ko.isComputed should return false for non-computed values', function () {
+    arrayForEach([
+      undefined,
+      null,
+      'x',
+            {},
+      function () {},
+      observable(),
+            (function () { var x = computed(function () {}); x.__ko_proto__ = {}; return x }())
+    ], value => expect(isComputed(value)).toEqual(false))
   })
 
   it('Should require an evaluator function as constructor param', function () {

@@ -22,6 +22,11 @@ describe('Pure Computed', function () {
     expect(isPureComputed(instance)).toEqual(true)
   })
 
+  it('Should advertise that instances are not computed', function () {
+    var instance = observable()
+    expect(isComputed(instance)).toEqual(false)
+  })
+
   it('Should require an evaluator function as constructor param', function () {
     expect(function () { pureComputed() }).toThrow()
   })

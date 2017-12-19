@@ -17,7 +17,6 @@ import {
     removeDisposeCallback,
     safeSetTimeout,
     setPrototypeOf,
-    hasPrototype,
     setPrototypeOfOrExtend
 } from 'tko.utils'
 
@@ -99,7 +98,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
   }
 
   computedObservable[computedState] = state
-  computedObservable.hasWriteFunction = typeof writeFunction === 'function'
+  computedObservable.isWriteable = typeof writeFunction === 'function'
 
     // Inherit from 'subscribable'
   if (!canSetPrototype) {
@@ -535,18 +534,19 @@ if (canSetPrototype) {
   setPrototypeOf(computed.fn, subscribable.fn)
 }
 
-// Set the proto chain values for ko.hasPrototype
+// Set the proto values for ko.computed
 var protoProp = observable.protoProperty // == "__ko_proto__"
-computed[protoProp] = observable
 computed.fn[protoProp] = computed
 
+/* This is used by ko.isObservable */
+observable.observablePrototypes.add(computed)
+
 export function isComputed (instance) {
-  return hasPrototype(instance, computed)
+  return (typeof instance === 'function' && instance[protoProp] === computed)
 }
 
 export function isPureComputed (instance) {
-  return hasPrototype(instance, computed) &&
-        instance[computedState] && instance[computedState].pure
+  return isComputed(instance) && instance[computedState] && instance[computedState].pure
 }
 
 export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {
