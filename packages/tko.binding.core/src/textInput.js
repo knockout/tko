@@ -102,6 +102,7 @@ class TextInput extends BindingHandler {
       // will move the cursor to the end of the input, which would be bad while the user is typing.
       this.previousElementValue = modelValue // Make sure we ignore events (propertychange) that result from updating the value
       this.$element.value = modelValue
+      this.previousElementValue = this.$element.value // In case the browser changes the value (see #2281)
     }
   }
 }

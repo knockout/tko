@@ -1,3 +1,4 @@
+/* global testNode */
 import {
     applyBindings
 } from 'tko.bind'
@@ -11,16 +12,14 @@ import {
 } from 'tko.observable'
 
 import {
-    triggerEvent
+    triggerEvent, options
 } from 'tko.utils'
 
 import { DataBindProvider } from 'tko.provider.databind'
 
-import {
-    options
-} from 'tko.utils'
+import { bindings as coreBindings } from '../src'
 
-import {bindings as coreBindings} from '../src'
+const DEBUG = true
 
 import 'tko.utils/helpers/jasmine-13-helper.js'
 
@@ -102,7 +101,7 @@ describe('Binding: TextInput', function () {
     })
 
     testNode.innerHTML = "<input data-bind='textInput: valueForEditing' />"
-    applyBindings({ valueForEditing: valueForEditing}, testNode)
+    applyBindings({ valueForEditing: valueForEditing }, testNode)
 
         // set initial valid value
     testNode.childNodes[0].value = '1234'
@@ -250,11 +249,11 @@ describe('Binding: TextInput', function () {
     testNode.childNodes[0].focus()
     testNode.childNodes[0].value = 'some user-entered value'
     testNode.childNodes[1].focus() // focus on a different input to blur the previous one
-    triggerEvent(testNode.childNodes[0], "blur")
+    triggerEvent(testNode.childNodes[0], 'blur')
     expect(myobservable()).toEqual('some user-entered value')
   })
 
-  it('Should write only changed values to observable', function () {
+  it('Should write only changed values to model', function () {
     var model = { writtenValue: '' }
 
     testNode.innerHTML = "<input data-bind='textInput: writtenValue' />"
@@ -270,9 +269,33 @@ describe('Binding: TextInput', function () {
     expect(model.writtenValue).toBeUndefined()
   })
 
+  it('Should not write to model other than for user input', function () {
+    // In html5, the value returned by element.value is normalized and CR characters are transformed,
+    // See http://www.w3.org/TR/html5/forms.html#the-textarea-element, https://github.com/knockout/knockout/issues/2281
+    const originalValue = '12345\r\n67890'
+    const model = { writtenValue: observable(originalValue) }
+
+    testNode.innerHTML = "<textarea data-bind='textInput: writtenValue'></textarea>"
+    applyBindings(model, testNode)
+
+    // No user change; verify that model isn't changed (note that the view's value may be different)
+    triggerEvent(testNode.childNodes[0], 'blur')
+    expect(model.writtenValue()).toEqual(originalValue)
+
+    // A change by the user is written to the model
+    testNode.childNodes[0].value = '1234'
+    triggerEvent(testNode.childNodes[0], 'change')
+    expect(model.writtenValue()).toEqual('1234')
+
+    // A change from the model; the model isn't updated even if the view's value is different
+    model.writtenValue(originalValue)
+    triggerEvent(testNode.childNodes[0], 'blur')
+    expect(model.writtenValue()).toEqual(originalValue)
+  })
+
   if (typeof DEBUG !== 'undefined' && DEBUG) {
-        // The textInput binds to different events depending on the browser.
-        // But the DEBUG version allows us to force it to bind to specific events for testing purposes.
+    // The textInput binds to different events depending on the browser.
+    // But the DEBUG version allows us to force it to bind to specific events for testing purposes.
 
     describe('Event processing', function () {
       beforeEach(function () {
