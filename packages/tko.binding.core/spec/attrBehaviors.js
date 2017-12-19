@@ -38,20 +38,21 @@ describe('Binding: Attr', function () {
   })
 
   it('Should be able to set namespaced attribute values', function () {
-    var model = { myValue: 'first value' }
-    testNode.innerHTML =
-        [ '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
-          '<g>',
-          '<a data-bind="attr: { \'xlink:href\': myValue }">',
-          '<text>foo</text>',
-          '</a>',
-          '</g>',
-          '</svg>'
-        ].join('')
+    const model = { myValue: 'first value' }
+    testNode.innerHTML = [
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+      '<g>',
+      '<a data-bind="attr: { \'xlink:href\': myValue }">',
+      '<text>foo</text>',
+      '</a>',
+      '</g>',
+      '</svg>'
+    ].join('')
+
     applyBindings(model, testNode)
-    var attrNode = testNode.childNodes[0].childNodes[0].childNodes[0].getAttributeNode('xlink:href')
-    expect(attrNode.value).toEqual('first value')
-    expect(attrNode.namespaceURI).toEqual('http://www.w3.org/1999/xlink')
+    var anchor = testNode.childNodes[0]/* svg */.childNodes[0]/* g */.childNodes[0]/* a */
+    expect(anchor.getAttributeNode('xlink:href').value).toEqual('first value')
+    expect(anchor.getAttributeNode('xlink:href').namespaceURI).toEqual('http://www.w3.org/1999/xlink')
   })
 
   it('Should be able to set \"name\" attribute, even on IE6-7', function () {
