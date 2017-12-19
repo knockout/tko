@@ -310,10 +310,10 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
   }
 }
 
-function getBindingContext (viewModelOrBindingContext) {
+function getBindingContext (viewModelOrBindingContext, extendContextCallback) {
   return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)
     ? viewModelOrBindingContext
-    : new bindingContext(viewModelOrBindingContext)
+    : new bindingContext(viewModelOrBindingContext, undefined, undefined, extendContextCallback)
 }
 
 export function applyBindingAccessorsToNode (node, bindings, viewModelOrBindingContext, asyncBindingsApplied) {
@@ -338,7 +338,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode)
   return options.Promise.all(asyncBindingsApplied)
 }
 
-export function applyBindings (viewModelOrBindingContext, rootNode) {
+export function applyBindings (viewModelOrBindingContext, rootNode, extendContextCallback) {
   const asyncBindingsApplied = new Set()
   // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
   if (!options.jQuery === undefined && options.jQuery) {
@@ -354,8 +354,8 @@ export function applyBindings (viewModelOrBindingContext, rootNode) {
   } else if (rootNode.nodeType !== 1 && rootNode.nodeType !== 8) {
     throw Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node')
   }
-
-  applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, asyncBindingsApplied)
+  const rootContext = getBindingContext(viewModelOrBindingContext, extendContextCallback)
+  applyBindingsToNodeAndDescendantsInternal(rootContext, rootNode, asyncBindingsApplied)
   return options.Promise.all(asyncBindingsApplied)
 }
 
