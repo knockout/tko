@@ -422,6 +422,19 @@ describe('Pure Computed', function () {
     expect(timesEvaluated).toEqual(2)
   })
 
+  it('Should wake with the correct value when a chained pure computed has side effects for its awake event', function () {
+    const observableToUpdateOnAwake = observable(null)
+    const computed1 = pureComputed(observableToUpdateOnAwake)
+    const computed2 = pureComputed(computed1)
+
+    computed1.subscribe(() => observableToUpdateOnAwake('foo'), null, 'awake')
+    // Reading from the computed before subscribing caused the subscription to
+    // ignore side-effects from the awake callback of chained pure computeds
+    computed2()
+    computed2.subscribe(() => { })
+    expect(computed2()).toEqual('foo')
+  })
+
   describe('Should maintain order of subscriptions', function () {
     var data, dataPureComputed
 
