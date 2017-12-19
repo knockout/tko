@@ -1,4 +1,4 @@
-
+/* globals testNode */
 import {
     applyBindings, contextFor
 } from 'tko.bind'
@@ -58,24 +58,26 @@ describe('Binding: If', function () {
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
     var someItem = observable(true)
-    testNode.innerHTML = "<div data-bind='if: someItem'><span></span></div>"
+    testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: ++counter'></span></div>"
     var originalNode = testNode.childNodes[0].childNodes[0]
 
         // Value is initially true, so nodes are retained
-    applyBindings({ someItem: someItem }, testNode)
+    applyBindings({ someItem, counter: 0 }, testNode)
     expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
     expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
+    expect(testNode).toContainText("1")
 
         // Change the value to a different truthy value; see the previous SPAN remains
     someItem('different truthy value')
     expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
     expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
+    expect(testNode).toContainText("1")
   })
 
   it('Should toggle the presence and bindedness of descendant nodes according to the truthiness of the value', function () {
     var someItem = observable(undefined)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem().occasionallyExistentChildProp'></span></div>"
-    applyBindings({ someItem: someItem }, testNode)
+    applyBindings({ someItem }, testNode)
 
         // First it's not there
     expect(testNode.childNodes[0].childNodes.length).toEqual(0)
@@ -100,7 +102,7 @@ describe('Binding: If', function () {
   it('Should be able to define an \"if\" region using a containerless template', function () {
     var someitem = observable(undefined)
     testNode.innerHTML = 'hello <!-- ko if: someitem --><span data-bind="text: someitem().occasionallyexistentchildprop"></span><!-- /ko --> goodbye'
-    applyBindings({ someitem: someitem }, testNode)
+    applyBindings({ someitem }, testNode)
 
         // First it's not there
     expect(testNode).toContainHtml('hello <!-- ko if: someitem --><!-- /ko --> goodbye')

@@ -106,9 +106,11 @@ var matchers = {
   },
 
   toHaveValues (expectedValues) {
-      var values = arrayMap(this.actual.childNodes, function (node) { return node.value; });
-      this.actual = values;   // Fix explanatory message
-      return this.env.equals_(values, expectedValues);
+      var values = arrayFilter(
+        arrayMap(this.actual.childNodes, node => node.value),
+        value => value !== undefined)
+      this.actual = values   // Fix explanatory message
+      return this.env.equals_(values, expectedValues)
   },
 
 

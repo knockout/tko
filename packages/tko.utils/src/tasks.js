@@ -17,7 +17,7 @@ if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
     // From https://github.com/petkaantonov/bluebird * Copyright (c) 2014 Petka Antonov * License: MIT
   options.taskScheduler = (function (callback) {
     var div = w.document.createElement('div')
-    new MutationObserver(callback).observe(div, {attributes: true})
+    new w.MutationObserver(callback).observe(div, {attributes: true})
     return function () { div.classList.toggle('foo') }
   })(scheduledProcess)
 } else if (w && w.document && 'onreadystatechange' in w.document.createElement('script')) {

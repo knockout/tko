@@ -210,26 +210,33 @@ describe('Binding: With', function () {
   })
 
   it('Should provide access to an observable viewModel through $rawData', function () {
-    testNode.innerHTML = "<div data-bind='with: item'><input data-bind='value: $rawData'/></div>"
+    testNode.innerHTML = `<div data-bind='with: item'><input data-bind='value: $rawData'/><div data-bind='text: $data'></div></div>`
+
     var item = observable('one')
     applyBindings({ item: item }, testNode)
-    expect(item.getSubscriptionsCount('change')).toEqual(2)    // only subscriptions are the with and value bindings
+    expect(item.getSubscriptionsCount('change')).toEqual(3)    // subscriptions are the with and value bindings, and the binding contex
     expect(testNode.childNodes[0]).toHaveValues(['one'])
+    expect(testNode.childNodes[0]).toContainText('one')
 
         // Should update observable when input is changed
     testNode.childNodes[0].childNodes[0].value = 'two'
     triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
     expect(item()).toEqual('two')
+    expect(testNode.childNodes[0]).toContainText('two')
 
         // Should update the input when the observable changes
     item('three')
     expect(testNode.childNodes[0]).toHaveValues(['three'])
+    expect(testNode.childNodes[0]).toContainText('three')
+
+    // Subscription count is stable
+    expect(item.getSubscriptionsCount('change')).toEqual(3)
   })
 
   it('should refresh on dependency update binding', function () {
-        // Note:
-        //  - knockout/knockout#2285
-        //  - http://jsfiddle.net/g15jphta/6/
+    // Note:
+    //  - knockout/knockout#2285
+    //  - http://jsfiddle.net/g15jphta/6/
     testNode.innerHTML = `<!-- ko template: {foreach: items} -->
                 <div data-bind="text: x"></div>
                 <div data-bind="with: $root.getTotal.bind($data)">
@@ -251,38 +258,4 @@ describe('Binding: With', function () {
 
     model.items.push({ x: observable(15) })
   })
-
-  it('Should provide access to an observable viewModel through $rawData', function () {
-    testNode.innerHTML = "<div data-bind='with: item'><input data-bind='value: $rawData'/></div>"
-    var item = observable('one')
-    applyBindings({ item: item }, testNode)
-    // only subscriptions are the with and value bindings:
-    expect(item.getSubscriptionsCount('change')).toEqual(2)
-    expect(testNode.childNodes[0]).toHaveValues(['one'])
-
-      // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'two'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
-    expect(item()).toEqual('two')
-
-      // Should update the input when the observable changes
-    item('three')
-    expect(testNode.childNodes[0]).toHaveValues(['three'])
-  })
-
-  it('Should provide access to an observable viewModel through $rawData', function() {
-       testNode.innerHTML = "<div data-bind='with: item'><input data-bind='value: $rawData'/></div>";
-       var item = observable('one');
-       applyBindings({ item: item }, testNode);
-       expect(testNode.childNodes[0]).toHaveValues(['one']);
-
-       // Should update observable when input is changed
-       testNode.childNodes[0].childNodes[0].value = 'two';
-       triggerEvent(testNode.childNodes[0].childNodes[0], "change");
-       expect(item()).toEqual('two');
-
-       // Should update the input when the observable changes
-       item('three');
-       expect(testNode.childNodes[0]).toHaveValues(['three']);
-   });
 })

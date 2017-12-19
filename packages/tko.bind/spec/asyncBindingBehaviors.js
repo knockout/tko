@@ -1,3 +1,4 @@
+/* globals testNode */
 
 import {
     tasks, options
@@ -167,7 +168,7 @@ describe('Deferred bindings', function () {
     // Test is based on example in https://github.com/knockout/knockout/issues/1975
     testNode.innerHTML = '<div data-bind="if: show"><div data-bind="text: status"></div></div>'
     var value = Observable(0),
-      is1 = pureComputed(function () { return value() == 1 }),
+      is1 = pureComputed(function () { return value() === 1 }),
       status = pureComputed(function () { return is1() ? 'ok' : 'error' }),
       show = pureComputed(function () { return value() > 0 && is1() })
 
@@ -188,23 +189,70 @@ describe('Deferred bindings', function () {
   })
 
   it('Should update "if" binding before descendant bindings', function () {
-        // Based on example at http://stackoverflow.com/q/43341484/1287183
-    testNode.innerHTML = '<div data-bind="if: hasAddress()"><div data-bind="text: address().street"></div></div>'
+    // Based on example at https://github.com/knockout/knockout/pull/2226
+    testNode.innerHTML = `<div data-bind="if: hasAddress()"><span data-bind="text: streetNumber().toLowerCase()"></span> <span data-bind="text: street().toLowerCase()"></span></div>`
+
     var vm = {
-      address: Observable(),
-      hasAddress: pureComputed(function () { return vm.address() != null })
+      street: Observable(),
+      streetNumber: Observable(),
+      hasAddress: pureComputed(() => vm.streetNumber() && vm.street())
     }
 
     applyBindings(vm, testNode)
     jasmine.Clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml('')
+    expect(testNode.childNodes[0]).toContainText('')
 
-    vm.address({street: '123 my street'})
+    vm.street('my street')
+    vm.streetNumber('123')
     jasmine.Clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: address().street">123 my street</div>')
+    expect(testNode.childNodes[0]).toContainText('123 my street')
 
-    vm.address(null)
+    vm.street(null)
+    vm.streetNumber(null)
     jasmine.Clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml('')
+    expect(testNode.childNodes[0]).toContainText('')
+  })
+
+  it('Should update "with" binding before descendant bindings', function () {
+      // Based on example at https://github.com/knockout/knockout/pull/2226
+    testNode.innerHTML = `<div data-bind="with: hasAddress()"><span data-bind="text: $parent.streetNumber().toLowerCase()"></span> <span data-bind="text: $parent.street().toLowerCase()"></span></div>`
+    var vm = {
+      street: Observable(),
+      streetNumber: Observable(),
+      hasAddress: pureComputed(() => vm.streetNumber() && vm.street())
+    }
+
+    applyBindings(vm, testNode)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainText('')
+
+    vm.street('my street')
+    vm.streetNumber('123')
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainText('123 my street')
+
+    vm.street(null)
+    vm.streetNumber(null)
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainText('')
+  })
+
+  it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
+    var someItem = Observable(true)
+    testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: (++counter)'></span></div>"
+    var originalNode = testNode.childNodes[0].childNodes[0]
+
+      // Value is initially true, so nodes are retained
+    applyBindings({ someItem: someItem, counter: 0 }, testNode)
+    expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
+    expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
+    expect(testNode).toContainText('1')
+
+      // Change the value to a different truthy value; see the previous SPAN remains
+    someItem('different truthy value')
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
+    expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
+    expect(testNode).toContainText('1')
   })
 })

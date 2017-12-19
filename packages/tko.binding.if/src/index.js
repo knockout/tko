@@ -1,10 +1,16 @@
 
 import {
   IfBindingHandler,
-  ElseBindingHandler,
-  UnlessBindingHandler,
+  UnlessBindingHandler
+} from './ifUnless'
+
+import {
   WithBindingHandler
-} from './ifIfnotWith'
+} from './with'
+
+import {
+  ElseBindingHandler
+} from './else'
 
 export const bindings = {
   'if': IfBindingHandler,
