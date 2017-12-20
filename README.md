@@ -11,8 +11,6 @@
 
 <!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/brianmhunt.svg)](https://saucelabs.com/u/brianmhunt) -->
 
-
-
 **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout).
 
 
@@ -79,3 +77,11 @@ There's an [issue for that](https://github.com/knockout/tko/issues/1).
 ## License
 
 MIT license - [http://www.opensource.org/licenses/mit-license.php.](http://www.opensource.org/licenses/mit-license.php)
+
+## Shout Outs
+
+<div>
+  <a href='http://browserstack.com'>
+    <img height=150px src='https://p3.zdusercontent.com/attachment/1015988/gTNrZ9vPjL8ThUHOWP7ucklJi?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..HkCKDttXKDSGFoV5uaMPQA.ha9NDy63mjLKFcyNeib70TCkqfY0dcwiFwDYpZ8s5h75o-e1_cLjPAHlOUEwvKAbfMUaa1XpOL5F9AQd_B4iyc6JbgvKoKBxxe12aaOdfWFccP7r9iQ2Os6myiqBpP79prDXqFPMSAkF8ybzhVqCnWzxmK-Wvkbav-DGPZm3oS2IPD9ueIvf46bggFsikQhf1pjS5fgmzo07yi9Cf5SzA8zIKAjKX1RKQeFXOhBwxRfh_5SbJprfEZMnKBnGuO_qzP2fsK3BvxbyBKpIEWFdnA.t10i3BbyEpGtFVgyGbvQfw' alt='Browser Stack' />
+  </a>
+<div>
