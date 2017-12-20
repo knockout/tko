@@ -34,6 +34,11 @@ const SAUCE_LAUNCHERS = {
     base: 'SauceLabs',
     browserName: 'safari',
     version: 'latest'
+  },
+  SL_Edge_latest: {
+    base: 'SauceLabs',
+    browserName: 'microsoftedge',
+    version: 'latest'
   }
   /* ,
   sl_chrome_60: {
@@ -67,11 +72,6 @@ const SAUCE_LAUNCHERS = {
     base: 'SauceLabs',
     browserName: 'safari',
     version: 9
-  },
-  SL_Edge_latest: {
-    base: 'SauceLabs',
-    browserName: 'microsoftedge',
-    version: 'latest'
   },
   SL_IE_11: {
     base: 'SauceLabs',
@@ -199,7 +199,7 @@ module.exports = (config) => {
         public: 'public'
       },
       colors: true,
-      captureTimeout: 120000,
+      captureTimeout: 20000,
       customLaunchers: SAUCE_LAUNCHERS,
       browsers: Object.keys(SAUCE_LAUNCHERS),
       reporters: ['dots', 'saucelabs'],
