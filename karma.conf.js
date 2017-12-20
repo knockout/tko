@@ -199,7 +199,7 @@ module.exports = (config) => {
       colors: true,
       captureTimeout: 120000,
       customLaunchers: SAUCE_LAUNCHERS,
-      browsers: ['Electron', ...Object.keys(SAUCE_LAUNCHERS)],
+      browsers: Object.keys(SAUCE_LAUNCHERS),
       reporters: ['dots', 'saucelabs'],
       singleRun: true
     }, COMMON_CONFIG))
