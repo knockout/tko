@@ -4,7 +4,7 @@ import {
 } from 'tko.utils'
 
 import {
-    applyBindings, contextFor
+    applyBindings, contextFor, dataFor
 } from 'tko.bind'
 
 import {
@@ -167,7 +167,100 @@ describe('Binding: With', function () {
     expect(contextFor(firstSpan).$parents[1].name).toEqual('top')
   })
 
-  it('Should be able to define an \"with\" region using a containerless template', function () {
+  it('Should be able to access all parent bindings when using "as"', async function () {
+    testNode.innerHTML = `<div data-bind='with: topItem'>
+        <div data-bind="with: middleItem, as: 'middle'">
+            <div data-bind='with: middle.bottomItem'>
+                <span data-bind='text: name'></span>
+                <span data-bind='text: $parent.name'></span>
+                <span data-bind='text: middle.name'></span>
+                <span data-bind='text: $parents[1].name'></span>
+                <span data-bind='text: $root.name'></span>
+            </div>
+        </div>
+      </div>`
+    applyBindings({
+      name: 'outer',
+      topItem: {
+        name: 'top',
+        middleItem: {
+          name: 'middle',
+          bottomItem: {
+            name: 'bottom'
+          }
+        }
+      }
+    }, testNode)
+    const finalContainer = testNode.childNodes[0].children[0].children[0]
+    // This differs from ko 3.x in that `with` does not create a child context
+    // when using `as`.
+    const [name, parentName, middleName, parent1Name, rootName] = finalContainer.children
+    expect(name).toContainText('bottom')
+    expect(parentName).toContainText('top')
+    expect(middleName).toContainText('middle')
+    expect(parent1Name).toContainText('outer')
+    expect(rootName).toContainText('outer')
+    expect(contextFor(name).parents.length).toEqual(2)
+  })
+
+  it('Should not create a child context', function () {
+    testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item.childProp'></span></div>"
+    var someItem = { childProp: 'Hello' }
+    applyBindings({ someItem: someItem }, testNode)
+
+    expect(testNode.childNodes[0].childNodes[0]).toContainText('Hello')
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode))
+  })
+
+  it('Should provide access to observable value', function () {
+    testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><input data-bind='value: item'/></div>"
+    var someItem = observable('Hello')
+    applyBindings({ someItem: someItem }, testNode)
+    expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello')
+
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode))
+
+      // Should update observable when input is changed
+    testNode.childNodes[0].childNodes[0].value = 'Goodbye'
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    expect(someItem()).toEqual('Goodbye')
+
+      // Should update the input when the observable changes
+    someItem('Hello again')
+    expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello again')
+  })
+
+  it('Should not re-render the nodes when an observable value changes', function () {
+    testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item'></span></div>"
+    var someItem = observable('first')
+    applyBindings({ someItem }, testNode)
+    expect(testNode.childNodes[0]).toContainText('first')
+
+    var saveNode = testNode.childNodes[0].childNodes[0]
+    someItem('second')
+    expect(testNode.childNodes[0]).toContainText('second')
+    expect(testNode.childNodes[0].childNodes[0]).toEqual(saveNode)
+  })
+
+  it('Should remove nodes with an observable value become falsy', function () {
+    var someItem = observable(undefined)
+    testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item().occasionallyExistentChildProp'></span></div>"
+    applyBindings({ someItem: someItem }, testNode)
+
+      // First it's not there
+    expect(testNode.childNodes[0].childNodes.length).toEqual(0)
+
+      // Then it's there
+    someItem({ occasionallyExistentChildProp: 'Child prop value' })
+    expect(testNode.childNodes[0].childNodes.length).toEqual(1)
+    expect(testNode.childNodes[0].childNodes[0]).toContainText('Child prop value')
+
+      // Then it's gone again
+    someItem(null)
+    expect(testNode.childNodes[0].childNodes.length).toEqual(0)
+  })
+
+  it('Should be able to define an "with" region using a containerless template', function () {
     var someitem = observable(undefined)
     testNode.innerHTML = 'hello <!-- ko with: someitem --><span data-bind="text: occasionallyexistentchildprop"></span><!-- /ko --> goodbye'
     applyBindings({ someitem: someitem }, testNode)
@@ -184,7 +277,7 @@ describe('Binding: With', function () {
     expect(testNode).toContainHtml('hello <!-- ko with: someitem --><!-- /ko --> goodbye')
   })
 
-  it('Should be able to nest \"with\" regions defined by containerless templates', function () {
+  it('Should be able to nest "with" regions defined by containerless templates', function () {
     testNode.innerHTML = 'hello <!-- ko with: topitem -->' +
                                'Got top: <span data-bind="text: topprop"></span>' +
                                '<!-- ko with: childitem -->' +
@@ -243,7 +336,7 @@ describe('Binding: With', function () {
       self.items = observableArray([{ x: observable(4) }])
       self.getTotal = function () {
         var total = 0
-        arrayForEach(self.items(), item => total += item.x())
+        arrayForEach(self.items(), item => { total += item.x() })
         return total
       }
     }

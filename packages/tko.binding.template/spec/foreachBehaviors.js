@@ -1,5 +1,6 @@
+/* global testNode */
 import {
-    domData, setHtml, triggerEvent, removeNode, virtualElements
+    domData, setHtml, triggerEvent, removeNode, virtualElements, options
 } from 'tko.utils'
 
 import {
@@ -13,10 +14,6 @@ import {
 import { MultiProvider } from 'tko.provider.multi'
 import { VirtualProvider } from 'tko.provider.virtual'
 import { DataBindProvider } from 'tko.provider.databind'
-
-import {
-    options
-} from 'tko.utils'
 
 import {bindings as templateBindings} from '../src'
 import {bindings as ifBindings} from 'tko.binding.if'
@@ -389,7 +386,7 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0]).toContainText('added childfirst childhidden child')
   })
 
-  it("Should double-unwrap if the internal is iterable", function () {
+  it('Should double-unwrap if the internal is iterable', function () {
     testNode.innerHTML = "<div data-bind='foreach: myArray'><span data-bind='text: $data'></span></div>"
     var myArrayWrapped = observable(observableArray(['data value']))
     applyBindings({ myArray: myArrayWrapped }, testNode)
@@ -585,7 +582,7 @@ describe('Binding: Foreach', function () {
 
   it('Should be able to give an alias to $data using \"as\", and use it within a nested loop', function () {
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'>" +
-                           "<span data-bind='foreach: sub'>" +
+                           "<span data-bind='foreach: item.sub'>" +
                            "<span data-bind='text: item.name+\":\"+$data'></span>," +
                            '</span>' +
                            '</div>'
@@ -596,7 +593,7 @@ describe('Binding: Foreach', function () {
 
   it('Should be able to set up multiple nested levels of aliases using \"as\"', function () {
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'>" +
-                           "<span data-bind='foreach: { data: sub, as: \"subvalue\" }'>" +
+                           "<span data-bind='foreach: { data: item.sub, as: \"subvalue\" }'>" +
                            "<span data-bind='text: item.name+\":\"+subvalue'></span>," +
                            '</span>' +
                            '</div>'
@@ -645,7 +642,7 @@ describe('Binding: Foreach', function () {
     }
   })
 
-  it('Should provide access to observable array items through $rawData', function () {
+  it('Should provide access to observable items through $rawData', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><input data-bind='value: $rawData'/></div>"
     var x = observable('first'), y = observable('second'), someItems = observableArray([ x, y ])
     applyBindings({ someItems: someItems }, testNode)
@@ -665,7 +662,7 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0]).toHaveValues(['third'])
   })
 
-  it('Should not re-render the nodes when a observable array item changes', function () {
+  it('Should not re-render the nodes when an observable item changes', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: $data'></span></div>"
     var x = observable('first'), someItems = [ x ]
     applyBindings({ someItems: someItems }, testNode)
@@ -720,6 +717,61 @@ describe('Binding: Foreach', function () {
         // After the delay, the deleted item's node is removed
     jasmine.Clock.tick(1)
     expect(testNode).toContainText('--Mercury++--Venus++--Earth++--Mars++--Jupiter++--Saturn++')
+  })
+
+  /*
+     describe('With "noChildContextWithAs" and "as"')
+
+     There is no option in ko 4 for noChildContextWithAs; the default
+     is that there is no child context when `as` is used, for both the
+     `foreach` binding and the `template { foreach }`.
+   */
+
+  it('Should not create a child context when `as` is used', function () {
+    testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'><span data-bind='text: item'></span></div>"
+    var someItems = ['alpha', 'beta']
+    applyBindings({ someItems: someItems }, testNode)
+
+    expect(testNode.childNodes[0].childNodes[0]).toContainText('alpha')
+    expect(testNode.childNodes[0].childNodes[1]).toContainText('beta')
+
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode))
+    expect(dataFor(testNode.childNodes[0].childNodes[1])).toEqual(dataFor(testNode))
+  })
+
+  it('Should provide access to observable items', function () {
+    testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'><input data-bind='value: item'/></div>"
+    var x = observable('first'), y = observable('second'), someItems = observableArray([ x, y ])
+    applyBindings({ someItems: someItems }, testNode)
+    expect(testNode.childNodes[0]).toHaveValues(['first', 'second'])
+
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode))
+    expect(dataFor(testNode.childNodes[0].childNodes[1])).toEqual(dataFor(testNode))
+
+      // Should update observable when input is changed
+    testNode.childNodes[0].childNodes[0].value = 'third'
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    expect(x()).toEqual('third')
+
+      // Should update the input when the observable changes
+    y('fourth')
+    expect(testNode.childNodes[0]).toHaveValues(['third', 'fourth'])
+
+      // Should update the inputs when the array changes
+    someItems([x])
+    expect(testNode.childNodes[0]).toHaveValues(['third'])
+  })
+
+  it('Should not re-render the nodes when an observable item changes', function () {
+    testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'><span data-bind='text: item'></span></div>"
+    var x = observable('first'), someItems = [ x ]
+    applyBindings({ someItems: someItems }, testNode)
+    expect(testNode.childNodes[0]).toContainText('first')
+
+    var saveNode = testNode.childNodes[0].childNodes[0]
+    x('second')
+    expect(testNode.childNodes[0]).toContainText('second')
+    expect(testNode.childNodes[0].childNodes[0]).toEqual(saveNode)
   })
 
   it('Can modify the set of top-level nodes in a foreach loop', function () {

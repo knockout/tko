@@ -196,10 +196,15 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
 
     // This will be called by setDomNodeChildrenFromArrayMapping to get the nodes to add to targetNode
   function executeTemplateForArrayItem (arrayValue, index) {
-        // Support selecting template as a function of the data being rendered
-    arrayItemContext = parentBindingContext['createChildContext'](arrayValue, options['as'], function (context) {
-      context['$index'] = index
-    })
+    // Support selecting template as a function of the data being rendered
+    if (options.as) {
+      arrayItemContext = parentBindingContext.extend({
+        [options.as]: arrayValue,
+        $index: index
+      })
+    } else {
+      arrayItemContext = parentBindingContext.createChildContext(arrayValue, options.as, context => { context.$index = index })
+    }
 
     var templateName = resolveTemplateName(template, arrayValue, arrayItemContext)
     return executeTemplate(targetNode, 'ignoreTargetNode', templateName, arrayItemContext, options, afterBindingCallback)
