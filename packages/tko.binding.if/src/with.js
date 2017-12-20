@@ -2,10 +2,6 @@ import {
     unwrap
 } from 'tko.observable'
 
-import {
-  bindingContext, inheritParentIndicator
-} from 'tko.bind'
-
 import ConditionalBindingHandler from './ConditionalBindingHandler'
 
 /**
