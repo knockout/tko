@@ -33,7 +33,7 @@ Sometimes you might want to represent a data point on the screen in a different 
 <live-example params='id: "computed-writable-converter"'></live-example>
 
 
-Now, whenever the user enters a new price, the text box immediately updates to show it formatted with the currency symbol and two decimal places, no matter what format they entered the value in. This gives a great user experience, because the user sees how the software has understood their data entry as a price. They know they can't enter more than two decimal places, because if they try to, the additional decimal places are immediately removed. Similarly, they can't enter negative values, because the `write` callback strips off any minus sign.
+Now, whenever the user enters a new price, the text box updates to show it formatted with the currency symbol and two decimal places, no matter what format they entered the value in. This gives a great user experience, because the user sees how the software has understood their data entry as a price. They know they can't enter more than two decimal places, because if they try to, the additional decimal places are removed. Similarly, they can't enter negative values, because the `write` callback strips off any minus sign.
 
 ### Example 4: Filtering and validating user input
 
