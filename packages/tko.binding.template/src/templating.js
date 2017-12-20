@@ -26,7 +26,7 @@ import {
 } from './templateSources'
 
 var _templateEngine
-const cleanContainerDomDataKey = domData.nextKey();
+const cleanContainerDomDataKey = domData.nextKey()
 
 export function setTemplateEngine (tEngine) {
   if ((tEngine !== undefined) && !(tEngine instanceof templateEngine)) {
@@ -266,16 +266,19 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
 
       // If the nodes are already attached to a KO-generated container, we reuse that container without moving the
       // elements to a new one (we check only the first node, as the nodes are always moved together)
-      let container = nodes[0] && nodes[0].parentNode;
-      if (!container || !domData.get(container,  cleanContainerDomDataKey)) {
-        container = moveCleanedNodesToContainerElement(nodes);
-        domData.set(container, cleanContainerDomDataKey, true);
+      let container = nodes[0] && nodes[0].parentNode
+      if (!container || !domData.get(container, cleanContainerDomDataKey)) {
+        container = moveCleanedNodesToContainerElement(nodes)
+        domData.set(container, cleanContainerDomDataKey, true)
       }
 
       new AnonymousTemplate(element)['nodes'](container)
     } else {
-            // It's an anonymous template - store the element contents, then clear the element
+      // It's an anonymous template - store the element contents, then clear the element
       const templateNodes = virtualElements.childNodes(element)
+      if (templateNodes.length === 0) {
+        throw new Error('Anonymous template defined, but no template content was provided.')
+      }
       container = moveCleanedNodesToContainerElement(templateNodes) // This also removes the nodes from their current parent
       new AnonymousTemplate(element).nodes(container)
     }

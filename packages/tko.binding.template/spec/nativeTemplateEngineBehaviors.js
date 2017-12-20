@@ -1,3 +1,4 @@
+/* global testNode */
 import {
     applyBindings
 } from 'tko.bind'
@@ -88,7 +89,7 @@ describe('Native template engine', function () {
 
     it('can fetch template from <textarea> elements and data-bind on results', function () {
       var testTextAreaTemplate = ensureNodeExistsAndIsEmpty('testTextAreaTemplate', 'textarea'),
-        prop = "value"
+        prop = 'value'
       testRenderTemplate(testTextAreaTemplate, 'testTextAreaTemplate', prop)
     })
 
@@ -213,6 +214,17 @@ describe('Native template engine', function () {
       y('a')
       expect(inner).toEqual(2)
       expect(outer).toEqual(3)
+    })
+
+    it('with no content should be rejected', function () {
+      window.testDivTemplate.innerHTML = "<div data-bind='template: { data: someItem }'></div>"
+
+      var viewModel = {
+        someItem: { val: 'abc' }
+      }
+      expect(function () {
+        applyBindings(viewModel, window.testDivTemplate)
+      }).toThrowContaining('no template content')
     })
   })
 
