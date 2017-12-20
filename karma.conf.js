@@ -24,8 +24,18 @@ const SAUCE_LAUNCHERS = {
     base: 'SauceLabs',
     browserName: 'firefox',
     version: 'latest'
+  },
+  SL_iOS_latest: {
+    base: 'SauceLabs',
+    browserName: 'iphone',
+    version: 'latest'
+  },
+  SL_Safari_latest: {
+    base: 'SauceLabs',
+    browserName: 'safari',
+    version: 'latest'
   }
- /*,
+  /* ,
   sl_chrome_60: {
     base: 'SauceLabs',
     browserName: 'chrome',
@@ -36,11 +46,7 @@ const SAUCE_LAUNCHERS = {
     browserName: 'chrome',
     version: '45'
   },
-  SL_iOS_latest: {
-    base: 'SauceLabs',
-    browserName: 'iphone',
-    version: 'latest'
-  },
+,
   SL_iOS_10_0: {
     base: 'SauceLabs',
     browserName: 'iphone',
@@ -51,11 +57,7 @@ const SAUCE_LAUNCHERS = {
     browserName: 'iphone',
     version: '9.1'
   },
-  SL_Safari_latest: {
-    base: 'SauceLabs',
-    browserName: 'safari',
-    version: 'latest'
-  },
+
   SL_Safari_10: {
     base: 'SauceLabs',
     browserName: 'safari',
@@ -75,7 +77,7 @@ const SAUCE_LAUNCHERS = {
     base: 'SauceLabs',
     browserName: 'internet explorer',
     version: 11
-  }*/
+  } */
 
   // sl_firefox: {
   //   base: 'SauceLabs',
