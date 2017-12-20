@@ -6,14 +6,21 @@ machine:
     CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
     CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+    # Irritatingly the best option seems to be to hard-code the Sauce Labs
+    # Connect proxy version.
+    SC_VERSION: 4.4.11
 
 dependencies:
-  post:
+  override:
+    - wget https://saucelabs.com/downloads/sc-${SC_VERSION}-linux.tar.gz
+    - tar zxf sc-*-linux.tar.gz
+
+    - sc-${SC_VERSION}-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready:
+        background: true
+
     # While we wait for Sauce Connect, set up the node modules.
     - yarn config set workspaces-experimental true
     - yarn
-    - sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready:
-        background: true
     - lerna bootstrap
 
     # Wait for Sauec Connect tunnel to be ready
