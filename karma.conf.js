@@ -190,10 +190,9 @@ module.exports = (config) => {
     if (!SAUCE_ACCESS_KEY) {
       throw new Error('Environment needs SAUCE_ACCESS_KEY')
     }
-    const build = process.env.CIRCLE_BUILD_NUM || 'local'
     config.set(Object.assign({
-      build,
       sauceLabs: {
+        build: process.env.CIRCLE_BUILD_NUM || 'local',
         testName: `${pkg.name} @ ${pkg.version}`,
         startConnect: !argv.includes('--noStartConnect'),
         public: 'public'
