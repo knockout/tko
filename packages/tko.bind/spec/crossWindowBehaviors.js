@@ -36,7 +36,10 @@ import {
 
 const BLANK_HTML = `
 <!doctype html>
-<html><head></head><body></body></html>
+<html>
+  <head></head>
+  <body></body>
+</html>
 `
 
 describe('Cross-window support', function () {
@@ -65,10 +68,8 @@ describe('Cross-window support', function () {
     })
 
     win2.document.write(BLANK_HTML)
-
-    window.waitsFor(function () {
-      return (win2.document && win2.document.readyState == 'complete' && (body2 = win2.document.body))
-    }, 5000)
+    win2.document.close()
+    body2 = win2.document.body
 
     // renderTemplate
     window.runs(function () {
@@ -126,6 +127,6 @@ describe('Cross-window support', function () {
 
     // The `this.after` appears to not be called consistently, leaving
     // lingering windows open.
-    win2.close()
+    window.runs(() => win2.close())
   })
 })
