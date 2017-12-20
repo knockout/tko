@@ -8,7 +8,7 @@ machine:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 dependencies:
-
+  post:
     # While we wait for Sauce Connect, set up the node modules.
     - yarn config set workspaces-experimental true
     - yarn
@@ -16,12 +16,11 @@ dependencies:
         background: true
     - lerna bootstrap
 
-test:
-  override:
-
     # Wait for Sauec Connect tunnel to be ready
     - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
 
+test:
+  override:
     # Test in Electron
     - yarn test
     # Test in all other browsers
