@@ -192,7 +192,6 @@ module.exports = (config) => {
     }
     config.set(Object.assign({
       sauceLabs: {
-        build: process.env.CIRCLE_BUILD_NUM || 'local',
         testName: `${pkg.name} @ ${pkg.version}`,
         startConnect: !argv.includes('--noStartConnect'),
         public: 'public'
