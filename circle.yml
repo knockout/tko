@@ -8,19 +8,16 @@ machine:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 dependencies:
-  post:
-    - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
-    - tar -xzf sc-latest-linux.tar.gz
-
-test:
-  override:
-    - cd sc-*-linux && ./bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready:
-        background: true
 
     # While we wait for Sauce Connect, set up the node modules.
     - yarn config set workspaces-experimental true
     - yarn
+    - sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready:
+        background: true
     - lerna bootstrap
+
+test:
+  override:
 
     # Wait for Sauec Connect tunnel to be ready
     - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
