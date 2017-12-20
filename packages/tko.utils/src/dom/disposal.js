@@ -3,7 +3,7 @@
 //
 /* eslint no-cond-assign: 0 */
 import * as domData from './data.js'
-import {arrayRemoveItem, arrayPushAll} from '../array.js'
+import {arrayRemoveItem} from '../array.js'
 import {jQueryInstance} from '../jquery.js'
 
 var domDataKey = domData.nextKey()
@@ -31,27 +31,32 @@ function cleanSingleNode (node) {
   var callbacks = getDisposeCallbacksCollection(node, false)
   if (callbacks) {
     callbacks = callbacks.slice(0) // Clone, as the array may be modified during iteration (typically, callbacks will remove themselves)
-    for (var i = 0; i < callbacks.length; i++) { callbacks[i](node) }
+    for (let i = 0; i < callbacks.length; i++) { callbacks[i](node) }
   }
 
     // Erase the DOM data
   domData.clear(node)
 
     // Perform cleanup needed by external libraries (currently only jQuery, but can be extended)
-  for (var i = 0, j = otherNodeCleanerFunctions.length; i < j; ++i) {
+  for (let i = 0, j = otherNodeCleanerFunctions.length; i < j; ++i) {
     otherNodeCleanerFunctions[i](node)
   }
 
     // Clear any immediate-child comment nodes, as these wouldn't have been found by
-    // node.getElementsByTagName("*") in cleanNode() (comment nodes aren't elements)
+    // node.getElementsByTagName('*') in cleanNode() (comment nodes aren't elements)
   if (cleanableNodeTypesWithDescendants[node.nodeType]) { cleanImmediateCommentTypeChildren(node) }
 }
 
 function cleanImmediateCommentTypeChildren (nodeWithChildren) {
-  var child, nextChild = nodeWithChildren.firstChild
-  while (child = nextChild) {
-    nextChild = child.nextSibling
-    if (child.nodeType === 8) { cleanSingleNode(child) }
+  const children = nodeWithChildren.childNodes
+  let cleanedNode
+  for (let i = 0; i < children.length; ++i) {
+    if (children[i].nodeType === 8) {
+      cleanSingleNode(cleanedNode = children[i])
+      if (children[i] !== cleanedNode) {
+        throw Error('ko.cleanNode: An already cleaned node was removed from the document')
+      }
+    }
   }
 }
 
@@ -65,7 +70,7 @@ export function removeDisposeCallback (node, callback) {
   var callbacksCollection = getDisposeCallbacksCollection(node, false)
   if (callbacksCollection) {
     arrayRemoveItem(callbacksCollection, callback)
-    if (callbacksCollection.length == 0) { destroyCallbacksCollection(node) }
+    if (callbacksCollection.length === 0) { destroyCallbacksCollection(node) }
   }
 }
 
@@ -81,7 +86,7 @@ export function cleanNode (node) {
         let cleanedNode = descendants[i]
         cleanSingleNode(cleanedNode)
         if (descendants[i] !== cleanedNode) {
-          throw Error("ko.cleanNode: An already cleaned node was removed from the document")
+          throw Error('ko.cleanNode: An already cleaned node was removed from the document')
         }
       }
     }
