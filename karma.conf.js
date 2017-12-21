@@ -12,99 +12,63 @@ const {SAUCE_USERNAME, SAUCE_ACCESS_KEY} = process.env
 const root = path.join(process.cwd(), 'spec')
 const {argv} = process
 
+const VERSIONS_SYM = Symbol('Versions List')
+
 // For options, see https://saucelabs.com/platforms
 // https://wiki.saucelabs.com/display/DOCS/Platform+Configurator#/
-const SAUCE_LAUNCHERS = {
-  sl_chrome_latest: {
+const SL_BROWSERS = {
+  CHROME: {
     base: 'SauceLabs',
     browserName: 'chrome',
-    version: 'latest'
+    [VERSIONS_SYM]: ['latest', 60, 55, 50, 45] //, 40, 35, 30]
   },
-  SL_Firefox_latest: {
+
+  FIREFOX: {
     base: 'SauceLabs',
     browserName: 'firefox',
-    version: 'latest'
+    [VERSIONS_SYM]: ['latest']
   },
-  SL_iOS_latest: {
-    base: 'SauceLabs',
-    browserName: 'iphone',
-    version: 'latest'
-  },
-  SL_Safari_latest: {
+
+  SAFARI: {
     base: 'SauceLabs',
     browserName: 'safari',
-    version: 'latest'
+    [VERSIONS_SYM]: ['latest']
   },
-  SL_Edge_latest: {
+
+  EDGE: {
     base: 'SauceLabs',
     browserName: 'microsoftedge',
-    version: 'latest'
-  }
-  /* ,
-  sl_chrome_60: {
-    base: 'SauceLabs',
-    browserName: 'chrome',
-    version: '60'
-  },
-  sl_chrome_45: {
-    base: 'SauceLabs',
-    browserName: 'chrome',
-    version: '45'
-  },
-,
-  SL_iOS_10_0: {
-    base: 'SauceLabs',
-    browserName: 'iphone',
-    version: '10.0'
-  },
-  SL_iOS_9_1: {
-    base: 'SauceLabs',
-    browserName: 'iphone',
-    version: '9.1'
+    [VERSIONS_SYM]: ['latest']
   },
 
-  SL_Safari_10: {
-    base: 'SauceLabs',
-    browserName: 'safari',
-    version: 10
-  },
-  SL_Safari_9: {
-    base: 'SauceLabs',
-    browserName: 'safari',
-    version: 9
-  },
-  SL_IE_11: {
+  IE: {
     base: 'SauceLabs',
     browserName: 'internet explorer',
-    version: 11
-  } */
+    [VERSIONS_SYM]: [11]
+  },
 
-  // sl_firefox: {
-  //   base: 'SauceLabs',
-  //   browserName: 'firefox',
-  //   version: '30'
-  // },
-  // sl_ios_safari: {
+  // 🚨  The iPhone emulater on SauceLabs requires a huge connectionRetryTimeout
+  // because its startup time is around 90 seconds.
+  // IOS_SAFARI: {
   //   base: 'SauceLabs',
   //   browserName: 'iphone',
-  //   platform: 'OS X 10.9',
-  //   version: '7.1'
+  //   version: 'latest'
   // },
-  // sl_ie_11: {
-  //   base: 'SauceLabs',
-  //   browserName: 'internet explorer',
-  //   platform: 'Windows 8.1',
-  //   version: '11'
-  // },
-  // sl_android: {
-  //   base: 'SauceLabs',
-  //   browserName: 'Browser',
-  //   platform: 'Android',
-  //   version: '4.4',
-  //   deviceName: 'Samsung Galaxy S3 Emulator',
-  //   deviceOrientation: 'portrait'
-  // }
+
+  launchersFor (browser) {
+    const BROWSER = SL_BROWSERS[browser]
+    return BROWSER[VERSIONS_SYM].map(
+      v => ({ [`SL_${browser}_${v}`]: Object.assign({version: v}, BROWSER) })
+    )
+  }
 }
+
+const SAUCE_LAUNCHERS = Object.assign(
+  ...SL_BROWSERS.launchersFor('CHROME'),
+  ...SL_BROWSERS.launchersFor('FIREFOX'),
+  ...SL_BROWSERS.launchersFor('SAFARI'),
+  ...SL_BROWSERS.launchersFor('EDGE')
+)
 
 console.log(`
     🏕  Karma being loaded at:
@@ -163,8 +127,10 @@ const rollupPreprocessor = {
 
 const typescriptPreprocessor = {
   typescript,
+  lib: 'DOM,ES5,ES6,ScriptHost,ES2015,ES2016,ES2017',
   options: {
     target: 'ES5',
+    lib: 'DOM,ES5,ES6,ScriptHost,ES2015,ES2016,ES2017',
     removeComments: false,
     downlevelIteration: true
   }
@@ -172,7 +138,7 @@ const typescriptPreprocessor = {
 
 const COMMON_CONFIG = {
   rollupPreprocessor,
-  // typescriptPreprocessor, // Waiting on https://stackoverflow.com/questions/47210133
+  typescriptPreprocessor,
   basePath: process.cwd(),
   frameworks: pkg.karma.frameworks,
   resolve: { root },
@@ -180,7 +146,7 @@ const COMMON_CONFIG = {
     { pattern: 'spec/*.js', watched: false }
   ],
   preprocessors: {
-    'spec/**/*.js': ['rollup'] //, 'typescript']
+    'spec/**/*.js': ['rollup', 'typescript']
   }
 }
 
@@ -199,7 +165,9 @@ module.exports = (config) => {
         public: 'public'
       },
       colors: true,
-      captureTimeout: 20000,
+      captureTimeout: 120000,
+      browserDisconnectTimeout: 50000,
+      browserNoActivityTimeout: 50000,
       customLaunchers: SAUCE_LAUNCHERS,
       browsers: Object.keys(SAUCE_LAUNCHERS),
       reporters: ['dots', 'saucelabs'],
