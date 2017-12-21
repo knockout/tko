@@ -20,7 +20,7 @@ const SL_BROWSERS = {
   CHROME: {
     base: 'SauceLabs',
     browserName: 'chrome',
-    [VERSIONS_SYM]: ['latest', 60, 55] //, 50, 45, 40, 35, 30]
+    [VERSIONS_SYM]: ['latest', 60, 55]//, 50, 45, 40, 35, 30]
   },
 
   FIREFOX: {
@@ -131,8 +131,7 @@ const typescriptPreprocessor = {
     target: 'ES5',
     lib: ['DOM', 'ES5', 'ES6', 'ScriptHost', 'ES2015', 'ES2016', 'ES2017'],
     removeComments: false,
-    downlevelIteration: true,
-    sourceMap: true
+    downlevelIteration: true
   }
 }
 
