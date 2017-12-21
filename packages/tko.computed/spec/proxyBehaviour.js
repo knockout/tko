@@ -11,7 +11,11 @@ import {
   computed
 } from 'tko.computed'
 
+const proxySupport = 'Proxy' in window
+
 describe('Proxy', function () {
+  if (!proxySupport) { return }
+
   it('Should wrap a plain object', function () {
     const x = {}
     const p = proxy(x)

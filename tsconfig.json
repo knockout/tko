@@ -2,10 +2,10 @@
   "compileOnSave": false,
   "compilerOptions": {
     "downlevelIteration": true,
-    "target": "ES3",
+    "target": "ES5",
     "module": "ES2015",
     "allowJs": true,
     "importHelpers": true,
-    "strict": true  
+    "strict": true
   }
 }

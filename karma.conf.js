@@ -20,7 +20,7 @@ const SL_BROWSERS = {
   CHROME: {
     base: 'SauceLabs',
     browserName: 'chrome',
-    [VERSIONS_SYM]: ['latest', 60, 55, 50, 45] //, 40, 35, 30]
+    [VERSIONS_SYM]: ['latest', 60, 55] //, 50, 45, 40, 35, 30]
   },
 
   FIREFOX: {
@@ -44,7 +44,7 @@ const SL_BROWSERS = {
   IE: {
     base: 'SauceLabs',
     browserName: 'internet explorer',
-    [VERSIONS_SYM]: [11]
+    [VERSIONS_SYM]: [11, 10, 9]
   },
 
   // 🚨  The iPhone emulater on SauceLabs requires a huge connectionRetryTimeout
@@ -127,12 +127,12 @@ const rollupPreprocessor = {
 
 const typescriptPreprocessor = {
   typescript,
-  lib: 'DOM,ES5,ES6,ScriptHost,ES2015,ES2016,ES2017',
   options: {
     target: 'ES5',
-    lib: 'DOM,ES5,ES6,ScriptHost,ES2015,ES2016,ES2017',
+    lib: ['DOM', 'ES5', 'ES6', 'ScriptHost', 'ES2015', 'ES2016', 'ES2017'],
     removeComments: false,
-    downlevelIteration: true
+    downlevelIteration: true,
+    sourceMap: true
   }
 }
 
