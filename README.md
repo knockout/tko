@@ -33,7 +33,8 @@ By CDN
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
 | $ `npm install -g yarn` otherwise | Ensure yarn is globally available
 | $ `yarn` | Install local node packages and link tko modules
-| $ `yarn test` | Run all tests
+| $ `yarn test` | Run all tests. See below.
+| $ `yarn watch` | Run all tests and watch for changes. See below.
 | $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled
 | $ `lerna publish` | Bump versions and publish to npm registry
 
@@ -45,6 +46,18 @@ In each individual `packages/*/` directory, you can also run (presuming `rollup`
 | --- | --- |
 | $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run`
 | $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/`
+
+
+#### Testing with `yarn test` and `yarn watch`
+
+The `yarn test` and `yarn watch` commands can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests
+specific to that package.
+
+Optional arguments to `yarn test` include:
+
+- `--sauce` — use Sauce Labs to test a variety of platforms; requires an account at Sauce Labs and `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` to be set in the environment.
+- `--noStartConnect` — Do not start a new Sauce Connect proxy instance for every
+test; requires that Sauce Connect be already running.
 
 
 #### `visual.html`

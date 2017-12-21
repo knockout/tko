@@ -16,6 +16,12 @@ const VERSIONS_SYM = Symbol('Versions List')
 
 // For options, see https://saucelabs.com/platforms
 // https://wiki.saucelabs.com/display/DOCS/Platform+Configurator#/
+//
+// NOTE:  When a selection below is unavailable the following unhelpful error
+// is produced from webdriver.js:
+//
+// TypeError: Cannot read property 'value' of undefined
+//
 const SL_BROWSERS = {
   CHROME: {
     base: 'SauceLabs',
@@ -26,7 +32,7 @@ const SL_BROWSERS = {
   FIREFOX: {
     base: 'SauceLabs',
     browserName: 'firefox',
-    [VERSIONS_SYM]: ['latest']
+    [VERSIONS_SYM]: ['latest', 55, 50]
   },
 
   SAFARI: {
@@ -66,8 +72,9 @@ const SL_BROWSERS = {
 const SAUCE_LAUNCHERS = Object.assign(
   ...SL_BROWSERS.launchersFor('CHROME'),
   ...SL_BROWSERS.launchersFor('FIREFOX'),
-  ...SL_BROWSERS.launchersFor('SAFARI'),
-  ...SL_BROWSERS.launchersFor('EDGE')
+  ...SL_BROWSERS.launchersFor('SAFARI')
+  // ...SL_BROWSERS.launchersFor('EDGE'),
+  // ...SL_BROWSERS.launchersFor('IE')
 )
 
 console.log(`
@@ -165,8 +172,8 @@ module.exports = (config) => {
       },
       colors: true,
       captureTimeout: 120000,
-      browserDisconnectTimeout: 50000,
-      browserNoActivityTimeout: 50000,
+      browserDisconnectTimeout: 100000,
+      browserNoActivityTimeout: 100000,
       customLaunchers: SAUCE_LAUNCHERS,
       browsers: Object.keys(SAUCE_LAUNCHERS),
       reporters: ['dots', 'saucelabs'],
