@@ -9,7 +9,7 @@ import {
 } from 'tko.utils'
 
 import {
-  observable, observableArray
+  observable, observableArray, isObservable
 } from 'tko.observable'
 
 import {
@@ -349,14 +349,14 @@ describe('observable array changes', function () {
     assert.equal(div.text(), 'c')
   })
 
-  it('deletes from the beginning', function () {
+  it('deletes from the beginning / pop', function () {
     obs(['a', 'b', 'c'])
     applyBindings(view, div[0])
     obs.shift()
     assert.equal(div.text(), 'bc')
   })
 
-  it('deletes from the beginning', function () {
+  it('deletes from the beginning / shift', function () {
     obs(['a', 'b', 'c'])
     applyBindings(view, div[0])
     obs.pop()
@@ -760,6 +760,50 @@ describe('observable array changes', function () {
       assert.equal($(target).text(), ' 0 1 2')
     })
 
+    it('is present on a list of text & comment nodes', function () {
+      var target = document.createElement('ul')
+      target.innerHTML = `<div data-bind='foreach: $data'>
+          <!-- ko text: $index --><!-- /ko --><!-- ko text: $data --><!-- /ko -->
+        </div>`
+      var list = ['a', 'b', 'c']
+      applyBindings(list, target)
+      assert.equal($(target).text().replace(/\s+/g, ' '), ' 0a 1b 2c ')
+    })
+
+    it('updates as part of a calculation', function () {
+      var target = document.createElement('ul')
+      target.innerHTML = `<div data-bind='foreach: $data'>
+          <!-- ko text: $index() * 10 --><!-- /ko --><!-- ko text: $data --><!-- /ko -->
+        </div>`
+      var list = ['a', 'b', 'c']
+      applyBindings(list, target)
+      assert.equal($(target).text().replace(/\s+/g, ' '), ' 0a 10b 20c ')
+    })
+
+    it('updates in the middle of a list', function () {
+      var target = document.createElement('ul')
+      target.innerHTML = `<div data-bind='foreach: $data'>
+          <!-- ko text: $data === 'b' ? $index() * 10 : '-' --><!-- /ko -->
+          <!-- ko text: $data --><!-- /ko -->
+        </div>`
+      var list = ['a', 'b', 'c']
+      applyBindings(list, target)
+      assert.equal($(target).text().replace(/\s+/g, ' '), ' - a 10 b - c ')
+    })
+
+    it('updates when list is modified', function () {
+      var target = document.createElement('ul')
+      target.innerHTML = `<div data-bind='foreach: $data'>
+          <!-- ko text: $index() * 10 --><!-- /ko --><!-- ko text: $data --><!-- /ko -->
+        </div>`
+      var list = observableArray(['a', 'b', 'c'])
+      applyBindings(list, target)
+      list.splice(0, 0, 'z')
+      assert.equal($(target).text().replace(/\s+/g, ' '), ' 0z 10a 20b 30c ')
+      list.splice(2, 1)
+      assert.equal($(target).text().replace(/\s+/g, ' '), ' 0z 10a 20c ')
+    })
+
     it('updates the first list item', function () {
       var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>")
       var list = observableArray([])
@@ -801,11 +845,20 @@ describe('observable array changes', function () {
       assert.equal(contextFor(target.children()[2]).$index(), 2)
     })
 
-    it('is disabled with noIndex', function () {
+    it('is not initially an observable', function () {
       var target = $("<ul data-bind='foreach: {data: $data, noIndex: true}'><li data-bind='text: $data'></li></ul>")
       var list = observableArray(['a'])
       applyBindings(list, target[0])
-      assert.equal(contextFor(target.children()[0]).$index, undefined)
+      assert.notOk(isObservable(contextFor(target.children()[0]).$index))
+    })
+
+    it('is observable after the first call', function () {
+      var target = $("<ul data-bind='foreach: {data: $data, noIndex: true}'><li data-bind='text: $data'></li></ul>")
+      var list = observableArray(['a'])
+      applyBindings(list, target[0])
+      const $index = contextFor(target.children()[0]).$index
+      assert.equal($index(), 0)
+      assert.ok(isObservable(contextFor(target.children()[0]).$index))
     })
 
     it('is present with `as`', function () {
@@ -841,24 +894,6 @@ describe('observable array changes', function () {
       assert.equal(contextFor(target.children()[0]).$index(), 0)
       assert.equal(contextFor(target.children()[1]).$index(), 1)
       assert.equal(contextFor(target.children()[2]).$index(), 2)
-    })
-
-    it('respects `noIndex`', function () {
-      var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\", noIndex: true }'><li data-bind='text: xyz'></li></ul>")
-      var list = ['a', 'b', 'c']
-      applyBindings(list, target[0])
-      assert.equal(contextFor(target.children()[0]).$index, undefined)
-      assert.equal(contextFor(target.children()[1]).$index, undefined)
-      assert.equal(contextFor(target.children()[2]).$index, undefined)
-    })
-
-    it('respects `noIndex` on allBindings', function () {
-      var target = $("<ul data-bind='foreach: $data, as: \"xyz\", noIndex: true'><li data-bind='text: xyz'></li></ul>")
-      var list = ['a', 'b', 'c']
-      applyBindings(list, target[0])
-      assert.equal(contextFor(target.children()[0]).$index, undefined)
-      assert.equal(contextFor(target.children()[1]).$index, undefined)
-      assert.equal(contextFor(target.children()[2]).$index, undefined)
     })
 
     it('reads `as` from peer binding parameters', function () {
@@ -941,7 +976,7 @@ describe('focus', function () {
     }, 50)
   })
 
-  it('preserves objects when re-ordering multiple identical', function (done) {
+  it('preserves objects when re-ordering multiple identical, alt', function (done) {
     var o0 = {}
     var list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])

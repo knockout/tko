@@ -66,11 +66,6 @@ function valueToChangeAddItem (value, index) {
 // store a symbol for caching the pending delete info index in the data item objects
 const PENDING_DELETE_INDEX_SYM = createSymbolOrString('_ko_ffe_pending_delete_index')
 
-// Extend the given context with a $index (passed in via the createChildContext)
-function extend$context (include$index, $context) {
-  if (include$index) { $context.$index = observable() }
-  $context.$list = this.data
-}
 
 export class ForEachBinding extends AsyncBindingHandler {
   // NOTE: valid valueAccessors include:
@@ -87,15 +82,14 @@ export class ForEachBinding extends AsyncBindingHandler {
       Object.assign(settings, this.value)
     }
 
-    this.noIndex = settings.noIndex || this.allBindings.get('noIndex')
     this.as = settings.as || this.allBindings.get('as')
 
     this.data = settings.data || (unwrap(this.$context.$rawData) === this.value ? this.$context.$rawData : this.value)
 
     this.container = virtualElements.isStartComment(this.$element)
                      ? this.$element.parentNode : this.$element
-    this.generateContext = this.createContextGenerator(this.as, !this.noIndex)
-    if (this.noIndex) { this.updateIndexes = false }
+    this.generateContext = this.createContextGenerator(this.as)
+    this.$indexHasBeenRequested = false
 
     this.templateNode = makeTemplateNode(
       settings.templateNode || (settings.name
@@ -230,7 +224,9 @@ export class ForEachBinding extends AsyncBindingHandler {
     this.rendering_queued = false
 
     // Update our indexes.
-    if (this.updateIndexes) { this.updateIndexes(lowestIndexChanged) }
+    if (this.$indexHasBeenRequested) {
+      this.updateIndexes(lowestIndexChanged)
+    }
 
     this.endQueueFlush()
     this.changeQueue = []
@@ -239,6 +235,35 @@ export class ForEachBinding extends AsyncBindingHandler {
     if (isEmpty !== !this.isNotEmpty()) {
       this.isNotEmpty(!isEmpty)
     }
+  }
+
+  /**
+   * Once the $index has been asked for once, start calculating it.
+   * Note that this significantly degrades performance, from O(1) to O(n)
+   * for arbitrary changes to the list.
+   */
+  _first$indexRequest (ctx$indexRequestedFrom) {
+    this.$indexHasBeenRequested = true
+    for (let i = 0, len = this.firstLastNodesList.length; i < len; ++i) {
+      const ctx = this.getContextStartingFrom(this.firstLastNodesList[i].first)
+      // Overwrite the defineProperty.
+      if (ctx) { ctx.$index = observable(i) }
+    }
+    return ctx$indexRequestedFrom.$index()
+  }
+
+  _contextExtensions ($ctx) {
+    Object.assign($ctx, { $list: this.data })
+    if (this.$indexHasBeenRequested) {
+      $ctx.$index = observable()
+    } else {
+      Object.defineProperty($ctx, '$index', {
+        value: () => this._first$indexRequest($ctx),
+        configurable: true,
+        writable: true
+      })
+    }
+    return $ctx
   }
 
   /**
@@ -251,33 +276,19 @@ export class ForEachBinding extends AsyncBindingHandler {
    * @param  {bool} index Whether to calculate indexes
    * @return {function}   A function(dataValue) that returns the context
    */
-  createContextGenerator (as, index) {
-    var $context = this.$context
-    switch ((as && 1) | (index && 2)) {
-      case 0: // no-as & no-index
-        return function (v) {
-          return $context.createChildContext(v, null, extend$context.bind(this, false))
-        }
-
-      case 1: // as + no-index
-        return function (v) {
-          var obj = { $index: undefined, $list: this.data }
-          obj[as] = v
-          return $context.extend(obj)
-        }
-
-      case 2: // no-as + index
-        return function (v) {
-          return $context.createChildContext(v, null, extend$context.bind(this, true))
-        }
-
-      case 3: // as + index
-        return function (v) {
-          var obj = { $index: observable(), $list: this.data }
-          obj[as] = v
-          return $context.extend(obj)
-        }
+  createContextGenerator (as) {
+    const $ctx = this.$context
+    if (as) {
+      return v => this._contextExtensions($ctx.extend({ [as]: v }))
+    } else {
+      return v => $ctx.createChildContext(v, null, ctx => this._contextExtensions(ctx))
     }
+  }
+
+  updateFirstLastNodesList (index, children) {
+    const first = children[0]
+    const last = children[children.length - 1]
+    this.firstLastNodesList.splice(index, 0, { first, last })
   }
 
   // Process a changeItem with {status: 'added', ...}
@@ -295,22 +306,21 @@ export class ForEachBinding extends AsyncBindingHandler {
       var pendingDelete = this.getPendingDeleteFor(valuesToAdd[i])
       if (pendingDelete && pendingDelete.nodesets.length) {
         children = pendingDelete.nodesets.pop()
+        this.updateFirstLastNodesList(index + i, children)
       } else {
         var templateClone = this.templateNode.cloneNode(true)
+        children = virtualElements.childNodes(templateClone)
+        this.updateFirstLastNodesList(index + i, children)
+
         // Apply bindings first, and then process child nodes,
         // because bindings can add childnodes.
         const bindingResult = applyBindingsToDescendants(
           this.generateContext(valuesToAdd[i]), templateClone
         )
-
         asyncBindingResults.push(bindingResult)
-
-        children = virtualElements.childNodes(templateClone)
       }
 
-      // Note discussion at https://github.com/angular/angular.js/issues/7851
-      allChildNodes.push.apply(allChildNodes, Array.prototype.slice.call(children))
-      this.firstLastNodesList.splice(index + i, 0, { first: children[0], last: children[children.length - 1] })
+      allChildNodes.push(...children)
     }
 
     if (typeof this.afterAdd === 'function') {
@@ -322,7 +332,7 @@ export class ForEachBinding extends AsyncBindingHandler {
       this.insertAllAfter(allChildNodes, referenceElement)
     }
 
-    this.completeBinding(options.Promise.all(asyncBindingResults))
+    this.completeBinding(Promise.all(asyncBindingResults))
   }
 
   getNodesForIndex (index) {
