@@ -349,14 +349,14 @@ describe('observable array changes', function () {
     assert.equal(div.text(), 'c')
   })
 
-  it('deletes from the beginning / pop', function () {
+  it('deletes from the beginning / shift', function () {
     obs(['a', 'b', 'c'])
     applyBindings(view, div[0])
     obs.shift()
     assert.equal(div.text(), 'bc')
   })
 
-  it('deletes from the beginning / shift', function () {
+  it('deletes from the beginning / pop', function () {
     obs(['a', 'b', 'c'])
     applyBindings(view, div[0])
     obs.pop()
