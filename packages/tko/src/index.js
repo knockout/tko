@@ -12,6 +12,7 @@ import {
     isWriteableObservable,
     observable,
     observableArray,
+    isObservableArray,
     peek,
     subscribable,
     toJS,
@@ -112,6 +113,7 @@ utils.arrayForEach([
   'parseHtmlFragment',
   'setHtml',
   'compareArrays',
+  'createSymbolOrString',
   'setDomNodeChildrenFromArrayMapping'
 ], function (coreUtil) {
   coreUtils[coreUtil] = utils[coreUtil]
@@ -180,6 +182,7 @@ export default {
   isWritableObservable: isWriteableObservable,
   observable,
   observableArray,
+  isObservableArray,
   peek,
   subscribable,
   unwrap,
@@ -189,9 +192,11 @@ export default {
 
     // ... Computed ...
   computed,
+  dependentObservable: computed,
   isComputed,
   isPureComputed,
   pureComputed,
+  when: computed.when,
 
     // --- Templates ---
   nativeTemplateEngine,

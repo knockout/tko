@@ -1,6 +1,6 @@
 
 import {
-    observableArray, observable, isObservable, subscribable
+    observableArray, isObservableArray, observable, isObservable, subscribable
 } from '../src'
 
 describe('Observable Array', function () {
@@ -20,6 +20,23 @@ describe('Observable Array', function () {
 
   it('Should be observable', function () {
     expect(isObservable(testObservableArray)).toEqual(true)
+  })
+
+  it('Should advertise as observable array', function () {
+    expect(isObservableArray(observableArray())).toEqual(true)
+  })
+
+  it('isObservableArray should return false for non-observable array values', function () {
+    const types = [
+      undefined,
+      null,
+      'x',
+          {},
+      function () {},
+      observable([])
+    ]
+
+    types.forEach(value => expect(isObservableArray(value)).toEqual(false))
   })
 
   it('should be iterable', function () {

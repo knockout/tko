@@ -24,6 +24,10 @@ export function observableArray (initialValues) {
   return result
 }
 
+export function isObservableArray (instance) {
+  return isObservable(instance) && typeof instance.remove === 'function' && typeof instance.push === 'function'
+}
+
 observableArray.fn = {
   remove (valueOrPredicate) {
     var underlyingArray = this.peek()

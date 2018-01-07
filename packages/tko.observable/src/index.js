@@ -10,7 +10,7 @@ export {
     isWriteableObservable, isWritableObservable
 } from './observable'
 export { isSubscribable, subscribable } from './subscribable'
-export { observableArray } from './observableArray'
+export { observableArray, isObservableArray } from './observableArray'
 export { trackArrayChanges, arrayChangeEventName } from './observableArray.changeTracking'
 export { toJS, toJSON } from './mappingHelpers'
 export { deferUpdates } from './defer.js'
