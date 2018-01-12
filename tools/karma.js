@@ -84,9 +84,8 @@ const COMMON_CONFIG = {
   basePath: process.cwd(),
   frameworks: pkg.karma.frameworks,
   resolve: { root },
-  files: [
-    ...(pkg.karma.files || []),
-    { pattern: 'spec/*.js', watched: false }
+  files: pkg.karma.files || [
+    { pattern: 'spec/**/*.js', watched: false }
   ],
   preprocessors: {
     'spec/**/*.js': ['rollup', 'typescript']

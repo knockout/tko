@@ -39,7 +39,8 @@
     "files": [
       "dist/knockout.js",
       "helpers/jasmine-html.js",
-      "helpers/jasmine.extensions.js"
+      "helpers/jasmine.extensions.js",
+      "spec/**/*.js"
     ]
   },
   "licenses": [
