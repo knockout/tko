@@ -25,7 +25,8 @@ import {
     isComputed,
     isPureComputed,
     proxy,
-    pureComputed
+    pureComputed,
+    when
 } from 'tko.computed'
 
 import { VirtualProvider } from 'tko.provider.virtual'
@@ -196,7 +197,7 @@ export default {
   isComputed,
   isPureComputed,
   pureComputed,
-  when: computed.when,
+  when: when,
 
     // --- Templates ---
   nativeTemplateEngine,
