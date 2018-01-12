@@ -23,7 +23,7 @@
       "chai"
     ]
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json",
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
     "globals": [
       "assert",
@@ -42,6 +42,7 @@
   },
   "scripts": {
     "test": "karma start ../../karma.conf.js --once",
+    "build": "rollup -c ../../rollup.config.js",
     "watch": "karma start ../../karma.conf.js"
   }
 }

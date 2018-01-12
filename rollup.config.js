@@ -10,10 +10,26 @@ import license from 'rollup-plugin-license'
 import * as pkg from './package.json'
 
 const { LERNA_PACKAGE_NAME, LERNA_ROOT_PATH } = process.env
-const PACKAGE_ROOT_PATH = path.join(LERNA_ROOT_PATH, 'packages', LERNA_PACKAGE_NAME)
-const IS_BROWSER_BUNDLE = LERNA_PACKAGE_NAME === 'tko'
-const INPUT_FILE = path.join(PACKAGE_ROOT_PATH, 'src/index.js')
 const TKO_MODULES = getTkoModules()
+
+/**
+ * Expect rollup to be called by either Lerna from the monorepo root, or
+ * by the user in a specific directory.
+ */
+function getMonorepoRoot () {
+  return LERNA_ROOT_PATH || path.join(process.cwd(), '..', '..')
+}
+
+function getPackageName () {
+  return LERNA_PACKAGE_NAME || process.cwd().split(path.sep).pop()
+}
+
+function getPackageRoot () {
+  return path.join(getMonorepoRoot(), 'packages', getPackageName())
+}
+
+const BROWSER_PACKAGES = ['tko', 'knockout']
+const IS_BROWSER_BUNDLE = BROWSER_PACKAGES.includes(getPackageName())
 
 const banner = `/*!
  * <%= pkg.description %> 🥊  <%= pkg.name %>@${pkg.version}
@@ -55,20 +71,21 @@ export default [
 ]
 
 function getTkoModules () {
-  return fs.readdirSync(path.resolve(__dirname, 'packages'))
+  return fs.readdirSync(path.resolve(path.join(getMonorepoRoot(), 'packages')))
 }
 
 function getTkoES6Aliases () {
   return TKO_MODULES.reduce((accum, tkoModule) => Object.assign(accum, {
     [tkoModule]: path.resolve(
-      LERNA_ROOT_PATH,
+      getMonorepoRoot(),
       `packages/${tkoModule}/dist/${tkoModule}.es6.js`
     )
   }))
 }
 
 function createRollupConfig ({ minify, transpile } = {}) {
-  let filename = path.join(PACKAGE_ROOT_PATH, 'dist', LERNA_PACKAGE_NAME)
+  const packageName = getPackageName()
+  let filename = path.join(getPackageRoot(), 'dist', packageName)
 
   const plugins = [...UNIVERSAL_PLUGINS]
 
@@ -89,12 +106,12 @@ function createRollupConfig ({ minify, transpile } = {}) {
 
   return {
     plugins,
-    input: INPUT_FILE,
+    input: path.join(getPackageRoot(), 'src/index.js'),
     external: IS_BROWSER_BUNDLE ? undefined : TKO_MODULES,
     output: {
       file: filename,
       format: IS_BROWSER_BUNDLE ? 'umd' : 'es',
-      name: LERNA_PACKAGE_NAME === 'tko' ? 'ko' : LERNA_PACKAGE_NAME
+      name: IS_BROWSER_BUNDLE ? 'ko' : packageName
     },
     sourcemap: true
   }

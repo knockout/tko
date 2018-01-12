@@ -9,10 +9,10 @@
   },
   "scripts": {
     "prepublish": "yarn build",
-    "test": "lerna exec --concurrency=1 --loglevel=warn -- karma start ../../karma.conf.js --once",
-    "build": "lerna exec --concurrency=1 --loglevel=warn -- rollup -c ../../rollup.config.js",
+    "test": "lerna exec --concurrency=1 --loglevel=warn -- yarn test",
+    "build": "lerna exec --concurrency=1 --loglevel=warn -- yarn build",
     "lint": "standard",
-    "repackage": "./.inject.json.js packages/shared.package.json packages/*/package.json"
+    "repackage": "./tools/common-package-config.js packages/shared.package.json packages/*/package.json"
   },
   "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [
