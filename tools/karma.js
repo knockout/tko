@@ -49,23 +49,26 @@ const replacerPlugin = {
 }
 
 const rollupPreprocessor = {
-  format: 'iife',
-  name: pkg.name,
+  output: {
+    format: 'iife',
+    name: pkg.name,
+    /**
+     * Source maps often link multiple files (e.g. tko.utils/src/object.js)
+     * from different spec/ files.  This causes problems e.g. a breakpoints
+     * occur in the wrong spec/ file.
+     *
+     * Nevertheless enabling source maps when there's only one test file
+     * can be illuminating, so it's an option.
+     */
+    sourcemap: argv.includes('--sourcemap') ? 'inline' : false
+  },
+
   plugins: [
     replacerPlugin,
     nodeResolve({ module: true }),
     rollupCommonJS(),
     rollupVisualizer({ filename: './visual.html' })
-  ],
-  /**
-   * Source maps often link multiple files (e.g. tko.utils/src/object.js)
-   * from different spec/ files.  This causes problems e.g. a breakpoints
-   * occur in the wrong spec/ file.
-   *
-   * Nevertheless enabling source maps when there's only one test file
-   * can be illuminating, so it's an option.
-   */
-  sourcemap: argv.includes('--sourcemap') ? 'inline' : false
+  ]
 }
 
 const typescriptPreprocessor = {

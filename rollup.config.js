@@ -51,7 +51,7 @@ const UNIVERSAL_PLUGINS = [
   replace({ delimiters: ['{{', '}}'], VERSION: pkg.version }),
   nodeResolve({ module: true }),
   rollupVisualizer({ filename: 'visual.html' }),
-  license({ sourceMap: true, banner })
+  license({ sourcemap: true, banner })
 ]
 
 export default [

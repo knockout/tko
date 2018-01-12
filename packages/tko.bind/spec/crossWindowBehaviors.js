@@ -11,7 +11,8 @@ import {
 } from 'tko.observable'
 
 import {
-    renderTemplate, setTemplateEngine, templateEngine, nativeTemplateEngine
+    renderTemplate, setTemplateEngine, templateEngine, nativeTemplateEngine,
+    bindings as templateBindings
 } from 'tko.binding.template'
 
 import {
