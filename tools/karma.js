@@ -11,6 +11,7 @@ const typescript = require('typescript')
 const {argv} = process
 const root = path.join(process.cwd(), 'spec')
 
+const PACKAGES_PATH = path.join(__dirname, '..', 'packages')
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 console.log(`
@@ -43,7 +44,7 @@ const replacerPlugin = {
    */
   resolveId (importee, importer) {
     if (importee.includes('/')) { return }
-    const packagePath = path.join(__dirname, 'packages', importee, 'src/index.js')
+    const packagePath = path.join(PACKAGES_PATH, importee, 'src/index.js')
     if (fs.existsSync(packagePath)) { return packagePath }
   }
 }
