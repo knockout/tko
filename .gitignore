@@ -15,6 +15,7 @@ perf/*
 .DS_Store
 npm-debug.log
 node_modules
+.rpt2_cache
 
 # Knockout built files
 _repo

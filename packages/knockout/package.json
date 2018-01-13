@@ -37,7 +37,7 @@
       "jasmine"
     ],
     "files": [
-      "dist/knockout.js",
+      "dist/knockout.es6.js",
       "helpers/jasmine-html.js",
       "helpers/jasmine.extensions.js",
       "spec/**/*.js"
@@ -76,6 +76,7 @@
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
     "globals": [
+      "ko",
       "assert",
       "jasmine",
       "beforeEach",
@@ -87,7 +88,8 @@
       "xit",
       "expect",
       "describe",
-      "ddescribe"
+      "ddescribe",
+      "xdescribe"
     ]
   }
 }
