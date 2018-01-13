@@ -441,29 +441,20 @@ describe('Observable Array change tracking', function() {
     // inspect the runtime to work out the private name(s) for it, and intercept them all.
     // Then undo it all afterwards.
     function captureCompareArraysCalls(callback) {
-        var origCompareArrays = ko.utils.compareArrays,
-            interceptedCompareArrays = function() {
-                callLog.push(Array.prototype.slice.call(arguments, 0));
-                return origCompareArrays.apply(this, arguments);
-            },
-            aliases = [],
-            callLog = [];
-
-        // Find and intercept all the aliases
-        for (var key in ko.utils) {
-            if (ko.utils[key] === origCompareArrays) {
-                aliases.push(key);
-                ko.utils[key] = interceptedCompareArrays;
-            }
+        var trackArrayChanges = ko.observableArray.trackArrayChanges
+        var origCompareArrays = trackArrayChanges.compareArrays
+        var aliases = []
+        var callLog = []
+        function interceptedCompareArrays () {
+            callLog.push(Array.prototype.slice.call(arguments, 0));
+            return origCompareArrays.apply(this, arguments);
         }
+        trackArrayChanges.compareArrays = interceptedCompareArrays
 
         try {
             callback(callLog);
         } finally {
-            // Undo the interceptors
-            for (var i = 0; i < aliases.length; i++) {
-                ko.utils[aliases[i]] = origCompareArrays;
-            }
+          trackArrayChanges.compareArrays = origCompareArrays
         }
     }
 });

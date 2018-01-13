@@ -154,3 +154,6 @@ arrayForEach(['slice'], function (methodName) {
     return underlyingArray[methodName].apply(underlyingArray, arguments)
   }
 })
+
+// Expose for testing.
+observableArray.trackArrayChanges = trackArrayChanges
