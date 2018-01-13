@@ -176,6 +176,7 @@ export default {
   utils: coreUtils,
   dependencyDetection,
   ignoreDependencies: dependencyDetection.ignore,
+  selectExtensions: utils.selectExtensions,
 
     // -- Observable ---
   isObservable,

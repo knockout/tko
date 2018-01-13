@@ -38,7 +38,6 @@
     ],
     "files": [
       "dist/knockout.es6.js",
-      "helpers/jasmine-html.js",
       "helpers/jasmine.extensions.js",
       "spec/**/*.js"
     ]

@@ -67,6 +67,5 @@
     "packages/*"
   ],
   "private": true,
-  "dependencies": {
-  }
+  "dependencies": {}
 }

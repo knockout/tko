@@ -23,7 +23,6 @@ module.exports = {
   resolveId (importee, importer) {
     if (importee.includes('/')) { return }
     const packagePath = path.join(PACKAGES_PATH, importee, 'src/index.js')
-    if (fs.existsSync(packagePath)) { console.log(`${importee} => ${packagePath}`) }
     return fs.existsSync(packagePath) ? packagePath : null
   }
 }
