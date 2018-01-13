@@ -1,13 +1,14 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import alias from 'rollup-plugin-alias'
 import babelMinify from 'rollup-plugin-babel-minify'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
-import typescript from 'rollup-plugin-typescript'
+import typescript from 'rollup-plugin-typescript2'
 import rollupVisualizer from 'rollup-plugin-visualizer'
 import license from 'rollup-plugin-license'
 import * as pkg from './package.json'
+
+const replacerPlugin = require('./tools/rollup.replacerPlugin')
 
 const { LERNA_PACKAGE_NAME, LERNA_ROOT_PATH } = process.env
 const TKO_MODULES = getTkoModules()
@@ -38,7 +39,7 @@ const banner = `/*!
  */
 `
 
-  /* Use TypeScript instead of babel for transpilation for IE6 compat, plus it's faster */
+/* Use TypeScript instead of babel for transpilation for IE6 compat, plus it's faster */
 const TYPESCRIPT_CONFIG = {
   include: '**/*.js',
   exclude: 'node_modules',
@@ -74,15 +75,15 @@ function getTkoModules () {
   return fs.readdirSync(path.resolve(path.join(getMonorepoRoot(), 'packages')))
 }
 
-function getTkoES6Aliases () {
-  return TKO_MODULES.reduce((accum, tkoModule) => Object.assign(accum, {
-    [tkoModule]: path.resolve(
-      getMonorepoRoot(),
-      `packages/${tkoModule}/dist/${tkoModule}.es6.js`
-    )
-  }))
-}
-
+/**
+ * Create the various configurations for compiling.
+ *
+ * Note that transpilation includes `import ... 'tko.X'` from `packages/tko.X/dist`,
+ * whereas the .es6 versions include from `src/index.js`.  As a result, for example,
+ * we re-test from the .es6 version since it'll include code changes from src/,
+ * whereas the transpiled .js version imports will be stale (until the packages are
+ * recompiled).  This is widely regarded as a nuisance.
+ */
 function createRollupConfig ({ minify, transpile } = {}) {
   const packageName = getPackageName()
   let filename = path.join(getPackageRoot(), 'dist', packageName)
@@ -90,10 +91,11 @@ function createRollupConfig ({ minify, transpile } = {}) {
   const plugins = [...UNIVERSAL_PLUGINS]
 
   if (transpile) {
+    // FIXME: How do we map to `src/index.js` and include tslib?
     plugins.push(typescript(TYPESCRIPT_CONFIG))
   } else {
-    /* must come before resolve plugin */
-    plugins.unshift(alias(getTkoES6Aliases()))
+    // Must come before node resolve.
+    plugins.unshift(replacerPlugin)
     filename += '.es6'
   }
 

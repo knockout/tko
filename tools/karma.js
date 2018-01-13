@@ -8,10 +8,11 @@ const rollupCommonJS = require('rollup-plugin-commonjs')
 const rollupVisualizer = require('rollup-plugin-visualizer')
 const typescript = require('typescript')
 
+const replacerPlugin = require('./rollup.replacerPlugin')
+
 const {argv} = process
 const root = path.join(process.cwd(), 'spec')
 
-const PACKAGES_PATH = path.join(__dirname, '..', 'packages')
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 console.log(`
@@ -24,29 +25,6 @@ if (!pkg.karma || !pkg.karma.frameworks) {
     ⚠️  package.json at ${process.cwd()} does not have "karma.frameworks"
   `)
   process.exit()
-}
-
-const replacerPlugin = {
-  name: 'tko-package-imports',
-  /**
-   * Resolve the path of tko.* packages, so
-   *
-   *    tko.utils   =>   packages/tko.utils/src/index.js
-   *
-   * We use sources so that we don't have multiple references
-   * from different sources e.g. `tko.computed` and `tko.observable`
-   * both importing `tko.utils` would generate multiple versions
-   * of objectMap that rollup transpiles as objectMap$1 and
-   * objectMap$2.
-   *
-   * Plus by doing this we won't need to rebuild dist/ files
-   * whenever we make changes to the source.
-   */
-  resolveId (importee, importer) {
-    if (importee.includes('/')) { return }
-    const packagePath = path.join(PACKAGES_PATH, importee, 'src/index.js')
-    if (fs.existsSync(packagePath)) { return packagePath }
-  }
 }
 
 const rollupPreprocessor = {

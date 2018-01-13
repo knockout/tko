@@ -52,13 +52,12 @@
     "lerna": "^2.7.0",
     "mocha": "^4.1",
     "rollup": "^0.54",
-    "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel-minify": "^3.1.2",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-license": "^0.5.0",
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-replace": "^2.0",
-    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-plugin-typescript2": "^0.9.0",
     "rollup-plugin-visualizer": "^0.3.1",
     "sinon": "^4.1",
     "standard": "^10.0.3",
@@ -68,5 +67,6 @@
     "packages/*"
   ],
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+  }
 }
