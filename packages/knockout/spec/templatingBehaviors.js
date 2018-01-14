@@ -39,34 +39,24 @@ var dummyTemplateEngine = function (templates) {
         templateText = options.showParams ? templateText + ", data=" + data + ", options=" + options : templateText;
         var templateOptions = options.templateOptions; // Have templateOptions in scope to support [js:templateOptions.foo] syntax
 
-        var result;
-        //
-        // with (bindingContext) {
-        //     with (data || {}) {
-        //         with (options.templateRenderingVariablesInScope || {}) {
-        //             // Dummy [renderTemplate:...] syntax
-        //             result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
-        //                 return ko.renderTemplate(templateName, data, options);
-        //             });
+        const root = Object.assign({}, bindingContext, data, {templateOptions})
 
+        var result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
+            return ko.renderTemplate(templateName, data, options);
+        });
 
-        //             var evalHandler = function (match, script) {
-        //                 try {
-        //                     var evalResult = eval(script);
-        //                     return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
-        //                 } catch (ex) {
-        //                     throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
-        //                 }
-        //             }
+        result = result.replace(/\[\[js\:([\s\S]*?)\]\]/g, evalHandler);
+        result = result.replace(/\[js\:([\s\S]*?)\]/g, evalHandler);
 
-        //             // Dummy [[js:...]] syntax (in case you need to use square brackets inside the expression)
-        //             result = result.replace(/\[\[js\:([\s\S]*?)\]\]/g, evalHandler);
-
-        //             // Dummy [js:...] syntax
-        //             result = result.replace(/\[js\:([\s\S]*?)\]/g, evalHandler);
-        //         }
-        //     }
-        // }
+        function evalHandler (match, script) {
+            try {
+              console.log("SCRIPT", script)
+                var evalResult = eval(`root.${script}`);
+                return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
+            } catch (ex) {
+                throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
+            }
+        }
 
         // Use same HTML parsing code as real template engine so as to trigger same combination of IE weirdnesses
         // Also ensure resulting nodelist is an array to mimic what the default templating engine does, so we see the effects of not being able to remove dead memo comment nodes.
@@ -83,7 +73,7 @@ var dummyTemplateEngine = function (templates) {
 };
 dummyTemplateEngine.prototype = new ko.templateEngine();
 
-describe('Templating', function() {
+ddescribe('Templating', function() {
     beforeEach(jasmine.prepareTestNode);
     afterEach(function() {
         ko.setTemplateEngine(new ko.nativeTemplateEngine());
@@ -378,13 +368,13 @@ describe('Templating', function() {
 
     it('Data binding syntax should be able to reference variables put into scope by the template engine', function () {
         ko.setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<input data-bind='value:message' />" }));
-        ko.renderTemplate("someTemplate", null, { templateRenderingVariablesInScope: { message: "hello"} }, testNode);
+        ko.renderTemplate("someTemplate", { message: "hello"}, {}, testNode);
         expect(testNode.childNodes[0].value).toEqual("hello");
     });
 
     it('Should handle data-bind attributes with spaces around equals sign from inside templates and reference variables', function () {
         ko.setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<input data-bind = 'value:message' />" }));
-        ko.renderTemplate("someTemplate", null, { templateRenderingVariablesInScope: { message: "hello"} }, testNode);
+        ko.renderTemplate("someTemplate", { message: "hello"}, {}, testNode);
         expect(testNode.childNodes[0].value).toEqual("hello");
     });
 
@@ -948,17 +938,17 @@ describe('Templating', function() {
 
     it('Should be able to populate checkboxes from inside templates, despite IE6 limitations', function () {
         ko.setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<input type='checkbox' data-bind='checked:isChecked' />" }));
-        ko.renderTemplate("someTemplate", null, { templateRenderingVariablesInScope: { isChecked: true } }, testNode);
+        ko.renderTemplate("someTemplate", { isChecked: true }, {}, testNode);
         expect(testNode.childNodes[0].checked).toEqual(true);
     });
 
     it('Should be able to populate radio buttons from inside templates, despite IE6 limitations', function () {
         ko.setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<input type='radio' name='somename' value='abc' data-bind='checked:someValue' />" }));
-        ko.renderTemplate("someTemplate", null, { templateRenderingVariablesInScope: { someValue: 'abc' } }, testNode);
+        ko.renderTemplate("someTemplate", {someValue: 'abc'}, {}, testNode);
         expect(testNode.childNodes[0].checked).toEqual(true);
     });
 
-    it('Data binding \'templateOptions\' should be passed to template', function() {
+   it('Data binding \'templateOptions\' should be passed to template', function() {
         var myModel = {
             someAdditionalData: { myAdditionalProp: "someAdditionalValue" },
             people: new ko.observableArray([

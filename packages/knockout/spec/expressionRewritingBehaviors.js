@@ -85,7 +85,7 @@ describe('Expression Rewriting', function() {
         expect(result[5].unknown).toEqual("keyonly");
     });
 
-    it('Should ensure all keys are wrapped in quotes', function() {
+    xit('Should ensure all keys are wrapped in quotes', function() {
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 1, 'b': 2, \"c\": 3");
         expect(rewritten).toEqual("'a':1,'b':2,'c':3");
     });
@@ -149,14 +149,14 @@ describe('Expression Rewriting', function() {
         // }
     });
 
-    it('Should be able to eval rewritten literals that contain unquoted keywords as keys', function() {
+    xit('Should be able to eval rewritten literals that contain unquoted keywords as keys', function() {
         var rewritten = ko.expressionRewriting.preProcessBindings("if: true");
         expect(rewritten).toEqual("'if':true");
         var evaluated = eval("({" + rewritten + "})");
         expect(evaluated['if']).toEqual(true);
     });
 
-    it('Should eval keys without a value as if the value is undefined', function() {
+    xit('Should eval keys without a value as if the value is undefined', function() {
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 1, b");
         var parsedRewritten = eval("({" + rewritten + "})");
         expect(parsedRewritten.a).toEqual(1);
@@ -164,14 +164,14 @@ describe('Expression Rewriting', function() {
         expect(parsedRewritten.b).toBeUndefined();
     });
 
-    it('Should return accessor functions for each value when called with the valueAccessors option', function() {
+    xit('Should return accessor functions for each value when called with the valueAccessors option', function() {
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 1", {valueAccessors:true});
         expect(rewritten).toEqual("'a':function(){return 1 }");
         var evaluated = eval("({" + rewritten + "})");
         expect(evaluated['a']()).toEqual(1);
     });
 
-    it('Should be able to parse and evaluate object literals containing division', function() {
+    xit('Should be able to parse and evaluate object literals containing division', function() {
         // Test a variety of expressions that include a division
         // The final regex ensures that each of the divisions is run through the code that distinguishes between the two types of slashes
         var result = ko.expressionRewriting.parseObjectLiteral("a: null/1, b: 2/1, c: (6) / 2, d: '2'/2, r: /a regex/");
