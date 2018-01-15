@@ -39,7 +39,7 @@ var dummyTemplateEngine = function (templates) {
         templateText = options.showParams ? templateText + ", data=" + data + ", options=" + options : templateText;
         var templateOptions = options.templateOptions; // Have templateOptions in scope to support [js:templateOptions.foo] syntax
 
-        const root = Object.assign({}, bindingContext, data, {templateOptions})
+        const root = Object.assign({}, bindingContext, data, {templateOptions, ko})
 
         var result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
             return ko.renderTemplate(templateName, data, options);
@@ -50,7 +50,6 @@ var dummyTemplateEngine = function (templates) {
 
         function evalHandler (match, script) {
             try {
-              console.log("SCRIPT", script)
                 var evalResult = eval(`root.${script}`);
                 return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
             } catch (ex) {
@@ -73,7 +72,7 @@ var dummyTemplateEngine = function (templates) {
 };
 dummyTemplateEngine.prototype = new ko.templateEngine();
 
-ddescribe('Templating', function() {
+describe('Templating', function() {
     beforeEach(jasmine.prepareTestNode);
     afterEach(function() {
         ko.setTemplateEngine(new ko.nativeTemplateEngine());
@@ -734,7 +733,7 @@ ddescribe('Templating', function() {
         it('Should update DOM nodes when a dependency of their mapping function changes', function() {
             var myObservable = new ko.observable("Steve");
             var myArray = new ko.observableArray([{ personName: "Bob" }, { personName: myObservable }, { personName: "Another" }]);
-            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "<div>The item is [js: ko.utils.unwrapObservable(personName)]</div>" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "<div>The item is [js: ko.utils.unwrapObservable(root.personName)]</div>" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
@@ -781,7 +780,7 @@ ddescribe('Templating', function() {
         it('Should stop tracking inner observables when the container node is removed', function() {
             var innerObservable = ko.observable("some value");
             var myArray = new ko.observableArray([{obsVal:innerObservable}, {obsVal:innerObservable}]);
-            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: ko.utils.unwrapObservable(obsVal)]" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: ko.utils.unwrapObservable(root.obsVal)]" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
@@ -794,7 +793,7 @@ ddescribe('Templating', function() {
         it('Should stop tracking inner observables related to each array item when that array item is removed', function() {
             var innerObservable = ko.observable("some value");
             var myArray = new ko.observableArray([{obsVal:innerObservable}, {obsVal:innerObservable}]);
-            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: ko.utils.unwrapObservable(obsVal)]" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: ko.utils.unwrapObservable(root.obsVal)]" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);

@@ -1,6 +1,11 @@
 /* eslint semi: 0 */
 import * as utils from 'tko.utils'
 
+// Expose for testing.
+import {
+  parseObjectLiteral
+} from 'tko.utils.parser'
+
 import {
     // applyExtenders,
     // arrayChangeEventName,
@@ -121,7 +126,7 @@ utils.arrayForEach([
   coreUtils[coreUtil] = utils[coreUtil]
 })
 
-coreUtils.domNodeDisposal = {
+const domNodeDisposal = {
   addDisposeCallback: utils.addDisposeCallback,
   otherNodeCleanerFunctions: utils.otherNodeCleanerFunctions,
   removeDisposeCallback: utils.removeDisposeCallback,
@@ -129,9 +134,12 @@ coreUtils.domNodeDisposal = {
 }
 
 utils.extend(coreUtils, {
-  setDomNodeChildrenFromArrayMapping: setDomNodeChildrenFromArrayMapping,
+  setDomNodeChildrenFromArrayMapping,
+  filters: punchesFilters,
+  parseObjectLiteral,
   unwrapObservable: unwrap,
-  peekObservable: peek
+  peekObservable: peek,
+  domNodeDisposal
 })
 
 // Create the binding provider and default bindings.
@@ -156,10 +164,7 @@ provider.bindingHandlers.set(foreachBindings)
 provider.bindingHandlers.set({ each: foreachBindings.foreach })
 provider.bindingHandlers.set(componentBindings)
 
-Object.assign(utils.options.filters, punchesFilters);
-
-// Expose the API.
-export default {
+const knockoutInstance = {
     // --- Top-level ---
   version: '{{VERSION}}',
   options: utils.options,
@@ -225,3 +230,6 @@ export default {
     // --- Components ---
   components
 }
+
+// Expose the API.
+export default knockoutInstance

@@ -2,7 +2,7 @@
 describe('Expression Rewriting', function() {
 
     it('Should be able to parse simple object literals', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("a: 1, b: 2, \"quotedKey\": 3, 'aposQuotedKey': 4");
+        var result = ko.utils.parseObjectLiteral("a: 1, b: 2, \"quotedKey\": 3, 'aposQuotedKey': 4");
         expect(result.length).toEqual(4);
         expect(result[0].key).toEqual("a");
         expect(result[0].value).toEqual("1");
@@ -15,14 +15,14 @@ describe('Expression Rewriting', function() {
     });
 
     it('Should ignore any outer braces', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("{a: 1}");
+        var result = ko.utils.parseObjectLiteral("{a: 1}");
         expect(result.length).toEqual(1);
         expect(result[0].key).toEqual("a");
         expect(result[0].value).toEqual("1");
     });
 
     it('Should be able to parse object literals containing string literals', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("a: \"comma, colon: brace{ bracket[ apos' escapedQuot\\\" end\", b: 'escapedApos\\' brace} bracket] quot\"', c: `escapedTick\\` and more`");
+        var result = ko.utils.parseObjectLiteral("a: \"comma, colon: brace{ bracket[ apos' escapedQuot\\\" end\", b: 'escapedApos\\' brace} bracket] quot\"', c: `escapedTick\\` and more`");
         expect(result).toEqual([
                 { key: 'a', value: "\"comma, colon: brace{ bracket[ apos' escapedQuot\\\" end\"" },
                 { key: 'b', value: "'escapedApos\\' brace} bracket] quot\"'" },
@@ -32,7 +32,7 @@ describe('Expression Rewriting', function() {
 
     it('Should be able to parse object literals containing child objects, arrays, function literals, and newlines', function() {
         // The parsing may or may not keep unnecessary spaces. So to avoid confusion, avoid unnecessary spaces.
-        var result = ko.expressionRewriting.parseObjectLiteral(
+        var result = ko.utils.parseObjectLiteral(
             "myObject:{someChild:{},someChildArray:[1,2,3],\"quotedChildProp\":'string value'},\n"
           + "someFn:function(a,b,c){var regex=/{/;var str='/})({';return{};},"
           + "myArray:[{},function(){},\"my'Str\",'my\"Str']"
@@ -48,7 +48,7 @@ describe('Expression Rewriting', function() {
 
     it('Should correctly parse object literals containing property access using bracket notation', function() {
         // We can verify that strings are parsed correctly by including important characters in them (like commas)
-        var result = ko.expressionRewriting.parseObjectLiteral("a: x[\" , \"], b: x[' , '], c: x[` , `]");
+        var result = ko.utils.parseObjectLiteral("a: x[\" , \"], b: x[' , '], c: x[` , `]");
         expect(result).toEqual([
                 { key: 'a', value: "x[\" , \"]" },
                 { key: 'b', value: "x[' , ']" },
@@ -57,7 +57,7 @@ describe('Expression Rewriting', function() {
     });
 
     it('Should be able to parse object literals containing division and regular expressions', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("div: null/5, regexpFunc: function(){var regex=/{/g;return /123/;}");
+        var result = ko.utils.parseObjectLiteral("div: null/5, regexpFunc: function(){var regex=/{/g;return /123/;}");
         expect(result.length).toEqual(2);
         expect(result[0].key).toEqual("div");
         expect(result[0].value).toEqual("null/5");
@@ -66,14 +66,14 @@ describe('Expression Rewriting', function() {
     });
 
     it('Should parse a value that begins with a colon', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("a: :-)");
+        var result = ko.utils.parseObjectLiteral("a: :-)");
         expect(result.length).toEqual(1);
         expect(result[0].key).toEqual("a");
         expect(result[0].value).toEqual(":-)");
     });
 
     it('Should be able to cope with malformed syntax (things that aren\'t key-value pairs)', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("malformed1, 'mal:formed2', good:3, {malformed:4}, good5:5, keyonly:");
+        var result = ko.utils.parseObjectLiteral("malformed1, 'mal:formed2', good:3, {malformed:4}, good5:5, keyonly:");
         expect(result.length).toEqual(6);
         expect(result[0].unknown).toEqual("malformed1");
         expect(result[1].unknown).toEqual("mal:formed2");
@@ -174,7 +174,7 @@ describe('Expression Rewriting', function() {
     xit('Should be able to parse and evaluate object literals containing division', function() {
         // Test a variety of expressions that include a division
         // The final regex ensures that each of the divisions is run through the code that distinguishes between the two types of slashes
-        var result = ko.expressionRewriting.parseObjectLiteral("a: null/1, b: 2/1, c: (6) / 2, d: '2'/2, r: /a regex/");
+        var result = ko.utils.parseObjectLiteral("a: null/1, b: 2/1, c: (6) / 2, d: '2'/2, r: /a regex/");
         expect(result).toEqual([{key:'a', value: 'null/1'}, {key: 'b', value: '2/1'}, {key: 'c', value: '(6)/2'}, {key: 'd', value: '\'2\'/2'}, {key: 'r', value: '/a regex/'}]);
         var rewritten = ko.expressionRewriting.preProcessBindings(result, {valueAccessors:true});
         var evaluated = eval("({" + rewritten + "})");
@@ -185,13 +185,13 @@ describe('Expression Rewriting', function() {
     });
 
     it('Should return an empty array for an empty string', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral("");
+        var result = ko.utils.parseObjectLiteral("");
         expect(result).toEqual([]);
     });
 
     it('Should be able to parse object literals containing C++ style comments', function() {
         // From https://github.com/knockout/knockout/issues/1524
-        var result = ko.expressionRewriting.parseObjectLiteral(
+        var result = ko.utils.parseObjectLiteral(
             "model: router.activeItem, //wiring the router\n" +
             "afterCompose: router.afterCompose, //wiring the router\n" +
             "//transition:'entrance', //use the 'entrance' transition when switching views\n" +
@@ -206,7 +206,7 @@ describe('Expression Rewriting', function() {
     });
 
     it('Should be able to parse object literals containing C style comments', function() {
-        var result = ko.expressionRewriting.parseObjectLiteral(
+        var result = ko.utils.parseObjectLiteral(
             "a: xxx, /* First comment */\n" +
             "b: yyy, /* Multi-line comment that comments-out the next whole line\n" +
             "x: 'nothing', //this is also skipped */\n" +
