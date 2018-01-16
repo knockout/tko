@@ -270,7 +270,7 @@ describe('Dependent Observable', function() {
     it('Should accept "owner" parameter to define the object on which the evaluator function should be called', function () {
         var model = new (function () {
             this.greeting = "hello";
-            this.fullMessageWithoutOwner = ko.computed(function () { return this.greeting + " world" });
+            this.fullMessageWithoutOwner = ko.computed(function () { return (this || {}).greeting + " world" });
             this.fullMessageWithOwner = ko.computed(function () { return this.greeting + " world" }, this);
         })();
         expect(model.fullMessageWithoutOwner()).toEqual("undefined world");

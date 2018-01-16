@@ -25,6 +25,7 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
   const isFunc = typeof realDataItemOrAccessor === 'function' && !isObservable(realDataItemOrAccessor)
+  self.ko = options.knockoutInstance
 
   let nodes
   let subscribable
@@ -59,7 +60,6 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
       // Export 'ko' in the binding context so it will be available in bindings and templates
       // even if 'ko' isn't exported as a global, such as when using an AMD loader.
       // See https://github.com/SteveSanderson/knockout/issues/490
-      self.ko = options.knockoutInstance
     }
 
     if (shouldInheritData) {

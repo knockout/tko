@@ -180,6 +180,7 @@ const knockoutInstance = {
   tasks: utils.tasks,
   utils: coreUtils,
   dependencyDetection,
+  computedContext: dependencyDetection,
   ignoreDependencies: dependencyDetection.ignore,
   selectExtensions: utils.selectExtensions,
 
@@ -230,6 +231,8 @@ const knockoutInstance = {
     // --- Components ---
   components
 }
+
+utils.options.knockoutInstance = knockoutInstance
 
 // Expose the API.
 export default knockoutInstance
