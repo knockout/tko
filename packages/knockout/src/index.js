@@ -7,6 +7,10 @@ import {
 } from 'tko.utils.parser'
 
 import {
+  functionRewrite
+} from 'tko.utils.functionRewrite'
+
+import {
     // applyExtenders,
     // arrayChangeEventName,
     // deferUpdates,
