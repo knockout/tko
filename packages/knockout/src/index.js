@@ -237,6 +237,7 @@ const knockoutInstance = {
 }
 
 utils.options.knockoutInstance = knockoutInstance
+utils.options.bindingStringPreparsers = [functionRewrite]
 
 // Expose the API.
 export default knockoutInstance

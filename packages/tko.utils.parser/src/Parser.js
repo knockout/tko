@@ -767,8 +767,14 @@ export default class Parser {
     return result
   }
 
+  preparse (source = '') {
+    source = source.trim()
+    const preparsers = options.bindingStringPreparsers || []
+    return preparsers.reduce((acc, fn) => fn(acc), source)
+  }
+
   runParse (source, fn) {
-    this.text = (source || '').trim()
+    this.text = this.preparse(source)
     this.at = 0
     this.ch = ' '
 
