@@ -122,8 +122,8 @@ function createRollupConfig ({ minify, transpile } = {}) {
     output: {
       file: filename,
       format: IS_BROWSER_BUNDLE ? 'umd' : 'es',
-      name: IS_BROWSER_BUNDLE ? 'ko' : packageName
-    },
-    sourcemap: true
+      name: IS_BROWSER_BUNDLE ? 'ko' : packageName,
+      sourcemap: true
+    }
   }
 }
