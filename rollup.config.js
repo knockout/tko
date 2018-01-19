@@ -55,21 +55,30 @@ const UNIVERSAL_PLUGINS = [
   license({ sourcemap: true, banner })
 ]
 
-export default [
-  /* tko.<module?>.es6.js */
-  createRollupConfig(),
-  /* tko.<module?>.js */
-  createRollupConfig({ transpile: true }),
-  ...(IS_BROWSER_BUNDLE
-    ? [
-      /* tko.es6.min.js */
-      createRollupConfig({ minify: true }),
-      /* tko.min.js */
-      createRollupConfig({ minify: true, transpile: true })
-    ]
-    : []
-  )
-]
+function getConfigs () {
+  // Respect a `--es6` option to speed up compilation during e.g.
+  // testing.
+  if (process.argv.includes('--es6')) {
+    return createRollupConfig()
+  }
+  return [
+    /* tko.<module?>.es6.js */
+    createRollupConfig(),
+    /* tko.<module?>.js */
+    createRollupConfig({ transpile: true }),
+    ...(IS_BROWSER_BUNDLE
+      ? [
+        /* tko.es6.min.js */
+        createRollupConfig({ minify: true }),
+        /* tko.min.js */
+        createRollupConfig({ minify: true, transpile: true })
+      ]
+      : []
+    )
+  ]
+}
+
+export default getConfigs()
 
 function getTkoModules () {
   return fs.readdirSync(path.resolve(path.join(getMonorepoRoot(), 'packages')))
