@@ -1,14 +1,13 @@
 {
-  "name": "tko.provider.functionRewrite",
+  "name": "tko.utils.functionRewrite",
   "version": "4.0.0-alpha4",
   "description": "Rewrite `function {}` as lambdas (=>)",
-  "module": "dist/tko.provider.functionRewrite.js",
+  "module": "dist/tko.utils.functionRewrite.js",
   "files": [
     "dist/"
   ],
   "license": "MIT",
   "dependencies": {
-    "tko.provider": "^4.0.0-alpha4",
     "tslib": "^1.8.0"
   },
   "karma": {

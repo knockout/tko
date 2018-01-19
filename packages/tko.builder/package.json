@@ -1,8 +1,8 @@
 {
-  "name": "tko",
+  "name": "tko.builder",
   "version": "4.0.0-alpha4a",
-  "description": "The TKO.js Javascript Library",
-  "main": "dist/tko.js",
+  "description": "Compile a customized instance of Knockout.",
+  "main": "dist/tko.builder.js",
   "repository": "git@github.com:knockout/tko",
   "author": "The Knockout Team",
   "license": "MIT",
