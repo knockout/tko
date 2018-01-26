@@ -6,14 +6,15 @@ import {
 describe('Function Rewrite Provider', function () {
   describe('replaceFunctionStrings', function () {
     const tryExpect = {
-      'x: function () {}': 'x: => undefined',
-      'x: function ( ) { return t }': 'x: => t',
-      'x:function(){return t}': 'x:=> t',
-      'x: function () { return t }, y: function () { return z }': 'x: => t, y: => z',
-      'x: function () { return a + b }': 'x: => a + b',
-      // 'x: function () { return {} }': 'x: => {}',
-      'x: function () { return "abc" }': 'x: => "abc"',
-      'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: function() { }, nullLiteral: null, undefinedLiteral: undefined': 'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: => undefined, nullLiteral: null, undefinedLiteral: undefined'
+      'x: function () {}': 'x: () => undefined',
+      'x: function ( ) { return t }': 'x: () => t',
+      'x:function(){return t}': 'x:() => t',
+      'x: function () { return t }, y: function () { return z }': 'x: () => t, y: () => z',
+      'x: function () { return a + b }': 'x: () => a + b',
+      // 'x: function () { return {} }': 'x: () => {}',
+      'x: function () { return "abc" }': 'x: () => "abc"',
+      'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: function() { }, nullLiteral: null, undefinedLiteral: undefined': 'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: () => undefined, nullLiteral: null, undefinedLiteral: undefined',
+      'function (v) { return v.name + " (" + v.job + ")"; }': '(v) => v.name + " (" + v.job + ")";'
     }
     const idempotents = [
       'x: nonfunction () {}'
