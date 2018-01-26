@@ -16,6 +16,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (observable) Add `ko.proxy` and related functions `ko.proxy.peek(obj, prop)`, `ko.proxy.isProxied(obj)`, `ko.proxy.getObservable(obj, prop)`.
 * Fix missing `ko.when` and `ko.isObservableArray`
 * Add `options.bindingStringPreparsers` array of functions that mutate binding strings before they are parsed
+* Parse ES2015 object initializer shorthands e.g. `{name}` = `{name: name}`
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 
