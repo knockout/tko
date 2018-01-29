@@ -40,12 +40,14 @@ const builder = new Builder({
     foreachBindings,
     componentBindings,
     { each: foreachBindings.foreach }
-  ]
+  ],
+  options: {
+    bindingStringPreparsers: [functionRewrite]
+  }
 })
 
 export default builder.create({
   version: '{{ VERSION }}',
   components,
-  bindingStringPreparsers: [functionRewrite],
-  Component: components.ComponentABC
+  Component: components.ComponentABC,
 })
