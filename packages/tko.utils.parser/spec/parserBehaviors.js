@@ -488,6 +488,32 @@ describe('unary operations', function () {
       bindings.x()()
       assert.equal(obs(), 146)
     })
+
+    it('ignores empty arguments', () => {
+      const binding = 'x: () => yfn(146)'
+      const obs = observable()
+      const context = { yfn: function (n) { obs(n) } }
+      const bindings = makeBindings(binding, context)
+      assert.equal(obs(), undefined)
+      bindings.x() // does not evaluate on lookup
+      assert.equal(obs(), undefined)
+      bindings.x()()
+      assert.equal(obs(), 146)
+    })
+
+    it('exposes arguments', () => {
+      const binding = 'x: (z) => 1 + z'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(941), 942)
+    })
+
+    it('exposes multiple arguments', () => {
+      const binding = 'x: (a,b,c) => a * b * c'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(1, 2, 3), 6)
+    })
   })
 
   describe('@ lookup/unwrap', function () {
