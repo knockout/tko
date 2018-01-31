@@ -148,3 +148,44 @@ jasmine.ieVersion = typeof(document) == 'undefined' ? undefined : (function() {
 }());
 
 jasmine.browserSupportsProtoAssignment = { __proto__: [] } instanceof Array;
+
+
+
+//
+// bmh: Monkeypatch so we can catch errors in asynchronous functions.
+//
+jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMillis) {
+  var scheduledFunc;
+  var funcsToRun = [];
+  for (var timeoutKey in this.scheduledFunctions) {
+      scheduledFunc = this.scheduledFunctions[timeoutKey];
+      if (scheduledFunc != jasmine.undefined &&
+          scheduledFunc.runAtMillis >= oldMillis &&
+          scheduledFunc.runAtMillis <= nowMillis) {
+          funcsToRun.push(scheduledFunc);
+          this.scheduledFunctions[timeoutKey] = jasmine.undefined;
+      }
+  }
+
+  if (funcsToRun.length > 0) {
+      funcsToRun.sort(function(a, b) {
+          return a.runAtMillis - b.runAtMillis;
+      });
+
+      for (var i = 0; i < funcsToRun.length; ++i) {
+        //try {       // mbest: Removed so we can catch errors in asynchronous functions
+          var funcToRun = funcsToRun[i];
+          this.nowMillis = funcToRun.runAtMillis;
+          funcToRun.funcToCall();
+          if (funcToRun.recurring) {
+              this.scheduleFunction(funcToRun.timeoutKey,
+                funcToRun.funcToCall,
+                funcToRun.millis,
+                true);
+          }
+        //} catch(e) {
+        //}
+      }
+      this.runFunctionsWithinRange(oldMillis, nowMillis);
+  }
+};

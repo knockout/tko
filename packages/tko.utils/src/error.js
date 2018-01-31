@@ -6,17 +6,18 @@
 import options from './options.js'
 
 export function catchFunctionErrors (delegate) {
-  return options.onError ? function () {
+  if (!options.onError) { return delegate }
+  return (...args) => {
     try {
-      return delegate.apply(this, arguments)
-    } catch (e) {
-      options.onError(e)
+      return delegate(...args)
+    } catch (err) {
+      options.onError(err)
     }
-  } : delegate
+  }
 }
 
 export function deferError (error) {
-  safeSetTimeout(function () { options.onError(error) }, 0)
+  safeSetTimeout(function () { throw error }, 0)
 }
 
 export function safeSetTimeout (handler, timeout) {
