@@ -3,11 +3,13 @@ describe('onError handler', function () {
     var windowOnErrorCount = 0;
     var windowOnErrorOriginal;
     var lastSeenError = null;
+    const originalOnError = ko.options.onError
 
     beforeEach(function () {
-        ko.onError = function (error) {
+        ko.options.onError = function (error) {
             lastSeenError = error;
             koOnErrorCount++;
+            throw error
         };
 
         function ensureNodeExistsAndIsEmpty(id, tagName, type) {
@@ -43,7 +45,7 @@ describe('onError handler', function () {
 
     afterEach(function () {
         window.onerror = windowOnErrorOriginal;
-        ko.onError = null;
+        ko.options.onError = originalOnError;
         lastSeenError = null;
     });
 

@@ -325,7 +325,7 @@ describe('Tasks scheduler', function() {
 
         jasmine.Clock.useMock();
         this.restoreAfter(ko.tasks, 'scheduler');
-        ko.tasks.scheduler = function (callback) {
+        ko.options.taskScheduler = function (callback) {
             ++counts[0];
             setTimeout(callback, 0);
         };
