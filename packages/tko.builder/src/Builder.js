@@ -142,6 +142,7 @@ const knockout = {
   // --- Utilities ---
   cleanNode,
   dependencyDetection,
+  computedContext: dependencyDetection,
   filters: options.filters,
   ignoreDependencies: dependencyDetection.ignore,
   memoization,

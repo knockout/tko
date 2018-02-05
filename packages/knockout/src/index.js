@@ -49,5 +49,5 @@ const builder = new Builder({
 export default builder.create({
   version: '{{ VERSION }}',
   components,
-  Component: components.ComponentABC,
+  Component: components.ComponentABC
 })
