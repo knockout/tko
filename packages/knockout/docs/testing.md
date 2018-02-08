@@ -16,3 +16,4 @@ Notes:
 - removed `postJson` tests
 - expose the Knockout instance from which a `BindingContext` was created as `$context.ko`
 - make the Knockout instance changeable, via `ko.options.knockoutInstance`
+- .length tests depend on whether .length is overwriteable

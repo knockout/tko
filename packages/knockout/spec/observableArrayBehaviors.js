@@ -274,9 +274,16 @@ describe('Observable Array', function() {
         expect(testObservableArray.indexOf("fake")).toEqual(-1);
     });
 
-    it('Should return 0 when you call myArray.length, and the true length when you call myArray().length', function() {
+    it('Should return the true length / myArray.length, and the true length when you call myArray().length', function() {
         testObservableArray(["Alpha", "Beta", "Gamma"]);
-        expect(testObservableArray.length).toEqual(0); // Because JavaScript won't let us override "length" directly
+        let overwriteableLength = false
+        // Old JavaScript won't let us override "length" directly
+        try {
+          Object.defineProperty(function x () {}, 'length', {})
+          overwriteableLength = true
+        } catch (e) { }
+
+        expect(testObservableArray.length).toEqual(overwriteableLength ? 3 : 0);
         expect(testObservableArray().length).toEqual(3);
     });
 
