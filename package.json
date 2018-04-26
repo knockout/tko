@@ -63,7 +63,9 @@
     "rollup-plugin-visualizer": "^0.6.0",
     "sinon": "^5.0",
     "standard": "^11.0.1",
-    "typescript": "^2.8.3"
+    "tslint": "5.9.1",
+    "tslib": "1.9.0",
+    "typescript": "^2.6.2"
   },
   "workspaces": [
     "packages/*"
