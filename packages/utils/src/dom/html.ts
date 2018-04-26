@@ -9,16 +9,18 @@ import { forceRefresh } from './fixes.js'
 import * as virtualElements from './virtualElements'
 import options from '../options'
 
-var none = [0, '', ''],
-  table = [1, '<table>', '</table>'],
-  tbody = [2, '<table><tbody>', '</tbody></table>'],
-  colgroup = [ 2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
-  tr = [3, '<table><tbody><tr>', '</tr></tbody></table>'],
-  select = [1, "<select multiple='multiple'>", '</select>'],
-  fieldset = [1, '<fieldset>', '</fieldset>'],
-  map = [1, '<map>', '</map>'],
-  object = [1, '<object>', '</object>'],
-  lookup = {
+type TagTuple = [number, string, string]
+
+var none: TagTuple = [0, '', ''],
+  table: TagTuple = [1, '<table>', '</table>'],
+  tbody: TagTuple = [2, '<table><tbody>', '</tbody></table>'],
+  colgroup: TagTuple = [ 2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+  tr: TagTuple = [3, '<table><tbody><tr>', '</tr></tbody></table>'],
+  select: TagTuple = [1, "<select multiple='multiple'>", '</select>'],
+  fieldset: TagTuple = [1, '<fieldset>', '</fieldset>'],
+  map: TagTuple = [1, '<map>', '</map>'],
+  object: TagTuple = [1, '<object>', '</object>'],
+  lookup: { [k: string]: TagTuple} = {
     'area': map,
     'col': colgroup,
     'colgroup': table,
@@ -36,16 +38,19 @@ var none = [0, '', ''],
   },
 
     // The canonical way to test that the HTML5 <template> tag is supported
-  supportsTemplateTag = options.document && 'content' in options.document.createElement('template')
+  supportsTemplateTag = options.document && 'content' in options.document.createElement('template');
 
-function getWrap (tags) {
+function getWrap (tags: string) {
   const m = tags.match(/^(?:<!--.*?-->\s*?)*?<([a-z]+)[\s>]/)
   return (m && lookup[m[1]]) || none
 }
 
-function simpleHtmlParse (html, documentContext) {
-  documentContext || (documentContext = document)
-  var windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
+function simpleHtmlParse(html: string, documentContext: any) {
+  if (!documentContext) {
+    documentContext = document;
+  }
+
+  const windowContext = documentContext.parentWindow || documentContext.defaultView || window;
 
     // Based on jQuery's "clean" function, but only accounting for table-related elements.
     // If you have referenced jQuery, this won't be used anyway - KO will use jQuery's "clean" function directly
@@ -56,55 +61,54 @@ function simpleHtmlParse (html, documentContext) {
     // (possibly a text node) in front of the comment. So, KO does not attempt to workaround this IE issue automatically at present.
 
     // Trim whitespace, otherwise indexOf won't work as expected
-  var tags = stringTrim(html).toLowerCase(), div = documentContext.createElement('div'),
-    wrap = getWrap(tags),
-    depth = wrap[0]
+  const tags = stringTrim(html).toLowerCase(), wrap = getWrap(tags);
+  let div = documentContext.createElement('div'), depth = wrap[0];
 
     // Go to html and back, then peel off extra wrappers
     // Note that we always prefix with some dummy text, because otherwise, IE<9 will strip out leading comment nodes in descendants. Total madness.
-  var markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
-  if (typeof windowContext['innerShiv'] === 'function') {
+  const markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>';
+  if (typeof windowContext.innerShiv === 'function') {
         // Note that innerShiv is deprecated in favour of html5shiv. We should consider adding
         // support for html5shiv (except if no explicit support is needed, e.g., if html5shiv
         // somehow shims the native APIs so it just works anyway)
-    div.appendChild(windowContext['innerShiv'](markup))
+    div.appendChild(windowContext.innerShiv(markup));
   } else {
-    div.innerHTML = markup
+    div.innerHTML = markup;
   }
 
     // Move to the right depth
-  while (depth--) { div = div.lastChild }
+  while (depth--) { div = div.lastChild; }
 
-  return makeArray(div.lastChild.childNodes)
+  return makeArray(div.lastChild.childNodes);
 }
 
-function templateHtmlParse (html, documentContext) {
-  if (!documentContext) { documentContext = document }
-  var template = documentContext.createElement('template')
-  template.innerHTML = html
-  return makeArray(template.content.childNodes)
+function templateHtmlParse(html: string, documentContext: any) {
+  if (!documentContext) { documentContext = document; }
+  const template = documentContext.createElement('template');
+  template.innerHTML = html;
+  return makeArray(template.content.childNodes);
 }
 
-function jQueryHtmlParse (html, documentContext) {
+function jQueryHtmlParse(html: string, documentContext: any) {
     // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
-  if (jQueryInstance.parseHTML) {
-    return jQueryInstance.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
+  if ((jQueryInstance as any).parseHTML) {
+    return (jQueryInstance as any).parseHTML(html, documentContext) || []; // Ensure we always return an array and never null
   } else {
         // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-    var elems = jQueryInstance.clean([html], documentContext)
+    const elems = (jQueryInstance as any).clean([html], documentContext);
 
         // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
         // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
         // Fix this by finding the top-most dummy parent element, and detaching it from its owner fragment.
     if (elems && elems[0]) {
             // Find the top-most parent element that's a direct child of a document fragment
-      var elem = elems[0]
-      while (elem.parentNode && elem.parentNode.nodeType !== 11 /* i.e., DocumentFragment */) { elem = elem.parentNode }
+      let elem = elems[0];
+      while (elem.parentNode && elem.parentNode.nodeType !== 11 /* i.e., DocumentFragment */) { elem = elem.parentNode; }
             // ... then detach it
-      if (elem.parentNode) { elem.parentNode.removeChild(elem) }
+      if (elem.parentNode) { elem.parentNode.removeChild(elem); }
     }
 
-    return elems
+    return elems;
   }
 }
 
@@ -118,7 +122,7 @@ function jQueryHtmlParse (html, documentContext) {
  * @param  {Object} documentContext That owns the executing code.
  * @return {[DOMNode]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html, documentContext) {
+export function parseHtmlFragment(html: string, documentContext: any) {
     // Prefer <template>-tag based HTML parsing.
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
 
@@ -128,15 +132,17 @@ export function parseHtmlFragment (html, documentContext) {
         : (jQueryInstance ? jQueryHtmlParse(html, documentContext)
 
         // ... otherwise, this simple logic will do in most common cases.
-        : simpleHtmlParse(html, documentContext))
+        : simpleHtmlParse(html, documentContext));
 }
 
-export function parseHtmlForTemplateNodes (html, documentContext) {
-  const nodes = parseHtmlFragment(html, documentContext)
-  return (nodes.length && nodes[0].parentElement) || moveCleanedNodesToContainerElement(nodes)
+export function parseHtmlForTemplateNodes(html: string, documentContext: any) {
+  const nodes = parseHtmlFragment(html, documentContext);
+  return (nodes.length && nodes[0].parentElement) || moveCleanedNodesToContainerElement(nodes);
 }
 
-/**
+type StringGetter = () => string;
+
+ /**
   * setHtml empties the node's contents, unwraps the HTML, and
   * sets the node's HTML using jQuery.html or parseHtmlFragment
   *
@@ -144,17 +150,17 @@ export function parseHtmlForTemplateNodes (html, documentContext) {
   * @param {DOMNode} html HTML to be inserted in node
   * @returns undefined
   */
-export function setHtml (node, html) {
-  emptyDomNode(node)
+export function setHtml(node: Node, html: string|StringGetter|any) {
+  emptyDomNode(node);
 
     // There's few cases where we would want to display a stringified
     // function, so we unwrap it.
   if (typeof html === 'function') {
-    html = html()
+    html = html();
   }
 
   if ((html !== null) && (html !== undefined)) {
-    if (typeof html !== 'string') { html = html.toString() }
+    if (typeof html !== 'string') { html = html.toString(); }
 
         // If the browser supports <template> tags, prefer that, as
         // it obviates all the complex workarounds of jQuery.
@@ -163,26 +169,26 @@ export function setHtml (node, html) {
         // for example <tr> elements which are not normally allowed to exist on their own.
         // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
     if (jQueryInstance && !supportsTemplateTag) {
-      jQueryInstance(node).html(html)
+      jQueryInstance(node).html(html);
     } else {
             // ... otherwise, use KO's own parsing logic.
-      var parsedNodes = parseHtmlFragment(html, node.ownerDocument)
+      const parsedNodes = parseHtmlFragment(html, node.ownerDocument);
 
       if (node.nodeType === 8) {
         if (html === null) {
-          virtualElements.emptyNode(node)
+          virtualElements.emptyNode(node);
         } else {
-          virtualElements.setDomNodeChildren(node, parsedNodes)
+          virtualElements.setDomNodeChildren(node, parsedNodes);
         }
       } else {
-        for (var i = 0; i < parsedNodes.length; i++) { node.appendChild(parsedNodes[i]) }
+        for (const parsedNode of parsedNodes) { node.appendChild(parsedNodes); }
       }
     }
   }
 }
 
 
-export function setTextContent (element, textContent) {
+export function setTextContent (element: HTMLElement, textContent: string | StringGetter) {
   var value = typeof textContent === 'function' ? textContent() : textContent
   if ((value === null) || (value === undefined)) { value = '' }
 
@@ -191,9 +197,9 @@ export function setTextContent (element, textContent) {
     // we'll clear everything and create a single text node.
   var innerTextNode = virtualElements.firstChild(element)
   if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
-    virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)])
+    virtualElements.setDomNodeChildren(element, [((element as HTMLElement).ownerDocument as HTMLDocument).createTextNode(value)])
   } else {
-    innerTextNode.data = value
+    (innerTextNode as Text).data = value
   }
 
   forceRefresh(element)

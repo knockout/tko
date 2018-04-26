@@ -2,27 +2,26 @@
 // String (and JSON)
 //
 
-export function stringTrim (string) {
-  return string === null || string === undefined ? ''
-        : string.trim
-            ? string.trim()
-            : string.toString().replace(/^[\s\xa0]+|[\s\xa0]+$/g, '')
+export function stringTrim(str: string) {
+  return str === null || str === undefined ? ''
+        : str.trim
+            ? str.trim()
+            : str.toString().replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 }
 
-export function stringStartsWith (string, startsWith) {
-  string = string || ''
-  if (startsWith.length > string.length) { return false }
-  return string.substring(0, startsWith.length) === startsWith
+export function stringStartsWith(str: string, startsWith: string) {
+  str = str || '';
+  if (startsWith.length > str.length) { return false; }
+  return str.substring(0, startsWith.length) === startsWith;
 }
 
-export function parseJson (jsonString) {
+export function parseJson(jsonString: string) {
   if (typeof jsonString === 'string') {
-    jsonString = stringTrim(jsonString)
+    jsonString = stringTrim(jsonString);
     if (jsonString) {
-      if (JSON && JSON.parse) // Use native parsing where available
-            { return JSON.parse(jsonString) }
-      return (new Function('return ' + jsonString))() // Fallback on less safe parsing for older browsers
+      if (JSON && JSON.parse) { return JSON.parse(jsonString); } // Use native parsing where available
+      return (new Function('return ' + jsonString))(); // Fallback on less safe parsing for older browsers
     }
   }
-  return null
+  return null;
 }

@@ -4,85 +4,98 @@
 // Note that the array functions may be called with
 // Array-like things, such as NodeList.
 
-const {isArray} = Array
+export const {isArray} = Array;
 
-export function arrayForEach (array, action, thisArg) {
-  if (arguments.length > 2) { action = action.bind(thisArg) }
+// export function arrayForEach<T, TThis>(array: T[], action: (this: TThis, item: T, index: number, array: T[]) => void, thisArg: TThis): void;
+export function arrayForEach<T>(array: T[], action: (item: T, index: number, array: T[]) => void, thisArg?: any) {
+  if (thisArg) { action = action.bind(thisArg); }
   for (let i = 0, j = array.length; i < j; ++i) {
-    action(array[i], i, array)
+    action(array[i], i, array);
   }
 }
 
-export function arrayIndexOf (array, item) {
-  return (isArray(array) ? array : [...array]).indexOf(item)
+export function arrayIndexOf<T>(array: T[], item: T) {
+  return (isArray(array) ? array : [...array as T[]]).indexOf(item);
 }
 
-export function arrayFirst (array, predicate, predicateOwner) {
-  return (isArray(array) ? array : [...array])
+// export function arrayFirst<T, TThis>(array: T[], predicate: (this: TThis, value: T, index: number, obj: T[]) => boolean, predicateOwner: TThis): void;
+export function arrayFirst<T>(array: T[], predicate: (value: T, index: number, obj: T[]) => boolean, predicateOwner?: any) {
+  return (isArray(array) ? array : [...array as T[]])
     .find(predicate, predicateOwner)
 }
 
-export function arrayMap (array = [], mapping, thisArg) {
+export function arrayMap<T, U= T, TTHis= void>(array: T[], mapping: (this: TTHis, v: T, k: number) => U, thisArg: TTHis): U[];
+export function arrayMap<T, U= T>(array: T[] = [], mapping: (v: T, k: number) => U, thisArg?: any) {
   if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   return array === null ? [] : Array.from(array, mapping)
 }
 
-export function arrayRemoveItem (array, itemToRemove) {
-  var index = arrayIndexOf(array, itemToRemove)
+export function arrayRemoveItem<T>(array: T[], itemToRemove: T) {
+  const index = arrayIndexOf(array, itemToRemove);
   if (index > 0) {
-    array.splice(index, 1)
+    array.splice(index, 1);
   } else if (index === 0) {
-    array.shift()
+    array.shift();
   }
 }
 
-export function arrayGetDistinctValues (array = []) {
+export function arrayGetDistinctValues<T>(array: T[] = []) {
   const seen = new Set()
   if (array === null) { return [] }
-  return (isArray(array) ? array : [...array])
-    .filter(item => seen.has(item) ? false : seen.add(item))
+  return (isArray(array) ? array : [...array as T[]])
+    .filter(item => seen.has(item) ? false : seen.add(item));
 }
 
-export function arrayFilter (array, predicate, thisArg) {
+export function arrayFilter<T, TThis = void>(array: T[], predicate: (this: TThis, value: T, index: number, array: T[]) => any, thisArg: TThis): T[];
+export function arrayFilter<T>(array: T[], predicate: (value: T, index: number, array: T[]) => any, thisArg?: any) {
   if (arguments.length > 2) { predicate = predicate.bind(thisArg) }
-  return array === null ? [] : (isArray(array) ? array : [...array]).filter(predicate)
+  return array === null ? [] : (isArray(array) ? array : [...array as T[]]).filter(predicate)
 }
 
-export function arrayPushAll (array, valuesToPush) {
+export function arrayPushAll<T>(array: T[], valuesToPush: ArrayLike<T>) {
   if (isArray(valuesToPush)) {
-    array.push.apply(array, valuesToPush)
+    array.push.apply(array, valuesToPush);
   } else {
-    for (var i = 0, j = valuesToPush.length; i < j; i++) { array.push(valuesToPush[i]) }
+    for (let i = 0, j = valuesToPush.length; i < j; i++) {
+      array.push(valuesToPush[i]);
+    }
   }
-  return array
+
+  return array;
 }
 
-export function addOrRemoveItem (array, value, included) {
-  var existingEntryIndex = arrayIndexOf(typeof array.peek === 'function' ? array.peek() : array, value)
+export function addOrRemoveItem<T>(array: T[], value: T, included?: boolean) {
+  const existingEntryIndex = arrayIndexOf('peek' in array && typeof (array as any).peek === 'function' ? (array as any).peek() : array, value);
   if (existingEntryIndex < 0) {
-    if (included) { array.push(value) }
+    if (included) { array.push(value); }
   } else {
-    if (!included) { array.splice(existingEntryIndex, 1) }
+    if (!included) { array.splice(existingEntryIndex, 1); }
   }
 }
 
-export function makeArray (arrayLikeObject) {
-  return Array.from(arrayLikeObject)
+export function makeArray<T>(arrayLikeObject: ArrayLike<T>) {
+  return Array.from(arrayLikeObject);
 }
 
-export function range (min, max) {
-  min = typeof min === 'function' ? min() : min
-  max = typeof max === 'function' ? max() : max
-  var result = []
-  for (var i = min; i <= max; i++) { result.push(i) }
-  return result
+export type RangeFunction = () => number;
+export function range(min: number|RangeFunction, max: number|RangeFunction) {
+  min = typeof min === 'function' ? min() : min;
+  max = typeof max === 'function' ? max() : max;
+  const result = [];
+
+  for (let i = min; i <= max; i++) { result.push(i); }
+
+  return result;
 }
 
 // Go through the items that have been added and deleted and try to find matches between them.
-export function findMovesInArrayComparison (left, right, limitFailedCompares) {
+export function findMovesInArrayComparison(left: any[], right: any[], limitFailedCompares: number|boolean) {
   if (left.length && right.length) {
-    var failedCompares, l, r, leftItem, rightItem
+    let failedCompares, l, r, leftItem, rightItem;
+
+    // tslint:disable-next-line:no-conditional-assignment
     for (failedCompares = l = 0; (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]); ++l) {
+      // tslint:disable-next-line:no-conditional-assignment
       for (r = 0; rightItem = right[r]; ++r) {
         if (leftItem.value === rightItem.value) {
           leftItem.moved = rightItem.index
@@ -92,7 +105,7 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares) {
           break
         }
       }
-      failedCompares += r
+      failedCompares += r;
     }
   }
 }
@@ -100,33 +113,43 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares) {
 const statusNotInOld = 'added'
 const statusNotInNew = 'deleted'
 
+export interface ICompareArrayOptions {
+  dontLimitMoves?: boolean;
+  sparse?: boolean;
+}
+
     // Simple calculation based on Levenshtein distance.
-export function compareArrays (oldArray, newArray, options) {
+export function compareArrays<T>(oldArray: T[], newArray: T[], options ?: boolean|ICompareArrayOptions) {
     // For backward compatibility, if the third arg is actually a bool, interpret
     // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
   options = (typeof options === 'boolean') ? { dontLimitMoves: options } : (options || {})
   oldArray = oldArray || []
   newArray = newArray || []
 
-  if (oldArray.length < newArray.length) { return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options) } else { return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options) }
+  if (oldArray.length < newArray.length) {
+     return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options);
+  } else {
+     return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options);
+  }
 }
 
-function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, statusNotInBig, options) {
-  var myMin = Math.min,
+function compareSmallArrayToBigArray<T>(smlArray: T[], bigArray: T[], statusNotInSml: any, statusNotInBig: any, options: ICompareArrayOptions) {
+  // tslint:disable:prefer-const
+  let myMin = Math.min,
     myMax = Math.max,
     editDistanceMatrix = [],
     smlIndex, smlIndexMax = smlArray.length,
     bigIndex, bigIndexMax = bigArray.length,
     compareRange = (bigIndexMax - smlIndexMax) || 1,
     maxDistance = smlIndexMax + bigIndexMax + 1,
-    thisRow, lastRow,
-    bigIndexMaxForRow, bigIndexMinForRow
+    thisRow, lastRow: any,
+    bigIndexMaxForRow, bigIndexMinForRow;
 
   for (smlIndex = 0; smlIndex <= smlIndexMax; smlIndex++) {
-    lastRow = thisRow
-    editDistanceMatrix.push(thisRow = [])
-    bigIndexMaxForRow = myMin(bigIndexMax, smlIndex + compareRange)
-    bigIndexMinForRow = myMax(0, smlIndex - 1)
+    lastRow = thisRow;
+    editDistanceMatrix.push(thisRow = []);
+    bigIndexMaxForRow = myMin(bigIndexMax, smlIndex + compareRange);
+    bigIndexMinForRow = myMax(0, smlIndex - 1);
     for (bigIndex = bigIndexMinForRow; bigIndex <= bigIndexMaxForRow; bigIndex++) {
       if (!bigIndex) {
         thisRow[bigIndex] = smlIndex + 1
@@ -136,33 +159,33 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
       } else if (smlArray[smlIndex - 1] === bigArray[bigIndex - 1]) {
         thisRow[bigIndex] = lastRow[bigIndex - 1]
       } else {                  // copy value (no edit)
-        var northDistance = lastRow[bigIndex] || maxDistance       // not in big (deletion)
-        var westDistance = thisRow[bigIndex - 1] || maxDistance    // not in small (addition)
+        const northDistance = lastRow[bigIndex] || maxDistance       // not in big (deletion)
+        const westDistance: number = thisRow[bigIndex - 1] || maxDistance    // not in small (addition)
         thisRow[bigIndex] = myMin(northDistance, westDistance) + 1
       }
     }
   }
 
-  var editScript = [], meMinusOne, notInSml = [], notInBig = []
+  let editScript = [], meMinusOne, notInSml = [], notInBig = [];
   for (smlIndex = smlIndexMax, bigIndex = bigIndexMax; smlIndex || bigIndex;) {
-    meMinusOne = editDistanceMatrix[smlIndex][bigIndex] - 1
+    meMinusOne = editDistanceMatrix[smlIndex][bigIndex] - 1;
     if (bigIndex && meMinusOne === editDistanceMatrix[smlIndex][bigIndex - 1]) {
       notInSml.push(editScript[editScript.length] = {     // added
-        'status': statusNotInSml,
-        'value': bigArray[--bigIndex],
-        'index': bigIndex })
+        status: statusNotInSml,
+        value: bigArray[--bigIndex],
+        index: bigIndex });
     } else if (smlIndex && meMinusOne === editDistanceMatrix[smlIndex - 1][bigIndex]) {
       notInBig.push(editScript[editScript.length] = {     // deleted
-        'status': statusNotInBig,
-        'value': smlArray[--smlIndex],
-        'index': smlIndex })
+        status: statusNotInBig,
+        value: smlArray[--smlIndex],
+        index: smlIndex });
     } else {
       --bigIndex
       --smlIndex
       if (!options.sparse) {
         editScript.push({
-          'status': 'retained',
-          'value': bigArray[bigIndex] })
+          status: 'retained',
+          value: bigArray[bigIndex] });
       }
     }
   }
@@ -171,5 +194,5 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     // smlIndexMax keeps the time complexity of this algorithm linear.
   findMovesInArrayComparison(notInBig, notInSml, !options.dontLimitMoves && smlIndexMax * 10)
 
-  return editScript.reverse()
+  return editScript.reverse();
 }

@@ -3,10 +3,10 @@
 //
 // TODO: deprecate in favour of options.$
 
-import options from './options'
+import options from './options';
 
-export var jQueryInstance = options.global && options.global.jQuery
+export let jQueryInstance = options.jQuery;
 
-export function jQuerySetInstance (jquery) {
-  options.jQuery = jQueryInstance = jquery
+export function jQuerySetInstance(jquery: JQueryStatic) {
+  options.jQuery = jQueryInstance = jquery;
 }
