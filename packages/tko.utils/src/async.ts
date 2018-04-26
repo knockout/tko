@@ -1,24 +1,26 @@
 //
 // Asynchronous functionality
 // ---
-import { safeSetTimeout } from './error.js'
+import { safeSetTimeout } from './error';
 
-export function throttle (callback, timeout) {
-  var timeoutInstance
-  return function (...args) {
+// tslint:disable-next-line:ban-types
+export function throttle(callback: Function, timeout: number) {
+  let timeoutInstance: number|undefined;
+  return (...args: any[]) => {
     if (!timeoutInstance) {
-      timeoutInstance = safeSetTimeout(function () {
-        timeoutInstance = undefined
-        callback(...args)
-      }, timeout)
+      timeoutInstance = safeSetTimeout(() => {
+        timeoutInstance = undefined;
+        callback(...args);
+      }, timeout);
     }
-  }
+  };
 }
 
-export function debounce (callback, timeout) {
-  var timeoutInstance
-  return function (...args) {
-    clearTimeout(timeoutInstance)
-    timeoutInstance = safeSetTimeout(() => callback(...args), timeout)
-  }
+// tslint:disable-next-line:ban-types
+export function debounce(callback: Function, timeout: number) {
+  let timeoutInstance: number|undefined;
+  return (...args: any[]) => {
+    clearTimeout(timeoutInstance);
+    timeoutInstance = safeSetTimeout(() => callback(...args), timeout);
+  };
 }

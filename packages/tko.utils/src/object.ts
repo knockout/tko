@@ -2,62 +2,63 @@
 // Object functions
 //
 
-export function hasOwnProperty(obj, propName) {
-  return Object.prototype.hasOwnProperty.call(obj, propName)
+export function hasOwnProperty(obj: any, propName: string) {
+  return Object.prototype.hasOwnProperty.call(obj, propName) as boolean;
 }
 
-export function extend (target, source) {
+export function extend(target: any, source: any) {
   if (source) {
-    for (var prop in source) {
+    for (const prop in source) {
       if (hasOwnProperty(source, prop)) {
-        target[prop] = source[prop]
+        target[prop] = source[prop];
       }
     }
   }
-  return target
+  return target;
 }
 
-export function objectForEach (obj, action) {
-  for (var prop in obj) {
+export function objectForEach<T>(obj: T, action: (prop: keyof T, value: T[keyof T]) => void) {
+  for (const prop in obj) {
     if (hasOwnProperty(obj, prop)) {
-      action(prop, obj[prop])
+      action(prop, obj[prop]);
     }
   }
 }
 
-export function objectMap (source, mapping, thisArg) {
-  if (!source) { return source }
-  if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
-  var target = {}
-  for (var prop in source) {
+export type MappingFunction<TSource, TThis= void> = (value: TSource[keyof TSource], prop: keyof TSource, source: TSource) => any;
+export function objectMap<TSource, TThis= void>(source: TSource, mapping: MappingFunction<TSource, TThis>, thisArg?: TThis) {
+  if (!source) { return source; }
+  if (thisArg) { mapping = mapping.bind(thisArg); }
+  const target: any = {};
+  for (const prop in source) {
     if (hasOwnProperty(source, prop)) {
-      target[prop] = mapping(source[prop], prop, source)
+      target[prop] = mapping(source[prop], prop, source);
     }
   }
-  return target
+  return target;
 }
-export function getObjectOwnProperty (obj, propName) {
-  return hasOwnProperty(obj, propName) ? obj[propName] : undefined
+export function getObjectOwnProperty<TSource>(obj: TSource, propName: keyof TSource) {
+  return hasOwnProperty(obj, propName) ? obj[propName] : undefined;
 }
 
-export function clonePlainObjectDeep (obj, seen) {
-  if (!seen) { seen = [] }
+export function clonePlainObjectDeep(obj: any, seen?: any[]) {
+  if (!seen) { seen = []; }
 
   if (!obj || typeof obj !== 'object' ||
         obj.constructor !== Object ||
         seen.indexOf(obj) !== -1) {
-    return obj
+    return obj;
   }
 
     // Anything that makes it below is a plain object that has not yet
     // been seen/cloned.
-  seen.push(obj)
+  seen.push(obj);
 
-  var result = {}
-  for (var prop in obj) {
+  const result: any = {};
+  for (const prop in obj) {
     if (hasOwnProperty(obj, prop)) {
-      result[prop] = clonePlainObjectDeep(obj[prop], seen)
+      result[prop] = clonePlainObjectDeep(obj[prop], seen);
     }
   }
-  return result
+  return result;
 }

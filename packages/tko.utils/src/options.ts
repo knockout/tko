@@ -4,56 +4,84 @@
 //
 // This is the root 'options', which must be extended by others.
 
-var _global
+// tslint:disable-next-line:variable-name
+let _global: Window;
+let jq: JQueryStatic|null = null;
+let promise: PromiseConstructorLike|null = null;
+let document: Document|null = null;
 
-try { _global = window } catch (e) { _global = global }
+try {
+  _global = window;
+  jq = jQuery;
+  document = window.document;
+} catch (e) {
+  _global = global as any as Window;
+}
 
-var options = {
+if ('Promise' in _global) {
+  promise = (_global as any).Promise as PromiseConstructorLike;
+}
+
+// tslint:disable-next-line:ban-types
+type TaskScheduler = (callback: Function) => any;
+const taskScheduler = null; // Workaround for typedef
+
+const options = {
   deferUpdates: false,
 
   useOnlyNativeEvents: false,
 
   protoProperty: '__ko_proto__',
 
-    // Modify the default attribute from `data-bind`.
+  /**
+   * Modify the default attribute from `data-bind`.
+   */
   defaultBindingAttribute: 'data-bind',
 
-    // Enable/disable <!-- ko binding: ... -> style bindings
+  /**
+   * Enable/disable <!-- ko binding: ... -> style bindings
+   */
   allowVirtualElements: true,
 
-    // Global variables that can be accessed from bindings.
+  /**
+   * Global variables that can be accessed from bindings.
+   */
   bindingGlobals: _global,
 
-    // An instance of the binding provider.
+  /**
+   * An instance of the binding provider.
+   */
   bindingProviderInstance: null,
 
-    // jQuery will be automatically set to _global.jQuery in applyBindings
-    // if it is (strictly equal to) undefined.  Set it to false or null to
-    // disable automatically setting jQuery.
-  jQuery: _global && _global.jQuery,
+  /**
+   * jQuery will be automatically set to _global.jQuery in applyBindings
+   * if it is (strictly equal to) undefined.  Set it to false or null to
+   * disable automatically setting jQuery.
+   */
+  jQuery: jq,
 
-  Promise: _global && _global.Promise,
+  Promise: promise,
 
-  taskScheduler: null,
+  taskScheduler: (taskScheduler as TaskScheduler|null),
 
   debug: false,
 
   global: _global,
-  document: _global.document,
+  document,
 
-    // Filters for bindings
-    //   data-bind="expression | filter_1 | filter_2"
+  /**
+   * Filters for bindings
+   *   data-bind="expression | filter_1 | filter_2"
+   */
   filters: {},
 
-  onError: function (e) { throw e },
+  onError(e: Error) { throw e; },
 
-  set: function (name, value) {
-    options[name] = value
-  }
-}
+  set(name: string, value: any) {
+    (options as any)[name] = value;
+  },
 
-Object.defineProperty(options, '$', {
-  get: function () { return options.jQuery }
-})
+  $: jQuery
+};
 
-export default options
+export default options;

@@ -4,32 +4,32 @@
 
 */
 
-export * from './array.js'
-export * from './async.js'
-export * from './error.js'
-export * from './ie.js'
-export * from './object.js'
-export * from './function.js'
-export * from './proto.js'
-export * from './string.js'
-export * from './symbol.js'
-export * from './css.js'
-export { jQuerySetInstance } from './jquery.js'
-export { default as options } from './options.js'
+export * from './array';
+export * from './async';
+export * from './error';
+export * from './ie';
+export * from './object';
+export * from './function';
+export * from './proto';
+export * from './string';
+export * from './symbol';
+export * from './css';
+export { jQuerySetInstance } from './jquery';
+export { default as options } from './options';
 
 // DOM;
-export * from './dom/event.js'
-export * from './dom/info.js'
-export * from './dom/manipulation.js'
-export * from './dom/fixes.js'
-export * from './dom/html.js'
-export * from './dom/disposal.js'
-export * from './dom/selectExtensions.js'
+export * from './dom/event';
+export * from './dom/info';
+export * from './dom/manipulation';
+export * from './dom/fixes';
+export * from './dom/html';
+export * from './dom/disposal';
+export * from './dom/selectExtensions';
 
 // Sub-Modules;
-import * as memoization from './memoization'
-import * as tasks from './tasks.js'
-import * as virtualElements from './dom/virtualElements.js'
-import * as domData from './dom/data.js'
+import * as memoization from './memoization';
+import * as tasks from './tasks';
+import * as virtualElements from './dom/virtualElements';
+import * as domData from './dom/data';
 
-export {tasks, virtualElements, domData, memoization}
+export {tasks, virtualElements, domData, memoization};
