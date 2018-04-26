@@ -27,7 +27,8 @@
     ]
   },
   "dependencies": {
-    "tslib": "^1.8.0"
+    "@types/jquery": "3.3.1",
+    "tslib": "1.9.0"
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json",
   "standard": {
