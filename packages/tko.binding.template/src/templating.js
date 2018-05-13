@@ -6,6 +6,7 @@ import {
 
 import {
     applyBindings, setDomNodeChildrenFromArrayMapping, AsyncBindingHandler,
+    notifyBindingEvent, bindingEvent,
     bindingContext as BindingContextConstructor
 } from 'tko.bind'
 
@@ -133,6 +134,9 @@ function executeTemplate (targetNodeOrNodeArray, renderMode, template, bindingCo
   if (haveAddedNodesToParent) {
     activateBindingsOnContinuousNodeArray(renderedNodesArray, bindingContext, afterBindingCallback)
     if (options.afterRender) { dependencyDetection.ignore(options.afterRender, null, [renderedNodesArray, bindingContext['$data']]) }
+    if (renderMode === 'replaceChildren') {
+      notifyBindingEvent(targetNodeOrNodeArray, bindingEvent.childrenComplete)
+    }
   }
 
   return renderedNodesArray
@@ -233,6 +237,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
     // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
     dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, filteredArray, executeTemplateForArrayItem, options, activateBindingsCallback])
+    notifyBindingEvent(targetNode, bindingEvent.childrenComplete)
   }, null, { disposeWhenNodeIsRemoved: targetNode })
 }
 

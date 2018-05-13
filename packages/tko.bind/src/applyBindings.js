@@ -20,6 +20,10 @@ import {
 } from './bindingContext'
 
 import {
+  subscribeToBindingEvent, bindingEvent, notifyBindingEvent
+} from './bindingEvent'
+
+import {
   LegacyBindingHandler
 } from './LegacyBindingHandler'
 
@@ -113,10 +117,16 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
     nextInQueue = virtualElements.firstChild(elementOrVirtualElement)
   }
 
+  let bindingApplied = false
   while (currentChild = nextInQueue) {
-        // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
+    // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
     nextInQueue = virtualElements.nextSibling(currentChild)
     applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
+    bindingApplied = true
+  }
+
+  if (bindingApplied) {
+    notifyBindingEvent(elementOrVirtualElement, bindingEvent.childrenComplete)
   }
 }
 
@@ -257,6 +267,15 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
         // The following is the 3.x allBindings API
     allBindings.has = (key) => key in bindings
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
+
+    if (bindingEvent.childrenComplete in bindings) {
+      subscribeToBindingEvent(node, bindingEvent.childrenComplete, () => {
+        const callback = evaluateValueAccessor(bindings[bindingEvent.childrenComplete])
+        if (!callback) { return }
+        const nodes = virtualElements.childNodes(node)
+        if (nodes.length) { callback(nodes, ko.dataFor(nodes[0])) }
+      })
+    }
 
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
     for (const [key, BindingHandlerClass] of bindingsGenerated) {

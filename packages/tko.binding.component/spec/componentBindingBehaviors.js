@@ -705,6 +705,27 @@ describe('Components: Component binding', function () {
     expect(testNode).toContainText('Hello! Your param is 456 Goodbye.')
   })
 
+  it('Should call a childrenComplete callback function', function () {
+    testNode.innerHTML = '<div data-bind="component: testComponentBindingValue, childrenComplete: callback"></div>'
+    components.register(testComponentName, { template: '<div data-bind="text: myvalue"></div>' })
+    testComponentParams.myvalue = 'some parameter value'
+
+    var callbacks = 0
+    outerViewModel.callback = function (nodes, data) {
+      expect(nodes.length).toEqual(1)
+      expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0])
+      expect(data).toEqual(testComponentParams)
+      callbacks++
+    }
+
+    applyBindings(outerViewModel, testNode)
+    expect(callbacks).toEqual(0)
+
+    jasmine.Clock.tick(1)
+    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: myvalue">some parameter value</div>')
+    expect(callbacks).toEqual(1)
+  })
+
   describe('Component `bindingHandlers`', function () {
     it('overloads existing and provides new bindings', function () {
       const calls = []

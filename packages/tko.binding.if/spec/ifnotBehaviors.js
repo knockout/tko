@@ -97,4 +97,22 @@ describe('Binding: Ifnot', function () {
     expect(testNode.childNodes[0]).toContainText('Parents: 0')
     expect(contextFor(testNode.childNodes[0].childNodes[1]).$parents.length).toEqual(0)
   })
+
+  it('Should call a childrenComplete callback function', function () {
+    testNode.innerHTML = "<div data-bind='ifnot: condition, childrenComplete: callback'><span data-bind='text: someText'></span></div>"
+    var someItem = observable({ childprop: 'child' }),
+      callbacks = 0
+    var viewModel = { condition: observable(false), someText: 'hello', callback: function () { callbacks++ } }
+    applyBindings(viewModel, testNode)
+    expect(callbacks).toEqual(1)
+    expect(testNode.childNodes[0]).toContainText('hello')
+
+    viewModel.condition(true)
+    expect(callbacks).toEqual(1)
+    expect(testNode.childNodes[0].childNodes.length).toEqual(0)
+
+    viewModel.condition(false)
+    expect(callbacks).toEqual(2)
+    expect(testNode.childNodes[0]).toContainText('hello')
+  })
 })

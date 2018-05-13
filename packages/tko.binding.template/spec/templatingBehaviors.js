@@ -205,6 +205,20 @@ describe('Templating', function () {
     expect(testNode.childNodes[0].innerHTML).toEqual('result = 456')
   })
 
+  it('Should call a generic childrenComplete callback function', function () {
+    setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'result = [js: childProp]' }))
+    testNode.innerHTML = "<div data-bind='template: { name: \"someTemplate\", data: someItem }, childrenComplete: callback'></div>"
+    var someItem = observable({ childProp: 'child' }),
+      callbacks = 0
+    applyBindings({ someItem: someItem, callback: function () { callbacks++ } }, testNode)
+    expect(callbacks).toEqual(1)
+    expect(testNode.childNodes[0]).toContainText('result = child')
+
+    someItem({ childProp: 'new child' })
+    expect(callbacks).toEqual(2)
+    expect(testNode.childNodes[0]).toContainText('result = new child')
+  })
+
   it('Should stop tracking inner observables immediately when the container node is removed from the document', function () {
     var innerObservable = observable('some value')
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'result = [js: nomangle$data.childProp()]' }))
@@ -380,24 +394,23 @@ describe('Templating', function () {
     expect(viewModel.someProp.getSubscriptionsCount('change')).toEqual(1)    // only subscription is from the templating code
   })
 
-  it('Data binding syntax should be able to use $rawData in binding value to refer to a top level template\'s view model observable', function() {
+  it('Data binding syntax should be able to use $rawData in binding value to refer to a top level template\'s view model observable', function () {
     options.bindingGlobals.isObservable = isObservable
-    setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }));
-    renderTemplate("someTemplate", observable('value'), null, testNode);
-    expect(testNode.childNodes[0]).toContainText("true");
-});
+    setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }))
+    renderTemplate('someTemplate', observable('value'), null, testNode)
+    expect(testNode.childNodes[0]).toContainText('true')
+  })
 
-it('Data binding syntax should be able to use $rawData in binding value to refer to a data-bound template\'s view model observable', function() {
+  it('Data binding syntax should be able to use $rawData in binding value to refer to a data-bound template\'s view model observable', function () {
     options.bindingGlobals.isObservable = isObservable
-    setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }));
-    testNode.innerHTML = "<div data-bind='template: { name: \"someTemplate\", data: someProp }'></div>";
+    setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }))
+    testNode.innerHTML = "<div data-bind='template: { name: \"someTemplate\", data: someProp }'></div>"
 
-    const viewModel = { someProp: observable('value') };
-    applyBindings(viewModel, testNode);
+    const viewModel = { someProp: observable('value') }
+    applyBindings(viewModel, testNode)
 
-    expect(testNode.childNodes[0].childNodes[0]).toContainText("true");
-});
-
+    expect(testNode.childNodes[0].childNodes[0]).toContainText('true')
+  })
 
   it('Data binding syntax should defer evaluation of variables until the end of template rendering (so bindings can take independent subscriptions to them)', function () {
     setTemplateEngine(new dummyTemplateEngine({
@@ -524,37 +537,35 @@ it('Data binding syntax should be able to use $rawData in binding value to refer
     expect(testNode.childNodes[0]).toContainHtml('begin<span data-bind="template: \'innertemplate\'">the name is beta</span>end')
   })
 
+  it('Should accept a "nodes" option that gives the template nodes, and able to use the same nodes for multiple bindings', function () {
+    testNode.innerHTML = "<div data-bind='template: { nodes: testNodes, data: testData1, bypassDomNodeWrap: true }'></div><div data-bind='template: { nodes: testNodes, data: testData2, bypassDomNodeWrap: true }'></div>"
+    var model = {
+      testNodes: [
+            document.createTextNode('begin'),
+            document.createElement('span'),
+            document.createTextNode('end')
+          ],
+      testData1: observable({ name: observable('alpha1') }),
+      testData2: observable({ name: observable('alpha2') })
+    }
+    model.testNodes[1].setAttribute('data-bind', 'text: name') // See that bindings are applied to the injected nodes
 
-    it('Should accept a "nodes" option that gives the template nodes, and able to use the same nodes for multiple bindings', function () {
-        testNode.innerHTML = "<div data-bind='template: { nodes: testNodes, data: testData1, bypassDomNodeWrap: true }'></div><div data-bind='template: { nodes: testNodes, data: testData2, bypassDomNodeWrap: true }'></div>";
-        var model = {
-            testNodes: [
-                document.createTextNode("begin"),
-                document.createElement("span"),
-                document.createTextNode("end")
-            ],
-            testData1: observable({ name: observable("alpha1") }),
-            testData2: observable({ name: observable("alpha2") })
-        };
-        model.testNodes[1].setAttribute("data-bind", "text: name"); // See that bindings are applied to the injected nodes
-
-        applyBindings(model, testNode);
-        expect(testNode.childNodes[0]).toContainText("beginalpha1end");
-        expect(testNode.childNodes[1]).toContainText("beginalpha2end");
+    applyBindings(model, testNode)
+    expect(testNode.childNodes[0]).toContainText('beginalpha1end')
+    expect(testNode.childNodes[1]).toContainText('beginalpha2end')
 
         // The injected bindings update to match model changes as usual
-        model.testData1().name("beta1");
-        model.testData2().name("beta2");
-        expect(testNode.childNodes[0]).toContainText("beginbeta1end");
-        expect(testNode.childNodes[1]).toContainText("beginbeta2end");
+    model.testData1().name('beta1')
+    model.testData2().name('beta2')
+    expect(testNode.childNodes[0]).toContainText('beginbeta1end')
+    expect(testNode.childNodes[1]).toContainText('beginbeta2end')
 
         // The template binding re-renders successfully if model changes
-        model.testData1({ name: observable("gamma1") });
-        model.testData2({ name: observable("gamma2") });
-        expect(testNode.childNodes[0]).toContainText("begingamma1end");
-        expect(testNode.childNodes[1]).toContainText("begingamma2end");
-    });
-
+    model.testData1({ name: observable('gamma1') })
+    model.testData2({ name: observable('gamma2') })
+    expect(testNode.childNodes[0]).toContainText('begingamma1end')
+    expect(testNode.childNodes[1]).toContainText('begingamma2end')
+  })
 
   it('Should accept a "nodes" option that gives the template nodes, and it can be used in conjunction with "foreach"', function () {
     testNode.innerHTML = "<div data-bind='template: { nodes: testNodes, foreach: testData, bypassDomNodeWrap: true }'></div>"

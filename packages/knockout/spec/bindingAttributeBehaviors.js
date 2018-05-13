@@ -628,11 +628,11 @@ describe('Binding attribute syntax', function() {
         ko.applyBindings({}, testNode);
     });
 
-    it('Should call childrenComplete callback registered with ko.bindingEvent.subscribe', function () {
+    it('Should call childrenComplete callback registered with ko.subscribeToBindingEvent', function () {
         var callbacks = 0,
             vm = {};
 
-        ko.bindingEvent.subscribe(testNode, "childrenComplete", function (node) {
+        ko.subscribeToBindingEvent(testNode, "childrenComplete", function (node) {
             callbacks++;
             expect(node).toEqual(testNode);
             expect(ko.dataFor(node)).toEqual(vm);

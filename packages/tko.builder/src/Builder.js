@@ -83,6 +83,9 @@ import {
     contextFor,
     dataFor,
     getBindingHandler,
+    bindingEvent,
+    notifyBindingEvent,
+    subscribeToBindingEvent,
     BindingHandler,
     AsyncBindingHandler,
     setDomNodeChildrenFromArrayMapping
@@ -194,7 +197,10 @@ const knockout = {
   BindingHandler,
   AsyncBindingHandler,
   virtualElements,
-  domNodeDisposal
+  domNodeDisposal,
+  bindingEvent,
+  notifyBindingEvent,
+  subscribeToBindingEvent
 }
 
 export class Builder {
