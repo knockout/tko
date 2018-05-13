@@ -40,6 +40,9 @@ export default class MultiProvider extends Provider {
   }
 
   preprocessNode (node) {
+    if (this.instance && this.instance.preprocessNode) {
+      this.instance.preprocessNode(node)
+    }
     for (const provider of this.providersFor(node)) {
       const newNodes = provider.preprocessNode(node)
       if (newNodes) { return newNodes }
