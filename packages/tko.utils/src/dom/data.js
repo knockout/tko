@@ -81,4 +81,9 @@ function set (node, key, value) {
   dataForNode && (dataForNode[key] = value)
 }
 
-export { get, set, clear }
+function getOrSet (node, key, value) {
+  const dataForNode = getDataForNode(node, true, /* createIfNotFound */)
+  return dataForNode[key] || (dataForNode[key] = value)
+}
+
+export { get, set, getOrSet, clear }
