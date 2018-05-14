@@ -196,10 +196,11 @@ function * topologicalSortBindings (bindings, $component) {
 }
 
 function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyncBindingsApplied) {
+  const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
   // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
+  const alreadyBound = bindingInfo.alreadyBound
   if (!sourceBindings) {
-    const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
-    if (bindingInfo.context) {
+    if (alreadyBound) {
       onBindingError({
         during: 'apply',
         errorCaptured: new Error('You cannot apply bindings multiple times to the same element.'),
@@ -208,11 +209,16 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       })
       return false
     }
-    bindingInfo.context = bindingContext
-    if (bindingContext[contextSubscribeSymbol]) {
-      bindingContext[contextSubscribeSymbol]._addNode(node)
-    }
+    bindingInfo.alreadyBound = true
   }
+  if (!alreadyBound) {
+    bindingInfo.context = bindingContext
+  }
+
+  if (bindingContext[contextSubscribeSymbol]) {
+    bindingContext[contextSubscribeSymbol]._addNode(node)
+  }
+
 
   // Use bindings if given, otherwise fall back on asking the bindings provider to give us some bindings
   var bindings
