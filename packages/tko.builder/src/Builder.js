@@ -219,7 +219,7 @@ export class Builder {
     }
 
     this.providedProperties = {
-      extenders: Object.assign({}, defaultExtenders, extenders),
+      extenders: Object.assign(defaultExtenders, extenders),
       bindingHandlers: provider.bindingHandlers,
       bindingProvider: provider
     }
