@@ -13,7 +13,7 @@ import { VirtualProvider } from 'tko.provider.virtual'
 import { DataBindProvider } from 'tko.provider.databind'
 
 import {
-    applyBindings, dataFor, bindingContext,
+    applyBindings, dataFor, bindingContext, bindingEvent,
     applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../src'
 
@@ -793,14 +793,14 @@ describe('Binding attribute syntax', function () {
     applyBindings({}, testNode)
   })
 
-  it('Should call childrenComplete callback registered with ko.subscribeToBindingEvent', function () {
+  it('Should call childrenComplete callback registered with bindingEvent.subscribe', function () {
     var callbacks = 0,
       vm = {}
 
-    ko.subscribeToBindingEvent(testNode, 'childrenComplete', function (node) {
+    bindingEvent.subscribe(testNode, 'childrenComplete', function (node) {
       callbacks++
       expect(node).toEqual(testNode)
-      expect(ko.dataFor(node)).toEqual(vm)
+      expect(dataFor(node)).toEqual(vm)
     })
 
     testNode.innerHTML = '<div></div>'

@@ -11,6 +11,10 @@ import {
     unwrap, isObservable
 } from 'tko.observable'
 
+import {
+  contextAncestorBindingInfo
+} from './bindingEvent'
+
 export const boundElementDomDataKey = domData.nextKey()
 
 export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')
@@ -54,6 +58,11 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
 
             // Copy $root and any custom properties from the parent context
       extend(self, parentContext)
+
+       // Copy Symbol properties
+      if (contextAncestorBindingInfo in parentContext) {
+        self[contextAncestorBindingInfo] = parentContext[contextAncestorBindingInfo]
+      }
 
             // Because the above copy overwrites our own properties, we need to reset them.
       self[contextSubscribeSymbol] = subscribable

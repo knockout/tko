@@ -82,10 +82,7 @@ import {
     applyBindingsToNode,
     contextFor,
     dataFor,
-    getBindingHandler,
     bindingEvent,
-    notifyBindingEvent,
-    subscribeToBindingEvent,
     BindingHandler,
     AsyncBindingHandler,
     setDomNodeChildrenFromArrayMapping
@@ -198,8 +195,6 @@ const knockout = {
   virtualElements,
   domNodeDisposal,
   bindingEvent,
-  notifyBindingEvent,
-  subscribeToBindingEvent,
 
   get getBindingHandler () { return options.getBindingHandler },
   set getBindingHandler (fn) { options.set('getBindingHandler', fn) }

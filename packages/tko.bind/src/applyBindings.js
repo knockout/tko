@@ -20,8 +20,12 @@ import {
 } from './bindingContext'
 
 import {
-  subscribeToBindingEvent, bindingEvent, notifyBindingEvent
+  bindingEvent
 } from './bindingEvent'
+
+import {
+  dataFor
+} from './bindingContext'
 
 import {
   LegacyBindingHandler
@@ -116,17 +120,13 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
     nextInQueue = virtualElements.firstChild(elementOrVirtualElement)
   }
 
-  let bindingApplied = false
   while (currentChild = nextInQueue) {
     // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
     nextInQueue = virtualElements.nextSibling(currentChild)
     applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
-    bindingApplied = true
   }
 
-  if (bindingApplied) {
-    notifyBindingEvent(elementOrVirtualElement, bindingEvent.childrenComplete)
-  }
+  bindingEvent.notify(elementOrVirtualElement, bindingEvent.childrenComplete)
 }
 
 function hasBindings (node) {
@@ -196,10 +196,10 @@ function * topologicalSortBindings (bindings, $component) {
 }
 
 function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyncBindingsApplied) {
-  const bindingInfo = domData.get(node, boundElementDomDataKey)
   // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
   if (!sourceBindings) {
-    if (bindingInfo) {
+    const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
+    if (bindingInfo.context) {
       onBindingError({
         during: 'apply',
         errorCaptured: new Error('You cannot apply bindings multiple times to the same element.'),
@@ -208,7 +208,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       })
       return false
     }
-    domData.set(node, boundElementDomDataKey, { context: bindingContext })
+    bindingInfo.context = bindingContext
     if (bindingContext[contextSubscribeSymbol]) {
       bindingContext[contextSubscribeSymbol]._addNode(node)
     }
@@ -268,11 +268,11 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
 
     if (bindingEvent.childrenComplete in bindings) {
-      subscribeToBindingEvent(node, bindingEvent.childrenComplete, () => {
+      bindingEvent.subscribe(node, bindingEvent.childrenComplete, () => {
         const callback = evaluateValueAccessor(bindings[bindingEvent.childrenComplete])
         if (!callback) { return }
         const nodes = virtualElements.childNodes(node)
-        if (nodes.length) { callback(nodes, ko.dataFor(nodes[0])) }
+        if (nodes.length) { callback(nodes, dataFor(nodes[0])) }
       })
     }
 
@@ -315,7 +315,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           bindingHandlerThatControlsDescendantBindings = key
         }
 
-        if (bindingHandler.bindingCompleted instanceof options.Promise) {
+        if (bindingHandler.bindingCompleted instanceof Promise) {
           asyncBindingsApplied.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
@@ -346,7 +346,7 @@ export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) 
   const asyncBindingsApplied = new Set()
   var context = getBindingContext(viewModelOrBindingContext)
   applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context, asyncBindingsApplied)
-  return options.Promise.all(asyncBindingsApplied)
+  return asyncBindingsApplied.size && Promise.all(asyncBindingsApplied)
 }
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
@@ -354,7 +354,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode)
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, asyncBindingsApplied)
   }
-  return options.Promise.all(asyncBindingsApplied)
+  return asyncBindingsApplied.size && Promise.all(asyncBindingsApplied)
 }
 
 export function applyBindings (viewModelOrBindingContext, rootNode, extendContextCallback) {
@@ -375,7 +375,7 @@ export function applyBindings (viewModelOrBindingContext, rootNode, extendContex
   }
   const rootContext = getBindingContext(viewModelOrBindingContext, extendContextCallback)
   applyBindingsToNodeAndDescendantsInternal(rootContext, rootNode, asyncBindingsApplied)
-  return options.Promise.all(asyncBindingsApplied)
+  return Promise.all(asyncBindingsApplied)
 }
 
 function onBindingError (spec) {

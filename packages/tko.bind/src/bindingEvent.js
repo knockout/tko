@@ -7,24 +7,34 @@ import {
   subscribable
 } from 'tko.observable'
 
+export const contextAncestorBindingInfo = Symbol('_ancestorBindingInfo')
+const boundElementDomDataKey = domData.nextKey()
+
 export const bindingEvent = {
   childrenComplete: 'childrenComplete',
-  descendentsComplete: 'descendentsComplete'
-}
+  descendentsComplete: 'descendentsComplete',
 
-const bindingEventsDomDataKey = domData.nextKey()
+  subscribe: function (node, event, callback, context) {
+    const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
+    if (!bindingInfo.eventSubscribable) {
+      bindingInfo.eventSubscribable = new subscribable()
+    }
+    return bindingInfo.eventSubscribable.subscribe(callback, context, event)
+  },
 
-export function notifyBindingEvent (node, event) {
-  const eventSubscribable = domData.get(node, bindingEventsDomDataKey)
-  if (eventSubscribable) {
-    eventSubscribable.notifySubscribers(node, event)
+  notify: function (node, event) {
+    const bindingInfo = domData.get(node, boundElementDomDataKey)
+    if (bindingInfo) {
+      if (bindingInfo.eventSubscribable) {
+        bindingInfo.eventSubscribable['notifySubscribers'](node, event)
+      }
+      if (event === bindingEvent.childrenComplete) {
+        if (bindingInfo.asyncContext) {
+          bindingInfo.asyncContext.completeChildren()
+        } else if (bindingInfo.eventSubscribable && bindingInfo.eventSubscribable.hasSubscriptionsForEvent(bindingEvent.descendantsComplete)) {
+          throw new Error('descendantsComplete event not supported for bindings on this node')
+        }
+      }
+    }
   }
-}
-
-export function subscribeToBindingEvent (node, event, callback) {
-  var eventSubscribable = domData.get(node, bindingEventsDomDataKey)
-  if (!eventSubscribable) {
-    domData.set(node, bindingEventsDomDataKey, eventSubscribable = new subscribable())
-  }
-  return eventSubscribable.subscribe(callback, null, event)
 }
