@@ -24,8 +24,9 @@ export var style = {
         jQueryInstance(element).css(styleName, styleValue)
       } else {
         styleName = styleName.replace(/-(\w)/g, (all, letter) => letter.toUpperCase())
+        const previousStyle = element.style[styleName]
         element.style[styleName] = styleValue
-        if (styleValue !== '' && element.style[styleName] === '' && !isNaN(styleValue)) {
+        if (styleValue !== previousStyle && element.style[styleName] === previousStyle && !isNaN(styleValue)) {
           element.style[styleName] = styleValue + 'px'
         }
       }
