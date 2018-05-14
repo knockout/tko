@@ -6,6 +6,8 @@ import {
     observable
 } from 'tko.observable'
 
+import { MultiProvider } from 'tko.provider.multi'
+import { VirtualProvider } from 'tko.provider.virtual'
 import { DataBindProvider } from 'tko.provider.databind'
 
 import {
@@ -92,7 +94,7 @@ describe('Node preprocessing', function () {
   })
 
   it('Should call a childrenComplete callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function () {
-    class TestProvider extends DataBindProvider {
+    class TestProvider extends MultiProvider {
       preprocessNode (node) {
         if (node.nodeType === 3 && node.data.charAt(0) === '$') {
           var newNodes = [
@@ -106,7 +108,11 @@ describe('Node preprocessing', function () {
           return newNodes
         }
       }
-  }
+    }
+    options.bindingProviderInstance = new TestProvider()
+    options.bindingProviderInstance.bindingHandlers.set(coreBindings)
+    options.bindingProviderInstance.addProvider(new DataBindProvider())
+    options.bindingProviderInstance.addProvider(new VirtualProvider())
 
     // Now perform bindings, and see that childrenComplete gets the output from the preprocessor and bindings
     var callbacks = 0,

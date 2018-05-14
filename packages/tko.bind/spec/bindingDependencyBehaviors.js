@@ -11,7 +11,7 @@ import {
 import {
     unwrap,
     observable as observableConstructor
-} from 'tobservableConstructor';
+} from 'tko.observable';
 
 import {
     computed as computedConstructor
