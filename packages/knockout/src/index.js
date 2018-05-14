@@ -21,6 +21,15 @@ import components from 'tko.utils.component'
 
 import { functionRewrite } from 'tko.utils.functionRewrite'
 
+/**
+ * expressionRewriting is deprecated in TKO because we have our own JS
+ * parser now.  This is here only for legacy compatibility.
+ */
+const dataBindProvider = new DataBindProvider()
+const expressionRewriting = {
+  preProcessBindings: s => dataBindProvider.preProcessBindings(s)
+}
+
 const builder = new Builder({
   filters,
   provider: new MultiProvider({
@@ -28,7 +37,7 @@ const builder = new Builder({
       new AttributeMustacheProvider(),
       new TextMustacheProvider(),
       new ComponentProvider(),
-      new DataBindProvider(),
+      dataBindProvider,
       new VirtualProvider(),
       new AttributeProvider()
     ]
@@ -49,5 +58,6 @@ const builder = new Builder({
 export default builder.create({
   version: '{{ VERSION }}',
   components,
-  Component: components.ComponentABC
+  Component: components.ComponentABC,
+  expressionRewriting
 })
