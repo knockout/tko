@@ -24,7 +24,7 @@ export function arrayFirst (array, predicate, predicateOwner) {
 
 export function arrayMap (array = [], mapping, thisArg) {
   if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
-  return Array.from(array, mapping)
+  return array === null ? [] : Array.from(array, mapping)
 }
 
 export function arrayRemoveItem (array, itemToRemove) {
@@ -38,13 +38,14 @@ export function arrayRemoveItem (array, itemToRemove) {
 
 export function arrayGetDistinctValues (array = []) {
   const seen = new Set()
+  if (array === null) { return [] }
   return (isArray(array) ? array : [...array])
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
 export function arrayFilter (array, predicate, thisArg) {
   if (arguments.length > 2) { predicate = predicate.bind(thisArg) }
-  return (isArray(array) ? array : [...array]).filter(predicate)
+  return array === null ? [] : (isArray(array) ? array : [...array]).filter(predicate)
 }
 
 export function arrayPushAll (array, valuesToPush) {
