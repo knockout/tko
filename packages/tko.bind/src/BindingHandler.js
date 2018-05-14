@@ -47,10 +47,15 @@ export class BindingHandler extends LifeCycle {
  * An AsyncBindingHandler shall call `completeBinding` when the binding
  * is to be considered complete.
  */
+const ResolveSymbol = Symbol('Async Binding Resolved')
+
 export class AsyncBindingHandler extends BindingHandler {
   constructor (params) {
     super(params)
-    this.bindingCompletion = new options.Promise((resolve) => { this.completeBinding = resolve })
+    this.bindingCompletion = new Promise((resolve) => {
+      this[ResolveSymbol] = resolve
+    })
+    this.completeBinding = bindingResult => this[ResolveSymbol](bindingResult)
   }
 
   get bindingCompleted () { return this.bindingCompletion }

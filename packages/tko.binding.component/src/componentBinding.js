@@ -97,8 +97,20 @@ export default class ComponentBinding extends AsyncBindingHandler {
     const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
-    applyBindingsToDescendants(childBindingContext, this.$element)
-      .then(this.completeBinding)
+    const possibleFuture = applyBindingsToDescendants(childBindingContext, this.$element)
+    if (possibleFuture instanceof Promise) {
+      possibleFuture
+        .then(bindingResult => this.onApplicationComplete(componentViewModel, bindingResult))
+    } else {
+      this.onApplicationComplete(componentViewModel, possibleFuture)
+    }
+  }
+
+  onApplicationComplete (componentViewModel, bindingResult) {
+    if (componentViewModel && componentViewModel.koDescendantsComplete) {
+      componentViewModel.koDescendantsComplete(this.$element)
+    }
+    this.completeBinding(bindingResult)
   }
 
   cleanUpState () {
