@@ -14,7 +14,7 @@ import {
 } from 'tko.computed'
 
 import {
-    isObservable, dependencyDetection, unwrap, observable
+    isObservable, dependencyDetection, unwrap, observable, isObservableArray
 } from 'tko.observable'
 
 import {
@@ -223,21 +223,35 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     arrayItemContext = null
   }
 
-  return computed(function () {
-    let unwrappedArray = unwrap(arrayOrObservableArray) || []
-    const unwrappedIsIterable = Symbol.iterator in unwrappedArray
-    if (!unwrappedIsIterable) { unwrappedArray = [unwrappedArray] }
-
-    // Filter out any entries marked as destroyed
-    var filteredArray = arrayFilter(unwrappedArray, function (item) {
-      return options['includeDestroyed'] || item === undefined || item === null || !unwrap(item['_destroy'])
-    })
-
-    // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
-    // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
-    dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, filteredArray, executeTemplateForArrayItem, options, activateBindingsCallback])
+  // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
+  // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
+  function localSetDomNodeChildrenFromArrayMapping (newArray, changeList) {
+    dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, newArray, executeTemplateForArrayItem, options, activateBindingsCallback, changeList])
     bindingEvent.notify(targetNode, bindingEvent.childrenComplete)
-  }, null, { disposeWhenNodeIsRemoved: targetNode })
+  }
+
+  const shouldHideDestroyed = (options.includeDestroyed === false) || (options.foreachHidesDestroyed && !options.includeDestroyed);
+  if (!shouldHideDestroyed && !options.beforeRemove && isObservableArray(arrayOrObservableArray)) {
+    localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray.peek())
+    var subscription = arrayOrObservableArray.subscribe(function (changeList) {
+      localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray(), changeList)
+    }, null, 'arrayChange')
+    subscription.disposeWhenNodeIsRemoved(targetNode)
+    return subscription
+  } else {
+    return computed(function () {
+      var unwrappedArray = unwrap(arrayOrObservableArray) || []
+      const unwrappedIsIterable = Symbol.iterator in unwrappedArray
+      if (!unwrappedIsIterable) { unwrappedArray = [unwrappedArray] }
+      if (shouldHideDestroyed) {
+        // Filter out any entries marked as destroyed
+        unwrappedArray = arrayFilter(unwrappedArray, function (item) {
+          return item === undefined || item === null || !unwrap(item._destroy);
+        })
+      }
+      localSetDomNodeChildrenFromArrayMapping(unwrappedArray)
+    }, null, { disposeWhenNodeIsRemoved: targetNode })
+  }
 }
 
 let templateComputedDomDataKey = domData.nextKey()
@@ -340,7 +354,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
   disposeOldComputedAndStoreNewOne (element, newComputed) {
     let oldComputed = domData.get(element, templateComputedDomDataKey)
     if (oldComputed && (typeof oldComputed.dispose === 'function')) { oldComputed.dispose() }
-    domData.set(element, templateComputedDomDataKey, (newComputed && newComputed.isActive()) ? newComputed : undefined)
+    domData.set(element, templateComputedDomDataKey, (newComputed && (!newComputed.isActive || newComputed.isActive())) ? newComputed : undefined)
   }
 
   get controlsDescendants () { return true }

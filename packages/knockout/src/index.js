@@ -46,7 +46,6 @@ const builder = new Builder({
     coreBindings,
     templateBindings,
     ifBindings,
-    foreachBindings,
     componentBindings,
     { each: foreachBindings.foreach }
   ],

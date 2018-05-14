@@ -45,6 +45,10 @@ var options = {
     //   data-bind="expression | filter_1 | filter_2"
   filters: {},
 
+  // Used by the template binding.
+  includeDestroyed: false,
+  foreachHidesDestroyed: false,
+
   onError: function (e) { throw e },
 
   set: function (name, value) {

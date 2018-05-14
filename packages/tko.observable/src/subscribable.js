@@ -1,7 +1,8 @@
 /* eslint no-cond-assign: 0 */
 import {
     setPrototypeOfOrExtend, arrayRemoveItem, objectForEach,
-    canSetPrototype, setPrototypeOf, options
+    canSetPrototype, setPrototypeOf, options, removeDisposeCallback,
+    addDisposeCallback
 } from 'tko.utils'
 
 import { applyExtenders } from './extenders.js'
@@ -9,15 +10,26 @@ import * as dependencyDetection from './dependencyDetection.js'
 
 export function subscription (target, callback, disposeCallback) {
   this._target = target
-  this.callback = callback
-  this.disposeCallback = disposeCallback
-  this.isDisposed = false
+  this._callback = callback
+  this._disposeCallback = disposeCallback
+  this._isDisposed = false
+  this._domNodeDisposalCallback = null
 }
 
-subscription.prototype.dispose = function () {
-  this.isDisposed = true
-  this.disposeCallback()
-}
+Object.assign(subscription.prototype, {
+  dispose () {
+    if (this._domNodeDisposalCallback) {
+      removeDisposeCallback(this._node, this._domNodeDisposalCallback)
+    }
+    this._isDisposed = true
+    this._disposeCallback()
+  },
+
+  disposeWhenNodeIsRemoved (node) {
+    this._node = node
+    addDisposeCallback(node, this._domNodeDisposalCallback = this.dispose.bind(this))
+  }
+})
 
 export function subscribable () {
   setPrototypeOfOrExtend(this, ko_subscribable_fn)
@@ -71,8 +83,8 @@ var ko_subscribable_fn = {
         for (let i = 0, subscriptionInstance; subscriptionInstance = subs[i]; ++i) {
                     // In case a subscription was disposed during the arrayForEach cycle, check
                     // for isDisposed on each subscription before invoking its callback
-          if (!subscriptionInstance.isDisposed) {
-            subscriptionInstance.callback(valueToNotify)
+          if (!subscriptionInstance._isDisposed) {
+            subscriptionInstance._callback(valueToNotify)
           }
         }
       } finally {
