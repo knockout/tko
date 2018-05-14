@@ -49,7 +49,10 @@ var options = {
 
   set: function (name, value) {
     options[name] = value
-  }
+  },
+
+  // Overload getBindingHandler to have a custom lookup function.
+  getBindingHandler (/* key */) { }
 }
 
 Object.defineProperty(options, '$', {

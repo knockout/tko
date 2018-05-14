@@ -193,14 +193,17 @@ const knockout = {
   applyBindingsToNode,
   contextFor,
   dataFor,
-  getBindingHandler,
   BindingHandler,
   AsyncBindingHandler,
   virtualElements,
   domNodeDisposal,
   bindingEvent,
   notifyBindingEvent,
-  subscribeToBindingEvent
+  subscribeToBindingEvent,
+
+  get getBindingHandler () { return options.getBindingHandler },
+  set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
+
 }
 
 export class Builder {

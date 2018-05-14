@@ -51,14 +51,13 @@ function getBindingHandlerFromComponent (bindingKey, $component) {
 }
 
 export function getBindingHandler (bindingKey) {
-  return asProperHandlerClass(options.bindingProviderInstance.bindingHandlers.get(bindingKey), bindingKey)
+  const bindingDefinition = options.getBindingHandler(bindingKey) || options.bindingProviderInstance.bindingHandlers.get(bindingKey)
+  return asProperHandlerClass(bindingDefinition, bindingKey)
 }
 
 // Returns the valueAccessor function for a binding value
 function makeValueAccessor (value) {
-  return function () {
-    return value
-  }
+  return () => value
 }
 
 // Returns the value of a valueAccessor function
