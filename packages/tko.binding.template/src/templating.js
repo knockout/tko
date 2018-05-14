@@ -1,7 +1,7 @@
 import {
     virtualElements, fixUpContinuousNodeArray, replaceDomNodes, memoization,
     domNodeIsAttachedToDocument, moveCleanedNodesToContainerElement,
-    arrayFilter, domData, options
+    arrayFilter, domData, options as koOptions
 } from 'tko.utils'
 
 import {
@@ -57,7 +57,7 @@ function activateBindingsOnContinuousNodeArray (continuousNodeArray, bindingCont
     var firstNode = continuousNodeArray[0]
     var lastNode = continuousNodeArray[continuousNodeArray.length - 1]
     var parentNode = firstNode.parentNode
-    var provider = options.bindingProviderInstance
+    var provider = koOptions.bindingProviderInstance
     var preprocessNode = provider.preprocessNode
 
     if (preprocessNode) {
@@ -201,10 +201,16 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
   function executeTemplateForArrayItem (arrayValue, index) {
     // Support selecting template as a function of the data being rendered
     if (options.as) {
-      arrayItemContext = parentBindingContext.extend({
-        [options.as]: arrayValue,
-        $index: index
-      })
+      if (koOptions.createChildContextWithAs) {
+        arrayItemContext = parentBindingContext.createChildContext(
+          arrayValue, options.as, context => { context.$index = index }
+        )
+      } else {
+        arrayItemContext = parentBindingContext.extend({
+          [options.as]: arrayValue,
+          $index: index
+        })
+      }
     } else {
       arrayItemContext = parentBindingContext.createChildContext(arrayValue, options.as, context => { context.$index = index })
     }
@@ -216,7 +222,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     // This will be called whenever setDomNodeChildrenFromArrayMapping has added nodes to targetNode
   var activateBindingsCallback = function (arrayValue, addedNodesArray /*, index */) {
     activateBindingsOnContinuousNodeArray(addedNodesArray, arrayItemContext, afterBindingCallback)
-    if (options['afterRender']) { options['afterRender'](addedNodesArray, arrayValue) }
+    if (options.afterRender) { options.afterRender(addedNodesArray, arrayValue) }
 
         // release the "cache" variable, so that it can be collected by
         // the GC when its value isn't used from within the bindings anymore.
