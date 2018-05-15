@@ -38,7 +38,7 @@ var none = [0, '', ''],
   supportsTemplateTag = options.document && 'content' in options.document.createElement('template')
 
 function getWrap (tags) {
-  var m = tags.match(/^<([a-z]+)[ >]/)
+  const m = tags.match(/^(?:<!--.*?-->\s*?)*?<([a-z]+)[\s>]/)
   return (m && lookup[m[1]]) || none
 }
 
