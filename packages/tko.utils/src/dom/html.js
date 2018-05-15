@@ -5,6 +5,7 @@ import { stringTrim } from '../string.js'
 import { makeArray } from '../array.js'
 import { emptyDomNode, moveCleanedNodesToContainerElement } from './manipulation.js'
 import { jQueryInstance } from '../jquery.js'
+import { forceRefresh } from './fixes.js'
 import * as virtualElements from './virtualElements'
 import options from '../options'
 
@@ -178,4 +179,22 @@ export function setHtml (node, html) {
       }
     }
   }
+}
+
+
+export function setTextContent (element, textContent) {
+  var value = typeof textContent === 'function' ? textContent() : textContent
+  if ((value === null) || (value === undefined)) { value = '' }
+
+    // We need there to be exactly one child: a text node.
+    // If there are no children, more than one, or if it's not a text node,
+    // we'll clear everything and create a single text node.
+  var innerTextNode = virtualElements.firstChild(element)
+  if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
+    virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)])
+  } else {
+    innerTextNode.data = value
+  }
+
+  forceRefresh(element)
 }
