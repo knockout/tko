@@ -13,6 +13,7 @@ import {
   arrayMap,
   arrayPushAll,
   arrayRemoveItem,
+  addCleaner,
   cleanNode,
   cloneNodes,
   compareArrays,
@@ -23,11 +24,11 @@ import {
   objectForEach,
   objectMap,
   options,
-  otherNodeCleanerFunctions,
   parseHtmlFragment,
   parseJson,
   range,
   registerEventHandler,
+  removeCleaner,
   removeDisposeCallback,
   removeNode,
   selectExtensions,
@@ -100,9 +101,16 @@ import {
 
 const domNodeDisposal = {
   addDisposeCallback,
-  otherNodeCleanerFunctions,
   removeDisposeCallback,
-  removeNode
+  removeNode,
+  addCleaner,
+  removeCleaner,
+  get cleanExternalData () {
+    return options.cleanExternalData
+  },
+  set cleanExternalData (cleanerFn) {
+    options.set('cleanExternalData', cleanerFn)
+  }
 }
 
 const utils = Object.assign({
@@ -198,7 +206,6 @@ const knockout = {
 
   get getBindingHandler () { return options.getBindingHandler },
   set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
-
 }
 
 export class Builder {

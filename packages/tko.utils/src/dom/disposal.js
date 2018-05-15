@@ -3,7 +3,8 @@
 //
 /* eslint no-cond-assign: 0 */
 import * as domData from './data.js'
-import {arrayRemoveItem} from '../array.js'
+import { default as options } from '../options.js'
+import {arrayRemoveItem, arrayIndexOf} from '../array.js'
 import {jQueryInstance} from '../jquery.js'
 
 var domDataKey = domData.nextKey()
@@ -42,19 +43,25 @@ function cleanSingleNode (node) {
     otherNodeCleanerFunctions[i](node)
   }
 
+  if (options.cleanExternalData) {
+    options.cleanExternalData(node)
+  }
+
     // Clear any immediate-child comment nodes, as these wouldn't have been found by
     // node.getElementsByTagName('*') in cleanNode() (comment nodes aren't elements)
-  if (cleanableNodeTypesWithDescendants[node.nodeType]) { cleanImmediateCommentTypeChildren(node) }
+  if (cleanableNodeTypesWithDescendants[node.nodeType]) {
+    cleanNodesInList(node.childNodes, true /* onlyComments */)
+  }
 }
 
-function cleanImmediateCommentTypeChildren (nodeWithChildren) {
-  const children = nodeWithChildren.childNodes
-  let cleanedNode
-  for (let i = 0; i < children.length; ++i) {
-    if (children[i].nodeType === 8) {
-      cleanSingleNode(cleanedNode = children[i])
-      if (children[i] !== cleanedNode) {
-        throw Error('ko.cleanNode: An already cleaned node was removed from the document')
+function cleanNodesInList (nodeList, onlyComments) {
+  const cleanedNodes = []
+  let lastCleanedNode
+  for (var i = 0; i < nodeList.length; i++) {
+    if (!onlyComments || nodeList[i].nodeType === 8) {
+      cleanSingleNode(cleanedNodes[cleanedNodes.length] = lastCleanedNode = nodeList[i]);
+      if (nodeList[i] !== lastCleanedNode) {
+        while (i-- && arrayIndexOf(cleanedNodes, nodeList[i]) === -1) {}
       }
     }
   }
@@ -75,20 +82,13 @@ export function removeDisposeCallback (node, callback) {
 }
 
 export function cleanNode (node) {
-    // First clean this node, where applicable
+  // First clean this node, where applicable
   if (cleanableNodeTypes[node.nodeType]) {
     cleanSingleNode(node)
 
-        // ... then its descendants, where applicable
+    // ... then its descendants, where applicable
     if (cleanableNodeTypesWithDescendants[node.nodeType]) {
-      const descendants = node.getElementsByTagName('*')
-      for (let i = 0; i < descendants.length; ++i) {
-        let cleanedNode = descendants[i]
-        cleanSingleNode(cleanedNode)
-        if (descendants[i] !== cleanedNode) {
-          throw Error('ko.cleanNode: An already cleaned node was removed from the document')
-        }
-      }
+      cleanNodesInList(node.getElementsByTagName("*"))
     }
   }
   return node
@@ -100,14 +100,22 @@ export function removeNode (node) {
 }
 
 // Expose supplemental node cleaning functions.
-export var otherNodeCleanerFunctions = []
+export const otherNodeCleanerFunctions = []
+
+export function addCleaner (fn) {
+  otherNodeCleanerFunctions.push(fn)
+}
+
+export function removeCleaner (fn) {
+  const fnIndex = otherNodeCleanerFunctions.indexOf(fn)
+  if (fnIndex >= 0) { otherNodeCleanerFunctions.splice(fnIndex, 1) }
+}
 
 // Special support for jQuery here because it's so commonly used.
 // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
 // so notify it to tear down any resources associated with the node & descendants here.
 export function cleanjQueryData (node) {
-  var jQueryCleanNodeFn = jQueryInstance
-        ? jQueryInstance.cleanData : null
+  var jQueryCleanNodeFn = jQueryInstance ? jQueryInstance.cleanData : null
 
   if (jQueryCleanNodeFn) {
     jQueryCleanNodeFn([node])

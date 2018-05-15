@@ -59,7 +59,8 @@ var options = {
   },
 
   // Overload getBindingHandler to have a custom lookup function.
-  getBindingHandler (/* key */) { }
+  getBindingHandler (/* key */) {},
+  cleanExternalData (/* node, callback */) {}
 }
 
 Object.defineProperty(options, '$', {
