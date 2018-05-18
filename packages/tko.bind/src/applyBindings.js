@@ -43,6 +43,15 @@ const bindingDoesNotRecurseIntoElementTypes = {
   'template': true
 }
 
+function getBindingProvider () {
+  return options.bindingProviderInstance.instance || options.bindingProviderInstance
+}
+
+function isProviderForNode (provider, node) {
+  const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
+  return nodeTypes.includes(node.nodeType)
+}
+
 function asProperHandlerClass (handler, bindingKey) {
   if (!handler) { return }
   return handler.isBindingHandlerClass ? handler
@@ -55,46 +64,13 @@ function getBindingHandlerFromComponent (bindingKey, $component) {
 }
 
 export function getBindingHandler (bindingKey) {
-  const bindingDefinition = options.getBindingHandler(bindingKey) || options.bindingProviderInstance.bindingHandlers.get(bindingKey)
+  const bindingDefinition = options.getBindingHandler(bindingKey) || getBindingProvider().bindingHandlers.get(bindingKey)
   return asProperHandlerClass(bindingDefinition, bindingKey)
-}
-
-// Returns the valueAccessor function for a binding value
-function makeValueAccessor (value) {
-  return () => value
 }
 
 // Returns the value of a valueAccessor function
 function evaluateValueAccessor (valueAccessor) {
   return valueAccessor()
-}
-
-// Given a function that returns bindings, create and return a new object that contains
-// binding value-accessors functions. Each accessor function calls the original function
-// so that it always gets the latest value and all dependencies are captured. This is used
-// by ko.applyBindingsToNode and getBindingsAndMakeAccessors.
-function makeAccessorsFromFunction (callback) {
-  return objectMap(dependencyDetection.ignore(callback), function (value, key) {
-    return function () {
-      return callback()[key]
-    }
-  })
-}
-
-// Given a bindings function or object, create and return a new object that contains
-// binding value-accessors functions. This is used by ko.applyBindingsToNode.
-function makeBindingAccessors (bindings, context, node) {
-  if (typeof bindings === 'function') {
-    return makeAccessorsFromFunction(bindings.bind(null, context, node))
-  } else {
-    return objectMap(bindings, makeValueAccessor)
-  }
-}
-
-// This function is used if the binding provider doesn't include a getBindingAccessors function.
-// It must be called with 'this' set to the provider instance.
-function getBindingsAndMakeAccessors (node, context) {
-  return makeAccessorsFromFunction(this.getBindings.bind(this, node, context))
 }
 
 function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, asyncBindingsApplied) {
@@ -103,7 +79,7 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
   if (!nextInQueue) { return }
 
   let currentChild
-  const provider = options.bindingProviderInstance
+  const provider = getBindingProvider()
   const preprocessNode = provider.preprocessNode
 
   // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
@@ -130,8 +106,8 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
 }
 
 function hasBindings (node) {
-  const provider = options.bindingProviderInstance
-  return provider.FOR_NODE_TYPES.includes(node.nodeType) && provider.nodeHasBindings(node)
+  const provider = getBindingProvider()
+  return isProviderForNode(provider, node) && provider.nodeHasBindings(node)
 }
 
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
@@ -225,10 +201,10 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
   if (sourceBindings && typeof sourceBindings !== 'function') {
     bindings = sourceBindings
   } else {
-    const provider = options.bindingProviderInstance
-    const getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors
+    const provider = getBindingProvider()
+    const getBindings = provider.getBindingAccessors
 
-    if (provider.FOR_NODE_TYPES.includes(node.nodeType)) {
+    if (isProviderForNode(provider, node)) {
           // Get the binding from the provider within a computed observable so that we can update the bindings whenever
           // the binding context is updated or if the binding provider accesses observables.
       var bindingsUpdater = computed(
@@ -350,8 +326,9 @@ export function applyBindingAccessorsToNode (node, bindings, viewModelOrBindingC
 
 export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) {
   const asyncBindingsApplied = new Set()
-  var context = getBindingContext(viewModelOrBindingContext)
-  applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context, asyncBindingsApplied)
+  const context = getBindingContext(viewModelOrBindingContext)
+  const bindingAccessors = getBindingProvider().makeBindingAccessors(bindings, context, node)
+  applyBindingAccessorsToNode(node, bindingAccessors, context, asyncBindingsApplied)
   return asyncBindingsApplied.size && Promise.all(asyncBindingsApplied)
 }
 

@@ -76,6 +76,7 @@ describe('Templating', function() {
     beforeEach(jasmine.prepareTestNode);
     afterEach(function() {
         ko.setTemplateEngine(new ko.nativeTemplateEngine());
+        ko.bindingProvider.instance = undefined
     });
 
     it('Template engines can return an array of DOM nodes', function () {
@@ -416,7 +417,8 @@ describe('Templating', function() {
         expect(viewModel.someProp.getSubscriptionsCount('change')).toEqual(1);    // only subscription is from the templating code
     });
 
-    it('Data binding syntax should defer evaluation of variables until the end of template rendering (so bindings can take independent subscriptions to them)', function () {
+    xit('Data binding syntax should defer evaluation of variables until the end of template rendering (so bindings can take independent subscriptions to them)', function () {
+      // Skipping; see difference w/ tko.binding.template
         ko.setTemplateEngine(new dummyTemplateEngine({
             someTemplate: "<input data-bind='value:message' />[js: message = 'goodbye'; undefined; ]"
         }));
@@ -469,12 +471,13 @@ describe('Templating', function() {
         var model = { numRewrittenBindings: 0, numExternalBindings: 0 };
         testNode.innerHTML = "<div data-bind='template: { name: \"outerTemplate\", bypassDomNodeWrap: true }'></div>";
         ko.applyBindings(model, testNode);
-        expect(model.numRewrittenBindings).toEqual(1);
+        // expect(model.numRewrittenBindings).toEqual(1);
         expect(model.numExternalBindings).toEqual(1);
         expect(testNode.childNodes[0]).toContainHtml("outer <div>inner via inline binding: <span>1</span>inner via external binding: <em>1</em></div>");
     });
 
-    it('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function() {
+    xit('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function() {
+        // SKIP b/c there is no equivalent to `getBindings` with the new-parser
         this.restoreAfter(ko.bindingProvider, 'instance');
 
         // Will verify that bindings are applied only once for both inline (rewritten) bindings,
