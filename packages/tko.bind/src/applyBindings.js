@@ -15,8 +15,7 @@ import {
 } from 'tko.computed'
 
 import {
-    bindingContext, storedBindingContextForNode, boundElementDomDataKey,
-    contextSubscribeSymbol
+  dataFor, bindingContext, boundElementDomDataKey, contextSubscribeSymbol
 } from './bindingContext'
 
 import {
@@ -24,8 +23,8 @@ import {
 } from './bindingEvent'
 
 import {
-  dataFor
-} from './bindingContext'
+  BindingResult
+} from './BindingResult'
 
 import {
   LegacyBindingHandler
@@ -329,7 +328,7 @@ export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) 
   const context = getBindingContext(viewModelOrBindingContext)
   const bindingAccessors = getBindingProvider().makeBindingAccessors(bindings, context, node)
   applyBindingAccessorsToNode(node, bindingAccessors, context, asyncBindingsApplied)
-  return asyncBindingsApplied.size && Promise.all(asyncBindingsApplied)
+  return new BindingResult({asyncBindingsApplied})
 }
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
@@ -337,7 +336,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode)
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, asyncBindingsApplied)
   }
-  return asyncBindingsApplied.size && Promise.all(asyncBindingsApplied)
+  return new BindingResult({asyncBindingsApplied})
 }
 
 export function applyBindings (viewModelOrBindingContext, rootNode, extendContextCallback) {
