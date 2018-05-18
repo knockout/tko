@@ -224,6 +224,7 @@ describe('Binding: Foreach', function() {
     });
 
     it('Should call an afterRender callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function() {
+        this.restoreAfter(ko.bindingProvider, 'instance');
         // Set up a binding provider that converts text nodes to expressions
         var originalBindingProvider = ko.bindingProvider.instance,
             preprocessingBindingProvider = function() { };
@@ -262,8 +263,6 @@ describe('Binding: Foreach', function() {
 
         expect(testNode.childNodes[0]).toContainText('[Alpha][Beta]');
         expect(callbackReceivedArrayValues).toEqual(['Alpha', 'Beta']);
-
-        ko.bindingProvider.instance = originalBindingProvider;
     });
 
     it('Exception in afterAdd callback should not cause extra elements on next update', function () {
