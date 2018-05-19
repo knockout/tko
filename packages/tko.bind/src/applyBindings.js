@@ -325,18 +325,20 @@ export function applyBindingAccessorsToNode (node, bindings, viewModelOrBindingC
 
 export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) {
   const asyncBindingsApplied = new Set()
-  const context = getBindingContext(viewModelOrBindingContext)
-  const bindingAccessors = getBindingProvider().makeBindingAccessors(bindings, context, node)
-  applyBindingAccessorsToNode(node, bindingAccessors, context, asyncBindingsApplied)
-  return new BindingResult({asyncBindingsApplied})
+  const bindingContext = getBindingContext(viewModelOrBindingContext)
+  const bindingAccessors = getBindingProvider().makeBindingAccessors(bindings, bindingContext, node)
+  applyBindingAccessorsToNode(node, bindingAccessors, bindingContext, asyncBindingsApplied)
+  return new BindingResult({asyncBindingsApplied, rootNode: node, bindingContext})
 }
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
   const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
-    applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, asyncBindingsApplied)
+    const bindingContext = getBindingContext(viewModelOrBindingContext)
+    applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
+    return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
   }
-  return new BindingResult({asyncBindingsApplied})
+  return new BindingResult({asyncBindingsApplied, rootNode})
 }
 
 export function applyBindings (viewModelOrBindingContext, rootNode, extendContextCallback) {
