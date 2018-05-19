@@ -32,8 +32,11 @@ describe('Binding: Options', function() {
             { name: 'bob', job: 'manager' },
             { name: 'frank', job: 'coder & tester' }
         ]);
-        testNode.innerHTML = "<select data-bind='options:myValues, optionsText: function (v) { return v[\"name\"] + \" (\" + v[\"job\"] + \")\"; }'><option>should be deleted</option></select>";
-        ko.applyBindings({ myValues: modelValues }, testNode);
+        testNode.innerHTML = "<select data-bind='options:myValues, optionsText: textFn'><option>should be deleted</option></select>"
+        ko.applyBindings({
+          myValues: modelValues,
+          textFn: function (v) { return v.name + ' (' + v.job + ')' }
+        }, testNode)
         expect(testNode.childNodes[0]).toHaveTexts(["bob (manager)", "frank (coder & tester)"]);
     });
 
@@ -42,8 +45,11 @@ describe('Binding: Options', function() {
             { name: 'bob', job: 'manager' },
             { name: 'frank', job: 'coder & tester' }
         ]);
-        testNode.innerHTML = "<select data-bind='options: myValues, optionsValue: function (v) { return v.name + \" (\" + v.job + \")\"; }'><option>should be deleted</option></select>";
-        ko.applyBindings({ myValues: modelValues }, testNode);
+        testNode.innerHTML = "<select data-bind='options: myValues, optionsValue: optionsFn'><option>should be deleted</option></select>"
+        ko.applyBindings({
+          myValues: modelValues,
+          optionsFn: function (v) { return v.name + ' (' + v.job + ')' }
+        }, testNode)
         expect(testNode.childNodes[0]).toHaveValues(["bob (manager)", "frank (coder & tester)"]);
         expect(testNode.childNodes[0]).toHaveTexts(["bob (manager)", "frank (coder & tester)"]);
     });
