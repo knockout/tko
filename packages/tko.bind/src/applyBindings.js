@@ -288,7 +288,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           })
         )
 
-              // Expose the bindings via domData.
+        // Expose the bindings via domData.
         allBindingHandlers[key] = bindingHandler
 
         if (bindingHandler.controlsDescendants) {
@@ -303,11 +303,24 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
         reportBindingError('creation', err)
       }
     }
+
+    callPossibleDescendantsComplete(node, bindings, asyncBindingsApplied)
   }
 
-  return {
-    shouldBindDescendants: bindingHandlerThatControlsDescendantBindings === undefined
+  const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined
+  return { shouldBindDescendants }
+}
+
+async function callPossibleDescendantsComplete (node, bindings, asyncBindingsApplied) {
+  const descendantsCompleteBind = bindings[bindingEvent.descendantsComplete]
+  if (!descendantsCompleteBind) { return }
+  bindingEvent.notify(node, bindingEvent.descendantsComplete)
+  const callback = evaluateValueAccessor(descendantsCompleteBind)
+  if (!callback || !virtualElements.firstChild(node)) { return }
+  if (asyncBindingsApplied.size) {
+    await Promise.all(asyncBindingsApplied)
   }
+  callback(node)
 }
 
 function getBindingContext (viewModelOrBindingContext, extendContextCallback) {

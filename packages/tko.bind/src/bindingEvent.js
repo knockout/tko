@@ -12,7 +12,7 @@ const boundElementDomDataKey = domData.nextKey()
 
 export const bindingEvent = {
   childrenComplete: 'childrenComplete',
-  descendentsComplete: 'descendentsComplete',
+  descendantsComplete: 'descendantsComplete',
 
   subscribe: function (node, event, callback, context) {
     const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
