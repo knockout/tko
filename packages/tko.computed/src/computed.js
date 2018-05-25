@@ -411,10 +411,12 @@ computed.fn = {
     subscribable.fn.limit.call(this, limitFunction)
     Object.assign(this, {
       _evalIfChanged () {
-        if (state.isStale) {
-          this.evaluateImmediate()
-        } else {
-          state.isDirty = false
+        if (!this[computedState].isSleeping) {
+          if (this[computedState].isStale) {
+            this.evaluateImmediate()
+          } else {
+            this[computedState].isDirty = false
+          }
         }
         return state.latestValue
       },

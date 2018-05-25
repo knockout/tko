@@ -110,6 +110,7 @@ function hasBindings (node) {
 }
 
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
+  let bindingContextForDescendants = bindingContext
   var isElement = nodeVerified.nodeType === 1
   if (isElement) { // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -122,18 +123,18 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
   let shouldApplyBindings = isElement || // Case (1)
       hasBindings(nodeVerified)          // Case (2)
 
-  const {shouldBindDescendants} = shouldApplyBindings
-    ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
-    : { shouldBindDescendants: true }
+  if (shouldApplyBindings) {
+    bindingContextForDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied).bindingContextForDescendants
+  }
 
-  if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
+  if (bindingContextForDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
     // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
     //  * For children of a *real* element, the binding context is certainly the same as on their DOM .parentNode,
     //    hence bindingContextsMayDifferFromDomParentElement is false
     //  * For children of a *virtual* element, we can't be sure. Evaluating .parentNode on those children may
     //    skip over any number of intermediate virtual elements, any of which might define a custom binding context,
     //    hence bindingContextsMayDifferFromDomParentElement is true
-    applyBindingsToDescendantsInternal(bindingContext, nodeVerified, asyncBindingsApplied)
+    applyBindingsToDescendantsInternal(bindingContextForDescendants, nodeVerified, asyncBindingsApplied)
   }
 }
 
@@ -190,11 +191,6 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     bindingInfo.context = bindingContext
   }
 
-  if (bindingContext[contextSubscribeSymbol]) {
-    bindingContext[contextSubscribeSymbol]._addNode(node)
-  }
-
-
   // Use bindings if given, otherwise fall back on asking the bindings provider to give us some bindings
   var bindings
   if (sourceBindings && typeof sourceBindings !== 'function') {
@@ -220,6 +216,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     }
   }
 
+  let contextToExtend = bindingContext
   var bindingHandlerThatControlsDescendantBindings
   if (bindings) {
     const $component = bindingContext.$component || {}
@@ -257,6 +254,17 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       })
     }
 
+    if (ko.bindingEvent.descendantsComplete in bindings) {
+          contextToExtend = ko.bindingEvent.startPossiblyAsyncContentBinding(node, bindingContext);
+          ko.bindingEvent.subscribe(node, ko.bindingEvent.descendantsComplete, function () {
+              var callback = evaluateValueAccessor(bindings[ko.bindingEvent.descendantsComplete]);
+              if (callback && ko.virtualElements.firstChild(node)) {
+                  callback(node);
+              }
+          });
+      }
+
+
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
         // Go through the sorted bindings, calling init and update for each
@@ -267,7 +275,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           bindings,
           allBindings,
           bindingKey: key,
-          bindingContext,
+          contextToExtend,
           element: node,
           valueAccessor: getValueAccessor(key)
         })
@@ -282,7 +290,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           new BindingHandlerClass({
             allBindings,
             $element: node,
-            $context: bindingContext,
+            $context: contextToExtend,
             onError: reportBindingError,
             valueAccessor (...v) { return getValueAccessor(key)(...v) }
           })
@@ -303,24 +311,14 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
         reportBindingError('creation', err)
       }
     }
-
-    callPossibleDescendantsComplete(node, bindings, asyncBindingsApplied)
   }
 
-  const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined
-  return { shouldBindDescendants }
-}
 
-async function callPossibleDescendantsComplete (node, bindings, asyncBindingsApplied) {
-  const descendantsCompleteBind = bindings[bindingEvent.descendantsComplete]
-  if (!descendantsCompleteBind) { return }
-  bindingEvent.notify(node, bindingEvent.descendantsComplete)
-  const callback = evaluateValueAccessor(descendantsCompleteBind)
-  if (!callback || !virtualElements.firstChild(node)) { return }
-  if (asyncBindingsApplied.size) {
-    await Promise.all(asyncBindingsApplied)
+  const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined;
+  return {
+    shouldBindDescendants: shouldBindDescendants,
+    bindingContextForDescendants: shouldBindDescendants && contextToExtend
   }
-  callback(node)
 }
 
 function getBindingContext (viewModelOrBindingContext, extendContextCallback) {
