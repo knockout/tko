@@ -282,7 +282,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       }
 
       if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
-        throw new Error(`The binding [${key}] cannot be used with virtual elements`)
+        throw new Error(`The binding '${key}' cannot be used with virtual elements`)
       }
 
       try {
