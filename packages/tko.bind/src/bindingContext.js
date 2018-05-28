@@ -151,7 +151,7 @@ Object.assign(bindingContext.prototype, {
     // If the parent context references an observable view model, "_subscribable" will always be the
     // latest view model object. If not, "_subscribable" isn't set, and we can use the static "$data" value.
     return new bindingContext(inheritParentIndicator, this, null, function (self, parentContext) {
-      extend(self, typeof properties === 'function' ? properties(self) : properties)
+      extend(self, typeof properties === 'function' ? properties.call(self) : properties)
     })
   },
 

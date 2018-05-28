@@ -254,16 +254,15 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       })
     }
 
-    if (ko.bindingEvent.descendantsComplete in bindings) {
-          contextToExtend = ko.bindingEvent.startPossiblyAsyncContentBinding(node, bindingContext);
-          ko.bindingEvent.subscribe(node, ko.bindingEvent.descendantsComplete, function () {
-              var callback = evaluateValueAccessor(bindings[ko.bindingEvent.descendantsComplete]);
-              if (callback && ko.virtualElements.firstChild(node)) {
-                  callback(node);
-              }
-          });
-      }
-
+    if (bindingEvent.descendantsComplete in bindings) {
+      contextToExtend = bindingEvent.startPossiblyAsyncContentBinding(node, bindingContext)
+      bindingEvent.subscribe(node, bindingEvent.descendantsComplete, function () {
+        var callback = evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
+        if (callback && virtualElements.firstChild(node)) {
+          callback(node)
+        }
+      })
+    }
 
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
