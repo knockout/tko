@@ -203,9 +203,6 @@ const knockout = {
   virtualElements,
   domNodeDisposal,
   bindingEvent,
-
-  get getBindingHandler () { return options.getBindingHandler },
-  set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
 }
 
 export class Builder {
@@ -236,11 +233,13 @@ export class Builder {
    * @return {Object} An instance of Knockout.
    */
   create (...additionalProperties) {
-    const instance = Object.assign({},
-      knockout,
-      this.providedProperties,
-      ...additionalProperties
-    )
+    const instance = Object.assign({
+      get getBindingHandler () { return options.getBindingHandler },
+      set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
+    },
+    knockout,
+    this.providedProperties,
+    ...additionalProperties)
     instance.options.knockoutInstance = instance
     return instance
   }
