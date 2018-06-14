@@ -255,7 +255,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   _contextExtensions ($ctx) {
     Object.assign($ctx, { $list: this.data })
     if (this.$indexHasBeenRequested) {
-      $ctx.$index = observable()
+      $ctx.$index = $ctx.$index || observable()
     } else {
       Object.defineProperty($ctx, '$index', {
         value: () => this._first$indexRequest($ctx),
