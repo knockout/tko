@@ -189,7 +189,7 @@ describe('BindingHandler behaviours', function () {
 
       expect(function () {
         applyBindings({}, testNode)
-      }).toThrowContaining('The binding [fnHandler] cannot be used with virtual elements')
+      }).toThrowContaining('The binding \'fnHandler\' cannot be used with virtual elements')
       expect(called).toEqual(0)
     })
   })

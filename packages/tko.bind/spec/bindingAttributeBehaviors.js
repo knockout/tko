@@ -481,7 +481,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = 'Hello <!-- ko visible: false -->Some text<!-- /ko --> Goodbye'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow('The binding [visible] cannot be used with virtual elements')
+    }).toThrow('The binding \'visible\' cannot be used with virtual elements')
   })
 
   it('Should be able to set a custom binding to use containerless binding', function () {
