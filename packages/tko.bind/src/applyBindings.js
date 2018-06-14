@@ -110,7 +110,6 @@ function hasBindings (node) {
 }
 
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
-  let bindingContextForDescendants = bindingContext
   var isElement = nodeVerified.nodeType === 1
   if (isElement) { // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -123,18 +122,18 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
   let shouldApplyBindings = isElement || // Case (1)
       hasBindings(nodeVerified)          // Case (2)
 
-  if (shouldApplyBindings) {
-    bindingContextForDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied).bindingContextForDescendants
-  }
+  const {shouldBindDescendants} = shouldApplyBindings
+    ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
+    : { shouldBindDescendants: true }
 
-  if (bindingContextForDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
+  if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
     // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
     //  * For children of a *real* element, the binding context is certainly the same as on their DOM .parentNode,
     //    hence bindingContextsMayDifferFromDomParentElement is false
     //  * For children of a *virtual* element, we can't be sure. Evaluating .parentNode on those children may
     //    skip over any number of intermediate virtual elements, any of which might define a custom binding context,
     //    hence bindingContextsMayDifferFromDomParentElement is true
-    applyBindingsToDescendantsInternal(bindingContextForDescendants, nodeVerified, asyncBindingsApplied)
+    applyBindingsToDescendantsInternal(bindingContext, nodeVerified, asyncBindingsApplied)
   }
 }
 
@@ -216,7 +215,6 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     }
   }
 
-  let contextToExtend = bindingContext
   var bindingHandlerThatControlsDescendantBindings
   if (bindings) {
     const $component = bindingContext.$component || {}
@@ -265,7 +263,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           bindings,
           allBindings,
           bindingKey: key,
-          contextToExtend,
+          bindingContext,
           element: node,
           valueAccessor: getValueAccessor(key)
         })
@@ -280,7 +278,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           new BindingHandlerClass({
             allBindings,
             $element: node,
-            $context: contextToExtend,
+            $context: bindingContext,
             onError: reportBindingError,
             valueAccessor (...v) { return getValueAccessor(key)(...v) }
           })
@@ -303,27 +301,36 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       }
     }
 
-    /** descendantsComplete ought to be an instance of the descendantsComplete
-     *  binding handler. */
-    if (bindingEvent.descendantsComplete in bindings && virtualElements.firstChild(node)) {
-      const accessor = evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
-      if (typeof accessor === 'function') {
-        const callback = () => accessor(node)
-        if (nodeAsyncBindingPromises.size) {
-          Promise.all(nodeAsyncBindingPromises).then(callback)
-        } else {
-          callback()
-        }
-      }
-    }
+    triggerDescendantsComplete(node, bindings, nodeAsyncBindingPromises)
   }
 
-  const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined;
-  return {
-    shouldBindDescendants: shouldBindDescendants,
-    bindingContextForDescendants: shouldBindDescendants && contextToExtend
+  const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined
+  return { shouldBindDescendants }
+}
+
+/**
+ *
+ * @param {HTMLElement} node
+ * @param {Object} bindings
+ * @param {[Promise]} nodeAsyncBindingPromises
+ */
+function triggerDescendantsComplete (node, bindings, nodeAsyncBindingPromises) {
+  /** descendantsComplete ought to be an instance of the descendantsComplete
+    *  binding handler. */
+  const hasBindingHandler = bindingEvent.descendantsComplete in bindings
+  const hasFirstChild = virtualElements.firstChild(node)
+  const accessor = hasBindingHandler && evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
+  const callback = () => {
+    bindingEvent.notify(node, bindingEvent.descendantsComplete)
+    if (accessor && hasFirstChild) { accessor(node) }
+  }
+  if (nodeAsyncBindingPromises.size) {
+    Promise.all(nodeAsyncBindingPromises).then(callback)
+  } else {
+    callback()
   }
 }
+
 
 function getBindingContext (viewModelOrBindingContext, extendContextCallback) {
   return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)

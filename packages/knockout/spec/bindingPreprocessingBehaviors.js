@@ -56,7 +56,8 @@ describe('Binding preprocessing', function() {
         expect(parsedRewritten.b).toEqual(3);
     });
 
-    it('Should be able to get a dynamically created binding handler during preprocessing', function() {
+    // See knockout/tko#67
+    xit('Should be able to get a dynamically created binding handler during preprocessing', function() {
         this.restoreAfter(ko, 'getBindingHandler'); // restore original function when done
 
         ko.getBindingHandler = function(bindingKey) {

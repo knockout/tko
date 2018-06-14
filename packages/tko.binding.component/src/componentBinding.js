@@ -97,15 +97,14 @@ export default class ComponentBinding extends DescendantBindingHandler {
     const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
-    if (componentViewModel && componentViewModel.koDescendantsComplete) {
-      this.afterRenderSub = bindingEvent.subscribe(element, bindingEvent.descendantsComplete, componentViewModel.koDescendantsComplete, componentViewModel)
-    }
-
     const onBinding = this.onBindingComplete.bind(this, componentViewModel)
-    this.applyBindingsToDescendants(childBindingContext, onBinding)
+    const applied = this.applyBindingsToDescendants(childBindingContext, onBinding)
   }
 
   onBindingComplete (componentViewModel, bindingResult) {
+    if (componentViewModel.koDescendantsComplete) {
+      componentViewModel.koDescendantsComplete(this.$element)
+    }
     this.completeBinding(bindingResult)
   }
 
@@ -114,10 +113,6 @@ export default class ComponentBinding extends DescendantBindingHandler {
     const currentViewDispose = currentView && currentView.dispose
     if (typeof currentViewDispose === 'function') {
       currentViewDispose.call(currentView)
-    }
-    if (this.afterRenderSub) {
-      this.afterRenderSub.dispose()
-      this.afterRenderSub = null
     }
     this.currentViewModel = null
     // Any in-flight loading operation is no longer relevant, so make sure we ignore its completion
