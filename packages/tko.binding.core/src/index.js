@@ -3,6 +3,7 @@ import {attr} from './attr.js'
 import {checked, checkedValue} from './checked.js'
 import {click} from './click.js'
 import {css} from './css.js'
+import descendantsComplete from './descendantsComplete'
 import {enable, disable} from './enableDisable.js'
 import {eventHandler, onHandler} from './event.js'
 import {hasfocus} from './hasfocus.js'
@@ -20,30 +21,31 @@ import {visible, hidden} from './visible.js'
 import {using} from './using.js'
 
 export var bindings = {
-  attr: attr,
-  checked: checked,
-  checkedValue: checkedValue,
-  click: click,
-  css: css,
+  attr,
+  checked,
+  checkedValue,
+  click,
+  css,
   'class': css,
-  enable: enable,
+  descendantsComplete,
+  enable,
   'event': eventHandler,
-  disable: disable,
-  hasfocus: hasfocus,
+  disable,
+  hasfocus,
   hasFocus: hasfocus,
-  hidden: hidden,
-  html: html,
+  hidden,
+  html,
   'let': $let,
   on: onHandler,
-  options: options,
-  selectedOptions: selectedOptions,
-  style: style,
-  submit: submit,
-  text: text,
-  textInput: textInput,
+  options,
+  selectedOptions,
+  style,
+  submit,
+  text,
+  textInput,
   textinput: textInput,
-  uniqueName: uniqueName,
-  using: using,
-  value: value,
-  visible: visible
+  uniqueName,
+  using,
+  value,
+  visible
 }

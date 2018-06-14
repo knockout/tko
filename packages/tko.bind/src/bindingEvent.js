@@ -1,6 +1,6 @@
 
 import {
-  domData, removeDisposeCallback, arrayRemoveItem
+  domData, removeDisposeCallback, arrayRemoveItem, addDisposeCallback
 } from 'tko.utils'
 
 import {
@@ -14,7 +14,7 @@ export const bindingEvent = {
   childrenComplete: 'childrenComplete',
   descendantsComplete: 'descendantsComplete',
 
-  subscribe: function (node, event, callback, context) {
+  subscribe (node, event, callback, context) {
     const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
     if (!bindingInfo.eventSubscribable) {
       bindingInfo.eventSubscribable = new subscribable()
@@ -22,11 +22,11 @@ export const bindingEvent = {
     return bindingInfo.eventSubscribable.subscribe(callback, context, event)
   },
 
-  notify: function (node, event) {
+  notify (node, event) {
     const bindingInfo = domData.get(node, boundElementDomDataKey)
     if (bindingInfo) {
       if (bindingInfo.eventSubscribable) {
-        bindingInfo.eventSubscribable['notifySubscribers'](node, event)
+        bindingInfo.eventSubscribable.notifySubscribers(node, event)
       }
       if (event === bindingEvent.childrenComplete) {
         if (bindingInfo.asyncContext) {
@@ -41,13 +41,16 @@ export const bindingEvent = {
   startPossiblyAsyncContentBinding (node, bindingContext) {
     const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
 
+    // Create (or get the existing) async context object for this node, and return a new binding context with a pointer to this node
+    if (!bindingInfo.asyncContext) {
+      bindingInfo.asyncContext = new AsyncCompleteContext(node, bindingInfo, bindingContext[contextAncestorBindingInfo])
+    }
+
     // If the context was already extended with this node's binding info, just return the extended context
     if (bindingContext[contextAncestorBindingInfo] === bindingInfo) {
       return bindingContext
     }
 
-    // Create (or get the existing) async context object for this node, and return a new binding context with a pointer to this node
-    bindingInfo.asyncContext = bindingInfo.asyncContext = new AsyncCompleteContext(node, bindingInfo, bindingContext[contextAncestorBindingInfo])
     return bindingContext.extend(function () {
       this[contextAncestorBindingInfo] = bindingInfo
     })
@@ -71,7 +74,7 @@ class AsyncCompleteContext {
     this.childrenComplete = false
 
     if (!bindingInfo.asyncContext) {
-      ko.utils.domNodeDisposal.addDisposeCallback(node, asyncContextDispose)
+      addDisposeCallback(node, asyncContextDispose)
     }
 
     if (ancestorBindingInfo && ancestorBindingInfo.asyncContext) {

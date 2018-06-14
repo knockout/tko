@@ -3,15 +3,15 @@
 //
 
 import {
-    virtualElements, makeArray, cloneNodes
+  virtualElements, makeArray, cloneNodes
 } from 'tko.utils'
 
 import {
-    unwrap
+  unwrap
 } from 'tko.observable'
 
 import {
-    applyBindingsToDescendants, AsyncBindingHandler
+  DescendantBindingHandler, bindingEvent
 } from 'tko.bind'
 
 import {LifeCycle} from 'tko.lifecycle'
@@ -20,7 +20,7 @@ import registry from 'tko.utils.component'
 
 var componentLoadingOperationUniqueId = 0
 
-export default class ComponentBinding extends AsyncBindingHandler {
+export default class ComponentBinding extends DescendantBindingHandler {
   constructor (params) {
     super(params)
     this.originalChildNodes = makeArray(
@@ -97,19 +97,15 @@ export default class ComponentBinding extends AsyncBindingHandler {
     const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
-    const bindingResult = applyBindingsToDescendants(childBindingContext, this.$element)
-    if (bindingResult.isSync) {
-      this.onApplicationComplete(componentViewModel, bindingResult)
-    } else {
-      bindingResult.completionPromise
-        .then(() => this.onApplicationComplete(componentViewModel, bindingResult))
+    if (componentViewModel && componentViewModel.koDescendantsComplete) {
+      this.afterRenderSub = bindingEvent.subscribe(element, bindingEvent.descendantsComplete, componentViewModel.koDescendantsComplete, componentViewModel)
     }
+
+    const onBinding = this.onBindingComplete.bind(this, componentViewModel)
+    this.applyBindingsToDescendants(childBindingContext, onBinding)
   }
 
-  onApplicationComplete (componentViewModel, bindingResult) {
-    if (componentViewModel && componentViewModel.koDescendantsComplete) {
-      componentViewModel.koDescendantsComplete(this.$element)
-    }
+  onBindingComplete (componentViewModel, bindingResult) {
     this.completeBinding(bindingResult)
   }
 
@@ -118,6 +114,10 @@ export default class ComponentBinding extends AsyncBindingHandler {
     const currentViewDispose = currentView && currentView.dispose
     if (typeof currentViewDispose === 'function') {
       currentViewDispose.call(currentView)
+    }
+    if (this.afterRenderSub) {
+      this.afterRenderSub.dispose()
+      this.afterRenderSub = null
     }
     this.currentViewModel = null
     // Any in-flight loading operation is no longer relevant, so make sure we ignore its completion

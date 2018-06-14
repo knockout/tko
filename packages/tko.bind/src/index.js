@@ -8,4 +8,5 @@ export {
   AsyncBindingHandler,
   DescendantBindingHandler
 } from './BindingHandler'
+
 export { bindingEvent } from './bindingEvent'

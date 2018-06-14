@@ -254,17 +254,8 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       })
     }
 
-    if (bindingEvent.descendantsComplete in bindings) {
-      contextToExtend = bindingEvent.startPossiblyAsyncContentBinding(node, bindingContext)
-      bindingEvent.subscribe(node, bindingEvent.descendantsComplete, function () {
-        var callback = evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
-        if (callback && virtualElements.firstChild(node)) {
-          callback(node)
-        }
-      })
-    }
-
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
+    const nodeAsyncBindingPromises = new Set()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {
@@ -305,13 +296,27 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
 
         if (bindingHandler.bindingCompleted instanceof Promise) {
           asyncBindingsApplied.add(bindingHandler.bindingCompleted)
+          nodeAsyncBindingPromises.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
         reportBindingError('creation', err)
       }
     }
-  }
 
+    /** descendantsComplete ought to be an instance of the descendantsComplete
+     *  binding handler. */
+    if (bindingEvent.descendantsComplete in bindings && virtualElements.firstChild(node)) {
+      const accessor = evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
+      if (typeof accessor === 'function') {
+        const callback = () => accessor(node)
+        if (nodeAsyncBindingPromises.size) {
+          Promise.all(nodeAsyncBindingPromises).then(callback)
+        } else {
+          callback()
+        }
+      }
+    }
+  }
 
   const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined;
   return {
