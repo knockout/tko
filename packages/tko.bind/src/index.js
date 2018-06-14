@@ -5,8 +5,11 @@ export * from './arrayToDomNodeChildren'
 
 export {
   BindingHandler,
-  AsyncBindingHandler,
-  DescendantBindingHandler
+  AsyncBindingHandler
 } from './BindingHandler'
+
+export {
+  DescendantBindingHandler
+} from './DescendantBindingHandler'
 
 export { bindingEvent } from './bindingEvent'

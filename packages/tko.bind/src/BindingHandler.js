@@ -7,11 +7,6 @@ import {
     LifeCycle
 } from 'tko.lifecycle'
 
-import {
-  applyBindingsToDescendants
-} from './applyBindings'
-
-
 export class BindingHandler extends LifeCycle {
   constructor (params) {
     super()
@@ -64,22 +59,4 @@ export class AsyncBindingHandler extends BindingHandler {
   }
 
   get bindingCompleted () { return this.bindingCompletion }
-}
-
-/**
- * This DescendantBindingHandler is a base class for bindings that control
- * descendants, such as the `if`, `with`, `component`, `foreach` and `template`
- * bindings.
- */
-export class DescendantBindingHandler extends AsyncBindingHandler {
-  async applyBindingsToDescendants (childContext, callback) {
-    const bindingResult = applyBindingsToDescendants(childContext, this.$element)
-    if (bindingResult.isSync) {
-      this.bindingCompletion = bindingResult
-    } else {
-      await bindingResult.completionPromise
-    }
-    if (callback) { callback(bindingResult) }
-    this.completeBinding(bindingResult)
-  }
 }
