@@ -36,5 +36,5 @@ jobs:
 
     - run: while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
     - run: yarn test
-    - run: yarn test --sauce --noStartConnect
+    # - run: yarn test --sauce --noStartConnect
     - run: killall --wait sc
