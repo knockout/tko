@@ -12,6 +12,7 @@ jobs:
         key: node-{{ .Branch }}
     - restore_cache:
         key: saucelabs
+    - run: npm i -g lerna
     - run: yarn
     - run: lerna bootstrap
     - save_cache:
