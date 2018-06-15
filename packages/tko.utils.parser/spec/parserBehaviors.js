@@ -501,14 +501,15 @@ describe('unary operations', function () {
       assert.equal(obs(), 146)
     })
 
-    it('exposes arguments', () => {
+    // Noting #65.
+    it.skip('exposes arguments', () => {
       const binding = 'x: (z) => 1 + z'
       const context = {}
       const bindings = makeBindings(binding, context)
       assert.equal(bindings.x()(941), 942)
     })
 
-    it('exposes multiple arguments', () => {
+    it.skip('exposes multiple arguments', () => {
       const binding = 'x: (a,b,c) => a * b * c'
       const context = {}
       const bindings = makeBindings(binding, context)

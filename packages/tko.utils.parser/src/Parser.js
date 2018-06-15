@@ -771,9 +771,8 @@ export default class Parser {
   }
 
   preparse (source = '') {
-    source = source.trim()
     const preparsers = options.bindingStringPreparsers || []
-    return preparsers.reduce((acc, fn) => fn(acc), source)
+    return preparsers.reduce((acc, fn) => fn(acc), source.trim())
   }
 
   runParse (source, fn) {
