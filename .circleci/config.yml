@@ -12,9 +12,8 @@ jobs:
         key: node-{{ .Branch }}
     - restore_cache:
         key: saucelabs
-    - run: npm i -g lerna
     - run: yarn
-    - run: lerna bootstrap
+    - run: yarn run lerna bootstrap
     - save_cache:
         key: node-{{ .Branch }}
         paths:
@@ -28,12 +27,6 @@ jobs:
         paths:
           - sc-*-linux.tar.gz
 
-
-  test:
-    docker:
-    - image: "circleci/node:10-browsers"
-
-    steps:
     - run:
         command: "sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready"
         background: true
@@ -45,11 +38,3 @@ jobs:
     - run: yarn test
     - run: yarn test --sauce --noStartConnect
     - run: killall --wait sc
-
-workflows:
-  version: 2
-  build_and_test:
-    jobs:
-    - build
-    - test
-
