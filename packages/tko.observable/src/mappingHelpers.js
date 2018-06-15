@@ -4,7 +4,7 @@
 // toJS & toJSON
 //
 import {
-    stringifyJson, arrayIndexOf
+    arrayIndexOf
 } from 'tko.utils'
 
 import { isObservable } from './observable.js'
@@ -24,7 +24,7 @@ export function toJS (rootObject) {
 
 export function toJSON (rootObject, replacer, space) {     // replacer and space are optional
   var plainJavaScriptObject = toJS(rootObject)
-  return stringifyJson(plainJavaScriptObject, replacer, space)
+  return JSON.stringify(plainJavaScriptObject, replacer, space)
 }
 
 function mapJsObjectGraph (rootObject, mapInputCallback, visitedObjects) {

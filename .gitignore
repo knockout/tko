@@ -15,6 +15,7 @@ perf/*
 .DS_Store
 npm-debug.log
 node_modules
+.rpt2_cache
 
 # Knockout built files
 _repo
@@ -37,3 +38,4 @@ packages/*/visual.html
 /packages/tko/dist/tko.es6.js.map
 /packages/tko/dist/tko.es6.min.js
 /packages/tko/dist/tko.es6.min.js.map
+/.vscode

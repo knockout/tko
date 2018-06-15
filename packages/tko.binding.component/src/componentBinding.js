@@ -3,15 +3,15 @@
 //
 
 import {
-    virtualElements, makeArray, cloneNodes
+  virtualElements, makeArray, cloneNodes
 } from 'tko.utils'
 
 import {
-    unwrap
+  unwrap
 } from 'tko.observable'
 
 import {
-    applyBindingsToDescendants, AsyncBindingHandler
+  DescendantBindingHandler, bindingEvent
 } from 'tko.bind'
 
 import {LifeCycle} from 'tko.lifecycle'
@@ -20,7 +20,7 @@ import registry from 'tko.utils.component'
 
 var componentLoadingOperationUniqueId = 0
 
-export default class ComponentBinding extends AsyncBindingHandler {
+export default class ComponentBinding extends DescendantBindingHandler {
   constructor (params) {
     super(params)
     this.originalChildNodes = makeArray(
@@ -97,8 +97,15 @@ export default class ComponentBinding extends AsyncBindingHandler {
     const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
-    applyBindingsToDescendants(childBindingContext, this.$element)
-      .then(this.completeBinding)
+    const onBinding = this.onBindingComplete.bind(this, componentViewModel)
+    const applied = this.applyBindingsToDescendants(childBindingContext, onBinding)
+  }
+
+  onBindingComplete (componentViewModel, bindingResult) {
+    if (componentViewModel.koDescendantsComplete) {
+      componentViewModel.koDescendantsComplete(this.$element)
+    }
+    this.completeBinding(bindingResult)
   }
 
   cleanUpState () {

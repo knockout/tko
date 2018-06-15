@@ -1,6 +1,6 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 🎩  Beta-1 (ongoing)
+## 🎩  `master` (ongoing)
 
 * (observable) When supported, `observable.length` will now be undefined (was `0` before), and `observableArray.length` will now be the length of the wrapped array
 * (observableArraty) `observableArray` is now iterable (has a `Symbol.iterator` property)
@@ -14,6 +14,10 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * (components) Issue a warning if `ignoreCustomElementWarning` is not passed to a component registration and the component name is not usable for custom elements.
 * (observable) Removed `then` from `observable.fn` because it'll likely cause a lot of confusing issues with implicit unwrapping from `async` functions.
 * (observable) Add `ko.proxy` and related functions `ko.proxy.peek(obj, prop)`, `ko.proxy.isProxied(obj)`, `ko.proxy.getObservable(obj, prop)`.
+* Fix missing `ko.when` and `ko.isObservableArray`
+* Add `options.bindingStringPreparsers` array of functions that mutate binding strings before they are parsed
+* Parse ES2015 object initializer shorthands e.g. `{name}` = `{name: name}`
+* Expose `ko.computedContext` as alias of `ko.dependencyDetection`
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 

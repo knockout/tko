@@ -11,7 +11,8 @@ import {
 } from 'tko.observable'
 
 import {
-    renderTemplate, setTemplateEngine, templateEngine, nativeTemplateEngine
+    renderTemplate, setTemplateEngine, templateEngine, nativeTemplateEngine,
+    bindings as templateBindings
 } from 'tko.binding.template'
 
 import {
@@ -21,10 +22,6 @@ import {
 import {
     bindings as coreBindings
 } from 'tko.binding.core'
-
-import {
-    bindings as templateBindings
-} from 'tko.binding.template'
 
 import {
     bindings as ifBindings

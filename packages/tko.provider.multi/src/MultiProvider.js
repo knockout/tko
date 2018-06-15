@@ -15,6 +15,10 @@ export default class MultiProvider extends Provider {
     providers.forEach(p => this.addProvider(p))
   }
 
+  setGlobals (globals) {
+    [this, ...this.providers].forEach(p => (p.globals = globals))
+  }
+
   addProvider (provider) {
     this.providers.push(provider)
     provider.bindingHandlers = this.bindingHandlers

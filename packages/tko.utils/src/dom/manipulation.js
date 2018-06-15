@@ -5,8 +5,6 @@
 import { makeArray } from '../array.js'
 import { ieVersion } from '../ie.js'
 import { cleanNode, removeNode } from './disposal.js'
-import { forceRefresh } from './fixes.js'
-import * as virtualElements from './virtualElements.js'
 
 export function moveCleanedNodesToContainerElement (nodes) {
     // Ensure it's a real array, as we're about to reparent the nodes and
@@ -59,23 +57,6 @@ export function setElementName (element, name) {
       element.mergeAttributes(document.createElement("<input name='" + element.name + "'/>"), false)
     } catch (e) {} // For IE9 with doc mode "IE9 Standards" and browser mode "IE9 Compatibility View"
   }
-}
-
-export function setTextContent (element, textContent) {
-  var value = typeof textContent === 'function' ? textContent() : textContent
-  if ((value === null) || (value === undefined)) { value = '' }
-
-    // We need there to be exactly one child: a text node.
-    // If there are no children, more than one, or if it's not a text node,
-    // we'll clear everything and create a single text node.
-  var innerTextNode = virtualElements.firstChild(element)
-  if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
-    virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)])
-  } else {
-    innerTextNode.data = value
-  }
-
-  forceRefresh(element)
 }
 
 export function emptyDomNode (domNode) {

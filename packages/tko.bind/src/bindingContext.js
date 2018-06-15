@@ -4,12 +4,16 @@ import {
 } from 'tko.utils'
 
 import {
-    computed
+    computed, pureComputed
 } from 'tko.computed'
 
 import {
     unwrap, isObservable
 } from 'tko.observable'
+
+import {
+  contextAncestorBindingInfo
+} from './bindingEvent'
 
 export const boundElementDomDataKey = domData.nextKey()
 
@@ -25,6 +29,11 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
   const isFunc = typeof realDataItemOrAccessor === 'function' && !isObservable(realDataItemOrAccessor)
+
+  // Export 'ko' in the binding context so it will be available in bindings and templates
+  // even if 'ko' isn't exported as a global, such as when using an AMD loader.
+  // See https://github.com/SteveSanderson/knockout/issues/490
+  self.ko = options.knockoutInstance
 
   let nodes
   let subscribable
@@ -50,17 +59,16 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
             // Copy $root and any custom properties from the parent context
       extend(self, parentContext)
 
-            // Because the above copy overwrites our own properties, we need to reset them.
-      self[contextSubscribeSymbol] = subscribable
+       // Copy Symbol properties
+      if (contextAncestorBindingInfo in parentContext) {
+        self[contextAncestorBindingInfo] = parentContext[contextAncestorBindingInfo]
+      }
     } else {
       self.$parents = []
       self.$root = dataItem
-
-      // Export 'ko' in the binding context so it will be available in bindings and templates
-      // even if 'ko' isn't exported as a global, such as when using an AMD loader.
-      // See https://github.com/SteveSanderson/knockout/issues/490
-      self.ko = options.knockoutInstance
     }
+
+    self[contextSubscribeSymbol] = subscribable
 
     if (shouldInheritData) {
       dataItem = self.$data
@@ -79,45 +87,25 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
     return self.$data
   }
 
-  function disposeWhen () {
-    return nodes && !anyDomNodeIsAttachedToDocument(nodes)
-  }
-
   if (settings && settings.exportDependencies) {
         // The "exportDependencies" option means that the calling code will track any dependencies and re-create
         // the binding context when they change.
     updateContext()
-    return
-  }
-
-  subscribable = computed(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true })
+  } else {
+    subscribable = pureComputed(updateContext)
+    subscribable.peek()
 
     // At this point, the binding context has been initialized, and the "subscribable" computed observable is
     // subscribed to any observables that were accessed in the process. If there is nothing to track, the
     // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
     // the context object.
-  if (subscribable.isActive()) {
-    self[contextSubscribeSymbol] = subscribable
+    if (subscribable.isActive()) {
+      self[contextSubscribeSymbol] = subscribable
 
-        // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
-    subscribable.equalityComparer = null
-
-        // We need to be able to dispose of this computed observable when it's no longer needed. This would be
-        // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
-        // we cannot assume that those nodes have any relation to each other. So instead we track any node that
-        // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
-
-        // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
-    nodes = []
-    subscribable._addNode = function (node) {
-      nodes.push(node)
-      addDisposeCallback(node, function (node) {
-        arrayRemoveItem(nodes, node)
-        if (!nodes.length) {
-          subscribable.dispose()
-          self[contextSubscribeSymbol] = subscribable = undefined
-        }
-      })
+      // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
+      subscribable['equalityComparer'] = null
+    } else {
+      self[contextSubscribeSymbol] = undefined
     }
   }
 }
@@ -163,7 +151,7 @@ Object.assign(bindingContext.prototype, {
     // If the parent context references an observable view model, "_subscribable" will always be the
     // latest view model object. If not, "_subscribable" isn't set, and we can use the static "$data" value.
     return new bindingContext(inheritParentIndicator, this, null, function (self, parentContext) {
-      extend(self, typeof properties === 'function' ? properties() : properties)
+      extend(self, typeof properties === 'function' ? properties.call(self) : properties)
     })
   },
 

@@ -1,12 +1,12 @@
 import {
     virtualElements, fixUpContinuousNodeArray, replaceDomNodes, memoization,
     domNodeIsAttachedToDocument, moveCleanedNodesToContainerElement,
-    arrayFilter, domData, options
+    arrayFilter, domData, options as koOptions
 } from 'tko.utils'
 
 import {
     applyBindings, setDomNodeChildrenFromArrayMapping, AsyncBindingHandler,
-    bindingContext as BindingContextConstructor
+    bindingEvent, bindingContext as BindingContextConstructor
 } from 'tko.bind'
 
 import {
@@ -14,7 +14,7 @@ import {
 } from 'tko.computed'
 
 import {
-    isObservable, dependencyDetection, unwrap, observable
+    isObservable, dependencyDetection, unwrap, observable, isObservableArray
 } from 'tko.observable'
 
 import {
@@ -57,7 +57,7 @@ function activateBindingsOnContinuousNodeArray (continuousNodeArray, bindingCont
     var firstNode = continuousNodeArray[0]
     var lastNode = continuousNodeArray[continuousNodeArray.length - 1]
     var parentNode = firstNode.parentNode
-    var provider = options.bindingProviderInstance
+    var provider = koOptions.bindingProviderInstance
     var preprocessNode = provider.preprocessNode
 
     if (preprocessNode) {
@@ -133,6 +133,9 @@ function executeTemplate (targetNodeOrNodeArray, renderMode, template, bindingCo
   if (haveAddedNodesToParent) {
     activateBindingsOnContinuousNodeArray(renderedNodesArray, bindingContext, afterBindingCallback)
     if (options.afterRender) { dependencyDetection.ignore(options.afterRender, null, [renderedNodesArray, bindingContext['$data']]) }
+    if (renderMode === 'replaceChildren') {
+      bindingEvent.notify(targetNodeOrNodeArray, bindingEvent.childrenComplete)
+    }
   }
 
   return renderedNodesArray
@@ -198,10 +201,16 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
   function executeTemplateForArrayItem (arrayValue, index) {
     // Support selecting template as a function of the data being rendered
     if (options.as) {
-      arrayItemContext = parentBindingContext.extend({
-        [options.as]: arrayValue,
-        $index: index
-      })
+      if (koOptions.createChildContextWithAs) {
+        arrayItemContext = parentBindingContext.createChildContext(
+          arrayValue, options.as, context => { context.$index = index }
+        )
+      } else {
+        arrayItemContext = parentBindingContext.extend({
+          [options.as]: arrayValue,
+          $index: index
+        })
+      }
     } else {
       arrayItemContext = parentBindingContext.createChildContext(arrayValue, options.as, context => { context.$index = index })
     }
@@ -213,27 +222,42 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     // This will be called whenever setDomNodeChildrenFromArrayMapping has added nodes to targetNode
   var activateBindingsCallback = function (arrayValue, addedNodesArray /*, index */) {
     activateBindingsOnContinuousNodeArray(addedNodesArray, arrayItemContext, afterBindingCallback)
-    if (options['afterRender']) { options['afterRender'](addedNodesArray, arrayValue) }
+    if (options.afterRender) { options.afterRender(addedNodesArray, arrayValue) }
 
         // release the "cache" variable, so that it can be collected by
         // the GC when its value isn't used from within the bindings anymore.
     arrayItemContext = null
   }
 
-  return computed(function () {
-    let unwrappedArray = unwrap(arrayOrObservableArray) || []
-    const unwrappedIsIterable = Symbol.iterator in unwrappedArray
-    if (!unwrappedIsIterable) { unwrappedArray = [unwrappedArray] }
+  // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
+  // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
+  function localSetDomNodeChildrenFromArrayMapping (newArray, changeList) {
+    dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, newArray, executeTemplateForArrayItem, options, activateBindingsCallback, changeList])
+    bindingEvent.notify(targetNode, bindingEvent.childrenComplete)
+  }
 
-    // Filter out any entries marked as destroyed
-    var filteredArray = arrayFilter(unwrappedArray, function (item) {
-      return options['includeDestroyed'] || item === undefined || item === null || !unwrap(item['_destroy'])
-    })
-
-    // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
-    // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
-    dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, filteredArray, executeTemplateForArrayItem, options, activateBindingsCallback])
-  }, null, { disposeWhenNodeIsRemoved: targetNode })
+  const shouldHideDestroyed = (options.includeDestroyed === false) || (koOptions.foreachHidesDestroyed && !options.includeDestroyed);
+  if (!shouldHideDestroyed && !options.beforeRemove && isObservableArray(arrayOrObservableArray)) {
+    localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray.peek())
+    var subscription = arrayOrObservableArray.subscribe(function (changeList) {
+      localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray(), changeList)
+    }, null, 'arrayChange')
+    subscription.disposeWhenNodeIsRemoved(targetNode)
+    return subscription
+  } else {
+    return computed(function () {
+      var unwrappedArray = unwrap(arrayOrObservableArray) || []
+      const unwrappedIsIterable = Symbol.iterator in unwrappedArray
+      if (!unwrappedIsIterable) { unwrappedArray = [unwrappedArray] }
+      if (shouldHideDestroyed) {
+        // Filter out any entries marked as destroyed
+        unwrappedArray = arrayFilter(unwrappedArray, function (item) {
+          return item === undefined || item === null || !unwrap(item._destroy);
+        })
+      }
+      localSetDomNodeChildrenFromArrayMapping(unwrappedArray)
+    }, null, { disposeWhenNodeIsRemoved: targetNode })
+  }
 }
 
 let templateComputedDomDataKey = domData.nextKey()
@@ -336,7 +360,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
   disposeOldComputedAndStoreNewOne (element, newComputed) {
     let oldComputed = domData.get(element, templateComputedDomDataKey)
     if (oldComputed && (typeof oldComputed.dispose === 'function')) { oldComputed.dispose() }
-    domData.set(element, templateComputedDomDataKey, (newComputed && newComputed.isActive()) ? newComputed : undefined)
+    domData.set(element, templateComputedDomDataKey, (newComputed && (!newComputed.isActive || newComputed.isActive())) ? newComputed : undefined)
   }
 
   get controlsDescendants () { return true }

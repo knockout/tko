@@ -6,7 +6,6 @@
 import {
     addDisposeCallback,
     arrayForEach,
-    canSetPrototype,
     createSymbolOrString,
     domNodeIsAttachedToDocument,
     extend,
@@ -16,8 +15,6 @@ import {
     options as koOptions,
     removeDisposeCallback,
     safeSetTimeout,
-    setPrototypeOf,
-    setPrototypeOfOrExtend
 } from 'tko.utils'
 
 import {
@@ -100,15 +97,10 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
   computedObservable[computedState] = state
   computedObservable.isWriteable = typeof writeFunction === 'function'
 
-    // Inherit from 'subscribable'
-  if (!canSetPrototype) {
-        // 'subscribable' won't be on the prototype chain unless we put it there directly
-    extend(computedObservable, subscribable.fn)
-  }
   subscribable.fn.init(computedObservable)
 
-    // Inherit from 'computed'
-  setPrototypeOfOrExtend(computedObservable, computed.fn)
+  // Inherit from 'computed'
+  Object.setPrototypeOf(computedObservable, computed.fn)
 
   if (options.pure) {
     state.pure = true
@@ -411,10 +403,12 @@ computed.fn = {
     subscribable.fn.limit.call(this, limitFunction)
     Object.assign(this, {
       _evalIfChanged () {
-        if (state.isStale) {
-          this.evaluateImmediate()
-        } else {
-          state.isDirty = false
+        if (!this[computedState].isSleeping) {
+          if (this[computedState].isStale) {
+            this.evaluateImmediate()
+          } else {
+            this[computedState].isDirty = false
+          }
         }
         return state.latestValue
       },
@@ -528,11 +522,7 @@ var deferEvaluationOverrides = {
   }
 }
 
-// Note that for browsers that don't support proto assignment, the
-// inheritance chain is created manually in the ko.computed constructor
-if (canSetPrototype) {
-  setPrototypeOf(computed.fn, subscribable.fn)
-}
+Object.setPrototypeOf(computed.fn, subscribable.fn)
 
 // Set the proto values for ko.computed
 var protoProp = observable.protoProperty // == "__ko_proto__"

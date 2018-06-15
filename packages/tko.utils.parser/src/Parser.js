@@ -211,13 +211,16 @@ export default class Parser {
         } else {
           key = this.name()
         }
-        this.white()
-        ch = this.next(':')
         if (hasOwnProperty(object, key)) {
           this.error('Duplicate key "' + key + '"')
         }
-
-        this.objectAddValue(object, key, this.expression())
+        if (this.white() === ':') {
+          ch = this.next(':')
+          this.objectAddValue(object, key, this.expression())
+        } else {
+          const objectKeyIsValue = new Identifier(this, key, [])
+          this.objectAddValue(object, key, objectKeyIsValue)
+        }
 
         ch = this.white()
         if (ch === '}') {
@@ -767,8 +770,13 @@ export default class Parser {
     return result
   }
 
+  preparse (source = '') {
+    const preparsers = options.bindingStringPreparsers || []
+    return preparsers.reduce((acc, fn) => fn(acc), source.trim())
+  }
+
   runParse (source, fn) {
-    this.text = (source || '').trim()
+    this.text = this.preparse(source)
     this.at = 0
     this.ch = ' '
 

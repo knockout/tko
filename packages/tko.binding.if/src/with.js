@@ -1,5 +1,10 @@
+
 import {
-    unwrap
+  options
+} from 'tko.utils'
+
+import {
+  unwrap
 } from 'tko.observable'
 
 import ConditionalBindingHandler from './ConditionalBindingHandler'
@@ -15,7 +20,7 @@ export class WithBindingHandler extends ConditionalBindingHandler {
 
     // If given `as`, reduce the condition to a boolean, so it does not
     // change & refresh when the value is updated.
-    const conditionalFn = this.asOption
+    const conditionalFn = this.asOption && !options.createChildContextWithAs
       ? () => Boolean(unwrap(this.value)) : () => unwrap(this.value)
     this.conditional = this.computed(conditionalFn)
 
@@ -23,9 +28,12 @@ export class WithBindingHandler extends ConditionalBindingHandler {
   }
 
   get bindingContext () {
-    return this.asOption
-      ? this.$context.extend({[this.asOption]: this.value})
-      : this.$context.createChildContext(this.valueAccessor)
+    if (!this.asOption) {
+      return this.$context.createChildContext(this.valueAccessor)
+    }
+    return options.createChildContextWithAs
+      ? this.$context.createChildContext(this.value, this.asOption)
+      : this.$context.extend({[this.asOption]: this.value})
   }
 
   renderStatus () {

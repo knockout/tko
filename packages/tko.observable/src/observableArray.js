@@ -3,8 +3,7 @@
 // ===
 //
 import {
-    setPrototypeOfOrExtend, arrayIndexOf, canSetPrototype, setPrototypeOf,
-    arrayForEach, overwriteLengthPropertyIfSupported
+    arrayIndexOf, arrayForEach, overwriteLengthPropertyIfSupported
 } from 'tko.utils'
 
 import { observable, isObservable } from './observable.js'
@@ -17,7 +16,7 @@ export function observableArray (initialValues) {
   if (typeof initialValues !== 'object' || !('length' in initialValues)) { throw new Error('The argument passed when initializing an observable array must be an array, or null, or undefined.') }
 
   var result = observable(initialValues)
-  setPrototypeOfOrExtend(result, observableArray.fn)
+  Object.setPrototypeOf(result, observableArray.fn)
   trackArrayChanges(result)
         // ^== result.extend({ trackArrayChanges: true })
   overwriteLengthPropertyIfSupported(result, { get: () => result().length })
@@ -124,11 +123,7 @@ observableArray.fn = {
   }
 }
 
-// Note that for browsers that don't support proto assignment, the
-// inheritance chain is created manually in the ko.observableArray constructor
-if (canSetPrototype) {
-  setPrototypeOf(observableArray.fn, observable.fn)
-}
+Object.setPrototypeOf(observableArray.fn, observable.fn)
 
 // Populate ko.observableArray.fn with read/write functions from native arrays
 // Important: Do not add any additional functions here that may reasonably be used to *read* data from the array
@@ -154,3 +149,6 @@ arrayForEach(['slice'], function (methodName) {
     return underlyingArray[methodName].apply(underlyingArray, arguments)
   }
 })
+
+// Expose for testing.
+observableArray.trackArrayChanges = trackArrayChanges

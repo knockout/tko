@@ -35,8 +35,8 @@ function makeBindings (binding, context) {
 
 describe('the bindings parser', function () {
   it('parses bindings with JSON values', function () {
-    var binding_string = 'a: "A", b: 1, b_: -1, c: 2.1, c_:-2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null',
-      value = new Parser().parse(binding_string);
+    const bindingString = 'a: "A", b: 1, b_: -1, c: 2.1, c_:-2.1, d: ["X", "Y"], e: {"R": "V"}, t: true, f: false, n: null, o'
+    const value = new Parser().parse(bindingString)
     assert.equal(value.a(), 'A', 'string');
     assert.equal(value.b(), 1, 'int');
     assert.equal(value.b_(), -1, '-int');
@@ -49,6 +49,7 @@ describe('the bindings parser', function () {
     assert.equal(value.t(), true, 'true');
     assert.equal(value.f(), false, 'false');
     assert.equal(value.n(), null, 'null');
+    assert.equal(value.o(), undefined, '{o}');
   })
 
   it('works with alphanumerics ä and å (unicode < 0x0100)', function () {
@@ -123,10 +124,17 @@ describe('the bindings parser', function () {
   })
 
   it('parses object: attr: {name: value}', function () {
-    var binding = 'attr: { klass: kValue }',
-      context = ctxStub({ kValue: 'Sam' }),
-      bindings = new Parser().parse(binding, context);
+    const binding = 'attr: { klass: kValue }'
+    const context = ctxStub({ kValue: 'Sam' })
+    const bindings = new Parser().parse(binding, context)
     assert.equal(bindings.attr().klass, 'Sam')
+  })
+
+  it('parses object: attr: {name}', function () {
+    const binding = 'attr: { kv }'
+    const context = ctxStub({ kv: 'Sam' })
+    const bindings = new Parser().parse(binding, context)
+    assert.equal(bindings.attr().kv, 'Sam')
   })
 
   it('parses object: attr: {name: observable(value)}', function () {
@@ -479,6 +487,33 @@ describe('unary operations', function () {
       assert.equal(obs(), undefined)
       bindings.x()()
       assert.equal(obs(), 146)
+    })
+
+    it('ignores empty arguments', () => {
+      const binding = 'x: () => yfn(146)'
+      const obs = observable()
+      const context = { yfn: function (n) { obs(n) } }
+      const bindings = makeBindings(binding, context)
+      assert.equal(obs(), undefined)
+      bindings.x() // does not evaluate on lookup
+      assert.equal(obs(), undefined)
+      bindings.x()()
+      assert.equal(obs(), 146)
+    })
+
+    // Noting #65.
+    it.skip('exposes arguments', () => {
+      const binding = 'x: (z) => 1 + z'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(941), 942)
+    })
+
+    it.skip('exposes multiple arguments', () => {
+      const binding = 'x: (a,b,c) => a * b * c'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(1, 2, 3), 6)
     })
   })
 

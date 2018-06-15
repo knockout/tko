@@ -1,0 +1,41 @@
+{
+  "name": "tko.utils.functionRewrite",
+  "version": "4.0.0-alpha4",
+  "description": "Rewrite `function {}` as lambdas (=>)",
+  "module": "dist/tko.utils.functionRewrite.js",
+  "files": [
+    "dist/"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "tslib": "^1.8.0"
+  },
+  "karma": {
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
+  },
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
+  "standard": {
+    "globals": [
+      "assert",
+      "jasmine",
+      "beforeEach",
+      "before",
+      "after",
+      "afterEach",
+      "it",
+      "iit",
+      "xit",
+      "expect",
+      "describe",
+      "ddescribe"
+    ]
+  },
+  "scripts": {
+    "test": "karma start ../../karma.conf.js --once",
+    "build": "rollup -c ../../rollup.config.js",
+    "watch": "karma start ../../karma.conf.js"
+  }
+}

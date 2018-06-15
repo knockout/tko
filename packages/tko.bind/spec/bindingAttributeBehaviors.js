@@ -1,11 +1,11 @@
 /* global testNode */
 import {
-    cleanNode, options, virtualElements, objectForEach
+  cleanNode, options, virtualElements, objectForEach
 } from 'tko.utils'
 
 import {
-    unwrap,
-    observable as koObservable
+  unwrap,
+  observable as koObservable
 } from 'tko.observable'
 
 import { MultiProvider } from 'tko.provider.multi'
@@ -13,8 +13,8 @@ import { VirtualProvider } from 'tko.provider.virtual'
 import { DataBindProvider } from 'tko.provider.databind'
 
 import {
-    applyBindings, dataFor, bindingContext,
-    applyBindingsToDescendants, applyBindingsToNode, contextFor
+  applyBindings, dataFor, bindingContext, bindingEvent,
+  applyBindingsToDescendants, applyBindingsToNode, contextFor
 } from '../src'
 
 import { bindings as coreBindings } from 'tko.binding.core'
@@ -29,7 +29,7 @@ describe('Binding attribute syntax', function () {
   beforeEach(jasmine.prepareTestNode)
 
   beforeEach(function () {
-        // Set up the default binding handlers.
+    // Set up the default binding handlers.
     var provider = new MultiProvider({providers: [
       new VirtualProvider(),
       new DataBindProvider()
@@ -43,7 +43,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('applyBindings should accept no parameters and then act on document.body with undefined model', function () {
-    this.after(function () { cleanNode(document.body) })     // Just to avoid interfering with other specs
+    this.after(function () { cleanNode(document.body) }) // Just to avoid interfering with other specs
 
     var didInit = false
     bindingHandlers.test = {
@@ -59,7 +59,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('applyBindings should accept one parameter and then act on document.body with parameter as model', function () {
-    this.after(function () { cleanNode(document.body) })     // Just to avoid interfering with other specs
+    this.after(function () { cleanNode(document.body) }) // Just to avoid interfering with other specs
 
     var didInit = false
     var suppliedViewModel = {}
@@ -127,7 +127,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should tolerate wacky IE conditional comments', function () {
-        // Represents issue https://github.com/SteveSanderson/knockout/issues/186. Would fail on IE9, but work on earlier IE versions.
+    // Represents issue https://github.com/SteveSanderson/knockout/issues/186. Would fail on IE9, but work on earlier IE versions.
     testNode.innerHTML = '<div><!--[if IE]><!-->Hello<!--<![endif]--></div>'
     applyBindings(null, testNode) // No exception means success
   })
@@ -241,7 +241,7 @@ describe('Binding attribute syntax', function () {
     expect(obe_calls).toEqual(2)
   })
 
-    // * This is probably poor policy, but it only applies to legacy handlers. *
+  // * This is probably poor policy, but it only applies to legacy handlers. *
   it('Calls the `update` even if `init` fails', function () {
     var cc = false
     this.after(function () { options.set('onError', undefined) })
@@ -261,14 +261,14 @@ describe('Binding attribute syntax', function () {
     this.after(function () { options.set('onError', undefined) })
     options.set('onError', function (err) {
       expect(err.message.indexOf('turtle')).toNotEqual(-1)
-            // Check for the `spec` properties
+      // Check for the `spec` properties
       expect(err.bindingKey).toEqual('test')
       oe_calls++
     })
     bindingHandlers.test = {
       init: function () { throw new Error('A turtle!') },
       update: function (e, oxy) {
-        unwrap(oxy())  // Create dependency.
+        unwrap(oxy()) // Create dependency.
         throw new Error('Two turtles!')
       }
     }
@@ -361,7 +361,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should use properties on the view model in preference to properties on the binding context', function () {
-        // In KO 3.5 this test relied on a bit of duck-typing (it has a $data).
+    // In KO 3.5 this test relied on a bit of duck-typing (it has a $data).
     testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>"
     var outer = new bindingContext({ someProp: 'Outer value' })
     var inner = new bindingContext({ someProp: 'Inner value' }, outer)
@@ -383,7 +383,7 @@ describe('Binding attribute syntax', function () {
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$customProp).toEqual('my value')
     expect(contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toBeUndefined() // Should not affect original binding context
 
-        // value of $data and $parent should be unchanged in extended context
+    // value of $data and $parent should be unchanged in extended context
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data).toEqual(vm.sub)
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$parent).toEqual(vm)
   })
@@ -409,7 +409,7 @@ describe('Binding attribute syntax', function () {
       allowedProperties.push('_subscribable')
     }
     objectForEach(contextFor(testNode.childNodes[0].childNodes[0]),
-                  (prop) => expect(allowedProperties).toContain(prop))
+      (prop) => expect(allowedProperties).toContain(prop))
   })
 
   it('Should be able to retrieve the binding context associated with any node', function () {
@@ -418,15 +418,15 @@ describe('Binding attribute syntax', function () {
 
     expect(testNode.childNodes[0].childNodes[0]).toContainText('Bert')
 
-        // Can't get binding context for unbound nodes
+    // Can't get binding context for unbound nodes
     expect(dataFor(testNode)).toBeUndefined()
     expect(contextFor(testNode)).toBeUndefined()
 
-        // Can get binding context for directly bound nodes
+    // Can get binding context for directly bound nodes
     expect(dataFor(testNode.childNodes[0]).name).toEqual('Bert')
     expect(contextFor(testNode.childNodes[0]).$data.name).toEqual('Bert')
 
-        // Can get binding context for descendants of directly bound nodes
+    // Can get binding context for descendants of directly bound nodes
     expect(dataFor(testNode.childNodes[0].childNodes[0]).name).toEqual('Bert')
     expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('Bert')
 
@@ -436,12 +436,12 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should not return a context object for unbound elements that are descendants of bound elements', function () {
-        // From https://github.com/knockout/knockout/issues/2148
+    // From https://github.com/knockout/knockout/issues/2148
     testNode.innerHTML = '<div data-bind="visible: isVisible"><span>Some text</span><div data-bind="allowBindings: false"><input data-bind="value: someValue"></div></div>'
 
     bindingHandlers.allowBindings = {
       init: function (elem, valueAccessor) {
-                // Let bindings proceed as normal *only if* my value is false
+        // Let bindings proceed as normal *only if* my value is false
         var shouldAllowBindings = unwrap(valueAccessor())
         return { controlsDescendantBindings: !shouldAllowBindings }
       }
@@ -449,22 +449,39 @@ describe('Binding attribute syntax', function () {
     var vm = {isVisible: true}
     applyBindings(vm, testNode)
 
-        // All of the bound nodes return the viewmodel
+    // All of the bound nodes return the viewmodel
     expect(dataFor(testNode.childNodes[0])).toBe(vm)
     expect(dataFor(testNode.childNodes[0].childNodes[0])).toBe(vm)
     expect(dataFor(testNode.childNodes[0].childNodes[1])).toBe(vm)
     expect(contextFor(testNode.childNodes[0].childNodes[1]).$data).toBe(vm)
 
-        // The unbound child node returns undefined
+    // The unbound child node returns undefined
     expect(dataFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined()
     expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined()
+  })
+
+  it('Should return the context object for nodes specifically bound, but override with general binding', function () {
+    // See https://github.com/knockout/knockout/issues/231#issuecomment-388210267
+    testNode.innerHTML = '<div data-bind="text: name"></div>'
+
+    var vm1 = { name: 'specific' }
+    applyBindingsToNode(testNode.childNodes[0], { text: vm1.name }, vm1)
+    expect(testNode).toContainText(vm1.name)
+    expect(dataFor(testNode.childNodes[0])).toBe(vm1)
+    expect(contextFor(testNode.childNodes[0]).$data).toBe(vm1)
+
+    var vm2 = { name: 'general' }
+    applyBindings(vm2, testNode)
+    expect(testNode).toContainText(vm2.name)
+    expect(dataFor(testNode.childNodes[0])).toBe(vm2)
+    expect(contextFor(testNode.childNodes[0]).$data).toBe(vm2)
   })
 
   it('Should not be allowed to use containerless binding syntax for bindings other than whitelisted ones', function () {
     testNode.innerHTML = 'Hello <!-- ko visible: false -->Some text<!-- /ko --> Goodbye'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow('The binding [visible] cannot be used with virtual elements')
+    }).toThrow('The binding \'visible\' cannot be used with virtual elements')
   })
 
   it('Should be able to set a custom binding to use containerless binding', function () {
@@ -530,7 +547,7 @@ describe('Binding attribute syntax', function () {
     var countNodes = 0
     bindingHandlers.test = {
       init: function (element) {
-                // Counts the number of virtual children, and overwrites the text contents of any text nodes
+        // Counts the number of virtual children, and overwrites the text contents of any text nodes
         for (var node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
           countNodes++
           if (node.nodeType === 3) { node.data = 'new text' }
@@ -611,7 +628,7 @@ describe('Binding attribute syntax', function () {
     expect(dataFor(testNode.childNodes[1].childNodes[0]).myCustomData).toEqual(123)
     expect(dataFor(testNode.childNodes[1].childNodes[1]).myCustomData).toEqual(123)
   })
-    // TODO: FAIL
+  // TODO: FAIL
   it('Should be able to access custom context variables in child context', function () {
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -646,10 +663,10 @@ describe('Binding attribute syntax', function () {
   it('Should not allow multiple applyBindings calls for the same element', function () {
     testNode.innerHTML = "<div data-bind='text: \"Some Text\"'></div>"
 
-        // First call is fine
+    // First call is fine
     applyBindings({}, testNode)
 
-        // Second call throws an error
+    // Second call throws an error
     expect(function () {
       applyBindings({}, testNode)
     }).toThrow('You cannot apply bindings multiple times to the same element.')
@@ -658,55 +675,55 @@ describe('Binding attribute syntax', function () {
   it('Should allow multiple applyBindings calls for the same element if cleanNode is used', function () {
     testNode.innerHTML = "<div data-bind='text: \"Some Text\"'></div>"
 
-        // First call
+    // First call
     applyBindings({}, testNode)
 
-        // cleanNode called before second call
+    // cleanNode called before second call
     cleanNode(testNode)
     applyBindings({}, testNode)
-        // Should not throw any errors
+    // Should not throw any errors
   })
 
   it('Should allow multiple applyBindings calls for the same element if subsequent call provides a binding', function () {
     testNode.innerHTML = "<div data-bind='text: \"Some Text\"'></div>"
 
-        // First call uses data-bind
+    // First call uses data-bind
     applyBindings({}, testNode)
 
-        // Second call provides a binding
+    // Second call provides a binding
     applyBindingsToNode(testNode, { visible: false }, {})
-        // Should not throw any errors
+    // Should not throw any errors
   })
 
   it('Should allow multiple applyBindings calls for the same element if initial call provides a binding', function () {
     testNode.innerHTML = "<div data-bind='text: \"Some Text\"'></div>"
 
-        // First call provides a binding
+    // First call provides a binding
     applyBindingsToNode(testNode, { visible: false }, {})
 
-        // Second call uses data-bind
+    // Second call uses data-bind
     applyBindings({}, testNode)
-        // Should not throw any errors
+    // Should not throw any errors
   })
 
   describe('Should not bind against text content inside restricted elements', function () {
     this.beforeEach(function () {
       this.restoreAfter(options, 'bindingProviderInstance')
 
-            // Developers won't expect or want binding to mutate the contents of <script> or <textarea>
-            // elements. Historically this wasn't a problem because the default binding provider only
-            // acts on elements, but now custom providers can act on text contents of elements, it's
-            // important to ensure we don't break these elements by mutating their contents.
+      // Developers won't expect or want binding to mutate the contents of <script> or <textarea>
+      // elements. Historically this wasn't a problem because the default binding provider only
+      // acts on elements, but now custom providers can act on text contents of elements, it's
+      // important to ensure we don't break these elements by mutating their contents.
 
-            // First replace the binding provider with one that's hardcoded to replace all text
-            // content with a special message, via a binding handler that operates on text nodes
+      // First replace the binding provider with one that's hardcoded to replace all text
+      // content with a special message, via a binding handler that operates on text nodes
 
       var originalBindingProvider = options.bindingProviderInstance
       options.bindingProviderInstance = {
         get FOR_NODE_TYPES () { return [3] },
         nodeHasBindings: function (node) {
-                    // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
-                    // This will still prove that the binding provider was not executed on the children of a restricted element.
+          // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
+          // This will still prove that the binding provider was not executed on the children of a restricted element.
           if (node.nodeType === 3 && jasmine.ieVersion < 9) {
             node.data = 'replaced'
             return false
@@ -748,5 +765,63 @@ describe('Binding attribute syntax', function () {
       applyBindings({ sometext: 'hello' }, testNode)
       expect(testNode).toContainHtml('<p>replaced</p><template>test</template><p>replaced</p>')
     })
+  })
+
+  it('Should call a childrenComplete callback function after descendent elements are bound', function () {
+    var callbacks = 0,
+      callback = function (nodes, data) {
+        expect(nodes.length).toEqual(1)
+        expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0])
+        expect(data).toEqual(vm)
+        callbacks++
+      },
+      vm = { callback: callback }
+
+    testNode.innerHTML = "<div data-bind='childrenComplete: callback'><span data-bind='text: \"Some Text\"'></span></div>"
+    applyBindings(vm, testNode)
+    expect(callbacks).toEqual(1)
+  })
+
+  it('Should call a childrenComplete callback function when bound to a virtual element', function () {
+    var callbacks = 0,
+      callback = function (nodes, data) {
+        expect(nodes.length).toEqual(1)
+        expect(nodes[0]).toEqual(testNode.childNodes[1])
+        expect(data).toEqual(vm)
+        callbacks++
+      },
+      vm = { callback: callback }
+
+    testNode.innerHTML = "<!-- ko childrenComplete: callback --><span data-bind='text: \"Some Text\"'></span><!-- /ko -->"
+    applyBindings(vm, testNode)
+    expect(callbacks).toEqual(1)
+  })
+
+  it('Should not call a childrenComplete callback function when there are no descendant nodes', function () {
+    var callbacks = 0
+
+    testNode.innerHTML = "<div data-bind='childrenComplete: callback'></div>"
+    applyBindings({ callback: function () { callbacks++ } }, testNode)
+    expect(callbacks).toEqual(0)
+  })
+
+  it('Should ignore (and not throw an error) for a null childrenComplete callback', function () {
+    testNode.innerHTML = "<div data-bind='childrenComplete: null'><span data-bind='text: \"Some Text\"'></span></div>"
+    applyBindings({}, testNode)
+  })
+
+  it('Should call childrenComplete callback registered with bindingEvent.subscribe', function () {
+    var callbacks = 0,
+      vm = {}
+
+    bindingEvent.subscribe(testNode, 'childrenComplete', function (node) {
+      callbacks++
+      expect(node).toEqual(testNode)
+      expect(dataFor(node)).toEqual(vm)
+    })
+
+    testNode.innerHTML = '<div></div>'
+    applyBindings(vm, testNode)
+    expect(callbacks).toEqual(1)
   })
 })

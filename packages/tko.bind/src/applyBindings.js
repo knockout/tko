@@ -15,9 +15,16 @@ import {
 } from 'tko.computed'
 
 import {
-    bindingContext, storedBindingContextForNode, boundElementDomDataKey,
-    contextSubscribeSymbol
+  dataFor, bindingContext, boundElementDomDataKey, contextSubscribeSymbol
 } from './bindingContext'
+
+import {
+  bindingEvent
+} from './bindingEvent'
+
+import {
+  BindingResult
+} from './BindingResult'
 
 import {
   LegacyBindingHandler
@@ -35,6 +42,15 @@ const bindingDoesNotRecurseIntoElementTypes = {
   'template': true
 }
 
+function getBindingProvider () {
+  return options.bindingProviderInstance.instance || options.bindingProviderInstance
+}
+
+function isProviderForNode (provider, node) {
+  const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
+  return nodeTypes.includes(node.nodeType)
+}
+
 function asProperHandlerClass (handler, bindingKey) {
   if (!handler) { return }
   return handler.isBindingHandlerClass ? handler
@@ -47,47 +63,13 @@ function getBindingHandlerFromComponent (bindingKey, $component) {
 }
 
 export function getBindingHandler (bindingKey) {
-  return asProperHandlerClass(options.bindingProviderInstance.bindingHandlers.get(bindingKey), bindingKey)
-}
-
-// Returns the valueAccessor function for a binding value
-function makeValueAccessor (value) {
-  return function () {
-    return value
-  }
+  const bindingDefinition = options.getBindingHandler(bindingKey) || getBindingProvider().bindingHandlers.get(bindingKey)
+  return asProperHandlerClass(bindingDefinition, bindingKey)
 }
 
 // Returns the value of a valueAccessor function
 function evaluateValueAccessor (valueAccessor) {
   return valueAccessor()
-}
-
-// Given a function that returns bindings, create and return a new object that contains
-// binding value-accessors functions. Each accessor function calls the original function
-// so that it always gets the latest value and all dependencies are captured. This is used
-// by ko.applyBindingsToNode and getBindingsAndMakeAccessors.
-function makeAccessorsFromFunction (callback) {
-  return objectMap(dependencyDetection.ignore(callback), function (value, key) {
-    return function () {
-      return callback()[key]
-    }
-  })
-}
-
-// Given a bindings function or object, create and return a new object that contains
-// binding value-accessors functions. This is used by ko.applyBindingsToNode.
-function makeBindingAccessors (bindings, context, node) {
-  if (typeof bindings === 'function') {
-    return makeAccessorsFromFunction(bindings.bind(null, context, node))
-  } else {
-    return objectMap(bindings, makeValueAccessor)
-  }
-}
-
-// This function is used if the binding provider doesn't include a getBindingAccessors function.
-// It must be called with 'this' set to the provider instance.
-function getBindingsAndMakeAccessors (node, context) {
-  return makeAccessorsFromFunction(this.getBindings.bind(this, node, context))
 }
 
 function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, asyncBindingsApplied) {
@@ -96,7 +78,7 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
   if (!nextInQueue) { return }
 
   let currentChild
-  const provider = options.bindingProviderInstance
+  const provider = getBindingProvider()
   const preprocessNode = provider.preprocessNode
 
   // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
@@ -114,15 +96,17 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
   }
 
   while (currentChild = nextInQueue) {
-        // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
+    // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
     nextInQueue = virtualElements.nextSibling(currentChild)
     applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
   }
+
+  bindingEvent.notify(elementOrVirtualElement, bindingEvent.childrenComplete)
 }
 
 function hasBindings (node) {
-  const provider = options.bindingProviderInstance
-  return provider.FOR_NODE_TYPES.includes(node.nodeType) && provider.nodeHasBindings(node)
+  const provider = getBindingProvider()
+  return isProviderForNode(provider, node) && provider.nodeHasBindings(node)
 }
 
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
@@ -187,10 +171,11 @@ function * topologicalSortBindings (bindings, $component) {
 }
 
 function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyncBindingsApplied) {
-  const bindingInfo = domData.get(node, boundElementDomDataKey)
+  const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
   // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
+  const alreadyBound = bindingInfo.alreadyBound
   if (!sourceBindings) {
-    if (bindingInfo) {
+    if (alreadyBound) {
       onBindingError({
         during: 'apply',
         errorCaptured: new Error('You cannot apply bindings multiple times to the same element.'),
@@ -199,10 +184,10 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       })
       return false
     }
-    domData.set(node, boundElementDomDataKey, { context: bindingContext })
-    if (bindingContext[contextSubscribeSymbol]) {
-      bindingContext[contextSubscribeSymbol]._addNode(node)
-    }
+    bindingInfo.alreadyBound = true
+  }
+  if (!alreadyBound) {
+    bindingInfo.context = bindingContext
   }
 
   // Use bindings if given, otherwise fall back on asking the bindings provider to give us some bindings
@@ -210,10 +195,10 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
   if (sourceBindings && typeof sourceBindings !== 'function') {
     bindings = sourceBindings
   } else {
-    const provider = options.bindingProviderInstance
-    const getBindings = provider.getBindingAccessors || getBindingsAndMakeAccessors
+    const provider = getBindingProvider()
+    const getBindings = provider.getBindingAccessors
 
-    if (provider.FOR_NODE_TYPES.includes(node.nodeType)) {
+    if (isProviderForNode(provider, node)) {
           // Get the binding from the provider within a computed observable so that we can update the bindings whenever
           // the binding context is updated or if the binding provider accesses observables.
       var bindingsUpdater = computed(
@@ -258,7 +243,17 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     allBindings.has = (key) => key in bindings
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
 
+    if (bindingEvent.childrenComplete in bindings) {
+      bindingEvent.subscribe(node, bindingEvent.childrenComplete, () => {
+        const callback = evaluateValueAccessor(bindings[bindingEvent.childrenComplete])
+        if (!callback) { return }
+        const nodes = virtualElements.childNodes(node)
+        if (nodes.length) { callback(nodes, dataFor(nodes[0])) }
+      })
+    }
+
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
+    const nodeAsyncBindingPromises = new Set()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
         // Go through the sorted bindings, calling init and update for each
       function reportBindingError (during, errorCaptured) {
@@ -275,7 +270,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
       }
 
       if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
-        throw new Error(`The binding [${key}] cannot be used with virtual elements`)
+        throw new Error(`The binding '${key}' cannot be used with virtual elements`)
       }
 
       try {
@@ -289,7 +284,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           })
         )
 
-              // Expose the bindings via domData.
+        // Expose the bindings via domData.
         allBindingHandlers[key] = bindingHandler
 
         if (bindingHandler.controlsDescendants) {
@@ -297,19 +292,45 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           bindingHandlerThatControlsDescendantBindings = key
         }
 
-        if (bindingHandler.bindingCompleted instanceof options.Promise) {
+        if (bindingHandler.bindingCompleted instanceof Promise) {
           asyncBindingsApplied.add(bindingHandler.bindingCompleted)
+          nodeAsyncBindingPromises.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
         reportBindingError('creation', err)
       }
     }
+
+    triggerDescendantsComplete(node, bindings, nodeAsyncBindingPromises)
   }
 
-  return {
-    shouldBindDescendants: bindingHandlerThatControlsDescendantBindings === undefined
+  const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined
+  return { shouldBindDescendants }
+}
+
+/**
+ *
+ * @param {HTMLElement} node
+ * @param {Object} bindings
+ * @param {[Promise]} nodeAsyncBindingPromises
+ */
+function triggerDescendantsComplete (node, bindings, nodeAsyncBindingPromises) {
+  /** descendantsComplete ought to be an instance of the descendantsComplete
+    *  binding handler. */
+  const hasBindingHandler = bindingEvent.descendantsComplete in bindings
+  const hasFirstChild = virtualElements.firstChild(node)
+  const accessor = hasBindingHandler && evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
+  const callback = () => {
+    bindingEvent.notify(node, bindingEvent.descendantsComplete)
+    if (accessor && hasFirstChild) { accessor(node) }
+  }
+  if (nodeAsyncBindingPromises.size) {
+    Promise.all(nodeAsyncBindingPromises).then(callback)
+  } else {
+    callback()
   }
 }
+
 
 function getBindingContext (viewModelOrBindingContext, extendContextCallback) {
   return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)
@@ -326,17 +347,20 @@ export function applyBindingAccessorsToNode (node, bindings, viewModelOrBindingC
 
 export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) {
   const asyncBindingsApplied = new Set()
-  var context = getBindingContext(viewModelOrBindingContext)
-  applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context, asyncBindingsApplied)
-  return options.Promise.all(asyncBindingsApplied)
+  const bindingContext = getBindingContext(viewModelOrBindingContext)
+  const bindingAccessors = getBindingProvider().makeBindingAccessors(bindings, bindingContext, node)
+  applyBindingAccessorsToNode(node, bindingAccessors, bindingContext, asyncBindingsApplied)
+  return new BindingResult({asyncBindingsApplied, rootNode: node, bindingContext})
 }
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
   const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
-    applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, asyncBindingsApplied)
+    const bindingContext = getBindingContext(viewModelOrBindingContext)
+    applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
+    return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
   }
-  return options.Promise.all(asyncBindingsApplied)
+  return new BindingResult({asyncBindingsApplied, rootNode})
 }
 
 export function applyBindings (viewModelOrBindingContext, rootNode, extendContextCallback) {
@@ -357,7 +381,7 @@ export function applyBindings (viewModelOrBindingContext, rootNode, extendContex
   }
   const rootContext = getBindingContext(viewModelOrBindingContext, extendContextCallback)
   applyBindingsToNodeAndDescendantsInternal(rootContext, rootNode, asyncBindingsApplied)
-  return options.Promise.all(asyncBindingsApplied)
+  return Promise.all(asyncBindingsApplied)
 }
 
 function onBindingError (spec) {

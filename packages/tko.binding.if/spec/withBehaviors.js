@@ -377,4 +377,21 @@ describe('Binding: With', function () {
 
     model.items.push({ x: observable(15) })
   })
+
+  it('Should call a childrenComplete callback function', function () {
+    testNode.innerHTML = "<div data-bind='with: someItem, childrenComplete: callback'><span data-bind='text: childprop'></span></div>"
+    var someItem = observable({ childprop: 'child' }),
+      callbacks = 0
+    applyBindings({ someItem: someItem, callback: function () { callbacks++ } }, testNode)
+    expect(callbacks).toEqual(1)
+    expect(testNode.childNodes[0]).toContainText('child')
+
+    someItem(null)
+    expect(callbacks).toEqual(1)
+    expect(testNode.childNodes[0].childNodes.length).toEqual(0)
+
+    someItem({ childprop: 'new child' })
+    expect(callbacks).toEqual(2)
+    expect(testNode.childNodes[0]).toContainText('new child')
+  })
 })

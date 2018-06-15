@@ -128,9 +128,11 @@ describe('Binding: Foreach', function () {
     someItems.pop()
     expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>')
 
-        // Also, marking as "destroy" should eliminate the item from display
-    someItems.destroy(someItems()[0])
-    expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: childprop">second child</span>')
+    // Disabling this legacy test re. the `destroyed` observable property.
+    // options.includeDestroyed = false
+    // Also, marking as "destroy" should eliminate the item from display
+    // someItems.destroy(someItems()[0])
+    // expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: childprop">second child</span>')
   })
 
   it('Should remove all nodes corresponding to a removed array item, even if they were generated via containerless templates', function () {
@@ -393,12 +395,15 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0]).toContainText('added childfirst childhidden child')
   })
 
-  it('Should double-unwrap if the internal is iterable', function () {
+  it('Should not double-unwrap if the internal is iterable', function () {
+    // Previously an observable value was doubly-unwrapped: in the foreach handler and then in the template handler.
+    // This is now fixed so that the value is unwrapped just in the template handler and only peeked at in the foreach handler.
+    // See https://github.com/SteveSanderson/knockout/issues/523
     testNode.innerHTML = "<div data-bind='foreach: myArray'><span data-bind='text: $data'></span></div>"
     var myArrayWrapped = observable(observableArray(['data value']))
     applyBindings({ myArray: myArrayWrapped }, testNode)
     // Because the unwrapped value isn't an array, nothing gets rendered.
-    expect(testNode.childNodes[0]).toContainText('data value')
+    expect(testNode.childNodes[0]).toContainText('')
   })
 
   it('Should not triple-unwrap the given value', function () {
