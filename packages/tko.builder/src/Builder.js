@@ -46,7 +46,7 @@ import {
 
 import {
   LifeCycle
-} from 'tko.LifeCycle'
+} from 'tko.lifecycle'
 
 import {
     // applyExtenders,

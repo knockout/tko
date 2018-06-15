@@ -4,14 +4,28 @@ jobs:
     docker:
     - image: "circleci/node:10-browsers"
       environment:
-      SC_VERSION: 4.4.12
+        SC_VERSION: 4.4.12
 
     steps:
     - checkout
-    - restore_cache:
-        key: node-{{ .Branch }}
+
     - restore_cache:
         key: saucelabs
+    - run: wget -c https://saucelabs.com/downloads/sc-${SC_VERSION}-linux.tar.gz
+    - run: tar zxf sc-${SC_VERSION}-linux.tar.gz
+    - save_cache:
+        key: saucelabs
+        paths:
+          - sc-*-linux.tar.gz
+    - run:
+        command: "sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready"
+        background: true
+        environment:
+          CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
+          CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
+
+    - restore_cache:
+        key: node-{{ .Branch }}
     - run: yarn
     - run: yarn run lerna bootstrap
     - save_cache:
@@ -19,20 +33,6 @@ jobs:
         paths:
           - node_modules
           - /home/circleci/.cache/yarn/v1
-
-    - run: wget -c https://saucelabs.com/downloads/sc-${SC_VERSION}-linux.tar.gz
-    - run: tar zxf sc-${SC_VERSION}-linux.tar.gz
-    - save_cache:
-        key: saucelabs
-        paths:
-          - sc-*-linux.tar.gz
-
-    - run:
-        command: "sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready"
-        background: true
-        environment:
-          CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
-          CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
 
     - run: while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
     - run: yarn test
