@@ -236,7 +236,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     bindingEvent.notify(targetNode, bindingEvent.childrenComplete)
   }
 
-  const shouldHideDestroyed = (options.includeDestroyed === false) || (options.foreachHidesDestroyed && !options.includeDestroyed);
+  const shouldHideDestroyed = (options.includeDestroyed === false) || (koOptions.foreachHidesDestroyed && !options.includeDestroyed);
   if (!shouldHideDestroyed && !options.beforeRemove && isObservableArray(arrayOrObservableArray)) {
     localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray.peek())
     var subscription = arrayOrObservableArray.subscribe(function (changeList) {

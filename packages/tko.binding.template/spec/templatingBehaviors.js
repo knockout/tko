@@ -206,7 +206,7 @@ describe('Templating', function () {
   })
 
   it('Should call a generic childrenComplete callback function', function () {
-    setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'result = [js: childProp]' }))
+    setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'result = [js: nomangle$data.childProp]' }))
     testNode.innerHTML = "<div data-bind='template: { name: \"someTemplate\", data: someItem }, childrenComplete: callback'></div>"
     var someItem = observable({ childProp: 'child' }),
       callbacks = 0
@@ -822,9 +822,10 @@ describe('Templating', function () {
     })
 
     it('Should omit any items whose \'_destroy\' flag is set (unwrapping the flag if it is observable)', function () {
+      options.includeDestroyed = false
       var myArray = observableArray([{ someProp: 1 }, { someProp: 2, _destroy: 'evals to true' }, { someProp: 3 }, { someProp: 4, _destroy: observable(false) }])
       setTemplateEngine(new dummyTemplateEngine({ itemTemplate: '<div>someProp=[js: nomangle$data.someProp]</div>' }))
-      testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>"
+      testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection, includeDestroyed: false }'></div>"
 
       applyBindings({ myCollection: myArray }, testNode)
       expect(testNode.childNodes[0]).toContainHtml('<div>someprop=1</div><div>someprop=3</div><div>someprop=4</div>')
