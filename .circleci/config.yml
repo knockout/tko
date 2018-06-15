@@ -34,10 +34,10 @@ jobs:
 
     steps:
     - run: sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready
-      background: true
-      environment:
-        CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
-        CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
+        background: true
+        environment:
+          CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
+          CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
 
     - run: while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
     - run: yarn test
