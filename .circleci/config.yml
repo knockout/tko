@@ -33,7 +33,8 @@ jobs:
     - image: "circleci/node:10-browsers"
 
     steps:
-    - run: sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready
+    - run:
+        command: "sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready"
         background: true
         environment:
           CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
