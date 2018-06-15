@@ -28,6 +28,10 @@
  */
 import {LifeCycle} from 'tko.lifecycle'
 import {register} from './loaders'
+import jss from 'jss'
+// import preset from 'jss-preset-default'
+
+// jss.setup(preset())
 
 export class ComponentABC extends LifeCycle {
 	/**
@@ -35,6 +39,23 @@ export class ComponentABC extends LifeCycle {
 	 */
   static get elementName () {
     throw new Error('[ComponentABC] `elementName` must be overloaded.')
+  }
+
+  /**
+   * Overload this to return an JSS styles object.
+   */
+  jss () { return {} }
+
+  /**
+   * Access the localized sheets with `css.class`.
+   */
+  get css () {
+    return {}
+    if (!this._jss_sheet) {
+      this._jss_sheet = jss.createStyleSheet(this.jss)
+      this._jss_sheet.attach()
+    }
+    return this._jss_sheet
   }
 
 	/**

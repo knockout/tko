@@ -143,4 +143,17 @@ describe('ComponentABC', function () {
     cleanNode(testNode)
     expect(disp).toEqual(true)
   })
+
+  describe('jss', function () {
+    it('creates and attaches a sheet', () => {
+      class JSX extends ComponentABC {
+        jss () {
+          return { 'my-button': { color: pink } }
+        }
+      }
+      const j = new JSX()
+      expect(j.css).toContain('my-button')
+
+    })
+  })
 })

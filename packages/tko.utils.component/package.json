@@ -8,6 +8,8 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "jss": "^9.8.3",
+    "jss-preset-default": "^4.5.0",
     "tko.lifecycle": "^4.0.0-alpha4",
     "tko.observable": "^4.0.0-alpha4",
     "tko.utils": "^4.0.0-alpha4",

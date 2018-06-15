@@ -49,7 +49,10 @@ const TYPESCRIPT_CONFIG = {
 /* Plugins used for all builds */
 const UNIVERSAL_PLUGINS = [
   /* Replace {{VERSION}} with pkg.json's `version` */
-  replace({ delimiters: ['{{', '}}'], VERSION: pkg.version }),
+  replace({
+    delimiters: ['{{', '}}'],
+    VERSION: pkg.version
+  }),
   nodeResolve({ module: true }),
   rollupVisualizer({ filename: 'visual.html' }),
   license({ sourcemap: true, banner })
