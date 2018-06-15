@@ -25,11 +25,11 @@ jobs:
           CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
 
     - restore_cache:
-        key: node-{{ .Branch }}
+        key: node-{{ .Branch }}-0001
     - run: yarn
     - run: yarn run lerna bootstrap
     - save_cache:
-        key: node-{{ .Branch }}
+        key: node-{{ .Branch }}-0001
         paths:
           - node_modules
           - /home/circleci/.cache/yarn/v1
