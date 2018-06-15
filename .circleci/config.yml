@@ -9,6 +9,9 @@ jobs:
     steps:
     - checkout
 
+    # psmisc contains the `killall` command, needed below to reap the sc process
+    - run: sudo apt-get install -y psmisc
+
     - restore_cache:
         key: saucelabs
     - run: wget -c https://saucelabs.com/downloads/sc-${SC_VERSION}-linux.tar.gz
