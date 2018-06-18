@@ -2,6 +2,7 @@
 import {registry} from './registry'
 
 import { ComponentABC } from './ComponentABC'
+import { ComponentJJJ } from './ComponentJJJ'
 
 import {
   register,
