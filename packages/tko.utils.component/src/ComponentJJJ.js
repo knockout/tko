@@ -3,10 +3,10 @@ import {
   ComponentABC
 } from './ComponentABC'
 
-import jss from 'jss'
-import preset from 'jss-preset-default'
+// import jss from 'jss/dist/jss'
+// import preset from 'jss-preset-default'
 
-jss.setup(preset())
+// jss.setup(preset())
 
 /**
  * A Knockout Component that supports JSS and JSX (and Javascript, hence JJJ).
