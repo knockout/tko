@@ -91,7 +91,6 @@ function monitorObservableChild (node, child) {
   const jsx = unwrap(child)
   let nodeToReplace = convertJsxChildToDom(jsx)
 
-  child.subscribe(console.error)
   const subscription = child.subscribe(newJsx => {
     const newNode = convertJsxChildToDom(newJsx)
     const $context = contextFor(node)
