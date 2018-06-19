@@ -3,8 +3,8 @@ import {
   ComponentABC
 } from './ComponentABC'
 
-// import jss from 'jss/dist/jss'
-// import preset from 'jss-preset-default'
+import jss from 'jss/dist/jss'
+// import preset from 'jss-preset-default/dist/jss-preset-default'
 
 // jss.setup(preset())
 
