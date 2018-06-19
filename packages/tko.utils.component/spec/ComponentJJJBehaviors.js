@@ -28,7 +28,7 @@ import {
 
 const {ComponentJJJ} = components
 
-describe('ComponentJJJ', function () {
+xdescribe('ComponentJJJ', function () {
   var testComponentName = 'test-component',
     testComponentBindingValue,
     testComponentParams,
