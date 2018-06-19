@@ -614,6 +614,30 @@ describe('Templating', function () {
     }).toThrowContaining('The "nodes" option must be a plain, non-observable array')
   })
 
+  /**
+   * Update the templating engine to handle JSX nodes.
+   */
+  xit('Should accept `jsx:...`', function () {
+    testNode.innerHTML = "<div data-bind='template: { jsx: testJsx }'></div>"
+    const obs = observable('alpha')
+    var model = {
+      testJsx: {
+        elementName: 'begin',
+        attributes: {},
+        children: [
+          {elementName: 'span', children: [obs], attributes: {}},
+          {elementName: 'end', children: [], attributes: {}}
+        ]
+      }
+    }
+
+    applyBindings(model, testNode)
+    expect(testNode.childNodes[0]).toContainHtml('<begin><span>alpha</span><end></end></begin>')
+
+    obs('beta')
+    expect(testNode.childNodes[0]).toContainHtml('<begin><span>beta</span><end></end></begin>')
+  })
+
   describe('Data binding \'foreach\' option', function () {
     it('Should remove existing content', function () {
       setTemplateEngine(new dummyTemplateEngine({ itemTemplate: '<span>template content</span>' }))

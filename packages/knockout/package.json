@@ -70,7 +70,6 @@
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
     "globals": [
-      "ko",
       "assert",
       "jasmine",
       "beforeEach",
@@ -82,8 +81,7 @@
       "xit",
       "expect",
       "describe",
-      "ddescribe",
-      "xdescribe"
+      "ddescribe"
     ]
   }
 }
