@@ -24,6 +24,23 @@ import {
 export default class ComponentProvider extends Provider {
   get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
 
+  /**
+   * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
+   * @param {HTMLElement} node
+   */
+  preprocessNode (node) {
+    if (node.tagName === 'SLOT') {
+      const parent = node.parentNode
+      const slotName = node.getAttribute('name')
+      const openNode = document.createComment(`ko slot: "${slotName}"`)
+      const closeNode = document.createComment('/ko')
+      parent.insertBefore(openNode, node)
+      parent.insertBefore(closeNode, node)
+      parent.removeChild(node)
+      return [openNode, closeNode]
+    }
+  }
+
   nodeHasBindings (node) {
     return Boolean(this.getComponentNameForNode(node))
   }

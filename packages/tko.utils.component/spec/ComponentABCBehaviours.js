@@ -143,4 +143,5 @@ describe('ComponentABC', function () {
     cleanNode(testNode)
     expect(disp).toEqual(true)
   })
+
 })

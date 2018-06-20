@@ -267,7 +267,6 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     super(params)
     const element = this.$element
     const bindingValue = unwrap(this.value)
-    let container
 
     // Expose 'conditional' for `else` chaining.
     domData.set(element, 'conditional', {
@@ -276,37 +275,49 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
 
     // Support anonymous templates
     if (typeof bindingValue === 'string' || bindingValue.name) {
-            // It's a named template - clear the element
-      virtualElements.emptyNode(element)
+      this.bindNamedTemplate()
     } else if ('nodes' in bindingValue) {
-            // We've been given an array of DOM nodes. Save them as the template source.
-            // There is no known use case for the node array being an observable array (if the output
-            // varies, put that behavior *into* your template - that's what templates are for), and
-            // the implementation would be a mess, so assert that it's not observable.
-      var nodes = bindingValue.nodes || []
-      if (isObservable(nodes)) {
-        throw new Error('The "nodes" option must be a plain, non-observable array.')
-      }
-
-      // If the nodes are already attached to a KO-generated container, we reuse that container without moving the
-      // elements to a new one (we check only the first node, as the nodes are always moved together)
-      let container = nodes[0] && nodes[0].parentNode
-      if (!container || !domData.get(container, cleanContainerDomDataKey)) {
-        container = moveCleanedNodesToContainerElement(nodes)
-        domData.set(container, cleanContainerDomDataKey, true)
-      }
-
-      new AnonymousTemplate(element)['nodes'](container)
+      this.bindNodeTemplate(bindingValue.nodes || [])
     } else {
-      // It's an anonymous template - store the element contents, then clear the element
-      const templateNodes = virtualElements.childNodes(element)
-      if (templateNodes.length === 0) {
-        throw new Error('Anonymous template defined, but no template content was provided.')
-      }
-      container = moveCleanedNodesToContainerElement(templateNodes) // This also removes the nodes from their current parent
-      new AnonymousTemplate(element).nodes(container)
+      this.bindAnonymousTemplate()
     }
+
     this.computed(this.onValueChange.bind(this))
+  }
+
+  bindNamedTemplate () {
+    // It's a named template - clear the element
+    virtualElements.emptyNode(this.$element)
+  }
+
+  // We've been given an array of DOM nodes. Save them as the template source.
+  // There is no known use case for the node array being an observable array (if the output
+  // varies, put that behavior *into* your template - that's what templates are for), and
+  // the implementation would be a mess, so assert that it's not observable.
+  bindNodeTemplate (nodes) {
+    if (isObservable(nodes)) {
+      throw new Error('The "nodes" option must be a plain, non-observable array.')
+    }
+
+    // If the nodes are already attached to a KO-generated container, we reuse that container without moving the
+    // elements to a new one (we check only the first node, as the nodes are always moved together)
+    let container = nodes[0] && nodes[0].parentNode
+    if (!container || !domData.get(container, cleanContainerDomDataKey)) {
+      container = moveCleanedNodesToContainerElement(nodes)
+      domData.set(container, cleanContainerDomDataKey, true)
+    }
+
+    new AnonymousTemplate(this.$element).nodes(container)
+  }
+
+  bindAnonymousTemplate () {
+    // It's an anonymous template - store the element contents, then clear the element
+    const templateNodes = virtualElements.childNodes(this.$element)
+    if (templateNodes.length === 0) {
+      throw new Error('Anonymous template defined, but no template content was provided.')
+    }
+    const container = moveCleanedNodesToContainerElement(templateNodes) // This also removes the nodes from their current parent
+    new AnonymousTemplate(this.$element).nodes(container)
   }
 
   onValueChange () {

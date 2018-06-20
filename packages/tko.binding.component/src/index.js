@@ -1,3 +1,4 @@
 
 import component from './componentBinding'
-export var bindings = { component }
+import slot from './slotBinding'
+export var bindings = { component, slot }

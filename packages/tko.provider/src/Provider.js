@@ -28,7 +28,13 @@ export default class Provider {
   }
   nodeHasBindings (/* node */) {}
   getBindingAccessors (/* node, context */) {}
-  preprocessNode (/* node */) {}
+
+  /**
+   * Preprocess a given node.
+   * @param {HTMLElement} node
+   * @returns {[HTMLElement]|undefined}
+   */
+  preprocessNode (node) {}
   postProcess (/* node */) {}
 
   /** For legacy binding provider assignments to

@@ -1,0 +1,47 @@
+{
+  "name": "tko.utils.jsx",
+  "version": "4.0.0-alpha4",
+  "description": "TKO JSX Rendering",
+  "module": "dist/tko.utils.jsx.js",
+  "files": [
+    "dist/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "ko"
+  ],
+  "author": "Knockout",
+  "license": "MIT",
+  "karma": {
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^1.8.0"
+  },
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
+  "standard": {
+    "globals": [
+      "assert",
+      "beforeEach",
+      "before",
+      "after",
+      "afterEach",
+      "it",
+      "expect",
+      "describe"
+    ]
+  },
+  "scripts": {
+    "test": "karma start ../../karma.conf.js --once",
+    "build": "rollup -c ../../rollup.config.js",
+    "watch": "karma start ../../karma.conf.js"
+  }
+}
