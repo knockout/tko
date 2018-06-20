@@ -20,6 +20,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Expose `ko.computedContext` as alias of `ko.dependencyDetection`
 * Support JSX for component templates, so the `template` can consume the output of [babel-plugin-transform-jsx](https://www.npmjs.com/package/babel-plugin-transform-jsx)
 * Support component template slots, much like those in Vue.js.
+* Support `template` properties on Component View models (previously they had to be static properties)
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 

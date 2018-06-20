@@ -45,7 +45,10 @@ export class ComponentABC extends LifeCycle {
 	 * 4. An AMD module (with `{require: 'some/template'}`)
 	 * @return {mixed} One of the accepted template types for the ComponentBinding.
 	 */
-  static get template () { return { element: this.element } }
+  static get template () {
+    if ('template' in this.prototype) { return }
+    return { element: this.element }
+  }
 
 	/**
 	 * This is called by the default `template`.  Overload this to return:

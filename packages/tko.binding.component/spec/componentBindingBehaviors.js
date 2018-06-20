@@ -828,6 +828,18 @@ describe('Components: Component binding', function () {
     })
   })
 
+  it('uses the template from a view model, if a component template is not defined', function () {
+    class ViewModel extends components.ComponentABC {
+      get template () {
+        return [document.createElement(`inner-bits`)]
+      }
+    }
+
+    ViewModel.register('test-component')
+    applyBindings(outerViewModel, testNode)
+    expect(testNode.innerHTML).toContain('<inner-bits></inner-bits>')
+  })
+
   describe('jsx', function () {
     it('accepts and uses jsx', function () {
       class ViewModel extends components.ComponentABC {

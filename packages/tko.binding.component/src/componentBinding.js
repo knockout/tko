@@ -33,8 +33,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.computed('computeApplyComponent')
   }
 
-  cloneTemplateIntoElement (componentName, componentDefinition, element) {
-    const template = componentDefinition.template
+  cloneTemplateIntoElement (componentName, template, element) {
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
@@ -89,9 +88,22 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (!componentDefinition) {
       throw new Error('Unknown component \'' + componentName + '\'')
     }
-    this.cloneTemplateIntoElement(componentName, componentDefinition, element)
+
+    if (componentDefinition.template) {
+      this.cloneTemplateIntoElement(componentName, componentDefinition.template, element)
+    }
 
     const componentViewModel = this.createViewModel(componentDefinition, element, this.originalChildNodes, componentParams)
+
+    const viewTemplate = componentViewModel && componentViewModel.template
+
+    if (!viewTemplate && !componentDefinition.template) {
+      throw new Error('Component \'' + componentName + '\' has no template')
+    }
+
+    if (!componentDefinition.template) {
+      this.cloneTemplateIntoElement(componentName, viewTemplate, element)
+    }
 
     if (componentViewModel instanceof LifeCycle) {
       componentViewModel.anchorTo(this.$element)
