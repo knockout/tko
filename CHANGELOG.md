@@ -18,6 +18,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Add `options.bindingStringPreparsers` array of functions that mutate binding strings before they are parsed
 * Parse ES2015 object initializer shorthands e.g. `{name}` = `{name: name}`
 * Expose `ko.computedContext` as alias of `ko.dependencyDetection`
+* Support JSX for component templates, so the `template` can consume the output of [babel-plugin-transform-jsx](https://www.npmjs.com/package/babel-plugin-transform-jsx)
+* Support component template slots, much like those in Vue.js.
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 
