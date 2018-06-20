@@ -80,10 +80,17 @@ function updateAttributes (node, attributes, subscriptions) {
   for (const [name, value] of Object.entries(attributes || {})) {
     if (isObservable(value)) {
       subscriptions.push(value.subscribe(attr => {
-        node.setAttribute(name, unwrap(attr))
+        if (attr === undefined) {
+          node.removeAttribute(name)
+        } else {
+          node.setAttribute(name, attr)
+        }
       }))
     }
-    node.setAttribute(name, unwrap(value))
+    const unwrappedValue = unwrap(value)
+    if (unwrappedValue !== undefined) {
+      node.setAttribute(name, unwrappedValue)
+    }
   }
 }
 
@@ -97,7 +104,7 @@ function monitorObservableChild (node, child) {
     cleanNode(nodeToReplace)
     node.replaceChild(newNode, nodeToReplace)
     if ($context) {
-      applyBindings(newNode, contextFor(node))
+      applyBindings(contextFor(node), newNode)
     }
     nodeToReplace = newNode
   })

@@ -125,8 +125,8 @@ function resolveTemplate (errorCallback, templateConfig, callback) {
   } else if (isDocumentFragment(templateConfig)) {
         // Document fragment - use its child nodes
     callback(makeArray(templateConfig.childNodes))
-  } else if (templateConfig['element']) {
-    var element = templateConfig['element']
+  } else if (templateConfig.element) {
+    var element = templateConfig.element
     if (isDomElement(element)) {
             // Element instance - copy its child nodes
       callback(cloneNodesFromTemplateSourceElement(element))
@@ -141,6 +141,9 @@ function resolveTemplate (errorCallback, templateConfig, callback) {
     } else {
       errorCallback('Unknown element type: ' + element)
     }
+  } else if (templateConfig.elementName) {
+    // JSX in the style of babel-plugin-transform-jsx
+    callback(templateConfig)
   } else {
     errorCallback('Unknown template value: ' + templateConfig)
   }

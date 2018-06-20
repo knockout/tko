@@ -14,6 +14,10 @@ import {
   DescendantBindingHandler, bindingEvent
 } from 'tko.bind'
 
+import {
+  jsxToNode
+} from 'tko.utils.jsx'
+
 import {LifeCycle} from 'tko.lifecycle'
 
 import registry from 'tko.utils.component'
@@ -30,18 +34,22 @@ export default class ComponentBinding extends DescendantBindingHandler {
   }
 
   cloneTemplateIntoElement (componentName, componentDefinition, element) {
-    const template = componentDefinition['template']
+    const template = componentDefinition.template
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
-    const clonedNodesArray = cloneNodes(template)
-    virtualElements.setDomNodeChildren(element, clonedNodesArray)
+    if (template.elementName) {
+      virtualElements.setDomNodeChildren(element, [jsxToNode(template)])
+    } else {
+      const clonedNodesArray = cloneNodes(template)
+      virtualElements.setDomNodeChildren(element, clonedNodesArray)
+    }
   }
 
   createViewModel (componentDefinition, element, originalChildNodes, componentParams) {
     const componentViewModelFactory = componentDefinition.createViewModel
     return componentViewModelFactory
-      ? componentViewModelFactory.call(componentDefinition, componentParams, { 'element': element, 'templateNodes': originalChildNodes })
+      ? componentViewModelFactory.call(componentDefinition, componentParams, { element: element, templateNodes: originalChildNodes })
       : componentParams // Template-only component
   }
 
@@ -53,8 +61,8 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (typeof value === 'string') {
       componentName = value
     } else {
-      componentName = unwrap(value['name'])
-      componentParams = unwrap(value['params'])
+      componentName = unwrap(value.name)
+      componentParams = unwrap(value.params)
     }
 
     this.latestComponentName = componentName
@@ -102,7 +110,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
   }
 
   onBindingComplete (componentViewModel, bindingResult) {
-    if (componentViewModel.koDescendantsComplete) {
+    if (componentViewModel && componentViewModel.koDescendantsComplete) {
       componentViewModel.koDescendantsComplete(this.$element)
     }
     this.completeBinding(bindingResult)

@@ -827,4 +827,57 @@ describe('Components: Component binding', function () {
       expect(testNode).toContainText('First')
     })
   })
+
+  ddescribe('jsx', function () {
+    it('accepts and uses jsx', function () {
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return {
+            elementName: 'div',
+            attributes: { attr: '123' },
+            children: ['téxt']
+          }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="123">téxt</div>')
+    })
+
+    it('updates jsx on changes', function () {
+      const obs = observable('v0')
+      const o2 = observable('text')
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // Passing <div attr={obs}>{o2}</div> through
+          // babel-plugin-transform-jsx will yield:
+          return {
+            elementName: 'div',
+            attributes: { attr: obs },
+            children: [o2]
+          }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="v0">text</div>')
+
+      obs('v1')
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="v1">text</div>')
+
+      obs(undefined)
+      expect(testNode.children[0].innerHTML).toEqual('<div>text</div>')
+
+      o2({ elementName: 'i', children: ['g'], attributes: {} })
+      expect(testNode.children[0].innerHTML).toEqual('<div><i>g</i></div>')
+
+      o2(undefined)
+      expect(testNode.children[0].innerHTML).toEqual('<div><!--[jsx placeholder]--></div>')
+    })
+
+  })
 })
