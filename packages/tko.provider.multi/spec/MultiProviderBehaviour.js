@@ -68,24 +68,28 @@ describe('MultiProvider Behaviour', function () {
   })
 
   describe('preprocessNode', function () {
-    it('returns the first preprocessing result', function () {
+    it('calls all preprocessors', function () {
+      let calls = 0
       const mp = new MultiProvider({
         providers: [
-          {preprocessNode () { return 'x' }, FOR_NODE_TYPES: [1]},
-          {preprocessNode () { return 'y' }, FOR_NODE_TYPES: [1]}
+          {preprocessNode () { ++calls }, FOR_NODE_TYPES: [1]},
+          {preprocessNode () { ++calls }, FOR_NODE_TYPES: [1]}
         ]
       })
-      assert.equal(mp.preprocessNode({ nodeType: 1 }), 'x')
+      mp.preprocessNode({ nodeType: 1 })
+      assert.equal(calls, 2)
     })
 
     it('skips preprocessing if node types are not handled', function () {
+      let calls = 0
       const mp = new MultiProvider({
         providers: [
-          {preprocessNode () { return 'x' }, FOR_NODE_TYPES: [2]},
-          {preprocessNode () { return 'y' }, FOR_NODE_TYPES: [1]}
+          {preprocessNode () { ++calls }, FOR_NODE_TYPES: [2]},
+          {preprocessNode () { ++calls }, FOR_NODE_TYPES: [1]}
         ]
       })
-      assert.equal(mp.preprocessNode({ nodeType: 1 }), 'y')
+      mp.preprocessNode({ nodeType: 1 })
+      assert.equal(calls, 1)
     })
   })
 })

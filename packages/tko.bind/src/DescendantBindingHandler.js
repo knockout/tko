@@ -14,6 +14,8 @@ import {
  * bindings.
  */
 export class DescendantBindingHandler extends AsyncBindingHandler {
+  get controlsDescendants () { return true }
+
   async applyBindingsToDescendants (childContext, callback) {
     const bindingResult = applyBindingsToDescendants(childContext, this.$element)
     if (bindingResult.isSync) {

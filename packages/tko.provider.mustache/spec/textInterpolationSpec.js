@@ -267,7 +267,7 @@ describe('Interpolation Markup bindings', function () {
   });
 
   it('Should work when used in template declared using <script>', function () {
-    testNode.innerHTML = "<div data-bind='template: \"tmpl\"'></div><script type='text/html' id='tmpl'>{{'name'}}</textarea>";
+    testNode.innerHTML = "<div data-bind='template: \"tmpl\"'></div><script type='text/html' id='tmpl'>{{'name'}}</script>";
     applyBindings(null, testNode);
     expect(testNode.childNodes[0]).toContainText('name');
   });

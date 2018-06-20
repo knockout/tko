@@ -56,7 +56,6 @@ export default class MultiProvider extends Provider {
   }
 
   getBindingAccessors (node, ctx) {
-    node = this.preprocessNode(node) || node
     const bindings = {}
     for (const [key, accessor] of this.enumerateProviderBindings(node, ctx)) {
       if (key in bindings) {
