@@ -9,7 +9,7 @@
   },
   "scripts": {
     "prepublish": "yarn build",
-    "test": "lerna exec --concurrency=2 --loglevel=warn -- yarn test",
+    "test": "lerna exec --concurrency=1 --loglevel=warn -- yarn test",
     "build": "lerna exec --concurrency=1 --loglevel=warn -- yarn build",
     "lint": "standard",
     "repackage": "./tools/common-package-config.js packages/shared.package.json packages/*/package.json"
