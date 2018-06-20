@@ -828,7 +828,7 @@ describe('Components: Component binding', function () {
     })
   })
 
-  ddescribe('jsx', function () {
+  describe('jsx', function () {
     it('accepts and uses jsx', function () {
       class ViewModel extends components.ComponentABC {
         static get template () {
@@ -878,6 +878,158 @@ describe('Components: Component binding', function () {
       o2(undefined)
       expect(testNode.children[0].innerHTML).toEqual('<div><!--[jsx placeholder]--></div>')
     })
+  })
 
+  describe('slots', function () {
+    it('inserts into <slot> content with the named slot template', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              <i data-bind='slot: "alpha"'></i>
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
+    })
+
+    it('inserts into virtual element slot with the slot template', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              <!-- ko slot: "alpha" --><!-- /ko -->
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
+    })
+
+    it('inserts multiple times into virtual element slot with the slot template', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              <!-- ko slot: "alpha" --><!-- /ko -->
+              <!-- ko slot: "alpha" --><!-- /ko -->
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep beep`)
+    })
+
+    it('inserts into nested elements', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div><i><span>
+              <!-- ko slot: "alpha" --><!-- /ko -->
+            </span></i></div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
+    })
+
+    it('inserts the node with the slot name', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <em slot='alpha'>beep</em>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              <!-- ko slot: "alpha" --><!-- /ko -->
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
+      const em = testNode.children[0].children[0].children[0]
+      expect(em.tagName).toEqual('EM')
+      expect(em.getAttribute('slot')).toEqual('alpha')
+    })
+
+    it('ignores missing slots', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='beta'>beep</template>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              <!-- ko slot: "alpha" --><!-- /ko -->
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(``)
+    })
+
+    it('preprocesses <slot> nodes', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              <slot name='alpha'></slot>
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
+    })
   })
 })
