@@ -17,6 +17,7 @@ import {registry} from './registry'
 // 2. Or, to resolve configuration objects by loading viewmodels/templates via arbitrary logic.
 
 export var defaultConfigRegistry = {}
+export const VIEW_MODEL_FACTORY = Symbol('Knockout View Model ViewModel factory')
 
 export function register (componentName, config) {
   if (!config) {
@@ -150,7 +151,9 @@ function resolveTemplate (errorCallback, templateConfig, callback) {
 }
 
 function resolveViewModel (errorCallback, viewModelConfig, callback) {
-  if (typeof viewModelConfig === 'function') {
+  if (viewModelConfig[VIEW_MODEL_FACTORY]) {
+    callback((...args) => viewModelConfig[VIEW_MODEL_FACTORY](...args))
+  } else if (typeof viewModelConfig === 'function') {
         // Constructor - convert to standard factory function format
         // By design, this does *not* supply componentInfo to the constructor, as the intent is that
         // componentInfo contains non-viewmodel data (e.g., the component's element) that should only

@@ -21,6 +21,10 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Support JSX for component templates, so the `template` can consume the output of [babel-plugin-transform-jsx](https://www.npmjs.com/package/babel-plugin-transform-jsx)
 * Support component template slots, much like those in Vue.js.
 * Support `template` properties on Component View models (previously they had to be static properties)
+* Numerous forward-ports from Knockout 3.x (#54)
+* Expose `createViewModel` on Components registered with `Component.register`
+* Changed `Component.elementName` to `Component.customElementName` and use a kebab-case version of the class name for the custom element name by default
+* Pass `{element, templateNodes}` to the `Component` constructor as the second parameter of descendants of the `Component` class
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 

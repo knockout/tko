@@ -27,14 +27,16 @@
  * with `this.addEventListener(type, action)`.
  */
 import {LifeCycle} from 'tko.lifecycle'
-import {register} from './loaders'
+import {register, VIEW_MODEL_FACTORY} from './loaders'
 
 export class ComponentABC extends LifeCycle {
 	/**
+   * The tag name of the custom element.  For example 'my-component'.
+   * By default converts the class name from camel case to kebab case.
 	 * @return {string} The custom node name of this component.
 	 */
-  static get elementName () {
-    throw new Error('[ComponentABC] `elementName` must be overloaded.')
+  static get customElementName () {
+    return this.name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
   }
 
 	/**
@@ -65,7 +67,17 @@ export class ComponentABC extends LifeCycle {
 	 */
   static get sync () { return true }
 
-  static register (name = this.elementName) {
+  /**
+   * Construct a new instance of the model.  When using ComponentABC as a
+   * base class, we do pass in the $element and $componentTemplateNodes.
+   * @param {Object} params
+   * @param {{element: HTMLElement, templateNodes: [HTMLElement]}} componentInfo
+   */
+  static [VIEW_MODEL_FACTORY] (params, componentInfo) {
+    return new this(params, componentInfo)
+  }
+
+  static register (name = this.customElementName) {
     const viewModel = this
     const {template} = this
     const synchronous = this.sync
