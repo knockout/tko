@@ -58,7 +58,8 @@ export default class SlotBinding extends DescendantBindingHandler {
     if (slotNode instanceof HTMLTemplateElement) {
       return slotNode.content.cloneNode(true).childNodes
     }
-    return [slotNode.cloneNode(true)]
+    return (Array.isArray(slotNode) ? slotNode : [slotNode])
+      .map(sn => sn.cloneNode(true))
   }
 
   * genSlotsByName (templateNodes) {
@@ -75,6 +76,9 @@ export default class SlotBinding extends DescendantBindingHandler {
     if (!$componentTemplateNodes[SLOTS_SYM]) {
       $componentTemplateNodes[SLOTS_SYM] = Object.assign({},
         ...this.genSlotsByName($componentTemplateNodes))
+    }
+    if (!slotName) {
+      return $componentTemplateNodes
     }
     return $componentTemplateNodes[SLOTS_SYM][slotName]
   }

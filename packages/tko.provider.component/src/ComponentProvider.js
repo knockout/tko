@@ -31,7 +31,7 @@ export default class ComponentProvider extends Provider {
   preprocessNode (node) {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
-      const slotName = node.getAttribute('name')
+      const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
       const closeNode = document.createComment('/ko')
       parent.insertBefore(openNode, node)
