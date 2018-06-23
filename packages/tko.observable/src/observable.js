@@ -3,7 +3,7 @@
 //  ---
 //
 import {
-    createSymbolOrString, options, overwriteLengthPropertyIfSupported
+  options, overwriteLengthPropertyIfSupported
 } from 'tko.utils'
 
 import * as dependencyDetection from './dependencyDetection.js'
@@ -11,7 +11,7 @@ import { deferUpdates } from './defer.js'
 import { subscribable, defaultEvent } from './subscribable.js'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
 
-var observableLatestValue = createSymbolOrString('_latestValue')
+var observableLatestValue = Symbol('_latestValue')
 
 export function observable (initialValue) {
   function Observable () {
@@ -58,6 +58,9 @@ observable.fn = {
   valueWillMutate () {
     this.notifySubscribers(this[observableLatestValue], 'beforeChange')
   },
+  // subscribe (callback, callbackTarget, event) {
+  // https://github.com/tc39/proposal-observable/issues/190
+  // }
 
   // Some observables may not always be writeable, notably computeds.
   isWriteable: true
