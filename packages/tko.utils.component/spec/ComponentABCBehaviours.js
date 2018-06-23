@@ -69,24 +69,26 @@ describe('ComponentABC', function () {
 
   it('throws when template or element is not overloaded', function () {
     class CX extends ComponentABC {
-      elementName () { return 'a-b' }
-        }
+      customElementName () { return 'a-b' }
+    }
     expect(() => CX.register()).toThrowContaining('overload')
   })
 
-  it('throws when elementName is not overloaded', function () {
-    class CX extends ComponentABC {
+  it('uses the class name kebab-case elementName is not overloaded', function () {
+    class CaaXbbb extends ComponentABC {
       template () { return 'a-b' }
-        }
-    expect(() => CX.register()).toThrowContaining('overload')
+    }
+    CaaXbbb.register()
+    expect(CaaXbbb.customElementName).toEqual('caa-xbbb')
   })
+
   it('binds when registered like a normal component', function () {
     class CX extends ComponentABC {
       constructor (...args) {
         super(...args)
         this.myvalue = 'some parameter value'
       }
-      static get elementName () { return 'test-component' }
+      static get customElementName () { return 'test-component' }
       static get template () { return '<div data-bind="text: myvalue"></div>' }
 		}
     CX.register()
@@ -103,7 +105,7 @@ describe('ComponentABC', function () {
         super(...args)
         this.myvalue = 'some parameter value'
       }
-      static get elementName () { return 'test-component' }
+      static get customElementName () { return 'test-component' }
       static get template () { return '<div data-bind="text: myvalue"></div>' }
         }
     CX.register()
@@ -113,7 +115,7 @@ describe('ComponentABC', function () {
 
   it('respects the `element` property', function () {
     class CX extends ComponentABC {
-      static get elementName () { return 'test-component' }
+      static get customElementName () { return 'test-component' }
       static get element () {
         const node = document.createElement('div')
         node.innerHTML = '<i>vid</i>'
@@ -135,7 +137,7 @@ describe('ComponentABC', function () {
         super.dispose()
         disp = true
       }
-      static get elementName () { return 'test-component' }
+      static get customElementName () { return 'test-component' }
       static get template () { return '<i></i>' }
         }
     CX.register()
