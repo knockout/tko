@@ -25,6 +25,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Expose `createViewModel` on Components registered with `Component.register`
 * Changed `Component.elementName` to `Component.customElementName` and use a kebab-case version of the class name for the custom element name by default
 * Pass `{element, templateNodes}` to the `Component` constructor as the second parameter of descendants of the `Component` class
+* Add support for `<ko binding='...'>`
+* Add basic support for `ko.subscribable` as TC39-Observables
 
 ## 🚚  Alpha-4a (8 Nov 2017)
 

@@ -58,9 +58,16 @@ observable.fn = {
   valueWillMutate () {
     this.notifySubscribers(this[observableLatestValue], 'beforeChange')
   },
-  // subscribe (callback, callbackTarget, event) {
+
+  // Note that TC39 `subscribe` ought to immediately emit.
   // https://github.com/tc39/proposal-observable/issues/190
-  // }
+  subscribe (callback, callbackTarget, event) {
+    const isTC39Callback = typeof callback === 'object' && callback.next
+    if (isTC39Callback) {
+      callback.next(this())
+    }
+    return subscribable.fn.subscribe.call(this, callback, callbackTarget, event)
+  },
 
   // Some observables may not always be writeable, notably computeds.
   isWriteable: true

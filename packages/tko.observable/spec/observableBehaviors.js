@@ -348,7 +348,17 @@ describe('Observable', function () {
     expect(myObservable.customFunction1).toBe(customFunction1)
     expect(myObservable.customFunction2).toBe(customFunction2)
   })
+
+  it('immediately emits any value when called with {next: ...}', function () {
+    const instance = observable(1)
+    let x
+    instance.subscribe({next: v => (x = v)})
+    expect(x).toEqual(1)
+    observable(2)
+    expect(x).toEqual(1)
+  })
 })
+
 
 describe('unwrap', function () {
   it('Should return the supplied value for non-observables', function () {
