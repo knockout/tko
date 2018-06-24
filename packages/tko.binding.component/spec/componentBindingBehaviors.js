@@ -1043,5 +1043,30 @@ describe('Components: Component binding', function () {
       applyBindings(outerViewModel, testNode)
       expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
     })
+
+    it('inserts all component template nodes in an unnamed (default) slot', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <em>B.</em>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              A.
+              <slot></slot>
+              C.
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`A. B. C.`)
+      const em = testNode.children[0].children[0].children[0]
+      expect(em.tagName).toEqual('EM')
+    })
   })
 })
