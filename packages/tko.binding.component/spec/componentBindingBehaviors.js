@@ -1044,6 +1044,31 @@ describe('Components: Component binding', function () {
       expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
     })
 
+    it('processes default and named slots', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+          Gamma
+          <div>Zeta</div>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              X <slot name='alpha'></slot> Y <slot></slot> Q
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      const innerText = testNode.children[0].innerText
+        .replace(/\s+/g, ' ').trim()
+      expect(innerText).toEqual(`X beep Y Gamma Zeta Q`)
+    })
+
     it('inserts all component template nodes in an unnamed (default) slot', function () {
       testNode.innerHTML = `
         <test-component>
@@ -1065,6 +1090,27 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       expect(testNode.children[0].innerText.trim()).toEqual(`A. B. C.`)
+      const em = testNode.children[0].children[0].children[0]
+      expect(em.tagName).toEqual('EM')
+    })
+
+    it('inserts multiple nodes from a <template>', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <em>B.</em>
+          <i>C.</i>
+          <b>E.</b>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return ` <div> <slot></slot> </div> `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`B. C. E.`)
       const em = testNode.children[0].children[0].children[0]
       expect(em.tagName).toEqual('EM')
     })

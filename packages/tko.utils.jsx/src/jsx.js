@@ -44,6 +44,14 @@ export function jsxToNode (jsx) {
   return node
 }
 
+function appendChild (possibleTemplateElement, nodeToAppend) {
+  if ('content' in possibleTemplateElement) {
+    possibleTemplateElement.content.appendChild(nodeToAppend)
+  } else {
+    possibleTemplateElement.appendChild(nodeToAppend)
+  }
+}
+
 /**
  *
  * @param {HTMLElement} node
@@ -61,7 +69,7 @@ function updateChildren (node, children, subscriptions) {
     if (isObservable(child)) {
       subscriptions.push(monitorObservableChild(node, child))
     } else {
-      node.appendChild(convertJsxChildToDom(child))
+      appendChild(node, convertJsxChildToDom(child))
     }
   }
 }
@@ -109,7 +117,7 @@ function monitorObservableChild (node, child) {
     nodeToReplace = newNode
   })
 
-  node.appendChild(nodeToReplace)
+  appendChild(node, nodeToReplace)
   return subscription
 }
 
