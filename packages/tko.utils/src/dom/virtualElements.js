@@ -103,8 +103,11 @@ export function emptyNode (node) {
 export function setDomNodeChildren (node, childNodes) {
   if (!isStartComment(node)) { setRegularDomNodeChildren(node, childNodes) } else {
     emptyNode(node)
-    var endCommentNode = node.nextSibling // Must be the next sibling, as we just emptied the children
-    for (var i = 0, j = childNodes.length; i < j; i++) { endCommentNode.parentNode.insertBefore(childNodes[i], endCommentNode) }
+    const endCommentNode = node.nextSibling // Must be the next sibling, as we just emptied the children
+    const parentNode = endCommentNode.parentNode
+    for (var i = 0, j = childNodes.length; i < j; ++i) {
+      parentNode.insertBefore(childNodes[i], endCommentNode)
+    }
   }
 }
 

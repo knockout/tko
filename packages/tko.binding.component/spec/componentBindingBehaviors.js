@@ -890,6 +890,61 @@ describe('Components: Component binding', function () {
       o2(undefined)
       expect(testNode.children[0].innerHTML).toEqual('<div><!--[jsx placeholder]--></div>')
     })
+
+    it('inserts a partial when the `template` is an array', function () {
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return [
+            { elementName: 'b', attributes: { }, children: ['x'] },
+            { elementName: 'i', attributes: { }, children: ['y'] },
+            { elementName: 'em', attributes: { }, children: ['z'] }
+          ]
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<b>x</b><i>y</i><em>z</em>')
+    })
+
+    it('inserts partials from `children`', function () {
+      const children = [
+        'abc',
+        { elementName: 'c', attributes: {}, children: [['C']] }
+      ]
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return [
+            { elementName: 'b', attributes: { }, children: ['x', children] }
+          ]
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c></b>')
+    })
+
+    it('inserts & updates observable partials from `children`', function () {
+      const children = observableArray([
+        'abc',
+        { elementName: 'c', attributes: {}, children: [['C']] }
+      ])
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return [
+            { elementName: 'b', attributes: { }, children: ['x', children] }
+          ]
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c></b>')
+
+      children.pop()
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc</b>')
+
+      children.unshift('rrr')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc</b>')
+    })
   })
 
   describe('slots', function () {
@@ -1044,6 +1099,31 @@ describe('Components: Component binding', function () {
       expect(testNode.children[0].innerText.trim()).toEqual(`beep`)
     })
 
+    it('processes default and named slots', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+          Gamma
+          <div>Zeta</div>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return `
+            <div>
+              X <slot name='alpha'></slot> Y <slot></slot> Q
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      const innerText = testNode.children[0].innerText
+        .replace(/\s+/g, ' ').trim()
+      expect(innerText).toEqual(`X beep Y Gamma Zeta Q`)
+    })
+
     it('inserts all component template nodes in an unnamed (default) slot', function () {
       testNode.innerHTML = `
         <test-component>
@@ -1065,6 +1145,27 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       expect(testNode.children[0].innerText.trim()).toEqual(`A. B. C.`)
+      const em = testNode.children[0].children[0].children[0]
+      expect(em.tagName).toEqual('EM')
+    })
+
+    it('inserts multiple nodes from a <template>', function () {
+      testNode.innerHTML = `
+        <test-component>
+          <em>B.</em>
+          <i>C.</i>
+          <b>E.</b>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return ` <div> <slot></slot> </div> `
+        }
+      }
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerText.trim()).toEqual(`B. C. E.`)
       const em = testNode.children[0].children[0].children[0]
       expect(em.tagName).toEqual('EM')
     })
