@@ -44,15 +44,39 @@ export function jsxToNode (jsx) {
   return node
 }
 
-function appendChildOrChildren (possibleTemplateElement, nodeToAppend) {
-  if (Array.isArray(nodeToAppend)) {
-    for (const node of nodeToAppend) {
+function getInsertTarget (possibleTemplateElement) {
+  return 'content' in possibleTemplateElement
+    ? possibleTemplateElement.content : possibleTemplateElement
+}
+
+/**
+ *
+ * @param {HTMLElement|HTMLTemplateElement} possibleTemplateElement
+ * @param {Node} toAppend
+ */
+function appendChildOrChildren (possibleTemplateElement, toAppend) {
+  if (Array.isArray(toAppend)) {
+    for (const node of toAppend) {
       appendChildOrChildren(possibleTemplateElement, node)
     }
-  } else if ('content' in possibleTemplateElement) {
-    possibleTemplateElement.content.appendChild(nodeToAppend)
   } else {
-    possibleTemplateElement.appendChild(nodeToAppend)
+    getInsertTarget(possibleTemplateElement).appendChild(toAppend)
+  }
+}
+
+/**
+ *
+ * @param {HTMLElement|HTMLTemplateElement} possibleTemplateElement
+ * @param {Node} toAppend
+ * @param {Node} beforeNode
+ */
+function insertChildOrChildren (possibleTemplateElement, toAppend, beforeNode) {
+  if (Array.isArray(toAppend)) {
+    for (const node of toAppend) {
+      appendChildOrChildren(possibleTemplateElement, node)
+    }
+  } else {
+    getInsertTarget(possibleTemplateElement).insertBefore(toAppend, beforeNode)
   }
 }
 
@@ -117,17 +141,25 @@ function updateAttributes (node, attributes, subscriptions) {
 function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
   const newNodeOrNodes = convertJsxChildToDom(newJsx)
   const $context = contextFor(toReplace)
+  const firstNodeToReplace = Array.isArray(toReplace)
+    ? toReplace[0] || null : toReplace
+
+  insertChildOrChildren(parentNode, newNodeOrNodes, firstNodeToReplace)
 
   if (Array.isArray(toReplace)) {
     for (const node of toReplace) { removeNode(node) }
   } else {
     removeNode(toReplace)
   }
-  appendChildOrChildren(parentNode, newNodeOrNodes)
   if ($context) { applyBindings($context, newNodeOrNodes) }
   return newNodeOrNodes
 }
 
+/**
+ *
+ * @param {HTMLElement} node
+ * @param {jsx|Array} child
+ */
 function monitorObservableChild (node, child) {
   const jsx = unwrap(child)
   let toReplace = convertJsxChildToDom(jsx)
