@@ -37,7 +37,10 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
-    if (template.elementName) {
+    const possibleJsxPartial = Array.isArray(template) && template.length
+    if (possibleJsxPartial && template[0].hasOwnProperty('elementName')) {
+      virtualElements.setDomNodeChildren(element, template.map(jsxToNode))
+    } else if (template.elementName) {
       virtualElements.setDomNodeChildren(element, [jsxToNode(template)])
     } else {
       const clonedNodesArray = cloneNodes(template)

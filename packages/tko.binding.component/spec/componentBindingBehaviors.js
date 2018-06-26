@@ -890,6 +890,23 @@ describe('Components: Component binding', function () {
       o2(undefined)
       expect(testNode.children[0].innerHTML).toEqual('<div><!--[jsx placeholder]--></div>')
     })
+
+    it('inserts a partial when the `template` is an array', function () {
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // Passing <div attr={obs}>{o2}</div> through
+          // babel-plugin-transform-jsx will yield:
+          return [
+            { elementName: 'b', attributes: { }, children: ['x'] },
+            { elementName: 'i', attributes: { }, children: ['y'] },
+            { elementName: 'em', attributes: { }, children: ['z'] }
+          ]
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<b>x</b><i>y</i><em>z</em>')
+    })
   })
 
   describe('slots', function () {
