@@ -1,6 +1,6 @@
 
 import {
-  cleanNode, removeNode, addDisposeCallback
+  removeNode, addDisposeCallback
 } from 'tko.utils'
 
 import {
@@ -44,8 +44,12 @@ export function jsxToNode (jsx) {
   return node
 }
 
-function appendChild (possibleTemplateElement, nodeToAppend) {
-  if ('content' in possibleTemplateElement) {
+function appendChildOrChildren (possibleTemplateElement, nodeToAppend) {
+  if (Array.isArray(nodeToAppend)) {
+    for (const node of nodeToAppend) {
+      appendChildOrChildren(possibleTemplateElement, node)
+    }
+  } else if ('content' in possibleTemplateElement) {
     possibleTemplateElement.content.appendChild(nodeToAppend)
   } else {
     possibleTemplateElement.appendChild(nodeToAppend)
@@ -69,7 +73,7 @@ function updateChildren (node, children, subscriptions) {
     if (isObservable(child)) {
       subscriptions.push(monitorObservableChild(node, child))
     } else {
-      appendChild(node, convertJsxChildToDom(child))
+      appendChildOrChildren(node, convertJsxChildToDom(child))
     }
   }
 }
@@ -102,28 +106,48 @@ function updateAttributes (node, attributes, subscriptions) {
   }
 }
 
+/**
+ *
+ * @param {jsx} newJsx
+ * @param {HTMLElement|Array} toReplace
+ * @return {HTMLElement|Array} Nodes to replace next time
+ *
+ * TODO: Use trackArrayChanges to minimize changes to the DOM and state-loss.
+ */
+function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
+  const newNodeOrNodes = convertJsxChildToDom(newJsx)
+  const $context = contextFor(toReplace)
+
+  if (Array.isArray(toReplace)) {
+    for (const node of toReplace) { removeNode(node) }
+  } else {
+    removeNode(toReplace)
+  }
+  appendChildOrChildren(parentNode, newNodeOrNodes)
+  if ($context) { applyBindings($context, newNodeOrNodes) }
+  return newNodeOrNodes
+}
+
 function monitorObservableChild (node, child) {
   const jsx = unwrap(child)
-  let nodeToReplace = convertJsxChildToDom(jsx)
+  let toReplace = convertJsxChildToDom(jsx)
+  appendChildOrChildren(node, toReplace)
 
   const subscription = child.subscribe(newJsx => {
-    const newNode = convertJsxChildToDom(newJsx)
-    const $context = contextFor(node)
-    cleanNode(nodeToReplace)
-    node.replaceChild(newNode, nodeToReplace)
-    if ($context) {
-      applyBindings(contextFor(node), newNode)
-    }
-    nodeToReplace = newNode
+    toReplace = replaceNodeOrNodes(newJsx, toReplace, node)
   })
 
-  appendChild(node, nodeToReplace)
   return subscription
 }
 
+/**
+ * Convert a child to the anticipated HTMLElement(s).
+ * @param {string|array|jsx} child
+ * @return {Array|Comment|HTMLElement}
+ */
 function convertJsxChildToDom (child) {
-  return typeof child === 'string'
-    ? document.createTextNode(child)
-    : child ? jsxToNode(child)
-      : document.createComment('[jsx placeholder]')
+  return typeof child === 'string' ? document.createTextNode(child)
+    : Array.isArray(child) ? child.map(convertJsxChildToDom)
+      : child ? jsxToNode(child)
+        : document.createComment('[jsx placeholder]')
 }

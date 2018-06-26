@@ -894,8 +894,6 @@ describe('Components: Component binding', function () {
     it('inserts a partial when the `template` is an array', function () {
       class ViewModel extends components.ComponentABC {
         static get template () {
-          // Passing <div attr={obs}>{o2}</div> through
-          // babel-plugin-transform-jsx will yield:
           return [
             { elementName: 'b', attributes: { }, children: ['x'] },
             { elementName: 'i', attributes: { }, children: ['y'] },
@@ -906,6 +904,46 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
       expect(testNode.children[0].innerHTML).toEqual('<b>x</b><i>y</i><em>z</em>')
+    })
+
+    it('inserts partials from `children`', function () {
+      const children = [
+        'abc',
+        { elementName: 'c', attributes: {}, children: [['C']] }
+      ]
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return [
+            { elementName: 'b', attributes: { }, children: ['x', children] }
+          ]
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c></b>')
+    })
+
+    it('inserts & updates observable partials from `children`', function () {
+      const children = observableArray([
+        'abc',
+        { elementName: 'c', attributes: {}, children: [['C']] }
+      ])
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return [
+            { elementName: 'b', attributes: { }, children: ['x', children] }
+          ]
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c></b>')
+
+      children.pop()
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc</b>')
+
+      children.unshift('rrr')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc</b>')
     })
   })
 
