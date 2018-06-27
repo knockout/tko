@@ -71,6 +71,8 @@ function appendChildOrChildren (possibleTemplateElement, toAppend) {
  * @param {Node} beforeNode
  */
 function insertChildOrChildren (possibleTemplateElement, toAppend, beforeNode) {
+  if (!beforeNode.parentNode) { return }
+
   if (Array.isArray(toAppend)) {
     for (const node of toAppend) {
       appendChildOrChildren(possibleTemplateElement, node)
@@ -151,7 +153,15 @@ function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
   } else {
     removeNode(toReplace)
   }
-  if ($context) { applyBindings($context, newNodeOrNodes) }
+  if ($context) {
+    if (Array.isArray(newNodeOrNodes)) {
+      for (const node of newNodeOrNodes) {
+        applyBindings($context, node)
+      }
+    } else {
+      applyBindings($context, newNodeOrNodes)
+    }
+  }
   return newNodeOrNodes
 }
 
