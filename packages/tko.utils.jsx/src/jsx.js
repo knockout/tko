@@ -11,6 +11,31 @@ import {
   contextFor, applyBindings
 } from 'tko.bind'
 
+import {
+  NATIVE_BINDINGS
+} from 'tko.provider.native'
+
+
+/**
+ *
+ * @param {any} possibleJsx Test whether this value is JSX.
+ *
+ * True for
+ *    { elementName }
+ *    [{elementName}]
+ *    observable({elementName} | [])
+ *
+ * Any observable will return truthy if its value is an array,
+ * since it may in future be JSX.
+ */
+export function maybeJsx (possibleJsx) {
+  const value = unwrap(possibleJsx)
+  if (!value) { return false }
+  if (value.elementName) { return true }
+  if (value.length && value[0].elementName) { return true }
+  return false
+}
+
 /**
  * Use a JSX transpilation of the format created by babel-plugin-transform-jsx
  * @param {Object} jsx An object of the form
@@ -106,6 +131,21 @@ function updateChildren (node, children, subscriptions) {
 
 /**
  *
+ * @param {*} node
+ * @param {*} name
+ * @param {*} value
+ */
+function setNodeAttribute (node, name, value) {
+  if (name.startsWith('ko-')) {
+    const nodeJsxAttrs = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
+    nodeJsxAttrs[name.replace(/^ko-/, '')] = () => value
+  } else {
+    node.setAttribute(name, value)
+  }
+}
+
+/**
+ *
  * @param {HTMLElement} node
  * @param {Object} attributes
  * @param {Array} subscriptions
@@ -121,13 +161,13 @@ function updateAttributes (node, attributes, subscriptions) {
         if (attr === undefined) {
           node.removeAttribute(name)
         } else {
-          node.setAttribute(name, attr)
+          setNodeAttribute(node, name, attr)
         }
       }))
     }
     const unwrappedValue = unwrap(value)
     if (unwrappedValue !== undefined) {
-      node.setAttribute(name, unwrappedValue)
+      setNodeAttribute(node, name, unwrappedValue)
     }
   }
 }
@@ -153,6 +193,7 @@ function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
   } else {
     removeNode(toReplace)
   }
+
   if ($context) {
     if (Array.isArray(newNodeOrNodes)) {
       for (const node of newNodeOrNodes) {

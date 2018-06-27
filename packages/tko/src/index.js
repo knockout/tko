@@ -8,6 +8,9 @@ import { MultiProvider } from 'tko.provider.multi'
 import {
   TextMustacheProvider, AttributeMustacheProvider
 } from 'tko.provider.mustache'
+import {
+  NativeProvider
+} from 'tko.provider.native'
 
 import { bindings as coreBindings } from 'tko.binding.core'
 import { bindings as templateBindings } from 'tko.binding.template'
@@ -28,7 +31,8 @@ const builder = new Builder({
       new ComponentProvider(),
       new DataBindProvider(),
       new VirtualProvider(),
-      new AttributeProvider()
+      new AttributeProvider(),
+      new NativeProvider()
     ]
   }),
   bindings: [

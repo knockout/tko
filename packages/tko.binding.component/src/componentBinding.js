@@ -7,15 +7,15 @@ import {
 } from 'tko.utils'
 
 import {
-  unwrap
+  unwrap, isObservable
 } from 'tko.observable'
 
 import {
-  DescendantBindingHandler, bindingEvent
+  DescendantBindingHandler
 } from 'tko.bind'
 
 import {
-  jsxToNode
+  jsxToNode, maybeJsx
 } from 'tko.utils.jsx'
 
 import {LifeCycle} from 'tko.lifecycle'
@@ -33,15 +33,22 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.computed('computeApplyComponent')
   }
 
+  setDomNodesFromJsx (jsx, element) {
+    const jsxArray = Array.isArray(jsx) ? jsx : [jsx]
+    const domNodeChildren = jsxArray.map(jsxToNode)
+    virtualElements.setDomNodeChildren(element, domNodeChildren)
+  }
+
   cloneTemplateIntoElement (componentName, template, element) {
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
-    const possibleJsxPartial = Array.isArray(template) && template.length
-    if (possibleJsxPartial && template[0].hasOwnProperty('elementName')) {
-      virtualElements.setDomNodeChildren(element, template.map(jsxToNode))
-    } else if (template.elementName) {
-      virtualElements.setDomNodeChildren(element, [jsxToNode(template)])
+
+    if (maybeJsx(template)) {
+      if (isObservable(template)) {
+        this.subscribe(template, jsx => this.setDomNodesFromJsx(jsx, element))
+        this.setDomNodesFromJsx(unwrap(template), element)
+      }
     } else {
       const clonedNodesArray = cloneNodes(template)
       virtualElements.setDomNodeChildren(element, clonedNodesArray)
