@@ -9,6 +9,11 @@ import { applyExtenders } from './extenders.js'
 import * as dependencyDetection from './dependencyDetection.js'
 export { isSubscribable } from './subscribableSymbol'
 
+// Descendants may have a LATEST_VALUE, which if present
+// causes TC39 subscriptions to emit the latest value when
+// subscribed.
+export const LATEST_VALUE = Symbol('Knockout latest value')
+
 export function subscribable () {
   Object.setPrototypeOf(this, ko_subscribable_fn)
   ko_subscribable_fn.init(this)
@@ -26,7 +31,6 @@ var ko_subscribable_fn = {
   },
 
   subscribe (callback, callbackTarget, event) {
-    const self = this
     // TC39 proposed standard Observable { next: () => ... }
     const isTC39Callback = typeof callback === 'object' && callback.next
 
@@ -35,21 +39,28 @@ var ko_subscribable_fn = {
       next: callbackTarget ? callback.bind(callbackTarget) : callback
     }
 
-    const subscriptionInstance = new Subscription(self, observer, function () {
-      arrayRemoveItem(self._subscriptions[event], subscriptionInstance)
-      if (self.afterSubscriptionRemove) {
-        self.afterSubscriptionRemove(event)
+    const subscriptionInstance = new Subscription(this, observer, () => {
+      arrayRemoveItem(this._subscriptions[event], subscriptionInstance)
+      if (this.afterSubscriptionRemove) {
+        this.afterSubscriptionRemove(event)
       }
     })
 
-    if (self.beforeSubscriptionAdd) {
-      self.beforeSubscriptionAdd(event)
+    if (this.beforeSubscriptionAdd) {
+      this.beforeSubscriptionAdd(event)
     }
 
-    if (!self._subscriptions[event]) {
-      self._subscriptions[event] = []
+    if (!this._subscriptions[event]) {
+      this._subscriptions[event] = []
     }
-    self._subscriptions[event].push(subscriptionInstance)
+    this._subscriptions[event].push(subscriptionInstance)
+
+    // Have TC39 `subscribe` immediately emit.
+    // https://github.com/tc39/proposal-observable/issues/190
+
+    if (isTC39Callback && LATEST_VALUE in this) {
+      observer.next(this[LATEST_VALUE])
+    }
 
     return subscriptionInstance
   },

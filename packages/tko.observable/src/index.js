@@ -9,7 +9,7 @@ export {
     observable, isObservable, unwrap, peek,
     isWriteableObservable, isWritableObservable
 } from './observable'
-export { isSubscribable, subscribable } from './subscribable'
+export { isSubscribable, subscribable, LATEST_VALUE } from './subscribable'
 export { observableArray, isObservableArray } from './observableArray'
 export { trackArrayChanges, arrayChangeEventName } from './observableArray.changeTracking'
 export { toJS, toJSON } from './mappingHelpers'

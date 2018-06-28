@@ -22,7 +22,8 @@ import {
     extenders,
     valuesArePrimitiveAndEqual,
     observable,
-    subscribable
+    subscribable,
+    LATEST_VALUE
 } from 'tko.observable'
 
 const computedState = createSymbolOrString('_state')
@@ -395,6 +396,10 @@ computed.fn = {
       this.evaluateImmediate()
     }
     return state.latestValue
+  },
+
+  get [LATEST_VALUE] () {
+    return this.peek()
   },
 
   limit (limitFunction) {
