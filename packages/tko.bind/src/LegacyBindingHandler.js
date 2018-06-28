@@ -26,6 +26,7 @@ export class LegacyBindingHandler extends BindingHandler {
   constructor (params) {
     super(params)
     const handler = this.handler
+    this.onError = params.onError
 
     if (typeof handler.dispose === 'function') {
       this.addDisposable(handler)
@@ -33,16 +34,18 @@ export class LegacyBindingHandler extends BindingHandler {
 
     try {
       this.initReturn = handler.init && handler.init(...this.legacyArgs)
-    } catch (e) { params.onError('init', e) }
+    } catch (e) {
+      params.onError('init', e)
+    }
+  }
 
-    if (typeof handler.update === 'function') {
-      this.computed(() => {
-        try {
-          handler.update(...this.legacyArgs)
-        } catch (e) {
-          params.onError('update', e)
-        }
-      })
+  onValueChange () {
+    const handler = this.handler
+    if (typeof handler.update !== 'function') { return }
+    try {
+      handler.update(...this.legacyArgs)
+    } catch (e) {
+      this.onError('update', e)
     }
   }
 

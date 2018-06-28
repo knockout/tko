@@ -284,6 +284,12 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
           })
         )
 
+        if (bindingHandler.onValueChange) {
+          dependencyDetection.ignore(() =>
+            bindingHandler.computed('onValueChange')
+          )
+        }
+
         // Expose the bindings via domData.
         allBindingHandlers[key] = bindingHandler
 
