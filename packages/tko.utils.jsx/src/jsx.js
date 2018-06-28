@@ -162,6 +162,10 @@ function updateAttributes (node, attributes, subscriptions) {
   }
 
   for (const [name, value] of Object.entries(attributes || {})) {
+    if (name.startsWith('ko-')) {
+      setNodeAttribute(node, name, value)
+      continue
+    }
     if (isObservable(value)) {
       subscriptions.push(value.subscribe(attr => {
         if (attr === undefined) {

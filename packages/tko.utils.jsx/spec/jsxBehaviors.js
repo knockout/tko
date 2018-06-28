@@ -7,6 +7,9 @@ import {
   jsxToNode
 } from '../src'
 
+import {
+  NATIVE_BINDINGS
+} from 'tko.provider.native'
 
 describe('jsx', function () {
   it('converts a simple node', () => {
@@ -127,5 +130,16 @@ describe('jsx', function () {
       elementName: 'abbr', children: [], attributes: { in: 'y' }
     }, 'y'])
     assert.equal(node.outerHTML, '<div>x<abbr in="y"></abbr>y</div>')
+  })
+
+  it('does not unwrap observables for binding handlers', function () {
+    const obs = observable('x')
+    const node = jsxToNode({
+      elementName: 'div',
+      children: [],
+      attributes: { 'ko-x': obs, 'ko-y': 'z' }
+    })
+    assert.strictEqual(node[NATIVE_BINDINGS]['ko-x'], obs)
+    assert.equal(node[NATIVE_BINDINGS]['ko-y'], 'z')
   })
 })
