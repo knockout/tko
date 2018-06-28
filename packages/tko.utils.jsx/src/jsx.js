@@ -109,7 +109,7 @@ function insertChildOrChildren (possibleTemplateElement, toAppend, beforeNode) {
 
   if (Array.isArray(toAppend)) {
     for (const node of toAppend) {
-      appendChildOrChildren(possibleTemplateElement, node)
+      insertChildOrChildren(possibleTemplateElement, node, beforeNode)
     }
   } else {
     getInsertTarget(possibleTemplateElement).insertBefore(toAppend, beforeNode)
