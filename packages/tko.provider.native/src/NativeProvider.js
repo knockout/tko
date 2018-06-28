@@ -1,5 +1,9 @@
 
 import {
+  isObservable
+} from 'tko.observable'
+
+import {
   Provider
 } from 'tko.provider'
 
@@ -19,6 +23,16 @@ export default class NativeProvider extends Provider {
       .some(key => key.startsWith('ko-'))
   }
 
+  onlyBindings ([name]) {
+    return name.startsWith('ko-')
+  }
+
+  valueAsAccessor ([name, value]) {
+    const bindingName = name.replace(/^ko-/, '')
+    const valueFn = isObservable(value) ? value : () => value
+    return {[bindingName]: valueFn}
+  }
+
   /**
    * Return as valueAccessor function all the entries matching `ko-*`
    * @param {HTMLElement} node
@@ -26,8 +40,8 @@ export default class NativeProvider extends Provider {
   getBindingAccessors (node) {
     return Object.assign({},
       ...Object.entries(node[NATIVE_BINDINGS] || {})
-        .filter(([name, value]) => name.startsWith('ko-'))
-        .map(([name, value]) => ({[name.replace(/^ko-/, '')]: () => value}))
+        .filter(this.onlyBindings)
+        .map(this.valueAsAccessor)
     )
   }
 }

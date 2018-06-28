@@ -1,5 +1,9 @@
 
 import {
+  observable
+} from 'tko.observable'
+
+import {
   NativeProvider, NATIVE_BINDINGS
 } from '../src'
 
@@ -31,4 +35,16 @@ describe('Native Provider Behaviour', function () {
     assert.deepEqual(p.getBindingAccessors(div), {})
   })
 
+  it('returns valueAccessors that update observables', () => {
+    const p = new NativeProvider()
+    const div = document.createElement('div')
+    const obs = observable('iI')
+    const attr = {'ko-oo': obs, 'ko-fn': () => 'ø'}
+    div[NATIVE_BINDINGS] = attr
+    const accessors = p.getBindingAccessors(div)
+    assert.equal(accessors.oo(), 'iI')
+    accessors.oo('rv')
+    assert.equal(obs(), 'rv')
+    assert.equal(accessors.fn()(), 'ø')
+  })
 })
