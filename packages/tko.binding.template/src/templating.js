@@ -281,8 +281,6 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     } else {
       this.bindAnonymousTemplate()
     }
-
-    this.computed(this.onValueChange.bind(this))
   }
 
   bindNamedTemplate () {

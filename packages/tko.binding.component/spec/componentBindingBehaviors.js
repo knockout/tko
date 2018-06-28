@@ -29,6 +29,10 @@ import {
 } from 'tko.binding.if'
 
 import {
+  NATIVE_BINDINGS
+} from 'tko.provider.native'
+
+import {
   bindings as componentBindings
 } from '../src'
 
@@ -944,6 +948,41 @@ describe('Components: Component binding', function () {
 
       children.unshift('rrr')
       expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc</b>')
+    })
+
+    it('inserts and updates observable template', function () {
+      const t = observable(["abc"])
+      class ViewModel extends components.ComponentABC {
+        get template () {
+          return t
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('abc')
+
+      t(["rr", "vv"])
+      expect(testNode.children[0].innerHTML).toEqual('rrvv')
+    })
+
+    it('gets params from the node', function () {
+      const x = {v: 'rrr'}
+      let seen = null
+      class ViewModel extends components.ComponentABC {
+        constructor (params) {
+          super(params)
+          seen = params
+        }
+
+        static get template () {
+          return { elementName: 'name', attributes: {}, children: [] }
+        }
+      }
+      ViewModel.register('test-component')
+      testNode.children[0][NATIVE_BINDINGS] = {x, y: () => x}
+      applyBindings(outerViewModel, testNode)
+      expect(seen.x).toEqual(x)
+      expect(seen.y()).toEqual(x)
     })
   })
 

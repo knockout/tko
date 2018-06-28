@@ -11,6 +11,36 @@ import {
   contextFor, applyBindings
 } from 'tko.bind'
 
+import {
+  NATIVE_BINDINGS
+} from 'tko.provider.native'
+
+
+/**
+ *
+ * @param {any} possibleJsx Test whether this value is JSX.
+ *
+ * True for
+ *    { elementName }
+ *    [{elementName}]
+ *    observable({elementName} | [])
+ *
+ * Any observable will return truthy if its value is an array that doesn't
+ * contain HTML elements.  Template nodes should not be observable unless they
+ * are JSX.
+ *
+ * There's a bit of guesswork here that we could nail down with more test cases.
+ */
+export function maybeJsx (possibleJsx) {
+  if (isObservable(possibleJsx)) { return true }
+  const value = unwrap(possibleJsx)
+  if (!value) { return false }
+  if (value.elementName) { return true }
+  if (!Array.isArray(value) || !value.length) { return false }
+  if (value[0] instanceof window.Node) { return false }
+  return true
+}
+
 /**
  * Use a JSX transpilation of the format created by babel-plugin-transform-jsx
  * @param {Object} jsx An object of the form
@@ -20,6 +50,10 @@ import {
  *    }
  */
 export function jsxToNode (jsx) {
+  if (typeof jsx === 'string') {
+    return document.createTextNode(jsx)
+  }
+
   const node = document.createElement(jsx.elementName)
   const subscriptions = []
 
@@ -44,15 +78,41 @@ export function jsxToNode (jsx) {
   return node
 }
 
-function appendChildOrChildren (possibleTemplateElement, nodeToAppend) {
-  if (Array.isArray(nodeToAppend)) {
-    for (const node of nodeToAppend) {
+function getInsertTarget (possibleTemplateElement) {
+  return 'content' in possibleTemplateElement
+    ? possibleTemplateElement.content : possibleTemplateElement
+}
+
+/**
+ *
+ * @param {HTMLElement|HTMLTemplateElement} possibleTemplateElement
+ * @param {Node} toAppend
+ */
+function appendChildOrChildren (possibleTemplateElement, toAppend) {
+  if (Array.isArray(toAppend)) {
+    for (const node of toAppend) {
       appendChildOrChildren(possibleTemplateElement, node)
     }
-  } else if ('content' in possibleTemplateElement) {
-    possibleTemplateElement.content.appendChild(nodeToAppend)
   } else {
-    possibleTemplateElement.appendChild(nodeToAppend)
+    getInsertTarget(possibleTemplateElement).appendChild(toAppend)
+  }
+}
+
+/**
+ *
+ * @param {HTMLElement|HTMLTemplateElement} possibleTemplateElement
+ * @param {Node} toAppend
+ * @param {Node} beforeNode
+ */
+function insertChildOrChildren (possibleTemplateElement, toAppend, beforeNode) {
+  if (!beforeNode.parentNode) { return }
+
+  if (Array.isArray(toAppend)) {
+    for (const node of toAppend) {
+      insertChildOrChildren(possibleTemplateElement, node, beforeNode)
+    }
+  } else {
+    getInsertTarget(possibleTemplateElement).insertBefore(toAppend, beforeNode)
   }
 }
 
@@ -80,6 +140,18 @@ function updateChildren (node, children, subscriptions) {
 
 /**
  *
+ * @param {*} node
+ * @param {*} name
+ * @param {*} value
+ */
+function setNodeAttribute (node, name, value) {
+  const nodeJsxAttrs = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
+  nodeJsxAttrs[name] = value
+  if (typeof value === 'string') { node.setAttribute(name, value) }
+}
+
+/**
+ *
  * @param {HTMLElement} node
  * @param {Object} attributes
  * @param {Array} subscriptions
@@ -95,13 +167,13 @@ function updateAttributes (node, attributes, subscriptions) {
         if (attr === undefined) {
           node.removeAttribute(name)
         } else {
-          node.setAttribute(name, attr)
+          setNodeAttribute(node, name, attr)
         }
       }))
     }
     const unwrappedValue = unwrap(value)
     if (unwrappedValue !== undefined) {
-      node.setAttribute(name, unwrappedValue)
+      setNodeAttribute(node, name, unwrappedValue)
     }
   }
 }
@@ -117,17 +189,34 @@ function updateAttributes (node, attributes, subscriptions) {
 function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
   const newNodeOrNodes = convertJsxChildToDom(newJsx)
   const $context = contextFor(toReplace)
+  const firstNodeToReplace = Array.isArray(toReplace)
+    ? toReplace[0] || null : toReplace
+
+  insertChildOrChildren(parentNode, newNodeOrNodes, firstNodeToReplace)
 
   if (Array.isArray(toReplace)) {
     for (const node of toReplace) { removeNode(node) }
   } else {
     removeNode(toReplace)
   }
-  appendChildOrChildren(parentNode, newNodeOrNodes)
-  if ($context) { applyBindings($context, newNodeOrNodes) }
+
+  if ($context) {
+    if (Array.isArray(newNodeOrNodes)) {
+      for (const node of newNodeOrNodes) {
+        applyBindings($context, node)
+      }
+    } else {
+      applyBindings($context, newNodeOrNodes)
+    }
+  }
   return newNodeOrNodes
 }
 
+/**
+ *
+ * @param {HTMLElement} node
+ * @param {jsx|Array} child
+ */
 function monitorObservableChild (node, child) {
   const jsx = unwrap(child)
   let toReplace = convertJsxChildToDom(jsx)
@@ -146,8 +235,8 @@ function monitorObservableChild (node, child) {
  * @return {Array|Comment|HTMLElement}
  */
 function convertJsxChildToDom (child) {
-  return typeof child === 'string' ? document.createTextNode(child)
-    : Array.isArray(child) ? child.map(convertJsxChildToDom)
-      : child ? jsxToNode(child)
-        : document.createComment('[jsx placeholder]')
+  return Array.isArray(child)
+    ? child.map(convertJsxChildToDom)
+    : child ? jsxToNode(child)
+      : document.createComment('[jsx placeholder]')
 }

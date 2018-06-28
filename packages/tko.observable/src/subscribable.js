@@ -1,37 +1,18 @@
 /* eslint no-cond-assign: 0 */
 import {
-    arrayRemoveItem, objectForEach, options, removeDisposeCallback,
-    addDisposeCallback
+    arrayRemoveItem, objectForEach, options
 } from 'tko.utils'
 
+import Subscription from './Subscription'
 import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
-export { isSubscribable } from './subscribableSymbol'
 import { applyExtenders } from './extenders.js'
 import * as dependencyDetection from './dependencyDetection.js'
+export { isSubscribable } from './subscribableSymbol'
 
-
-export function subscription (target, callback, disposeCallback) {
-  this._target = target
-  this._callback = callback
-  this._disposeCallback = disposeCallback
-  this._isDisposed = false
-  this._domNodeDisposalCallback = null
-}
-
-Object.assign(subscription.prototype, {
-  dispose () {
-    if (this._domNodeDisposalCallback) {
-      removeDisposeCallback(this._node, this._domNodeDisposalCallback)
-    }
-    this._isDisposed = true
-    this._disposeCallback()
-  },
-
-  disposeWhenNodeIsRemoved (node) {
-    this._node = node
-    addDisposeCallback(node, this._domNodeDisposalCallback = this.dispose.bind(this))
-  }
-})
+// Descendants may have a LATEST_VALUE, which if present
+// causes TC39 subscriptions to emit the latest value when
+// subscribed.
+export const LATEST_VALUE = Symbol('Knockout latest value')
 
 export function subscribable () {
   Object.setPrototypeOf(this, ko_subscribable_fn)
@@ -42,6 +23,7 @@ export var defaultEvent = 'change'
 
 var ko_subscribable_fn = {
   [SUBSCRIBABLE_SYM]: true,
+  [Symbol.observable] () { return this },
 
   init (instance) {
     instance._subscriptions = { change: [] }
@@ -49,26 +31,36 @@ var ko_subscribable_fn = {
   },
 
   subscribe (callback, callbackTarget, event) {
-    var self = this
+    // TC39 proposed standard Observable { next: () => ... }
+    const isTC39Callback = typeof callback === 'object' && callback.next
 
     event = event || defaultEvent
-    var boundCallback = callbackTarget ? callback.bind(callbackTarget) : callback
+    const observer = isTC39Callback ? callback : {
+      next: callbackTarget ? callback.bind(callbackTarget) : callback
+    }
 
-    var subscriptionInstance = new subscription(self, boundCallback, function () {
-      arrayRemoveItem(self._subscriptions[event], subscriptionInstance)
-      if (self.afterSubscriptionRemove) {
-        self.afterSubscriptionRemove(event)
+    const subscriptionInstance = new Subscription(this, observer, () => {
+      arrayRemoveItem(this._subscriptions[event], subscriptionInstance)
+      if (this.afterSubscriptionRemove) {
+        this.afterSubscriptionRemove(event)
       }
     })
 
-    if (self.beforeSubscriptionAdd) {
-      self.beforeSubscriptionAdd(event)
+    if (this.beforeSubscriptionAdd) {
+      this.beforeSubscriptionAdd(event)
     }
 
-    if (!self._subscriptions[event]) {
-      self._subscriptions[event] = []
+    if (!this._subscriptions[event]) {
+      this._subscriptions[event] = []
     }
-    self._subscriptions[event].push(subscriptionInstance)
+    this._subscriptions[event].push(subscriptionInstance)
+
+    // Have TC39 `subscribe` immediately emit.
+    // https://github.com/tc39/proposal-observable/issues/190
+
+    if (isTC39Callback && LATEST_VALUE in this) {
+      observer.next(this[LATEST_VALUE])
+    }
 
     return subscriptionInstance
   },

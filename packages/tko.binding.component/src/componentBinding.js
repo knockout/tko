@@ -7,16 +7,20 @@ import {
 } from 'tko.utils'
 
 import {
-  unwrap
+  unwrap, isObservable
 } from 'tko.observable'
 
 import {
-  DescendantBindingHandler, bindingEvent
+  DescendantBindingHandler, applyBindingsToDescendants
 } from 'tko.bind'
 
 import {
-  jsxToNode
+  jsxToNode, maybeJsx
 } from 'tko.utils.jsx'
+
+import {
+  NATIVE_BINDINGS
+} from 'tko.provider.native'
 
 import {LifeCycle} from 'tko.lifecycle'
 
@@ -33,15 +37,25 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.computed('computeApplyComponent')
   }
 
+  setDomNodesFromJsx (jsx, element) {
+    const jsxArray = Array.isArray(jsx) ? jsx : [jsx]
+    const domNodeChildren = jsxArray.map(jsxToNode)
+    virtualElements.setDomNodeChildren(element, domNodeChildren)
+  }
+
   cloneTemplateIntoElement (componentName, template, element) {
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
-    const possibleJsxPartial = Array.isArray(template) && template.length
-    if (possibleJsxPartial && template[0].hasOwnProperty('elementName')) {
-      virtualElements.setDomNodeChildren(element, template.map(jsxToNode))
-    } else if (template.elementName) {
-      virtualElements.setDomNodeChildren(element, [jsxToNode(template)])
+
+    if (maybeJsx(template)) {
+      if (isObservable(template)) {
+        this.subscribe(template, jsx => {
+          this.setDomNodesFromJsx(jsx, element)
+          applyBindingsToDescendants(this.childBindingContext, this.$element)
+        })
+      }
+      this.setDomNodesFromJsx(unwrap(template), element)
     } else {
       const clonedNodesArray = cloneNodes(template)
       virtualElements.setDomNodeChildren(element, clonedNodesArray)
@@ -64,7 +78,8 @@ export default class ComponentBinding extends DescendantBindingHandler {
       componentName = value
     } else {
       componentName = unwrap(value.name)
-      componentParams = unwrap(value.params)
+      componentParams = NATIVE_BINDINGS in this.$element
+        ? this.$element[NATIVE_BINDINGS] : unwrap(value.params)
     }
 
     this.latestComponentName = componentName
@@ -117,11 +132,11 @@ export default class ComponentBinding extends DescendantBindingHandler {
       $componentTemplateNodes: this.originalChildNodes
     })
 
-    const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
+    this.childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
     const onBinding = this.onBindingComplete.bind(this, componentViewModel)
-    const applied = this.applyBindingsToDescendants(childBindingContext, onBinding)
+    this.applyBindingsToDescendants(this.childBindingContext, onBinding)
   }
 
   onBindingComplete (componentViewModel, bindingResult) {

@@ -176,4 +176,12 @@ describe('Subscribable', function () {
     // Issue #2252: make sure .toString method does not throw error
     expect(new subscribable().toString()).toBe('[object Object]')
   })
+
+  it('subscribes with TC39 Observable {next: () =>}', function () {
+    var instance = new subscribable()
+    var notifiedValue
+    instance.subscribe({ next (value) { notifiedValue = value } })
+    instance.notifySubscribers(123)
+    expect(notifiedValue).toEqual(123)
+  })
 })

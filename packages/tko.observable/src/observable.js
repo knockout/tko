@@ -3,37 +3,35 @@
 //  ---
 //
 import {
-    createSymbolOrString, options, overwriteLengthPropertyIfSupported
+  options, overwriteLengthPropertyIfSupported
 } from 'tko.utils'
 
 import * as dependencyDetection from './dependencyDetection.js'
 import { deferUpdates } from './defer.js'
-import { subscribable, defaultEvent } from './subscribable.js'
+import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
-
-var observableLatestValue = createSymbolOrString('_latestValue')
 
 export function observable (initialValue) {
   function Observable () {
     if (arguments.length > 0) {
             // Write
             // Ignore writes if the value hasn't changed
-      if (Observable.isDifferent(Observable[observableLatestValue], arguments[0])) {
+      if (Observable.isDifferent(Observable[LATEST_VALUE], arguments[0])) {
         Observable.valueWillMutate()
-        Observable[observableLatestValue] = arguments[0]
+        Observable[LATEST_VALUE] = arguments[0]
         Observable.valueHasMutated()
       }
       return this // Permits chained assignments
     } else {
             // Read
       dependencyDetection.registerDependency(Observable) // The caller only needs to be notified of changes if they did a "read" operation
-      return Observable[observableLatestValue]
+      return Observable[LATEST_VALUE]
     }
   }
 
   overwriteLengthPropertyIfSupported(Observable, { value: undefined })
 
-  Observable[observableLatestValue] = initialValue
+  Observable[LATEST_VALUE] = initialValue
 
   subscribable.fn.init(Observable)
 
@@ -50,13 +48,13 @@ export function observable (initialValue) {
 // Define prototype for observables
 observable.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-  peek () { return this[observableLatestValue] },
+  peek () { return this[LATEST_VALUE] },
   valueHasMutated () {
-    this.notifySubscribers(this[observableLatestValue], 'spectate')
-    this.notifySubscribers(this[observableLatestValue])
+    this.notifySubscribers(this[LATEST_VALUE], 'spectate')
+    this.notifySubscribers(this[LATEST_VALUE])
   },
   valueWillMutate () {
-    this.notifySubscribers(this[observableLatestValue], 'beforeChange')
+    this.notifySubscribers(this[LATEST_VALUE], 'beforeChange')
   },
 
   // Some observables may not always be writeable, notably computeds.
