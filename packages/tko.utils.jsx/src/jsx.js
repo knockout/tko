@@ -25,15 +25,20 @@ import {
  *    [{elementName}]
  *    observable({elementName} | [])
  *
- * Any observable will return truthy if its value is an array,
- * since it may in future be JSX.
+ * Any observable will return truthy if its value is an array that doesn't
+ * contain HTML elements.  Template nodes should not be observable unless they
+ * are JSX.
+ *
+ * There's a bit of guesswork here that we could nail down with more test cases.
  */
 export function maybeJsx (possibleJsx) {
+  if (isObservable(possibleJsx)) { return true }
   const value = unwrap(possibleJsx)
   if (!value) { return false }
   if (value.elementName) { return true }
-  if (value.length && value[0].elementName) { return true }
-  return false
+  if (!Array.isArray(value) || !value.length) { return false }
+  if (value[0] instanceof window.Node) { return false }
+  return true
 }
 
 /**
@@ -45,6 +50,10 @@ export function maybeJsx (possibleJsx) {
  *    }
  */
 export function jsxToNode (jsx) {
+  if (typeof jsx === 'string') {
+    return document.createTextNode(jsx)
+  }
+
   const node = document.createElement(jsx.elementName)
   const subscriptions = []
 
@@ -226,8 +235,8 @@ function monitorObservableChild (node, child) {
  * @return {Array|Comment|HTMLElement}
  */
 function convertJsxChildToDom (child) {
-  return typeof child === 'string' ? document.createTextNode(child)
-    : Array.isArray(child) ? child.map(convertJsxChildToDom)
-      : child ? jsxToNode(child)
-        : document.createComment('[jsx placeholder]')
+  return Array.isArray(child)
+    ? child.map(convertJsxChildToDom)
+    : child ? jsxToNode(child)
+      : document.createComment('[jsx placeholder]')
 }

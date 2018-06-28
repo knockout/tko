@@ -950,6 +950,21 @@ describe('Components: Component binding', function () {
       expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc</b>')
     })
 
+    it('inserts and updates observable template', function () {
+      const t = observable(["abc"])
+      class ViewModel extends components.ComponentABC {
+        get template () {
+          return t
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.children[0].innerHTML).toEqual('abc')
+
+      t(["rr", "vv"])
+      expect(testNode.children[0].innerHTML).toEqual('rrvv')
+    })
+
     it('gets params from the node', function () {
       const x = {v: 'rrr'}
       let seen = null

@@ -11,7 +11,7 @@ import {
 } from 'tko.observable'
 
 import {
-  DescendantBindingHandler
+  DescendantBindingHandler, applyBindingsToDescendants
 } from 'tko.bind'
 
 import {
@@ -50,7 +50,10 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     if (maybeJsx(template)) {
       if (isObservable(template)) {
-        this.subscribe(template, jsx => this.setDomNodesFromJsx(jsx, element))
+        this.subscribe(template, jsx => {
+          this.setDomNodesFromJsx(jsx, element)
+          applyBindingsToDescendants(this.childBindingContext, this.$element)
+        })
       }
       this.setDomNodesFromJsx(unwrap(template), element)
     } else {
@@ -129,11 +132,11 @@ export default class ComponentBinding extends DescendantBindingHandler {
       $componentTemplateNodes: this.originalChildNodes
     })
 
-    const childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
+    this.childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
     const onBinding = this.onBindingComplete.bind(this, componentViewModel)
-    const applied = this.applyBindingsToDescendants(childBindingContext, onBinding)
+    this.applyBindingsToDescendants(this.childBindingContext, onBinding)
   }
 
   onBindingComplete (componentViewModel, bindingResult) {
