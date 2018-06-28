@@ -18,6 +18,10 @@ import {
   jsxToNode, maybeJsx
 } from 'tko.utils.jsx'
 
+import {
+  NATIVE_BINDINGS
+} from 'tko.provider.native'
+
 import {LifeCycle} from 'tko.lifecycle'
 
 import registry from 'tko.utils.component'
@@ -47,8 +51,8 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (maybeJsx(template)) {
       if (isObservable(template)) {
         this.subscribe(template, jsx => this.setDomNodesFromJsx(jsx, element))
-        this.setDomNodesFromJsx(unwrap(template), element)
       }
+      this.setDomNodesFromJsx(unwrap(template), element)
     } else {
       const clonedNodesArray = cloneNodes(template)
       virtualElements.setDomNodeChildren(element, clonedNodesArray)
@@ -71,7 +75,8 @@ export default class ComponentBinding extends DescendantBindingHandler {
       componentName = value
     } else {
       componentName = unwrap(value.name)
-      componentParams = unwrap(value.params)
+      componentParams = NATIVE_BINDINGS in this.$element
+        ? this.$element[NATIVE_BINDINGS] : unwrap(value.params)
     }
 
     this.latestComponentName = componentName

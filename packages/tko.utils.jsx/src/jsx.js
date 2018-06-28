@@ -136,12 +136,9 @@ function updateChildren (node, children, subscriptions) {
  * @param {*} value
  */
 function setNodeAttribute (node, name, value) {
-  if (name.startsWith('ko-')) {
-    const nodeJsxAttrs = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
-    nodeJsxAttrs[name.replace(/^ko-/, '')] = () => value
-  } else {
-    node.setAttribute(name, value)
-  }
+  const nodeJsxAttrs = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
+  nodeJsxAttrs[name] = value
+  if (typeof value === 'string') { node.setAttribute(name, value) }
 }
 
 /**
