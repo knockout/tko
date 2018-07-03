@@ -4,7 +4,6 @@ import babelMinify from 'rollup-plugin-babel-minify'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import typescript from 'rollup-plugin-typescript2'
-import rollupVisualizer from 'rollup-plugin-visualizer'
 import license from 'rollup-plugin-license'
 import * as pkg from './package.json'
 
@@ -54,7 +53,6 @@ const UNIVERSAL_PLUGINS = [
     VERSION: pkg.version
   }),
   nodeResolve({ module: true }),
-  rollupVisualizer({ filename: 'visual.html' }),
   license({ sourcemap: true, banner })
 ]
 
