@@ -1,6 +1,6 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 🎩  `master` (ongoing)
+## 🎩  `alpha-5` (4 July 2018)
 
 * (observable) When supported, `observable.length` will now be undefined (was `0` before), and `observableArray.length` will now be the length of the wrapped array
 * (observableArraty) `observableArray` is now iterable (has a `Symbol.iterator` property)
