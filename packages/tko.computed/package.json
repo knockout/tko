@@ -1,14 +1,14 @@
 {
   "name": "tko.computed",
-  "version": "4.0.0-alpha4",
+  "version": "4.0.0-alpha5",
   "description": "TKO Computed Observables",
   "module": "dist/tko.computed.js",
   "files": [
     "dist/"
   ],
   "dependencies": {
-    "tko.observable": "^4.0.0-alpha4",
-    "tko.utils": "^4.0.0-alpha4",
+    "tko.observable": "^4.0.0-alpha5",
+    "tko.utils": "^4.0.0-alpha5",
     "tslib": "^1.8.0"
   },
   "repository": {

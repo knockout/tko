@@ -1,6 +1,6 @@
 {
   "name": "tko.utils.jsx",
-  "version": "4.0.0-alpha4",
+  "version": "4.0.0-alpha5",
   "description": "TKO JSX Rendering",
   "module": "dist/tko.utils.jsx.js",
   "files": [

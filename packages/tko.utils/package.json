@@ -1,6 +1,6 @@
 {
   "name": "tko.utils",
-  "version": "4.0.0-alpha4",
+  "version": "4.0.0-alpha5",
   "description": "TKO Utilities",
   "module": "dist/tko.utils.js",
   "files": [
