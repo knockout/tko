@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## 🎒 `alpha-5b` (5 July 2018)
+
+* Fix auto-unwrapping of Jsx attributes
+
 ## 🎩  `alpha-5` (4 July 2018)
 
 * (observable) When supported, `observable.length` will now be undefined (was `0` before), and `observableArray.length` will now be the length of the wrapped array

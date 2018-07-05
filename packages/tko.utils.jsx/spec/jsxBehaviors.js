@@ -137,9 +137,11 @@ describe('jsx', function () {
     const node = jsxToNode({
       elementName: 'div',
       children: [],
-      attributes: { 'ko-x': obs, 'ko-y': 'z' }
+      attributes: { 'ko-x': obs, 'ko-y': 'z', 'any': obs, 'any2': 'e' }
     })
     assert.strictEqual(node[NATIVE_BINDINGS]['ko-x'], obs)
     assert.equal(node[NATIVE_BINDINGS]['ko-y'], 'z')
+    assert.strictEqual(node[NATIVE_BINDINGS]['any'], obs)
+    assert.equal(node[NATIVE_BINDINGS]['any2'], 'e')
   })
 })

@@ -140,14 +140,20 @@ function updateChildren (node, children, subscriptions) {
 
 /**
  *
- * @param {*} node
- * @param {*} name
- * @param {*} value
+ * @param {HTMLElement} node
+ * @param {string} name
+ * @param {any} valueOrObservable
  */
-function setNodeAttribute (node, name, value) {
-  const nodeJsxAttrs = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
-  nodeJsxAttrs[name] = value
-  if (typeof value === 'string') { node.setAttribute(name, value) }
+function setNodeAttribute (node, name, valueOrObservable) {
+  const value = unwrap(valueOrObservable)
+  const nodeJsxAttrs = node[NATIVE_BINDINGS] ||
+    (node[NATIVE_BINDINGS] = {})
+  nodeJsxAttrs[name] = valueOrObservable
+  if (typeof value === 'string') {
+    node.setAttribute(name, value)
+  } else if (value === undefined) {
+    node.removeAttribute(name)
+  }
 }
 
 /**
@@ -162,23 +168,12 @@ function updateAttributes (node, attributes, subscriptions) {
   }
 
   for (const [name, value] of Object.entries(attributes || {})) {
-    if (name.startsWith('ko-')) {
-      setNodeAttribute(node, name, value)
-      continue
-    }
     if (isObservable(value)) {
-      subscriptions.push(value.subscribe(attr => {
-        if (attr === undefined) {
-          node.removeAttribute(name)
-        } else {
-          setNodeAttribute(node, name, attr)
-        }
-      }))
+      subscriptions.push(
+        value.subscribe(attr => setNodeAttribute(node, name, value))
+      )
     }
-    const unwrappedValue = unwrap(value)
-    if (unwrappedValue !== undefined) {
-      setNodeAttribute(node, name, unwrappedValue)
-    }
+    setNodeAttribute(node, name, value)
   }
 }
 
