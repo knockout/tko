@@ -1,6 +1,6 @@
 {
   "name": "tko.observable",
-  "version": "4.0.0-alpha5",
+  "version": "4.0.0-alpha5b",
   "description": "TKO subscribables and observables",
   "module": "dist/tko.observable.js",
   "repository": {
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/knockout/tko.observable#readme",
   "dependencies": {
-    "tko.utils": "^4.0.0-alpha5",
+    "tko.utils": "^4.0.0-alpha5b",
     "tslib": "^1.8.0"
   },
   "karma": {

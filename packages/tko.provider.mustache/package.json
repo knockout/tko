@@ -1,6 +1,6 @@
 {
   "name": "tko.provider.mustache",
-  "version": "4.0.0-alpha5",
+  "version": "4.0.0-alpha5b",
   "description": "Interpolate text/node attributes {{ }}",
   "module": "dist/tko.provider.mustache.js",
   "files": [
@@ -22,11 +22,11 @@
   },
   "homepage": "https://github.com/knockout/tko.preprocessor.textInterpolation#readme",
   "dependencies": {
-    "tko.binding.template": "^4.0.0-alpha5",
-    "tko.observable": "^4.0.0-alpha5",
-    "tko.provider": "^4.0.0-alpha5",
-    "tko.utils": "^4.0.0-alpha5",
-    "tko.utils.parser": "^4.0.0-alpha5",
+    "tko.binding.template": "^4.0.0-alpha5b",
+    "tko.observable": "^4.0.0-alpha5b",
+    "tko.provider": "^4.0.0-alpha5b",
+    "tko.utils": "^4.0.0-alpha5b",
+    "tko.utils.parser": "^4.0.0-alpha5b",
     "tslib": "^1.8.0"
   },
   "karma": {

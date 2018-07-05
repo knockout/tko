@@ -1,18 +1,18 @@
 {
   "name": "tko.bind",
-  "version": "4.0.0-alpha5",
+  "version": "4.0.0-alpha5b",
   "description": "TKO DOM-Observable Binding",
   "module": "dist/tko.bind.js",
   "dependencies": {
-    "tko.computed": "^4.0.0-alpha5",
-    "tko.lifecycle": "^4.0.0-alpha5",
-    "tko.observable": "^4.0.0-alpha5",
-    "tko.provider": "^4.0.0-alpha5",
-    "tko.utils": "^4.0.0-alpha5",
+    "tko.computed": "^4.0.0-alpha5b",
+    "tko.lifecycle": "^4.0.0-alpha5b",
+    "tko.observable": "^4.0.0-alpha5b",
+    "tko.provider": "^4.0.0-alpha5b",
+    "tko.utils": "^4.0.0-alpha5b",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "tko.binding.foreach": "^4.0.0-alpha5"
+    "tko.binding.foreach": "^4.0.0-alpha5b"
   },
   "files": [
     "dist/"
