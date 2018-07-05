@@ -122,31 +122,38 @@ describe('KO LifeCycle', function () {
       assert.equal(o(), 1)
     })
 
-    it.skip('disposes when anchored nodes are cleaned', function () {
-      /**
-       * We're only skipping this because it requires a little more
-       * setup (i.e. applyBindings + cleanNode), but it's relatively
-       * marginal value given the simplicity and how simple the
-       * functionality of anchorTo is.
-       */
-      var Ctr, c, div, o
-      o = observable()
-      Ctr = (function () {
-        function Ctr () {
-          this.computed(o, 'comp')
+    it('addEventListener removes event on dispose', function () {
+      let divClick = 0
+      let anchorClick = 0
+      const o = observable()
+      const div = document.createElement('div')
+      const anchor = document.createElement('em')
+      class NodeLifeCycle extends LifeCycle {
+        constructor () {
+          super()
+          this.computed(o, () => o())
+          this.anchorTo(anchor)
+          this.addEventListener(div, 'click', () => divClick++)
+          this.addEventListener(anchor, 'click', () => anchorClick++)
         }
-        Ctr.prototype.comp = function () {
-          return o()
-        }
-        return Ctr
-      })()
-      LifeCycle.mixInto(Ctr)
-      c = new Ctr()
-      div = document.createElement('div')
-      c.anchorTo(div)
+      }
+      const nlc = new NodeLifeCycle()
       assert.equal(o.getSubscriptionsCount(), 1)
-      cleanNode(c)
+
+      div.click()
+      assert.equal(divClick, 1)
+      assert.equal(anchorClick, 0)
+      anchor.click()
+      assert.equal(divClick, 1)
+      assert.equal(anchorClick, 1)
+
+      nlc.dispose()
+
       assert.equal(o.getSubscriptionsCount(), 0)
+      div.click()
+      anchor.click()
+      assert.equal(divClick, 1)
+      assert.equal(anchorClick, 1)
     })
   })
 })
