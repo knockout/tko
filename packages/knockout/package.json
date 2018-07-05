@@ -1,5 +1,6 @@
 {
-  "name": "knockout",
+  "name": "knockout-proper",
+  "private": true,
   "description": "Knockout makes it easier to create rich, responsive UIs with JavaScript",
   "homepage": "http://knockoutjs.com/",
   "version": "4.0.0-alpha5",
