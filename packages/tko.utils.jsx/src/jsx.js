@@ -48,7 +48,7 @@ export function maybeJsx (possibleJsx) {
  * @param {HTMLElemen} node
  * @return {HTMLElement} clone of node
  */
-export function cloneNode (node) {
+export function cloneNodeFromOriginal (node) {
   if (!node) { return [] }
 
   if (node[ORIGINAL_JSX_SYM]) {
@@ -85,9 +85,7 @@ export function jsxToNode (jsx) {
 
   /** Slots need to be able to replicate with the attributes, which
    *  are not preserved when cloning from template nodes. */
-  if (jsx.attributes.slot) {
-    node[ORIGINAL_JSX_SYM] = jsx
-  }
+  node[ORIGINAL_JSX_SYM] = jsx
 
   updateAttributes(node, unwrap(jsx.attributes), subscriptions)
   if (isObservable(jsx.attributes)) {

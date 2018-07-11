@@ -19,7 +19,7 @@ import {
 } from 'tko.utils'
 
 import {
-  cloneNode
+  cloneNodeFromOriginal
 } from 'tko.utils.jsx'
 
 import {
@@ -51,7 +51,7 @@ export default class SlotBinding extends DescendantBindingHandler {
    * @param {HTMLElement}} slotValue
    */
   replaceSlotWithNode (nodeInComponentTemplate, slotNode) {
-    const nodesForSlot = cloneNode(slotNode)
+    const nodesForSlot = cloneNodeFromOriginal(slotNode)
     virtualElements.setDomNodeChildren(nodeInComponentTemplate, nodesForSlot)
   }
 

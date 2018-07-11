@@ -4,8 +4,8 @@ import {
 } from 'tko.observable'
 
 import {
-  NativeProvider, NATIVE_BINDINGS
-} from '../src'
+  default as NativeProvider, NATIVE_BINDINGS
+} from '../src/NativeProvider'
 
 describe('Native Provider Behaviour', function () {
   it('returns native bindings', function () {
