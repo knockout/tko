@@ -8,7 +8,7 @@ import {
 } from '../src'
 
 import {
-  NATIVE_BINDINGS
+  NativeProvider
 } from 'tko.provider.native'
 
 describe('jsx', function () {
@@ -139,9 +139,10 @@ describe('jsx', function () {
       children: [],
       attributes: { 'ko-x': obs, 'ko-y': 'z', 'any': obs, 'any2': 'e' }
     })
-    assert.strictEqual(node[NATIVE_BINDINGS]['ko-x'], obs)
-    assert.equal(node[NATIVE_BINDINGS]['ko-y'], 'z')
-    assert.strictEqual(node[NATIVE_BINDINGS]['any'], obs)
-    assert.equal(node[NATIVE_BINDINGS]['any2'], 'e')
+    const nodeValues = NativeProvider.getNodeValues(node)
+    assert.strictEqual(nodeValues['ko-x'], obs)
+    assert.equal(nodeValues['ko-y'], 'z')
+    assert.strictEqual(nodeValues['any'], obs)
+    assert.equal(nodeValues['any2'], 'e')
   })
 })

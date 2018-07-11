@@ -12,9 +12,10 @@ import {
 } from 'tko.bind'
 
 import {
-  NATIVE_BINDINGS
+  NativeProvider
 } from 'tko.provider.native'
 
+const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
 /**
  *
@@ -42,6 +43,31 @@ export function maybeJsx (possibleJsx) {
 }
 
 /**
+ * Clone a node from its original JSX if possible, otherwise using DOM cloneNode
+ * This preserves any native attributes set by JSX.
+ * @param {HTMLElemen} node
+ * @return {HTMLElement} clone of node
+ */
+export function cloneNode (node) {
+  if (!node) { return [] }
+
+  if (node[ORIGINAL_JSX_SYM]) {
+    const possibleTemplate = jsxToNode(node[ORIGINAL_JSX_SYM])
+    return [...possibleTemplate.content
+      ? possibleTemplate.content.childNodes
+      : possibleTemplate.childNodes]
+  }
+
+  if ('content' in node) {
+    const clone = document.importNode(node.content, true)
+    return [...clone.childNodes]
+  }
+
+  const nodeArray = Array.isArray(node) ? node : [node]
+  return nodeArray.map(n => n.cloneNode(true))
+}
+
+/**
  * Use a JSX transpilation of the format created by babel-plugin-transform-jsx
  * @param {Object} jsx An object of the form
  *    { elementName: node-name e.g. "div",
@@ -56,6 +82,12 @@ export function jsxToNode (jsx) {
 
   const node = document.createElement(jsx.elementName)
   const subscriptions = []
+
+  /** Slots need to be able to replicate with the attributes, which
+   *  are not preserved when cloning from template nodes. */
+  if (jsx.attributes.slot) {
+    node[ORIGINAL_JSX_SYM] = jsx
+  }
 
   updateAttributes(node, unwrap(jsx.attributes), subscriptions)
   if (isObservable(jsx.attributes)) {
@@ -146,9 +178,7 @@ function updateChildren (node, children, subscriptions) {
  */
 function setNodeAttribute (node, name, valueOrObservable) {
   const value = unwrap(valueOrObservable)
-  const nodeJsxAttrs = node[NATIVE_BINDINGS] ||
-    (node[NATIVE_BINDINGS] = {})
-  nodeJsxAttrs[name] = valueOrObservable
+  NativeProvider.addValueToNode(node, name, valueOrObservable)
   if (typeof value === 'string') {
     node.setAttribute(name, value)
   } else if (value === undefined) {

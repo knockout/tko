@@ -19,7 +19,7 @@ import {
 } from 'tko.utils.jsx'
 
 import {
-  NATIVE_BINDINGS
+  NativeProvider
 } from 'tko.provider.native'
 
 import {LifeCycle} from 'tko.lifecycle'
@@ -69,6 +69,28 @@ export default class ComponentBinding extends DescendantBindingHandler {
       : componentParams // Template-only component
   }
 
+  /**
+   * Return the $componentTemplateSlotNodes for the given template
+   * @param {HTMLElement|jsx} template
+   */
+  makeTemplateSlotNodes (originalChildNodes) {
+    return Object.assign({}, ...this.genSlotsByName(originalChildNodes))
+  }
+
+  /**
+   * Iterate over the templateNodes, yielding each '<element slot=name>'
+   * as an object * of {name: element}.
+   * @param {HTMLElement} templateNodes
+   */
+  * genSlotsByName (templateNodes) {
+    for (const node of templateNodes) {
+      if (node.nodeType !== 1) { continue }
+      const slotName = node.getAttribute('slot')
+      if (!slotName) { continue }
+      yield {[slotName]: node}
+    }
+  }
+
   computeApplyComponent () {
     const value = unwrap(this.value)
     let componentName
@@ -78,8 +100,8 @@ export default class ComponentBinding extends DescendantBindingHandler {
       componentName = value
     } else {
       componentName = unwrap(value.name)
-      componentParams = NATIVE_BINDINGS in this.$element
-        ? this.$element[NATIVE_BINDINGS] : unwrap(value.params)
+      componentParams = NativeProvider.getNodeValues(this.$element) ||
+        unwrap(value.params)
     }
 
     this.latestComponentName = componentName
@@ -129,7 +151,9 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     const ctxExtender = (ctx) => Object.assign(ctx, {
       $component: componentViewModel,
-      $componentTemplateNodes: this.originalChildNodes
+      $componentTemplateNodes: this.originalChildNodes,
+      $componentTemplateSlotNodes: this.makeTemplateSlotNodes(
+        this.originalChildNodes)
     })
 
     this.childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)

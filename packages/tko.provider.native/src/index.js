@@ -1,4 +1,3 @@
 export {
-  default as NativeProvider,
-  NATIVE_BINDINGS
+  default as NativeProvider
 } from './NativeProvider'

@@ -11,6 +11,7 @@ import { MultiProvider } from 'tko.provider.multi'
 import { DataBindProvider } from 'tko.provider.databind'
 import { VirtualProvider } from 'tko.provider.virtual'
 import { ComponentProvider } from 'tko.provider.component'
+import { NativeProvider } from 'tko.provider.native'
 
 import {
     applyBindings, dataFor
@@ -29,8 +30,8 @@ import {
 } from 'tko.binding.if'
 
 import {
-  NATIVE_BINDINGS
-} from 'tko.provider.native'
+  jsxToNode
+} from 'tko.utils.jsx'
 
 import {
   bindings as componentBindings
@@ -60,7 +61,8 @@ describe('Components: Component binding', function () {
       providers: [
         new DataBindProvider(),
         new ComponentProvider(),
-        new VirtualProvider()
+        new VirtualProvider(),
+        new NativeProvider()
       ]
     })
     options.bindingProviderInstance = provider
@@ -979,7 +981,8 @@ describe('Components: Component binding', function () {
         }
       }
       ViewModel.register('test-component')
-      testNode.children[0][NATIVE_BINDINGS] = {x, y: () => x}
+      NativeProvider.addValueToNode(testNode.children[0], 'x', x)
+      NativeProvider.addValueToNode(testNode.children[0], 'y', () => x)
       applyBindings(outerViewModel, testNode)
       expect(seen.x).toEqual(x)
       expect(seen.y()).toEqual(x)
@@ -1207,6 +1210,79 @@ describe('Components: Component binding', function () {
       expect(testNode.children[0].innerText.trim()).toEqual(`B. C. E.`)
       const em = testNode.children[0].children[0].children[0]
       expect(em.tagName).toEqual('EM')
+    })
+
+    it('preserves inserts JSX-based slots', function () {
+      testNode.innerHTML = ''
+      testNode.appendChild(jsxToNode({
+        elementName: 'test-component',
+        attributes: {},
+        children: [{
+          elementName: 'template',
+          attributes: {slot: 'X'},
+          children: ['t', 'o']
+        }]
+      }))
+
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // As-if it's from JSX:
+          return {
+            elementName: 'div',
+            attributes: {},
+            children: [
+              'A',
+              { elementName: 'slot', attributes: {name: 'X'}, children: [] },
+              'B'
+            ]
+          }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      const text = testNode.children[0].innerText.trim().replace(/\s+/, ' ')
+      expect(text).toEqual('AtoB')
+    })
+
+    it('preserves native attributes on child nodes', function () {
+      testNode.innerHTML = ''
+      const attrx = {}
+      testNode.appendChild(jsxToNode({
+        elementName: 'test-component',
+        attributes: {},
+        children: [{
+          elementName: 'template',
+          attributes: {slot: 'X'},
+          children: [{
+            elementName: 'em',
+            attributes: {attrx, attry: 'y', attrz: () => 'z'},
+            children: []
+          }]
+        }]
+      }))
+
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // As-if it's from JSX:
+          return {
+            elementName: 'div',
+            attributes: {},
+            children: [
+              { elementName: 'slot', attributes: {name: 'X'}, children: [] }
+            ]
+          }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      const em = testNode.querySelector('em')
+      expect(NativeProvider.getNodeValues(em).attry).toEqual('y')
+      expect(NativeProvider.getNodeValues(em).attrz()).toEqual('z')
+      expect(NativeProvider.getNodeValues(em).attrx).toEqual(attrx)
     })
   })
 })

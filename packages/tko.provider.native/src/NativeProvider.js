@@ -44,4 +44,24 @@ export default class NativeProvider extends Provider {
         .map(this.valueAsAccessor)
     )
   }
+
+  /**
+   * Add a named-value to the given node.
+   * @param {HTMLElement} node
+   * @param {string} name
+   * @param {any} value
+   */
+  static addValueToNode (node, name, value) {
+    const obj = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
+    obj[name] = value
+  }
+
+  /**
+   *
+   * @param {HTMLElement} node
+   * @return {object} the stored values
+   */
+  static getNodeValues (node) {
+    return node[NATIVE_BINDINGS]
+  }
 }

@@ -19,10 +19,12 @@ import {
 } from 'tko.utils'
 
 import {
+  cloneNode
+} from 'tko.utils.jsx'
+
+import {
   DescendantBindingHandler, contextFor
 } from 'tko.bind'
-
-const SLOTS_SYM = Symbol('Knockout Slots')
 
 /**
  * SlotBinding replaces a slot with
@@ -49,40 +51,20 @@ export default class SlotBinding extends DescendantBindingHandler {
    * @param {HTMLElement}} slotValue
    */
   replaceSlotWithNode (nodeInComponentTemplate, slotNode) {
-    const nodesForSlot = this.getNodesForSlot(slotNode)
+    const nodesForSlot = cloneNode(slotNode)
     virtualElements.setDomNodeChildren(nodeInComponentTemplate, nodesForSlot)
   }
 
-  getNodesForSlot (slotNode) {
-    if (!slotNode) { return [] }
-    if ('content' in slotNode) {
-      const clone = document.importNode(slotNode.content, true)
-      return [...clone.childNodes]
-    }
-    return (Array.isArray(slotNode) ? slotNode : [slotNode])
-      .map(sn => sn.cloneNode(true))
-  }
-
-  * genSlotsByName (templateNodes) {
-    for (const node of templateNodes) {
-      if (node.nodeType !== 1) { continue }
-      const slotName = node.getAttribute('slot')
-      if (!slotName) { continue }
-      yield {[slotName]: node}
-    }
-  }
-
   getSlot (slotName) {
-    const {$componentTemplateNodes} = this.$context
-    if (!$componentTemplateNodes[SLOTS_SYM]) {
-      $componentTemplateNodes[SLOTS_SYM] = Object.assign({},
-        ...this.genSlotsByName($componentTemplateNodes))
-    }
+    const {$componentTemplateSlotNodes} = this.$context
+
     if (!slotName) {
-      return [...$componentTemplateNodes]
-        .filter(n => !n.getAttribute || !n.getAttribute('slot'))
+      return $componentTemplateSlotNodes[''] ||
+        [...this.$context.$componentTemplateNodes]
+          .filter(n => !n.getAttribute || !n.getAttribute('slot'))
     }
-    return $componentTemplateNodes[SLOTS_SYM][slotName]
+
+    return $componentTemplateSlotNodes[slotName]
   }
 
   static get allowVirtualElements () { return true }
