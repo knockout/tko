@@ -652,7 +652,7 @@ export default class Parser {
       case 'null': return null
       case 'undefined': return void 0
       case 'function':
-        throw new Error('Knockout: Anonymous functions are no longer supported, but `=>` lambas are.')
+        throw new Error('Knockout: Anonymous functions are no longer supported, but `=>` lambdas are.')
     // return this.anonymous_fn();
     }
     return new Identifier(this, token, this.dereferences())
