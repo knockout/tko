@@ -1,6 +1,6 @@
 {
   "name": "tko",
-  "version": "4.0.0-alpha5c",
+  "version": "4.0.0-alpha5d",
   "description": "The TKO.js Javascript Library",
   "main": "dist/tko.js",
   "repository": "git@github.com:knockout/tko",

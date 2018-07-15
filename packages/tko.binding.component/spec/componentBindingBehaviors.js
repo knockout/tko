@@ -882,19 +882,19 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="v0">text</div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="v0">text<!--[JSX P]--></div>')
 
       obs('v1')
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="v1">text</div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="v1">text<!--[JSX P]--></div>')
 
       obs(undefined)
-      expect(testNode.children[0].innerHTML).toEqual('<div>text</div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div>text<!--[JSX P]--></div>')
 
       o2({ elementName: 'i', children: ['g'], attributes: {} })
-      expect(testNode.children[0].innerHTML).toEqual('<div><i>g</i></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div><i>g</i><!--[JSX P]--></div>')
 
       o2(undefined)
-      expect(testNode.children[0].innerHTML).toEqual('<div><!--[jsx placeholder]--></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div><!--[JSX C]--><!--[JSX P]--></div>')
     })
 
     it('inserts a partial when the `template` is an array', function () {
@@ -943,13 +943,13 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c></b>')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c><!--[JSX P]--></b>')
 
       children.pop()
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc</b>')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<!--[JSX P]--></b>')
 
       children.unshift('rrr')
-      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc</b>')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc<!--[JSX P]--></b>')
     })
 
     it('inserts and updates observable template', function () {
@@ -1283,6 +1283,48 @@ describe('Components: Component binding', function () {
       expect(NativeProvider.getNodeValues(em).attry).toEqual('y')
       expect(NativeProvider.getNodeValues(em).attrz()).toEqual('z')
       expect(NativeProvider.getNodeValues(em).attrx).toEqual(attrx)
+    })
+
+    it('respects observable array changes', function () {
+      testNode.innerHTML = ''
+      const arr = observableArray([])
+      testNode.appendChild(jsxToNode({
+        elementName: 'test-component',
+        attributes: {},
+        children: [{
+          elementName: 'template',
+          attributes: {slot: 'X'},
+          children: [arr]
+        }]
+      }))
+
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // As-if it's from JSX:
+          return {
+            elementName: 'div',
+            attributes: {},
+            children: [
+              { elementName: 'slot', attributes: {name: 'X'}, children: [] }
+            ]
+          }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.innerText).toEqual('')
+
+      arr(['abc', 'def'])
+      expect(testNode.innerText).toEqual('abcdef')
+
+      arr([])
+      expect(testNode.innerText).toEqual('')
+
+      arr([{elementName: 'div', children: ['r'], attributs: {x:1}}])
+      const div = testNode.childNodes[0].childNodes[0]
+      expect(div.innerHTML).toEqual('<!--ko slot: "X"--><div>r</div><!--[JSX P]--><!--/ko-->')
     })
   })
 })

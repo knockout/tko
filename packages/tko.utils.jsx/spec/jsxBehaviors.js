@@ -51,9 +51,9 @@ describe('jsx', function () {
       attributes: {}
     })
 
-    assert.equal(node.outerHTML, '<div>x<span>zzz</span>zzzy</div>')
+    assert.equal(node.outerHTML, '<div>x<span>zzz<!--[JSX P]--></span>zzz<!--[JSX P]-->y</div>')
     obs('fff')
-    assert.equal(node.outerHTML, '<div>x<span>fff</span>fffy</div>')
+    assert.equal(node.outerHTML, '<div>x<span>fff<!--[JSX P]--></span>fff<!--[JSX P]-->y</div>')
   })
 
   it('interjects an attribute observable', function () {
@@ -103,13 +103,13 @@ describe('jsx', function () {
       attributes: { }
     })
 
-    assert.equal(node.outerHTML, '<div>x<span in="x"></span>y</div>')
+    assert.equal(node.outerHTML, '<div>x<span in="x"></span><!--[JSX P]-->y</div>')
     obs(undefined)
-    assert.equal(node.outerHTML, '<div>x<!--[jsx placeholder]-->y</div>')
+    assert.equal(node.outerHTML, '<div>x<!--[JSX C]--><!--[JSX P]-->y</div>')
     obs({
       elementName: 'abbr', children: [], attributes: { in: 'y' }
     })
-    assert.equal(node.outerHTML, '<div>x<abbr in="y"></abbr>y</div>')
+    assert.equal(node.outerHTML, '<div>x<abbr in="y"></abbr><!--[JSX P]-->y</div>')
   })
 
   it('updates from observable child nodes', function () {

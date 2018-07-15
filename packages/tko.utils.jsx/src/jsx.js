@@ -213,13 +213,12 @@ function updateAttributes (node, attributes, subscriptions) {
  *
  * TODO: Use trackArrayChanges to minimize changes to the DOM and state-loss.
  */
-function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
+function replaceNodeOrNodes (newJsx, toReplace, placeholder) {
   const newNodeOrNodes = convertJsxChildToDom(newJsx)
-  const $context = contextFor(toReplace)
-  const firstNodeToReplace = Array.isArray(toReplace)
-    ? toReplace[0] || null : toReplace
+  const {parentNode} = placeholder
+  const $context = contextFor(parentNode)
 
-  insertChildOrChildren(parentNode, newNodeOrNodes, firstNodeToReplace)
+  insertChildOrChildren(parentNode, newNodeOrNodes, placeholder)
 
   if (Array.isArray(toReplace)) {
     for (const node of toReplace) { removeNode(node) }
@@ -229,7 +228,7 @@ function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
 
   if ($context) {
     if (Array.isArray(newNodeOrNodes)) {
-      for (const node of newNodeOrNodes) {
+      for (const node of newNodeOrNodes.filter(n => n.nodeType === 1 || n.nodeType === 8)) {
         applyBindings($context, node)
       }
     } else {
@@ -247,10 +246,12 @@ function replaceNodeOrNodes (newJsx, toReplace, parentNode) {
 function monitorObservableChild (node, child) {
   const jsx = unwrap(child)
   let toReplace = convertJsxChildToDom(jsx)
+  const placeholder = document.createComment('[JSX P]')
   appendChildOrChildren(node, toReplace)
+  getInsertTarget(node).appendChild(placeholder)
 
   const subscription = child.subscribe(newJsx => {
-    toReplace = replaceNodeOrNodes(newJsx, toReplace, node)
+    toReplace = replaceNodeOrNodes(newJsx, toReplace, placeholder)
   })
 
   return subscription
@@ -265,5 +266,5 @@ function convertJsxChildToDom (child) {
   return Array.isArray(child)
     ? child.map(convertJsxChildToDom)
     : child ? jsxToNode(child)
-      : document.createComment('[jsx placeholder]')
+      : document.createComment('[JSX C]')
 }
