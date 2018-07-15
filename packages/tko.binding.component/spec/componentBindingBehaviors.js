@@ -1212,7 +1212,7 @@ describe('Components: Component binding', function () {
       expect(em.tagName).toEqual('EM')
     })
 
-    it('preserves inserts JSX-based slots', function () {
+    it('preserves JSX-based slots', function () {
       testNode.innerHTML = ''
       testNode.appendChild(jsxToNode({
         elementName: 'test-component',
@@ -1285,6 +1285,24 @@ describe('Components: Component binding', function () {
       expect(NativeProvider.getNodeValues(em).attrx).toEqual(attrx)
     })
 
+    it('updates observable nodes', function () {
+      const obs = observable('text')
+
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // As-if it's from JSX:
+          return { elementName: 'div', attributes: {}, children: [obs] }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      expect(testNode.innerText).toEqual('text')
+      obs('téx†')
+      expect(testNode.innerText).toEqual('téx†')
+    })
+
     it('respects observable array changes', function () {
       testNode.innerHTML = ''
       const arr = observableArray([])
@@ -1322,9 +1340,9 @@ describe('Components: Component binding', function () {
       arr([])
       expect(testNode.innerText).toEqual('')
 
-      arr([{elementName: 'div', children: ['r'], attributs: {x:1}}])
+      arr([{elementName: 'div', children: ['r'], attributes: {x: 1}}, 'text'])
       const div = testNode.childNodes[0].childNodes[0]
-      expect(div.innerHTML).toEqual('<!--ko slot: "X"--><div>r</div><!--[JSX P]--><!--/ko-->')
+      expect(div.innerHTML).toEqual('<!--ko slot: "X"--><div>r</div>text<!--[JSX P]--><!--/ko-->')
     })
   })
 })

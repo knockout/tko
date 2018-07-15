@@ -43,6 +43,14 @@ export function maybeJsx (possibleJsx) {
 }
 
 /**
+ * True when Node is a type suitable for applyBindings
+ * @param {Node} node
+ */
+function canApplyBindings (node) {
+  return node.nodeType === 1 || node.nodeType === 8
+}
+
+/**
  * Clone a node from its original JSX if possible, otherwise using DOM cloneNode
  * This preserves any native attributes set by JSX.
  * @param {HTMLElemen} node
@@ -228,10 +236,10 @@ function replaceNodeOrNodes (newJsx, toReplace, placeholder) {
 
   if ($context) {
     if (Array.isArray(newNodeOrNodes)) {
-      for (const node of newNodeOrNodes.filter(n => n.nodeType === 1 || n.nodeType === 8)) {
+      for (const node of newNodeOrNodes.filter(canApplyBindings)) {
         applyBindings($context, node)
       }
-    } else {
+    } else if (canApplyBindings(newNodeOrNodes)) {
       applyBindings($context, newNodeOrNodes)
     }
   }
