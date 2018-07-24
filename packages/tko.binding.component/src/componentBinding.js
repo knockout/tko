@@ -39,7 +39,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
   setDomNodesFromJsx (jsx, element) {
     const jsxArray = Array.isArray(jsx) ? jsx : [jsx]
-    const domNodeChildren = jsxArray.map(jsxToNode)
+    const domNodeChildren = jsxArray.map(j => jsxToNode(j))
     virtualElements.setDomNodeChildren(element, domNodeChildren)
   }
 

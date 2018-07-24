@@ -910,6 +910,9 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
       expect(testNode.children[0].innerHTML).toEqual('<b>x</b><i>y</i><em>z</em>')
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[1] instanceof HTMLElement).toBeTruthy()
     })
 
     it('inserts partials from `children`', function () {
@@ -986,6 +989,8 @@ describe('Components: Component binding', function () {
       applyBindings(outerViewModel, testNode)
       expect(seen.x).toEqual(x)
       expect(seen.y()).toEqual(x)
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
     })
   })
 
@@ -1299,6 +1304,9 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       expect(testNode.innerText).toEqual('text')
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+
       obs('téx†')
       expect(testNode.innerText).toEqual('téx†')
     })
@@ -1333,6 +1341,8 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       expect(testNode.innerText).toEqual('')
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
 
       arr(['abc', 'def'])
       expect(testNode.innerText).toEqual('abcdef')

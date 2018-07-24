@@ -91,7 +91,6 @@ export function jsxToNode (jsx, xmlns) {
   const subscriptions = []
   let node
   if (isObservable(jsx)) {
-    debugger
     subscriptions.push(jsx.subscribe(v => {
       const parentNode = node.parentNode
       if (parentNode) {

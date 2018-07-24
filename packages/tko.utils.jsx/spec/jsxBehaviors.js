@@ -48,7 +48,6 @@ describe('jsx', function () {
     assert.equal(node.nodeValue, '[JSX J]')
     assert.strictEqual(node, parent.childNodes[0])
     obs('text')
-    debugger
     assert.instanceOf(parent.childNodes[0], Text)
     assert.equal(parent.childNodes[0].nodeValue, 'text')
     obs({elementName: 'b', attributes: {}, children: []})
