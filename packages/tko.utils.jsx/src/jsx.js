@@ -16,6 +16,7 @@ import {
 } from 'tko.provider.native'
 
 const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
+const NAMESPACES = { svg: 'http://www.w3.org/2000/svg' }
 
 /**
  *
@@ -83,29 +84,31 @@ export function cloneNodeFromOriginal (node) {
  *      children: [string | jsx]
  *    }
  */
-export function jsxToNode (jsx) {
+export function jsxToNode (jsx, xmlns) {
   if (typeof jsx === 'string') {
     return document.createTextNode(jsx)
   }
+  
+  xmlns = xmlns || jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || null
 
-  const node = document.createElement(jsx.elementName)
+  const node = document.createElementNS(xmlns, jsx.elementName)
   const subscriptions = []
 
   /** Slots need to be able to replicate with the attributes, which
    *  are not preserved when cloning from template nodes. */
   node[ORIGINAL_JSX_SYM] = jsx
 
-  updateAttributes(node, unwrap(jsx.attributes), subscriptions)
+  updateAttributes(node, unwrap(jsx.attributes), subscriptions, xmlns)
   if (isObservable(jsx.attributes)) {
     subscriptions.push(jsx.attributes.subscribe(attrs => {
-      updateAttributes(node, unwrap(attrs), subscriptions)
+      updateAttributes(node, unwrap(attrs), subscriptions, xmlns)
     }))
   }
 
-  updateChildren(node, unwrap(jsx.children), subscriptions)
+  updateChildren(node, unwrap(jsx.children), subscriptions, xmlns)
   if (isObservable(jsx.children)) {
     subscriptions.push(jsx.children.subscribe(children => {
-      updateChildren(node, children, subscriptions)
+      updateChildren(node, children, subscriptions, xmlns)
     }))
   }
 
@@ -160,7 +163,7 @@ function insertChildOrChildren (possibleTemplateElement, toAppend, beforeNode) {
  * @param {Array} children
  * @param {Array} subscriptions
  */
-function updateChildren (node, children, subscriptions) {
+function updateChildren (node, children, subscriptions, xmlns) {
   let lastChild = node.lastChild
   while (lastChild) {
     removeNode(lastChild)
@@ -169,9 +172,9 @@ function updateChildren (node, children, subscriptions) {
 
   for (const child of children || []) {
     if (isObservable(child)) {
-      subscriptions.push(monitorObservableChild(node, child))
+      subscriptions.push(monitorObservableChild(node, child, xmlns))
     } else {
-      appendChildOrChildren(node, convertJsxChildToDom(child))
+      appendChildOrChildren(node, convertJsxChildToDom(child, xmlns))
     }
   }
 }
@@ -182,13 +185,13 @@ function updateChildren (node, children, subscriptions) {
  * @param {string} name
  * @param {any} valueOrObservable
  */
-function setNodeAttribute (node, name, valueOrObservable) {
+function setNodeAttribute (node, name, valueOrObservable, xmlns) {
   const value = unwrap(valueOrObservable)
   NativeProvider.addValueToNode(node, name, valueOrObservable)
   if (typeof value === 'string') {
-    node.setAttribute(name, value)
+    node.setAttributeNS(xmlns, name, value)
   } else if (value === undefined) {
-    node.removeAttribute(name)
+    node.removeAttributeNS(xmlns, name)
   }
 }
 
@@ -198,18 +201,18 @@ function setNodeAttribute (node, name, valueOrObservable) {
  * @param {Object} attributes
  * @param {Array} subscriptions
  */
-function updateAttributes (node, attributes, subscriptions) {
+function updateAttributes (node, attributes, subscriptions, xmlns) {
   while (node.attributes.length) {
-    node.removeAttribute(node.attributes[0].name)
+    node.removeAttributeNS(xmlns, node.attributes[0].name)
   }
 
   for (const [name, value] of Object.entries(attributes || {})) {
     if (isObservable(value)) {
       subscriptions.push(
-        value.subscribe(attr => setNodeAttribute(node, name, value))
+        value.subscribe(attr => setNodeAttribute(node, name, value, xmlns))
       )
     }
-    setNodeAttribute(node, name, value)
+    setNodeAttribute(node, name, value, xmlns)
   }
 }
 
@@ -221,8 +224,8 @@ function updateAttributes (node, attributes, subscriptions) {
  *
  * TODO: Use trackArrayChanges to minimize changes to the DOM and state-loss.
  */
-function replaceNodeOrNodes (newJsx, toReplace, placeholder) {
-  const newNodeOrNodes = convertJsxChildToDom(newJsx)
+function replaceNodeOrNodes (newJsx, toReplace, placeholder, xmlns) {
+  const newNodeOrNodes = convertJsxChildToDom(newJsx, xmlns)
   const {parentNode} = placeholder
   const $context = contextFor(parentNode)
 
@@ -251,15 +254,15 @@ function replaceNodeOrNodes (newJsx, toReplace, placeholder) {
  * @param {HTMLElement} node
  * @param {jsx|Array} child
  */
-function monitorObservableChild (node, child) {
+function monitorObservableChild (node, child, xmlns) {
   const jsx = unwrap(child)
-  let toReplace = convertJsxChildToDom(jsx)
+  let toReplace = convertJsxChildToDom(jsx, xmlns)
   const placeholder = document.createComment('[JSX P]')
   appendChildOrChildren(node, toReplace)
   getInsertTarget(node).appendChild(placeholder)
 
   const subscription = child.subscribe(newJsx => {
-    toReplace = replaceNodeOrNodes(newJsx, toReplace, placeholder)
+    toReplace = replaceNodeOrNodes(newJsx, toReplace, placeholder, xmlns)
   })
 
   return subscription
@@ -270,9 +273,9 @@ function monitorObservableChild (node, child) {
  * @param {string|array|jsx} child
  * @return {Array|Comment|HTMLElement}
  */
-function convertJsxChildToDom (child) {
+function convertJsxChildToDom (child, xmlns) {
   return Array.isArray(child)
-    ? child.map(convertJsxChildToDom)
-    : child ? jsxToNode(child)
+    ? child.map(node => convertJsxChildToDom(node, xmlns))
+    : child ? jsxToNode(child, xmlns)
       : document.createComment('[JSX C]')
 }

@@ -145,4 +145,17 @@ describe('jsx', function () {
     assert.strictEqual(nodeValues['any'], obs)
     assert.equal(nodeValues['any2'], 'e')
   })
+
+  it('inserts SVG nodes and children correctly', function () {
+    const obs = observable()
+    const circle = { elementName: 'circle', children: [], attributes: {} }
+    const svg = { elementName: 'svg', children: [circle, obs], attributes: { abc: '123' } }
+    const node = jsxToNode(svg)
+    assert.instanceOf(node, SVGElement)
+    assert.instanceOf(node.childNodes[0], SVGElement)
+    assert.lengthOf(node.childNodes, 3)
+    obs({ elementName: 'rect', children: [], attributes: {} })
+    assert.equal(node.childNodes[1].tagName, 'rect')
+    assert.instanceOf(node.childNodes[1], SVGElement)
+  })
 })
