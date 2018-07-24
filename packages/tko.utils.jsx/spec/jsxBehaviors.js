@@ -38,6 +38,25 @@ describe('jsx', function () {
       '<div-som attrx="y"></div-som>more text</abc-def>')
   })
 
+  it('unwraps and monitors the parameter', function () {
+    const obs = observable()
+    const node = jsxToNode(obs)
+    // A parent is needed because we use replaceNode.
+    const parent = document.createElement('div')
+    parent.appendChild(node)
+    assert.instanceOf(node, Comment)
+    assert.equal(node.nodeValue, '[JSX J]')
+    assert.strictEqual(node, parent.childNodes[0])
+    obs('text')
+    debugger
+    assert.instanceOf(parent.childNodes[0], Text)
+    assert.equal(parent.childNodes[0].nodeValue, 'text')
+    obs({elementName: 'b', attributes: {}, children: []})
+    assert.equal(parent.innerHTML, '<b></b>')
+    obs(undefined)
+    assert.equal(parent.innerHTML, '<!--[JSX J]-->')
+  })
+
   it('interjects a text observable', function () {
     const obs = observable('zzz')
     const child = {
@@ -117,11 +136,7 @@ describe('jsx', function () {
       elementName: 'span', children: [], attributes: { in: 'x' }
     }, "def"])
 
-    const node = jsxToNode({
-      elementName: "div",
-      children: obs,
-      attributes: { }
-    })
+    const node = jsxToNode({ elementName: "div", children: obs, attributes: { } })
 
     assert.equal(node.outerHTML, '<div>abc<span in="x"></span>def</div>')
     obs(undefined)
@@ -130,6 +145,24 @@ describe('jsx', function () {
       elementName: 'abbr', children: [], attributes: { in: 'y' }
     }, 'y'])
     assert.equal(node.outerHTML, '<div>x<abbr in="y"></abbr>y</div>')
+  })
+
+  it('tracks observables in observable arrays', function () {
+    const obs = observable([])
+    const o2 = observable()
+    const node = jsxToNode({ elementName: "i", children: obs, attributes: { } })
+
+    assert.equal(node.outerHTML, '<i></i>')
+    obs([o2])
+    assert.equal(node.outerHTML, '<i><!--[JSX C]--><!--[JSX P]--></i>')
+    o2('text')
+    assert.equal(node.outerHTML, '<i>text<!--[JSX P]--></i>')
+    o2(['123', '456'])
+    assert.equal(node.outerHTML, '<i>123456<!--[JSX P]--></i>')
+    o2([])
+    assert.equal(node.outerHTML, '<i><!--[JSX P]--></i>')
+    o2('r2d2')
+    assert.equal(node.outerHTML, '<i>r2d2<!--[JSX P]--></i>')
   })
 
   it('does not unwrap observables for binding handlers', function () {
@@ -158,4 +191,5 @@ describe('jsx', function () {
     assert.equal(node.childNodes[1].tagName, 'rect')
     assert.instanceOf(node.childNodes[1], SVGElement)
   })
+
 })

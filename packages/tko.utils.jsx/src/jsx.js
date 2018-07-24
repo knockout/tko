@@ -85,31 +85,44 @@ export function cloneNodeFromOriginal (node) {
  *    }
  */
 export function jsxToNode (jsx, xmlns) {
-  if (typeof jsx === 'string') {
-    return document.createTextNode(jsx)
-  }
-  
-  xmlns = xmlns || jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || null
-
-  const node = document.createElementNS(xmlns, jsx.elementName)
   const subscriptions = []
-
-  /** Slots need to be able to replicate with the attributes, which
-   *  are not preserved when cloning from template nodes. */
-  node[ORIGINAL_JSX_SYM] = jsx
-
-  updateAttributes(node, unwrap(jsx.attributes), subscriptions, xmlns)
-  if (isObservable(jsx.attributes)) {
-    subscriptions.push(jsx.attributes.subscribe(attrs => {
-      updateAttributes(node, unwrap(attrs), subscriptions, xmlns)
+  let node
+  if (isObservable(jsx)) {
+    debugger
+    subscriptions.push(jsx.subscribe(v => {
+      const parentNode = node.parentNode
+      if (parentNode) {
+        const newNode = jsxToNode(v, xmlns)
+        parentNode.replaceChild(newNode, node)
+        node = newNode
+      }
     }))
-  }
-
-  updateChildren(node, unwrap(jsx.children), subscriptions, xmlns)
-  if (isObservable(jsx.children)) {
-    subscriptions.push(jsx.children.subscribe(children => {
-      updateChildren(node, children, subscriptions, xmlns)
-    }))
+    node = jsxToNode(jsx(), xmlns)
+  } else if (typeof jsx === 'string') {
+    return document.createTextNode(jsx)
+  } else if (!jsx) {
+    return document.createComment('[JSX J]')
+  } else {
+    xmlns = xmlns || jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || null
+    node = document.createElementNS(xmlns, jsx.elementName)
+  
+    /** Slots need to be able to replicate with the attributes, which
+     *  are not preserved when cloning from template nodes. */
+    node[ORIGINAL_JSX_SYM] = jsx
+  
+    updateAttributes(node, unwrap(jsx.attributes), subscriptions, xmlns)
+    if (isObservable(jsx.attributes)) {
+      subscriptions.push(jsx.attributes.subscribe(attrs => {
+        updateAttributes(node, unwrap(attrs), subscriptions, xmlns)
+      }))
+    }
+  
+    updateChildren(node, unwrap(jsx.children), subscriptions, xmlns)
+    if (isObservable(jsx.children)) {
+      subscriptions.push(jsx.children.subscribe(children => {
+        updateChildren(node, children, subscriptions, xmlns)
+      }))
+    }
   }
 
   if (subscriptions.length) {
@@ -118,6 +131,7 @@ export function jsxToNode (jsx, xmlns) {
 
   return node
 }
+
 
 function getInsertTarget (possibleTemplateElement) {
   return 'content' in possibleTemplateElement
