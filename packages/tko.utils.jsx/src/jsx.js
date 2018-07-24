@@ -105,8 +105,8 @@ export function jsxToNode (jsx, xmlns) {
   } else if (!jsx) {
     return document.createComment('[JSX J]')
   } else {
-    xmlns = xmlns || jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || NAMESPACES.html
-    node = document.createElementNS(xmlns, jsx.elementName)
+    xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || xmlns
+    node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
   
     /** Slots need to be able to replicate with the attributes, which
      *  are not preserved when cloning from template nodes. */
@@ -201,13 +201,13 @@ function updateChildren (node, children, subscriptions, xmlns) {
  * @param {string} name
  * @param {any} valueOrObservable
  */
-function setNodeAttribute (node, name, valueOrObservable, xmlns) {
+function setNodeAttribute (node, name, valueOrObservable) {
   const value = unwrap(valueOrObservable)
   NativeProvider.addValueToNode(node, name, valueOrObservable)
   if (typeof value === 'string') {
-    node.setAttributeNS(xmlns, name, value)
+    node.setAttributeNS(null, name, value)
   } else if (value === undefined) {
-    node.removeAttributeNS(xmlns, name)
+    node.removeAttributeNS(null, name)
   }
 }
 
@@ -217,18 +217,18 @@ function setNodeAttribute (node, name, valueOrObservable, xmlns) {
  * @param {Object} attributes
  * @param {Array} subscriptions
  */
-function updateAttributes (node, attributes, subscriptions, xmlns) {
+function updateAttributes (node, attributes, subscriptions) {
   while (node.attributes.length) {
-    node.removeAttributeNS(xmlns, node.attributes[0].name)
+    node.removeAttributeNS(null, node.attributes[0].name)
   }
 
   for (const [name, value] of Object.entries(attributes || {})) {
     if (isObservable(value)) {
       subscriptions.push(
-        value.subscribe(attr => setNodeAttribute(node, name, value, xmlns))
+        value.subscribe(attr => setNodeAttribute(node, name, value))
       )
     }
-    setNodeAttribute(node, name, value, xmlns)
+    setNodeAttribute(node, name, value)
   }
 }
 
