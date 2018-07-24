@@ -16,7 +16,10 @@ import {
 } from 'tko.provider.native'
 
 const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
-const NAMESPACES = { svg: 'http://www.w3.org/2000/svg' }
+const NAMESPACES = {
+  svg: 'http://www.w3.org/2000/svg',
+  html: 'http://www.w3.org/1999/xhtml'
+}
 
 /**
  *
@@ -103,7 +106,7 @@ export function jsxToNode (jsx, xmlns) {
   } else if (!jsx) {
     return document.createComment('[JSX J]')
   } else {
-    xmlns = xmlns || jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || null
+    xmlns = xmlns || jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || NAMESPACES.html
     node = document.createElementNS(xmlns, jsx.elementName)
   
     /** Slots need to be able to replicate with the attributes, which

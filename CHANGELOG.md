@@ -1,8 +1,12 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 🎒 `alpha-5b` (5 July 2018)
+## 🎒 `alpha-5a..ongoing` (5 July 2018)
 
+* Test release
 * Fix auto-unwrapping of Jsx attributes
+* Allow JSX to be used with SVG elements, and respect xmlns attribute
+* Refresh JSX node when it's subscribable
+* Make `<slot>` elements and JSX play better together
 
 ## 🎩  `alpha-5` (4 July 2018)
 
