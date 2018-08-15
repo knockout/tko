@@ -7,6 +7,7 @@ Our sincerest thanks for the financial support.
 ☕️  Michael Balsom (since 2017/11)
 ☕️  Sebastian Gfeller (since 2018/06)
 ☕️  Yujiro Hata (since 2017/12)
+☕️  Jonathan Carter (since 2018/07)
 
 Ryan Niemeyer (since 2017/11)
 Peter Nicholson (since 2017/11)
