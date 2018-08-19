@@ -29,8 +29,8 @@ function getPackageRoot () {
 }
 
 const BROWSER_PACKAGES = [
-  '@tko/build.knockout',
-  '@tko/build.reference'
+  'build.knockout',
+  'build.reference'
 ]
 
 const IS_BROWSER_BUNDLE = BROWSER_PACKAGES.includes(getPackageName())
