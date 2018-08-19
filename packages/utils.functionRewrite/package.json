@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.functionRewrite",
-  "version": "4.0.0-alpha6.0",
+  "version": "4.0.0-alpha6.1",
   "description": "Rewrite `function {}` as lambdas (=>)",
   "module": "dist/utils.functionRewrite.js",
   "files": [
