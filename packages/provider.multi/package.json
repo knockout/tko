@@ -2,7 +2,7 @@
   "name": "@tko/provider.multi",
   "version": "4.0.0-alpha6.0",
   "description": "Combine multiple other providers into one",
-  "module": "dist/tko.provider.multi.js",
+  "module": "dist/provider.multi.js",
   "files": [
     "dist/"
   ],

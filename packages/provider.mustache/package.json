@@ -2,7 +2,7 @@
   "name": "@tko/provider.mustache",
   "version": "4.0.0-alpha6.0",
   "description": "Interpolate text/node attributes {{ }}",
-  "module": "dist/tko.provider.mustache.js",
+  "module": "dist/provider.mustache.js",
   "files": [
     "dist/"
   ],

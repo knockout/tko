@@ -2,7 +2,7 @@
   "name": "@tko/builder",
   "version": "4.0.0-alpha6.0",
   "description": "Compile a customized instance of Knockout.",
-  "main": "dist/tko.builder.js",
+  "main": "dist/builder.js",
   "repository": "git@github.com:knockout/tko",
   "author": "The Knockout Team",
   "license": "MIT",

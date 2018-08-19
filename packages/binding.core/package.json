@@ -2,7 +2,7 @@
   "name": "@tko/binding.core",
   "version": "4.0.0-alpha6.0",
   "description": "TKO Core bindings",
-  "module": "dist/tko.binding.core.js",
+  "module": "dist/binding.core.js",
   "files": [
     "dist/"
   ],

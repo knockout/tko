@@ -1,5 +1,5 @@
 {
-  "module": "dist/tko.lifecycle.js",
+  "module": "dist/lifecycle.js",
   "dependencies": {
     "@tko/computed": "^4.0.0-alpha6.0",
     "@tko/utils": "^4.0.0-alpha6.0",

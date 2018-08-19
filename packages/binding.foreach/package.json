@@ -2,7 +2,7 @@
   "name": "@tko/binding.foreach",
   "version": "4.0.0-alpha6.0",
   "description": "Knockout Foreach Binding",
-  "module": "dist/tko.binding.foreach.js",
+  "module": "dist/binding.foreach.js",
   "scripts": {
     "test": "karma start ../../karma.conf.js --once",
     "build": "rollup -c ../../rollup.config.js",

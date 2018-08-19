@@ -2,7 +2,7 @@
   "name": "@tko/provider.databind",
   "version": "4.0.0-alpha6.0",
   "description": "Link HTML attributes based on a `data-bind` HTML attribute",
-  "module": "dist/tko.provider.databind.js",
+  "module": "dist/provider.databind.js",
   "files": [
     "dist/"
   ],
