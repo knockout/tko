@@ -1,6 +1,6 @@
 import {
   stringTrim
-} from 'tko.utils'
+} from '@tko/utils'
 
 /* eslint no-cond-assign: 0 */
 

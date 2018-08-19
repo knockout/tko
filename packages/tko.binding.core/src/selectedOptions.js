@@ -2,11 +2,11 @@
 import {
     arrayForEach, setOptionNodeSelectionState, arrayIndexOf,
     registerEventHandler, tagNameLower, selectExtensions
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 export var selectedOptions = {
   after: ['options', 'foreach'],

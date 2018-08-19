@@ -1,6 +1,6 @@
 import {
     extenders
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed

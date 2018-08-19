@@ -12,31 +12,31 @@
 
 import {
   options, triggerEvent
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
   applyBindings,
   dataFor,
   bindingContext
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
   Parser, Identifier, Arguments
-} from 'tko.utils.parser'
+} from '@tko/utils.parser'
 
 import {
   DataBindProvider
 } from '../src'
 
-import * as coreBindings from 'tko.binding.core';
+import * as coreBindings from '@tko/binding.core';
 
 var instance
 

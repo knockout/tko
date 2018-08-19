@@ -38,15 +38,15 @@ import {
   toggleDomNodeCssClass,
   triggerEvent,
   virtualElements
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   parseObjectLiteral
-} from 'tko.utils.parser'
+} from '@tko/utils.parser'
 
 import {
   LifeCycle
-} from 'tko.lifecycle'
+} from '@tko/lifecycle'
 
 import {
     // applyExtenders,
@@ -65,7 +65,7 @@ import {
     toJS,
     toJSON,
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed,
@@ -74,7 +74,7 @@ import {
     proxy,
     pureComputed,
     when
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
     applyBindingAccessorsToNode,
@@ -87,7 +87,7 @@ import {
     BindingHandler,
     AsyncBindingHandler,
     setDomNodeChildrenFromArrayMapping
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     anonymousTemplate,
@@ -97,7 +97,7 @@ import {
     setTemplateEngine,
     templateEngine
     // templateSources
-} from 'tko.binding.template'
+} from '@tko/binding.template'
 
 const domNodeDisposal = {
   addDisposeCallback,

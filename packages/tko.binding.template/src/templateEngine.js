@@ -27,7 +27,7 @@
 
 import {
   extend, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   domElement, anonymousTemplate

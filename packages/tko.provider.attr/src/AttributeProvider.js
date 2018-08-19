@@ -1,7 +1,7 @@
 
 import {
   Provider
-} from 'tko.provider'
+} from '@tko/provider'
 
 /**
  * Convert attributes with ko-* to bindings.

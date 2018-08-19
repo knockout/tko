@@ -5,7 +5,7 @@
 //
 import {
     arrayIndexOf
-} from 'tko.utils'
+} from '@tko/utils'
 
 import { isObservable } from './observable.js'
 

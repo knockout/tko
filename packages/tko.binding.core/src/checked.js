@@ -1,15 +1,15 @@
 
 import {
     registerEventHandler, arrayIndexOf, addOrRemoveItem
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap, dependencyDetection, isWriteableObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed, pureComputed
-} from 'tko.computed'
+} from '@tko/computed'
 
 export var checked = {
   after: ['value', 'attr'],

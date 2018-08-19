@@ -1,19 +1,19 @@
 /* globals testNode */
 import {
     applyBindings, contextFor
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { DataBindProvider } from 'tko.provider.databind'
-import { MultiProvider } from 'tko.provider.multi'
-import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { VirtualProvider } from '@tko/provider.virtual'
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   bindings as ifBindings
@@ -22,7 +22,7 @@ import {
   // nativeTemplateEngine
 } from '../src'
 
-import {bindings as coreBindings} from 'tko.binding.core'
+import {bindings as coreBindings} from '@tko/binding.core'
 
 import 'tko.utils/helpers/jasmine-13-helper.js'
 

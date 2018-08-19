@@ -1,11 +1,11 @@
 
 import {
   setElementName, objectForEach
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 export var attr = {
   update: function (element, valueAccessor, allBindings) {

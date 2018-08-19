@@ -1,7 +1,7 @@
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 export var enable = {
   update: function (element, valueAccessor) {

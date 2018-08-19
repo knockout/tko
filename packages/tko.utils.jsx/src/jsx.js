@@ -1,19 +1,19 @@
 
 import {
   removeNode, addDisposeCallback
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   isObservable, unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   contextFor, applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
   NativeProvider
-} from 'tko.provider.native'
+} from '@tko/provider.native'
 
 const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 const NAMESPACES = {

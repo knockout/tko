@@ -1,7 +1,7 @@
 
 import {
     arrayFilter, arrayMap, selectExtensions
-} from 'tko.utils'
+} from '@tko/utils'
 
 /**
  * Note that these matchers cannot be included in jasmine-13-helpers.js.

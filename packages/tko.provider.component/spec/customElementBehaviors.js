@@ -1,46 +1,46 @@
 
 import {
     options, tasks, objectForEach, cleanNode, triggerEvent
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable, isWritableObservable, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     isComputed
-} from 'tko.computed'
+} from '@tko/computed'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { DataBindProvider } from 'tko.provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     applyBindings, dataFor
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import {
     bindings as templateBindings
-} from 'tko.binding.template'
+} from '@tko/binding.template'
 
 import {
     bindings as ifBindings
-} from 'tko.binding.if'
+} from '@tko/binding.if'
 
-import components from 'tko.utils.component'
+import components from '@tko/utils.component'
 
 import {
   bindings as componentBindings
-} from 'tko.binding.component'
+} from '@tko/binding.component'
 
 import {ComponentProvider} from '../src'
 
 import {
     useMockForTasks
-} from 'tko.utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Components: Custom elements', function () {
   var bindingHandlers

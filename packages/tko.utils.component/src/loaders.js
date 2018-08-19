@@ -2,7 +2,7 @@
 import {
     isDomElement, isDocumentFragment, tagNameLower, parseHtmlFragment,
     makeArray, cloneNodes, hasOwnProperty
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {registry} from './registry'
 

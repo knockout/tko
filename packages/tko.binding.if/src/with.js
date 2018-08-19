@@ -1,11 +1,11 @@
 
 import {
   options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import ConditionalBindingHandler from './ConditionalBindingHandler'
 

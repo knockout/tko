@@ -4,7 +4,7 @@
 
 import {
   observable, observableArray, unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   computed

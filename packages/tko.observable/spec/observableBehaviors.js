@@ -1,7 +1,7 @@
 
 import {
   arrayForEach
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable, isSubscribable, isObservable,

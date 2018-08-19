@@ -2,20 +2,20 @@ import {
     virtualElements, fixUpContinuousNodeArray, replaceDomNodes, memoization,
     domNodeIsAttachedToDocument, moveCleanedNodesToContainerElement,
     arrayFilter, domData, options as koOptions
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     applyBindings, setDomNodeChildrenFromArrayMapping, AsyncBindingHandler,
     bindingEvent, bindingContext as BindingContextConstructor
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
     isObservable, dependencyDetection, unwrap, observable, isObservableArray
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     templateEngine

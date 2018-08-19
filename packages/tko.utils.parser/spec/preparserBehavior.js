@@ -1,7 +1,7 @@
 
 import {
   DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 import parseObjectLiteral from '../src/preparse'
 

@@ -2,11 +2,11 @@
 
 import {
   options
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
   observable
-} from 'tko.observable';
+} from '@tko/observable';
 
 import {
   Parser

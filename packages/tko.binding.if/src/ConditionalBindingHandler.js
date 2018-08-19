@@ -1,14 +1,14 @@
 import {
     cloneNodes, virtualElements, cleanNode, domData
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     dependencyDetection, observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     applyBindingsToDescendants, AsyncBindingHandler
-} from 'tko.bind'
+} from '@tko/bind'
 
 /**
  * Create a DOMbinding that controls DOM nodes presence

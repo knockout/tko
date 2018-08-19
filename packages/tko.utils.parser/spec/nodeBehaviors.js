@@ -2,7 +2,7 @@
 
 import {
   observable
-} from 'tko.observable';
+} from '@tko/observable';
 
 import {
   Parser, Node, Arguments, Identifier

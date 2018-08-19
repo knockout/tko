@@ -3,7 +3,7 @@
  */
 import {
   BindingHandler
-} from 'tko.bind'
+} from '@tko/bind'
 
 export default class DescendantsCompleteHandler extends BindingHandler {
   onDescendantsComplete () {

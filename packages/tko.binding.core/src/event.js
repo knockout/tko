@@ -2,7 +2,7 @@
 import {
     objectForEach, registerEventHandler, makeArray,
     throttle as throttleFn, debounce as debounceFn
-} from 'tko.utils'
+} from '@tko/utils'
 
 // For certain common events (currently just 'click'), allow a simplified data-binding syntax
 // e.g. click:handler instead of the usual full-length event:{click:handler}

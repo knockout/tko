@@ -16,15 +16,15 @@
  */
 import {
   virtualElements
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   cloneNodeFromOriginal
-} from 'tko.utils.jsx'
+} from '@tko/utils.jsx'
 
 import {
   DescendantBindingHandler, contextFor
-} from 'tko.bind'
+} from '@tko/bind'
 
 /**
  * SlotBinding replaces a slot with

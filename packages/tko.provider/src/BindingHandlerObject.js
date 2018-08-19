@@ -1,7 +1,7 @@
 
 import {
   options
-} from 'tko.utils'
+} from '@tko/utils'
 
 export default class BindingHandlerObject {
   set (nameOrObject, value) {

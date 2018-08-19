@@ -1,7 +1,7 @@
 
 import {
   Provider
-} from 'tko.provider'
+} from '@tko/provider'
 
 export default class MultiProvider extends Provider {
   get FOR_NODE_TYPES () { return this.nodeTypes }

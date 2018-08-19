@@ -2,11 +2,11 @@
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     cleanNode
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   LifeCycle

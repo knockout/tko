@@ -2,11 +2,11 @@
 import Node from './Node'
 import Arguments from './Arguments'
 
-import { hasOwnProperty } from 'tko.utils'
+import { hasOwnProperty } from '@tko/utils'
 
 import {
   isWriteableObservable, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   IDStart, IDContinue

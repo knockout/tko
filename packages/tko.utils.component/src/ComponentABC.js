@@ -26,7 +26,7 @@
  * NOTE: A Component created this way can add events to the component node
  * with `this.addEventListener(type, action)`.
  */
-import {LifeCycle} from 'tko.lifecycle'
+import {LifeCycle} from '@tko/lifecycle'
 import {register, VIEW_MODEL_FACTORY} from './loaders'
 
 export class ComponentABC extends LifeCycle {

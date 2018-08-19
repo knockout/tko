@@ -4,15 +4,15 @@
 import {
     extend, objectMap, virtualElements, tagNameLower, domData, objectForEach,
     arrayIndexOf, arrayForEach, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     dependencyDetection
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
   dataFor, bindingContext, boundElementDomDataKey, contextSubscribeSymbol

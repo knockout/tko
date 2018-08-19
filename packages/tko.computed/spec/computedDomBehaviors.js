@@ -1,10 +1,10 @@
 import {
     domData
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable as Observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed as Computed

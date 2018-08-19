@@ -4,7 +4,7 @@
 //
 import {
     arrayIndexOf, arrayForEach, overwriteLengthPropertyIfSupported
-} from 'tko.utils'
+} from '@tko/utils'
 
 import { observable, isObservable } from './observable.js'
 

@@ -1,11 +1,11 @@
 
 import {
   unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   Provider
-} from 'tko.provider'
+} from '@tko/provider'
 
 import {
   parseInterpolation

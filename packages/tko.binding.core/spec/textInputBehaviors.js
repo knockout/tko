@@ -1,21 +1,21 @@
 /* global testNode */
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     triggerEvent, options
-} from 'tko.utils'
+} from '@tko/utils'
 
-import { DataBindProvider } from 'tko.provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import { bindings as coreBindings } from '../src'
 

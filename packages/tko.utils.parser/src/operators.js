@@ -1,6 +1,6 @@
 import {
   unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 export function LAMBDA () {}
 

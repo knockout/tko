@@ -1,11 +1,11 @@
 
 import {
     createSymbolOrString, toggleDomNodeCssClass, objectForEach, stringTrim
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 export var css = {
   aliases: ['class'],

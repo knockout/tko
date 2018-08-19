@@ -2,7 +2,7 @@
 //  Defer Updates
 //  ===
 //
-import { tasks } from 'tko.utils'
+import { tasks } from '@tko/utils'
 
 export function deferUpdates (target) {
   if (target._deferUpdates) { return }

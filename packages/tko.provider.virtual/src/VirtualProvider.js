@@ -1,10 +1,10 @@
 import {
   virtualElements
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   BindingStringProvider
-} from 'tko.provider.bindingstring'
+} from '@tko/provider.bindingstring'
 
 export default class VirtualProvider extends BindingStringProvider {
   get FOR_NODE_TYPES () { return [ 1, 8 ] }

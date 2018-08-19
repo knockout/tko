@@ -1,11 +1,11 @@
 
 import {
     createSymbolOrString, triggerEvent, registerEventHandler
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap, dependencyDetection
-} from 'tko.observable'
+} from '@tko/observable'
 
 var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
 var hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue')

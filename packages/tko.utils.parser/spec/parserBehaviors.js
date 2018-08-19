@@ -2,24 +2,24 @@
 
 import {
   options
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
   observable,
   unwrap,
   isObservable
-} from 'tko.observable';
+} from '@tko/observable';
 
 import {
   applyBindings
-} from 'tko.bind';
+} from '@tko/bind';
 
-import { DataBindProvider } from 'tko.provider.databind'
-import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
+import { VirtualProvider } from '@tko/provider.virtual'
 
 import {
   bindings as coreBindings
-} from 'tko.binding.core';
+} from '@tko/binding.core';
 
 import {
   Parser

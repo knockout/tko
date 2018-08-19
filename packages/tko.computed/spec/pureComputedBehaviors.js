@@ -1,6 +1,6 @@
 import {
     isWriteableObservable, observable, dependencyDetection
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     isPureComputed, isComputed, computed, pureComputed

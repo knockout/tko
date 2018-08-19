@@ -1,11 +1,11 @@
 
 import {
   domData, removeDisposeCallback, arrayRemoveItem, addDisposeCallback
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   subscribable
-} from 'tko.observable'
+} from '@tko/observable'
 
 export const contextAncestorBindingInfo = Symbol('_ancestorBindingInfo')
 const boundElementDomDataKey = domData.nextKey()

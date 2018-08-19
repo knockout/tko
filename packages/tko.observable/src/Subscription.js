@@ -1,7 +1,7 @@
 
 import {
   removeDisposeCallback, addDisposeCallback
-} from 'tko.utils'
+} from '@tko/utils'
 
 
 export default class Subscription {

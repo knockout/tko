@@ -1,31 +1,31 @@
 import {
     options, tasks, domData, triggerEvent, cleanNode
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observableArray, observable, isWritableObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { DataBindProvider } from 'tko.provider.databind'
-import { VirtualProvider } from 'tko.provider.virtual'
-import { ComponentProvider } from 'tko.provider.component'
+import { MultiProvider } from '@tko/provider.multi'
+import { DataBindProvider } from '@tko/provider.databind'
+import { VirtualProvider } from '@tko/provider.virtual'
+import { ComponentProvider } from '@tko/provider.component'
 
 import {
     applyBindings, dataFor
-} from 'tko.bind'
+} from '@tko/bind'
 
-import { bindings as coreBindings } from 'tko.binding.core'
-import { bindings as templateBindings } from 'tko.binding.template'
-import { bindings as ifBindings } from 'tko.binding.if'
-import { bindings as componentBindings } from 'tko.binding.component'
+import { bindings as coreBindings } from '@tko/binding.core'
+import { bindings as templateBindings } from '@tko/binding.template'
+import { bindings as ifBindings } from '@tko/binding.if'
+import { bindings as componentBindings } from '@tko/binding.component'
 
 import components from '../src'
 const {ComponentABC} = components
 
 import {
     useMockForTasks
-} from 'tko.utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('ComponentABC', function () {
   var testComponentName = 'test-component',

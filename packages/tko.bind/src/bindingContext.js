@@ -1,15 +1,15 @@
 import {
     extend, options, anyDomNodeIsAttachedToDocument, addDisposeCallback,
     arrayRemoveItem, domData
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     computed, pureComputed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
     unwrap, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   contextAncestorBindingInfo

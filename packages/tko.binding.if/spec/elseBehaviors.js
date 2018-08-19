@@ -1,19 +1,19 @@
 /* eslint semi: 0 */
 import {
     applyBindings
-} from 'tko.bind';
+} from '@tko/bind';
 
 import {
     observable
-} from 'tko.observable';
+} from '@tko/observable';
 
-import { DataBindProvider } from 'tko.provider.databind'
-import { MultiProvider } from 'tko.provider.multi'
-import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { VirtualProvider } from '@tko/provider.virtual'
 
 import {
     options
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
     bindings as ifBindings
@@ -21,7 +21,7 @@ import {
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core';
+} from '@tko/binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 

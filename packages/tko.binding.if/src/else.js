@@ -1,10 +1,10 @@
 import {
     virtualElements, domData
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   IfBindingHandler

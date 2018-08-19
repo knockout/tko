@@ -1,6 +1,6 @@
 import {
     setTextContent
-} from 'tko.utils'
+} from '@tko/utils'
 
 export var text = {
   init: function () {

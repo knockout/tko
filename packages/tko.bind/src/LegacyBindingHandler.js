@@ -1,11 +1,11 @@
 
 import {
   virtualElements, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   dependencyDetection
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   BindingHandler

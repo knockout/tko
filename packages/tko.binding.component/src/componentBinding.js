@@ -4,27 +4,27 @@
 
 import {
   virtualElements, makeArray, cloneNodes
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   unwrap, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   DescendantBindingHandler, applyBindingsToDescendants
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
   jsxToNode, maybeJsx
-} from 'tko.utils.jsx'
+} from '@tko/utils.jsx'
 
 import {
   NativeProvider
-} from 'tko.provider.native'
+} from '@tko/provider.native'
 
-import {LifeCycle} from 'tko.lifecycle'
+import {LifeCycle} from '@tko/lifecycle'
 
-import registry from 'tko.utils.component'
+import registry from '@tko/utils.component'
 
 var componentLoadingOperationUniqueId = 0
 

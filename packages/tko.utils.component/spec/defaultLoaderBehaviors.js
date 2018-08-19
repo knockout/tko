@@ -1,6 +1,6 @@
 import {
     parseHtmlFragment
-} from 'tko.utils'
+} from '@tko/utils'
 
 import components from '../src'
 

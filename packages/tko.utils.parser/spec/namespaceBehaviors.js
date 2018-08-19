@@ -2,23 +2,23 @@
 
 import {
   options, triggerEvent
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
   observable
-} from 'tko.observable';
+} from '@tko/observable';
 
 import {
   applyBindings
-} from 'tko.bind';
+} from '@tko/bind';
 
 import {
   DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 import {
   bindings as coreBindings
-} from 'tko.binding.core';
+} from '@tko/binding.core';
 
 import {
   Parser

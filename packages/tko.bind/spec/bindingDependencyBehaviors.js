@@ -2,31 +2,31 @@
 
 import {
     options
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
     removeNode, triggerEvent, extend
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
     unwrap,
     observable as observableConstructor
-} from 'tko.observable';
+} from '@tko/observable';
 
 import {
     computed as computedConstructor
-} from 'tko.computed';
+} from '@tko/computed';
 
-import { MultiProvider } from 'tko.provider.multi';
-import { DataBindProvider } from 'tko.provider.databind';
-import { VirtualProvider } from 'tko.provider.virtual';
+import { MultiProvider } from '@tko/provider.multi';
+import { DataBindProvider } from '@tko/provider.databind';
+import { VirtualProvider } from '@tko/provider.virtual';
 
 import {
     applyBindings, contextFor,
     applyBindingsToDescendants
 } from '../src';
 
-import {bindings as coreBindings} from 'tko.binding.core';
+import {bindings as coreBindings} from '@tko/binding.core';
 
 import 'tko.utils/helpers/jasmine-13-helper.js';
 

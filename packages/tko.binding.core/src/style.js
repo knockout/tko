@@ -1,11 +1,11 @@
 
 import {
     objectForEach, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 const {jQueryInstance} = options
 

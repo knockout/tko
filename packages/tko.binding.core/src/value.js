@@ -3,19 +3,19 @@ import {
     arrayPushAll, arrayGetDistinctValues, ieVersion, arrayIndexOf,
     stringStartsWith, safeSetTimeout,
     tagNameLower, triggerEvent, arrayForEach, selectExtensions
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap, dependencyDetection
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
     applyBindingAccessorsToNode, BindingHandler
-} from 'tko.bind'
+} from '@tko/bind'
 
 export class value extends BindingHandler {
   static get after () { return ['options', 'foreach', 'template'] }

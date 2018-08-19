@@ -8,13 +8,13 @@
 
 import {
     tasks, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable as koObservable,
     observableArray as koObservableArray,
     subscribable as koSubscribable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed as koComputed,
@@ -24,7 +24,7 @@ import {
 
 import {
     useMockForTasks
-} from 'tko.utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Throttled observables', function () {
   beforeEach(function () { waits(1) }) // Workaround for spurious timing-related failures on IE8 (issue #736)

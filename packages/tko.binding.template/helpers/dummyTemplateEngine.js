@@ -1,7 +1,7 @@
 
 import {
   extend, arrayPushAll, parseHtmlFragment
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
     renderTemplate, anonymousTemplate, templateEngine

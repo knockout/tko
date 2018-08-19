@@ -5,7 +5,7 @@
 import {
     options, objectForEach,
     throttle as throttleFn, debounce as debounceFn
-} from 'tko.utils'
+} from '@tko/utils'
 
 import { deferUpdates } from './defer.js'
 

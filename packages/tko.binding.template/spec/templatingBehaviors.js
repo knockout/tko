@@ -1,22 +1,22 @@
 import {
     arrayForEach, domData, removeNode
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     observable, observableArray, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { VirtualProvider } from 'tko.provider.virtual'
-import { DataBindProvider } from 'tko.provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { VirtualProvider } from '@tko/provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     bindings as templateBindings, renderTemplate,
@@ -25,7 +25,7 @@ import {
 
 import {
   bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import 'tko.utils/helpers/jasmine-13-helper.js'
 import {

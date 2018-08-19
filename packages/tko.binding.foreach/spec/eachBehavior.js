@@ -6,27 +6,27 @@
 
 import {
   removeNode, arrayForEach, options, domData
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   observable, observableArray, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
   contextFor, dataFor, applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
-import { DataBindProvider } from 'tko.provider.databind'
-import { VirtualProvider } from 'tko.provider.virtual'
-import { MultiProvider } from 'tko.provider.multi'
+import { DataBindProvider } from '@tko/provider.databind'
+import { VirtualProvider } from '@tko/provider.virtual'
+import { MultiProvider } from '@tko/provider.multi'
 
 import {
   bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import {
   ForEachBinding

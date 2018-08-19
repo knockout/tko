@@ -1,16 +1,16 @@
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { DataBindProvider } from 'tko.provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import { bindings as coreBindings } from '../src'
 

@@ -4,7 +4,7 @@
 //
 import {
   options, overwriteLengthPropertyIfSupported
-} from 'tko.utils'
+} from '@tko/utils'
 
 import * as dependencyDetection from './dependencyDetection.js'
 import { deferUpdates } from './defer.js'

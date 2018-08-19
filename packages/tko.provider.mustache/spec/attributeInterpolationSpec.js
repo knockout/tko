@@ -2,27 +2,27 @@
 
 import {
     triggerEvent, options
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
     applyBindings
-} from 'tko.bind';
+} from '@tko/bind';
 
 import {
     observable as Observable
-} from 'tko.observable';
+} from '@tko/observable';
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core';
+} from '@tko/binding.core';
 
 import {
   MultiProvider
-} from 'tko.provider.multi'
+} from '@tko/provider.multi'
 
 import {
   DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 import {
     AttributeMustacheProvider

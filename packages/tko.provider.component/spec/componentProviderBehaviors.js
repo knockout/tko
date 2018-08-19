@@ -1,28 +1,28 @@
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable, isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { DataBindProvider } from 'tko.provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import {
   bindings as componentBindings
-} from 'tko.binding.component'
+} from '@tko/binding.component'
 
-import components from 'tko.utils.component'
+import components from '@tko/utils.component'
 
 import { ComponentProvider } from '../src'
 

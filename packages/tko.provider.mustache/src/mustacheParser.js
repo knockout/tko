@@ -1,7 +1,7 @@
 
 import {
   Parser
-} from 'tko.utils.parser'
+} from '@tko/utils.parser'
 
 const INNER_EXPRESSION = /^([\s\S]*)}}([\s\S]*?)\{\{([\s\S]*)$/
 const OUTER_EXPRESSION = /^([\s\S]*?)\{\{([\s\S]*)}}([\s\S]*)$/

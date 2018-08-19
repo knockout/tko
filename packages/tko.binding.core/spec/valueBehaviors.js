@@ -1,25 +1,25 @@
 import {
     triggerEvent, domData
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
     observable,
     observableArray
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
-import { DataBindProvider } from 'tko.provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {bindings as coreBindings} from '../src'
 

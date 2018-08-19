@@ -1,7 +1,7 @@
 
 import {
   observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   jsxToNode
@@ -9,7 +9,7 @@ import {
 
 import {
   NativeProvider
-} from 'tko.provider.native'
+} from '@tko/provider.native'
 
 describe('jsx', function () {
   it('converts a simple node', () => {

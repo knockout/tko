@@ -1,7 +1,7 @@
 
 import {
     arrayMap
-} from 'tko.utils';
+} from '@tko/utils';
 
 
 jasmine.setNodeText = function(node, text) {

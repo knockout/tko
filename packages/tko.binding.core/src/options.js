@@ -3,15 +3,15 @@ import {
     tagNameLower, arrayFilter, arrayMap, setTextContent, arrayIndexOf,
     setOptionNodeSelectionState, triggerEvent, domData,
     ensureSelectElementIsRenderedCorrectly, selectExtensions
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap, dependencyDetection
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     setDomNodeChildrenFromArrayMapping
-} from 'tko.bind'
+} from '@tko/bind'
 
 var captionPlaceholder = {}
 

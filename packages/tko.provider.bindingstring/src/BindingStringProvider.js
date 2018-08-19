@@ -1,10 +1,10 @@
 import {
   Parser, parseObjectLiteral
-} from 'tko.utils.parser'
+} from '@tko/utils.parser'
 
 import {
    Provider
- } from 'tko.provider'
+ } from '@tko/provider'
 
 /**
  * BindingStringProvider is an abstract base class parses a binding string.

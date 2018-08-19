@@ -1,7 +1,7 @@
 
 import {
   unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   default as operators,

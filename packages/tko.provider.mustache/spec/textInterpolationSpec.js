@@ -2,31 +2,31 @@
 
 import {
     options
-} from 'tko.utils';
+} from '@tko/utils';
 
 import {
     applyBindings
-} from 'tko.bind';
+} from '@tko/bind';
 
 import {
     observable as Observable
-} from 'tko.observable';
+} from '@tko/observable';
 
-import { DataBindProvider } from 'tko.provider.databind'
-import { MultiProvider } from 'tko.provider.multi'
-import { VirtualProvider } from 'tko.provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { VirtualProvider } from '@tko/provider.virtual'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core';
+} from '@tko/binding.core';
 
 import {
     bindings as templateBindings
-} from 'tko.binding.template';
+} from '@tko/binding.template';
 
 import {
     bindings as ifBindings
-} from 'tko.binding.if';
+} from '@tko/binding.if';
 
 import {
     TextMustacheProvider

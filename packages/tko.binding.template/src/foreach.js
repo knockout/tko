@@ -1,7 +1,7 @@
 
 import {
   unwrap, peek
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     nativeTemplateEngine

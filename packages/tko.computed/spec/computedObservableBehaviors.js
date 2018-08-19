@@ -1,11 +1,11 @@
 import {
   arrayForEach
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     isSubscribable, isObservable, observable, unwrap, dependencyDetection,
     isWritableObservable, isWriteableObservable, observableArray, subscribable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed, isPureComputed, isComputed

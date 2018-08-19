@@ -5,7 +5,7 @@
 
 import {
   options, objectForEach, clonePlainObjectDeep, extend, hasOwnProperty
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {default as Expression} from './Expression'
 import {default as Identifier} from './Identifier'

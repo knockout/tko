@@ -1,25 +1,25 @@
 /* global testNode */
 import {
     registerEventHandler, triggerEvent, removeNode, arrayForEach, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     observable,
     observableArray
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
-import { DataBindProvider } from 'tko.provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import { bindings as coreBindings } from '../src'
-import { bindings as templateBindings } from 'tko.binding.template'
+import { bindings as templateBindings } from '@tko/binding.template'
 
 import 'tko.utils/helpers/jasmine-13-helper.js'
 

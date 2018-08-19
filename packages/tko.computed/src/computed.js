@@ -15,7 +15,7 @@ import {
     options as koOptions,
     removeDisposeCallback,
     safeSetTimeout,
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     dependencyDetection,
@@ -24,7 +24,7 @@ import {
     observable,
     subscribable,
     LATEST_VALUE
-} from 'tko.observable'
+} from '@tko/observable'
 
 const computedState = createSymbolOrString('_state')
 const DISPOSED_STATE = {

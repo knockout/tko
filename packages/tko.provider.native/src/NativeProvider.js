@@ -1,11 +1,11 @@
 
 import {
   isObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   Provider
-} from 'tko.provider'
+} from '@tko/provider'
 
 export const NATIVE_BINDINGS = Symbol('Knockout native bindings')
 

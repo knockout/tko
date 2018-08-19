@@ -8,15 +8,15 @@
 import {
   arrayForEach, cleanNode, options, virtualElements,
   createSymbolOrString, domData, domNodeIsContainedBy
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   isObservable, unwrap, observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   contextFor, applyBindingsToDescendants, AsyncBindingHandler
-} from 'tko.bind'
+} from '@tko/bind'
 
 //      Utilities
 const MAX_LIST_SIZE = 9007199254740991

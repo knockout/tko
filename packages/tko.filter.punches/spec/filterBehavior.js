@@ -1,7 +1,7 @@
 
 import {
   observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import { filters } from '../src'
 

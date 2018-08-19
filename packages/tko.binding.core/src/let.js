@@ -1,7 +1,7 @@
 
 import {
     applyBindingsToDescendants
-} from 'tko.bind'
+} from '@tko/bind'
 
 export default {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {

@@ -1,20 +1,20 @@
 import {
     arrayForEach
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
-import { DataBindProvider } from 'tko.provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import * as coreBindings from '../src'
 

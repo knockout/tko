@@ -1,6 +1,6 @@
 import {
   Provider
-} from 'tko.provider'
+} from '@tko/provider'
 
 import {
   parseInterpolation

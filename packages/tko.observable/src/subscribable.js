@@ -1,7 +1,7 @@
 /* eslint no-cond-assign: 0 */
 import {
     arrayRemoveItem, objectForEach, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import Subscription from './Subscription'
 import { SUBSCRIBABLE_SYM } from './subscribableSymbol'

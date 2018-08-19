@@ -1,25 +1,25 @@
 
 import {
   tagNameLower, objectMap
-} from 'tko.utils'
+} from '@tko/utils'
 
-import registry from 'tko.utils.component'
+import registry from '@tko/utils.component'
 
 import {
   unwrap, isWriteableObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
   Provider
-} from 'tko.provider'
+} from '@tko/provider'
 
 import {
   Parser
-} from 'tko.utils.parser'
+} from '@tko/utils.parser'
 
 export default class ComponentProvider extends Provider {
   get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE

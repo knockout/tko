@@ -1,7 +1,7 @@
 
 import {
   extend, options, ieVersion, makeArray, parseHtmlFragment
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
   templateEngine

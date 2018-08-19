@@ -2,19 +2,19 @@
 import {
     domData, registerEventHandler, ieVersion, safeSetTimeout, options,
     arrayForEach, tagNameLower
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 import {
   BindingHandler
-} from 'tko.bind'
+} from '@tko/bind'
 
 var parseVersion, operaVersion, safariVersion, firefoxVersion
 

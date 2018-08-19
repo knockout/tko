@@ -1,11 +1,11 @@
 
 import {
     arrayMap
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap, observable as Observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     setDomNodeChildrenFromArrayMapping

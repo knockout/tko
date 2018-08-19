@@ -1,11 +1,11 @@
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     LifeCycle
-} from 'tko.lifecycle'
+} from '@tko/lifecycle'
 
 export class BindingHandler extends LifeCycle {
   constructor (params) {

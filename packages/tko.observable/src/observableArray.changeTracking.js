@@ -6,7 +6,7 @@
 
 import {
     extend, compareArrays, findMovesInArrayComparison
-} from 'tko.utils'
+} from '@tko/utils'
 
 import { defaultEvent } from './subscribable.js'
 import { extenders } from './extenders.js'

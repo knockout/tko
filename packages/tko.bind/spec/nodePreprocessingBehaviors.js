@@ -1,18 +1,18 @@
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { VirtualProvider } from 'tko.provider.virtual'
-import { DataBindProvider } from 'tko.provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { VirtualProvider } from '@tko/provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import {
     applyBindings

@@ -1,10 +1,10 @@
 import {
     setHtml, parseHtmlFragment, virtualElements
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap
-} from 'tko.observable'
+} from '@tko/observable'
 
 export var html = {
   init: function () {

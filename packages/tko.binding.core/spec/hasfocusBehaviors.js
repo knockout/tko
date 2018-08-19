@@ -1,22 +1,22 @@
 import {
     triggerEvent, registerEventHandler, ieVersion
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 import {
     options, arrayForEach
-} from 'tko.utils'
+} from '@tko/utils'
 
 import * as coreBindings from '../src'
 

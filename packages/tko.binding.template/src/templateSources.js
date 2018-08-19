@@ -24,7 +24,7 @@
 
 import {
     tagNameLower as tagNameLowerFn, setHtml, domData, parseHtmlForTemplateNodes
-} from 'tko.utils'
+} from '@tko/utils'
 
 // ---- ko.templateSources.domElement -----
 

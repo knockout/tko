@@ -2,24 +2,24 @@
 
 import {
     options, tasks
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { VirtualProvider } from 'tko.provider.virtual'
-import { DataBindProvider } from 'tko.provider.databind'
+import { MultiProvider } from '@tko/provider.multi'
+import { VirtualProvider } from '@tko/provider.virtual'
+import { DataBindProvider } from '@tko/provider.databind'
 
 import {
     applyBindings, BindingHandler, applyBindingsToDescendants
 } from '../src'
 
-import { bindings as coreBindings } from 'tko.binding.core'
-import { bindings as templateBindings } from 'tko.binding.template'
-import { bindings as ifBindings } from 'tko.binding.if'
-import { bindings as eachBindings } from 'tko.binding.foreach'
+import { bindings as coreBindings } from '@tko/binding.core'
+import { bindings as templateBindings } from '@tko/binding.template'
+import { bindings as ifBindings } from '@tko/binding.if'
+import { bindings as eachBindings } from '@tko/binding.foreach'
 
 describe('Binding Application Promise', function () {
   var bindingHandlers

@@ -1,7 +1,7 @@
 
 import {
   observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   default as NativeProvider, NATIVE_BINDINGS

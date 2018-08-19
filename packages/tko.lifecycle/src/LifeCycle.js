@@ -2,11 +2,11 @@
 
 import {
     addDisposeCallback, createSymbolOrString
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 const SUBSCRIPTIONS = createSymbolOrString('LifeCycle Subscriptions List')
 const ANCHOR_NODE = createSymbolOrString('LifeCycle Anchor Node')

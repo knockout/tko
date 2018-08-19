@@ -1,47 +1,47 @@
 
 import {
     options, tasks, domData, triggerEvent, cleanNode
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observableArray, observable, isWritableObservable
-} from 'tko.observable'
+} from '@tko/observable'
 
-import { MultiProvider } from 'tko.provider.multi'
-import { DataBindProvider } from 'tko.provider.databind'
-import { VirtualProvider } from 'tko.provider.virtual'
-import { ComponentProvider } from 'tko.provider.component'
-import { NativeProvider } from 'tko.provider.native'
+import { MultiProvider } from '@tko/provider.multi'
+import { DataBindProvider } from '@tko/provider.databind'
+import { VirtualProvider } from '@tko/provider.virtual'
+import { ComponentProvider } from '@tko/provider.component'
+import { NativeProvider } from '@tko/provider.native'
 
 import {
     applyBindings, dataFor
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import {
     bindings as templateBindings
-} from 'tko.binding.template'
+} from '@tko/binding.template'
 
 import {
     bindings as ifBindings
-} from 'tko.binding.if'
+} from '@tko/binding.if'
 
 import {
   jsxToNode
-} from 'tko.utils.jsx'
+} from '@tko/utils.jsx'
 
 import {
   bindings as componentBindings
 } from '../src'
 
-import components from 'tko.utils.component'
+import components from '@tko/utils.component'
 
 import {
     useMockForTasks
-} from 'tko.utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Components: Component binding', function () {
   var testComponentName = 'test-component',

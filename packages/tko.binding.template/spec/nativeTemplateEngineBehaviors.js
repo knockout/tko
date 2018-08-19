@@ -1,19 +1,19 @@
 /* global testNode */
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     observable, observableArray
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 import {
     options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     bindings as templateBindings,
@@ -22,7 +22,7 @@ import {
 } from '../src'
 import {
     bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import 'tko.utils/helpers/jasmine-13-helper.js'
 

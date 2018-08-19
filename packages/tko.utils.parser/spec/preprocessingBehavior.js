@@ -1,6 +1,6 @@
 import {
   DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 describe('Binding preprocessing', function () {
   var bindingHandlers,

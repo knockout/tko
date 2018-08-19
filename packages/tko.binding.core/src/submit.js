@@ -1,7 +1,7 @@
 
 import {
     registerEventHandler
-} from 'tko.utils'
+} from '@tko/utils'
 
 export var submit = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {

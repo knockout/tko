@@ -4,32 +4,32 @@ import {
 
 import {
     cleanNode, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
     renderTemplate, setTemplateEngine, templateEngine, nativeTemplateEngine,
     bindings as templateBindings
-} from 'tko.binding.template'
+} from '@tko/binding.template'
 
 import {
     DataBindProvider
-} from 'tko.provider.databind'
+} from '@tko/provider.databind'
 
 import {
     bindings as coreBindings
-} from 'tko.binding.core'
+} from '@tko/binding.core'
 
 import {
     bindings as ifBindings
-} from 'tko.binding.if'
+} from '@tko/binding.if'
 
 import {
     dummyTemplateEngine
-} from 'tko.binding.template/helpers/dummyTemplateEngine.js'
+} from '@tko/binding.template/helpers/dummyTemplateEngine.js'
 
 const BLANK_HTML = `
 <!doctype html>

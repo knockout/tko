@@ -2,30 +2,30 @@
 
 import {
     tasks, options
-} from 'tko.utils'
+} from '@tko/utils'
 
 import {
     unwrap,
     observable as Observable,
     observableArray as ObservableArray
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   pureComputed
-} from 'tko.computed'
+} from '@tko/computed'
 
-import { DataBindProvider } from 'tko.provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
-import { bindings as coreBindings } from 'tko.binding.core'
-import { bindings as templateBindings } from 'tko.binding.template'
-import { bindings as ifBindings } from 'tko.binding.if'
+import { bindings as coreBindings } from '@tko/binding.core'
+import { bindings as templateBindings } from '@tko/binding.template'
+import { bindings as ifBindings } from '@tko/binding.if'
 import {
     applyBindings
-} from 'tko.bind'
+} from '@tko/bind'
 
 import {
     useMockForTasks
-} from 'tko.utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Deferred bindings', function () {
   var bindingSpy, bindingHandlers

@@ -5,11 +5,11 @@ import {
 
 import {
   observable
-} from 'tko.observable'
+} from '@tko/observable'
 
 import {
   computed
-} from 'tko.computed'
+} from '@tko/computed'
 
 const proxySupport = 'Proxy' in window
 
