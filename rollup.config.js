@@ -28,7 +28,11 @@ function getPackageRoot () {
   return path.join(getMonorepoRoot(), 'packages', getPackageName())
 }
 
-const BROWSER_PACKAGES = ['tko', 'knockout']
+const BROWSER_PACKAGES = [
+  '@tko/build.knockout',
+  '@tko/build.reference'
+]
+
 const IS_BROWSER_BUNDLE = BROWSER_PACKAGES.includes(getPackageName())
 
 const banner = `/*!
@@ -81,8 +85,12 @@ function getConfigs () {
 
 export default getConfigs()
 
+/**
+ * Return a list of @tko/* modules.
+ */
 function getTkoModules () {
   return fs.readdirSync(path.resolve(path.join(getMonorepoRoot(), 'packages')))
+    .map(filename => `@tko/${filename}`)
 }
 
 /**
