@@ -24,6 +24,9 @@
     "@tko/utils.component": "^4.0.0-alpha6.0",
     "tslib": "^1.8.0"
   },
+  "files": [
+    "dist/"
+  ],
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
     "globals": [
