@@ -1,6 +1,6 @@
 {
   "name": "@tko/filter.punches",
-  "version": "4.0.0-alpha6.2",
+  "version": "4.0.0-alpha6.3",
   "description": "TKO filters from knockout punches",
   "module": "dist/filter.punches.js",
   "files": [
@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/knockout/tko#readme",
   "dependencies": {
-    "@tko/observable": "^4.0.0-alpha6.2",
+    "@tko/observable": "^4.0.0-alpha6.3",
     "tslib": "^1.8.0"
   },
   "karma": {
