@@ -37,19 +37,13 @@
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
-    "globals": [
-      "assert",
+    "env": [
+      "browser",
       "jasmine",
-      "beforeEach",
-      "before",
-      "after",
-      "afterEach",
-      "it",
-      "iit",
-      "xit",
-      "expect",
-      "describe",
-      "ddescribe"
+      "mocha"
     ]
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

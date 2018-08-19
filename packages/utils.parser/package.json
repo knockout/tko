@@ -30,20 +30,14 @@
     "watch": "karma start ../../karma.conf.js"
   },
   "standard": {
-    "globals": [
-      "assert",
+    "env": [
+      "browser",
       "jasmine",
-      "beforeEach",
-      "before",
-      "after",
-      "afterEach",
-      "it",
-      "iit",
-      "xit",
-      "expect",
-      "describe",
-      "ddescribe"
+      "mocha"
     ]
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`"
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
+  "publishConfig": {
+    "access": "public"
+  }
 }

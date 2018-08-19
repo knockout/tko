@@ -34,19 +34,10 @@
   },
   "__about__": "These are copied into all packages/*/package.json",
   "standard": {
-    "globals": [
-      "assert",
+    "env": [
+      "browser",
       "jasmine",
-      "beforeEach",
-      "before",
-      "after",
-      "afterEach",
-      "it",
-      "iit",
-      "xit",
-      "expect",
-      "describe",
-      "ddescribe"
+      "mocha"
     ]
   },
   "scripts": {
@@ -54,5 +45,8 @@
     "build": "rollup -c ../../rollup.config.js",
     "watch": "karma start ../../karma.conf.js"
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`"
+  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
+  "publishConfig": {
+    "access": "public"
+  }
 }
