@@ -19,7 +19,7 @@ import { filters } from '@tko/filter.punches'
 
 import components from '@tko/utils.component'
 
-import { functionRewrite } from '@tko/utils.functionRewrite'
+import { functionRewrite } from '@tko/utils.functionrewrite'
 
 /**
  * expressionRewriting is deprecated in TKO because we have our own JS

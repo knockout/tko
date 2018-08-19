@@ -64,7 +64,7 @@
     "@tko/provider.mustache": "^4.0.0-alpha6.1",
     "@tko/provider.virtual": "^4.0.0-alpha6.1",
     "@tko/utils.component": "^4.0.0-alpha6.1",
-    "@tko/utils.functionRewrite": "^4.0.0-alpha6.1",
+    "@tko/utils.functionrewrite": "^4.0.0-alpha6.1",
     "tslib": "^1.8.0"
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
