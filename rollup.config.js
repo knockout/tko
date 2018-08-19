@@ -21,7 +21,7 @@ function getMonorepoRoot () {
 }
 
 function getPackageName () {
-  return LERNA_PACKAGE_NAME || process.cwd().split(path.sep).pop()
+  return (LERNA_PACKAGE_NAME || '').replace('@tko/', '') || process.cwd().split(path.sep).pop()
 }
 
 function getPackageRoot () {
