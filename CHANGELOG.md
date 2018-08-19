@@ -2,6 +2,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ## 🎒 `alpha-5a..ongoing` (5 July 2018)
 
+* The `tko` package will now be published as `@tko/build.reference`, and knockout as `@tko/build.knockout`
+* Mass move of `tko.*` to the `@tko` organization i.e. `@tko/`
 * Test release
 * Fix auto-unwrapping of Jsx attributes
 * Allow JSX to be used with SVG elements, and respect xmlns attribute

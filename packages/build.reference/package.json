@@ -1,5 +1,5 @@
 {
-  "name": "tko",
+  "name": "@tko/build.reference",
   "version": "4.0.0-alpha5h",
   "description": "The TKO.js Javascript Library",
   "main": "dist/tko.js",
