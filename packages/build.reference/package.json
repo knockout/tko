@@ -1,7 +1,7 @@
 {
   "name": "@tko/build.reference",
   "version": "4.0.0-alpha6.0",
-  "description": "The TKO.js Javascript Library",
+  "description": "The TKO Reference Build",
   "main": "dist/build.reference.js",
   "repository": "git@github.com:knockout/tko",
   "author": "The Knockout Team",
