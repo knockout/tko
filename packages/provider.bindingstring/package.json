@@ -1,5 +1,5 @@
 {
-  "name": "tko.provider.bindingstring",
+  "name": "@tko/provider.bindingstring",
   "version": "4.0.0-alpha5b",
   "description": "Abstract Base Class for providers that parse a binding string",
   "module": "dist/tko.provider.bindingString.js",
@@ -8,8 +8,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "tko.provider": "^4.0.0-alpha5b",
-    "tko.utils.parser": "^4.0.0-alpha5b",
+    "@tko/provider": "^4.0.0-alpha5b",
+    "@tko/utils.parser": "^4.0.0-alpha5b",
     "tslib": "^1.8.0"
   },
   "karma": {

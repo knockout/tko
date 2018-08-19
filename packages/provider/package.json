@@ -1,5 +1,5 @@
 {
-  "name": "tko.provider",
+  "name": "@tko/provider",
   "version": "4.0.0-alpha5b",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
   "module": "dist/tko.provider.js",
@@ -9,7 +9,7 @@
   "author": "Knockout Team",
   "license": "MIT",
   "dependencies": {
-    "tko.utils": "^4.0.0-alpha5b",
+    "@tko/utils": "^4.0.0-alpha5b",
     "tslib": "^1.8.0"
   },
   "karma": {

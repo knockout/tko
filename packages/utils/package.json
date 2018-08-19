@@ -1,5 +1,5 @@
 {
-  "name": "tko.utils",
+  "name": "@tko/utils",
   "version": "4.0.0-alpha5b",
   "description": "TKO Utilities",
   "module": "dist/tko.utils.js",

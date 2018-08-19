@@ -1,5 +1,5 @@
 {
-  "name": "tko.binding.if",
+  "name": "@tko/binding.if",
   "version": "4.0.0-alpha5b",
   "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
   "module": "dist/tko.binding.if.js",
@@ -22,10 +22,10 @@
   },
   "homepage": "https://github.com/knockout/tko.binding.if#readme",
   "dependencies": {
-    "tko.bind": "^4.0.0-alpha5b",
-    "tko.computed": "^4.0.0-alpha5b",
-    "tko.observable": "^4.0.0-alpha5b",
-    "tko.utils": "^4.0.0-alpha5b",
+    "@tko/bind": "^4.0.0-alpha5b",
+    "@tko/computed": "^4.0.0-alpha5b",
+    "@tko/observable": "^4.0.0-alpha5b",
+    "@tko/utils": "^4.0.0-alpha5b",
     "tslib": "^1.8.0"
   },
   "karma": {
