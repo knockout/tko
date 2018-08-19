@@ -1,6 +1,6 @@
 {
   "name": "@tko/binding.core",
-  "version": "4.0.0-alpha5b",
+  "version": "4.0.0-alpha6.0",
   "description": "TKO Core bindings",
   "module": "dist/tko.binding.core.js",
   "files": [
@@ -22,10 +22,10 @@
   },
   "homepage": "https://github.com/knockout/tko.util#readme",
   "dependencies": {
-    "@tko/bind": "^4.0.0-alpha5b",
-    "@tko/computed": "^4.0.0-alpha5b",
-    "@tko/observable": "^4.0.0-alpha5b",
-    "@tko/utils": "^4.0.0-alpha5b",
+    "@tko/bind": "^4.0.0-alpha6.0",
+    "@tko/computed": "^4.0.0-alpha6.0",
+    "@tko/observable": "^4.0.0-alpha6.0",
+    "@tko/utils": "^4.0.0-alpha6.0",
     "tslib": "^1.8.0"
   },
   "karma": {
