@@ -21,7 +21,7 @@ const PACKAGES_PATH = path.join(__dirname, '..', 'packages')
 module.exports = {
   name: 'tko-package-imports',
   resolveId (importee, importer) {
-    if (importee.includes('/') && !importee.includes('@tko')) { return }
+    if (importee.replace('@tko/', '').includes('/')) { return }
     importee = importee.replace('@tko/', '')
     const packagePath = path.join(PACKAGES_PATH, importee, 'src/index.js')
     return fs.existsSync(packagePath) ? packagePath : null

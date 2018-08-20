@@ -30,7 +30,7 @@ if (!pkg.karma || !pkg.karma.frameworks) {
 const rollupPreprocessor = {
   output: {
     format: 'iife',
-    name: pkg.name,
+    name: pkg.name.replace('@tko/', ''),
     /**
      * Source maps often link multiple files (e.g. tko.utils/src/object.js)
      * from different spec/ files.  This causes problems e.g. a breakpoints
