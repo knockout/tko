@@ -32,7 +32,7 @@ import {
     TextMustacheProvider
 } from '../src';
 
-import 'tko.utils/helpers/jasmine-13-helper.js';
+import '@tko/utils/helpers/jasmine-13-helper.js';
 import '../helpers/jasmine-interpolation-helpers.js';
 
 describe('Interpolation Markup preprocessor', function () {

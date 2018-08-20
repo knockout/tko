@@ -28,7 +28,7 @@ import {
     AttributeMustacheProvider
 } from '../src';
 
-import 'tko.utils/helpers/jasmine-13-helper.js';
+import '@tko/utils/helpers/jasmine-13-helper.js';
 
 function ctxStub (obj = {}) { return { lookup (v) { return obj[v] } } }
 

@@ -14,7 +14,7 @@ import {
 
 import { bindings as coreBindings } from '../src'
 
-import 'tko.utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Binding: Enable/Disable', function () {
   beforeEach(jasmine.prepareTestNode)

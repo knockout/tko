@@ -20,7 +20,7 @@ import {
 
 import * as coreBindings from '../src'
 
-import 'tko.utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper.js'
 
 
 arrayForEach(['hasfocus', 'hasFocus'], binding => {

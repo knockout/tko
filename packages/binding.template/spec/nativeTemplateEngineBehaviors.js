@@ -24,7 +24,7 @@ import {
     bindings as coreBindings
 } from '@tko/binding.core'
 
-import 'tko.utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Native template engine', function () {
   function ensureNodeExistsAndIsEmpty (id, tagName, type) {

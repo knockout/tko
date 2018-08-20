@@ -19,7 +19,7 @@ import {bindings as templateBindings} from '../src'
 import {bindings as ifBindings} from '@tko/binding.if'
 import {bindings as coreBindings} from '@tko/binding.core'
 
-import 'tko.utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper.js'
 
 // virtualEvents, removeNode
 describe('Binding: Foreach', function () {

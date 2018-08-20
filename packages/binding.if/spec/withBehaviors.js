@@ -19,7 +19,7 @@ import {bindings as withBindings} from '../src'
 import {bindings as coreBindings} from '@tko/binding.core'
 import {bindings as templateBindings} from '@tko/binding.template'
 
-import 'tko.utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper.js'
 
 describe('Binding: With', function () {
   beforeEach(jasmine.prepareTestNode)
