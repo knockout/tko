@@ -71,6 +71,7 @@ describe('KO LifeCycle', function () {
       o = observable()
       Ctr = (function () {
         function Ctr () {
+          this.ons = () => {}
           this.subscribe(o, this.ons)
         }
         return Ctr

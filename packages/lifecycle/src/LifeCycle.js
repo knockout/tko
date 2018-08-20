@@ -28,9 +28,9 @@ export default class LifeCycle {
     }
   }
 
-  subscribe (observable, action) {
-    if (typeof action === 'string') { action = this[action].bind(this) }
-    this.addDisposable(observable.subscribe(action))
+  subscribe (observable, action, subscriptionType) {
+    if (typeof action === 'string') { action = this[action] }
+    this.addDisposable(observable.subscribe(action, this, subscriptionType))
   }
 
   computed (params) {
