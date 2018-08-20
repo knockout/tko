@@ -17,15 +17,15 @@ import {
   NativeProvider
 } from '@tko/provider.native'
 
-const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
+export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
 const NAMESPACES = {
   svg: 'http://www.w3.org/2000/svg',
   html: 'http://www.w3.org/1999/xhtml'
 }
 
-export default class JsxObserver extends LifeCycle {
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns) {
+export class JsxObserver extends LifeCycle {
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, $context) {
     super()
 
     const parentNodeTarget = 'content' in parentNode
@@ -40,7 +40,7 @@ export default class JsxObserver extends LifeCycle {
         insertBefore = document.createComment('O')
       }
 
-      if (insertBefore.parentNode !== parentNode) {
+      if (insertBefore.parentNode !== parentNodeTarget) {
         parentNodeTarget.insertBefore(insertBefore, null)
       }
     }
@@ -48,6 +48,7 @@ export default class JsxObserver extends LifeCycle {
     this.anchorTo(insertBefore || parentNode)
 
     Object.assign(this, {
+      $context,
       insertBefore,
       parentNode,
       parentNodeTarget,
@@ -141,7 +142,7 @@ export default class JsxObserver extends LifeCycle {
   }
 
   applyBindingsToNodeOrArray (nodeOrArray) {
-    const $context = contextFor(this.parentNode)
+    const {$context} = this
     if (!$context) { return }
     if (Array.isArray(nodeOrArray)) {
       for (const node of nodeOrArray.filter(this.canApplyBindings)) {
@@ -258,3 +259,5 @@ export default class JsxObserver extends LifeCycle {
     }
   }
 }
+
+export default JsxObserver

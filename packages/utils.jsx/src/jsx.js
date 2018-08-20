@@ -15,7 +15,9 @@ import {
   NativeProvider
 } from '@tko/provider.native'
 
-import JsxObserver from './JsxObserver'
+import {
+  JsxObserver, ORIGINAL_JSX_SYM
+ } from './JsxObserver'
 
 /**
  *

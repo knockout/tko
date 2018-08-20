@@ -15,7 +15,7 @@ import {
 } from '@tko/bind'
 
 import {
-  jsxToNode, maybeJsx
+  JsxObserver, maybeJsx
 } from '@tko/utils.jsx'
 
 import {
@@ -37,25 +37,15 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.computed('computeApplyComponent')
   }
 
-  setDomNodesFromJsx (jsx, element) {
-    const jsxArray = Array.isArray(jsx) ? jsx : [jsx]
-    const domNodeChildren = jsxArray.map(j => jsxToNode(j))
-    virtualElements.setDomNodeChildren(element, domNodeChildren)
-  }
-
   cloneTemplateIntoElement (componentName, template, element) {
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
 
     if (maybeJsx(template)) {
-      if (isObservable(template)) {
-        this.subscribe(template, jsx => {
-          this.setDomNodesFromJsx(jsx, element)
-          applyBindingsToDescendants(this.childBindingContext, this.$element)
-        })
-      }
-      this.setDomNodesFromJsx(unwrap(template), element)
+      this.addDisposable(new JsxObserver(template, element, null, undefined,
+        this.childBindingContext))
+
     } else {
       const clonedNodesArray = cloneNodes(template)
       virtualElements.setDomNodeChildren(element, clonedNodesArray)
