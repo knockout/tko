@@ -35,7 +35,9 @@ export function trackArrayChanges (target, options) {
 
     // Watch "subscribe" calls, and for array change events, ensure change tracking is enabled
   target.beforeSubscriptionAdd = function (event) {
-    if (underlyingBeforeSubscriptionAddFunction) { underlyingBeforeSubscriptionAddFunction.call(target, event) }
+    if (underlyingBeforeSubscriptionAddFunction) {
+      underlyingBeforeSubscriptionAddFunction.call(target, event)
+    }
     if (event === arrayChangeEventName) {
       trackChanges()
     }
@@ -43,7 +45,9 @@ export function trackArrayChanges (target, options) {
 
     // Watch "dispose" calls, and for array change events, ensure change tracking is disabled when all are disposed
   target.afterSubscriptionRemove = function (event) {
-    if (underlyingAfterSubscriptionRemoveFunction) { underlyingAfterSubscriptionRemoveFunction.call(target, event) }
+    if (underlyingAfterSubscriptionRemoveFunction) {
+      underlyingAfterSubscriptionRemoveFunction.call(target, event)
+    }
     if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
       if (underlyingNotifySubscribersFunction) {
         target.notifySubscribers = underlyingNotifySubscribersFunction
@@ -67,7 +71,7 @@ export function trackArrayChanges (target, options) {
 
         // Intercept "notifySubscribers" to track how many times it was called.
     underlyingNotifySubscribersFunction = target['notifySubscribers']
-    target['notifySubscribers'] = function (valueToNotify, event) {
+    target.notifySubscribers = function (valueToNotify, event) {
       if (!event || event === defaultEvent) {
         ++pendingNotifications
       }
@@ -79,12 +83,13 @@ export function trackArrayChanges (target, options) {
     var previousContents = [].concat(target.peek() || [])
     cachedDiff = null
     arrayChangeSubscription = target.subscribe(function (currentContents) {
+      let changes
             // Make a copy of the current contents and ensure it's an array
       currentContents = [].concat(currentContents || [])
 
             // Compute the diff and issue notifications, but only if someone is listening
       if (target.hasSubscriptionsForEvent(arrayChangeEventName)) {
-        var changes = getChanges(previousContents, currentContents)
+        changes = getChanges(previousContents, currentContents)
       }
 
             // Eliminate references to the old, removed items, so they can be GCed
@@ -93,7 +98,7 @@ export function trackArrayChanges (target, options) {
       pendingNotifications = 0
 
       if (changes && changes.length) {
-        target['notifySubscribers'](changes, arrayChangeEventName)
+        target.notifySubscribers(changes, arrayChangeEventName)
       }
     })
   }
@@ -111,9 +116,8 @@ export function trackArrayChanges (target, options) {
   }
 
   target.cacheDiffForKnownOperation = function (rawArray, operationName, args) {
-    var index, argsIndex
-        // Only run if we're currently tracking changes for this observable array
-        // and there aren't any pending deferred notifications.
+      // Only run if we're currently tracking changes for this observable array
+      // and there aren't any pending deferred notifications.
     if (!trackingChanges || pendingNotifications) {
       return
     }
@@ -129,7 +133,7 @@ export function trackArrayChanges (target, options) {
       case 'push':
         offset = arrayLength
       case 'unshift':
-        for (index = 0; index < argsLength; index++) {
+        for (let index = 0; index < argsLength; index++) {
           pushDiff('added', args[index], offset + index)
         }
         break
@@ -150,7 +154,7 @@ export function trackArrayChanges (target, options) {
           endAddIndex = startIndex + argsLength - 2,
           endIndex = Math.max(endDeleteIndex, endAddIndex),
           additions = [], deletions = []
-        for (index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
+        for (let index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
           if (index < endDeleteIndex) { deletions.push(pushDiff('deleted', rawArray[index], index)) }
           if (index < endAddIndex) { additions.push(pushDiff('added', args[argsIndex], index)) }
         }

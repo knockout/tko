@@ -84,9 +84,9 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares) {
     var failedCompares, l, r, leftItem, rightItem
     for (failedCompares = l = 0; (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]); ++l) {
       for (r = 0; rightItem = right[r]; ++r) {
-        if (leftItem['value'] === rightItem['value']) {
-          leftItem['moved'] = rightItem['index']
-          rightItem['moved'] = leftItem['index']
+        if (leftItem.value === rightItem.value) {
+          leftItem.moved = rightItem.index
+          rightItem.moved = leftItem.index
           right.splice(r, 1)         // This item is marked as moved; so remove it from right list
           failedCompares = r = 0     // Reset failed compares count because we're checking for consecutive failures
           break
@@ -97,13 +97,14 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares) {
   }
 }
 
-var statusNotInOld = 'added', statusNotInNew = 'deleted'
+const statusNotInOld = 'added'
+const statusNotInNew = 'deleted'
 
     // Simple calculation based on Levenshtein distance.
 export function compareArrays (oldArray, newArray, options) {
     // For backward compatibility, if the third arg is actually a bool, interpret
     // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
-  options = (typeof options === 'boolean') ? { 'dontLimitMoves': options } : (options || {})
+  options = (typeof options === 'boolean') ? { dontLimitMoves: options } : (options || {})
   oldArray = oldArray || []
   newArray = newArray || []
 
@@ -127,13 +128,18 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     bigIndexMaxForRow = myMin(bigIndexMax, smlIndex + compareRange)
     bigIndexMinForRow = myMax(0, smlIndex - 1)
     for (bigIndex = bigIndexMinForRow; bigIndex <= bigIndexMaxForRow; bigIndex++) {
-      if (!bigIndex) { thisRow[bigIndex] = smlIndex + 1 } else if (!smlIndex)  // Top row - transform empty array into new array via additions
-              { thisRow[bigIndex] = bigIndex + 1 } else if (smlArray[smlIndex - 1] === bigArray[bigIndex - 1]) { thisRow[bigIndex] = lastRow[bigIndex - 1] }                  // copy value (no edit)
-      else {
-                var northDistance = lastRow[bigIndex] || maxDistance       // not in big (deletion)
-                var westDistance = thisRow[bigIndex - 1] || maxDistance    // not in small (addition)
-                thisRow[bigIndex] = myMin(northDistance, westDistance) + 1
-              }
+      if (!bigIndex) {
+        thisRow[bigIndex] = smlIndex + 1
+      } else if (!smlIndex) {
+         // Top row - transform empty array into new array via additions
+        thisRow[bigIndex] = bigIndex + 1
+      } else if (smlArray[smlIndex - 1] === bigArray[bigIndex - 1]) {
+        thisRow[bigIndex] = lastRow[bigIndex - 1]
+      } else {                  // copy value (no edit)
+        var northDistance = lastRow[bigIndex] || maxDistance       // not in big (deletion)
+        var westDistance = thisRow[bigIndex - 1] || maxDistance    // not in small (addition)
+        thisRow[bigIndex] = myMin(northDistance, westDistance) + 1
+      }
     }
   }
 
@@ -153,7 +159,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     } else {
       --bigIndex
       --smlIndex
-      if (!options['sparse']) {
+      if (!options.sparse) {
         editScript.push({
           'status': 'retained',
           'value': bigArray[bigIndex] })
@@ -163,7 +169,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
 
     // Set a limit on the number of consecutive non-matching comparisons; having it a multiple of
     // smlIndexMax keeps the time complexity of this algorithm linear.
-  findMovesInArrayComparison(notInBig, notInSml, !options['dontLimitMoves'] && smlIndexMax * 10)
+  findMovesInArrayComparison(notInBig, notInSml, !options.dontLimitMoves && smlIndexMax * 10)
 
   return editScript.reverse()
 }
