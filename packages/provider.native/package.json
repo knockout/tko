@@ -28,7 +28,8 @@
   "scripts": {
     "test": "karma start ../../karma.conf.js --once",
     "build": "rollup -c ../../rollup.config.js",
-    "watch": "karma start ../../karma.conf.js"
+    "watch": "karma start ../../karma.conf.js",
+    "prepare": "rollup -c ../../rollup.config.js"
   },
   "publishConfig": {
     "access": "public"
