@@ -12,6 +12,10 @@ import {
 } from '@tko/provider.native'
 
 import {
+  VirtualProvider
+} from '@tko/provider.virtual'
+
+import {
   applyBindings, contextFor
 } from '@tko/bind'
 
@@ -287,31 +291,94 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  describe('bindings', () => {
+    it('applies bindings attached to the nodes', () => {
+      let counter = 0
+      const parent = document.createElement('div')
+      const provider = new NativeProvider()
+      options.bindingProviderInstance = provider
+      provider.bindingHandlers.set({ counter: () => ++counter })
+      const jsx = {
+        elementName: 'r',
+        children: [],
+        attributes: {'ko-counter': true}
+      }
+      const jo = new JsxObserver(jsx, parent)
+      applyBindings({}, parent)
+      assert.equal(counter, 1)
+      jo.dispose()
+    })
+  })
+
   describe('$context', () => {
-    it('applies the bindings of the parent node to children', () => {
+    function testContext (jsxConvertible, nodeToTest = n => n.childNodes[0]) {
       const parent = document.createElement('div')
       const view = {}
-      options.bindingProviderInstance = new NativeProvider()
+      options.bindingProviderInstance = new VirtualProvider()
+      const jo = new JsxObserver(jsxConvertible, parent)
       applyBindings(view, parent)
-      const inner = {
-        elementName: 'i',
-        children: ['y', observable('z')],
-        attributes: {}
-      }
-      const inner2 = {
-        elementName: 'i',
-        children: observable([inner]),
-        attributes: {}
-      }
-      const jo = new JsxObserver([inner, observable(inner), inner2], parent)
-
-      const [i0, i1, _, i2] = [...parent.childNodes]
-      assert.strictEqual(contextFor(i0).$data, view, 'i0')
-      assert.strictEqual(contextFor(i1).$data, view, 'i1')
-      assert.strictEqual(contextFor(i2).$data, view, 'i2')
-      assert.strictEqual(contextFor(i2.childNodes[0]).$data, view, 'i2')
-
+      assert.strictEqual(contextFor(nodeToTest(parent)).$data, view)
       jo.dispose()
+    }
+
+    it('applies to a jsx object', () => {
+      testContext({ elementName: 'x', children: [], attributes: {} })
+    })
+
+    it('applies to a jsx object in an array', () => {
+      testContext([{ elementName: 'x', children: [], attributes: {} }])
+    })
+
+    it('applies to a jsx object in an observable', () => {
+      testContext(observable({ elementName: 'x', children: [], attributes: {} }))
+    })
+
+    it('applies to a jsx array in an observable', () => {
+      testContext(observable([{ elementName: 'x', children: [], attributes: {} }]))
+    })
+
+    it('applies to an array with a an observable', () => {
+      const inner = { elementName: 'i1', children: [], attributes: {} }
+      testContext([observable(inner)])
+    })
+
+    it('applies to jsx with children', () => {
+      const jsx = {
+        elementName: 'x',
+        children: [ { elementName: 'y', children: [], attributes: {} } ],
+        attributes: {}
+      }
+      testContext(jsx, n => n.childNodes[0].childNodes[0])
+    })
+
+    it('applies to observable jsx children', () => {
+      const jsx = {
+        elementName: 'x',
+        children: observable(
+          [ { elementName: 'y', children: [], attributes: {} } ]
+        ),
+        attributes: {}
+      }
+      testContext(jsx, n => n.childNodes[0].childNodes[0])
+    })
+
+    it('applies to jsx children that are observable', () => {
+      const jsx = observable({
+        elementName: 'x',
+        children: [
+          observable({ elementName: 'y', children: [], attributes: {} })
+        ],
+        attributes: {}
+      })
+      testContext(jsx, n => n.childNodes[0].childNodes[0])
+    })
+
+    it('applies to observables when they are updated', () => {
+      const obs = observable()
+      testContext(obs, n => {
+        obs({ elementName: 'x', children: [], attributes: {} })
+        return n.childNodes[0]
+      })
     })
   })
 

@@ -992,9 +992,31 @@ describe('Components: Component binding', function () {
       expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
       expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
     })
-  })
 
-  ddescribe('slots', function () {
+    it('binds context for ViewModel::template', () => {
+      class ViewModel extends components.ComponentABC {
+        get template () {
+          return { elementName: 'a', children: [], attributes: {} }
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(dataFor(testNode.childNodes[0])).toEqual(outerViewModel)
+    })
+
+    it('binds context for ViewModel.template', () => {
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          return { elementName: 'a', children: [], attributes: {} }
+        }
+      }
+      ViewModel.register('test-component')
+      applyBindings(outerViewModel, testNode)
+      expect(dataFor(testNode.childNodes[0])).toEqual(outerViewModel)
+    })
+  }) // /jsx
+
+  describe('slots', function () {
     it('inserts into <slot> content with the named slot template', function () {
       testNode.innerHTML = `
         <test-component>
@@ -1376,6 +1398,8 @@ describe('Components: Component binding', function () {
         }]
       }
 
+      const jo = new JsxObserver(jsx, testNode)
+
       class ViewModel extends components.ComponentABC {
         static get template () {
           // <div><slot name='X'></slot><div>
@@ -1392,7 +1416,6 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      const jo = new JsxObserver(jsx, testNode)
 
       expect(testNode.innerText).toEqual('')
       expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
@@ -1400,7 +1423,6 @@ describe('Components: Component binding', function () {
 
       // <div x="1">r</div>
       arr([{elementName: 'div', children: ['r'], attributes: {x: 1}}, 'text'])
-      console.log(testNode.innerHTML)
       expect(testNode.innerHTML).toEqual(
         '<test-component><div><!--ko slot: "X"--><div>r</div>text<!--/ko--></div></test-component>')
       jo.dispose()

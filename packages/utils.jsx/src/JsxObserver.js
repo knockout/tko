@@ -10,7 +10,7 @@ import {
 } from '@tko/bind'
 
 import {
-  isObservable, unwrap,
+  isObservable, unwrap
 } from '@tko/observable'
 
 import {
@@ -40,7 +40,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, $context) {
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -70,8 +70,8 @@ export class JsxObserver extends LifeCycle {
       parentNode,
       parentNodeTarget,
       xmlns,
-      $context,
       nodeArrayOrObservableAtIndex: [],
+      performingInitialAdditions: true,
       subscriptionsForNode: new Map()
     })
 
@@ -80,6 +80,7 @@ export class JsxObserver extends LifeCycle {
     if (jsx !== null && jsx !== undefined) {
       this.observableArrayChange(this.createInitialAdditions(jsx))
     }
+    this.performingInitialAdditions = false
   }
 
   /**
@@ -147,8 +148,14 @@ export class JsxObserver extends LifeCycle {
     if (isObservable(jsx)) {
       const nextNode = this.lastNodeFor(index)
       const {parentNode, xmlns} = this
-      nodeArrayOrObservable = [new JsxObserver(jsx, parentNode, nextNode, xmlns)]
+      const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns)
+      nodeArrayOrObservable = [observer]
     } else {
+      const $context = contextFor(this.parentNode)
+      const isInsideTemplate = 'content' in this.parentNode
+      const shouldApplyBindings = $context && !isInsideTemplate &&
+        !this.performingInitialAdditions
+
       if (Array.isArray(jsx)) {
         nodeArrayOrObservable = jsx.map(j => this.jsxToNode(j))
       } else {
@@ -158,10 +165,9 @@ export class JsxObserver extends LifeCycle {
 
       for (const node of nodeArrayOrObservable) {
         this.parentNodeTarget.insertBefore(node, insertBefore)
-      }
-
-      if (!this.parentNode.content) {
-        this.applyBindingsToNodeOrArray(nodeArrayOrObservable)
+        if (shouldApplyBindings && this.canApplyBindings(node)) {
+          applyBindings($context, node)
+        }
       }
     }
 
@@ -170,30 +176,12 @@ export class JsxObserver extends LifeCycle {
   }
 
   /**
-   * True when Node is a type suitable for applyBindings
+   * True when Node is a type suitable for applyBindings i.e. a HTMLElement
+   * or a Comment.
    * @param {Node} node
    */
   canApplyBindings (node) {
     return node.nodeType === 1 || node.nodeType === 8
-  }
-
-  getContext () {
-    if (typeof this.$context === 'function') { return this.$context() }
-    if (this.$context) { return this.$context }
-    return contextFor(this.parentNode)
-  }
-
-  applyBindingsToNodeOrArray (nodeOrArray) {
-    const $context = this.getContext()
-    if (!$context) { return }
-
-    if (Array.isArray(nodeOrArray)) {
-      for (const node of nodeOrArray.filter(this.canApplyBindings)) {
-        applyBindings($context, node)
-      }
-    } else if (canApplyBindings(nodeOrArray)) {
-      applyBindings($context, nodeOrArray)
-    }
   }
 
   delChange (index) {
