@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/knockout/tko.binding.foreach/issues"
   },
-  "homepage": "https://github.com/knockout/tko.binding.foreach",
+  "homepage": "https://tko.io",
   "dependencies": {
     "@tko/bind": "^4.0.0-alpha6.4",
     "@tko/observable": "^4.0.0-alpha6.4",
@@ -50,5 +50,11 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ]
 }

@@ -5,7 +5,9 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import typescript from 'rollup-plugin-typescript2'
 import license from 'rollup-plugin-license'
-import * as pkg from './package.json'
+
+const pkgJson = fs.readFileSync(`${process.cwd()}/package.json`, {encoding: 'utf8'})
+const pkg = JSON.parse(pkgJson)
 
 const replacerPlugin = require('./tools/rollup.replacerPlugin')
 

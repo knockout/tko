@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
   },
-  "homepage": "https://github.com/knockout/tko#readme",
+  "homepage": "https://tko.io",
   "dependencies": {
     "@tko/observable": "^4.0.0-alpha6.4",
     "tslib": "^1.8.0"
@@ -45,5 +45,11 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ]
 }

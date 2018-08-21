@@ -24,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/knockout/tko.computed/issues"
   },
-  "homepage": "https://github.com/knockout/tko.computed#readme",
+  "homepage": "https://tko.io",
   "karma": {
     "frameworks": [
       "jasmine"
@@ -45,5 +45,11 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ]
 }

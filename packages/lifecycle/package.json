@@ -38,5 +38,12 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "homepage": "https://tko.io",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ]
 }

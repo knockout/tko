@@ -26,7 +26,7 @@
   "bugs": {
     "url": "https://github.com/knockout/tko.bind/issues"
   },
-  "homepage": "https://github.com/knockout/tko.bind#readme",
+  "homepage": "https://tko.io",
   "karma": {
     "frameworks": [
       "jasmine"
@@ -48,5 +48,11 @@
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ]
 }
