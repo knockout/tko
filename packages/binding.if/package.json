@@ -1,6 +1,6 @@
 {
   "name": "@tko/binding.if",
-  "version": "4.0.0-alpha6.5",
+  "version": "4.0.0-alpha6.6",
   "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
   "module": "dist/binding.if.js",
   "files": [
@@ -22,10 +22,10 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/bind": "^4.0.0-alpha6.5",
-    "@tko/computed": "^4.0.0-alpha6.5",
-    "@tko/observable": "^4.0.0-alpha6.5",
-    "@tko/utils": "^4.0.0-alpha6.5",
+    "@tko/bind": "^4.0.0-alpha6.6",
+    "@tko/computed": "^4.0.0-alpha6.6",
+    "@tko/observable": "^4.0.0-alpha6.6",
+    "@tko/utils": "^4.0.0-alpha6.6",
     "tslib": "^1.8.0"
   },
   "karma": {

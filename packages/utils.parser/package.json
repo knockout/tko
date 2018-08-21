@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.parser",
-  "version": "4.0.0-alpha6.5",
+  "version": "4.0.0-alpha6.6",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
   "module": "dist/utils.parser.js",
   "files": [
@@ -8,14 +8,14 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/observable": "^4.0.0-alpha6.5",
-    "@tko/utils": "^4.0.0-alpha6.5",
+    "@tko/observable": "^4.0.0-alpha6.6",
+    "@tko/utils": "^4.0.0-alpha6.6",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "@tko/bind": "^4.0.0-alpha6.5",
-    "@tko/binding.core": "^4.0.0-alpha6.5",
-    "@tko/provider.databind": "^4.0.0-alpha6.5"
+    "@tko/bind": "^4.0.0-alpha6.6",
+    "@tko/binding.core": "^4.0.0-alpha6.6",
+    "@tko/provider.databind": "^4.0.0-alpha6.6"
   },
   "karma": {
     "frameworks": [
