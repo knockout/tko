@@ -263,6 +263,18 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  it('inserts null and undefined values as comments', () => {
+    const parent = document.createElement('div')
+    const jsx = {
+      elementName: 'div',
+      children: ['a', null, 'b', undefined, 'c'],
+      attributes: {}
+    }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `<div>a<!--null-->b<!--undefined-->c</div>`)
+    jo.dispose()
+  })
+
   describe('$context', () => {
     it('applies the bindings of the parent node to children', () => {
       const parent = document.createElement('div')

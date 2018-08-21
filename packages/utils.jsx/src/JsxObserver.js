@@ -214,6 +214,9 @@ export class JsxObserver extends LifeCycle {
     if (typeof jsx === 'string') {
       return document.createTextNode(jsx)
     }
+    if (jsx === null || jsx === undefined) {
+      return document.createComment(String(jsx))
+    }
     if (jsx instanceof Node) {
       if (ORIGINAL_JSX_SYM in jsx) {
         jsx = jsx[ORIGINAL_JSX_SYM]
