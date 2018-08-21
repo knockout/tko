@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.component",
-  "version": "4.0.0-alpha6.4",
+  "version": "4.0.0-alpha6.5",
   "description": "Registry and loading utilities for web components",
   "module": "dist/utils.component.js",
   "files": [
@@ -8,19 +8,19 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/lifecycle": "^4.0.0-alpha6.4",
-    "@tko/observable": "^4.0.0-alpha6.4",
-    "@tko/utils": "^4.0.0-alpha6.4",
+    "@tko/lifecycle": "^4.0.0-alpha6.5",
+    "@tko/observable": "^4.0.0-alpha6.5",
+    "@tko/utils": "^4.0.0-alpha6.5",
     "jss": "^9.8.3",
     "jss-preset-default": "^4.5.0",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "@tko/bind": "^4.0.0-alpha6.4",
-    "@tko/binding.core": "^4.0.0-alpha6.4",
-    "@tko/computed": "^4.0.0-alpha6.4",
-    "@tko/provider.multi": "^4.0.0-alpha6.4",
-    "@tko/provider.virtual": "^4.0.0-alpha6.4"
+    "@tko/bind": "^4.0.0-alpha6.5",
+    "@tko/binding.core": "^4.0.0-alpha6.5",
+    "@tko/computed": "^4.0.0-alpha6.5",
+    "@tko/provider.multi": "^4.0.0-alpha6.5",
+    "@tko/provider.virtual": "^4.0.0-alpha6.5"
   },
   "karma": {
     "frameworks": [

@@ -1,6 +1,6 @@
 {
   "name": "@tko/binding.template",
-  "version": "4.0.0-alpha6.4",
+  "version": "4.0.0-alpha6.5",
   "description": "TKO Template bindings",
   "module": "dist/binding.template.js",
   "files": [
@@ -22,10 +22,10 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/bind": "^4.0.0-alpha6.4",
-    "@tko/computed": "^4.0.0-alpha6.4",
-    "@tko/observable": "^4.0.0-alpha6.4",
-    "@tko/utils": "^4.0.0-alpha6.4",
+    "@tko/bind": "^4.0.0-alpha6.5",
+    "@tko/computed": "^4.0.0-alpha6.5",
+    "@tko/observable": "^4.0.0-alpha6.5",
+    "@tko/utils": "^4.0.0-alpha6.5",
     "tslib": "^1.8.0"
   },
   "karma": {
@@ -34,7 +34,7 @@
     ]
   },
   "devDependencies": {
-    "@tko/binding.if": "^4.0.0-alpha6.4"
+    "@tko/binding.if": "^4.0.0-alpha6.5"
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
