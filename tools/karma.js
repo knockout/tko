@@ -53,8 +53,8 @@ const rollupPreprocessor = {
 const typescriptPreprocessor = {
   typescript,
   options: {
-    target: 'ES5',
-    lib: ['DOM', 'ES5', 'ES6', 'ScriptHost', 'ES2015', 'ES2016', 'ES2017'],
+    target: 'ES2017',
+    // lib: ['DOM', 'ES5', 'ES6', 'ScriptHost', 'ES2015', 'ES2016', 'ES2017'],
     removeComments: false,
     downlevelIteration: true
   }
