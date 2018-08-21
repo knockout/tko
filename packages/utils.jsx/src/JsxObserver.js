@@ -123,7 +123,8 @@ export class JsxObserver extends LifeCycle {
   observableArrayChange (changes) {
     let adds = []
     let dels = []
-    for (const change of changes) {
+    for (const index in changes) {
+      const change = changes[index]
       if (change.status === 'added') {
         adds.push([change.index, change.value])
       } else {

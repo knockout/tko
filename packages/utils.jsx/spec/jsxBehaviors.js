@@ -275,6 +275,18 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  it('inserts sparse arrays', () => {
+    // The JSX preprocessor can generate sparse arrays with e.g.
+    //  <div>{/* thing */}</div>
+    const parent = document.createElement('div')
+    const jsx = []
+    jsx[0] = 'a'
+    jsx[2] = 'b'
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `ab`)
+    jo.dispose()
+  })
+
   describe('$context', () => {
     it('applies the bindings of the parent node to children', () => {
       const parent = document.createElement('div')
