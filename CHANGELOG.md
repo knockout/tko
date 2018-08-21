@@ -1,7 +1,10 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 🎒 `alpha-5a..ongoing` (5 July 2018)
+## 🎒 `alpha-5a..alpha6.x`  (ongoing)
 
+* JSX now supports infinitely nestable observables/arrays
+* JSX now uses `trackArrayChanges` to give O(1) updates to arrays
+* LifeCycle::subscribe now binds to the current class instance
 * The `tko` package will now be published as `@tko/build.reference`, and knockout as `@tko/build.knockout`
 * Mass move of `tko.*` to the `@tko` organization i.e. `@tko/`
 * Test release

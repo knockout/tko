@@ -16,8 +16,18 @@ import {
 } from '@tko/bind'
 
 import {
-  jsxToNode, JsxObserver
+  JsxObserver
 } from '../src'
+import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
+
+
+/**
+ * Simple wrapper for testing.
+ */
+function jsxToNode (jsx, xmlns, node = document.createElement('div')) {
+  new JsxObserver(jsx, node, null, xmlns)
+  return node.childNodes[0]
+}
 
 describe('jsx', function () {
   it('converts a simple node', () => {
@@ -193,6 +203,15 @@ describe('jsx', function () {
     assert.equal(nodeValues['any2'], 'e')
   })
 
+  it('inserts after a comment parent-node', () => {
+    const parent = document.createElement('div')
+    const comment = document.createComment('comment-parent')
+    parent.appendChild(comment)
+    parent.appendChild(document.createComment('end'))
+    const o = new JsxObserver('r', comment)
+    assert.equal(parent.innerHTML, `<!--comment-parent-->r<!--end-->`)
+  })
+
   it('inserts SVG nodes and children correctly', function () {
     const obs = observable()
     const circle = { elementName: 'circle', children: [], attributes: {} }
@@ -204,6 +223,44 @@ describe('jsx', function () {
     obs({ elementName: 'rect', children: [], attributes: {} })
     assert.equal(node.childNodes[1].tagName, 'rect')
     assert.instanceOf(node.childNodes[1], SVGElement)
+  })
+
+  it('inserts actual nodes correctly', () => {
+    const parent = document.createElement('div')
+    const itag = document.createElement('i')
+    const jsx = { elementName: 'div', children: [itag], attributes: {} }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `<div><i></i></div>`)
+    jo.dispose()
+  })
+
+  it('inserts actual nodes multiple times', () => {
+    const parent = document.createElement('div')
+    const itag = document.createElement('i')
+    const jsx = { elementName: 'div', children: [itag, itag], attributes: {} }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `<div><i></i><i></i></div>`)
+    jo.dispose()
+  })
+
+  it('inserts nodes from original JSX correctly', () => {
+    const parent = document.createElement('div')
+    const itag = document.createElement('i')
+    itag[ORIGINAL_JSX_SYM] = { elementName: 'b', children: [], attributes: {} }
+    const jsx = { elementName: 'div', children: [itag], attributes: {} }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `<div><b></b></div>`)
+    jo.dispose()
+  })
+
+  it('inserts nodes from original JSX multiple times', () => {
+    const parent = document.createElement('div')
+    const itag = document.createElement('i')
+    itag[ORIGINAL_JSX_SYM] = { elementName: 'b', children: [], attributes: {} }
+    const jsx = { elementName: 'div', children: [itag, itag], attributes: {} }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `<div><b></b><b></b></div>`)
+    jo.dispose()
   })
 
   describe('$context', () => {

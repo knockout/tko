@@ -24,35 +24,53 @@ const NAMESPACES = {
   html: 'http://www.w3.org/1999/xhtml'
 }
 
+/**
+ * JSX object from a pre-processor.
+ * @typedef {Object} JSX
+ * @property {string} elementName becomes the `tagName`
+ * @property {Array.<JSX>} children
+ * @property {object} attributes
+ */
+
+/**
+ * Observe a variety of possible cases from JSX, modifying the
+ * `parentNode` at `insertBefore` with the result.
+ */
 export class JsxObserver extends LifeCycle {
+  /**
+   * @param {any} jsxOrObservable take a long list of permutations
+   */
   constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, $context) {
     super()
 
-    const parentNodeTarget = 'content' in parentNode
-      ? parentNode.content
-      : parentNode
+    const parentNodeIsComment = parentNode.nodeType === 8
+
+    const parentNodeTarget = this.getParentTarget(parentNode)
 
     if (isObservable(jsxOrObservable)) {
       jsxOrObservable.extend({trackArrayChanges: true})
       this.subscribe(jsxOrObservable, this.observableArrayChange, 'arrayChange')
 
       if (!insertBefore) {
+        const insertAt = parentNodeIsComment ? parentNode.nextSibling : null
         insertBefore = document.createComment('O')
+        parentNodeTarget.insertBefore(insertBefore, insertAt)
       }
+    }
 
-      if (insertBefore.parentNode !== parentNodeTarget) {
-        parentNodeTarget.insertBefore(insertBefore, null)
-      }
+    if (parentNodeIsComment && !insertBefore) {
+      // Typcially: insertBefore becomes <!-- /ko -->
+      insertBefore = parentNode.nextSibling
     }
 
     this.anchorTo(insertBefore || parentNode)
 
     Object.assign(this, {
-      $context,
       insertBefore,
       parentNode,
       parentNodeTarget,
       xmlns,
+      $context,
       nodeArrayOrObservableAtIndex: [],
       subscriptionsForNode: new Map()
     })
@@ -64,9 +82,22 @@ export class JsxObserver extends LifeCycle {
     }
   }
 
+  /**
+   * @param {HMTLElement|Comment|HTMLTemplateElement} parentNode
+   */
+  getParentTarget (parentNode) {
+    if ('content' in parentNode) { return parentNode.content }
+    if (parentNode.nodeType === 8) { return parentNode.parentNode }
+    return parentNode
+  }
+
   dispose () {
     super.dispose()
-    this.parentNodeTarget.remove(this.insertBefore)
+    const ib = this.insertBefore
+    const insertBeforeIsChild = ib && this.parentNodeTarget === ib.parentNode
+    if (insertBeforeIsChild) {
+      this.parentNodeTarget.removeChild(ib)
+    }
     this.removeAllPriorNodes()
   }
 
@@ -123,10 +154,14 @@ export class JsxObserver extends LifeCycle {
         nodeArrayOrObservable = [this.jsxToNode(jsx)]
       }
       const insertBefore = this.lastNodeFor(index)
+
       for (const node of nodeArrayOrObservable) {
         this.parentNodeTarget.insertBefore(node, insertBefore)
       }
-      this.applyBindingsToNodeOrArray(nodeArrayOrObservable)
+
+      if (!this.parentNode.content) {
+        this.applyBindingsToNodeOrArray(nodeArrayOrObservable)
+      }
     }
 
     this.nodeArrayOrObservableAtIndex.splice(index, 0,
@@ -141,9 +176,16 @@ export class JsxObserver extends LifeCycle {
     return node.nodeType === 1 || node.nodeType === 8
   }
 
+  getContext () {
+    if (typeof this.$context === 'function') { return this.$context() }
+    if (this.$context) { return this.$context }
+    return contextFor(this.parentNode)
+  }
+
   applyBindingsToNodeOrArray (nodeOrArray) {
-    const {$context} = this
+    const $context = this.getContext()
     if (!$context) { return }
+
     if (Array.isArray(nodeOrArray)) {
       for (const node of nodeOrArray.filter(this.canApplyBindings)) {
         applyBindings($context, node)
@@ -172,6 +214,14 @@ export class JsxObserver extends LifeCycle {
     if (typeof jsx === 'string') {
       return document.createTextNode(jsx)
     }
+    if (jsx instanceof Node) {
+      if (ORIGINAL_JSX_SYM in jsx) {
+        jsx = jsx[ORIGINAL_JSX_SYM]
+      } else {
+        return jsx.cloneNode(true)
+      }
+    }
+
     const xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || this.xmlns
     const node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
 

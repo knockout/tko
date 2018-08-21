@@ -19,7 +19,7 @@ import {
 } from '@tko/utils'
 
 import {
-  cloneNodeFromOriginal
+  JsxObserver, getOriginalJsxForNode
 } from '@tko/utils.jsx'
 
 import {
@@ -51,9 +51,25 @@ export default class SlotBinding extends DescendantBindingHandler {
    * @param {HTMLElement}} slotValue
    */
   replaceSlotWithNode (nodeInComponentTemplate, slotNode) {
-    const nodesForSlot = cloneNodeFromOriginal(slotNode)
-    virtualElements.setDomNodeChildren(nodeInComponentTemplate, nodesForSlot)
+    const nodes = this.cloneNodeFromOriginal(slotNode)
+    virtualElements.emptyNode(nodeInComponentTemplate)
+    this.addDisposable(new JsxObserver(nodes, nodeInComponentTemplate))
   }
+
+  cloneNodeFromOriginal (node) {
+    if (!node) { return [] }
+    const jsx = getOriginalJsxForNode(node)
+    if (jsx) { return jsx.children }
+
+    if ('content' in node) {
+      const clone = document.importNode(node.content, true)
+      return [...clone.childNodes]
+    }
+
+    const nodeArray = Array.isArray(node) ? node : [node]
+    return nodeArray.map(n => n.cloneNode(true))
+  }
+
 
   getSlot (slotName) {
     const {$componentTemplateSlotNodes} = this.$context

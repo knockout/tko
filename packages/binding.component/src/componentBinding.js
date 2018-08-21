@@ -43,8 +43,9 @@ export default class ComponentBinding extends DescendantBindingHandler {
     }
 
     if (maybeJsx(template)) {
+      virtualElements.emptyNode(element)
       this.addDisposable(new JsxObserver(template, element, null, undefined,
-        this.childBindingContext))
+        () => this.childBindingContext))
 
     } else {
       const clonedNodesArray = cloneNodes(template)
@@ -104,6 +105,17 @@ export default class ComponentBinding extends DescendantBindingHandler {
     registry.get(componentName, (defn) => this.applyComponentDefinition(componentName, componentParams, defn))
   }
 
+  makeChildBindingContext ($component) {
+    const ctxExtender = (ctx) => Object.assign(ctx, {
+      $component,
+      $componentTemplateNodes: this.originalChildNodes,
+      $componentTemplateSlotNodes: this.makeTemplateSlotNodes(
+        this.originalChildNodes)
+    })
+
+    return this.$context.createChildContext($component, undefined, ctxExtender)
+  }
+
   applyComponentDefinition (componentName, componentParams, componentDefinition) {
     // If this is not the current load operation for this element, ignore it.
     if (this.currentLoadingOperationId !== this.loadingOperationId ||
@@ -124,6 +136,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
     }
 
     const componentViewModel = this.createViewModel(componentDefinition, element, this.originalChildNodes, componentParams)
+    this.childBindingContext = this.makeChildBindingContext(componentViewModel)
 
     const viewTemplate = componentViewModel && componentViewModel.template
 
@@ -139,14 +152,6 @@ export default class ComponentBinding extends DescendantBindingHandler {
       componentViewModel.anchorTo(this.$element)
     }
 
-    const ctxExtender = (ctx) => Object.assign(ctx, {
-      $component: componentViewModel,
-      $componentTemplateNodes: this.originalChildNodes,
-      $componentTemplateSlotNodes: this.makeTemplateSlotNodes(
-        this.originalChildNodes)
-    })
-
-    this.childBindingContext = this.$context.createChildContext(componentViewModel, /* dataItemAlias */ undefined, ctxExtender)
     this.currentViewModel = componentViewModel
 
     const onBinding = this.onBindingComplete.bind(this, componentViewModel)

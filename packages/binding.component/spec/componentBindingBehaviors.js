@@ -30,7 +30,7 @@ import {
 } from '@tko/binding.if'
 
 import {
-  jsxToNode
+  JsxObserver
 } from '@tko/utils.jsx'
 
 import {
@@ -882,19 +882,19 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="v0">text<!--[JSX P]--></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="v0">text<!--O--></div>')
 
       obs('v1')
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="v1">text<!--[JSX P]--></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div attr="v1">text<!--O--></div>')
 
       obs(undefined)
-      expect(testNode.children[0].innerHTML).toEqual('<div>text<!--[JSX P]--></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div>text<!--O--></div>')
 
       o2({ elementName: 'i', children: ['g'], attributes: {} })
-      expect(testNode.children[0].innerHTML).toEqual('<div><i>g</i><!--[JSX P]--></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div><i>g</i><!--O--></div>')
 
       o2(undefined)
-      expect(testNode.children[0].innerHTML).toEqual('<div><!--[JSX C]--><!--[JSX P]--></div>')
+      expect(testNode.children[0].innerHTML).toEqual('<div><!--O--></div>')
     })
 
     it('inserts a partial when the `template` is an array', function () {
@@ -946,13 +946,13 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c><!--[JSX P]--></b>')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c><!--O--></b>')
 
       children.pop()
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<!--[JSX P]--></b>')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<!--O--></b>')
 
       children.unshift('rrr')
-      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc<!--[JSX P]--></b>')
+      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc<!--O--></b>')
     })
 
     it('inserts and updates observable template', function () {
@@ -964,10 +964,10 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('abc')
+      expect(testNode.children[0].innerHTML).toEqual('abc<!--O-->')
 
       t(["rr", "vv"])
-      expect(testNode.children[0].innerHTML).toEqual('rrvv')
+      expect(testNode.children[0].innerHTML).toEqual('rrvv<!--O-->')
     })
 
     it('gets params from the node', function () {
@@ -994,7 +994,7 @@ describe('Components: Component binding', function () {
     })
   })
 
-  describe('slots', function () {
+  ddescribe('slots', function () {
     it('inserts into <slot> content with the named slot template', function () {
       testNode.innerHTML = `
         <test-component>
@@ -1047,7 +1047,7 @@ describe('Components: Component binding', function () {
         static get template () {
           return `
             <div>
-              <!-- ko slot: "alpha" --><!-- /ko -->
+              <!-- ko slot: "alpha" --><!-- /ko --> /
               <!-- ko slot: "alpha" --><!-- /ko -->
             </div>
           `
@@ -1056,7 +1056,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerText.trim()).toEqual(`beep beep`)
+      expect(testNode.children[0].innerText.trim()).toEqual(`beep / beep`)
     })
 
     it('inserts into nested elements', function () {
@@ -1219,7 +1219,7 @@ describe('Components: Component binding', function () {
 
     it('preserves JSX-based slots', function () {
       testNode.innerHTML = ''
-      testNode.appendChild(jsxToNode({
+      new JsxObserver({
         elementName: 'test-component',
         attributes: {},
         children: [{
@@ -1227,7 +1227,7 @@ describe('Components: Component binding', function () {
           attributes: {slot: 'X'},
           children: ['t', 'o']
         }]
-      }))
+      }, testNode)
 
       class ViewModel extends components.ComponentABC {
         static get template () {
@@ -1254,7 +1254,7 @@ describe('Components: Component binding', function () {
     it('preserves native attributes on child nodes', function () {
       testNode.innerHTML = ''
       const attrx = {}
-      testNode.appendChild(jsxToNode({
+      const jsx = {
         elementName: 'test-component',
         attributes: {},
         children: [{
@@ -1266,7 +1266,8 @@ describe('Components: Component binding', function () {
             children: []
           }]
         }]
-      }))
+      }
+      new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
         static get template () {
@@ -1311,10 +1312,10 @@ describe('Components: Component binding', function () {
       expect(testNode.innerText).toEqual('téx†')
     })
 
-    it('respects observable array changes', function () {
+    it('respects observable array changes with text', function () {
       testNode.innerHTML = ''
       const arr = observableArray([])
-      testNode.appendChild(jsxToNode({
+      const jsx = {
         elementName: 'test-component',
         attributes: {},
         children: [{
@@ -1322,7 +1323,9 @@ describe('Components: Component binding', function () {
           attributes: {slot: 'X'},
           children: [arr]
         }]
-      }))
+      }
+
+      new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
         static get template () {
@@ -1340,19 +1343,67 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
+
       expect(testNode.innerText).toEqual('')
       expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
       expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
 
-      arr(['abc', 'def'])
-      expect(testNode.innerText).toEqual('abcdef')
+      arr(['abcdef'])
+      expect(testNode.innerHTML).toEqual(
+        '<test-component><div><!--ko slot: "X"-->abcdef<!--/ko--></div></test-component>'
+      )
 
       arr([])
-      expect(testNode.innerText).toEqual('')
+      expect(testNode.innerHTML).toEqual(
+        `<test-component><div><!--ko slot: "X"--><!--/ko--></div></test-component>`
+      )
+    })
 
+    it('respects observable array changes with JSX', function () {
+      testNode.innerHTML = ''
+      const arr = observableArray([])
+
+      // <test-component>
+      //   <template slot='X'>{arr}</template>
+      // </test-component>
+      const jsx = {
+        elementName: 'test-component',
+        attributes: {},
+        children: [{
+          elementName: 'template',
+          attributes: {slot: 'X'},
+          children: [arr]
+        }]
+      }
+
+      class ViewModel extends components.ComponentABC {
+        static get template () {
+          // <div><slot name='X'></slot><div>
+          return {
+            elementName: 'div',
+            attributes: {},
+            children: [
+              { elementName: 'slot', attributes: {name: 'X'}, children: [] }
+            ]
+          }
+        }
+      }
+
+      ViewModel.register('test-component')
+
+      applyBindings(outerViewModel, testNode)
+      const jo = new JsxObserver(jsx, testNode)
+
+      expect(testNode.innerText).toEqual('')
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+
+      // <div x="1">r</div>
       arr([{elementName: 'div', children: ['r'], attributes: {x: 1}}, 'text'])
-      const div = testNode.childNodes[0].childNodes[0]
-      expect(div.innerHTML).toEqual('<!--ko slot: "X"--><div>r</div>text<!--[JSX P]--><!--/ko-->')
+      console.log(testNode.innerHTML)
+      expect(testNode.innerHTML).toEqual(
+        '<test-component><div><!--ko slot: "X"--><div>r</div>text<!--/ko--></div></test-component>')
+      jo.dispose()
     })
   })
 })

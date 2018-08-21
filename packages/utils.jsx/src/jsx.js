@@ -44,44 +44,6 @@ export function maybeJsx (possibleJsx) {
   return true
 }
 
-function canApplyBindings (node) {
-  return node.nodeType === 1 || node.nodeType === 8
-}
-
-/**
- * Clone a node from its original JSX if possible, otherwise using DOM cloneNode
- * This preserves any native attributes set by JSX.
- * @param {HTMLElemen} node
- * @return {HTMLElement} clone of node
- */
-export function cloneNodeFromOriginal (node) {
-  if (!node) { return [] }
-
-  if (node[ORIGINAL_JSX_SYM]) {
-    const possibleTemplate = jsxToNode(node[ORIGINAL_JSX_SYM])
-    return [...possibleTemplate.content
-      ? possibleTemplate.content.childNodes
-      : possibleTemplate.childNodes]
-  }
-
-  if ('content' in node) {
-    const clone = document.importNode(node.content, true)
-    return [...clone.childNodes]
-  }
-
-  const nodeArray = Array.isArray(node) ? node : [node]
-  return nodeArray.map(n => n.cloneNode(true))
-}
-
-/**
- * Use a JSX transpilation of the format created by babel-plugin-transform-jsx
- * @param {Object} jsx An object of the form
- *    { elementName: node-name e.g. "div",
- *      attributes: { "attr": "value", ... },
- *      children: [string | jsx]
- *    }
- */
-export function jsxToNode (jsx, xmlns, node = document.createElement('div')) {
-  const observer = new JsxObserver(jsx, node, null, xmlns)
-  return node.childNodes[0]
+export function getOriginalJsxForNode (node) {
+  return node[ORIGINAL_JSX_SYM]
 }
