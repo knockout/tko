@@ -37,7 +37,7 @@
       "jasmine"
     ],
     "files": [
-      "dist/knockout.es6.js",
+      "dist/build.knockout.es6.js",
       "helpers/jasmine.extensions.js",
       "spec/**/*.js"
     ]
