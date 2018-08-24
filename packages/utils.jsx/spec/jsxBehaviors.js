@@ -291,6 +291,57 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  it('inserts primitives as strings', () => {
+    const parent = document.createElement('div')
+    const jsx = [1, '2', false, true]
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '12falsetrue')
+    jo.dispose()
+  })
+
+  it('inserts null/undefined/symbol as comments', () => {
+    const parent = document.createElement('div')
+    const jsx = [null, undefined, Symbol('z')]
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '<!--null--><!--undefined--><!--Symbol(z)-->')
+    jo.dispose()
+  })
+
+  it('inserts BigInt as a string', () => {
+    const supported = 'BigInt' in window
+    if (!supported) { return }
+    const parent = document.createElement('div')
+    const jsx = [BigInt(123)]
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '123')
+    jo.dispose()
+  })
+
+  it('inserts arbitrary objects as string comments', () => {
+    // Arbitrary objects ought to never show up here, but in the event
+    // that they do, we add them as comments to make KO more debuggable.
+    const parent = document.createElement('div')
+    const jsx = [{x: '123'}]
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '<!--{"x":"123"}-->')
+    jo.dispose()
+
+  })
+
+  it('inserts a promise after it resolves', async () => {
+    const parent = document.createElement('div')
+    const obs = observable()
+    const p = obs.when(true)
+    const jsx = [p]
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '<!--P-->')
+    obs(true)
+    await p
+    console.log('x')
+    assert.equal(parent.innerHTML, 'true')
+    jo.dispose()
+  })
+
   describe('bindings', () => {
     it('applies bindings attached to the nodes', () => {
       let counter = 0

@@ -157,9 +157,9 @@ export class JsxObserver extends LifeCycle {
         !this.performingInitialAdditions
 
       if (Array.isArray(jsx)) {
-        nodeArrayOrObservable = jsx.map(j => this.jsxToNode(j))
+        nodeArrayOrObservable = jsx.map(j => this.anyToNode(j))
       } else {
-        nodeArrayOrObservable = [this.jsxToNode(jsx)]
+        nodeArrayOrObservable = [this.anyToNode(jsx)]
       }
       const insertBefore = this.lastNodeFor(index)
 
@@ -199,21 +199,67 @@ export class JsxObserver extends LifeCycle {
     return this.subscriptionsForNode.get(node)
   }
 
-  jsxToNode (jsx) {
-    if (typeof jsx === 'string') {
-      return document.createTextNode(jsx)
-    }
-    if (jsx === null || jsx === undefined) {
-      return document.createComment(String(jsx))
-    }
-    if (jsx instanceof Node) {
-      if (ORIGINAL_JSX_SYM in jsx) {
-        jsx = jsx[ORIGINAL_JSX_SYM]
-      } else {
-        return jsx.cloneNode(true)
-      }
+  /**
+   * Promises/A+ compliant isThenable (per section 1.2)
+   */
+  isThenable (object) {
+    const objectType = typeof object
+    const thenableType = objectType === 'object' || objectType === 'function'
+    return thenableType && object !== null && typeof object.then === 'function'
+  }
+
+  isJsx (jsx) {
+    return typeof jsx.elementName === 'string' && jsx.children && jsx.attributes
+  }
+
+  /**
+   * @param {any} value acceptable to turn into a Node
+   *
+   * The one thing `any` cannot be here is an Array or Observable; both those
+   * cases are handled with new JsxObservers.
+   */
+  anyToNode (any) {
+    if (this.isThenable(any)) { return this.futureJsxNode(any) }
+
+    switch (typeof any) {
+      case 'object': break
+      case 'function': return anyToNode(any())
+      case 'undefined':
+      case 'symbol':
+        return document.createComment(String(any))
+      case 'string': return document.createTextNode(any)
+      case 'boolean':
+      case 'number':
+      case 'bigint':
+      default:
+        return document.createTextNode(String(any))
     }
 
+    if (any === null) { return document.createComment(String(any)) }
+    if (any instanceof Node) { return this.cloneNode(any) }
+    if (!this.isJsx(any)) { return document.createComment(JSON.stringify(any)) }
+
+    return this.jsxToNode(any)
+  }
+
+  /**
+   * Clone a node; if that node was originally from JSX, we clone from there
+   * so we preserve binding handlers.
+   *
+   * @param {HTMLElement} node
+   */
+  cloneNode (node) {
+    if (ORIGINAL_JSX_SYM in node) {
+      return this.jsxToNode(node[ORIGINAL_JSX_SYM])
+    } else {
+      return node.cloneNode(true)
+    }
+  }
+
+  /**
+   * @param {JSX} jsx to convert to a node.
+   */
+  jsxToNode (jsx) {
     const xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || this.xmlns
     const node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
 
@@ -235,6 +281,17 @@ export class JsxObserver extends LifeCycle {
     this.addDisposable(new JsxObserver(jsx.children, node, null, xmlns))
 
     return node
+  }
+
+  futureJsxNode (promise) {
+    const placeholder = document.createComment('P')
+    promise.then(v => {
+      const {parentNode} = placeholder
+      if (parentNode) {
+        parentNode.replaceChild(this.anyToNode(v), placeholder)
+      }
+    })
+    return placeholder
   }
 
   updateAttributes (node, attributes) {
