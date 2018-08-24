@@ -337,7 +337,6 @@ describe('jsx', function () {
     assert.equal(parent.innerHTML, '<!--P-->')
     obs(true)
     await p
-    console.log('x')
     assert.equal(parent.innerHTML, 'true')
     jo.dispose()
   })

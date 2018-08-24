@@ -61,3 +61,26 @@ export function clonePlainObjectDeep (obj, seen) {
   }
   return result
 }
+
+/**
+ * JSON.stringify, but inserts `...` for objects that are referenced
+ * multiple times, preventing infinite recursion.
+ */
+export function safeStringify (value) {
+  const seen = new Set()
+  return JSON.stringify(value, (k, v) => {
+    if (seen.has(v)) { return '...' }
+    if (typeof v === 'object') { seen.add(v) }
+    return v
+  })
+}
+
+
+/**
+ * Promises/A+ compliant isThenable (per section 1.2)
+ */
+export function isThenable (object) {
+  const objectType = typeof object
+  const thenableType = objectType === 'object' || objectType === 'function'
+  return thenableType && object !== null && typeof object.then === 'function'
+}

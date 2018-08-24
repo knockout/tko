@@ -437,4 +437,20 @@ describe('cloneNodes', function () {
 
     expect(childIsClone).toBe(true)
   })
+
+  describe('safeStringfy', () => {
+    const {safeStringify} = utils
+
+    it('stringifies plain objects', () => {
+      expect(safeStringify({})).toEqual('{}')
+    })
+
+    it('stringifies recursive objects', () => {
+      const recursive = { b: 1, c: 1 }
+      recursive.a = recursive
+
+      const expectObj = { b: 1, c: 1, a: '...' }
+      expect(JSON.parse(safeStringify(recursive))).toEqual(expectObj)
+    })
+  })
 })

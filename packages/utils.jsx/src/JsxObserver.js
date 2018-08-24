@@ -2,7 +2,7 @@
 import {LifeCycle} from '@tko/lifecycle'
 
 import {
-  removeNode
+  removeNode, safeStringify, isThenable
 } from '@tko/utils'
 
 import {
@@ -199,15 +199,6 @@ export class JsxObserver extends LifeCycle {
     return this.subscriptionsForNode.get(node)
   }
 
-  /**
-   * Promises/A+ compliant isThenable (per section 1.2)
-   */
-  isThenable (object) {
-    const objectType = typeof object
-    const thenableType = objectType === 'object' || objectType === 'function'
-    return thenableType && object !== null && typeof object.then === 'function'
-  }
-
   isJsx (jsx) {
     return typeof jsx.elementName === 'string' && jsx.children && jsx.attributes
   }
@@ -219,7 +210,7 @@ export class JsxObserver extends LifeCycle {
    * cases are handled with new JsxObservers.
    */
   anyToNode (any) {
-    if (this.isThenable(any)) { return this.futureJsxNode(any) }
+    if (isThenable(any)) { return this.futureJsxNode(any) }
 
     switch (typeof any) {
       case 'object': break
@@ -237,7 +228,7 @@ export class JsxObserver extends LifeCycle {
 
     if (any === null) { return document.createComment(String(any)) }
     if (any instanceof Node) { return this.cloneNode(any) }
-    if (!this.isJsx(any)) { return document.createComment(JSON.stringify(any)) }
+    if (!this.isJsx(any)) { return document.createComment(safeStringify(any)) }
 
     return this.jsxToNode(any)
   }
