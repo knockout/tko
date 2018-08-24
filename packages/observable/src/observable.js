@@ -57,6 +57,10 @@ observable.fn = {
     this.notifySubscribers(this[LATEST_VALUE], 'beforeChange')
   },
 
+  modify (fn, peek = true) {
+    return this(fn(peek ? this.peek() : this()))
+  },
+
   // Some observables may not always be writeable, notably computeds.
   isWriteable: true
 }
