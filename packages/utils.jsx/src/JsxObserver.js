@@ -200,7 +200,9 @@ export class JsxObserver extends LifeCycle {
   }
 
   isJsx (jsx) {
-    return typeof jsx.elementName === 'string' && jsx.children && jsx.attributes
+    return typeof jsx.elementName === 'string' &&
+      'children' in jsx &&
+      'attributes' in jsx
   }
 
   /**
