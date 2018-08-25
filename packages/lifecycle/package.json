@@ -1,18 +1,18 @@
 {
   "module": "dist/lifecycle.js",
   "dependencies": {
-    "@tko/computed": "^4.0.0-alpha6.7",
-    "@tko/utils": "^4.0.0-alpha6.7",
+    "@tko/computed": "^4.0.0-alpha6.8",
+    "@tko/utils": "^4.0.0-alpha6.8",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "@tko/observable": "^4.0.0-alpha6.7"
+    "@tko/observable": "^4.0.0-alpha6.8"
   },
   "files": [
     "dist/"
   ],
   "name": "@tko/lifecycle",
-  "version": "4.0.0-alpha6.7",
+  "version": "4.0.0-alpha6.8",
   "description": "Knockout LifeCycle for object instances",
   "repository": "git@github.com:knockout/tko.lifecycle.git",
   "author": "Knockout Team",
