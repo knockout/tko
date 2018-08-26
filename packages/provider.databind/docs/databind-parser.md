@@ -92,7 +92,7 @@ Sbind language is closer to JSON than Javascript, so it's easier to describe its
 5. a subset of Javascript expressions are available (see below);
 6. observables that are part of expressions are automatically unwrapped for convenience.
 
-† Note that this is a deviation from the ordinary Knockout behaviour, where
+† Note that this is a deviation from the ordinary Knockout behavior, where
 `this` would be `window` (unless the function is otherwise bound).
 
 KSB provider uses Knockout's built-in bindings, so `text`, `foreach`, and all the others should work as expected. It also works with virtual elements.
@@ -176,7 +176,7 @@ KSB supports some [Javascript operations](https://developer.mozilla.org/en-US/do
 
 Notes:
 
-1. Observables in expressions are unwrapped as a convenience so `text: a > b` will unwrap both `a` and `b` if they are observables. It will not unwrap for membership i.e. `a.property` will return the `property` of the observable (`a.property`), not the property of the observable's unwrapped value (`ko.unwrap(a).property`). If the variable referred to is not part of an expression (e.g. `text: a`) then the variable will not be unwrapped before being passed to a binding. This is the expected behaviour.
+1. Observables in expressions are unwrapped as a convenience so `text: a > b` will unwrap both `a` and `b` if they are observables. It will not unwrap for membership i.e. `a.property` will return the `property` of the observable (`a.property`), not the property of the observable's unwrapped value (`ko.unwrap(a).property`). If the variable referred to is not part of an expression (e.g. `text: a`) then the variable will not be unwrapped before being passed to a binding. This is the expected behavior.
 
 2. While negation and double-negation are supported, trible negation (`!!!`) will not work as expected.
 

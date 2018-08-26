@@ -3,7 +3,7 @@ import {
   BindingStringProvider
 } from '../src'
 
-describe('Binding String Provider behaviour', function () {
+describe('Binding String Provider behavior', function () {
   describe('getBindingAccessors', function () {
     it('parses the given string', function () {
       class TestBSP extends BindingStringProvider {

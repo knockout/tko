@@ -3,7 +3,7 @@ import {
   MultiProvider
 } from '../src'
 
-describe('MultiProvider Behaviour', function () {
+describe('MultiProvider Behavior', function () {
   describe('nodeHasBindings', function () {
     it('is true if one provider the last is true', function () {
       const mp = new MultiProvider({

@@ -2,7 +2,7 @@
 
 //
 // TODO/FIXME:
-// The following is a combination of observable and comptued behaviour.  In
+// The following is a combination of observable and comptued behavior.  In
 // future the Observable-only parts ought to be moved to tko.observable tests.
 //
 

@@ -1,5 +1,5 @@
 describe('Binding: Click', function() {
-    // This is just a special case of the "event" binding, so not necessary to respecify all its behaviours
+    // This is just a special case of the "event" binding, so not necessary to respecify all its behaviors
     beforeEach(jasmine.prepareTestNode);
 
     it('Should invoke the supplied function on click, using model as \'this\' param and first arg, and event as second arg', function () {

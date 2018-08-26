@@ -30,7 +30,7 @@ import { bindings as ifBindings } from '@tko/binding.if'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'
 
-describe('BindingHandler behaviours', function () {
+describe('BindingHandler behaviors', function () {
   var bindingHandlers
 
   beforeEach(jasmine.prepareTestNode)

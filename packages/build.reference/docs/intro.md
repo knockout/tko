@@ -18,7 +18,7 @@ Knockout helps you create rich, responsive, maintainable applications built on a
 - **Templating**
   Create reusable components and sophisticated web applications.
 - **Extensible**
-  Implement custom behaviours and compartmentalized code.
+  Implement custom behaviors and compartmentalized code.
 
 TKO has a comprehensive suite of tests that ensure its correct functioning and allow easy verification on different Javascript browsers and platforms.
 

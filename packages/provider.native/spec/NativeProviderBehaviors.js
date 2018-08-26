@@ -7,7 +7,7 @@ import {
   default as NativeProvider, NATIVE_BINDINGS
 } from '../src/NativeProvider'
 
-describe('Native Provider Behaviour', function () {
+describe('Native Provider Behavior', function () {
   it('returns native bindings', function () {
     const p = new NativeProvider()
     const div = document.createElement('div')

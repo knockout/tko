@@ -1,5 +1,5 @@
 //
-// Test Mapping Behaviour
+// Test Mapping Behavior
 //
 
 import {

@@ -72,7 +72,7 @@ describe('Binding: CSS style', function () {
   })
 
   it('Should be able to use "false" to remove a style', function () {
-    // Verifying that the fix for 972 doesn't break this existing behaviour
+    // Verifying that the fix for 972 doesn't break this existing behavior
     testNode.innerHTML = "<div style='width: 100px' data-bind='style: { width: false }'></div>"
     applyBindings(null, testNode)
     expect(testNode.childNodes[0].style.width).toBe('')

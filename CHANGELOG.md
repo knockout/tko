@@ -91,7 +91,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Add `each` as an alias of `foreach`
 
 * Parser
-  * Correct behaviour with dereferencing members of expressions (e.g. `(x || y).z` or `(abc || {x: null})['x']`)
+  * Correct behavior with dereferencing members of expressions (e.g. `(x || y).z` or `(abc || {x: null})['x']`)
   * Fix canonical (`() => ...`) lambdas
   * Support C & C++ style comments (knockout/knockout#1524)
   * Fix filter/or ambiguity on pipe `|`

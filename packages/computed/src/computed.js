@@ -127,7 +127,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
     state.suppressDisposalUntilDisposeWhenReturnsFalse = true
 
         // disposeWhenNodeIsRemoved: true can be used to opt into the "only dispose after first false result"
-        // behaviour even if there's no specific node to watch. In that case, clear the option so we don't try
+        // behavior even if there's no specific node to watch. In that case, clear the option so we don't try
         // to watch for a non-node's disposal. This technique is intended for KO's internal use only and shouldn't
         // be documented or used by application code, as it's likely to change in a future version of KO.
     if (!state.disposeWhenNodeIsRemoved.nodeType) {
