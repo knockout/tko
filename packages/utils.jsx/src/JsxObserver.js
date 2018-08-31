@@ -289,18 +289,20 @@ export class JsxObserver extends LifeCycle {
 
   updateAttributes (node, attributes) {
     const subscriptions = this.getSubscriptionsForNode(node)
-
-    while (node.attributes.length) {
-      node.removeAttributeNS(null, node.attributes[0].name)
-    }
+    const toRemove = new Set([...node.attributes].map(n => n.name))
 
     for (const [name, value] of Object.entries(attributes || {})) {
+      toRemove.delete(name)
       if (isObservable(value)) {
         subscriptions.push(
-          value.subscribe(attr => this.setNodeAttribute(node, name, value))
+          value.subscribe(attr => this.setNodeAttribute(node, name, attr))
         )
       }
       this.setNodeAttribute(node, name, value)
+    }
+
+    for (const name of toRemove) {
+      this.setNodeAttribute(node, name, undefined)
     }
   }
 

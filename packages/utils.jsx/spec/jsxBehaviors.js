@@ -103,42 +103,6 @@ describe('jsx', function () {
     assert.equal(node.outerHTML, '<div>x<span>fff<!--O--></span>fff<!--O-->y</div>')
   })
 
-  it('interjects an attribute observable', function () {
-    const obs = observable('zzz')
-    const child = {
-      elementName: "span",
-      children: [],
-      attributes: { xorz: obs }
-    }
-    const node = jsxToNode({
-      elementName: "div",
-      children: ['x', child, 'y'],
-      attributes: { xorz: obs }
-    })
-
-    assert.equal(node.outerHTML, '<div xorz="zzz">x<span xorz="zzz"></span>y</div>')
-    obs('f2')
-    assert.equal(node.outerHTML, '<div xorz="f2">x<span xorz="f2"></span>y</div>')
-  })
-
-  it('interjects all attributes', function () {
-    const obs = observable({ xorz: 'abc' })
-    const child = {
-      elementName: "span",
-      children: [],
-      attributes: obs
-    }
-    const node = jsxToNode({
-      elementName: "div",
-      children: ['x', child, 'y'],
-      attributes: obs
-    })
-
-    assert.equal(node.outerHTML, '<div xorz="abc">x<span xorz="abc"></span>y</div>')
-    obs({ xandy: 'P' })
-    assert.equal(node.outerHTML, '<div xandy="P">x<span xandy="P"></span>y</div>')
-  })
-
   it('interjects child nodes', function () {
     const obs = observable({
       elementName: 'span', children: [], attributes: { in: 'x' }
@@ -341,6 +305,64 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  describe('attributes', () => {
+    it('interjects an attribute observable', function () {
+      const obs = observable('zzz')
+      const child = {
+        elementName: "span",
+        children: [],
+        attributes: { xorz: obs }
+      }
+      const node = jsxToNode({
+        elementName: "div",
+        children: ['x', child, 'y'],
+        attributes: { xorz: obs }
+      })
+
+      assert.equal(node.outerHTML, '<div xorz="zzz">x<span xorz="zzz"></span>y</div>')
+      obs('f2')
+      assert.equal(node.outerHTML, '<div xorz="f2">x<span xorz="f2"></span>y</div>')
+    })
+
+    it('interjects all attributes', function () {
+      const obs = observable({ xorz: 'abc' })
+      const child = {
+        elementName: "span",
+        children: [],
+        attributes: obs
+      }
+      const node = jsxToNode({
+        elementName: "div",
+        children: ['x', child, 'y'],
+        attributes: obs
+      })
+
+      assert.equal(node.outerHTML, '<div xorz="abc">x<span xorz="abc"></span>y</div>')
+      obs({ xandy: 'P' })
+      assert.equal(node.outerHTML, '<div xandy="P">x<span xandy="P"></span>y</div>')
+    })
+
+    it('toggles an empty observable attribute', () => {
+      const o = observable(undefined)
+      const node = jsxToNode({ elementName: 'i', children: [], attributes: {x: o}})
+      assert.equal(node.outerHTML, '<i></i>')
+      o('')
+      assert.equal(node.outerHTML, '<i x=""></i>')
+      o(undefined)
+      assert.equal(node.outerHTML, '<i></i>')
+    })
+
+    it('toggles an observable attribute existence', () => {
+      const o = observable(undefined)
+      const node = jsxToNode({ elementName: 'i', children: [], attributes: {x: o}})
+      assert.equal(node.outerHTML, '<i></i>')
+      o('123')
+      assert.equal(node.outerHTML, '<i x="123"></i>')
+      o(undefined)
+      assert.equal(node.outerHTML, '<i></i>')
+    })
+  })
+
   describe('bindings', () => {
     it('applies bindings attached to the nodes', () => {
       let counter = 0
@@ -511,6 +533,5 @@ describe('jsx', function () {
       assert.equal(parent.innerHTML, 'xy<!--O-->')
       jo.dispose()
     })
-
   })
 })
