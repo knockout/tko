@@ -263,6 +263,14 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  it('calls functions to unwrap', () => {
+    const parent = document.createElement('div')
+    const jsx = [() => 'bca']
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, 'bca')
+    jo.dispose()
+  })
+
   it('inserts null/undefined/symbol as comments', () => {
     const parent = document.createElement('div')
     const jsx = [null, undefined, Symbol('z')]

@@ -216,7 +216,7 @@ export class JsxObserver extends LifeCycle {
 
     switch (typeof any) {
       case 'object': break
-      case 'function': return anyToNode(any())
+      case 'function': return this.anyToNode(any())
       case 'undefined':
       case 'symbol':
         return document.createComment(String(any))
