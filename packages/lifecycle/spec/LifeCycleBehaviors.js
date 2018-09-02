@@ -65,6 +65,59 @@ describe('KO LifeCycle', function () {
     })
   })
 
+  describe('computed', () => {
+    let lastThis
+
+    beforeEach(() => (lastThis = null))
+
+    class LcComputedTest extends LifeCycle {
+      method () { lastThis = this }
+    }
+
+    it('calls a named function', () => {
+      const lf = new LcComputedTest()
+      lf.computed('method')
+      assert.strictEqual(lastThis, lf)
+    })
+
+    it('binds and calls a this.method', () => {
+      const lf = new LcComputedTest()
+      lf.computed(lf.method)
+      assert.strictEqual(lastThis, lf)
+    })
+
+    it('calls a bound method', () => {
+      const lf = new LcComputedTest()
+      function fn () { lastThis = this }
+      lf.computed(fn.bind(lf))
+      assert.strictEqual(lastThis, lf)
+    })
+
+    it('calls a function (unbound)', () => {
+      const lf = new LcComputedTest()
+      lf.computed(function y () { 'use strict'; lastThis = this })
+      assert.strictEqual(lastThis, undefined)
+    })
+
+    it('calls a () => {}', () => {
+      const lf = new LcComputedTest()
+      lf.computed(() => (lastThis = this))
+      assert.strictEqual(lastThis, this)
+    })
+
+    it('given a string binds and calls that method', () => {
+      const lf = new LcComputedTest()
+      lf.computed('method')
+      assert.strictEqual(lastThis, lf)
+    })
+
+    it('binds an object argument', () => {
+      const lf = new LcComputedTest()
+      lf.computed({ read: lf.method })
+      assert.strictEqual(lastThis, lf)
+    })
+  })
+
   describe('dispose', function () {
     it('disposes of subscriptions', function () {
       var Ctr, c, o

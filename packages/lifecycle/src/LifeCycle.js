@@ -35,10 +35,14 @@ export default class LifeCycle {
 
   computed (params) {
     if (typeof params === 'string') {
-      params = { read: this[params], write: this[params], owner: this }
-    } else if (typeof params === 'object') {
-      // Pass directly.
+      params = { read: this[params], write: this[params] }
+    }
+
+    if (typeof params === 'object') {
+      params = Object.assign({ owner: this }, params)
     } else if (typeof params === 'function') {
+      const proto = Object.getPrototypeOf(this)
+      if (proto && proto[params.name] === params) { params = params.bind(this) }
       params = { read: params, write: params }
     } else {
       throw new Error('LifeCycle::computed not given a valid type.')
