@@ -55,12 +55,16 @@ export class JsxObserver extends LifeCycle {
         const insertAt = parentNodeIsComment ? parentNode.nextSibling : null
         insertBefore = document.createComment('O')
         parentNodeTarget.insertBefore(insertBefore, insertAt)
+      } else {
+        this.adoptedInsertBefore = true
       }
     }
 
     if (parentNodeIsComment && !insertBefore) {
       // Typcially: insertBefore becomes <!-- /ko -->
       insertBefore = parentNode.nextSibling
+      // Mark this so we don't remove the next node - since we didn't create it.
+      this.adoptedInsertBefore = true
     }
 
     this.anchorTo(insertBefore || parentNode)
@@ -96,7 +100,7 @@ export class JsxObserver extends LifeCycle {
     super.dispose()
     const ib = this.insertBefore
     const insertBeforeIsChild = ib && this.parentNodeTarget === ib.parentNode
-    if (insertBeforeIsChild) {
+    if (insertBeforeIsChild && !this.adoptedInsertBefore) {
       this.parentNodeTarget.removeChild(ib)
     }
     this.removeAllPriorNodes()
@@ -329,7 +333,10 @@ export class JsxObserver extends LifeCycle {
   lastNodeFor (index) {
     const nodesAtIndex = this.nodeArrayOrObservableAtIndex[index] || []
     const [lastNodeOfPrior] = nodesAtIndex.slice(-1)
-    return lastNodeOfPrior || this.insertBefore
+    const insertBefore = lastNodeOfPrior instanceof JsxObserver
+      ? lastNodeOfPrior.insertBefore : lastNodeOfPrior || this.insertBefore
+    if (insertBefore) { return insertBefore.parentNode ? insertBefore : null }
+    return null
   }
 
   removeAllPriorNodes () {

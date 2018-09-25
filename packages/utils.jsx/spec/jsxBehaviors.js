@@ -8,6 +8,10 @@ import {
 } from '@tko/observable'
 
 import {
+  computed
+} from '@tko/computed'
+
+import {
   NativeProvider
 } from '@tko/provider.native'
 
@@ -297,7 +301,46 @@ describe('jsx', function () {
     const jo = new JsxObserver(jsx, parent)
     assert.equal(parent.innerHTML, '<!--{"x":"123"}-->')
     jo.dispose()
+  })
 
+  it('unwraps multiple text computeds at root', () => {
+    const parent = document.createElement('div')
+    const o = observable(false)
+    const c1 = computed(() => [o, '123'])
+    const c0 = computed(() => o() ? c1 : 'abc')
+    const jo = new JsxObserver(c0, parent)
+    assert.equal(parent.innerHTML, 'abc<!--O-->')
+    o('zzz')
+    assert.equal(parent.innerHTML, 'zzz123<!--O-->')
+    jo.dispose()
+  })
+
+  it('unwraps multiple text computeds as children', () => {
+    const parent = document.createElement('div')
+    const o = observable(false)
+    const c1 = computed(() => [o, '123'])
+    const c0 = computed(() => o() ? c1 : 'abc')
+    const jsx = { elementName: 'r', children: [c0], attributes: {} }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '<r>abc<!--O--></r>')
+    o('zzz')
+    assert.equal(parent.innerHTML, '<r>zzz123<!--O--></r>')
+    jo.dispose()
+  })
+
+  it('unwraps multiple element computeds as children', () => {
+    const parent = document.createElement('div')
+    const o = observable(false)
+    const v = { elementName: 'v', children: ['VV'], attributes: {} }
+    const w = { elementName: 'w', children: ['WW'], attributes: {} }
+    const c1 = computed(() => v)
+    const c0 = computed(() => o() ? c1 : w)
+    const jsx = { elementName: 'r', children: [c0], attributes: {} }
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '<r><w>WW</w><!--O--></r>')
+    o('zzz')
+    assert.equal(parent.innerHTML, '<r><v>VV</v><!--O--></r>')
+    jo.dispose()
   })
 
   it('inserts a promise after it resolves', async () => {
@@ -539,6 +582,30 @@ describe('jsx', function () {
       const parent = document.createElement('div')
       const jo = new JsxObserver([obs], parent)
       assert.equal(parent.innerHTML, 'xy<!--O-->')
+      jo.dispose()
+    })
+
+    it('removes and adds computed array', () => {
+      const x = observable(false)
+      const arr = computed(() => x() ? ['X', 'Y'] : ['Y', 'X'])
+      const parent = document.createElement('div')
+      const jo = new JsxObserver(arr, parent)
+      assert.equal(parent.innerHTML, 'YX<!--O-->')
+      x(true)
+      assert.equal(parent.innerHTML, 'XY<!--O-->')
+      jo.dispose()
+    })
+
+    it('removes and adds observables', () => {
+      const o0 = observable('A')
+      const o1 = observable('B')
+      const x = observable(false)
+      const arr = computed(() => x() ? [o0, o1] : [o0, o1, o0])
+      const parent = document.createElement('div')
+      const jo = new JsxObserver(arr, parent)
+      assert.equal(parent.innerHTML, 'ABA<!--O-->')
+      x(true)
+      assert.equal(parent.innerHTML, 'AB<!--O-->')
       jo.dispose()
     })
   })

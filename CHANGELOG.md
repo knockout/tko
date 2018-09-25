@@ -12,6 +12,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Allow JSX to be used with SVG elements, and respect xmlns attribute
 * Refresh JSX node when it's subscribable
 * Make `<slot>` elements and JSX play better together
+* Fix JSX computed not working when returning an array of observables
 
 ## 🎩  `alpha-5` (4 July 2018)
 
