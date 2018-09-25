@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.multi",
-  "version": "4.0.0-alpha6.10",
+  "version": "4.0.0-4.0.0-alpha6.10.0",
   "description": "Combine multiple other providers into one",
   "module": "dist/provider.multi.js",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0-alpha6.10",
+    "@tko/provider": "^4.0.0-4.0.0-alpha6.10.0",
     "tslib": "^1.8.0"
   },
   "karma": {
