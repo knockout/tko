@@ -259,11 +259,101 @@ describe('jsx', function () {
     jo.dispose()
   })
 
-  it('inserts primitives as strings', () => {
+  describe('primitives', () => {
+    const PRIMITIVES = [1, '2', true, false, 0, 11.1]
+    for (const p of PRIMITIVES) {
+      it(`inserts ${p} as a primitive`, () => {
+        const parent = document.createElement('div')
+        const jsx = p
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, String(p))
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as an observable`, () => {
+        const parent = document.createElement('div')
+        const jsx = observable(p)
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `${p}<!--O-->`)
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as a primitive child of a node`, () => {
+        const parent = document.createElement('div')
+        const jsx = {elementName: 'j', children: [p], attributes: {}}
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `<j>${p}</j>`)
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as an observable child of a node`, () => {
+        const parent = document.createElement('div')
+        const v = observable(p)
+        const jsx = {elementName: 'j', children: [v], attributes: {}}
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `<j>${p}<!--O--></j>`)
+        v.modify(x => `[${x}]`)
+        assert.equal(parent.innerHTML, `<j>[${p}]<!--O--></j>`)
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as a primitive child of an array`, () => {
+        const parent = document.createElement('div')
+        const jsx = [p]
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `${p}`)
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as an observable child of an array`, () => {
+        const parent = document.createElement('div')
+        const v = observable(p)
+        const jsx = [v]
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `${p}<!--O-->`)
+        v.modify(x => `[${x}]`)
+        assert.equal(parent.innerHTML, `[${p}]<!--O-->`)
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as an attribute`, () => {
+        const parent = document.createElement('div')
+        const jsx = {elementName: 'j', children: [], attributes: {p}}
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `<j p="${p}"></j>`)
+        jo.dispose()
+      })
+
+      it(`inserts ${p} as an observable attribute`, () => {
+        const parent = document.createElement('div')
+        const v = observable(p)
+        const jsx = {elementName: 'j', children: [], attributes: {v}}
+        const jo = new JsxObserver(jsx, parent)
+        assert.equal(parent.innerHTML, `<j v="${p}"></j>`)
+        v.modify(x => `[${x}]`)
+        assert.equal(parent.innerHTML, `<j v="[${p}]"></j>`)
+        jo.dispose()
+      })
+    }
+  })
+
+  it('converts and updates an observable number', () => {
     const parent = document.createElement('div')
-    const jsx = [1, '2', false, true]
+    const jsx = observable(4)
     const jo = new JsxObserver(jsx, parent)
-    assert.equal(parent.innerHTML, '12falsetrue')
+    assert.equal(parent.innerHTML, '4<!--O-->')
+    jsx.modify(v => 17 + v)
+    assert.equal(parent.innerHTML, '21<!--O-->')
+    jo.dispose()
+  })
+
+  it('converts and updates an observable child number', () => {
+    const parent = document.createElement('div')
+    const jsx = {elementName: 'x', children: [observable(4)], attributes: {}}
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, '<x>4<!--O--></x>')
+    jsx.children[0].modify(v => 17 + v)
+    assert.equal(parent.innerHTML, '<x>21<!--O--></x>')
     jo.dispose()
   })
 
@@ -411,6 +501,16 @@ describe('jsx', function () {
       assert.equal(node.outerHTML, '<i x="123"></i>')
       o(undefined)
       assert.equal(node.outerHTML, '<i></i>')
+    })
+
+    it('resolves a thenable when complete', async () => {
+      const o = observable(false)
+      const x = o.when(true).then(() => 'abc')
+      const node = jsxToNode({ elementName: 'i', children: [], attributes: {x}})
+      assert.equal(node.outerHTML, '<i></i>')
+      o(true)
+      await x
+      assert.equal(node.outerHTML, '<i x="abc"></i>')
     })
   })
 

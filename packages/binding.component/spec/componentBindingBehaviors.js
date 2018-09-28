@@ -1424,7 +1424,7 @@ describe('Components: Component binding', function () {
       // <div x="1">r</div>
       arr([{elementName: 'div', children: ['r'], attributes: {x: 1}}, 'text'])
       expect(testNode.innerHTML).toEqual(
-        '<test-component><div><!--ko slot: "X"--><div>r</div>text<!--/ko--></div></test-component>')
+        '<test-component><div><!--ko slot: "X"--><div x="1">r</div>text<!--/ko--></div></test-component>')
       jo.dispose()
     })
   })

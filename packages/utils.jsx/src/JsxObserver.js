@@ -319,10 +319,13 @@ export class JsxObserver extends LifeCycle {
   setNodeAttribute (node, name, valueOrObservable) {
     const value = unwrap(valueOrObservable)
     NativeProvider.addValueToNode(node, name, valueOrObservable)
-    if (typeof value === 'string') {
-      node.setAttributeNS(null, name, value)
-    } else if (value === undefined) {
+    if (value === undefined) {
       node.removeAttributeNS(null, name)
+    } else if (isThenable(valueOrObservable)) {
+      Promise.resolve(valueOrObservable)
+        .then(v => this.setNodeAttribute(node, name, v))
+    } else {
+      node.setAttributeNS(null, name, String(value))
     }
   }
 
