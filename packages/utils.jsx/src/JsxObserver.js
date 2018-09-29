@@ -324,8 +324,10 @@ export class JsxObserver extends LifeCycle {
     } else if (isThenable(valueOrObservable)) {
       Promise.resolve(valueOrObservable)
         .then(v => this.setNodeAttribute(node, name, v))
-    } else {
+    } else if (name !== 'xmlns') {
       node.setAttributeNS(null, name, String(value))
+    } else {
+      node.setAttribute(name, String(value))
     }
   }
 
