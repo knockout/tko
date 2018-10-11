@@ -118,7 +118,7 @@ export class ForEachBinding extends AsyncBindingHandler {
 
     // Prime content
     const primeData = unwrap(this.data)
-    if (primeData.map) {
+    if (primeData && primeData.map) {
       this.onArrayChange(primeData.map(valueToChangeAddItem), true)
     } else {
       this.completeBinding()
