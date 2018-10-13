@@ -104,6 +104,16 @@ export class JsxObserver extends LifeCycle {
       this.parentNodeTarget.removeChild(ib)
     }
     this.removeAllPriorNodes()
+    Object.assign(this, {
+      parentNode: null,
+      parentNodeTarget: null,
+      insertBefore: null,
+      nodeArrayOrObservableAtIndex: []
+    })
+    for (const subscriptions of this.subscriptionsForNode.values()) {
+      subscriptions.forEach(s => s.dispose())
+    }
+    this.subscriptionsForNode.clear()
   }
 
   createInitialAdditions (possibleIterable) {
@@ -147,10 +157,15 @@ export class JsxObserver extends LifeCycle {
    * @param {string|object|Array|Observable.string|Observable.Array|Obseravble.object} jsx
    */
   addChange (index, jsx) {
+
+    this.nodeArrayOrObservableAtIndex.splice(index, 0,
+      this.injectNode(jsx, this.lastNodeFor(index)))
+  }
+
+  injectNode (jsx, nextNode) {
     let nodeArrayOrObservable
 
     if (isObservable(jsx)) {
-      const nextNode = this.lastNodeFor(index)
       const {parentNode, xmlns} = this
       const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns)
       nodeArrayOrObservable = [observer]
@@ -165,18 +180,16 @@ export class JsxObserver extends LifeCycle {
       } else {
         nodeArrayOrObservable = [this.anyToNode(jsx)]
       }
-      const insertBefore = this.lastNodeFor(index)
 
       for (const node of nodeArrayOrObservable) {
-        this.parentNodeTarget.insertBefore(node, insertBefore)
+        this.parentNodeTarget.insertBefore(node, nextNode)
         if (shouldApplyBindings && this.canApplyBindings(node)) {
           applyBindings($context, node)
         }
       }
     }
 
-    this.nodeArrayOrObservableAtIndex.splice(index, 0,
-      nodeArrayOrObservable)
+    return nodeArrayOrObservable
   }
 
   /**
@@ -260,18 +273,16 @@ export class JsxObserver extends LifeCycle {
     const xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || this.xmlns
     const node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
 
-    const subscriptions = this.getSubscriptionsForNode(node)
-
     /** Slots need to be able to replicate with the attributes, which
      *  are not preserved when cloning from template nodes. */
     node[ORIGINAL_JSX_SYM] = jsx
 
     if (isObservable(jsx.attributes)) {
+      const subscriptions = this.getSubscriptionsForNode(node)
       subscriptions.push(
         jsx.attributes.subscribe(attrs => {
           this.updateAttributes(node, unwrap(attrs))
-        })
-      )
+        }))
     }
     this.updateAttributes(node, unwrap(jsx.attributes))
 
@@ -284,9 +295,7 @@ export class JsxObserver extends LifeCycle {
     const placeholder = document.createComment('P')
     promise.then(v => {
       const {parentNode} = placeholder
-      if (parentNode) {
-        parentNode.replaceChild(this.anyToNode(v), placeholder)
-      }
+      if (parentNode) { this.injectNode(v, placeholder) }
     })
     return placeholder
   }
@@ -299,8 +308,7 @@ export class JsxObserver extends LifeCycle {
       toRemove.delete(name)
       if (isObservable(value)) {
         subscriptions.push(
-          value.subscribe(attr => this.setNodeAttribute(node, name, attr))
-        )
+          value.subscribe(attr => this.setNodeAttribute(node, name, attr)))
       }
       this.setNodeAttribute(node, name, value)
     }
@@ -358,10 +366,13 @@ export class JsxObserver extends LifeCycle {
         continue
       }
       const node = nodeOrObservable
+      node[ORIGINAL_JSX_SYM] = 'disposed'
       removeNode(node)
-      const subscriptions = this.subscriptionsForNode.get(node) || []
-      subscriptions.forEach(s => s.dispose())
-      this.subscriptionsForNode.delete(node)
+      const subscriptions = this.subscriptionsForNode.get(node)
+      if (subscriptions) {
+        subscriptions.forEach(s => s.dispose())
+        this.subscriptionsForNode.delete(node)
+      }
     }
   }
 }

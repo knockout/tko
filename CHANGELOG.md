@@ -13,6 +13,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Refresh JSX node when it's subscribable
 * Make `<slot>` elements and JSX play better together
 * Fix JSX computed not working when returning an array of observables
+* Fix futures resolving to observables
+* Fix node subscriptions not being properly disposed
 
 ## 🎩  `alpha-5` (4 July 2018)
 

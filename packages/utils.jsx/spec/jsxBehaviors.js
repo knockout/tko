@@ -442,7 +442,47 @@ describe('jsx', function () {
     assert.equal(parent.innerHTML, '<!--P-->')
     obs(true)
     await p
-    assert.equal(parent.innerHTML, 'true')
+    assert.equal(parent.innerHTML, 'true<!--P-->')
+    jo.dispose()
+  })
+
+  it('resolves a promise to a working observable', async () => {
+    const parent = document.createElement('div')
+    const obs = observable()
+    const jsx = ['a', Promise.resolve(obs), 'b']
+    const jo = new JsxObserver(jsx, parent)
+    assert.equal(parent.innerHTML, 'a<!--P-->b')
+    await jsx[0]
+    assert.equal(parent.innerHTML, 'a<!--P-->b')
+    obs('123')
+    assert.equal(parent.innerHTML, 'a123<!--P-->b')
+    obs('345')
+    assert.equal(parent.innerHTML, 'a345<!--P-->b')
+    obs(null)
+    assert.equal(parent.innerHTML, 'a<!--P-->b')
+    obs(undefined)
+    assert.equal(parent.innerHTML, 'a<!--P-->b')
+    obs({elementName: 'x', children: [], attributes: {y: 1}})
+    assert.equal(parent.innerHTML, 'a<x y="1"></x><!--P-->b')
+    jo.dispose()
+  })
+
+  it('applies binds nodes created by promises', async () => {
+    let counter = 0
+    const parent = document.createElement('div')
+    const provider = new NativeProvider()
+    options.bindingProviderInstance = provider
+    provider.bindingHandlers.set({ counter: () => ++counter })
+    const jsx = Promise.resolve({
+      elementName: 'r',
+      children: [],
+      attributes: {'ko-counter': true}
+    })
+    const jo = new JsxObserver(jsx, parent)
+    applyBindings({}, parent)
+    assert.equal(counter, 0)
+    await jsx
+    assert.equal(counter, 1)
     jo.dispose()
   })
 
