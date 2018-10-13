@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.attr",
-  "version": "4.0.0-alpha7.1",
+  "version": "4.0.0-alpha7.2",
   "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
   "module": "dist/provider.attr.js",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0-alpha7.1",
+    "@tko/provider": "^4.0.0-alpha7.2",
     "tslib": "^1.8.0"
   },
   "karma": {

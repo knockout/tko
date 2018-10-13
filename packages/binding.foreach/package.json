@@ -1,6 +1,6 @@
 {
   "name": "@tko/binding.foreach",
-  "version": "4.0.0-alpha7.1",
+  "version": "4.0.0-alpha7.2",
   "description": "Knockout Foreach Binding",
   "module": "dist/binding.foreach.js",
   "scripts": {
@@ -28,10 +28,10 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/bind": "^4.0.0-alpha7.1",
-    "@tko/observable": "^4.0.0-alpha7.1",
-    "@tko/provider": "^4.0.0-alpha7.1",
-    "@tko/utils": "^4.0.0-alpha7.1",
+    "@tko/bind": "^4.0.0-alpha7.2",
+    "@tko/observable": "^4.0.0-alpha7.2",
+    "@tko/provider": "^4.0.0-alpha7.2",
+    "@tko/utils": "^4.0.0-alpha7.2",
     "tslib": "^1.8.0"
   },
   "karma": {
