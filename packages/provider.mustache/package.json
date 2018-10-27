@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.mustache",
-  "version": "4.0.0-alpha7.2",
+  "version": "4.0.0-alpha7.3",
   "description": "Interpolate text/node attributes {{ }}",
   "module": "dist/provider.mustache.js",
   "files": [
@@ -22,11 +22,11 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/binding.template": "^4.0.0-alpha7.2",
-    "@tko/observable": "^4.0.0-alpha7.2",
-    "@tko/provider": "^4.0.0-alpha7.2",
-    "@tko/utils": "^4.0.0-alpha7.2",
-    "@tko/utils.parser": "^4.0.0-alpha7.2",
+    "@tko/binding.template": "^4.0.0-alpha7.3",
+    "@tko/observable": "^4.0.0-alpha7.3",
+    "@tko/provider": "^4.0.0-alpha7.3",
+    "@tko/utils": "^4.0.0-alpha7.3",
+    "@tko/utils.parser": "^4.0.0-alpha7.3",
     "tslib": "^1.8.0"
   },
   "karma": {
