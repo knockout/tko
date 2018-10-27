@@ -21,7 +21,10 @@ export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
 const NAMESPACES = {
   svg: 'http://www.w3.org/2000/svg',
-  html: 'http://www.w3.org/1999/xhtml'
+  html: 'http://www.w3.org/1999/xhtml',
+  xml: 'http://www.w3.org/XML/1998/namespace',
+  xlink: 'http://www.w3.org/1999/xlink',
+  xmlns: 'http://www.w3.org/2000/xmlns/'
 }
 
 /**
@@ -322,6 +325,19 @@ export class JsxObserver extends LifeCycle {
   }
 
   /**
+   * See https://stackoverflow.com/a/52572048
+   * @param {string} attr element attribute
+   * @return {string} namespace argument for setAtttributeNS
+   */
+  getNamespaceOfAttribute (attr) {
+    const [prefix, ...unqualifiedName] = attr.split(':')
+    if (prefix === 'xmlns' || (unqualifiedName.length && NAMESPACES[prefix])) {
+      return NAMESPACES[prefix]
+    }
+    return null
+  }
+
+  /**
    *
    * @param {HTMLElement} node
    * @param {string} name
@@ -335,10 +351,9 @@ export class JsxObserver extends LifeCycle {
     } else if (isThenable(valueOrObservable)) {
       Promise.resolve(valueOrObservable)
         .then(v => this.setNodeAttribute(node, name, v))
-    } else if (name !== 'xmlns') {
-      node.setAttributeNS(null, name, String(value))
     } else {
-      node.setAttribute(name, String(value))
+      const ns = this.getNamespaceOfAttribute(name)
+      node.setAttributeNS(ns, name, String(value))
     }
   }
 

@@ -598,20 +598,51 @@ describe('jsx', function () {
       assert.equal(node.outerHTML, '<i x="abc"></i>')
     })
 
-    it('ignores the xmlns attribute, so as to not error', () => {
-      // Setting `xmlns` with node.setAttributeNS throws:
-      // Failed to execute 'setAttributeNS' on 'Element': '' is an
-      // invalid namespace for attributes.
-      // So when setting `xmlns` we use node.setAttribute.  This *could*
-      // apply to other node types.
-      // See: https://stackoverflow.com/questions/52571125
-      const node = jsxToNode({
-        elementName: 'svg',
-        children: ['x'],
-        attributes: { xmlns: 'http://www.w3.org/2000/svg' }
+    describe('namespaces', () => {
+      // Note: https://stackoverflow.com/questions/52571125
+      const NS = {
+        svg: 'http://www.w3.org/2000/svg',
+        html: 'http://www.w3.org/1999/xhtml',
+        xml: 'http://www.w3.org/XML/1998/namespace',
+        xlink: 'http://www.w3.org/1999/xlink',
+        xmlns: 'http://www.w3.org/2000/xmlns/'
+      }
+
+      it('xmlns', () => {
+        // Setting `xmlns` with node.setAttributeNS throws:
+        // Failed to execute 'setAttributeNS' on 'Element': '' is an
+        // invalid namespace for attributes.
+        // So when setting `xmlns` we use node.setAttribute.  This *could*
+        // apply to other node types.
+        // See: https://stackoverflow.com/questions/52571125
+        const node = jsxToNode({
+          elementName: 'svg',
+          children: ['x'],
+          attributes: { xmlns: NS.svg }
+        })
+
+        assert.equal(node.outerHTML, `<svg xmlns="${NS.svg}">x</svg>`)
       })
 
-      assert.equal(node.outerHTML, '<svg xmlns="http://www.w3.org/2000/svg">x</svg>')
+      it('xlink:href', () => {
+        const node = jsxToNode({
+          elementName: 'svg',
+          children: ['x'],
+          attributes: { xmlns: NS.svg, 'xmlns:xlink': NS.xlink }
+        })
+
+        assert.equal(node.outerHTML, `<svg xmlns="${NS.svg}" xmlns:xlink="${NS.xlink}">x</svg>`)
+      })
+
+      it('xml:space', () => {
+        const node = jsxToNode({
+          elementName: 'div',
+          children: ['x'],
+          attributes: { 'xml:space': 'preserve' }
+        })
+
+        assert.equal(node.outerHTML, `<div xml:space="preserve">x</div>`)
+      })
     })
   })
 
