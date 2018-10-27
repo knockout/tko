@@ -10,7 +10,7 @@ import {
 } from '@tko/bind'
 
 import {
-  isObservable, unwrap
+  isObservable, unwrap, observable
 } from '@tko/observable'
 
 import {
@@ -157,7 +157,6 @@ export class JsxObserver extends LifeCycle {
    * @param {string|object|Array|Observable.string|Observable.Array|Obseravble.object} jsx
    */
   addChange (index, jsx) {
-
     this.nodeArrayOrObservableAtIndex.splice(index, 0,
       this.injectNode(jsx, this.lastNodeFor(index)))
   }
@@ -232,9 +231,14 @@ export class JsxObserver extends LifeCycle {
     if (isThenable(any)) { return this.futureJsxNode(any) }
 
     switch (typeof any) {
-      case 'object': break
+      case 'object':
+        if (any instanceof Error) {
+          return document.createComment(any.toString())
+        }
+        break
       case 'function': return this.anyToNode(any())
       case 'undefined':
+      case 'Error':
       case 'symbol':
         return document.createComment(String(any))
       case 'string': return document.createTextNode(any)
@@ -292,12 +296,11 @@ export class JsxObserver extends LifeCycle {
   }
 
   futureJsxNode (promise) {
-    const placeholder = document.createComment('P')
-    promise.then(v => {
-      const {parentNode} = placeholder
-      if (parentNode) { this.injectNode(v, placeholder) }
-    })
-    return placeholder
+    const obs = observable()
+    promise.then(obs).catch(e => obs(e instanceof Error ? e : Error(e)))
+    const jo = new JsxObserver(obs, this.parentNode, null, this.xmlns)
+    this.addDisposable(jo)
+    return jo.insertBefore
   }
 
   updateAttributes (node, attributes) {

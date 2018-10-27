@@ -433,59 +433,104 @@ describe('jsx', function () {
     jo.dispose()
   })
 
-  it('inserts a promise after it resolves', async () => {
-    const parent = document.createElement('div')
-    const obs = observable()
-    const p = obs.when(true)
-    const jsx = [p]
-    const jo = new JsxObserver(jsx, parent)
-    assert.equal(parent.innerHTML, '<!--P-->')
-    obs(true)
-    await p
-    assert.equal(parent.innerHTML, 'true<!--P-->')
-    jo.dispose()
-  })
-
-  it('resolves a promise to a working observable', async () => {
-    const parent = document.createElement('div')
-    const obs = observable()
-    const jsx = ['a', Promise.resolve(obs), 'b']
-    const jo = new JsxObserver(jsx, parent)
-    assert.equal(parent.innerHTML, 'a<!--P-->b')
-    await jsx[0]
-    assert.equal(parent.innerHTML, 'a<!--P-->b')
-    obs('123')
-    assert.equal(parent.innerHTML, 'a123<!--P-->b')
-    obs('345')
-    assert.equal(parent.innerHTML, 'a345<!--P-->b')
-    obs(null)
-    assert.equal(parent.innerHTML, 'a<!--P-->b')
-    obs(undefined)
-    assert.equal(parent.innerHTML, 'a<!--P-->b')
-    obs({elementName: 'x', children: [], attributes: {y: 1}})
-    assert.equal(parent.innerHTML, 'a<x y="1"></x><!--P-->b')
-    jo.dispose()
-  })
-
-  it('applies binds nodes created by promises', async () => {
-    let counter = 0
-    const parent = document.createElement('div')
-    const provider = new NativeProvider()
-    options.bindingProviderInstance = provider
-    provider.bindingHandlers.set({ counter: () => ++counter })
-    const jsx = Promise.resolve({
-      elementName: 'r',
-      children: [],
-      attributes: {'ko-counter': true}
+  /**
+   *        Promises
+   */
+  describe('promises', () => {
+    it('inserts a promise after it resolves', async () => {
+      const parent = document.createElement('div')
+      const obs = observable()
+      const p = obs.when(true)
+      const jsx = [p]
+      const jo = new JsxObserver(jsx, parent)
+      assert.equal(parent.innerHTML, '<!--O-->')
+      obs(true)
+      await p
+      assert.equal(parent.innerHTML, 'true<!--O-->')
+      jo.dispose()
     })
-    const jo = new JsxObserver(jsx, parent)
-    applyBindings({}, parent)
-    assert.equal(counter, 0)
-    await jsx
-    assert.equal(counter, 1)
-    jo.dispose()
+
+    it('resolves a promise to a working observable', async () => {
+      const parent = document.createElement('div')
+      const obs = observable()
+      const jsx = ['a', Promise.resolve(obs), 'b']
+      const jo = new JsxObserver(jsx, parent)
+      assert.equal(parent.innerHTML, 'a<!--O-->b')
+      await jsx[0]
+      assert.equal(parent.innerHTML, 'a<!--O-->b')
+      obs('123')
+      assert.equal(parent.innerHTML, 'a123<!--O-->b')
+      obs('345')
+      assert.equal(parent.innerHTML, 'a345<!--O-->b')
+      obs(null)
+      assert.equal(parent.innerHTML, 'a<!--O-->b')
+      obs(undefined)
+      assert.equal(parent.innerHTML, 'a<!--O-->b')
+      obs({elementName: 'x', children: [], attributes: {y: 1}})
+      assert.equal(parent.innerHTML, 'a<x y="1"></x><!--O-->b')
+      jo.dispose()
+    })
+
+    it('binds nodes created by promises', async () => {
+      let counter = 0
+      const parent = document.createElement('div')
+      const provider = new NativeProvider()
+      options.bindingProviderInstance = provider
+      provider.bindingHandlers.set({ counter: () => ++counter })
+      const jsx = Promise.resolve({
+        elementName: 'r',
+        children: [],
+        attributes: {'ko-counter': true}
+      })
+      const jo = new JsxObserver(jsx, parent)
+      applyBindings({}, parent)
+      assert.equal(counter, 0)
+      await jsx
+      assert.equal(counter, 1)
+      jo.dispose()
+    })
+
+    it('removes promises from arrays before the promise resolves', async () => {
+      const parent = document.createElement('div')
+      const p = Promise.resolve('1')
+      const obs = observableArray(['a', p, 'b'])
+      const jsx = obs
+      const jo = new JsxObserver(jsx, parent)
+      obs(['c'])
+      assert.equal(parent.innerHTML, 'c<!--O-->')
+      await p
+      assert.equal(parent.innerHTML, 'c<!--O-->')
+      jo.dispose()
+    })
+
+    it('removes promises from arrays after the promise resolves', async () => {
+      const parent = document.createElement('div')
+      const p = Promise.resolve('1')
+      const obs = observableArray(['a', p, 'b'])
+      const jsx = obs
+      const jo = new JsxObserver(jsx, parent)
+      await p
+      obs(['c'])
+      assert.equal(parent.innerHTML, 'c<!--O-->')
+      jo.dispose()
+    })
+
+    it('adds a comment with the text of an error', async () => {
+      const parent = document.createElement('div')
+      const p0 = Promise.reject(new Error('Ex'))
+      const p1 = Promise.reject('Ey')
+      const jsx = [p0, p1]
+      const jo = new JsxObserver(jsx, parent)
+      try { await p0 } catch (err) {}
+      try { await p1 } catch (err) {}
+      assert.equal(parent.innerHTML, '<!--Error: Ex--><!--O--><!--Error: Ey--><!--O-->')
+      jo.dispose()
+    })
   })
 
+  /**
+   *          Attributes
+   */
   describe('attributes', () => {
     it('interjects an attribute observable', function () {
       const obs = observable('zzz')
