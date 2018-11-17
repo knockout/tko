@@ -2,7 +2,7 @@
 import {LifeCycle} from '@tko/lifecycle'
 
 import {
-  removeNode, safeStringify, isThenable
+  cleanNode, safeStringify, isThenable
 } from '@tko/utils'
 
 import {
@@ -385,13 +385,23 @@ export class JsxObserver extends LifeCycle {
       }
       const node = nodeOrObservable
       node[ORIGINAL_JSX_SYM] = 'disposed'
-      removeNode(node)
+      this.detachAndDispose(node)
       const subscriptions = this.subscriptionsForNode.get(node)
       if (subscriptions) {
         subscriptions.forEach(s => s.dispose())
         this.subscriptionsForNode.delete(node)
       }
     }
+  }
+
+  /**
+   * Detach the given node, and dispose of its children.
+   *
+   * The cleaning can trigger a lot of garbage collection, so we defer that.
+   */
+  detachAndDispose (node) {
+    node.remove()
+    requestAnimationFrame(() => cleanNode(node))
   }
 }
 

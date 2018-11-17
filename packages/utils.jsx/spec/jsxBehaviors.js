@@ -1,6 +1,6 @@
 
 import {
-  options
+  options, cleanNode
 } from '@tko/utils'
 
 import {
@@ -29,11 +29,20 @@ import {
 import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
 
 
+class JsxTestObserver extends JsxObserver {
+  // For testing purposes, we make this synchronous.
+  detachAndDispose (node) {
+    node.remove()
+    cleanNode(node)
+  }
+}
+
+
 /**
  * Simple wrapper for testing.
  */
 function jsxToNode (jsx, xmlns, node = document.createElement('div')) {
-  new JsxObserver(jsx, node, null, xmlns)
+  new JsxTestObserver(jsx, node, null, xmlns)
   return node.childNodes[0]
 }
 
@@ -71,7 +80,7 @@ describe('jsx', function () {
   it('unwraps and monitors the parameter', function () {
     const obs = observable()
     const parent = document.createElement('div')
-    const jo = new JsxObserver(obs, parent)
+    const jo = new JsxTestObserver(obs, parent)
     const child0 = parent.childNodes[0]
     assert.instanceOf(child0, Comment)
     assert.equal(child0.nodeValue, 'O')
@@ -180,7 +189,7 @@ describe('jsx', function () {
     const comment = document.createComment('comment-parent')
     parent.appendChild(comment)
     parent.appendChild(document.createComment('end'))
-    const o = new JsxObserver('r', comment)
+    const o = new JsxTestObserver('r', comment)
     assert.equal(parent.innerHTML, `<!--comment-parent-->r<!--end-->`)
   })
 
@@ -195,13 +204,14 @@ describe('jsx', function () {
     obs({ elementName: 'rect', children: [], attributes: {} })
     assert.equal(node.childNodes[1].tagName, 'rect')
     assert.instanceOf(node.childNodes[1], SVGElement)
+    assert.equal(node.outerHTML, '<svg abc="123"><circle></circle><rect></rect><!--O--></svg>')
   })
 
   it('inserts actual nodes correctly', () => {
     const parent = document.createElement('div')
     const itag = document.createElement('i')
     const jsx = { elementName: 'div', children: [itag], attributes: {} }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `<div><i></i></div>`)
     jo.dispose()
   })
@@ -210,7 +220,7 @@ describe('jsx', function () {
     const parent = document.createElement('div')
     const itag = document.createElement('i')
     const jsx = { elementName: 'div', children: [itag, itag], attributes: {} }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `<div><i></i><i></i></div>`)
     jo.dispose()
   })
@@ -220,7 +230,7 @@ describe('jsx', function () {
     const itag = document.createElement('i')
     itag[ORIGINAL_JSX_SYM] = { elementName: 'b', children: [], attributes: {} }
     const jsx = { elementName: 'div', children: [itag], attributes: {} }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `<div><b></b></div>`)
     jo.dispose()
   })
@@ -230,7 +240,7 @@ describe('jsx', function () {
     const itag = document.createElement('i')
     itag[ORIGINAL_JSX_SYM] = { elementName: 'b', children: [], attributes: {} }
     const jsx = { elementName: 'div', children: [itag, itag], attributes: {} }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `<div><b></b><b></b></div>`)
     jo.dispose()
   })
@@ -242,7 +252,7 @@ describe('jsx', function () {
       children: ['a', null, 'b', undefined, 'c'],
       attributes: {}
     }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `<div>a<!--null-->b<!--undefined-->c</div>`)
     jo.dispose()
   })
@@ -254,7 +264,7 @@ describe('jsx', function () {
     const jsx = []
     jsx[0] = 'a'
     jsx[2] = 'b'
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `ab`)
     jo.dispose()
   })
@@ -265,7 +275,7 @@ describe('jsx', function () {
       it(`inserts ${p} as a primitive`, () => {
         const parent = document.createElement('div')
         const jsx = p
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, String(p))
         jo.dispose()
       })
@@ -273,7 +283,7 @@ describe('jsx', function () {
       it(`inserts ${p} as an observable`, () => {
         const parent = document.createElement('div')
         const jsx = observable(p)
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `${p}<!--O-->`)
         jo.dispose()
       })
@@ -281,7 +291,7 @@ describe('jsx', function () {
       it(`inserts ${p} as a primitive child of a node`, () => {
         const parent = document.createElement('div')
         const jsx = {elementName: 'j', children: [p], attributes: {}}
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `<j>${p}</j>`)
         jo.dispose()
       })
@@ -290,7 +300,7 @@ describe('jsx', function () {
         const parent = document.createElement('div')
         const v = observable(p)
         const jsx = {elementName: 'j', children: [v], attributes: {}}
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `<j>${p}<!--O--></j>`)
         v.modify(x => `[${x}]`)
         assert.equal(parent.innerHTML, `<j>[${p}]<!--O--></j>`)
@@ -300,7 +310,7 @@ describe('jsx', function () {
       it(`inserts ${p} as a primitive child of an array`, () => {
         const parent = document.createElement('div')
         const jsx = [p]
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `${p}`)
         jo.dispose()
       })
@@ -309,7 +319,7 @@ describe('jsx', function () {
         const parent = document.createElement('div')
         const v = observable(p)
         const jsx = [v]
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `${p}<!--O-->`)
         v.modify(x => `[${x}]`)
         assert.equal(parent.innerHTML, `[${p}]<!--O-->`)
@@ -319,7 +329,7 @@ describe('jsx', function () {
       it(`inserts ${p} as an attribute`, () => {
         const parent = document.createElement('div')
         const jsx = {elementName: 'j', children: [], attributes: {p}}
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `<j p="${p}"></j>`)
         jo.dispose()
       })
@@ -328,7 +338,7 @@ describe('jsx', function () {
         const parent = document.createElement('div')
         const v = observable(p)
         const jsx = {elementName: 'j', children: [], attributes: {v}}
-        const jo = new JsxObserver(jsx, parent)
+        const jo = new JsxTestObserver(jsx, parent)
         assert.equal(parent.innerHTML, `<j v="${p}"></j>`)
         v.modify(x => `[${x}]`)
         assert.equal(parent.innerHTML, `<j v="[${p}]"></j>`)
@@ -340,7 +350,7 @@ describe('jsx', function () {
   it('converts and updates an observable number', () => {
     const parent = document.createElement('div')
     const jsx = observable(4)
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '4<!--O-->')
     jsx.modify(v => 17 + v)
     assert.equal(parent.innerHTML, '21<!--O-->')
@@ -350,7 +360,7 @@ describe('jsx', function () {
   it('converts and updates an observable child number', () => {
     const parent = document.createElement('div')
     const jsx = {elementName: 'x', children: [observable(4)], attributes: {}}
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '<x>4<!--O--></x>')
     jsx.children[0].modify(v => 17 + v)
     assert.equal(parent.innerHTML, '<x>21<!--O--></x>')
@@ -360,7 +370,7 @@ describe('jsx', function () {
   it('calls functions to unwrap', () => {
     const parent = document.createElement('div')
     const jsx = [() => 'bca']
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, 'bca')
     jo.dispose()
   })
@@ -368,7 +378,7 @@ describe('jsx', function () {
   it('inserts null/undefined/symbol as comments', () => {
     const parent = document.createElement('div')
     const jsx = [null, undefined, Symbol('z')]
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '<!--null--><!--undefined--><!--Symbol(z)-->')
     jo.dispose()
   })
@@ -378,7 +388,7 @@ describe('jsx', function () {
     if (!supported) { return }
     const parent = document.createElement('div')
     const jsx = [BigInt(123)]
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '123')
     jo.dispose()
   })
@@ -388,7 +398,7 @@ describe('jsx', function () {
     // that they do, we add them as comments to make KO more debuggable.
     const parent = document.createElement('div')
     const jsx = [{x: '123'}]
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '<!--{"x":"123"}-->')
     jo.dispose()
   })
@@ -398,7 +408,7 @@ describe('jsx', function () {
     const o = observable(false)
     const c1 = computed(() => [o, '123'])
     const c0 = computed(() => o() ? c1 : 'abc')
-    const jo = new JsxObserver(c0, parent)
+    const jo = new JsxTestObserver(c0, parent)
     assert.equal(parent.innerHTML, 'abc<!--O-->')
     o('zzz')
     assert.equal(parent.innerHTML, 'zzz123<!--O-->')
@@ -411,7 +421,7 @@ describe('jsx', function () {
     const c1 = computed(() => [o, '123'])
     const c0 = computed(() => o() ? c1 : 'abc')
     const jsx = { elementName: 'r', children: [c0], attributes: {} }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '<r>abc<!--O--></r>')
     o('zzz')
     assert.equal(parent.innerHTML, '<r>zzz123<!--O--></r>')
@@ -426,7 +436,7 @@ describe('jsx', function () {
     const c1 = computed(() => v)
     const c0 = computed(() => o() ? c1 : w)
     const jsx = { elementName: 'r', children: [c0], attributes: {} }
-    const jo = new JsxObserver(jsx, parent)
+    const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, '<r><w>WW</w><!--O--></r>')
     o('zzz')
     assert.equal(parent.innerHTML, '<r><v>VV</v><!--O--></r>')
@@ -442,7 +452,7 @@ describe('jsx', function () {
       const obs = observable()
       const p = obs.when(true)
       const jsx = [p]
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       assert.equal(parent.innerHTML, '<!--O-->')
       obs(true)
       await p
@@ -454,7 +464,7 @@ describe('jsx', function () {
       const parent = document.createElement('div')
       const obs = observable()
       const jsx = ['a', Promise.resolve(obs), 'b']
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       assert.equal(parent.innerHTML, 'a<!--O-->b')
       await jsx[0]
       assert.equal(parent.innerHTML, 'a<!--O-->b')
@@ -482,7 +492,7 @@ describe('jsx', function () {
         children: [],
         attributes: {'ko-counter': true}
       })
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       applyBindings({}, parent)
       assert.equal(counter, 0)
       await jsx
@@ -495,7 +505,7 @@ describe('jsx', function () {
       const p = Promise.resolve('1')
       const obs = observableArray(['a', p, 'b'])
       const jsx = obs
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       obs(['c'])
       assert.equal(parent.innerHTML, 'c<!--O-->')
       await p
@@ -508,7 +518,7 @@ describe('jsx', function () {
       const p = Promise.resolve('1')
       const obs = observableArray(['a', p, 'b'])
       const jsx = obs
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       await p
       obs(['c'])
       assert.equal(parent.innerHTML, 'c<!--O-->')
@@ -520,7 +530,7 @@ describe('jsx', function () {
       const p0 = Promise.reject(new Error('Ex'))
       const p1 = Promise.reject('Ey')
       const jsx = [p0, p1]
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       try { await p0 } catch (err) {}
       try { await p1 } catch (err) {}
       assert.equal(parent.innerHTML, '<!--Error: Ex--><!--O--><!--Error: Ey--><!--O-->')
@@ -658,7 +668,7 @@ describe('jsx', function () {
         children: [],
         attributes: {'ko-counter': true}
       }
-      const jo = new JsxObserver(jsx, parent)
+      const jo = new JsxTestObserver(jsx, parent)
       applyBindings({}, parent)
       assert.equal(counter, 1)
       jo.dispose()
@@ -670,7 +680,7 @@ describe('jsx', function () {
       const parent = document.createElement('div')
       const view = {}
       options.bindingProviderInstance = new VirtualProvider()
-      const jo = new JsxObserver(jsxConvertible, parent)
+      const jo = new JsxTestObserver(jsxConvertible, parent)
       applyBindings(view, parent)
       assert.strictEqual(contextFor(nodeToTest(parent)).$data, view)
       jo.dispose()
@@ -741,7 +751,7 @@ describe('jsx', function () {
     it('reverses an array correctly', () => {
       const obs = observable(['a', 'b', 'c', 'd'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver(obs, parent)
+      const jo = new JsxTestObserver(obs, parent)
       assert.equal(parent.innerHTML, 'abcd<!--O-->')
 
       obs(obs().reverse())
@@ -753,7 +763,7 @@ describe('jsx', function () {
     it('adds at start/end correctly', () => {
       const obs = observable(['a', 'b', 'c', 'd'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver(obs, parent)
+      const jo = new JsxTestObserver(obs, parent)
       obs(['X', 'a', 'b', 'c', 'd'])
       assert.equal(parent.innerHTML, 'Xabcd<!--O-->')
       obs(['X', 'a', 'b', 'c', 'd', 'Y'])
@@ -764,7 +774,7 @@ describe('jsx', function () {
     it('inserts into the middle correctly', () => {
       const obs = observable(['a', 'b', 'c', 'd'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver(obs, parent)
+      const jo = new JsxTestObserver(obs, parent)
       obs(['a', 'b', 'X', 'c', 'd'])
       assert.equal(parent.innerHTML, 'abXcd<!--O-->')
       jo.dispose()
@@ -773,7 +783,7 @@ describe('jsx', function () {
     it('removes from the start/middle/end correctly', () => {
       const obs = observable(['a', 'b', 'c', 'd'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver(obs, parent)
+      const jo = new JsxTestObserver(obs, parent)
       obs(['b', 'c', 'd'])
       assert.equal(parent.innerHTML, 'bcd<!--O-->')
       obs(['b','d'])
@@ -786,7 +796,7 @@ describe('jsx', function () {
     it('inserts / flattens an observable array', () => {
       const obs = observableArray(['x'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver([obs], parent)
+      const jo = new JsxTestObserver([obs], parent)
       assert.equal(parent.innerHTML, 'x<!--O-->')
       jo.dispose()
     })
@@ -794,7 +804,7 @@ describe('jsx', function () {
     it('updates an observable array', () => {
       const obs = observableArray(['x'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver([obs], parent)
+      const jo = new JsxTestObserver([obs], parent)
       obs(['y', 'z'])
       assert.equal(parent.innerHTML, 'yz<!--O-->')
       obs(['z', '2'])
@@ -812,7 +822,7 @@ describe('jsx', function () {
         ])
       ])
       const parent = document.createElement('div')
-      const jo = new JsxObserver([obs], parent)
+      const jo = new JsxTestObserver([obs], parent)
       assert.equal(parent.innerHTML, 'xy<!--O-->')
       jo.dispose()
     })
@@ -821,7 +831,7 @@ describe('jsx', function () {
       const x = observable(false)
       const arr = computed(() => x() ? ['X', 'Y'] : ['Y', 'X'])
       const parent = document.createElement('div')
-      const jo = new JsxObserver(arr, parent)
+      const jo = new JsxTestObserver(arr, parent)
       assert.equal(parent.innerHTML, 'YX<!--O-->')
       x(true)
       assert.equal(parent.innerHTML, 'XY<!--O-->')
@@ -834,7 +844,7 @@ describe('jsx', function () {
       const x = observable(false)
       const arr = computed(() => x() ? [o0, o1] : [o0, o1, o0])
       const parent = document.createElement('div')
-      const jo = new JsxObserver(arr, parent)
+      const jo = new JsxTestObserver(arr, parent)
       assert.equal(parent.innerHTML, 'ABA<!--O-->')
       x(true)
       assert.equal(parent.innerHTML, 'AB<!--O-->')
