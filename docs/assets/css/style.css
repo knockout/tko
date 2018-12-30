@@ -1,0 +1,10 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+body {
+	background-color: 'pink';
+	width: 200px;
+	height: 50px;
+}
