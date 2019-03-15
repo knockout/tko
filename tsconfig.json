@@ -2,9 +2,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "downlevelIteration": true,
-    "target": "ES5",
-    "lib": [ "dom", "es5", "es2015.core", "es2015.collection", "es2015.promise", "es2015.symbol", "es2015.symbol.wellknown", "scripthost" ],
-    "module": "ES2015",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "allowJs": true,
     "importHelpers": true,

@@ -32,13 +32,13 @@ export const selectExtensions = {
         if (typeof value === 'string') {
           domData.set(element, selectExtensions.optionValueDomDataKey, undefined);
           if (hasDomDataExpandoProperty in element) { // IE <= 8 throws errors if you delete non-existent properties from a DOM node
-            delete element[hasDomDataExpandoProperty];
+            delete (element as any)[hasDomDataExpandoProperty];
           }
           element.value = value;
         } else {
                         // Store arbitrary object using DomData
           domData.set(element, selectExtensions.optionValueDomDataKey, value);
-          element[hasDomDataExpandoProperty] = true;
+          (element as any)[hasDomDataExpandoProperty as any] = true;
                         // Special treatment of numbers is just for backward compatibility. KO 1.2.1 wrote numerical values to element.value.
           (element as any).value = typeof value === 'number' ? value : '';
         }

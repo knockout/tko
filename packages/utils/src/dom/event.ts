@@ -25,7 +25,7 @@ knownEvents.MouseEvents = [
 
 objectForEach(knownEvents, (eventType, knownEventsForType) => {
   if (knownEventsForType.length) {
-    for (let i = 0, j = knownEventsForType.length; i < j; i++) { knownEventTypesByEventName[knownEventsForType[i]] = eventType; }
+    for (let i = 0, j = knownEventsForType.length; i < j; i++) { knownEventTypesByEventName[knownEventsForType[i]] = eventType as string; }
   }
 });
 

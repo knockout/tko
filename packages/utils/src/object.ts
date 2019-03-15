@@ -38,7 +38,7 @@ export function objectMap<TSource, TThis= void>(source: TSource, mapping: Mappin
   return target;
 }
 export function getObjectOwnProperty<TSource>(obj: TSource, propName: keyof TSource) {
-  return hasOwnProperty(obj, propName) ? obj[propName] : undefined;
+  return hasOwnProperty(obj, propName as string) ? obj[propName] : undefined;
 }
 
 export function clonePlainObjectDeep(obj: any, seen?: any[]) {
@@ -67,7 +67,7 @@ export function clonePlainObjectDeep(obj: any, seen?: any[]) {
  * JSON.stringify, but inserts `...` for objects that are referenced
  * multiple times, preventing infinite recursion.
  */
-export function safeStringify (value) {
+export function safeStringify (value: any) {
   const seen = new Set()
   return JSON.stringify(value, (k, v) => {
     if (seen.has(v)) { return '...' }
@@ -80,7 +80,7 @@ export function safeStringify (value) {
 /**
  * Promises/A+ compliant isThenable (per section 1.2)
  */
-export function isThenable (object) {
+export function isThenable (object: any) {
   const objectType = typeof object
   const thenableType = objectType === 'object' || objectType === 'function'
   return thenableType && object !== null && typeof object.then === 'function'

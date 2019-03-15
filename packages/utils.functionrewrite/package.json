@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "tslib": "^1.8.0"
+    "tslib": "^1.9.3"
   },
   "karma": {
     "frameworks": [

@@ -13,6 +13,11 @@ const replacerPlugin = require('./tools/rollup.replacerPlugin')
 
 const { LERNA_PACKAGE_NAME, LERNA_ROOT_PATH } = process.env
 const TKO_MODULES = getTkoModules()
+const BROWSER_PACKAGES = [
+  'build.knockout',
+  'build.reference'
+]
+const IS_BROWSER_BUNDLE = BROWSER_PACKAGES.includes(getPackageName())
 
 /**
  * Expect rollup to be called by either Lerna from the monorepo root, or
@@ -30,12 +35,11 @@ function getPackageRoot () {
   return path.join(getMonorepoRoot(), 'packages', getPackageName())
 }
 
-const BROWSER_PACKAGES = [
-  'build.knockout',
-  'build.reference'
-]
-
-const IS_BROWSER_BUNDLE = BROWSER_PACKAGES.includes(getPackageName())
+function getIndexExtension () {
+  return fs.readdirSync(path.join(getPackageRoot(), 'src'))
+    .find((f) => f.startsWith('index'))
+    .match(/\.(ts|js)/)[1]
+}
 
 const banner = `/*!
  * <%= pkg.description %> 🥊  <%= pkg.name %>@${pkg.version}
@@ -46,7 +50,7 @@ const banner = `/*!
 
 /* Use TypeScript instead of babel for transpilation for IE6 compat, plus it's faster */
 const TYPESCRIPT_CONFIG = {
-  include: '**/*.js',
+  include: ['**/*.js', '**/*.ts'],
   exclude: 'node_modules',
   typescript: require('typescript')
 }
@@ -109,11 +113,15 @@ function createRollupConfig ({ minify, transpile } = {}) {
   let filename = path.join(getPackageRoot(), 'dist', packageName)
 
   const plugins = [...UNIVERSAL_PLUGINS]
+  
+  plugins.push(typescript({
+    ...TYPESCRIPT_CONFIG,
+    tsconfigOverride: {
+      target: transpile ? 'ES5' : 'ES2017'
+    }
+  }))
 
-  if (transpile) {
-    // FIXME: How do we map to `src/index.js` and include tslib?
-    plugins.push(typescript(TYPESCRIPT_CONFIG))
-  } else {
+  if (!transpile) {
     // Must come before node resolve.
     plugins.unshift(replacerPlugin)
     filename += '.es6'
@@ -128,7 +136,7 @@ function createRollupConfig ({ minify, transpile } = {}) {
 
   return {
     plugins,
-    input: path.join(getPackageRoot(), 'src/index.js'),
+    input: path.join(getPackageRoot(), `src/index.${getIndexExtension()}`),
     external: IS_BROWSER_BUNDLE ? undefined : TKO_MODULES,
     output: {
       file: filename,
