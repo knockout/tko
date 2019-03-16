@@ -51,7 +51,10 @@ const rollupPreprocessor = {
     rollupTypescript({
       include: ['**/*.js', '**/*.ts'],
       exclude: 'node_modules',
-      typescript: require('typescript')
+      typescript: require('typescript'),
+      tsconfigOverride: {
+        target: 'ES2017'
+      }
     })
   ]
 }

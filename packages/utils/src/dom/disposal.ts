@@ -37,7 +37,7 @@ function cleanSingleNode(node: CleanableNode) {
   if (callbacks) {
     callbacks = callbacks.slice(0); // Clone, as the array may be modified during iteration (typically, callbacks will remove themselves)
     for (const cb of callbacks) {
-      callbacks(node);
+      cb(node);
     }
   }
 
@@ -96,8 +96,7 @@ export function cleanNode (node: Node) {
 
     // ... then its descendants, where applicable
     if (cleanableNodeTypesWithDescendants[node.nodeType]) {
-      // cleanNodesInList((node as CleanableNodeWithDescendants).getElementsByTagName("*"))
-      cleanNodesInList((node as CleanableNodeWithDescendants).childNodes)
+      cleanNodesInList((node as any).getElementsByTagName('*'));
     }
   }
   return node;

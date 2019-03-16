@@ -12,7 +12,7 @@ let document: Document|null = null;
 
 try {
   _global = window;
-  jq = jQuery;
+  jq = (window as any).jQuery;
   document = window.document;
 } catch (e) {
   _global = global as any as Window;
