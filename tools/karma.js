@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const rollupCommonJS = require('rollup-plugin-commonjs')
+const rollupTypescript = require('rollup-plugin-typescript2')
 const rollupVisualizer = require('rollup-plugin-visualizer')
 const typescript = require('typescript')
 
@@ -46,7 +47,12 @@ const rollupPreprocessor = {
     replacerPlugin,
     nodeResolve({ module: true }),
     rollupCommonJS(),
-    rollupVisualizer({ filename: './visual.html' })
+    rollupVisualizer({ filename: './visual.html' }),
+    rollupTypescript({
+      include: ['**/*.js', '**/*.ts'],
+      exclude: 'node_modules',
+      typescript: require('typescript')
+    })
   ]
 }
 
