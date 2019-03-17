@@ -1,17 +1,12 @@
 
 import {
-    arrayPushAll, arrayGetDistinctValues, ieVersion, arrayIndexOf,
-    stringStartsWith, safeSetTimeout,
-    tagNameLower, triggerEvent, arrayForEach, selectExtensions
+    ieVersion, stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach,
+    selectExtensions
 } from '@tko/utils'
 
 import {
     unwrap, dependencyDetection
 } from '@tko/observable'
-
-import {
-    computed
-} from '@tko/computed'
 
 import {
     applyBindingAccessorsToNode, BindingHandler
@@ -36,7 +31,7 @@ export class value extends BindingHandler {
     if (this.ieAutoCompleteHackNeeded) {
       this.addEventListener('propertyChange', () => this.propertyChangedFired = true)
       this.addEventListener('focus', () => this.propertyChangedFired = false)
-      this.addEventListner('blur', () => this.propertyChangeFired &&
+      this.addEventListener('blur', () => this.propertyChangeFired &&
         this.valueUpdateHandler())
     }
 

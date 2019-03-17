@@ -4,6 +4,8 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 * Make node cleaning upon removal with JSX asynchronous
 * Add `createElement` to the `tko` reference build, that (essentially) mimics `React.createElement`
+* Fix and add test for `applyBindingsToNode` being used in delegation (i.e. with computeds)
+* Fix typo in `ieAutoCompleteHackNeeded` for `value` binding
 
 ## 🎒 `alpha-5a..alpha6.x`  (ongoing)
 

@@ -4,6 +4,10 @@ import {
 } from '@tko/utils'
 
 import {
+  isWriteableObservable
+} from '@tko/observable'
+
+import {
     LifeCycle
 } from '@tko/lifecycle'
 
@@ -23,7 +27,14 @@ export class BindingHandler extends LifeCycle {
   }
 
   get value () { return this.valueAccessor() }
-  set value (v) { return this.valueAccessor(v) }
+  set value (v) {
+    const va = this.valueAccessor()
+    if (isWriteableObservable(va)) {
+      va(v)
+    } else {
+      this.valueAccessor(v)
+    }
+  }
 
   get controlsDescendants () { return false }
 

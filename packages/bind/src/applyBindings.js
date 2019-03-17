@@ -122,7 +122,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
   let shouldApplyBindings = isElement || // Case (1)
       hasBindings(nodeVerified)          // Case (2)
 
-  const {shouldBindDescendants} = shouldApplyBindings
+  const { shouldBindDescendants } = shouldApplyBindings
     ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
     : { shouldBindDescendants: true }
 
@@ -186,6 +186,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     }
     bindingInfo.alreadyBound = true
   }
+
   if (!alreadyBound) {
     bindingInfo.context = bindingContext
   }
@@ -227,7 +228,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
         // the latest binding value and registers a dependency on the binding updater.
     const getValueAccessor = bindingsUpdater
             ? (bindingKey) => function (optionalValue) {
-              var valueAccessor = bindingsUpdater()[bindingKey]
+              const valueAccessor = bindingsUpdater()[bindingKey]
               if (arguments.length === 0) {
                 return evaluateValueAccessor(valueAccessor)
               } else {
@@ -239,6 +240,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
     function allBindings () {
       return objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor)
     }
+
         // The following is the 3.x allBindings API
     allBindings.has = (key) => key in bindings
     allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))

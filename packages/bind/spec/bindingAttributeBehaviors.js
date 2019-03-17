@@ -8,6 +8,10 @@ import {
   observable as koObservable
 } from '@tko/observable'
 
+import {
+  computed
+} from '@tko/computed'
+
 import { MultiProvider } from '@tko/provider.multi'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { DataBindProvider } from '@tko/provider.databind'
@@ -704,6 +708,33 @@ describe('Binding attribute syntax', function () {
     // Second call uses data-bind
     applyBindings({}, testNode)
     // Should not throw any errors
+  })
+
+
+  it(`Should allow delegation with applyBindingsToNode`, () => {
+    testNode.innerHTML = `<i data-bind='myBinding: o'></i>`
+    let read = false
+    let write = false
+
+    bindingHandlers.myBinding = {
+      init: function(element, valueAccessor, allBindings, data, context) {
+        const interceptor = computed({
+            read: function () { read = 'r' },
+            write: function (v) { write = 'w' },
+            disposeWhenNodeIsRemoved: element
+        })
+        applyBindingsToNode(element, { value: interceptor }, context)
+      }
+    }
+
+    const element = document.createElement('div')
+    element.setAttribute('data-bind', 'myBinding: o')
+    const viewModel = { o: koObservable(123) }
+    applyBindings(viewModel, element)
+    expect(read).toEqual('r')
+    const event = new Event('change', { 'bubbles': true, 'cancelable': true })
+    element.dispatchEvent(event)
+    expect(write).toEqual('w')
   })
 
   describe('Should not bind against text content inside restricted elements', function () {

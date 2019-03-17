@@ -3,7 +3,6 @@ import {
 } from '@tko/utils'
 
 import {
-    unwrap,
     observable as koObservable
 } from '@tko/observable'
 
@@ -20,8 +19,7 @@ import {
 } from '@tko/provider.databind'
 
 import {
-    applyBindings, dataFor, bindingContext, BindingHandler,
-    applyBindingsToDescendants, applyBindingsToNode, contextFor
+    applyBindings, BindingHandler, contextFor
 } from '../src'
 
 import { bindings as coreBindings } from '@tko/binding.core'
