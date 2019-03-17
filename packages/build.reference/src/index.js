@@ -21,6 +21,7 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import { filters } from '@tko/filter.punches'
 
 import components from '@tko/utils.component'
+import { createElement } from 'utils.jsx'
 
 const builder = new Builder({
   filters,
@@ -46,7 +47,8 @@ const builder = new Builder({
 })
 
 export default builder.create({
-  version: '{{VERSION}}',
+  createElement,
   components,
-  Component: components.ComponentABC
+  version: '{{VERSION}}',
+  Component: components.ComponentABC,
 })
