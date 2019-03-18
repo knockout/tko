@@ -1,46 +1,4 @@
 {
     "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
-    ],
-    "jsRules": {},
-    "rules": {
-        "arrow-parens": [true, "ban-single-arg-parens"],
-        "quotemark": [true, "single","avoid-template", "avoid-escape"],
-        "object-literal-sort-keys": false,
-        "ordered-imports": [
-            true,
-            {
-                "import-sources-order": "any",
-                "named-imports-order": "any"
-            }
-        ],
-        "member-ordering": false,
-        "max-classes-per-file": [true, 6],
-        "max-line-length": [true, 250],
-        "no-conditional-assignment": false,
-        "no-empty": false,
-        "one-variable-per-declaration": false,
-        "no-console": false,
-        "no-shadowed-variable": false,
-        "trailing-comma": false,
-        "typedef-whitespace": [
-            true,
-            {
-                "call-signature": "nospace",
-                "index-signature": "nospace",
-                "parameter": "nospace",
-                "property-declaration": "nospace",
-                "variable-declaration": "nospace"
-            },
-            {
-                "call-signature": "onespace",
-                "index-signature": "onespace",
-                "parameter": "onespace",
-                "property-declaration": "onespace",
-                "variable-declaration": "onespace"
-            }
-        ]
-    },
-    "rulesDirectory": []
+    "extends": "tslint-config-standard"
 }

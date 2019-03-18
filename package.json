@@ -66,6 +66,7 @@
     "standard": "^10.0.3",
     "tslib": "^1.9.3",
     "tslint": "5.9.1",
+    "tslint-config-standard": "^8.0.1",
     "typescript": "^3.3.3333"
   },
   "workspaces": [
