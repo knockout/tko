@@ -33,7 +33,9 @@ export function subscribable<T> (this: ISubscribable<T>) : void {
 }
 
 interface TC39Callback {
+  // TODO
 }
+
 type Subscriber = (value: any) => void | TC39Callback
 
 export const defaultEvent = 'change'
@@ -54,7 +56,7 @@ class Subscribable<T> implements ISubscribable<T> {
     this._versionNumber = 1
   }
 
-  subscribe(callback: Subscriber, callbackTarget?: Function, event = defaultEvent) : Subscription {
+  subscribe<T> (callback: Subscriber, callbackTarget?: Function, event = defaultEvent) : Subscription<T> {
     // TC39 proposed standard Observable { next: () => ... }
     const isTC39Callback = typeof callback === 'object' && callback.next
 

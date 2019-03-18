@@ -8,13 +8,21 @@ import {
 
 import * as dependencyDetection from './dependencyDetection.js'
 import { deferUpdates } from './defer.js'
-import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
+import { subscribable, defaultEvent } from './subscribable'
+import { LATEST_VALUE } from './Subscription'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
 
-interface Observable = (...args: any[]) => void
+interface IObservable<T> {
+  (this: IObservable<T>, ...args: any[]): IObservable<T>
+  isDifferent: (latest: T, other: T) => boolean
+  [LATEST_VALUE]: T
+  valueWillMutate: () => void
+  valueHasMutated: () => void
+  isWriteable: boolean
+}
 
-export function observable (initialValue: any) : Observable {
-  function Observable (...args: any[]) : Observable {
+export function observable<T> (initialValue: T) : Observable<T> {
+  const Observable: IObservable<T> = function (this: IObservable<T>, ...args: any[]) : T|IObservable<T> {
     if (args.length > 0) {
             // Write
             // Ignore writes if the value hasn't changed
@@ -50,7 +58,7 @@ export function observable (initialValue: any) : Observable {
 // Define prototype for observables
 observable.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-  peek () { return this[LATEST_VALUE] },
+  peek (this: IObservable<T>) : T { return this[LATEST_VALUE] },
   valueHasMutated () {
     this.notifySubscribers(this[LATEST_VALUE], 'spectate')
     this.notifySubscribers(this[LATEST_VALUE])
@@ -146,7 +154,7 @@ observable.fn[protoProperty] = observable
 // isObservable will be `true`.
 observable.observablePrototypes = new Set([observable])
 
-export function isObservable (instance) {
+export function isObservable<T> (instance: T|IObservable<T>) {
   const proto = typeof instance === 'function' && instance[protoProperty]
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
@@ -154,15 +162,15 @@ export function isObservable (instance) {
   return !!proto
 }
 
-export function unwrap (value) {
+export function unwrap<T> (value: T|IObservable<T>) {
   return isObservable(value) ? value() : value
 }
 
-export function peek (value) {
+export function peek<T> (value: T|IObservable<T>) {
   return isObservable(value) ? value.peek() : value
 }
 
-export function isWriteableObservable (instance) {
+export function isWriteableObservable<T> (instance: T|IObservable<T>) {
   return isObservable(instance) && instance.isWriteable
 }
 
