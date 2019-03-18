@@ -39,3 +39,4 @@ packages/*/visual.html
 /packages/tko/dist/tko.es6.min.js
 /packages/tko/dist/tko.es6.min.js.map
 /.vscode
+docs
