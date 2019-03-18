@@ -10,14 +10,14 @@ export default class Subscription<T> {
   private _domNodeDisposalCallback: null|DisposeCallback
   private _node: null|Node
   private _isDisposed: boolean
-  private _disposeCallback: DisposeCallback
   private _callback: null|((value: T) => void)
-  private _target: any
 
-  constructor (target: ISubscribable<T>, observer, disposeCallback: DisposeCallback) {
-    this._target = target
+  constructor (
+    private _target: ISubscribable<T>,
+    observer,
+    private _disposeCallback: DisposeCallback
+  ) {
     this._callback = observer.next
-    this._disposeCallback = disposeCallback
     this._domNodeDisposalCallback = null
     this._node = null
     this._isDisposed = false
