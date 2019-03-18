@@ -2,23 +2,9 @@
 import {
   removeDisposeCallback, DisposeCallback, addDisposeCallback
 } from '@tko/utils'
+import { ISubscribable } from './subscribable'
 
-import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
 export const LATEST_VALUE = Symbol('Knockout latest value')
-
-interface Subscribable<T> {
-  _versionNumber: number
-  _subscriptions: Record<string, Subscription<T>[]>
-  [SUBSCRIBABLE_SYM]: boolean
-  [LATEST_VALUE]: any
-  [Symbol.observable]: Subscribable<T>
-
-  init: () => void
-  equalityComparer: (oldValue: any, newValue: any) => boolean
-  afterSubscriptionRemove: (event: string) => void
-  beforeSubscriptionAdd: (event: string) => void
-  subscribe: (callback, callbackTarget?, event?: string) => Subscription
-}
 
 export default class Subscription<T> {
   private _domNodeDisposalCallback: null|DisposeCallback
@@ -28,7 +14,7 @@ export default class Subscription<T> {
   private _callback: null|((value: T) => void)
   private _target: any
 
-  constructor (target: Subscribable<T>, observer, disposeCallback: DisposeCallback) {
+  constructor (target: ISubscribable<T>, observer, disposeCallback: DisposeCallback) {
     this._target = target
     this._callback = observer.next
     this._disposeCallback = disposeCallback

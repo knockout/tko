@@ -3,6 +3,7 @@
   "version": "4.0.0-alpha7.4",
   "description": "TKO Utilities",
   "module": "dist/utils.js",
+  "types": "./src",
   "files": [
     "dist/"
   ],
