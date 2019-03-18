@@ -3,38 +3,40 @@ import {
     arrayRemoveItem, objectForEach, options
 } from '@tko/utils'
 
-import Subscription from './Subscription'
-import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
+import { default as Subscription, LATEST_VALUE } from './Subscription'
 import { applyExtenders } from './extenders.js'
 import * as dependencyDetection from './dependencyDetection.js'
 export { isSubscribable } from './subscribableSymbol'
+import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
 
 // Descendants may have a LATEST_VALUE, which if present
 // causes TC39 subscriptions to emit the latest value when
 // subscribed.
-export const LATEST_VALUE = Symbol('Knockout latest value')
 
-export function subscribable () {
+export function subscribable<T> (this: Subscribable<T>) : void {
   Object.setPrototypeOf(this, ko_subscribable_fn)
   ko_subscribable_fn.init(this)
 }
 
-export var defaultEvent = 'change'
+interface TC39Callback {
+}
+type Subscriber = (value: any) => void | TC39Callback
 
-var ko_subscribable_fn = {
+export const defaultEvent = 'change'
+
+const ko_subscribable_fn = {
   [SUBSCRIBABLE_SYM]: true,
   [Symbol.observable] () { return this },
 
-  init (instance) {
+  init<T> (instance : Subscribable<T>) : void {
     instance._subscriptions = { change: [] }
     instance._versionNumber = 1
   },
 
-  subscribe (callback, callbackTarget, event) {
+  subscribe<T> (this: Subscribable<T>, callback: Subscriber, callbackTarget?: Function, event = defaultEvent) : Subscription {
     // TC39 proposed standard Observable { next: () => ... }
     const isTC39Callback = typeof callback === 'object' && callback.next
 
-    event = event || defaultEvent
     const observer = isTC39Callback ? callback : {
       next: callbackTarget ? callback.bind(callbackTarget) : callback
     }
@@ -65,7 +67,7 @@ var ko_subscribable_fn = {
     return subscriptionInstance
   },
 
-  notifySubscribers (valueToNotify, event) {
+  notifySubscribers (valueToNotify: any, event: string) {
     event = event || defaultEvent
     if (event === defaultEvent) {
       this.updateVersion()
@@ -89,23 +91,23 @@ var ko_subscribable_fn = {
     }
   },
 
-  getVersion () {
+  getVersion (this: Subscribable) : number {
     return this._versionNumber
   },
 
-  hasChanged (versionToCheck) {
+  hasChanged (versionToCheck : number) : boolean {
     return this.getVersion() !== versionToCheck
   },
 
-  updateVersion () {
+  updateVersion (this: Subscribable) :void {
     ++this._versionNumber
   },
 
-  hasSubscriptionsForEvent (event) {
+  hasSubscriptionsForEvent (event: string) : boolean {
     return this._subscriptions[event] && this._subscriptions[event].length
   },
 
-  getSubscriptionsCount (event) {
+  getSubscriptionsCount (event: string) : number {
     if (event) {
       return this._subscriptions[event] && this._subscriptions[event].length || 0
     } else {
@@ -119,27 +121,27 @@ var ko_subscribable_fn = {
     }
   },
 
-  isDifferent (oldValue, newValue) {
+  isDifferent (oldValue: any , newValue: any) : boolean {
     return !this.equalityComparer ||
-               !this.equalityComparer(oldValue, newValue)
+      !this.equalityComparer(oldValue, newValue)
   },
 
-  once (cb) {
-    const subs = this.subscribe((nv) => {
+  once (this: Subscribable, cb: (value: any) => void) : void {
+    const subs = this.subscribe(nv => {
       subs.dispose()
       cb(nv)
     })
   },
 
-  when (test, returnValue) {
+  when (test: any|((value: any) => boolean), returnValue?: any) : Promise<any> {
     const current = this.peek()
     const givenRv = arguments.length > 1
     const testFn = typeof test === 'function' ? test : v => v === test
     if (testFn(current)) {
-      return options.Promise.resolve(givenRv ? returnValue : current)
+      return Promise.resolve(givenRv ? returnValue : current)
     }
-    return new options.Promise((resolve, reject) => {
-      const subs = this.subscribe(newValue => {
+    return new Promise((resolve, reject) => {
+      const subs = this.subscribe((newValue: any) => {
         if (testFn(newValue)) {
           subs.dispose()
           resolve(givenRv ? returnValue : newValue)
@@ -148,13 +150,13 @@ var ko_subscribable_fn = {
     })
   },
 
-  yet (test, ...args) {
+  yet (test: any|((value: any) => boolean), ...args) {
     const testFn = typeof test === 'function' ? test : v => v === test
     const negated = v => !testFn(v)
     return this.when(negated, ...args)
   },
 
-  next () { return new Promise(resolve => this.once(resolve)) },
+  next () : Promise<any> { return new Promise(resolve => this.once(resolve)) },
 
   toString () { return '[object Object]' },
 
