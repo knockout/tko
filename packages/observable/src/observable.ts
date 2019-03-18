@@ -8,12 +8,14 @@ import {
 
 import * as dependencyDetection from './dependencyDetection.js'
 import { deferUpdates } from './defer.js'
-import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
+import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
 
-export function observable (initialValue) {
-  function Observable () {
-    if (arguments.length > 0) {
+interface Observable = (...args: any[]) => void
+
+export function observable (initialValue: any) : Observable {
+  function Observable (...args: any[]) : Observable {
+    if (args.length > 0) {
             // Write
             // Ignore writes if the value hasn't changed
       if (Observable.isDifferent(Observable[LATEST_VALUE], arguments[0])) {
