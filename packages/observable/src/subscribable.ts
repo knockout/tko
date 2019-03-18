@@ -3,7 +3,7 @@ import {
     arrayRemoveItem, objectForEach, options
 } from '@tko/utils'
 
-import { default as Subscription, LATEST_VALUE } from './Subscription'
+import { default as Subscription, Subscribable, LATEST_VALUE } from './Subscription'
 import { applyExtenders } from './extenders.js'
 import * as dependencyDetection from './dependencyDetection.js'
 export { isSubscribable } from './subscribableSymbol'
@@ -19,12 +19,14 @@ export function subscribable<T> (this: Subscribable<T>) : void {
 }
 
 interface TC39Callback {
+  // TODO
 }
+
 type Subscriber = (value: any) => void | TC39Callback
 
 export const defaultEvent = 'change'
 
-const ko_subscribable_fn = {
+const ko_subscribable_fn: Subscribable<T> = {
   [SUBSCRIBABLE_SYM]: true,
   [Symbol.observable] () { return this },
 
@@ -33,7 +35,7 @@ const ko_subscribable_fn = {
     instance._versionNumber = 1
   },
 
-  subscribe<T> (this: Subscribable<T>, callback: Subscriber, callbackTarget?: Function, event = defaultEvent) : Subscription {
+  subscribe<T> (this: Subscribable<T>, callback: Subscriber, callbackTarget?: Function, event = defaultEvent) : Subscription<T> {
     // TC39 proposed standard Observable { next: () => ... }
     const isTC39Callback = typeof callback === 'object' && callback.next
 

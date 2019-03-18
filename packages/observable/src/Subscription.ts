@@ -6,18 +6,18 @@ import {
 import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
 export const LATEST_VALUE = Symbol('Knockout latest value')
 
-interface Subscribable<T> {
+export interface Subscribable<T> {
   _versionNumber: number
   _subscriptions: Record<string, Subscription<T>[]>
   [SUBSCRIBABLE_SYM]: boolean
-  [LATEST_VALUE]: any
+  [LATEST_VALUE]: T
   [Symbol.observable]: Subscribable<T>
 
-  init: () => void
-  equalityComparer: (oldValue: any, newValue: any) => boolean
+  init: (instance: Subscribable<T>) => void
+  equalityComparer: (oldValue: T, newValue: T) => boolean
   afterSubscriptionRemove: (event: string) => void
   beforeSubscriptionAdd: (event: string) => void
-  subscribe: (callback, callbackTarget?, event?: string) => Subscription
+  subscribe: (callback, callbackTarget?, event?: string) => Subscription<T>
 }
 
 export default class Subscription<T> {
