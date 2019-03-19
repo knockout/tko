@@ -1,40 +1,65 @@
 /* eslint no-cond-assign: 0 */
 import {
-    arrayRemoveItem, objectForEach, options
+    arrayRemoveItem, objectForEach
 } from '@tko/utils'
 
-import Subscription from './Subscription'
-import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
+import { default as Subscription, LATEST_VALUE } from './Subscription'
 import { applyExtenders } from './extenders.js'
 import * as dependencyDetection from './dependencyDetection.js'
 export { isSubscribable } from './subscribableSymbol'
+import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
+
+export interface ISubscribable<T> {
+  _versionNumber: number
+  _subscriptions: Record<string, Subscription<T>[]>
+  [SUBSCRIBABLE_SYM]: boolean
+  [LATEST_VALUE]?: any
+  [Symbol.observable] (): ISubscribable<T>
+
+  init: () => void
+  equalityComparer?: (oldValue: any, newValue: any) => boolean
+  afterSubscriptionRemove?: (event: string) => void
+  beforeSubscriptionAdd?: (event: string) => void
+  subscribe: (callback, callbackTarget?, event?: string) => Subscription<T>
+}
 
 // Descendants may have a LATEST_VALUE, which if present
 // causes TC39 subscriptions to emit the latest value when
 // subscribed.
-export const LATEST_VALUE = Symbol('Knockout latest value')
 
-export function subscribable () {
-  Object.setPrototypeOf(this, ko_subscribable_fn)
-  ko_subscribable_fn.init(this)
+export function subscribable<T> (this: ISubscribable<T>) : void {
+  Object.setPrototypeOf(this, Subscribable.prototype)
+  this.init()
 }
 
-export var defaultEvent = 'change'
+interface TC39Callback {
+  // TODO
+}
 
-var ko_subscribable_fn = {
-  [SUBSCRIBABLE_SYM]: true,
-  [Symbol.observable] () { return this },
+type Subscriber = (value: any) => void | TC39Callback
 
-  init (instance) {
-    instance._subscriptions = { change: [] }
-    instance._versionNumber = 1
-  },
+export const defaultEvent = 'change'
 
-  subscribe (callback, callbackTarget, event) {
+class Subscribable<T> implements ISubscribable<T> {
+  public _subscriptions!: Record<string, any[]> // @todo make more restrictive
+  public _versionNumber!: number
+
+  public afterSubscriptionRemove?: (event: string) => void
+  public beforeSubscriptionAdd?: (event: string) => void
+  public equalityComparer?: (oldValue: any, newValue: any) => boolean
+
+  [SUBSCRIBABLE_SYM]: true
+  [Symbol.observable] () { return this }
+
+  init() : void {
+    this._subscriptions = { change: [] }
+    this._versionNumber = 1
+  }
+
+  subscribe<T> (callback: Subscriber, callbackTarget?: Function, event = defaultEvent) : Subscription<T> {
     // TC39 proposed standard Observable { next: () => ... }
     const isTC39Callback = typeof callback === 'object' && callback.next
 
-    event = event || defaultEvent
     const observer = isTC39Callback ? callback : {
       next: callbackTarget ? callback.bind(callbackTarget) : callback
     }
@@ -63,9 +88,9 @@ var ko_subscribable_fn = {
     }
 
     return subscriptionInstance
-  },
+  }
 
-  notifySubscribers (valueToNotify, event) {
+  notifySubscribers (valueToNotify: any, event: string) {
     event = event || defaultEvent
     if (event === defaultEvent) {
       this.updateVersion()
@@ -87,25 +112,25 @@ var ko_subscribable_fn = {
         dependencyDetection.end() // End suppressing dependency detection
       }
     }
-  },
+  }
 
-  getVersion () {
+  getVersion () : number {
     return this._versionNumber
-  },
+  }
 
-  hasChanged (versionToCheck) {
+  hasChanged (versionToCheck : number) : boolean {
     return this.getVersion() !== versionToCheck
-  },
+  }
 
-  updateVersion () {
+  updateVersion () :void {
     ++this._versionNumber
-  },
+  }
 
-  hasSubscriptionsForEvent (event) {
+  hasSubscriptionsForEvent (event: string) : boolean {
     return this._subscriptions[event] && this._subscriptions[event].length
-  },
+  }
 
-  getSubscriptionsCount (event) {
+  getSubscriptionsCount (event: string) : number {
     if (event) {
       return this._subscriptions[event] && this._subscriptions[event].length || 0
     } else {
@@ -117,53 +142,53 @@ var ko_subscribable_fn = {
       })
       return total
     }
-  },
+  }
 
-  isDifferent (oldValue, newValue) {
+  isDifferent (oldValue: any , newValue: any) : boolean {
     return !this.equalityComparer ||
-               !this.equalityComparer(oldValue, newValue)
-  },
+      !this.equalityComparer(oldValue, newValue)
+  }
 
-  once (cb) {
-    const subs = this.subscribe((nv) => {
+  once (cb: (value: any) => void) : void {
+    const subs = this.subscribe(nv => {
       subs.dispose()
       cb(nv)
     })
-  },
+  }
 
-  when (test, returnValue) {
+  when (test: any|((value: any) => boolean), returnValue?: any) : Promise<any> {
     const current = this.peek()
     const givenRv = arguments.length > 1
     const testFn = typeof test === 'function' ? test : v => v === test
     if (testFn(current)) {
-      return options.Promise.resolve(givenRv ? returnValue : current)
+      return Promise.resolve(givenRv ? returnValue : current)
     }
-    return new options.Promise((resolve, reject) => {
-      const subs = this.subscribe(newValue => {
+    return new Promise((resolve, reject) => {
+      const subs = this.subscribe((newValue: any) => {
         if (testFn(newValue)) {
           subs.dispose()
           resolve(givenRv ? returnValue : newValue)
         }
       })
     })
-  },
+  }
 
-  yet (test, ...args) {
+  yet (test: any|((value: any) => boolean), ...args) {
     const testFn = typeof test === 'function' ? test : v => v === test
     const negated = v => !testFn(v)
     return this.when(negated, ...args)
-  },
+  }
 
-  next () { return new Promise(resolve => this.once(resolve)) },
+  next () : Promise<any> { return new Promise(resolve => this.once(resolve)) }
 
-  toString () { return '[object Object]' },
+  toString () { return '[object Object]' }
 
-  extend: applyExtenders
+  extend = applyExtenders
 }
 
 // For browsers that support proto assignment, we overwrite the prototype of each
 // observable instance. Since observables are functions, we need Function.prototype
 // to still be in the prototype chain.
-Object.setPrototypeOf(ko_subscribable_fn, Function.prototype)
+Object.setPrototypeOf(Subscribable, Function.prototype)
 
-subscribable.fn = ko_subscribable_fn
+subscribable.fn = Subscribable.prototype

@@ -9,7 +9,7 @@
   "dependencies": {
     "@tko/observable": "^4.0.0-alpha7.4",
     "@tko/utils": "^4.0.0-alpha7.4",
-    "tslib": "^1.8.0"
+    "tslib": "^1.9.3"
   },
   "repository": {
     "type": "git",

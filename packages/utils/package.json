@@ -3,6 +3,7 @@
   "version": "4.0.0-alpha7.4",
   "description": "TKO Utilities",
   "module": "dist/utils.js",
+  "types": "./src",
   "files": [
     "dist/"
   ],
@@ -27,7 +28,8 @@
     ]
   },
   "dependencies": {
-    "tslib": "^1.8.0"
+    "@types/jquery": "3.3.1",
+    "tslib": "^1.9.3"
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {

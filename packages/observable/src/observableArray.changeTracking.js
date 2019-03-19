@@ -8,7 +8,7 @@ import {
     extend, compareArrays, findMovesInArrayComparison
 } from '@tko/utils'
 
-import { defaultEvent } from './subscribable.js'
+import { defaultEvent } from './subscribable'
 import { extenders } from './extenders.js'
 
 export var arrayChangeEventName = 'arrayChange'

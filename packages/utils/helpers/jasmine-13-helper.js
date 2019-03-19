@@ -5,7 +5,7 @@
 
 import {
   arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty
-} from '../src/'
+} from '../dist/utils.es6'
 
 
 window.DEBUG = true;

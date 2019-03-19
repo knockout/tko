@@ -2,8 +2,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "downlevelIteration": true,
-    "target": "ES3",
-    "module": "ES2015",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "allowJs": true,
     "importHelpers": true,
     "strict": true
