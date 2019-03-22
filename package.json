@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@lerna/version": "^3.13.1",
     "chai": "^4.1.2",
     "electron": "^2.0.0",
     "fs-extra": "^7.0.0",
@@ -50,7 +51,7 @@
     "karma-sauce-launcher": "^1.2.0",
     "karma-sinon": "^1.0.5",
     "karma-typescript-preprocessor": "^0.3.1",
-    "lerna": "^2.11.0",
+    "lerna": "^3.13.1",
     "mocha": "^5.1",
     "rollup": "^0.58",
     "rollup-plugin-babel-minify": "^4.0.0",
@@ -68,5 +69,6 @@
     "packages/*"
   ],
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+  }
 }
