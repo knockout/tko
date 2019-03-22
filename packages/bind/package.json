@@ -1,6 +1,6 @@
 {
   "name": "@tko/bind",
-  "version": "4.0.0-alpha7.4",
+  "version": "4.0.0-alpha8",
   "description": "TKO DOM-Observable Binding",
   "module": "dist/bind.js",
   "dependencies": {
@@ -12,7 +12,7 @@
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "@tko/binding.foreach": "^4.0.0-alpha7.4"
+    "@tko/binding.foreach": "^4.0.0-alpha8"
   },
   "files": [
     "dist/"
