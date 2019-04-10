@@ -47,7 +47,7 @@ function getBindingProvider () {
 }
 
 function isProviderForNode (provider, node) {
-  const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
+  const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8, 11]
   return nodeTypes.includes(node.nodeType)
 }
 
@@ -363,7 +363,7 @@ export function applyBindingsToNode (node, bindings, viewModelOrBindingContext) 
 
 export function applyBindingsToDescendants (viewModelOrBindingContext, rootNode) {
   const asyncBindingsApplied = new Set()
-  if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
+  if (rootNode.nodeType === 1 || rootNode.nodeType === 8 || rootNode.nodeType === 11) {
     const bindingContext = getBindingContext(viewModelOrBindingContext)
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
@@ -384,7 +384,7 @@ export function applyBindings (viewModelOrBindingContext, rootNode, extendContex
     if (!rootNode) {
       throw Error('ko.applyBindings: could not find window.document.body; has the document been loaded?')
     }
-  } else if (rootNode.nodeType !== 1 && rootNode.nodeType !== 8) {
+  } else if (rootNode.nodeType !== 1 && rootNode.nodeType !== 8 && rootNode.nodeType !== 11) {
     throw Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node')
   }
   const rootContext = getBindingContext(viewModelOrBindingContext, extendContextCallback)
