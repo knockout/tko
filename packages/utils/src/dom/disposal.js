@@ -12,8 +12,9 @@ var domDataKey = domData.nextKey()
 // 1: Element
 // 8: Comment
 // 9: Document
-var cleanableNodeTypes = { 1: true, 8: true, 9: true }
-var cleanableNodeTypesWithDescendants = { 1: true, 9: true }
+// 11: Document Fragment
+var cleanableNodeTypes = { 1: true, 8: true, 9: true, 11: true }
+var cleanableNodeTypesWithDescendants = { 1: true, 9: true , 11: true}
 
 function getDisposeCallbacksCollection (node, createIfNotFound) {
   var allDisposeCallbacks = domData.get(node, domDataKey)
