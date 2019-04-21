@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "tko",
+=======
+  "name": "tko"
+>>>>>>> 4507cbffd9fdbcdb8f673aab18bd0953a85c8033
   "homepage": "https://tko.io/",
   "license": "MIT",
   "author": "The Knockout.js Team",
