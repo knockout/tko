@@ -6,6 +6,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Add `createElement` to the `tko` reference build, that (essentially) mimics `React.createElement`
 * Fix and add test for `applyBindingsToNode` being used in delegation (i.e. with computeds)
 * Fix typo in `ieAutoCompleteHackNeeded` for `value` binding
+* Fix case where JSX `computed` value is initially `null` or `undefined`
 
 ## 🎒 `alpha-5a..alpha6.x`  (ongoing)
 
