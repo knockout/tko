@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.databind",
-  "version": "4.0.0-alpha7.4",
+  "version": "4.0.0-alpha8",
   "description": "Link HTML attributes based on a `data-bind` HTML attribute",
   "module": "dist/provider.databind.js",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider.bindingstring": "^4.0.0-alpha7.4",
+    "@tko/provider.bindingstring": "^4.0.0-alpha8",
     "tslib": "^1.8.0"
   },
   "karma": {

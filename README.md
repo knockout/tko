@@ -21,10 +21,9 @@ To install use one of the usual package managers e.g.
 - $ `yarn add tko`
 - $ `npm install tko`
 
-By CDN
+Reference Build over CDN
 
-- Stable: https://unpkg.com/tko/dist/tko[.es6][.min].js
-- Latest (development only): https://rawgit.com/knockout/tko/master/packages/tko/dist/tko[.es6][.min].js
+- https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-alpha8/dist/build.reference.min.js
 
 ### Using the Monorepo
 

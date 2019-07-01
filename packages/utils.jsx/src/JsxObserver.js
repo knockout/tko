@@ -14,6 +14,10 @@ import {
 } from '@tko/observable'
 
 import {
+  isComputed
+} from '@tko/computed'
+
+import {
   NativeProvider
 } from '@tko/provider.native'
 
@@ -51,7 +55,7 @@ export class JsxObserver extends LifeCycle {
     const parentNodeTarget = this.getParentTarget(parentNode)
 
     if (isObservable(jsxOrObservable)) {
-      jsxOrObservable.extend({trackArrayChanges: true})
+      jsxOrObservable.extend({ trackArrayChanges: true })
       this.subscribe(jsxOrObservable, this.observableArrayChange, 'arrayChange')
 
       if (!insertBefore) {
@@ -83,8 +87,9 @@ export class JsxObserver extends LifeCycle {
     })
 
     const jsx = unwrap(jsxOrObservable)
+    const computed = isComputed(jsxOrObservable)
 
-    if (jsx !== null && jsx !== undefined) {
+    if (computed || (jsx !== null && jsx !== undefined)) {
       this.observableArrayChange(this.createInitialAdditions(jsx))
     }
     this.performingInitialAdditions = false

@@ -415,6 +415,17 @@ describe('jsx', function () {
     jo.dispose()
   })
 
+  it('unwraps null computeds at root', () => {
+    const parent = document.createElement('div')
+    const o = observable(null)
+    const c0 = computed(() => o())
+    const jo = new JsxTestObserver(c0, parent)
+    assert.equal(parent.innerHTML, '<!--null--><!--O-->')
+    o('zaz')
+    assert.equal(parent.innerHTML, 'zaz<!--O-->')
+    jo.dispose()
+  })
+
   it('unwraps multiple text computeds as children', () => {
     const parent = document.createElement('div')
     const o = observable(false)
