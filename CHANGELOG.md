@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## 👢 alpha.10
+
+* Update build system (experimenting)
+
 ## 🐇 alpha.9 
 
 * Change JSX behaviour so Node instances in observables are not cloned.  This behaviour allows injecting `HTMLCanvasElement` instances without losing the canvas content.
