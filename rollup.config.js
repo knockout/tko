@@ -108,14 +108,13 @@ function createRollupConfig ({ minify, transpile } = {}) {
   const packageName = getPackageName()
   let filename = path.join(getPackageRoot(), 'dist', packageName)
 
-  const plugins = [...UNIVERSAL_PLUGINS]
+  const plugins = [replacerPlugin, ...UNIVERSAL_PLUGINS]
 
+      // plugins.unshift(replacerPlugin)
   if (transpile) {
     // FIXME: How do we map to `src/index.js` and include tslib?
     plugins.push(typescript(TYPESCRIPT_CONFIG))
   } else {
-    // Must come before node resolve.
-    plugins.unshift(replacerPlugin)
     filename += '.es6'
   }
 
