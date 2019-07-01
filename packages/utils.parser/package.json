@@ -4,7 +4,8 @@
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
   "module": "dist/utils.parser.js",
   "files": [
-    "dist/"
+    "dist/",
+    "helpers/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -25,10 +26,10 @@
     ]
   },
   "scripts": {
-    "test": "karma start ../../karma.conf.js --once",
-    "build": "rollup -c ../../rollup.config.js",
-    "watch": "karma start ../../karma.conf.js",
-    "prepare": "rollup -c ../../rollup.config.js"
+    "test": "npx karma start ../../karma.conf.js --once",
+    "build": "npx rollup -c ../../rollup.config.js",
+    "watch": "npx karma start ../../karma.conf.js",
+    "prepare": "npx rollup -c ../../rollup.config.js"
   },
   "standard": {
     "env": [

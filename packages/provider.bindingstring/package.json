@@ -4,7 +4,8 @@
   "description": "Abstract Base Class for providers that parse a binding string",
   "module": "dist/provider.bindingString.js",
   "files": [
-    "dist/"
+    "dist/",
+    "helpers/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -27,10 +28,10 @@
     ]
   },
   "scripts": {
-    "test": "karma start ../../karma.conf.js --once",
-    "build": "rollup -c ../../rollup.config.js",
-    "watch": "karma start ../../karma.conf.js",
-    "prepare": "rollup -c ../../rollup.config.js"
+    "test": "npx karma start ../../karma.conf.js --once",
+    "build": "npx rollup -c ../../rollup.config.js",
+    "watch": "npx karma start ../../karma.conf.js",
+    "prepare": "npx rollup -c ../../rollup.config.js"
   },
   "publishConfig": {
     "access": "public"

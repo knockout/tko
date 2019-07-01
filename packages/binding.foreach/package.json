@@ -4,13 +4,14 @@
   "description": "Knockout Foreach Binding",
   "module": "dist/binding.foreach.js",
   "scripts": {
-    "test": "karma start ../../karma.conf.js --once",
-    "build": "rollup -c ../../rollup.config.js",
-    "watch": "karma start ../../karma.conf.js",
-    "prepare": "rollup -c ../../rollup.config.js"
+    "test": "npx karma start ../../karma.conf.js --once",
+    "build": "npx rollup -c ../../rollup.config.js",
+    "watch": "npx karma start ../../karma.conf.js",
+    "prepare": "npx rollup -c ../../rollup.config.js"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "helpers/"
   ],
   "repository": {
     "type": "git",

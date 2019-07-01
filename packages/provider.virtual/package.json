@@ -4,7 +4,8 @@
   "description": "Binding provider for <!-- ko handler: ... --> virtual elements",
   "module": "dist/provider.virtual.js",
   "files": [
-    "dist/"
+    "dist/",
+    "helpers/"
   ],
   "author": "Knockout Team",
   "license": "MIT",
@@ -28,10 +29,10 @@
     ]
   },
   "scripts": {
-    "test": "karma start ../../karma.conf.js --once",
-    "build": "rollup -c ../../rollup.config.js",
-    "watch": "karma start ../../karma.conf.js",
-    "prepare": "rollup -c ../../rollup.config.js"
+    "test": "npx karma start ../../karma.conf.js --once",
+    "build": "npx rollup -c ../../rollup.config.js",
+    "watch": "npx karma start ../../karma.conf.js",
+    "prepare": "npx rollup -c ../../rollup.config.js"
   },
   "publishConfig": {
     "access": "public"
