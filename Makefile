@@ -1,5 +1,5 @@
 NODE  	:= npx
-LERNA 	:= $(LERNA)
+LERNA 	:= $(NODE) lerna
 
 default: build
 
