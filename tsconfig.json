@@ -6,6 +6,13 @@
     "module": "ES2015",
     "allowJs": true,
     "importHelpers": true,
-    "strict": true
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "*",
+        "packages/*"
+      ]
+    }
   }
 }
