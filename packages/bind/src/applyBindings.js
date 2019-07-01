@@ -176,6 +176,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
   const alreadyBound = bindingInfo.alreadyBound
   if (!sourceBindings) {
     if (alreadyBound) {
+      if (!hasBindings(node)) { return false }
       onBindingError({
         during: 'apply',
         errorCaptured: new Error('You cannot apply bindings multiple times to the same element.'),
