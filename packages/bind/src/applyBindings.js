@@ -109,6 +109,10 @@ function hasBindings (node) {
   return isProviderForNode(provider, node) && provider.nodeHasBindings(node)
 }
 
+function nodeOrChildHasBindings (node) {
+  return hasBindings(node) || [...node.childNodes].some(c => nodeOrChildHasBindings(c))
+}
+
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
   var isElement = nodeVerified.nodeType === 1
   if (isElement) { // Workaround IE <= 8 HTML parsing weirdness
@@ -176,7 +180,7 @@ function applyBindingsToNodeInternal (node, sourceBindings, bindingContext, asyn
   const alreadyBound = bindingInfo.alreadyBound
   if (!sourceBindings) {
     if (alreadyBound) {
-      if (!hasBindings(node)) { return false }
+      if (!nodeOrChildHasBindings(node)) { return false }
       onBindingError({
         during: 'apply',
         errorCaptured: new Error('You cannot apply bindings multiple times to the same element.'),

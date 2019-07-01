@@ -255,11 +255,32 @@ describe('jsx', function () {
     jo.dispose()
   })
 
-  it('errors injecting a non-JSX node twice', () => {
+  it('errors injecting a non-JSX node with bindings twice', () => {
     const parent = document.createElement('div')
     const itag = { elementName: 'i', children: [], attributes: { 'ko-counter': 'abc' }}
     const io = observable()
     const jsx = { elementName: 'div', children: [itag, io], attributes: {} }
+    const jo = new JsxTestObserver(jsx, parent)
+
+    let counter = 0
+    const provider = new NativeProvider()
+    options.bindingProviderInstance = provider
+    provider.bindingHandlers.set({ counter: () => ++counter })
+
+    applyBindings({ abc: '123' }, parent)
+    assert.equal(counter, 1)
+    const inode = parent.children[0].children[0]
+    delete inode[ORIGINAL_JSX_SYM]
+    assert.throws(() => io(inode), /You cannot apply bindings multiple times/)
+    jo.dispose()
+  })
+
+  it('errors injecting a non-JSX node with binding child twice', () => {
+    const parent = document.createElement('div')
+    const itag = { elementName: 'i', children: [], attributes: { 'ko-counter': 'abc' } }
+    const btag = { elementName: 'b', children: [itag], attributes: {} }
+    const io = observable()
+    const jsx = { elementName: 'div', children: [btag, io], attributes: {} }
     const jo = new JsxTestObserver(jsx, parent)
 
     let counter = 0
