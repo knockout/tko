@@ -31,9 +31,10 @@ bootstrap:
 bump:
 	$(LERNA) version
 
-# "identify packages tagged by lerna version and publish them to npm."
-publish: build
-	$(LERNA) publish from-git
+# from-git "identify packages tagged by lerna version and publish them to npm."
+# from-package "packages where the latest version is not present in the registry"
+publish-unpublished: build
+	$(LERNA) publish from-package
 
 node_modules: bootstrap
 	$(NODE) yarn install
