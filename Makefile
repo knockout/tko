@@ -30,7 +30,6 @@ bootstrap:
 .PHONY: bump
 bump:
 	$(LERNA) version
-	$(MAKE) build
 
 node_modules: bootstrap
 	$(NODE) yarn install
