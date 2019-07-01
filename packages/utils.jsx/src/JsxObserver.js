@@ -247,7 +247,7 @@ export class JsxObserver extends LifeCycle {
           return document.createComment(String(any))
         }
         if (any instanceof Node) {
-          return any
+          return this.cloneJSXorMoveNode(any)
         }
         break
       case 'function': return this.anyToNode(any())
@@ -263,9 +263,9 @@ export class JsxObserver extends LifeCycle {
         return document.createTextNode(String(any))
     }
 
-    if (!this.isJsx(any)) { return document.createComment(safeStringify(any)) }
-
-    return this.jsxToNode(any)
+    return this.isJsx(any)
+      ? this.jsxToNode(any)
+      :document.createComment(safeStringify(any))
   }
 
   /**
@@ -274,12 +274,10 @@ export class JsxObserver extends LifeCycle {
    *
    * @param {HTMLElement} node
    */
-  cloneNode (node) {
-    if (ORIGINAL_JSX_SYM in node) {
-      return this.jsxToNode(node[ORIGINAL_JSX_SYM])
-    } else {
-      return node.cloneNode(true)
-    }
+  cloneJSXorMoveNode (node) {
+    return ORIGINAL_JSX_SYM in node
+      ? this.jsxToNode(node[ORIGINAL_JSX_SYM])
+      : node
   }
 
   /**

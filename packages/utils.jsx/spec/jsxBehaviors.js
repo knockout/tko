@@ -216,12 +216,22 @@ describe('jsx', function () {
     jo.dispose()
   })
 
-  it('inserts actual nodes multiple times', () => {
+  it('inserts multiple nodes', () => {
+    const parent = document.createElement('div')
+    const itag = document.createElement('i')
+    const btag = document.createElement('b')
+    const jsx = { elementName: 'div', children: [itag, btag], attributes: {} }
+    const jo = new JsxTestObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `<div><i></i><b></b></div>`)
+    jo.dispose()
+  })
+
+  it('moves nodes inserted multiple times', () => {
     const parent = document.createElement('div')
     const itag = document.createElement('i')
     const jsx = { elementName: 'div', children: [itag, itag], attributes: {} }
     const jo = new JsxTestObserver(jsx, parent)
-    assert.equal(parent.innerHTML, `<div><i></i><i></i></div>`)
+    assert.equal(parent.innerHTML, `<div><i></i></div>`)
     jo.dispose()
   })
 

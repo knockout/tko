@@ -7,6 +7,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 * Fix and add test for `applyBindingsToNode` being used in delegation (i.e. with computeds)
 * Fix typo in `ieAutoCompleteHackNeeded` for `value` binding
 * Fix case where JSX `computed` value is initially `null` or `undefined`
+* Change JSX behaviour so Node instances in observables are not cloned.  This behaviour allows injecting `HTMLCanvasElement` instances without losing the canvas content.
 
 ## 🎒 `alpha-5a..alpha6.x`  (ongoing)
 
