@@ -238,6 +238,12 @@ export class JsxObserver extends LifeCycle {
         if (any instanceof Error) {
           return document.createComment(any.toString())
         }
+        if (any === null) {
+          return document.createComment(String(any))
+        }
+        if (any instanceof Node) {
+          return any
+        }
         break
       case 'function': return this.anyToNode(any())
       case 'undefined':
@@ -252,8 +258,6 @@ export class JsxObserver extends LifeCycle {
         return document.createTextNode(String(any))
     }
 
-    if (any === null) { return document.createComment(String(any)) }
-    if (any instanceof Node) { return this.cloneNode(any) }
     if (!this.isJsx(any)) { return document.createComment(safeStringify(any)) }
 
     return this.jsxToNode(any)
