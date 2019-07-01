@@ -48,6 +48,7 @@ export function getOriginalJsxForNode (node) {
   return node[ORIGINAL_JSX_SYM]
 }
 
+
 /**
  * Convert JSX into an object that can be consumed by TKO.
  * Mimics React.createElement
@@ -55,10 +56,14 @@ export function getOriginalJsxForNode (node) {
  * @param {object|null} a attributes of the element
  * @param  {...string|object} c children of the element
  */
-export function createElement (e, a, ...c) {
-  return {
-    elementName: e,
-    attributes: a || {},
-    children: [...c]
-  }
+export function createElement (elementName, attributes, ...children) {
+  return elementName === Fragment ? children
+    : {
+      elementName: elementName,
+      attributes: attributes || {},
+      children: [...children]
+    }
 }
+
+export const Fragment = Symbol('JSX Fragment')
+  

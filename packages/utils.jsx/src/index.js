@@ -1,5 +1,5 @@
 export {
-  getOriginalJsxForNode, maybeJsx, createElement
+  getOriginalJsxForNode, maybeJsx, createElement, Fragment
 } from './jsx'
 
 export {

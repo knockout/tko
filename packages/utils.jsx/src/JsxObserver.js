@@ -391,7 +391,7 @@ export class JsxObserver extends LifeCycle {
         continue
       }
       const node = nodeOrObservable
-      node[ORIGINAL_JSX_SYM] = 'disposed'
+      delete node[ORIGINAL_JSX_SYM]
       this.detachAndDispose(node)
       const subscriptions = this.subscriptionsForNode.get(node)
       if (subscriptions) {
