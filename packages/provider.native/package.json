@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.native",
-  "version": "4.0.0-alpha9",
+  "version": "4.0.0-4.0.0-alpha10.0",
   "description": "Link binding handlers whose value is already attached to the node",
   "module": "dist/provider.native.js",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0-alpha9",
+    "@tko/provider": "^4.0.0-4.0.0-alpha10.0",
     "tslib": "^1.8.0"
   },
   "karma": {
