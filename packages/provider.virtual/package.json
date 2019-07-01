@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.virtual",
-  "version": "4.0.0-4.0.0-alpha10.0",
+  "version": "4.0.0-alpha10.0",
   "description": "Binding provider for <!-- ko handler: ... --> virtual elements",
   "module": "dist/provider.virtual.js",
   "files": [
@@ -10,8 +10,8 @@
   "author": "Knockout Team",
   "license": "MIT",
   "dependencies": {
-    "@tko/provider.bindingstring": "^4.0.0-4.0.0-alpha10.0",
-    "@tko/utils": "^4.0.0-4.0.0-alpha10.0",
+    "@tko/provider.bindingstring": "^4.0.0-alpha10.0",
+    "@tko/utils": "^4.0.0-alpha10.0",
     "tslib": "^1.8.0"
   },
   "karma": {
