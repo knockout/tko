@@ -1,18 +1,19 @@
 NODE  	:= npx
+LERNA 	:= $(LERNA)
 
 default: build
 
 .PHONY: test
 test:
-	$(NODE) lerna exec --concurrency=1 --loglevel=warn -- yarn test
+	$(LERNA) exec --concurrency=1 --loglevel=warn -- yarn test
 
 .PHONY: testn
 testn:
-	$(NODE) lerna exec --concurrency=6 --loglevel=warn -- yarn test
+	$(LERNA) exec --concurrency=6 --loglevel=warn -- yarn test
 
 .PHONY: build
 build: node_modules
-	$(NODE) lerna exec --concurrency=6 --loglevel=warn -- yarn build
+	$(LERNA) exec --concurrency=6 --loglevel=warn -- yarn build
 
 .PHONY: lint
 lint:
@@ -24,7 +25,12 @@ repackage:
 
 .PHONY: bootstrap
 bootstrap:
-	$(NODE) lerna bootstrap
+	$(LERNA) bootstrap
+
+.PHONY: bump
+bump:
+	$(LERNA) version
+	$(MAKE) build
 
 node_modules: bootstrap
 	$(NODE) yarn install
