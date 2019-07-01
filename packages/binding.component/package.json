@@ -1,16 +1,16 @@
 {
   "name": "@tko/binding.component",
-  "version": "4.0.0-alpha8",
+  "version": "4.0.0-alpha9",
   "description": "component: binding for web components",
   "module": "dist/binding.component.js",
   "license": "MIT",
   "dependencies": {
-    "@tko/bind": "^4.0.0-alpha8",
-    "@tko/lifecycle": "^4.0.0-alpha7.4",
-    "@tko/observable": "^4.0.0-alpha7.4",
-    "@tko/provider": "^4.0.0-alpha7.4",
-    "@tko/utils": "^4.0.0-alpha7.4",
-    "@tko/utils.component": "^4.0.0-alpha8",
+    "@tko/bind": "^4.0.0-alpha9",
+    "@tko/lifecycle": "^4.0.0-alpha9",
+    "@tko/observable": "^4.0.0-alpha9",
+    "@tko/provider": "^4.0.0-alpha9",
+    "@tko/utils": "^4.0.0-alpha9",
+    "@tko/utils.component": "^4.0.0-alpha9",
     "tslib": "^1.8.0"
   },
   "files": [
