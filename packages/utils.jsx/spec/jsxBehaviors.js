@@ -32,7 +32,7 @@ import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
 class JsxTestObserver extends JsxObserver {
   // For testing purposes, we make this synchronous.
   detachAndDispose (node) {
-    node.remove()
+    super.detachAndDispose(node)
     cleanNode(node)
   }
 }
@@ -360,6 +360,56 @@ describe('jsx', function () {
     jsx[2] = 'b'
     const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `ab`)
+    jo.dispose()
+  })
+
+  it('inserts arrays of arrays', () => {
+    const parent = document.createElement('div')
+    const jsx = [['a'], [['b']], [[['c']]]]
+    const jo = new JsxTestObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `abc`)
+    jo.dispose()
+  })
+
+  /**
+   * Simple generator of the given parameter.
+   */
+  function * gX (...args) { yield * args }
+  /**
+   * Simple generator of [G0, G1, G2]
+   */
+  function * g3 () { yield * gX('G0', 'G1', 'G2') }
+
+  it('a generator', () => {
+    const parent = document.createElement('div')
+    const jsx = g3()
+    const jo = new JsxTestObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `G0G1G2`)
+    jo.dispose()
+  })
+
+  it('inserts array of generators', () => {
+    const parent = document.createElement('div')
+    const jsx = [g3(), g3()]
+    const jo = new JsxTestObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `G0G1G2G0G1G2`)
+    jo.dispose()
+  })
+
+  it('inserts generators of arrays', () => {
+    function * gA () { yield * [['a'], ['b'], ['c']]}
+    const parent = document.createElement('div')
+    const jsx = gA()
+    const jo = new JsxTestObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `abc`)
+    jo.dispose()
+  })
+
+  it('inserts nested arrays/generators', () => {
+    const parent = document.createElement('div')
+    const jsx = [gX('a', 'b', ['c', gX('d', 'e')])]
+    const jo = new JsxTestObserver(jsx, parent)
+    assert.equal(parent.innerHTML, `abcde`)
     jo.dispose()
   })
 

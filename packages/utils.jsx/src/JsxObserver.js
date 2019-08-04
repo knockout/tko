@@ -31,6 +31,10 @@ const NAMESPACES = {
   xmlns: 'http://www.w3.org/2000/xmlns/'
 }
 
+function isIterable (v) {
+  return v && typeof v[Symbol.iterator] === 'function'
+}
+
 /**
  * JSX object from a pre-processor.
  * @typedef {Object} JSX
@@ -176,6 +180,12 @@ export class JsxObserver extends LifeCycle {
       const {parentNode, xmlns} = this
       const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns)
       nodeArrayOrObservable = [observer]
+    } else if (typeof jsx !== 'string' && isIterable(jsx)) {
+      nodeArrayOrObservable = []
+      for (const child of jsx) {
+        nodeArrayOrObservable.unshift(
+          this.injectNode(child, nextNode))
+      }
     } else {
       const $context = contextFor(this.parentNode)
       const isInsideTemplate = 'content' in this.parentNode
@@ -249,6 +259,9 @@ export class JsxObserver extends LifeCycle {
         if (any instanceof Node) {
           return this.cloneJSXorMoveNode(any)
         }
+        if (Symbol.iterator in any) {
+          return any
+        }
         break
       case 'function': return this.anyToNode(any())
       case 'undefined':
@@ -265,7 +278,7 @@ export class JsxObserver extends LifeCycle {
 
     return this.isJsx(any)
       ? this.jsxToNode(any)
-      :document.createComment(safeStringify(any))
+      : document.createComment(safeStringify(any))
   }
 
   /**
@@ -407,7 +420,13 @@ export class JsxObserver extends LifeCycle {
    * The cleaning can trigger a lot of garbage collection, so we defer that.
    */
   detachAndDispose (node) {
-    node.remove()
+    if (isIterable(node)) {
+      for (const child of node) {
+        this.detachAndDispose(child)
+      }
+    } else {
+      node.remove()
+    }
     requestAnimationFrame(() => cleanNode(node))
   }
 }
