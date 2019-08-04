@@ -24,8 +24,21 @@ import {
 } from '@tko/bind'
 
 import {
+  ComponentABC
+} from '@tko/utils.component'
+
+import {
+  bindings as componentBindings
+} from '@tko/binding.component'
+
+import {
+  ComponentProvider
+} from '@tko/provider.component'
+
+import {
   JsxObserver
 } from '../src'
+
 import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
 
 
@@ -826,6 +839,59 @@ describe('jsx', function () {
       const jo = new JsxTestObserver(jsx, parent)
       applyBindings({}, parent)
       assert.equal(counter, 1)
+      jo.dispose()
+    })
+  })
+
+  describe.only('components', () => {
+    it('binds components that return JSX', () => {
+      class TestComponent extends ComponentABC {
+        get template () {
+          return { elementName: 'a', children: ['A'], attributes: {} }
+        }
+      }
+
+      TestComponent.register()
+      options.bindingProviderInstance = new ComponentProvider()
+      options.bindingProviderInstance.bindingHandlers.component = componentBindings.component
+
+      const parent = document.createElement('div')
+      const jsx = {
+        elementName: 'test-component', children: ['B'], attributes: {} }
+      const jo = new JsxTestObserver(jsx, parent)
+      applyBindings({}, parent)
+      assert.equal(parent.innerHTML,
+        '<test-component><a>A</a></test-component>')
+      jo.dispose()
+    })
+
+    it('binds components array', () => {
+      const arr = observableArray([])
+      class TestComponentInner extends ComponentABC {
+        get template () {
+          return { elementName: 'i', children: ['I'], attributes: {} }
+        }
+      }
+
+      class TestComponentOuter extends ComponentABC {
+        get template () {
+          return { elementName: 'a', children: [arr], attributes: {} }
+        }
+      }
+
+      TestComponentOuter.register('t-o')
+      TestComponentInner.register('t-i')
+      options.bindingProviderInstance = new ComponentProvider()
+      options.bindingProviderInstance.bindingHandlers.component = componentBindings.component
+
+      const parent = document.createElement('div')
+      const jsx = {
+        elementName: 't-o', children: ['B'], attributes: {} }
+      const jo = new JsxTestObserver(jsx, parent)
+      applyBindings({}, parent)
+      assert.equal(parent.innerHTML, '<t-o><a><!--O--></a></t-o>')
+      arr([{ elementName: 't-i', attributes: {}, children: ['Z'] }])
+      assert.equal(parent.innerHTML, '<t-o><a><t-i><i>I</i></t-i><!--O--></a></t-o>')
       jo.dispose()
     })
   })
