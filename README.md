@@ -18,12 +18,20 @@
 
 To install use one of the usual package managers e.g.
 
-- $ `yarn add tko`
-- $ `npm install tko`
+- $ `yarn add @tko/build.reference`
+- $ `npm install @tko/build.reference`
 
-Reference Build over CDN
+Over CDN 
 
-- https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-alpha8/dist/build.reference.min.js
+- Reference Build: https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-alpha8/dist/build.reference.min.js
+
+#### Knockout Build
+The Knockout build has some backwards compatibility that is not in the reference build.  See the build differences, here: https://tko.io/3to4
+
+It's available as `@tko/build.knockout`, and over CDN:
+
+- Knockout Build https://cdn.jsdelivr.net/npm/@tko/build.knockout@4.0.0-alpha8/dist/build.knockout.min.js
+
 
 ### Using the Monorepo
 

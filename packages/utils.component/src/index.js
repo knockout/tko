@@ -11,6 +11,8 @@ import {
   defaultConfigRegistry
 } from './loaders'
 
+export { ComponentABC }
+
 export default {
   ComponentABC,
   // -- Registry --

@@ -1,18 +1,17 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## 👢 alpha.10
+## Work In Progress
+
+* Add support for passing generators to JSX
+
+
+## 👢 `alpha8.0` (1 July 2019)
 
 * Update build system (experimenting)
-
-## 🐇 alpha.9 
-
 * Change JSX behaviour so Node instances in observables are not cloned.  This behaviour allows injecting `HTMLCanvasElement` instances without losing the canvas content.
-
-## 🕌 alpha.8
-
 * Fix case where JSX `computed` value is initially `null` or `undefined`
 
-## 🎇 alpha.7
+## 🎇 `alpha7`
 
 * Make node cleaning upon removal with JSX asynchronous
 * Add `createElement` to the `tko` reference build, that (essentially) mimics `React.createElement`
