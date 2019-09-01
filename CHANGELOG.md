@@ -3,6 +3,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 ## Work In Progress
 
 * Add support for passing generators to JSX
+* Fix parsing of objects with trailing commas (e.g. `{ a: 1, }`)
 
 
 ## 👢 `alpha8.0` (1 July 2019)
