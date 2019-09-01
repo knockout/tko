@@ -230,6 +230,10 @@ export default class Parser {
 
         this.next(',')
         ch = this.white()
+        if (ch === '}') {
+          ch = this.next('}')
+          return object
+        }
       }
     }
     this.error('Bad object')

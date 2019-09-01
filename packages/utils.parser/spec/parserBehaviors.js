@@ -152,6 +152,14 @@ describe('the bindings parser', function () {
     assert.equal(bindings.attr().b, 'Imaginary')
   })
 
+  it('parses object: attr: {n1: v1, n2: v2,}', function () {
+    var binding = 'attr : { a: x, b: y, }',
+      context = ctxStub({ x: 'Real', y: 'Imaginary' }),
+      bindings = new Parser().parse(binding, context);
+    assert.equal(bindings.attr().a, 'Real')
+    assert.equal(bindings.attr().b, 'Imaginary')
+  })
+
   it('parses compound operator d()[0]()', function () {
     var binding = 'attr: d()[0]()',
       d = function () {
