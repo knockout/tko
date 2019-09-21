@@ -1,10 +1,10 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## Work In Progress
+## 🥾 `alpha8.1 ` (20 Sept 2019)
 
 * Add support for passing generators to JSX
 * Fix parsing of objects with trailing commas (e.g. `{ a: 1, }`)
-
+* Fix nested JSX observers not binding children
 
 ## 👢 `alpha8.0` (1 July 2019)
 

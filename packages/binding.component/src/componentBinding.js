@@ -44,7 +44,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     if (maybeJsx(template)) {
       virtualElements.emptyNode(element)
-      this.addDisposable(new JsxObserver(template, element))
+      this.addDisposable(new JsxObserver(template, element, null, undefined, this.childBindingContext))
 
     } else {
       const clonedNodesArray = cloneNodes(template)
@@ -55,7 +55,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
   createViewModel (componentDefinition, element, originalChildNodes, componentParams) {
     const componentViewModelFactory = componentDefinition.createViewModel
     return componentViewModelFactory
-      ? componentViewModelFactory.call(componentDefinition, componentParams, { element: element, templateNodes: originalChildNodes })
+      ? componentViewModelFactory.call(componentDefinition, componentParams, { element, templateNodes: originalChildNodes })
       : componentParams // Template-only component
   }
 
@@ -131,10 +131,15 @@ export default class ComponentBinding extends DescendantBindingHandler {
     }
 
     if (componentDefinition.template) {
+      this.childBindingContext = this.makeChildBindingContext(this)
       this.cloneTemplateIntoElement(componentName, componentDefinition.template, element)
     }
 
     const componentViewModel = this.createViewModel(componentDefinition, element, this.originalChildNodes, componentParams)
+
+    if (!this.childBindingContext) {
+      this.childBindingContext = this.makeChildBindingContext(componentViewModel)
+    }
 
     const viewTemplate = componentViewModel && componentViewModel.template
 
@@ -145,8 +150,6 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (!componentDefinition.template) {
       this.cloneTemplateIntoElement(componentName, viewTemplate, element)
     }
-
-    this.childBindingContext = this.makeChildBindingContext(componentViewModel)
 
     if (componentViewModel instanceof LifeCycle) {
       componentViewModel.anchorTo(this.$element)

@@ -51,7 +51,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns) {
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, childContext) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -86,8 +86,8 @@ export class JsxObserver extends LifeCycle {
       parentNodeTarget,
       xmlns,
       nodeArrayOrObservableAtIndex: [],
-      performingInitialAdditions: true,
-      subscriptionsForNode: new Map()
+      subscriptionsForNode: new Map(),
+      childContext,
     })
 
     const jsx = unwrap(jsxOrObservable)
@@ -96,7 +96,6 @@ export class JsxObserver extends LifeCycle {
     if (computed || (jsx !== null && jsx !== undefined)) {
       this.observableArrayChange(this.createInitialAdditions(jsx))
     }
-    this.performingInitialAdditions = false
   }
 
   /**
@@ -187,10 +186,9 @@ export class JsxObserver extends LifeCycle {
           this.injectNode(child, nextNode))
       }
     } else {
-      const $context = contextFor(this.parentNode)
+      const $context = this.childContext || contextFor(this.parentNode)
       const isInsideTemplate = 'content' in this.parentNode
-      const shouldApplyBindings = $context && !isInsideTemplate &&
-        !this.performingInitialAdditions
+      const shouldApplyBindings = $context && !isInsideTemplate
 
       if (Array.isArray(jsx)) {
         nodeArrayOrObservable = jsx.map(j => this.anyToNode(j))
