@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.parser",
-  "version": "4.0.0-alpha8.0",
+  "version": "4.0.0-alpha8.1",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
   "module": "dist/utils.parser.js",
   "files": [
@@ -16,7 +16,7 @@
   "devDependencies": {
     "@tko/bind": "^4.0.0-alpha8.0",
     "@tko/binding.core": "^4.0.0-alpha8.0",
-    "@tko/provider.databind": "^4.0.0-alpha8.0"
+    "@tko/provider.databind": "^4.0.0-alpha8.1"
   },
   "karma": {
     "frameworks": [

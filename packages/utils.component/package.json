@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.component",
-  "version": "4.0.0-alpha8.0",
+  "version": "4.0.0-alpha8.1",
   "description": "Registry and loading utilities for web components",
   "module": "dist/utils.component.js",
   "files": [
@@ -21,7 +21,7 @@
     "@tko/binding.core": "^4.0.0-alpha8.0",
     "@tko/computed": "^4.0.0-alpha8.0",
     "@tko/provider.multi": "^4.0.0-alpha8.0",
-    "@tko/provider.virtual": "^4.0.0-alpha8.0"
+    "@tko/provider.virtual": "^4.0.0-alpha8.1"
   },
   "karma": {
     "frameworks": [

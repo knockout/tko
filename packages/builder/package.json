@@ -1,6 +1,6 @@
 {
   "name": "@tko/builder",
-  "version": "4.0.0-alpha8.0",
+  "version": "4.0.0-alpha8.1",
   "description": "Compile a customized instance of Knockout.",
   "main": "dist/builder.js",
   "repository": "git@github.com:knockout/tko",
@@ -13,7 +13,7 @@
     "@tko/lifecycle": "^4.0.0-alpha8.0",
     "@tko/observable": "^4.0.0-alpha8.0",
     "@tko/utils": "^4.0.0-alpha8.0",
-    "@tko/utils.parser": "^4.0.0-alpha8.0",
+    "@tko/utils.parser": "^4.0.0-alpha8.1",
     "tslib": "^1.8.0"
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
