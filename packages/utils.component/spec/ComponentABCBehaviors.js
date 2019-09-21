@@ -1,10 +1,6 @@
 import {
-    options, tasks, domData, triggerEvent, cleanNode
+    options, tasks, cleanNode
 } from '@tko/utils'
-
-import {
-    observableArray, observable, isWritableObservable
-} from '@tko/observable'
 
 import { MultiProvider } from '@tko/provider.multi'
 import { DataBindProvider } from '@tko/provider.databind'
