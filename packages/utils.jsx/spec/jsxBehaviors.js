@@ -841,9 +841,33 @@ describe('jsx', function () {
       assert.equal(counter, 1)
       jo.dispose()
     })
+
+    it('applies bindings attached to array/nested observable nodes', () => {
+      let counter = 0
+      const parent = document.createElement('div')
+      const provider = new NativeProvider()
+      options.bindingProviderInstance = provider
+      provider.bindingHandlers.set({ counter: () => ++counter })
+      const q = { elementName: 'q', children: [], attributes: { 'ko-counter': true }}
+      const oq = observable()
+      const jsx = {
+        elementName: 'r',
+        children: [computed(() => oq())],
+        attributes: {}
+      }
+      const jo = new JsxTestObserver(jsx, parent)
+      applyBindings({}, parent)
+      oq([q, q])
+      assert.equal(counter, 2)
+      oq([q, q, q])
+      assert.equal(counter, 3)
+      oq(observable([{ elementName: 'v', children: [q], attributes: {} }]))
+      assert.equal(counter, 4)
+      jo.dispose()
+    })
   })
 
-  describe.only('components', () => {
+  describe('components', () => {
     it('binds components that return JSX', () => {
       class TestComponent extends ComponentABC {
         get template () {
