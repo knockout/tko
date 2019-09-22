@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.component",
-  "version": "4.0.0-alpha8.1",
+  "version": "4.0.0-alpha8.2",
   "description": "Bind custom web components e.g. <custom-binding>",
   "module": "dist/provider.component.js",
   "files": [
@@ -13,7 +13,7 @@
     "@tko/observable": "^4.0.0-alpha8.0",
     "@tko/provider": "^4.0.0-alpha8.0",
     "@tko/utils": "^4.0.0-alpha8.0",
-    "@tko/utils.component": "^4.0.0-alpha8.1",
+    "@tko/utils.component": "^4.0.0-alpha8.2",
     "@tko/utils.parser": "^4.0.0-alpha8.1",
     "tslib": "^1.8.0"
   },

@@ -1,13 +1,13 @@
 {
   "name": "@tko/build.reference",
-  "version": "4.0.0-alpha8.1",
+  "version": "4.0.0-alpha8.2",
   "description": "The TKO Reference Build",
   "main": "dist/build.reference.js",
   "repository": "git@github.com:knockout/tko",
   "author": "The Knockout Team",
   "license": "MIT",
   "devDependencies": {
-    "@tko/binding.component": "^4.0.0-alpha8.1",
+    "@tko/binding.component": "^4.0.0-alpha8.2",
     "@tko/binding.core": "^4.0.0-alpha8.0",
     "@tko/binding.foreach": "^4.0.0-alpha8.0",
     "@tko/binding.if": "^4.0.0-alpha8.0",
@@ -16,12 +16,12 @@
     "@tko/filter.punches": "^4.0.0-alpha8.0",
     "@tko/provider.attr": "^4.0.0-alpha8.0",
     "@tko/provider.bindingstring": "^4.0.0-alpha8.1",
-    "@tko/provider.component": "^4.0.0-alpha8.1",
+    "@tko/provider.component": "^4.0.0-alpha8.2",
     "@tko/provider.databind": "^4.0.0-alpha8.1",
     "@tko/provider.multi": "^4.0.0-alpha8.0",
     "@tko/provider.mustache": "^4.0.0-alpha8.1",
     "@tko/provider.virtual": "^4.0.0-alpha8.1",
-    "@tko/utils.component": "^4.0.0-alpha8.1",
+    "@tko/utils.component": "^4.0.0-alpha8.2",
     "tslib": "^1.8.0"
   },
   "files": [

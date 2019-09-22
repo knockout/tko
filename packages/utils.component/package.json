@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.component",
-  "version": "4.0.0-alpha8.1",
+  "version": "4.0.0-alpha8.2",
   "description": "Registry and loading utilities for web components",
   "module": "dist/utils.component.js",
   "files": [
