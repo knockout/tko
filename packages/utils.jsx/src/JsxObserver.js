@@ -51,7 +51,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, childContext) {
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, noInitialBinding) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -82,12 +82,12 @@ export class JsxObserver extends LifeCycle {
 
     Object.assign(this, {
       insertBefore,
+      noInitialBinding,
       parentNode,
       parentNodeTarget,
       xmlns,
       nodeArrayOrObservableAtIndex: [],
       subscriptionsForNode: new Map(),
-      childContext,
     })
 
     const jsx = unwrap(jsxOrObservable)
@@ -96,6 +96,7 @@ export class JsxObserver extends LifeCycle {
     if (computed || (jsx !== null && jsx !== undefined)) {
       this.observableArrayChange(this.createInitialAdditions(jsx))
     }
+    this.noInitialBinding = false
   }
 
   /**
@@ -177,7 +178,7 @@ export class JsxObserver extends LifeCycle {
 
     if (isObservable(jsx)) {
       const {parentNode, xmlns} = this
-      const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns)
+      const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns, this.noInitialBinding)
       nodeArrayOrObservable = [observer]
     } else if (typeof jsx !== 'string' && isIterable(jsx)) {
       nodeArrayOrObservable = []
@@ -186,9 +187,9 @@ export class JsxObserver extends LifeCycle {
           this.injectNode(child, nextNode))
       }
     } else {
-      const $context = this.childContext || contextFor(this.parentNode)
+      const $context = contextFor(this.parentNode)
       const isInsideTemplate = 'content' in this.parentNode
-      const shouldApplyBindings = $context && !isInsideTemplate
+      const shouldApplyBindings = $context && !isInsideTemplate && !this.noInitialBinding
 
       if (Array.isArray(jsx)) {
         nodeArrayOrObservable = jsx.map(j => this.anyToNode(j))
@@ -311,7 +312,7 @@ export class JsxObserver extends LifeCycle {
     }
     this.updateAttributes(node, unwrap(jsx.attributes))
 
-    this.addDisposable(new JsxObserver(jsx.children, node, null, xmlns))
+    this.addDisposable(new JsxObserver(jsx.children, node, null, xmlns, this.noInitialBinding))
 
     return node
   }
@@ -319,7 +320,7 @@ export class JsxObserver extends LifeCycle {
   futureJsxNode (promise) {
     const obs = observable()
     promise.then(obs).catch(e => obs(e instanceof Error ? e : Error(e)))
-    const jo = new JsxObserver(obs, this.parentNode, null, this.xmlns)
+    const jo = new JsxObserver(obs, this.parentNode, null, this.xmlns, this.noInitialBinding)
     this.addDisposable(jo)
     return jo.insertBefore
   }

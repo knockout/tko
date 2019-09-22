@@ -863,6 +863,32 @@ describe('jsx', function () {
       assert.equal(counter, 3)
       oq(observable([{ elementName: 'v', children: [q], attributes: {} }]))
       assert.equal(counter, 4)
+      oq(observable([{ elementName: 'v', children: [observable([q, q])], attributes: {} }]))
+      assert.equal(counter, 6)
+      jo.dispose()
+    })
+
+    it('noInitialBinding applies no bindings to array/nested observable nodes', () => {
+      let counter = 0
+      const parent = document.createElement('div')
+      const provider = new NativeProvider()
+      options.bindingProviderInstance = provider
+      provider.bindingHandlers.set({ counter: () => {console.trace(); ++counter }})
+
+      const q = { elementName: 'q', children: [], attributes: { 'ko-counter': true }}
+      const oq = observable([q])
+      const jsx = {
+        elementName: 'r',
+        children: [computed(() => oq())],
+        attributes: {}
+      }
+      assert.equal(counter, 0, 'a')
+      const jo = new JsxTestObserver(jsx, parent, undefined, undefined, true)
+      assert.equal(counter, 0, 'after jsx binding')
+      applyBindings({}, parent)
+      assert.equal(counter, 1, 'after jsx binding')
+      oq([q,q,q])
+      assert.equal(counter, 3, 'after jsx binding')
       jo.dispose()
     })
   })

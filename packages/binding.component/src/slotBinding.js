@@ -53,7 +53,7 @@ export default class SlotBinding extends DescendantBindingHandler {
   replaceSlotWithNode (nodeInComponentTemplate, slotNode) {
     const nodes = this.cloneNodeFromOriginal(slotNode)
     virtualElements.emptyNode(nodeInComponentTemplate)
-    this.addDisposable(new JsxObserver(nodes, nodeInComponentTemplate))
+    this.addDisposable(new JsxObserver(nodes, nodeInComponentTemplate, undefined, undefined, true))
   }
 
   cloneNodeFromOriginal (node) {

@@ -44,7 +44,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     if (maybeJsx(template)) {
       virtualElements.emptyNode(element)
-      this.addDisposable(new JsxObserver(template, element, null, undefined, this.childBindingContext))
+      this.addDisposable(new JsxObserver(template, element, null, undefined, true))
 
     } else {
       const clonedNodesArray = cloneNodes(template)
@@ -131,15 +131,12 @@ export default class ComponentBinding extends DescendantBindingHandler {
     }
 
     if (componentDefinition.template) {
-      this.childBindingContext = this.makeChildBindingContext(this)
       this.cloneTemplateIntoElement(componentName, componentDefinition.template, element)
     }
 
     const componentViewModel = this.createViewModel(componentDefinition, element, this.originalChildNodes, componentParams)
 
-    if (!this.childBindingContext) {
-      this.childBindingContext = this.makeChildBindingContext(componentViewModel)
-    }
+    this.childBindingContext = this.makeChildBindingContext(componentViewModel)
 
     const viewTemplate = componentViewModel && componentViewModel.template
 
