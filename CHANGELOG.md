@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## 🥿 `alpha8.2 ` (22 Sept 2019)
+
+* Fix `SlotBinding` being called twice via JSX/Observables
+
 ## 🥾 `alpha8.1 ` (20 Sept 2019)
 
 * Add support for passing generators to JSX
