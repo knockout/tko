@@ -1,6 +1,6 @@
 {
   "name": "@tko/build.reference",
-  "version": "4.0.0-alpha8.2",
+  "version": "4.0.0-alpha8.3a",
   "description": "The TKO Reference Build",
   "main": "dist/build.reference.js",
   "repository": "git@github.com:knockout/tko",
@@ -22,6 +22,7 @@
     "@tko/provider.mustache": "^4.0.0-alpha8.1",
     "@tko/provider.virtual": "^4.0.0-alpha8.1",
     "@tko/utils.component": "^4.0.0-alpha8.2",
+    "@tko/utils.jsx": "^4.0.0-alpha8.2",
     "tslib": "^1.8.0"
   },
   "files": [
