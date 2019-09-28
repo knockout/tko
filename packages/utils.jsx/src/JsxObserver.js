@@ -2,7 +2,7 @@
 import {LifeCycle} from '@tko/lifecycle'
 
 import {
-  cleanNode, safeStringify, isThenable
+  safeStringify, isThenable
 } from '@tko/utils'
 
 import {
@@ -20,6 +20,10 @@ import {
 import {
   NativeProvider
 } from '@tko/provider.native'
+
+import {
+  queueCleanNode
+} from './jsxClean'
 
 export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
@@ -426,7 +430,7 @@ export class JsxObserver extends LifeCycle {
     } else {
       node.remove()
     }
-    requestAnimationFrame(() => cleanNode(node))
+    queueCleanNode(node)
   }
 }
 

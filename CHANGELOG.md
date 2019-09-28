@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## 🧤  `alpha 8.3` (28 Sept 2019)
+
+* Queue JSX node cleaning in batches
+
 ## 🥿 `alpha8.2 ` (22 Sept 2019)
 
 * Fix `SlotBinding` being called twice via JSX/Observables
