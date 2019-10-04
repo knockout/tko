@@ -112,6 +112,7 @@ export class JsxObserver extends LifeCycle {
     return parentNode
   }
 
+  remove () { this.dispose() }
   dispose () {
     super.dispose()
     const ib = this.insertBefore
