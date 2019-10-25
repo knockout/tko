@@ -1,6 +1,6 @@
 {
   "name": "@tko/build.reference",
-  "version": "4.0.0-alpha8.4",
+  "version": "4.0.0-alpha8.4a",
   "description": "The TKO Reference Build",
   "main": "dist/build.reference.js",
   "repository": "git@github.com:knockout/tko",
@@ -20,7 +20,7 @@
     "@tko/provider.databind": "^4.0.0-alpha8.4",
     "@tko/provider.multi": "^4.0.0-alpha8.4",
     "@tko/provider.mustache": "^4.0.0-alpha8.4",
-    "@tko/provider.native": "^4.0.0-alpha8.4",
+    "@tko/provider.native": "^4.0.0-alpha8.4a",
     "@tko/provider.virtual": "^4.0.0-alpha8.4",
     "@tko/utils.component": "^4.0.0-alpha8.4",
     "@tko/utils.jsx": "^4.0.0-alpha8.4",

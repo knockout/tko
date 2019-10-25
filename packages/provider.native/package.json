@@ -1,6 +1,6 @@
 {
   "name": "@tko/provider.native",
-  "version": "4.0.0-alpha8.4",
+  "version": "4.0.0-alpha8.4a",
   "description": "Link binding handlers whose value is already attached to the node",
   "module": "dist/provider.native.js",
   "files": [
