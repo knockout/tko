@@ -59,10 +59,10 @@ describe('Components: Component binding', function () {
 
     var provider = new MultiProvider({
       providers: [
-        new NativeProvider(),
-        new DataBindProvider(),
         new ComponentProvider(),
+        new DataBindProvider(),
         new VirtualProvider(),
+        new NativeProvider(),
       ]
     })
     options.bindingProviderInstance = provider
