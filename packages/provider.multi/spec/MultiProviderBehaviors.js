@@ -53,7 +53,17 @@ describe('MultiProvider Behavior', function () {
           {getBindingAccessors () { return { y: 'Y' } }, preprocessNode () {}, FOR_NODE_TYPES: [1]}
         ]
       })
-      assert.deepEqual(mp.getBindingAccessors({nodeType: 1}), {x: 'X', y: 'Y'})
+      assert.deepEqual(mp.getBindingAccessors({nodeType: 1}), { x: 'X',  y: 'Y' })
+    })
+
+    it('performs only the first preemptive binding', function () {
+      const mp = new MultiProvider({
+        providers: [
+          {getBindingAccessors () { return { x: 'X' } }, preemptive: true, preprocessNode () {}, FOR_NODE_TYPES: [1]},
+          {getBindingAccessors () { return { y: 'Y' } }, preprocessNode () {}, FOR_NODE_TYPES: [1]}
+        ]
+      })
+      assert.deepEqual(mp.getBindingAccessors({nodeType: 1}), {x: 'X'})
     })
 
     it('Skips providers for different node types', function () {

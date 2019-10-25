@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## 🐇 `alpha 8.4` (24 Oct 2019)
+
+* [Security] Make the `NativeProvider` preemptive so that observables passed to JSX won't be double-bound (preventing XSS attacks of the form `<div>{jsxObservable}</div>` where `jsxObservable` is `{{ some_variable }}`).
+
 ## 🧤  `alpha 8.3` (28 Sept 2019)
 
 * Queue JSX node cleaning in batches

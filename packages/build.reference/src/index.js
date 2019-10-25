@@ -27,13 +27,13 @@ const builder = new Builder({
   filters,
   provider: new MultiProvider({
     providers: [
+      new ComponentProvider(),
+      new NativeProvider(),
       new AttributeMustacheProvider(),
       new TextMustacheProvider(),
-      new ComponentProvider(),
       new DataBindProvider(),
       new VirtualProvider(),
       new AttributeProvider(),
-      new NativeProvider()
     ]
   }),
   bindings: [

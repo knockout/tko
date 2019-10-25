@@ -18,7 +18,7 @@ import {
 } from '@tko/computed'
 
 import {
-  NativeProvider
+  NativeProvider, NATIVE_BINDINGS
 } from '@tko/provider.native'
 
 import {
@@ -68,7 +68,7 @@ export class JsxObserver extends LifeCycle {
 
       if (!insertBefore) {
         const insertAt = parentNodeIsComment ? parentNode.nextSibling : null
-        insertBefore = document.createComment('O')
+        insertBefore = this.createComment('O')
         parentNodeTarget.insertBefore(insertBefore, insertAt)
       } else {
         this.adoptedInsertBefore = true
@@ -255,10 +255,10 @@ export class JsxObserver extends LifeCycle {
     switch (typeof any) {
       case 'object':
         if (any instanceof Error) {
-          return document.createComment(any.toString())
+          return this.createComment(any.toString())
         }
         if (any === null) {
-          return document.createComment(String(any))
+          return this.createComment(String(any))
         }
         if (any instanceof Node) {
           return this.cloneJSXorMoveNode(any)
@@ -271,18 +271,30 @@ export class JsxObserver extends LifeCycle {
       case 'undefined':
       case 'Error':
       case 'symbol':
-        return document.createComment(String(any))
-      case 'string': return document.createTextNode(any)
+        return this.createComment(String(any))
+      case 'string': return this.createTextNode(any)
       case 'boolean':
       case 'number':
       case 'bigint':
       default:
-        return document.createTextNode(String(any))
+        return this.createTextNode(String(any))
     }
 
     return this.isJsx(any)
       ? this.jsxToNode(any)
-      : document.createComment(safeStringify(any))
+      : this.createComment(safeStringify(any))
+  }
+
+  createComment (string) {
+    const node = document.createComment(string)
+    node[NATIVE_BINDINGS] = true
+    return node
+  }
+
+  createTextNode (string) {
+    const node = document.createTextNode(string)
+    node[NATIVE_BINDINGS] = true
+    return node
   }
 
   /**

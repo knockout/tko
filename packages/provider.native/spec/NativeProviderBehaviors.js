@@ -7,6 +7,12 @@ import {
   default as NativeProvider, NATIVE_BINDINGS
 } from '../src/NativeProvider'
 
+import { MultiProvider } from '@tko/provider.multi'
+import { DataBindProvider } from '@tko/provider.databind'
+import {
+  TextMustacheProvider, AttributeMustacheProvider
+} from '@tko/provider.mustache'
+
 describe('Native Provider Behavior', function () {
   it('returns native bindings', function () {
     const p = new NativeProvider()
@@ -46,5 +52,62 @@ describe('Native Provider Behavior', function () {
     accessors.oo('rv')
     assert.equal(obs(), 'rv')
     assert.equal(accessors.fn()(), 'ø')
+  })
+
+  describe('pre-emption', () => {
+    const divWithNativeBindings = bindings => {
+      const div = document.createElement('div')
+      div[NATIVE_BINDINGS] = bindings
+      return div
+    }
+
+    it('pre-empts ko-databind', () => {
+      const mp = new MultiProvider()
+      mp.addProvider(new NativeProvider())
+      mp.addProvider(new DataBindProvider())
+      const div = divWithNativeBindings({ 'ko-native': '123' })
+      div.setAttribute('data-bind', '{ databind: 345 }')
+      const bindings = mp.getBindingAccessors(div, {})
+      assert.ok('native' in bindings, 'native in bindings')
+      assert.notOk('databind' in bindings, 'databind in bindings')
+      assert.equal(Object.keys(bindings).length, 1)
+    })
+
+    it('pre-empts {{ }} attributes', () => {
+      const mp = new MultiProvider()
+      mp.addProvider(new NativeProvider())
+      mp.addProvider(new AttributeMustacheProvider())
+      const div = divWithNativeBindings({ 'ko-native': '123' })
+      div.setAttribute('hello', '{{ 345 }}')
+      const bindings = mp.getBindingAccessors(div, {})
+      assert.ok('native' in bindings, 'native in bindings')
+      assert.notOk('text' in bindings, 'text in bindings')
+      assert.equal(Object.keys(bindings).length, 1)
+    })
+
+    it('pre-empts {{ }} text nodes', () => {
+      const mp = new MultiProvider()
+      mp.addProvider(new NativeProvider())
+      mp.addProvider(new TextMustacheProvider())
+      const div = divWithNativeBindings({ 'ko-native': '123' })
+      const child = document.createTextNode('{{ child }}')
+      child[NATIVE_BINDINGS] = {}
+      div.appendChild(child)
+      const nodes = mp.preprocessNode(div.childNodes[0])
+      assert.ok(nodes instanceof Text)
+      assert.equal(nodes.nodeValue, '{{ child }}')
+    })
+
+    it('does not pre-empt text nodes w/o NATIVE_BINDINGS', () => {
+      const mp = new MultiProvider()
+      mp.addProvider(new NativeProvider())
+      mp.addProvider(new TextMustacheProvider())
+      const div = divWithNativeBindings({ 'ko-native': '123' })
+      div.appendChild(document.createTextNode('{{ child }}'))
+      const nodes = mp.preprocessNode(div.childNodes[0])
+      console.log(nodes)
+      assert.equal(nodes.length, 2)
+      assert.equal(nodes[0].textContent, 'ko text:child')
+    })
   })
 })

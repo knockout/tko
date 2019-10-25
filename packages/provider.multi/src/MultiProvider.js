@@ -48,10 +48,10 @@ export default class MultiProvider extends Provider {
 
   * enumerateProviderBindings (node, ctx) {
     for (const provider of this.providersFor(node)) {
-      const bindings = provider.getBindingAccessors(node, ctx) || {}
-      for (const [key, accessor] of Object.entries(bindings || {})) {
-        yield [key, accessor]
-      }
+      const bindings = provider.getBindingAccessors(node, ctx)
+      if (!bindings) { continue }
+      yield * Object.entries(bindings || {})
+      if (provider.preemptive) { return }
     }
   }
 

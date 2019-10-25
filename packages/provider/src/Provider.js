@@ -26,6 +26,7 @@ export default class Provider {
   setGlobals (globals) {
     this.globals = globals
   }
+  get preemptive () { return false }
   nodeHasBindings (/* node */) {}
   getBindingAccessors (/* node, context */) {}
 
