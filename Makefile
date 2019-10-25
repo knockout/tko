@@ -28,7 +28,7 @@ bootstrap:
 	$(LERNA) bootstrap
 
 .PHONY: bump
-bump: build
+bump:
 	$(LERNA) version
 
 # from-git "identify packages tagged by lerna version and publish them to npm."
