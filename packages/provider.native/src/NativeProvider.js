@@ -48,11 +48,10 @@ export default class NativeProvider extends Provider {
    * @param {HTMLElement} node
    */
   getBindingAccessors (node) {
-    return Object.assign({},
-      ...Object.entries(node[NATIVE_BINDINGS] || {})
-        .filter(this.onlyBindings)
-        .map(this.valueAsAccessor)
-    )
+    const bindings = Object.entries(node[NATIVE_BINDINGS] || {})
+      .filter(this.onlyBindings)
+    if (!bindings.length) { return null }
+    return Object.assign({}, ...bindings.map(this.valueAsAccessor))
   }
 
   /**

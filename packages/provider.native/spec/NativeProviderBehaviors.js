@@ -31,14 +31,14 @@ describe('Native Provider Behavior', function () {
     const attr = {'thing': {}}
     div[NATIVE_BINDINGS] = attr
     assert.notOk(p.nodeHasBindings(div), false)
-    assert.deepEqual(p.getBindingAccessors(div), {})
+    assert.equal(p.getBindingAccessors(div), null)
   })
 
   it('ignores nodes w/o the symbol', function () {
     const p = new NativeProvider()
     const div = document.createElement('div')
     assert.notOk(p.nodeHasBindings(div), false)
-    assert.deepEqual(p.getBindingAccessors(div), {})
+    assert.equal(p.getBindingAccessors(div), null)
   })
 
   it('returns valueAccessors that update observables', () => {
@@ -70,6 +70,30 @@ describe('Native Provider Behavior', function () {
       const bindings = mp.getBindingAccessors(div, {})
       assert.ok('native' in bindings, 'native in bindings')
       assert.notOk('databind' in bindings, 'databind in bindings')
+      assert.equal(Object.keys(bindings).length, 1)
+    })
+
+    it('does not pre-empt ko-databind when native bindings are empty', () => {
+      const mp = new MultiProvider()
+      mp.addProvider(new NativeProvider())
+      mp.addProvider(new DataBindProvider())
+      const div = divWithNativeBindings({  })
+      div.setAttribute('data-bind', '{ databind: 345 }')
+      const bindings = mp.getBindingAccessors(div, {})
+      assert.notOk('native' in bindings, 'native in bindings')
+      assert.ok('databind' in bindings, 'databind in bindings')
+      assert.equal(Object.keys(bindings).length, 1)
+    })
+
+    it('does not pre-empt ko-databind when native properties are not bindings', () => {
+      const mp = new MultiProvider()
+      mp.addProvider(new NativeProvider())
+      mp.addProvider(new DataBindProvider())
+      const div = divWithNativeBindings({ random: 'value' })
+      div.setAttribute('data-bind', '{ databind: 345 }')
+      const bindings = mp.getBindingAccessors(div, {})
+      assert.notOk('native' in bindings, 'native in bindings')
+      assert.ok('databind' in bindings, 'databind in bindings')
       assert.equal(Object.keys(bindings).length, 1)
     })
 
@@ -105,7 +129,6 @@ describe('Native Provider Behavior', function () {
       const div = divWithNativeBindings({ 'ko-native': '123' })
       div.appendChild(document.createTextNode('{{ child }}'))
       const nodes = mp.preprocessNode(div.childNodes[0])
-      console.log(nodes)
       assert.equal(nodes.length, 2)
       assert.equal(nodes[0].textContent, 'ko text:child')
     })
