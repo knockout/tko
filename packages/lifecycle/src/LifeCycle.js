@@ -73,9 +73,13 @@ export default class LifeCycle {
     this.addDisposable({ dispose })
   }
 
-  anchorTo (node) {
-    addDisposeCallback(node, () => this.dispose())
-    this[ANCHOR_NODE] = node
+  anchorTo (nodeOrLifeCycle) {
+    if ('addDisposable' in nodeOrLifeCycle) {
+      nodeOrLifeCycle.addDisposable.push(this)
+    } else {
+      this[ANCHOR_NODE] = nodeOrLifeCycle
+      addDisposeCallback(nodeOrLifeCycle, () => this[ANCHOR_NODE] === nodeOrLifeCycle && this.dispose())
+    }
   }
 
   dispose () {
