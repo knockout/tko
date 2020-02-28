@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## 👑 `alpha 9` (28 Feb 2020)
+
+* Fix JSX observable properties being overwritten with observed value on the NativeProvider
+
 ## 🐇 `alpha 8.4a` (24 Oct 2019)
 
 * Make the `NativeProvider` less preemptive i.e. allow other bindings to proceed if there are no native (JSX) bindings.  This means `data-bind` and other attributes can be used inside JSX.

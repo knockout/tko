@@ -350,7 +350,7 @@ export class JsxObserver extends LifeCycle {
       toRemove.delete(name)
       if (isObservable(value)) {
         subscriptions.push(
-          value.subscribe(attr => this.setNodeAttribute(node, name, attr)))
+          value.subscribe(attr => this.setNodeAttribute(node, name, value)))
       }
       this.setNodeAttribute(node, name, value)
     }
