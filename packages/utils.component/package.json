@@ -1,6 +1,6 @@
 {
   "name": "@tko/utils.component",
-  "version": "4.0.0-alpha8.4",
+  "version": "4.0.0-alpha9.0",
   "description": "Registry and loading utilities for web components",
   "module": "dist/utils.component.js",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/lifecycle": "^4.0.0-alpha8.0",
+    "@tko/lifecycle": "^4.0.0-alpha9.0",
     "@tko/observable": "^4.0.0-alpha8.0",
     "@tko/utils": "^4.0.0-alpha8.0",
     "jss": "^9.8.3",
@@ -17,11 +17,11 @@
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "@tko/bind": "^4.0.0-alpha8.4",
-    "@tko/binding.core": "^4.0.0-alpha8.4",
+    "@tko/bind": "^4.0.0-alpha9.0",
+    "@tko/binding.core": "^4.0.0-alpha9.0",
     "@tko/computed": "^4.0.0-alpha8.0",
     "@tko/provider.multi": "^4.0.0-alpha8.4",
-    "@tko/provider.virtual": "^4.0.0-alpha8.4"
+    "@tko/provider.virtual": "^4.0.0-alpha9.0"
   },
   "karma": {
     "frameworks": [
