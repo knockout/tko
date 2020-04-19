@@ -27,31 +27,10 @@ import {
 
 export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
-type TkoNodeAttribute =
-  | string
-  | (() => string)
-  | KnockoutSubscribable<string>
-
-interface TkoJsxObject {
-  elementName: string
-  children: [TkoJsxObject]
-  attributes: Record<string, TkoNodeAttribute>
-}
-
-type TkoNodeable =
-  | (() => TkoNodeable)
-  | { [Symbol.iterator]: IterableIterator<TkoNodeable> }
-  | { [Symbol.toPrimitive]: string }
-  | BigInt
-  | boolean
-  | Error
-  | Node
-  | null
-  | number
-  | string
-  | Symbol
-  | TkoJsxObject
-  | undefined
+type JsxNodeable = import('./types').JsxNodeable
+type JsxNodeAttribute = import('./types').JsxNodeAttribute
+type JsxObject = import('./types').JsxObject
+interface Disposable { dispose(): void }
 
 const NAMESPACES = {
   svg: 'http://www.w3.org/2000/svg',
@@ -61,11 +40,11 @@ const NAMESPACES = {
   xmlns: 'http://www.w3.org/2000/xmlns/'
 }
 
-function isIterable (v) {
+function isIterable (v: JsxNodeable) {
   return v && typeof v[Symbol.iterator] === 'function'
 }
 
-function isIterableNonString (v) {
+function isIterableNonString (v: JsxNodeable) {
   return typeof v !== 'string' && isIterable(v)
 }
 
@@ -82,10 +61,24 @@ function isIterableNonString (v) {
  * `parentNode` at `insertBefore` with the result.
  */
 export class JsxObserver extends LifeCycle {
+  insertBefore: Node
+  adoptedInsertBefore: boolean
+  noInitialBinding: boolean
+  parentNodeTarget: Node
+  xmlns: string
+  subscriptionsForNode: Map<Node, Disposable>
+  nodeArrayOrObservableAtIndex: Array<Node|(() => Node)> // | KnockoutObservable
+
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, noInitialBinding) {
+  constructor (
+    jsxOrObservable: JsxNodeable,
+    parentNode: Node,
+    insertBefore: Node | null = null,
+    xmlns?: string,
+    noInitialBinding?: boolean
+  ) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -136,7 +129,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {HMTLElement|Comment|HTMLTemplateElement} parentNode
    */
-  getParentTarget (parentNode) {
+  getParentTarget (parentNode: Node | Element | Comment | HTMLTemplateElement) {
     if ('content' in parentNode) { return parentNode.content }
     if (parentNode.nodeType === 8) { return parentNode.parentNode }
     return parentNode
@@ -163,10 +156,10 @@ export class JsxObserver extends LifeCycle {
     this.subscriptionsForNode.clear()
   }
 
-  createInitialAdditions (possibleIterable) {
+  createInitialAdditions (possibleIterable: JsxNodeable) {
     const status = 'added'
-    if (typeof possibleIteratable === 'object' &&
-      posibleIterable !== null &&
+    if (typeof possibleIterable === 'object' &&
+      possibleIterable !== null &&
       Symbol.iterator in possibleIterable) {
       possibleIterable = [...possibleIterable]
     }
@@ -279,7 +272,7 @@ export class JsxObserver extends LifeCycle {
    * The one thing `any` cannot be here is an Array or Observable; both those
    * cases are handled with new JsxObservers.
    */
-  anyToNode (any: TkoNodeable): Comment | Element | Text {
+  anyToNode (any: JsxNodeable): Comment | Element | Text {
     if (isThenable(any)) { return this.futureJsxNode(any) }
 
     switch (typeof any) {
