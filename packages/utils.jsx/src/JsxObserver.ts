@@ -27,6 +27,32 @@ import {
 
 export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
+type TkoNodeAttribute =
+  | string
+  | (() => string)
+  | KnockoutSubscribable<string>
+
+interface TkoJsxObject {
+  elementName: string
+  children: [TkoJsxObject]
+  attributes: Record<string, TkoNodeAttribute>
+}
+
+type TkoNodeable =
+  | (() => TkoNodeable)
+  | { [Symbol.iterator]: IterableIterator<TkoNodeable> }
+  | { [Symbol.toPrimitive]: string }
+  | BigInt
+  | boolean
+  | Error
+  | Node
+  | null
+  | number
+  | string
+  | Symbol
+  | TkoJsxObject
+  | undefined
+
 const NAMESPACES = {
   svg: 'http://www.w3.org/2000/svg',
   html: 'http://www.w3.org/1999/xhtml',
@@ -37,6 +63,10 @@ const NAMESPACES = {
 
 function isIterable (v) {
   return v && typeof v[Symbol.iterator] === 'function'
+}
+
+function isIterableNonString (v) {
+  return typeof v !== 'string' && isIterable(v)
 }
 
 /**
@@ -185,7 +215,7 @@ export class JsxObserver extends LifeCycle {
       const {parentNode, xmlns} = this
       const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns, this.noInitialBinding)
       nodeArrayOrObservable = [observer]
-    } else if (typeof jsx !== 'string' && isIterable(jsx)) {
+    } else if (isIterableNonString(jsx)) {
       nodeArrayOrObservable = []
       for (const child of jsx) {
         nodeArrayOrObservable.unshift(
@@ -196,8 +226,8 @@ export class JsxObserver extends LifeCycle {
       const isInsideTemplate = 'content' in this.parentNode
       const shouldApplyBindings = $context && !isInsideTemplate && !this.noInitialBinding
 
-      if (Array.isArray(jsx)) {
-        nodeArrayOrObservable = jsx.map(j => this.anyToNode(j))
+      if (isIterableNonString(jsx)) {
+        nodeArrayOrObservable = [...jsx].map(j => this.anyToNode(j))
       } else {
         nodeArrayOrObservable = [this.anyToNode(jsx)]
       }
@@ -249,23 +279,14 @@ export class JsxObserver extends LifeCycle {
    * The one thing `any` cannot be here is an Array or Observable; both those
    * cases are handled with new JsxObservers.
    */
-  anyToNode (any) {
+  anyToNode (any: TkoNodeable): Comment | Element | Text {
     if (isThenable(any)) { return this.futureJsxNode(any) }
 
     switch (typeof any) {
       case 'object':
-        if (any instanceof Error) {
-          return this.createComment(any.toString())
-        }
-        if (any === null) {
-          return this.createComment(String(any))
-        }
-        if (any instanceof Node) {
-          return this.cloneJSXorMoveNode(any)
-        }
-        if (Symbol.iterator in any) {
-          return any
-        }
+        if (any instanceof Error) { return this.createComment(any.toString()) }
+        if (any === null) { return this.createComment(String(any)) }
+        if (any instanceof Node) { return this.cloneJSXorMoveNode(any) }
         break
       case 'function': return this.anyToNode(any())
       case 'undefined':
