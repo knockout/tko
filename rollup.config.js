@@ -106,10 +106,9 @@ function createRollupConfig ({ minify, transpile } = {}) {
     baseUrl: path.join(__dirname, 'packages'),
     tsconfig: path.resolve(path.join(__dirname, 'tsconfig.js')),
     typescript: require('typescript'),
-    include: ["**/*.ts", "**/*.js"],
+    include: ["**/*.ts", "**/*.js", 'packages/@types/index.d.ts'],
     exclude: ["node_modules"],
     outDir: path.join(getPackageRoot(), `dist`),
-
   }
 
   if (transpile) {
