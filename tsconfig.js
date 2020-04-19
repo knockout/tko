@@ -9,10 +9,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "*",
-        "packages/*"
-      ]
-    }
-  }
+      "@tko/*": [ "*/src" ]
+    },
+  },
 }
