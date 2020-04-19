@@ -1,5 +1,8 @@
 // Type definitions for TKO
 //
+// Note that this is a work in progress for TKO, and the typescript
+// definitions will eventually be included in each separate module.
+//
 // Based originally on Types for Knockout 3.4
 // Project: http://knockoutjs.com
 // Definitions by: Boris Yankov <https://github.com/borisyankov>,
@@ -12,7 +15,7 @@
 //                 Retsam <https://github.com/Retsam>
 //                 Rey Pena <https://github.com/ReyPena>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.3
+// TypeScript Version: 3.8
 
 interface KnockoutSubscribableFunctions<T> {
     /**
@@ -270,12 +273,71 @@ interface KnockoutReadonlyObservableArray<T> extends KnockoutReadonlyObservable<
     subscribe<U>(callback: (newValue: U) => void, target: any, event: string): KnockoutSubscription;
 }
 
+interface KnockoutExtendedArrayObservable<T> extends KnockoutObservable<T[]> {
+  length: number
+  [Symbol.iterator]: () => Iterator<T>
+
+  forEach(callbackfn: (value: T, index: number, array: ReadonlyArray<T>) => void, thisArg?: any): void
+
+  indexOf(searchString: string, position?: number): KnockoutComputed<number>
+  lastIndexOf(searchString: string, position?: number): KnockoutComputed<number>
+
+  every(callbackfn: (value: T, index: number, array: T[]) => unknown, thisArg?: any): KnockoutComputed<boolean>
+
+  find<S extends T>(predicate: (this: void, value: T, index: number, obj: T[]) => value is S, thisArg?: any): KnockoutComputed<S | undefined>
+  find(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any) : KnockoutComputed<T | undefined>
+  findIndex(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any): KnockoutComputed<number>
+
+  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T): KnockoutComputed<T>
+  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue: T): KnockoutComputed<T>
+  reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): KnockoutComputed<U>
+
+  reduceRight(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T): KnockoutComputed<T>
+  reduceRight(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue: T): KnockoutComputed<T>
+  reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): KnockoutComputed<U>
+
+  some(callbackfn: (value: T, index: number, array: T[]) => unknown, thisArg?: any): KnockoutComputed<boolean>
+
+  slice(start?: number, end?: number): KnockoutComputedArray<T>
+
+  filter<S extends T>(callbackfn: (value: T, index: number, array: T[]) => value is S, thisArg?: any): KnockoutComputedArray<S>
+  filter(callbackfn: (value: T, index: number, array: T[]) => unknown, thisArg?: any) : KnockoutComputedArray<T>
+
+  keys(o: object): KnockoutComputedArray<string>
+
+  map<U>(callbackfn: (value: T, index: number, array: T[]) => U) : KnockoutComputedArray<U>
+
+  includes(searchElement: T, fromIndex?: number): KnockoutComputed<boolean>
+
+  flat<U>(depth?: number): KnockoutComputedArray<U>;
+  flatMap<U, This = undefined> (
+    callback: (this: This, value: T, index: number, array: T[]) => U|ReadonlyArray<U>,
+    thisArg?: This
+  ) : KnockoutComputedArray<U>
+}
+
+/**
+ * These will be added with
+ interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T> {
+  }
+
+interface KnockoutComputedArray<T> extends KnockoutComputed<T>, KnockoutExtendedArrayObservable<T> {}
+ */
+
+interface KnockoutLifeCycle {
+  computed<T>(p: string | (() => T)): KnockoutComputed<T>
+  subscribe<T>(o: KnockoutObservable<T>, fn: ((v: T) => void)): KnockoutSubscription
+  anchorTo(HTMLElement): void
+  addDisposable(KnockoutLifeCycle): void
+}
+
+
 /*
     NOTE: In theory this should extend both KnockoutObservable<T[]> and KnockoutReadonlyObservableArray<T>,
         but can't since they both provide conflicting typings of .subscribe.
     So it extends KnockoutObservable<T[]> and duplicates the subscribe definitions, which should be kept in sync
 */
-interface KnockoutObservableArray<T> extends KnockoutObservable<T[]>, KnockoutObservableArrayFunctions<T> {
+interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T>, KnockoutObservableArrayFunctions<T> {
     subscribe(callback: (newValue: KnockoutArrayChange<T>[]) => void, target: any, event: "arrayChange"): KnockoutSubscription;
     subscribe(callback: (newValue: T[]) => void, target: any, event: "beforeChange"): KnockoutSubscription;
     subscribe(callback: (newValue: T[]) => void, target?: any, event?: "change"): KnockoutSubscription;
@@ -305,6 +367,19 @@ interface KnockoutReadonlyObservable<T> extends KnockoutSubscribable<T>, Knockou
     peek(): T;
     valueHasMutated?: { (): void; };
     valueWillMutate?: { (): void; };
+
+    once (cb: (v?: T) => any): void
+
+    /**
+     * `yet` waits until the value is no longer equal to `v`.
+     */
+    yet: (v: T | ((z: T) => boolean)) => Promise<T>
+
+    /**
+     * `when` waits until the value is equal to `v`.
+     */
+    when: (v: T | ((z: T) => boolean)) => Promise<T>
+
 }
 
 interface KnockoutObservable<T> extends KnockoutReadonlyObservable<T> {
@@ -316,6 +391,8 @@ interface KnockoutObservable<T> extends KnockoutReadonlyObservable<T> {
      * @param requestedExtenders Name of the extender feature and it's value, e.g. { notify: 'always' }, { rateLimit: 50 }
      */
     extend(requestedExtenders: { [key: string]: any; }): KnockoutObservable<T>;
+
+    modify: ( op: (v: T) => T ) => void
 }
 
 interface KnockoutComputedOptions<T> {
@@ -648,7 +725,20 @@ interface KnockoutTasks {
     runEarly(): void;
 }
 
-/////////////////////////////////
+interface KnockoutLifeCycleStatic {
+  new() : KnockoutLifeCycle
+}
+///////////////////////
+type MaybeObservable<T> = KnockoutObservable<T> | T
+type MaybeObservableArray<T> = KnockoutObservableArray<T> | T
+type MaybeComputed<T> = KnockoutComputed<T> | T
+type MaybeSubscribable<T> =
+  | MaybeComputed<T>
+  | MaybeObservable<T>
+  | MaybeObservableArray<T>
+
+
+/////////
 interface KnockoutStatic {
     utils: KnockoutUtils;
     memoization: KnockoutMemoization;
@@ -658,6 +748,8 @@ interface KnockoutStatic {
 
     virtualElements: KnockoutVirtualElements;
     extenders: KnockoutExtenders;
+
+    LifeCycle: KnockoutLifeCycleStatic
 
     applyBindings(viewModelOrBindingContext?: any, rootNode?: any): void;
     applyBindingsToDescendants(viewModelOrBindingContext: any, rootNode: any): void;
@@ -671,6 +763,9 @@ interface KnockoutStatic {
     observable: KnockoutObservableStatic;
 
     computed: KnockoutComputedStatic;
+
+    peek<T>(v: KnockoutSubscribable<T>): T
+
     /**
      * Creates a pure computed observable.
      * @param evaluatorFunction Function that computes the observable value.
@@ -1060,6 +1155,11 @@ interface KnockoutComponents {
      */
     getComponentNameForNode(node: Node): string;
 }
+
+type TkoJsxNodeAttribute = import('utils.jsx/types').JsxNodeAttribute
+type TkoJsxObject = import('@tko/utils.jsx/types').JsxObject
+type TkoJsxNodeable = import('@tko/utils.jsx/types').JsxObject
+
 
 declare var ko: KnockoutStatic;
 
