@@ -30,6 +30,8 @@ export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 type JsxNodeable = import('./types').JsxNodeable
 type JsxNodeAttribute = import('./types').JsxNodeAttribute
 type JsxObject = import('./types').JsxObject
+type JsxAttributes = Record<string, MaybeObservable<JsxNodeAttribute>>
+
 interface Disposable { dispose(): void }
 
 const NAMESPACES = {
@@ -242,23 +244,23 @@ export class JsxObserver extends LifeCycle {
    * or a Comment.
    * @param {Node} node
    */
-  canApplyBindings (node) {
+  canApplyBindings (node: Node) {
     return node.nodeType === 1 || node.nodeType === 8
   }
 
-  delChange (index) {
+  delChange (index: number) {
     this.removeNodeArrayOrObservable(
       this.nodeArrayOrObservableAtIndex[index])
     this.nodeArrayOrObservableAtIndex.splice(index, 1)
   }
 
-  getSubscriptionsForNode (node) {
+  getSubscriptionsForNode (node: Node) {
     if (!this.subscriptionsForNode.has(node)) {
-      const subscriptions = []
+      const subscriptions = [] as Disposable[]
       this.subscriptionsForNode.set(node, subscriptions)
       return subscriptions
     }
-    return this.subscriptionsForNode.get(node)
+    return this.subscriptionsForNode.get(node) as Disposable[]
   }
 
   isJsx (jsx) {
@@ -327,7 +329,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {JSX} jsx to convert to a node.
    */
-  jsxToNode (jsx) {
+  jsxToNode (jsx: JsxNodeable) {
     const xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || this.xmlns
     const node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
 
@@ -338,11 +340,11 @@ export class JsxObserver extends LifeCycle {
     if (isObservable(jsx.attributes)) {
       const subscriptions = this.getSubscriptionsForNode(node)
       subscriptions.push(
-        jsx.attributes.subscribe(attrs => {
-          this.updateAttributes(node, unwrap(attrs))
+        jsx.attributes.subscribe((attrs: MaybeObservable<JsxAttributes>) => {
+          this.updateAttributes(node, unwrap: Node(attr: JsxAttributess))
         }))
     }
-    this.updateAttributes(node, unwrap(jsx.attributes))
+    this.updateAttributes(node, unwrap(jsx: Node.attribute: JsxAttributess))
 
     this.addDisposable(new JsxObserver(jsx.children, node, null, xmlns, this.noInitialBinding))
 
@@ -357,9 +359,9 @@ export class JsxObserver extends LifeCycle {
     return jo.insertBefore
   }
 
-  updateAttributes (node, attributes) {
+  updateAttributes (node: Element, attributes: JsxAttributes) {
     const subscriptions = this.getSubscriptionsForNode(node)
-    const toRemove = new Set([...node.attributes].map(n => n.name))
+    const toRemove = new Set(Array.from(node.attributes).map(n => n.name))
 
     for (const [name, value] of Object.entries(attributes || {})) {
       toRemove.delete(name)
@@ -380,7 +382,7 @@ export class JsxObserver extends LifeCycle {
    * @param {string} attr element attribute
    * @return {string} namespace argument for setAtttributeNS
    */
-  getNamespaceOfAttribute (attr) {
+  getNamespaceOfAttribute (attr: JsxNodeAttribute) {
     const [prefix, ...unqualifiedName] = attr.split(':')
     if (prefix === 'xmlns' || (unqualifiedName.length && NAMESPACES[prefix])) {
       return NAMESPACES[prefix]
@@ -450,7 +452,7 @@ export class JsxObserver extends LifeCycle {
    *
    * The cleaning can trigger a lot of garbage collection, so we defer that.
    */
-  detachAndDispose (node) {
+  detachAndDispose (node: Element | Comment | Text) {
     if (isIterable(node)) {
       for (const child of node) {
         this.detachAndDispose(child)
