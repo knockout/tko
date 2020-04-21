@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "moduleResolution": "node",
     "downlevelIteration": true,
     "target": "ES3",
     "module": "ES2015",
@@ -11,8 +12,12 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@tko/*": [ "*/src" ],
+      "@tko/*": ["packages/*/src/index.js"],
       "*": ["*"],
     },
+    "traceResolution": true,
   },
+  // "include": ["**/*.ts", "**/*.js", "packages/@types/index.d.ts"],
+  // "files": ["packages/*/src/index.js"],
+  // "exclude": ["karma.conf.js", "node_modules", "**/spec/*"],
 }

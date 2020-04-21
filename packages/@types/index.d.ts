@@ -316,13 +316,10 @@ interface KnockoutExtendedArrayObservable<T> extends KnockoutObservable<T[]> {
   ) : KnockoutComputedArray<U>
 }
 
-/**
- * These will be added with
- interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T> {
-  }
+interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T> {
+}
 
 interface KnockoutComputedArray<T> extends KnockoutComputed<T>, KnockoutExtendedArrayObservable<T> {}
- */
 
 interface KnockoutLifeCycle {
   computed<T>(p: string | (() => T)): KnockoutComputed<T>

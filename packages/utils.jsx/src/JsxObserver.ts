@@ -61,13 +61,14 @@ function isIterableNonString (v: JsxNodeable) {
  * `parentNode` at `insertBefore` with the result.
  */
 export class JsxObserver extends LifeCycle {
-  insertBefore: Node
   adoptedInsertBefore: boolean
-  noInitialBinding: boolean
-  parentNodeTarget: Node
-  xmlns: string
-  subscriptionsForNode: Map<Node, Disposable>
+  insertBefore: Node
   nodeArrayOrObservableAtIndex: Array<Node|(() => Node)> // | KnockoutObservable
+  noInitialBinding: boolean
+  parentNode: Node
+  parentNodeTarget: Node
+  subscriptionsForNode: Map<Node, Disposable[]>
+  xmlns: string
 
   /**
    * @param {any} jsxOrObservable take a long list of permutations
@@ -92,7 +93,7 @@ export class JsxObserver extends LifeCycle {
       if (!insertBefore) {
         const insertAt = parentNodeIsComment ? parentNode.nextSibling : null
         insertBefore = this.createComment('O')
-        parentNodeTarget.insertBefore(insertBefore, insertAt)
+        parentNodeTarget!.insertBefore(insertBefore, insertAt)
       } else {
         this.adoptedInsertBefore = true
       }
@@ -175,7 +176,7 @@ export class JsxObserver extends LifeCycle {
    *   - to the new array indexes for adds
    *   - sorted by index in ascending order
    */
-  observableArrayChange (changes) {
+  observableArrayChange (changes: KnockoutArrayChange<any>[]) {
     let adds = []
     let dels = []
     for (const index in changes) {
@@ -196,12 +197,12 @@ export class JsxObserver extends LifeCycle {
    * @param {int} index
    * @param {string|object|Array|Observable.string|Observable.Array|Obseravble.object} jsx
    */
-  addChange (index, jsx) {
+  addChange (index: number, jsx: JsxNodeable) {
     this.nodeArrayOrObservableAtIndex.splice(index, 0,
       this.injectNode(jsx, this.lastNodeFor(index)))
   }
 
-  injectNode (jsx, nextNode) {
+  injectNode (jsx: JsxNodeable, nextNode: Node) {
     let nodeArrayOrObservable
 
     if (isObservable(jsx)) {
