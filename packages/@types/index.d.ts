@@ -321,11 +321,13 @@ interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T> 
 
 interface KnockoutComputedArray<T> extends KnockoutComputed<T>, KnockoutExtendedArrayObservable<T> {}
 
+type KnockoutSubscriptionCallback<T> = (v: T) => void
+
 interface KnockoutLifeCycle {
   computed<T>(p: string | (() => T)): KnockoutComputed<T>
   subscribe<T>(o: KnockoutObservable<T>, fn: ((v: T) => void)): KnockoutSubscription
-  anchorTo(HTMLElement): void
-  addDisposable(KnockoutLifeCycle): void
+  anchorTo(e: HTMLElement | KnockoutLifeCycle): void
+  addDisposable(d: KnockoutLifeCycle): void
 }
 
 
