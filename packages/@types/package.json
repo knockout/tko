@@ -1,0 +1,9 @@
+{
+  "name": "@types/tko",
+  "version": "1.0.0",
+  "description": "TKO Ambient Types (temporary)",
+  "types": "./index.d.ts",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true
+}

@@ -1,5 +1,5 @@
 
-import {LifeCycle} from '@tko/lifecycle'
+import { LifeCycle } from '@tko/lifecycle'
 
 import {
   safeStringify, isThenable
@@ -27,6 +27,8 @@ import {
 
 export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
+type MaybeObservable<T> = KnockoutObservable<T> | T
+
 type JsxNodeable = import('./types').JsxNodeable
 type JsxNodeAttribute = import('./types').JsxNodeAttribute
 type JsxObject = import('./types').JsxObject
@@ -43,7 +45,7 @@ const NAMESPACES = {
 }
 
 function isIterable (v: JsxNodeable) {
-  return v && typeof v[Symbol.iterator] === 'function'
+  return v && typeof v === 'object' && Symbol.iterator in v
 }
 
 function isIterableNonString (v: JsxNodeable) {

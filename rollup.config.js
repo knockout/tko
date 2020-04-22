@@ -103,11 +103,8 @@ function createRollupConfig ({ minify, transpile } = {}) {
 
   const plugins = [replacerPlugin, ...UNIVERSAL_PLUGINS]
   const tsConfig = {
-    baseUrl: path.join(__dirname, 'packages'),
-    tsconfig: path.resolve(path.join(__dirname, 'tsconfig.js')),
+    tsconfig: path.resolve(path.join(__dirname, 'tsconfig.json')),
     typescript: require('typescript'),
-    include: ["**/*.ts", "**/*.js", 'packages/@types/index.d.ts'],
-    exclude: ["node_modules"],
     outDir: path.join(getPackageRoot(), `dist`),
   }
 

@@ -17,7 +17,7 @@
     },
     "traceResolution": true,
   },
-  // "include": ["**/*.ts", "**/*.js", "packages/@types/index.d.ts"],
+  "include": ["**/*.ts", "**/*.js"],
   // "files": ["packages/*/src/index.js"],
-  // "exclude": ["karma.conf.js", "node_modules", "**/spec/*"],
+  "exclude": ["karma.conf.js", "node_modules", "**/spec/*"],
 }
