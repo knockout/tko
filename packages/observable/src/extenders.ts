@@ -9,6 +9,24 @@ import {
 
 import { deferUpdates } from './defer.js'
 
+/**
+ * Extend this interface with new extenders and their respective return types.
+ */
+export interface KnockoutExtenders {
+  throttle(target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>;
+  notify(target: any, notifyWhen: string): any;
+
+  rateLimit(target: any, timeout: number): any;
+  rateLimit(target: any, options: { timeout: number; method?: string; }): any;
+
+  trackArrayChanges(target: any, v: true): KnockoutSubscribable<T>;
+}
+
+type KnockoutExtenderArgs = {
+  readonly [P in keyof KnockoutExtenders]?: Parameters<KnockoutExtenders[P]>[1]
+}
+
+
 const primitiveTypes = {
   'undefined': 1, 'boolean': 1, 'number': 1, 'string': 1
 }
@@ -18,11 +36,14 @@ export function valuesArePrimitiveAndEqual<T> (a: T, b: T): boolean {
   return oldValueIsPrimitive ? (a === b) : false
 }
 
-export function applyExtenders (requestedExtenders) {
-  var target = this
+export function applyExtenders<T> (
+  this: KnockoutSubscribable<T>,
+  requestedExtenders: KnockoutExtenderArgs,
+) {
+  let target = this
   if (requestedExtenders) {
     objectForEach(requestedExtenders, function (key, value) {
-      var extenderHandler = extenders[key]
+      const extenderHandler = extenders[key]
       if (typeof extenderHandler === 'function') {
         target = extenderHandler(target, value) || target
       } else {
@@ -71,8 +92,8 @@ export function rateLimit (target, options) {
   })
 }
 
-export var extenders = {
-  notify: notify,
-  deferred: deferred,
-  rateLimit: rateLimit
+export const extenders: KnockoutExtenders = {
+  notify,
+  deferred,
+  rateLimit,
 }

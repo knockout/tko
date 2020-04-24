@@ -420,16 +420,6 @@ interface KnockoutVirtualElements {
     childNodes(node: KnockoutVirtualElement): Node[];
 }
 
-interface KnockoutExtenders {
-    throttle(target: any, timeout: number): KnockoutComputed<any>;
-    notify(target: any, notifyWhen: string): any;
-
-    rateLimit(target: any, timeout: number): any;
-    rateLimit(target: any, options: { timeout: number; method?: string; }): any;
-
-    trackArrayChanges(target: any): any;
-}
-
 //
 // NOTE TO MAINTAINERS AND CONTRIBUTORS : pay attention to only include symbols that are
 // publicly exported in the minified version of ko, without that you can give the false

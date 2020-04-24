@@ -83,11 +83,6 @@ interface KnockoutSubscribable<T> extends KnockoutSubscribableFunctions<T> {
    */
   subscribe<U>(callback: (eventValue: U) => void, target: any, event: KnockoutEventType): KnockoutSubscription;
   /**
-   * Customizes observables basic functionality.
-   * @param requestedExtenders Name of the extender feature and its value, e.g. { notify: 'always' }, { rateLimit: 50 }
-   */
-  extend(requestedExtenders: { [key: string]: any; }): KnockoutSubscribable<T>;
-  /**
   * Gets total number of subscribers.
   */
   getSubscriptionsCount(): number;
@@ -284,6 +279,10 @@ const ko_subscribable_fn = {
 
   toString () { return '[object Object]' },
 
+  /**
+   * Customizes observables basic functionality.
+   * @param requestedExtenders Name of the extender feature and its value, e.g. { notify: 'always' }, { rateLimit: 50 }
+   */
   extend: applyExtenders
 }
 
