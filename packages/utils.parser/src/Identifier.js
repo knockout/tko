@@ -8,10 +8,6 @@ import {
   isWriteableObservable, isObservable
 } from '@tko/observable'
 
-import {
-  IDStart, IDContinue
-} from './identifierExpressions'
-
 export default class Identifier {
   constructor (parser, token, dereferences) {
     this.token = token
@@ -152,25 +148,28 @@ export default class Identifier {
 
   /**
    * Determine if a character is a valid item in an identifier.
-   * Note that we do not check whether the first item is a number, nor do we
-   * support unicode identifiers here.
+   * Won't catch reserved words iterating through one char at a time.
    *
-   * From:  http://stackoverflow.com/a/9337047
    * @param  {String}  ch  The character
+   * @param {Boolean} start   Is the first character?
    * @return {Boolean}     True if this is a valid identifier
    */
-  // function is_identifier_char(ch) {
-  //   return (ch >= 'A' && ch <= 'Z') ||
-  //          (ch >= 'a' && ch <= 'z') ||
-  //          (ch >= '0' && ch <= 9) ||
-  //           ch === '_' || ch === '$';
-  // }
+  static is_valid_char(ch, start) {
+    let name = start ? ch
+    : '_'+ch
+    try {
+      Function('var ' + name)
+    } catch( e ) {
+      return false
+    }
+    return true
+  }
   static is_valid_start_char (ch) {
-    return IDStart.test(ch)
+    return Identifier.is_valid_char(ch,true)
   }
 
   static is_valid_continue_char (ch) {
-    return IDContinue.test(ch)
+    return Identifier.is_valid_char(ch,false)
   }
 
   get [Node.isExpressionOrIdentifierSymbol] () { return true }
