@@ -11,8 +11,12 @@ import { deferUpdates } from './defer.js'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
 
-export function observable (initialValue) {
-  function Observable () {
+type KnockoutObservable<T> = import('./types').KnockoutObservable<T>
+
+
+export function observable<T> (initialValue: T): KnockoutObservable<T> {
+
+  const Observable = (function (): T | KnockoutObservable<T> {
     if (arguments.length > 0) {
             // Write
             // Ignore writes if the value hasn't changed
@@ -27,7 +31,7 @@ export function observable (initialValue) {
       dependencyDetection.registerDependency(Observable) // The caller only needs to be notified of changes if they did a "read" operation
       return Observable[LATEST_VALUE]
     }
-  }
+  }) as KnockoutObservable<T>
 
   overwriteLengthPropertyIfSupported(Observable, { value: undefined })
 
@@ -48,16 +52,19 @@ export function observable (initialValue) {
 // Define prototype for observables
 observable.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-  peek () { return this[LATEST_VALUE] },
-  valueHasMutated () {
+
+  peek<T> (this: KnockoutObservable<T>) { return this[LATEST_VALUE] },
+
+  valueHasMutated (this: KnockoutObservable<T>) {
     this.notifySubscribers(this[LATEST_VALUE], 'spectate')
     this.notifySubscribers(this[LATEST_VALUE])
   },
-  valueWillMutate () {
+
+  valueWillMutate (this: KnockoutObservable<T>) {
     this.notifySubscribers(this[LATEST_VALUE], 'beforeChange')
   },
 
-  modify (fn, peek = true) {
+  modify (this: KnockoutObservable<T>, fn, peek = true) {
     return this(fn(peek ? this.peek() : this()))
   },
 

@@ -17,20 +17,6 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 3.8
 
-interface KnockoutSubscribableFunctions<T> {
-    /**
-     * Notify subscribers of knockout "change" event. This doesn't actually change the observable value.
-     * @param eventValue A value to be sent with the event.
-     * @param event The knockout event.
-     */
-    notifySubscribers(eventValue?: T, event?: "change"): void;
-    /**
-     * Notify subscribers of a knockout or user defined event.
-     * @param eventValue A value to be sent with the event.
-     * @param event The knockout or user defined event name.
-     */
-    notifySubscribers<U>(eventValue: U, event: string): void;
-}
 
 interface KnockoutComputedFunctions<T> {
 }
@@ -168,43 +154,7 @@ interface KnockoutSubscription {
     dispose(): void;
 }
 
-interface KnockoutSubscribable<T> extends KnockoutSubscribableFunctions<T> {
-    /**
-     * Registers to be notified after the observable's value changes.
-     * @param callback Function that is called whenever the notification happens.
-     * @param target Defines the value of 'this' in the callback function.
-     * @param event The knockout event name.
-     */
-    subscribe(callback: (newValue: T) => void, target?: any, event?: "change"): KnockoutSubscription;
-    /**
-     * Registers to be notified before the observable's value changes.
-     * @param callback Function that is called whenever the notification happens.
-     * @param target Defines the value of 'this' in the callback function.
-     * @param event The knockout event name.
-     */
-    subscribe(callback: (newValue: T) => void, target: any, event: "beforeChange"): KnockoutSubscription;
-    /**
-     * Registers to be notified when a knockout or user defined event happens.
-     * @param callback Function that is called whenever the notification happens. eventValue can be anything. No relation to underlying observable.
-     * @param target Defines the value of 'this' in the callback function.
-     * @param event The knockout or user defined event name.
-     */
-    subscribe<U>(callback: (eventValue: U) => void, target: any, event: string): KnockoutSubscription;
-    /**
-     * Customizes observables basic functionality.
-     * @param requestedExtenders Name of the extender feature and its value, e.g. { notify: 'always' }, { rateLimit: 50 }
-     */
-    extend(requestedExtenders: { [key: string]: any; }): KnockoutSubscribable<T>;
-    /**
-    * Gets total number of subscribers.
-    */
-    getSubscriptionsCount(): number;
-    /**
-     * Gets number of subscribers of a particular event.
-     * @param event Event name.
-     */
-    getSubscriptionsCount(event: string): number;
-}
+
 
 interface KnockoutComputedStatic {
     fn: KnockoutComputedFunctions<any>;
@@ -325,74 +275,12 @@ type KnockoutSubscriptionCallback<T> = (v: T) => void
 
 interface KnockoutLifeCycle {
   computed<T>(p: string | (() => T)): KnockoutComputed<T>
-  subscribe<T>(o: KnockoutObservable<T>, fn: ((v: T) => void)): KnockoutSubscription
+  subscribe<T>(o: KnockoutSubscribable<T>, fn: ((v: T) => void)): KnockoutSubscription
   anchorTo(e: HTMLElement | KnockoutLifeCycle): void
   addDisposable(d: KnockoutLifeCycle): void
 }
 
 
-/*
-    NOTE: In theory this should extend both KnockoutObservable<T[]> and KnockoutReadonlyObservableArray<T>,
-        but can't since they both provide conflicting typings of .subscribe.
-    So it extends KnockoutObservable<T[]> and duplicates the subscribe definitions, which should be kept in sync
-*/
-interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T>, KnockoutObservableArrayFunctions<T> {
-    subscribe(callback: (newValue: KnockoutArrayChange<T>[]) => void, target: any, event: "arrayChange"): KnockoutSubscription;
-    subscribe(callback: (newValue: T[]) => void, target: any, event: "beforeChange"): KnockoutSubscription;
-    subscribe(callback: (newValue: T[]) => void, target?: any, event?: "change"): KnockoutSubscription;
-    subscribe<U>(callback: (newValue: U) => void, target: any, event: string): KnockoutSubscription;
-
-    extend(requestedExtenders: { [key: string]: any; }): KnockoutObservableArray<T>;
-}
-
-interface KnockoutObservableStatic {
-    fn: KnockoutObservableFunctions<any>;
-
-    <T>(value: T): KnockoutObservable<T>;
-    <T = any>(value: null): KnockoutObservable<T | null>
-    <T = any>(): KnockoutObservable<T | undefined>
-}
-
-/**
- * While all observable are writable at runtime, this type is analogous to the native ReadonlyArray type:
- * casting an observable to this type expresses the intention that this observable shouldn't be mutated.
- */
-interface KnockoutReadonlyObservable<T> extends KnockoutSubscribable<T>, KnockoutObservableFunctions<T> {
-    (): T;
-
-    /**
-     * Returns the current value of the computed observable without creating a dependency.
-     */
-    peek(): T;
-    valueHasMutated?: { (): void; };
-    valueWillMutate?: { (): void; };
-
-    once (cb: (v?: T) => any): void
-
-    /**
-     * `yet` waits until the value is no longer equal to `v`.
-     */
-    yet: (v: T | ((z: T) => boolean)) => Promise<T>
-
-    /**
-     * `when` waits until the value is equal to `v`.
-     */
-    when: (v: T | ((z: T) => boolean)) => Promise<T>
-
-}
-
-interface KnockoutObservable<T> extends KnockoutReadonlyObservable<T> {
-    (value: T): void;
-
-    // Since .extend does arbitrary thing to an observable, it's not safe to do on a readonly observable
-    /**
-     * Customizes observables basic functionality.
-     * @param requestedExtenders Name of the extender feature and it's value, e.g. { notify: 'always' }, { rateLimit: 50 }
-     */
-    extend(requestedExtenders: { [key: string]: any; }): KnockoutObservable<T>;
-
-    modify: ( op: (v: T) => T ) => void
-}
 
 interface KnockoutComputedOptions<T> {
     /**

@@ -9,12 +9,12 @@ import {
 
 import { deferUpdates } from './defer.js'
 
-var primitiveTypes = {
+const primitiveTypes = {
   'undefined': 1, 'boolean': 1, 'number': 1, 'string': 1
 }
 
-export function valuesArePrimitiveAndEqual (a, b) {
-  var oldValueIsPrimitive = (a === null) || (typeof (a) in primitiveTypes)
+export function valuesArePrimitiveAndEqual<T> (a: T, b: T): boolean {
+  const oldValueIsPrimitive = (a === null) || (typeof (a) in primitiveTypes)
   return oldValueIsPrimitive ? (a === b) : false
 }
 
