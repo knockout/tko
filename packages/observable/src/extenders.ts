@@ -9,17 +9,19 @@ import {
 
 import { deferUpdates } from './defer.js'
 
+type KnockoutSubscribable<T> = import('./subscribable').KnockoutSubscribable<T>
+
 /**
  * Extend this interface with new extenders and their respective return types.
  */
 export interface KnockoutExtenders {
-  throttle(target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>;
-  notify(target: any, notifyWhen: string): any;
+  throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>;
+  notify<T> (target: any, notifyWhen: string): void
+  deferred<T> (target: KnockoutSubscribable<T>, option: true): void
 
-  rateLimit(target: any, timeout: number): any;
-  rateLimit(target: any, options: { timeout: number; method?: string; }): any;
+  rateLimit<T> (target: KnockoutSubscribable<T>, options: RateLimitOptions): void
 
-  trackArrayChanges(target: any, v: true): KnockoutSubscribable<T>;
+  trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
 }
 
 type KnockoutExtenderArgs = {
@@ -42,14 +44,15 @@ export function applyExtenders<T> (
 ) {
   let target = this
   if (requestedExtenders) {
-    objectForEach(requestedExtenders, function (key, value) {
-      const extenderHandler = extenders[key]
+    for (const key in requestedExtenders) {
+      const options = requestedExtenders[key as keyof KnockoutExtenderArgs]
+      const extenderHandler = extenders[key as keyof KnockoutExtenderArgs]
       if (typeof extenderHandler === 'function') {
-        target = extenderHandler(target, value) || target
+        target = (extenderHandler as any)(target, options) || target
       } else {
         options.onError(new Error('Extender not found: ' + key))
       }
-    })
+    }
   }
   return target
 }
@@ -59,37 +62,42 @@ export function applyExtenders<T> (
  */
 
 // Change when notifications are published.
-export function notify (target, notifyWhen) {
-  target.equalityComparer = notifyWhen == 'always'
-        ? null  // null equalityComparer means to always notify
-        : valuesArePrimitiveAndEqual
+export function notify<T> (target: KnockoutSubscribable<T>, notifyWhen: string) {
+  target.equalityComparer = notifyWhen === 'always'
+    ? null  // null equalityComparer means to always notify
+    : valuesArePrimitiveAndEqual
 }
 
-export function deferred (target, option) {
+export function deferred<T> (target: KnockoutSubscribable<T>, option: true) {
   if (option !== true) {
     throw new Error('The \'deferred\' extender only accepts the value \'true\', because it is not supported to turn deferral off once enabled.')
   }
   deferUpdates(target)
 }
 
-export function rateLimit (target, options) {
-  var timeout, method, limitFunction
+type RateLimitOptions = number | {
+  timeout: number
+  method: 'notifyWhenChangesStop' | 'throttle' | 'debounce'
+}
 
-  if (typeof options === 'number') {
-    timeout = options
-  } else {
-    timeout = options.timeout
-    method = options.method
-  }
+type RateLimitFunction = typeof debounceFn | typeof throttleFn
 
-    // rateLimit supersedes deferred updates
+export function rateLimit<T> (
+  target: KnockoutSubscribable<T>,
+  options: RateLimitOptions,
+) {
+  const timeout = typeof options === 'number' ? options : options.timeout
+  const method = typeof options === 'number' ? null : options.method
+
+  // rateLimit supersedes deferred updates
   target._deferUpdates = false
 
-  limitFunction = method === 'notifyWhenChangesStop' ? debounceFn : throttleFn
+  const limitFunction = (
+    method === 'notifyWhenChangesStop' ||
+    method === 'debounce'
+  ) ? debounceFn : throttleFn
 
-  target.limit(function (callback) {
-    return limitFunction(callback, timeout)
-  })
+  target.limit((cb: RateLimitFunction) => limitFunction(cb, timeout))
 }
 
 export const extenders: KnockoutExtenders = {

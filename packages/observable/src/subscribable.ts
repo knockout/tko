@@ -52,9 +52,19 @@ interface KnockoutSubscription {
 }
 
 
-interface KnockoutSubscribable<T> extends KnockoutSubscribableFunctions<T> {
+export interface KnockoutSubscribable<T> extends KnockoutSubscribableFunctions<T> {
   _subscriptions: Record<KnockoutEventType, KnockoutSubscription[]>
   _versionNumber: number
+  _deferUpdates: boolean
+
+  /**
+   * Used by knockout to decide if value of observable has changed and should notify subscribers. Returns true if instances are primitives, and false if are objects.
+   * If your observable holds an object, this can be overwritten to return equality based on your needs.
+   * A `null` equalityComparer means to always notify.
+   * @param a previous value.
+   * @param b next value.
+   */
+  equalityComparer: null | ((a: T, b: T) => boolean)
 
   /**
    * Used by Observable limit function.
@@ -295,7 +305,7 @@ subscribable.fn = ko_subscribable_fn
 
 
 type SubscribableFn = typeof ko_subscribable_fn
-interface KnockoutSubscribable<T> extends SubscribableFn {
+export interface KnockoutSubscribable<T> extends SubscribableFn {
   when<T, U> (this: KnockoutSubscribable<T>, test: T | ((v: T) => boolean)): Promise<T>
   when<T, U> (this: KnockoutSubscribable<T>, test: T | ((v: T) => boolean), returnValue: U): Promise<U>
 }
