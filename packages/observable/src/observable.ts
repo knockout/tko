@@ -11,8 +11,6 @@ import { deferUpdates } from './defer.js'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
 
-type KnockoutObservable<T> = import('./types').KnockoutObservable<T>
-
 
 export function observable<T> (initialValue: T): KnockoutObservable<T> {
   const Observable = (function (): T | KnockoutObservable<T> {
@@ -48,10 +46,11 @@ export function observable<T> (initialValue: T): KnockoutObservable<T> {
   return Observable
 }
 
-// Define prototype for observables
+/**
+ * Prototype for Observables
+ */
 observable.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-
 
   valueHasMutated (this: KnockoutObservable<T>) {
     this.notifySubscribers(this[LATEST_VALUE], 'spectate')
@@ -62,7 +61,12 @@ observable.fn = {
     this.notifySubscribers(this[LATEST_VALUE], 'beforeChange')
   },
 
-  modify (this: KnockoutObservable<T>, fn, peek = true) {
+  /**
+   * Pass in and change the value of the observable.
+   *
+   * Example: to increment the value `o.modify(x => x++)`
+   */
+  modify (this: KnockoutObservable<T>, fn: (value: T) => T, peek = true) {
     return this(fn(peek ? this.peek() : this()))
   },
 
@@ -149,7 +153,7 @@ observable.fn[protoProperty] = observable
 // isObservable will be `true`.
 observable.observablePrototypes = new Set([observable])
 
-export function isObservable (instance) {
+export function isObservable<T> (instance: T) {
   const proto = typeof instance === 'function' && instance[protoProperty]
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
@@ -157,16 +161,56 @@ export function isObservable (instance) {
   return !!proto
 }
 
-export function unwrap (value) {
+export function unwrap<T> (value: KnockoutSubscribable<T>) {
   return isObservable(value) ? value() : value
 }
 
-export function peek (value) {
+export function peek<T> (value: KnockoutSubscribable<T>) {
   return isObservable(value) ? value.peek() : value
 }
 
-export function isWriteableObservable (instance) {
+export function isWriteableObservable<T> (instance: KnockoutObservable<T>) {
   return isObservable(instance) && instance.isWriteable
 }
 
 export { isWriteableObservable as isWritableObservable }
+
+
+type ObservableFn = typeof observable.fn
+
+
+declare global {
+  export interface KnockoutObservable<T> extends KnockoutSubscribable<T>, ObservableFn {
+    /**
+     * Unwrap the value, creating a dependency.
+     */
+    (): T
+
+    /**
+     * Set the value of the observable.
+     */
+    (value: T): void;
+  }
+
+  /**
+   * While all observable are writable at runtime, this type is analogous to the native ReadonlyArray type:
+   * casting an observable to this type expresses the intention that this observable shouldn't be mutated.
+   */
+  export interface KnockoutReadonlyObservable<T> extends KnockoutObservable<T> {
+    (): void
+    /**
+     * This observable has been given a read-only type.
+     */
+    (value: never): void
+    extend: never
+    modify: never
+  }
+
+  export interface KnockoutObservableStatic {
+    fn: ObservableFn
+
+    <T>(value: T): KnockoutObservable<T>
+    <T = any>(value: null): KnockoutObservable<T | null>
+    <T = any>(): KnockoutObservable<T | undefined>
+  }
+}

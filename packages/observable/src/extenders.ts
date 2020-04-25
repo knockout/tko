@@ -9,19 +9,9 @@ import {
 
 import { deferUpdates } from './defer.js'
 
-type KnockoutSubscribable<T> = import('./subscribable').KnockoutSubscribable<T>
-
-/**
- * Extend this interface with new extenders and their respective return types.
- */
-declare global {
-  export interface KnockoutExtenders {
-    throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>
-    notify<T> (target: any, notifyWhen: string): void
-    deferred<T> (target: KnockoutSubscribable<T>, option: true): void
-    rateLimit<T> (target: KnockoutSubscribable<T>, options: RateLimitOptions): void
-    trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
-  }
+type RateLimitOptions = number | {
+  timeout: number
+  method: 'notifyWhenChangesStop' | 'throttle' | 'debounce'
 }
 
 type KnockoutExtenderArgs = {
@@ -34,8 +24,8 @@ const primitiveTypes = {
 }
 
 export function valuesArePrimitiveAndEqual<T> (a: T, b: T): boolean {
-  const oldValueIsPrimitive = (a === null) || (typeof (a) in primitiveTypes)
-  return oldValueIsPrimitive ? (a === b) : false
+  const oldValueIsPrimitive = (a === null) || (typeof a in primitiveTypes)
+  return oldValueIsPrimitive ? a === b : false
 }
 
 export function applyExtenders<T> (
@@ -75,10 +65,6 @@ export function deferred<T> (target: KnockoutSubscribable<T>, option: true) {
   deferUpdates(target)
 }
 
-type RateLimitOptions = number | {
-  timeout: number
-  method: 'notifyWhenChangesStop' | 'throttle' | 'debounce'
-}
 
 export type RateLimitFunction = typeof debounceFn | typeof throttleFn
 
@@ -104,4 +90,19 @@ export const extenders: Partial<KnockoutExtenders> = {
   notify,
   deferred,
   rateLimit,
+}
+
+
+
+/**
+ * Extend this interface with new extenders and their respective return types.
+ */
+declare global {
+  export interface KnockoutExtenders {
+    throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>
+    notify<T> (target: any, notifyWhen: string): void
+    deferred<T> (target: KnockoutSubscribable<T>, option: true): void
+    rateLimit<T> (target: KnockoutSubscribable<T>, options: RateLimitOptions): void
+    trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
+  }
 }

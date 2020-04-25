@@ -24,9 +24,10 @@ type Predicate<T> = (v: T) => boolean
  * `arrayChange`.
  */
 interface KnockoutEventTypeInterface {
-  change: true,
   beforeChange: true,
+  change: true,
   dirty: true,
+  spectate: true,
 }
 
 type KnockoutEventType = keyof KnockoutEventTypeInterface
@@ -150,8 +151,7 @@ const readFunctions = {
   },
 
   isDifferent<T> (this: KnockoutSubscribable<T>, oldValue: T, newValue: T) {
-    return !this.equalityComparer ||
-      !this.equalityComparer(oldValue, newValue)
+    return !this.equalityComparer || !this.equalityComparer(oldValue, newValue)
   },
 
   /**
@@ -273,11 +273,11 @@ declare global {
     /**
      * Used by knockout to decide if value of observable has changed and should notify subscribers. Returns true if instances are primitives, and false if are objects.
      * If your observable holds an object, this can be overwritten to return equality based on your needs.
-     * A `null` equalityComparer means to always notify.
+     * A `falsy` equalityComparer means to always notify.
      * @param a previous value.
      * @param b next value.
      */
-    equalityComparer: null | ((a: T, b: T) => boolean)
+    equalityComparer?: ((a: T, b: T) => boolean)
 
     /**
      * Used by Observable limit function.

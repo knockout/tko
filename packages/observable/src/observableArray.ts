@@ -152,3 +152,13 @@ arrayForEach(['slice'], function (methodName) {
 
 // Expose for testing.
 observableArray.trackArrayChanges = trackArrayChanges
+
+
+
+declare global {
+  export interface KnockoutObservableArray<T> extends KnockoutObservable<T> {
+
+
+    extend(requestedExtenders: { [key: string]: any; }): KnockoutObservableArray<T>
+  }
+}
