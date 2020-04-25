@@ -4,14 +4,22 @@ import {
 } from '@tko/utils'
 
 
-export default class Subscription {
-  constructor (target, observer, disposeCallback) {
-    this._target = target
+export default class Subscription<T> {
+  private _callback: (v: T) => void
+  private _isDisposed = false
+  private _domNodeDisposalCallback: () => void
+  private _node: Element
+
+  constructor (
+    private _target: KnockoutSubscribable<T>,
+    observer: { next: (v: T) => void },
+    private _disposeCallback: () => void,
+  ) {
     this._callback = observer.next
-    this._disposeCallback = disposeCallback
     this._isDisposed = false
-    this._domNodeDisposalCallback = null
   }
+
+  callback (v: T) { this._callback(v) }
 
   dispose () {
     if (this._domNodeDisposalCallback) {
@@ -21,7 +29,7 @@ export default class Subscription {
     this._disposeCallback()
   }
 
-  disposeWhenNodeIsRemoved (node) {
+  disposeWhenNodeIsRemoved (node: Element) {
     this._node = node
     addDisposeCallback(node, this._domNodeDisposalCallback = this.dispose.bind(this))
   }

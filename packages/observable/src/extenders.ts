@@ -14,14 +14,14 @@ type KnockoutSubscribable<T> = import('./subscribable').KnockoutSubscribable<T>
 /**
  * Extend this interface with new extenders and their respective return types.
  */
-export interface KnockoutExtenders {
-  throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>;
-  notify<T> (target: any, notifyWhen: string): void
-  deferred<T> (target: KnockoutSubscribable<T>, option: true): void
-
-  rateLimit<T> (target: KnockoutSubscribable<T>, options: RateLimitOptions): void
-
-  trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
+declare global {
+  export interface KnockoutExtenders {
+    throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>
+    notify<T> (target: any, notifyWhen: string): void
+    deferred<T> (target: KnockoutSubscribable<T>, option: true): void
+    rateLimit<T> (target: KnockoutSubscribable<T>, options: RateLimitOptions): void
+    trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
+  }
 }
 
 type KnockoutExtenderArgs = {
@@ -45,10 +45,10 @@ export function applyExtenders<T> (
   let target = this
   if (requestedExtenders) {
     for (const key in requestedExtenders) {
-      const options = requestedExtenders[key as keyof KnockoutExtenderArgs]
+      const value = requestedExtenders[key as keyof KnockoutExtenderArgs]
       const extenderHandler = extenders[key as keyof KnockoutExtenderArgs]
       if (typeof extenderHandler === 'function') {
-        target = (extenderHandler as any)(target, options) || target
+        target = (extenderHandler as any)(target, value) || target
       } else {
         options.onError(new Error('Extender not found: ' + key))
       }
@@ -80,7 +80,7 @@ type RateLimitOptions = number | {
   method: 'notifyWhenChangesStop' | 'throttle' | 'debounce'
 }
 
-type RateLimitFunction = typeof debounceFn | typeof throttleFn
+export type RateLimitFunction = typeof debounceFn | typeof throttleFn
 
 export function rateLimit<T> (
   target: KnockoutSubscribable<T>,
@@ -100,7 +100,7 @@ export function rateLimit<T> (
   target.limit((cb: RateLimitFunction) => limitFunction(cb, timeout))
 }
 
-export const extenders: KnockoutExtenders = {
+export const extenders: Partial<KnockoutExtenders> = {
   notify,
   deferred,
   rateLimit,

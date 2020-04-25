@@ -15,7 +15,6 @@ type KnockoutObservable<T> = import('./types').KnockoutObservable<T>
 
 
 export function observable<T> (initialValue: T): KnockoutObservable<T> {
-
   const Observable = (function (): T | KnockoutObservable<T> {
     if (arguments.length > 0) {
             // Write
@@ -53,7 +52,6 @@ export function observable<T> (initialValue: T): KnockoutObservable<T> {
 observable.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
 
-  peek<T> (this: KnockoutObservable<T>) { return this[LATEST_VALUE] },
 
   valueHasMutated (this: KnockoutObservable<T>) {
     this.notifySubscribers(this[LATEST_VALUE], 'spectate')
@@ -144,7 +142,7 @@ subscribable.fn.limit = function limit (limitFunction) {
 
 Object.setPrototypeOf(observable.fn, subscribable.fn)
 
-var protoProperty = observable.protoProperty = options.protoProperty
+const protoProperty = observable.protoProperty = options.protoProperty
 observable.fn[protoProperty] = observable
 
 // Subclasses can add themselves to observableProperties so that

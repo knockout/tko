@@ -67,7 +67,5 @@
     "packages/*"
   ],
   "private": true,
-  "dependencies": {
-    "@types/tko": "./packages/@types"
-  }
+  "dependencies": {}
 }
