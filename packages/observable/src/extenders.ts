@@ -2,17 +2,8 @@
 // Observable extenders
 // ---
 //
-import {
-    options, objectForEach,
-    throttle as throttleFn, debounce as debounceFn
-} from '@tko/utils'
-
+import { options } from '@tko/utils'
 import { deferUpdates } from './defer.js'
-
-type RateLimitOptions = number | {
-  timeout: number
-  method: 'notifyWhenChangesStop' | 'throttle' | 'debounce'
-}
 
 type KnockoutExtenderArgs = {
   readonly [P in keyof KnockoutExtenders]?: Parameters<KnockoutExtenders[P]>[1]
@@ -65,31 +56,9 @@ export function deferred<T> (target: KnockoutSubscribable<T>, option: true) {
   deferUpdates(target)
 }
 
-
-export type RateLimitFunction = typeof debounceFn | typeof throttleFn
-
-export function rateLimit<T> (
-  target: KnockoutSubscribable<T>,
-  options: RateLimitOptions,
-) {
-  const timeout = typeof options === 'number' ? options : options.timeout
-  const method = typeof options === 'number' ? null : options.method
-
-  // rateLimit supersedes deferred updates
-  target._deferUpdates = false
-
-  const limitFunction = (
-    method === 'notifyWhenChangesStop' ||
-    method === 'debounce'
-  ) ? debounceFn : throttleFn
-
-  target.limit((cb: RateLimitFunction) => limitFunction(cb, timeout))
-}
-
 export const extenders: Partial<KnockoutExtenders> = {
   notify,
   deferred,
-  rateLimit,
 }
 
 
@@ -102,7 +71,6 @@ declare global {
     throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>
     notify<T> (target: any, notifyWhen: string): void
     deferred<T> (target: KnockoutSubscribable<T>, option: true): void
-    rateLimit<T> (target: KnockoutSubscribable<T>, options: RateLimitOptions): void
     trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
   }
 }

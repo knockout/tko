@@ -10,10 +10,10 @@ import * as dependencyDetection from './dependencyDetection.js'
 import { deferUpdates } from './defer.js'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
+import { limit } from './limit'
 
-
-export function observable<T> (initialValue: T): KnockoutObservable<T> {
-  const Observable = (function (): T | KnockoutObservable<T> {
+function observableStatic<T> (initialValue: T): KnockoutObservable<T> {
+  const Observable = (function (this: KnockoutObservable<T>): T | KnockoutObservable<T> {
     if (arguments.length > 0) {
             // Write
             // Ignore writes if the value hasn't changed
@@ -46,10 +46,12 @@ export function observable<T> (initialValue: T): KnockoutObservable<T> {
   return Observable
 }
 
+export const observable = observableStatic as KnockoutObservableStatic
+
 /**
  * Prototype for Observables
  */
-observable.fn = {
+const observableFn = {
   equalityComparer: valuesArePrimitiveAndEqual,
 
   valueHasMutated (this: KnockoutObservable<T>) {
@@ -70,79 +72,14 @@ observable.fn = {
     return this(fn(peek ? this.peek() : this()))
   },
 
+  limit,
+
   // Some observables may not always be writeable, notably computeds.
   isWriteable: true
 }
 
-// Moved out of "limit" to avoid the extra closure
-function limitNotifySubscribers (value, event) {
-  if (!event || event === defaultEvent) {
-    this._limitChange(value)
-  } else if (event === 'beforeChange') {
-    this._limitBeforeChange(value)
-  } else {
-    this._origNotifySubscribers(value, event)
-  }
-}
+observable.fn = observableFn
 
-// Add `limit` function to the subscribable prototype
-subscribable.fn.limit = function limit (limitFunction) {
-  var self = this
-  var selfIsObservable = isObservable(self)
-  var beforeChange = 'beforeChange'
-  var ignoreBeforeChange, notifyNextChange, previousValue, pendingValue, didUpdate
-
-  if (!self._origNotifySubscribers) {
-    self._origNotifySubscribers = self.notifySubscribers
-    self.notifySubscribers = limitNotifySubscribers
-  }
-
-  var finish = limitFunction(function () {
-    self._notificationIsPending = false
-
-    // If an observable provided a reference to itself, access it to get the latest value.
-    // This allows computed observables to delay calculating their value until needed.
-    if (selfIsObservable && pendingValue === self) {
-      pendingValue = self._evalIfChanged ? self._evalIfChanged() : self()
-    }
-    const shouldNotify = notifyNextChange || (
-      didUpdate && self.isDifferent(previousValue, pendingValue)
-    )
-    self._notifyNextChange = didUpdate = ignoreBeforeChange = false
-    if (shouldNotify) {
-      self._origNotifySubscribers(previousValue = pendingValue)
-    }
-  })
-
-  Object.assign(self, {
-    _limitChange  (value, isDirty) {
-      if (!isDirty || !self._notificationIsPending) {
-        didUpdate = !isDirty
-      }
-      self._changeSubscriptions = [...self._subscriptions[defaultEvent]]
-      self._notificationIsPending = ignoreBeforeChange = true
-      pendingValue = value
-      finish()
-    },
-
-    _limitBeforeChange (value) {
-      if (!ignoreBeforeChange) {
-        previousValue = value
-        self._origNotifySubscribers(value, beforeChange)
-      }
-    },
-
-    _notifyNextChangeIfValueIsDifferent () {
-      if (self.isDifferent(previousValue, self.peek(true /* evaluate */))) {
-        notifyNextChange = true
-      }
-    },
-
-    _recordUpdate () {
-      didUpdate = true
-    }
-  })
-}
 
 Object.setPrototypeOf(observable.fn, subscribable.fn)
 
@@ -175,8 +112,10 @@ export function isWriteableObservable<T> (instance: KnockoutObservable<T>) {
 
 export { isWriteableObservable as isWritableObservable }
 
-
-type ObservableFn = typeof observable.fn
+/**
+ * Note the Omit<> re. https://stackoverflow.com/questions/61427945
+ */
+type ObservableFn = Omit<typeof observableFn, 'equalityComparer'>
 
 
 declare global {

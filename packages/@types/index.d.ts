@@ -22,13 +22,6 @@ interface KnockoutComputedFunctions<T> {
 }
 
 interface KnockoutObservableFunctions<T> {
-    /**
-     * Used by knockout to decide if value of observable has changed and should notify subscribers. Returns true if instances are primitives, and false if are objects.
-     * If your observable holds an object, this can be overwritten to return equality based on your needs.
-     * @param a previous value.
-     * @param b next value.
-     */
-    equalityComparer(a: T, b: T): boolean;
 }
 
 // The functions of observable arrays that don't mutate the array

@@ -19,18 +19,6 @@ export const LATEST_VALUE = Symbol('Knockout latest value')
 
 type Predicate<T> = (v: T) => boolean
 
-/**
- * Extend this interface to add more event types, e.g.
- * `arrayChange`.
- */
-interface KnockoutEventTypeInterface {
-  beforeChange: true,
-  change: true,
-  dirty: true,
-  spectate: true,
-}
-
-type KnockoutEventType = keyof KnockoutEventTypeInterface
 
 type Tc39Callback<T> = {
   next (value: T): void
@@ -256,6 +244,20 @@ subscribable.fn = subscribableFn
 type SubscribableFn = typeof subscribableFn
 
 declare global {
+
+  /**
+   * Extend this interface to add more event types, e.g.
+   * `arrayChange`.
+   */
+  export interface KnockoutEventTypeInterface {
+    beforeChange: true,
+    change: true,
+    dirty: true,
+    spectate: true,
+  }
+
+  export type KnockoutEventType = keyof KnockoutEventTypeInterface
+
   /**
    * Forms the base for KnockoutObservable, KnockoutComputed, and KnockoutObservableArray.
    */
@@ -277,7 +279,7 @@ declare global {
      * @param a previous value.
      * @param b next value.
      */
-    equalityComparer?: ((a: T, b: T) => boolean)
+    equalityComparer: null | ((a: T, b: T) => boolean)
 
     /**
      * Used by Observable limit function.
