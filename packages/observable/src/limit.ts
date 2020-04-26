@@ -87,7 +87,7 @@ export function limit<T> (
       if (!isDirty || !self._notificationIsPending) {
         didUpdate = !isDirty
       }
-      self._changeSubscriptions = [...self._subscriptions[defaultEvent]]
+      self._changeSubscriptions = Array.from(self._subscriptions[defaultEvent] || [])
       self._notificationIsPending = ignoreBeforeChange = true
       pendingValue = value
       finish()

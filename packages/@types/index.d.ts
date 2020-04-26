@@ -24,114 +24,9 @@ interface KnockoutComputedFunctions<T> {
 interface KnockoutObservableFunctions<T> {
 }
 
-// The functions of observable arrays that don't mutate the array
-interface KnockoutReadonlyObservableArrayFunctions<T> {
-    /**
-      * Returns the index of the first occurrence of a value in an array.
-      * @param searchElement The value to locate in the array.
-      * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
-      */
-    indexOf(searchElement: T, fromIndex?: number): number;
-    /**
-      * Returns a section of an array.
-      * @param start The beginning of the specified portion of the array.
-      * @param end The end of the specified portion of the array.
-      */
-    slice(start: number, end?: number): T[];
-}
 // The functions of observable arrays that mutate the array
-interface KnockoutObservableArrayFunctions<T> extends KnockoutReadonlyObservableArrayFunctions<T> {
-    /**
-     * Removes and returns all the remaining elements starting from a given index.
-     * @param start The zero-based location in the array from which to start removing elements.
-     */
-    splice(start: number): T[];
-    /**
-     * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
-     * @param start The zero-based location in the array from which to start removing elements.
-     * @param deleteCount The number of elements to remove.
-     * @param items Elements to insert into the array in place of the deleted elements.
-     */
-    splice(start: number, deleteCount: number, ...items: T[]): T[];
-    /**
-     * Removes the last value from the array and returns it.
-     */
-    pop(): T;
-    /**
-     * Adds new item or items to the end of array.
-     * @param items Items  to be added.
-     */
-    push(...items: T[]): void;
-    /**
-     * Removes the first value from the array and returns it.
-     */
-    shift(): T;
-    /**
-     * Inserts new item or items at the beginning of the array.
-     * @param items Items to be added.
-     */
-    unshift(...items: T[]): number;
-    /**
-     * Reverses the order of the array and returns the observableArray (not the underlying array).
-     */
-    reverse(): KnockoutObservableArray<T>;
-    /**
-     * Sorts the array contents and returns the observableArray.
-     */
-    sort(): KnockoutObservableArray<T>;
-    /**
-     * Sorts the array contents and returns the observableArray.
-     * @param compareFunction A function that returns negative value if first argument is smaller, positive value if second is smaller, or zero to treat them as equal.
-     */
-    sort(compareFunction: (left: T, right: T) => number): KnockoutObservableArray<T>;
+interface KnockoutObservableArrayFunctions<T> {
 
-    // Ko specific
-    /**
-     * Replaces the first value that equals oldItem with newItem.
-     * @param oldItem Item to be replaced.
-     * @param newItem Replacing item.
-     */
-    replace(oldItem: T, newItem: T): void;
-    /**
-     * Removes all values that equal item and returns them as an array.
-     * @param item The item to be removed.
-     */
-    remove(item: T): T[];
-    /**
-     * Removes all values and returns them as an array.
-     * @param removeFunction A function used to determine true if item should be removed and fasle otherwise.
-     */
-    remove(removeFunction: (item: T) => boolean): T[];
-    /**
-     * Removes all values that equal any of the supplied items.
-     * @param items Items to be removed.
-     */
-    removeAll(items: T[]): T[];
-    /**
-     * Removes all values and returns them as an array.
-     */
-    removeAll(): T[];
-
-    // Ko specific Usually relevant to Ruby on Rails developers only
-    /**
-     * Finds any objects in the array that equal someItem and gives them a special property called _destroy with value true.
-     * @param item Items to be marked with the property.
-     */
-    destroy(item: T): void;
-    /**
-     * Finds any objects in the array filtered by a function and gives them a special property called _destroy with value true.
-     * @param destroyFunction A function used to determine which items should be marked with the property.
-     */
-    destroy(destroyFunction: (item: T) => boolean): void;
-    /**
-     * Finds any objects in the array that equal suplied items and gives them a special property called _destroy with value true.
-     * @param items
-     */
-    destroyAll(items: T[]): void;
-    /**
-     * Gives a special property called _destroy with value true to all objects in the array.
-     */
-    destroyAll(): void;
 }
 
 interface KnockoutSubscribableStatic {
@@ -139,14 +34,6 @@ interface KnockoutSubscribableStatic {
 
     new <T>(): KnockoutSubscribable<T>;
 }
-
-interface KnockoutSubscription {
-    /**
-     * Terminates a subscription.
-     */
-    dispose(): void;
-}
-
 
 
 interface KnockoutComputedStatic {
@@ -198,11 +85,6 @@ interface KnockoutComputed<T> extends KnockoutReadonlyComputed<T>, KnockoutObser
     extend(requestedExtenders: { [key: string]: any; }): KnockoutComputed<T>;
 }
 
-interface KnockoutObservableArrayStatic {
-    fn: KnockoutObservableArrayFunctions<any>;
-
-    <T>(value?: T[] | null): KnockoutObservableArray<T>;
-}
 
 /**
  * While all observable arrays are writable at runtime, this type is analogous to the native ReadonlyArray type:
@@ -598,9 +480,8 @@ interface KnockoutTasks {
 interface KnockoutLifeCycleStatic {
   new() : KnockoutLifeCycle
 }
+
 ///////////////////////
-type MaybeObservable<T> = KnockoutObservable<T> | T
-type MaybeObservableArray<T> = KnockoutObservableArray<T> | T
 type MaybeComputed<T> = KnockoutComputed<T> | T
 type MaybeSubscribable<T> =
   | MaybeComputed<T>

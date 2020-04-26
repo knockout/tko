@@ -159,5 +159,7 @@ declare global {
     <T = any>(value: null): KnockoutObservable<T | null>
     <T = any>(): KnockoutObservable<T | undefined>
   }
+
+  type MaybeObservable<T> = KnockoutObservable<T> | T
 }
 

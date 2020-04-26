@@ -38,3 +38,8 @@ export default class Subscription<T> {
   unsubscribe () { this.dispose() }
   get closed () { return this._isDisposed }
 }
+
+
+declare global {
+  export type KnockoutSubscription<T = any> = Subscription<T>
+}
