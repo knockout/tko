@@ -54,12 +54,12 @@ export const observable = observableStatic as KnockoutObservableStatic
 const observableFn = {
   equalityComparer: valuesArePrimitiveAndEqual,
 
-  valueHasMutated (this: KnockoutObservable<T>) {
+  valueHasMutated<T> (this: KnockoutObservable<T>) {
     this.notifySubscribers(this[LATEST_VALUE], 'spectate')
     this.notifySubscribers(this[LATEST_VALUE])
   },
 
-  valueWillMutate (this: KnockoutObservable<T>) {
+  valueWillMutate<T> (this: KnockoutObservable<T>) {
     this.notifySubscribers(this[LATEST_VALUE], 'beforeChange')
   },
 
@@ -68,7 +68,7 @@ const observableFn = {
    *
    * Example: to increment the value `o.modify(x => x++)`
    */
-  modify (this: KnockoutObservable<T>, fn: (value: T) => T, peek = true) {
+  modify<T> (this: KnockoutObservable<T>, fn: (value: T) => T, peek = true) {
     return this(fn(peek ? this.peek() : this()))
   },
 
@@ -76,7 +76,7 @@ const observableFn = {
 
   // Some observables may not always be writeable, notably computeds.
   isWriteable: true
-}
+} as const
 
 observable.fn = observableFn
 

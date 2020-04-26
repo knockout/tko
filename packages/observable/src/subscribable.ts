@@ -8,7 +8,7 @@ import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
 import { applyExtenders } from './extenders.js'
 import * as dependencyDetection from './dependencyDetection.js'
 
-type RateLimitFunction = import('./extenders').RateLimitFunction
+type RateLimitFunction = import('./limit').RateLimitFunction
 
 export { isSubscribable } from './subscribableSymbol'
 
@@ -145,7 +145,7 @@ const readFunctions = {
   /**
    * Return the current value without creating observable dependencies.
    */
-  peek<T> (this: KnockoutSubscribable<T>) { return this[LATEST_VALUE] },
+  peek<T> (this: KnockoutSubscribable<T>, forceEvaluation = false) { return this[LATEST_VALUE] },
 
   /**
    *

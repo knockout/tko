@@ -1,6 +1,10 @@
 
-import { throttle as throttleFn, debounce as debounceFn } from '@tko/utils'
+import {
+  throttle as throttleFn, debounce as debounceFn,
+} from '@tko/utils'
+import { isObservable } from './observable'
 import { extenders } from './extenders'
+import { defaultEvent } from './subscribable'
 
 export type RateLimitFunction = typeof debounceFn | typeof throttleFn
 
@@ -43,11 +47,18 @@ function limitNotifySubscribers<T> (
 }
 
 // Add `limit` function to the subscribable prototype
-export function limit (limitFunction) {
-  var self = this
-  var selfIsObservable = isObservable(self)
-  var beforeChange = 'beforeChange'
-  var ignoreBeforeChange, notifyNextChange, previousValue, pendingValue, didUpdate
+export function limit<T> (
+  this: KnockoutObservable<T>,
+  limitFunction: RateLimitFunction,
+) {
+  const self = this
+  const selfIsObservable = isObservable(self)
+  const beforeChange = 'beforeChange'
+  let ignoreBeforeChange: boolean
+  let notifyNextChange: boolean
+  let previousValue: T | KnockoutSubscribable<T>
+  let pendingValue: T | KnockoutSubscribable<T>
+  let didUpdate: boolean
 
   if (!self._origNotifySubscribers) {
     self._origNotifySubscribers = self.notifySubscribers
@@ -63,16 +74,16 @@ export function limit (limitFunction) {
       pendingValue = self._evalIfChanged ? self._evalIfChanged() : self()
     }
     const shouldNotify = notifyNextChange || (
-      didUpdate && self.isDifferent(previousValue, pendingValue)
+      didUpdate && self.isDifferent(previousValue as T, pendingValue as T)
     )
     self._notifyNextChange = didUpdate = ignoreBeforeChange = false
     if (shouldNotify) {
-      self._origNotifySubscribers(previousValue = pendingValue)
+      self._origNotifySubscribers((previousValue as T) = (pendingValue as T))
     }
   })
 
   Object.assign(self, {
-    _limitChange  (value, isDirty) {
+    _limitChange (value: T, isDirty: boolean) {
       if (!isDirty || !self._notificationIsPending) {
         didUpdate = !isDirty
       }
@@ -82,7 +93,7 @@ export function limit (limitFunction) {
       finish()
     },
 
-    _limitBeforeChange (value) {
+    _limitBeforeChange (value: T) {
       if (!ignoreBeforeChange) {
         previousValue = value
         self._origNotifySubscribers(value, beforeChange)
@@ -90,7 +101,7 @@ export function limit (limitFunction) {
     },
 
     _notifyNextChangeIfValueIsDifferent () {
-      if (self.isDifferent(previousValue, self.peek(true /* evaluate */))) {
+      if (self.isDifferent(previousValue as T, self.peek(true /* evaluate */))) {
         notifyNextChange = true
       }
     },
@@ -104,7 +115,16 @@ export function limit (limitFunction) {
 extenders.rateLimit = rateLimit
 
 declare global {
-  interface KnockoutExtenders {
+  export interface KnockoutExtenders {
     rateLimit: typeof rateLimit,
+  }
+
+  export interface KnockoutObservable<T> {
+    _notificationIsPending: boolean
+    _evalIfChanged?: () => T | KnockoutSubscribable<T>
+    _origNotifySubscribers: KnockoutObservable<T>['notifySubscribers']
+    _notifyNextChange: boolean
+    _limitChange: (value: T) => void
+    _limitBeforeChange: (value: T) => void
   }
 }
