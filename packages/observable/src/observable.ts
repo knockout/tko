@@ -47,11 +47,13 @@ function observableStatic<T> (initialValue: T): KnockoutObservable<T> {
 }
 
 export const observable = observableStatic as KnockoutObservableStatic
+const protoProperty = observable.protoProperty = options.protoProperty
 
 /**
  * Prototype for Observables
  */
 const observableFn = {
+  [protoProperty]: observable,
   equalityComparer: valuesArePrimitiveAndEqual,
 
   valueHasMutated<T> (this: KnockoutObservable<T>) {
@@ -79,12 +81,7 @@ const observableFn = {
 } as const
 
 observable.fn = observableFn
-
-
 Object.setPrototypeOf(observable.fn, subscribable.fn)
-
-const protoProperty = observable.protoProperty = options.protoProperty
-observable.fn[protoProperty] = observable
 
 // Subclasses can add themselves to observableProperties so that
 // isObservable will be `true`.
@@ -146,6 +143,9 @@ declare global {
   }
 
   export interface KnockoutObservableStatic {
+    protoProperty: string
+    observablePrototypes: Set<any>
+
     fn: ObservableFn
 
     <T>(value: T): KnockoutObservable<T>
