@@ -87,7 +87,7 @@ Object.setPrototypeOf(observable.fn, subscribable.fn)
 // isObservable will be `true`.
 observable.observablePrototypes = new Set([observable])
 
-export function isObservable<T> (instance: T) {
+export function isObservable<T> (instance: any): instance is KnockoutObservable<T> {
   const proto = typeof instance === 'function' && instance[protoProperty]
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
@@ -111,12 +111,13 @@ export { isWriteableObservable as isWritableObservable }
 
 /**
  * Note the Omit<> re. https://stackoverflow.com/questions/61427945
+ * when this is used to extend KnockoutObservable<T>
  */
-type ObservableFn = Omit<typeof observableFn, 'equalityComparer'>
+type ObservableFn = typeof observableFn
 
 
 declare global {
-  export interface KnockoutObservable<T> extends KnockoutSubscribable<T>, ObservableFn {
+  export interface KnockoutObservable<T> extends KnockoutSubscribable<T>, Omit<ObservableFn, keyof KnockoutObservable<T>> {
     /**
      * Unwrap the value, creating a dependency.
      */
@@ -126,6 +127,10 @@ declare global {
      * Set the value of the observable.
      */
     (value: T): void;
+
+    modify (this: KnockoutObservable<T>, fn: (value: T) => T, peek: boolean): void
+    valueHasMutated (this: KnockoutObservable<T>): void
+    valueWillMutate (this: KnockoutObservable<T>): void
   }
 
   /**
@@ -140,6 +145,8 @@ declare global {
     (value: never): void
     extend: never
     modify: never
+    valueHasMutated: never
+    valueWillMutate: never
   }
 
   export interface KnockoutObservableStatic {
@@ -153,3 +160,4 @@ declare global {
     <T = any>(): KnockoutObservable<T | undefined>
   }
 }
+
