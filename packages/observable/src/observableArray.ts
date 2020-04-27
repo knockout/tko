@@ -27,6 +27,8 @@ export function isObservableArray<T> (instance: any): instance is KnockoutObserv
   return isObservable(instance) && typeof instance.remove === 'function' && typeof instance.push === 'function'
 }
 
+
+
 observableArray.fn = {
   remove<T> (this: KnockoutObservableArray<T>, valueOrPredicate) {
     var underlyingArray = this.peek()
@@ -126,13 +128,19 @@ observableArray.fn = {
 Object.setPrototypeOf(observableArray.fn, observable.fn)
 
 // Populate ko.observableArray.fn with read/write functions from native arrays
-// Important: Do not add any additional functions here that may reasonably be used to *read* data from the array
+// Important: Do not add any additional write-functions here that may reasonably be used to *read* data from the array
 // because we'll eval them without causing subscriptions, so ko.computed output could end up getting stale
-const writeFunctions = ['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'] as const
-const readFunctions = ['splice'] as const
+const writeFunctions = [
+  'copyWithin', 'fill', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice',
+  'unshift',
+] as const
 
+const readFunctions = ['forEach', 'splice'] as const
+
+
+const proxyMethods = {} as Record<string, (...args: any) => any>
 for (const methodName of writeFunctions) {
-  observableArray.fn[methodName] = function<T> (this: KnockoutObservableArray<T>, ...args: any[]) {
+  proxyMethods[methodName] = function<T> (this: KnockoutObservableArray<T>, ...args: any[]) {
     // Use "peek" to avoid creating a subscription in any computed that we're executing in the context of
     // (for consistency with mutating regular observables)
     const underlyingArray = this.peek()
@@ -142,22 +150,25 @@ for (const methodName of writeFunctions) {
     const methodCallResult = method.apply(underlyingArray, ...args)
     this.valueHasMutated()
     // The native sort and reverse methods return a reference to the array, but it makes more sense to return the observable array instead.
-    return methodCallResult === underlyingArray
-      ? this : methodCallResult
+    return methodCallResult === underlyingArray ? this : methodCallResult
   }
-}\
+}
 
 // Populate ko.observableArray.fn with read-only functions from native arrays
 for (const methodName of readFunctions) {
-  observableArray.fn[methodName] = function<T> (this: KnockoutObservableArray<T>, ...args) {
+  proxyMethods[methodName] = function<T> (this: KnockoutObservableArray<T>, ...args: any[]) {
     const underlyingArray = this()
-    return underlyingArray[methodName].apply(underlyingArray, ...args)
+    const method = underlyingArray[methodName] as any
+    return method.apply(underlyingArray, ...args)
   }
-})
+}
 
-// Expose for testing.
+Object.assign(observableArray.fn, proxyMethods)
 observableArray.trackArrayChanges = trackArrayChanges
 
+type ProxyMethodType = typeof writeFunctions[number] | typeof readFunctions[number]
+type ArrayProxyMethods = { readonly [P in ProxyMethodType]: Array<any>[P] }
+type ObservableArrayFn = typeof observableArray.fn
 
 
 declare global {
@@ -281,8 +292,11 @@ declare global {
     destroyAll: never
   }
 
+
+  interface KnockoutObservableArrayFunctions extends ObservableArrayFn, ArrayProxyMethods { }
+
   interface KnockoutObservableArrayStatic {
-    fn: KnockoutObservableArrayFunctions<any>
+    fn: KnockoutObservableArrayFunctions
 
     <T>(value?: T[] | null): KnockoutObservableArray<T>
   }

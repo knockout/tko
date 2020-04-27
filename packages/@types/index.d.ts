@@ -18,17 +18,6 @@
 // TypeScript Version: 3.8
 
 
-interface KnockoutComputedFunctions<T> {
-}
-
-interface KnockoutObservableFunctions<T> {
-}
-
-// The functions of observable arrays that mutate the array
-interface KnockoutObservableArrayFunctions<T> {
-
-}
-
 interface KnockoutSubscribableStatic {
     fn: KnockoutSubscribableFunctions<any>;
 
