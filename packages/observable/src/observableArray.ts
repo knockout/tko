@@ -3,7 +3,7 @@
 // ===
 //
 import {
-    arrayIndexOf, arrayForEach, overwriteLengthPropertyIfSupported
+    arrayIndexOf, overwriteLengthPropertyIfSupported
 } from '@tko/utils'
 
 import { observable, isObservable } from './observable.js'
@@ -28,12 +28,16 @@ export function isObservableArray<T> (instance: any): instance is KnockoutObserv
 }
 
 
+type ValueOrPredicate<T> = T | (value: T) => boolean
 
 observableArray.fn = {
-  remove<T> (this: KnockoutObservableArray<T>, valueOrPredicate) {
+  remove<T> (this: KnockoutObservableArray<T>, valueOrPredicate: ValueOrPredicate<T>) {
     var underlyingArray = this.peek()
     var removedValues = []
-    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
+    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate)
+      ? valueOrPredicate
+      : (value: T) => value === valueOrPredicate
+
     for (var i = 0; i < underlyingArray.length; i++) {
       var value = underlyingArray[i]
       if (predicate(value)) {
@@ -48,14 +52,15 @@ observableArray.fn = {
         i--
       }
     }
+
     if (removedValues.length) {
       this.valueHasMutated()
     }
     return removedValues
   },
 
-  removeAll<T> (this: KnockoutObservableArray<T>, arrayOfValues) {
-        // If you passed zero args, we remove everything
+  removeAll<T> (this: KnockoutObservableArray<T>, arrayOfValues: T[]) {
+    // If you passed zero args, we remove everything
     if (arrayOfValues === undefined) {
       var underlyingArray = this.peek()
       var allValues = underlyingArray.slice(0)
@@ -64,36 +69,40 @@ observableArray.fn = {
       this.valueHasMutated()
       return allValues
     }
-        // If you passed an arg, we interpret it as an array of entries to remove
-    if (!arrayOfValues) {
-      return []
-    }
-    return this['remove'](function (value) {
+
+    // If you passed an arg, we interpret it as an array of entries to remove
+    if (!arrayOfValues) { return [] }
+
+    return this.remove(function (value) {
       return arrayIndexOf(arrayOfValues, value) >= 0
     })
   },
 
-  destroy<T> (this: KnockoutObservableArray<T>, valueOrPredicate) {
+  destroy<T> (this: KnockoutObservableArray<T>, valueOrPredicate: ValueOrPredicate<T>) {
     var underlyingArray = this.peek()
-    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
+    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate)
+      ? valueOrPredicate
+      : (value: T) => value === valueOrPredicate
+
     this.valueWillMutate()
     for (var i = underlyingArray.length - 1; i >= 0; i--) {
       var value = underlyingArray[i]
       if (predicate(value)) {
-        value['_destroy'] = true
+        (value as any)['_destroy'] = true
       }
     }
     this.valueHasMutated()
   },
 
-  destroyAll<T> (this: KnockoutObservableArray<T>, arrayOfValues) {
-        // If you passed zero args, we destroy everything
-    if (arrayOfValues === undefined) { return this.destroy(function () { return true }) }
-
-        // If you passed an arg, we interpret it as an array of entries to destroy
-    if (!arrayOfValues) {
-      return []
+  destroyAll<T> (this: KnockoutObservableArray<T>, arrayOfValues: T[]) {
+    // If you passed zero args, we destroy everything
+    if (arrayOfValues === undefined) {
+      return this.destroy(function () { return true })
     }
+
+    // If you passed an arg, we interpret it as an array of entries to destroy
+    if (!arrayOfValues) { return [] }
+
     return this.destroy(function (value) {
       return arrayIndexOf(arrayOfValues, value) >= 0
     })
@@ -103,7 +112,7 @@ observableArray.fn = {
     return arrayIndexOf(this(), item)
   },
 
-  replace<T> (this: KnockoutObservableArray<T>, oldItem, newItem) {
+  replace<T> (this: KnockoutObservableArray<T>, oldItem: T, newItem: T) {
     var index = this.indexOf(oldItem)
     if (index >= 0) {
       this.valueWillMutate()
@@ -112,7 +121,7 @@ observableArray.fn = {
     }
   },
 
-  sorted<T> (this: KnockoutObservableArray<T>, compareFn) {
+  sorted<T> (this: KnockoutObservableArray<T>, compareFn: Parameters<Array<T>['sort']>[0]) {
     return [...this()].sort(compareFn)
   },
 
