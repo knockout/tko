@@ -85,22 +85,23 @@ type ArrayToArray<T> = {
   [P in ArrayToArrayTypes]: (...args: Parameters<Array<T>[P]>) => KnockoutComputed<ReturnType<Array<T>[P]>>
 }
 
-/**
- * The KnockoutArrayProperties<T> type augments the properties in the
- * ObservableArray or Computed with the underlying ES5+ properties of
- * an array.
- *
- * These methods can be chained, returning a computed:
- * e.g. `obs.map(v => v * 2).filter(v => v > 12)` returns a
- */
-export interface KnockoutArrayProperties<T = any> extends ArrayToArray<T>, ArrayProperties<T> {
-  length: number
-  forEach: Array<T>['forEach']
-  [Symbol.iterator]: IterableIterator<T>
-}
-
 
 declare global {
+  /**
+   * The KnockoutArrayProperties<T> type augments the properties in the
+   * ObservableArray or Computed with the underlying ES5+ properties of
+   * an array.
+   *
+   * These methods can be chained, returning a computed:
+   * e.g. `obs.map(v => v * 2).filter(v => v > 12)` returns a
+   */
+  export interface KnockoutArrayProperties<T = any> extends ArrayToArray<T>, ArrayProperties<T> {
+    length: number
+    forEach: Array<T>['forEach']
+    [Symbol.iterator]: IterableIterator<T>
+  }
+
+
   export interface KnockoutExtenders {
     arrayProperties: typeof arrayProperties
   }

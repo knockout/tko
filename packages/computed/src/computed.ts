@@ -62,11 +62,13 @@ function initialState<T> (evaluatorFunctionTarget: any, options: KnockoutCompute
   }
 }
 
-type ComputedState = ReturnType<typeof initialState>
+type ComputedState<T> = Omit<ReturnType<typeof initialState>, 'latestValue'> & { latestValue?: T }
 
-
-
-export function computed<T> (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options: KnockoutComputedDefine<T>) {
+export function computed<T> (
+  evaluatorFunctionOrOptions: (() => T) | KnockoutComputedDefine<T>,
+  evaluatorFunctionTarget: any,
+  options: KnockoutComputedOptions<T>,
+) {
   if (typeof evaluatorFunctionOrOptions === 'object') {
         // Single-parameter syntax - everything is on this "options" param
     options = evaluatorFunctionOrOptions
@@ -88,7 +90,7 @@ export function computed<T> (evaluatorFunctionOrOptions, evaluatorFunctionTarget
     if (arguments.length > 0) {
       if (typeof writeFunction === 'function') {
                 // Writing a value
-        writeFunction.apply(state.evaluatorFunctionTarget, arguments)
+        writeFunction.apply(state.evaluatorFunctionTarget, arguments as any)
       } else {
         throw new Error("Cannot write a value to a computed unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
       }
@@ -231,7 +233,7 @@ computed.fn = {
   markDirty<T> (this: KnockoutComputed<T>) {
         // Process "dirty" events if we can handle delayed notifications
     if (this._evalDelayed && !this[computedState].isBeingEvaluated) {
-      this._evalDelayed(false /* notifyChange */)
+      this._evalDelayed(false)
     }
   },
   isActive<T> (this: KnockoutComputed<T>) {
@@ -270,12 +272,12 @@ computed.fn = {
         computedObservable.evaluateImmediate(true /* notifyChange */)
       }, throttleEvaluationTimeout)
     } else if (computedObservable._evalDelayed) {
-      computedObservable._evalDelayed(true /* notifyChange */)
+      computedObservable._evalDelayed(true)
     } else {
-      computedObservable.evaluateImmediate(true /* notifyChange */)
+      computedObservable.evaluateImmediate(true)
     }
   },
-  evaluateImmediate<T> (this: KnockoutComputed<T>, notifyChange) {
+  evaluateImmediate<T> (this: KnockoutComputed<T>, notifyChange?: boolean) {
     var computedObservable = this,
       state = computedObservable[computedState],
       disposeWhen = state.disposeWhen,
@@ -295,7 +297,7 @@ computed.fn = {
     }
 
     if (state.disposeWhenNodeIsRemoved && !domNodeIsAttachedToDocument(state.disposeWhenNodeIsRemoved) || disposeWhen && disposeWhen()) {
-            // See comment above about suppressDisposalUntilDisposeWhenReturnsFalse
+      // See comment above about suppressDisposalUntilDisposeWhenReturnsFalse
       if (!state.suppressDisposalUntilDisposeWhenReturnsFalse) {
         computedObservable.dispose()
         return
@@ -314,10 +316,10 @@ computed.fn = {
 
     return changed
   },
-  evaluateImmediate_CallReadWithDependencyDetection<T> (this: KnockoutComputed<T>, notifyChange) {
-        // This function is really just part of the evaluateImmediate logic. You would never call it from anywhere else.
-        // Factoring it out into a separate function means it can be independent of the try/catch block in evaluateImmediate,
-        // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
+  evaluateImmediate_CallReadWithDependencyDetection<T> (this: KnockoutComputed<T>, notifyChange?: boolean) {
+    // This function is really just part of the evaluateImmediate logic. You would never call it from anywhere else.
+    // Factoring it out into a separate function means it can be independent of the try/catch block in evaluateImmediate,
+    // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
 
     var computedObservable = this,
       state = computedObservable[computedState],
@@ -378,15 +380,17 @@ computed.fn = {
 
     return changed
   },
-  evaluateImmediate_CallReadThenEndDependencyDetection<T> (this: KnockoutComputed<T>, state, dependencyDetectionContext) {
+  evaluateImmediate_CallReadThenEndDependencyDetection<T> (this: KnockoutComputed<T>, state: ComputedState<T>, dependencyDetectionContext) {
     // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
     // You'd never call it from anywhere else. Factoring it out means that evaluateImmediate_CallReadWithDependencyDetection
     // can be independent of try/finally blocks, which contributes to saving about 40% off the CPU
     // overhead of computed evaluation (on V8 at least).
 
     try {
-      var readFunction = state.readFunction
-      return state.evaluatorFunctionTarget ? readFunction.call(state.evaluatorFunctionTarget) : readFunction()
+      const readFunction = state.readFunction
+      return state.evaluatorFunctionTarget
+        ? readFunction.call(state.evaluatorFunctionTarget)
+        : readFunction()
     } finally {
       dependencyDetection.end()
 
@@ -417,7 +421,7 @@ computed.fn = {
     // Override the limit function with one that delays evaluation as well
     subscribable.fn.limit.call(this, limitFunction)
     Object.assign(this, {
-      _evalIfChanged () {
+      _evalIfChanged<T> (this: KnockoutComputed<T>) {
         if (!this[computedState].isSleeping) {
           if (this[computedState].isStale) {
             this.evaluateImmediate()
@@ -427,7 +431,7 @@ computed.fn = {
         }
         return state.latestValue
       },
-      _evalDelayed (isChange) {
+      _evalDelayed<T> (this: KnockoutComputed<T>, isChange: boolean) {
         this._limitBeforeChange(state.latestValue)
 
         // Mark as dirty
@@ -559,7 +563,10 @@ export function isPureComputed (instance) {
   return isComputed(instance) && instance[computedState] && instance[computedState].pure
 }
 
-export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {
+export function pureComputed (
+  evaluatorFunctionOrOptions: (() => T) | Omit<KnockoutComputedDefine<T>,
+  'pure'>, evaluatorFunctionTarget: any,
+) {
   if (typeof evaluatorFunctionOrOptions === 'function') {
     return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure': true})
   } else {
@@ -642,7 +649,10 @@ declare global {
 
 
   interface KnockoutComputed<T> extends KnockoutObservable<T>, KnockoutComputedFunctions {
+    [computedState]: ComputedState
     fn: KnockoutComputedFunctions
+
+    _evalDelayed?: (this: KnockoutComputed<T>, isChange: boolean) => void
 
     /**
      * Manually disposes the computed observable, clearing all subscriptions to dependencies.
@@ -659,4 +669,5 @@ declare global {
 
   interface KnockoutComputedArray<T> extends KnockoutComputed<T[]>, KnockoutArrayProperties<T> {
   }
+
 }

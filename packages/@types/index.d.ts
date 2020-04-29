@@ -25,28 +25,6 @@ interface KnockoutSubscribableStatic {
 }
 
 
-interface KnockoutComputedStatic {
-    fn: KnockoutComputedFunctions<any>;
-
-    /**
-     * Creates computed observable.
-     */
-    <T>(): KnockoutComputed<T>;
-    /**
-     * Creates computed observable.
-     * @param evaluatorFunction Function that computes the observable value.
-     * @param context Defines the value of 'this' when evaluating the computed observable.
-     * @param options An object with further properties for the computed observable.
-     */
-    <T>(evaluatorFunction: () => T, context?: any, options?: KnockoutComputedOptions<T>): KnockoutComputed<T>;
-    /**
-     * Creates computed observable.
-     * @param options An object that defines the computed observable options and behavior.
-     * @param context Defines the value of 'this' when evaluating the computed observable.
-     */
-    <T>(options: KnockoutComputedDefine<T>, context?: any): KnockoutComputed<T>;
-}
-
 interface KnockoutReadonlyComputed<T> extends KnockoutReadonlyObservable<T> {
     /**
      * Returns whether the computed observable may be updated in the future. A computed observable is inactive if it has no dependencies.
@@ -56,22 +34,6 @@ interface KnockoutReadonlyComputed<T> extends KnockoutReadonlyObservable<T> {
      * Returns the current number of dependencies of the computed observable.
      */
     getDependenciesCount(): number;
-}
-
-interface KnockoutComputed<T> extends KnockoutReadonlyComputed<T>, KnockoutObservable<T>, KnockoutComputedFunctions<T> {
-    fn: KnockoutComputedFunctions<any>;
-
-    /**
-     * Manually disposes the computed observable, clearing all subscriptions to dependencies.
-     * This function is useful if you want to stop a computed observable from being updated or want to clean up memory for a
-     * computed observable that has dependencies on observables that won’t be cleaned.
-     */
-    dispose(): void;
-    /**
-     * Customizes observables basic functionality.
-     * @param requestedExtenders Name of the extender feature and it's value, e.g. { notify: 'always' }, { rateLimit: 50 }
-     */
-    extend(requestedExtenders: { [key: string]: any; }): KnockoutComputed<T>;
 }
 
 
@@ -87,55 +49,6 @@ interface KnockoutReadonlyObservableArray<T> extends KnockoutReadonlyObservable<
     subscribe<U>(callback: (newValue: U) => void, target: any, event: string): KnockoutSubscription;
 }
 
-interface KnockoutExtendedArrayObservable<T> extends KnockoutObservable<T[]> {
-  length: number
-  [Symbol.iterator]: () => Iterator<T>
-
-  forEach(callbackfn: (value: T, index: number, array: ReadonlyArray<T>) => void, thisArg?: any): void
-
-  indexOf(searchString: string, position?: number): KnockoutComputed<number>
-  lastIndexOf(searchString: string, position?: number): KnockoutComputed<number>
-
-  every(callbackfn: (value: T, index: number, array: T[]) => unknown, thisArg?: any): KnockoutComputed<boolean>
-
-  find<S extends T>(predicate: (this: void, value: T, index: number, obj: T[]) => value is S, thisArg?: any): KnockoutComputed<S | undefined>
-  find(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any) : KnockoutComputed<T | undefined>
-  findIndex(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any): KnockoutComputed<number>
-
-  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T): KnockoutComputed<T>
-  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue: T): KnockoutComputed<T>
-  reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): KnockoutComputed<U>
-
-  reduceRight(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T): KnockoutComputed<T>
-  reduceRight(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: T[]) => T, initialValue: T): KnockoutComputed<T>
-  reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): KnockoutComputed<U>
-
-  some(callbackfn: (value: T, index: number, array: T[]) => unknown, thisArg?: any): KnockoutComputed<boolean>
-
-  slice(start?: number, end?: number): KnockoutComputedArray<T>
-
-  filter<S extends T>(callbackfn: (value: T, index: number, array: T[]) => value is S, thisArg?: any): KnockoutComputedArray<S>
-  filter(callbackfn: (value: T, index: number, array: T[]) => unknown, thisArg?: any) : KnockoutComputedArray<T>
-
-  keys(o: object): KnockoutComputedArray<string>
-
-  map<U>(callbackfn: (value: T, index: number, array: T[]) => U) : KnockoutComputedArray<U>
-
-  includes(searchElement: T, fromIndex?: number): KnockoutComputed<boolean>
-
-  flat<U>(depth?: number): KnockoutComputedArray<U>;
-  flatMap<U, This = undefined> (
-    callback: (this: This, value: T, index: number, array: T[]) => U|ReadonlyArray<U>,
-    thisArg?: This
-  ) : KnockoutComputedArray<U>
-}
-
-interface KnockoutObservableArray<T> extends KnockoutExtendedArrayObservable<T> {
-}
-
-interface KnockoutComputedArray<T> extends KnockoutComputed<T>, KnockoutExtendedArrayObservable<T> {}
-
-type KnockoutSubscriptionCallback<T> = (v: T) => void
 
 interface KnockoutLifeCycle {
   computed<T>(p: string | (() => T)): KnockoutComputed<T>
@@ -144,46 +57,6 @@ interface KnockoutLifeCycle {
   addDisposable(d: KnockoutLifeCycle): void
 }
 
-
-
-interface KnockoutComputedOptions<T> {
-    /**
-     * Makes the computed observable writable. This is a function that receives values that other code is trying to write to your computed observable.
-     * It’s up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
-     * @param value Value being written to the computer observable.
-     */
-    write?(value: T): void;
-    /**
-     * Disposal of the computed observable will be triggered when the specified DOM node is removed by KO.
-     * This feature is used to dispose computed observables used in bindings when nodes are removed by the template and control-flow bindings.
-     */
-    disposeWhenNodeIsRemoved?: Node;
-    /**
-     * This function is executed before each re-evaluation to determine if the computed observable should be disposed.
-     * A true-ish result will trigger disposal of the computed observable.
-     */
-    disposeWhen?(): boolean;
-    /**
-     * Defines the value of 'this' whenever KO invokes your 'read' or 'write' callbacks.
-     */
-    owner?: any;
-    /**
-     * If true, then the value of the computed observable will not be evaluated until something actually attempts to access its value or manually subscribes to it.
-     * By default, a computed observable has its value determined immediately during creation.
-     */
-    deferEvaluation?: boolean;
-    /**
-     * If true, the computed observable will be set up as a purecomputed observable. This option is an alternative to the ko.pureComputed constructor.
-     */
-    pure?: boolean;
-}
-
-interface KnockoutComputedDefine<T> extends KnockoutComputedOptions<T> {
-    /**
-     * A function that is used to evaluate the computed observable’s current value.
-     */
-    read(): T;
-}
 
 interface KnockoutBindingContext {
     $parent: any;
