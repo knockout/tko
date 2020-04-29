@@ -71,6 +71,5 @@ declare global {
     throttle<T> (target: KnockoutSubscribable<T>, timeout: number): KnockoutComputed<T>
     notify<T> (target: any, notifyWhen: string): void
     deferred<T> (target: KnockoutSubscribable<T>, option: true): void
-    trackArrayChanges<T> (target: KnockoutSubscribable<T>, v: true): KnockoutSubscribable<T>
   }
 }

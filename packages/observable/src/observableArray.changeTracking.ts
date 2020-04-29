@@ -11,10 +11,21 @@ import {
 import { defaultEvent } from './subscribable.js'
 import { extenders } from './extenders.js'
 
-export var arrayChangeEventName = 'arrayChange'
+export const arrayChangeEventName = 'arrayChange' as const
 
-export function trackArrayChanges (target, options) {
-    // Use the provided options--each call to trackArrayChanges overwrites the previously set options
+type TrackArrayChangeOptions = true | { sparse: boolean }
+type Operations = 'push' | 'unshift' | 'shift' | 'pop' | 'splice'
+
+type TrackableObservable<T> =  KnockoutObservableArray<T>
+// For stronger type safety we could add:
+//    KnockoutObservable<T> | KnockoutComputed<T> to
+//    TrackableObservable<T>
+
+export function trackArrayChanges<T> (
+  target: TrackableObservable<T>,
+  options: TrackArrayChangeOptions,
+) {
+  // Use the provided options--each call to trackArrayChanges overwrites the previously set options
   target.compareArrayOptions = {}
   if (options && typeof options === 'object') {
     extend(target.compareArrayOptions, options)
@@ -22,14 +33,13 @@ export function trackArrayChanges (target, options) {
   target.compareArrayOptions.sparse = true
 
     // Only modify the target observable once
-  if (target.cacheDiffForKnownOperation) {
-    return
-  }
+  if (target.cacheDiffForKnownOperation) { return }
+
   let trackingChanges = false
-  let cachedDiff = null
-  let arrayChangeSubscription
+  let cachedDiff: ReturnType<typeof compareArrays> | null = null
+  let arrayChangeSubscription: null | KnockoutSubscription
   let pendingNotifications = 0
-  let underlyingNotifySubscribersFunction
+  let underlyingNotifySubscribersFunction: TrackableObservable<T>['notifySubscribers']
   let underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd
   let underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove
 
@@ -51,7 +61,7 @@ export function trackArrayChanges (target, options) {
     if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
       if (underlyingNotifySubscribersFunction) {
         target.notifySubscribers = underlyingNotifySubscribersFunction
-        underlyingNotifySubscribersFunction = undefined
+        underlyingNotifySubscribersFunction = undefined as any
       }
       if (arrayChangeSubscription) {
         arrayChangeSubscription.dispose()
@@ -62,30 +72,29 @@ export function trackArrayChanges (target, options) {
   }
 
   function trackChanges () {
-        // Calling 'trackChanges' multiple times is the same as calling it once
-    if (trackingChanges) {
-      return
-    }
-
+    // Calling 'trackChanges' multiple times is the same as calling it once
+    if (trackingChanges) { return }
     trackingChanges = true
 
-        // Intercept "notifySubscribers" to track how many times it was called.
+    // Intercept "notifySubscribers" to track how many times it was called.
     underlyingNotifySubscribersFunction = target['notifySubscribers']
-    target.notifySubscribers = function (valueToNotify, event) {
+    target.notifySubscribers = function (this: KnockoutSubscribable<T>, ...args: any) {
+      const event: KnockoutEventType = args[1]
       if (!event || event === defaultEvent) {
         ++pendingNotifications
       }
-      return underlyingNotifySubscribersFunction.apply(this, arguments)
+      return underlyingNotifySubscribersFunction.apply(this, args)
     }
 
-        // Each time the array changes value, capture a clone so that on the next
-        // change it's possible to produce a diff
-    var previousContents = [].concat(target.peek() === undefined ? [] : target.peek())
+    // Each time the array changes value, capture a clone so that on the next
+    // change it's possible to produce a diff
+    let previousContents = target.peek() === undefined ? []
+      : [...target.peek()]
     cachedDiff = null
-    arrayChangeSubscription = target.subscribe(function (currentContents) {
+    arrayChangeSubscription = target.subscribe(function (currentContents: T[]) {
       let changes
-            // Make a copy of the current contents and ensure it's an array
-      currentContents = [].concat(currentContents || [])
+      // Make a copy of the current contents and ensure it's an array
+      currentContents = [...currentContents || []]
 
             // Compute the diff and issue notifications, but only if someone is listening
       if (target.hasSubscriptionsForEvent(arrayChangeEventName)) {
@@ -103,7 +112,7 @@ export function trackArrayChanges (target, options) {
     })
   }
 
-  function getChanges (previousContents, currentContents) {
+  function getChanges (previousContents: T[], currentContents: T[]) {
         // We try to re-use cached diffs.
         // The scenarios where pendingNotifications > 1 are when using rate-limiting or the Deferred Updates
         // plugin, which without this check would not be compatible with arrayChange notifications. Normally,
@@ -115,20 +124,24 @@ export function trackArrayChanges (target, options) {
     return cachedDiff
   }
 
-  target.cacheDiffForKnownOperation = function (rawArray, operationName, args) {
+  target.cacheDiffForKnownOperation = function (rawArray: any, operationName: Operations, args: any) {
       // Only run if we're currently tracking changes for this observable array
       // and there aren't any pending deferred notifications.
-    if (!trackingChanges || pendingNotifications) {
-      return
+    if (!trackingChanges || pendingNotifications) { return }
+    type Diff = {
+      status: 'added' | 'deleted',
+      index: number,
+      value: T
     }
-    var diff = [],
-      arrayLength = rawArray.length,
-      argsLength = args.length,
-      offset = 0
+    const diff = [] as Diff[]
+    const arrayLength = rawArray.length
+    const argsLength = args.length
+    let offset = 0
 
-    function pushDiff (status, value, index) {
-      return diff[diff.length] = { 'status': status, 'value': value, 'index': index }
+    function pushDiff (status: Diff['status'], value: T, index: number) {
+      return diff[diff.length] = { status, value, index }
     }
+
     switch (operationName) {
       case 'push':
         offset = arrayLength
@@ -147,13 +160,14 @@ export function trackArrayChanges (target, options) {
         break
 
       case 'splice':
-            // Negative start index means 'from end of array'. After that we clamp to [0...arrayLength].
-            // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-        var startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
-          endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
-          endAddIndex = startIndex + argsLength - 2,
-          endIndex = Math.max(endDeleteIndex, endAddIndex),
-          additions = [], deletions = []
+        // Negative start index means 'from end of array'. After that we clamp to [0...arrayLength].
+        // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+        const startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength)
+        const endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength)
+        const endAddIndex = startIndex + argsLength - 2
+        const endIndex = Math.max(endDeleteIndex, endAddIndex)
+        const additions = []
+        const deletions = []
         for (let index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
           if (index < endDeleteIndex) { deletions.push(pushDiff('deleted', rawArray[index], index)) }
           if (index < endAddIndex) { additions.push(pushDiff('added', args[argsIndex], index)) }
@@ -174,3 +188,20 @@ trackArrayChanges.compareArrays = compareArrays
 // Add the trackArrayChanges extender so we can use
 // obs.extend({ trackArrayChanges: true })
 extenders.trackArrayChanges = trackArrayChanges
+
+
+declare global {
+  interface KnockoutExtenders {
+    trackArrayChanges: typeof trackArrayChanges
+  }
+
+  interface KnockoutSubscribable<T> {
+    compareArrayOptions: { sparse?: boolean }
+    cacheDiffForKnownOperation: null | ((rawArray: any, operationName: Operations, args: any) => void)
+  }
+
+  interface KnockoutEventTypeInterface {
+    arrayChange: true
+  }
+}
+
