@@ -342,7 +342,7 @@ declare global {
      */
     getSubscriptionsCount(event: KnockoutEventType): number;
 
-    limit: (this: KnockoutSubscribable<T>, fn: RateLimitFunction) => void
+    limit (this: KnockoutSubscribable<T>, fn: RateLimitFunction): void
     // when<T> (this: KnockoutSubscribable<T>, test: T | Predicate<T>): Promise<T>
     // when<T, U> (this: KnockoutSubscribable<T>, test: T | Predicate<T>, returnValue: U): Promise<U>
   }

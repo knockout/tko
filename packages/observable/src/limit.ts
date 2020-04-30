@@ -6,9 +6,7 @@ import { isObservable } from './observable'
 import { extenders } from './extenders'
 import { defaultEvent } from './subscribable'
 
-declare global {
-  export type RateLimitFunction = typeof debounceFn | typeof throttleFn
-}
+export type RateLimitFunction = typeof debounceFn | typeof throttleFn
 
 type RateLimitOptions = number | {
   timeout: number

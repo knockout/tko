@@ -131,6 +131,13 @@ declare global {
     modify (this: KnockoutObservable<T>, fn: (value: T) => T, peek: boolean): void
     valueHasMutated (this: KnockoutObservable<T>): void
     valueWillMutate (this: KnockoutObservable<T>): void
+
+    [protoProperty]: observable,
+
+    /**
+     * Some observables may not always be writeable, notably computeds.
+     */
+    isWriteable: boolean
   }
 
   /**
@@ -162,4 +169,3 @@ declare global {
 
   type MaybeObservable<T> = KnockoutObservable<T> | T
 }
-

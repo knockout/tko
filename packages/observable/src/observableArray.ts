@@ -183,6 +183,16 @@ type ObservableArrayFn = typeof observableArray.fn
 declare global {
   export interface KnockoutObservableArray<T> extends KnockoutObservable<T> {
     /**
+     * Unwrap the array.
+     */
+    (): T[]
+
+    /**
+     * Set the value of the observable array
+     */
+    (value: T[]): void
+
+    /**
      * Returns the index of the first occurrence of a value in an  array.
      * @param searchElement The value to locate in the array.
      * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
