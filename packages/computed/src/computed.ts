@@ -6,7 +6,6 @@
 import {
     addDisposeCallback,
     arrayForEach,
-    createSymbolOrString,
     domNodeIsAttachedToDocument,
     extend,
     options,
@@ -41,7 +40,7 @@ const DISPOSED_STATE = {
 } as const
 
 
-function initialState<T> (evaluatorFunctionTarget: any, options: KnockoutComputedDefine<T>) {
+function initialState<T> (options: ReadonlyComputedDefine<T>) {
   return {
     latestValue: undefined,
     isStale: true,
@@ -52,7 +51,7 @@ function initialState<T> (evaluatorFunctionTarget: any, options: KnockoutCompute
     pure: false,
     isSleeping: false,
     readFunction: options.read,
-    evaluatorFunctionTarget: evaluatorFunctionTarget || options.owner,
+    evaluatorFunctionTarget: options.owner,
     disposeWhenNodeIsRemoved: options.disposeWhenNodeIsRemoved || null,
     disposeWhen: options.disposeWhen,
     domNodeDisposalCallback: null,
@@ -65,26 +64,29 @@ function initialState<T> (evaluatorFunctionTarget: any, options: KnockoutCompute
 type ComputedState<T> = Omit<ReturnType<typeof initialState>, 'latestValue'> & { latestValue?: T }
 
 export function computed<T> (
-  evaluatorFunctionOrOptions: (() => T) | KnockoutComputedDefine<T>,
-  evaluatorFunctionTarget: any,
-  options: KnockoutComputedOptions<T>,
+  evaluatorFunctionOrOptions: (() => T) | ComputedDefine<T>,
+  evaluatorFunctionTarget?: any,
+  options?: ComputedOptions<T>,
 ) {
-  if (typeof evaluatorFunctionOrOptions === 'object') {
-        // Single-parameter syntax - everything is on this "options" param
-    options = evaluatorFunctionOrOptions
-  } else {
-        // Multi-parameter syntax - construct the options according to the params passed
-    options = options || {}
-    if (evaluatorFunctionOrOptions) {
-      options.read = evaluatorFunctionOrOptions
+  const opts = ((): ComputedDefine<T> => {
+    if ('read' in evaluatorFunctionOrOptions) {
+      // Single-parameter syntax - everything is on this "options" param
+      return evaluatorFunctionOrOptions
     }
-  }
-  if (typeof options.read !== 'function') {
+    // Multi-parameter syntax - construct the options according to the params passed
+    return {
+      ...options,
+      read: evaluatorFunctionOrOptions,
+      owner: evaluatorFunctionTarget,
+    }
+  })()
+
+  if (typeof opts.read !== 'function') {
     throw Error('Pass a function that returns the value of the computed')
   }
 
-  var writeFunction = options.write
-  const state = initialState(evaluatorFunctionTarget, options)
+  const writeFunction = 'write' in opts ? opts.write : null
+  const state = initialState(opts)
 
   function computedObservable () {
     if (arguments.length > 0) {
@@ -128,20 +130,20 @@ export function computed<T> (
   }
 
   if (koOptions.debug) {
-        // #1731 - Aid debugging by exposing the computed's options
-    computedObservable._options = options
+    // #1731 - Aid debugging by exposing the computed's options
+    computedObservable._options = opts
   }
 
   if (state.disposeWhenNodeIsRemoved) {
-        // Since this computed is associated with a DOM node, and we don't want to dispose the computed
-        // until the DOM node is *removed* from the document (as opposed to never having been in the document),
-        // we'll prevent disposal until "disposeWhen" first returns false.
+    // Since this computed is associated with a DOM node, and we don't want to dispose the computed
+    // until the DOM node is *removed* from the document (as opposed to never having been in the document),
+    // we'll prevent disposal until "disposeWhen" first returns false.
     state.suppressDisposalUntilDisposeWhenReturnsFalse = true
 
-        // disposeWhenNodeIsRemoved: true can be used to opt into the "only dispose after first false result"
-        // behavior even if there's no specific node to watch. In that case, clear the option so we don't try
-        // to watch for a non-node's disposal. This technique is intended for KO's internal use only and shouldn't
-        // be documented or used by application code, as it's likely to change in a future version of KO.
+    // disposeWhenNodeIsRemoved: true can be used to opt into the "only dispose after first false result"
+    // behavior even if there's no specific node to watch. In that case, clear the option so we don't try
+    // to watch for a non-node's disposal. This technique is intended for KO's internal use only and shouldn't
+    // be documented or used by application code, as it's likely to change in a future version of KO.
     if (!state.disposeWhenNodeIsRemoved.nodeType) {
       state.disposeWhenNodeIsRemoved = null
     }
@@ -564,7 +566,7 @@ export function isPureComputed (instance) {
 }
 
 export function pureComputed (
-  evaluatorFunctionOrOptions: (() => T) | Omit<KnockoutComputedDefine<T>,
+  evaluatorFunctionOrOptions: (() => T) | Omit<ReadonlyComputedDefine<T>,
   'pure'>, evaluatorFunctionTarget: any,
 ) {
   if (typeof evaluatorFunctionOrOptions === 'function') {
@@ -578,14 +580,7 @@ export function pureComputed (
 
 
 
-
-interface KnockoutComputedOptions<T> {
-  /**
-   * Makes the computed observable writable. This is a function that receives values that other code is trying to write to your computed observable.
-   * It’s up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
-   * @param value Value being written to the computer observable.
-   */
-  write?(value: T): void;
+interface ReadonlyComputedOptions<T> {
   /**
    * Disposal of the computed observable will be triggered when the specified DOM node is removed by KO.
    * This feature is used to dispose computed observables used in bindings when nodes are removed by the template and control-flow bindings.
@@ -611,43 +606,32 @@ interface KnockoutComputedOptions<T> {
   pure?: boolean;
 }
 
+interface WriteableComputedOptions<T, U = T> extends ReadonlyComputedOptions<T> {
+  /**
+   * Makes the computed observable writable. This is a function that receives values that other code is trying to write to your computed observable.
+   * It’s up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
+   * @param value Value being written to the computer observable.
+   */
+  write (value: U): void
+}
 
 
-interface KnockoutComputedDefine<T> extends KnockoutComputedOptions<T> {
+interface ReadonlyComputedDefine<T> extends ReadonlyComputedOptions<T> {
   /**
    * A function that is used to evaluate the computed observable’s current value.
    */
   read(): T;
 }
 
+interface WriteableComputedDefine<T, U> extends ReadonlyComputedDefine<T>, WriteableComputedOptions<T, U> {}
+
+type ComputedOptions<T, U = T> = ReadonlyComputedOptions<T> | WriteableComputedOptions<T, U>
+type ComputedDefine<T, U = T> = ReadonlyComputedDefine<T> | WriteableComputedDefine<T, U>
+
 type KnockoutComputedFunctions = typeof computed.fn
 
 
 declare global {
-
-  interface KnockoutComputedStatic {
-    fn: KnockoutComputedFunctions<any>;
-
-    /**
-     * Creates computed observable.
-     */
-    <T>(): KnockoutComputed<T>;
-    /**
-     * Creates computed observable.
-     * @param evaluatorFunction Function that computes the observable value.
-     * @param context Defines the value of 'this' when evaluating the computed observable.
-     * @param options An object with further properties for the computed observable.
-     */
-    <T>(evaluatorFunction: () => T, context?: any, options?: KnockoutComputedOptions<T>): KnockoutComputed<T>;
-    /**
-     * Creates computed observable.
-     * @param options An object that defines the computed observable options and behavior.
-     * @param context Defines the value of 'this' when evaluating the computed observable.
-     */
-    <T>(options: KnockoutComputedDefine<T>, context?: any): KnockoutComputed<T>;
-  }
-
-
   interface KnockoutComputed<T> extends KnockoutObservable<T>, KnockoutComputedFunctions {
     [computedState]: ComputedState
     fn: KnockoutComputedFunctions
@@ -667,7 +651,54 @@ declare global {
     extend(requestedExtenders: { [key: string]: any; }): KnockoutComputed<T>;
   }
 
+  interface KnockoutWriteableComputed<T, U> extends KnockoutComputed<T> {
+    /**
+     * Pass the value to the `write` function given to the computed.
+     */
+    (value: U): void
+  }
+
   interface KnockoutComputedArray<T> extends KnockoutComputed<T[]>, KnockoutArrayProperties<T> {
   }
 
+  /**
+   * This is the `(t)ko.computed` function that creates a computed
+   * observable.
+   */
+  interface KnockoutComputedStatic {
+    fn: KnockoutComputedFunctions
+
+    /**
+     * Creates computed observable.
+     * @param evaluatorFunction Function that computes the observable value.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     * @param options An object with further properties for the computed observable.
+     */
+    <T>(evaluatorFunction: () => T, context?: any, options?: ReadonlyComputedOptions<T>): KnockoutComputed<T>
+
+    /**
+     * Creates computed observable.
+     * @param options An object that defines the computed observable options and behavior.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     */
+    <T>(options: ReadonlyComputedDefine<T>, context?: any): KnockoutComputed<T>
+
+    /**
+     * Creates writeable computed observable.
+     * @param evaluatorFunction Function that computes the observable value.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     * @param options An object with further properties for the computed observable.
+     */
+    <T, U>(evaluatorFunction: () => T, context?: any, options?: WriteableComputedOptions<T, U>): KnockoutWriteableComputed<T, U>
+    /**
+     * Creates writeable computed observable.
+     * @param options An object that defines the computed observable options and behavior.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     */
+    <T, U>(options: WriteableComputedDefine<T, U>, context?: any): KnockoutWriteableComputed<T, U>
+  }
+
+  interface KnockoutEventTypeInterface {
+    asleep: true
+  }
 }
