@@ -4,6 +4,8 @@
 //
 // This is the root 'options', which must be extended by others.
 
+export type ProtoProperty = '__ko_proto__'
+
 let _global: any
 
 try { _global = window } catch (e) { _global = global }
@@ -13,7 +15,7 @@ const options: any = {
 
   useOnlyNativeEvents: false,
 
-  protoProperty: '__ko_proto__' as const,
+  protoProperty: '__ko_proto__' as ProtoProperty,
 
     // Modify the default attribute from `data-bind`.
   defaultBindingAttribute: 'data-bind',
