@@ -7,7 +7,7 @@
     "url": "https://github.com/knockout/tko.git"
   },
   "scripts": {
-    "prepublish": "yarn build",
+    "prepublishOnly": "yarn build",
     "test": "lerna exec --concurrency=1 --loglevel=warn -- yarn test",
     "build": "lerna exec --concurrency=6 --loglevel=warn -- yarn build"
   },
