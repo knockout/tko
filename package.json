@@ -45,7 +45,7 @@
     "jquery": "^3.5.0",
     "karma": "^5.0.2",
     "karma-chai": "^0.1.0",
-    "karma-electron-launcher": "^0.2.0",
+    "karma-electron-launcher": "^0.3.0",
     "karma-jasmine": "^3.1.1",
     "karma-mocha": "^2.0.0",
     "karma-rollup-preprocessor": "^7.0.5",
