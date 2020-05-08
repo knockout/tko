@@ -181,7 +181,7 @@ type ObservableArrayFn = typeof observableArray.fn
 
 
 declare global {
-  export interface KnockoutObservableArray<T> extends KnockoutObservable<T> {
+  export interface KnockoutObservableArray<T> extends KnockoutObservable<T[]> {
     /**
      * Unwrap the array.
      */
@@ -298,7 +298,7 @@ declare global {
     destroyAll(): void;
   }
 
-  interface KnockoutReadonlyObservableArrayFunctions<T> extends KnockoutReadonlyObservable<T>, Omit<KnockoutObservableArray<T>, keyof KnockoutReadonlyObservable<T>> {
+  interface KnockoutReadonlyObservableArrayFunctions<T> extends KnockoutReadonlyObservable<T[]>, Omit<KnockoutObservableArray<T>, keyof KnockoutReadonlyObservable<T[]>> {
     splice: never
     shift: never
     unshift: never
