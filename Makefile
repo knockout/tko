@@ -40,3 +40,7 @@ node_modules: bootstrap
 	$(NODE) yarn install
 
 all: build test
+
+
+lint:
+	node_modules/.bin/tsc --noEmit -w
