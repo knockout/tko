@@ -3,9 +3,11 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "downlevelIteration": true,
+    "declaration": true,
     "target": "ES2020",
     "module": "ES2020",
     "lib": [
+      "dom",
       "es2019.array", // for .flat and .flatMap
     ],
     // "noImplicitAny": false,
@@ -18,10 +20,10 @@
       "@tko/*": ["packages/*/src/index.js"],
       "*": ["*"],
     },
-    "outDir": "build/",
+    "outDir": "dist/",
     // "traceResolution": true,
   },
-  "include": ["**/*.ts", "**/*.js"],
+  "include": ["packages/*/src/*.ts", "packages/*/src/*.js"],
   // "files": ["packages/*/src/index.js"],
-  "exclude": ["karma.conf.js", "node_modules", "**/spec/*"],
+  "exclude": ["node_modules", "**/spec/*"],
 }
