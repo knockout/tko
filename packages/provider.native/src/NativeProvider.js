@@ -56,7 +56,7 @@ export default class NativeProvider extends Provider {
 
   /**
    * Add a named-value to the given node.
-   * @param {HTMLElement} node
+   * @param {Element} node
    * @param {string} name
    * @param {any} value
    */

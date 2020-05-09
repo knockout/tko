@@ -95,11 +95,11 @@ export function isObservable<T> (instance: any): instance is KnockoutObservable<
   return !!proto
 }
 
-export function unwrap<T> (value: KnockoutSubscribable<T>) {
+export function unwrap<T> (value: any): T {
   return isObservable(value) ? value() : value
 }
 
-export function peek<T> (value: KnockoutSubscribable<T>) {
+export function peek<T> (value: any): T {
   return isObservable(value) ? value.peek() : value
 }
 

@@ -28,7 +28,7 @@ export function isObservableArray<T> (instance: any): instance is KnockoutObserv
 }
 
 
-type ValueOrPredicate<T> = T | (value: T) => boolean
+type ValueOrPredicate<T> = T | ((value: T) => boolean)
 
 observableArray.fn = {
   remove<T> (this: KnockoutObservableArray<T>, valueOrPredicate: ValueOrPredicate<T>) {

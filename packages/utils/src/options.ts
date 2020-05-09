@@ -54,7 +54,7 @@ const options: any = {
   includeDestroyed: false,
   foreachHidesDestroyed: false,
 
-  onError: function (e) { throw e },
+  onError: function (e: Error) { throw e },
 
   set: (name: keyof typeof options, value: any) => { options[name] = value },
 
