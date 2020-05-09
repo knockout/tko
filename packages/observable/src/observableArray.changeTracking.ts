@@ -23,7 +23,7 @@ type TrackableObservable<T> =  KnockoutObservableArray<T>
 
 export function trackArrayChanges<T> (
   target: TrackableObservable<T>,
-  options: TrackArrayChangeOptions,
+  options?: TrackArrayChangeOptions,
 ) {
   // Use the provided options--each call to trackArrayChanges overwrites the previously set options
   target.compareArrayOptions = {}
