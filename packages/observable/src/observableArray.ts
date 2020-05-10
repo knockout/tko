@@ -23,15 +23,24 @@ export function observableArray<T> (initialValues?: T[] | null) {
   return result
 }
 
-export function isObservableArray<T> (instance: any): instance is KnockoutObservableArray<T> {
-  return isObservable(instance) && typeof instance.remove === 'function' && typeof instance.push === 'function'
+export function isObservableArray<T> (
+  instance: any,
+): instance is KnockoutObservableArray<T> {
+  return isObservable(instance)
+    && 'remove' in instance && typeof (instance as any).remove === 'function'
+    && 'push' in instance && typeof (instance as any).push === 'function'
 }
 
 
-type ValueOrPredicate<T> = T | ((value: T) => boolean)
+type ValueOrPredicate<T> = any
+  // | KnockoutObservable<T>
+  // | ((value: T) => boolean)
 
 observableArray.fn = {
-  remove<T> (this: KnockoutObservableArray<T>, valueOrPredicate: ValueOrPredicate<T>) {
+  remove<T> (
+    this: KnockoutObservableArray<T>,
+    valueOrPredicate: ValueOrPredicate<T>,
+  ) {
     var underlyingArray = this.peek()
     var removedValues = []
     var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate)
@@ -78,7 +87,10 @@ observableArray.fn = {
     })
   },
 
-  destroy<T> (this: KnockoutObservableArray<T>, valueOrPredicate: ValueOrPredicate<T>) {
+  destroy<T> (
+    this: KnockoutObservableArray<T>,
+    valueOrPredicate: ValueOrPredicate<T>,
+  ) {
     var underlyingArray = this.peek()
     var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate)
       ? valueOrPredicate
@@ -86,7 +98,7 @@ observableArray.fn = {
 
     this.valueWillMutate()
     for (var i = underlyingArray.length - 1; i >= 0; i--) {
-      var value = underlyingArray[i]
+      const value = underlyingArray[i]
       if (predicate(value)) {
         (value as any)['_destroy'] = true
       }
@@ -140,7 +152,7 @@ Object.setPrototypeOf(observableArray.fn, observable.fn)
 // Important: Do not add any additional write-functions here that may reasonably be used to *read* data from the array
 // because we'll eval them without causing subscriptions, so ko.computed output could end up getting stale
 const writeFunctions = [
-  'copyWithin', 'fill', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice',
+  'pop', 'push', 'reverse', 'shift', 'sort', 'splice',
   'unshift',
 ] as const
 
@@ -154,7 +166,7 @@ for (const methodName of writeFunctions) {
     // (for consistency with mutating regular observables)
     const underlyingArray = this.peek()
     this.valueWillMutate()
-    this.cacheDiffForKnownOperation(underlyingArray, methodName, arguments)
+    this.cacheDiffForKnownOperation?.(underlyingArray, methodName, arguments)
     const method = underlyingArray[methodName] as any
     const methodCallResult = method.apply(underlyingArray, ...args)
     this.valueHasMutated()

@@ -141,7 +141,7 @@ declare global {
     valueHasMutated (this: KnockoutObservable<T>): void
     valueWillMutate (this: KnockoutObservable<T>): void
 
-    [protoProperty]: observable,
+    [protoProperty]: typeof observable,
 
     /**
      * Some observables may not always be writeable, notably computeds.

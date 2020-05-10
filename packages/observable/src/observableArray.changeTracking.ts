@@ -14,7 +14,14 @@ import { extenders } from './extenders.js'
 export const arrayChangeEventName = 'arrayChange' as const
 
 type TrackArrayChangeOptions = true | { sparse: boolean }
-type Operations = 'push' | 'unshift' | 'shift' | 'pop' | 'splice'
+type Operations =
+  | 'pop'
+  | 'push'
+  | 'reverse'
+  | 'shift'
+  | 'sort'
+  | 'splice'
+  | 'unshift'
 
 type TrackableObservable<T> =  KnockoutObservableArray<T>
 // For stronger type safety we could add:
@@ -124,7 +131,11 @@ export function trackArrayChanges<T> (
     return cachedDiff
   }
 
-  target.cacheDiffForKnownOperation = function (rawArray: any, operationName: Operations, args: any) {
+  target.cacheDiffForKnownOperation = function (
+    rawArray: any,
+    operationName: Operations,
+    args: any,
+  ) {
       // Only run if we're currently tracking changes for this observable array
       // and there aren't any pending deferred notifications.
     if (!trackingChanges || pendingNotifications) { return }

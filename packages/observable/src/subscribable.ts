@@ -91,7 +91,7 @@ const readFunctions = {
     }
     if (this.hasSubscriptionsForEvent(event)) {
       const subs = event === defaultEvent && this._changeSubscriptions
-        || [...this._subscriptions[event]]
+        || [...this._subscriptions[event] || []]
 
       try {
         dependencyDetection.begin()
