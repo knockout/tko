@@ -348,7 +348,7 @@ export class JsxObserver extends LifeCycle {
     if (isObservable(jsx.attributes)) {
       const subscriptions = this.getSubscriptionsForNode(node)
       subscriptions.push(
-        jsx.attributes.subscribe((attrs: MaybeObservable<JsxAttributes>) => {
+        jsx.attributes.subscribe((attrs: JsxAttributes) => {
           this.updateAttributes(node, unwrap(attrs))
         }))
     }
