@@ -18,13 +18,6 @@
 // TypeScript Version: 3.8
 
 
-interface KnockoutSubscribableStatic {
-    fn: KnockoutSubscribableFunctions<any>;
-
-    new <T>(): KnockoutSubscribable<T>;
-}
-
-
 interface KnockoutReadonlyComputed<T> extends KnockoutReadonlyObservable<T> {
     /**
      * Returns whether the computed observable may be updated in the future. A computed observable is inactive if it has no dependencies.
@@ -372,7 +365,7 @@ interface KnockoutStatic {
     applyBindingAccessorsToNode(node: Node, bindings: {}, viewModel: any): void;
     applyBindingsToNode(node: Node, bindings: any, viewModelOrBindingContext?: any): any;
 
-    subscribable: KnockoutSubscribableStatic;
+    // subscribable: KnockoutSubscribableStatic;
     observable: KnockoutObservableStatic;
 
     computed: KnockoutComputedStatic;
