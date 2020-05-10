@@ -12,7 +12,7 @@ export interface JsxObject {
 
 export type JsxNodeable =
   | (() => JsxNodeable)
-  | { [Symbol.iterator]: IterableIterator<JsxNodeable> }
+  | { [Symbol.iterator] (): Generator<JsxNodeable> }
   | Array<JsxNodeable>
   | BigInt
   | boolean
