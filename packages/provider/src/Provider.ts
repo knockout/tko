@@ -9,8 +9,11 @@ import {
 
 import BindingHandlerObject from './BindingHandlerObject'
 
-export default class Provider {
-  constructor (params = {}) {
+export default abstract class Provider {
+  bindingHandlers: BindingHandlerObject
+  globals: Record<string, any>
+
+  constructor (params: any = {}) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')
     }
@@ -23,23 +26,24 @@ export default class Provider {
     this.globals = params.globals || {}
   }
 
-  setGlobals (globals) {
-    this.globals = globals
-  }
+  abstract get FOR_NODE_TYPES (): Array<number>
+
+  setGlobals (g: Record<string, any>) { this.globals = g }
   get preemptive () { return false }
-  nodeHasBindings (/* node */) {}
-  getBindingAccessors (/* node, context */) {}
+  nodeHasBindings (node: Node) {}
+  getBindingAccessors (node: Node, context: KnockoutBindingContext) {}
 
   /**
    * Preprocess a given node.
    * @param {HTMLElement} node
    * @returns {[HTMLElement]|undefined}
    */
-  preprocessNode (node) {}
-  postProcess (/* node */) {}
+  preprocessNode (node: Node) {}
+  postProcess (node: Node) {}
 
   /** For legacy binding provider assignments to
    *  ko.bindingProvider.instance = ... */
+  private _overloadInstance?: any
   get instance () { return this._overloadInstance || this }
   set instance (provider) {
     if (!provider || provider === this) {
@@ -53,20 +57,24 @@ export default class Provider {
   // binding value-accessors functions. Each accessor function calls the original function
   // so that it always gets the latest value and all dependencies are captured. This is used
   // by ko.applyBindingsToNode and getBindingsAndMakeAccessors.
-  makeAccessorsFromFunction (callback) {
+  makeAccessorsFromFunction (callback: () => any) {
     return objectMap(dependencyDetection.ignore(callback),
-      (value, key) => () => callback()[key]
+      (value: any, key: string) => () => callback()[key]
     )
   }
 
   // Returns the valueAccessor function for a binding value
-  makeValueAccessor (value) {
+  makeValueAccessor (value: any) {
     return () => value
   }
 
   // Given a bindings function or object, create and return a new object that contains
   // binding value-accessors functions. This is used by ko.applyBindingsToNode.
-  makeBindingAccessors (bindings, context, node) {
+  makeBindingAccessors (
+    bindings: any,
+    context: KnockoutBindingContext,
+    node: Node,
+  ) {
     if (typeof bindings === 'function') {
       return this.makeAccessorsFromFunction(bindings.bind(null, context, node))
     } else {
@@ -86,30 +94,29 @@ export default class Provider {
 class LegacyProvider extends Provider {
   get FOR_NODE_TYPES () { return [1, 3, 8] }
 
-  constructor (providerObject, parentProvider) {
+  constructor (private providerObject: any, parentProvider: any) {
     super()
-    Object.assign(this, {providerObject})
     this.bindingHandlers = providerObject.bindingHandlers || parentProvider.bindingHandlers
   }
 
   // This function is used if the binding provider doesn't include a getBindingAccessors function.
   // It must be called with 'this' set to the provider instance.
-  getBindingsAndMakeAccessors (node, context) {
+  getBindingsAndMakeAccessors (node: Node, context: KnockoutBindingContext) {
     const bindingsFn = this.providerObject.getBindings.bind(this.providerObject, node, context)
     return this.makeAccessorsFromFunction(bindingsFn)
   }
 
-  getBindingAccessors (node, context) {
+  getBindingAccessors (node: Node, context: KnockoutBindingContext) {
     return this.providerObject.getBindingAccessors
       ? this.providerObject.getBindingAccessors(node, context)
       : this.getBindingsAndMakeAccessors(node, context)
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node: Node) {
     return this.providerObject.nodeHasBindings(node)
   }
 
-  preprocessNode (node) {
+  preprocessNode (node: Node) {
     if (this.providerObject.preprocessNode) {
       return this.providerObject.preprocessNode(node)
     }

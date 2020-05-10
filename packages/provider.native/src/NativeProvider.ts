@@ -49,14 +49,14 @@ export default class NativeProvider extends Provider {
     return node[NATIVE_BINDINGS] ? node : null
   }
 
-  onlyBindings ([name]) {
-    return name.startsWith('ko-')
+  private onlyBindings ([name, value]: [string, any]) {
+    return name.startsWith('ko-') && typeof value === 'function'
   }
 
-  valueAsAccessor ([name, value]: [string, string]) {
+  private valueAsAccessor (name: string, value: string) {
     const bindingName = name.replace(/^ko-/, '')
     const valueFn = isObservable(value) ? value : () => value
-    return {[bindingName]: valueFn}
+    return [bindingName, valueFn]
   }
 
   /**
@@ -65,9 +65,10 @@ export default class NativeProvider extends Provider {
    */
   getBindingAccessors (node: Node) {
     const bindings = Object.entries(node[NATIVE_BINDINGS] || {})
-      .filter(this.onlyBindings)
+      .filter(this.onlyBindings) as [string, any]
     if (!bindings.length) { return null }
-    return Object.assign({}, ...bindings.map(this.valueAsAccessor))
+    return Object.fromEntries(
+      bindings.map(([n, v]) => this.valueAsAccessor(n, v)))
   }
 
   /**
