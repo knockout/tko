@@ -88,11 +88,10 @@ Object.setPrototypeOf(observable.fn, subscribable.fn)
 observable.observablePrototypes = new Set([observable])
 
 
-export function isObservable<T> (instance: KnockoutObservable<T>): instance is KnockoutObservable<T>
-export function isObservable<T> (instance: KnockoutObservableArray<T>): instance is KnockoutObservableArray<T>
-export function isObservable<T> (instance: T): false
-export function isObservable (instance: any) {
-  const proto = typeof instance === 'function' && instance[protoProperty]
+export function isObservable<T> (
+  instance: KnockoutObservable<T> | KnockoutObservableArray<T> | T,
+): instance is KnockoutObservable<T> {
+  const proto = typeof instance === 'function' && protoProperty in instance
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
   }
