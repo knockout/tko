@@ -9,6 +9,7 @@
     "lib": [
       "dom",
       "es2019.array", // for .flat and .flatMap
+      "es2019.object", // for Object.fromEntries
     ],
     // "noImplicitAny": false,
     "strictPropertyInitialization": false,
