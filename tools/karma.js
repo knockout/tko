@@ -3,8 +3,8 @@
  */
 const fs = require('fs')
 const path = require('path')
-const nodeResolve = require('rollup-plugin-node-resolve')
-const rollupCommonJS = require('rollup-plugin-commonjs')
+const nodeResolve = require('@rollup/plugin-node-resolve')
+const rollupCommonJS = require('@rollup/plugin-commonjs')
 const rollupVisualizer = require('rollup-plugin-visualizer')
 const typescript = require('typescript')
 
@@ -67,10 +67,12 @@ const COMMON_CONFIG = {
   frameworks: pkg.karma.frameworks,
   resolve: { root },
   files: pkg.karma.files || [
-    { pattern: 'spec/**/*.js', watched: false }
+    { pattern: 'spec/**/*.js', watched: false },
+    { pattern: 'spec/**/*.ts', watched: false },
   ],
   preprocessors: {
-    'spec/**/*.js': ['rollup', 'typescript']
+    'spec/**/*.ts': ['rollup', 'typescript'],
+    'spec/**/*.js': ['rollup', 'typescript'],
   }
 }
 

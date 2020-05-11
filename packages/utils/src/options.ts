@@ -4,16 +4,18 @@
 //
 // This is the root 'options', which must be extended by others.
 
-var _global
+export type ProtoProperty = '__ko_proto__'
+
+let _global: any
 
 try { _global = window } catch (e) { _global = global }
 
-var options = {
+const options: any = {
   deferUpdates: false,
 
   useOnlyNativeEvents: false,
 
-  protoProperty: '__ko_proto__',
+  protoProperty: '__ko_proto__' as ProtoProperty,
 
     // Modify the default attribute from `data-bind`.
   defaultBindingAttribute: 'data-bind',
@@ -33,9 +35,9 @@ var options = {
     // jQuery will be automatically set to _global.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
-  jQuery: _global && _global.jQuery,
+  jQuery: _global?.['jQuery'] as any,
 
-  Promise: _global && _global.Promise,
+  Promise: _global?.['Promise'] as any,
 
   taskScheduler: null,
 
@@ -52,16 +54,14 @@ var options = {
   includeDestroyed: false,
   foreachHidesDestroyed: false,
 
-  onError: function (e) { throw e },
+  onError: function (e: Error) { throw e },
 
-  set: function (name, value) {
-    options[name] = value
-  },
+  set: (name: keyof typeof options, value: any) => { options[name] = value },
 
   // Overload getBindingHandler to have a custom lookup function.
   getBindingHandler (/* key */) {},
   cleanExternalData (/* node, callback */) {}
-}
+} as const
 
 Object.defineProperty(options, '$', {
   get: function () { return options.jQuery }

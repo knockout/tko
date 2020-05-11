@@ -1,5 +1,5 @@
 
-import {LifeCycle} from '@tko/lifecycle'
+import { LifeCycle } from '@tko/lifecycle'
 
 import {
   safeStringify, isThenable
@@ -18,14 +18,25 @@ import {
 } from '@tko/computed'
 
 import {
-  NativeProvider, NATIVE_BINDINGS
+  NativeProvider, setNativeBindings, getNativeBindings, NativeBindingNodes,
 } from '@tko/provider.native'
 
 import {
   queueCleanNode
 } from './jsxClean'
 
+import type {
+  JsxNodeable, JsxNodeAttribute, JsxObject,
+} from './types'
+
 export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
+
+type MaybeObservable<T> = KnockoutObservable<T> | T
+type JsxAttributes = Record<string, MaybeObservable<JsxNodeAttribute>>
+type Trackable = NativeBindingNodes | JsxObserver
+type TrackedAtIndex = Trackable | (() => Trackable) | TrackedAtIndex[]
+
+interface Disposable { dispose(): void }
 
 const NAMESPACES = {
   svg: 'http://www.w3.org/2000/svg',
@@ -33,11 +44,20 @@ const NAMESPACES = {
   xml: 'http://www.w3.org/XML/1998/namespace',
   xlink: 'http://www.w3.org/1999/xlink',
   xmlns: 'http://www.w3.org/2000/xmlns/'
+} as const
+
+const isNamespace = (s: string): s is keyof typeof NAMESPACES => s in NAMESPACES
+const namespaceOrNull = (s: string) => isNamespace(s) ? NAMESPACES[s] : null
+
+function isIterableElement (v: JsxNodeable): v is { [Symbol.iterator]: () => Generator<Element> } {
+  return isIterable<Element>(v)
 }
 
-function isIterable (v) {
-  return v && typeof v[Symbol.iterator] === 'function'
+function isIterable<T>(v: any): v is { [Symbol.iterator]: () => Generator<T> } {
+  if (!v || typeof v !== 'object') { return false }
+  return typeof v[Symbol.iterator] === 'function'
 }
+
 
 /**
  * JSX object from a pre-processor.
@@ -52,10 +72,25 @@ function isIterable (v) {
  * `parentNode` at `insertBefore` with the result.
  */
 export class JsxObserver extends LifeCycle {
+  adoptedInsertBefore: boolean
+  insertBefore: Node
+  nodeArrayOrObservableAtIndex: TrackedAtIndex[]
+  noInitialBinding: boolean
+  parentNode: Node
+  parentNodeTarget: Node
+  subscriptionsForNode: Map<Node, Disposable[]>
+  xmlns: string
+
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, noInitialBinding) {
+  constructor (
+    jsxOrObservable: JsxNodeable,
+    parentNode: Node,
+    insertBefore: Node | null = null,
+    xmlns?: string,
+    noInitialBinding?: boolean
+  ) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -69,7 +104,7 @@ export class JsxObserver extends LifeCycle {
       if (!insertBefore) {
         const insertAt = parentNodeIsComment ? parentNode.nextSibling : null
         insertBefore = this.createComment('O')
-        parentNodeTarget.insertBefore(insertBefore, insertAt)
+        parentNodeTarget!.insertBefore(insertBefore, insertAt)
       } else {
         this.adoptedInsertBefore = true
       }
@@ -106,7 +141,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {HMTLElement|Comment|HTMLTemplateElement} parentNode
    */
-  getParentTarget (parentNode) {
+  getParentTarget (parentNode: Node | Element | Comment | HTMLTemplateElement) {
     if ('content' in parentNode) { return parentNode.content }
     if (parentNode.nodeType === 8) { return parentNode.parentNode }
     return parentNode
@@ -133,16 +168,15 @@ export class JsxObserver extends LifeCycle {
     this.subscriptionsForNode.clear()
   }
 
-  createInitialAdditions (possibleIterable) {
+  /**
+   * Add the initial nodes.  Iterate over any generator.
+   */
+  createInitialAdditions (possibleIterable: JsxNodeable): KnockoutArrayChange<any>[] {
     const status = 'added'
-    if (typeof possibleIteratable === 'object' &&
-      posibleIterable !== null &&
-      Symbol.iterator in possibleIterable) {
-      possibleIterable = [...possibleIterable]
-    }
+    const iter = isIterable(possibleIterable) ? [...possibleIterable] : null
 
-    return Array.isArray(possibleIterable)
-      ? possibleIterable.map((value, index) => ({ index, status, value }))
+    return Array.isArray(iter)
+      ? iter.map((value, index) => ({ index, status, value }))
       : [{ status, index: 0, value: possibleIterable }]
   }
 
@@ -152,9 +186,10 @@ export class JsxObserver extends LifeCycle {
    *   - to the new array indexes for adds
    *   - sorted by index in ascending order
    */
-  observableArrayChange (changes) {
-    let adds = []
-    let dels = []
+  observableArrayChange (changes: KnockoutArrayChange<any>[]) {
+    type DeltaList = [number, JsxNodeable][]
+    const adds = [] as DeltaList
+    const dels = [] as DeltaList
     for (const index in changes) {
       const change = changes[index]
       if (change.status === 'added') {
@@ -163,7 +198,7 @@ export class JsxObserver extends LifeCycle {
         dels.unshift([change.index, change.value])
       }
     }
-    dels.forEach(change => this.delChange(...change))
+    dels.forEach(([index]) => this.delChange(index))
     adds.forEach(change => this.addChange(...change))
   }
 
@@ -173,43 +208,45 @@ export class JsxObserver extends LifeCycle {
    * @param {int} index
    * @param {string|object|Array|Observable.string|Observable.Array|Obseravble.object} jsx
    */
-  addChange (index, jsx) {
+  addChange (index: number, jsx: JsxNodeable) {
     this.nodeArrayOrObservableAtIndex.splice(index, 0,
       this.injectNode(jsx, this.lastNodeFor(index)))
   }
 
-  injectNode (jsx, nextNode) {
-    let nodeArrayOrObservable
+  injectNode (
+    jsx: JsxNodeable,
+    nextNode: NativeBindingNodes,
+  ): Trackable[] {
 
     if (isObservable(jsx)) {
       const {parentNode, xmlns} = this
       const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns, this.noInitialBinding)
-      nodeArrayOrObservable = [observer]
-    } else if (typeof jsx !== 'string' && isIterable(jsx)) {
-      nodeArrayOrObservable = []
+      return [observer]
+    } else if (isIterableElement(jsx)) {
+      const nodeArrayOrObservable = [] as Trackable[]
       for (const child of jsx) {
-        nodeArrayOrObservable.unshift(
-          this.injectNode(child, nextNode))
+        nodeArrayOrObservable.unshift(...this.injectNode(child, nextNode))
       }
-    } else {
-      const $context = contextFor(this.parentNode)
-      const isInsideTemplate = 'content' in this.parentNode
-      const shouldApplyBindings = $context && !isInsideTemplate && !this.noInitialBinding
-
-      if (Array.isArray(jsx)) {
-        nodeArrayOrObservable = jsx.map(j => this.anyToNode(j))
-      } else {
-        nodeArrayOrObservable = [this.anyToNode(jsx)]
-      }
-
-      for (const node of nodeArrayOrObservable) {
-        this.parentNodeTarget.insertBefore(node, nextNode)
-        if (shouldApplyBindings && this.canApplyBindings(node)) {
-          applyBindings($context, node)
-        }
-      }
+      return nodeArrayOrObservable
     }
 
+    let nodeArrayOrObservable = [] as NativeBindingNodes[]
+    const $context = contextFor(this.parentNode)
+    const isInsideTemplate = 'content' in this.parentNode
+    const shouldApplyBindings = $context && !isInsideTemplate && !this.noInitialBinding
+
+    if (isIterableElement(jsx)) {
+      nodeArrayOrObservable = [...jsx].map(j => this.anyToNode(j))
+    } else {
+      nodeArrayOrObservable = [this.anyToNode(jsx)]
+    }
+
+    for (const node of nodeArrayOrObservable) {
+      this.parentNodeTarget.insertBefore(node, nextNode)
+      if (shouldApplyBindings && this.canApplyBindings(node)) {
+        applyBindings($context, node)
+      }
+    }
     return nodeArrayOrObservable
   }
 
@@ -218,26 +255,26 @@ export class JsxObserver extends LifeCycle {
    * or a Comment.
    * @param {Node} node
    */
-  canApplyBindings (node) {
+  canApplyBindings (node: Node) {
     return node.nodeType === 1 || node.nodeType === 8
   }
 
-  delChange (index) {
+  delChange (index: number) {
     this.removeNodeArrayOrObservable(
       this.nodeArrayOrObservableAtIndex[index])
     this.nodeArrayOrObservableAtIndex.splice(index, 1)
   }
 
-  getSubscriptionsForNode (node) {
+  getSubscriptionsForNode (node: Node) {
     if (!this.subscriptionsForNode.has(node)) {
-      const subscriptions = []
+      const subscriptions = [] as Disposable[]
       this.subscriptionsForNode.set(node, subscriptions)
       return subscriptions
     }
-    return this.subscriptionsForNode.get(node)
+    return this.subscriptionsForNode.get(node) as Disposable[]
   }
 
-  isJsx (jsx) {
+  isJsx (jsx: any): jsx is JsxObject {
     return typeof jsx.elementName === 'string' &&
       'children' in jsx &&
       'attributes' in jsx
@@ -249,27 +286,17 @@ export class JsxObserver extends LifeCycle {
    * The one thing `any` cannot be here is an Array or Observable; both those
    * cases are handled with new JsxObservers.
    */
-  anyToNode (any) {
+  anyToNode (any: JsxNodeable): Comment | Element | Text {
     if (isThenable(any)) { return this.futureJsxNode(any) }
 
     switch (typeof any) {
       case 'object':
-        if (any instanceof Error) {
-          return this.createComment(any.toString())
-        }
-        if (any === null) {
-          return this.createComment(String(any))
-        }
-        if (any instanceof Node) {
-          return this.cloneJSXorMoveNode(any)
-        }
-        if (Symbol.iterator in any) {
-          return any
-        }
+        if (any instanceof Error) { return this.createComment(any.toString()) }
+        if (any === null) { return this.createComment(String(any)) }
+        if (any instanceof Node) { return this.cloneJSXorMoveNode(any) }
         break
       case 'function': return this.anyToNode(any())
       case 'undefined':
-      case 'Error':
       case 'symbol':
         return this.createComment(String(any))
       case 'string': return this.createTextNode(any)
@@ -285,16 +312,12 @@ export class JsxObserver extends LifeCycle {
       : this.createComment(safeStringify(any))
   }
 
-  createComment (string) {
-    const node = document.createComment(string)
-    node[NATIVE_BINDINGS] = true
-    return node
+  createComment (string: string) {
+    return setNativeBindings(document.createComment(string), true)
   }
 
-  createTextNode (string) {
-    const node = document.createTextNode(string)
-    node[NATIVE_BINDINGS] = true
-    return node
+  createTextNode (string: string) {
+    return setNativeBindings(document.createTextNode(string), true)
   }
 
   /**
@@ -303,7 +326,7 @@ export class JsxObserver extends LifeCycle {
    *
    * @param {HTMLElement} node
    */
-  cloneJSXorMoveNode (node) {
+  cloneJSXorMoveNode (node: NativeBindingNodes) {
     return ORIGINAL_JSX_SYM in node
       ? this.jsxToNode(node[ORIGINAL_JSX_SYM])
       : node
@@ -312,39 +335,43 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {JSX} jsx to convert to a node.
    */
-  jsxToNode (jsx) {
-    const xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || this.xmlns
+  jsxToNode (jsx: JsxObject) {
+    const xmlns = (
+      jsx.attributes.xmlns || namespaceOrNull(jsx.elementName) || this.xmlns
+    ) as string
     const node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
 
     /** Slots need to be able to replicate with the attributes, which
      *  are not preserved when cloning from template nodes. */
-    node[ORIGINAL_JSX_SYM] = jsx
+    setNativeBindings(node, jsx)
 
     if (isObservable(jsx.attributes)) {
       const subscriptions = this.getSubscriptionsForNode(node)
       subscriptions.push(
-        jsx.attributes.subscribe(attrs => {
+        jsx.attributes.subscribe((attrs: JsxAttributes) => {
           this.updateAttributes(node, unwrap(attrs))
         }))
     }
+
     this.updateAttributes(node, unwrap(jsx.attributes))
-
-    this.addDisposable(new JsxObserver(jsx.children, node, null, xmlns, this.noInitialBinding))
-
+    this.addDisposable(
+      new JsxObserver(jsx.children, node, null, xmlns, this.noInitialBinding))
     return node
   }
 
-  futureJsxNode (promise) {
+  futureJsxNode (future: JsxNodeable) {
     const obs = observable()
-    promise.then(obs).catch(e => obs(e instanceof Error ? e : Error(e)))
+    Promise.resolve(future)
+      .then(obs)
+      .catch((e: Error) => obs(e instanceof Error ? e : Error(e)))
     const jo = new JsxObserver(obs, this.parentNode, null, this.xmlns, this.noInitialBinding)
     this.addDisposable(jo)
-    return jo.insertBefore
+    return jo.insertBefore as Comment | Text | Element
   }
 
-  updateAttributes (node, attributes) {
+  updateAttributes (node: Element, attributes: JsxAttributes) {
     const subscriptions = this.getSubscriptionsForNode(node)
-    const toRemove = new Set([...node.attributes].map(n => n.name))
+    const toRemove = new Set(Array.from(node.attributes).map(n => n.name))
 
     for (const [name, value] of Object.entries(attributes || {})) {
       toRemove.delete(name)
@@ -365,9 +392,9 @@ export class JsxObserver extends LifeCycle {
    * @param {string} attr element attribute
    * @return {string} namespace argument for setAtttributeNS
    */
-  getNamespaceOfAttribute (attr) {
+  getNamespaceOfAttribute (attr: string) {
     const [prefix, ...unqualifiedName] = attr.split(':')
-    if (prefix === 'xmlns' || (unqualifiedName.length && NAMESPACES[prefix])) {
+    if (prefix === 'xmlns' || (unqualifiedName.length && isNamespace(prefix))) {
       return NAMESPACES[prefix]
     }
     return null
@@ -379,7 +406,11 @@ export class JsxObserver extends LifeCycle {
    * @param {string} name
    * @param {any} valueOrObservable
    */
-  setNodeAttribute (node, name, valueOrObservable) {
+  setNodeAttribute (
+    node: Element,
+    name: string,
+    valueOrObservable?: MaybeObservable<any>,
+  ) {
     const value = unwrap(valueOrObservable)
     NativeProvider.addValueToNode(node, name, valueOrObservable)
     if (value === undefined) {
@@ -397,7 +428,7 @@ export class JsxObserver extends LifeCycle {
    * @param {int} index
    * @return {Comment} that immediately precedes this.
    */
-  lastNodeFor (index) {
+  lastNodeFor (index: number) {
     const nodesAtIndex = this.nodeArrayOrObservableAtIndex[index] || []
     const [lastNodeOfPrior] = nodesAtIndex.slice(-1)
     const insertBefore = lastNodeOfPrior instanceof JsxObserver
@@ -413,14 +444,16 @@ export class JsxObserver extends LifeCycle {
     }
   }
 
-  removeNodeArrayOrObservable (nodeArrayOrObservable) {
+  removeNodeArrayOrObservable (
+    nodeArrayOrObservable: TrackedAtIndex
+  ) {
     for (const nodeOrObservable of nodeArrayOrObservable) {
       if (nodeOrObservable instanceof JsxObserver) {
         nodeOrObservable.dispose()
         continue
       }
-      const node = nodeOrObservable
-      delete node[ORIGINAL_JSX_SYM]
+      const node = typeof nodeOrObservable === 'function' ? nodeOrObservable() : nodeOrObservable
+      delete (node as any)[ORIGINAL_JSX_SYM]
       this.detachAndDispose(node)
       const subscriptions = this.subscriptionsForNode.get(node)
       if (subscriptions) {
@@ -435,8 +468,8 @@ export class JsxObserver extends LifeCycle {
    *
    * The cleaning can trigger a lot of garbage collection, so we defer that.
    */
-  detachAndDispose (node) {
-    if (isIterable(node)) {
+  detachAndDispose (node: NativeBindingNodes) {
+    if (isIterableElement(node)) {
       for (const child of node) {
         this.detachAndDispose(child)
       }

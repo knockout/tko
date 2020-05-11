@@ -6,7 +6,6 @@
 import {
     addDisposeCallback,
     arrayForEach,
-    createSymbolOrString,
     domNodeIsAttachedToDocument,
     extend,
     options,
@@ -26,7 +25,9 @@ import {
     LATEST_VALUE
 } from '@tko/observable'
 
-const computedState = createSymbolOrString('_state')
+import type { ProtoProperty } from '@tko/utils/src/options'
+
+const computedState = Symbol('TKO Computed state')
 const DISPOSED_STATE = {
   dependencyTracking: null,
   dependenciesCount: 0,
@@ -37,25 +38,11 @@ const DISPOSED_STATE = {
   disposeWhenNodeIsRemoved: null,
   readFunction: null,
   _options: null
-}
+} as const
 
-export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
-  if (typeof evaluatorFunctionOrOptions === 'object') {
-        // Single-parameter syntax - everything is on this "options" param
-    options = evaluatorFunctionOrOptions
-  } else {
-        // Multi-parameter syntax - construct the options according to the params passed
-    options = options || {}
-    if (evaluatorFunctionOrOptions) {
-      options.read = evaluatorFunctionOrOptions
-    }
-  }
-  if (typeof options.read !== 'function') {
-    throw Error('Pass a function that returns the value of the computed')
-  }
 
-  var writeFunction = options.write
-  var state = {
+function initialState<T> (options: ReadonlyComputedDefine<T>) {
+  return {
     latestValue: undefined,
     isStale: true,
     isDirty: true,
@@ -65,20 +52,48 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
     pure: false,
     isSleeping: false,
     readFunction: options.read,
-    evaluatorFunctionTarget: evaluatorFunctionTarget || options.owner,
-    disposeWhenNodeIsRemoved: options.disposeWhenNodeIsRemoved || options.disposeWhenNodeIsRemoved || null,
-    disposeWhen: options.disposeWhen || options.disposeWhen,
+    evaluatorFunctionTarget: options.owner,
+    disposeWhenNodeIsRemoved: options.disposeWhenNodeIsRemoved || null,
+    disposeWhen: options.disposeWhen,
     domNodeDisposalCallback: null,
     dependencyTracking: {},
     dependenciesCount: 0,
     evaluationTimeoutInstance: null
   }
+}
+
+type ComputedState<T> = Omit<ReturnType<typeof initialState>, 'latestValue'> & { latestValue?: T }
+
+export function computed<T> (
+  evaluatorFunctionOrOptions: (() => T) | ComputedDefine<T>,
+  evaluatorFunctionTarget?: any,
+  options?: ComputedOptions<T>,
+) {
+  const opts = ((): ComputedDefine<T> => {
+    if ('read' in evaluatorFunctionOrOptions) {
+      // Single-parameter syntax - everything is on this "options" param
+      return evaluatorFunctionOrOptions
+    }
+    // Multi-parameter syntax - construct the options according to the params passed
+    return {
+      ...options,
+      read: evaluatorFunctionOrOptions,
+      owner: evaluatorFunctionTarget,
+    }
+  })()
+
+  if (typeof opts.read !== 'function') {
+    throw Error('Pass a function that returns the value of the computed')
+  }
+
+  const writeFunction = 'write' in opts ? opts.write : null
+  const state = initialState(opts)
 
   function computedObservable () {
     if (arguments.length > 0) {
       if (typeof writeFunction === 'function') {
                 // Writing a value
-        writeFunction.apply(state.evaluatorFunctionTarget, arguments)
+        writeFunction.apply(state.evaluatorFunctionTarget, arguments as any)
       } else {
         throw new Error("Cannot write a value to a computed unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
       }
@@ -116,20 +131,20 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
   }
 
   if (koOptions.debug) {
-        // #1731 - Aid debugging by exposing the computed's options
-    computedObservable._options = options
+    // #1731 - Aid debugging by exposing the computed's options
+    computedObservable._options = opts
   }
 
   if (state.disposeWhenNodeIsRemoved) {
-        // Since this computed is associated with a DOM node, and we don't want to dispose the computed
-        // until the DOM node is *removed* from the document (as opposed to never having been in the document),
-        // we'll prevent disposal until "disposeWhen" first returns false.
+    // Since this computed is associated with a DOM node, and we don't want to dispose the computed
+    // until the DOM node is *removed* from the document (as opposed to never having been in the document),
+    // we'll prevent disposal until "disposeWhen" first returns false.
     state.suppressDisposalUntilDisposeWhenReturnsFalse = true
 
-        // disposeWhenNodeIsRemoved: true can be used to opt into the "only dispose after first false result"
-        // behavior even if there's no specific node to watch. In that case, clear the option so we don't try
-        // to watch for a non-node's disposal. This technique is intended for KO's internal use only and shouldn't
-        // be documented or used by application code, as it's likely to change in a future version of KO.
+    // disposeWhenNodeIsRemoved: true can be used to opt into the "only dispose after first false result"
+    // behavior even if there's no specific node to watch. In that case, clear the option so we don't try
+    // to watch for a non-node's disposal. This technique is intended for KO's internal use only and shouldn't
+    // be documented or used by application code, as it's likely to change in a future version of KO.
     if (!state.disposeWhenNodeIsRemoved.nodeType) {
       state.disposeWhenNodeIsRemoved = null
     }
@@ -152,7 +167,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
 }
 
 // Utility function that disposes a given dependencyTracking entry
-function computedDisposeDependencyCallback (id, entryToDispose) {
+function computedDisposeDependencyCallback<T> (this: KnockoutComputed<T>, id, entryToDispose) {
   if (entryToDispose !== null && entryToDispose.dispose) {
     entryToDispose.dispose()
   }
@@ -160,7 +175,7 @@ function computedDisposeDependencyCallback (id, entryToDispose) {
 
 // This function gets called each time a dependency is detected while evaluating a computed.
 // It's factored out as a shared function to avoid creating unnecessary function instances during evaluation.
-function computedBeginDependencyDetectionCallback (subscribable, id) {
+function computedBeginDependencyDetectionCallback<T> (this: KnockoutComputed<T>, subscribable, id) {
   var computedObservable = this.computedObservable,
     state = computedObservable[computedState]
   if (!state.isDisposed) {
@@ -183,11 +198,11 @@ function computedBeginDependencyDetectionCallback (subscribable, id) {
 
 computed.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-  getDependenciesCount () {
+  getDependenciesCount<T> (this: KnockoutComputed<T>) {
     return this[computedState].dependenciesCount
   },
 
-  getDependencies () {
+  getDependencies<T> (this: KnockoutComputed<T>) {
     const dependencyTracking = this[computedState].dependencyTracking
     const dependentObservables = []
 
@@ -198,7 +213,12 @@ computed.fn = {
     return dependentObservables
   },
 
-  addDependencyTracking (id, target, trackingObj) {
+  addDependencyTracking<T> (
+    this: KnockoutComputed<T>,
+    id: string,
+    target: any,
+    trackingObj,
+  ) {
     if (this[computedState].pure && target === this) {
       throw Error("A 'pure' computed must not be called recursively")
     }
@@ -207,9 +227,12 @@ computed.fn = {
     trackingObj._order = this[computedState].dependenciesCount++
     trackingObj._version = target.getVersion()
   },
-  haveDependenciesChanged () {
-    var id, dependency, dependencyTracking = this[computedState].dependencyTracking
-    for (id in dependencyTracking) {
+
+  haveDependenciesChanged<T> (this: KnockoutComputed<T>) {
+    let dependency
+    const {dependencyTracking} = this[computedState]
+
+    for (const id in dependencyTracking) {
       if (hasOwnProperty(dependencyTracking, id)) {
         dependency = dependencyTracking[id]
         if ((this._evalDelayed && dependency._target._notificationIsPending) || dependency._target.hasChanged(dependency._version)) {
@@ -218,17 +241,17 @@ computed.fn = {
       }
     }
   },
-  markDirty () {
+  markDirty<T> (this: KnockoutComputed<T>) {
         // Process "dirty" events if we can handle delayed notifications
     if (this._evalDelayed && !this[computedState].isBeingEvaluated) {
-      this._evalDelayed(false /* notifyChange */)
+      this._evalDelayed(false)
     }
   },
-  isActive () {
+  isActive<T> (this: KnockoutComputed<T>) {
     const state = this[computedState]
     return state.isDirty || state.dependenciesCount > 0
   },
-  respondToChange () {
+  respondToChange<T> (this: KnockoutComputed<T>) {
         // Ignore "change" events if we've already scheduled a delayed notification
     if (!this._notificationIsPending) {
       this.evaluatePossiblyAsync()
@@ -236,7 +259,7 @@ computed.fn = {
       this[computedState].isStale = true
     }
   },
-  subscribeToDependency (target) {
+  subscribeToDependency<T> (this: KnockoutComputed<T>, target) {
     if (target._deferUpdates) {
       var dirtySub = target.subscribe(this.markDirty, this, 'dirty'),
         changeSub = target.subscribe(this.respondToChange, this)
@@ -251,7 +274,7 @@ computed.fn = {
       return target.subscribe(this.evaluatePossiblyAsync, this)
     }
   },
-  evaluatePossiblyAsync () {
+  evaluatePossiblyAsync<T> (this: KnockoutComputed<T>) {
     var computedObservable = this,
       throttleEvaluationTimeout = computedObservable.throttleEvaluation
     if (throttleEvaluationTimeout && throttleEvaluationTimeout >= 0) {
@@ -260,12 +283,12 @@ computed.fn = {
         computedObservable.evaluateImmediate(true /* notifyChange */)
       }, throttleEvaluationTimeout)
     } else if (computedObservable._evalDelayed) {
-      computedObservable._evalDelayed(true /* notifyChange */)
+      computedObservable._evalDelayed(true)
     } else {
-      computedObservable.evaluateImmediate(true /* notifyChange */)
+      computedObservable.evaluateImmediate(true)
     }
   },
-  evaluateImmediate (notifyChange) {
+  evaluateImmediate<T> (this: KnockoutComputed<T>, notifyChange?: boolean) {
     var computedObservable = this,
       state = computedObservable[computedState],
       disposeWhen = state.disposeWhen,
@@ -285,7 +308,7 @@ computed.fn = {
     }
 
     if (state.disposeWhenNodeIsRemoved && !domNodeIsAttachedToDocument(state.disposeWhenNodeIsRemoved) || disposeWhen && disposeWhen()) {
-            // See comment above about suppressDisposalUntilDisposeWhenReturnsFalse
+      // See comment above about suppressDisposalUntilDisposeWhenReturnsFalse
       if (!state.suppressDisposalUntilDisposeWhenReturnsFalse) {
         computedObservable.dispose()
         return
@@ -304,10 +327,10 @@ computed.fn = {
 
     return changed
   },
-  evaluateImmediate_CallReadWithDependencyDetection (notifyChange) {
-        // This function is really just part of the evaluateImmediate logic. You would never call it from anywhere else.
-        // Factoring it out into a separate function means it can be independent of the try/catch block in evaluateImmediate,
-        // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
+  evaluateImmediate_CallReadWithDependencyDetection<T> (this: KnockoutComputed<T>, notifyChange?: boolean) {
+    // This function is really just part of the evaluateImmediate logic. You would never call it from anywhere else.
+    // Factoring it out into a separate function means it can be independent of the try/catch block in evaluateImmediate,
+    // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
 
     var computedObservable = this,
       state = computedObservable[computedState],
@@ -368,15 +391,21 @@ computed.fn = {
 
     return changed
   },
-  evaluateImmediate_CallReadThenEndDependencyDetection (state, dependencyDetectionContext) {
+  evaluateImmediate_CallReadThenEndDependencyDetection<T> (
+    this: KnockoutComputed<T>,
+    state: ComputedState<T>,
+    dependencyDetectionContext,
+  ) {
     // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
     // You'd never call it from anywhere else. Factoring it out means that evaluateImmediate_CallReadWithDependencyDetection
     // can be independent of try/finally blocks, which contributes to saving about 40% off the CPU
     // overhead of computed evaluation (on V8 at least).
 
     try {
-      var readFunction = state.readFunction
-      return state.evaluatorFunctionTarget ? readFunction.call(state.evaluatorFunctionTarget) : readFunction()
+      const readFunction = state.readFunction
+      return state.evaluatorFunctionTarget
+        ? readFunction.call(state.evaluatorFunctionTarget)
+        : readFunction()
     } finally {
       dependencyDetection.end()
 
@@ -388,7 +417,10 @@ computed.fn = {
       state.isStale = state.isDirty = false
     }
   },
-  peek (forceEvaluate) {
+  peek<T> (
+    this: KnockoutComputed<T>,
+    forceEvaluate?: boolean,
+  ) {
     // Peek won't ordinarily re-evaluate, except while the computed is sleeping
     //  or to get the initial value when "deferEvaluation" is set.
     const state = this[computedState]
@@ -398,16 +430,19 @@ computed.fn = {
     return state.latestValue
   },
 
-  get [LATEST_VALUE] () {
+  get [LATEST_VALUE] (this: KnockoutComputed<T>) {
     return this.peek()
   },
 
-  limit (limitFunction) {
+  limit<T> (
+    this: KnockoutComputed<T>,
+    limitFunction: RateLimitFunction,
+  ) {
     const state = this[computedState]
     // Override the limit function with one that delays evaluation as well
     subscribable.fn.limit.call(this, limitFunction)
     Object.assign(this, {
-      _evalIfChanged () {
+      _evalIfChanged<T> (this: KnockoutComputed<T>) {
         if (!this[computedState].isSleeping) {
           if (this[computedState].isStale) {
             this.evaluateImmediate()
@@ -417,7 +452,7 @@ computed.fn = {
         }
         return state.latestValue
       },
-      _evalDelayed (isChange) {
+      _evalDelayed<T> (this: KnockoutComputed<T>, isChange: boolean) {
         this._limitBeforeChange(state.latestValue)
 
         // Mark as dirty
@@ -432,7 +467,7 @@ computed.fn = {
       }
     })
   },
-  dispose () {
+  dispose<T> (this: KnockoutComputed<T>) {
     var state = this[computedState]
     if (!state.isSleeping && state.dependencyTracking) {
       objectForEach(state.dependencyTracking, function (id, dependency) {
@@ -448,8 +483,8 @@ computed.fn = {
   }
 }
 
-var pureComputedOverrides = {
-  beforeSubscriptionAdd (event) {
+const pureComputedOverrides = {
+  beforeSubscriptionAdd<T> (this: KnockoutComputed<T>, event: KnockoutEventType) {
         // If asleep, wake up the computed by subscribing to any dependencies.
     var computedObservable = this,
       state = computedObservable[computedState]
@@ -489,10 +524,14 @@ var pureComputedOverrides = {
       }
     }
   },
-  afterSubscriptionRemove (event) {
+
+  afterSubscriptionRemove<T> (
+    this: KnockoutComputed<T>,
+    event: KnockoutEventType,
+  ) {
     var state = this[computedState]
     if (!state.isDisposed && event === 'change' && !this.hasSubscriptionsForEvent('change')) {
-      objectForEach(state.dependencyTracking, function (id, dependency) {
+      objectForEach(state.dependencyTracking, (id: number, dependency: KnockoutComputed<T>) => {
         if (dependency.dispose) {
           state.dependencyTracking[id] = {
             _target: dependency._target,
@@ -506,21 +545,25 @@ var pureComputedOverrides = {
       this.notifySubscribers(undefined, 'asleep')
     }
   },
-  getVersion () {
-        // Because a pure computed is not automatically updated while it is sleeping, we can't
-        // simply return the version number. Instead, we check if any of the dependencies have
-        // changed and conditionally re-evaluate the computed observable.
+
+  getVersion<T> (this: KnockoutComputed<T>) {
+    // Because a pure computed is not automatically updated while it is sleeping, we can't
+    // simply return the version number. Instead, we check if any of the dependencies have
+    // changed and conditionally re-evaluate the computed observable.
     var state = this[computedState]
     if (state.isSleeping && (state.isStale || this.haveDependenciesChanged())) {
       this.evaluateImmediate()
     }
     return subscribable.fn.getVersion.call(this)
   }
-}
+} as const
 
-var deferEvaluationOverrides = {
-  beforeSubscriptionAdd (event) {
-        // This will force a computed with deferEvaluation to evaluate when the first subscription is registered.
+const deferEvaluationOverrides = {
+  beforeSubscriptionAdd<T> (
+    this: KnockoutComputed<T>,
+    event: KnockoutEventType,
+  ) {
+    // This will force a computed with deferEvaluation to evaluate when the first subscription is registered.
     if (event === 'change' || event === 'beforeChange') {
       this.peek()
     }
@@ -530,26 +573,167 @@ var deferEvaluationOverrides = {
 Object.setPrototypeOf(computed.fn, subscribable.fn)
 
 // Set the proto values for ko.computed
-var protoProp = observable.protoProperty // == "__ko_proto__"
+const protoProp = observable.protoProperty as ProtoProperty
 computed.fn[protoProp] = computed
 
 /* This is used by ko.isObservable */
 observable.observablePrototypes.add(computed)
 
-export function isComputed (instance) {
-  return (typeof instance === 'function' && instance[protoProp] === computed)
+export function isComputed<T> (
+  instance: KnockoutComputed<T> | T,
+): instance is KnockoutComputed<T> {
+  return (typeof instance === 'function' &&
+    (instance as any)[protoProp] === computed)
 }
 
-export function isPureComputed (instance) {
-  return isComputed(instance) && instance[computedState] && instance[computedState].pure
+export function isPureComputed<T> (
+  instance: KnockoutComputed<T> | T,
+): instance is KnockoutPureComputed<T> {
+  return isComputed(instance) &&
+    (instance as any)[computedState] &&
+    (instance as any)[computedState].pure
 }
 
-export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {
+export function pureComputed<T> (
+  evaluatorFunctionOrOptions: (() => T) | Omit<ReadonlyComputedDefine<T>,
+  'pure'>, evaluatorFunctionTarget: any,
+) {
   if (typeof evaluatorFunctionOrOptions === 'function') {
     return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure': true})
   } else {
-    evaluatorFunctionOrOptions = extend({}, evaluatorFunctionOrOptions)   // make a copy of the parameter object
-    evaluatorFunctionOrOptions.pure = true
-    return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget)
+    const optionsClone = {
+      ...evaluatorFunctionOrOptions, pure: true }
+    return computed(optionsClone, evaluatorFunctionTarget)
+  }
+}
+
+
+
+interface ReadonlyComputedOptions<T> {
+  /**
+   * Disposal of the computed observable will be triggered when the specified DOM node is removed by KO.
+   * This feature is used to dispose computed observables used in bindings when nodes are removed by the template and control-flow bindings.
+   */
+  disposeWhenNodeIsRemoved?: Node;
+  /**
+   * This function is executed before each re-evaluation to determine if the computed observable should be disposed.
+   * A true-ish result will trigger disposal of the computed observable.
+   */
+  disposeWhen?(): boolean;
+  /**
+   * Defines the value of 'this' whenever KO invokes your 'read' or 'write' callbacks.
+   */
+  owner?: any;
+  /**
+   * If true, then the value of the computed observable will not be evaluated until something actually attempts to access its value or manually subscribes to it.
+   * By default, a computed observable has its value determined immediately during creation.
+   */
+  deferEvaluation?: boolean;
+  /**
+   * If true, the computed observable will be set up as a purecomputed observable. This option is an alternative to the ko.pureComputed constructor.
+   */
+  pure?: boolean;
+}
+
+interface WriteableComputedOptions<T, U = T> extends ReadonlyComputedOptions<T> {
+  /**
+   * Makes the computed observable writable. This is a function that receives values that other code is trying to write to your computed observable.
+   * It’s up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
+   * @param value Value being written to the computer observable.
+   */
+  write (value: U): void
+}
+
+
+interface ReadonlyComputedDefine<T> extends ReadonlyComputedOptions<T> {
+  /**
+   * A function that is used to evaluate the computed observable’s current value.
+   */
+  read(): T;
+}
+
+interface WriteableComputedDefine<T, U> extends ReadonlyComputedDefine<T>, WriteableComputedOptions<T, U> {}
+
+type ComputedOptions<T, U = T> = ReadonlyComputedOptions<T> | WriteableComputedOptions<T, U>
+type ComputedDefine<T, U = T> = ReadonlyComputedDefine<T> | WriteableComputedDefine<T, U>
+
+type KnockoutComputedFunctions = typeof computed.fn
+
+
+declare global {
+  interface KnockoutComputed<T> extends Omit<KnockoutObservable<T>, keyof KnockoutComputed<T> | keyof KnockoutComputedFunctions>, KnockoutComputedFunctions {
+    [computedState]: ComputedState<T>
+    fn: KnockoutComputedFunctions
+    [LATEST_VALUE]: T
+
+    _evalDelayed?: (this: KnockoutComputed<T>, isChange: boolean) => void
+
+    /**
+     * Manually disposes the computed observable, clearing all subscriptions to dependencies.
+     * This function is useful if you want to stop a computed observable from being updated or want to clean up memory for a
+     * computed observable that has dependencies on observables that won’t be cleaned.
+     */
+    dispose(): void;
+    /**
+     * Customizes observables basic functionality.
+     * @param requestedExtenders Name of the extender feature and it's value, e.g. { notify: 'always' }, { rateLimit: 50 }
+     */
+    extend(requestedExtenders: { [key: string]: any; }): KnockoutComputed<T>;
+  }
+
+  interface KnockoutWriteableComputed<T, U> extends KnockoutComputed<T> {
+    /**
+     * Pass the value to the `write` function given to the computed.
+     */
+    (value: U): void
+  }
+
+  interface KnockoutComputedArray<T> extends KnockoutComputed<T[]>, KnockoutArrayProperties<T> {
+  }
+
+  interface KnockoutPureComputed<T> extends KnockoutComputed<T> {
+
+  }
+
+  /**
+   * This is the `(t)ko.computed` function that creates a computed
+   * observable.
+   */
+  interface KnockoutComputedStatic {
+    fn: KnockoutComputedFunctions
+
+    /**
+     * Creates computed observable.
+     * @param evaluatorFunction Function that computes the observable value.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     * @param options An object with further properties for the computed observable.
+     */
+    <T>(evaluatorFunction: () => T, context?: any, options?: ReadonlyComputedOptions<T>): KnockoutComputed<T>
+
+    /**
+     * Creates computed observable.
+     * @param options An object that defines the computed observable options and behavior.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     */
+    <T>(options: ReadonlyComputedDefine<T>, context?: any): KnockoutComputed<T>
+
+    /**
+     * Creates writeable computed observable.
+     * @param evaluatorFunction Function that computes the observable value.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     * @param options An object with further properties for the computed observable.
+     */
+    <T, U>(evaluatorFunction: () => T, context?: any, options?: WriteableComputedOptions<T, U>): KnockoutWriteableComputed<T, U>
+    /**
+     * Creates writeable computed observable.
+     * @param options An object that defines the computed observable options and behavior.
+     * @param context Defines the value of 'this' when evaluating the computed observable.
+     */
+    <T, U>(options: WriteableComputedDefine<T, U>, context?: any): KnockoutWriteableComputed<T, U>
+  }
+
+  interface KnockoutEventTypeInterface {
+    asleep: true
+    awake: true
   }
 }

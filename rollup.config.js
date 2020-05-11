@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import babelMinify from 'rollup-plugin-babel-minify'
-import nodeResolve from 'rollup-plugin-node-resolve'
-import replace from 'rollup-plugin-replace'
-import typescript from 'rollup-plugin-typescript2'
+import Terser from 'rollup-plugin-terser'
+import nodeResolve from '@rollup/plugin-node-resolve'
+import replace from '@rollup/plugin-replace'
+import typescript from '@rollup/plugin-typescript'
 import license from 'rollup-plugin-license'
 
 const pkgJson = fs.readFileSync(`${process.cwd()}/package.json`, {encoding: 'utf8'})
@@ -43,13 +43,6 @@ const banner = `/*!
  * License: ${pkg.licenses[0].type} (${pkg.licenses[0].url})
  */
 `
-
-/* Use TypeScript instead of babel for transpilation for IE6 compat, plus it's faster */
-const TYPESCRIPT_CONFIG = {
-  include: '**/*.js',
-  exclude: 'node_modules',
-  typescript: require('typescript')
-}
 
 /* Plugins used for all builds */
 const UNIVERSAL_PLUGINS = [
@@ -109,17 +102,23 @@ function createRollupConfig ({ minify, transpile } = {}) {
   let filename = path.join(getPackageRoot(), 'dist', packageName)
 
   const plugins = [replacerPlugin, ...UNIVERSAL_PLUGINS]
+  const tsConfig = {
+    tsconfig: path.resolve(path.join(__dirname, 'tsconfig.json')),
+    typescript: require('typescript'),
+    outDir: path.join(getPackageRoot(), `dist`),
+  }
 
-      // plugins.unshift(replacerPlugin)
   if (transpile) {
-    // FIXME: How do we map to `src/index.js` and include tslib?
-    plugins.push(typescript(TYPESCRIPT_CONFIG))
+    // Our .js files
+    plugins.push(typescript({ ...tsConfig, target: 'ES3', module: 'ES2015' }))
   } else {
+    // Our .es6 files
+    plugins.push(typescript({...tsConfig, target: 'ES2018', module: 'ESNext' }))
     filename += '.es6'
   }
 
   if (minify) {
-    plugins.push(babelMinify({ comments: false }))
+    plugins.push(terser())
     filename += '.min'
   }
 
@@ -130,7 +129,8 @@ function createRollupConfig ({ minify, transpile } = {}) {
     input: path.join(getPackageRoot(), 'src/index.js'),
     external: IS_BROWSER_BUNDLE ? undefined : TKO_MODULES,
     output: {
-      file: filename,
+      // file: path.join(getPackageRoot(), `dist`, filename),
+      dir: path.join(getPackageRoot(), `dist`),
       format: IS_BROWSER_BUNDLE ? 'umd' : 'es',
       name: IS_BROWSER_BUNDLE ? 'ko' : packageName,
       sourcemap: true
