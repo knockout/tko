@@ -124,7 +124,7 @@ declare global {
     _evalIfChanged?: () => T | KnockoutSubscribable<T>
     _origNotifySubscribers: KnockoutObservable<T>['notifySubscribers']
     _notifyNextChange: boolean
-    _limitChange: (value: T) => void
+    _limitChange: (value: T, isDirty?: boolean) => void
     _limitBeforeChange: (value: T) => void
   }
 }

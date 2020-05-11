@@ -6,11 +6,15 @@ import {
   options, overwriteLengthPropertyIfSupported
 } from '@tko/utils'
 
+import type { ProtoProperty } from '@tko/utils/src/options'
+
+
 import * as dependencyDetection from './dependencyDetection.js'
 import { deferUpdates } from './defer.js'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
 import { valuesArePrimitiveAndEqual } from './extenders.js'
 import { limit } from './limit'
+
 
 function observableStatic<T> (initialValue: T): KnockoutObservable<T> {
   const Observable = (function (this: KnockoutObservable<T>): T | KnockoutObservable<T> {
@@ -47,7 +51,7 @@ function observableStatic<T> (initialValue: T): KnockoutObservable<T> {
 }
 
 export const observable = observableStatic as KnockoutObservableStatic
-const protoProperty = observable.protoProperty = options.protoProperty
+const protoProperty = observable.protoProperty = options.protoProperty as ProtoProperty
 
 /**
  * Prototype for Observables
@@ -166,7 +170,7 @@ declare global {
   }
 
   export interface KnockoutObservableStatic {
-    protoProperty: string
+    protoProperty: ProtoProperty
     observablePrototypes: Set<any>
 
     fn: ObservableFn
