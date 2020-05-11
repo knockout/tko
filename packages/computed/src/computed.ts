@@ -25,6 +25,7 @@ import {
     LATEST_VALUE
 } from '@tko/observable'
 
+import type { ProtoProperty } from '@tko/utils/src/options'
 
 const computedState = Symbol('TKO Computed state')
 const DISPOSED_STATE = {
@@ -212,7 +213,12 @@ computed.fn = {
     return dependentObservables
   },
 
-  addDependencyTracking<T> (this: KnockoutComputed<T>, id, target, trackingObj) {
+  addDependencyTracking<T> (
+    this: KnockoutComputed<T>,
+    id: string,
+    target: any,
+    trackingObj,
+  ) {
     if (this[computedState].pure && target === this) {
       throw Error("A 'pure' computed must not be called recursively")
     }
@@ -221,9 +227,12 @@ computed.fn = {
     trackingObj._order = this[computedState].dependenciesCount++
     trackingObj._version = target.getVersion()
   },
+
   haveDependenciesChanged<T> (this: KnockoutComputed<T>) {
-    var id, dependency, dependencyTracking = this[computedState].dependencyTracking
-    for (id in dependencyTracking) {
+    let dependency
+    const {dependencyTracking} = this[computedState]
+
+    for (const id in dependencyTracking) {
       if (hasOwnProperty(dependencyTracking, id)) {
         dependency = dependencyTracking[id]
         if ((this._evalDelayed && dependency._target._notificationIsPending) || dependency._target.hasChanged(dependency._version)) {
@@ -382,7 +391,11 @@ computed.fn = {
 
     return changed
   },
-  evaluateImmediate_CallReadThenEndDependencyDetection<T> (this: KnockoutComputed<T>, state: ComputedState<T>, dependencyDetectionContext) {
+  evaluateImmediate_CallReadThenEndDependencyDetection<T> (
+    this: KnockoutComputed<T>,
+    state: ComputedState<T>,
+    dependencyDetectionContext,
+  ) {
     // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
     // You'd never call it from anywhere else. Factoring it out means that evaluateImmediate_CallReadWithDependencyDetection
     // can be independent of try/finally blocks, which contributes to saving about 40% off the CPU
@@ -404,7 +417,10 @@ computed.fn = {
       state.isStale = state.isDirty = false
     }
   },
-  peek<T> (this: KnockoutComputed<T>, forceEvaluate: boolean) {
+  peek<T> (
+    this: KnockoutComputed<T>,
+    forceEvaluate?: boolean,
+  ) {
     // Peek won't ordinarily re-evaluate, except while the computed is sleeping
     //  or to get the initial value when "deferEvaluation" is set.
     const state = this[computedState]
@@ -414,11 +430,14 @@ computed.fn = {
     return state.latestValue
   },
 
-  get [LATEST_VALUE] () {
+  get [LATEST_VALUE] (this: KnockoutComputed<T>) {
     return this.peek()
   },
 
-  limit<T> (this: KnockoutComputed<T>, limitFunction: RateLimitFunction) {
+  limit<T> (
+    this: KnockoutComputed<T>,
+    limitFunction: RateLimitFunction,
+  ) {
     const state = this[computedState]
     // Override the limit function with one that delays evaluation as well
     subscribable.fn.limit.call(this, limitFunction)
@@ -539,9 +558,12 @@ const pureComputedOverrides = {
   }
 } as const
 
-var deferEvaluationOverrides = {
-  beforeSubscriptionAdd (event: KnockoutEventType) {
-        // This will force a computed with deferEvaluation to evaluate when the first subscription is registered.
+const deferEvaluationOverrides = {
+  beforeSubscriptionAdd<T> (
+    this: KnockoutComputed<T>,
+    event: KnockoutEventType,
+  ) {
+    // This will force a computed with deferEvaluation to evaluate when the first subscription is registered.
     if (event === 'change' || event === 'beforeChange') {
       this.peek()
     }
@@ -551,30 +573,37 @@ var deferEvaluationOverrides = {
 Object.setPrototypeOf(computed.fn, subscribable.fn)
 
 // Set the proto values for ko.computed
-var protoProp = observable.protoProperty // == "__ko_proto__"
+const protoProp = observable.protoProperty as ProtoProperty
 computed.fn[protoProp] = computed
 
 /* This is used by ko.isObservable */
 observable.observablePrototypes.add(computed)
 
-export function isComputed (instance) {
-  return (typeof instance === 'function' && instance[protoProp] === computed)
+export function isComputed<T> (
+  instance: KnockoutComputed<T> | T,
+): instance is KnockoutComputed<T> {
+  return (typeof instance === 'function' &&
+    (instance as any)[protoProp] === computed)
 }
 
-export function isPureComputed (instance) {
-  return isComputed(instance) && instance[computedState] && instance[computedState].pure
+export function isPureComputed<T> (
+  instance: KnockoutComputed<T> | T,
+): instance is KnockoutPureComputed<T> {
+  return isComputed(instance) &&
+    (instance as any)[computedState] &&
+    (instance as any)[computedState].pure
 }
 
-export function pureComputed (
+export function pureComputed<T> (
   evaluatorFunctionOrOptions: (() => T) | Omit<ReadonlyComputedDefine<T>,
   'pure'>, evaluatorFunctionTarget: any,
 ) {
   if (typeof evaluatorFunctionOrOptions === 'function') {
     return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure': true})
   } else {
-    evaluatorFunctionOrOptions = extend({}, evaluatorFunctionOrOptions)   // make a copy of the parameter object
-    evaluatorFunctionOrOptions.pure = true
-    return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget)
+    const optionsClone = {
+      ...evaluatorFunctionOrOptions, pure: true }
+    return computed(optionsClone, evaluatorFunctionTarget)
   }
 }
 
@@ -632,9 +661,10 @@ type KnockoutComputedFunctions = typeof computed.fn
 
 
 declare global {
-  interface KnockoutComputed<T> extends KnockoutObservable<T>, KnockoutComputedFunctions {
-    [computedState]: ComputedState
+  interface KnockoutComputed<T> extends Omit<KnockoutObservable<T>, keyof KnockoutComputed<T> | keyof KnockoutComputedFunctions>, KnockoutComputedFunctions {
+    [computedState]: ComputedState<T>
     fn: KnockoutComputedFunctions
+    [LATEST_VALUE]: T
 
     _evalDelayed?: (this: KnockoutComputed<T>, isChange: boolean) => void
 
@@ -659,6 +689,10 @@ declare global {
   }
 
   interface KnockoutComputedArray<T> extends KnockoutComputed<T[]>, KnockoutArrayProperties<T> {
+  }
+
+  interface KnockoutPureComputed<T> extends KnockoutComputed<T> {
+
   }
 
   /**
@@ -700,5 +734,6 @@ declare global {
 
   interface KnockoutEventTypeInterface {
     asleep: true
+    awake: true
   }
 }
