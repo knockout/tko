@@ -27,7 +27,7 @@
     "@tko/computed": "^4.0.0-alpha8.0",
     "@tko/observable": "^4.0.0-alpha8.0",
     "@tko/utils": "^4.0.0-alpha8.0",
-    "tslib": "^1.8.0"
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [

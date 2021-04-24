@@ -11,7 +11,7 @@
     "@tko/provider": "^4.0.0-alpha8.4",
     "@tko/utils": "^4.0.0-alpha8.0",
     "@tko/utils.component": "^4.0.0-alpha9.0",
-    "tslib": "^1.8.0"
+    "tslib": "^2.2.0"
   },
   "files": [
     "dist/",

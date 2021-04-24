@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "tslib": "^1.8.0"
+    "tslib": "^2.2.0"
   },
   "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
   "standard": {
