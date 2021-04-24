@@ -11,4 +11,4 @@ const deps = Object.keys(pkg.dependencies)
   .filter(v => v.startsWith('@tko/'))
   .map(r => r.replace('@tko/', '../') + '/dist/index.mjs')
 
-console.log(deps.join(' '))
+console.log(deps.join('\n\r'))
