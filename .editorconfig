@@ -7,7 +7,11 @@ trim_trailing_whitespace = true
 charset = utf-8
 indent_size = 2
 
-[*.js]
+[{Makefile,**.mk}]
+indent_size = 4
+indent_style = tab
+
+[{*.js,*.ts}]
 indent_style = space
 indent_size = 2
 
