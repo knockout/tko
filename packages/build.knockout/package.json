@@ -7,10 +7,6 @@
   "author": "The Knockout.js team",
   "main": "dist/build.knockout.js",
   "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
   },
   "repository": {
     "type": "git",

@@ -7,8 +7,8 @@ import fs from 'fs'
 const pkg_path = path.join(process.cwd(), 'package.json')
 const pkg = JSON.parse(fs.readFileSync(pkg_path))
 
-const deps = Object.keys(pkg.dependencies)
+const deps = Object.keys(pkg.dependencies || [])
   .filter(v => v.startsWith('@tko/'))
-  .map(r => r.replace('@tko/', '../') + '/dist/index.mjs')
+  .map(r => path.join(r.replace('@tko/', '../'), 'src', '*'))
 
-console.log(deps.join('\n\r'))
+console.log(deps.join('\n'))

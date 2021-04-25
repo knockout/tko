@@ -8,46 +8,26 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
-    # "prepublish": "yarn build",
-    # "test": "lerna exec --concurrency=1 --loglevel=warn -- yarn test",
-    # "build": "lerna exec --concurrency=6 --loglevel=warn -- yarn build"
-
-# packages 	:= $(patsubst packages/%,%,$(wildcard packages/*))
-packages := bind
-targets_es6	:= $(foreach p,$(packages),packages/$(p)/dist/$(p).es6.js)
-targets_es6	:= $(foreach p,$(packages),packages/$(p)/dist/$(p).esm.js)
-
-# List peer dependencies of a given package.
-# > (c => Object.keys(JSON.parse(fs.readFileSync("packages/"+c+"/package.json", "utf8")).dependencies).filter(c => c.startsWith("@tko/")))("bind")
-
-$(targets_es6): # dependencies: src/* packages.json{@tko/*}
-
-ES_TARGET := ES6
-
-ESBUILD := ./node_modules/.bin/esbuild --platform=node \
-				--target=ES_TARGET \
-				--banner=js="//BANNER" \
-				--footer=js="//FOOTER" \
-				--bundle
+packages 	:= $(wildcard packages/*)
 
 default:
-	@echo "PACKAGES ${packages}"
-	@echo "es6 ${targets_es6}"
-	@echo "esm ${targets_esm}"
+	@echo " 📦  ${packages}"
+
+all::
+	make -j6 $(packages)
+
+.PHONY: $(packages)
+$(packages): # dependencies: src/* packages.json{@tko/*}
+	@echo "hey $@ $< $? $@"
+	cd $@; make
 
 .PHONY: test
 test:
 	npm run test --workspaces
-# $(LERNA) exec --concurrency=1 --loglevel=warn -- npm run test
 
 .PHONY: testn
 testn:
 	lerna exec --concurrency=6 --loglevel=warn -- npm run test
-
-.PHONY: build
-build: node_modules
-# $(LERNA) exec --concurrency=6 --loglevel=warn -- npm run build
-	npx lerna exec --loglevel=warn -- make -f ../../tools/build.mk dist/out.js log-level=info
 
 .PHONY: lint
 lint:
@@ -56,10 +36,6 @@ lint:
 .PHONY: repackage
 repackage:
 	$(NPX) ./tools/common-package-config.js packages/shared.package.json packages/*/package.json
-
-.PHONY: bootstrap
-bootstrap:
-	npm bootstrap
 
 .PHONY: bump
 bump:
@@ -72,10 +48,10 @@ publish-unpublished: build
 
 package.json:
 
-node_modules: bootstrap package.json packages/*/package.json
-	npm i
+install: node_modules
 
-all: build test
+node_modules: package.json packages/*/package.json
+	npm i
 
 outdated-list:
 	$(NPX) npm-check-updates

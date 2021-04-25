@@ -39,10 +39,6 @@
     ]
   },
   "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
   },
   "publishConfig": {
     "access": "public"

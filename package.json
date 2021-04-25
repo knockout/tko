@@ -6,9 +6,7 @@
     "type": "git",
     "url": "https://github.com/knockout/tko.git"
   },
-  "scripts": {
-    "prepublish": "npm run build"
-  },
+  "scripts": {},
   "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [
     {
