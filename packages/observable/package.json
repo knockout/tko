@@ -2,11 +2,12 @@
   "name": "@tko/observable",
   "version": "4.0.0-alpha8.0",
   "description": "TKO subscribables and observables",
-  "module": "dist/observable.js",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.observable.git"
   },
+  "main": "/dist/index.mjs",
   "files": [
     "dist/",
     "helpers/"
