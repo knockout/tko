@@ -1,17 +1,21 @@
 
-src 		:= $(shell find src -name *.js)
+src 		:= $(shell find src -name *.js) \
+			   $(shell find src -name *.ts) \
+			   index.ts
 log-level 	?= warning
 
 package := $(shell node -e "console.log(require('./package.json').name)")
 version := $(shell node -e "console.log(require('./package.json').version)")
 peer_src := $(shell node ../../tools/peer_dependencies.mjs)
 
-banner := /*! ${package} 🥊 ${version} 🥊 (c) The Knockout.js Team 🥊 https://tko.io 🥊 License: MIT (https://opensource.org/licenses/MIT) */
+banner := // ${package} 🥊 ${version}
 
-default:: esm
+default::
+	$(MAKE) -j3 esm commonjs
 
 esm: dist/index.mjs
 commonjs: dist/index.js
+browser: dist/browser.min.js
 
 *.ts:
 
@@ -36,8 +40,8 @@ dist/index.mjs: $(src) $(peer_src)
 		--banner:js="$(banner)" \
 		--bundle \
 		--sourcemap=external \
-		--outfile=dist/index.mjs \
-		./src/index.js
+		--outfile=$@ \
+		./index.ts
 
 # Build a CommonJS bundle, targetting ES6.
 dist/index.js: $(src) $(peer_src)
@@ -49,14 +53,22 @@ dist/index.js: $(src) $(peer_src)
 		--banner:js="$(banner)" \
 		--bundle \
 		--sourcemap=external \
-		--outfile=dist/index.js \
-		./src/index.js
+		--outfile=$@ \
+		./index.ts
 
-# As browser-include
-# --target=es6 \
-# --format=iife \
-# --minify \
-# --outfile=index.es6.min?.js
+dist/browser.min.js:
+	npx esbuild \
+		--platform=neutral \
+		--target=es6 \
+		--format=iife \
+		--global-name=tko \
+		--log-level=$(log-level) \
+		--banner:js="$(banner)" \
+		--bundle \
+		--minify \
+		--sourcemap=external \
+		--outfile=$@ \
+		./index.ts
 
 clean:
 	rm -rf dist/*
