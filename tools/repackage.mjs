@@ -12,13 +12,7 @@ const packageData = (pkg, version) => ({
   version: version,
   ...pkg,
   // Common
-  standard: {
-		env: [
-			"browser",
-			"jasmine",
-			"mocha"
-		]
-  },
+  standard: undefined,
   exports: {
     require: "./dist/index.js",
     import: "./dist/index.mjs"
