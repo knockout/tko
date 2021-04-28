@@ -1,18 +1,17 @@
 {
+  "version": "4.0.0-alpha9.0",
   "name": "@tko/build.knockout",
   "description": "Knockout makes it easier to create rich, responsive UIs with JavaScript",
   "homepage": "https://tko.io",
-  "version": "4.0.0-alpha9.0",
   "license": "MIT",
-  "author": "The Knockout.js team",
-  "main": "dist/build.knockout.js",
-  "scripts": {
-  },
+  "author": "The Knockout Team",
   "repository": {
     "type": "git",
-    "url": "https://github.com/knockout/knockout.git"
+    "url": "git+https://github.com/knockout/tko.git"
   },
-  "bugs": "https://github.com/knockout/knockout/issues",
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  },
   "testling": {
     "preprocess": "build/build.sh",
     "html": "spec/runner.html?src=build/output/knockout-latest.js&testling=true",
@@ -43,7 +42,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://opensource.org/licenses/MIT"
     }
   ],
   "devDependencies": {
@@ -65,15 +64,8 @@
     "@tko/utils.functionrewrite": "^4.0.0-alpha8.2",
     "tslib": "^2.2.0"
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
-  "standard": {
-    "env": [
-      "browser",
-      "jasmine",
-      "mocha"
-    ]
-  },
-  "publishConfig": {
-    "access": "public"
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs"
   }
 }

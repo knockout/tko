@@ -1,9 +1,11 @@
 {
-  "name": "@tko/builder",
   "version": "4.0.0-alpha9.0",
+  "name": "@tko/builder",
   "description": "Compile a customized instance of Knockout.",
-  "main": "dist/builder.js",
-  "repository": "git@github.com:knockout/tko",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  },
   "author": "The Knockout Team",
   "license": "MIT",
   "devDependencies": {
@@ -16,32 +18,22 @@
     "@tko/utils.parser": "^4.0.0-alpha9.0",
     "tslib": "^2.2.0"
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
-  "standard": {
-    "env": [
-      "browser",
-      "jasmine",
-      "mocha"
-    ]
-  },
-  "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://opensource.org/licenses/MIT"
     }
   ],
   "files": [
     "dist/",
     "helpers/"
-  ]
+  ],
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs"
+  },
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  }
 }

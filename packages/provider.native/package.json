@@ -1,6 +1,6 @@
 {
-  "name": "@tko/provider.native",
   "version": "4.0.0-alpha8.4a",
+  "name": "@tko/provider.native",
   "description": "Link binding handlers whose value is already attached to the node",
   "module": "dist/provider.native.js",
   "files": [
@@ -18,28 +18,23 @@
       "chai"
     ]
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
-  "standard": {
-    "env": [
-      "browser",
-      "jasmine",
-      "mocha"
-    ]
-  },
-  "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs"
+  },
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  },
+  "author": "The Knockout Team",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  }
 }
