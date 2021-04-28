@@ -9,6 +9,6 @@ const pkg = JSON.parse(fs.readFileSync(pkg_path))
 
 const deps = Object.keys(pkg.dependencies || [])
   .filter(v => v.startsWith('@tko/'))
-  .map(r => path.join(r.replace('@tko/', '../'), 'src', '*'))
+  .map(r => path.join(r.replace('@tko/', '../'), 'dist', '*.mjs'))
 
 console.log(deps.join('\n'))

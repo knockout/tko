@@ -11,13 +11,11 @@ MAKEFLAGS += --no-builtin-rules
 packages 	:= $(wildcard packages/*)
 package_jsons := $(wildcard packages/*/package.json)
 
-default:
-	make -j8 $(packages)
-	make -j8 $(package_jsons)
-
+default: all
 
 all::
-	make -j6 $(packages)
+	make -j8 $(packages)
+	make -j8 $(package_jsons)
 
 .PHONY: $(packages)
 $(packages):
@@ -57,3 +55,6 @@ outdated-upgrade:
 	npm upgrade-interactive --latest
 
 install: node_modules
+
+clean:
+	rm -rf packages/*/dist/*

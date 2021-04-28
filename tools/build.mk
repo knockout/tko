@@ -11,7 +11,7 @@ peer_src := $(shell node ../../tools/peer_dependencies.mjs)
 banner := // ${package} 🥊 ${version}
 
 default::
-	$(MAKE) -j3 esm commonjs
+	$(MAKE) esm commonjs
 
 esm: dist/index.mjs
 commonjs: dist/index.js
@@ -29,11 +29,12 @@ info:
 
 $(peer_src):
 	@echo "Compiling peer dependency $@"
-	cd $(dir $@) && make
+	cd $(dir $@)/.. && make
 
 # ./node_modules/.bin/esbuild
 # Build a ES6 export module.
 dist/index.mjs: $(src) $(peer_src)
+	@echo "Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--log-level=$(log-level) \
@@ -45,6 +46,7 @@ dist/index.mjs: $(src) $(peer_src)
 
 # Build a CommonJS bundle, targetting ES6.
 dist/index.js: $(src) $(peer_src)
+	@echo "Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--target=es6 \
@@ -57,6 +59,7 @@ dist/index.js: $(src) $(peer_src)
 		./index.ts
 
 dist/browser.min.js:
+	@echo "Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--target=es6 \
