@@ -9,35 +9,32 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 packages 	:= $(wildcard packages/*)
+package_jsons := $(wildcard packages/*/package.json)
 
 default:
-	@echo " 📦  ${packages}"
+	make -j8 $(packages)
+	make -j8 $(package_jsons)
+
 
 all::
 	make -j6 $(packages)
 
 .PHONY: $(packages)
-$(packages): # dependencies: src/* packages.json{@tko/*}
-	@echo "hey $@ $< $? $@"
+$(packages):
 	cd $@; make
 
-.PHONY: test
 test:
 	npm run test --workspaces
 
-.PHONY: testn
-testn:
-	lerna exec --concurrency=6 --loglevel=warn -- npm run test
-
-.PHONY: lint
 lint:
 	$(NPX) standard
 
-.PHONY: repackage
-repackage:
-	$(NPX) ./tools/common-package-config.js packages/shared.package.json packages/*/package.json
+repackage: $(package_jsons)
 
-.PHONY: bump
+$(package_jsons): tools/repackage.mjs
+	PKG=`dirname $@`
+	cd $(shell dirname $@); make repackage
+
 bump:
 	lerna version
 
@@ -54,7 +51,6 @@ node_modules: package.json packages/*/package.json
 	npm i
 
 outdated-list:
-	$(NPX) npm-check-updates
 	npm outdated
 
 outdated-upgrade:

@@ -70,5 +70,11 @@ dist/browser.min.js:
 		--outfile=$@ \
 		./index.ts
 
+repackage: ../../tools/repackage.mjs ../../lerna.json
+	node ../../tools/repackage.mjs
+
 clean:
 	rm -rf dist/*
+
+test:
+	npx karma start ../../karma.conf --once
