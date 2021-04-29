@@ -8,8 +8,9 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
-packages 	:= $(wildcard packages/*)
-package_jsons := $(wildcard packages/*/package.json)
+packages 		:= $(wildcard packages/*)
+package_jsons 	:= $(wildcard packages/*/package.json)
+packages_tests	:= $(packages:packages/%=test/%)
 
 default: all
 
@@ -21,8 +22,16 @@ all::
 $(packages):
 	cd $@; make
 
-test:
-	npm run test --workspaces
+test: $(packages_tests)
+
+#
+# make test/{package}
+#
+# make test/utils
+#
+$(packages_tests):
+	cd packages/`basename $@`; make test
+
 
 lint:
 	$(NPX) standard
@@ -30,8 +39,7 @@ lint:
 repackage: $(package_jsons)
 
 $(package_jsons): tools/repackage.mjs
-	PKG=`dirname $@`
-	cd $(shell dirname $@); make repackage
+	cd $(shell dirname $@); PKG=`dirname $@` make repackage
 
 bump:
 	lerna version
