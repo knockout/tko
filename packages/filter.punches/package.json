@@ -38,7 +38,10 @@
     }
   ],
   "exports": {
-    "require": "./dist/index.js",
-    "import": "./dist/index.mjs"
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./helpers/*": "./helpers/*"
   }
 }

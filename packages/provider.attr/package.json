@@ -26,8 +26,11 @@
     }
   ],
   "exports": {
-    "require": "./dist/index.js",
-    "import": "./dist/index.mjs"
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./helpers/*": "./helpers/*"
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

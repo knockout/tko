@@ -14,8 +14,11 @@ const packageData = (pkg, version) => ({
   // Common
   standard: undefined,
   exports: {
-    require: "./dist/index.js",
-    import: "./dist/index.mjs"
+    ".": {
+      require: "./dist/index.js",
+      import: "./dist/index.mjs"
+    },
+    "./helpers/*": "./helpers/*"
   },
   files: [
     "dist/",
