@@ -55,8 +55,9 @@ export function dummyTemplateEngine(templates) {
         var result;
 
         data = data || {};
-         // Rollup mangles `data` to e.g. `data$$1`.  This workaround works
-         // as long as nomangle$data doesn't appear anywhere not in tests.
+        // Builders (e.g. rollup) mangle `data` to e.g. `data$$1`.
+        // This workaround works as long as nomangle$data doesn't
+        // appear anywhere not in tests.
         const nomangle$data = data
         window.__prevent_tree_shaking__ = nomangle$data
         delete window.__prevent_tree_shaking__
