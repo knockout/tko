@@ -49,12 +49,12 @@ bump:
 publish-unpublished: build
 	lerna publish from-package
 
+package-lock.json: package.json packages/*/package.json
+	npm i
+
 package.json:
 
 install: node_modules
-
-node_modules: package.json packages/*/package.json
-	npm i
 
 outdated-list:
 	npm outdated
@@ -62,7 +62,9 @@ outdated-list:
 outdated-upgrade:
 	npm upgrade-interactive --latest
 
-install: node_modules
+install: package-lock.json
 
 clean:
+	rm package-lock.json
 	rm -rf packages/*/dist/*
+	rm -rf packages/*/package-lock.json
