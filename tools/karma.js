@@ -15,6 +15,11 @@ const COMMON_CONFIG = {
   preprocessors: {
     'spec/**/*.js': ['esbuild'],
     'spec/**/*.ts': ['esbuild']
+  },
+  esbuild: {
+    // See: https://esbuild.github.io/api/
+    format: 'iife',
+    bundle: true,
   }
 }
 

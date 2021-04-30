@@ -12,7 +12,8 @@ function sauceConfig (config) {
   if (!SAUCE_ACCESS_KEY) {
     throw new Error('Environment needs SAUCE_ACCESS_KEY')
   }
-  config.set(Object.assign({
+  config.set({
+    ...COMMON_CONFIG,
     sauceLabs: {
       testName: `${pkg.name} @ ${pkg.version}`,
       startConnect: !argv.includes('--noStartConnect'),
@@ -26,11 +27,12 @@ function sauceConfig (config) {
     browsers: Object.keys(SAUCE_LAUNCHERS),
     reporters: ['dots', 'saucelabs'],
     singleRun: true
-  }, COMMON_CONFIG))
+  })
 }
 
 function localConfig (config) {
-  config.set(Object.assign({
+  config.set({
+    ...COMMON_CONFIG,
     electronOpts: {
       frame: false,
       resizable: false,
@@ -41,7 +43,7 @@ function localConfig (config) {
     },
     browsers: ['Electron'],
     singleRun: argv.includes('--once')
-  }, COMMON_CONFIG))
+  })
 }
 
 module.exports = (config) => {
