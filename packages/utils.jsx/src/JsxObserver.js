@@ -269,7 +269,6 @@ export class JsxObserver extends LifeCycle {
         break
       case 'function': return this.anyToNode(any())
       case 'undefined':
-      case 'Error':
       case 'symbol':
         return this.createComment(String(any))
       case 'string': return this.createTextNode(any)
