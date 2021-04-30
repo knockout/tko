@@ -25,6 +25,12 @@
     ]
   },
   "dependencies": {
+    "@tko/bind": "^4.0.0-alpha8.0",
+    "@tko/computed": "^4.0.0-alpha8.0",
+    "@tko/lifecycle": "^4.0.0-alpha8.0",
+    "@tko/observable": "^4.0.0-alpha8.0",
+    "@tko/provider.native": "^4.0.0-alpha8.0",
+    "@tko/utils": "^4.0.0-alpha8.0",
     "tslib": "^2.2.0"
   },
   "homepage": "https://tko.io",
@@ -36,8 +42,8 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
     },
     "./helpers/*": "./helpers/*"
   },
