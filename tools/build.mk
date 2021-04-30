@@ -1,7 +1,6 @@
 
 src 		:= $(shell find src -name *.js) \
-			   $(shell find src -name *.ts) \
-			   index.ts
+			   $(shell find src -name *.ts)
 log-level 	?= warning
 
 package := $(shell node -e "console.log(require('./package.json').name)")
@@ -13,11 +12,13 @@ banner := // ${package} 🥊 ${version}
 default::
 	$(MAKE) esm commonjs
 
-esm: dist/index.mjs
-commonjs: dist/index.js
+esm: dist/index.js
+commonjs: dist/index.cjs
 browser: dist/browser.min.js
 
 *.ts:
+
+package.json:
 
 info:
 	@echo "Package: $(package)"
@@ -33,40 +34,39 @@ $(peer_src):
 
 # ./node_modules/.bin/esbuild
 # Build a ES6 export module.
-dist/index.mjs: $(src) $(peer_src)
-	@echo "Compiling ${package} => $@"
+dist/index.js: $(src) $(peer_src) package.json
+	@echo "  ⚒  Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--log-level=$(log-level) \
-		--banner:js="$(banner)" \
-		--bundle \
+		--banner:js="$(banner) ESM" \
 		--sourcemap=external \
-		--outfile=$@ \
-		./index.ts
+		--outdir=dist/ \
+		$(src)
 
 # Build a CommonJS bundle, targetting ES6.
-dist/index.js: $(src) $(peer_src)
-	@echo "Compiling ${package} => $@"
+dist/index.cjs: $(src) $(peer_src) package.json
+	@echo "  ⚒  Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--target=es6 \
 		--format=cjs \
 		--log-level=$(log-level) \
-		--banner:js="$(banner)" \
+		--banner:js="$(banner) CommonJS" \
 		--bundle \
 		--sourcemap=external \
 		--outfile=$@ \
 		./index.ts
 
-dist/browser.min.js:
-	@echo "Compiling ${package} => $@"
+dist/browser.min.js: $(src) $(peer_src) package.json
+	@echo "  ⚒  Compiling ${package} => $@"
 	npx esbuild \
-		--platform=neutral \
+		--platform=browser \
 		--target=es6 \
 		--format=iife \
 		--global-name=tko \
 		--log-level=$(log-level) \
-		--banner:js="$(banner)" \
+		--banner:js="$(banner) IIFE" \
 		--bundle \
 		--minify \
 		--sourcemap=external \
