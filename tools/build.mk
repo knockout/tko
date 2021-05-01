@@ -79,5 +79,8 @@ repackage: ../../tools/repackage.mjs ../../lerna.json
 clean:
 	rm -rf dist/*
 
-test:
+test: esm
 	npx karma start ../../karma.conf --once
+
+watch: esm
+	npx karma start ../../karma.conf
