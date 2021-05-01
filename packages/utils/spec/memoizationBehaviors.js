@@ -1,5 +1,5 @@
 
-import { memoization } from '../src'
+import { memoization } from '../dist'
 
 function parseMemoCommentHtml (commentHtml) {
   commentHtml = commentHtml.replace('<!--', '').replace('-->', '')

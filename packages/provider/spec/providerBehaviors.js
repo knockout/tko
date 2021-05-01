@@ -1,7 +1,7 @@
 
 import {
   Provider
-} from '../src'
+} from '../dist'
 
 describe('Provider', function () {
   it('throws an error if not subclassed', function () {

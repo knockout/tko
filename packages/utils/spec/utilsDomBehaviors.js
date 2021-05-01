@@ -1,8 +1,8 @@
 import '../helpers/jasmine-13-helper.js'
 
-import * as utils from '../src'
-import { registerEventHandler } from '../src'
-import options from '../src/options.js'
+import * as utils from '../dist'
+import { registerEventHandler } from '../dist'
+import options from '../dist/options.js'
 
 var ko = ko || {}
 ko.utils = utils

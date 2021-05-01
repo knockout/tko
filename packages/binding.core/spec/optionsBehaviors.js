@@ -18,13 +18,13 @@ import {
     options
 } from '@tko/utils'
 
-import {bindings as coreBindings} from '../src'
+import {bindings as coreBindings} from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'
 
 import {
     matchers
-} from '../src/test-helper'
+} from '../dist/test-helper'
 
 describe('Binding: Options', function () {
   beforeEach(jasmine.prepareTestNode)

@@ -27,7 +27,7 @@ import {
 
 import {
   Identifier, Arguments
-} from '../src'
+} from '../dist'
 
 describe('Identifier', function () {
   function testLookup (identifier, $data) {

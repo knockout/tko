@@ -1,6 +1,6 @@
 import {
     applyBindings
-} from '../src'
+} from '../dist'
 
 import {
     cleanNode, options

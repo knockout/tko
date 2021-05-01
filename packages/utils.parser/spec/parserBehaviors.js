@@ -14,7 +14,6 @@ import {
   applyBindings
 } from '@tko/bind';
 
-import { DataBindProvider } from '@tko/provider.databind'
 import { VirtualProvider } from '@tko/provider.virtual'
 
 import {
@@ -23,7 +22,7 @@ import {
 
 import {
   Parser
-} from '../src';
+} from '../dist';
 
 function ctxStub (ctx) {
   return { lookup (v) { return ctx ? ctx[v] : null } }

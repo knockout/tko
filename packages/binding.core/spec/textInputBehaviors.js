@@ -17,7 +17,7 @@ import {
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import { bindings as coreBindings } from '../src'
+import { bindings as coreBindings } from '../dist'
 
 const DEBUG = true
 

@@ -3,7 +3,7 @@ import {
   DataBindProvider
 } from '@tko/provider.databind'
 
-import parseObjectLiteral from '../src/preparse'
+import parseObjectLiteral from '../dist/preparse'
 
 describe('Expression Rewriting', function () {
   var preProcessBindings

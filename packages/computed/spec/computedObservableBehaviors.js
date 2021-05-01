@@ -9,7 +9,7 @@ import {
 
 import {
     computed, isPureComputed, isComputed
-} from '../src'
+} from '../dist'
 
 describe('Dependent Observable', function () {
   it('Should be subscribable', function () {

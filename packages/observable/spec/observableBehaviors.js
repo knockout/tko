@@ -7,7 +7,7 @@ import {
     observable, isSubscribable, isObservable,
     isWriteableObservable, isWritableObservable, subscribable,
     unwrap
-} from '../src'
+} from '../dist'
 
 describe('Observable', function () {
   it('Should be subscribable', function () {

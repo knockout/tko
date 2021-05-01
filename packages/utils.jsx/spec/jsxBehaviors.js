@@ -37,9 +37,9 @@ import {
 
 import {
   JsxObserver
-} from '../src'
+} from '../dist'
 
-import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
+import { ORIGINAL_JSX_SYM } from '../dist/JsxObserver';
 
 
 class JsxTestObserver extends JsxObserver {

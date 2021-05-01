@@ -19,7 +19,7 @@ import {
     bindings as templateBindings,
     renderTemplate,
     anonymousTemplate
-} from '../src'
+} from '../dist'
 import {
     bindings as coreBindings
 } from '@tko/binding.core'

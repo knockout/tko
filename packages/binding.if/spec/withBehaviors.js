@@ -15,7 +15,7 @@ import { DataBindProvider } from '@tko/provider.databind'
 import { MultiProvider } from '@tko/provider.multi'
 import { VirtualProvider } from '@tko/provider.virtual'
 
-import {bindings as withBindings} from '../src'
+import {bindings as withBindings} from '../dist'
 import {bindings as coreBindings} from '@tko/binding.core'
 import {bindings as templateBindings} from '@tko/binding.template'
 

@@ -10,7 +10,7 @@ import {
 
 import {
   LifeCycle
-} from '../src'
+} from '../dist'
 
 describe('KO LifeCycle', function () {
   describe('mixInto', function () {

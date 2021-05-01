@@ -20,7 +20,7 @@ import {
     computed as koComputed,
     pureComputed as koPureComputed,
     when
-} from '../src'
+} from '../dist'
 
 import {
     useMockForTasks

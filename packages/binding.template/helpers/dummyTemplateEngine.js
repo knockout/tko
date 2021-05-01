@@ -5,7 +5,7 @@ import {
 
 import {
     renderTemplate, anonymousTemplate, templateEngine
-} from '../src';
+} from '../dist';
 
 
 export function dummyTemplateEngine(templates) {

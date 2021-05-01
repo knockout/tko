@@ -16,7 +16,7 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 import { bindings as componentBindings } from '@tko/binding.component'
 
-import components from '../src'
+import components from '../dist'
 const {ComponentABC} = components
 
 import {

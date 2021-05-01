@@ -19,7 +19,7 @@ import { DataBindProvider } from '@tko/provider.databind'
 import {
   applyBindings, dataFor, bindingContext, bindingEvent,
   applyBindingsToDescendants, applyBindingsToNode, contextFor
-} from '../src'
+} from '../dist'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'

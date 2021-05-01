@@ -5,7 +5,7 @@ import {
 
 import {
   when
-} from '../src'
+} from '../dist'
 
 describe('when', function () {
   it('Runs callback when predicate function becomes true, but only once', function () {

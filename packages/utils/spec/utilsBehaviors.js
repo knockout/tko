@@ -1,4 +1,4 @@
-import * as utils from '../src'
+import * as utils from '../dist'
 import '../helpers/jasmine-13-helper.js'
 
 var ko = ko || {}

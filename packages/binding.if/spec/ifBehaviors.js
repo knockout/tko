@@ -20,7 +20,7 @@ import {
   // setTemplateEngine,
   // templateEngine,
   // nativeTemplateEngine
-} from '../src'
+} from '../dist'
 
 import {bindings as coreBindings} from '@tko/binding.core'
 

@@ -1,7 +1,7 @@
 
 import {
   MultiProvider
-} from '../src'
+} from '../dist'
 
 describe('MultiProvider Behavior', function () {
   describe('nodeHasBindings', function () {

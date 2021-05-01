@@ -21,7 +21,7 @@ import {
 import {
     bindings as templateBindings, renderTemplate,
     setTemplateEngine, nativeTemplateEngine
-} from '../src'
+} from '../dist'
 
 import {
   bindings as coreBindings

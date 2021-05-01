@@ -1,7 +1,7 @@
 
 import {
   BindingStringProvider
-} from '../src'
+} from '../dist'
 
 describe('Binding String Provider behavior', function () {
   describe('getBindingAccessors', function () {
