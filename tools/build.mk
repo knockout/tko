@@ -1,11 +1,12 @@
 
+tools_dir	:= ../../tools
 src 		:= $(shell find src -name *.js) \
 			   $(shell find src -name *.ts)
 log-level 	?= warning
 
 package := $(shell node -e "console.log(require('./package.json').name)")
 version := $(shell node -e "console.log(require('./package.json').version)")
-peer_src := $(shell node ../../tools/peer_dependencies.mjs)
+peer_src := $(shell node $(tools_dir)/peer_dependencies.mjs)
 
 banner := // ${package} 🥊 ${version}
 
@@ -73,14 +74,14 @@ dist/browser.min.js: $(src) $(peer_src) package.json
 		--outfile=$@ \
 		./index.ts
 
-repackage: ../../tools/repackage.mjs ../../lerna.json
-	node ../../tools/repackage.mjs
+repackage: $(tools_dir)/repackage.mjs ../../lerna.json
+	node $(tools_dir)/repackage.mjs
 
 clean:
 	rm -rf dist/*
 
 test: esm
-	npx karma start ../../karma.conf --once
+	npx karma start $(tools_dir)/karma.conf --once
 
 watch: esm
-	npx karma start ../../karma.conf
+	npx karma start $(tools_dir)/karma.conf
