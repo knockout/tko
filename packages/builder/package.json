@@ -36,6 +36,11 @@
     },
     "./helpers/*": "./helpers/*"
   },
+  "karma": {
+    "frameworks": [
+      "jasmine"
+    ]
+  },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
   }
