@@ -30,13 +30,13 @@ info:
 	@echo "Peer Source": $(peer_src)
 
 $(peer_src):
-	@echo "Compiling peer dependency $@"
-	cd $(dir $@)/.. && make
+	@echo "[make] Compiling peer dependency $@"
+	cd $(subst /dist/*.js,,$@) && make
 
 # ./node_modules/.bin/esbuild
 # Build a ES6 export module.
 dist/index.js: $(src) $(peer_src) package.json
-	@echo "  ⚒  Compiling ${package} => $@"
+	@echo "[make] Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--log-level=$(log-level) \
@@ -47,7 +47,7 @@ dist/index.js: $(src) $(peer_src) package.json
 
 # Build a CommonJS bundle, targetting ES6.
 dist/index.cjs: $(src) $(peer_src) package.json
-	@echo "  ⚒  Compiling ${package} => $@"
+	@echo "[make] Compiling ${package} => $@"
 	npx esbuild \
 		--platform=neutral \
 		--target=es6 \
@@ -60,7 +60,7 @@ dist/index.cjs: $(src) $(peer_src) package.json
 		./index.ts
 
 dist/browser.min.js: $(src) $(peer_src) package.json
-	@echo "  ⚒  Compiling ${package} => $@"
+	@echo "[make] Compiling ${package} => $@"
 	npx esbuild \
 		--platform=browser \
 		--target=es6 \
