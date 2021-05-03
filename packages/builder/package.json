@@ -38,7 +38,7 @@
   },
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha"
     ]
   },
   "bugs": {
