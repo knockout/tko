@@ -55,7 +55,7 @@ const builder = new Builder({
 })
 
 export default builder.create({
-  version: '{{ VERSION }}',
+  version: BUILD_VERSION,
   components,
   Component: components.ComponentABC,
   expressionRewriting

@@ -42,6 +42,7 @@ dist/index.js: $(src) $(peer_src) package.json
 		--platform=neutral \
 		--log-level=$(log-level) \
 		--banner:js="$(banner) ESM" \
+		--define:BUILD_VERSION='"${version}"' \
 		--sourcemap=external \
 		--outdir=dist/ \
 		$(src)
@@ -55,6 +56,7 @@ dist/index.cjs: $(src) $(peer_src) package.json
 		--format=cjs \
 		--log-level=$(log-level) \
 		--banner:js="$(banner) CommonJS" \
+		--define:BUILD_VERSION='"${version}"' \
 		--bundle \
 		--sourcemap=external \
 		--outfile=$@ \
@@ -69,6 +71,7 @@ dist/browser.min.js: $(src) $(peer_src) package.json
 		--global-name=$(iife-global-name) \
 		--log-level=$(log-level) \
 		--banner:js="$(banner) IIFE" \
+		--define:BUILD_VERSION='"${version}"' \
 		--bundle \
 		--minify \
 		--sourcemap=external \

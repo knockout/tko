@@ -52,6 +52,6 @@ export default builder.create({
     Fragment,
   },
   components,
-  version: '{{VERSION}}',
+  version: BUILD_VERSION,
   Component: components.ComponentABC,
 })
