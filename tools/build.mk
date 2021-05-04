@@ -9,6 +9,7 @@ version := $(shell node -e "console.log(require('./package.json').version)")
 peer_src := $(shell node $(tools_dir)/peer_dependencies.mjs)
 
 banner := // ${package} 🥊 ${version}
+iife-global-name := tko
 
 default::
 	$(MAKE) esm commonjs
@@ -65,7 +66,7 @@ dist/browser.min.js: $(src) $(peer_src) package.json
 		--platform=browser \
 		--target=es6 \
 		--format=iife \
-		--global-name=tko \
+		--global-name=$(iife-global-name) \
 		--log-level=$(log-level) \
 		--banner:js="$(banner) IIFE" \
 		--bundle \

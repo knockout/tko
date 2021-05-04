@@ -12,15 +12,9 @@ Commands for building & testing:
 
 ```
 Build all:
-$ yarn build
+$ make
 
 Test once.
-$ yarn test
-
-Build only ES6 (the tested version):
-$ yarn build --es6
-
-Watch with Karma server
-$ yarn watch
+$ make test
 ```
 
