@@ -73,7 +73,7 @@ dist/browser.min.js: $(src) $(peer_src) package.json
 		--minify \
 		--sourcemap=external \
 		--outfile=$@ \
-		./index.ts
+		./src/common.ts
 
 repackage: $(tools_dir)/repackage.mjs ../../lerna.json
 	node $(tools_dir)/repackage.mjs
