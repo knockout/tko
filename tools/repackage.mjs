@@ -1,12 +1,11 @@
 /**
- * A simple utility for updating the package.json files with
- * some dynamics when we re-release.
+ * A simple utility for ensuring that the contents of
+ * the package.json files are consistent and it is
+ * easy to distribute changes.
  */
-import path from 'path'
 import fs from 'fs/promises'
-import url from 'url'
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const LERNA_CONF = '../../lerna.json'
 
 const packageData = (pkg, version) => ({
   version: version,
@@ -41,9 +40,11 @@ const packageData = (pkg, version) => ({
   },
 })
 
-const version = JSON.parse(await fs.readFile(path.join(__dirname, '../lerna.json'))).version
-const pkg = await fs.readFile('package.json', 'utf8').catch(() => '{}')
-console.info(`Repackaged ${pkg.name} as ${version}.`)
-const data = packageData(JSON.parse(pkg), version)
+const parse = async n => JSON.parse(await fs.readFile(n, 'utf8'))
+
+const version = (await parse(LERNA_CONF)).version
+const pkg = await parse('package.json')
+console.info(`Rewriting package.json: ${pkg.name}.`)
+const data = packageData(pkg, version)
 fs.writeFile('package.json', JSON.stringify(data, null, 2), 'utf8')
   .catch(console.error)

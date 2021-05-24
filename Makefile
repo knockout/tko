@@ -1,66 +1,52 @@
 NPX		:= npx
 NODE  	:= node
 NPM		:= npm
+LERNA	:= npx lerna
 
 # Some make settings
 SHELL := bash
 .ONESHELL:
-MAKEFLAGS += --warn-undefined-variables
-MAKEFLAGS += --no-builtin-rules
-
-packages 		:= $(wildcard packages/*)
-package_jsons 	:= $(wildcard packages/*/package.json)
-packages_tests	:= $(packages:packages/%=test/%)
+MAKEFLAGS 	+= --warn-undefined-variables
+MAKEFLAGS 	+= --no-builtin-rules
 
 default: all
 
 all::
-	make -j8 $(packages)
-	make -j8 $(package_jsons)
+	$(LERNA) --concurrency 8 exec -- $(MAKE)
 
 .PHONY: $(packages)
 $(packages):
-	cd $@; make
+	cd $@; $(MAKE)
 
-test: $(packages_tests)
-
-#
-# make test/{package}
-#
-# make test/utils
-#
-$(packages_tests):
-	cd packages/`basename $@`; make test
-
+test:
+	$(LERNA) exec --stream -- $(MAKE) test
 
 lint:
 	$(NPX) standard
 
-repackage: $(package_jsons)
-
-$(package_jsons): tools/repackage.mjs
-	cd $(shell dirname $@); PKG=`dirname $@` make repackage
+repackage: tools/repackage.mjs
+	$(LERNA) exec --stream -- $(MAKE) repackage
 
 bump:
-	lerna version
+	$(LERNA) version
 
 # from-git "identify packages tagged by lerna version and publish them to npm."
 # from-package "packages where the latest version is not present in the registry"
 publish-unpublished: build
-	lerna publish from-package
+	$(LERNA) publish from-package
 
 package-lock.json: package.json packages/*/package.json
-	npm i
+	$(NPM) i
 
 package.json:
 
 install: node_modules
 
 outdated-list:
-	npm outdated
+	$(NPM) outdated
 
 outdated-upgrade:
-	npm upgrade-interactive --latest
+	$(NPM) upgrade-interactive --latest
 
 install: package-lock.json
 
@@ -68,3 +54,8 @@ clean:
 	rm package-lock.json
 	rm -rf packages/*/dist/*
 	rm -rf packages/*/package-lock.json
+
+# Local linking of these packages, so they
+# are available for local testing/dev.
+link:
+	$(LERNA) exec -- npm link
