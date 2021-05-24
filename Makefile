@@ -12,11 +12,7 @@ MAKEFLAGS 	+= --no-builtin-rules
 default: all
 
 all::
-	$(LERNA) --concurrency 8 exec -- $(MAKE)
-
-.PHONY: $(packages)
-$(packages):
-	cd $@; $(MAKE)
+	$(LERNA) --concurrency 8 exec --stream -- $(MAKE)
 
 test:
 	$(LERNA) exec --stream -- $(MAKE) test
@@ -54,6 +50,8 @@ clean:
 	rm package-lock.json
 	rm -rf packages/*/dist/*
 	rm -rf packages/*/package-lock.json
+	rm -rf builds/*/dist/*
+	rm -rf builds/*/package-lock.json
 
 # Local linking of these packages, so they
 # are available for local testing/dev.
