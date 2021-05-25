@@ -46,12 +46,13 @@ const builder = new Builder({
   ]
 })
 
+const version = BUILD_VERSION
 export default builder.create({
   jsx: {
     createElement,
     Fragment,
   },
   components,
-  version: BUILD_VERSION,
+  version,
   Component: components.ComponentABC,
 })
