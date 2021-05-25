@@ -71,12 +71,13 @@ dist/browser.min.js: $(src) $(peer_src) package.json
 		--global-name=$(iife-global-name) \
 		--log-level=$(log-level) \
 		--banner:js="$(banner) IIFE" \
+		--footer:js="(self||window||global).$(iife-global-name) = $(iife-global-name).default" \
 		--define:BUILD_VERSION='"${version}"' \
 		--bundle \
 		--minify \
 		--sourcemap=external \
 		--outfile=$@ \
-		./src/common.ts
+		./src/index.js
 
 repackage: $(tools_dir)/repackage.mjs ../../lerna.json
 	node $(tools_dir)/repackage.mjs

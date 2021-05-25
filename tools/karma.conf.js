@@ -6,7 +6,6 @@ const fs = require('fs')
 const {argv} = process
 const {SAUCE_USERNAME, SAUCE_ACCESS_KEY} = process.env
 
-
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 const CommonConfig = {
@@ -24,6 +23,9 @@ const CommonConfig = {
     // See: https://esbuild.github.io/api/
     format: 'iife',
     bundle: false,
+    define: {
+      BUILD_VERSION: '"test"',
+    }
   }
 }
 
