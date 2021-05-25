@@ -56,4 +56,4 @@ clean:
 # Local linking of these packages, so they
 # are available for local testing/dev.
 link:
-	$(LERNA) exec -- npm link
+	$(LERNA) exec --stream -- npm link
