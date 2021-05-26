@@ -47,7 +47,7 @@ outdated-upgrade:
 install: package-lock.json
 
 clean:
-	rm package-lock.json
+	rm -f package-lock.json
 	rm -rf packages/*/dist/*
 	rm -rf packages/*/package-lock.json
 	rm -rf builds/*/dist/*
