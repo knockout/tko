@@ -1,31 +1,15 @@
-version: 2
+version: 2.1
+orbs:
+  saucectl: saucelabs/saucectl-run@1.0.0
+
 jobs:
-  build:
+  test-sauce:
     docker:
-    - image: "circleci/node:10-browsers"
-      environment:
-        SC_VERSION: 4.4.12
+    - image: "circleci/node:14-browsers"
 
     steps:
     - checkout
-
-    # psmisc contains the `killall` command, needed below to reap the sc process
-    - run: sudo apt-get install -y psmisc
-
-    - restore_cache:
-        key: saucelabs
-    - run: wget -c https://saucelabs.com/downloads/sc-${SC_VERSION}-linux.tar.gz
-    - run: tar zxf sc-${SC_VERSION}-linux.tar.gz
-    - save_cache:
-        key: saucelabs
-        paths:
-          - sc-*-linux.tar.gz
-    - run:
-        command: "sc-*-linux/bin/sc --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY --readyfile ~/sauce_is_ready"
-        background: true
-        environment:
-          CI_AUTOMATE_PROJECT: $CIRCLE_SHA1
-          CI_AUTOMATE_BUILD: Build No. $CIRCLE_BUILD_NUM for $CIRCLE_SHA1
+    - saucectl/saucectl-run
 
     - restore_cache:
         key: node-{{ .Branch }}-0001
@@ -36,8 +20,4 @@ jobs:
         paths:
           - node_modules
           - /home/circleci/.cache/yarn/v1
-
-    - run: while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
     - run: yarn test
-    # - run: yarn test --sauce --noStartConnect
-    - run: killall --wait sc
