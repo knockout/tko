@@ -3,12 +3,13 @@ orbs:
   saucectl: saucelabs/saucectl-run@1.0.0
 
 jobs:
-  test-sauce:
+  test-tko:
     docker:
     - image: "circleci/node:14-browsers"
 
     steps:
     - checkout
+
     - saucectl/saucectl-run
 
     - restore_cache:
@@ -21,3 +22,10 @@ jobs:
           - node_modules
           - /home/circleci/.cache/yarn/v1
     - run: yarn test
+
+
+workflows:
+  version: 2
+  default_workflow:
+    jobs:
+      - test-tko
