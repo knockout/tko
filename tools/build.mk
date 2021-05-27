@@ -10,6 +10,10 @@ version := $(shell node -e "console.log(require('./package.json').version)")
 banner := // ${package} 🥊 ${version}
 iife-global-name := tko
 
+KARMA 	:= npx karma
+ESBUILD := npx esbuild
+
+
 default::
 	$(MAKE) esm commonjs
 
@@ -31,7 +35,7 @@ info:
 # Build a ES6 export module.
 dist/index.js: $(src) package.json
 	@echo "[make] Compiling ${package} => $@"
-	npx esbuild \
+	$(ESBUILD) \
 		--platform=neutral \
 		--log-level=$(log-level) \
 		--banner:js="$(banner) ESM" \
@@ -43,7 +47,7 @@ dist/index.js: $(src) package.json
 # Build a CommonJS bundle, targetting ES6.
 dist/index.cjs: $(src) package.json
 	@echo "[make] Compiling ${package} => $@"
-	npx esbuild \
+	$(ESBUILD) \
 		--platform=neutral \
 		--target=es6 \
 		--format=cjs \
@@ -57,7 +61,7 @@ dist/index.cjs: $(src) package.json
 
 dist/browser.min.js: $(src) package.json
 	@echo "[make] Compiling ${package} => $@"
-	npx esbuild \
+	$(ESBUILD) \
 		--platform=browser \
 		--target=es6 \
 		--format=iife \
@@ -79,7 +83,10 @@ clean:
 	rm -rf dist/*
 
 test: esm
-	npx karma start $(tools_dir)/karma.conf --once
+	$(KARMA) start $(tools_dir)/karma.conf --once
 
 watch: esm
-	npx karma start $(tools_dir)/karma.conf
+	$(KARMA) start $(tools_dir)/karma.conf
+
+test-ci:
+	$(KARMA) start $(tools_dir)/karma.conf --once --sauce

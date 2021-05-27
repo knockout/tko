@@ -17,6 +17,9 @@ all::
 test:
 	$(LERNA) exec --stream -- $(MAKE) test
 
+ci:
+	$(LERNA) exec --stream -- $(MAKE) test-ci
+
 lint:
 	$(NPX) standard
 
