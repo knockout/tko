@@ -14,6 +14,9 @@
     "tslib": "^2.2.0"
   },
   "devDependencies": {
+    "@tko/bind": "^4.0.0-alpha9.0",
+    "@tko/binding.core": "^4.0.0-alpha9.0",
+    "@tko/provider.databind": "^4.0.0-alpha9.0"
   },
   "karma": {
     "frameworks": [
