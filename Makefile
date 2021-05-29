@@ -8,11 +8,12 @@ SHELL := bash
 .ONESHELL:
 MAKEFLAGS 	+= --warn-undefined-variables
 MAKEFLAGS 	+= --no-builtin-rules
+CONCURRENCY = 8
 
 default: all
 
 all::
-	$(LERNA) --concurrency 8 exec --stream -- $(MAKE)
+	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test:
 	$(LERNA) exec --stream -- $(MAKE) test

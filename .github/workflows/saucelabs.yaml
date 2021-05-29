@@ -25,5 +25,5 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: 14
-    - run: make all
+    - run: make CONCURRENCY=1 all
     - run: make ci
