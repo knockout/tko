@@ -12,7 +12,14 @@ CONCURRENCY = 8
 
 default: all
 
-all::
+package.json:
+
+package-lock.json:
+	npm i
+
+node_modules: package-lock.json
+
+all:: node_modules
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test:
