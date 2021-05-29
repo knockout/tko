@@ -34,7 +34,7 @@
       "jasmine"
     ]
   },
-  "devDependencies": {
+  "peerDependencies": {
     "@tko/binding.if": "^4.0.0-alpha9.0"
   },
   "licenses": [

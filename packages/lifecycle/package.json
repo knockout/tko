@@ -6,7 +6,7 @@
     "@tko/utils": "^4.0.0-alpha8.0",
     "tslib": "^2.2.0"
   },
-  "devDependencies": {
+  "peerDependencies": {
     "@tko/observable": "^4.0.0-alpha8.0"
   },
   "files": [

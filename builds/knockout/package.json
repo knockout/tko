@@ -45,7 +45,7 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   ],
-  "devDependencies": {
+  "dependencies": {
     "@tko/binding.component": "^4.0.0-alpha9.0",
     "@tko/binding.core": "^4.0.0-alpha9.0",
     "@tko/binding.foreach": "^4.0.0-alpha9.0",

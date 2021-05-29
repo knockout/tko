@@ -11,7 +11,7 @@
     "@tko/utils": "^4.0.0-alpha8.0",
     "tslib": "^2.2.0"
   },
-  "devDependencies": {
+  "peerDependencies": {
     "@tko/binding.foreach": "^4.0.0-alpha9.0"
   },
   "files": [
