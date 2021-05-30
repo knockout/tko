@@ -14,9 +14,6 @@ default: all
 
 package.json:
 
-package-lock.json:
-	npm i
-
 node_modules: package-lock.json
 
 all:: node_modules

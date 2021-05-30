@@ -47,13 +47,13 @@ const CommonConfig = {
    CHROME: {
      base: 'SauceLabs',
      browserName: 'chrome',
-     [VERSIONS_SYM]: ['latest', 60, 55]//, 50, 45, 40, 35, 30]
+     [VERSIONS_SYM]: ['latest']//, 50, 45, 40, 35, 30]
    },
 
    FIREFOX: {
      base: 'SauceLabs',
      browserName: 'firefox',
-     [VERSIONS_SYM]: ['latest', 55, 50]
+     [VERSIONS_SYM]: ['latest']
    },
 
    SAFARI: {
@@ -66,12 +66,6 @@ const CommonConfig = {
      base: 'SauceLabs',
      browserName: 'microsoftedge',
      [VERSIONS_SYM]: ['latest']
-   },
-
-   IE: {
-     base: 'SauceLabs',
-     browserName: 'internet explorer',
-     [VERSIONS_SYM]: [11, 10, 9]
    },
 
    // 🚨  The iPhone emulater on SauceLabs requires a huge connectionRetryTimeout
@@ -95,7 +89,6 @@ const CommonConfig = {
    ...SauceBrowsers.launchersFor('FIREFOX'),
    ...SauceBrowsers.launchersFor('SAFARI')
    // ...SauceBrowsers.launchersFor('EDGE'),
-   // ...SauceBrowsers.launchersFor('IE')
  )
 
 
