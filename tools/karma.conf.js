@@ -87,7 +87,7 @@ const CommonConfig = {
  const SauceLaunchers = Object.assign(
    ...SauceBrowsers.launchersFor('CHROME'),
    ...SauceBrowsers.launchersFor('FIREFOX'),
-   ...SauceBrowsers.launchersFor('SAFARI')
+  //  ...SauceBrowsers.launchersFor('SAFARI')
    // ...SauceBrowsers.launchersFor('EDGE'),
  )
 
