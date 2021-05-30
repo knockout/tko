@@ -92,7 +92,6 @@ const CommonConfig = {
  )
 
 
-
 function sauceConfig (config) {
   if (!SAUCE_USERNAME) {
     throw new Error('Environment needs SAUCE_USERNAME')
@@ -104,7 +103,7 @@ function sauceConfig (config) {
     ...CommonConfig,
     sauceLabs: {
       testName: `${pkg.name} @ ${pkg.version}`,
-      startConnect: !argv.includes('--noStartConnect'),
+      startConnect: argv.includes('--startConnect'),
       public: 'public'
     },
     colors: true,
