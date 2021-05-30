@@ -19,5 +19,6 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: 16
+    - run: sudo apt-get install xvfb electron
     - run: make CONCURRENCY=1 all
-    - run: make test
+    - run: xvfb-run --auto-servernum make test
