@@ -27,3 +27,6 @@ jobs:
         node-version: 16
     - run: make CONCURRENCY=1 all
     - run: make ci
+      env:
+        SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+        SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
