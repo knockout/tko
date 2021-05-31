@@ -104,7 +104,9 @@ function sauceConfig (config) {
     sauceLabs: {
       testName: `${pkg.name} @ ${pkg.version}`,
       startConnect: argv.includes('--startConnect'),
-      public: 'public'
+      public: 'public',
+      recordVideo: false,
+      recordScreenshots: false,
     },
     colors: true,
     captureTimeout: 120000,

@@ -23,7 +23,7 @@ test:
 	$(LERNA) exec --stream -- $(MAKE) test
 
 ci:
-	$(LERNA) exec --stream -- $(MAKE) test-ci
+	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
 
 lint:
 	$(NPX) standard

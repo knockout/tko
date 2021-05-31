@@ -3,13 +3,9 @@ name: SauceLabs Browser CI
 
 on:
   push:
-    # branches: [ master ]
-    # Disable pending future CI tests
-    branches-ignore:
-      - '**'
-
-  # pull_request:
-  #   branches: [ master ]
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   test:
