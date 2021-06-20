@@ -16,7 +16,7 @@ package.json:
 
 node_modules: package-lock.json
 
-all:: node_modules
+all:: node_modules package-lock.json
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test:
