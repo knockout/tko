@@ -1,7 +1,7 @@
 
 import {
   proxy, peek, isProxied, getObservable
-} from '../src/proxy'
+} from '../dist/proxy'
 
 import {
   observable

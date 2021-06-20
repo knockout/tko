@@ -4,7 +4,7 @@
 
 import {
     toJS, toJSON, isObservable, observable, observableArray
-} from '../src'
+} from '../dist'
 
 describe('Mapping helpers', function () {
   it('toJS should require a parameter', function () {

@@ -1,0 +1,58 @@
+{
+  "version": "4.0.0-alpha9.0",
+  "name": "@tko/build.reference",
+  "description": "The TKO Reference Build",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  },
+  "author": "The Knockout Team",
+  "karma": {
+    "frameworks": [
+      "mocha",
+      "chai"
+    ]
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@tko/binding.component": "^4.0.0-alpha9.0",
+    "@tko/binding.core": "^4.0.0-alpha9.0",
+    "@tko/binding.foreach": "^4.0.0-alpha9.0",
+    "@tko/binding.if": "^4.0.0-alpha9.0",
+    "@tko/binding.template": "^4.0.0-alpha9.0",
+    "@tko/builder": "^4.0.0-alpha9.0",
+    "@tko/filter.punches": "^4.0.0-alpha8.0",
+    "@tko/provider.attr": "^4.0.0-alpha8.4",
+    "@tko/provider.bindingstring": "^4.0.0-alpha9.0",
+    "@tko/provider.component": "^4.0.0-alpha9.0",
+    "@tko/provider.databind": "^4.0.0-alpha9.0",
+    "@tko/provider.multi": "^4.0.0-alpha8.4",
+    "@tko/provider.mustache": "^4.0.0-alpha9.0",
+    "@tko/provider.native": "^4.0.0-alpha8.4a",
+    "@tko/provider.virtual": "^4.0.0-alpha9.0",
+    "@tko/utils.component": "^4.0.0-alpha9.0",
+    "@tko/utils.jsx": "^4.0.0-alpha9.0",
+    "tslib": "^2.2.0"
+  },
+  "files": [
+    "dist/",
+    "helpers/"
+  ],
+  "homepage": "https://tko.io",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./helpers/*": "./helpers/*"
+  },
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  }
+}

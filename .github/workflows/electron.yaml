@@ -1,0 +1,31 @@
+name: Local Node CI
+
+on:
+  push:
+    branches-ignore:
+      - '**'
+  # push:
+  #   branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     node-version: [16.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16
+    - run: sudo apt-get install xvfb
+    - run: make CONCURRENCY=1 all
+    - run: npm i electron
+    - name: Run headless test
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: make test

@@ -1,7 +1,7 @@
 
 import {
     isSubscribable, subscribable
-} from '../src'
+} from '../dist'
 
 describe('Subscribable', function () {
   it('Should declare that it is subscribable', function () {

@@ -1,6 +1,6 @@
 import {
     options, tasks
-} from '../src'
+} from '../dist'
 
 describe('onError handler', function () {
   var koOnErrorCount = 0

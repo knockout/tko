@@ -7,7 +7,7 @@ import {
     computed
 } from '@tko/computed'
 
-import components from '../src'
+import components from '../dist'
 
 describe('Components: Loader registry', function () {
   var testAsyncDelay = 20,

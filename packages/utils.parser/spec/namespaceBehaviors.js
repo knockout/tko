@@ -22,7 +22,7 @@ import {
 
 import {
   Parser
-} from '../src';
+} from '../dist';
 
 function ctxStub (ctx) {
   return { lookup (v) { return ctx ? ctx[v] : null } }

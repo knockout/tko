@@ -1,0 +1,74 @@
+{
+  "version": "4.0.0-alpha9.0",
+  "name": "@tko/build.knockout",
+  "description": "Knockout makes it easier to create rich, responsive UIs with JavaScript",
+  "homepage": "https://tko.io",
+  "license": "MIT",
+  "author": "The Knockout Team",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  },
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  },
+  "testling": {
+    "preprocess": "build/build.sh",
+    "html": "spec/runner.html?src=build/output/knockout-latest.js&testling=true",
+    "browsers": [
+      "ie/6..latest",
+      "chrome/20..latest",
+      "firefox/3..latest",
+      "safari/5.0.5..latest",
+      "opera/11.0..latest",
+      "iphone/6..latest",
+      "ipad/6..latest"
+    ]
+  },
+  "files": [
+    "dist/",
+    "helpers/"
+  ],
+  "karma": {
+    "frameworks": [
+      "jasmine"
+    ],
+    "files": [
+      "dist/browser.min.js",
+      "helpers/jasmine.extensions.js",
+      "spec/**/*.js"
+    ]
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  ],
+  "dependencies": {
+    "@tko/binding.component": "^4.0.0-alpha9.0",
+    "@tko/binding.core": "^4.0.0-alpha9.0",
+    "@tko/binding.foreach": "^4.0.0-alpha9.0",
+    "@tko/binding.if": "^4.0.0-alpha9.0",
+    "@tko/binding.template": "^4.0.0-alpha9.0",
+    "@tko/builder": "^4.0.0-alpha9.0",
+    "@tko/filter.punches": "^4.0.0-alpha8.0",
+    "@tko/provider.attr": "^4.0.0-alpha8.4",
+    "@tko/provider.bindingstring": "^4.0.0-alpha9.0",
+    "@tko/provider.component": "^4.0.0-alpha9.0",
+    "@tko/provider.databind": "^4.0.0-alpha9.0",
+    "@tko/provider.multi": "^4.0.0-alpha8.4",
+    "@tko/provider.mustache": "^4.0.0-alpha9.0",
+    "@tko/provider.virtual": "^4.0.0-alpha9.0",
+    "@tko/utils.component": "^4.0.0-alpha9.0",
+    "@tko/utils.functionrewrite": "^4.0.0-alpha8.2",
+    "tslib": "^2.2.0"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./helpers/*": "./helpers/*"
+  }
+}

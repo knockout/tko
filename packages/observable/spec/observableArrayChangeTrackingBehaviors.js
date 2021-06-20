@@ -1,11 +1,11 @@
 
 import {
     observableArray, observable
-} from '../src'
+} from '../dist'
 
 import {
     trackArrayChanges
-} from '../src/observableArray.changeTracking.js'
+} from '../dist/observableArray.changeTracking.js'
 
 function captureCompareArraysCalls (callback) {
   var origCompareArrays = trackArrayChanges.compareArrays,

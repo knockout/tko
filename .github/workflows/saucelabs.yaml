@@ -1,0 +1,36 @@
+name: SauceLabs Browser CI
+
+
+on:
+  push:
+    branches-ignore:
+      - '**'
+  # push:
+  #   branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     node-version: [16.x]
+
+    steps:
+    - uses: saucelabs/sauce-connect-action@v1
+      with:
+        username: ${{ secrets.SAUCE_USERNAME }}
+        accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+        tunnelIdentifier: github-action-tunnel
+        scVersion: 4.6.4
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16
+    - run: make CONCURRENCY=1 all
+    - run: make ci
+      env:
+        SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+        SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}

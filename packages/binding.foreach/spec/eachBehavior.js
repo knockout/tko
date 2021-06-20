@@ -30,7 +30,7 @@ import {
 
 import {
   ForEachBinding
-} from '../src/foreach'
+} from '../dist/foreach'
 
 import $ from 'jquery'
 

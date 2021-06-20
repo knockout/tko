@@ -1,10 +1,7 @@
-import {
-    extend, options, anyDomNodeIsAttachedToDocument, addDisposeCallback,
-    arrayRemoveItem, domData
-} from '@tko/utils'
+import { extend, options, domData } from '@tko/utils'
 
 import {
-    computed, pureComputed
+    pureComputed
 } from '@tko/computed'
 
 import {

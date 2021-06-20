@@ -1,7 +1,7 @@
 
 import {
   VirtualProvider
-} from '../src'
+} from '../dist'
 
 /**
  * There aren't many tests here because virtual bindings are used throughout

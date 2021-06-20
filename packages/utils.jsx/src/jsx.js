@@ -1,22 +1,10 @@
 
 import {
-  removeNode, addDisposeCallback
-} from '@tko/utils'
-
-import {
   isObservable, unwrap
 } from '@tko/observable'
 
 import {
-  contextFor, applyBindings
-} from '@tko/bind'
-
-import {
-  NativeProvider
-} from '@tko/provider.native'
-
-import {
-  JsxObserver, ORIGINAL_JSX_SYM
+  ORIGINAL_JSX_SYM
  } from './JsxObserver'
 
 /**
@@ -66,4 +54,4 @@ export function createElement (elementName, attributes, ...children) {
 }
 
 export const Fragment = Symbol('JSX Fragment')
-  
+

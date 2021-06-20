@@ -3,7 +3,7 @@ import {
   observable
 } from '@tko/observable'
 
-import { filters } from '../src'
+import { filters } from '../dist'
 
 if (!Array.isArray) {
   Array.isArray = function (arg) {

@@ -2,7 +2,7 @@ import {
     parseHtmlFragment
 } from '@tko/utils'
 
-import components from '../src'
+import components from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'
 

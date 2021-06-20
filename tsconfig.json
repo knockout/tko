@@ -2,8 +2,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "downlevelIteration": true,
-    "target": "ES3",
+    "target": "ES6",
     "module": "ES2015",
+    "moduleResolution": "node",
     "allowJs": true,
     "importHelpers": true,
     "strict": true,
@@ -11,7 +12,8 @@
     "paths": {
       "*": [
         "*",
-        "packages/*"
+        "packages/*",
+        "builds/*"
       ]
     }
   }

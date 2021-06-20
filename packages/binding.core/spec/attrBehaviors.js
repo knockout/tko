@@ -16,7 +16,7 @@ import {
     options
 } from '@tko/utils'
 
-import * as coreBindings from '../src'
+import * as coreBindings from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'
 

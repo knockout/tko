@@ -24,7 +24,7 @@ import {
 
 import components from '@tko/utils.component'
 
-import { ComponentProvider } from '../src'
+import { ComponentProvider } from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'
 

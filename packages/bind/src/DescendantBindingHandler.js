@@ -1,12 +1,7 @@
 
 
-import {
-  applyBindingsToDescendants
-} from './applyBindings'
-
-import {
-  AsyncBindingHandler
-} from './BindingHandler'
+import { applyBindingsToDescendants } from './applyBindings'
+import { AsyncBindingHandler } from './BindingHandler'
 
 /**
  * This DescendantBindingHandler is a base class for bindings that control

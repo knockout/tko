@@ -5,7 +5,7 @@
 
 import {
   arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty
-} from '../src/'
+} from '../dist/'
 
 
 window.DEBUG = true;

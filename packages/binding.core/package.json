@@ -1,6 +1,6 @@
 {
-  "name": "@tko/binding.core",
   "version": "4.0.0-alpha9.0",
+  "name": "@tko/binding.core",
   "description": "TKO Core bindings",
   "module": "dist/binding.core.js",
   "files": [
@@ -9,17 +9,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knockout/tko.binding.core.git"
+    "url": "git+https://github.com/knockout/tko.git"
   },
   "keywords": [
     "knockout",
     "tko",
     "ko"
   ],
-  "author": "Knockout",
+  "author": "The Knockout Team",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/knockout/tko.util/issues"
+    "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
   "dependencies": {
@@ -27,34 +27,24 @@
     "@tko/computed": "^4.0.0-alpha8.0",
     "@tko/observable": "^4.0.0-alpha8.0",
     "@tko/utils": "^4.0.0-alpha8.0",
-    "tslib": "^1.8.0"
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [
       "jasmine"
     ]
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
-  "standard": {
-    "env": [
-      "browser",
-      "jasmine",
-      "mocha"
-    ]
-  },
-  "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./helpers/*": "./helpers/*"
+  }
 }

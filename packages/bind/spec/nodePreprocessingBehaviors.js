@@ -16,7 +16,7 @@ import {
 
 import {
     applyBindings
-} from '../src'
+} from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'
 

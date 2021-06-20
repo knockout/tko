@@ -1,7 +1,7 @@
 
 import {
   AttributeProvider
-} from '../src'
+} from '../dist'
 
 describe('Attribute Provider Behavior', function () {
   describe('nodeHasBindings', function () {

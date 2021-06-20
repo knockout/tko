@@ -18,7 +18,7 @@ import {
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import { bindings as coreBindings } from '../src'
+import { bindings as coreBindings } from '../dist'
 import { bindings as templateBindings } from '@tko/binding.template'
 
 import '@tko/utils/helpers/jasmine-13-helper.js'

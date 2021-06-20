@@ -1,15 +1,7 @@
 
-import {
-    options
-} from '@tko/utils'
-
-import {
-  isWriteableObservable
-} from '@tko/observable'
-
-import {
-    LifeCycle
-} from '@tko/lifecycle'
+import { options } from '@tko/utils'
+import { isWriteableObservable } from '@tko/observable'
+import { LifeCycle } from '@tko/lifecycle'
 
 export class BindingHandler extends LifeCycle {
   constructor (params) {

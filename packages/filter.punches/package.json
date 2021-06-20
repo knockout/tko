@@ -1,28 +1,22 @@
 {
-  "name": "@tko/filter.punches",
   "version": "4.0.0-alpha8.0",
+  "name": "@tko/filter.punches",
   "description": "TKO filters from knockout punches",
   "module": "dist/filter.punches.js",
   "files": [
     "dist/",
     "helpers/"
   ],
-  "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knockout/tko.filter.punches.git"
+    "url": "git+https://github.com/knockout/tko.git"
   },
   "keywords": [
     "knockout",
     "tko",
     "ko"
   ],
-  "author": "Knockout",
+  "author": "The Knockout Team",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
@@ -30,28 +24,24 @@
   "homepage": "https://tko.io",
   "dependencies": {
     "@tko/observable": "^4.0.0-alpha8.0",
-    "tslib": "^1.8.0"
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [
       "jasmine"
     ]
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
-  "standard": {
-    "env": [
-      "browser",
-      "jasmine",
-      "mocha"
-    ]
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./helpers/*": "./helpers/*"
+  }
 }

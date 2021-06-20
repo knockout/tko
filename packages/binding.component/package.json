@@ -1,6 +1,6 @@
 {
-  "name": "@tko/binding.component",
   "version": "4.0.0-alpha9.0",
+  "name": "@tko/binding.component",
   "description": "component: binding for web components",
   "module": "dist/binding.component.js",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "@tko/provider": "^4.0.0-alpha8.4",
     "@tko/utils": "^4.0.0-alpha8.0",
     "@tko/utils.component": "^4.0.0-alpha9.0",
-    "tslib": "^1.8.0"
+    "tslib": "^2.2.0"
   },
   "files": [
     "dist/",
@@ -22,28 +22,26 @@
       "jasmine"
     ]
   },
-  "__about__shared.package.json": "These properties are copied into all packages/*/package.json.  Run `yarn repackage`",
-  "standard": {
-    "env": [
-      "browser",
-      "jasmine",
-      "mocha"
-    ]
-  },
-  "scripts": {
-    "test": "npx karma start ../../karma.conf.js --once",
-    "build": "npx rollup -c ../../rollup.config.js",
-    "watch": "npx karma start ../../karma.conf.js",
-    "prepare": "npx rollup -c ../../rollup.config.js"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./helpers/*": "./helpers/*"
+  },
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  },
+  "author": "The Knockout Team",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  }
 }

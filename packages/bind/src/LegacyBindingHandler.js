@@ -1,15 +1,6 @@
 
-import {
-  virtualElements, options
-} from '@tko/utils'
-
-import {
-  dependencyDetection
-} from '@tko/observable'
-
-import {
-  BindingHandler
-} from './BindingHandler'
+import { virtualElements, options } from '@tko/utils'
+import { BindingHandler } from './BindingHandler'
 
 /**
  * We have no guarantees, for users employing legacy bindings,

@@ -4,7 +4,7 @@ import {
 
 import {
     isPureComputed, isComputed, computed, pureComputed
-} from '../src'
+} from '../dist'
 
 describe('Pure Computed', function () {
   it('Observables should advertise that instances are not pure computed', function () {

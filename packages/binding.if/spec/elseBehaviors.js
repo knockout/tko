@@ -17,7 +17,7 @@ import {
 
 import {
     bindings as ifBindings
-} from '../src';
+} from '../dist';
 
 import {
     bindings as coreBindings

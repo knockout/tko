@@ -1,7 +1,7 @@
 
 import {
   functionRewrite
-} from '../src'
+} from '../dist'
 
 describe('Function Rewrite Provider', function () {
   describe('replaceFunctionStrings', function () {

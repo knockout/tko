@@ -34,7 +34,7 @@ import {
 
 import {
   DataBindProvider
-} from '../src'
+} from '../dist'
 
 import * as coreBindings from '@tko/binding.core';
 

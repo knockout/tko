@@ -1,7 +1,7 @@
 
 import {
     arrayForEach, parseHtmlFragment
-} from '../src'
+} from '../dist'
 
 import '../helpers/jasmine-13-helper.js'
 

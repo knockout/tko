@@ -1,33 +1,36 @@
-NODE  	:= npx
-LERNA 	:= $(NODE) lerna
+NPX		:= npx
+NODE  	:= node
+NPM		:= npm
+LERNA	:= npx lerna
 
-default: build
+# Some make settings
+SHELL := bash
+.ONESHELL:
+MAKEFLAGS 	+= --warn-undefined-variables
+MAKEFLAGS 	+= --no-builtin-rules
+CONCURRENCY = 8
 
-.PHONY: test
+default: all
+
+package.json:
+
+node_modules: package-lock.json
+
+all:: node_modules
+	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
+
 test:
-	$(LERNA) exec --concurrency=1 --loglevel=warn -- yarn test
+	$(LERNA) exec --stream -- $(MAKE) test
 
-.PHONY: testn
-testn:
-	$(LERNA) exec --concurrency=6 --loglevel=warn -- yarn test
+ci:
+	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
 
-.PHONY: build
-build: node_modules
-	$(LERNA) exec --concurrency=6 --loglevel=warn -- yarn build
-
-.PHONY: lint
 lint:
-	$(NODE) standard
+	$(NPX) standard
 
-.PHONY: repackage
-repackage:
-	$(NODE) ./tools/common-package-config.js packages/shared.package.json packages/*/package.json
+repackage: tools/repackage.mjs
+	$(LERNA) exec --stream -- $(MAKE) repackage
 
-.PHONY: bootstrap
-bootstrap:
-	$(LERNA) bootstrap
-
-.PHONY: bump
 bump:
 	$(LERNA) version
 
@@ -36,7 +39,29 @@ bump:
 publish-unpublished: build
 	$(LERNA) publish from-package
 
-node_modules: bootstrap
-	$(NODE) yarn install
+package-lock.json: package.json packages/*/package.json
+	$(NPM) i
 
-all: build test
+package.json:
+
+install: node_modules
+
+outdated-list:
+	$(NPM) outdated
+
+outdated-upgrade:
+	$(NPM) upgrade-interactive --latest
+
+install: package-lock.json
+
+clean:
+	rm -f package-lock.json
+	rm -rf packages/*/dist/*
+	rm -rf packages/*/package-lock.json
+	rm -rf builds/*/dist/*
+	rm -rf builds/*/package-lock.json
+
+# Local linking of these packages, so they
+# are available for local testing/dev.
+link:
+	$(LERNA) exec --stream -- npm link

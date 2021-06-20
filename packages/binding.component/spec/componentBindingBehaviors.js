@@ -35,7 +35,7 @@ import {
 
 import {
   bindings as componentBindings
-} from '../src'
+} from '../dist'
 
 import components from '@tko/utils.component'
 
