@@ -1,1 +1,1 @@
-export {default as AttributeProvider} from './AttributeProvider.js'
+export {default as AttributeProvider} from './AttributeProvider'

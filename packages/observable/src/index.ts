@@ -13,7 +13,7 @@ export { isSubscribable, subscribable, LATEST_VALUE } from './subscribable'
 export { observableArray, isObservableArray } from './observableArray'
 export { trackArrayChanges, arrayChangeEventName } from './observableArray.changeTracking'
 export { toJS, toJSON } from './mappingHelpers'
-export { deferUpdates } from './defer.js'
+export { deferUpdates } from './defer'
 
 export { valuesArePrimitiveAndEqual, applyExtenders, extenders } from './extenders'
 
