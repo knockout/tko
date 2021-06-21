@@ -93,17 +93,11 @@ const CommonConfig = {
 
 
 function sauceConfig (config) {
-  if (!SAUCE_USERNAME) {
-    throw new Error('Environment needs SAUCE_USERNAME')
-  }
-  if (!SAUCE_ACCESS_KEY) {
-    throw new Error('Environment needs SAUCE_ACCESS_KEY')
-  }
   config.set({
     ...CommonConfig,
     sauceLabs: {
       testName: `${pkg.name} @ ${pkg.version}`,
-      startConnect: argv.includes('--startConnect'),
+      startConnect: Boolean(argv.includes('--startConnect')),
       public: 'public',
       recordVideo: false,
       recordScreenshots: false,
