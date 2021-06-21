@@ -1,11 +1,11 @@
 //
 // HTML-based manipulation
 //
-import { stringTrim } from '../string.js'
-import { makeArray } from '../array.js'
-import { emptyDomNode, moveCleanedNodesToContainerElement } from './manipulation.js'
-import { jQueryInstance } from '../jquery.js'
-import { forceRefresh } from './fixes.js'
+import { stringTrim } from '../string'
+import { makeArray } from '../array'
+import { emptyDomNode, moveCleanedNodesToContainerElement } from './manipulation'
+import { jQueryInstance } from '../jquery'
+import { forceRefresh } from './fixes'
 import * as virtualElements from './virtualElements'
 import options from '../options'
 

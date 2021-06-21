@@ -3,7 +3,7 @@ import {
     arrayForEach, parseHtmlFragment
 } from '../dist'
 
-import '../helpers/jasmine-13-helper.js'
+import '../helpers/jasmine-13-helper'
 
 describe('Parse HTML fragment', function () {
   var supportsTemplateTag = 'content' in document.createElement('template')

@@ -27,8 +27,8 @@ export * from './dom/selectExtensions.js'
 
 // Sub-Modules;
 import * as memoization from './memoization'
-import * as tasks from './tasks.js'
-import * as virtualElements from './dom/virtualElements.js'
-import * as domData from './dom/data.js'
+import * as tasks from './tasks'
+import * as virtualElements from './dom/virtualElements'
+import * as domData from './dom/data'
 
 export {tasks, virtualElements, domData, memoization}

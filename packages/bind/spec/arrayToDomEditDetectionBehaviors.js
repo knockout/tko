@@ -11,7 +11,7 @@ import {
     setDomNodeChildrenFromArrayMapping
 } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 function copyDomNodeChildren (domNode) {
   var copy = []

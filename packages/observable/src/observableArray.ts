@@ -6,9 +6,9 @@ import {
     arrayIndexOf, arrayForEach, overwriteLengthPropertyIfSupported
 } from '@tko/utils'
 
-import { observable, isObservable } from './observable.js'
+import { observable, isObservable } from './observable'
 
-import { trackArrayChanges } from './observableArray.changeTracking.js'
+import { trackArrayChanges } from './observableArray.changeTracking'
 
 export function observableArray (initialValues) {
   initialValues = initialValues || []

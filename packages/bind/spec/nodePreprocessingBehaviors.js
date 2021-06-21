@@ -18,7 +18,7 @@ import {
     applyBindings
 } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Node preprocessing', function () {
   beforeEach(jasmine.prepareTestNode)

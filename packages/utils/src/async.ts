@@ -1,7 +1,7 @@
 //
 // Asynchronous functionality
 // ---
-import { safeSetTimeout } from './error.js'
+import { safeSetTimeout } from './error'
 
 export function throttle (callback, timeout) {
   var timeoutInstance

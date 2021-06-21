@@ -2,10 +2,10 @@
 // DOM node disposal
 //
 /* eslint no-cond-assign: 0 */
-import * as domData from './data.js'
-import { default as options } from '../options.js'
-import {arrayRemoveItem, arrayIndexOf} from '../array.js'
-import {jQueryInstance} from '../jquery.js'
+import * as domData from './data'
+import { default as options } from '../options'
+import {arrayRemoveItem, arrayIndexOf} from '../array'
+import {jQueryInstance} from '../jquery'
 
 var domDataKey = domData.nextKey()
 // Node types:

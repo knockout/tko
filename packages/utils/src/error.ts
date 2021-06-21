@@ -3,7 +3,7 @@
 // ---
 //
 // The default onError handler is to re-throw.
-import options from './options.js'
+import options from './options'
 
 export function catchFunctionErrors (delegate) {
   if (!options.onError) { return delegate }

@@ -21,7 +21,7 @@ import { bindings as coreBindings } from '../dist'
 
 const DEBUG = true
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: TextInput', function () {
   var bindingHandlers

@@ -7,7 +7,7 @@ import {
     throttle as throttleFn, debounce as debounceFn
 } from '@tko/utils'
 
-import { deferUpdates } from './defer.js'
+import { deferUpdates } from './defer'
 
 var primitiveTypes = {
   'undefined': 1, 'boolean': 1, 'number': 1, 'string': 1

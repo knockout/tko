@@ -10,7 +10,7 @@ import {
     computed as Computed
 } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Dependent Observable DOM', function () {
   beforeEach(jasmine.prepareTestNode)

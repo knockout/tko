@@ -5,8 +5,8 @@ import {
 
 import Subscription from './Subscription'
 import { SUBSCRIBABLE_SYM } from './subscribableSymbol'
-import { applyExtenders } from './extenders.js'
-import * as dependencyDetection from './dependencyDetection.js'
+import { applyExtenders } from './extenders'
+import * as dependencyDetection from './dependencyDetection'
 export { isSubscribable } from './subscribableSymbol'
 
 // Descendants may have a LATEST_VALUE, which if present

@@ -4,7 +4,7 @@ import {
 
 import components from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Components: Default loader', function () {
   var waitsFor = window.waitsFor

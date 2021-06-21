@@ -18,7 +18,7 @@ import {
 
 import * as coreBindings from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Attr', function () {
   beforeEach(jasmine.prepareTestNode)

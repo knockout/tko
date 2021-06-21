@@ -7,7 +7,7 @@ import {
     arrayIndexOf
 } from '@tko/utils'
 
-import { isObservable } from './observable.js'
+import { isObservable } from './observable'
 
 var maxNestedObservableDepth = 10 // Escape the (unlikely) pathological case where an observable's current value is itself (or similar reference cycle)
 

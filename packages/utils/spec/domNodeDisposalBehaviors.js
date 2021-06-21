@@ -4,7 +4,7 @@ import {
     otherNodeCleanerFunctions, cleanjQueryData
 } from '../dist'
 
-import '../helpers/jasmine-13-helper.js'
+import '../helpers/jasmine-13-helper'
 
 describe('DOM node disposal', function () {
   var jQuery = options.jQuery

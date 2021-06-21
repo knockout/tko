@@ -26,7 +26,7 @@ import components from '@tko/utils.component'
 
 import { ComponentProvider } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Components: Provider', function () {
   var bindingHandlers

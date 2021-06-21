@@ -1,7 +1,7 @@
 //
 // Information about the DOM
 //
-import { arrayFirst } from '../array.js'
+import { arrayFirst } from '../array'
 
 export function domNodeIsContainedBy (node, containedByNode) {
   if (node === containedByNode) { return true }

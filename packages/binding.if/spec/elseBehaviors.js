@@ -23,7 +23,7 @@ import {
     bindings as coreBindings
 } from '@tko/binding.core';
 
-import '@tko/utils/helpers/jasmine-13-helper.js';
+import '@tko/utils/helpers/jasmine-13-helper';
 
 describe('else inside an if binding', function () {
   beforeEach(jasmine.prepareTestNode);

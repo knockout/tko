@@ -1,5 +1,5 @@
 import * as utils from '../dist'
-import '../helpers/jasmine-13-helper.js'
+import '../helpers/jasmine-13-helper'
 
 var ko = ko || {}
 ko.utils = utils

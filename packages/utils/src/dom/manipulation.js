@@ -2,9 +2,9 @@
 // DOM manipulation
 //
 /* eslint no-empty: 0 */
-import { makeArray } from '../array.js'
-import { ieVersion } from '../ie.js'
-import { cleanNode, removeNode } from './disposal.js'
+import { makeArray } from '../array'
+import { ieVersion } from '../ie'
+import { cleanNode, removeNode } from './disposal'
 
 export function moveCleanedNodesToContainerElement (nodes) {
     // Ensure it's a real array, as we're about to reparent the nodes and

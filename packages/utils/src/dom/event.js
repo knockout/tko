@@ -2,14 +2,14 @@
 // DOM Events
 //
 
-import { objectForEach } from '../object.js'
-import { jQueryInstance } from '../jquery.js'
-import { ieVersion } from '../ie.js'
-import { catchFunctionErrors } from '../error.js'
+import { objectForEach } from '../object'
+import { jQueryInstance } from '../jquery'
+import { ieVersion } from '../ie'
+import { catchFunctionErrors } from '../error'
 
-import { tagNameLower } from './info.js'
-import { addDisposeCallback } from './disposal.js'
-import options from '../options.js'
+import { tagNameLower } from './info'
+import { addDisposeCallback } from './disposal'
+import options from '../options'
 
 // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
 var knownEvents = {},

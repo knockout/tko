@@ -14,9 +14,9 @@
 // IE 9 cannot reliably read the "nodeValue" property of a comment node (see https://github.com/SteveSanderson/knockout/issues/186)
 // but it does give them a nonstandard alternative property called "text" that it can read reliably. Other browsers don't have that property.
 // So, use node.text where available, and node.nodeValue elsewhere
-import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation.js'
-import { removeNode } from './disposal.js'
-import { tagNameLower } from './info.js'
+import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation'
+import { removeNode } from './disposal'
+import { tagNameLower } from './info'
 import * as domData from './data'
 import options from '../options'
 

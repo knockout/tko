@@ -6,10 +6,10 @@ import {
   options, overwriteLengthPropertyIfSupported
 } from '@tko/utils'
 
-import * as dependencyDetection from './dependencyDetection.js'
-import { deferUpdates } from './defer.js'
-import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable.js'
-import { valuesArePrimitiveAndEqual } from './extenders.js'
+import * as dependencyDetection from './dependencyDetection'
+import { deferUpdates } from './defer'
+import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
+import { valuesArePrimitiveAndEqual } from './extenders'
 
 export function observable (initialValue) {
   function Observable () {

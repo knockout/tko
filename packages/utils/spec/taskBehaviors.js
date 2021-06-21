@@ -1,4 +1,4 @@
-import { useMockForTasks } from '../helpers/jasmine-13-helper.js'
+import { useMockForTasks } from '../helpers/jasmine-13-helper'
 
 import { tasks, options, ieVersion } from '../dist'
 

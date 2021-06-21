@@ -2,7 +2,7 @@
 // DOM - CSS
 //
 
-import { arrayForEach, addOrRemoveItem } from './array.js'
+import { arrayForEach, addOrRemoveItem } from './array'
 
 // For details on the pattern for changing node classes
 // see: https://github.com/knockout/knockout/issues/1597

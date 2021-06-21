@@ -4,7 +4,7 @@
 //
 /* eslint no-cond-assign: 0 */
 import options from './options'
-import { deferError } from './error.js'
+import { deferError } from './error'
 
 var taskQueue = [],
   taskQueueLength = 0,

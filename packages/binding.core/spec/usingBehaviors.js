@@ -17,7 +17,7 @@ import { MultiProvider } from '@tko/provider.multi'
 import {bindings as templateBindings} from '@tko/binding.template'
 import {bindings as coreBindings} from '@tko/binding.core'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Using', function () {
   beforeEach(jasmine.prepareTestNode)

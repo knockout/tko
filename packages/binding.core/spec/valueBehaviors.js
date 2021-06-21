@@ -23,7 +23,7 @@ import {
 
 import {bindings as coreBindings} from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper.js'
+import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Value', function () {
   beforeEach(jasmine.prepareTestNode)
