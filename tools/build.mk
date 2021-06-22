@@ -1,8 +1,9 @@
 
 tools_dir	:= ../../tools
-src 		:= $(shell find src -name *.js) \
-			   $(shell find src -name *.ts)
 log-level 	?= warning
+
+src 		:= $(shell find src -name '*.ts')
+esm-dist	:= $(subst src/,dist/,$(src:.ts=.js))
 
 package := $(shell node -e "console.log(require('./package.json').name)")
 version := $(shell node -e "console.log(require('./package.json').version)")
@@ -12,7 +13,8 @@ iife-global-name := tko
 
 KARMA 	:= npx karma
 ESBUILD := npx esbuild
-
+.SUFFIXES:
+.SUFFIXES: .ts .js
 
 default::
 	$(MAKE) esm commonjs
@@ -31,7 +33,6 @@ info:
 	@echo
 	@echo "Source $(src)"
 
-# ./node_modules/.bin/esbuild
 # Build a ES6 export module.
 dist/index.js: $(src) package.json
 	@echo "[make] Compiling ${package} => $@"
