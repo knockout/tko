@@ -8,7 +8,7 @@ import {
 
 import {
   IfBindingHandler
-} from './ifUnless.js'
+} from './ifUnless'
 
 /**
  * The `else` binding

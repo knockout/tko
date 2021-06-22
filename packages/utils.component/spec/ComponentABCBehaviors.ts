@@ -21,7 +21,7 @@ const {ComponentABC} = components
 
 import {
     useMockForTasks
-} from '@tko/utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('ComponentABC', function () {
   var testComponentName = 'test-component',

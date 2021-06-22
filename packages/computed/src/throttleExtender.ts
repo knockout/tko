@@ -4,7 +4,7 @@ import {
 
 import {
     computed
-} from './computed.js'
+} from './computed'
 
 export function throttleExtender (target, timeout) {
     // Throttling means two things:

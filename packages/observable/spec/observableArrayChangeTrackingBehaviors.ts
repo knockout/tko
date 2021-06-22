@@ -5,7 +5,7 @@ import {
 
 import {
     trackArrayChanges
-} from '../dist/observableArray.changeTracking.js'
+} from '../dist/observableArray.changeTracking'
 
 function captureCompareArraysCalls (callback) {
   var origCompareArrays = trackArrayChanges.compareArrays,

@@ -8,7 +8,7 @@ import {
 
 import {
   computed
-} from './computed.js'
+} from './computed'
 
 const PROXY_SYM = Symbol('Knockout Proxied Object')
 const MIRROR_SYM = Symbol('Knockout Proxied Observables')

@@ -41,7 +41,7 @@ import components from '@tko/utils.component'
 
 import {
     useMockForTasks
-} from '@tko/utils/helpers/jasmine-13-helper.js'
+} from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Components: Component binding', function () {
   var testComponentName = 'test-component',
