@@ -19,6 +19,7 @@ src/index.html:
 dist/entry.js: src/entry.tsx dist/
 	$(ESBUILD) src/entry.tsx \
 		--bundle \
+		--format=esm \
 		--sourcemap \
 		--metafile=dist/meta.json \
 		--outfile=dist/entry.js
@@ -37,6 +38,7 @@ clean:
 serve: build
 	$(ESBUILD) src/entry.tsx \
 		--bundle \
+		--format=esm \
 		--sourcemap \
 		--metafile=dist/meta.json \
 		 --servedir=dist --serve=$(PORT) \

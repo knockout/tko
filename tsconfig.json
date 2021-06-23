@@ -21,6 +21,7 @@
         "packages/*",
         "builds/*"
       ]
-    }
+    },
+    "jsx": "preserve"
   }
 }
