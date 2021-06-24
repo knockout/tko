@@ -1,0 +1,12 @@
+{
+  "name": "www.tko.io",
+  "version": "1.0.0",
+  "description": "www.tko.io",
+  "repository": "https://github.com/knockout/tko",
+  "author": "The Knockout Team",
+  "license": "MIT",
+  "dependencies": {
+    "jss": "^10.6.0",
+    "jss-preset-default": "^10.6.0"
+  }
+}
