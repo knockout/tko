@@ -7,8 +7,29 @@ class WwwTkoIo extends TkoComponent {
   }
 
   async afterFontsLoad (html /* : JSX */) {
-    await document.fonts?.ready
-    return html
+    const o = observable(this.fontStrutHTML)
+    console.log('bef', document.fonts.check('1em Roboto'))
+    document.fonts?.ready
+      .then(() => {
+        o(html)
+        console.log('aft', document.fonts.check('1em Roboto'))
+      })
+
+    return o
+  }
+
+  /**
+   * Show text with the fonts, so document.fonts.ready
+   * queues
+   */
+  get fontStrutHTML () {
+    const { jss } = this
+    return (
+      <>
+        <div class={jss.brandFontStrut}>.</div>
+        <div class={jss.bodyFontStrut}>.</div>
+      </>
+    )
   }
 
   bodyHTML () {
@@ -40,7 +61,6 @@ class WwwTkoIo extends TkoComponent {
   }
 
   static get css () {
-    console.log(`getting CSS`)
     return {
       '@global': {
         body: {
@@ -77,6 +97,16 @@ class WwwTkoIo extends TkoComponent {
 
       body: {
         padding: '1rem',
+      },
+
+      brandFontStrut: {
+        opacity: 0,
+        fontFamily: 'var(--brand-font)',
+      },
+
+      bodyFontStrut: {
+        opacity: 0,
+        fontFamily: 'var(--body-font)',
       }
     }
   }
