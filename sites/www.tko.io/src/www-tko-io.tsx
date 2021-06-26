@@ -1,38 +1,29 @@
-import {TkoComponent} from './TkoComponent'
+import { computed } from '@tko/computed'
 import { observable } from '@tko/observable'
+
+import { TkoComponent } from './TkoComponent'
+
+const fontsLoaded = observable(false)
+const opacityUntilFontsLoaded = computed(() => fontsLoaded() ? 1 : 0)
 
 class WwwTkoIo extends TkoComponent {
   get template () {
-    return <>{this.afterFontsLoad(this.bodyHTML())}</>
-  }
-
-  async afterFontsLoad (html /* : JSX */) {
-    const o = observable(this.fontStrutHTML)
-    console.log('bef', document.fonts.check('1em Roboto'))
-    document.fonts?.ready
-      .then(() => {
-        o(html)
-        console.log('aft', document.fonts.check('1em Roboto'))
-      })
-
-    return o
+    this.monitorFontsLoading()
+    return <>{this.bodyHTML()}</>
   }
 
   /**
-   * Show text with the fonts, so document.fonts.ready
-   * queues
+   * document.fonts.ready is a promise that resolves when all
+   * the fonts on the screen are loaded.
    */
-  get fontStrutHTML () {
-    const { jss } = this
-    return (
-      <>
-        <div class={jss.brandFontStrut}>.</div>
-        <div class={jss.bodyFontStrut}>.</div>
-      </>
-    )
+  private async monitorFontsLoading () {
+    const waitForRender = Promise.resolve()
+    await waitForRender
+    await document.fonts.ready
+    fontsLoaded(true)
   }
 
-  bodyHTML () {
+  private bodyHTML () {
     const { jss } = this
     return (
       <div class={jss.layout}>
@@ -62,10 +53,14 @@ class WwwTkoIo extends TkoComponent {
 
   static get css () {
     return {
+      '@import': [
+        `url('https://fonts.googleapis.com/css2?family=Roboto&family=Pacifico&display=swap')`
+      ],
       '@global': {
         body: {
           padding: 0,
           margin: 0,
+          // opacity: opacityUntilFontsLoaded,
           ...this.cssVars,
         },
       },
