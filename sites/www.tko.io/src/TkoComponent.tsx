@@ -51,8 +51,6 @@ export abstract class TkoComponent extends tko.components.ComponentABC {
       classNamePrefix: `${this.constructor.name}--`
     }
     const sheet = jss.createStyleSheet(this.css, options).attach()
-    // sheet.update(window.app.jssThemeParams())
-    // this.subscribe(window.app.jssThemeParams, v => sheet.update(v))
     return this._styles || (this._styles = sheet)
   }
 
