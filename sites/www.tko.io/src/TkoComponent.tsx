@@ -62,7 +62,7 @@ export abstract class TkoComponent extends tko.components.ComponentABC {
     if (!this.css) { return { classes: {} } as StyleSheet }
     const options = {
       meta: `🎨  Static Classes for ${this.name}`,
-      // link: true, // Warning: [JSS] Failed to execute 'insertRule' on 'CSSStyleSheet': Failed to insert the rule.
+      link: true, // Warning: [JSS] Failed to execute 'insertRule' on 'CSSStyleSheet': Failed to insert the rule.
       classNamePrefix: `${this.name}__`
     }
     const sheet = jss.createStyleSheet(this.css, options).attach()

@@ -6,6 +6,7 @@
   "author": "The Knockout Team",
   "license": "MIT",
   "dependencies": {
+    "@types/css-font-loading-module": "^0.0.5",
     "jss": "^10.6.0",
     "jss-preset-default": "^10.6.0"
   }

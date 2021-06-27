@@ -1,29 +1,10 @@
 import { computed } from '@tko/computed'
 import { observable } from '@tko/observable'
 
-import { TkoComponent } from './TkoComponent'
+import { WithFontsView } from './WithFontsView'
 
-const fontsLoaded = observable(false)
-const opacityUntilFontsLoaded = computed(() => fontsLoaded() ? 1 : 0)
-
-class WwwTkoIo extends TkoComponent {
-  get template () {
-    this.monitorFontsLoading()
-    return <>{this.bodyHTML()}</>
-  }
-
-  /**
-   * document.fonts.ready is a promise that resolves when all
-   * the fonts on the screen are loaded.
-   */
-  private async monitorFontsLoading () {
-    const waitForRender = Promise.resolve()
-    await waitForRender
-    await document.fonts.ready
-    fontsLoaded(true)
-  }
-
-  private bodyHTML () {
+class WwwTkoIo extends WithFontsView {
+  protected bodyHTML () {
     const { jss } = this
     return (
       <div class={jss.layout}>
@@ -53,14 +34,19 @@ class WwwTkoIo extends TkoComponent {
 
   static get css () {
     return {
-      '@import': [
-        `url('https://fonts.googleapis.com/css2?family=Roboto&family=Pacifico&display=swap')`
-      ],
+      ...super.css,
+
+      // See: https://github.com/cssinjs/jss/issues/1524
+      // Once this is fixed, we can use this in places of the similar <link>
+      // '@import': [
+      //   'url(https://fonts.googleapis.com/css2?family=Roboto&family=Pacifico&display=swap)',
+      // ],
+
       '@global': {
         body: {
+          ...super.css['@global'].body,
           padding: 0,
           margin: 0,
-          // opacity: opacityUntilFontsLoaded,
           ...this.cssVars,
         },
       },
@@ -68,7 +54,6 @@ class WwwTkoIo extends TkoComponent {
       layout: {
         display: 'grid',
         gridTemplateRows: 'var(--head-height) 1fr',
-        // backgroundColor: '#fcd4d4',
         backgroundColor: 'var(--bg-color)',
         color: 'var(--fg-color)',
         height: '100%',
