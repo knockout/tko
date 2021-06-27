@@ -13,11 +13,9 @@ export abstract class WithFontsView extends TkoComponent {
    * the fonts on the screen are loaded.
    */
   private async monitorFontsLoading () {
-    const waitForRender = Promise.resolve()
-    await waitForRender
-    console.log(`Fonts loading: ?`, document.fonts.check('1rem Pacifico'))
+    const waitForFontsToBeOnScreen = Promise.resolve()
+    await waitForFontsToBeOnScreen
     await document.fonts.ready
-    console.log(`Fonts ready: ?`, document.fonts.check('1rem Pacifico'))
     WithFontsView.fontsLoaded(true)
   }
 
