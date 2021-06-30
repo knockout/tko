@@ -14,6 +14,10 @@ export { isSubscribable } from './subscribableSymbol'
 // subscribed.
 export const LATEST_VALUE = Symbol('Knockout latest value')
 
+if (!Symbol.observable) {
+  Symbol.observable = Symbol.for('@tko/Symbol.observable')
+}
+
 export function subscribable () {
   Object.setPrototypeOf(this, ko_subscribable_fn)
   ko_subscribable_fn.init(this)
