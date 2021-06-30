@@ -1,7 +1,6 @@
-import { computed } from '@tko/computed'
-import { observable } from '@tko/observable'
 
 import { WithFontsView } from './WithFontsView'
+import './play-ground'
 
 class WwwTkoIo extends WithFontsView {
   protected bodyHTML () {
@@ -14,7 +13,8 @@ class WwwTkoIo extends WithFontsView {
           </div>
         </div>
         <div class={jss.body}>
-          How are you?
+          <h1>Playground</h1>
+          <play-ground />
         </div>
       </div>
     )

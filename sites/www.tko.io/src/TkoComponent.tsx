@@ -74,7 +74,7 @@ export abstract class TkoComponent extends tko.components.ComponentABC {
    */
    get jss (): Record<string, string> {
     return this[JSS] || (this[JSS] = {
-      ...this.constructor.styles.classes,
+      ...(this.constructor as typeof TkoComponent).styles.classes,
       ...this.styles.classes,
     })
   }

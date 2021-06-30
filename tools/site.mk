@@ -28,7 +28,7 @@ dist/index.html: src/index.html dist/
 	ln -sf ../src/index.html dist/index.html
 
 .PHONY: BUILD
-build: dist/index.html dist/entry.js
+build:: dist/index.html dist/entry.js
 
 .PHONY: clean
 clean:
