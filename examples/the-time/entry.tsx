@@ -1,9 +1,16 @@
 import tko from "./tko";
 
-import "./the-time";
-
 console.log("Entry.");
 
-tko.cleanNode(document.body);
+class TheTime extends tko.Component {
+  get template() {
+    const date = new Date().toISOString();
+    return <div>{date}</div>;
+  }
+}
 
+tko.components.unregister("the-time");
+TheTime.register("the-time");
+
+tko.cleanNode(document.body);
 tko.applyBindings();
