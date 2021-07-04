@@ -12,5 +12,12 @@ class TheTime extends tko.Component {
 tko.components.unregister("the-time");
 TheTime.register("the-time");
 
-tko.cleanNode(document.body);
-tko.applyBindings();
+const applyBindings = async () => {
+  // We usually don't need to cleanNode before
+  // applying bindings, but it's needed for
+  // codesandbox.io
+  await tko.cleanNode(document.body);
+  tko.applyBindings();
+}
+
+applyBindings()
