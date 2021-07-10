@@ -17,6 +17,12 @@ describe('Subscribable', function () {
     expect(isSubscribable(null)).toEqual(false)
   })
 
+  it('creates/has a Symbol.observable', () => {
+    const sub = new subscribable()
+    expect(Symbol.observable).toEqual(Symbol.for('@tko/Symbol.observable'))
+    expect(sub[Symbol.observable]()).toBe(sub)
+  })
+
   it('Should be able to notify subscribers', function () {
     var instance = new subscribable()
     var notifiedValue
