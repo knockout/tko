@@ -1,0 +1,11 @@
+{
+  "name": "TKO example",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@tko/build.reference": "^4.0.0-alpha9.0",
+    "esbuild": "^0.12.13"
+  },
+  "scripts": {
+  }
+}
