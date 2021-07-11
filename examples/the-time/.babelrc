@@ -1,0 +1,34 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": "chrome 70"
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "@babel/plugin-transform-typescript",
+      {
+        "isTSX": true
+      }
+    ],
+    [
+      "transform-runtime",
+      {
+        "regenerator": true
+      }
+    ],
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "useBuiltIns": true,
+        "pragma": "ko.jsx.createElement",
+        "pragmaFrag": "ko.jsx.Fragment",
+        "throwIfNamespace": false
+      }
+    ]
+  ],
+  "parserOpts": {}
+}
