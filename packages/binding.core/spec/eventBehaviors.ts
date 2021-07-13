@@ -62,10 +62,25 @@ describe('Binding: Event', function () {
   })
 
   it('Should prevent default action', function () {
-    testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: noop }'>hey</button>"
+    testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: noop }'>hey</a>"
     applyBindings({ noop: function () {} }, testNode)
     triggerEvent(testNode.childNodes[0], 'click')
         // Assuming we haven't been redirected to http://www.example.com/, this spec has now passed
+  })
+
+  it('Should allow default action by setting preventDefault:false', function () {
+    testNode.innerHTML = "<div data-bind='event: {click: test}'><a href='#' data-bind='event: {click: {preventDefault: obs}}'>hey</a></div>"
+    let prevented
+    let obs = observable(true)
+    applyBindings({
+        test: (_, event) => prevented = event.defaultPrevented,
+        obs: obs
+    }, testNode)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(prevented).toEqual(true)
+    obs(false)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(prevented).toEqual(false)
   })
 
   it('Should let bubblable events bubble to parent elements by default', function () {

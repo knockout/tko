@@ -31,12 +31,12 @@ export const eventHandler = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     var eventsToHandle = valueAccessor() || {}
     objectForEach(eventsToHandle, function (eventName, descriptor) {
-      const {passive, capture, once, preventDefault, stopPropagation, debounce, throttle} = makeDescriptor(descriptor)
+      const {passive, capture, once, debounce, throttle} = makeDescriptor(descriptor)
       const eventOptions = (capture || passive || once) && {capture, passive, once}
 
       let eventHandlerFn = (event, ...more) => {
         var handlerReturnValue
-        const {handler, passive, bubble} = makeDescriptor(valueAccessor()[eventName])
+        const {handler, passive, bubble, preventDefault} = makeDescriptor(valueAccessor()[eventName])
 
         try {
           // Take all the event args, and prefix with the viewmodel
@@ -46,11 +46,9 @@ export const eventHandler = {
             handlerReturnValue = handler.apply(possiblyUpdatedViewModel, argsForHandler)
           }
         } finally {
-          if (preventDefault !== undefined) {
-            if (unwrap(preventDefault)) { event.preventDefault() }
-          // backwards compat: use return value if preventDefault was not specified
-          } else if (handlerReturnValue !== true) {
-            // Normally we want to prevent default action. Developer can override this be explicitly returning true.
+          if (handlerReturnValue !== true && (preventDefault === undefined || unwrap(preventDefault))) {
+            // Normally we want to prevent default action. Developer can override this be explicitly returning true
+            // or by setting preventDefault in the descriptor
             // preventDefault will throw an error if the event is passive.
             if (event.preventDefault) {
               if (!passive) { event.preventDefault() }
@@ -60,15 +58,10 @@ export const eventHandler = {
           }
         }
 
-        if (stopPropagation !== undefined) {
-          if (unwrap(stopPropagation)) { event.stopPropagation() }
-        // backwards compat: look for eventNameBubble binding
-        } else {
-          const bubbleMark = allBindings.get(eventName + 'Bubble') !== false
-          if (bubble === false || !bubbleMark) {
-            event.cancelBubble = true
-            if (event.stopPropagation) { event.stopPropagation() }
-          }
+        const bubbleMark = allBindings.get(eventName + 'Bubble') !== false
+        if (bubble === false || !bubbleMark) {
+          event.cancelBubble = true
+          if (event.stopPropagation) { event.stopPropagation() }
         }
       }
 
