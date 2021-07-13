@@ -69,9 +69,19 @@ describe('Binding: Event', function () {
   })
 
   it('Should allow default action by setting preventDefault:false', function () {
+    testNode.innerHTML = "<div data-bind='event: {click: test}'><a href='#' data-bind='event: {click: {preventDefault: false}}'>hey</a></div>"
+    let prevented
+    applyBindings({
+        test: (_, event) => prevented = event.defaultPrevented,
+    }, testNode)
+    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    expect(prevented).toEqual(false)
+  })
+
+  it('Should conditionally allow default action when preventDefault is observable', function () {
     testNode.innerHTML = "<div data-bind='event: {click: test}'><a href='#' data-bind='event: {click: {preventDefault: obs}}'>hey</a></div>"
     let prevented
-    let obs = observable(true)
+    const obs = observable(true)
     applyBindings({
         test: (_, event) => prevented = event.defaultPrevented,
         obs: obs

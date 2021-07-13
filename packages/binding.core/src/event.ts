@@ -46,7 +46,10 @@ export const eventHandler = {
             handlerReturnValue = handler.apply(possiblyUpdatedViewModel, argsForHandler)
           }
         } finally {
-          if (handlerReturnValue !== true && (preventDefault === undefined || unwrap(preventDefault))) {
+          // preventDefault in the descriptor takes precedent over the handler return value
+          if (preventDefault !== undefined) {
+            if (unwrap(preventDefault)) { event.preventDefault() }
+          } else if (handlerReturnValue !== true) {
             // Normally we want to prevent default action. Developer can override this be explicitly returning true
             // or by setting preventDefault in the descriptor
             // preventDefault will throw an error if the event is passive.
