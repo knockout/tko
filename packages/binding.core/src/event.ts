@@ -4,6 +4,10 @@ import {
     throttle as throttleFn, debounce as debounceFn
 } from '@tko/utils'
 
+import {
+    unwrap
+} from '@tko/observable'
+
 // For certain common events (currently just 'click'), allow a simplified data-binding syntax
 // e.g. click:handler instead of the usual full-length event:{click:handler}
 export function makeEventHandlerShortcut (eventName) {
@@ -27,7 +31,7 @@ export const eventHandler = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     var eventsToHandle = valueAccessor() || {}
     objectForEach(eventsToHandle, function (eventName, descriptor) {
-      const {passive, capture, once, debounce, throttle} = makeDescriptor(descriptor)
+      const {passive, capture, once, preventDefault, stopPropagation, debounce, throttle} = makeDescriptor(descriptor)
       const eventOptions = (capture || passive || once) && {capture, passive, once}
 
       let eventHandlerFn = (event, ...more) => {
@@ -42,7 +46,10 @@ export const eventHandler = {
             handlerReturnValue = handler.apply(possiblyUpdatedViewModel, argsForHandler)
           }
         } finally {
-          if (handlerReturnValue !== true) {
+          if (preventDefault !== undefined) {
+            if (unwrap(preventDefault)) { event.preventDefault() }
+          // backwards compat: use return value if preventDefault was not specified
+          } else if (handlerReturnValue !== true) {
             // Normally we want to prevent default action. Developer can override this be explicitly returning true.
             // preventDefault will throw an error if the event is passive.
             if (event.preventDefault) {
@@ -53,10 +60,15 @@ export const eventHandler = {
           }
         }
 
-        const bubbleMark = allBindings.get(eventName + 'Bubble') !== false
-        if (bubble === false || !bubbleMark) {
-          event.cancelBubble = true
-          if (event.stopPropagation) { event.stopPropagation() }
+        if (stopPropagation !== undefined) {
+          if (unwrap(stopPropagation)) { event.stopPropagation() }
+        // backwards compat: look for eventNameBubble binding
+        } else {
+          const bubbleMark = allBindings.get(eventName + 'Bubble') !== false
+          if (bubble === false || !bubbleMark) {
+            event.cancelBubble = true
+            if (event.stopPropagation) { event.stopPropagation() }
+          }
         }
       }
 
