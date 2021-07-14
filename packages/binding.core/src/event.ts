@@ -50,14 +50,9 @@ export const eventHandler = {
           if (preventDefault !== undefined) {
             if (unwrap(preventDefault)) { event.preventDefault() }
           } else if (handlerReturnValue !== true) {
-            // Normally we want to prevent default action. Developer can override this be explicitly returning true
-            // or by setting preventDefault in the descriptor
+            // Normally we want to prevent default action. Developer can override this by explicitly returning true
             // preventDefault will throw an error if the event is passive.
-            if (event.preventDefault) {
-              if (!passive) { event.preventDefault() }
-            } else {
-              event.returnValue = false
-            }
+            if (!passive) { event.preventDefault() }
           }
         }
 
