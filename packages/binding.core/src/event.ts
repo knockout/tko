@@ -4,6 +4,10 @@ import {
     throttle as throttleFn, debounce as debounceFn
 } from '@tko/utils'
 
+import {
+    unwrap
+} from '@tko/observable'
+
 // For certain common events (currently just 'click'), allow a simplified data-binding syntax
 // e.g. click:handler instead of the usual full-length event:{click:handler}
 export function makeEventHandlerShortcut (eventName) {
@@ -32,7 +36,7 @@ export const eventHandler = {
 
       let eventHandlerFn = (event, ...more) => {
         var handlerReturnValue
-        const {handler, passive, bubble} = makeDescriptor(valueAccessor()[eventName])
+        const {handler, passive, bubble, preventDefault} = makeDescriptor(valueAccessor()[eventName])
 
         try {
           // Take all the event args, and prefix with the viewmodel
@@ -42,14 +46,13 @@ export const eventHandler = {
             handlerReturnValue = handler.apply(possiblyUpdatedViewModel, argsForHandler)
           }
         } finally {
-          if (handlerReturnValue !== true) {
-            // Normally we want to prevent default action. Developer can override this be explicitly returning true.
+          // preventDefault in the descriptor takes precedent over the handler return value
+          if (preventDefault !== undefined) {
+            if (unwrap(preventDefault)) { event.preventDefault() }
+          } else if (handlerReturnValue !== true) {
+            // Normally we want to prevent default action. Developer can override this by explicitly returning true
             // preventDefault will throw an error if the event is passive.
-            if (event.preventDefault) {
-              if (!passive) { event.preventDefault() }
-            } else {
-              event.returnValue = false
-            }
+            if (!passive) { event.preventDefault() }
           }
         }
 
