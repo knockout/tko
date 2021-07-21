@@ -1,5 +1,12 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## upcoming
+
+- Switch to `esbuild`
+- add `preventDefault` to event handler bindings
+- switch source to Typescript (but no types exported yet)
+- change build.reference & build.knockout build export strategy
+
 ## 👑 `alpha 9` (28 Feb 2020)
 
 * Fix JSX observable properties being overwritten with observed value on the NativeProvider
