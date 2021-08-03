@@ -74,6 +74,18 @@ describe('Binding: Options', function () {
     expect(testNode.childNodes[0]).toHaveTexts(['bob (manager)', 'frank (coder & tester)'])
   })
 
+  it('Should accept lambda in optionsText param to compute text from model values', function () {
+    var modelValues = observableArray([
+            { name: 'bob' },
+            { name: 'frank' }
+    ])
+    testNode.innerHTML = "<select data-bind='options:myValues, optionsText: val => val.toUpperCase()'><option>should be deleted</option></select>"
+    applyBindings({
+      myValues: modelValues,
+    }, testNode)
+    expect(testNode.childNodes[0]).toHaveTexts(['BOB', 'FRANK'])
+  })
+
   it('Should accept a function in optionsValue param to select subproperties of the model values (and use that for the option text)', function () {
     var modelValues = observableArray([
             { name: 'bob', job: 'manager' },

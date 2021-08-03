@@ -61,6 +61,19 @@ describe('Binding: Event', function () {
     triggerEvent(testNode.childNodes[0], 'mouseout') // Shouldn't do anything (specifically, shouldn't throw)
   })
 
+  it('Should invoke lambda when the event occurs, using model as \'this\' param and first arg, and event as second arg', function () {
+    testNode.innerHTML = "<button data-bind='event: { click: (data, event) => data.log(event) }'>hey</button>"
+    let thing = null;
+    applyBindings({
+      log (arg) {
+        thing = arg
+      }
+    })
+    triggerEvent(testNode.childNodes[0], 'click')
+    expect(thing)
+    expect(thing.type).toEqual('click')
+  })
+
   it('Should prevent default action', function () {
     testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: noop }'>hey</a>"
     applyBindings({ noop: function () {} }, testNode)
