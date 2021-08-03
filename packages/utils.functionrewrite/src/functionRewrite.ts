@@ -9,9 +9,9 @@ const FUNCTION_REX = /\bfunction\s*\(([^)]*)\)\s*{\s*(?:(?:return\s+)?([^}]+?)[;
 export default function functionRewrite (bindingString) {
   return bindingString
     .replace(FUNCTION_REX, (match, args, rv) => {
-    if (!functionRewrite.silent) {
-      console.log(`Knockout: Replace "${match}" with "=> ${rv}"`)
-    }
-    return `(${args.trim()}) => ${rv}`
+      if (!functionRewrite.silent) {
+        console.log(`Knockout: Replace "${match}" with "(${args.trim()}) => ${rv}"`)
+      }
+      return `(${args.trim()}) => ${rv}`
   })
 }
