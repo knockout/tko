@@ -21,7 +21,7 @@ default::
 
 esm: dist/index.js
 commonjs: dist/index.cjs
-browser: dist/browser.min.js
+browser: dist/browser.min.js dist/browser.js
 
 *.ts:
 
@@ -61,7 +61,7 @@ dist/index.cjs: $(src) package.json
 		./index.ts
 
 dist/browser.min.js: $(src) package.json
-	@echo "[make] Compiling ${package} => $@"
+	@echo "[make] Compiling minified ${package} => $@"
 	$(ESBUILD) \
 		--platform=browser \
 		--target=es6 \
@@ -73,6 +73,22 @@ dist/browser.min.js: $(src) package.json
 		--define:BUILD_VERSION='"${version}"' \
 		--bundle \
 		--minify \
+		--sourcemap=external \
+		--outfile=$@ \
+		./src/index.js
+
+dist/browser.js: $(src) package.json
+	@echo "[make] Compiling ${package} => $@"
+	$(ESBUILD) \
+		--platform=browser \
+		--target=es6 \
+		--format=iife \
+		--global-name=$(iife-global-name) \
+		--log-level=$(log-level) \
+		--banner:js="$(banner) IIFE" \
+		--footer:js="(typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : global).$(iife-global-name) = $(iife-global-name).default" \
+		--define:BUILD_VERSION='"${version}"' \
+		--bundle \
 		--sourcemap=external \
 		--outfile=$@ \
 		./src/index.js
