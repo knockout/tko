@@ -22,11 +22,11 @@ export default class Parameters {
     if (node instanceof Identifier && node.token) {
       this.names.push(node.token)
     }
-    console.log(`Parameters constructed from node ${JSON.stringify(origNode, null, 2)}: ${JSON.stringify(this.names)}`)
+    // console.log(`Parameters constructed from node ${JSON.stringify(origNode, null, 2)}: ${JSON.stringify(this.names)}`)
   }
 
   extendContext (context, args) {
-    console.log(`lambda lhs: ${JSON.stringify(this, null, 2)} context: ${context}`)
+    // console.log(`lambda lhs: ${JSON.stringify(this, null, 2)} context: ${context}`)
     if (!this.names) return context
     else {
       const newValues = {}

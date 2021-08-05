@@ -79,7 +79,7 @@ describe('Binding: Options', function () {
             { name: 'bob' },
             { name: 'frank' }
     ])
-    testNode.innerHTML = "<select data-bind='options:myValues, optionsText: val => val.toUpperCase()'><option>should be deleted</option></select>"
+    testNode.innerHTML = "<select data-bind='options: myValues, optionsText: val => val.name.toUpperCase()'><option>should be deleted</option></select>"
     applyBindings({
       myValues: modelValues,
     }, testNode)

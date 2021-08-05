@@ -812,6 +812,7 @@ export default class Parser {
     this.currentContextGlobals = [context, globals, node]
     const parseFn = () => this.readBindings()
     const bindingAccessors = this.runParse(source, parseFn)
+    // console.log(JSON.stringify(bindingAccessors, null, 2))
     return this.convertToAccessors(bindingAccessors, context, globals, node)
   }
 

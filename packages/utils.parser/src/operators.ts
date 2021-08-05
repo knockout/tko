@@ -69,9 +69,6 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Oper
 operators['@'].precedence = 21
 operators['#'].precedence = 21
 
-  // lambda
-operators['=>'].precedence = 20
-
   // Member
 operators['.'].precedence = 19
 operators['['].precedence = 19
@@ -125,5 +122,8 @@ operators[','].precedence = 1
 
   // Call a function
 operators['call'].precedence = 1
+
+  // lambda
+operators['=>'].precedence = 1
 
 export { operators as default }

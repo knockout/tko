@@ -516,8 +516,8 @@ describe('unary operations', function () {
       assert.equal(obs(), 146)
     })
 
-    it('exposes arguments', () => {
-      const binding = 'x: (z) => 1 + z'
+    it('exposes single argument', () => {
+      const binding = 'x: z => 1 + z'
       const context = {}
       const bindings = makeBindings(binding, context)
       assert.equal(typeof bindings.x, 'function', 'binding should be a function')
@@ -530,6 +530,13 @@ describe('unary operations', function () {
       const context = {}
       const bindings = makeBindings(binding, context)
       assert.equal(bindings.x()(1, 2, 3), 6)
+    })
+
+    it('can call methods on args', () => {
+      const binding = 'x: s => s.toUpperCase()'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()('foo'), 'FOO')
     })
   })
 
@@ -947,7 +954,7 @@ describe('compound expressions', function () {
     function fn () {
       expect_equal('u.r', undefined) // undefined
     }
-    assert.throws(fn, 'defined')
+    assert.throws(fn, 'dereference')
   })
 
   it('calls function F1', function () {

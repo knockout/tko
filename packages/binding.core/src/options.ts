@@ -74,7 +74,8 @@ export var options = {
 
     function applyToObject (object, predicate, defaultValue) {
       var predicateType = typeof predicate
-      if (predicateType == 'function')    // Given a function; run it against the data value
+      // console.log(predicate, predicateType)
+      if (predicateType === 'function')    // Given a function; run it against the data value
               { return predicate(object) } else if (predicateType == 'string') // Given a string; treat it as a property name on the data value
               { return object[predicate] } else                                // Given no optionsText arg; use the data value itself
                 { return defaultValue }

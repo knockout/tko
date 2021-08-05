@@ -54,8 +54,8 @@ export default class Identifier {
         // fn(args)
         value = value.apply(lastValue || $data, member)
         lastValue = value
-      } else if (value === null) {
-        throw new Error(`dereference of null value in ${JSON.stringify(this, null, 2)} context: ${$context}`)
+      } else if (value === null || value === undefined) {
+        throw new Error(`dereference of null value in ${JSON.stringify(this, null, 2)} context: ${JSON.stringify($context, null, 2)}`)
       } else {
         // obj[x] or obj.x dereference.  Note that obj may be a function.
         lastValue = value
