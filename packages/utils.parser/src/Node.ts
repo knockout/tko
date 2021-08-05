@@ -53,7 +53,14 @@ export default class Node {
     var node = this
 
     if (node.op === LAMBDA) {
-      return () => node.get_leaf_value(node.rhs, context, globals, node)
+      return (...args) => {
+        let lambdaContext = context
+        if (node.lhs) {
+          lambdaContext = node.lhs.extendContext(context, args)
+          console.log(`lambdaContext: ${lambdaContext}`)
+        }
+        return node.get_leaf_value(node.rhs, lambdaContext, globals, node)
+      }
     }
 
     const lhv = node.get_leaf_value(node.lhs, context, globals, node)

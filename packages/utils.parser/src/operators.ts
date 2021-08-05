@@ -54,6 +54,7 @@ const operators = {
   // Access
   '.': function member (a, b) { return a[b] },
   '[': function member (a, b) { return a[b] },
+  ',': function comma (a, b) { return b },
   // conditional/ternary
   // '?': ternary See Node.js
   // Function-Call
@@ -118,6 +119,9 @@ operators['||'].precedence = 5
 
 operators['&&'].earlyOut = (a) => !a
 operators['||'].earlyOut = (a) => a
+
+  // multiple values
+operators[','].precedence = 1
 
   // Call a function
 operators['call'].precedence = 1

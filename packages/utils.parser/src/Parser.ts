@@ -10,6 +10,7 @@ import {
 import {default as Expression} from './Expression'
 import {default as Identifier} from './Identifier'
 import {default as Arguments} from './Arguments'
+import {default as Parameters} from './Parameters'
 import {default as Ternary} from './Ternary'
 import {default as Node} from './Node'
 import {default as operators} from './operators'
@@ -216,7 +217,7 @@ export default class Parser {
         }
         if (this.white() === ':') {
           ch = this.next(':')
-          this.objectAddValue(object, key, this.expression())
+          this.objectAddValue(object, key, this.expression({singleValue: true}))
         } else {
           const objectKeyIsValue = new Identifier(this, key, [])
           this.objectAddValue(object, key, objectKeyIsValue)
@@ -325,7 +326,7 @@ export default class Parser {
         return array
       }
       while (ch) {
-        array.push(this.expression())
+        array.push(this.expression({singleValue: true}))
         ch = this.white()
         if (ch === ']') {
           ch = this.next(']')
@@ -339,9 +340,8 @@ export default class Parser {
   }
 
   value () {
-    var ch
     this.white()
-    ch = this.ch
+    let ch = this.ch
     switch (ch) {
       case '{': return this.object()
       case '[': return this.array()
@@ -420,7 +420,7 @@ export default class Parser {
     while (ch) {
       if (ch === ':') {
         ch = this.next()
-        args.push(this.expression('|'))
+        args.push(this.expression({filterable: '|', singleValue: true}))
       }
 
       if (ch === '|') {
@@ -456,7 +456,7 @@ export default class Parser {
  * @return {function}   A function that computes the value of the expression
  *                      when called or a primitive.
  */
-  expression (filterable) {
+  expression ({filterable, singleValue} = {}) {
     let op
     let nodes = []
     let ch = this.white()
@@ -479,8 +479,10 @@ export default class Parser {
       }
       ch = this.white()
 
-      if (ch === ':' || ch === '}' || ch === ',' || ch === ']' ||
-        ch === ')' || ch === '' || ch === '`' || (ch === '|' && filterable === '|')) {
+      if (ch === ':' || ch === '}' || ch === ']' ||
+        ch === ')' || ch === '' || ch === '`' ||
+        (ch === '|' && filterable === '|') ||
+        (ch === ',' && singleValue)) {
         break
       }
 
@@ -506,6 +508,10 @@ export default class Parser {
         nodes.push(this.expression())
         ch = this.next(']')
         op = null
+      } else if (op === operators['=>']) {
+        // convert the last node to Parameters
+        nodes[nodes.length-1] = new Parameters(this, nodes[nodes.length-1])
+        nodes.push(op)
       } else if (op) {
         nodes.push(op)
       }
@@ -561,7 +567,7 @@ export default class Parser {
         this.next(')')
         return new Arguments(this, args)
       } else {
-        args.push(this.expression())
+        args.push(this.expression({singleValue: true}))
         ch = this.white()
       }
       if (ch !== ')') { this.next(',') }
@@ -697,20 +703,20 @@ export default class Parser {
           }
 
           ch = this.next(':')
-          this.objectAddValue(bindings[key[0]], key[1], this.expression(true))
+          this.objectAddValue(bindings[key[0]], key[1], this.expression({filterable: true, singleValue: true}))
         } else {
           ch = this.next(':')
           if (bindings[key] && typeof bindings[key] === 'object' && bindings[key].constructor === Object) {
           // Extend a namespaced bindings e.g. we've previously seen
           // on.x, now we're seeing on: { 'abc' }.
-            expr = this.expression(true)
+            expr = this.expression({filterable: true, singleValue: true})
             if (typeof expr !== 'object' || expr.constructor !== Object) {
               options.onError('Expected plain object for ' + key + ' value.')
             } else {
               extend(bindings[key], expr)
             }
           } else {
-            bindings[key] = this.expression(true)
+            bindings[key] = this.expression({filterable: true, singleValue: true})
           }
         }
 
@@ -815,7 +821,7 @@ export default class Parser {
   parseExpression (source, context = {}, globals = {}, node) {
     if (!source) { return () => '' }
     this.currentContextGlobals = [context, globals, node]
-    const parseFn = () => this.expression(true)
+    const parseFn = () => this.expression({filterable: true, singleValue: true})
     const bindingAccessors = this.runParse(source, parseFn)
     return this.valueAsAccessor(bindingAccessors, context, globals, node)
   }

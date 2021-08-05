@@ -25,7 +25,15 @@ import {
 } from '../dist';
 
 function ctxStub (ctx) {
-  return { lookup (v) { return ctx ? ctx[v] : null } }
+  return {
+    lookup (v) { return ctx ? ctx[v] : null },
+    extend (vals) {
+      return ctxStub(Object.assign({}, ctx, vals))
+    },
+    toString () {
+      return JSON.stringify(ctx, null, 2)
+    }
+  }
 }
 
 function makeBindings (binding, context) {
@@ -508,16 +516,17 @@ describe('unary operations', function () {
       assert.equal(obs(), 146)
     })
 
-    // Noting #65.
     it('exposes arguments', () => {
       const binding = 'x: (z) => 1 + z'
       const context = {}
       const bindings = makeBindings(binding, context)
+      assert.equal(typeof bindings.x, 'function', 'binding should be a function')
+      assert.equal(typeof bindings.x(), 'function', `binding value ${bindings.x()} should be a function`)
       assert.equal(bindings.x()(941), 942)
     })
 
     it('exposes multiple arguments', () => {
-      const binding = 'x: (a,b,c) => a * b * c'
+      const binding = 'x: (a,b, c) => a * b * c'
       const context = {}
       const bindings = makeBindings(binding, context)
       assert.equal(bindings.x()(1, 2, 3), 6)
