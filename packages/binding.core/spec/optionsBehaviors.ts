@@ -79,11 +79,7 @@ describe('Binding: Options', function () {
             { name: 'bob' },
             { name: 'frank' }
     ])
-<<<<<<< HEAD
     testNode.innerHTML = "<select data-bind='options: myValues, optionsText: val => val.name.toUpperCase()'><option>should be deleted</option></select>"
-=======
-    testNode.innerHTML = "<select data-bind='options:myValues, optionsText: val => val.toUpperCase()'><option>should be deleted</option></select>"
->>>>>>> 2a710013 (Add tests for lambdas with args)
     applyBindings({
       myValues: modelValues,
     }, testNode)
