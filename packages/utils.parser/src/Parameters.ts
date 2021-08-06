@@ -6,22 +6,26 @@ import Identifier from './Identifier'
 export default class Parameters {
   constructor (parser, node) {
     const origNode = node
-    // converts a node of comma-separated Identifiers to Parameters
-    this.names = []
+
+    // convert a node of comma-separated Identifiers to Parameters
+    const names = []
     if (node instanceof Expression) {
       node = node.root
     }
-    while (node instanceof Node) {
-      if (node.op === operators[','] && node.lhs instanceof Identifier && node.lhs.token) {
-        this.names.push(node.lhs.token)
+    // left-associative series of commas produces a tree with children only on the lhs, so we can extract the leaves with a simplified depth-first traversal
+    while (node) {
+      if (node instanceof Identifier) {
+        names.push(node.token)
+        node = null
+      } else if ((node instanceof Node) && node.op === operators[','] && (node.rhs instanceof Identifier)) {
+        names.push(node.rhs.token)
+        node = node.lhs
       } else {
         parser.error(`only simple identifiers allowed in lambda parameter list but found ${JSON.stringify(node, null, 2)}`)
       }
-      node = node.rhs
     }
-    if (node instanceof Identifier && node.token) {
-      this.names.push(node.token)
-    }
+    names.reverse()
+    this.names = names
     // console.log(`Parameters constructed from node ${JSON.stringify(origNode, null, 2)}: ${JSON.stringify(this.names)}`)
   }
 

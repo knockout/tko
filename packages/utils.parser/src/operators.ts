@@ -118,7 +118,7 @@ operators['&&'].earlyOut = (a) => !a
 operators['||'].earlyOut = (a) => a
 
   // multiple values
-operators[','].precedence = 1
+operators[','].precedence = 2
 
   // Call a function
 operators['call'].precedence = 1

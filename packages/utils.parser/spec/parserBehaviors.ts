@@ -538,6 +538,14 @@ describe('unary operations', function () {
       const bindings = makeBindings(binding, context)
       assert.equal(bindings.x()('foo'), 'FOO')
     })
+
+    it('can have a ternary operator as body', () => {
+      const binding = 'x: n => n > 0 ? "positive" : "negative"'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(1), 'positive')
+      assert.equal(bindings.x()(-1), 'negative')
+    })
   })
 
   describe('@ lookup/unwrap', function () {
