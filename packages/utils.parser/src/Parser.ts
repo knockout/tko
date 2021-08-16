@@ -546,9 +546,9 @@ export default class Parser {
 
   ternary (nodes) {
     var ternary = new Ternary()
-    ternary.yes = this.expression()
+    ternary.yes = this.expression({singleValue: true})
     this.next(':')
-    ternary.no = this.expression()
+    ternary.no = this.expression({singleValue: true})
     nodes.push(operators['?'])
     nodes.push(ternary)
   }

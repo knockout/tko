@@ -546,6 +546,14 @@ describe('unary operations', function () {
       assert.equal(bindings.x()(1), 'positive')
       assert.equal(bindings.x()(-1), 'negative')
     })
+
+    it('can have ternary followed by other bindings', () => {
+      const binding = 'x: n => n > 0 ? "positive" : "negative", y: "foo"'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(1), 'positive')
+      assert.equal(bindings.y(), 'foo')
+    })
   })
 
   describe('@ lookup/unwrap', function () {
@@ -647,6 +655,16 @@ describe('unary operations', function () {
       assert.equal(bindings.x(), 'stringa');
       obs(false);
       assert.equal(bindings.x(), 'string!a');
+    })
+
+    it('can be followed by other bindings', () => {
+      const binding = 'x: n > 0 ? "positive" : "negative", y: n + 1'
+      const context = {
+        n: observable(-3)
+      }
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x(), 'negative')
+      assert.equal(bindings.y(), -2)
     })
   })
 })
