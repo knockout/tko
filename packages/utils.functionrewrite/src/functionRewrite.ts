@@ -4,14 +4,18 @@
  *
  */
 
-const FUNCTION_REX = /\bfunction\s*\(([^)]*)\)\s*{\s*(?:(?:return\s+)?([^}]+?)[;\s]*)?}/g
+const FUNCTION_REX = /\bfunction\s*\(([^)]*)\)\s*{\s*(?:(return\s+)?([^}]+?)[;\s]*)?}/g
 
 export default function functionRewrite (bindingString) {
   return bindingString
-    .replace(FUNCTION_REX, (match, args, rv) => {
-      if (!functionRewrite.silent) {
-        console.log(`Knockout: Replace "${match}" with "(${args.trim()}) => ${rv}"`)
+    .replace(FUNCTION_REX, (match, args, returnKeyword, rv) => {
+      if (rv && !returnKeyword) {
+        rv += ' && undefined'
       }
-      return `(${args.trim()}) => ${rv}`
+      const out = `(${args.trim()}) => ${rv}`
+      if (!functionRewrite.silent) {
+        console.log(`Knockout: Replace "${match}" with "${out}"`)
+      }
+      return out
   })
 }
