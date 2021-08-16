@@ -4,7 +4,7 @@
  *
  */
 
-const FUNCTION_REX = /\bfunction\s*\(([^)]*)\)\s*{\s*(?:(return\s+)?([^}]+?)[;\s]*)?}/g
+const FUNCTION_REX = /\bfunction\s*\(([^)]*)\)\s*\{\s*(?:(return\s)?([^}]+?)[;\s]*)?\}/g
 
 export default function functionRewrite (bindingString) {
   return bindingString
