@@ -53,7 +53,8 @@ export var selectExtensions = {
         for (let i = 0, n = element.options.length, optionValue; i < n; ++i) {
           optionValue = selectExtensions.readValue(element.options[i])
           // Include special check to handle selecting a caption with a blank string value
-          if (optionValue === value || (optionValue === '' && value === undefined)) {
+          // Note that the looser == check here is intentional so that integer model values will match string element values.
+          if (optionValue == value || (optionValue === '' && value === undefined)) {
             selection = i
             break
           }
