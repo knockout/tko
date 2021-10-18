@@ -106,11 +106,11 @@ export default class Identifier {
     let leaf = this.token
     let i, n, root
 
-    if (hasOwnProperty($data, leaf)) {
+    if ($data instanceof Object && leaf in $data) {
       root = $data
-    } else if (hasOwnProperty($context, leaf)) {
+    } else if (leaf in $context) {
       root = $context
-    } else if (hasOwnProperty(globals, leaf)) {
+    } else if (leaf in globals) {
       root = globals
     } else {
       throw new Error('Identifier::set_value -- ' +
