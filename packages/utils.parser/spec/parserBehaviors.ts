@@ -526,10 +526,16 @@ describe('unary operations', function () {
     })
 
     it('exposes multiple arguments', () => {
-      const binding = 'x: (a,b, c) => a * b * c'
+      const binding = 'x: (a,b, c) => a * b / c'
       const context = {}
       const bindings = makeBindings(binding, context)
-      assert.equal(bindings.x()(1, 2, 3), 6)
+      assert.equal(bindings.x()(4, 3, 2), 6)
+    })
+
+    it('fails on malformed arguments', () => {
+      const binding = 'x: (a, b + c) => a * b / c'
+      const context = {}
+      assert.throws(() => makeBindings(binding, context), "only simple identifiers allowed")
     })
 
     it('can call methods on args', () => {
