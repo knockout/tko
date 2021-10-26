@@ -123,3 +123,21 @@ describe('cloneNodes', function () {
     expect(childIsClone).toBe(true)
   })
 })
+
+describe('selectExtensions', () => {
+  beforeEach(jasmine.prepareTestNode)
+
+  it('should use loose equality for select value', () => {
+    const select = document.createElement('select')
+    select.innerHTML = `
+      <option value="42" selected>Forty-two</option>
+      <option value="84">Eighty-four</option>
+    `
+    testNode.appendChild(select)
+
+    expect(select.selectedIndex).toBe(0)
+    expect(utils.selectExtensions.readValue(select)).toBe('42')
+    utils.selectExtensions.writeValue(select, 84, true)
+    expect(select.selectedIndex).toBe(1)
+  })
+})
