@@ -6,6 +6,10 @@ export function hasOwnProperty(obj, propName) {
   return Object.prototype.hasOwnProperty.call(obj, propName)
 }
 
+export function isObjectLike(obj) {
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function')
+}
+
 export function extend (target, source) {
   if (source) {
     for (var prop in source) {

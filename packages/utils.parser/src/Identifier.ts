@@ -2,7 +2,7 @@
 import Node from './Node'
 import Arguments from './Arguments'
 
-import { hasOwnProperty } from '@tko/utils'
+import { hasOwnProperty, isObjectLike } from '@tko/utils'
 
 import {
   isWriteableObservable, isObservable
@@ -106,7 +106,7 @@ export default class Identifier {
     let leaf = this.token
     let i, n, root
 
-    if ($data instanceof Object && leaf in $data) {
+    if (isObjectLike($data) && leaf in $data) {
       root = $data
     } else if (leaf in $context) {
       root = $context
