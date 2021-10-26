@@ -217,7 +217,7 @@ export default class Parser {
         }
         if (this.white() === ':') {
           ch = this.next(':')
-          this.objectAddValue(object, key, this.expression({singleValue: true}))
+          this.objectAddValue(object, key, this.singleValueExpression())
         } else {
           const objectKeyIsValue = new Identifier(this, key, [])
           this.objectAddValue(object, key, objectKeyIsValue)
@@ -326,7 +326,7 @@ export default class Parser {
         return array
       }
       while (ch) {
-        array.push(this.expression({singleValue: true}))
+        array.push(this.singleValueExpression())
         ch = this.white()
         if (ch === ']') {
           ch = this.next(']')
@@ -420,7 +420,7 @@ export default class Parser {
     while (ch) {
       if (ch === ':') {
         ch = this.next()
-        args.push(this.expression({filterable: '|', singleValue: true}))
+        args.push(this.singleValueExpression('|'))
       }
 
       if (ch === '|') {
@@ -453,10 +453,18 @@ export default class Parser {
  * Shunting-Yard.
  *   See: http://en.wikipedia.org/wiki/Shunting-yard_algorithm
  *
- * @return {function}   A function that computes the value of the expression
- *                      when called or a primitive.
+ * @param filterable - Whether the expression can include jinga-style filters.
+ *    An argument of '|' is used only by the filter() method to parse subsequent
+ *    filters.
+ * @param allowMultipleValues - Whether multiple values separated by commas are
+ *    allowed in this expression. When true (default), this method consumes
+ *    subsequent comma-separated values.
+ * @see {@link Parser.singleValueExpression}
+ * 
+ * @returns a function that computes the value of the expression
+ *    when called or a primitive.
  */
-  expression ({filterable, singleValue} = {}) {
+  expression (filterable: string | bool = false, allowMultipleValues: bool = true) {
     let op
     let nodes = []
     let ch = this.white()
@@ -482,7 +490,7 @@ export default class Parser {
       if (ch === ':' || ch === '}' || ch === ']' ||
         ch === ')' || ch === '' || ch === '`' ||
         (ch === '|' && filterable === '|') ||
-        (ch === ',' && singleValue)) {
+        (ch === ',' && !allowMultipleValues)) {
         break
       }
 
@@ -544,11 +552,22 @@ export default class Parser {
     return new Expression(nodes)
   }
 
+/**
+ * Use this method to parse expressions that can be followed by additional markup
+ * seperated by a comma, such as in bindings strings.
+ * 
+ * @returns an expression that cannot contain multiple values separated by commas.
+ * @see {@link Parser.expression}
+ */
+  singleValueExpression (filterable: bool | string) {
+    return this.expression(filterable, false)
+  }
+
   ternary (nodes) {
     var ternary = new Ternary()
-    ternary.yes = this.expression({singleValue: true})
+    ternary.yes = this.singleValueExpression()
     this.next(':')
-    ternary.no = this.expression({singleValue: true})
+    ternary.no = this.singleValueExpression()
     nodes.push(operators['?'])
     nodes.push(ternary)
   }
@@ -567,7 +586,7 @@ export default class Parser {
         this.next(')')
         return new Arguments(this, args)
       } else {
-        args.push(this.expression({singleValue: true}))
+        args.push(this.singleValueExpression())
         ch = this.white()
       }
       if (ch !== ')') { this.next(',') }
@@ -703,20 +722,20 @@ export default class Parser {
           }
 
           ch = this.next(':')
-          this.objectAddValue(bindings[key[0]], key[1], this.expression({filterable: true, singleValue: true}))
+          this.objectAddValue(bindings[key[0]], key[1], this.singleValueExpression(true))
         } else {
           ch = this.next(':')
           if (bindings[key] && typeof bindings[key] === 'object' && bindings[key].constructor === Object) {
           // Extend a namespaced bindings e.g. we've previously seen
           // on.x, now we're seeing on: { 'abc' }.
-            expr = this.expression({filterable: true, singleValue: true})
+            expr = this.singleValueExpression(true)
             if (typeof expr !== 'object' || expr.constructor !== Object) {
               options.onError('Expected plain object for ' + key + ' value.')
             } else {
               extend(bindings[key], expr)
             }
           } else {
-            bindings[key] = this.expression({filterable: true, singleValue: true})
+            bindings[key] = this.singleValueExpression(true)
           }
         }
 
@@ -821,7 +840,7 @@ export default class Parser {
   parseExpression (source, context = {}, globals = {}, node) {
     if (!source) { return () => '' }
     this.currentContextGlobals = [context, globals, node]
-    const parseFn = () => this.expression({filterable: true, singleValue: true})
+    const parseFn = () => this.singleValueExpression(true)
     const bindingAccessors = this.runParse(source, parseFn)
     return this.valueAsAccessor(bindingAccessors, context, globals, node)
   }
