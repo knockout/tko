@@ -26,11 +26,9 @@ export default class Parameters {
     }
     names.reverse()
     this.names = names
-    // console.log(`Parameters constructed from node ${JSON.stringify(origNode, null, 2)}: ${JSON.stringify(this.names)}`)
   }
 
   extendContext (context, args) {
-    // console.log(`lambda lhs: ${JSON.stringify(this, null, 2)} context: ${context}`)
     if (!this.names) return context
     else {
       const newValues = {}
