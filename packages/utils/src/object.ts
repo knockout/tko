@@ -6,8 +6,14 @@ export function hasOwnProperty(obj, propName) {
   return Object.prototype.hasOwnProperty.call(obj, propName)
 }
 
+/**
+ * True when obj is a non-null object, or a function.
+ * @param obj 
+ * @returns 
+ */
 export function isObjectLike(obj) {
-  return !!obj && (typeof obj === 'object' || typeof obj === 'function')
+  if (obj === null) { return false }
+  return typeof obj === 'object' || typeof obj === 'function'
 }
 
 export function extend (target, source) {
@@ -83,8 +89,6 @@ export function safeStringify (value) {
 /**
  * Promises/A+ compliant isThenable (per section 1.2)
  */
-export function isThenable (object) {
-  const objectType = typeof object
-  const thenableType = objectType === 'object' || objectType === 'function'
-  return thenableType && object !== null && typeof object.then === 'function'
+export function isThenable (object: any) {
+  return isObjectLike(object) && typeof object.then === 'function'
 }
