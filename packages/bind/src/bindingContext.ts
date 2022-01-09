@@ -1,4 +1,4 @@
-import { extend, options, domData } from '@tko/utils'
+import { extend, options, domData, isObjectLike } from '@tko/utils'
 
 import {
     pureComputed
@@ -118,7 +118,7 @@ Object.assign(bindingContext.prototype, {
     }
     const $data = this.$data
     // instanceof Object covers 1. {}, 2. [], 3. function() {}, 4. new *;  it excludes undefined, null, primitives.
-    if ($data instanceof Object && token in $data) { return $data[token] }
+    if (isObjectLike($data) && token in $data) { return $data[token] }
     if (token in this) { return this[token] }
     if (token in globals) { return globals[token] }
 

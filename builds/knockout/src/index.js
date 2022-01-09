@@ -5,9 +5,6 @@ import { DataBindProvider } from '@tko/provider.databind'
 import { ComponentProvider } from '@tko/provider.component'
 import { AttributeProvider } from '@tko/provider.attr'
 import { MultiProvider } from '@tko/provider.multi'
-import {
-  TextMustacheProvider, AttributeMustacheProvider
-} from '@tko/provider.mustache'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
@@ -34,8 +31,6 @@ const builder = new Builder({
   filters,
   provider: new MultiProvider({
     providers: [
-      new AttributeMustacheProvider(),
-      new TextMustacheProvider(),
       new ComponentProvider(),
       dataBindProvider,
       new VirtualProvider(),
