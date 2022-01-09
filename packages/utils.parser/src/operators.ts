@@ -54,6 +54,7 @@ const operators = {
   // Access
   '.': function member (a, b) { return a[b] },
   '[': function member (a, b) { return a[b] },
+  ',': function comma (a, b) { return b },
   // conditional/ternary
   // '?': ternary See Node.js
   // Function-Call
@@ -67,9 +68,6 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Oper
   // Our operator - unwrap/call
 operators['@'].precedence = 21
 operators['#'].precedence = 21
-
-  // lambda
-operators['=>'].precedence = 20
 
   // Member
 operators['.'].precedence = 19
@@ -119,7 +117,13 @@ operators['||'].precedence = 5
 operators['&&'].earlyOut = (a) => !a
 operators['||'].earlyOut = (a) => a
 
+  // multiple values
+operators[','].precedence = 2
+
   // Call a function
 operators['call'].precedence = 1
+
+  // lambda
+operators['=>'].precedence = 1
 
 export { operators as default }

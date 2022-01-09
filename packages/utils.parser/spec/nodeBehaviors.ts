@@ -5,7 +5,7 @@ import {
 } from '@tko/observable';
 
 import {
-  Parser, Node, Arguments, Identifier
+  Parser, Node, Arguments, Identifier, Ternary
 } from '../dist';
 
 var op = Node.operators
@@ -93,16 +93,22 @@ describe('the create_root function', function () {
   })
 
   it('converts multiple * to a tree', function () {
+    // expr: a * b / c
+    // sexp: (/ (* a b) c)
     var nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
       tree = nodes_to_tree(nodes.slice(0));
-    assert.equal(tree.lhs, 'a');
-    assert.equal(tree.op, operators['*']);
-    assert.equal(tree.rhs.lhs, 'b');
-    assert.equal(tree.rhs.op, operators['/']);
-    assert.equal(tree.rhs.rhs, 'c');
+    assert.equal(tree.lhs.lhs, 'a');
+    assert.equal(tree.lhs.op, operators['*']);
+    assert.equal(tree.lhs.rhs, 'b');
+    assert.equal(tree.op, operators['/']);
+    assert.equal(tree.rhs, 'c');
   })
 
   it('converts a complex set as expected', function () {
+    // expr: a * b + c * d * e > f + g % h
+    // prec:   4   3   4   4   1   3   4   
+    // sexp: (> (+ (* a b) (* (* c d) e))
+    //          (+ f (% g h)))
     var nodes = [
         'a', operators['*'], 'b',
         operators['+'],
@@ -110,7 +116,8 @@ describe('the create_root function', function () {
         operators['>'],
         'f', operators['+'], 'g', operators['%'], 'h'
       ],
-      root = nodes_to_tree(nodes.slice(0));
+      root = nodes_to_tree(nodes.slice(0), true);
+    // console.log(JSON.stringify(root, null, 2))
     assert.equal(root.op, operators['>'], '>')
 
     assert.equal(root.lhs.op, operators['+'], '+')
@@ -118,10 +125,11 @@ describe('the create_root function', function () {
     assert.equal(root.lhs.lhs.lhs, 'a')
     assert.equal(root.lhs.lhs.rhs, 'b')
 
-    assert.equal(root.lhs.rhs.op, operators['*'], '*')
-    assert.equal(root.lhs.rhs.lhs, 'c')
-    assert.equal(root.lhs.rhs.rhs.lhs, 'd')
-    assert.equal(root.lhs.rhs.rhs.rhs, 'e')
+    assert.equal(root.lhs.rhs.op, operators['*'], '* 2')
+    assert.equal(root.lhs.rhs.lhs.op, operators['*'], '* 3')
+    assert.equal(root.lhs.rhs.lhs.lhs, 'c')
+    assert.equal(root.lhs.rhs.lhs.rhs, 'd')
+    assert.equal(root.lhs.rhs.rhs, 'e')
 
     assert.equal(root.rhs.op, operators['+'], 'rhs +')
     assert.equal(root.rhs.lhs, 'f')
@@ -129,6 +137,22 @@ describe('the create_root function', function () {
     assert.equal(root.rhs.rhs.op, operators['%'])
     assert.equal(root.rhs.rhs.lhs, 'g')
     assert.equal(root.rhs.rhs.rhs, 'h')
+  })
+
+  it('converts a lambda with ternary operator', function () {
+    const root = nodes_to_tree([
+      undefined, op['=>'],
+      -1, op['>'], 0,
+      op['?'],
+      new Ternary('positive', 'negative')
+    ])
+    // console.log(JSON.stringify(root, null, 2))
+    assert.equal(root.op, op['=>'])
+    assert.equal(root.rhs.op, op['?'])
+    assert.equal(root.rhs.lhs.op, op['>'])
+    assert.equal(root.rhs.rhs.yes, 'positive')
+    assert.equal(root.rhs.rhs.no, 'negative')
+    assert.equal(root.get_value()(), 'negative')
   })
 })
 
