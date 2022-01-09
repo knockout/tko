@@ -58,7 +58,6 @@
     "@tko/provider.component": "^4.0.0-alpha9.0",
     "@tko/provider.databind": "^4.0.0-alpha9.0",
     "@tko/provider.multi": "^4.0.0-alpha8.4",
-    "@tko/provider.mustache": "^4.0.0-alpha9.0",
     "@tko/provider.virtual": "^4.0.0-alpha9.0",
     "@tko/utils.component": "^4.0.0-alpha9.0",
     "@tko/utils.functionrewrite": "^4.0.0-alpha8.2",
