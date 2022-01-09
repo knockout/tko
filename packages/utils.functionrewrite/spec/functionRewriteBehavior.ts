@@ -15,7 +15,7 @@ describe('Function Rewrite Provider', function () {
       'x: function () { return "abc" }': 'x: () => "abc"',
       'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: function() { }, nullLiteral: null, undefinedLiteral: undefined': 'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, functionLiteral: () => undefined, nullLiteral: null, undefinedLiteral: undefined',
       'function (v) { return v.name + " (" + v.job + ")"; }': '(v) => v.name + " (" + v.job + ")"',
-      'function () { foo(); }': '() => foo() && undefined'
+      'function () { foo(); }': '() => foo() && undefined',
     }
     const idempotents = [
       'x: nonfunction () {}'

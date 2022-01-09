@@ -25,7 +25,15 @@ import {
 } from '../dist';
 
 function ctxStub (ctx) {
-  return { lookup (v) { return ctx ? ctx[v] : null } }
+  return {
+    lookup (v) { return ctx ? ctx[v] : null },
+    extend (vals) {
+      return ctxStub(Object.assign({}, ctx, vals))
+    },
+    toString () {
+      return JSON.stringify(ctx, null, 2)
+    }
+  }
 }
 
 function makeBindings (binding, context) {
@@ -508,19 +516,49 @@ describe('unary operations', function () {
       assert.equal(obs(), 146)
     })
 
-    // Noting #65.
-    it.skip('exposes arguments', () => {
-      const binding = 'x: (z) => 1 + z'
+    it('exposes single argument', () => {
+      const binding = 'x: z => 1 + z'
       const context = {}
       const bindings = makeBindings(binding, context)
+      assert.equal(typeof bindings.x, 'function', 'binding should be a function')
+      assert.equal(typeof bindings.x(), 'function', `binding value ${bindings.x()} should be a function`)
       assert.equal(bindings.x()(941), 942)
     })
 
-    it.skip('exposes multiple arguments', () => {
-      const binding = 'x: (a,b,c) => a * b * c'
+    it('exposes multiple arguments', () => {
+      const binding = 'x: (a,b, c) => a * b / c'
       const context = {}
       const bindings = makeBindings(binding, context)
-      assert.equal(bindings.x()(1, 2, 3), 6)
+      assert.equal(bindings.x()(4, 3, 2), 6)
+    })
+
+    it('fails on malformed arguments', () => {
+      const binding = 'x: (a, b + c) => a * b / c'
+      const context = {}
+      assert.throws(() => makeBindings(binding, context), "only simple identifiers allowed")
+    })
+
+    it('can call methods on args', () => {
+      const binding = 'x: s => s.toUpperCase()'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()('foo'), 'FOO')
+    })
+
+    it('can have a ternary operator as body', () => {
+      const binding = 'x: n => n > 0 ? "positive" : "negative"'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(1), 'positive')
+      assert.equal(bindings.x()(-1), 'negative')
+    })
+
+    it('can have ternary followed by other bindings', () => {
+      const binding = 'x: n => n > 0 ? "positive" : "negative", y: "foo"'
+      const context = {}
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x()(1), 'positive')
+      assert.equal(bindings.y(), 'foo')
     })
   })
 
@@ -623,6 +661,16 @@ describe('unary operations', function () {
       assert.equal(bindings.x(), 'stringa');
       obs(false);
       assert.equal(bindings.x(), 'string!a');
+    })
+
+    it('can be followed by other bindings', () => {
+      const binding = 'x: n > 0 ? "positive" : "negative", y: n + 1'
+      const context = {
+        n: observable(-3)
+      }
+      const bindings = makeBindings(binding, context)
+      assert.equal(bindings.x(), 'negative')
+      assert.equal(bindings.y(), -2)
     })
   })
 })
@@ -938,7 +986,7 @@ describe('compound expressions', function () {
     function fn () {
       expect_equal('u.r', undefined) // undefined
     }
-    assert.throws(fn, 'defined')
+    assert.throws(fn, 'dereference')
   })
 
   it('calls function F1', function () {
