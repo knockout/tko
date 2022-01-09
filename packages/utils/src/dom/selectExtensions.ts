@@ -53,19 +53,17 @@ export var selectExtensions = {
         for (let i = 0, n = element.options.length, optionValue; i < n; ++i) {
           optionValue = selectExtensions.readValue(element.options[i])
           // Include special check to handle selecting a caption with a blank string value
-          if (optionValue === value || (optionValue === '' && value === undefined)) {
+          // Note that the looser == check here is intentional so that integer model values will match string element values.
+          const strictEqual = optionValue === value
+          const blankEqual = optionValue === '' && value === undefined
+          const numericEqual = typeof value === 'number' && Number(optionValue) === value
+          if (strictEqual || blankEqual || numericEqual) {
             selection = i
             break
           }
         }
         if (allowUnset || selection >= 0 || (value === undefined && element.size > 1)) {
           element.selectedIndex = selection
-          if (ieVersion === 6) {
-            // Workaround for IE6 bug: It won't reliably apply values to SELECT nodes during the same execution thread
-            // right after you've changed the set of OPTION nodes on it. So for that node type, we'll schedule a second thread
-            // to apply the value as well.
-            safeSetTimeout(() => { element.selectedIndex = selection }, 0)
-          }
         }
         break
       default:

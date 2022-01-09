@@ -10,6 +10,7 @@
     "@tko/observable": "^4.0.0-alpha8.0",
     "@tko/provider": "^4.0.0-alpha8.4",
     "@tko/utils": "^4.0.0-alpha8.0",
+    "@tko/utils.jsx": "^4.0.0-alpha8.0",
     "@tko/utils.component": "^4.0.0-alpha9.0",
     "tslib": "^2.2.0"
   },

@@ -32,7 +32,12 @@ import {
 describe('Identifier', function () {
   function testLookup (identifier, $data) {
     const ctx = new bindingContext($data)
-    return new Identifier(null, identifier).get_value(undefined, ctx)
+    return new Identifier(null, identifier).get_value(undefined, ctx, {})
+  }
+
+  function testWrite (identifier, $data, newValue) {
+    const ctx = new bindingContext($data)
+    return new Identifier(null, identifier).set_value(newValue, ctx, {})
   }
 
   var c = 'Z',
@@ -46,12 +51,39 @@ describe('Identifier', function () {
     assert.equal(testLookup('f', context), f)
   })
 
+  it('looks up values on no-prototype $data', function () {
+    const $data = Object.create(null)
+    $data.c = c
+    assert.equal(testLookup('c', $data), 'Z')
+  })
+
   it('returns null as expected', function () {
     assert.equal(testLookup('$data', null), null)
   })
 
   it('returns undefined as expected', function () {
     assert.equal(testLookup('$data', undefined), undefined)
+  })
+
+  it('sets plain values on $data', () => {
+    const $data = { c: c }
+    assert.equal($data.c, 'Z')
+    testWrite('c', $data, 'X')
+    assert.equal($data.c, 'X')
+  })
+
+  it('sets observable values on $data', () => {
+    const $data = { c: observable(c) }
+    assert.equal($data.c(), 'Z')
+    testWrite('c', $data, 'X')
+    assert.equal($data.c(), 'X')
+  })
+
+  it('sets plain values on no-prototype $data', () => {
+    const $data = Object.create(null)
+    $data.c = c
+    testWrite('c', $data, 'X')
+    assert.equal($data.c, 'X')
   })
 
   it('dereferences values on the parser', function () {
