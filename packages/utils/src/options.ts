@@ -22,7 +22,7 @@ var options = {
   allowVirtualElements: true,
 
     // Global variables that can be accessed from bindings.
-  bindingGlobals: {},
+  bindingGlobals: Object.create(null),
 
     // An instance of the binding provider.
   bindingProviderInstance: null,
