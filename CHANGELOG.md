@@ -11,6 +11,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 - add `preventDefault` to event handler bindings
 - switch source to Typescript (but no types exported yet)
 - change build.reference & build.knockout build export strategy
+- make bindingGlobals empty by default (#165 @danieldickison)
 
 ## 👑 `alpha 9` (28 Feb 2020)
 
