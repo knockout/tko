@@ -18,6 +18,8 @@ import components from '@tko/utils.component'
 
 import { functionRewrite } from '@tko/utils.functionrewrite'
 
+import { options as defaultOptions } from '@tko/utils'
+
 /**
  * expressionRewriting is deprecated in TKO because we have our own JS
  * parser now.  This is here only for legacy compatibility.
@@ -45,6 +47,7 @@ const builder = new Builder({
     { each: foreachBindings.foreach }
   ],
   options: {
+    bindingGlobals: defaultOptions.global,
     bindingStringPreparsers: [functionRewrite]
   }
 })
