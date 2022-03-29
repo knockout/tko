@@ -10,5 +10,5 @@ build:
 
 # hugo new <SECTIONNAME>/<FILENAME>.<FORMAT>
 
-deploy:
+deploy: build
 	$(FIREBASE) deploy --only hosting --project $(GCP_PROJECT)
