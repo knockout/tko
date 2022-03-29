@@ -36,6 +36,7 @@
     "chai": "^4.3.4",
     "electron": "^16.0.6",
     "esbuild": "^0.14.11",
+    "firebase-tools": "^10.5.0",
     "fs-extra": "^10.0.0",
     "jquery": "^3.6.0",
     "karma": "^6.3.2",
