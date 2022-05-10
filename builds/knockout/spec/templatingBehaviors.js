@@ -1,5 +1,5 @@
 
-var dummyTemplateEngine = function (templates) {
+export var dummyTemplateEngine = function (templates) {
     var inMemoryTemplates = templates || {};
     var inMemoryTemplateData = {};
 

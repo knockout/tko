@@ -1,4 +1,4 @@
-
+import { dummyTemplateEngine } from "./templatingBehaviors";
 
 describe('Cross-window support', function() {
     it('Should work in another window', function () {
