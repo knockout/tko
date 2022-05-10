@@ -3,9 +3,6 @@
 // ---
 // toJS & toJSON
 //
-import {
-    arrayIndexOf
-} from '@tko/utils'
 
 import { isObservable } from './observable'
 
@@ -27,15 +24,13 @@ export function toJSON (rootObject, replacer, space) {     // replacer and space
   return JSON.stringify(plainJavaScriptObject, replacer, space)
 }
 
-function mapJsObjectGraph (rootObject, mapInputCallback, visitedObjects) {
-  visitedObjects = visitedObjects || new objectLookup()
-
+function mapJsObjectGraph (rootObject, mapInputCallback, visitedObjects = new Map()) {
   rootObject = mapInputCallback(rootObject)
   var canHaveProperties = (typeof rootObject === 'object') && (rootObject !== null) && (rootObject !== undefined) && (!(rootObject instanceof RegExp)) && (!(rootObject instanceof Date)) && (!(rootObject instanceof String)) && (!(rootObject instanceof Number)) && (!(rootObject instanceof Boolean))
   if (!canHaveProperties) { return rootObject }
 
   var outputProperties = rootObject instanceof Array ? [] : {}
-  visitedObjects.save(rootObject, outputProperties)
+  visitedObjects.set(rootObject, outputProperties)
 
   visitPropertiesOrArrayEntries(rootObject, function (indexer) {
     var propertyValue = mapInputCallback(rootObject[indexer])
@@ -70,25 +65,5 @@ function visitPropertiesOrArrayEntries (rootObject, visitorCallback) {
     for (var propertyName in rootObject) {
       visitorCallback(propertyName)
     }
-  }
-}
-
-function objectLookup () {
-  this.keys = []
-  this.values = []
-}
-
-objectLookup.prototype = {
-  constructor: objectLookup,
-  save: function (key, value) {
-    var existingIndex = arrayIndexOf(this.keys, key)
-    if (existingIndex >= 0) { this.values[existingIndex] = value } else {
-      this.keys.push(key)
-      this.values.push(value)
-    }
-  },
-  get: function (key) {
-    var existingIndex = arrayIndexOf(this.keys, key)
-    return (existingIndex >= 0) ? this.values[existingIndex] : undefined
   }
 }
