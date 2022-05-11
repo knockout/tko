@@ -2,6 +2,7 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
 ## upcoming
 
+- replace `objectLookup` with `Map` in `toJS` for O(n) instead of O(n²) computational complexity (#170 @brianmhunt)
 - fix equality comparison for select option values (#155/#163 @danieldickison)
 - fix identifier set_value in parser (#157/#161 @danieldickison)
 - remove mustache from text/attr bindings by default (#156 @danieldickison)
