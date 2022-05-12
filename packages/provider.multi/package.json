@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-alpha8.4",
+  "version": "4.0.0-beta1.0",
   "name": "@tko/provider.multi",
   "description": "Combine multiple other providers into one",
   "module": "dist/provider.multi.js",
@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0-alpha8.4",
+    "@tko/provider": "^4.0.0-beta1.0",
     "tslib": "^2.2.0"
   },
   "karma": {
