@@ -28,9 +28,12 @@ ci:
 lint:
 	$(NPX) standard
 
+# Run the `repackage` target in every directory.  Essentially
+# homogenizes the `package.json`.
 repackage: tools/repackage.mjs
 	$(LERNA) exec --stream -- $(MAKE) repackage
 
+# Run to update the versions of all the package.json files, before publishing.
 bump:
 	$(LERNA) version
 
