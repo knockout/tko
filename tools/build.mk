@@ -43,7 +43,7 @@ dist/index.js: $(src) package.json
 		--define:BUILD_VERSION='"${version}"' \
 		--sourcemap=external \
 		--outdir=dist/ \
-		$(src)
+		src/index.ts
 
 # Build a CommonJS bundle, targetting ES6.
 dist/index.cjs: $(src) package.json
@@ -75,7 +75,7 @@ dist/browser.min.js: $(src) package.json
 		--minify \
 		--sourcemap=external \
 		--outfile=$@ \
-		./src/index.js
+		./src/index.ts
 
 repackage: $(tools_dir)/repackage.mjs ../../lerna.json
 	node $(tools_dir)/repackage.mjs
