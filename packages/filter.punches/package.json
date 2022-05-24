@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta1.0",
+  "version": "4.0.0-beta1.3",
   "name": "@tko/filter.punches",
   "description": "TKO filters from knockout punches",
   "module": "dist/filter.punches.js",
@@ -23,7 +23,7 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/observable": "^4.0.0-beta1.0",
+    "@tko/observable": "^4.0.0-beta1.3",
     "tslib": "^2.2.0"
   },
   "karma": {

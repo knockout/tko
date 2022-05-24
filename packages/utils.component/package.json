@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta1.0",
+  "version": "4.0.0-beta1.3",
   "name": "@tko/utils.component",
   "description": "Registry and loading utilities for web components",
   "module": "dist/utils.component.js",
@@ -9,9 +9,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/lifecycle": "^4.0.0-beta1.0",
-    "@tko/observable": "^4.0.0-beta1.0",
-    "@tko/utils": "^4.0.0-beta1.0",
+    "@tko/lifecycle": "^4.0.0-beta1.3",
+    "@tko/observable": "^4.0.0-beta1.3",
+    "@tko/utils": "^4.0.0-beta1.3",
     "tslib": "^2.2.0"
   },
   "peerDependencies": {
