@@ -1,6 +1,6 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## Beta1.2
+## Beta1.3
 
 - replace `objectLookup` with `Map` in `toJS` for O(n) instead of O(n²) computational complexity (#170 @felipesantoz)
 - fix equality comparison for select option values (#155/#163 @danieldickison)
