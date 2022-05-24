@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-alpha8.0",
+  "version": "4.0.0-beta1.0",
   "name": "@tko/utils",
   "description": "TKO Utilities",
   "type": "module",

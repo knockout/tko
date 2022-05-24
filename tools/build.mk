@@ -17,11 +17,12 @@ ESBUILD := npx esbuild
 .SUFFIXES: .ts .js
 
 default::
-	$(MAKE) esm commonjs
+	$(MAKE) esm commonjs mjs
 
-esm: dist/index.js
-commonjs: dist/index.cjs
 browser: dist/browser.min.js dist/browser.js
+commonjs: dist/index.cjs
+esm: dist/index.js
+mjs: dist/index.mjs
 
 *.ts:
 
@@ -44,6 +45,17 @@ dist/index.js: $(src) package.json
 		--sourcemap=external \
 		--outdir=dist/ \
 		$(src)
+
+dist/index.mjs: $(src) package.json
+	@echo "[make] Compiling ${package} => $@"
+	$(ESBUILD) \
+		--platform=neutral \
+		--log-level=$(log-level) \
+		--banner:js="$(banner) MJS" \
+		--define:BUILD_VERSION='"${version}"' \
+		--sourcemap=external \
+		--outfile=dist/index.mjs \
+		src/index.ts
 
 # Build a CommonJS bundle, targetting ES6.
 dist/index.cjs: $(src) package.json
@@ -75,7 +87,7 @@ dist/browser.min.js: $(src) package.json
 		--minify \
 		--sourcemap=external \
 		--outfile=$@ \
-		./src/index.js
+		./src/index.ts
 
 dist/browser.js: $(src) package.json
 	@echo "[make] Compiling ${package} => $@"

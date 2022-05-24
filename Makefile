@@ -28,15 +28,18 @@ ci:
 lint:
 	$(NPX) standard
 
+# Run the `repackage` target in every directory.  Essentially
+# homogenizes the `package.json`.
 repackage: tools/repackage.mjs
 	$(LERNA) exec --stream -- $(MAKE) repackage
 
+# Run to update the versions of all the package.json files, before publishing.
 bump:
 	$(LERNA) version
 
 # from-git "identify packages tagged by lerna version and publish them to npm."
 # from-package "packages where the latest version is not present in the registry"
-publish-unpublished: build
+publish-unpublished: all link
 	$(LERNA) publish from-package
 
 package-lock.json: package.json packages/*/package.json
@@ -55,6 +58,7 @@ outdated-upgrade:
 install: package-lock.json
 
 clean:
+	rm -rf node_modules/
 	rm -f package-lock.json
 	rm -rf packages/*/dist/*
 	rm -rf packages/*/package-lock.json

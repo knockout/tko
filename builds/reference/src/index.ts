@@ -21,7 +21,7 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import { filters } from '@tko/filter.punches'
 
 import components from '@tko/utils.component'
-import { createElement, Fragment } from 'utils.jsx'
+import { createElement, Fragment } from '@tko/utils.jsx'
 
 const builder = new Builder({
   filters,
