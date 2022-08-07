@@ -24,6 +24,7 @@
         4. [MJS](#imports-mjs)
     3. [Sites](#sites)
 3. [Using the Monporepo](#monorepo)
+    1. [Test suit](#tests)
 4. [Objectives](#objectives)
 5. [Roadmap](#roadmap)
 6. [License](#license)
@@ -37,7 +38,7 @@
 
 <!-- how it can house original KO monorepo, if the goal of TKO is not KO -->
 <!-- **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout). -->
-**TKO** serves as a foundation for `Knockout 4` which goal is to become a drop-in replacement and a feature-rich expansion of already existing KnockoutJS (3+) while adhering new standarts and paradigms of web developmentent. Its built on top of current KnockoutJS featurelist while being [mostly compatible](https://www.tko.io/3to4) with it, further about it and build differences at [download](#download) section.
+**TKO** serves as a foundation for `Knockout 4` which goal is to become a drop-in replacement and a feature-rich expansion of already existing KnockoutJS (3+) while adhering new standards and paradigms of web developmentent. Its built on top of current KnockoutJS featurelist while being [mostly compatible](https://www.tko.io/3to4) with it, further about it and build differences at [download](#download) section.
 
 
 ### Download <a id="download"></a>
@@ -127,33 +128,21 @@ First thing at getting familiar with the project monorepo is to look at `./Makef
 | $ `make test` | Run all tests. See below.
 | $ `make publish-unpublished` | Bump versions and publish to npm registry
 
-
----
-> **TODO**: remove rollup info as current version uses ESbuild
-
-In each individual `packages/*/` directory, you can also run (presuming `rollup` and `karma` are installed globally):
+In each individual `packages/*/` directory, you can also run (presuming `esbuild` and `karma` are installed globally):
 
 | Command | Effect |
 | --- | --- |
-| $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run`
-| $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/`
+| $ `make test` | Test the local package, abstraction of `npx karma start ../../tools/karma.conf --once`
+| $ `make` | Build the package into the local `dist/`
 
 
-#### Testing with `yarn test` and `yarn watch`
+### Test suit <a id="tests"></a>
 
-The `yarn test` and `yarn watch` commands can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests
-specific to that package.
+```sh
+  make test
+```
 
-Optional arguments to `yarn test` include:
-
-- `--sauce` — use Sauce Labs to test a variety of platforms; requires an account at Sauce Labs and `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` to be set in the environment.
-- `--noStartConnect` — Do not start a new Sauce Connect proxy instance for every
-test; requires that Sauce Connect be already running.
-
-
-#### `visual.html`
-
-Note that running `karma` or `rollup` will create a `visual.html` file that shows the proportional size of imports into each package.
+Testing suit is build around Karma and Jasmine. The `make test` command can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests specific to that package from their `spec` folders.
 
 
 ## Objectives <a id="objectives"></a>
