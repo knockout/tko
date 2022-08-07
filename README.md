@@ -64,7 +64,7 @@ Currently there is no default package root import due to availability of differe
 * ESM <a id="imports-esm"></a>
 
   ```js
-    import ko from "@tko/build.reference/dist/index.js"
+  import ko from "@tko/build.reference/dist/index.js"
   ```
 
   `ko` is default export so feel free to change import name on your desired.
@@ -72,9 +72,9 @@ Currently there is no default package root import due to availability of differe
 * IIFE <a id="imports-iife"></a>
 
   ```js
-    import "@tko/build.reference/dist/browser.js"
-    // or use already minified bundle
-    import "@tko/build.reference/dist/browser.min.js"
+  import "@tko/build.reference/dist/browser.js"
+  // or use already minified bundle
+  import "@tko/build.reference/dist/browser.min.js"
   ```
 
   Imported namespace is available *only* as `tko`.
@@ -82,18 +82,16 @@ Currently there is no default package root import due to availability of differe
 * CommonJS <a id="imports-cjs"></a>
 
   ```js
-    "@tko/build.reference/dist/index.cjs"
+  const ko = require("@tko/build.reference/dist/index.cjs")
   ```
-
-  TODO
 
 * MJS <a id="imports-mjs"></a>
 
   ```js
-    "@tko/build.reference/dist/index.mjs"
+  import ko from "@tko/build.reference/dist/index.mjs"
   ```
 
-  TODO
+  `ko` is default export so feel free to change import name on your desired.
 
 > **Note**: you can check imported TKO version by looking at its namespace attribute `.version<String>` in runtime.
 
@@ -131,7 +129,7 @@ In each individual `packages/*/` directory, you can also run (presuming `esbuild
 ### Test suit <a id="tests"></a>
 
 ```sh
-  make test
+make test
 ```
 
 Testing suit is build around Karma and Jasmine. The `make test` command can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests specific to that package from their respective `spec` folders.
