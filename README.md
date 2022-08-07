@@ -99,7 +99,7 @@ Currently there is no default package root import due to availability of differe
 
   TODO
 
-> Note: you can check imported TKO version by looking at its namespace attribute `.version<String>` in runtime.
+> **Note**: you can check imported TKO version by looking at its namespace attribute `.version<String>` in runtime.
 
 
 ### Sites <a id="sites"></a>
@@ -114,17 +114,23 @@ Currently there are 2 points of interest which further would be considered a wik
 ## Using the Monorepo <a id="monorepo"></a>
 ---
 
+The default package manager for monorepo currently is `npm` with the addition of [Lerna](https://lerna.js.org/docs/getting-started) as a viable choice for monorepo management.
+
+First thing at getting familiar with the project monorepo is to look at `Makefile` at project root. Since its a separate file spanning entire repo, we will cover only the most used commands:
+
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
-| $ `npm install -g yarn` otherwise | Ensure yarn is globally available
-| $ `yarn` | Install local node packages and link tko modules
-| $ `yarn test` | Run all tests. See below.
-| $ `yarn watch` | Run all tests and watch for changes. See below.
-| $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled
-| $ `lerna publish` | Bump versions and publish to npm registry
+| $ `make` | Install all dependencies, build reference and compatibility versions of TKO at `builds/*/dist/*` (without any transpilation - needs proving). It is the `default` behavior, calling `all` directive.
+| $ `make clean` | empties build directories `.../dist/*` and `package-lock.json`'s inside of every `package/*` and `builds/*`
+| $ `npm i` | Install local node packages and link tko modules
+| $ `make test` | Run all tests. See below.
+| $ `make watch` | Run all tests and watch for changes. See below.
+| $ `make publish-unpublished` | Bump versions and publish to npm registry
 
-Checkout `package.json => scripts` for more commands that can be executed with `yarn {command}`.
+
+---
+> **TODO**: remove rollup info as current version uses ESbuild
 
 In each individual `packages/*/` directory, you can also run (presuming `rollup` and `karma` are installed globally):
 
