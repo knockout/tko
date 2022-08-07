@@ -31,10 +31,7 @@
 7. [Shoutouts](#shoutouts)
 
 
-<br/>
-
 ## Getting Started <a id="getting-started"></a>
----
 
 <!-- how it can house original KO monorepo, if the goal of TKO is not KO -->
 <!-- **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout). -->
@@ -60,8 +57,6 @@ This Knockout build has some backwards compatibility that is not in the referenc
 - *Reference* Build: https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-alpha8/dist/build.reference.min.js
 - *Compatibility* Build: https://cdn.jsdelivr.net/npm/@tko/build.knockout@4.0.0-alpha8/dist/build.knockout.min.js
 
-
-<br/>
 
 ### Using TKO in a project <a id="usage"></a>
 Currently there is no default package root import due to availability of different builds listed below. Every TKO build supports all listed below module types:
@@ -110,10 +105,7 @@ Currently there are 2 points of interest which further would be considered a wik
 - https://brianmhunt.github.io/knockout - Work In Profress wiki/docs for Knockout
 
 
-<br/>
-
 ## Using the Monorepo <a id="monorepo"></a>
----
 
 The default package manager for monorepo currently is `npm` with the addition of [Lerna](https://lerna.js.org/docs/getting-started) as a viable choice for monorepo management.
 
@@ -142,14 +134,14 @@ In each individual `packages/*/` directory, you can also run (presuming `esbuild
   make test
 ```
 
-Testing suit is build around Karma and Jasmine. The `make test` command can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests specific to that package from their `spec` folders.
+Testing suit is build around Karma and Jasmine. The `make test` command can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests specific to that package from their respective `spec` folders.
 
 
 ## Objectives <a id="objectives"></a>
 
 TKO aims to become a base for future versions of Knockout.  The objectives include:
 
-- Modularization into ES6 and separate projects, with compilation using an ES6 compiler like [Rollup](http://rollupjs.org/).  This solves several problems with Knockout, including:
+- Modularization into ES6 and separate projects, with compilation using an ES6 compiler like [esbuild](https://esbuild.github.io/).  This solves several problems with Knockout, including:
   - Some folks want to roll-their-own with e.g. removing components
   - Compilation is now with Closure compiler, which is actually transliterating – meaning the *debug* and *minified* versions have different code paths (mostly in the form of things exposed in *debug* being missing in the *minified* version)
   - The compilation of Knockout is just concatenation, leading to difficulties with maintainance, severance, and replacement
