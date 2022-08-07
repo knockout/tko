@@ -37,7 +37,7 @@
 
 <!-- how it can house original KO monorepo, if the goal of TKO is not KO -->
 <!-- **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout). -->
-**TKO** serves as a foundation for `Knockout 4` which goal is to become a drop-in replacement and a feature-rich expansion of already existing KnockoutJS (3+) while adhearing new standarts and paradigms of web developmentent. Its built on top of current KnockoutJS featurelist while being [mostly compatible](https://www.tko.io/3to4) with it, further about it and build differences at [download](#download) section.
+**TKO** serves as a foundation for `Knockout 4` which goal is to become a drop-in replacement and a feature-rich expansion of already existing KnockoutJS (3+) while adhering new standarts and paradigms of web developmentent. Its built on top of current KnockoutJS featurelist while being [mostly compatible](https://www.tko.io/3to4) with it, further about it and build differences at [download](#download) section.
 
 
 ### Download <a id="download"></a>
@@ -116,16 +116,15 @@ Currently there are 2 points of interest which further would be considered a wik
 
 The default package manager for monorepo currently is `npm` with the addition of [Lerna](https://lerna.js.org/docs/getting-started) as a viable choice for monorepo management.
 
-First thing at getting familiar with the project monorepo is to look at `Makefile` at project root. Since its a separate file spanning entire repo, we will cover only the most used commands:
+First thing at getting familiar with the project monorepo is to look at `./Makefile` at project root. Since its a separate file spanning entire repo, we will cover only the most commonly used commands:
 
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
-| $ `make` | Install all dependencies, build reference and compatibility versions of TKO at `builds/*/dist/*` (without any transpilation - needs proving). It is the `default` behavior, calling `all` directive.
+| $ `make` | Install all dependencies, build *reference* and *compatibility* versions of TKO at `builds/*/dist/*` without any transpilation. It is the `default` makefile behavior calling `all` directive.
 | $ `make clean` | empties build directories `.../dist/*` and `package-lock.json`'s inside of every `package/*` and `builds/*`
 | $ `npm i` | Install local node packages and link tko modules
 | $ `make test` | Run all tests. See below.
-| $ `make watch` | Run all tests and watch for changes. See below.
 | $ `make publish-unpublished` | Bump versions and publish to npm registry
 
 
