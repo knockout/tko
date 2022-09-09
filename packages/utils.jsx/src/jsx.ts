@@ -1,4 +1,5 @@
 
+import { attr } from '@tko/binding.core/src/attr'
 import {
   isObservable, unwrap
 } from '@tko/observable'
@@ -45,10 +46,21 @@ export function getOriginalJsxForNode (node) {
  * @param  {...string|object} c children of the element
  */
 export function createElement (elementName, attributes, ...children) {
+  const internalAttributes = attributes || {};
+  if(internalAttributes.hasOwnProperty('children')) {
+    console.error(
+      "%s: `children` cannot be used as an attribute. It gets automatically bound to the child elements of this component. " +
+        "If you want to access the same value within the child component, you should pass it as a different attribute.",
+      elementName
+    );
+  }
+
+  internalAttributes.children = [...children] || []
+
   return elementName === Fragment ? children
     : {
       elementName: elementName,
-      attributes: attributes || {},
+      attributes: internalAttributes,
       children: [...children]
     }
 }
