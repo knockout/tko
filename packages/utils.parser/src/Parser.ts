@@ -440,7 +440,7 @@ export default class Parser {
         argValues.push(Node.value_of(args[i], context, globals, node))
       }
 
-      return nextFilter(options.filters[name].apply(null, argValues))
+      return nextFilter(options.filters[name].apply(context, argValues))
     }
 
   // Lowest precedence.
