@@ -24,6 +24,8 @@ const operators = {
   '!!': function notnot (a, b) { return !!b },
   '++': function preinc (a, b) { return ++b },
   '--': function preinc (a, b) { return --b },
+  // exponent
+  '**': function exp (a, b) { return a ** b },
   // mul/div
   '*': function mul (a, b) { return a * b },
   '/': function div (a, b) { return a / b },
@@ -31,7 +33,7 @@ const operators = {
   // sub/add
   '+': function add (a, b) { return a + b },
   '-': function sub (a, b) { return (a || 0) - (b || 0) },
-  '&-': function neg (a, b) { return -1 * b },
+  '&-': function neg (a, b) { return -1 * b }, // unary -
   // relational
   '<': function lt (a, b) { return a < b },
   '<=': function le (a, b) { return a <= b },
@@ -51,8 +53,10 @@ const operators = {
   // logic
   '&&': function logicAnd (a, b) { return a && b },
   '||': function logicOr (a, b) { return a || b },
+  '??': function nullishCoalesce (a, b) { return a ?? b },
   // Access
   '.': function member (a, b) { return a[b] },
+  '?.': function optionalMember (a, b) { return a?.[b] },
   '[': function member (a, b) { return a[b] },
   ',': function comma (a, b) { return b },
   // conditional/ternary
@@ -72,6 +76,7 @@ operators['#'].precedence = 21
   // Member
 operators['.'].precedence = 19
 operators['['].precedence = 19
+operators['?.'].precedence = 19
 
   // Logical not
 operators['!'].precedence = 16
@@ -81,6 +86,9 @@ operators['!!'].precedence = 16 // explicit double-negative
 operators['++'].precedence = 16
 operators['--'].precedence = 16
 operators['&-'].precedence = 16
+
+  // exponent
+operators['**'].precedent = 15
 
   // mul/div/remainder
 operators['%'].precedence = 14
@@ -113,9 +121,11 @@ operators['!=='].precedence = 10
   // logic
 operators['&&'].precedence = 6
 operators['||'].precedence = 5
+operators['??'].precedence = 5
 
 operators['&&'].earlyOut = (a) => !a
 operators['||'].earlyOut = (a) => a
+operators['??'].earlyOut = (a) => a
 
   // multiple values
 operators[','].precedence = 2

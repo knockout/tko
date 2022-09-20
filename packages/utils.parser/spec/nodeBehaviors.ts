@@ -22,7 +22,7 @@ beforeEach(function () {
 
 describe('Operators', function () {
   function test (nodes, val, name) {
-    assert.equal(Node.create_root(nodes).get_value(), val, name);
+    assert.strictEqual(Node.create_root(nodes).get_value(), val, name);
   }
 
   it('does simple arithmetic', function () {
@@ -43,6 +43,20 @@ describe('Operators', function () {
     test([false, op['||'], false], false);
   })
 
+  it('performs ?? nullish coalesce', () => {
+    test([false, op['??'], true], false);
+    test([true, op['??'], false], true);
+    test([undefined, op['??'], true], true);
+    test([null, op['??'], false], false);
+  })
+
+  it('performs ?. optional chaining', () => { 
+    test([{}, op['?.'], 'a'], undefined);
+    test([null, op['?.'], 'a'], undefined);
+    test([{ a: 1 }, op['?.'], 'a'], 1);
+    test([{ a: 'b' }, op['?.'], 'a'], 'b');
+  })
+
   it('mixes binary logic and simple arithemtic', function () {
     test([0, op['||'], 1, op['+'], 2], 3, 'a');
     test([0, op['&&'], 1, op['+'], 2], 0, 'b');
@@ -58,7 +72,7 @@ describe('Operators', function () {
   it('mixes (in)equality and binary logic', function () {
     test([0, op['||'], 0, op['!=='], 2], true, 'a');
     test([1, op['||'], 0, op['!=='], 2], 1, 'b');
-    test([0, op['&&'], 1, op['!=='], 2], false, 'c');
+    test([0, op['&&'], 1, op['!=='], 2], 0, 'c');
     test([0, op['&&'], 0, op['!=='], 2], 0, 'c2');
 
     test([0, op['!=='], 1, op['||'], 2], true, 'd');
