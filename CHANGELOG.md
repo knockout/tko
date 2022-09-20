@@ -1,5 +1,12 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## Beta 1.4
+
+- Support nullish coalescing `??`
+- Support optional chaining `?.`
+- Support exponentiation operator `**`
+- Pass `context` to mustache pipe filters as `this`
+
 ## Beta1.3
 
 - replace `objectLookup` with `Map` in `toJS` for O(n) instead of O(n²) computational complexity (#170 @felipesantoz)
