@@ -507,7 +507,7 @@ export default class Parser {
       if (op === operators['?']) {
         this.ternary(nodes)
         break
-      } else if (op === operators['.']) {
+      } else if (op === operators['.'] || op === operators['?.']) {
         nodes.push(op)
         nodes.push(this.member())
         op = null

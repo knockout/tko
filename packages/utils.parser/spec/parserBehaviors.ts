@@ -982,11 +982,9 @@ describe('compound expressions', function () {
     }, 'not found')
   })
 
-  it("throws when 'r' is not on u", function () {
-    function fn () {
-      expect_equal('u.r', undefined) // undefined
-    }
-    assert.throws(fn, 'dereference')
+  it("returns undefined when 'r' is not on u", function () {
+    expect_equal('u.r', undefined) // undefined
+    expect_equal('u.r.q', undefined) // undefined
   })
 
   it('calls function F1', function () {

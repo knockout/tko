@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## Beta 1.5
+
+- Make optional chaining the default for property lookups
+
 ## Beta 1.4
 
 - Support nullish coalescing `??`

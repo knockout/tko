@@ -55,9 +55,9 @@ const operators = {
   '||': function logicOr (a, b) { return a || b },
   '??': function nullishCoalesce (a, b) { return a ?? b },
   // Access
-  '.': function member (a, b) { return a[b] },
-  '?.': function optionalMember (a, b) { return a?.[b] },
-  '[': function member (a, b) { return a[b] },
+  '.': function member (a, b) { return a?.[b] },
+  '?.': function omember (a, b) { return a?.[b] },
+  '[': function bmember (a, b) { return a?.[b] },
   ',': function comma (a, b) { return b },
   // conditional/ternary
   // '?': ternary See Node.js
