@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta1.4",
+  "version": "4.0.0-beta1.5",
   "name": "@tko/utils.parser",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
   "module": "dist/utils.parser.js",
