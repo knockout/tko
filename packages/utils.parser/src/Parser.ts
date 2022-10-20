@@ -440,7 +440,7 @@ export default class Parser {
         argValues.push(Node.value_of(args[i], context, globals, node))
       }
 
-      return nextFilter(options.filters[name].apply(null, argValues))
+      return nextFilter(options.filters[name].apply(context, argValues))
     }
 
   // Lowest precedence.
@@ -507,7 +507,7 @@ export default class Parser {
       if (op === operators['?']) {
         this.ternary(nodes)
         break
-      } else if (op === operators['.']) {
+      } else if (op === operators['.'] || op === operators['?.']) {
         nodes.push(op)
         nodes.push(this.member())
         op = null

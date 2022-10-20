@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0-beta1.5",
   "name": "@tko/builder",
   "description": "Compile a customized instance of Knockout.",
   "repository": {
@@ -15,7 +15,7 @@
     "@tko/lifecycle": "^4.0.0-beta1.3",
     "@tko/observable": "^4.0.0-beta1.3",
     "@tko/utils": "^4.0.0-beta1.3",
-    "@tko/utils.parser": "^4.0.0-beta1.3",
+    "@tko/utils.parser": "^4.0.0-beta1.5",
     "tslib": "^2.2.0"
   },
   "homepage": "https://tko.io",

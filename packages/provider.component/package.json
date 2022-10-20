@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0-beta1.5",
   "name": "@tko/provider.component",
   "description": "Bind custom web components e.g. <custom-binding>",
   "module": "dist/provider.component.js",
@@ -14,7 +14,7 @@
     "@tko/provider": "^4.0.0-beta1.3",
     "@tko/utils": "^4.0.0-beta1.3",
     "@tko/utils.component": "^4.0.0-beta1.3",
-    "@tko/utils.parser": "^4.0.0-beta1.3",
+    "@tko/utils.parser": "^4.0.0-beta1.5",
     "tslib": "^2.2.0"
   },
   "karma": {
