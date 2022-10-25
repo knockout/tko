@@ -1,0 +1,40 @@
+html {
+    font-family: sans-serif;
+    color: #333;
+    background: #eee;
+}
+
+body {
+    margin: 0;
+    display: grid;
+    grid-template-areas:
+        "hd  hd  "
+        "nav main"
+        "ft  ft  ";
+    grid-template-columns: 3fr 7fr;
+    grid-template-rows: max-content 1fr max-content;
+    min-height: 100vh;
+}
+
+nav {
+    grid-area: nav;
+    background: gray;
+    padding: 1rem;
+}
+
+main {
+    grid-area: main;
+    padding: 1rem;
+}
+
+header {
+    grid-area: hd;
+    padding: 1rem;
+    background: red;
+}
+
+footer {
+    grid-area: ft;
+    padding: 1rem;
+    background: green;
+}
