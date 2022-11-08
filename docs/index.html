@@ -3,6 +3,13 @@
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="./style.css">
+        <script type="module">
+            import { TOCObserver } from "./js/TOCObserver.js"
+            new TOCObserver(
+                document.querySelectorAll('#contents > ol a'),
+                document.querySelectorAll('main > section')
+            )
+        </script>
     </head>
     <body>
         <header>
@@ -41,6 +48,7 @@
             <section id="contributing">
                 <h2>Contributing</h2>
                 todo
+                <p>In fermentum et sollicitudin ac orci phasellus. Arcu risus quis varius quam quisque id. Massa id neque aliquam vestibulum morbi blandit cursus risus. Massa vitae tortor condimentum lacinia quis vel eros donec ac. Egestas maecenas pharetra convallis posuere morbi leo. Sodales ut eu sem integer vitae justo eget. Erat nam at lectus urna. Volutpat blandit aliquam etiam erat velit scelerisque in dictum non. Quam pellentesque nec nam aliquam sem et. Pellentesque habitant morbi tristique senectus. At in tellus integer feugiat scelerisque varius morbi enim. Tempor orci dapibus ultrices in.
             </section>
 
             <section id="reference">

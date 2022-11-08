@@ -56,10 +56,6 @@ body {
     min-height: 100vh;
 }
 
-section {
-    margin-bottom: 2rem;
-}
-
 nav {
     grid-area: nav;
     background: var(--nav-bg);
@@ -75,6 +71,9 @@ nav {
     padding: 0;
     list-style-position: inside;
 }
+#contents > ol a.active {
+    font-weight: bold;
+}
 
 main {
     grid-area: main;
@@ -83,6 +82,13 @@ main {
 }
 main h2 {
     border-bottom: solid 1px rgba(0, 0, 0, 0.25);
+}
+main > section {
+    margin-bottom: 2rem;
+
+    /* inflate box size above so scrolling to #id leaves some space at th tope */
+    margin-top: -7rem;
+    padding-top: 7rem;
 }
 
 header {
