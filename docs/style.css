@@ -1,40 +1,135 @@
+:root {
+    --fg-color: #333;
+    --link-color: #039;
+    --nav-bg: #c9d7d7;
+    --main-bg: #eee;
+    --head-foot-bg: linear-gradient(45deg, rgb(229, 176, 176), rgb(204, 181, 230));
+    --html-bg: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --fg-color: #ddd;
+        --link-color: #6cf;
+        --nav-bg: #4e6262;
+        --main-bg: #444;
+        --head-foot-bg: linear-gradient(to top right, rgb(95, 56, 56), rgb(204, 181, 230));
+        --html-bg: #333;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
 html {
     font-family: sans-serif;
-    color: #333;
-    background: #eee;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--fg-color);
+    background: var(--html-bg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+a:link, a:visited {
+    color: var(--link-color);
+}
+li a:link {
+    text-decoration: none;
+}
+li a:link:hover {
+    text-decoration: underline;
 }
 
 body {
     margin: 0;
     display: grid;
     grid-template-areas:
-        "hd  hd  "
-        "nav main"
-        "ft  ft  ";
-    grid-template-columns: 3fr 7fr;
+        "hd   hd   hd   hd  "
+        "l    nav  main r   "
+        "ft   ft   ft   ft  ";
+    grid-template-columns: 1fr 13rem 47rem 1fr;
     grid-template-rows: max-content 1fr max-content;
     min-height: 100vh;
 }
 
+section {
+    margin-bottom: 2rem;
+}
+
 nav {
     grid-area: nav;
-    background: gray;
+    background: var(--nav-bg);
     padding: 1rem;
+}
+
+#contents {
+    position: sticky;
+    top: 0;
+    margin: 0;
+}
+#contents > ol {
+    padding: 0;
+    list-style-position: inside;
 }
 
 main {
     grid-area: main;
     padding: 1rem;
+    background: var(--main-bg);
+}
+main h2 {
+    border-bottom: solid 1px rgba(0, 0, 0, 0.25);
 }
 
 header {
     grid-area: hd;
-    padding: 1rem;
-    background: red;
+    padding: max(env(safe-area-inset-top), 1rem) 1rem 1rem 1rem;
+    background: var(--head-foot-bg);
+
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    align-items: center;
+}
+header .github-link {
+    width: 30px;
+    height: 30px;
 }
 
 footer {
     grid-area: ft;
-    padding: 1rem;
-    background: green;
+    padding: 1rem 1rem max(env(safe-area-inset-bottom), 1rem) 1rem;
+    background: var(--head-foot-bg);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    body {
+        grid-template-areas:
+            "hd   hd   hd  "
+            "nav  nav  nav "
+            "l    main  r  "
+            "ft   ft   ft  ";
+        grid-template-columns: 1fr minmax(auto, 30rem) 1fr;
+        grid-template-rows: max-content max-content 1fr max-content;
+    }
+
+    nav {
+        position: sticky;
+        top: 0;
+    }
+
+    #contents > h3 {
+        display: none;
+    }
+
+    #contents > ol {
+        display: flex;
+        flex-flow: row wrap;
+        column-gap: 1rem;
+        margin: 0;
+    }
 }
