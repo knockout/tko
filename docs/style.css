@@ -3,8 +3,9 @@
     --link-color: #039;
     --nav-bg: #c9d7d7;
     --main-bg: #eee;
-    --head-foot-bg: linear-gradient(45deg, rgb(229, 176, 176), rgb(204, 181, 230));
-    --html-bg: #ddd;
+    --html-foot-bg: clear;
+    --html-bg: #a8c1c1;
+    --border-color: rgba(0, 0, 0, 0.25);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,8 +14,8 @@
         --link-color: #6cf;
         --nav-bg: #4e6262;
         --main-bg: #444;
-        --head-foot-bg: linear-gradient(to top right, rgb(95, 56, 56), rgb(204, 181, 230));
-        --html-bg: #333;
+        --html-bg: #577373;
+        --border-color: rgba(255, 255, 255, 0.25);
     }
 }
 
@@ -27,6 +28,7 @@ html {
     font-size: 16px;
     line-height: 1.5;
     color: var(--fg-color);
+    fill: var(--fg-color);
     background: var(--html-bg);
 }
 
@@ -51,7 +53,7 @@ body {
         "hd   hd   hd   hd  "
         "l    nav  main r   "
         "ft   ft   ft   ft  ";
-    grid-template-columns: 1fr 13rem 47rem 1fr;
+    grid-template-columns: 1fr [left] 13rem [main] 47rem [right] 1fr;
     grid-template-rows: max-content 1fr max-content;
     min-height: 100vh;
 }
@@ -81,7 +83,7 @@ main {
     background: var(--main-bg);
 }
 main h2 {
-    border-bottom: solid 1px rgba(0, 0, 0, 0.25);
+    border-bottom: solid 1px var(--border-color);
 }
 main > section {
     margin-bottom: 2rem;
@@ -93,22 +95,37 @@ main > section {
 
 header {
     grid-area: hd;
-    padding: max(env(safe-area-inset-top), 1rem) 1rem 1rem 1rem;
     background: var(--head-foot-bg);
 
     display: grid;
-    grid-template-columns: 1fr max-content;
+    grid-template-columns: subgrid;
+}
+header > .header-content {
+    grid-column: main / right;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: [l] 1fr [m] max-content [r];
     align-items: center;
 }
-header .github-link {
+header > .header-content > .github-link {
     width: 30px;
     height: 30px;
 }
 
 footer {
     grid-area: ft;
-    padding: 1rem 1rem max(env(safe-area-inset-bottom), 1rem) 1rem;
+    padding: 1rem;
     background: var(--head-foot-bg);
+}
+
+/* Phones with notches and cutouts */
+@supports (padding: max(0px)) {
+    heading {
+        padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    footer {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
 }
 
 /* Mobile */
