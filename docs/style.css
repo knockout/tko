@@ -64,16 +64,16 @@ nav {
     padding: 1rem;
 }
 
-#contents {
+#toc {
     position: sticky;
     top: 0;
     margin: 0;
 }
-#contents > ol {
+#toc > ol {
     padding: 0;
     list-style-position: inside;
 }
-#contents > ol a.active {
+#toc > ol a.active {
     font-weight: bold;
 }
 
@@ -95,37 +95,28 @@ main > section {
 
 header {
     grid-area: hd;
+}
+footer {
+    grid-area: ft;
+}
+header, footer {
     background: var(--head-foot-bg);
-
     display: grid;
     grid-template-columns: subgrid;
 }
-header > .header-content {
+header > .content,
+footer > .content {
     grid-column: main / right;
     padding: 1rem;
+}
+header > .content {
     display: grid;
     grid-template-columns: [l] 1fr [m] max-content [r];
     align-items: center;
 }
-header > .header-content > .github-link {
+header .github-link {
     width: 30px;
     height: 30px;
-}
-
-footer {
-    grid-area: ft;
-    padding: 1rem;
-    background: var(--head-foot-bg);
-}
-
-/* Phones with notches and cutouts */
-@supports (padding: max(0px)) {
-    heading {
-        padding-top: max(1rem, env(safe-area-inset-top));
-    }
-    footer {
-        padding-bottom: max(1rem, env(safe-area-inset-bottom));
-    }
 }
 
 /* Mobile */
@@ -145,11 +136,11 @@ footer {
         top: 0;
     }
 
-    #contents > h3 {
+    #toc > h3 {
         display: none;
     }
 
-    #contents > ol {
+    #toc > ol {
         display: flex;
         flex-flow: row wrap;
         column-gap: 1rem;
