@@ -62,7 +62,7 @@
 
               <p>The <a href="TODO">Knockout-compatible build</a> can be used as a drop-in replacement for existing pages that utilize Knockout. There are a few backwards-incompatible changes that may need to be addressed:</p>
 
-              <h3>Bindings can’t be multi-statement function literals</h3>
+              <h3>➤ Bindings can’t be multi-statement function literals</h3>
               <p>Unlike KO, because TKO doesn’t use <code>eval</code> for parsing bindings, only single-expression arrow functions are supported in bindings. The KO-compatible build will convert <code>function</code> literals in bindings into an equivalent arrow function, but only if the function body contains exactly one statement. Bindings like:</p>
               <pre><code>
 &lt;button data-bind="click: function() { doX(); doY(); }">
@@ -84,7 +84,7 @@ this.doXThenY = function () { doX(); doY(); }
 &lt;/button>
               </code></pre>
 
-              <h3>Bindings can’t access the global window scope</h3>
+              <h3>➤ Bindings can’t access the global window scope</h3>
               <p>To limit the scope of possible XSS attacks, bindings no longer have access to the global window scope by default. Any global objects you want bindings to access should be exposed as an explicit view model property:</p>
               <pre><code>
 // before
@@ -97,7 +97,7 @@ this.pageUrl = window.location.href
 &lt;span data-bind="text: pageUrl">&lt;/span>
               </code></pre>
 
-              <h3><code>foreach</code> with <code>as</code> option no longer creates child context</h3>
+              <h3>➤ <code>foreach</code> with <code>as</code> option no longer creates child context</h3>
               <p>If you provide the <code>as</code> option to a <code>foreach</code> binding, TKO no longer creates a child binding context. This means that any uses of <code>$parent</code> or <code>$parents</code> inside of the loop will need to be updated.</p>
               <pre><code>
 // before
@@ -107,10 +107,10 @@ this.pageUrl = window.location.href
 
 // after
 &lt;ol data-bind="foreach: {data: myArray, as: 'foo'}">
-  &lt;li data-bind="text: textForFoo(foo)">&lt;/li>
+  &lt;li data-bind="text: <mark>textForFoo</mark>(foo)">&lt;/li>
 &lt;/ol>
 // or
-&lt;ol data-bind="foreach: myArray">
+&lt;ol data-bind="foreach: <mark>myArray</mark>">
   &lt;li data-bind="text: $parent.textForFoo($data)">&lt;/li>
 &lt;/ol>
               </code></pre>
