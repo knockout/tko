@@ -6,6 +6,9 @@
     --html-foot-bg: clear;
     --html-bg: #a8c1c1;
     --border-color: rgba(0, 0, 0, 0.25);
+
+    --code-bg: #333;
+    --code-fg: #bcb;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,7 +27,7 @@
 }
 
 html {
-    font-family: sans-serif;
+    font-family: ui-sans-serif, sans-serif;
     font-size: 16px;
     line-height: 1.5;
     color: var(--fg-color);
@@ -44,6 +47,17 @@ li a:link {
 }
 li a:link:hover {
     text-decoration: underline;
+}
+
+code {
+    font-family: ui-monospace, monospace;
+}
+
+pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 0 1rem;
+    overflow: scroll;
 }
 
 body {

@@ -27,6 +27,7 @@
                 <ol>
                     <li><a href="#introduction">Introduction</a></li>
                     <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#migrating">Migrating from Knockout</a></li>
                     <li><a href="#contributing">Contributing</a></li>
                     <li><a href="#reference">Reference</a></li>
                 </ol>
@@ -35,10 +36,15 @@
         <main>
             <section id="introduction">
                 <h2>Introduction</h2>
-                <p>TKO is the successor to <a href="https://knockoutjs.com">Knockout</a></p>
+                <p>TKO is a two-way binding framework for creating dynamic web UIs.</p>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet consectetur adipiscing elit ut aliquam purus sit amet. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Ultrices vitae auctor eu augue ut lectus. Sed nisi lacus sed viverra tellus. Nulla malesuada pellentesque elit eget gravida cum sociis. Quis varius quam quisque id diam vel quam elementum. Egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Metus aliquam eleifend mi in nulla posuere sollicitudin. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra. Nisi lacus sed viverra tellus in. Ultrices sagittis orci a scelerisque purus semper eget. Amet aliquam id diam maecenas ultricies. Viverra orci sagittis eu volutpat odio facilisis mauris sit. Rutrum quisque non tellus orci ac. At varius vel pharetra vel turpis nunc eget. Ac odio tempor orci dapibus ultrices in iaculis nunc. Porttitor lacus luctus accumsan tortor posuere ac ut consequat semper.
+                <p>TKO is the successor to <a href="https://knockoutjs.com">Knockout</a>. Compared to its predecessor, TKO features some notable improvements:</p>
 
+                <ul>
+                  <li><strong>Improved security</strong> by avoiding the use of <code>eval</code>. This provides an extra layer of protection against <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Types_of_attacks#cross-site_scripting_xss" target="_blank"><abbr title="cross-site scripting">XSS</abbr></a> attacks by allowing your site to implement a strict <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP" target="_blank">Content Security Policy</a>.</li>
+                  <li>Built as <strong>ES modules</strong> via <a href="https://www.typescriptlang.org" target <a href="https://esbuild.github.io" target="_blank">esbuild</a>. That means it can be <code>import</code>-ed into modern JavaScript/TypeScript projects to take advantage of features like tree-shaking to minimize code size.</li>
+                  <li>…</li>
+                </ul>
             </section>
 
             <section id="getting-started">
@@ -51,9 +57,69 @@
 
             </section>
 
+            <section id="migrating">
+              <h2>Migrating from Knockout</h2>
+
+              <p>The <a href="TODO">Knockout-compatible build</a> can be used as a drop-in replacement for existing pages that utilize Knockout. There are a few backwards-incompatible changes that may need to be addressed:</p>
+
+              <h3>Bindings can’t be multi-statement function literals</h3>
+              <p>Unlike KO, because TKO doesn’t use <code>eval</code> for parsing bindings, only single-expression arrow functions are supported in bindings. The KO-compatible build will convert <code>function</code> literals in bindings into an equivalent arrow function, but only if the function body contains exactly one statement. Bindings like:</p>
+              <pre><code>
+&lt;button data-bind="click: function() { doX(); doY(); }">
+  Do X then Y
+&lt;/button>
+              </code></pre>
+              <p>…will need to have the function moved into the view model like so:</p>
+              <pre><code>
+// view model
+this.doXThenY = function () { doX(); doY(); }
+
+// binding
+&lt;button data-bind="click: doXThenY">
+Do X then Y
+&lt;/button>
+// …or…
+&lt;button data-bind="click: () => doXThenY()">
+Do X then Y
+&lt;/button>
+              </code></pre>
+
+              <h3>Bindings can’t access the global window scope</h3>
+              <p>To limit the scope of possible XSS attacks, bindings no longer have access to the global window scope by default. Any global objects you want bindings to access should be exposed as an explicit view model property:</p>
+              <pre><code>
+// before
+&lt;span data-bind="text: location.href">&lt;/span>
+
+// after view model
+this.pageUrl = window.location.href
+
+// after binding
+&lt;span data-bind="text: pageUrl">&lt;/span>
+              </code></pre>
+
+              <h3><code>foreach</code> with <code>as</code> option no longer creates child context</h3>
+              <p>If you provide the <code>as</code> option to a <code>foreach</code> binding, TKO no longer creates a child binding context. This means that any uses of <code>$parent</code> or <code>$parents</code> inside of the loop will need to be updated.</p>
+              <pre><code>
+// before
+&lt;ol data-bind="foreach: {data: myArray, as: 'foo'}">
+  &lt;li data-bind="text: $parent.textForFoo(foo)">&lt;/li>
+&lt;/ol>
+
+// after
+&lt;ol data-bind="foreach: {data: myArray, as: 'foo'}">
+  &lt;li data-bind="text: textForFoo(foo)">&lt;/li>
+&lt;/ol>
+// or
+&lt;ol data-bind="foreach: myArray">
+  &lt;li data-bind="text: $parent.textForFoo($data)">&lt;/li>
+&lt;/ol>
+              </code></pre>
+            </section>
+
             <section id="contributing">
                 <h2>Contributing</h2>
-                todo
+                <p>Bug reports, pull requests, and discussions are all welcome via the <a href="https://github.com/knockout/tko" target="_blank">GitHub page</a>.</p>
+
                 <p>In fermentum et sollicitudin ac orci phasellus. Arcu risus quis varius quam quisque id. Massa id neque aliquam vestibulum morbi blandit cursus risus. Massa vitae tortor condimentum lacinia quis vel eros donec ac. Egestas maecenas pharetra convallis posuere morbi leo. Sodales ut eu sem integer vitae justo eget. Erat nam at lectus urna. Volutpat blandit aliquam etiam erat velit scelerisque in dictum non. Quam pellentesque nec nam aliquam sem et. Pellentesque habitant morbi tristique senectus. At in tellus integer feugiat scelerisque varius morbi enim. Tempor orci dapibus ultrices in.
             </section>
 
@@ -68,7 +134,7 @@
         </main>
         <footer>
             <div class="content">
-              footer here
+              footer here 👋
             </div>
         </footer>
     </body>
