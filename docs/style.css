@@ -53,7 +53,7 @@ body {
         "hd   hd   hd   hd  "
         "l    nav  main r   "
         "ft   ft   ft   ft  ";
-    grid-template-columns: 1fr [left] 13rem [main] 47rem [right] 1fr;
+    grid-template-columns: 1fr [left] 13rem [main] minmax(15rem, 40rem) [right] 1fr;
     grid-template-rows: max-content 1fr max-content;
     min-height: 100vh;
 }
@@ -66,7 +66,7 @@ nav {
 
 #toc {
     position: sticky;
-    top: 0;
+    top: 1rem;
     margin: 0;
 }
 #toc > ol {
