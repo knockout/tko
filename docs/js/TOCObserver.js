@@ -9,7 +9,7 @@ export class TOCObserver {
     this.#sections = Array.from(sections)
     this.#visibleSections = new Set()
     this.#observer = new IntersectionObserver(this.onIntersection.bind(this), {
-      rootMargin: '-40% 0 -40% 0'
+      rootMargin: '-40% 0px -40% 0px'
     })
     for (const s of sections) {
       this.#observer.observe(s)

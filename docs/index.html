@@ -5,11 +5,14 @@
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" type="text/css" href="./style.css">
         <script type="module">
+            import "https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-beta1.5/dist/browser.js"
+            import "./js/DemoPanel.js"
             import { TOCObserver } from "./js/TOCObserver.js"
             new TOCObserver(
                 document.querySelectorAll('#toc > ol a'),
                 document.querySelectorAll('main > section')
             )
+            tko.applyBindings({})
         </script>
     </head>
     <body>
@@ -34,8 +37,22 @@
             </section>
         </nav>
         <main>
+
             <section id="introduction">
                 <h2>Introduction</h2>
+
+                <demo-panel
+                    data-vm="
+                        const vm = {
+                            foo: tko.observable('hello')
+                        }
+                        return vm
+                    "
+                >
+                    <input data-bind="value: foo">
+                    <p>In a paragraph: {{foo}}</p>
+                </demo-panel>
+
                 <p>TKO is a two-way binding framework for creating dynamic web UIs.</p>
 
                 <p>TKO is the successor to <a href="https://knockoutjs.com">Knockout</a>. Compared to its predecessor, TKO features some notable improvements:</p>
@@ -49,6 +66,7 @@
 
             <section id="getting-started">
                 <h2>Getting Started</h2>
+
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet consectetur adipiscing elit ut aliquam purus sit amet. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Ultrices vitae auctor eu augue ut lectus. Sed nisi lacus sed viverra tellus. Nulla malesuada pellentesque elit eget gravida cum sociis. Quis varius quam quisque id diam vel quam elementum. Egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Metus aliquam eleifend mi in nulla posuere sollicitudin. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra. Nisi lacus sed viverra tellus in. Ultrices sagittis orci a scelerisque purus semper eget. Amet aliquam id diam maecenas ultricies. Viverra orci sagittis eu volutpat odio facilisis mauris sit. Rutrum quisque non tellus orci ac. At varius vel pharetra vel turpis nunc eget. Ac odio tempor orci dapibus ultrices in iaculis nunc. Porttitor lacus luctus accumsan tortor posuere ac ut consequat semper.
 
                 <p>Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum. At elementum eu facilisis sed odio morbi quis commodo. Eget magna fermentum iaculis eu. Cursus vitae congue mauris rhoncus aenean vel. Felis eget velit aliquet sagittis id consectetur purus ut faucibus. Tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Lectus urna duis convallis convallis. In cursus turpis massa tincidunt dui. Odio aenean sed adipiscing diam donec adipiscing tristique risus. Sed lectus vestibulum mattis ullamcorper velit sed. Sapien et ligula ullamcorper malesuada proin libero nunc. Tellus integer feugiat scelerisque varius morbi.
@@ -137,5 +155,8 @@ this.pageUrl = window.location.href
               footer here 👋
             </div>
         </footer>
+        
+        <!-- <iframe id="stackblitz" src="https://stackblitz.com/edit/vitejs-vite-hbz6or?embed=1&file=src/main.ts"></iframe> -->
+
     </body>
 </html>

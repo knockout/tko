@@ -66,6 +66,13 @@ pre mark {
     font-style: italic;
 }
 
+#stackblitz {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    aspect-ratio: calc(16/9);
+}
+
 body {
     margin: 0;
     display: grid;
