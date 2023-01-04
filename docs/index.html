@@ -41,16 +41,19 @@
             <section id="introduction">
                 <h2>Introduction</h2>
 
-                <demo-panel
-                    data-vm="
-                        const vm = {
-                            foo: tko.observable('hello')
-                        }
-                        return vm
-                    "
-                >
-                    <input data-bind="value: foo">
-                    <p>In a paragraph: {{foo}}</p>
+                <demo-panel>
+                    <div id="demo-intro">
+                      <h4>Hello <em>{{name}}!</em></h4>
+                      <label>
+                        name:
+                        <input size="10" data-bind="textInput: name">
+                      </label>
+                    </div>
+                    <script type="tko-demo">
+                      tko.applyBindings({
+                        name: tko.observable('World')
+                      }, document.getElementById('demo-intro'))
+                    </script>
                 </demo-panel>
 
                 <p>TKO is a two-way binding framework for creating dynamic web UIs.</p>
@@ -66,6 +69,74 @@
 
             <section id="getting-started">
                 <h2>Getting Started</h2>
+
+                <p>Here’s a full-fledged demo for ye olde TODO app:</p>
+
+                <demo-panel>
+                  <div id="demo-todos">
+                    <style>
+                      #demo-todos label.done {
+                        text-decoration: line-through;
+                      }
+                      #demo-todos li > button {
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                      }
+                      #demo-todos form {
+                        display: grid;
+                        grid-template-columns: 1fr max-content;
+                      }
+                    </style>
+                    <ol data-bind="foreach: todos">
+                      <li>
+                        <label data-bind="css: {done: done}">
+                          <input type="checkbox"
+                            data-bind="checked: done"
+                          >
+                          {{title}}
+                        </label>
+                        <button data-bind="click: $parent.delete">
+                          🗑
+                        </button>
+                      </li>
+                    </ol>
+                    <form data-bind="submit: add">
+                      <input data-bind="value: newTitle" size="5" placeholder="new todo">
+                      <button>add</button>
+                    </form>
+                  </div>
+                  <script type="tko-demo">
+                    const TodoVM = class {
+                      constructor (...initItems) {
+                        this.todos = tko.observableArray(initItems.map(i => this.#makeItem(i)))
+                        this.newTitle = tko.observable('')
+                      }
+
+                      #makeItem (title) {
+                        return {
+                          title,
+                          done: tko.observable(false)
+                        }
+                      }
+
+                      add () {
+                        this.todos.push({
+                          title: this.newTitle(),
+                          done: tko.observable(false)
+                        })
+                        this.newTitle('')
+                      }
+
+                      delete (item) {
+                        this.todos.remove(item)
+                      }
+                    }
+                    const vm = new TodoVM('Make thing', '…⁉️', 'Profit💸')
+                    const elem = document.getElementById('demo-todos')
+                    tko.applyBindings(vm, elem)
+                  </script>
+                </demo-panel>
 
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet consectetur adipiscing elit ut aliquam purus sit amet. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Ultrices vitae auctor eu augue ut lectus. Sed nisi lacus sed viverra tellus. Nulla malesuada pellentesque elit eget gravida cum sociis. Quis varius quam quisque id diam vel quam elementum. Egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Metus aliquam eleifend mi in nulla posuere sollicitudin. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra. Nisi lacus sed viverra tellus in. Ultrices sagittis orci a scelerisque purus semper eget. Amet aliquam id diam maecenas ultricies. Viverra orci sagittis eu volutpat odio facilisis mauris sit. Rutrum quisque non tellus orci ac. At varius vel pharetra vel turpis nunc eget. Ac odio tempor orci dapibus ultrices in iaculis nunc. Porttitor lacus luctus accumsan tortor posuere ac ut consequat semper.
 

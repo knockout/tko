@@ -11,27 +11,32 @@ export class DemoPanel extends tko.Component {
   constructor (_, { element, templateNodes }) {
     super()
 
-    let htmlSrc = '<div data-bind="text: foo"></div>'
-    if (element.dataset.html) {
-      htmlSrc = element.dataset.html
-    } else if (templateNodes) {
-      htmlSrc = templateNodes.map(n => {
-        return n.outerHTML ?? '\n'
-      }).join('')
+    let htmlSrc = ''
+    let jsSrc = ''
+    for (const n of templateNodes) {
+      if (n instanceof HTMLScriptElement) {
+        jsSrc = n.text
+      } else if (n instanceof Text) {
+        htmlSrc += n.data
+      } else {
+        htmlSrc += n.outerHTML ?? '\n'
+      }
     }
-    this.html = tko.observable(trimSrc(htmlSrc))
 
-    const vmSrc = element.dataset.vm || 'return {"foo": "bar"}'
-    this.vm = tko.observable(trimSrc(vmSrc))
+    this.html = tko.observable(trimSrc(htmlSrc))
+    this.js = tko.observable(trimSrc(jsSrc))
   }
 
   static get element () {
     const root = document.createElement('div')
     root.classList.add('demo-panel')
     root.innerHTML = `
-      <textarea class="html" data-bind="textInput: html"></textarea>
-      <textarea class="vm" data-bind="textInput: vm"></textarea>
-      <div class="render" data-bind="htmlWithBindings: {html: html, vm: vm}"></div>
+      <h3 class="html">HTML</h3>
+      <h3 class="js">JS</h3>
+      <h3 class="Render">Output</h3>
+      <textarea class="html" spellcheck="false" data-bind="textInput: html"></textarea>
+      <textarea class="js" spellcheck="false" data-bind="textInput: js"></textarea>
+      <div class="render" data-bind="htmlWithBindings"></div>
     `
     return root
   }
@@ -45,11 +50,10 @@ export class DemoPanel extends tko.Component {
       htmlWithBindings: (element, valueAccessor) => {
         this.computed(() => {
           try {
-            const vm = (new Function(this.vm())).call()
             const root = document.createElement('div')
             root.innerHTML = this.html()
             element.replaceChildren(root)
-            tko.applyBindings(vm, root)
+            new Function(this.js()).call()
           } catch (e) {
             element.innerText = e.toString()
           }

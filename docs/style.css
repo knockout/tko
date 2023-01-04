@@ -120,6 +120,51 @@ main > section {
     padding-top: 7rem;
 }
 
+
+demo-panel {
+    width: 100%;
+/*    border: 3px solid var(--border-color);*/
+    display: grid;
+    grid-template:
+        "html-hd    js-hd   render-hd" max-content
+        "html-edit  js-edit render   " 10rem
+      /  1fr        1fr     1fr       ;
+    align-items: stretch;
+    justify-items: stretch;
+    column-gap: 0.5rem;
+}
+demo-panel > textarea {
+    font-family: monospace;
+    white-space: pre;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border: 1px solid;
+    padding: 0.5rem;
+}
+demo-panel > h3.html {
+    grid-area: html-hd;
+}
+demo-panel > h3.js {
+    grid-area: js-hd;
+}
+demo-panel > h3.render {
+    grid-area: render-hd;
+}
+demo-panel > textarea.html {
+    grid-area: html-edit;
+}
+demo-panel > textarea.js {
+    grid-area: js-edit;
+}
+demo-panel > div.render {
+    grid-area: render;
+    overflow: scroll;
+    border: solid 2px var(--border-color);
+    border-radius: 0.5rem;
+}
+
+
+
 header {
     grid-area: hd;
 }
