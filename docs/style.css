@@ -8,7 +8,7 @@
     --border-color: rgba(0, 0, 0, 0.25);
 
     --code-bg: #333;
-    --code-fg: #bcb;
+    --code-fg: #c5ddd3;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,6 +39,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 
+p {
+    margin: 0.5rem 0;
+}
+
 a:link, a:visited {
     color: var(--link-color);
 }
@@ -56,6 +60,7 @@ code {
 pre {
     background: var(--code-bg);
     color: var(--code-fg);
+    font-size: 0.75rem;
     padding: 0 1rem;
     overflow: scroll;
 }
@@ -80,7 +85,7 @@ body {
         "hd   hd   hd   hd  "
         "l    nav  main r   "
         "ft   ft   ft   ft  ";
-    grid-template-columns: 1fr [left] 13rem [main] minmax(15rem, 40rem) [right] 1fr;
+    grid-template-columns: 1fr [left] 13rem [main] minmax(15rem, 50rem) [right] 1fr;
     grid-template-rows: max-content 1fr max-content;
     min-height: 100vh;
 }
@@ -119,50 +124,6 @@ main > section {
     margin-top: -7rem;
     padding-top: 7rem;
 }
-
-
-demo-panel {
-    width: 100%;
-/*    border: 3px solid var(--border-color);*/
-    display: grid;
-    grid-template:
-        "html-hd    js-hd   render-hd" max-content
-        "html-edit  js-edit render   " 10rem
-      /  1fr        1fr     1fr       ;
-    align-items: stretch;
-    justify-items: stretch;
-    column-gap: 0.5rem;
-}
-demo-panel > textarea {
-    font-family: monospace;
-    white-space: pre;
-    background: var(--code-bg);
-    color: var(--code-fg);
-    border: 1px solid;
-    padding: 0.5rem;
-}
-demo-panel > h3.html {
-    grid-area: html-hd;
-}
-demo-panel > h3.js {
-    grid-area: js-hd;
-}
-demo-panel > h3.render {
-    grid-area: render-hd;
-}
-demo-panel > textarea.html {
-    grid-area: html-edit;
-}
-demo-panel > textarea.js {
-    grid-area: js-edit;
-}
-demo-panel > div.render {
-    grid-area: render;
-    overflow: scroll;
-    border: solid 2px var(--border-color);
-    border-radius: 0.5rem;
-}
-
 
 
 header {

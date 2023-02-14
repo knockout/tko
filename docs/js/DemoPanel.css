@@ -1,0 +1,51 @@
+demo-panel {
+    width: 100%;
+    margin-top: 0.5rem;
+    border: 1px solid var(--border-color);
+    display: grid;
+    grid-template:
+        "html-hd    js-hd   render-hd" max-content
+        "html-edit  js-edit render   " 10rem
+      /  1fr        1fr     1fr       ;
+    align-items: stretch;
+    justify-items: stretch;
+}
+demo-panel > textarea {
+    font-family: Source Code Variable, Source Code Pro, Inconsolas, ui-monospace, monospace;
+    white-space: pre;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    font-size: 0.75rem;
+    border: none;
+    padding: 0.5rem;
+    margin: 0;
+}
+demo-panel > h3 {
+    text-align: center;
+    font-size: 1rem;
+}
+demo-panel > h3.html {
+    grid-area: html-hd;
+    background: var(--code-bg);
+    color: var(--code-fg);
+}
+demo-panel > h3.js {
+    grid-area: js-hd;
+    background: var(--code-bg);
+    color: var(--code-fg);
+}
+demo-panel > h3.render {
+    grid-area: render-hd;
+}
+demo-panel > textarea.html {
+    grid-area: html-edit;
+}
+demo-panel > textarea.js {
+    grid-area: js-edit;
+}
+demo-panel > div.render {
+    grid-area: render;
+    overflow: scroll;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}

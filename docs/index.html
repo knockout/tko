@@ -3,7 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" type="text/css" href="./style.css">
+        <style>
+          @import 'style.css';
+          @import 'js/DemoPanel.css';
+        </style>
         <script type="module">
             import "https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-beta1.5/dist/browser.js"
             import "./js/DemoPanel.js"
@@ -41,6 +44,8 @@
             <section id="introduction">
                 <h2>Introduction</h2>
 
+                <p>TKO is a two-way binding framework for creating dynamic web UIs.</p>
+
                 <demo-panel>
                     <div id="demo-intro">
                       <h4>Hello <em>{{name}}!</em></h4>
@@ -55,8 +60,6 @@
                       }, document.getElementById('demo-intro'))
                     </script>
                 </demo-panel>
-
-                <p>TKO is a two-way binding framework for creating dynamic web UIs.</p>
 
                 <p>TKO is the successor to <a href="https://knockoutjs.com">Knockout</a>. Compared to its predecessor, TKO features some notable improvements:</p>
 
@@ -208,17 +211,14 @@ this.pageUrl = window.location.href
             <section id="contributing">
                 <h2>Contributing</h2>
                 <p>Bug reports, pull requests, and discussions are all welcome via the <a href="https://github.com/knockout/tko" target="_blank">GitHub page</a>.</p>
-
-                <p>In fermentum et sollicitudin ac orci phasellus. Arcu risus quis varius quam quisque id. Massa id neque aliquam vestibulum morbi blandit cursus risus. Massa vitae tortor condimentum lacinia quis vel eros donec ac. Egestas maecenas pharetra convallis posuere morbi leo. Sodales ut eu sem integer vitae justo eget. Erat nam at lectus urna. Volutpat blandit aliquam etiam erat velit scelerisque in dictum non. Quam pellentesque nec nam aliquam sem et. Pellentesque habitant morbi tristique senectus. At in tellus integer feugiat scelerisque varius morbi enim. Tempor orci dapibus ultrices in.
             </section>
 
             <section id="reference">
                 <h2>Reference</h2>
                 <ul>
-                    <li>link…</li>
+                    <li>Generated API docs coming soon™</li>
+                    <li><a href="https://knockoutjs.com/documentation/introduction.html" target="_blank">Knockout Reference</a> is still mostly accurate for TKO</li>
                 </ul>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet consectetur adipiscing elit ut aliquam purus sit amet. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Ultrices vitae auctor eu augue ut lectus. Sed nisi lacus sed viverra tellus. Nulla malesuada pellentesque elit eget gravida cum sociis. Quis varius quam quisque id diam vel quam elementum. Egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Metus aliquam eleifend mi in nulla posuere sollicitudin. Lacus luctus accumsan tortor posuere ac ut consequat semper viverra. Nisi lacus sed viverra tellus in. Ultrices sagittis orci a scelerisque purus semper eget. Amet aliquam id diam maecenas ultricies. Viverra orci sagittis eu volutpat odio facilisis mauris sit. Rutrum quisque non tellus orci ac. At varius vel pharetra vel turpis nunc eget. Ac odio tempor orci dapibus ultrices in iaculis nunc. Porttitor lacus luctus accumsan tortor posuere ac ut consequat semper.
-
             </section>
         </main>
         <footer>
