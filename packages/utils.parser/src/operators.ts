@@ -42,8 +42,8 @@ const operators = {
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
   // equality
-  '==': function equal (a, b) { return a === b },
-  '!=': function ne (a, b) { return a !== b },
+  '==': function equal (a, b) { return a == b },
+  '!=': function ne (a, b) { return a != b },
   '===': function sequal (a, b) { return a === b },
   '!==': function sne (a, b) { return a !== b },
   // bitwise
