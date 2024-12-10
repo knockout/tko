@@ -23,6 +23,12 @@ import { filters } from '@tko/filter.punches'
 import components from '@tko/utils.component'
 import { createElement, Fragment } from '@tko/utils.jsx'
 
+import { overloadOperator } from 'packages/utils.parser'
+
+/** Overload "evil twins" with strict equivalents */
+overloadOperator('==', (a, b) => a === b)
+overloadOperator('!=', (a, b) => a !== b)
+
 const builder = new Builder({
   filters,
   provider: new MultiProvider({

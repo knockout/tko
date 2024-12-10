@@ -1,5 +1,10 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## Beta 1.6
+
+- Fix |filter1|filter2 filter2 not having root
+- In the Knockout build, don't convert evil twins (`==`/`!=`) to strict counterparts (`===`/`!==`)
+
 ## Beta 1.5
 
 - Make optional chaining the default for property lookups

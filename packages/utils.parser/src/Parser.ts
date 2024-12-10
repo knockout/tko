@@ -433,14 +433,14 @@ export default class Parser {
       ch = this.white()
     }
 
-    var filter = function filter (value, ignored, context, globals, node) {
+    function filter (value, ignored, context, globals, node) {
       var argValues = [value]
 
       for (var i = 0, j = args.length; i < j; ++i) {
         argValues.push(Node.value_of(args[i], context, globals, node))
       }
 
-      return nextFilter(options.filters[name].apply(context, argValues))
+      return nextFilter(options.filters[name].apply(context, argValues), ignored, context, globals, node)
     }
 
   // Lowest precedence.
@@ -460,7 +460,7 @@ export default class Parser {
  *    allowed in this expression. When true (default), this method consumes
  *    subsequent comma-separated values.
  * @see {@link Parser.singleValueExpression}
- * 
+ *
  * @returns a function that computes the value of the expression
  *    when called or a primitive.
  */
@@ -555,7 +555,7 @@ export default class Parser {
 /**
  * Use this method to parse expressions that can be followed by additional markup
  * seperated by a comma, such as in bindings strings.
- * 
+ *
  * @returns an expression that cannot contain multiple values separated by commas.
  * @see {@link Parser.expression}
  */
