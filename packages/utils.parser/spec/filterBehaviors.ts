@@ -87,4 +87,25 @@ describe('filters', function () {
     assert.equal(p.b(), 'ttey')
     assert.equal(p.c(), 'ttez')
   })
+
+  describe('root', () => {
+    let _testRoot = null
+    options.filters.setRoot = function (v) {
+      _testRoot = this
+    }
+
+    it('preserves the root across a single filter', () => {
+      const ourRoot = ctxStub({v: 'tt'})
+      const p = new Parser().parse('b: v | setRoot', ourRoot)
+      p.b()
+      assert.equal(_testRoot, ourRoot)
+    })
+
+    it('preserves the root across a multiple filters', () => {
+      const ourRoot = ctxStub({v: 'tt'})
+      const p = new Parser().parse('b: v | uppercase | setRoot', ourRoot)
+      p.b()
+      assert.strictEqual(_testRoot.lookup, ourRoot.lookup)
+    })
+  })
 })
