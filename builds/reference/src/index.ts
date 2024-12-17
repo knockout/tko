@@ -23,7 +23,7 @@ import { filters } from '@tko/filter.punches'
 import components from '@tko/utils.component'
 import { createElement, Fragment } from '@tko/utils.jsx'
 
-import { overloadOperator } from 'packages/utils.parser'
+import { overloadOperator } from '@tko/utils.parser'
 
 /** Overload "evil twins" with strict equivalents */
 overloadOperator('==', (a, b) => a === b)
