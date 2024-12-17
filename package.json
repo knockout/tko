@@ -35,7 +35,7 @@
     "@types/mocha": "^9.1.1",
     "chai": "^4.5.0",
     "electron": "^16.2.8",
-    "esbuild": "^0.14.54",
+    "esbuild": "^0.17.19",
     "fs-extra": "^10.1.0",
     "jquery": "^3.7.1",
     "karma": "^6.4.4",
