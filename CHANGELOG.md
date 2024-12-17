@@ -1,5 +1,9 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## Beta 1.7
+
+- Fix bad import operation of packages/utils.parser
+
 ## Beta 1.6
 
 - Fix |filter1|filter2 filter2 not having root
