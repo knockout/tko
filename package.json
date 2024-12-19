@@ -39,7 +39,7 @@
     "jquery": "^3.7.1",
     "karma": "^6.4.4",
     "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "3.2.0",
+    "karma-chrome-launcher": "^3.2.0",
     "karma-electron-launcher": "^0.3.0",
     "karma-esbuild": "^2.3.0",
     "karma-jasmine": "^0.1.6",
