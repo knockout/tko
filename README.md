@@ -40,6 +40,7 @@ It's available as `@tko/build.knockout`, and over CDN:
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
 | $ `npm install -g yarn` otherwise | Ensure yarn is globally available
 | $ `yarn` | Install local node packages and link tko modules
+| $ `make` | **Currently TKO use a make file**
 | $ `yarn test` | Run all tests. See below.
 | $ `yarn watch` | Run all tests and watch for changes. See below.
 | $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled
@@ -56,6 +57,14 @@ In each individual `packages/*/` directory, you can also run (presuming `rollup`
 
 
 #### Testing with `yarn test` and `yarn watch`
+
+**NEW:**
+
+Start tests with electron: `make test`
+
+Start tests with headless-chrome: `make test-headless`
+***
+OLD:
 
 The `yarn test` and `yarn watch` commands can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests
 specific to that package.
@@ -88,6 +97,23 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
     - Built-ins have first-class access to quite a bit of good Knockout code, but plugins generally have second-class access and often have to duplicate Knockout internals
     - Quality plugins have lots of boilerplate for compilation, release, documentation, and testing
 
+
+## Some WSL tricks
+
+Install electron-deps for "make test":
+```
+sudo apt-get install build-essential clang libdbus-1-dev libgtk-3-dev \
+libnotify-dev libasound2-dev libcap-dev \
+libcups2-dev libxtst-dev \
+libxss1 libnss3-dev gcc-multilib g++-multilib curl \
+gperf bison python3-dbusmock openjdk-8-jre 
+```
+
+Install Chrome for "make test-headless":
+```
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt -y install ./google-chrome-stable_current_amd64.deb
+```
 
 ## Next steps
 
