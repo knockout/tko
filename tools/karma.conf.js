@@ -119,7 +119,7 @@ function sauceConfig (config) {
   })
 }
 
-function localConfig(config) {
+function localConfig(config, useChrome) {
   config.set({
     ...CommonConfig,
     electronOpts: {
@@ -130,8 +130,9 @@ function localConfig(config) {
       fullscreenable: false,
       hasShadow: false
     },
-    browsers: ['testRunner'],
-	customLaunchers: {
+    browsers: useChrome ? 
+    ['testRunner'] : ['Electron'],
+	  customLaunchers: {
       testRunner: {
         base: "ChromeHeadless",
         flags: ["--no-sandbox"]
@@ -145,6 +146,7 @@ module.exports = (config) => {
   if (argv.includes('--sauce')) {
     sauceConfig(config)
   } else {
-    localConfig(config)
+    const useChrome = argv.includes('--headless-chrome')
+    localConfig(config, useChrome)
   }
 }

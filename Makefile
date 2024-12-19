@@ -22,6 +22,9 @@ all:: node_modules package-lock.json
 test:
 	$(LERNA) exec --stream -- $(MAKE) test
 
+test-headless:
+	$(LERNA) exec --stream -- $(MAKE) test-headless
+
 ci:
 	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
 
