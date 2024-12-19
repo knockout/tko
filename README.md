@@ -3,8 +3,6 @@
 
 [![npm version](https://badge.fury.io/js/tko.svg)](https://badge.fury.io/js/tko)
 [![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
-[![devDependency Status](https://david-dm.org/knockout/tko/dev-status.svg)](https://david-dm.org/knockout/tko#info=devDependencies)
 [![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 [![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -38,7 +36,7 @@ It's available as `@tko/build.knockout`, and over CDN:
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository.
-| $ `npm install -g yarn` otherwise | Ensure yarn is globally available
+| $ `npm install -g yarn` | Ensure yarn is globally available
 | $ `yarn` | Install local node packages and link tko modules
 | $ `make` | **Currently TKO use a make file**
 | $ `yarn test` | Run all tests. See below.
