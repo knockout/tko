@@ -1,7 +1,7 @@
 # Use an official Node.js image as the base image
-FROM node:18-bullseye
+FROM node:22-bookworm
 
-# Install necessary dependencies for make
+# Install necessary dependencies for make and chromium
 RUN apt-get update && apt-get install -y \
   build-essential \
   wget \
@@ -31,8 +31,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies using npm or yarn
-RUN npm install --force
-RUN yarn && yarn install
+#RUN npm install --force
+#RUN yarn && yarn install
 
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROME_PATH=/usr/bin/chromium
