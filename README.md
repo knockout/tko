@@ -1,10 +1,8 @@
 
-### TKO (“Technical Knockout”)
+# TKO (“Technical Knockout”)
 
 [![npm version](https://badge.fury.io/js/tko.svg)](https://badge.fury.io/js/tko)
 [![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Libscore](https://img.shields.io/libscore/s/ko.svg)](http://libscore.com/#ko)
-[![devDependency Status](https://david-dm.org/knockout/tko/dev-status.svg)](https://david-dm.org/knockout/tko#info=devDependencies)
 [![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 [![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -13,37 +11,37 @@
 
 **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout).
 
-
-### Getting Started
+## Getting Started
 
 To install use one of the usual package managers e.g.
 
 - $ `yarn add @tko/build.reference`
 - $ `npm install @tko/build.reference`
 
-Over CDN 
+Over CDN
 
 - Reference Build: https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-alpha8/dist/build.reference.min.js
 
-#### Knockout Build
+## Knockout Build
+
 The Knockout build has some backwards compatibility that is not in the reference build.  See the build differences, here: https://tko.io/3to4
 
 It's available as `@tko/build.knockout`, and over CDN:
 
 - Knockout Build https://cdn.jsdelivr.net/npm/@tko/build.knockout@4.0.0-alpha8/dist/build.knockout.min.js
 
-
 ### Using the Monorepo
 
 | Command | Effect |
 | ------- | ------ |
-| $ `git clone git@github.com:knockout/tko` | Clone the repository.
-| $ `npm install -g yarn` otherwise | Ensure yarn is globally available
-| $ `yarn` | Install local node packages and link tko modules
-| $ `yarn test` | Run all tests. See below.
-| $ `yarn watch` | Run all tests and watch for changes. See below.
-| $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled
-| $ `lerna publish` | Bump versions and publish to npm registry
+| $ `git clone git@github.com:knockout/tko` | Clone the repository. |
+| $ `npm install -g yarn` | Ensure yarn is globally available |
+| $ `yarn` | Install local node packages and link tko modules |
+| $ `make` | **Currently TKO use a make file** |
+| $ `yarn test` | Run all tests. See below. |
+| $ `yarn watch` | Run all tests and watch for changes. See below. |
+| $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled |
+| $ `lerna publish` | Bump versions and publish to npm registry |
 
 Checkout `package.json => scripts` for more commands that can be executed with `yarn {command}`.
 
@@ -51,11 +49,18 @@ In each individual `packages/*/` directory, you can also run (presuming `rollup`
 
 | Command | Effect |
 | --- | --- |
-| $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run`
-| $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/`
-
+| $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run` |
+| $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/` |
 
 #### Testing with `yarn test` and `yarn watch`
+
+### NEW
+
+Start tests with electron: `make test`
+
+Start tests with headless-chrome: `make test-headless`
+
+### OLD
 
 The `yarn test` and `yarn watch` commands can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests
 specific to that package.
@@ -66,11 +71,9 @@ Optional arguments to `yarn test` include:
 - `--noStartConnect` — Do not start a new Sauce Connect proxy instance for every
 test; requires that Sauce Connect be already running.
 
-
 #### `visual.html`
 
 Note that running `karma` or `rollup` will create a `visual.html` file that shows the proportional size of imports into each package.
-
 
 ### Objectives
 
@@ -88,11 +91,28 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
     - Built-ins have first-class access to quite a bit of good Knockout code, but plugins generally have second-class access and often have to duplicate Knockout internals
     - Quality plugins have lots of boilerplate for compilation, release, documentation, and testing
 
+## Some WSL tricks
+
+Install electron-deps for "make test":
+
+```bash
+sudo apt-get install build-essential clang libdbus-1-dev libgtk-3-dev \
+libnotify-dev libasound2-dev libcap-dev \
+libcups2-dev libxtst-dev \
+libxss1 libnss3-dev gcc-multilib g++-multilib curl \
+gperf bison python3-dbusmock openjdk-8-jre
+```
+
+Install Chrome for "make test-headless":
+
+```bash
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt -y install ./google-chrome-stable_current_amd64.deb
+```
 
 ## Next steps
 
 There's an [issue for that](https://github.com/knockout/tko/issues/1).
-
 
 ## License
 
