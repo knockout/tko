@@ -2,6 +2,7 @@ NPX		:= npx
 NODE  	:= node
 NPM		:= npm
 LERNA	:= npx lerna
+DOCKER	:= docker
 
 # Some make settings
 SHELL := bash
@@ -30,6 +31,9 @@ ci:
 
 lint:
 	$(NPX) standard
+
+docker-build:
+	$(DOCKER) build . --tag tko
 
 # Run the `repackage` target in every directory.  Essentially
 # homogenizes the `package.json`.
