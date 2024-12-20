@@ -39,7 +39,7 @@ const DISPOSED_STATE = {
   _options: null
 }
 
-export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
+export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, options?) {
   if (typeof evaluatorFunctionOrOptions === 'object') {
         // Single-parameter syntax - everything is on this "options" param
     options = evaluatorFunctionOrOptions
@@ -544,7 +544,7 @@ export function isPureComputed (instance) {
   return isComputed(instance) && instance[computedState] && instance[computedState].pure
 }
 
-export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {
+export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?) {
   if (typeof evaluatorFunctionOrOptions === 'function') {
     return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure': true})
   } else {

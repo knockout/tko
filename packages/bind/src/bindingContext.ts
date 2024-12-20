@@ -19,9 +19,13 @@ export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')
 // Unique stub to indicate inheritance.
 const inheritParentIndicator = Symbol('Knockout Parent Indicator')
 
+export interface BindingContextSetting {
+  exportDependencies?: boolean;
+}
+
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, settings) {
+export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, settings? : BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -157,20 +161,20 @@ Object.assign(bindingContext.prototype, {
   }
 })
 
-export function storedBindingContextForNode (node) {
+export function storedBindingContextForNode (node : HTMLElement) {
   const bindingInfo = domData.get(node, boundElementDomDataKey)
   return bindingInfo && bindingInfo.context
 }
 
 // Retrieving binding context from arbitrary nodes
-export function contextFor (node) {
+export function contextFor (node : HTMLElement) {
   // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
   if (node && (node.nodeType === 1 || node.nodeType === 8)) {
     return storedBindingContextForNode(node)
   }
 }
 
-export function dataFor (node) {
+export function dataFor (node : HTMLElement) {
   var context = contextFor(node)
   return context ? context.$data : undefined
 }

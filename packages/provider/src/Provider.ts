@@ -27,8 +27,8 @@ export default class Provider {
     this.globals = globals
   }
   get preemptive () { return false }
-  nodeHasBindings (/* node */) {}
-  getBindingAccessors (/* node, context */) {}
+  nodeHasBindings (node) {}
+  getBindingAccessors (node, context) {}
 
   /**
    * Preprocess a given node.
@@ -37,6 +37,10 @@ export default class Provider {
    */
   preprocessNode (node) {}
   postProcess (/* node */) {}
+
+  bindingHandlers : BindingHandlerObject
+  globals : any | undefined
+  _overloadInstance : any | undefined
 
   /** For legacy binding provider assignments to
    *  ko.bindingProvider.instance = ... */
@@ -86,6 +90,8 @@ export default class Provider {
 class LegacyProvider extends Provider {
   get FOR_NODE_TYPES () { return [1, 3, 8] }
 
+  providerObject : any
+
   constructor (providerObject, parentProvider) {
     super()
     Object.assign(this, {providerObject})
@@ -105,7 +111,7 @@ class LegacyProvider extends Provider {
       : this.getBindingsAndMakeAccessors(node, context)
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node : HTMLElement) : boolean {
     return this.providerObject.nodeHasBindings(node)
   }
 

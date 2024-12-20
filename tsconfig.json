@@ -5,10 +5,15 @@
     "target": "ES6",
     "module": "ES2015",
     "moduleResolution": "node",
-    "allowJs": true,
+    "allowJs": false,
     "importHelpers": true,
     "strict": true,
     "baseUrl": ".",
+    "noImplicitAny": false, /*Disable some typing feature from ts to detect first steps to a strong typed version*/
+    "noImplicitThis": false,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noUncheckedIndexedAccess": false,
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [
         "packages/utils/helpers/jasmine-13-helper.ts"
@@ -22,5 +27,11 @@
         "builds/*"
       ]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "builds",
+    "docs",
+    "packages/**/dist/*"
+  ]
 }
