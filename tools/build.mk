@@ -114,6 +114,9 @@ clean:
 test: esm
 	$(KARMA) start $(tools_dir)/karma.conf --once
 
+test-headless: esm
+	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome
+
 watch: esm
 	$(KARMA) start $(tools_dir)/karma.conf
 
