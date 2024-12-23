@@ -41,12 +41,22 @@ import {
 
 import { ORIGINAL_JSX_SYM } from '../dist/JsxObserver';
 
+import { assert } from "chai"
 
 class JsxTestObserver extends JsxObserver {
+  
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns?, noInitialBinding?) {
+    super(jsxOrObservable, parentNode, insertBefore, xmlns, noInitialBinding)
+  }
+  
   // For testing purposes, we make this synchronous.
   detachAndDispose (node) {
     super.detachAndDispose(node)
     cleanNode(node)
+  }
+
+  dispose () {
+    super.dispose()
   }
 }
 
@@ -54,9 +64,9 @@ class JsxTestObserver extends JsxObserver {
 /**
  * Simple wrapper for testing.
  */
-function jsxToNode (jsx, xmlns, node = document.createElement('div')) {
+function jsxToNode (jsx, xmlns?, node = document.createElement('div')) : HTMLElement {
   new JsxTestObserver(jsx, node, null, xmlns)
-  return node.childNodes[0]
+  return node.childNodes[0] as HTMLElement
 }
 
 describe('jsx', function () {
@@ -368,7 +378,7 @@ describe('jsx', function () {
     // The JSX preprocessor can generate sparse arrays with e.g.
     //  <div>{/* thing */}</div>
     const parent = document.createElement('div')
-    const jsx = []
+    const jsx = new Array()
     jsx[0] = 'a'
     jsx[2] = 'b'
     const jo = new JsxTestObserver(jsx, parent)

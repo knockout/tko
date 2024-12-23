@@ -26,6 +26,8 @@ import {
     matchers
 } from '../dist/test-helper'
 
+declare var testNode : HTMLElement
+
 describe('Binding: Options', function () {
   beforeEach(jasmine.prepareTestNode)
 

@@ -22,7 +22,7 @@ export function arrayFirst (array, predicate, predicateOwner) {
     .find(predicate, predicateOwner)
 }
 
-export function arrayMap (array = [], mapping, thisArg) {
+export function arrayMap (array = [], mapping, thisArg?) {
   if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   return array === null ? [] : Array.from(array, mapping)
 }

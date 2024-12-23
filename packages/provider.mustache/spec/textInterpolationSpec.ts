@@ -35,6 +35,8 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper';
 import '../helpers/jasmine-interpolation-helpers';
 
+declare var testNode : HTMLElement
+
 describe('Interpolation Markup preprocessor', function () {
   function testPreprocess (node) {
     const provider = new TextMustacheProvider()

@@ -38,6 +38,9 @@ import {
 
 import * as coreBindings from '@tko/binding.core';
 
+import { assert} from "chai"
+import * as sinon from "sinon"
+
 var instance
 
 beforeEach(function () {
@@ -398,7 +401,7 @@ describe('all bindings', function () {
 })
 
 describe('The lookup of variables (get_lookup_root)', function () {
-  function makeBindings (binding, context, globals, node) {
+  function makeBindings (binding, context, globals?, node?) {
     const ctx = new bindingContext(context)
     return new Parser().parse(binding, ctx, globals, node)
   }

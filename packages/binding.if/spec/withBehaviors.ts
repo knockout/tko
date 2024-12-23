@@ -21,6 +21,8 @@ import {bindings as templateBindings} from '@tko/binding.template'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
+declare var testNode : HTMLElement
+
 describe('Binding: With', function () {
   beforeEach(jasmine.prepareTestNode)
 
@@ -160,7 +162,7 @@ describe('Binding: With', function () {
     expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('top')
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('middle')
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('bottom')
-    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
     expect(firstSpan.tagName).toEqual('SPAN')
     expect(contextFor(firstSpan).$data.name).toEqual('bottom')
     expect(contextFor(firstSpan).$root.name).toEqual('outer')

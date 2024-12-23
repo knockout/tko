@@ -23,6 +23,8 @@ const DEBUG = true
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
+declare var testNode : any
+
 describe('Binding: TextInput', function () {
   var bindingHandlers
   beforeEach(jasmine.prepareTestNode)

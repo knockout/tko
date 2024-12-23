@@ -3,6 +3,9 @@ import {
   MultiProvider
 } from '../dist'
 
+import {} from "jasmine"
+import { assert } from "chai"
+
 describe('MultiProvider Behavior', function () {
   describe('nodeHasBindings', function () {
     it('is true if one provider the last is true', function () {

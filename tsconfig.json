@@ -9,11 +9,17 @@
     "importHelpers": true,
     "strict": true,
     "baseUrl": ".",
-    "noImplicitAny": false, /*Disable some typing feature from ts to detect first steps to a strong typed version*/
+    "noEmit": true,
+    /*Disable some typing feature from ts to detect first steps to a strong typed version*/
+    "noImplicitAny": false, 
     "noImplicitThis": false,
     "noImplicitOverride": false,
     "noImplicitReturns": false,
     "noUncheckedIndexedAccess": false,
+    "strictPropertyInitialization": false,
+    "strictBindCallApply": false,
+    "strictFunctionTypes": false,
+    /* END Disabling */
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [
         "packages/utils/helpers/jasmine-13-helper.ts"
@@ -32,6 +38,6 @@
     "node_modules",
     "builds",
     "docs",
-    "packages/**/dist/*"
+    "tools"
   ]
 }

@@ -376,7 +376,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext : any, roo
   return new BindingResult({asyncBindingsApplied, rootNode})
 }
 
-export function applyBindings (viewModelOrBindingContext : any, rootNode : HTMLElement, extendContextCallback : any) {
+export function applyBindings (viewModelOrBindingContext : any, rootNode : HTMLElement, extendContextCallback? : any) {
   const asyncBindingsApplied = new Set()
   // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
   if (!options.jQuery === undefined && options.jQuery) {

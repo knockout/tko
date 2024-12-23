@@ -11,10 +11,14 @@ import {
     setDomNodeChildrenFromArrayMapping
 } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import  '@tko/utils/helpers/jasmine-13-helper'
 
-function copyDomNodeChildren (domNode) {
-  var copy = []
+import {} from "jasmine"
+
+declare var testNode : any
+
+function copyDomNodeChildren (domNode : HTMLElement) {
+  var copy = new Array()
   for (var i = 0; i < domNode.childNodes.length; i++) { copy.push(domNode.childNodes[i]) }
   return copy
 }
@@ -40,7 +44,7 @@ describe('Array to DOM node children mapping', function () {
   })
 
   it('Should only call the mapping function for new array elements', function () {
-    var mappingInvocations = []
+    var mappingInvocations = new Array()
     var mapping = function (arrayItem) {
       mappingInvocations.push(arrayItem)
       return null
@@ -142,7 +146,7 @@ describe('Array to DOM node children mapping', function () {
       output.innerHTML = unwrap(arrayItem) || 'null'
       return [output]
     }
-    var callback = function (arrayItem /*, nodes */) {
+    var callback = function (arrayItem, nodes?) {
       ++countCallbackInvocations
       expect(mappingInvocations[mappingInvocations.length - 1]).toEqual(arrayItem)
     }

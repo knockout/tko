@@ -25,6 +25,8 @@ import {bindings as coreBindings} from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
+declare var testNode : any
+
 describe('Binding: Value', function () {
   beforeEach(jasmine.prepareTestNode)
 
