@@ -26,6 +26,5 @@ coverage/
 *-debug.log
 *-error.log
 
-package-lock.json
 .vscode
 yarn.lock
