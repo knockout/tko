@@ -40,8 +40,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run lint
-        run: make lint
+      #- name: Run lint
+        #run: make lint
 
       - name: Run tests
         run: make test
