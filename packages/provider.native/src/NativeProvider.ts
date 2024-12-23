@@ -19,7 +19,7 @@ export default class NativeProvider extends Provider {
   get FOR_NODE_TYPES () { return [ 1, 3 ] }
   get preemptive () { return true }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node : HTMLElement) {
     if (!node[NATIVE_BINDINGS]) { return false }
     return Object.keys(node[NATIVE_BINDINGS] || {})
       .some(key => key.startsWith('ko-'))
@@ -29,7 +29,7 @@ export default class NativeProvider extends Provider {
    * There can be only one preprocessor; when there are native bindings,
    * prevent re-entrance (and likely XSS) from the `{{ }}` provider.
    */
-  preprocessNode (node) {
+  preprocessNode (node : HTMLElement) {
     return node[NATIVE_BINDINGS] ? node : null
   }
 
@@ -47,7 +47,7 @@ export default class NativeProvider extends Provider {
    * Return as valueAccessor function all the entries matching `ko-*`
    * @param {HTMLElement} node
    */
-  getBindingAccessors (node) {
+  getBindingAccessors (node : HTMLElement) {
     const bindings = Object.entries(node[NATIVE_BINDINGS] || {})
       .filter(this.onlyBindings)
     if (!bindings.length) { return null }
@@ -60,7 +60,7 @@ export default class NativeProvider extends Provider {
    * @param {string} name
    * @param {any} value
    */
-  static addValueToNode (node, name, value) {
+  static addValueToNode (node : HTMLElement, name, value) {
     const obj = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
     obj[name] = value
   }
@@ -70,7 +70,7 @@ export default class NativeProvider extends Provider {
    * @param {HTMLElement} node
    * @return {object} the stored values
    */
-  static getNodeValues (node) {
+  static getNodeValues (node : HTMLElement) {
     return node[NATIVE_BINDINGS]
   }
 }

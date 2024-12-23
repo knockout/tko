@@ -1,63 +1,70 @@
+declare var jQuery : any
+
+
 //
 // This becomes ko.options
 // --
 //
 // This is the root 'options', which must be extended by others.
+class OptionsClass {
+  [key: string]: any;
+  
+  deferUpdates: boolean = false
 
-const options = {
-  deferUpdates: false,
+  useOnlyNativeEvents: boolean = false
 
-  useOnlyNativeEvents: false,
-
-  protoProperty: '__ko_proto__',
+  protoProperty: string = '__ko_proto__'
 
     // Modify the default attribute from `data-bind`.
-  defaultBindingAttribute: 'data-bind',
+  defaultBindingAttribute: string = 'data-bind'
 
     // Enable/disable <!-- ko binding: ... -> style bindings
-  allowVirtualElements: true,
+  allowVirtualElements: boolean = true
 
     // Global variables that can be accessed from bindings.
-  bindingGlobals: Object.create(null),
+  bindingGlobals: Object = Object.create(null)
 
     // An instance of the binding provider.
-  bindingProviderInstance: null,
+  bindingProviderInstance: Object | any = null
 
   // Whether the `with` binding creates a child context when used with `as`.
-  createChildContextWithAs: false,
+  createChildContextWithAs: boolean = false
 
     // jQuery will be automatically set to globalThis.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
-  jQuery: globalThis.jQuery,
+  jQuery: any = globalThis.jQuery
 
-  Promise: globalThis.Promise,
+  Promise: PromiseConstructor = globalThis.Promise
 
-  taskScheduler: null,
+  taskScheduler: any = null
 
-  debug: false,
+  debug: boolean = false
 
-  global: globalThis,
-  document: globalThis.document,
+  global: any = globalThis
+  document: Document = globalThis.document
 
     // Filters for bindings
     //   data-bind="expression | filter_1 | filter_2"
-  filters: {},
+  filters: any = {}
 
   // Used by the template binding.
-  includeDestroyed: false,
-  foreachHidesDestroyed: false,
+  includeDestroyed: boolean = false
 
-  onError: function (e) { throw e },
+  foreachHidesDestroyed: boolean = false
 
-  set: function (name, value) {
-    options[name] = value
-  },
+  onError (e : Error) : void { throw e }
+
+  set(name : string, value : any) : void {
+    this[name] = value
+  }
 
   // Overload getBindingHandler to have a custom lookup function.
-  getBindingHandler (/* key */) {},
+  getBindingHandler (key) : any { return null; }
   cleanExternalData (/* node, callback */) {}
 }
+
+const options = new OptionsClass()
 
 Object.defineProperty(options, '$', {
   get: function () { return options.jQuery }

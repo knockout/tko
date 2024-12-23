@@ -20,7 +20,7 @@ function getId () {
   return ++lastId
 }
 
-export function begin (options) {
+export function begin (options?) {
   outerFrames.push(currentFrame)
   currentFrame = options
 }
@@ -36,7 +36,7 @@ export function registerDependency (subscribable) {
   }
 }
 
-export function ignore (callback, callbackTarget, callbackArgs) {
+export function ignore (callback, callbackTarget?, callbackArgs?) {
   try {
     begin()
     return callback.apply(callbackTarget, callbackArgs || [])

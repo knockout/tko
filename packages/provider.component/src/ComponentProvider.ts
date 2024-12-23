@@ -28,20 +28,25 @@ export default class ComponentProvider extends Provider {
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
    * @param {HTMLElement} node
    */
-  preprocessNode (node) {
+  preprocessNode (node : HTMLElement) {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
       const closeNode = document.createComment('/ko')
+      
+      if(!parent)
+        throw Error("Missing parent node")
+      
       parent.insertBefore(openNode, node)
       parent.insertBefore(closeNode, node)
       parent.removeChild(node)
+      
       return [openNode, closeNode]
     }
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node : HTMLElement) : boolean {
     return Boolean(this.getComponentNameForNode(node))
   }
 
@@ -68,7 +73,7 @@ export default class ComponentProvider extends Provider {
   getComponentParams (node, context) {
     const parser = new Parser(node, context, this.globals)
     const paramsString = (node.getAttribute('params') || '').trim()
-    const accessors = parser.parse(paramsString, context, node)
+    const accessors = parser.parse(paramsString, context, undefined, node)
     if (!accessors || Object.keys(accessors).length === 0) {
       return { $raw: {} }
     }
