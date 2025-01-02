@@ -20,7 +20,7 @@ import { tagNameLower } from './info'
 import * as domData from './data'
 import options from '../options'
 
-var commentNodesHaveTextProperty = options.document && options.document.createComment('test').textContent === '<!--test-->'
+var commentNodesHaveTextProperty = options.document && ("text" in options.document.createComment('test')) //in case of IE8..
 
 export var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/
 export var endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
