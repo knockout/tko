@@ -34,6 +34,8 @@ import {
 
 import $ from 'jquery'
 
+import { assert } from "chai"
+
 beforeEach(function () {
   var provider = new MultiProvider({
     providers: [new DataBindProvider(), new VirtualProvider()]

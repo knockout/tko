@@ -20,7 +20,7 @@ import { tagNameLower } from './info'
 import * as domData from './data'
 import options from '../options'
 
-var commentNodesHaveTextProperty = options.document && options.document.createComment('test').text === '<!--test-->'
+var commentNodesHaveTextProperty = options.document && options.document.createComment('test').textContent === '<!--test-->'
 
 export var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/
 export var endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
@@ -43,7 +43,7 @@ const matchedEndCommentDataKey = '__ko_matchedEndComment__'
 export function getVirtualChildren (startComment, allowUnbalanced) {
   var currentNode = startComment
   var depth = 1
-  var children = []
+  var children = new Array()
   while (currentNode = currentNode.nextSibling) {
     if (isEndComment(currentNode)) {
       domData.set(currentNode, matchedEndCommentDataKey, true)

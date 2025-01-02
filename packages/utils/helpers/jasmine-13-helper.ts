@@ -1,8 +1,14 @@
+/// <reference types="jasmine" />
+/// <reference types="jquery" />
+
+
 /*
  * Configure the Jasmine testing framework.
  */
  /* globals runs, waitsFor, jasmine */
 
+
+ 
 import {
   arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty
 } from '../dist/'
@@ -15,13 +21,14 @@ window.amdRequire = window.require;
 // window.jQuery with 'undefined' on IE < 9
 window.jQueryInstance = window.jQuery;
 
-// export var testNode;
+
+//export var testNode;
 jasmine.updateInterval = 500;
 
 /*
     Some helper functions for jasmine on the browser
  */
-jasmine.resolve = function (promise) {
+jasmine.resolve = function (promise : Promise<boolean>) {
   let complete = false
   runs(() => promise.then((result) => { complete = result || true }))
   waitsFor(() => complete)
@@ -31,7 +38,7 @@ jasmine.prepareTestNode = function() {
     // The bindings specs make frequent use of this utility function to set up
     // a clean new DOM node they can execute code against
     var existingNode = document.getElementById("testNode");
-    if (existingNode !== null)
+    if (existingNode !== null && existingNode.parentNode)
         existingNode.parentNode.removeChild(existingNode);
     window.testNode = document.createElement("div");
     window.testNode.id = "testNode";
@@ -90,7 +97,7 @@ var matchers = {
   },
 
   toHaveOwnProperties (expectedProperties) {
-      var ownProperties = [];
+      var ownProperties = new Array();
       for (var prop in this.actual) {
           if (hasOwnProperty(this.actual, prop)) {
               ownProperties.push(prop);
@@ -168,7 +175,7 @@ var matchers = {
 //
 jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMillis) {
     var scheduledFunc;
-    var funcsToRun = [];
+    var funcsToRun = new Array();
     for (var timeoutKey in this.scheduledFunctions) {
         scheduledFunc = this.scheduledFunctions[timeoutKey];
         if (scheduledFunc != jasmine.undefined &&
@@ -180,7 +187,7 @@ jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMil
     }
 
     if (funcsToRun.length > 0) {
-        funcsToRun.sort(function(a, b) {
+        funcsToRun.sort(function(a : any, b : any) {
             return a.runAtMillis - b.runAtMillis;
         });
 

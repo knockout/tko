@@ -24,7 +24,7 @@ import {
   Parser
 } from '../dist';
 
-import { assert} from "chai"
+import { assert } from "chai"
 
 function ctxStub (ctx?) {
   return {
