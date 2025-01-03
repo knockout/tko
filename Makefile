@@ -67,13 +67,16 @@ outdated-upgrade:
 
 install: package-lock.json
 
-clean:
+sweep:
+	rm -rf packages/*/dist/*
+	rm -rf builds/*/dist/*
+	
+clean: sweep
 	rm -rf node_modules/
 	rm -f package-lock.json
-	rm -rf packages/*/dist/*
 	rm -rf packages/*/package-lock.json
-	rm -rf builds/*/dist/*
 	rm -rf builds/*/package-lock.json
+
 
 # Local linking of these packages, so they
 # are available for local testing/dev.

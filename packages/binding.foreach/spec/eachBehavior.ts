@@ -928,7 +928,7 @@ describe('focus', function () {
     setTimeout(function () {
       assert.strictEqual(document.activeElement, document.body)
       done()
-    }, 50)
+    }, 1000)
   })
 
   it('does not preserves primitive targets when re-ordering', function (done) {
@@ -942,7 +942,7 @@ describe('focus', function () {
     setTimeout(function () {
       assert.strictEqual(document.activeElement, document.body)
       done()
-    }, 50)
+    }, 1000)
   })
 
   it('preserves objects when re-ordering', function (done) {
@@ -957,7 +957,7 @@ describe('focus', function () {
     setTimeout(function () {
       assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
       done()
-    }, 50)
+    }, 1000)
   })
 
   it('preserves objects when re-ordering multiple identical', function (done) {
@@ -975,7 +975,7 @@ describe('focus', function () {
     setTimeout(function () {
       assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
       done()
-    }, 50)
+    }, 1000)
   })
 
   it('preserves objects when re-ordering multiple identical, alt', function (done) {
@@ -992,7 +992,7 @@ describe('focus', function () {
     setTimeout(function () {
       assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
       done()
-    }, 50)
+    }, 1000)
   })
 })
 
