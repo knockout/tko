@@ -75,7 +75,7 @@ describe('arrayRemoveItem', function () {
   })
 
   it('Should do nothing for empty arrays', function () {
-    var input = []
+    var input = new Array()
     ko.utils.arrayRemoveItem(input, 'a')
     expect(input).toEqual([])
   })

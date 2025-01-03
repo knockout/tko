@@ -88,7 +88,7 @@ describe('Components: Default loader', function () {
     var templateProviderCallback,
       viewModelProviderCallback,
       createViewModelFunction = function () {},
-      domNodeArray = [],
+      domNodeArray = new Array(),
       didResolveDefinition = false,
       config = {
         template: {

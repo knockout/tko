@@ -18,7 +18,7 @@ var cleanableNodeTypesWithDescendants = { 1: true, 9: true }
 function getDisposeCallbacksCollection (node, createIfNotFound) {
   var allDisposeCallbacks = domData.get(node, domDataKey)
   if ((allDisposeCallbacks === undefined) && createIfNotFound) {
-    allDisposeCallbacks = []
+    allDisposeCallbacks = new Array()
     domData.set(node, domDataKey, allDisposeCallbacks)
   }
   return allDisposeCallbacks
@@ -54,8 +54,8 @@ function cleanSingleNode (node) {
   }
 }
 
-function cleanNodesInList (nodeList, onlyComments) {
-  const cleanedNodes = []
+function cleanNodesInList (nodeList, onlyComments?) {
+  const cleanedNodes = new Array()
   let lastCleanedNode
   for (var i = 0; i < nodeList.length; i++) {
     if (!onlyComments || nodeList[i].nodeType === 8) {
@@ -100,7 +100,7 @@ export function removeNode (node) {
 }
 
 // Expose supplemental node cleaning functions.
-export const otherNodeCleanerFunctions = []
+export const otherNodeCleanerFunctions = new Array()
 
 export function addCleaner (fn) {
   otherNodeCleanerFunctions.push(fn)

@@ -102,7 +102,7 @@ describe('Pure Computed', function () {
     var obs = new observable('A')
     var computed = pureComputed(obs)
     var computed2 = pureComputed(computed)
-    var notifiedValues = []
+    var notifiedValues = new Array()
 
     computed.subscribe(function (value) {
       notifiedValues.push(value)
@@ -164,7 +164,7 @@ describe('Pure Computed', function () {
   it('Should awaken and perform dependency detection when subscribed to', function () {
     var data = observable('A'),
       computedInstance = pureComputed(data),
-      notifiedValues = []
+      notifiedValues = new Array()
 
         // Subscribe to computed; the dependency should now be tracked
     computedInstance.subscribe(function (value) { notifiedValues.push(value) })
@@ -226,7 +226,7 @@ describe('Pure Computed', function () {
     var timesEvaluated = 0,
       data = observable('A'),
       computedInstance = pureComputed(function () { ++timesEvaluated; return data() }),
-      notifiedValues = [],
+      notifiedValues = new Array(),
       subscribeFunc = function (value) { notifiedValues.push(value) },
       subscription
 
@@ -444,7 +444,7 @@ describe('Pure Computed', function () {
     var data, dataPureComputed
 
     function subscribeAndUpdate (computedInstance, newDataValue, expectedNotifiedValues) {
-      var notifiedValues = []
+      var notifiedValues = new Array()
       computedInstance.subscribe(function (value) { notifiedValues.push(value) })
 
       data(newDataValue)

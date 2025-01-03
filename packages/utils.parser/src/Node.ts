@@ -92,8 +92,8 @@ export default class Node {
   */
   static create_root (nodes, debug=false) {
     // shunting yard algorithm with output to an abstact syntax tree of Nodes
-    const out = []
-    const ops = []
+    const out = new Array()
+    const ops = new Array()
     for (let i = 0; i < nodes.length; i += 2) {
       out.push(nodes[i]) // next value
       const op = nodes[i+1]

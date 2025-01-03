@@ -80,12 +80,12 @@ export function trackArrayChanges (target, options) {
 
         // Each time the array changes value, capture a clone so that on the next
         // change it's possible to produce a diff
-    var previousContents = [].concat(target.peek() === undefined ? [] : target.peek())
+    var previousContents = new Array().concat(target.peek() === undefined ? [] : target.peek())
     cachedDiff = null
     arrayChangeSubscription = target.subscribe(function (currentContents) {
       let changes
             // Make a copy of the current contents and ensure it's an array
-      currentContents = [].concat(currentContents || [])
+      currentContents = new Array().concat(currentContents || [])
 
             // Compute the diff and issue notifications, but only if someone is listening
       if (target.hasSubscriptionsForEvent(arrayChangeEventName)) {
@@ -121,7 +121,7 @@ export function trackArrayChanges (target, options) {
     if (!trackingChanges || pendingNotifications) {
       return
     }
-    var diff = [],
+    var diff = new Array(),
       arrayLength = rawArray.length,
       argsLength = args.length,
       offset = 0
@@ -153,7 +153,7 @@ export function trackArrayChanges (target, options) {
           endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
           endAddIndex = startIndex + argsLength - 2,
           endIndex = Math.max(endDeleteIndex, endAddIndex),
-          additions = [], deletions = []
+          additions = new Array(), deletions = new Array()
         for (let index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
           if (index < endDeleteIndex) { deletions.push(pushDiff('deleted', rawArray[index], index)) }
           if (index < endAddIndex) { additions.push(pushDiff('added', args[argsIndex], index)) }

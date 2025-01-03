@@ -35,9 +35,15 @@ declare global {
 
         interface Matchers<T> {
 
-            toContainText(expected: string, ignoreSpaces: boolean) : boolean;
-            toHaveOwnProperties(expectedProperties : any) : boolean;
-            toThrowContaining(expected : any): boolean;
+            toContainText(expected: string, ignoreSpaces: boolean) : boolean
+            toHaveOwnProperties(expectedProperties : any) : boolean
+            toHaveTexts (expectedTexts : any) : boolean
+            toHaveValues (expectedValues : any) : boolean
+            toHaveCheckedStates (expectedValues : any) : boolean
+            toThrowContaining(expected : any) : boolean
+            toEqualOneOf (expectedPossibilities : any) : boolean
+            toContainHtml (expectedHtml : any, postProcessCleanedHtml : any) : boolean
+            toHaveSelectedValues(expectedValues : any) : boolean
         }
 
         interface Spy {

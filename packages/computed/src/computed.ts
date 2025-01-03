@@ -189,7 +189,7 @@ computed.fn = {
 
   getDependencies () {
     const dependencyTracking = this[computedState].dependencyTracking
-    const dependentObservables = []
+    const dependentObservables = new Array()
 
     objectForEach(dependencyTracking, function (id, dependency) {
       dependentObservables[dependency._order] = dependency._target
@@ -463,7 +463,7 @@ var pureComputedOverrides = {
         }
       } else {
         // First put the dependencies in order
-        var dependenciesOrder = []
+        var dependenciesOrder = new Array()
         objectForEach(state.dependencyTracking, function (id, dependency) {
           dependenciesOrder[dependency._order] = id
         })

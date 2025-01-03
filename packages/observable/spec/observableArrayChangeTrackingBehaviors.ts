@@ -13,8 +13,8 @@ function captureCompareArraysCalls (callback) {
       callLog.push(Array.prototype.slice.call(arguments, 0))
       return origCompareArrays.apply(this, arguments)
     },
-        // aliases = [],
-    callLog = []
+        // aliases = new Array(),
+    callLog = new Array()
 
   trackArrayChanges.compareArrays = interceptedCompareArrays
 

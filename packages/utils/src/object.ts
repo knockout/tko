@@ -51,7 +51,7 @@ export function getObjectOwnProperty (obj, propName) {
 }
 
 export function clonePlainObjectDeep (obj, seen) {
-  if (!seen) { seen = [] }
+  if (!seen) { seen = new Array() }
 
   if (!obj || typeof obj !== 'object' ||
         obj.constructor !== Object ||

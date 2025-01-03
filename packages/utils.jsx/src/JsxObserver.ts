@@ -153,8 +153,8 @@ export class JsxObserver extends LifeCycle {
    *   - sorted by index in ascending order
    */
   observableArrayChange (changes) {
-    let adds = []
-    let dels = []
+    let adds = new Array()
+    let dels = new Array()
     for (const index in changes) {
       const change = changes[index]
       if (change.status === 'added') {
@@ -186,7 +186,7 @@ export class JsxObserver extends LifeCycle {
       const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns, this.noInitialBinding)
       nodeArrayOrObservable = [observer]
     } else if (typeof jsx !== 'string' && isIterable(jsx)) {
-      nodeArrayOrObservable = []
+      nodeArrayOrObservable = new Array()
       for (const child of jsx) {
         nodeArrayOrObservable.unshift(
           this.injectNode(child, nextNode))
@@ -230,7 +230,7 @@ export class JsxObserver extends LifeCycle {
 
   getSubscriptionsForNode (node) {
     if (!this.subscriptionsForNode.has(node)) {
-      const subscriptions = []
+      const subscriptions = new Array()
       this.subscriptionsForNode.set(node, subscriptions)
       return subscriptions
     }

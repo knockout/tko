@@ -30,7 +30,7 @@ export function isObservableArray (instance) {
 observableArray.fn = {
   remove (valueOrPredicate) {
     var underlyingArray = this.peek()
-    var removedValues = []
+    var removedValues = new Array()
     var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
     for (var i = 0; i < underlyingArray.length; i++) {
       var value = underlyingArray[i]

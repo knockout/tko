@@ -22,7 +22,7 @@ export function arrayFirst (array, predicate, predicateOwner) {
     .find(predicate, predicateOwner)
 }
 
-export function arrayMap (array = [], mapping, thisArg?) {
+export function arrayMap (array = new Array(), mapping, thisArg?) {
   if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   return array === null ? [] : Array.from(array, mapping)
 }
@@ -36,7 +36,7 @@ export function arrayRemoveItem (array, itemToRemove) {
   }
 }
 
-export function arrayGetDistinctValues (array = []) {
+export function arrayGetDistinctValues (array = new Array()) {
   const seen = new Set()
   if (array === null) { return [] }
   return (isArray(array) ? array : [...array])
@@ -73,7 +73,7 @@ export function makeArray (arrayLikeObject) {
 export function range (min, max) {
   min = typeof min === 'function' ? min() : min
   max = typeof max === 'function' ? max() : max
-  var result = []
+  var result = new Array()
   for (var i = min; i <= max; i++) { result.push(i) }
   return result
 }
@@ -114,7 +114,7 @@ export function compareArrays (oldArray, newArray, options) {
 function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, statusNotInBig, options) {
   var myMin = Math.min,
     myMax = Math.max,
-    editDistanceMatrix = [],
+    editDistanceMatrix = new Array(),
     smlIndex, smlIndexMax = smlArray.length,
     bigIndex, bigIndexMax = bigArray.length,
     compareRange = (bigIndexMax - smlIndexMax) || 1,
@@ -124,7 +124,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
 
   for (smlIndex = 0; smlIndex <= smlIndexMax; smlIndex++) {
     lastRow = thisRow
-    editDistanceMatrix.push(thisRow = [])
+    editDistanceMatrix.push(thisRow = new Array())
     bigIndexMaxForRow = myMin(bigIndexMax, smlIndex + compareRange)
     bigIndexMinForRow = myMax(0, smlIndex - 1)
     for (bigIndex = bigIndexMinForRow; bigIndex <= bigIndexMaxForRow; bigIndex++) {
@@ -143,7 +143,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     }
   }
 
-  var editScript = [], meMinusOne, notInSml = [], notInBig = []
+  var editScript = new Array(), meMinusOne, notInSml = new Array(), notInBig = new Array()
   for (smlIndex = smlIndexMax, bigIndex = bigIndexMax; smlIndex || bigIndex;) {
     meMinusOne = editDistanceMatrix[smlIndex][bigIndex] - 1
     if (bigIndex && meMinusOne === editDistanceMatrix[smlIndex][bigIndex - 1]) {

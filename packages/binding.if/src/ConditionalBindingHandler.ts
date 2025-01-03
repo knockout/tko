@@ -107,8 +107,8 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
    */
   cloneIfElseNodes (element, hasElse) {
     const children = virtualElements.childNodes(element)
-    const ifNodes = []
-    const elseNodes = []
+    const ifNodes = new Array()
+    const elseNodes = new Array()
     let target = ifNodes
 
     for (var i = 0, j = children.length; i < j; ++i) {

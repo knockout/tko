@@ -13,7 +13,7 @@ export var selectedOptions = {
 
   init: function (element, valueAccessor, allBindings) {
     registerEventHandler(element, 'change', function () {
-      var value = valueAccessor(), valueToWrite = []
+      var value = valueAccessor(), valueToWrite = new Array()
       arrayForEach(element.getElementsByTagName('option'), function (node) {
         if (node.selected) { valueToWrite.push(selectExtensions.readValue(node)) }
       })

@@ -41,7 +41,7 @@ export var options = {
       arrayToDomNodeChildrenOptions = {},
       captionValue,
       filteredArray,
-      previousSelectedValues = []
+      previousSelectedValues = new Array()
 
     if (!valueAllowUnset) {
       if (multiple) {

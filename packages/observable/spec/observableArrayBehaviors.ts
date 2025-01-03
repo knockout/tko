@@ -8,11 +8,11 @@ describe('Observable Array', function () {
 
   beforeEach(function () {
     testObservableArray = observableArray([1, 2, 3])
-    notifiedValues = []
+    notifiedValues = new Array()
     testObservableArray.subscribe(function (value) {
       notifiedValues.push(value ? value.slice(0) : value)
     })
-    beforeNotifiedValues = []
+    beforeNotifiedValues = new Array()
     testObservableArray.subscribe(function (value) {
       beforeNotifiedValues.push(value ? value.slice(0) : value)
     }, null, 'beforeChange')
@@ -140,7 +140,7 @@ describe('Observable Array', function () {
 
   it('Should notify subscribers on remove by value', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     var removed = testObservableArray.remove('Beta')
     expect(removed).toEqual(['Beta'])
     expect(notifiedValues).toEqual([['Alpha', 'Gamma']])
@@ -148,7 +148,7 @@ describe('Observable Array', function () {
 
   it('Should notify subscribers on remove by predicate', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     var removed = testObservableArray.remove(function (value) { return value == 'Beta' })
     expect(removed).toEqual(['Beta'])
     expect(notifiedValues).toEqual([['Alpha', 'Gamma']])
@@ -156,7 +156,7 @@ describe('Observable Array', function () {
 
   it('Should notify subscribers on remove multiple by value', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     var removed = testObservableArray.removeAll(['Gamma', 'Alpha'])
     expect(removed).toEqual(['Alpha', 'Gamma'])
     expect(notifiedValues).toEqual([['Beta']])
@@ -164,7 +164,7 @@ describe('Observable Array', function () {
 
   it('Should clear observable array entirely if you pass no args to removeAll()', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     var removed = testObservableArray.removeAll()
     expect(removed).toEqual(['Alpha', 'Beta', 'Gamma'])
     expect(notifiedValues).toEqual([[]])
@@ -172,7 +172,7 @@ describe('Observable Array', function () {
 
   it('Should notify "beforeChange" subscribers before remove', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    beforeNotifiedValues = []
+    beforeNotifiedValues = new Array()
     var removed = testObservableArray.remove('Beta')
     expect(removed).toEqual(['Beta'])
     expect(beforeNotifiedValues).toEqual([['Alpha', 'Beta', 'Gamma']])
@@ -180,7 +180,7 @@ describe('Observable Array', function () {
 
   it('Should not notify subscribers on remove by value with no match', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     var removed = testObservableArray.remove('Delta')
     expect(removed).toEqual([])
     expect(notifiedValues).toEqual([])
@@ -188,7 +188,7 @@ describe('Observable Array', function () {
 
   it('Should not notify "beforeChange" subscribers before remove by value with no match', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    beforeNotifiedValues = []
+    beforeNotifiedValues = new Array()
     var removed = testObservableArray.remove('Delta')
     expect(removed).toEqual([])
     expect(beforeNotifiedValues).toEqual([])
@@ -197,7 +197,7 @@ describe('Observable Array', function () {
   it('Should modify original array on remove', function () {
     var originalArray = ['Alpha', 'Beta', 'Gamma']
     testObservableArray(originalArray)
-    notifiedValues = []
+    notifiedValues = new Array()
     testObservableArray.remove('Beta')
     expect(originalArray).toEqual(['Alpha', 'Gamma'])
   })
@@ -205,7 +205,7 @@ describe('Observable Array', function () {
   it('Should modify original array on removeAll', function () {
     var originalArray = ['Alpha', 'Beta', 'Gamma']
     testObservableArray(originalArray)
-    notifiedValues = []
+    notifiedValues = new Array()
     testObservableArray.removeAll()
     expect(originalArray).toEqual([])
   })
@@ -213,7 +213,7 @@ describe('Observable Array', function () {
   it('Should remove matching observable items', function () {
     var x = observable(), y = observable()
     testObservableArray([x, y])
-    notifiedValues = []
+    notifiedValues = new Array()
     var removed = testObservableArray.remove(y)
     expect(testObservableArray()).toEqual([x])
     expect(removed).toEqual([y])
@@ -222,7 +222,7 @@ describe('Observable Array', function () {
 
   it('Should throw an exception if matching array item moved or removed during "remove"', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     expect(function () {
       testObservableArray.remove(function (value) {
         if (value === 'Beta') {
@@ -236,14 +236,14 @@ describe('Observable Array', function () {
 
   it('Should notify subscribers on replace', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    notifiedValues = []
+    notifiedValues = new Array()
     testObservableArray.replace('Beta', 'Delta')
     expect(notifiedValues).toEqual([['Alpha', 'Delta', 'Gamma']])
   })
 
   it('Should notify "beforeChange" subscribers before replace', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
-    beforeNotifiedValues = []
+    beforeNotifiedValues = new Array()
     testObservableArray.replace('Beta', 'Delta')
     expect(beforeNotifiedValues).toEqual([['Alpha', 'Beta', 'Gamma']])
   })
@@ -297,7 +297,7 @@ describe('Observable Array', function () {
   it('Should return a new sorted array from "sorted"', function () {
           // set some unsorted values so we can see that the new array is sorted
     testObservableArray([ 5, 7, 3, 1 ])
-    notifiedValues = []
+    notifiedValues = new Array()
 
     var newArray = testObservableArray.sorted()
     expect(newArray).toEqual([ 1, 3, 5, 7 ])

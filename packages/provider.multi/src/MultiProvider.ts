@@ -10,8 +10,8 @@ export default class MultiProvider extends Provider {
     super(params)
     const providers = params.providers || []
     this.nodeTypeMap = {}
-    this.nodeTypes = []
-    this.providers = []
+    this.nodeTypes = new Array()
+    this.providers = new Array()
     providers.forEach(p => this.addProvider(p))
   }
 
@@ -25,7 +25,7 @@ export default class MultiProvider extends Provider {
     provider.globals = this.globals
     const nodeTypeMap = this.nodeTypeMap
     for (const nodeType of provider.FOR_NODE_TYPES) {
-      if (!nodeTypeMap[nodeType]) { nodeTypeMap[nodeType] = [] }
+      if (!nodeTypeMap[nodeType]) { nodeTypeMap[nodeType] = new Array() }
       nodeTypeMap[nodeType].push(provider)
     }
     this.nodeTypes = Object.keys(this.nodeTypeMap).map(k => parseInt(k, 10))

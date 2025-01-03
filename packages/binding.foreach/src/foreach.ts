@@ -100,11 +100,11 @@ export class ForEachBinding extends AsyncBindingHandler {
     ;['afterAdd', 'beforeRemove', 'afterQueueFlush', 'beforeQueueFlush']
       .forEach(p => { this[p] = settings[p] || this.allBindings.get(p) })
 
-    this.changeQueue = []
-    this.firstLastNodesList = []
-    this.indexesToDelete = []
+    this.changeQueue = new Array()
+    this.firstLastNodesList = new Array()
+    this.indexesToDelete = new Array()
     this.rendering_queued = false
-    this.pendingDeletes = []
+    this.pendingDeletes = new Array()
 
     // Expose the conditional so that if the `foreach` data is empty, successive
     // 'else' bindings will appear.
@@ -229,7 +229,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     }
 
     this.endQueueFlush()
-    this.changeQueue = []
+    this.changeQueue = new Array()
 
     // Update the conditional exposed on the domData
     if (isEmpty !== !this.isNotEmpty()) {
@@ -297,8 +297,8 @@ export class ForEachBinding extends AsyncBindingHandler {
     var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value]
     var referenceElement = this.getLastNodeBeforeIndex(index)
     // gather all childnodes for a possible batch insertion
-    const allChildNodes = []
-    const asyncBindingResults = []
+    const allChildNodes = new Array()
+    const asyncBindingResults = new Array()
     var children
 
     for (var i = 0, len = valuesToAdd.length; i < len; ++i) {
@@ -336,7 +336,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   getNodesForIndex (index) {
-    let result = []
+    let result = new Array()
     let ptr = this.firstLastNodesList[index].first
     let last = this.firstLastNodesList[index].last
     result.push(ptr)
@@ -480,7 +480,7 @@ export class ForEachBinding extends AsyncBindingHandler {
       }
       if (pd.data && pd.data[PENDING_DELETE_INDEX_SYM] !== undefined) { delete pd.data[PENDING_DELETE_INDEX_SYM] }
     }
-    this.pendingDeletes = []
+    this.pendingDeletes = new Array()
   }
 
   // We batch our deletion of item indexes in our parallel array.
@@ -491,7 +491,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     for (let i = this.indexesToDelete.length - 1; i >= 0; --i) {
       this.firstLastNodesList.splice(this.indexesToDelete[i], 1)
     }
-    this.indexesToDelete = []
+    this.indexesToDelete = new Array()
   }
 
   updateIndexes (fromIndex) {

@@ -32,7 +32,7 @@ export default class Parameters {
 
   static nodeTreeToNames (node) {
     // left-associative series of commas produces a tree with children only on the lhs, so we can extract the leaves with a simplified depth-first traversal
-    const names = []
+    const names = new Array()
     while (node) {
       if (node instanceof Identifier) {
         names.push(node.token)

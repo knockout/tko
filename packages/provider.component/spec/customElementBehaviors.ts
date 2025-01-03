@@ -234,7 +234,7 @@ describe('Components: Custom elements', function () {
   })
 
   it('Supplies an empty params object (with empty $raw) if a custom element has an empty whitespace params attribute', function () {
-    var suppliedParams = []
+    var suppliedParams = new Array()
     components.register('test-component', {
       template: 'Ignored',
       viewModel: function (params) { suppliedParams.push(params) }

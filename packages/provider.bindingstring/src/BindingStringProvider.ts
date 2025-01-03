@@ -23,7 +23,7 @@ export default class BindingStringProvider extends Provider {
     const handler = this.bindingHandlers.get(handlerName)
 
     if (handler && handler.preprocess) {
-      const bindingsAddedByHandler = []
+      const bindingsAddedByHandler = new Array()
       const chainFn = (...args) => bindingsAddedByHandler.push(args)
       value = handler.preprocess(value, key, chainFn)
       for (const [key, value] of bindingsAddedByHandler) {

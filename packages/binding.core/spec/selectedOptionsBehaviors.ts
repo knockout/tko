@@ -131,7 +131,7 @@ describe('Binding: Selected Options', function () {
   })
 
   it('Should not change the scroll position when updating the view', function () {
-    var selection = observableArray(), data = []
+    var selection = observableArray(), data = new Array()
     for (var i = 1; i < 101; i++) {
       data.push({ code: '0000' + i, name: 'Item ' + i })
     }

@@ -31,7 +31,7 @@ describe('Throttled observables', function () {
 
   it('Should notify subscribers asynchronously after writes stop for the specified timeout duration', function () {
     var observable = koObservable('A').extend({ throttle: 100 })
-    var notifiedValues = []
+    var notifiedValues = new Array()
     observable.subscribe(function (value) {
       notifiedValues.push(value)
     })
@@ -56,7 +56,7 @@ describe('Throttled observables', function () {
         // Wait until after timeout
     waitsFor(function () {
       return notifiedValues.length > 0
-    }, 300)
+    }, "Timeout", 300)
     runs(function () {
       expect(notifiedValues.length).toEqual(1)
       expect(notifiedValues[0]).toEqual('F')
@@ -72,7 +72,7 @@ describe('Throttled dependent observables', function () {
     var asyncDepObs = koComputed(function () {
       return underlying()
     }).extend({ throttle: 100 })
-    var notifiedValues = []
+    var notifiedValues = new Array()
     asyncDepObs.subscribe(function (value) {
       notifiedValues.push(value)
     })
@@ -709,7 +709,7 @@ describe('Rate-limited', function () {
         onePointOne = koComputed(one).extend({rateLimit: 100}),
         two = koObservable(false),
         three = koComputed(function () { return onePointOne() || two() }),
-        threeNotifications = []
+        threeNotifications = new Array()
 
       three.subscribe(function (val) {
         threeNotifications.push(val)
@@ -718,7 +718,7 @@ describe('Rate-limited', function () {
     // The loop shows that the same steps work continuously
       for (var i = 0; i < 3; i++) {
         expect(onePointOne() || two() || three()).toEqual(false)
-        threeNotifications = []
+        threeNotifications = new Array()
 
         one(true)
         expect(threeNotifications).toEqual([])
@@ -853,7 +853,7 @@ describe('Deferred', function () {
       var one = koObservable(false).extend({rateLimit: 100}),
         two = koObservable(false),
         three = koComputed(function () { return one() || two() }),
-        threeNotifications = []
+        threeNotifications = new Array()
 
       three.subscribe(function (val) {
         threeNotifications.push(val)
@@ -862,7 +862,7 @@ describe('Deferred', function () {
             // The loop shows that the same steps work continuously
       for (var i = 0; i < 3; i++) {
         expect(one() || two() || three()).toEqual(false)
-        threeNotifications = []
+        threeNotifications = new Array()
 
         one(true)
         expect(threeNotifications).toEqual([])

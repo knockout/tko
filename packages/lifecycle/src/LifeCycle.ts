@@ -86,7 +86,7 @@ export default class LifeCycle {
   dispose () {
     const subscriptions = this[SUBSCRIPTIONS] || []
     subscriptions.forEach(s => s.dispose())
-    this[SUBSCRIPTIONS] = []
+    this[SUBSCRIPTIONS] = new Array()
     this[ANCHOR_NODE] = null
   }
 

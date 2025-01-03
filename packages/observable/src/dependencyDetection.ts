@@ -6,7 +6,7 @@
 //
 import { isSubscribable } from './subscribableSymbol'
 
-const outerFrames = []
+const outerFrames = new Array()
 let currentFrame
 let lastId = 0
 

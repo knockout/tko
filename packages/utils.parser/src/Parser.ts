@@ -315,7 +315,7 @@ export default class Parser {
   }
 
   array () {
-    let array = []
+    let array = new Array()
     let ch = this.ch
 
     if (ch === '[') {
@@ -407,7 +407,7 @@ export default class Parser {
  */
   filter () {
     let ch = this.next()
-    let args = []
+    let args = new Array()
     let nextFilter = function (v) { return v }
     let name = this.name()
 
@@ -466,7 +466,7 @@ export default class Parser {
  */
   expression (filterable: string | bool = false, allowMultipleValues: bool = true) {
     let op
-    let nodes = []
+    let nodes = new Array()
     let ch = this.white()
 
     while (ch) {
@@ -577,7 +577,7 @@ export default class Parser {
  *
  */
   funcArguments () {
-    let args = []
+    let args = new Array()
     let ch = this.next('(')
 
     while (ch) {
@@ -648,7 +648,7 @@ export default class Parser {
 
   dereferences () {
     let ch = this.white()
-    let dereferences = []
+    let dereferences = new Array()
     let deref
 
     while (ch) {

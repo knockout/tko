@@ -56,7 +56,7 @@ var ko_subscribable_fn = {
     }
 
     if (!this._subscriptions[event]) {
-      this._subscriptions[event] = []
+      this._subscriptions[event] = new Array()
     }
     this._subscriptions[event].push(subscriptionInstance)
 

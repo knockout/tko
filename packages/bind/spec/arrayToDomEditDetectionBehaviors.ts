@@ -52,7 +52,7 @@ describe('Array to DOM node children mapping', function () {
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'B'], mapping)
     expect(mappingInvocations).toEqual(['A', 'B'])
 
-    mappingInvocations = []
+    mappingInvocations = new Array()
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'A2', 'B'], mapping)
     expect(mappingInvocations).toEqual(['A2'])
   })
@@ -77,7 +77,7 @@ describe('Array to DOM node children mapping', function () {
   })
 
   it('Should insert added nodes at the corresponding place in the DOM', function () {
-    var mappingInvocations = []
+    var mappingInvocations = new Array()
     var mapping = function (arrayItem) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
@@ -89,14 +89,14 @@ describe('Array to DOM node children mapping', function () {
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['A', 'B'])
     expect(mappingInvocations).toEqual(['A', 'B'])
 
-    mappingInvocations = []
+    mappingInvocations = new Array()
     setDomNodeChildrenFromArrayMapping(testNode, ['first', 'A', 'middle1', 'middle2', 'B', 'last'], mapping)
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['first', 'A', 'middle1', 'middle2', 'B', 'last'])
     expect(mappingInvocations).toEqual(['first', 'middle1', 'middle2', 'last'])
   })
 
   it('Should remove deleted nodes from the DOM', function () {
-    var mappingInvocations = []
+    var mappingInvocations = new Array()
     var mapping = function (arrayItem) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
@@ -108,7 +108,7 @@ describe('Array to DOM node children mapping', function () {
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['first', 'A', 'middle1', 'middle2', 'B', 'last'])
     expect(mappingInvocations).toEqual(['first', 'A', 'middle1', 'middle2', 'B', 'last'])
 
-    mappingInvocations = []
+    mappingInvocations = new Array()
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'B'], mapping)
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['A', 'B'])
     expect(mappingInvocations).toEqual([])
@@ -117,7 +117,7 @@ describe('Array to DOM node children mapping', function () {
   it('Should tolerate DOM nodes being removed manually, before the corresponding array entry is removed', function () {
         // Represents https://github.com/SteveSanderson/knockout/issues/413
         // Ideally, people wouldn't be mutating the generated DOM manually. But this didn't error in v2.0, so we should try to avoid introducing a break.
-    var mappingInvocations = []
+    var mappingInvocations = new Array()
     var mapping = function (arrayItem) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
@@ -139,7 +139,7 @@ describe('Array to DOM node children mapping', function () {
   })
 
   it('Should handle sequences of mixed insertions and deletions', function () {
-    var mappingInvocations = [], countCallbackInvocations = 0
+    var mappingInvocations = new Array(), countCallbackInvocations = 0
     var mapping = function (arrayItem) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
@@ -156,19 +156,19 @@ describe('Array to DOM node children mapping', function () {
     expect(mappingInvocations).toEqual(['A'])
     expect(countCallbackInvocations).toEqual(mappingInvocations.length)
 
-    mappingInvocations = [], countCallbackInvocations = 0
+    mappingInvocations = new Array(), countCallbackInvocations = 0
     setDomNodeChildrenFromArrayMapping(testNode, ['B'], mapping, null, callback) // Delete and replace single item
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['B'])
     expect(mappingInvocations).toEqual(['B'])
     expect(countCallbackInvocations).toEqual(mappingInvocations.length)
 
-    mappingInvocations = [], countCallbackInvocations = 0
+    mappingInvocations = new Array(), countCallbackInvocations = 0
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'B', 'C'], mapping, null, callback) // Add at beginning and end
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['A', 'B', 'C'])
     expect(mappingInvocations).toEqual(['A', 'C'])
     expect(countCallbackInvocations).toEqual(mappingInvocations.length)
 
-    mappingInvocations = [], countCallbackInvocations = 0
+    mappingInvocations = new Array(), countCallbackInvocations = 0
     setDomNodeChildrenFromArrayMapping(testNode, ['C', 'B', 'A'], mapping, null, callback) // Move items
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['C', 'B', 'A'])
     expect(mappingInvocations).toEqual([])
@@ -176,7 +176,7 @@ describe('Array to DOM node children mapping', function () {
 
         // Check that observable items can be added and unwrapped in the mapping function and will update the DOM.
         // Also check that observables accessed in the callback function do not update the DOM.
-    mappingInvocations = [], countCallbackInvocations = 0
+    mappingInvocations = new Array(), countCallbackInvocations = 0
     var observable = Observable(1), callbackObservable = Observable(1)
     var callback2 = function (arrayItem, nodes) {
       callbackObservable()
@@ -188,14 +188,14 @@ describe('Array to DOM node children mapping', function () {
     expect(countCallbackInvocations).toEqual(mappingInvocations.length)
 
         // Change the value of the mapped observable and verify that the DOM is updated
-    mappingInvocations = [], countCallbackInvocations = 0
+    mappingInvocations = new Array(), countCallbackInvocations = 0
     observable(2)
     expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['2', 'null', 'B'])
     expect(mappingInvocations).toEqual([observable])
     expect(countCallbackInvocations).toEqual(mappingInvocations.length)
 
         // Change the value of the callback observable and verify that the DOM wasn't updated
-    mappingInvocations = [], countCallbackInvocations = 0
+    mappingInvocations = new Array(), countCallbackInvocations = 0
     callbackObservable(2)
     expect(mappingInvocations.length).toEqual(0)
     expect(countCallbackInvocations).toEqual(0)

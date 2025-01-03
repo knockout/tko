@@ -38,7 +38,7 @@ describe('Tasks', function () {
   })
 
   it('Should run scheduled tasks in the order they were scheduled', function () {
-    var runValues : any = []
+    var runValues : any = new Array()
     var func = function (value) {
       runValues.push(value)
     }

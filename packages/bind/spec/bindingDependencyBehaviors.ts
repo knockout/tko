@@ -47,7 +47,7 @@ describe('Binding dependencies', function () {
 
   it('If the binding handler depends on an observable, invokes the init handler once and the update handler whenever a new value is available', function () {
     var observable = new observableConstructor();
-    var initPassedValues = [], updatePassedValues = [];
+    var initPassedValues = new Array(), updatePassedValues = new Array();
     bindingHandlers.test = {
       init: function (element, valueAccessor) { initPassedValues.push(valueAccessor()()); },
       update: function (element, valueAccessor) { updatePassedValues.push(valueAccessor()()); }
@@ -91,7 +91,7 @@ describe('Binding dependencies', function () {
 
     expect(observable.getSubscriptionsCount()).toEqual(1);
 
-    testNode.parentNode.removeChild(testNode);
+    testNode.parentNode?.removeChild(testNode);
     observable('B'); // Force re-evaluation
 
     expect(observable.getSubscriptionsCount()).toEqual(0);
@@ -99,7 +99,7 @@ describe('Binding dependencies', function () {
 
   it('If the binding attribute involves an observable, re-invokes the bindings if the observable notifies a change', function () {
     var observable = new observableConstructor({ message: 'hello' });
-    var passedValues = [];
+    var passedValues = new Array();
     bindingHandlers.test = { update: function (element, valueAccessor) { passedValues.push(valueAccessor()); } };
     testNode.innerHTML = "<div data-bind='test: myObservable().message'></div>";
 
@@ -320,15 +320,15 @@ describe('Binding dependencies', function () {
 
     // Change the childprop which is not an observable so should not change the bound element
     vm.childprop = 'new child';
-    expect(testNode.childNodes[0]).toContainText('child');
+    expect(testNode.children[0]).toContainText('child');
 
     // Update callback observable and check that the binding wasn't updated
     callbackObservable(2);
-    expect(testNode.childNodes[0]).toContainText('child');
+    expect(testNode.children[0]).toContainText('child');
 
     // Update the bound observable and verify that the binding is now updated
     bindingObservable(2);
-    expect(testNode.childNodes[0]).toContainText('new child');
+    expect(testNode.children[0]).toContainText('new child');
     expect(callbacks).toEqual(2);
   });
 
@@ -359,7 +359,7 @@ describe('Binding dependencies', function () {
     vm.callback = callbackSpy2;
 
     vm.observable('new value');
-    expect(testNode.childNodes[0]).toContainText('new value');
+    expect(testNode.children[0]).toContainText('new value');
     expect(callbackSpy1).not.toHaveBeenCalled();
     expect(callbackSpy2).toHaveBeenCalled();
   });
@@ -375,26 +375,26 @@ describe('Binding dependencies', function () {
       applyBindings(vm, testNode);
       expect(vm.getSubscriptionsCount()).toEqual(1);
 
-      expect(testNode.childNodes[0].childNodes[0].value).toEqual('My prop value');
+      expect(testNode.children[0].children[0].value).toEqual('My prop value');
 
             // a change to the input value should be written to the model
-      testNode.childNodes[0].childNodes[0].value = 'some user-entered value';
-      triggerEvent(testNode.childNodes[0].childNodes[0], 'change');
+      testNode.children[0].children[0].value = 'some user-entered value';
+      triggerEvent(testNode.children[0].children[0], 'change');
       expect(vm().someProp).toEqual('some user-entered value');
             // a click should use correct view model
-      triggerEvent(testNode.childNodes[0].childNodes[1], 'click');
+      triggerEvent(testNode.children[0].children[1], 'click');
       expect(clickedVM).toEqual(vm());
 
             // set the view-model to a new object
       vm({ someProp: observableConstructor('My new prop value'), checkVM: checkVM });
-      expect(testNode.childNodes[0].childNodes[0].value).toEqual('My new prop value');
+      expect(testNode.children[0].children[0].value).toEqual('My new prop value');
 
             // a change to the input value should be written to the new model
-      testNode.childNodes[0].childNodes[0].value = 'some new user-entered value';
-      triggerEvent(testNode.childNodes[0].childNodes[0], 'change');
+      testNode.children[0].children[0].value = 'some new user-entered value';
+      triggerEvent(testNode.children[0].children[0], 'change');
       expect(vm().someProp()).toEqual('some new user-entered value');
             // a click should use correct view model
-      triggerEvent(testNode.childNodes[0].childNodes[1], 'click');
+      triggerEvent(testNode.children[0].children[1], 'click');
       expect(clickedVM).toEqual(vm());
 
             // clear the element and the view-model (shouldn't be any errors) and the subscription should be cleared
@@ -449,7 +449,7 @@ describe('Binding dependencies', function () {
       expect(vm.getSubscriptionsCount()).toEqual(1);
 
             // remove the element and re-set the view-model; the subscription should be cleared
-      testNode.parentNode.removeChild(testNode);
+      testNode.parentNode?.removeChild(testNode);
       vm(null);
       expect(vm.getSubscriptionsCount()).toEqual(0);
     });
@@ -527,7 +527,7 @@ describe('Binding dependencies', function () {
       expect(testNode).toContainText('vm1');
 
       var parentContext = contextFor(testNode),
-        childContext = contextFor(testNode.childNodes[0].childNodes[0]);
+        childContext = contextFor(testNode.children[0].children[0]);
 
       expect(parentContext.$data).toEqual('vm1');
       expect(parentContext.$rawData).toBe(vm1);
@@ -577,7 +577,7 @@ describe('Binding dependencies', function () {
   describe('Order', function () {
     var bindingOrder;
     beforeEach(function () {
-      bindingOrder = [];
+      bindingOrder = new Array();
 
       function makeBinding (name) {
         return { init: function () { bindingOrder.push(name); } };
@@ -625,7 +625,7 @@ describe('Binding dependencies', function () {
       bindingHandlers.test1.after = ['test3'];
       bindingHandlers.test2.after = ['test1'];
       bindingHandlers.test3.after = ['test4', 'test2'];
-      bindingHandlers.test4.after = [];
+      bindingHandlers.test4.after = new Array();
       testNode.innerHTML = "<div data-bind='test1, unknownBinding, test2, test4, test3'></div>";
 
       expect(function () {

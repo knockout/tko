@@ -23,7 +23,7 @@ import { computed } from '@tko/computed'
 
 function mapNodeAndRefreshWhenChanged (containerNode, mapping, valueToMap, callbackAfterAddingNodes, index) {
   // Map this array value inside a dependentObservable so we re-map when any dependency changes
-  var mappedNodes = []
+  var mappedNodes = new Array()
   var dependentObservable = computed(function () {
     var newMappedNodes = mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
 
@@ -55,15 +55,15 @@ export function setDomNodeChildrenFromArrayMapping (domNode, array, mapping, opt
   let isFirstExecution = !lastMappingResult
 
   // Build the new mapping result
-  var newMappingResult = []
+  var newMappingResult = new Array()
   var lastMappingResultIndex = 0
   var newMappingResultIndex = 0
 
-  var nodesToDelete = []
-  var itemsToProcess = []
-  var itemsForBeforeRemoveCallbacks = []
-  var itemsForMoveCallbacks = []
-  var itemsForAfterAddCallbacks = []
+  var nodesToDelete = new Array()
+  var itemsToProcess = new Array()
+  var itemsForBeforeRemoveCallbacks = new Array()
+  var itemsForMoveCallbacks = new Array()
+  var itemsForAfterAddCallbacks = new Array()
   var mapData
   let countWaitingForRemove = 0
 

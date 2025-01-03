@@ -143,10 +143,10 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
 
 
 function * topologicalSortBindings (bindings, $component) {
-  const results = []
+  const results = new Array()
   // Depth-first sort
   const bindingsConsidered = {}    // A temporary record of which bindings are already in 'result'
-  const cyclicDependencyStack = [] // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
+  const cyclicDependencyStack = new Array() // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
 
   objectForEach(bindings, function pushBinding (bindingKey) {
     if (!bindingsConsidered[bindingKey]) {

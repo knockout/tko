@@ -20,7 +20,7 @@ export function moveCleanedNodesToContainerElement (nodes) {
 }
 
 export function cloneNodes (nodesArray, shouldCleanNodes) {
-  for (var i = 0, j = nodesArray.length, newNodesArray = []; i < j; i++) {
+  for (var i = 0, j = nodesArray.length, newNodesArray = new Array(); i < j; i++) {
     var clonedNode = nodesArray[i].cloneNode(true)
     newNodesArray.push(shouldCleanNodes ? cleanNode(clonedNode) : clonedNode)
   }

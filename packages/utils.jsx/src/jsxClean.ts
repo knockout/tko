@@ -4,7 +4,7 @@ import {
 
 const DELAY_MS = 25
 const MAX_CLEAN_AT_ONCE = 1000
-const cleanNodeQueue = []
+const cleanNodeQueue = new Array()
 let cleanNodeTimeoutID = null
 
 export function queueCleanNode (node) {

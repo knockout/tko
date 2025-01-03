@@ -65,7 +65,7 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
         self[contextAncestorBindingInfo] = parentContext[contextAncestorBindingInfo]
       }
     } else {
-      self.$parents = []
+      self.$parents = new Array()
       self.$root = dataItem
     }
 

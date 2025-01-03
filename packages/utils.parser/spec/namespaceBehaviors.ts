@@ -24,6 +24,8 @@ import {
   Parser
 } from '../dist';
 
+import { assert } from "chai"
+
 function ctxStub (ctx) {
   return { lookup (v) { return ctx ? ctx[v] : null } }
 }
@@ -71,7 +73,7 @@ describe('Parser Namespace', function () {
       var model = { onClick: function () { clickCalled = true } }
       node.innerHTML = "<button data-bind='event.click: onClick'>hey</button>"
       applyBindings(model, node)
-      triggerEvent(node.childNodes[0], 'click')
+      triggerEvent(node.children[0], 'click')
       assert.ok(clickCalled)
     })
 
@@ -80,9 +82,9 @@ describe('Parser Namespace', function () {
       node.innerHTML = "<div data-bind='css.myRule: someModelProperty'>Hallo</div>";
       applyBindings({ someModelProperty: observable1 }, node);
 
-      assert.equal(node.childNodes[0].className, '');
+      assert.equal(node.children[0].className, '');
       observable1(true);
-      assert.equal(node.childNodes[0].className, 'myRule');
+      assert.equal(node.children[0].className, 'myRule');
     })
 
     it('Should set style with style.stylename', function () {
@@ -90,12 +92,12 @@ describe('Parser Namespace', function () {
       node.innerHTML = "<div data-bind='style.backgroundColor: colorValue'>Hallo</div>";
       applyBindings({ colorValue: myObservable }, node);
 
-      assert.include(['red', '#ff0000'], node.childNodes[0].style.backgroundColor)
+      assert.include(['red', '#ff0000'], node.children[0].style.backgroundColor)
       // Opera returns style color values in #rrggbb notation, unlike other browsers
       myObservable('green');
-      assert.include(['green', '#008000'], node.childNodes[0].style.backgroundColor)
+      assert.include(['green', '#008000'], node.children[0].style.backgroundColor)
       myObservable(undefined);
-      assert.equal(node.childNodes[0].style.backgroundColor, '');
+      assert.equal(node.children[0].style.backgroundColor, '');
     })
   })
 })

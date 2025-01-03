@@ -241,7 +241,7 @@ describe('Dependent Observable', function () {
   it('Should notify "spectator" subscribers about changes', function () {
     var obs = new observable()
     var comp = computed(() => obs())
-    var notifiedValues = []
+    var notifiedValues = new Array()
     comp.subscribe(function (value) {
       notifiedValues.push(value)
     }, null, 'spectate')
@@ -264,7 +264,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should only update once when each dependency changes, even if evaluation calls the dependency multiple times', function () {
-    var notifiedValues = []
+    var notifiedValues = new Array()
     var observableInstance = new observable()
     var dependantObservable = computed(function () { return observableInstance() * observableInstance() })
     dependantObservable.subscribe(function (value) { notifiedValues.push(value) })
@@ -563,7 +563,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should expose a "notify" extender that can configure a computed to notify on all changes', function () {
-    var notifiedValues = []
+    var notifiedValues = new Array()
     var observableInstance = observable(1)
     var computedInstance = computed(function () { return observableInstance() })
     computedInstance.subscribe(function (value) { notifiedValues.push(value) })

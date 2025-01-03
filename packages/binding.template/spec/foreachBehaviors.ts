@@ -192,7 +192,7 @@ describe('Binding: Foreach', function () {
   it('Should be able to supply afterAdd and beforeRemove callbacks', function () {
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, afterAdd: myAfterAdd, beforeRemove: myBeforeRemove }'><span data-bind='text: $data'></span></div>"
     var someItems = observableArray(['first child'])
-    var afterAddCallbackData = [], beforeRemoveCallbackData = []
+    var afterAddCallbackData = new Array(), beforeRemoveCallbackData = new Array()
     applyBindings({
       someItems: someItems,
       myAfterAdd: function (elem, index, value) { afterAddCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }) },
@@ -219,7 +219,7 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
 
         // Remove another item
-    beforeRemoveCallbackData = []
+    beforeRemoveCallbackData = new Array()
     someItems.shift()
     expect(beforeRemoveCallbackData.length).toEqual(1)
     expect(beforeRemoveCallbackData[0].elem).toContainText('added child')
@@ -230,7 +230,7 @@ describe('Binding: Foreach', function () {
 
         // Try adding the item back; it should be added and not confused with the removed item
     testNode.childNodes[0].innerHTML = ''  // Actually remove *removed* nodes to check that they are not added back in
-    afterAddCallbackData = []
+    afterAddCallbackData = new Array()
     someItems.push('added child')
     expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">added child</span>')
     expect(afterAddCallbackData.length).toEqual(1)
@@ -281,7 +281,7 @@ describe('Binding: Foreach', function () {
         // Now perform a foreach binding, and see that afterRender gets the output from the preprocessor and bindings
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, afterRender: callback }'><span>[</span>$data<span>]</span></div>"
     var someItems = observableArray(['Alpha', 'Beta']),
-      callbackReceivedArrayValues = []
+      callbackReceivedArrayValues = new Array()
     applyBindings({
       someItems: someItems,
       callback: function (nodes, arrayValue) {

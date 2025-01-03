@@ -90,7 +90,7 @@ describe('Components: Loader registry', function () {
   })
 
   it("issues a PEBKAC when a component name does not have a dash", function () {
-    const logs = []
+    const logs = new Array()
     const orlog = console.log
     console.log = (v) => logs.push(v)
 
@@ -103,7 +103,7 @@ describe('Components: Loader registry', function () {
   })
 
   it("does not issue a PEBCAK when `ignoreCustomElementWarning` is true", function () {
-    const logs = []
+    const logs = new Array()
     const orlog = console.log
     console.log = (v) => logs.push(v)
 
@@ -351,9 +351,9 @@ describe('Components: Loader registry', function () {
 
   it('Only commences a single loading process, even if multiple requests arrive before loading has completed', function () {
         // Set up a mock AMD environment that logs calls
-    var someModuleTemplate = [],
+    var someModuleTemplate = new Array(),
       someComponentModule = { template: someModuleTemplate },
-      requireCallLog = []
+      requireCallLog = new Array()
     this.restoreAfter(window, 'require')
     window.require = function (modules, callback) {
       requireCallLog.push(modules.slice(0))
