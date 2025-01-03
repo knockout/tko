@@ -1,8 +1,13 @@
+/// <reference types="jasmine" />
+/// <reference types="jquery" />
+
+
 export { };
 
 declare global {
 
     var testNode: HTMLElement;
+    var jQueryInstance : JQuery
 
     interface Window {
         // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
@@ -27,5 +32,16 @@ declare global {
         var undefined: undefined
         var browserSupportsProtoAssignment: any
         var ieVersion: any
+
+        interface Matchers<T> {
+
+            toContainText(expected: string, ignoreSpaces: boolean) : boolean;
+            toHaveOwnProperties(expectedProperties : any) : boolean;
+            toThrowContaining(expected : any): boolean;
+        }
+
+        interface Spy {
+            reset() : any
+        }
     }
 }

@@ -44,6 +44,8 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 
+
+
 describe('Components: Component binding', function () {
   var testComponentName = 'test-component',
     testComponentBindingValue,

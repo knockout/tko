@@ -38,7 +38,7 @@ describe('Tasks', function () {
   })
 
   it('Should run scheduled tasks in the order they were scheduled', function () {
-    var runValues = []
+    var runValues : any = []
     var func = function (value) {
       runValues.push(value)
     }
@@ -69,7 +69,7 @@ describe('Tasks', function () {
   })
 
   it('Should process newly scheduled tasks during task processing', function () {
-    var runValues = []
+    var runValues = new Array
     var func = function (value) {
       runValues.push(value)
       tasks.schedule(function () {
@@ -85,7 +85,7 @@ describe('Tasks', function () {
   })
 
   it('Should keep correct state if a task throws an exception', function () {
-    var runValues = []
+    var runValues = new Array
     var func = function (value) {
       runValues.push(value)
     }
@@ -104,7 +104,7 @@ describe('Tasks', function () {
   })
 
   it('Should stop recursive task processing after a fixed number of iterations', function () {
-    var runValues = []
+    var runValues = new Array
     var func = function () {
       runValues.push('x')
       tasks.schedule(function () {})
@@ -123,7 +123,7 @@ describe('Tasks', function () {
   })
 
   it('Should not stop non-recursive task processing', function () {
-    var runValues = []
+    var runValues = new Array
     var func = function () {
       runValues.push('x')
     }
@@ -163,7 +163,7 @@ describe('Tasks', function () {
     })
 
     it('Should do nothing if task has already run', function () {
-      var runValues = []
+      var runValues = new Array
       var func = function (value) {
         runValues.push(value)
       }
@@ -184,7 +184,7 @@ describe('Tasks', function () {
     })
 
     it('Should work correctly after a task throws an exception', function () {
-      var runValues = [], handle
+      var runValues = new Array, handle
       var func = function (value) {
         runValues.push(value)
       }
@@ -210,7 +210,7 @@ describe('Tasks', function () {
 
   describe('runEarly', function () {
     it('Should run tasks early', function () {
-      var runValues = []
+      var runValues = new Array
       var func = function (value) {
         runValues.push(value)
       }
@@ -225,7 +225,7 @@ describe('Tasks', function () {
     })
 
     it('Should run tasks early during task processing', function () {
-      var runValues = []
+      var runValues = new Array
       var func = function (value) {
         runValues.push(value)
       }
@@ -248,7 +248,7 @@ describe('Tasks', function () {
     })
 
     it('Should stop recursive task processing after a fixed number of iterations', function () {
-      var runValues = []
+      var runValues = new Array
       var func = function () {
         runValues.push('x')
         tasks.schedule(function () {})
@@ -271,7 +271,7 @@ describe('Tasks', function () {
     })
 
     it('Should keep correct state if a task throws an exception', function () {
-      var runValues = []
+      var runValues = new Array
       var func = function (value) {
         runValues.push(value)
       }
