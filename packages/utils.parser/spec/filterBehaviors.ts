@@ -12,6 +12,8 @@ import {
   Parser
 } from '../dist';
 
+import { assert } from "chai"
+
 function ctxStub (o) { return { lookup (p) { return o[p] } } }
 
 describe('filters', function () {

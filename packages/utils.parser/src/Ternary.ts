@@ -2,7 +2,9 @@
 import Node from './Node'
 
 export default class Ternary {
-  constructor (yes, no) {
+  yes: any
+  no: any
+  constructor (yes?, no?) {
     Object.assign(this, {yes, no})
   }
 

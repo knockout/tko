@@ -75,7 +75,7 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: [1, 2]'><span></span></div>"
 
         // Apply some DOM Data to the SPAN
-    var span = testNode.childNodes[0].childNodes[0]
+    var span = testNode.childNodes[0].childNodes[0] as HTMLSpanElement
     expect(span.tagName).toEqual('SPAN')
     domData.set(span, 'mydata', 123)
 

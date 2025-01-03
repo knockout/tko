@@ -11,7 +11,7 @@ import { deferUpdates } from './defer'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
 
-export function observable (initialValue?: any) {
+export function observable<T = any> (initialValue?: any) :Observable<T> {
   function Observable () {
     if (arguments.length > 0) {
             // Write
