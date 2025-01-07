@@ -51,7 +51,7 @@ declare global {
       };
     
     var testNode: HTMLElement;
-    var jQueryInstance : JQuery
+    var jQueryInstance : JQueryStatic
 
   
     interface Window {
@@ -61,11 +61,15 @@ declare global {
         require: any
         jQuery: JQuery
         jQueryInstance: JQuery
+        testDivTemplate:HTMLElement
+        templateOutput:HTMLElement
     }
 
     //Jasmine and Mocha define duplicated functions, is a problem for the type system
     //This namespace merges the jasmine namespace to correct same tsc warnings
     namespace jasmine {
+
+        function getGlobal():any;
         var updateInterval: number
         function resolve(promise: Promise<boolean>)
         function prepareTestNode()

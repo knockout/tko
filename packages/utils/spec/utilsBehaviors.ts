@@ -359,7 +359,7 @@ describe('Function.bind', function () {
     expect(actual[0]).toEqualOneOf([undefined, global])
     expect(actual[1]).toEqual('b')
 
-    bound = fn.bind()
+    bound = fn.bind(null)
     actual = bound('b')
 
     expect(actual[0]).toEqualOneOf([undefined, global])
@@ -446,7 +446,12 @@ describe('cloneNodes', function () {
     })
 
     it('stringifies recursive objects', () => {
-      const recursive = { b: 1, c: 1 }
+      type Recursive = {
+        b:number;
+        c:number;
+        a?:Recursive;
+      };      
+      const recursive: Recursive = { b: 1, c: 1 }
       recursive.a = recursive
 
       const expectObj = { b: 1, c: 1, a: '...' }

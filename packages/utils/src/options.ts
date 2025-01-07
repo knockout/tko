@@ -33,7 +33,7 @@ class OptionsClass {
     // jQuery will be automatically set to globalThis.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
-  jQuery: any = globalThis.jQuery
+  jQuery: any = globalThis.jQueryInstance
 
   Promise: PromiseConstructor = globalThis.Promise
 

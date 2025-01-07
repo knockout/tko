@@ -6,7 +6,7 @@
 
 const {isArray} = Array
 
-export function arrayForEach (array, action, thisArg) {
+export function arrayForEach (array, action, thisArg?) {
   if (arguments.length > 2) { action = action.bind(thisArg) }
   for (let i = 0, j = array.length; i < j; ++i) {
     action(array[i], i, array)
@@ -17,7 +17,7 @@ export function arrayIndexOf (array, item) {
   return (isArray(array) ? array : [...array]).indexOf(item)
 }
 
-export function arrayFirst (array, predicate, predicateOwner) {
+export function arrayFirst (array, predicate, predicateOwner?) {
   return (isArray(array) ? array : [...array])
     .find(predicate, predicateOwner)
 }

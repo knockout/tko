@@ -15,9 +15,9 @@ describe('onError handler', function () {
       koOnErrorCount++
     }
 
-    function ensureNodeExistsAndIsEmpty (id, tagName, type) {
+    function ensureNodeExistsAndIsEmpty (id:string, tagName?:string, type?:string):HTMLElement {
       var existingNode = document.getElementById(id)
-      if (existingNode != null) { existingNode.parentNode.removeChild(existingNode) }
+      if (existingNode != null) { existingNode.parentNode?.removeChild(existingNode) }
       var resultNode = document.createElement(tagName || 'div')
       resultNode.id = id
       if (type) { resultNode.setAttribute('type', type) }
@@ -37,7 +37,7 @@ describe('onError handler', function () {
             // Don't spam the console, since these were triggered deliberately
             // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
             // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
-      var isPhantom = !!window._phantom
+      var isPhantom = !!(window as any)._phantom
       return !isPhantom
     }
   })

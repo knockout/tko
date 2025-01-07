@@ -47,12 +47,12 @@ export function fixUpContinuousNodeArray (continuousNodeArray, parentNode) {
 
 export function setOptionNodeSelectionState (optionNode, isSelected) {
     // IE6 sometimes throws "unknown error" if you try to write to .selected directly, whereas Firefox struggles with setAttribute. Pick one based on browser.
-  if (ieVersion < 7) { optionNode.setAttribute('selected', isSelected) } else { optionNode.selected = isSelected }
+  if ((ieVersion as any) < 7) { optionNode.setAttribute('selected', isSelected) } else { optionNode.selected = isSelected }
 }
 
 export function forceRefresh (node) {
     // Workaround for an IE9 rendering bug - https://github.com/SteveSanderson/knockout/issues/209
-  if (ieVersion >= 9) {
+  if ((ieVersion as any) >= 9) {
         // For text nodes and comment nodes (most likely virtual elements), we will have to refresh the container
     var elem = node.nodeType == 1 ? node : node.parentNode
     if (elem.style) { elem.style.zoom = elem.style.zoom }

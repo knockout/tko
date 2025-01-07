@@ -1,7 +1,7 @@
 
 import { memoization } from '../dist'
 
-import {} from "jasmine"
+//import { } from "karma-jasmine";
 
 function parseMemoCommentHtml (commentHtml) {
   commentHtml = commentHtml.replace('<!--', '').replace('-->', '')
