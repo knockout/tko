@@ -11,6 +11,11 @@ import {
 const IS_EXPR_OR_IDENT = Symbol('Node - Is Expression Or Identifier')
 
 export default class Node {
+  lhs: any
+  op: any
+  rhs: any
+
+
   constructor (lhs, op, rhs) {
     this.lhs = lhs
     this.op = op
@@ -49,8 +54,8 @@ export default class Node {
    * Note that for a lambda, we do not evaluate the RHS expression until
    * the lambda is called.
    */
-  get_value (notused, context, globals, node) {
-    var node = this
+  get_value (notused, context, globals, node: Node ) {
+    var node:Node = this ;
 
     if (node.op === LAMBDA) {
       return (...args) => {
@@ -77,7 +82,7 @@ export default class Node {
   static get isExpressionOrIdentifierSymbol () { return IS_EXPR_OR_IDENT }
   get [IS_EXPR_OR_IDENT] () { return true }
 
-  static value_of (item, context, globals, node) {
+  static value_of (item, context?, globals?, node? : Node) {
     if (item && item[Node.isExpressionOrIdentifierSymbol]) {
       return item.get_value(item, context, globals, node)
     }

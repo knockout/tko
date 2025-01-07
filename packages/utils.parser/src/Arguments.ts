@@ -2,6 +2,9 @@
 import Node from './Node'
 
 export default class Arguments {
+  private parser: any
+  private args: any
+  
   constructor (parser, args) {
     this.parser = parser
     this.args = args

@@ -207,7 +207,7 @@ export default class Parser {
   }
 
   object () {
-    let key
+    let key:string
     let object = {}
     let ch = this.ch
 

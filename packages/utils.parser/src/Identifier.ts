@@ -1,7 +1,7 @@
 
 import Node from './Node'
 import Arguments from './Arguments'
-
+import Parser from './Parser'
 import { hasOwnProperty, isObjectLike } from '@tko/utils'
 
 import {
@@ -13,7 +13,11 @@ import {
 } from './identifierExpressions'
 
 export default class Identifier {
-  constructor (parser, token, dereferences) {
+   token: string
+   dereferences: any
+   parser: Parser
+
+  constructor (parser: Parser, token: string, dereferences: any[]) {
     this.token = token
     this.dereferences = dereferences
     this.parser = parser
@@ -106,7 +110,7 @@ export default class Identifier {
   set_value (new_value, $context, globals) {
     const $data = $context.$data || {}
     const refs = this.dereferences || []
-    let leaf = this.token
+    let leaf:any = this.token
     let i, n, root
 
     if (isObjectLike($data) && leaf in $data) {

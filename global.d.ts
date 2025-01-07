@@ -51,16 +51,15 @@ declare global {
       };
     
     var testNode: HTMLElement;
-    var jQueryInstance : JQueryStatic
-
+    var jQueryInstance: JQueryStatic;
   
     interface Window {
         // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
         DEBUG: boolean
         amdRequire: any
         require: any
-        jQuery: JQuery
-        jQueryInstance: JQuery
+        jQuery: JQueryStatic
+        jQueryInstance: JQueryStatic
         testDivTemplate:HTMLElement
         templateOutput:HTMLElement
     }
@@ -68,7 +67,7 @@ declare global {
     //Jasmine and Mocha define duplicated functions, is a problem for the type system
     //This namespace merges the jasmine namespace to correct same tsc warnings
     namespace jasmine {
-
+        var Spec:any;
         function getGlobal():any;
         var updateInterval: number
         function resolve(promise: Promise<boolean>)
@@ -94,6 +93,10 @@ declare global {
             toContainHtml (expectedHtml : any, postProcessCleanedHtml : any) : boolean
             toHaveSelectedValues(expectedValues : any) : boolean
             toContainHtml(expectedValues:any):boolean
+        }
+
+        interface Clock{
+            mockScheduler:any
         }
 
         interface Spy {
