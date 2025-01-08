@@ -40,11 +40,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      #- name: Run lint
-        #run: make lint
+      - name: Run lint (optional)
+        run: make lint
+        continue-on-error: true
 
       - name: Run Build
         run: make
 
       - name: Run tests
         run: make test-headless
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tko
+          path: builds/knockout/dist  
