@@ -104,7 +104,7 @@ export class JsxObserver extends LifeCycle {
   }
 
   /**
-   * @param {HMTLElement|Comment|HTMLTemplateElement} parentNode
+   * @param {HTMLElement|Comment|HTMLTemplateElement} parentNode
    */
   getParentTarget (parentNode) {
     if ('content' in parentNode) { return parentNode.content }
