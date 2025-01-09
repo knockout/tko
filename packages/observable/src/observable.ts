@@ -11,7 +11,7 @@ import { deferUpdates } from './defer'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
 
-export function observable<T = any> (initialValue?: any) :Observable<T> {
+export function observable(initialValue?: any):Observable{
   function Observable () {
     if (arguments.length > 0) {
             // Write
@@ -144,7 +144,7 @@ observable.fn[protoProperty] = observable
 // isObservable will be `true`.
 observable.observablePrototypes = new Set([observable])
 
-export function isObservable (instance) {
+export function isObservable<T=any> (instance:any): instance is Observable<T> {
   const proto = typeof instance === 'function' && instance[protoProperty]
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
