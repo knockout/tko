@@ -104,7 +104,7 @@ export class JsxObserver extends LifeCycle {
   }
 
   /**
-   * @param {HMTLElement|Comment|HTMLTemplateElement} parentNode
+   * @param {HTMLElement|Comment|HTMLTemplateElement} parentNode
    */
   getParentTarget (parentNode) {
     if ('content' in parentNode) { return parentNode.content }
@@ -135,8 +135,8 @@ export class JsxObserver extends LifeCycle {
 
   createInitialAdditions (possibleIterable) {
     const status = 'added'
-    if (typeof possibleIteratable === 'object' &&
-      posibleIterable !== null &&
+    if (typeof possibleIterable === 'object' &&
+      possibleIterable !== null &&
       Symbol.iterator in possibleIterable) {
       possibleIterable = [...possibleIterable]
     }
