@@ -135,8 +135,8 @@ export class JsxObserver extends LifeCycle {
 
   createInitialAdditions (possibleIterable) {
     const status = 'added'
-    if (typeof possibleIteratable === 'object' &&
-      posibleIterable !== null &&
+    if (typeof possibleIterable === 'object' &&
+      possibleIterable !== null &&
       Symbol.iterator in possibleIterable) {
       possibleIterable = [...possibleIterable]
     }
