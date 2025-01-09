@@ -104,7 +104,7 @@ export class JsxObserver extends LifeCycle {
   }
 
   /**
-   * @param {HTMLElement|Comment|HTMLTemplateElement} parentNode
+   * @param {HMTLElement|Comment|HTMLTemplateElement} parentNode
    */
   getParentTarget (parentNode) {
     if ('content' in parentNode) { return parentNode.content }
@@ -171,7 +171,7 @@ export class JsxObserver extends LifeCycle {
    * Add a change at the given index.
    *
    * @param {int} index
-   * @param {string|object|Array|Observable.string|Observable.Array|Obseravble.object} jsx
+   * @param {string|object|Array|Observable.string|Observable.Array|Observable.object} jsx
    */
   addChange (index, jsx) {
     this.nodeArrayOrObservableAtIndex.splice(index, 0,

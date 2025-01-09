@@ -380,7 +380,7 @@ describe('jsx', function () {
     const parent = document.createElement('div')
     const jsx = new Array()
     jsx[0] = 'a'
-    jsx[2] = 'b'
+    jsx[1] = 'b'
     const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `ab`)
     jo.dispose()
