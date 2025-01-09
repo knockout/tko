@@ -13,8 +13,6 @@ import {
 
 import  '@tko/utils/helpers/jasmine-13-helper'
 
-import {} from "jasmine"
-
 declare var testNode : any
 
 function copyDomNodeChildren (domNode : HTMLElement) {

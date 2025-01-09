@@ -1,5 +1,6 @@
 {
   "compileOnSave": false,
+  "declaration": true,
   "compilerOptions": {
     "downlevelIteration": true,
     "target": "ES6",
@@ -11,7 +12,7 @@
     "baseUrl": ".",
     "noEmit": true,
     /*Disable some typing feature from ts to detect first steps to a strong typed version*/
-    "noImplicitAny": false, 
+    "noImplicitAny": false,
     "noImplicitThis": false,
     "noImplicitOverride": false,
     "noImplicitReturns": false,
@@ -19,6 +20,7 @@
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
     "strictFunctionTypes": false,
+    "skipLibCheck": true,
     /* END Disabling */
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [

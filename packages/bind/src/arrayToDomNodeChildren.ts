@@ -23,8 +23,8 @@ import { computed } from '@tko/computed'
 
 function mapNodeAndRefreshWhenChanged (containerNode, mapping, valueToMap, callbackAfterAddingNodes, index) {
   // Map this array value inside a dependentObservable so we re-map when any dependency changes
-  var mappedNodes = new Array()
-  var dependentObservable = computed(function () {
+  const mappedNodes = new Array()
+  const dependentObservable = computed(function () {
     var newMappedNodes = mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
 
     // On subsequent evaluations, just replace the previously-inserted DOM nodes

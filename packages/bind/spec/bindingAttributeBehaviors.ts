@@ -164,7 +164,7 @@ describe('Binding attribute syntax', function () {
     this.after(function () {
       options.onError = saved_obe
     })
-    options.onError = function (spec) {
+    options.onError = function (spec: any) {
       obe_calls++
       expect(spec.during).toEqual('init')
       expect(spec.errorCaptured.message).toMatch(/Message: A moth!$/)
@@ -189,7 +189,7 @@ describe('Binding attribute syntax', function () {
     this.after(function () {
       options.onError = saved_obe
     })
-    options.onError = function (spec) {
+    options.onError = function (spec: any) {
       obe_calls++
       expect(spec.during).toEqual('update')
       expect(spec.errorCaptured.message).toMatch(/A beetle!$/)
@@ -217,7 +217,7 @@ describe('Binding attribute syntax', function () {
       options.onError = saved_obe
     })
 
-    options.onError = function (spec) {
+    options.onError = function (spec: any) {
       obe_calls++
       expect(spec.during).toEqual('update')
       expect(spec.errorCaptured.message).toMatch(/Observable: 42$/)
@@ -266,7 +266,7 @@ describe('Binding attribute syntax', function () {
     var oxy = koObservable()
     this.after(function () { options.set('onError', undefined) })
     options.set('onError', function (err) {
-      expect(err.message.indexOf('turtle')).toNotEqual(-1)
+      expect(err.message.indexOf('turtle')).not.toEqual(-1)
       // Check for the `spec` properties
       expect(err.bindingKey).toEqual('test')
       oe_calls++
