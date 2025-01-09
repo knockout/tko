@@ -88,7 +88,7 @@ operators['--'].precedence = 16
 operators['&-'].precedence = 16
 
   // exponent
-operators['**'].precedent = 15
+operators['**'].precedence = 15
 
   // mul/div/remainder
 operators['%'].precedence = 14
