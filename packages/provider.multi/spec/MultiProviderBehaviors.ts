@@ -3,7 +3,6 @@ import {
   MultiProvider
 } from '../dist'
 
-import {} from "jasmine"
 import { assert } from "chai"
 
 describe('MultiProvider Behavior', function () {
