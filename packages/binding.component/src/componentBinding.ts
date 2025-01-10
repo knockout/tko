@@ -29,6 +29,12 @@ import registry from '@tko/utils.component'
 var componentLoadingOperationUniqueId = 0
 
 export default class ComponentBinding extends DescendantBindingHandler {
+  childBindingContext;
+  currentLoadingOperationId;
+  currentViewModel;
+  latestComponentName;
+  loadingOperationId;
+  originalChildNodes;
   constructor (params) {
     super(params)
     this.originalChildNodes = makeArray(
