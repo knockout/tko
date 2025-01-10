@@ -48,10 +48,10 @@ export default class AttributeMustacheProvider extends Provider {
     return !this.attributesToInterpolate(node.attributes).next().done
   }
 
-  partsTogether (parts, context, node: HTMLElement, ...valueToWrite) {
+  partsTogether (parts: any[], context: any, node: HTMLElement, ...valueToWrite: any[]) {
     if (parts.length > 1) {
       return parts
-        .map(p => unwrap(p.asAttr(context, this.globals, node))).join('')
+        .map((p: { asAttr: (arg0: any, arg1: any, arg2: HTMLElement) => any }) => unwrap(p.asAttr(context, this.globals, node))).join('')
     }
     // It may be a writeable observable e.g. value="{{ value }}".
     const part = parts[0].asAttr(context, this.globals)
@@ -59,35 +59,35 @@ export default class AttributeMustacheProvider extends Provider {
     return part
   }
 
-  attributeBinding (name, parts) {
+  attributeBinding (name: string, parts: any[]): (string | any[])[] {
     return [name, parts]
   }
 
-  * bindingParts (node: HTMLElement, context) {
+  * bindingParts (node: HTMLElement, context: any) {
     for (const attr of this.attributesToInterpolate(node.attributes)) {
       const parts = Array.from(parseInterpolation(attr.value))
       if (parts.length) { yield this.attributeBinding(attr.name, parts) }
     }
   }
 
-  getPossibleDirectBinding (attrName) {
+  getPossibleDirectBinding (attrName: string | number) {
     const bindingName = this.ATTRIBUTES_BINDING_MAP[attrName]
     return bindingName && this.bindingHandlers.get(attrName)
   }
 
-  * bindingObjects (node: HTMLElement, context) {
+  * bindingObjects (node: HTMLElement, context: any) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
       const bindingForAttribute = this.getPossibleDirectBinding(attrName)
       const handler = bindingForAttribute ? attrName : `attr.${attrName}`
       const accessorFn = bindingForAttribute
-        ? (...v) => this.partsTogether(parts, context, node, ...v)
-        : (...v) => ({[attrName]: this.partsTogether(parts, context, node, ...v)})
+        ? (...v: any) => this.partsTogether(parts, context, node, ...v)
+        : (...v: any) => ({[attrName]: this.partsTogether(parts, context, node, ...v)})
       node.removeAttribute(attrName)
       yield { [handler]: accessorFn }
     }
   }
 
-  getBindingAccessors (node: HTMLElement, context) {
+  getBindingAccessors (node: HTMLElement, context?: {}) {
     return Object.assign({}, ...this.bindingObjects(node, context))
   }
 }

@@ -71,7 +71,13 @@ export function rateLimit (target, options) {
   })
 }
 
-export var extenders = {
+interface ExtendersType{
+  notify (target, notifyWhen) 
+  deferred (target, option) 
+  rateLimit (target, options) 
+}
+
+export var extenders: ExtendersType = {
   notify: notify,
   deferred: deferred,
   rateLimit: rateLimit

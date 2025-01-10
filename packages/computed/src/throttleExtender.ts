@@ -1,10 +1,12 @@
-import {
-    extenders
-} from '@tko/observable'
+import { extenders as baseExtenders } from '@tko/observable'
+import { computed } from './computed'
 
-import {
-    computed
-} from './computed'
+interface ExtendersType{
+  notify (target, notifyWhen) 
+  deferred (target, option) 
+  rateLimit (target, options) 
+  throttle (target, timout)
+}
 
 export function throttleExtender (target, timeout) {
     // Throttling means two things:
@@ -15,7 +17,7 @@ export function throttleExtender (target, timeout) {
 
     // (2) For writable targets (observables, or writable dependent observables), we throttle *writes*
     //     so the target cannot change value synchronously or faster than a certain rate
-  var writeTimeoutInstance = null
+  var writeTimeoutInstance:NodeJS.Timeout | undefined = undefined
   return computed({
     read: target,
     write: function (value) {
@@ -26,5 +28,7 @@ export function throttleExtender (target, timeout) {
     }
   })
 }
+
+const extenders = baseExtenders as ExtendersType;
 
 extenders.throttle = throttleExtender

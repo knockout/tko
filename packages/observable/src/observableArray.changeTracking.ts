@@ -13,7 +13,7 @@ import { extenders } from './extenders'
 
 export var arrayChangeEventName = 'arrayChange'
 
-export function trackArrayChanges (target, options) {
+export function trackArrayChanges (target, options?) {
     // Use the provided options--each call to trackArrayChanges overwrites the previously set options
   target.compareArrayOptions = {}
   if (options && typeof options === 'object') {
@@ -26,7 +26,7 @@ export function trackArrayChanges (target, options) {
     return
   }
   let trackingChanges = false
-  let cachedDiff = null
+  let cachedDiff:any|null = null
   let arrayChangeSubscription
   let pendingNotifications = 0
   let underlyingNotifySubscribersFunction

@@ -79,7 +79,7 @@ export function range (min, max) {
 }
 
 // Go through the items that have been added and deleted and try to find matches between them.
-export function findMovesInArrayComparison (left, right, limitFailedCompares) {
+export function findMovesInArrayComparison (left, right, limitFailedCompares: number| boolean) {
   if (left.length && right.length) {
     var failedCompares, l, r, leftItem, rightItem
     for (failedCompares = l = 0; (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]); ++l) {
@@ -100,8 +100,12 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares) {
 const statusNotInOld = 'added'
 const statusNotInNew = 'deleted'
 
+interface Options {
+  dontLimitMoves: boolean
+}
+
     // Simple calculation based on Levenshtein distance.
-export function compareArrays (oldArray, newArray, options) {
+export function compareArrays (oldArray, newArray, options:Options|boolean) {
     // For backward compatibility, if the third arg is actually a bool, interpret
     // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
   options = (typeof options === 'boolean') ? { dontLimitMoves: options } : (options || {})

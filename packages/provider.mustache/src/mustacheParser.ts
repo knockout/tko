@@ -90,7 +90,7 @@ export function * parseOuterMatch (outerMatch) {
   yield new Text(post)
 }
 
-export function * parseInterpolation (text) {
+export function * parseInterpolation (text: string) {
   for (const textOrExpr of parseOuterMatch(text.match(OUTER_EXPRESSION))) {
     if (textOrExpr.text) { yield textOrExpr }
   }
