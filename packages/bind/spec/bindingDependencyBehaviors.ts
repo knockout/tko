@@ -46,7 +46,7 @@ describe('Binding dependencies', function () {
   })
 
   it('If the binding handler depends on an observable, invokes the init handler once and the update handler whenever a new value is available', function () {
-    var observable = new observableConstructor();
+    var observable = observableConstructor();
     var initPassedValues = new Array(), updatePassedValues = new Array();
     bindingHandlers.test = {
       init: function (element, valueAccessor) { initPassedValues.push(valueAccessor()()); },
@@ -67,7 +67,7 @@ describe('Binding dependencies', function () {
   });
 
   it('If the associated DOM element was removed by KO, handler subscriptions are disposed immediately', function () {
-    var observable = new observableConstructor('A');
+    var observable = observableConstructor('A');
     bindingHandlers.anyHandler = {
       update: function (element, valueAccessor) { valueAccessor(); }
     };
@@ -82,7 +82,7 @@ describe('Binding dependencies', function () {
   });
 
   it('If the associated DOM element was removed independently of KO, handler subscriptions are disposed on the next evaluation', function () {
-    var observable = new observableConstructor('A');
+    var observable = observableConstructor('A');
     bindingHandlers.anyHandler = {
       update: function (element, valueAccessor) { valueAccessor(); }
     };
@@ -98,7 +98,7 @@ describe('Binding dependencies', function () {
   });
 
   it('If the binding attribute involves an observable, re-invokes the bindings if the observable notifies a change', function () {
-    var observable = new observableConstructor({ message: 'hello' });
+    var observable = observableConstructor({ message: 'hello' });
     var passedValues = new Array();
     bindingHandlers.test = { update: function (element, valueAccessor) { passedValues.push(valueAccessor()); } };
     testNode.innerHTML = "<div data-bind='test: myObservable().message'></div>";
@@ -375,10 +375,11 @@ describe('Binding dependencies', function () {
       applyBindings(vm, testNode);
       expect(vm.getSubscriptionsCount()).toEqual(1);
 
-      expect(testNode.children[0].children[0].value).toEqual('My prop value');
+      const child = testNode.children[0].children[0] as HTMLInputElement;
+      expect(child.value).toEqual('My prop value');
 
-            // a change to the input value should be written to the model
-      testNode.children[0].children[0].value = 'some user-entered value';
+      // a change to the input value should be written to the model
+      child.value = 'some user-entered value';
       triggerEvent(testNode.children[0].children[0], 'change');
       expect(vm().someProp).toEqual('some user-entered value');
             // a click should use correct view model
@@ -387,10 +388,10 @@ describe('Binding dependencies', function () {
 
             // set the view-model to a new object
       vm({ someProp: observableConstructor('My new prop value'), checkVM: checkVM });
-      expect(testNode.children[0].children[0].value).toEqual('My new prop value');
+      expect(child.value).toEqual('My new prop value');
 
             // a change to the input value should be written to the new model
-      testNode.children[0].children[0].value = 'some new user-entered value';
+      child.value = 'some new user-entered value';
       triggerEvent(testNode.children[0].children[0], 'change');
       expect(vm().someProp()).toEqual('some new user-entered value');
             // a click should use correct view model
