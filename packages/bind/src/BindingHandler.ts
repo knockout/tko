@@ -4,6 +4,11 @@ import { isWriteableObservable } from '@tko/observable'
 import { LifeCycle } from '@tko/lifecycle'
 
 export class BindingHandler extends LifeCycle {
+  $context;
+  $element;
+  bindingCompletion;
+  valueAccessor;
+  completeBinding;
   constructor (params) {
     super()
     const {$element, valueAccessor, allBindings, $context} = params
@@ -18,7 +23,9 @@ export class BindingHandler extends LifeCycle {
     this.anchorTo($element)
   }
 
-  get value () { return this.valueAccessor() }
+  get value () {
+    return this.valueAccessor()
+  }
   set value (v) {
     const va = this.valueAccessor()
     if (isWriteableObservable(va)) {
@@ -39,7 +46,7 @@ export class BindingHandler extends LifeCycle {
      A binding should be complete when it has run through once, notably
      in server-side bindings for pre-rendering.
   */
-  get bindingCompleted () { return true }
+  get bindingCompleted (): any { return true }
 
   static registerAs (name, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, this)
