@@ -43,7 +43,7 @@ function getWrap (tags) {
   return (m && lookup[m[1]]) || none
 }
 
-function simpleHtmlParse (html, documentContext) {
+function simpleHtmlParse (html: string, documentContext) {
   documentContext || (documentContext = document)
   var windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
 
@@ -78,20 +78,20 @@ function simpleHtmlParse (html, documentContext) {
   return makeArray(div.lastChild.childNodes)
 }
 
-function templateHtmlParse (html, documentContext) {
+function templateHtmlParse (html: string, documentContext): ChildNode[] {
   if (!documentContext) { documentContext = document }
-  var template = documentContext.createElement('template')
+  var template = documentContext.createElement('template') as HTMLTemplateElement
   template.innerHTML = html
   return makeArray(template.content.childNodes)
 }
 
-function jQueryHtmlParse (html, documentContext) {
+function jQueryHtmlParse (html: string, documentContext: any) {
     // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
   if (jQueryInstance.parseHTML) {
     return jQueryInstance.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
   } else {
         // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-    var elems = jQueryInstance.clean([html], documentContext)
+    var elems = (jQueryInstance as any).clean([html], documentContext)
 
         // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
         // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
@@ -118,7 +118,7 @@ function jQueryHtmlParse (html, documentContext) {
  * @param  {Object} documentContext That owns the executing code.
  * @return {[DOMNode]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html, documentContext) {
+export function parseHtmlFragment (html: string , documentContext?: object): Node[] {
     // Prefer <template>-tag based HTML parsing.
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
 

@@ -66,7 +66,7 @@ export function addOrRemoveItem (array, value, included) {
   }
 }
 
-export function makeArray (arrayLikeObject) {
+export function makeArray<T=any> (arrayLikeObject:ArrayLike<T>):T[] {
   return Array.from(arrayLikeObject)
 }
 

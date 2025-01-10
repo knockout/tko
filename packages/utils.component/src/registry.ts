@@ -135,5 +135,5 @@ export var registry = {
 
   _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-  loaders: []
+  loaders: new Array()
 }
