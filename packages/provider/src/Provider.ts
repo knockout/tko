@@ -10,11 +10,11 @@ import {
 import BindingHandlerObject from './BindingHandlerObject'
 
 export interface ProviderParamsInput{
-  bindingHandlers: BindingHandlerObject;
-  globals:Global;
-  attributesToSkip:any;
-  attributesBindingMap:any;
-  providers:any;
+  bindingHandlers?: BindingHandlerObject;
+  globals?:Global;
+  attributesToSkip?:any;
+  attributesBindingMap?:any;
+  providers?:any[];
 }
 
 export default class Provider {

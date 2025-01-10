@@ -150,12 +150,13 @@ describe('Components: Custom elements', function () {
     applyBindings(viewModel, testNode)
     jasmine.Clock.tick(1)
     expect(testNode).toContainHtml('<test-component data-bind="visible: shouldshow">custom element</test-component>')
-    expect(testNode.childNodes[0].style.display).not.toBe('none')
+    const node = testNode.childNodes[0] as HTMLElement;
+    expect(node.style.display).not.toBe('none')
 
         // See that the 'visible' binding still works
     viewModel.shouldshow(false)
-    expect(testNode.childNodes[0].style.display).toBe('none')
-    expect(testNode.childNodes[0].innerHTML).toBe('custom element')
+    expect(node.style.display).toBe('none')
+    expect(node.innerHTML).toBe('custom element')
   })
 
   it('Is not possible to have regular data-bind bindings on a custom element if they also attempt to control descendants', function () {
@@ -176,7 +177,7 @@ describe('Components: Custom elements', function () {
       template: 'custom element'
     })
     testNode.innerHTML = '<test-component></test-component>'
-    var customElem = testNode.childNodes[0]
+    var customElem = testNode.childNodes[0] as HTMLElement;
     expect(customElem.tagName.toLowerCase()).toBe('test-component')
 
     applyBindings(null, customElem)
@@ -299,13 +300,14 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>'
     applyBindings({ myobservable: myobservable }, testNode)
     jasmine.Clock.tick(1)
-    var viewModelInstance = dataFor(testNode.firstChild.firstChild)
+    const node = testNode.childNodes[0].childNodes[0] as HTMLElement;
+    var viewModelInstance = dataFor(node)
     expect(testNode.firstChild).toContainText('the observable: 1')
 
         // See the observable instance can mutate, without causing the component to tear down
     myobservable(2)
     expect(testNode.firstChild).toContainText('the observable: 2')
-    expect(dataFor(testNode.firstChild.firstChild)).toBe(viewModelInstance) // Didn't create a new instance
+    expect(dataFor(node)).toBe(viewModelInstance) // Didn't create a new instance
     expect(viewModelInstance.wasDisposed).not.toBe(true)
   })
 
@@ -340,7 +342,8 @@ describe('Components: Custom elements', function () {
     applyBindings(rootViewModel, testNode)
     jasmine.Clock.tick(1)
     expect(testNode.firstChild).toContainText('the string reversed: ahplA')
-    var componentViewModelInstance = dataFor(testNode.firstChild.firstChild)
+    const node = testNode.childNodes[0].childNodes[0] as HTMLElement;
+    var componentViewModelInstance = dataFor(node)
     expect(constructorCallCount).toBe(1)
     expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1)
 
@@ -349,7 +352,7 @@ describe('Components: Custom elements', function () {
     rootViewModel.myobservable('Beta')
     expect(testNode.firstChild).toContainText('the string reversed: ateB')
     expect(constructorCallCount).toBe(1)
-    expect(dataFor(testNode.firstChild.firstChild)).toBe(componentViewModelInstance) // No new viewmodel needed
+    expect(dataFor(node)).toBe(componentViewModelInstance) // No new viewmodel needed
     expect(componentViewModelInstance.wasDisposed).not.toBe(true)
     expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1) // No extra subscription needed
 
@@ -394,35 +397,36 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = '<test-component params="somevalue: outer().inner"></test-component>'
     applyBindings({ outer: outerObservable }, testNode)
     jasmine.Clock.tick(1)
-    expect(testNode.childNodes[0].childNodes[0].value).toEqual('inner1')
+    const node = testNode.childNodes[0].childNodes[0] as HTMLInputElement;
+    expect(node.value).toEqual('inner1')
     expect(outerObservable.getSubscriptionsCount()).toBe(1)
     expect(innerObservable.getSubscriptionsCount()).toBe(1)
     expect(constructorCallCount).toBe(1)
 
         // See we can mutate the inner value and see the result show up
     innerObservable('inner2')
-    expect(testNode.childNodes[0].childNodes[0].value).toEqual('inner2')
+    expect(node.value).toEqual('inner2')
     expect(outerObservable.getSubscriptionsCount()).toBe(1)
     expect(innerObservable.getSubscriptionsCount()).toBe(1)
     expect(constructorCallCount).toBe(1)
 
         // See that we can mutate the observable from within the component
-    testNode.childNodes[0].childNodes[0].value = 'inner3'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    node.value = 'inner3'
+    triggerEvent(node, 'change')
     expect(innerObservable()).toEqual('inner3')
 
         // See we can mutate the outer value and see the result show up (cleaning subscriptions to the old inner value)
     var newInnerObservable = observable('newinner')
     outerObservable({ inner: newInnerObservable })
-    expect(testNode.childNodes[0].childNodes[0].value).toEqual('newinner')
+    expect(node.value).toEqual('newinner')
     expect(outerObservable.getSubscriptionsCount()).toBe(1)
     expect(innerObservable.getSubscriptionsCount()).toBe(0)
     expect(newInnerObservable.getSubscriptionsCount()).toBe(1)
     expect(constructorCallCount).toBe(1)
 
         // See that we can mutate the new observable from within the component
-    testNode.childNodes[0].childNodes[0].value = 'newinner2'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    node.value = 'newinner2'
+    triggerEvent(node, 'change')
     expect(newInnerObservable()).toEqual('newinner2')
     expect(innerObservable()).toEqual('inner3')    // original one hasn't changed
 
@@ -570,9 +574,10 @@ describe('Components: Custom elements', function () {
 
     jasmine.Clock.tick(1)
     expect(testNode.childNodes[0]).toContainText('Cheeses')
-    expect(testNode.childNodes[1].childNodes[0].tagName.toLowerCase()).toEqual('ul')
-    expect(testNode.childNodes[1].childNodes[0].className).toEqual('my-special-list')
-    expect(testNode.childNodes[1].childNodes[0]).toContainHtml(
+    const node = testNode.childNodes[1].childNodes[0] as HTMLElement
+    expect(node.tagName.toLowerCase()).toEqual('ul')
+    expect(node.className).toEqual('my-special-list')
+    expect(node).toContainHtml(
             '<li data-bind="template: { nodes: $component.supplieditemtemplate }">' +
           '<em data-bind="text: name">brie</em> has quality <em data-bind="text: quality">7</em>' +
           '</li>' +
