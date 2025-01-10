@@ -62,7 +62,7 @@ function beginLoadingComponent (componentName, callback) {
   })
 }
 
-function getFirstResultFromLoaders (methodName, argsExceptCallback, callback, candidateLoaders) {
+function getFirstResultFromLoaders (methodName, argsExceptCallback, callback, candidateLoaders?) {
     // On the first call in the stack, start with the full set of loaders
   if (!candidateLoaders) {
     candidateLoaders = registry.loaders.slice(0) // Use a copy, because we'll be mutating this array

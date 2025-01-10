@@ -73,7 +73,7 @@ export class ComponentABC extends LifeCycle {
    * @param {Object} params
    * @param {{element: HTMLElement, templateNodes: [HTMLElement]}} componentInfo
    */
-  static [VIEW_MODEL_FACTORY] (params, componentInfo) {
+  static [VIEW_MODEL_FACTORY] (params: object, componentInfo: ComponentInfo): ComponentABC {
     return new this(params, componentInfo)
   }
 
@@ -83,4 +83,8 @@ export class ComponentABC extends LifeCycle {
     const synchronous = this.sync
     register(name, { viewModel, template, synchronous })
   }
+}
+interface ComponentInfo{
+  element: HTMLElement;
+  templateNodes: HTMLElement[];
 }
