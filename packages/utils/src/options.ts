@@ -1,5 +1,9 @@
 declare var jQuery : any
 
+interface CustomBindingGlobalProperties {
+  String;
+  isObservable;
+}
 
 //
 // This becomes ko.options
@@ -21,8 +25,9 @@ class OptionsClass {
     // Enable/disable <!-- ko binding: ... -> style bindings
   allowVirtualElements: boolean = true
 
+
     // Global variables that can be accessed from bindings.
-  bindingGlobals: Object = Object.create(null)
+  bindingGlobals: Object & CustomBindingGlobalProperties = Object.create(null)
 
     // An instance of the binding provider.
   bindingProviderInstance: Object | any = null

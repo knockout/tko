@@ -11,7 +11,7 @@ import BindingHandlerObject from './BindingHandlerObject'
 
 export interface ProviderParamsInput{
   bindingHandlers?: BindingHandlerObject;
-  globals?:Global;
+  globals?:any;
   attributesToSkip?:any;
   attributesBindingMap?:any;
   providers?:any[];
