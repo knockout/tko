@@ -91,7 +91,7 @@ describe('filters', function () {
   })
 
   describe('root', () => {
-    let _testRoot = null
+    let _testRoot : any = null
     options.filters.setRoot = function (v) {
       _testRoot = this
     }
@@ -107,7 +107,8 @@ describe('filters', function () {
       const ourRoot = ctxStub({v: 'tt'})
       const p = new Parser().parse('b: v | uppercase | setRoot', ourRoot)
       p.b()
-      assert.strictEqual(_testRoot.lookup, ourRoot.lookup)
+      assert.notEqual(_testRoot, null)
+      assert.strictEqual(_testRoot?.lookup, ourRoot.lookup)
     })
   })
 })
