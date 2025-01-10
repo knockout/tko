@@ -9,8 +9,16 @@ import {
 
 import BindingHandlerObject from './BindingHandlerObject'
 
+export interface ProviderParamsInput{
+  bindingHandlers: BindingHandlerObject;
+  globals:Global;
+  attributesToSkip:any;
+  attributesBindingMap:any;
+  providers:any;
+}
+
 export default class Provider {
-  constructor (params = {}) {
+  constructor (params: ProviderParamsInput | null = null) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')
     }
@@ -19,8 +27,8 @@ export default class Provider {
       // node.nodeType's that the provider handles.
       throw new Error('Providers must have FOR_NODE_TYPES property')
     }
-    this.bindingHandlers = params.bindingHandlers || new BindingHandlerObject()
-    this.globals = params.globals || {}
+    this.bindingHandlers = params?.bindingHandlers || new BindingHandlerObject()
+    this.globals = params?.globals || {}
   }
 
   setGlobals (globals) {

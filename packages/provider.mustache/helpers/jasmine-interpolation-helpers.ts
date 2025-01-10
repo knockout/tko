@@ -4,7 +4,7 @@ import {
 } from '@tko/utils';
 
 
-jasmine.setNodeText = function(node, text) {
+jasmine.setNodeText = function(node, text:string) {
     'textContent' in node ? node.textContent = text : node.innerText = text;
 };
 

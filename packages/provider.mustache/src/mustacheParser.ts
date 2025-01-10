@@ -8,7 +8,8 @@ const OUTER_EXPRESSION = /^([\s\S]*?)\{\{([\s\S]*)}}([\s\S]*)$/
 const BINDING_EXPRESSION = /^([^,"'{}()/:[\]\s]+)\s+([^\s:].*)/
 
 class Interpolated {
-  constructor (text) {
+  text: string
+  constructor (text:string) {
     this.text = text
   }
 

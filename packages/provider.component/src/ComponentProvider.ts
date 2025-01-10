@@ -50,7 +50,7 @@ export default class ComponentProvider extends Provider {
     return Boolean(this.getComponentNameForNode(node))
   }
 
-  getBindingAccessors (node, context) {
+  getBindingAccessors (node: HTMLElement, context) {
     const componentName = this.getComponentNameForNode(node)
     if (!componentName) { return }
     const component = () => ({
@@ -60,7 +60,7 @@ export default class ComponentProvider extends Provider {
     return { component }
   }
 
-  getComponentNameForNode (node) {
+  getComponentNameForNode (node: HTMLElement) {
     if (node.nodeType !== node.ELEMENT_NODE) { return }
     const tagName = tagNameLower(node)
     if (registry.isRegistered(tagName)) {
@@ -70,8 +70,8 @@ export default class ComponentProvider extends Provider {
     }
   }
 
-  getComponentParams (node, context) {
-    const parser = new Parser(node, context, this.globals)
+  getComponentParams (node: HTMLElement, context) {
+    const parser = new (Parser as any)(node, context, this.globals) as Parser
     const paramsString = (node.getAttribute('params') || '').trim()
     const accessors = parser.parse(paramsString, context, undefined, node)
     if (!accessors || Object.keys(accessors).length === 0) {
@@ -84,7 +84,7 @@ export default class ComponentProvider extends Provider {
     return Object.assign({ $raw }, params)
   }
 
-  makeParamValue (node, paramValueComputed) {
+  makeParamValue (node: HTMLElement, paramValueComputed) {
     const paramValue = paramValueComputed.peek()
     // Does the evaluation of the parameter value unwrap any observables?
     if (!paramValueComputed.isActive()) {

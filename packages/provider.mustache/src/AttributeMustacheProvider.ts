@@ -10,6 +10,7 @@ import {
 import {
   parseInterpolation
 } from './mustacheParser'
+import { ProviderParamsInput } from 'packages/provider/src/Provider'
 
 /**
  * These are bindings that are mapped specific attributes, such as
@@ -26,26 +27,28 @@ const DEFAULT_ATTRIBUTE_BINDING_MAP = {
  *  Interpret {{ }} inside DOM attributes e.g. <div class='{{ classes }}'>
  */
 export default class AttributeMustacheProvider extends Provider {
+  ATTRIBUTES_TO_SKIP: Set<string>
+  ATTRIBUTES_BINDING_MAP: any
   get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
 
-  constructor (params = {}) {
+  constructor (params:ProviderParamsInput|null = null) {
     super(params)
-    this.ATTRIBUTES_TO_SKIP = new Set(params.attributesToSkip || ['data-bind'])
-    this.ATTRIBUTES_BINDING_MAP = params.attributesBindingMap || DEFAULT_ATTRIBUTE_BINDING_MAP
+    this.ATTRIBUTES_TO_SKIP = new Set(params?.attributesToSkip || ['data-bind'])
+    this.ATTRIBUTES_BINDING_MAP = params?.attributesBindingMap || DEFAULT_ATTRIBUTE_BINDING_MAP
   }
 
-  * attributesToInterpolate (attributes) {
+  * attributesToInterpolate (attributes: NamedNodeMap) {
     for (const attr of Array.from(attributes)) {
       if (this.ATTRIBUTES_TO_SKIP.has(attr.name)) { continue }
       if (attr.specified && attr.value.includes('{{')) { yield attr }
     }
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node: HTMLElement) {
     return !this.attributesToInterpolate(node.attributes).next().done
   }
 
-  partsTogether (parts, context, node, ...valueToWrite) {
+  partsTogether (parts, context, node: HTMLElement, ...valueToWrite) {
     if (parts.length > 1) {
       return parts
         .map(p => unwrap(p.asAttr(context, this.globals, node))).join('')
@@ -60,7 +63,7 @@ export default class AttributeMustacheProvider extends Provider {
     return [name, parts]
   }
 
-  * bindingParts (node, context) {
+  * bindingParts (node: HTMLElement, context) {
     for (const attr of this.attributesToInterpolate(node.attributes)) {
       const parts = Array.from(parseInterpolation(attr.value))
       if (parts.length) { yield this.attributeBinding(attr.name, parts) }
@@ -72,7 +75,7 @@ export default class AttributeMustacheProvider extends Provider {
     return bindingName && this.bindingHandlers.get(attrName)
   }
 
-  * bindingObjects (node, context) {
+  * bindingObjects (node: HTMLElement, context) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
       const bindingForAttribute = this.getPossibleDirectBinding(attrName)
       const handler = bindingForAttribute ? attrName : `attr.${attrName}`
@@ -84,7 +87,7 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  getBindingAccessors (node, context) {
+  getBindingAccessors (node: HTMLElement, context) {
     return Object.assign({}, ...this.bindingObjects(node, context))
   }
 }

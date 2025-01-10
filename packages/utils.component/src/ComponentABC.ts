@@ -74,7 +74,7 @@ export class ComponentABC extends LifeCycle {
    * @param {{element: HTMLElement, templateNodes: [HTMLElement]}} componentInfo
    */
   static [VIEW_MODEL_FACTORY] (params: object, componentInfo: ComponentInfo): ComponentABC {
-    return new this(params, componentInfo)
+    return new (this as any)(params, componentInfo)
   }
 
   static register (name = this.customElementName) {
