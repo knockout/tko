@@ -74,10 +74,29 @@ export class ForEachBinding extends AsyncBindingHandler {
   //    observableArray([])
   //    computed
   //    {data: array, name: string, as: string}
+  afterAdd;
+  allBindings;
+  static animateFrame;
+  as;
+  beforeRemove;
+  container;
+  changeSubs: any;
+  data;
+  generateContext;
+  $indexHasBeenRequested: boolean;
+  templateNode;
+  changeQueue: any[];
+  firstLastNodesList: any[];
+  indexesToDelete: any[];
+  isNotEmpty: any;
+  rendering_queued: boolean;
+  pendingDeletes: any[];
+  afterQueueFlush;
+  beforeQueueFlush;
 
   constructor (params) {
     super(params)
-    const settings = {}
+    const settings: any = {}
     if (isPlainObject(this.value)) {
       Object.assign(settings, this.value)
     }
@@ -93,7 +112,7 @@ export class ForEachBinding extends AsyncBindingHandler {
 
     this.templateNode = makeTemplateNode(
       settings.templateNode || (settings.name
-        ? document.getElementById(settings.name).cloneNode(true)
+        ? document.getElementById(settings.name)?.cloneNode(true)
         : this.$element)
     )
 
@@ -126,9 +145,9 @@ export class ForEachBinding extends AsyncBindingHandler {
 
     // Watch for changes
     if (isObservable(this.data)) {
-      if (!this.data.indexOf) {
+      if (!(this.data as any).indexOf) {
         // Make sure the observable is trackable.
-        this.data = this.data.extend({ trackArrayChanges: true })
+        this.data = (this.data as any).extend({ trackArrayChanges: true })
       }
       this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange')
     }
@@ -143,7 +162,7 @@ export class ForEachBinding extends AsyncBindingHandler {
 
   // If the array changes we register the change.
   onArrayChange (changeSet, isInitial) {
-    var changeMap = {
+    var changeMap: { added: any[], deleted: any[] } = {
       added: [],
       deleted: []
     }
@@ -155,7 +174,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     // because of this, when checking for possible batch additions, any delete can be between to adds with neighboring indexes, so only additions should be checked
     for (var i = 0, len = changeSet.length; i < len; i++) {
       if (changeMap.added.length && changeSet[i].status === 'added') {
-        var lastAdd = changeMap.added[changeMap.added.length - 1]
+        var lastAdd: any = changeMap.added[changeMap.added.length - 1]
         var lastIndex = lastAdd.isBatch ? lastAdd.index + lastAdd.values.length - 1 : lastAdd.index
         if (lastIndex + 1 === changeSet[i].index) {
           if (!lastAdd.isBatch) {
@@ -357,7 +376,7 @@ export class ForEachBinding extends AsyncBindingHandler {
    */
   activeChildElement (node) {
     var active = document.activeElement
-    if (domNodeIsContainedBy(active, node)) {
+    if (domNodeIsContainedBy(active!, node)) {
       return active
     }
   }
@@ -366,7 +385,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     let frag
     let len
     let i
-    let active = null
+    let active: any = null
     let containerNode = this.$element
 
     // Poor man's node and array check.
