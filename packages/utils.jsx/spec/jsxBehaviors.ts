@@ -378,7 +378,7 @@ describe('jsx', function () {
     // The JSX preprocessor can generate sparse arrays with e.g.
     //  <div>{/* thing */}</div>
     const parent = document.createElement('div')
-    const jsx = new Array()
+    const jsx: string[] = []
     jsx[0] = 'a'
     jsx[1] = 'b'
     const jo = new JsxTestObserver(jsx, parent)

@@ -4,6 +4,8 @@ import {
 } from '../dist'
 import { assert } from 'chai';
 
+import { assert } from "chai";
+
 describe('Function Rewrite Provider', function () {
   describe('replaceFunctionStrings', function () {
     const tryExpect = {

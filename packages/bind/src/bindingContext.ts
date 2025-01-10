@@ -25,7 +25,7 @@ export interface BindingContextSetting {
 
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, settings? : BindingContextSetting) {
+export function bindingContext (dataItemOrAccessor, parentContext?, dataItemAlias?, extendCallback?, settings? : BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor

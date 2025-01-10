@@ -40,8 +40,6 @@ describe('Parser Namespace', function () {
     assert.deepEqual(p.on(), expect)
   }
 
-  it.skip('Should call bindings with a period e.g. x.y') // ?
-
   it('namespace.attr returns an object', function () {
     trial({v: 't'}, 'on.p: v', { p: 't' })
   })
