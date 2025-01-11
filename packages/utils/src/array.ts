@@ -43,7 +43,7 @@ export function arrayGetDistinctValues (array = new Array()) {
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
-export function arrayFilter (array, predicate, thisArg) {
+export function arrayFilter (array, predicate, thisArg?) {
   if (arguments.length > 2) { predicate = predicate.bind(thisArg) }
   return array === null ? [] : (isArray(array) ? array : [...array]).filter(predicate)
 }

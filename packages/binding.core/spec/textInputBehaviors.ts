@@ -255,8 +255,13 @@ describe('Binding: TextInput', function () {
     expect(myobservable()).toEqual('some user-entered value')
   })
 
+  interface ModelType {
+    writtenValue: string | undefined;
+    someProp: string | undefined;
+  }
+
   it('Should write only changed values to model', function () {
-    var model = { writtenValue: '' }
+    var model : ModelType = { writtenValue: '', someProp: undefined }
 
     testNode.innerHTML = "<input data-bind='textInput: writtenValue' />"
     applyBindings(model, testNode)
@@ -356,7 +361,7 @@ describe('Binding: TextInput', function () {
       })
 
       it('Should update model property using earliest available event', function () {
-        var model = { someProp: '123' }
+        var model : ModelType = { someProp: '123', writtenValue: undefined }
         testNode.innerHTML = "<input data-bind='textInput:someProp' />"
         applyBindings(model, testNode)
 

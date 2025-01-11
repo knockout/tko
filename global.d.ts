@@ -1151,6 +1151,8 @@ declare global {
             toContainHtml(expectedHtml: any, postProcessCleanedHtml: any): boolean
             toHaveSelectedValues(expectedValues: any): boolean
             toContainHtml(expectedValues: any): boolean
+            toHaveNodeTypes  (expectedTypes: any): boolean
+            toContainHtmlElementsAndText (expectedHtml : any) : boolean
         }
 
         interface Clock {

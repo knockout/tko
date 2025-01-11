@@ -188,9 +188,9 @@ describe('Identifier', function () {
     })
 
     it('sets `this` of a top-level item to $data', function () {
-      options.bindingGlobals = {
+      options.bindingGlobals = Object.create({
         Ramanujan: '1729'
-      }
+      })
       var div = document.createElement('div'),
         context = {
           fn: function () {

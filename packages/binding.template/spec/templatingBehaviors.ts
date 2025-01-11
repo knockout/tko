@@ -38,7 +38,7 @@ describe('Templating', function () {
   beforeEach(jasmine.prepareTestNode)
 
   beforeEach(function () {
-    options.bindingGlobals = {}
+    options.bindingGlobals = Object.create(null)
       // Set up the default binding handlers.
     var provider = new MultiProvider({
       providers: [new DataBindProvider(), new VirtualProvider()],

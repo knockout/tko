@@ -76,7 +76,7 @@ describe('Parser Namespace', function () {
     })
 
     it('Should set css.classname', function () {
-      var observable1 = new observable();
+      var observable1 = observable();
       node.innerHTML = "<div data-bind='css.myRule: someModelProperty'>Hallo</div>";
       applyBindings({ someModelProperty: observable1 }, node);
 
@@ -86,7 +86,7 @@ describe('Parser Namespace', function () {
     })
 
     it('Should set style with style.stylename', function () {
-      var myObservable = new observable('red');
+      var myObservable = observable('red');
       node.innerHTML = "<div data-bind='style.backgroundColor: colorValue'>Hallo</div>";
       applyBindings({ colorValue: myObservable }, node);
 

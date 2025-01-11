@@ -67,7 +67,7 @@ describe('Components: Default loader', function () {
 
     waitsFor(function () {
       return didComplete
-    }, 100)
+    }, "timeout", 100)
   })
 
   it('getConfig supplies null for unknown components', function () {
@@ -80,7 +80,7 @@ describe('Components: Default loader', function () {
 
     waitsFor(function () {
       return didComplete
-    }, 100)
+    }, "timeout", 100)
   })
 
   it('Can load a template and viewmodel simultaneously', function () {
@@ -548,7 +548,7 @@ describe('Components: Default loader', function () {
 
     waitsFor(function () {
       return didComplete
-    }, 1000)
+    }, "timeout", 1000)
   }
 
   function testTemplateFromElement (wrapperMarkup, elementId, extraAssertsCallback) {

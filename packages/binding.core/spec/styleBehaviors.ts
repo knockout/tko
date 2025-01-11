@@ -28,7 +28,7 @@ describe('Binding: CSS style', function () {
   })
 
   it('Should be able to use standard CSS style name (rather than JavaScript name)', function () {
-    var myObservable = new observable('red')
+    var myObservable = observable('red')
     testNode.innerHTML = "<div data-bind='style: { \"background-color\": colorValue }'>Hallo</div>"
     applyBindings({ colorValue: myObservable }, testNode)
     var divEl = testNode.children[0] as HTMLDivElement

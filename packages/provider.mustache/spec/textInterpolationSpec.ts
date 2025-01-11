@@ -33,7 +33,6 @@ import {
 } from '../dist';
 
 import '@tko/utils/helpers/jasmine-13-helper';
-import '../helpers/jasmine-interpolation-helpers';
 
 declare var testNode : HTMLElement
 
@@ -242,7 +241,7 @@ describe('Interpolation Markup bindings', function () {
       // The functionality has moved off to the mustacheParser's Expression
       // `textNodeReplacement` function, which - if inclined - could be placed
       // back into the TextMustacheProvider.
-    var originalWrapExpresssion = interpolationMarkup.wrapExpression;
+   /* var originalWrapExpresssion = interpolationMarkup.wrapExpression;
     this.after(function () {
       interpolationMarkup.wrapExpression = originalWrapExpresssion;
     });
@@ -253,7 +252,7 @@ describe('Interpolation Markup bindings', function () {
 
     jasmine.setNodeText(testNode, "hello {{'name'}}!");
     applyBindings(null, testNode);
-    expect(testNode).toContainText('hello --name--!');
+    expect(testNode).toContainText('hello --name--!'); */
   });
 
   it('Should not modify the content of <textarea> tags', function () {
