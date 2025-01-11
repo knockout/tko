@@ -34,9 +34,10 @@ describe('Binding: Visible', function () {
       myModelProperty: myObservable
     }, testNode)
 
-    expect(testNode.childNodes[0].style.display).toEqual('none')
+    var node = (testNode.childNodes[0] as HTMLElement)
+    expect(node.style.display).toEqual('none')
     myObservable(true)
-    expect(testNode.childNodes[0].style.display).toEqual('')
+    expect(node.style.display).toEqual('')
   })
 
   it('Visible should unwrap observables implicitly', function () {
@@ -45,7 +46,8 @@ describe('Binding: Visible', function () {
     applyBindings({
       myModelProperty: myObservable
     }, testNode)
-    expect(testNode.childNodes[0].style.display).toEqual('none')
+    var node = (testNode.childNodes[0] as HTMLElement)
+    expect(node.style.display).toEqual('none')
   })
 
   it('Hidden means the node is only visible when the value is false', function () {
@@ -55,9 +57,10 @@ describe('Binding: Visible', function () {
       myModelProperty: myObservable
     }, testNode)
 
-    expect(testNode.childNodes[0].style.display).toEqual('')
+    var node = (testNode.childNodes[0] as HTMLElement)
+    expect(node.style.display).toEqual('')
     myObservable(true)
-    expect(testNode.childNodes[0].style.display).toEqual('none')
+    expect(node.style.display).toEqual('none')
   })
 
   it('Hidden should unwrap observables implicitly', function () {
@@ -66,6 +69,8 @@ describe('Binding: Visible', function () {
     applyBindings({
       myModelProperty: myObservable
     }, testNode)
-    expect(testNode.childNodes[0].style.display).toEqual('none')
+
+    var node = (testNode.childNodes[0] as HTMLElement)
+    expect(node.style.display).toEqual('none')
   })
 })

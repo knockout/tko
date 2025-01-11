@@ -76,13 +76,6 @@ jasmine.browserSupportsProtoAssignment = { __proto__: [] } instanceof Array;
 
 jasmine.ieVersion = ieVersion;
 
-
-
-import {
-    arrayMap
-} from '@tko/utils';
-
-
 jasmine.setNodeText = function(node, text:string) {
     'textContent' in node ? node.textContent = text : node.innerText = text;
 };
