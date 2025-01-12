@@ -214,8 +214,9 @@ describe('Binding: Using', function () {
     expect(testNode.childNodes[0]).toHaveValues(['one'])
 
         // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'two'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    var inputElement = testNode?.childNodes[0]?.childNodes[0] as HTMLInputElement
+    inputElement.value = 'two'
+    triggerEvent(inputElement, 'change')
     expect(item()).toEqual('two')
 
         // Should update the input when the observable changes

@@ -383,19 +383,18 @@ describe('Binding: Checked', function () {
         testNode.innerHTML = "<input type='radio' data-bind='checked:someProp, " + binding + ":true' />" +
                       "<input type='radio' data-bind='checked:someProp, " + binding + ":false' />"
         applyBindings({ someProp: myobservable }, testNode)
-
         
         expect(myobservable()).toEqual(false)
 
-                  // Check initial state
+        // Check initial state
         expect(testNode).toHaveCheckedStates([false, true])
-
-                  // Update observable; verify elements
+        // Update observable; verify elements
         myobservable(true)
         expect(testNode).toHaveCheckedStates([true, false])
 
-                  // "Click" a button; verify observable and elements
-        testNode.childNodes[1].click()
+        // "Click" a button; verify observable and elements
+        var inputElement = testNode.children[1] as HTMLInputElement;
+        inputElement.click()
         expect(myobservable()).toEqual(false)
         expect(testNode).toHaveCheckedStates([false, true])
       })
@@ -457,13 +456,15 @@ describe('Binding: Checked', function () {
           myobservable(true)
           expect(testNode).toHaveCheckedStates([true, false])
 
-                      // "check" a box; verify observable and elements
-          testNode.childNodes[1].click()
+          var inputElement = testNode.children[1] as HTMLInputElement;
+
+          // "check" a box; verify observable and elements
+          inputElement.click()
           expect(myobservable()).toEqual(false)
           expect(testNode).toHaveCheckedStates([false, true])
 
-                      // "uncheck" a box; verify observable and elements
-          testNode.childNodes[1].click()
+          // "uncheck" a box; verify observable and elements
+          inputElement.click()
           expect(myobservable()).toEqual(undefined)
           expect(testNode).toHaveCheckedStates([false, false])
         })

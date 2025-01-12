@@ -171,7 +171,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should automatically update value when a dependency changes', function () {
-    var observableInstance = new observable(1)
+    var observableInstance = observable(1)
     var dependantObservable = computed(function () { return observableInstance() + 1 })
     expect(dependantObservable()).toEqual(2)
 
@@ -200,8 +200,8 @@ describe('Dependent Observable', function () {
   })
 
   it('Should unsubscribe from previous dependencies each time a dependency changes', function () {
-    var observableA = new observable('A')
-    var observableB = new observable('B')
+    var observableA = observable('A')
+    var observableB = observable('B')
     var observableToUse = 'A'
     var timesEvaluated = 0
     var dependantObservable = computed(function () {
@@ -229,7 +229,7 @@ describe('Dependent Observable', function () {
 
   it('Should notify subscribers of changes', function () {
     var notifiedValue
-    var observableInstance = new observable(1)
+    var observableInstance = observable(1)
     var dependantObservable = computed(function () { return observableInstance() + 1 })
     dependantObservable.subscribe(function (value) { notifiedValue = value })
 
@@ -239,7 +239,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should notify "spectator" subscribers about changes', function () {
-    var obs = new observable()
+    var obs = observable()
     var comp = computed(() => obs())
     var notifiedValues = new Array()
     comp.subscribe(function (value) {
@@ -253,7 +253,7 @@ describe('Dependent Observable', function () {
 
   it('Should notify "beforeChange" subscribers before changes', function () {
     var notifiedValue
-    var observableInstance = new observable(1)
+    var observableInstance = observable(1)
     var dependantObservable = computed(function () { return observableInstance() + 1 })
     dependantObservable.subscribe(function (value) { notifiedValue = value }, null, 'beforeChange')
 
@@ -265,7 +265,7 @@ describe('Dependent Observable', function () {
 
   it('Should only update once when each dependency changes, even if evaluation calls the dependency multiple times', function () {
     var notifiedValues = new Array()
-    var observableInstance = new observable()
+    var observableInstance = observable()
     var dependantObservable = computed(function () { return observableInstance() * observableInstance() })
     dependantObservable.subscribe(function (value) { notifiedValues.push(value) })
     observableInstance(2)
@@ -274,7 +274,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should be able to chain computed observables', function () {
-    var underlyingObservable = new observable(1)
+    var underlyingObservable = observable(1)
     var computed1 = computed(function () { return underlyingObservable() + 1 })
     var computed2 = computed(function () { return computed1() + 1 })
     expect(computed2()).toEqual(3)
@@ -284,7 +284,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should be able to use \'peek\' on a computed observable to avoid a dependency', function () {
-    var underlyingObservable = new observable(1)
+    var underlyingObservable = observable(1)
     var computed1 = computed(function () { return underlyingObservable() + 1 })
     var computed2 = computed(function () { return computed1.peek() + 1 })
     expect(computed2()).toEqual(3)
@@ -305,7 +305,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should dispose and not call its evaluator function when the disposeWhen function returns true', function () {
-    var underlyingObservable = new observable(100)
+    var underlyingObservable = observable(100)
     var timeToDispose = false
     var timesEvaluated = 0
     var computedInstance = computed(

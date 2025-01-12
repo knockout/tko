@@ -439,7 +439,7 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0].childNodes[1]).toContainText('(Val: B1, Parents: 2, Rootval: ROOTVAL)(Val: B2, Parents: 2, Rootval: ROOTVAL)')
 
         // Verify we can access them later
-    var firstInnerTextNode = testNode.childNodes[0].childNodes[0].childNodes[1]
+    var firstInnerTextNode = testNode.childNodes[0].childNodes[0].childNodes[1] as HTMLElement
     expect(firstInnerTextNode.nodeType).toEqual(1) // The first span associated with A1
     expect(dataFor(firstInnerTextNode)).toEqual('A1')
     expect(contextFor(firstInnerTextNode).$parent.children()[2]).toEqual('A3')
@@ -484,7 +484,7 @@ describe('Binding: Foreach', function () {
     expect(testNode).toContainText('(Val: A1, Parents: 2, Rootval: ROOTVAL)(Val: A2, Parents: 2, Rootval: ROOTVAL)(Val: A3, Parents: 2, Rootval: ROOTVAL)(Val: B1, Parents: 2, Rootval: ROOTVAL)(Val: B2, Parents: 2, Rootval: ROOTVAL)')
 
         // Verify we can access them later
-    var firstInnerSpan = testNode.childNodes[3]
+    var firstInnerSpan = testNode.childNodes[3] as HTMLSpanElement
     expect(firstInnerSpan).toContainText('A1') // It is the first span bound in the context of A1
     expect(dataFor(firstInnerSpan)).toEqual('A1')
     expect(contextFor(firstInnerSpan).$parent.children()[2]).toEqual('A3')
