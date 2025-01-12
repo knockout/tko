@@ -66,8 +66,13 @@ describe('Observable Array', function () {
     expect(notifiedValues[0][1]).toEqual('Y')
   })
 
+  interface MyModel {
+    _destroy : any
+  }
+
   it('Should be able to mark single items as destroyed', function () {
-    var x = {}, y = {}
+    var x : MyModel = { _destroy : null}
+    var y : MyModel = { _destroy : null}
     testObservableArray([x, y])
     testObservableArray.destroy(y)
     expect(testObservableArray().length).toEqual(2)
@@ -76,7 +81,10 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark multiple items as destroyed', function () {
-    var x = {}, y = {}, z = {}
+    var x : MyModel = { _destroy : null}
+    var y : MyModel = { _destroy : null}
+    var z : MyModel = { _destroy : null}
+
     testObservableArray([x, y, z])
     testObservableArray.destroyAll([x, z])
     expect(testObservableArray().length).toEqual(3)
@@ -95,7 +103,10 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark all items as destroyed by passing no args to destroyAll()', function () {
-    var x = {}, y = {}, z = {}
+    var x : MyModel = { _destroy : null}
+    var y : MyModel = { _destroy : null}
+    var z : MyModel = { _destroy : null}
+
     testObservableArray([x, y, z])
     testObservableArray.destroyAll()
     expect(testObservableArray().length).toEqual(3)
@@ -249,7 +260,10 @@ describe('Observable Array', function () {
   })
 
   it('Should notify subscribers after marking items as destroyed', function () {
-    var x = {}, y = {}, didNotify = false
+    var x : MyModel = { _destroy : null}
+    var y : MyModel = { _destroy : null}
+    var didNotify = false
+
     testObservableArray([x, y])
     testObservableArray.subscribe(function (/* value */) {
       expect(x._destroy).toEqual(undefined)
@@ -261,7 +275,10 @@ describe('Observable Array', function () {
   })
 
   it('Should notify "beforeChange" subscribers before marking items as destroyed', function () {
-    var x = {}, y = {}, didNotify = false
+    var x : MyModel = { _destroy : null}
+    var y : MyModel = { _destroy : null}
+    var didNotify = false
+
     testObservableArray([x, y])
     testObservableArray.subscribe(function (/* value */) {
       expect(x._destroy).toEqual(undefined)
