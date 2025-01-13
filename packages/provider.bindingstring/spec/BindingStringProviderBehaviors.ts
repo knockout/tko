@@ -3,6 +3,8 @@ import {
   BindingStringProvider
 } from '../dist'
 
+import { assert } from "chai"
+
 describe('Binding String Provider behavior', function () {
   describe('getBindingAccessors', function () {
     it('parses the given string', function () {

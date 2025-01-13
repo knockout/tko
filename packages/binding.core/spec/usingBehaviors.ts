@@ -157,7 +157,7 @@ describe('Binding: Using', function () {
     testNode.innerHTML = "<div data-bind='using: someitem'>" +
             "<div data-bind='foreach: childprop'><span data-bind='text: $data'></span></div></div>"
 
-    var childprop = observableArray([])
+    var childprop = observableArray(new Array())
     var someitem = observable({childprop: childprop})
     var viewModel = {someitem: someitem}
     applyBindings(viewModel, testNode)
