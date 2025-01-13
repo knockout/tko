@@ -15,7 +15,7 @@ let uniqueId = 0
  * on the node. See https://github.com/knockout/knockout/issues/2141
  */
 const modern = {
-  getDataForNode (node : Node, createIfNotFound: boolean) {
+  getDataForNode (node : Node|Comment, createIfNotFound: boolean) {
     let dataForNode = node[dataStoreSymbol]
     if (!dataForNode && createIfNotFound) {
       dataForNode = node[dataStoreSymbol] = {}
@@ -37,7 +37,7 @@ const modern = {
  * use a separate data storage and link to it from the node using a string key.
  */
 const IE = {
-  getDataForNode (node: Node, createIfNotFound: boolean) {
+  getDataForNode (node: Node|Comment, createIfNotFound: boolean) {
     let dataStoreKey = node[dataStoreKeyExpandoPropertyName]
     const hasExistingDataStore = dataStoreKey && (dataStoreKey !== 'null') && dataStore[dataStoreKey]
     if (!hasExistingDataStore) {
@@ -70,7 +70,7 @@ export function nextKey () {
   return (uniqueId++) + dataStoreKeyExpandoPropertyName
 }
 
-function get (node, key) {
+function get (node: HTMLElement|Comment, key: string) {
   const dataForNode = getDataForNode(node, false)
   return dataForNode && dataForNode[key]
 }

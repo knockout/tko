@@ -1118,6 +1118,7 @@ declare global {
         jQueryInstance: JQueryStatic
         testDivTemplate: HTMLElement
         templateOutput: HTMLElement
+        innerShiv // For IE 
     }
 
     //Jasmine and Mocha define duplicated functions, is a problem for the type system
