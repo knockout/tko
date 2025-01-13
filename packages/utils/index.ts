@@ -1,2 +1,2 @@
 export * from './src'
-export { default } from './src'
+export { options as default  } from './src'

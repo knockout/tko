@@ -27,8 +27,8 @@ describe('Binding: Unique Name', function () {
     testNode.innerHTML = "<div data-bind='uniqueName: true'></div><div data-bind='uniqueName: true'></div>"
     applyBindings({}, testNode)
 
-    expect(testNode.childNodes[0].name.length > 0).toEqual(true)
-    expect(testNode.childNodes[1].name.length > 0).toEqual(true)
-    expect(testNode.childNodes[0].name === testNode.childNodes[1].name).toEqual(false)
+    expect((testNode.childNodes[0] as HTMLInputElement).name.length > 0).toEqual(true)
+    expect((testNode.childNodes[1] as HTMLInputElement).name.length > 0).toEqual(true)
+    expect((testNode.childNodes[0] as HTMLInputElement).name === (testNode.childNodes[1] as HTMLInputElement).name).toEqual(false)
   })
 })

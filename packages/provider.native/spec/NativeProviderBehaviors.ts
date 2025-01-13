@@ -13,6 +13,8 @@ import {
   TextMustacheProvider, AttributeMustacheProvider
 } from '@tko/provider.mustache'
 
+import { assert } from 'chai'
+
 describe('Native Provider Behavior', function () {
   it('returns native bindings', function () {
     const p = new NativeProvider()

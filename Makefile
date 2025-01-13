@@ -32,6 +32,9 @@ ci:
 lint:
 	$(NPX) standard
 
+tsc:
+	$(NPX) tsc
+
 docker-build:
 	$(DOCKER) build . --tag tko
 

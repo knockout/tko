@@ -14,28 +14,28 @@ export default class AttrProvider extends Provider {
 
   get PREFIX () { return 'ko-' }
 
-  getBindingAttributesList (node) {
+  getBindingAttributesList (node: HTMLElement) {
     if (!node.hasAttributes()) { return [] }
     return Array.from(node.attributes)
       .filter(attr => attr.name.startsWith(this.PREFIX))
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node: HTMLElement) {
     return this.getBindingAttributesList(node).length > 0
   }
 
-  getBindingAccessors (node, context) {
+  getBindingAccessors (node: HTMLElement, context) {
     return Object.assign({}, ...this.handlersFromAttributes(node, context))
   }
 
-  * handlersFromAttributes (node, context) {
+  * handlersFromAttributes (node: HTMLElement, context) {
     for (const attr of this.getBindingAttributesList(node)) {
       const name = attr.name.substr(this.PREFIX.length)
       yield {[name]: () => this.getValue(attr.value, context, node)}
     }
   }
 
-  getValue (token, $context, node) {
+  getValue (token, $context, node: HTMLElement) {
     /* FIXME: This duplicates Identifier.prototype.lookup_value; it should
        be refactored into e.g. a BindingContext method */
     if (!token) { return }

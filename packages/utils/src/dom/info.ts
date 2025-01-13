@@ -3,15 +3,17 @@
 //
 import { arrayFirst } from '../array'
 
-export function domNodeIsContainedBy (node, containedByNode) {
+export function domNodeIsContainedBy (node : Node, containedByNode: Node) {
   if (node === containedByNode) { return true }
   if (node.nodeType === 11) { return false } // Fixes issue #1162 - can't use node.contains for document fragments on IE8
   if (containedByNode.contains) { return containedByNode.contains(node.nodeType !== 1 ? node.parentNode : node) }
   if (containedByNode.compareDocumentPosition) { return (containedByNode.compareDocumentPosition(node) & 16) == 16 }
-  while (node && node != containedByNode) {
-    node = node.parentNode
+
+  let parentNode: Node | null = node;
+  while (parentNode && parentNode != containedByNode) {
+    parentNode = parentNode.parentNode
   }
-  return !!node
+  return !!parentNode
 }
 
 export function domNodeIsAttachedToDocument (node) {

@@ -2,6 +2,9 @@
 import Node from './Node'
 
 export default class Expression {
+  private nodes: any
+  root: any
+
   constructor (nodes) {
     this.nodes = nodes
     this.root = Node.create_root(nodes)

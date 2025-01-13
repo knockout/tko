@@ -40,7 +40,7 @@ export function unmemoize (memoId, callbackParams) {
 }
 
 export function unmemoizeDomNodeAndDescendants (domNode, extraCallbackParamsArray) {
-  var memos = []
+  var memos = new Array()
   findMemoNodes(domNode, memos)
   for (var i = 0, j = memos.length; i < j; i++) {
     var node = memos[i].domNode

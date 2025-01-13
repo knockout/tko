@@ -34,11 +34,11 @@ describe('Binding: CSS classes', function () {
     testNode.innerHTML = "<div class='unrelatedClass1 unrelatedClass2' data-bind='css: { myRule: someModelProperty, anotherRule: anotherModelProperty }'>Hallo</div>"
     applyBindings({ someModelProperty: observable1, anotherModelProperty: observable2 }, testNode)
 
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 unrelatedClass2 anotherRule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 unrelatedClass2 anotherRule')
     observable1(true)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 unrelatedClass2 anotherRule myRule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 unrelatedClass2 anotherRule myRule')
     observable2(false)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 unrelatedClass2 myRule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 unrelatedClass2 myRule')
   })
 
   it('Should give the element a single CSS class without a leading space when the specified value is true', function () {
@@ -46,9 +46,9 @@ describe('Binding: CSS classes', function () {
     testNode.innerHTML = "<div data-bind='css: { myRule: someModelProperty }'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
 
-    expect(testNode.childNodes[0].className).toEqual('')
+    expect(testNode.children[0].className).toEqual('')
     observable1(true)
-    expect(testNode.childNodes[0].className).toEqual('myRule')
+    expect(testNode.children[0].className).toEqual('myRule')
   })
 
   it('Should toggle multiple CSS classes if specified as a single string separated by spaces', function () {
@@ -56,11 +56,11 @@ describe('Binding: CSS classes', function () {
     testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: { \"myRule _another-Rule123\": someModelProperty }'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
 
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
     observable1(true)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 myRule _another-Rule123')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 myRule _another-Rule123')
     observable1(false)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
   })
 
   it('Should set/change dynamic CSS class(es) if string is specified', function () {
@@ -68,15 +68,15 @@ describe('Binding: CSS classes', function () {
     testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
 
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
     observable1('my-Rule')
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 my-Rule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 my-Rule')
     observable1('another_Rule  my-Rule')
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 another_Rule my-Rule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 another_Rule my-Rule')
     observable1(undefined)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
     observable1(' ')
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
   })
 
   it('Should work with any arbitrary class names', function () {
@@ -85,9 +85,9 @@ describe('Binding: CSS classes', function () {
     testNode.innerHTML = "<div data-bind='css: { \"complex/className complex.className\" : someModelProperty }'>Something</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
 
-    expect(testNode.childNodes[0].className).toEqual('')
+    expect(testNode.children[0].className).toEqual('')
     observable1(true)
-    expect(testNode.childNodes[0].className).toEqual('complex/className complex.className')
+    expect(testNode.children[0].className).toEqual('complex/className complex.className')
   })
 
     // Ensure CSS binding supports SVG, where applicable.
@@ -109,9 +109,9 @@ describe('Binding: CSS classes', function () {
       var myObservable = observable()
       testNode.innerHTML = "<svg class='Y' data-bind='css: {x: someModelProperty}'></svg>"
       applyBindings({someModelProperty: myObservable}, testNode)
-      expect(testNode.childNodes[0].getAttribute('class')).toEqual('Y')
+      expect(testNode.children[0].getAttribute('class')).toEqual('Y')
       myObservable(true)
-      expect(testNode.childNodes[0].getAttribute('class')).toEqual('Y x')
+      expect(testNode.children[0].getAttribute('class')).toEqual('Y x')
     }
   })
 
@@ -120,13 +120,13 @@ describe('Binding: CSS classes', function () {
     var observable1 = observable({})
     testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
     observable1('my-Rule')
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 my-Rule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 my-Rule')
     observable1(null)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1')
     observable1('my-Rule')
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass1 my-Rule')
+    expect(testNode.children[0].className).toEqual('unrelatedClass1 my-Rule')
   })
 
   it('Should be aliased as class as well as css', function () {
@@ -142,17 +142,17 @@ describe('Binding: CSS classes', function () {
     testNode.innerHTML = "<div class='unrelatedClass' data-bind='css: { staticClass: booleanProp }, class: stringProp'></div>"
 
     applyBindings({ booleanProp: booleanProp, stringProp: stringProp }, testNode)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass')
+    expect(testNode.children[0].className).toEqual('unrelatedClass')
 
     booleanProp(true)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass staticClass')
+    expect(testNode.children[0].className).toEqual('unrelatedClass staticClass')
 
     stringProp('dynamicClass')
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass staticClass dynamicClass')
+    expect(testNode.children[0].className).toEqual('unrelatedClass staticClass dynamicClass')
 
     booleanProp(false)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass dynamicClass')
+    expect(testNode.children[0].className).toEqual('unrelatedClass dynamicClass')
     stringProp(null)
-    expect(testNode.childNodes[0].className).toEqual('unrelatedClass')
+    expect(testNode.children[0].className).toEqual('unrelatedClass')
   })
 })

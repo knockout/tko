@@ -81,8 +81,8 @@ export function triggerEvent (element, eventType) {
   } else if (typeof document.createEvent === 'function') {
     if (typeof element.dispatchEvent === 'function') {
       var eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'
-      var event = document.createEvent(eventCategory)
-      event.initEvent(eventType, true, true, options.global, 0, 0, 0, 0, 0, false, false, false, false, 0, element)
+      var event = document.createEvent(eventCategory);
+      (event as any).initEvent(eventType, true, true, options.global, 0, 0, 0, 0, 0, false, false, false, false, 0, element)
       element.dispatchEvent(event)
     } else { throw new Error("The supplied element doesn't support dispatchEvent") }
   } else if (useClickWorkaround && element.click) {

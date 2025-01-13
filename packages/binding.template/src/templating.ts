@@ -155,7 +155,7 @@ function resolveTemplateName (template, data, context) {
   }
 }
 
-export function renderTemplate (template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode, afterBindingCallback) {
+export function renderTemplate (template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode?, afterBindingCallback?) {
   options = options || {}
   if ((options.templateEngine || _templateEngine) === undefined) { throw new Error('Set a template engine before calling renderTemplate') }
   renderMode = renderMode || 'replaceChildren'

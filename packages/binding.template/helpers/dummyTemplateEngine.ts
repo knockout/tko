@@ -8,7 +8,7 @@ import {
 } from '../dist';
 
 
-export function dummyTemplateEngine(templates) {
+export function dummyTemplateEngine(templates?) {
     var inMemoryTemplates = templates || {};
     var inMemoryTemplateData = {};
 

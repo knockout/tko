@@ -23,8 +23,8 @@ import { computed } from '@tko/computed'
 
 function mapNodeAndRefreshWhenChanged (containerNode, mapping, valueToMap, callbackAfterAddingNodes, index) {
   // Map this array value inside a dependentObservable so we re-map when any dependency changes
-  var mappedNodes = []
-  var dependentObservable = computed(function () {
+  const mappedNodes = new Array()
+  const dependentObservable: any = computed(function () {
     var newMappedNodes = mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
 
     // On subsequent evaluations, just replace the previously-inserted DOM nodes
@@ -44,7 +44,7 @@ function mapNodeAndRefreshWhenChanged (containerNode, mapping, valueToMap, callb
 var lastMappingResultDomDataKey = domData.nextKey()
 let deletedItemDummyValue = domData.nextKey()
 
-export function setDomNodeChildrenFromArrayMapping (domNode, array, mapping, options, callbackAfterAddingNodes, editScript) {
+export function setDomNodeChildrenFromArrayMapping (domNode, array, mapping, options, callbackAfterAddingNodes, editScript?) {
   // Compare the provided array against the previous one
   array = array || []
   if (typeof array.length === 'undefined') {
@@ -55,15 +55,15 @@ export function setDomNodeChildrenFromArrayMapping (domNode, array, mapping, opt
   let isFirstExecution = !lastMappingResult
 
   // Build the new mapping result
-  var newMappingResult = []
+  var newMappingResult = new Array()
   var lastMappingResultIndex = 0
   var newMappingResultIndex = 0
 
-  var nodesToDelete = []
-  var itemsToProcess = []
-  var itemsForBeforeRemoveCallbacks = []
-  var itemsForMoveCallbacks = []
-  var itemsForAfterAddCallbacks = []
+  var nodesToDelete = new Array()
+  var itemsToProcess = new Array()
+  var itemsForBeforeRemoveCallbacks = new Array()
+  var itemsForMoveCallbacks = new Array()
+  var itemsForAfterAddCallbacks = new Array()
   var mapData
   let countWaitingForRemove = 0
 

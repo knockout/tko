@@ -20,7 +20,7 @@ import { tagNameLower } from './info'
 import * as domData from './data'
 import options from '../options'
 
-var commentNodesHaveTextProperty = options.document && options.document.createComment('test').text === '<!--test-->'
+var commentNodesHaveTextProperty = options.document && ("text" in options.document.createComment('test')) //in case of IE8..
 
 export var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/
 export var endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
@@ -40,10 +40,10 @@ function isUnmatchedEndComment (node) {
 
 const matchedEndCommentDataKey = '__ko_matchedEndComment__'
 
-export function getVirtualChildren (startComment, allowUnbalanced) {
+export function getVirtualChildren (startComment, allowUnbalanced?) {
   var currentNode = startComment
   var depth = 1
-  var children = []
+  var children = new Array()
   while (currentNode = currentNode.nextSibling) {
     if (isEndComment(currentNode)) {
       domData.set(currentNode, matchedEndCommentDataKey, true)
@@ -59,7 +59,7 @@ export function getVirtualChildren (startComment, allowUnbalanced) {
   return null
 }
 
-function getMatchingEndComment (startComment, allowUnbalanced) {
+function getMatchingEndComment (startComment, allowUnbalanced?) {
   var allVirtualChildren = getVirtualChildren(startComment, allowUnbalanced)
   if (allVirtualChildren) {
     if (allVirtualChildren.length > 0) { return allVirtualChildren[allVirtualChildren.length - 1].nextSibling }
@@ -70,7 +70,7 @@ function getMatchingEndComment (startComment, allowUnbalanced) {
 function getUnbalancedChildTags (node) {
     // e.g., from <div>OK</div><!-- ko blah --><span>Another</span>, returns: <!-- ko blah --><span>Another</span>
     //       from <div>OK</div><!-- /ko --><!-- /ko -->,             returns: <!-- /ko --><!-- /ko -->
-  var childNode = node.firstChild, captureRemaining = null
+  var childNode = node.firstChild, captureRemaining:any = null
   if (childNode) {
     do {
       if (captureRemaining)                   // We already hit an unbalanced node and are now just scooping up all subsequent nodes

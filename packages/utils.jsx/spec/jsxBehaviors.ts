@@ -41,12 +41,22 @@ import {
 
 import { ORIGINAL_JSX_SYM } from '../dist/JsxObserver';
 
+import { assert } from "chai"
 
 class JsxTestObserver extends JsxObserver {
+  
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns?, noInitialBinding?) {
+    super(jsxOrObservable, parentNode, insertBefore, xmlns, noInitialBinding)
+  }
+  
   // For testing purposes, we make this synchronous.
   detachAndDispose (node) {
     super.detachAndDispose(node)
     cleanNode(node)
+  }
+
+  dispose () {
+    super.dispose()
   }
 }
 
@@ -54,9 +64,9 @@ class JsxTestObserver extends JsxObserver {
 /**
  * Simple wrapper for testing.
  */
-function jsxToNode (jsx, xmlns, node = document.createElement('div')) {
+function jsxToNode (jsx, xmlns?, node = document.createElement('div')) : HTMLElement {
   new JsxTestObserver(jsx, node, null, xmlns)
-  return node.childNodes[0]
+  return node.children[0] as HTMLElement
 }
 
 describe('jsx', function () {
@@ -215,8 +225,8 @@ describe('jsx', function () {
     assert.instanceOf(node.childNodes[0], SVGElement)
     assert.lengthOf(node.childNodes, 2)
     obs({ elementName: 'rect', children: [], attributes: {} })
-    assert.equal(node.childNodes[1].tagName, 'rect')
-    assert.instanceOf(node.childNodes[1], SVGElement)
+    assert.equal(node.children[1].tagName, 'rect')
+    assert.instanceOf(node.children[1], SVGElement)
     assert.equal(node.outerHTML, '<svg abc="123"><circle></circle><rect></rect><!--O--></svg>')
   })
 
@@ -316,6 +326,7 @@ describe('jsx', function () {
     const jsx = { elementName: 'div', children: [itag, io], attributes: {} }
     const jo = new JsxTestObserver(jsx, parent)
 
+    let counter = 0;
     const provider = new NativeProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set({ counter: () => ++counter })
@@ -368,9 +379,9 @@ describe('jsx', function () {
     // The JSX preprocessor can generate sparse arrays with e.g.
     //  <div>{/* thing */}</div>
     const parent = document.createElement('div')
-    const jsx = []
+    const jsx: string[] = []
     jsx[0] = 'a'
-    jsx[2] = 'b'
+    jsx[1] = 'b'
     const jo = new JsxTestObserver(jsx, parent)
     assert.equal(parent.innerHTML, `ab`)
     jo.dispose()
@@ -947,7 +958,7 @@ describe('jsx', function () {
   })
 
   describe('$context', () => {
-    function testContext (jsxConvertible, nodeToTest = n => n.childNodes[0]) {
+    function testContext (jsxConvertible, nodeToTest = n => n.children[0]) {
       const parent = document.createElement('div')
       const view = {}
       options.bindingProviderInstance = new VirtualProvider()
@@ -984,7 +995,7 @@ describe('jsx', function () {
         children: [ { elementName: 'y', children: [], attributes: {} } ],
         attributes: {}
       }
-      testContext(jsx, n => n.childNodes[0].childNodes[0])
+      testContext(jsx, n => n.children[0].children[0])
     })
 
     it('applies to observable jsx children', () => {
@@ -995,7 +1006,7 @@ describe('jsx', function () {
         ),
         attributes: {}
       }
-      testContext(jsx, n => n.childNodes[0].childNodes[0])
+      testContext(jsx, n => n.children[0].children[0])
     })
 
     it('applies to jsx children that are observable', () => {
@@ -1006,14 +1017,14 @@ describe('jsx', function () {
         ],
         attributes: {}
       })
-      testContext(jsx, n => n.childNodes[0].childNodes[0])
+      testContext(jsx, n => n.children[0].children[0])
     })
 
     it('applies to observables when they are updated', () => {
       const obs = observable()
       testContext(obs, n => {
         obs({ elementName: 'x', children: [], attributes: {} })
-        return n.childNodes[0]
+        return n.children[0]
       })
     })
   })

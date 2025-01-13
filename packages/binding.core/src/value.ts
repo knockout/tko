@@ -15,7 +15,11 @@ import {
 export class value extends BindingHandler {
   static get after () { return ['options', 'foreach', 'template'] }
 
-  constructor (...args) {
+  elementValueBeforeEvent: any;
+  propertyChangeFired: any;
+  propertyChangedFired: boolean;
+  updateFromModel: any;
+  constructor (...args: [any]) {
     super(...args)
 
     // If the value binding is placed on a radio/checkbox, then just pass through to checkedValue and quit
@@ -65,7 +69,7 @@ export class value extends BindingHandler {
   // Workaround for https://github.com/SteveSanderson/knockout/issues/122
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded () {
-    return ieVersion && isInputElement &&
+    return ieVersion && // isInputElement && // Not in use? comment for tsc error
       this.$element.type == 'text' && this.$element.autocomplete != 'off' &&
       (!this.$element.form || this.$element.form.autocomplete != 'off')
   }

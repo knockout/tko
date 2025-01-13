@@ -182,7 +182,7 @@ describe('each binding', function () {
 describe('is empty/conditional', function () {
   it('sets `elseChainSatisfied` to false for an empty array', function () {
     var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>")
-    var obs = []
+    var obs = new Array()
     var view = {obs: obs}
     applyBindings(view, div[0])
     assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), false)
@@ -485,7 +485,7 @@ describe('observable array changes', function () {
       var itemNumber = 100
       div = $("<div data-bind='foreach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>")
       applyBindings(view, div[0])
-      var arr = [], i
+      var arr = new Array(), i
       for (i = 0; i != itemNumber; ++i) {
         arr.push({ id: Math.floor(Math.random() * itemNumber), testHtml: '<span>Item ' + i + '</span>' })
       }
@@ -511,7 +511,7 @@ describe('observable array changes', function () {
       var itemNumber = 100
       div = $("<div data-bind='foreach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>")
       applyBindings(view, div[0])
-      var arr = [], i
+      var arr = new Array(), i
       for (i = 0; i != itemNumber; ++i) {
         arr.push({ id: Math.floor(Math.random() * itemNumber), testHtml: '<span>Item ' + i + '</span>' })
       }

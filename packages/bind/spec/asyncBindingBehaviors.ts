@@ -27,6 +27,8 @@ import {
     useMockForTasks
 } from '@tko/utils/helpers/jasmine-13-helper'
 
+declare var testNode : any
+
 describe('Deferred bindings', function () {
   var bindingSpy, bindingHandlers
 

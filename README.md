@@ -35,51 +35,41 @@ It's available as `@tko/build.knockout`, and over CDN:
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository. |
-| $ `npm install -g yarn` | Ensure yarn is globally available |
-| $ `yarn` | Install local node packages and link tko modules |
-| $ `make` | **Currently TKO use a make file** |
-| $ `yarn test` | Run all tests. See below. |
-| $ `yarn watch` | Run all tests and watch for changes. See below. |
-| $ `yarn build` | Build tko\[.module\]\[.es6\]\[.min\].js files, where `.es6` version has not been transpiled |
+| $ `npm install` | Ensure that all packages available |
+| $ `make` | **Currently TKO use a make file** / no scripts at package.json |
+| $ `make test` | Run all tests with electron. See below. |
+| $ `make test-headless` | Run all tests with chromium. See below. |
 | $ `lerna publish` | Bump versions and publish to npm registry |
 
-Checkout `package.json => scripts` for more commands that can be executed with `yarn {command}`.
+Checkout the `Makefile` for more commands that can be executed with `make {command}`.
 
-In each individual `packages/*/` directory, you can also run (presuming `rollup` and `karma` are installed globally):
+In each individual `packages/*/` directory, you can also run:
 
 | Command | Effect |
 | --- | --- |
 | $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run` |
-| $ `rollup -c ../../rollup.config.js`  | Build the package into the local `dist/` |
 
-#### Testing with `yarn test` and `yarn watch`
-
-### NEW
+### Testing
 
 Start tests with electron: `make test`
 
 Start tests with headless-chrome: `make test-headless`
 
-### OLD
+The test setup has naturally grown and been ported from knockout.js. Some tests use Jasmine 1.3, newer ones use Mocha, Chai and Sinon. Karma is used as test runner rather as test pipeline
 
-The `yarn test` and `yarn watch` commands can be used in the root directory, where it will run across all tests, or alternatively in any `packages/*/` directory to run tests
-specific to that package.
+Other options:
 
-Optional arguments to `yarn test` include:
+- `make ci` — use Sauce Labs to test a variety of platforms; requires an account at Sauce Labs and `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` to be set in the environment.
 
-- `--sauce` — use Sauce Labs to test a variety of platforms; requires an account at Sauce Labs and `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` to be set in the environment.
-- `--noStartConnect` — Do not start a new Sauce Connect proxy instance for every
-test; requires that Sauce Connect be already running.
+#### `visual.html` (possibly outdated)
 
-#### `visual.html`
+Note that running `karma` will create a `visual.html` file that shows the proportional size of imports into each package.
 
-Note that running `karma` or `rollup` will create a `visual.html` file that shows the proportional size of imports into each package.
-
-### Objectives
+## Objectives
 
 TKO aims to become a base for future versions of Knockout.  The objectives include:
 
-- Modularization into ES6 and separate projects, with compilation using an ES6 compiler like [Rollup](http://rollupjs.org/).  This solves several problems with Knockout, including:
+- Modularization into ES6 and separate projects, with compilation using an ES6 compiler like [Esbuild](https://esbuild.github.io/).  This solves several problems with Knockout, including:
   - Some folks want to roll-their-own with e.g. removing components
   - Compilation is now with Closure compiler, which is actually transliterating – meaning the *debug* and *minified* versions have different code paths (mostly in the form of things exposed in *debug* being missing in the *minified* version)
   - The compilation of Knockout is just concatenation, leading to difficulties with maintainance, severance, and replacement
@@ -90,6 +80,27 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
   - What should be simple plugins (e.g. binding handlers or providers) are complex, including:
     - Built-ins have first-class access to quite a bit of good Knockout code, but plugins generally have second-class access and often have to duplicate Knockout internals
     - Quality plugins have lots of boilerplate for compilation, release, documentation, and testing
+- Type-safe with Typescript
+- CSP compliant
+- JSX/TSX support
+
+## Overview of the development stack
+
+- **make** -> Build tasks
+- **npm** -> Node Package Manager
+- **esbuild** -> ts/js compiler and bundler
+- **lerna** -> mono-repo build-chain
+ 
+---
+
+- Test-Runner -> Karma
+- Test-Environment -> electron and headless-chrome
+- TDD/BDD-Frameworks -> 
+    - Jasmine 1.3
+    - Mocha + Chai
+    - sinon (Mocks)
+- Testing-Cloud-Service -> sauce
+- standard -> Code-Style (outdated for typescript)
 
 ## Some WSL tricks
 
@@ -122,6 +133,6 @@ MIT license - [http://www.opensource.org/licenses/mit-license.php.](http://www.o
 
 <div>
   <a href='http://browserstack.com'>
-    <img height=150px src='https://p3.zdusercontent.com/attachment/1015988/gTNrZ9vPjL8ThUHOWP7ucklJi?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..HkCKDttXKDSGFoV5uaMPQA.ha9NDy63mjLKFcyNeib70TCkqfY0dcwiFwDYpZ8s5h75o-e1_cLjPAHlOUEwvKAbfMUaa1XpOL5F9AQd_B4iyc6JbgvKoKBxxe12aaOdfWFccP7r9iQ2Os6myiqBpP79prDXqFPMSAkF8ybzhVqCnWzxmK-Wvkbav-DGPZm3oS2IPD9ueIvf46bggFsikQhf1pjS5fgmzo07yi9Cf5SzA8zIKAjKX1RKQeFXOhBwxRfh_5SbJprfEZMnKBnGuO_qzP2fsK3BvxbyBKpIEWFdnA.t10i3BbyEpGtFVgyGbvQfw' alt='Browser Stack' />
+    Browser Stack
   </a>
 <div>

@@ -1,6 +1,11 @@
 
 
 export class BindingResult {
+  
+  isSync : boolean
+  isComplete : boolean
+  completionPromise : Promise<BindingResult>
+  
   constructor ({asyncBindingsApplied, rootNode, bindingContext}) {
     Object.assign(this, {
       rootNode,

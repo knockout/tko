@@ -10,8 +10,9 @@ import * as dependencyDetection from './dependencyDetection'
 import { deferUpdates } from './defer'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
+import { Observable } from '../types/Observable'
 
-export function observable (initialValue) {
+export function observable(initialValue?: any): Observable{ 
   function Observable () {
     if (arguments.length > 0) {
             // Write
@@ -144,7 +145,7 @@ observable.fn[protoProperty] = observable
 // isObservable will be `true`.
 observable.observablePrototypes = new Set([observable])
 
-export function isObservable (instance) {
+export function isObservable<T=any> (instance:any): instance is Observable<T> {
   const proto = typeof instance === 'function' && instance[protoProperty]
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')
@@ -160,7 +161,7 @@ export function peek (value) {
   return isObservable(value) ? value.peek() : value
 }
 
-export function isWriteableObservable (instance) {
+export function isWriteableObservable<T = any> (instance: any): instance is Observable<T> {
   return isObservable(instance) && instance.isWriteable
 }
 

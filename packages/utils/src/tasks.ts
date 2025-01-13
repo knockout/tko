@@ -6,7 +6,11 @@
 import options from './options'
 import { deferError } from './error'
 
-var taskQueue = [],
+interface HTMLScriptElementOld extends HTMLScriptElement {
+  onreadystatechange: any;
+}
+
+var taskQueue = new Array(),
   taskQueueLength = 0,
   nextHandle = 1,
   nextIndexToProcess = 0,
@@ -24,11 +28,13 @@ if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
     // IE 6-10
     // From https://github.com/YuzuJS/setImmediate * Copyright (c) 2012 Barnesandnoble.com, llc, Donavon West, and Domenic Denicola * License: MIT
   options.taskScheduler = function (callback) {
-    var script = document.createElement('script')
+    var script : HTMLScriptElementOld  | null = document.createElement('script') as HTMLScriptElementOld
     script.onreadystatechange = function () {
-      script.onreadystatechange = null
-      document.documentElement.removeChild(script)
-      script = null
+      if(script) {
+        script.onreadystatechange = null
+        document.documentElement.removeChild(script)
+        script = null
+      }
       callback()
     }
     document.documentElement.appendChild(script)
@@ -69,7 +75,7 @@ function processTasks () {
 function scheduledProcess () {
   processTasks()
 
-    // Reset the queue
+  // Reset the queue  
   nextIndexToProcess = taskQueueLength = taskQueue.length = 0
 }
 

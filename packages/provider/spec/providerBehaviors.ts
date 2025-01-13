@@ -1,7 +1,10 @@
 
 import {
   Provider
-} from '../dist'
+} from '../src'
+
+import { assert } from "chai";
+import BindingHandlerObject from '../src/BindingHandlerObject';
 
 describe('Provider', function () {
   it('throws an error if not subclassed', function () {
@@ -17,10 +20,10 @@ describe('Provider', function () {
 
   it('sets globals and bindingHandlers from params', function () {
     class SubProvider extends Provider {
-      get FOR_NODE_TYPES () { [] }
+      get FOR_NODE_TYPES () { return [] }
     }
     const globals = {}
-    const bindingHandlers = {}
+    const bindingHandlers = {} as BindingHandlerObject
     const sp = new SubProvider({ globals, bindingHandlers })
     assert.strictEqual(sp.globals, globals)
     assert.strictEqual(sp.bindingHandlers, bindingHandlers)

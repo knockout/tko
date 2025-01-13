@@ -13,8 +13,12 @@ import { VirtualProvider } from '@tko/provider.virtual'
 import { DataBindProvider } from '@tko/provider.databind'
 
 import {
-    applyBindings, BindingHandler, applyBindingsToDescendants
+    applyBindings, applyBindingsToDescendants
 } from '../dist'
+
+import {
+  BindingHandler
+} from '..';
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
@@ -25,12 +29,16 @@ describe('Binding Application Promise', function () {
   var bindingHandlers
 
   class SyncBinding extends BindingHandler {
-    get bindingCompleted () { this.value(true) }
+    get bindingCompleted () {
+      return this.value(true)
+    }
     static get allowVirtualElements () { return true }
   }
 
   class AsyncBinding extends BindingHandler {
-    get bindingCompleted () { return options.Promise.resolve().then(() => this.value(true)) }
+    get bindingCompleted () {
+      return options.Promise.resolve().then(() => this.value(true))
+    }
     static get allowVirtualElements () { return true }
   }
 
@@ -46,7 +54,7 @@ describe('Binding Application Promise', function () {
   }
 
   beforeEach(function () {
-      // Set up the default binding handlers.
+    // Set up the default binding handlers.
     var provider = new MultiProvider({providers: [
       new VirtualProvider(),
       new DataBindProvider()

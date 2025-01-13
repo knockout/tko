@@ -70,8 +70,8 @@ describe('Cross-window support', function () {
 
     // renderTemplate
     window.runs(function () {
-      setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: text'></div>" }), true)
-      renderTemplate('someTemplate', { text: 'abc' }, null, body2)
+      setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: text'></div>" }))
+      renderTemplate('someTemplate', { text: 'abc' }, null, body2, null, null)
       expect(body2.childNodes.length).toEqual(1)
       expect(body2).toContainHtml('<div data-bind="text: text">abc</div>')
       cleanNode(body2)

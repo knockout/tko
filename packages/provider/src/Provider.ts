@@ -9,8 +9,16 @@ import {
 
 import BindingHandlerObject from './BindingHandlerObject'
 
+export interface ProviderParamsInput{
+  bindingHandlers?: BindingHandlerObject;
+  globals?:any;
+  attributesToSkip?:any;
+  attributesBindingMap?:any;
+  providers?:any[];
+}
+
 export default class Provider {
-  constructor (params = {}) {
+  constructor (params: ProviderParamsInput | null = null) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')
     }
@@ -19,16 +27,16 @@ export default class Provider {
       // node.nodeType's that the provider handles.
       throw new Error('Providers must have FOR_NODE_TYPES property')
     }
-    this.bindingHandlers = params.bindingHandlers || new BindingHandlerObject()
-    this.globals = params.globals || {}
+    this.bindingHandlers = params?.bindingHandlers || new BindingHandlerObject()
+    this.globals = params?.globals || {}
   }
 
   setGlobals (globals) {
     this.globals = globals
   }
   get preemptive () { return false }
-  nodeHasBindings (/* node */) {}
-  getBindingAccessors (/* node, context */) {}
+  nodeHasBindings (node) {}
+  getBindingAccessors (node, context) {}
 
   /**
    * Preprocess a given node.
@@ -37,6 +45,10 @@ export default class Provider {
    */
   preprocessNode (node) {}
   postProcess (/* node */) {}
+
+  bindingHandlers : BindingHandlerObject
+  globals : any | undefined
+  _overloadInstance : any | undefined
 
   /** For legacy binding provider assignments to
    *  ko.bindingProvider.instance = ... */
@@ -86,6 +98,8 @@ export default class Provider {
 class LegacyProvider extends Provider {
   get FOR_NODE_TYPES () { return [1, 3, 8] }
 
+  providerObject : any
+
   constructor (providerObject, parentProvider) {
     super()
     Object.assign(this, {providerObject})
@@ -105,7 +119,7 @@ class LegacyProvider extends Provider {
       : this.getBindingsAndMakeAccessors(node, context)
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node : HTMLElement) : boolean {
     return this.providerObject.nodeHasBindings(node)
   }
 
