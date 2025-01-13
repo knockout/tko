@@ -4,7 +4,7 @@ import {
 } from '@tko/utils'
 
 export default class BindingHandlerObject {
-  set (nameOrObject, value?) {
+  set (nameOrObject: string|object, value?: string|object) {
     if (typeof nameOrObject === 'string') {
       this[nameOrObject] = value
     } else if (typeof nameOrObject === 'object') {

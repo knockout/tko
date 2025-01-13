@@ -326,6 +326,7 @@ describe('jsx', function () {
     const jsx = { elementName: 'div', children: [itag, io], attributes: {} }
     const jo = new JsxTestObserver(jsx, parent)
 
+    let counter = 0;
     const provider = new NativeProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set({ counter: () => ++counter })
