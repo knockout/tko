@@ -48,7 +48,7 @@ describe('Binding: If', function () {
   xit('Should leave descendant nodes in the document (and bind them) if the value is truthy, independently of the active template engine', function () {
     this.after(function () { setTemplateEngine(new nativeTemplateEngine()) })
 
-    setTemplateEngine(new templateEngine()) // This template engine will just throw errors if you try to use it
+    setTemplateEngine(new nativeTemplateEngine()) // This template engine will just throw errors if you try to use it
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem.existentChildProp'></span></div>"
     expect(testNode.childNodes.length).toEqual(1)
     applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode)
@@ -63,13 +63,13 @@ describe('Binding: If', function () {
 
         // Value is initially true, so nodes are retained
     applyBindings({ someItem, counter: 0 }, testNode)
-    expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
+    expect((testNode.childNodes[0].childNodes[0] as HTMLElement).tagName.toLowerCase()).toEqual('span')
     expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
     expect(testNode).toContainText('1')
 
         // Change the value to a different truthy value; see the previous SPAN remains
     someItem('different truthy value')
-    expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
+    expect((testNode.childNodes[0].childNodes[0] as HTMLElement).tagName.toLowerCase()).toEqual('span')
     expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
     expect(testNode).toContainText('1')
   })
@@ -96,7 +96,7 @@ describe('Binding: If', function () {
     testNode.innerHTML = "<div data-bind='if: true'>Parents: <span data-bind='text: $parents.length'></span></div>"
     applyBindings({ }, testNode)
     expect(testNode.childNodes[0]).toContainText('Parents: 0')
-    expect(contextFor(testNode.childNodes[0].childNodes[1]).$parents.length).toEqual(0)
+    expect(contextFor((testNode.childNodes[0].childNodes[1] as HTMLElement)).$parents.length).toEqual(0)
   })
 
   it('Should be able to define an \"if\" region using a containerless template', function () {
