@@ -120,15 +120,15 @@ describe('Binding: Using', function () {
 
         // Also check that, when we later retrieve the binding contexts, we get consistent results
     expect(contextFor(testNode).$data.name).toEqual('outer')
-    expect(contextFor(testNode.childNodes[0]).$data.name).toEqual('outer')
-    expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('top')
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('middle')
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('bottom')
-    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+    expect(contextFor(testNode.childNodes[0] as HTMLElement).$data.name).toEqual('outer')
+    expect(contextFor(testNode.childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('top')
+    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('middle')
+    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('bottom')
+    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
     expect(firstSpan.tagName).toEqual('SPAN')
-    expect(contextFor(firstSpan).$data.name).toEqual('bottom')
-    expect(contextFor(firstSpan).$root.name).toEqual('outer')
-    expect(contextFor(firstSpan).$parents[1].name).toEqual('top')
+    expect(contextFor(firstSpan as HTMLElement).$data.name).toEqual('bottom')
+    expect(contextFor(firstSpan as HTMLElement).$root.name).toEqual('outer')
+    expect(contextFor(firstSpan as HTMLElement).$parents[1].name).toEqual('top')
   })
 
   it('Should be able to define a \"using\" region using a containerless binding', function () {
