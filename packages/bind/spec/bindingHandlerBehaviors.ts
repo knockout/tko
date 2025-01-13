@@ -53,11 +53,11 @@ describe('BindingHandler behaviors', function () {
       var xCalls = 0,
         yCalls = 0
       bindingHandlers.fnHandler = class extends BindingHandler {
-        
+
         v : any
         x : any
         y : any
-        
+        computed;
         constructor (...args) {
           super(...args)
           var v = this.v = koObservable(0)
@@ -101,6 +101,7 @@ describe('BindingHandler behaviors', function () {
       var obs = koObservable(),
         handlerInstance
       bindingHandlers.fnHandler = class extends BindingHandler {
+        subscribe;
         constructor (...args) {
           super(...args)
           handlerInstance = this
@@ -119,7 +120,7 @@ describe('BindingHandler behaviors', function () {
 
     it('registers a kind with HandlerClass.register', function () {
       class HC extends BindingHandler {}
-      
+
       BindingHandler.registerBindingHandler(HC, 'testHCregistration')
       expect(bindingHandlers.testHCregistration).toEqual(HC)
     })
