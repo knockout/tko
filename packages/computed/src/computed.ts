@@ -25,6 +25,7 @@ import {
     subscribable,
     LATEST_VALUE
 } from '@tko/observable'
+import { Computed, ComputedOptions, ComputedReadFunction, PureComputed } from '../types/computed'
 
 const computedState = createSymbolOrString('_state')
 const DISPOSED_STATE = {
@@ -39,7 +40,7 @@ const DISPOSED_STATE = {
   _options: null
 }
 
-export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, options?) {
+export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, options?: ComputedOptions): Computed {
   if (typeof evaluatorFunctionOrOptions === 'object') {
         // Single-parameter syntax - everything is on this "options" param
     options = evaluatorFunctionOrOptions
@@ -50,7 +51,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
       options.read = evaluatorFunctionOrOptions
     }
   }
-  if (typeof options.read !== 'function') {
+  if (typeof options?.read !== 'function') {
     throw Error('Pass a function that returns the value of the computed')
   }
 
@@ -536,20 +537,22 @@ computed.fn[protoProp] = computed
 /* This is used by ko.isObservable */
 observable.observablePrototypes.add(computed)
 
-export function isComputed (instance) {
+export function isComputed<T= any> (instance: any):instance is Computed<T> {
   return (typeof instance === 'function' && instance[protoProp] === computed)
 }
 
-export function isPureComputed (instance) {
+export function isPureComputed<T=any> (instance:any): instance is PureComputed<T> {
   return isComputed(instance) && instance[computedState] && instance[computedState].pure
 }
 
-export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?) {
+export function pureComputed<T = any> (evaluatorFunctionOrOptions: ComputedOptions|ComputedReadFunction, evaluatorFunctionTarget?):Computed<T> {
   if (typeof evaluatorFunctionOrOptions === 'function') {
-    return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure': true})
+    let evaluator = evaluatorFunctionOrOptions as ComputedReadFunction;
+    return computed(evaluator, evaluatorFunctionTarget, {'pure': true})
   } else {
-    evaluatorFunctionOrOptions = extend({}, evaluatorFunctionOrOptions)   // make a copy of the parameter object
-    evaluatorFunctionOrOptions.pure = true
-    return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget)
+    let options = evaluatorFunctionOrOptions as ComputedOptions;
+    options = extend({}, options)   // make a copy of the parameter object
+    options.pure = true
+    return computed(options, evaluatorFunctionTarget)
   }
 }
