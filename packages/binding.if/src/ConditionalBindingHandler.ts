@@ -35,7 +35,9 @@ import {
  * and this.computed('render') must be called in the child constructor.
  */
 export default class ConditionalBindingHandler extends AsyncBindingHandler {
-  bindingContext: any;
+  get bindingContext(): any {
+    return;
+  }
   completesElseChain: Observable;
   hasElse: boolean;
   ifElseNodes?: any;
