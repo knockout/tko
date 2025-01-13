@@ -1119,5 +1119,4 @@ declare global {
             reset(): any
         }
     }
-    export as namespace ko;
 }
