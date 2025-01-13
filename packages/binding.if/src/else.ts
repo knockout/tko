@@ -15,6 +15,8 @@ import {
  * (not to be mistaken for `<!-- else -->` inside if bindings.
  */
 export class ElseBindingHandler extends IfBindingHandler {
+  _elseChain: any;
+
   shouldDisplayIf () {
     return super.shouldDisplayIf() || this.value === undefined
   }
@@ -24,7 +26,9 @@ export class ElseBindingHandler extends IfBindingHandler {
    * @return {object}      { elseChainSatisfied: observable }
    */
   get elseChainIsAlreadySatisfied () {
-    if (!this._elseChain) { this._elseChain = this.readElseChain() }
+    if (!this._elseChain) {
+      this._elseChain = this.readElseChain()
+    }
     return unwrap(this._elseChain.elseChainSatisfied)
   }
 
