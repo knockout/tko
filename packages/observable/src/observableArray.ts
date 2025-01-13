@@ -9,8 +9,9 @@ import {
 import { observable, isObservable } from './observable'
 
 import { trackArrayChanges } from './observableArray.changeTracking'
+import { ObservableArray } from '../types/Observable';
 
-export function observableArray<T = any> (initialValues?: (null | undefined)[] | {}[] | (string | { elementName: string; attributes: {}; children: string[][] })[] | ({ name: string; id: Observable<any> } | { name: Observable<any>; id: number })[] | { name: string; job: string }[] | ({ name: string; _destroy: boolean } | { name: string; _destroy?: undefined })[] | { x: string }[] | { x: number }[] | { childprop: string }[] | { x: Observable<any> }[] | ({ childProp: string; _destroy?: undefined } | { childProp: string; _destroy: boolean })[] | { children: ObservableArray<any> }[] | { itemProp: string }[] | ({ name: Observable<any> } | { name: string })[] | ({ personName: string } | { personName: Observable<any> })[] | { obsVal: Observable<any> }[] | ({ someProp: number; _destroy?: undefined } | { someProp: number; _destroy: string } | { someProp: number; _destroy: Observable<any> })[] | { preferredTemplate: number; someProperty: string }[] | undefined): ObservableArray<T> {
+export function observableArray<T = any> (initialValues?: T[]): ObservableArray<T> {
   initialValues = initialValues || []
 
   if (typeof initialValues !== 'object' || !('length' in initialValues)) { throw new Error('The argument passed when initializing an observable array must be an array, or null, or undefined.') }
@@ -18,7 +19,7 @@ export function observableArray<T = any> (initialValues?: (null | undefined)[] |
   var result = Object.setPrototypeOf(observable(initialValues), observableArray.fn) as ObservableArray<T>
   trackArrayChanges(result)
         // ^== result.extend({ trackArrayChanges: true })
-  overwriteLengthPropertyIfSupported(result, { get: () => result().length })
+  overwriteLengthPropertyIfSupported(result, { get: () => result()?.length })
   return result
 }
 
