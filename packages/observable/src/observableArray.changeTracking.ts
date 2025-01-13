@@ -169,8 +169,8 @@ export function trackArrayChanges (target, options?) {
 }
 
 // Expose compareArrays for testing.
-trackArrayChanges.compareArrays = compareArrays
+trackArrayChanges.compareArrays = compareArrays;
 
 // Add the trackArrayChanges extender so we can use
 // obs.extend({ trackArrayChanges: true })
-extenders.trackArrayChanges = trackArrayChanges
+(extenders as any).trackArrayChanges = trackArrayChanges

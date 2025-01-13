@@ -79,7 +79,7 @@ export function range (min, max) {
 }
 
 // Go through the items that have been added and deleted and try to find matches between them.
-export function findMovesInArrayComparison (left, right, limitFailedCompares: number| boolean) {
+export function findMovesInArrayComparison (left, right, limitFailedCompares?: number| boolean) {
   if (left.length && right.length) {
     var failedCompares, l, r, leftItem, rightItem
     for (failedCompares = l = 0; (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]); ++l) {
