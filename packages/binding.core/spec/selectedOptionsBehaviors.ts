@@ -40,8 +40,8 @@ describe('Binding: Selected Options', function () {
 
   it('Should set selection in the SELECT node to match the model', function () {
     var bObject = {}
-    var values = new observableArray(['A', bObject, 'C'])
-    var selection = new observableArray([bObject])
+    var values = observableArray(['A', bObject, 'C'])
+    var selection = observableArray([bObject])
     testNode.innerHTML = "<select multiple='multiple' data-bind='options:myValues, selectedOptions:mySelection'></select>"
     applyBindings({ myValues: values, mySelection: selection }, testNode)
 
@@ -57,8 +57,8 @@ describe('Binding: Selected Options', function () {
     }
 
     var cObject = {}
-    var values = new observableArray(['A', 'B', cObject])
-    var selection = new observableArray(['B'])
+    var values = observableArray(['A', 'B', cObject])
+    var selection = observableArray(['B'])
     testNode.innerHTML = "<select multiple='multiple' data-bind='options:myValues, selectedOptions:mySelection'></select>"
     applyBindings({ myValues: values, mySelection: selection }, testNode)
 
@@ -79,7 +79,7 @@ describe('Binding: Selected Options', function () {
     }
 
     var cObject = {}
-    var values = new observableArray(['A', 'B', cObject])
+    var values = observableArray(['A', 'B', cObject])
     var selection = ['B']
     var myModel = { myValues: values, mySelection: selection }
     testNode.innerHTML = "<select multiple='multiple' data-bind='options:myValues, selectedOptions:mySelection'></select>"
@@ -101,7 +101,7 @@ describe('Binding: Selected Options', function () {
       if (/MSIE 6/i.test(navigator.userAgent)) { optionElement.setAttribute('selected', state) } else { optionElement.selected = state }
     }
 
-    var selection = new observableArray([])
+    var selection = observableArray([])
     testNode.innerHTML = "<select multiple='multiple' data-bind='selectedOptions:mySelection'><optgroup label='group'><option value='a'>a-text</option><option value='b'>b-text</option><option value='c'>c-text</option></optgroup></select>"
     applyBindings({ mySelection: selection }, testNode)
 
@@ -116,7 +116,7 @@ describe('Binding: Selected Options', function () {
   })
 
   it('Should set selection in the SELECT node inside an optgroup to match the model', function () {
-    var selection = new observableArray(['a'])
+    var selection = observableArray(['a'])
     testNode.innerHTML = "<select multiple='multiple' data-bind='selectedOptions:mySelection'><optgroup label='group'><option value='a'>a-text</option><option value='b'>b-text</option><option value='c'>c-text</option></optgroup><optgroup label='group2'><option value='d'>d-text</option></optgroup></select>"
     applyBindings({ mySelection: selection }, testNode)
 
@@ -139,7 +139,7 @@ describe('Binding: Selected Options', function () {
     testNode.innerHTML = "<select multiple=\"multiple\" data-bind=\"options: data, optionsText: 'name', optionsValue: 'code', selectedOptions: selectedItems\"></select>"
     applyBindings({ selectedItems: selection, data: data }, testNode)
 
-    var selectElem = testNode.childNodes[0]
+    var selectElem = testNode.childNodes[0] as HTMLElement
     expect(selectElem.scrollTop).toBe(0)
     expect(selectElem).toHaveSelectedValues([])
 
