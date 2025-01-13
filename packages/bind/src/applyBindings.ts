@@ -110,7 +110,7 @@ function hasBindings (node : HTMLElement) : boolean {
 }
 
 function nodeOrChildHasBindings (node : HTMLElement) : boolean {
-  return hasBindings(node) || [...node.childNodes].some(c => nodeOrChildHasBindings(c))
+  return hasBindings(node) || [...node.childNodes].some(c => nodeOrChildHasBindings(c as HTMLElement))
 }
 
 function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
@@ -126,7 +126,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
   let shouldApplyBindings = isElement || // Case (1)
       hasBindings(nodeVerified)          // Case (2)
 
-  const { shouldBindDescendants } = shouldApplyBindings
+  const { shouldBindDescendants }: any = shouldApplyBindings
     ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
     : { shouldBindDescendants: true }
 
@@ -207,7 +207,7 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
     if (isProviderForNode(provider, node)) {
           // Get the binding from the provider within a computed observable so that we can update the bindings whenever
           // the binding context is updated or if the binding provider accesses observables.
-      var bindingsUpdater = computed(
+      var bindingsUpdater: any = computed(
               function () {
                 bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext)
                   // Register a dependency on the binding context to support observable view models.
@@ -217,7 +217,9 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
               null, { disposeWhenNodeIsRemoved: node }
           )
 
-      if (!bindings || !bindingsUpdater.isActive()) { bindingsUpdater = null }
+      if (!bindings || !bindingsUpdater.isActive()){
+        bindingsUpdater = null
+      }
     }
   }
 
@@ -256,7 +258,7 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
         if (!callback) { return }
         const nodes = virtualElements.childNodes(node)
         if (nodes.length) { callback(nodes, dataFor(nodes[0])) }
-      })
+      }, null)
     }
 
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
@@ -373,7 +375,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext : any, roo
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
   }
-  return new BindingResult({asyncBindingsApplied, rootNode})
+  return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
 }
 
 export function applyBindings (viewModelOrBindingContext : any, rootNode : HTMLElement, extendContextCallback? : any) {
