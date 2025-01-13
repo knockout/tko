@@ -60,7 +60,7 @@ describe('Binding: Attr', function () {
     var myValue = observable('myName')
     testNode.innerHTML = "<input data-bind='attr: { name: myValue }' />"
     applyBindings({ myValue: myValue }, testNode)
-    expect(testNode.children[0].name).toEqual('myName')
+    expect((testNode.children[0] as HTMLInputElement).name).toEqual('myName')
     if (testNode.children[0].outerHTML) { // Old Firefox doesn't support outerHTML
       expect(testNode.children[0].outerHTML).toMatch('name="?myName"?')
     }
@@ -68,9 +68,9 @@ describe('Binding: Attr', function () {
 
         // Also check we can remove it (which, for a name attribute, means setting it to an empty string)
     myValue(false)
-    expect(testNode.children[0].name).toEqual('')
+    expect((testNode.children[0] as HTMLInputElement).name).toEqual('')
     if (testNode.children[0].outerHTML) { // Old Firefox doesn't support outerHTML
-      expect(testNode.children[0].outerHTML).toNotMatch('name="?([^">]+)')
+      expect(testNode.children[0].outerHTML).not.toMatch('name="?([^">]+)')
     }
     expect(testNode.children[0].getAttribute('name')).toEqual('')
   })
