@@ -455,9 +455,17 @@ describe('Components: Custom elements', function () {
   })
 
   it('Disposes the component when the custom element is cleaned', function () {
-        // This is really a behavior of the component binding, not custom elements.
-        // This spec just shows that custom elements don't break it for any reason.
-    var componentViewModel = {
+
+
+    interface myModel {
+      wasDisposed : boolean
+      dispose() : void
+    }
+
+    // This is really a behavior of the component binding, not custom elements.
+    // This spec just shows that custom elements don't break it for any reason.
+    var componentViewModel : myModel = {
+      wasDisposed: false,
       dispose: function () {
         this.wasDisposed = true
       }
@@ -518,7 +526,7 @@ describe('Components: Custom elements', function () {
     try {
       jasmine.Clock.tick(1)
       expect(testNode).toContainText('hello [the outer component [the inner component with value [my value]] goodbye] world')
-    } catch (ex) {
+    } catch (ex : any) {
       if (ex.message.indexOf('Unexpected call to method or property access.') >= 0) {
                 // On IE < 9, this scenario is only supported if you have referenced jQuery.
                 // So don't consider this to be a failure if jQuery isn't referenced.

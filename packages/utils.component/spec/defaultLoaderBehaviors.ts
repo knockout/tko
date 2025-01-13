@@ -551,7 +551,7 @@ describe('Components: Default loader', function () {
     }, "timeout", 1000)
   }
 
-  function testTemplateFromElement (wrapperMarkup, elementId, extraAssertsCallback) {
+  function testTemplateFromElement (wrapperMarkup, elementId, extraAssertsCallback?) {
     var testElem = document.createElement('div')
     document.body.appendChild(testElem) // Needed so it can be found by ID, and because IE<=8 won't parse its .innerHTML properly otherwise
 
