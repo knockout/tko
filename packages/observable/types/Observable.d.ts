@@ -51,6 +51,9 @@ export interface ObservableFunctions<T = any> extends Subscribable<T> {
     peek(): T;
     valueHasMutated(): void;
     valueWillMutate(): void;
+
+    //TKO
+    modify(fn,peek=true):Observable
 }
 
 export interface Observable<T = any> extends ObservableFunctions<T> {
