@@ -353,7 +353,7 @@ function getBindingContext (viewModelOrBindingContext, extendContextCallback?) {
     : new bindingContext(viewModelOrBindingContext, undefined, undefined, extendContextCallback)
 }
 
-export function applyBindingAccessorsToNode (node : HTMLElement, bindings : any, viewModelOrBindingContext :any, asyncBindingsApplied : any) {
+export function applyBindingAccessorsToNode (node : HTMLElement, bindings : any, viewModelOrBindingContext?: any, asyncBindingsApplied?: any) {
   if (node.nodeType === 1) { // If it's an element, workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(node)
   }
