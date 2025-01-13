@@ -1,7 +1,7 @@
 
 import {
     tagNameLower, arrayFilter, arrayMap, setTextContent, arrayIndexOf,
-    setOptionNodeSelectionState, triggerEvent, domData,
+    setOptionNodeSelectionState, triggerEvent,
     ensureSelectElementIsRenderedCorrectly, selectExtensions
 } from '@tko/utils'
 

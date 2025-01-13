@@ -26,7 +26,7 @@ export var selectExtensions = {
     }
   },
 
-  writeValue: function (element, value, allowUnset) {
+  writeValue: function (element, value, allowUnset?) {
     switch (tagNameLower(element)) {
       case 'option':
         if (typeof value === 'string') {

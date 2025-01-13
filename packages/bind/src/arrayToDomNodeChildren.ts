@@ -44,7 +44,7 @@ function mapNodeAndRefreshWhenChanged (containerNode, mapping, valueToMap, callb
 var lastMappingResultDomDataKey = domData.nextKey()
 let deletedItemDummyValue = domData.nextKey()
 
-export function setDomNodeChildrenFromArrayMapping (domNode, array, mapping, options, callbackAfterAddingNodes, editScript) {
+export function setDomNodeChildrenFromArrayMapping (domNode, array, mapping, options, callbackAfterAddingNodes, editScript?) {
   // Compare the provided array against the previous one
   array = array || []
   if (typeof array.length === 'undefined') {
