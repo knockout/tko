@@ -20,6 +20,7 @@ import {bindings as ifBindings} from '@tko/binding.if'
 import {bindings as coreBindings} from '@tko/binding.core'
 
 import '@tko/utils/helpers/jasmine-13-helper'
+import { ObservableArray } from 'packages/observable/types/Observable'
 
 declare var testNode : HTMLElement
 
@@ -320,7 +321,7 @@ describe('Binding: Foreach', function () {
   it('Should call an afterAdd callback function and not cause updates if an observable accessed in the callback is changed', function () {
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, afterAdd: callback }'><span data-bind='text: childprop'></span></div>"
     var callbackObservable = observable(1),
-      someItems = observableArray([]),
+      someItems: ObservableArray = observableArray([]),
       callbacks = 0
     applyBindings({ someItems: someItems, callback: function () { callbackObservable(); callbacks++ } }, testNode)
     someItems.push({ childprop: 'added child'})
