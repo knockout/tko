@@ -44,11 +44,11 @@ import { ORIGINAL_JSX_SYM } from '../dist/JsxObserver';
 import { assert } from "chai"
 
 class JsxTestObserver extends JsxObserver {
-  
+
   constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns?, noInitialBinding?) {
     super(jsxOrObservable, parentNode, insertBefore, xmlns, noInitialBinding)
   }
-  
+
   // For testing purposes, we make this synchronous.
   detachAndDispose (node) {
     super.detachAndDispose(node)
@@ -1091,7 +1091,7 @@ describe('jsx', function () {
       assert.equal(parent.innerHTML, 'yz<!--O-->')
       obs(['z', '2'])
       assert.equal(parent.innerHTML, 'z2<!--O-->')
-      obs('r')
+      obs(['r'])
       assert.equal(parent.innerHTML, 'r<!--O-->')
       jo.dispose()
     })
