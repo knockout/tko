@@ -56,7 +56,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
   }
 
   var writeFunction = options.write
-  var state = {
+  var state: state = {
     latestValue: undefined,
     isStale: true,
     isDirty: true,
@@ -74,7 +74,24 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
     dependenciesCount: 0,
     evaluationTimeoutInstance: null
   }
-
+  interface state {
+    latestValue: any,
+    isStale: boolean,
+    isDirty: boolean,
+    isBeingEvaluated: boolean,
+    suppressDisposalUntilDisposeWhenReturnsFalse: boolean,
+    isDisposed: boolean,
+    pure: boolean,
+    isSleeping: boolean,
+    readFunction: ComputedReadFunction,
+    evaluatorFunctionTarget: any,
+    disposeWhenNodeIsRemoved: Node | null,
+    disposeWhen?: () => boolean,
+    domNodeDisposalCallback: (() => void) | null,
+    dependencyTracking: any,
+    dependenciesCount: number,
+    evaluationTimeoutInstance: any
+  }
   function computedObservable () {
     if (arguments.length > 0) {
       if (typeof writeFunction === 'function') {
@@ -89,8 +106,8 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
       if (!state.isDisposed) {
         dependencyDetection.registerDependency(computedObservable)
       }
-      if (state.isDirty || (state.isSleeping && computedObservable.haveDependenciesChanged())) {
-        computedObservable.evaluateImmediate()
+      if (state.isDirty || (state.isSleeping && (computedObservable as any).haveDependenciesChanged())) {
+        (computedObservable as any).evaluateImmediate()
       }
       return state.latestValue
     }
@@ -138,18 +155,18 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
 
     // Evaluate, unless sleeping or deferEvaluation is true
   if (!state.isSleeping && !options.deferEvaluation) {
-    computedObservable.evaluateImmediate()
+    (computedObservable as any).evaluateImmediate()
   }
 
     // Attach a DOM node disposal callback so that the computed will be proactively disposed as soon as the node is
     // removed using ko.removeNode. But skip if isActive is false (there will never be any dependencies to dispose).
-  if (state.disposeWhenNodeIsRemoved && computedObservable.isActive()) {
+  if (state.disposeWhenNodeIsRemoved && (computedObservable as any).isActive()) {
     addDisposeCallback(state.disposeWhenNodeIsRemoved, state.domNodeDisposalCallback = function () {
-      computedObservable.dispose()
+      (computedObservable as any).dispose()
     })
   }
 
-  return computedObservable
+  return computedObservable as any;
 }
 
 // Utility function that disposes a given dependencyTracking entry
@@ -404,9 +421,9 @@ computed.fn = {
   },
 
   limit (limitFunction) {
-    const state = this[computedState]
+    const state = this[computedState];
     // Override the limit function with one that delays evaluation as well
-    subscribable.fn.limit.call(this, limitFunction)
+    (subscribable.fn as any).limit.call(this, limitFunction)
     Object.assign(this, {
       _evalIfChanged () {
         if (!this[computedState].isSleeping) {
@@ -535,7 +552,7 @@ var protoProp = observable.protoProperty // == "__ko_proto__"
 computed.fn[protoProp] = computed
 
 /* This is used by ko.isObservable */
-observable.observablePrototypes.add(computed)
+observable.observablePrototypes.add(computed as any)
 
 export function isComputed<T= any> (instance: any):instance is Computed<T> {
   return (typeof instance === 'function' && instance[protoProp] === computed)
