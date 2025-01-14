@@ -1218,10 +1218,11 @@ describe('Templating', function () {
 
       applyBindings({condition: condition}, testNode)
 
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true)
+      const child: HTMLElement = testNode.childNodes[0] as HTMLElement
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(true)
 
       condition(false)
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
     })
 
     it('is false iff the `ifnot` is true', function () {
@@ -1231,10 +1232,11 @@ describe('Templating', function () {
 
       applyBindings({condition: condition}, testNode)
 
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false)
+      const child: HTMLElement = testNode.childNodes[0] as HTMLElement
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
 
       condition(false)
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(true)
     })
 
     it('is false iff the `foreach` is empty', function () {
@@ -1244,15 +1246,16 @@ describe('Templating', function () {
 
       applyBindings({items: items}, testNode)
 
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false)
+      const child: HTMLElement = testNode.childNodes[0] as HTMLElement
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
 
       items([])
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
 
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
 
       items([123])
-      expect(domData.get(testNode.childNodes[0], 'conditional').elseChainSatisfied()).toEqual(true)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(true)
     })
 
     it('is false iff the `if` is false, on a DOM node', function () {
