@@ -10,6 +10,7 @@ import {
 import {
     computed, isPureComputed, isComputed
 } from '../dist'
+import { ObservableArray } from 'packages/observable/types/Observable'
 
 describe('Dependent Observable', function () {
   it('Should be subscribable', function () {
@@ -95,7 +96,7 @@ describe('Dependent Observable', function () {
     var someContainer = { depObs: instance }
     someContainer.depObs('some value')
     expect(invokedWriteWithValue).toEqual('some value')
-    expect(invokedWriteWithThis).toEqual(function () { return this }.call()) // Since no owner was specified
+    expect(invokedWriteWithThis).toEqual(function () { return this }.call(null)) // Since no owner was specified
   })
 
   it('Should be able to write to multiple computed properties on a model object using chaining syntax', function () {
@@ -626,13 +627,13 @@ describe('Dependent Observable', function () {
 
   it('Should inherit any properties defined on ko.subscribable.fn or computed.fn', function () {
     this.after(function () {
-      delete subscribable.fn.customProp       // Will be able to reach this
-      delete subscribable.fn.customFunc       // Overridden on computed.fn
+      delete (subscribable.fn as any).customProp       // Will be able to reach this
+      delete (subscribable.fn as any).customFunc       // Overridden on computed.fn
       delete computed.fn.customFunc         // Will be able to reach this
-    })
+    });
 
-    subscribable.fn.customProp = 'subscribable value'
-    subscribable.fn.customFunc = function () { throw new Error('Shouldn\'t be reachable') }
+    (subscribable.fn as any).customProp = 'subscribable value';
+    (subscribable.fn as any).customFunc = function () { throw new Error('Shouldn\'t be reachable') }
     computed.fn.customFunc = function () { return this() }
 
     var instance = computed(function () { return 123 })
@@ -647,16 +648,16 @@ describe('Dependent Observable', function () {
     }
 
     this.after(function () {
-      delete subscribable.fn.customFunction1
+      delete (subscribable.fn as any).customFunction1
       delete computed.fn.customFunction2
     })
 
     var computedInstance = computed(function () {})
 
-    var customFunction1 = function () {}
-    var customFunction2 = function () {}
+    var customFunction1 = function () {};
+    var customFunction2 = function () {};
 
-    subscribable.fn.customFunction1 = customFunction1
+    (subscribable.fn as any).customFunction1 = customFunction1
     computed.fn.customFunction2 = customFunction2
 
     expect(computedInstance.customFunction1).toBe(customFunction1)
@@ -686,7 +687,7 @@ describe('Dependent Observable', function () {
       observableInstance = observable(0),
       computedInstance = computed({
         read: function () {
-          return ++evaluateCount + observable()
+          return ++evaluateCount + observableInstance()
         },
         deferEvaluation: true
       })
@@ -811,7 +812,7 @@ describe('Dependent Observable', function () {
   describe('observableArray properties', function () {
     it('Should be able to call standard mutators without creating a subscription', function () {
       var timesEvaluated = 0,
-        newArray = observableArray(['Alpha', 'Beta', 'Gamma'])
+        newArray: ObservableArray = observableArray(['Alpha', 'Beta', 'Gamma'])
 
       computed(function () {
                 // Make a few standard mutations
