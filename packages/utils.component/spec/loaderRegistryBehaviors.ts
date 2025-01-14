@@ -76,7 +76,7 @@ describe('Components: Loader registry', function () {
         onLoaded()
       } else {
                 // Will complete asynchronously
-        window.waitsFor(function () { return loadedDefinition !== 'Not yet loaded' }, 300)
+        window.waitsFor(function () { return loadedDefinition !== 'Not yet loaded' }, undefined, 300)
         runs(onLoaded)
       }
     }
