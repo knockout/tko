@@ -12,7 +12,7 @@ import components from '../dist'
 describe('Components: Loader registry', function () {
   var testAsyncDelay = 20,
     testComponentName = 'test-component',
-    testComponentConfig = {},
+    testComponentConfig: any = {},
     testComponentDefinition = { template: {} },
     loaderThatDoesNotReturnAnything = {
       getConfig: function (name, callback) {
@@ -385,7 +385,7 @@ describe('Components: Loader registry', function () {
     })
 
         // And when the loading eventually completes, both requests are satisfied with the same definition
-    window.waitsFor(function () { return definition1 }, 300)
+    window.waitsFor(function () { return definition1 }, undefined, 300)
     runs(function () {
       expect(definition1.template).toBe(someModuleTemplate)
       expect(definition2).toBe(definition1)
