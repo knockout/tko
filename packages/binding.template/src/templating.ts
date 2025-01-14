@@ -24,6 +24,7 @@ import {
 import {
   anonymousTemplate as AnonymousTemplate
 } from './templateSources'
+import { Computed } from 'packages/computed/types/computed'
 
 var _templateEngine
 const cleanContainerDomDataKey = domData.nextKey()
@@ -231,7 +232,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
 
   // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
   // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
-  function localSetDomNodeChildrenFromArrayMapping (newArray, changeList) {
+  function localSetDomNodeChildrenFromArrayMapping (newArray, changeList?) {
     dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, newArray, executeTemplateForArrayItem, options, activateBindingsCallback, changeList])
     bindingEvent.notify(targetNode, bindingEvent.childrenComplete)
   }
@@ -324,46 +325,46 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     var value = this.value
     var options = unwrap(value)
     var shouldDisplay = true
-    var templateComputed = null
-    var elseChainSatisfied = domData.get(element, 'conditional').elseChainSatisfied
-    var templateName
+    let templateComputed: string | Computed<any> | null = null;
+    var elseChainSatisfied = domData.get(element, 'conditional').elseChainSatisfied;
+    var templateName;
 
     if (typeof options === 'string') {
-      templateName = value
-      options = {}
+      templateName = value;
+      options = {};
     } else {
-      templateName = options.name
+      templateName = options.name;
 
       // Support "if"/"ifnot" conditions
       if ('if' in options) {
-        shouldDisplay = unwrap(options.if)
+        shouldDisplay = unwrap(options.if);
       }
 
       if (shouldDisplay && 'ifnot' in options) {
-        shouldDisplay = !unwrap(options.ifnot)
+        shouldDisplay = !unwrap(options.ifnot);
       }
     }
 
     if ('foreach' in options) {
       // Render once for each data point (treating data set as empty if shouldDisplay==false)
-      var dataArray = (shouldDisplay && options.foreach) || []
-      templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding)
+      var dataArray = (shouldDisplay && options.foreach) || [];
+      templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding);
 
-      elseChainSatisfied((unwrap(dataArray) || []).length !== 0)
+      elseChainSatisfied((unwrap(dataArray) || []).length !== 0);
     } else if (shouldDisplay) {
       // Render once for this single data point (or use the viewModel if no data was provided)
       var innerBindingContext = ('data' in options)
         ? bindingContext.createStaticChildContext(options.data, options.as)  // Given an explicit 'data' value, we create a child binding context for it
-        : bindingContext                                                        // Given no explicit 'data' value, we retain the same binding context
-      templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding)
-      elseChainSatisfied(true)
+        : bindingContext;                                                        // Given no explicit 'data' value, we retain the same binding context
+      templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding);
+      elseChainSatisfied(true);
     } else {
-      virtualElements.emptyNode(element)
-      elseChainSatisfied(false)
+      virtualElements.emptyNode(element);
+      elseChainSatisfied(false);
     }
 
     // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
-    this.disposeOldComputedAndStoreNewOne(element, templateComputed)
+    this.disposeOldComputedAndStoreNewOne(element, templateComputed);
   }
 
   disposeOldComputedAndStoreNewOne (element, newComputed) {
