@@ -25,6 +25,7 @@ import {
 } from '../dist';
 
 import { assert } from "chai"
+import { Observable } from 'packages/observable/types/Observable';
 
 function ctxStub (ctx?) {
   return {

@@ -27,6 +27,10 @@ export interface SubscribableFunctions<T = any> extends Function {
     extend<S extends Subscribable<T>>(requestedExtenders: ObservableExtenderOptions<T>): S;
 
     getSubscriptionsCount(event?: string): number;
+
+    // TKO
+
+    when(test, returnValue?)
 }
 
 export interface Subscribable<T = any> extends SubscribableFunctions<T> { }
