@@ -1,8 +1,10 @@
+import { Subscribable } from 'packages/observable/types/Observable';
+
 export interface Computed<T = any> extends ComputedFunctions<T> {
     (): T;
     (value: T): this;
   }
-  
+
   export interface ComputedFunctions<T = any> extends Subscribable<T> {
     // It's possible for a to be undefined, since the equalityComparer is run on the initial
     // computation with undefined as the first argument. This is user-relevant for deferred computeds.
@@ -13,8 +15,8 @@ export interface Computed<T = any> extends ComputedFunctions<T> {
     getDependenciesCount(): number;
     getDependencies(): Subscribable[];
   }
-  
-  
+
+
   export interface PureComputed<T = any> extends Computed<T> { }
 
   export type ComputedReadFunction<T = any, TTarget = void> = Subscribable<T> | Observable<T> | Computed<T> | ((this: TTarget) => T);
@@ -45,6 +47,6 @@ export interface Computed<T = any> extends ComputedFunctions<T> {
   export function pureComputed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget): PureComputed<T>;
 
 
-  
+
   export function isComputed<T = any>(instance: any): instance is Computed<T>;
   export function isPureComputed<T = any>(instance: any): instance is PureComputed<T>;
