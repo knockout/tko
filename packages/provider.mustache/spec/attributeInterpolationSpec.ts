@@ -26,11 +26,12 @@ import {
 
 import '@tko/utils/helpers/jasmine-13-helper';
 import { AttributeMustacheProvider } from '../src';
+import { ObservableArray } from 'packages/observable/types/Observable';
 
 function ctxStub (obj = {}) { return { lookup (v) { return obj[v] } } }
 
 describe('Attribute Interpolation Markup Provider', function () {
-  var testNode: HTMLElement; 
+  var testNode: HTMLElement;
   var provider: AttributeMustacheProvider;
 
   beforeEach(function () {
@@ -151,12 +152,12 @@ describe('Attribute Interpolation Markup Provider', function () {
     testNode.setAttribute('id', '{{expr2}}');
     testNode.setAttribute('data-test', '{{expr3}}');
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(3)
-    const [p0, p1, p2, p3] = bindings
+    expect(bindings.length).toBe(3);
+    const [p0, p1, p2, p3] = bindings;
     const map = { title: 'expr1', id: 'expr2', 'data-test': 'expr3' }
     bindings.forEach(b => {
       const [handler, [part]] = b
-      expect(map[handler]).toEqual(part.text)
+      expect(map[handler as string]).toEqual(part.text)
     })
     expect(testNode.getAttribute('class')).toEqual('test')
   });
@@ -168,7 +169,7 @@ describe('Attribute Interpolation Markup Provider', function () {
     input.setAttribute('value', '{{expr1}}')
 
     const ctx = { expr1: Observable(), expr2: Observable() }
-    const bindings = Array.from(
+    const bindings: any[] = Array.from(
           provider.bindingObjects(testNode, ctxStub(ctx))
         )
     for (const binding of bindings) {
