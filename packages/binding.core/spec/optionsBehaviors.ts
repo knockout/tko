@@ -25,6 +25,7 @@ import '@tko/utils/helpers/jasmine-13-helper'
 import {
     matchers
 } from '../dist/test-helper'
+import { Observable, ObservableArray } from 'packages/observable/types/Observable'
 
 declare var testNode : HTMLElement
 
@@ -183,7 +184,7 @@ describe('Binding: Options', function () {
   })
 
   it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
-    var myObservable = observableArray(['A', 'B', 'C']), changeHandlerFireCount = 0
+    var myObservable: ObservableArray<string | number> = observableArray(['A', 'B', 'C']), changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues'></select>"
     registerEventHandler(testNode.childNodes[0], 'change', function () {
       changeHandlerFireCount++
@@ -214,7 +215,7 @@ describe('Binding: Options', function () {
   })
 
   it('Should trigger a change event when the options selection is changed by modifying the options data (multiple select)', function () {
-    var myObservable = observableArray(['A', 'B', 'C']), changeHandlerFireCount = 0
+    var myObservable: ObservableArray<any> = observableArray(['A', 'B', 'C']), changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues' multiple='multiple'></select>"
     registerEventHandler(testNode.childNodes[0], 'change', function () {
       changeHandlerFireCount++
