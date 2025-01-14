@@ -34,7 +34,7 @@ var templateScript = 1,
   templateTemplate = 3,
   templateElement = 4
 
-export function domElement (element) {
+export function domElement (element?) {
   this.domElement = element
 
   if (!element) { return }
