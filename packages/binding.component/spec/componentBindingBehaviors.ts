@@ -1350,7 +1350,7 @@ describe('Components: Component binding', function () {
 
     it('respects observable array changes with text', function () {
       testNode.innerHTML = ''
-      const arr = observableArray([])
+      const arr: ObservableArray = observableArray([])
       const jsx = {
         elementName: 'test-component',
         attributes: {},
@@ -1384,12 +1384,12 @@ describe('Components: Component binding', function () {
       expect(testNode.children[0] instanceof HTMLElement).toBeTruthy()
       expect(testNode.children[0].children[0] instanceof HTMLElement).toBeTruthy()
 
-      arr(['abcdef'])
+      arr(['abcdef']);
       expect(testNode.innerHTML).toEqual(
         '<test-component><div><!--ko slot: "X"-->abcdef<!--/ko--></div></test-component>'
       )
 
-      arr([])
+      arr([]);
       expect(testNode.innerHTML).toEqual(
         `<test-component><div><!--ko slot: "X"--><!--/ko--></div></test-component>`
       )
