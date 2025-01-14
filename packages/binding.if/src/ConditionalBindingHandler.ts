@@ -9,6 +9,7 @@ import {
 import {
     applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'
+import { Observable } from 'node_modules/@tko/observable/types/Observable';
 
 /**
  * Create a DOMbinding that controls DOM nodes presence
