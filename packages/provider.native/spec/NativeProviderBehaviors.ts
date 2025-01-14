@@ -119,7 +119,7 @@ describe('Native Provider Behavior', function () {
       const child = document.createTextNode('{{ child }}')
       child[NATIVE_BINDINGS] = {}
       div.appendChild(child)
-      const nodes = mp.preprocessNode(div.childNodes[0])
+      const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
       assert.ok(nodes instanceof Text)
       assert.equal(nodes.nodeValue, '{{ child }}')
     })
@@ -130,7 +130,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new TextMustacheProvider())
       const div = divWithNativeBindings({ 'ko-native': '123' })
       div.appendChild(document.createTextNode('{{ child }}'))
-      const nodes = mp.preprocessNode(div.childNodes[0])
+      const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
       assert.equal(nodes.length, 2)
       assert.equal(nodes[0].textContent, 'ko text:child')
     })
