@@ -77,12 +77,12 @@ export default class AttributeMustacheProvider extends Provider {
 
   * bindingObjects (node: HTMLElement, context: any) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
-      const bindingForAttribute = this.getPossibleDirectBinding(attrName)
-      const handler = bindingForAttribute ? attrName : `attr.${attrName}`
+      const bindingForAttribute = this.getPossibleDirectBinding(attrName as string)
+      const handler: string = bindingForAttribute ? attrName as string : `attr.${attrName}`
       const accessorFn = bindingForAttribute
-        ? (...v: any) => this.partsTogether(parts, context, node, ...v)
-        : (...v: any) => ({[attrName]: this.partsTogether(parts, context, node, ...v)})
-      node.removeAttribute(attrName)
+        ? (...v: any) => this.partsTogether(parts as any[], context, node, ...v)
+        : (...v: any) => ({[attrName as string]: this.partsTogether(parts as any[], context, node, ...v)})
+      node.removeAttribute(attrName as string)
       yield { [handler]: accessorFn }
     }
   }
