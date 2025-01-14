@@ -274,7 +274,7 @@ describe('Rate-limited', function () {
     })
 
     it('Should notify "spectator" subscribers whenever the value changes', function () {
-      var observable = new koObservable('A').extend({rateLimit: 500}),
+      var observable = koObservable('A').extend({rateLimit: 500}),
         spectateSpy = jasmine.createSpy('notifySpy'),
         notifySpy = jasmine.createSpy('notifySpy')
 
@@ -764,9 +764,9 @@ describe('Deferred', function () {
             // a given observable).
       var observable = koObservable()
 
-      observable.extend({deferred: true})
+      observable.extend({deferred: true});
       expect(function () {
-        observable.extend({deferred: false})
+        observable.extend(Object.assign({deferred: false}))
       }).toThrow('The \'deferred\' extender only accepts the value \'true\', because it is not supported to turn deferral off once enabled.')
     })
 
