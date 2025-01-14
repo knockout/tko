@@ -707,7 +707,7 @@ describe('array accessors - []', function () {
         x: x
       },
       bindings;
-    context.a[x] = 12;
+    context.a[x as any] = 12;
     bindings = makeBindings(binding, context);
     assert.equal(bindings.neg(), 12)
   })
