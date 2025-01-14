@@ -18,6 +18,7 @@ import {bindings as templateBindings} from '@tko/binding.template'
 import {bindings as coreBindings} from '@tko/binding.core'
 
 import '@tko/utils/helpers/jasmine-13-helper'
+import { ObservableArray } from 'packages/observable/types/Observable'
 
 describe('Binding: Using', function () {
   beforeEach(jasmine.prepareTestNode)
@@ -183,7 +184,7 @@ describe('Binding: Using', function () {
     testNode.innerHTML = "<div data-bind='using: someitem'>text" +
             "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
 
-    var childprop = observableArray([])
+    var childprop: ObservableArray = observableArray([])
     var someitem = observable({childprop: childprop})
     var viewModel = {someitem: someitem}
     applyBindings(viewModel, testNode)
