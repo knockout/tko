@@ -76,7 +76,7 @@ export function dummyTemplateEngine(templates?) {
             try {
                 var evalResult = eval(script);
                 return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
-            } catch (ex) {
+            } catch (ex: any) {
                 throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
             }
         };
