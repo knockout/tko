@@ -76,7 +76,7 @@ describe('Components: Loader registry', function () {
         onLoaded()
       } else {
                 // Will complete asynchronously
-        window.waitsFor(function () { return loadedDefinition !== 'Not yet loaded' }, undefined, 300)
+        window.waitsFor(function () { return loadedDefinition !== 'Not yet loaded' }, "timeout", 300)
         runs(onLoaded)
       }
     }
@@ -385,7 +385,7 @@ describe('Components: Loader registry', function () {
     })
 
         // And when the loading eventually completes, both requests are satisfied with the same definition
-    window.waitsFor(function () { return definition1 }, undefined, 300)
+    window.waitsFor(function () { return definition1 }, "timeout", 300)
     runs(function () {
       expect(definition1.template).toBe(someModuleTemplate)
       expect(definition2).toBe(definition1)
