@@ -381,9 +381,9 @@ describe('jsx', function () {
     const parent = document.createElement('div')
     const jsx: string[] = []
     jsx[0] = 'a'
-    jsx[1] = 'b'
+    jsx[2] = 'b'
     const jo = new JsxTestObserver(jsx, parent)
-    assert.equal(parent.innerHTML, `ab`)
+    assert.equal(parent.innerHTML, `a<!--undefined-->b`)
     jo.dispose()
   })
 
