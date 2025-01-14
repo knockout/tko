@@ -927,7 +927,7 @@ describe('jsx', function () {
     })
 
     it('binds components array', () => {
-      const arr = observableArray([])
+      const arr = observableArray<any>([])
       class TestComponentInner extends ComponentABC {
         get template () {
           return { elementName: 'i', children: ['I'], attributes: {} }
