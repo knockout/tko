@@ -1,5 +1,3 @@
-declare var jQuery : any
-
 interface CustomBindingGlobalProperties {
   String;
   isObservable;
