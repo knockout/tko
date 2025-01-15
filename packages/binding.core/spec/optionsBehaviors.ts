@@ -27,8 +27,6 @@ import {
 } from '../dist/test-helper'
 import { Observable, ObservableArray } from 'packages/observable/types/Observable'
 
-declare var testNode : HTMLElement
-
 describe('Binding: Options', function () {
   beforeEach(jasmine.prepareTestNode)
 

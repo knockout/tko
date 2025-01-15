@@ -42,8 +42,6 @@ import {
     useMockForTasks
 } from '@tko/utils/helpers/jasmine-13-helper'
 
-declare var testNode : HTMLElement
-
 describe('Components: Custom elements', function () {
   var bindingHandlers
 

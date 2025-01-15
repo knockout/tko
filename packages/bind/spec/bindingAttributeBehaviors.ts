@@ -27,8 +27,6 @@ import { bindings as ifBindings } from '@tko/binding.if'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
-declare var testNode : HTMLElement
-
 describe('Binding attribute syntax', function () {
   var bindingHandlers
 
