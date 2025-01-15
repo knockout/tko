@@ -17,7 +17,7 @@ export function throttleExtender (target, timeout) {
 
     // (2) For writable targets (observables, or writable dependent observables), we throttle *writes*
     //     so the target cannot change value synchronously or faster than a certain rate
-  var writeTimeoutInstance:NodeJS.Timeout | undefined = undefined
+  var writeTimeoutInstance: ReturnType<typeof setTimeout> | undefined = undefined
   return computed({
     read: target,
     write: function (value) {

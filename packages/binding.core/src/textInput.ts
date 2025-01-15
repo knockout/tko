@@ -27,8 +27,9 @@ class TextInput extends BindingHandler {
   get aliases () { return 'textinput' }
 
   previousElementValue: any;
-  elementValueBeforeEvent?: NodeJS.Timeout;
-  timeoutHandle?: NodeJS.Timeout;
+  elementValueBeforeEvent?: ReturnType<typeof setTimeout>;
+  timeoutHandle?: ReturnType<typeof setTimeout>;
+
   constructor (...args: [any]) {
     super(...args)
     this.previousElementValue = this.$element.value
