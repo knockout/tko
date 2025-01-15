@@ -55,7 +55,6 @@ describe('Cross-window support', function () {
   })
 
   it('Should work in another window', function () {
-    var body2
     const win2 = window.open('', '_blank', 'height=150,location=no,menubar=no,toolbar=no,width=250')
 
     if (!win2) { return }
@@ -66,12 +65,12 @@ describe('Cross-window support', function () {
 
     win2.document.write(BLANK_HTML)
     win2.document.close()
-    body2 = win2.document.body
+    const body2 = win2.document.body
 
     // renderTemplate
     window.runs(function () {
       setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: text'></div>" }))
-      renderTemplate('someTemplate', { text: 'abc' }, null, body2, null, null)
+      renderTemplate('someTemplate', { text: 'abc' }, null, body2)
       expect(body2.childNodes.length).toEqual(1)
       expect(body2).toContainHtml('<div data-bind="text: text">abc</div>')
       cleanNode(body2)
