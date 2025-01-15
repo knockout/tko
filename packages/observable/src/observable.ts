@@ -162,7 +162,7 @@ export function peek (value) {
 }
 
 export function isWriteableObservable<T = any> (instance: any): instance is Observable<T> {
-  return isObservable(instance) && instance.isWriteable
+  return isObservable(instance) && (instance as any).isWriteable
 }
 
 export { isWriteableObservable as isWritableObservable }
