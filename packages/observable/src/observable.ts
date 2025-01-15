@@ -12,15 +12,15 @@ import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
 import { Observable } from '../types/Observable'
 
-export function observable(initialValue?: any): Observable{ 
+export function observable(initialValue?: any): Observable{
   function Observable () {
     if (arguments.length > 0) {
             // Write
             // Ignore writes if the value hasn't changed
-      if (Observable.isDifferent(Observable[LATEST_VALUE], arguments[0])) {
-        Observable.valueWillMutate()
-        Observable[LATEST_VALUE] = arguments[0]
-        Observable.valueHasMutated()
+      if ((Observable as any).isDifferent(Observable[LATEST_VALUE], arguments[0])) {
+        (Observable as any).valueWillMutate();
+        Observable[LATEST_VALUE] = arguments[0];
+        (Observable as any).valueHasMutated();
       }
       return this // Permits chained assignments
     } else {
@@ -43,7 +43,7 @@ export function observable(initialValue?: any): Observable{
     deferUpdates(Observable)
   }
 
-  return Observable
+  return (Observable as any)
 }
 
 // Define prototype for observables
@@ -78,7 +78,7 @@ function limitNotifySubscribers (value, event) {
 }
 
 // Add `limit` function to the subscribable prototype
-subscribable.fn.limit = function limit (limitFunction) {
+(subscribable.fn as any).limit = function limit (limitFunction) {
   var self = this
   var selfIsObservable = isObservable(self)
   var beforeChange = 'beforeChange'
