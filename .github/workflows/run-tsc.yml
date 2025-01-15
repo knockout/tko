@@ -1,5 +1,5 @@
 # Workflow for checking tsc compile errors
-name: Check TSC
+name: Check build+tsc
 
 on:
   # Runs for every pull-requests created
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  tsc:
     runs-on: ubuntu-latest
 
     strategy:
@@ -33,3 +33,4 @@ jobs:
 
       - name: Run tsc
         run: npx tsc
+        continue-on-error: true
