@@ -372,7 +372,7 @@ describe('jsx', function () {
     jsx[0] = 'a'
     jsx[2] = 'b'
     const jo = new JsxTestObserver(jsx, parent)
-    assert.equal(parent.innerHTML, `ab`)
+    assert.equal(parent.innerHTML, `a<!--undefined-->b`)
     jo.dispose()
   })
 
