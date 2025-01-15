@@ -9,6 +9,7 @@
     "importHelpers": true,
     "strict": true,
     "baseUrl": ".",
+    "noEmit": true,
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [
         "packages/utils/helpers/jasmine-13-helper.ts"
@@ -22,5 +23,11 @@
         "builds/*"
       ]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "builds",
+    "docs",
+    "tools"
+  ]
 }
