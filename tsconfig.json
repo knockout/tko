@@ -9,7 +9,6 @@
     "allowJs": false,
     "importHelpers": true,
     "allowSyntheticDefaultImports":  true,
-
     "strict": true,
     "baseUrl": ".",
     "noEmit": true,
