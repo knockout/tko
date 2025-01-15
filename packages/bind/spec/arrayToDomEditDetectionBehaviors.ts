@@ -13,8 +13,6 @@ import {
 
 import  '@tko/utils/helpers/jasmine-13-helper'
 
-declare var testNode : any
-
 function copyDomNodeChildren (domNode : HTMLElement) {
   var copy = new Array()
   for (var i = 0; i < domNode.childNodes.length; i++) { copy.push(domNode.childNodes[i]) }
@@ -35,10 +33,10 @@ describe('Array to DOM node children mapping', function () {
     }
     setDomNodeChildrenFromArrayMapping(testNode, array, mapping)
     expect(testNode.childNodes.length).toEqual(4)
-    expect(testNode.childNodes[0].innerHTML).toEqual('A1')
-    expect(testNode.childNodes[1].innerHTML).toEqual('A2')
-    expect(testNode.childNodes[2].innerHTML).toEqual('B1')
-    expect(testNode.childNodes[3].innerHTML).toEqual('B2')
+    expect(testNode.children[0].innerHTML).toEqual('A1')
+    expect(testNode.children[1].innerHTML).toEqual('A2')
+    expect(testNode.children[2].innerHTML).toEqual('B1')
+    expect(testNode.children[3].innerHTML).toEqual('B2')
   })
 
   it('Should only call the mapping function for new array elements', function () {
@@ -84,7 +82,7 @@ describe('Array to DOM node children mapping', function () {
     }
 
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'B'], mapping)
-    expect(arrayMap(testNode.childNodes, function (x) { return x.innerHTML })).toEqual(['A', 'B'])
+    expect(arrayMap(testNode.children, function (x) { return x.innerHTML })).toEqual(['A', 'B'])
     expect(mappingInvocations).toEqual(['A', 'B'])
 
     mappingInvocations = new Array()
@@ -127,9 +125,9 @@ describe('Array to DOM node children mapping', function () {
     expect(testNode).toContainHtml('<div>a</div><div>b</div><div>c</div>')
 
         // Now kill the middle DIV manually, even though people shouldn't really do this
-    var elemToRemove = testNode.childNodes[1]
+    var elemToRemove = testNode.children[1]
     expect(elemToRemove.innerHTML).toEqual('B') // Be sure it's the right one
-    elemToRemove.parentNode.removeChild(elemToRemove)
+    elemToRemove.parentNode?.removeChild(elemToRemove)
 
         // Now remove the corresponding array entry. This shouldn't cause an exception.
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'C'], mapping)
