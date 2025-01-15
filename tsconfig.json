@@ -8,8 +8,8 @@
     "moduleResolution": "node",
     "allowJs": false,
     "importHelpers": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "allowSyntheticDefaultImports":  true,
+
     "strict": true,
     "baseUrl": ".",
     "noEmit": true,
