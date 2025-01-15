@@ -18,7 +18,7 @@ export function valuesArePrimitiveAndEqual (a, b) {
   return oldValueIsPrimitive ? (a === b) : false
 }
 
-export function applyExtenders (requestedExtenders) {
+export function applyExtenders (requestedExtenders?) {
   var target = this
   if (requestedExtenders) {
     objectForEach(requestedExtenders, function (key, value) {
