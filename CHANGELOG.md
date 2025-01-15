@@ -1,5 +1,10 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
+## Next
+- #194 fix userAgent typo in IE check @phillipc
+- #196 fix `**` operator precedence @mcselle
+- #195 add docker container for headless tests, upgrade packages, README fixes @Auge19
+
 ## Beta 1.7
 
 - Fix bad import operation of packages/utils.parser
