@@ -42,7 +42,7 @@ export default class SlotBinding extends DescendantBindingHandler {
 
     this.replaceSlotWithNode(this.$element, slotNode)
 
-    this.applyBindingsToDescendants(childContext, null)
+    this.applyBindingsToDescendants(childContext)
   }
 
   /**
