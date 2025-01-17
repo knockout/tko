@@ -59,7 +59,7 @@ declare global {
     // Project: http://knockoutjs.com
     // Definitions by: Maxime LUCE <https://github.com/SomaticIT>, Michael Best <https://github.com/mbest>
 
-    export as namespace ko;
+   // export as namespace ko;
 
     //#region subscribables/subscribable.js
 
@@ -305,14 +305,6 @@ declare global {
 
     //#endregion
 
-    //#region binding/selectExtensions.js
-
-    export module selectExtensions {
-        export function readValue(element: HTMLElement): any;
-        export function writeValue(element: HTMLElement, value?: any, allowUnset?: boolean): void;
-    }
-
-    //#endregion
 
     //#region binding/defaultBindings/
 
@@ -421,16 +413,6 @@ declare global {
         };
     }
 
-    export interface VirtualElementsAllowedBindings {
-        text: boolean;
-        foreach: boolean;
-        if: boolean;
-        ifnot: boolean;
-        with: boolean;
-        let: boolean;
-        using: boolean;
-    }
-
     //#endregion
 
     //#region binding/editDetection/compareArrays.js
@@ -509,9 +491,6 @@ declare global {
             init(element: Node, valueAccessor: () => MaybeSubscribable<string | BindingTemplateOptions>): BindingHandlerControlsDescendant;
             update(element: Node, valueAccessor: () => MaybeSubscribable<string | BindingTemplateOptions>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
         };
-    }
-    export interface VirtualElementsAllowedBindings {
-        template: boolean;
     }
 
     export function renderTemplate(template: string | Node | (() => string | Node)): string;
@@ -604,19 +583,10 @@ declare global {
             init(element: Node, valueAccessor: () => MaybeSubscribable<{ name: any; params: any; }>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
         };
     }
-    export interface VirtualElementsAllowedBindings {
-        component: boolean;
-    }
 
     //#endregion
 
-    //#region components/customElements.js
 
-    export module components {
-        export function getComponentNameForNode(node: Node): string;
-    }
-
-    //#endregion
 
     //#region components/defaultLoader.js
 
@@ -698,26 +668,6 @@ declare global {
     export module components {
         export function get(componentName: string, callback: (definition: Component, config: Config) => void): string;
         export function clearCachedDefinition(componentName: string): void;
-    }
-
-    //#endregion
-
-    //#region virtualElements.js
-
-    export interface VirtualElementsAllowedBindings {
-        [name: string]: boolean;
-    }
-
-    export module virtualElements {
-        export const allowedBindings: VirtualElementsAllowedBindings;
-
-        export function childNodes(node: Node): Node[];
-        export function emptyNode(node: Node): void;
-        export function firstChild(node: Node): Node;
-        export function insertAfter(node: Node, nodeToInsert: Node, insertAfterNode: Node): void;
-        export function nextSibling(node: Node): Node;
-        export function prepend(node: Node, nodeToPrepend: Node): void;
-        export function setDomNodeChildren(node: Node, childNodes: Node[]): void;
     }
 
     //#endregion

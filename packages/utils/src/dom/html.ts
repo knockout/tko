@@ -197,7 +197,7 @@ export function setTextContent (element, textContent) {
   if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
     virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)])
   } else {
-    innerTextNode.data = value
+    (innerTextNode as Text).data = value
   }
 
   forceRefresh(element)

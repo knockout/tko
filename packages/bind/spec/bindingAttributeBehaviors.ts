@@ -554,7 +554,7 @@ describe('Binding attribute syntax', function () {
         // Counts the number of virtual children, and overwrites the text contents of any text nodes
         for (var node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
           countNodes++
-          if (node.nodeType === 3) { node.data = 'new text' }
+          if (node.nodeType === 3) { (node as Text).data = 'new text' }
         }
       }
     }

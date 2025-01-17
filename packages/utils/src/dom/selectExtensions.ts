@@ -4,6 +4,7 @@ import { safeSetTimeout } from '../error'
 
 import { tagNameLower } from './info'
 import * as domData from './data'
+import { ensureSelectElementIsRenderedCorrectly } from './fixes'
 
 var hasDomDataExpandoProperty = Symbol('Knockout selectExtensions hasDomDataProperty')
 
@@ -14,19 +15,20 @@ var hasDomDataExpandoProperty = Symbol('Knockout selectExtensions hasDomDataProp
 export var selectExtensions = {
   optionValueDomDataKey: domData.nextKey(),
 
-  readValue: function (element) {
+  readValue: function (element : HTMLElement) {
     switch (tagNameLower(element)) {
       case 'option':
         if (element[hasDomDataExpandoProperty] === true) { return domData.get(element, selectExtensions.optionValueDomDataKey) }
-        return element.value
+        return (element as HTMLOptionElement).value
       case 'select':
-        return element.selectedIndex >= 0 ? selectExtensions.readValue(element.options[element.selectedIndex]) : undefined
+        const selectElement = element as HTMLSelectElement
+        return selectElement.selectedIndex >= 0 ? selectExtensions.readValue(selectElement.options[selectElement.selectedIndex]) : undefined
       default:
-        return element.value
+        return (element as HTMLInputElement).value
     }
   },
 
-  writeValue: function (element, value, allowUnset?) {
+  writeValue: function (element : HTMLElement, value?: any, allowUnset?: boolean) {
     switch (tagNameLower(element)) {
       case 'option':
         if (typeof value === 'string') {
@@ -34,13 +36,14 @@ export var selectExtensions = {
           if (hasDomDataExpandoProperty in element) { // IE <= 8 throws errors if you delete non-existent properties from a DOM node
             delete element[hasDomDataExpandoProperty]
           }
-          element.value = value
+          (element as HTMLOptionElement).value = value
         } else {
-                        // Store arbitrary object using DomData
+          var el = element as any //TODO Custom-Type with hasDomDataExpandoProperty
+          // Store arbitrary object using DomData
           domData.set(element, selectExtensions.optionValueDomDataKey, value)
-          element[hasDomDataExpandoProperty] = true
-                        // Special treatment of numbers is just for backward compatibility. KO 1.2.1 wrote numerical values to element.value.
-          element.value = typeof value === 'number' ? value : ''
+          el[hasDomDataExpandoProperty] = true
+          // Special treatment of numbers is just for backward compatibility. KO 1.2.1 wrote numerical values to element.value.
+          el.value = typeof value === 'number' ? value : ''
         }
 
         break
@@ -50,8 +53,11 @@ export var selectExtensions = {
           value = undefined
         }
         var selection = -1
-        for (let i = 0, n = element.options.length, optionValue; i < n; ++i) {
-          optionValue = selectExtensions.readValue(element.options[i])
+
+        const selectElement = element as HTMLSelectElement
+
+        for (let i = 0, n = selectElement.options.length, optionValue; i < n; ++i) {
+          optionValue = selectExtensions.readValue(selectElement.options[i])
           // Include special check to handle selecting a caption with a blank string value
           // Note that the looser == check here is intentional so that integer model values will match string element values.
           const strictEqual = optionValue === value
@@ -62,13 +68,13 @@ export var selectExtensions = {
             break
           }
         }
-        if (allowUnset || selection >= 0 || (value === undefined && element.size > 1)) {
-          element.selectedIndex = selection
+        if (allowUnset || selection >= 0 || (value === undefined && selectElement.size > 1)) {
+          selectElement.selectedIndex = selection
         }
         break
       default:
         if ((value === null) || (value === undefined)) { value = '' }
-        element.value = value
+        (element as HTMLInputElement).value = value
         break
     }
   }

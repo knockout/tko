@@ -86,41 +86,56 @@ function getUnbalancedChildTags (node) {
   return captureRemaining
 }
 
-export var allowedBindings = {}
+export interface VirtualElementsAllowedBindings {
+  text: boolean;
+  foreach: boolean;
+  if: boolean;
+  ifnot: boolean;
+  with: boolean;
+  let: boolean;
+  using: boolean;
+  template: boolean;
+  component: boolean;
+  [name: string]: boolean;
+}
+
+export var allowedBindings : VirtualElementsAllowedBindings = Object.create(null)
 export var hasBindingValue = isStartComment
 
-export function childNodes (node) {
+export function childNodes (node : Node) : any {
   return isStartComment(node) ? getVirtualChildren(node) : node.childNodes
 }
 
-export function emptyNode (node) {
+export function emptyNode (node : Node) {
   if (!isStartComment(node)) { emptyDomNode(node) } else {
     var virtualChildren = childNodes(node)
     for (var i = 0, j = virtualChildren.length; i < j; i++) { removeNode(virtualChildren[i]) }
   }
 }
 
-export function setDomNodeChildren (node, childNodes) {
+export function setDomNodeChildren (node : Node, childNodes : Node[]) {
   if (!isStartComment(node)) { setRegularDomNodeChildren(node, childNodes) } else {
     emptyNode(node)
     const endCommentNode = node.nextSibling // Must be the next sibling, as we just emptied the children
-    const parentNode = endCommentNode.parentNode
-    for (var i = 0, j = childNodes.length; i < j; ++i) {
-      parentNode.insertBefore(childNodes[i], endCommentNode)
+    if(endCommentNode && endCommentNode.parentNode) {
+      const parentNode = endCommentNode.parentNode
+      for (var i = 0, j = childNodes.length; i < j; ++i) {
+        parentNode.insertBefore(childNodes[i], endCommentNode)
+      }
     }
   }
 }
 
-export function prepend (containerNode, nodeToPrepend) {
+export function prepend (containerNode : Node, nodeToPrepend : Node) {
   if (!isStartComment(containerNode)) {
     if (containerNode.firstChild) { containerNode.insertBefore(nodeToPrepend, containerNode.firstChild) } else { containerNode.appendChild(nodeToPrepend) }
   } else {
-        // Start comments must always have a parent and at least one following sibling (the end comment)
-    containerNode.parentNode.insertBefore(nodeToPrepend, containerNode.nextSibling)
+    // Start comments must always have a parent and at least one following sibling (the end comment)
+    containerNode.parentNode?.insertBefore(nodeToPrepend, containerNode.nextSibling)
   }
 }
 
-export function insertAfter (containerNode, nodeToInsert, insertAfterNode) {
+export function insertAfter (containerNode : Node, nodeToInsert : Node, insertAfterNode : Node) {
   if (!insertAfterNode) {
     prepend(containerNode, nodeToInsert)
   } else if (!isStartComment(containerNode)) {
@@ -128,14 +143,14 @@ export function insertAfter (containerNode, nodeToInsert, insertAfterNode) {
     if (insertAfterNode.nextSibling) { containerNode.insertBefore(nodeToInsert, insertAfterNode.nextSibling) } else { containerNode.appendChild(nodeToInsert) }
   } else {
         // Children of start comments must always have a parent and at least one following sibling (the end comment)
-    containerNode.parentNode.insertBefore(nodeToInsert, insertAfterNode.nextSibling)
+    containerNode.parentNode?.insertBefore(nodeToInsert, insertAfterNode.nextSibling)
   }
 }
 
-export function firstChild (node) {
+export function firstChild (node : Node) {
   if (!isStartComment(node)) {
     if (node.firstChild && isEndComment(node.firstChild)) {
-      throw new Error('Found invalid end comment, as the first child of ' + node.outerHTML)
+      throw new Error('Found invalid end comment, as the first child of ' + (node as Element).outerHTML)
     }
     return node.firstChild
   }
@@ -145,8 +160,11 @@ export function firstChild (node) {
   return node.nextSibling
 }
 
-export function lastChild (node) {
+export function lastChild (node : Node) {  
   let nextChild = firstChild(node)
+  if(!nextChild)
+    return null;  
+
   let lastChildNode
 
   do {
@@ -156,14 +174,14 @@ export function lastChild (node) {
   return lastChildNode
 }
 
-export function nextSibling (node) {
+export function nextSibling (node : Node) {
   if (isStartComment(node)) {
     node = getMatchingEndComment(node)
   }
 
   if (node.nextSibling && isEndComment(node.nextSibling)) {
     if (isUnmatchedEndComment(node.nextSibling)) {
-      throw Error('Found end comment without a matching opening comment, as next sibling of ' + node.outerHTML)
+      throw Error('Found end comment without a matching opening comment, as next sibling of ' + (node as Element).outerHTML)
     }
     return null
   } else {
