@@ -244,7 +244,7 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
             } : (bindingKey) => bindings[bindingKey]
 
         // Use of allBindings as a function is maintained for backwards compatibility, but its use is deprecated
-    function allBindings () {
+    const allBindings = function () {
       return objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor)
     }
 
@@ -265,7 +265,7 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
     const nodeAsyncBindingPromises = new Set()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
         // Go through the sorted bindings, calling init and update for each
-      function reportBindingError (during, errorCaptured) {
+      const reportBindingError = function (during, errorCaptured) {
         onBindingError({
           during,
           errorCaptured,
