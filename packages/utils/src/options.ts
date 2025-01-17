@@ -3,12 +3,13 @@ interface CustomBindingGlobalProperties {
   isObservable;
 }
 
+
 //
 // This becomes ko.options
 // --
 //
 // This is the root 'options', which must be extended by others.
-class OptionsClass {
+export class Options {
   [key: string]: any;
   
   deferUpdates: boolean = false
@@ -67,7 +68,7 @@ class OptionsClass {
   cleanExternalData (node, callback?) {}
 }
 
-const options = new OptionsClass()
+const options = new Options()
 
 Object.defineProperty(options, '$', {
   get: function () { return options.jQuery }
