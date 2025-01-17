@@ -68,12 +68,12 @@ function cleanNodesInList (nodeList, onlyComments?) {
 }
 
 // Exports
-export function addDisposeCallback (node, callback) {
+export function addDisposeCallback (node : Node, callback : (node: Node) => void) {
   if (typeof callback !== 'function') { throw new Error('Callback must be a function') }
   getDisposeCallbacksCollection(node, true).push(callback)
 }
 
-export function removeDisposeCallback (node, callback) {
+export function removeDisposeCallback (node : Node, callback : (node: Node) => void) {
   var callbacksCollection = getDisposeCallbacksCollection(node, false)
   if (callbacksCollection) {
     arrayRemoveItem(callbacksCollection, callback)

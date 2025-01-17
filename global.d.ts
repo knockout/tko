@@ -663,15 +663,6 @@ declare global {
 
     //#endregion
 
-    //#region components/loaderRegistry.js
-
-    export module components {
-        export function get(componentName: string, callback: (definition: Component, config: Config) => void): string;
-        export function clearCachedDefinition(componentName: string): void;
-    }
-
-    //#endregion
-
     //#region utils.js
 
     export module utils {
@@ -725,38 +716,7 @@ declare global {
 
     export function unwrap<T = any>(value: MaybeSubscribable<T>): T;
 
-    export function onError(error: Error): void;
-
     //#endregion
-
-    //#region utils.domData.js
-
-    export module utils {
-        export module domData {
-            export function get<T = any>(node: Node, key: string): T;
-
-            export function set<T = any>(node: Node, key: string, value: T): void;
-
-            export function clear(node: Node): boolean;
-        }
-    }
-
-    //#endregion
-
-    //#region utils.domNodeDisposal.js
-
-    export module utils {
-        export module domNodeDisposal {
-            export function addDisposeCallback(node: Node, callback: (node: Node) => void): void;
-            export function removeDisposeCallback(node: Node, callback: (node: Node) => void): void;
-            export function cleanExternalData(node: Node): void;
-        }
-    }
-
-
-    //#endregion
-
-
 
     interface SymbolConstructor {
         observable?: Symbol;

@@ -110,7 +110,7 @@ function getFirstResultFromLoaders (methodName, argsExceptCallback, callback, ca
 }
 
 export var registry = {
-  get (componentName, callback) {
+  get (componentName : string, callback : any) {
     var cachedDefinition = getObjectOwnProperty(loadedDefinitionsCache, componentName)
     if (cachedDefinition) {
       // It's already loaded and cached. Reuse the same definition object.
@@ -129,7 +129,7 @@ export var registry = {
     }
   },
 
-  clearCachedDefinition (componentName) {
+  clearCachedDefinition (componentName : string) {
     delete loadedDefinitionsCache[componentName]
   },
 
