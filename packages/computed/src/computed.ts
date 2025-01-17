@@ -201,7 +201,7 @@ function computedBeginDependencyDetectionCallback (subscribable, id) {
 
 computed.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-  getDependenciesCount () {
+  getDependenciesCount () : number {
     return this[computedState].dependenciesCount
   },
 
