@@ -81,20 +81,23 @@ export function removeDisposeCallback (node, callback) {
   }
 }
 
-export function cleanNode (node) {
+export function cleanNode (node : Node) : typeof node {  
   // First clean this node, where applicable
   if (cleanableNodeTypes[node.nodeType]) {
     cleanSingleNode(node)
 
     // ... then its descendants, where applicable
-    if (cleanableNodeTypesWithDescendants[node.nodeType]) {
+    if (cleanableNodeTypesWithDescendants[node.nodeType] && node instanceof Element) {
       cleanNodesInList(node.getElementsByTagName("*"))
     }
   }
   return node
 }
 
-export function removeNode (node) {
+export function removeNode (node : Node | null) {
+  if(!node)
+    return;
+
   cleanNode(node)
   if (node.parentNode) { node.parentNode.removeChild(node) }
 }

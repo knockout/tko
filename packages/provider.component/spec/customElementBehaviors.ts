@@ -481,7 +481,7 @@ describe('Components: Custom elements', function () {
 
         // See the viewmodel is disposed when the corresponding DOM element is
     expect(componentViewModel.wasDisposed).not.toBe(true)
-    cleanNode(testNode.firstChild)
+    cleanNode(testNode.firstChild!)
     expect(componentViewModel.wasDisposed).toBe(true)
   })
 

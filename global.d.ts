@@ -733,19 +733,6 @@ declare global {
 
     //#endregion
 
-    //#region options.js
-
-    export interface Options {
-        deferUpdates: boolean;
-        useOnlyNativeEvents: boolean;
-        createChildContextWithAs: boolean;
-        foreachHidesDestroyed: boolean;
-    }
-
-    export const options: Options;
-
-    //#endregion
-
     //#region tasks.js
 
     export module tasks {
@@ -839,26 +826,6 @@ declare global {
             export function cleanExternalData(node: Node): void;
         }
     }
-
-    export function cleanNode(node: Node): typeof node;
-    export function removeNode(node: Node): void;
-
-    //#endregion
-
-    //#region utils.domManipulation.js
-
-    export module utils {
-        export function parseHtmlFragment(html: string, documentContext?: Document): Node[];
-        export function setHtml(node: Node, html: MaybeSubscribable<string>): void;
-    }
-
-    //#endregion
-
-    //#region version.js
-
-    export const version: string;
-
-    //#endregion
 
 
     //#endregion

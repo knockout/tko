@@ -118,7 +118,7 @@ function jQueryHtmlParse (html: string, documentContext: any) {
  * @param  {Object} documentContext That owns the executing code.
  * @return {[DOMNode]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html: string , documentContext?: object): Node[] {
+export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {
     // Prefer <template>-tag based HTML parsing.
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
 
@@ -144,7 +144,7 @@ export function parseHtmlForTemplateNodes (html, documentContext) {
   * @param {DOMNode} html HTML to be inserted in node
   * @returns undefined
   */
-export function setHtml (node, html) {
+export function setHtml (node : Node, html : Function | string) {
   emptyDomNode(node)
 
     // There's few cases where we would want to display a stringified
@@ -166,7 +166,11 @@ export function setHtml (node, html) {
       jQueryInstance(node).html(html)
     } else {
             // ... otherwise, use KO's own parsing logic.
-      var parsedNodes = parseHtmlFragment(html, node.ownerDocument)
+      var parsedNodes : Node[]
+      if(node.ownerDocument) 
+        parsedNodes = parseHtmlFragment(html, node.ownerDocument)
+      else 
+        parsedNodes = parseHtmlFragment(html)
 
       if (node.nodeType === 8) {
         if (html === null) {

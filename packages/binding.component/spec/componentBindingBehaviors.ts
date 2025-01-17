@@ -594,7 +594,7 @@ describe('Components: Component binding', function () {
     expect(viewModelInstance.wasDisposed).not.toBe(true)
 
         // See that cleaning the associated element automatically disposes the viewmodel
-    cleanNode(testNode.firstChild)
+    cleanNode(testNode.firstChild!)
     expect(viewModelInstance.wasDisposed).toBe(true)
   })
 
@@ -609,7 +609,7 @@ describe('Components: Component binding', function () {
     applyBindings(outerViewModel, testNode)
 
         // Before the component finishes loading, clean the DOM
-    cleanNode(testNode.firstChild)
+    cleanNode(testNode.firstChild!)
 
         // Now wait and see that, after loading finishes, the component wasn't used
     jasmine.Clock.tick(1)
@@ -702,7 +702,7 @@ describe('Components: Component binding', function () {
         // after they were disposed (e.g., because they were removed from the document)
     testComponentBindingValue.name('component-4')
     jasmine.Clock.tick(1)
-    cleanNode(testNode.firstChild) // Dispose the node before the module loading completes
+    cleanNode(testNode.firstChild!) // Dispose the node before the module loading completes
     requireCallbacks['module-4'](testViewModel4)
     expect(constructorCallLog.length).toBe(2) // No extra constructor calls
     expect(testNode).toContainText('Component 2 template') // No attempt to modify the DOM
