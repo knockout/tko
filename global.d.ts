@@ -566,16 +566,6 @@ declare global {
 
     //#endregion
 
-    //#region templating/jquery.tmpl/jqueryTmplTemplateEngine.js
-
-    export class jqueryTmplTemplateEngine extends templateEngine {
-        renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
-        createJavaScriptEvaluatorBlock(script: string): string;
-        addTemplate(templateName: string, templateMarkup: string): void;
-    }
-
-    //#endregion
-
     //#region components/componentBinding.js
 
     export interface BindingHandlers {
@@ -671,17 +661,6 @@ declare global {
             includeFields?: string[];
             submitter?: (form: HTMLFormElement) => void;
         }
-
-        export function addOrRemoveItem<T = any>(array: MaybeObservableArray<T>, value: T, included?: boolean): T[];
-
-        export function arrayForEach<T = any>(array: T[], action: (item: T, index: number) => void, actionOwner?: any): void;
-        export function arrayFirst<T = any>(array: T[], predicate: (item: T, index: number) => boolean, predicateOwner?: any): T;
-        export function arrayFilter<T = any>(array: T[], predicate: (item: T, index: number) => boolean, predicateOwner?: any): T[];
-        export function arrayGetDistinctValues<T = any>(array: T[]): T[];
-        export function arrayIndexOf<T = any>(array: MaybeObservableArray<T>, item: T): number;
-        export function arrayMap<T = any, U = any>(array: T[], mapping: (item: T, index: number) => U, mappingOwner?: any): U[];
-        export function arrayPushAll<T = any>(array: MaybeObservableArray<T>, valuesToPush: T[]): T[];
-        export function arrayRemoveItem<T = any>(array: MaybeObservableArray<T>, itemToRemove: T): void;
 
         export function extend<T = any, U = any>(target: T, source: U): T & U;
 

@@ -6,28 +6,28 @@
 
 const {isArray} = Array
 
-export function arrayForEach (array, action, thisArg?) {
-  if (arguments.length > 2) { action = action.bind(thisArg) }
+export function arrayForEach<T = any>(array: T[], action: (item: T, index: number, array? : T[]) => void, actionOwner?: any): void {
+  if (arguments.length > 2) { action = action.bind(actionOwner) }
   for (let i = 0, j = array.length; i < j; ++i) {
     action(array[i], i, array)
   }
 }
 
-export function arrayIndexOf (array, item) {
+export function arrayIndexOf<T = any>(array: Array<T>, item: T): number {
   return (isArray(array) ? array : [...array]).indexOf(item)
 }
 
-export function arrayFirst (array, predicate, predicateOwner?) {
+export function arrayFirst<T = any>(array: T[], predicate: (item: T, index: number) => boolean, predicateOwner?: any): T | undefined {
   return (isArray(array) ? array : [...array])
     .find(predicate, predicateOwner)
 }
 
-export function arrayMap (array: ArrayLike<any>, mapping, thisArg?) {
+export function arrayMap<T = any, U = any> (array: ArrayLike<T>, mapping: (item: T, index?: number) => U, thisArg?) {
   if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   return array === null ? [] : Array.from(array, mapping)
 }
 
-export function arrayRemoveItem (array, itemToRemove) {
+export function arrayRemoveItem<T = any>(array: Array<T>, itemToRemove: T): void {
   var index = arrayIndexOf(array, itemToRemove)
   if (index > 0) {
     array.splice(index, 1)
@@ -36,19 +36,19 @@ export function arrayRemoveItem (array, itemToRemove) {
   }
 }
 
-export function arrayGetDistinctValues (array = new Array()) {
+export function arrayGetDistinctValues<T = any>(array: T[]): T[] {
   const seen = new Set()
   if (array === null) { return [] }
   return (isArray(array) ? array : [...array])
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
-export function arrayFilter (array, predicate, thisArg?) {
-  if (arguments.length > 2) { predicate = predicate.bind(thisArg) }
+export function arrayFilter<T = any>(array: T[], predicate: (item: T, index: number) => boolean, predicateOwner?: any): T[] {
+  if (arguments.length > 2) { predicate = predicate.bind(predicateOwner) }
   return array === null ? [] : (isArray(array) ? array : [...array]).filter(predicate)
 }
 
-export function arrayPushAll (array, valuesToPush) {
+export function arrayPushAll<T = any>(array: Array<T>, valuesToPush: ArrayLike<T>): T[] {
   if (isArray(valuesToPush)) {
     array.push.apply(array, valuesToPush)
   } else {
@@ -57,7 +57,7 @@ export function arrayPushAll (array, valuesToPush) {
   return array
 }
 
-export function addOrRemoveItem (array, value, included) {
+export function addOrRemoveItem (array, value, included : boolean) {
   var existingEntryIndex = arrayIndexOf(typeof array.peek === 'function' ? array.peek() : array, value)
   if (existingEntryIndex < 0) {
     if (included) { array.push(value) }

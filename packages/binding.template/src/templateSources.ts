@@ -61,7 +61,7 @@ domElement.prototype.text = function (/* valueToWrite */) {
 }
 
 var dataDomDataPrefix = domData.nextKey() + '_'
-domElement.prototype.data = function (key /*, valueToWrite */) {
+domElement.prototype.data = function (key : string /*, valueToWrite */) {
   if (arguments.length === 1) {
     return domData.get(this.domElement, dataDomDataPrefix + key)
   } else {
