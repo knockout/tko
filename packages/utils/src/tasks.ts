@@ -83,7 +83,7 @@ function scheduleTaskProcessing () {
   options.taskScheduler(scheduledProcess)
 }
 
-export function schedule (func) {
+export function schedule (func: () => any) : number {
   if (!taskQueueLength) {
     scheduleTaskProcessing()
   }
@@ -92,7 +92,7 @@ export function schedule (func) {
   return nextHandle++
 }
 
-export function cancel (handle) {
+export function cancel (handle : number) {
   var index = handle - (nextHandle - taskQueueLength)
   if (index >= nextIndexToProcess && index < taskQueueLength) {
     taskQueue[index] = null

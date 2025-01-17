@@ -672,30 +672,6 @@ declare global {
 
     //#endregion
 
-    //#region memoization.js
-
-    export module memoization {
-        export function memoize(callback: (val: any) => void): Node[];
-        export function unmemoize(memoId: string, callbackParams: any[]): void;
-        export function unmemoizeDomNodeAndDescendants(domNode: Node, extraCallbackParamsArray: any[]): void;
-        export function parseMemoText(memoText: string): string;
-    }
-
-    //#endregion
-
-    //#region tasks.js
-
-    export module tasks {
-        export var scheduler: (callback: () => any) => void;
-
-        export function schedule(callback: () => any): number;
-        export function cancel(handle: number): void;
-
-        export function runEarly(): void;
-    }
-
-    //#endregion
-
     //#region utils.js
 
     export module utils {

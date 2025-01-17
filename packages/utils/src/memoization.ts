@@ -13,24 +13,25 @@ function generateRandomId () {
   return randomMax8HexChars() + randomMax8HexChars()
 }
 
-function findMemoNodes (rootNode, appendToArray) {
+function findMemoNodes (rootNode : Node, appendToArray : any[]) {
   if (!rootNode) { return }
   if (rootNode.nodeType == 8) {
-    var memoId = parseMemoText(rootNode.nodeValue)
+    const comment = rootNode as Comment
+    var memoId = parseMemoText(comment.nodeValue)
     if (memoId != null) { appendToArray.push({ domNode: rootNode, memoId: memoId }) }
   } else if (rootNode.nodeType == 1) {
     for (var i = 0, childNodes = rootNode.childNodes, j = childNodes.length; i < j; i++) { findMemoNodes(childNodes[i], appendToArray) }
   }
 }
 
-export function memoize (callback) {
+export function memoize (callback : (val: any) => void) : any {
   if (typeof callback !== 'function') { throw new Error('You can only pass a function to memoization.memoize()') }
   var memoId = generateRandomId()
   memos[memoId] = callback
   return '<!--[ko_memo:' + memoId + ']-->'
 }
 
-export function unmemoize (memoId, callbackParams) {
+export function unmemoize (memoId : string, callbackParams: any[]) {
   var callback = memos[memoId]
   if (callback === undefined) { throw new Error("Couldn't find any memo with ID " + memoId + ". Perhaps it's already been unmemoized.") }
   try {
@@ -39,7 +40,7 @@ export function unmemoize (memoId, callbackParams) {
   } finally { delete memos[memoId] }
 }
 
-export function unmemoizeDomNodeAndDescendants (domNode, extraCallbackParamsArray) {
+export function unmemoizeDomNodeAndDescendants (domNode : Node, extraCallbackParamsArray : any[]) {
   var memos = new Array()
   findMemoNodes(domNode, memos)
   for (var i = 0, j = memos.length; i < j; i++) {
@@ -52,7 +53,9 @@ export function unmemoizeDomNodeAndDescendants (domNode, extraCallbackParamsArra
   }
 }
 
-export function parseMemoText (memoText) {
+export function parseMemoText (memoText : string | null) : string | null {
+  if(!memoText)
+    return null
   var match = memoText.match(/^\[ko_memo\:(.*?)\]$/)
   return match ? match[1] : null
 }
