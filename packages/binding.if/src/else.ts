@@ -33,7 +33,7 @@ export class ElseBindingHandler extends IfBindingHandler {
   }
 
   readElseChain () {
-    let node = this.$element
+    let node: ChildNode | null = this.$element
     do {
       node = node.previousSibling
     } while (node && node.nodeType !== 1 && node.nodeType !== 8)
@@ -44,6 +44,6 @@ export class ElseBindingHandler extends IfBindingHandler {
       node = virtualElements.previousSibling(node)
     }
 
-    return domData.get(node, 'conditional') || {}
+    return domData.get(node as Node, 'conditional') || {}
   }
 }

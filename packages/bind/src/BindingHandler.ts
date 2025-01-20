@@ -4,13 +4,13 @@ import { isWriteableObservable } from '@tko/observable'
 import { LifeCycle } from '@tko/lifecycle'
 
 export class BindingHandler extends LifeCycle {
-  $context
-  $element
-  $data
-  bindingCompletion
-  valueAccessor
-  completeBinding
-  allBindings
+  $context: any
+  $element: HTMLElement
+  $data: any
+  bindingCompletion: any
+  valueAccessor: Function
+  completeBinding: any
+  allBindings: any
 
   constructor (params) {
     super()
@@ -55,7 +55,7 @@ export class BindingHandler extends LifeCycle {
     provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
   }
 
-  static registerBindingHandler(handler : BindingHandler, name, provider = options.bindingProviderInstance) {
+  static registerBindingHandler(handler: BindingHandler, name, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, handler)
   }
 }

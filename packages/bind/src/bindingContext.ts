@@ -11,6 +11,7 @@ import {
 import {
   contextAncestorBindingInfo
 } from './bindingEvent'
+import { Computed } from 'packages/computed/types/computed'
 
 export const boundElementDomDataKey = domData.nextKey()
 
@@ -25,7 +26,7 @@ export interface BindingContextSetting {
 
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext (dataItemOrAccessor, parentContext?, dataItemAlias?, extendCallback?, settings? : BindingContextSetting) {
+export function bindingContext (dataItemOrAccessor: any, parentContext?: any, dataItemAlias?: any, extendCallback?: Function, settings?: BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -36,8 +37,7 @@ export function bindingContext (dataItemOrAccessor, parentContext?, dataItemAlia
   // See https://github.com/SteveSanderson/knockout/issues/490
   self.ko = options.knockoutInstance
 
-  let nodes
-  let subscribable
+  let subscribable: any;
 
     // The binding context object includes static properties for the current, parent, and root view models.
     // If a view model is actually stored in an observable, the corresponding binding context object, and
@@ -113,7 +113,7 @@ export function bindingContext (dataItemOrAccessor, parentContext?, dataItemAlia
 
 Object.assign(bindingContext.prototype, {
 
-  lookup (token, globals, node) {
+  lookup (token: string, globals: any, node: any) {
     // short circuits
     switch (token) {
       case '$element': return node
@@ -122,9 +122,15 @@ Object.assign(bindingContext.prototype, {
     }
     const $data = this.$data
     // instanceof Object covers 1. {}, 2. [], 3. function() {}, 4. new *;  it excludes undefined, null, primitives.
-    if (isObjectLike($data) && token in $data) { return $data[token] }
-    if (token in this) { return this[token] }
-    if (token in globals) { return globals[token] }
+    if (isObjectLike($data) && token in $data) {
+      return $data[token]
+    }
+    if (token in this) {
+      return this[token]
+    }
+    if (token in globals) {
+      return globals[token]
+    }
 
     throw new Error(`The variable "${token}" was not found on $data, $context, or globals.`)
   },
@@ -134,14 +140,16 @@ Object.assign(bindingContext.prototype, {
   // But this does not mean that the $data value of the child context will also get updated. If the child
   // view model also depends on the parent view model, you must provide a function that returns the correct
   // view model on each update.
-  createChildContext (dataItemOrAccessor, dataItemAlias, extendCallback, settings) {
+  createChildContext (dataItemOrAccessor: any, dataItemAlias: any, extendCallback?: Function, settings?: BindingContextSetting) {
     return new bindingContext(dataItemOrAccessor, this, dataItemAlias, function (self, parentContext) {
           // Extend the context hierarchy by setting the appropriate pointers
       self.$parentContext = parentContext
       self.$parent = parentContext.$data
       self.$parents = (parentContext.$parents || []).slice(0)
       self.$parents.unshift(self.$parent)
-      if (extendCallback) { extendCallback(self) }
+      if (extendCallback) {
+        extendCallback(self)
+      }
     }, settings)
   },
 
@@ -156,25 +164,25 @@ Object.assign(bindingContext.prototype, {
     })
   },
 
-  createStaticChildContext (dataItemOrAccessor, dataItemAlias) {
+  createStaticChildContext (dataItemOrAccessor: any, dataItemAlias: any) {
     return this.createChildContext(dataItemOrAccessor, dataItemAlias, null, { 'exportDependencies': true })
   }
 })
 
-export function storedBindingContextForNode (node : HTMLElement|Comment) {
+export function storedBindingContextForNode (node: HTMLElement|Comment) {
   const bindingInfo = domData.get(node, boundElementDomDataKey)
   return bindingInfo && bindingInfo.context
 }
 
 // Retrieving binding context from arbitrary nodes
-export function contextFor (node : Node) {
+export function contextFor (node: Node) {
   // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
   if (node && (node.nodeType === 1 || node.nodeType === 8)) {
     return storedBindingContextForNode(node as HTMLElement|Comment)
   }
 }
 
-export function dataFor (node : Node) {
+export function dataFor (node: Node) {
   var context = contextFor(node)
   return context ? context.$data : undefined
 }

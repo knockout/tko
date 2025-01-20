@@ -1,12 +1,11 @@
 
 
 export class BindingResult {
-  
-  isSync : boolean
-  isComplete : boolean
-  completionPromise : Promise<BindingResult>
-  
-  constructor ({asyncBindingsApplied, rootNode, bindingContext}) {
+  isSync: boolean
+  isComplete: boolean
+  completionPromise: Promise<BindingResult>
+
+  constructor({asyncBindingsApplied, rootNode, bindingContext}) {
     Object.assign(this, {
       rootNode,
       bindingContext,
@@ -19,7 +18,7 @@ export class BindingResult {
     }
   }
 
-  async completeWhenBindingsFinish (asyncBindingsApplied) {
+  async completeWhenBindingsFinish(asyncBindingsApplied: any) {
     await Promise.all(asyncBindingsApplied)
     this.isComplete = true
     return this

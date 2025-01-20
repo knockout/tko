@@ -38,7 +38,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
   constructor (params) {
     super(params)
     this.originalChildNodes = makeArray(
-      virtualElements.childNodes(this.$element)
+      virtualElements.childNodes(this.$element as Node)
     )
     this.computed('computeApplyComponent')
   }
@@ -96,7 +96,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
       componentName = value
     } else {
       componentName = unwrap(value.name)
-      componentParams = NativeProvider.getNodeValues(this.$element) ||
+      componentParams = NativeProvider.getNodeValues(this.$element as HTMLElement) ||
         unwrap(value.params)
     }
 

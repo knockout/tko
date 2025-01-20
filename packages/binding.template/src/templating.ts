@@ -172,7 +172,7 @@ export function renderTemplate (template, dataOrBindingContext, options, targetN
         // Ensure we've got a proper binding context to work with
         var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof BindingContextConstructor))
               ? dataOrBindingContext
-              : new BindingContextConstructor(dataOrBindingContext, null, null, null, { 'exportDependencies': true })
+              : new BindingContextConstructor(dataOrBindingContext, null, null, undefined, { 'exportDependencies': true })
 
         var templateName = resolveTemplateName(template, bindingContext.$data, bindingContext)
         const renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options, afterBindingCallback)

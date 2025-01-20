@@ -20,8 +20,8 @@ export class LegacyBindingHandler extends BindingHandler {
     return undefined;
   }
   initReturn: any;
-  onError: any;
-  constructor (params) {
+  onError: (step: string, error: unknown) => void;
+  constructor (params: any) {
     super(params)
     const handler = this.handler
     this.onError = params.onError
@@ -37,9 +37,11 @@ export class LegacyBindingHandler extends BindingHandler {
     }
   }
 
-  onValueChange () {
+  onValueChange(): void {
     const handler = this.handler
-    if (typeof handler.update !== 'function') { return }
+    if (typeof handler.update !== 'function') {
+      return;
+    }
     try {
       handler.update(...this.legacyArgs)
     } catch (e) {
@@ -47,14 +49,14 @@ export class LegacyBindingHandler extends BindingHandler {
     }
   }
 
-  get legacyArgs () {
+  get legacyArgs(): any[] {
     return [
       this.$element, this.valueAccessor, this.allBindings,
       this.$data, this.$context
     ]
   }
 
-  get controlsDescendants () {
+  get controlsDescendants(): any {
     const objectToTest = this.initReturn || this.handler || {}
     return objectToTest.controlsDescendantBindings
   }
@@ -68,41 +70,47 @@ export class LegacyBindingHandler extends BindingHandler {
    * If given an object (the only kind supported in knockout 3.x and before), it
    * shall draw the `init`, `update`, and `allowVirtualElements` properties
    */
-  static getOrCreateFor (key, handler) {
+  static getOrCreateFor(handler: Function | any, key?: string): any {
     if (legacyBindingMap.has(handler)) {
       return legacyBindingMap.get(handler)
     }
-    const newLegacyHandler = this.createFor(key, handler)
+    const newLegacyHandler = this.createFor(handler, key)
     legacyBindingMap.set(handler, newLegacyHandler)
     return newLegacyHandler
   }
 
-  static createFor (key, handler) {
+  static createFor(handler: Function | any, key?: string): any {
     if (typeof handler === 'function') {
       const [initFn, disposeFn] = [handler, handler.dispose]
       return class extends LegacyBindingHandler {
         get handler () {
           const init = initFn.bind(this)
           const dispose = disposeFn ? disposeFn.bind(this) : null
-          return { init, dispose }
+          return { init, dispose };
         }
-        static get after () { return handler.after }
+        static get after () {
+          return handler.after;
+        }
         static get allowVirtualElements () {
-          return handler.allowVirtualElements || virtualElements.allowedBindings[key]
+          return handler.allowVirtualElements || virtualElements.allowedBindings[key!];
         }
       }
     }
 
     if (typeof handler === 'object') {
       return class extends LegacyBindingHandler {
-        get handler () { return handler }
-        static get after () { return handler.after }
+        get handler () {
+          return handler;
+        }
+        static get after () {
+          return handler.after;
+        }
         static get allowVirtualElements () {
-          return handler.allowVirtualElements || virtualElements.allowedBindings[key]
+          return handler.allowVirtualElements || virtualElements.allowedBindings[key!];
         }
       }
     }
 
-    throw new Error('The given handler is not an appropriate type.')
+    throw new Error('The given handler is not an appropriate type.');
   }
 }

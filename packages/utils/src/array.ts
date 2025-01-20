@@ -100,12 +100,13 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares?: n
 const statusNotInOld = 'added'
 const statusNotInNew = 'deleted'
 
-interface Options {
-  dontLimitMoves: boolean
+export interface CompareOptions {
+  dontLimitMoves: boolean,
+  sparse?: boolean
 }
 
     // Simple calculation based on Levenshtein distance.
-export function compareArrays (oldArray, newArray, options:Options|boolean) {
+export function compareArrays (oldArray: any[], newArray: any[], options: CompareOptions | boolean) {
     // For backward compatibility, if the third arg is actually a bool, interpret
     // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
   options = (typeof options === 'boolean') ? { dontLimitMoves: options } : (options || {})

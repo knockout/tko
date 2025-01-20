@@ -1,7 +1,7 @@
 
 import {
-    domData, registerEventHandler, ieVersion, safeSetTimeout, options,
-    arrayForEach, tagNameLower
+    ieVersion, safeSetTimeout, options,
+    arrayForEach
 } from '@tko/utils'
 
 import {
@@ -9,14 +9,10 @@ import {
 } from '@tko/observable'
 
 import {
-    computed
-} from '@tko/computed'
-
-import {
   BindingHandler
 } from '@tko/bind'
 
-var parseVersion, operaVersion, safariVersion, firefoxVersion
+var operaVersion, safariVersion, firefoxVersion
 
 
 /**
@@ -26,6 +22,7 @@ var parseVersion, operaVersion, safariVersion, firefoxVersion
 class TextInput extends BindingHandler {
   get aliases () { return 'textinput' }
 
+  $element: HTMLInputElement
   previousElementValue: any;
   elementValueBeforeEvent?: ReturnType<typeof setTimeout>;
   timeoutHandle?: ReturnType<typeof setTimeout>;
@@ -73,21 +70,21 @@ class TextInput extends BindingHandler {
     if (this.previousElementValue !== elementValue) {
               // Provide a way for tests to know exactly which event was processed
       if (options.debug && event) {
-        element._ko_textInputProcessedEvent = event.type
+        (element as any)._ko_textInputProcessedEvent = event.type
       }
       this.previousElementValue = elementValue
       this.value = elementValue
     }
   }
 
-  deferUpdateModel (event) {
+  deferUpdateModel (event: any) {
     const element = this.$element
     if (!this.timeoutHandle) {
       // The elementValueBeforeEvent variable is set *only* during the brief gap between an
       // event firing and the updateModel function running. This allows us to ignore model
       // updates that are from the previous state of the element, usually due to techniques
       // such as rateLimit. Such updates, if not ignored, can cause keystrokes to be lost.
-      this.elementValueBeforeEvent = element.value
+      this.elementValueBeforeEvent = element.value as any
       const handler = options.debug ? this.updateModel.bind(this, { type: event.type }) : this.updateModel
       this.timeoutHandle = safeSetTimeout(handler, 4)
     }

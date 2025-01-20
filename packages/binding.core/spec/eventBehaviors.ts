@@ -68,7 +68,7 @@ describe('Binding: Event', function () {
       log (arg) {
         thing = arg
       }
-    }, testNode, null)
+    }, testNode)
     triggerEvent(testNode.childNodes[0], 'click')
     expect(thing)
     expect(thing.type).toEqual('click')

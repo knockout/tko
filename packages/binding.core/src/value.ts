@@ -15,6 +15,7 @@ import {
 export class value extends BindingHandler {
   static get after () { return ['options', 'foreach', 'template'] }
 
+  $element: HTMLInputElement;
   elementValueBeforeEvent: any;
   propertyChangeFired: any;
   propertyChangedFired: boolean;

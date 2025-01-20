@@ -30,6 +30,19 @@ import {
   LegacyBindingHandler
 } from './LegacyBindingHandler'
 
+interface BindingError {
+  during: string,
+  errorCaptured: any,
+  bindings?: any,
+  allBindings?: any,
+  bindingKey?: string,
+  bindingContext: any,
+  element: HTMLElement,
+  valueAccessor?: Function,
+  message?: string,
+  stack?: any
+}
+
 // The following element types will not be recursed into during binding.
 const bindingDoesNotRecurseIntoElementTypes = {
     // Don't want bindings that operate on text nodes to mutate <script> and <textarea> contents,
@@ -42,42 +55,48 @@ const bindingDoesNotRecurseIntoElementTypes = {
   'template': true
 }
 
-function getBindingProvider () {
+function getBindingProvider() {
   return options.bindingProviderInstance.instance || options.bindingProviderInstance
 }
 
-function isProviderForNode (provider, node : HTMLElement) {
+function isProviderForNode(provider, node: HTMLElement): boolean {
   const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
   return nodeTypes.includes(node.nodeType)
 }
 
-function asProperHandlerClass (handler, bindingKey?) {
-  if (!handler) { return }
+function asProperHandlerClass(handler: any, bindingKey?: string): BindingHandler | undefined {
+  if (!handler) {
+    return;
+  }
   return handler.isBindingHandlerClass ? handler
-    : LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
+    : LegacyBindingHandler.getOrCreateFor(handler, bindingKey)
 }
 
-function getBindingHandlerFromComponent (bindingKey, $component) {
-  if (!$component || typeof $component.getBindingHandler !== 'function') { return }
+function getBindingHandlerFromComponent (bindingKey: string, $component: any) {
+  if (!$component || typeof $component.getBindingHandler !== 'function') {
+    return;
+  }
   return asProperHandlerClass($component.getBindingHandler(bindingKey))
 }
 
-export function getBindingHandler (bindingKey) {
+export function getBindingHandler(bindingKey: string): BindingHandler | undefined {
   const bindingDefinition = options.getBindingHandler(bindingKey) || getBindingProvider().bindingHandlers.get(bindingKey)
   return asProperHandlerClass(bindingDefinition, bindingKey)
 }
 
 // Returns the value of a valueAccessor function
-function evaluateValueAccessor (valueAccessor) {
+function evaluateValueAccessor (valueAccessor: Function): any {
   return valueAccessor()
 }
 
-function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, asyncBindingsApplied) {
-  let nextInQueue = virtualElements.firstChild(elementOrVirtualElement)
+function applyBindingsToDescendantsInternal (bindingContext: BindingContext, elementOrVirtualElement: Node, asyncBindingsApplied: Set<any>) {
+  let nextInQueue: ChildNode | null = virtualElements.firstChild(elementOrVirtualElement)
 
-  if (!nextInQueue) { return }
+  if (!nextInQueue) {
+    return;
+  }
 
-  let currentChild
+  let currentChild: ChildNode | null;
   const provider = getBindingProvider()
   const preprocessNode = provider.preprocessNode
 
@@ -98,22 +117,22 @@ function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualEle
   while (currentChild = nextInQueue) {
     // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
     nextInQueue = virtualElements.nextSibling(currentChild)
-    applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
+    applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild as HTMLElement, asyncBindingsApplied)
   }
 
   bindingEvent.notify(elementOrVirtualElement, bindingEvent.childrenComplete)
 }
 
-function hasBindings (node : HTMLElement) : boolean {
+function hasBindings (node: HTMLElement) : boolean {
   const provider = getBindingProvider()
   return isProviderForNode(provider, node) && provider.nodeHasBindings(node)
 }
 
-function nodeOrChildHasBindings (node : HTMLElement) : boolean {
+function nodeOrChildHasBindings (node: HTMLElement) : boolean {
   return hasBindings(node) || [...node.childNodes].some(c => nodeOrChildHasBindings(c as HTMLElement))
 }
 
-function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, asyncBindingsApplied) {
+function applyBindingsToNodeAndDescendantsInternal(bindingContext: BindingContext, nodeVerified: HTMLElement, asyncBindingsApplied) {
   var isElement = nodeVerified.nodeType === 1
   if (isElement) { // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -142,7 +161,7 @@ function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified
 }
 
 
-function * topologicalSortBindings (bindings, $component) {
+function * topologicalSortBindings (bindings: any, $component: any) {
   const results = new Array()
   // Depth-first sort
   const bindingsConsidered = {}    // A temporary record of which bindings are already in 'result'
@@ -174,7 +193,7 @@ function * topologicalSortBindings (bindings, $component) {
   for (const result of results) { yield result }
 }
 
-function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, bindingContext : any, asyncBindingsApplied : any) {
+function applyBindingsToNodeInternal (node: HTMLElement, sourceBindings: any, bindingContext: any, asyncBindingsApplied?: Set<any>) {
   const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
   // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
   const alreadyBound = bindingInfo.alreadyBound
@@ -223,7 +242,7 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
     }
   }
 
-  var bindingHandlerThatControlsDescendantBindings
+  let bindingHandlerThatControlsDescendantBindings: string | undefined;
   if (bindings) {
     const $component = bindingContext.$component || {}
 
@@ -303,12 +322,14 @@ function applyBindingsToNodeInternal (node : HTMLElement, sourceBindings : any, 
         allBindingHandlers[key] = bindingHandler
 
         if (bindingHandler.controlsDescendants) {
-          if (bindingHandlerThatControlsDescendantBindings !== undefined) { throw new Error('Multiple bindings (' + bindingHandlerThatControlsDescendantBindings + ' and ' + key + ') are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.') }
+          if (bindingHandlerThatControlsDescendantBindings !== undefined) {
+            throw new Error('Multiple bindings (' + bindingHandlerThatControlsDescendantBindings + ' and ' + key + ') are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.');
+          }
           bindingHandlerThatControlsDescendantBindings = key
         }
 
         if (bindingHandler.bindingCompleted instanceof Promise) {
-          asyncBindingsApplied.add(bindingHandler.bindingCompleted)
+          asyncBindingsApplied!.add(bindingHandler.bindingCompleted)
           nodeAsyncBindingPromises.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
@@ -347,20 +368,20 @@ function triggerDescendantsComplete (node : HTMLElement, bindings : Object, node
 }
 
 
-function getBindingContext (viewModelOrBindingContext, extendContextCallback?) {
+function getBindingContext (viewModelOrBindingContext: any, extendContextCallback?: Function) {
   return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)
     ? viewModelOrBindingContext
     : new bindingContext(viewModelOrBindingContext, undefined, undefined, extendContextCallback)
 }
 
-export function applyBindingAccessorsToNode (node : HTMLElement, bindings : any, viewModelOrBindingContext?: any, asyncBindingsApplied?: any) {
+export function applyBindingAccessorsToNode (node: HTMLElement, bindings: Record<string,any>, viewModelOrBindingContext?: any, asyncBindingsApplied?: Set<any>) {
   if (node.nodeType === 1) { // If it's an element, workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(node)
   }
   return applyBindingsToNodeInternal(node, bindings, getBindingContext(viewModelOrBindingContext), asyncBindingsApplied)
 }
 
-export function applyBindingsToNode (node : HTMLElement, bindings : any, viewModelOrBindingContext : any) {
+export function applyBindingsToNode (node: HTMLElement, bindings : Record<string, any>, viewModelOrBindingContext : any): BindingResult {
   const asyncBindingsApplied = new Set()
   const bindingContext = getBindingContext(viewModelOrBindingContext)
   const bindingAccessors = getBindingProvider().makeBindingAccessors(bindings, bindingContext, node)
@@ -368,7 +389,7 @@ export function applyBindingsToNode (node : HTMLElement, bindings : any, viewMod
   return new BindingResult({asyncBindingsApplied, rootNode: node, bindingContext})
 }
 
-export function applyBindingsToDescendants (viewModelOrBindingContext : any, rootNode : HTMLElement) {
+export function applyBindingsToDescendants (viewModelOrBindingContext: any, rootNode: HTMLElement): BindingResult {
   const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     const bindingContext = getBindingContext(viewModelOrBindingContext)
@@ -378,7 +399,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext : any, roo
   return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
 }
 
-export function applyBindings (viewModelOrBindingContext : any, rootNode : HTMLElement, extendContextCallback? : any) {
+export function applyBindings (viewModelOrBindingContext: any, rootNode: HTMLElement, extendContextCallback?: Function): Promise<unknown> {
   const asyncBindingsApplied = new Set()
   // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
   if (!options.jQuery === undefined && options.jQuery) {
@@ -399,8 +420,8 @@ export function applyBindings (viewModelOrBindingContext : any, rootNode : HTMLE
   return Promise.all(asyncBindingsApplied)
 }
 
-function onBindingError (spec) {
-  var error, bindingText
+function onBindingError (spec: BindingError) {
+  let error: any;
   if (spec.bindingKey) {
         // During: 'init' or initial 'update'
     error = spec.errorCaptured
