@@ -12,7 +12,7 @@ export class DescendantBindingHandler extends AsyncBindingHandler {
   get controlsDescendants () { return true }
 
   async applyBindingsToDescendants (childContext: any, callback?: Function) {
-    const bindingResult = applyBindingsToDescendants(childContext, this.$element as HTMLElement)
+    const bindingResult = applyBindingsToDescendants(childContext, this.$element)
     if (bindingResult.isSync) {
       this.bindingCompletion = bindingResult
     } else {
