@@ -36,20 +36,20 @@ describe('Binding: Text', function () {
     var model = { textProp: "'Val <with> \"special\" <i>characters</i>'" }
     testNode.innerHTML = "<span data-bind='text:textProp'></span>"
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0].textContent || testNode.childNodes[0].innerText).toEqual(model.textProp)
+    expect(testNode.childNodes[0].textContent || (testNode.childNodes[0] as HTMLElement).innerText).toEqual(model.textProp)
   })
 
   it('Should assign an empty string as value if the model value is null', function () {
     testNode.innerHTML = "<span data-bind='text:(null)' ></span>"
     applyBindings(null, testNode)
-    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : testNode.childNodes[0].innerText
+    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : (testNode.childNodes[0] as HTMLElement).innerText
     expect(actualText).toEqual('')
   })
 
   it('Should assign an empty string as value if the model value is undefined', function () {
     testNode.innerHTML = "<span data-bind='text:undefined' ></span>"
     applyBindings(null, testNode)
-    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : testNode.childNodes[0].innerText
+    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : (testNode.childNodes[0] as HTMLElement).innerText
     expect(actualText).toEqual('')
   })
 
@@ -119,6 +119,6 @@ describe('Binding: Text', function () {
         // get replaced by the special message.
     testNode.innerHTML = "<span data-bind='text: sometext'></span>"
     applyBindings({ sometext: 'hello' }, testNode)
-    expect('textContent' in testNode ? testNode.textContent : testNode.innerText).toEqual('hello')
+    expect('textContent' in testNode ? testNode.textContent : (testNode as HTMLElement).innerText).toEqual('hello')
   })
 })

@@ -62,7 +62,7 @@ function beginLoadingComponent (componentName, callback) {
   })
 }
 
-function getFirstResultFromLoaders (methodName, argsExceptCallback, callback, candidateLoaders) {
+function getFirstResultFromLoaders (methodName, argsExceptCallback, callback, candidateLoaders?) {
     // On the first call in the stack, start with the full set of loaders
   if (!candidateLoaders) {
     candidateLoaders = registry.loaders.slice(0) // Use a copy, because we'll be mutating this array
@@ -110,7 +110,7 @@ function getFirstResultFromLoaders (methodName, argsExceptCallback, callback, ca
 }
 
 export var registry = {
-  get (componentName, callback) {
+  get (componentName : string, callback : any) {
     var cachedDefinition = getObjectOwnProperty(loadedDefinitionsCache, componentName)
     if (cachedDefinition) {
       // It's already loaded and cached. Reuse the same definition object.
@@ -129,11 +129,11 @@ export var registry = {
     }
   },
 
-  clearCachedDefinition (componentName) {
+  clearCachedDefinition (componentName : string) {
     delete loadedDefinitionsCache[componentName]
   },
 
   _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-  loaders: []
+  loaders: new Array()
 }

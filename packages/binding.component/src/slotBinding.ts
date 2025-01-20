@@ -30,8 +30,8 @@ import {
  * SlotBinding replaces a slot with
  */
 export default class SlotBinding extends DescendantBindingHandler {
-  constructor (...params) {
-    super(...params)
+  constructor (params) {
+    super(params)
     const slotNode = this.getSlot(this.value)
     const $slotContext = contextFor(slotNode)
 

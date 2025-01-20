@@ -97,7 +97,7 @@ describe('Observable', function () {
 
   it('Should notify subscribers about each new value', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value)
     })
@@ -110,7 +110,7 @@ describe('Observable', function () {
 
   it('Should notify "spectator" subscribers about each new value', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value)
     }, null, 'spectate')
@@ -122,7 +122,7 @@ describe('Observable', function () {
 
   it('Should be able to tell it that its value has mutated, at which point it notifies subscribers', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value.childProperty)
     })
@@ -140,7 +140,7 @@ describe('Observable', function () {
 
   it('Should notify "beforeChange" subscribers before each new value', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value)
     }, null, 'beforeChange')
@@ -155,7 +155,7 @@ describe('Observable', function () {
 
   it('Should be able to tell it that its value will mutate, at which point it notifies "beforeChange" subscribers', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value ? value.childProperty : value)
     }, null, 'beforeChange')
@@ -177,7 +177,7 @@ describe('Observable', function () {
 
   it('Should ignore writes when the new value is primitive and strictly equals the old value', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     for (var i = 0; i < 3; i++) {
@@ -193,7 +193,7 @@ describe('Observable', function () {
 
   it('Should ignore writes when both the old and new values are strictly null', function () {
     var instance = observable(null)
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
     instance(null)
     expect(notifiedValues).toEqual([])
@@ -201,7 +201,7 @@ describe('Observable', function () {
 
   it('Should ignore writes when both the old and new values are strictly undefined', function () {
     var instance = observable(undefined)
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
     instance(undefined)
     expect(notifiedValues).toEqual([])
@@ -212,7 +212,7 @@ describe('Observable', function () {
         // all objects as new values. To override this, set an "equalityComparer" callback
     var constantObject = {}
     var instance = observable(constantObject)
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
     instance(constantObject)
     expect(notifiedValues).toEqual([constantObject])
@@ -220,7 +220,7 @@ describe('Observable', function () {
 
   it('Should notify subscribers of a change even when an identical primitive is written if you\'ve set the equality comparer to null', function () {
     var instance = observable('A')
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
         // No notification by default
@@ -239,7 +239,7 @@ describe('Observable', function () {
       return !(a && b) ? a === b : a.id == b.id
     }
 
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     instance({ id: 1 })
@@ -272,7 +272,7 @@ describe('Observable', function () {
 
   it('Should expose a "notify" extender that can configure the observable to notify on all writes, even if the value is unchanged', function () {
     var instance = observable()
-    var notifiedValues = []
+    var notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     instance(123)
@@ -295,7 +295,7 @@ describe('Observable', function () {
 
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
     var instance = observable(123)
-    var interceptedNotifications = []
+    var interceptedNotifications = new Array()
     instance.subscribe(function () { throw new Error('Should not notify subscribers by default once notifySubscribers is overridden') })
     instance.notifySubscribers = function (newValue, eventName) {
       interceptedNotifications.push({ eventName: eventName || 'None', value: newValue })

@@ -28,7 +28,7 @@ export var defaultEvent = 'change'
 
 var ko_subscribable_fn = {
   [SUBSCRIBABLE_SYM]: true,
-  [Symbol.observable] () { return this },
+  [Symbol.observable as any] () { return this },
 
   init (instance) {
     instance._subscriptions = { change: [] }
@@ -56,7 +56,7 @@ var ko_subscribable_fn = {
     }
 
     if (!this._subscriptions[event]) {
-      this._subscriptions[event] = []
+      this._subscriptions[event] = new Array()
     }
     this._subscriptions[event].push(subscriptionInstance)
 

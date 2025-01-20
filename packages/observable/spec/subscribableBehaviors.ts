@@ -119,7 +119,7 @@ describe('Subscribable', function () {
 
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
     var instance = new subscribable()
-    var interceptedNotifications = []
+    var interceptedNotifications = new Array()
     instance.subscribe(function () { throw new Error('Should not notify subscribers by default once notifySubscribers is overridden') })
     instance.notifySubscribers = function (newValue, eventName) {
       interceptedNotifications.push({ eventName: eventName, value: newValue })

@@ -25,6 +25,7 @@ import {
     subscribable,
     LATEST_VALUE
 } from '@tko/observable'
+import { Computed, ComputedOptions, ComputedReadFunction, PureComputed } from '../types/computed'
 
 const computedState = createSymbolOrString('_state')
 const DISPOSED_STATE = {
@@ -39,7 +40,7 @@ const DISPOSED_STATE = {
   _options: null
 }
 
-export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
+export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, options?: ComputedOptions): Computed {
   if (typeof evaluatorFunctionOrOptions === 'object') {
         // Single-parameter syntax - everything is on this "options" param
     options = evaluatorFunctionOrOptions
@@ -50,12 +51,12 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
       options.read = evaluatorFunctionOrOptions
     }
   }
-  if (typeof options.read !== 'function') {
+  if (typeof options?.read !== 'function') {
     throw Error('Pass a function that returns the value of the computed')
   }
 
   var writeFunction = options.write
-  var state = {
+  var state: state = {
     latestValue: undefined,
     isStale: true,
     isDirty: true,
@@ -73,7 +74,24 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
     dependenciesCount: 0,
     evaluationTimeoutInstance: null
   }
-
+  interface state {
+    latestValue: any,
+    isStale: boolean,
+    isDirty: boolean,
+    isBeingEvaluated: boolean,
+    suppressDisposalUntilDisposeWhenReturnsFalse: boolean,
+    isDisposed: boolean,
+    pure: boolean,
+    isSleeping: boolean,
+    readFunction: ComputedReadFunction,
+    evaluatorFunctionTarget: any,
+    disposeWhenNodeIsRemoved: Node | null,
+    disposeWhen?: () => boolean,
+    domNodeDisposalCallback: (() => void) | null,
+    dependencyTracking: any,
+    dependenciesCount: number,
+    evaluationTimeoutInstance: any
+  }
   function computedObservable () {
     if (arguments.length > 0) {
       if (typeof writeFunction === 'function') {
@@ -88,8 +106,8 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
       if (!state.isDisposed) {
         dependencyDetection.registerDependency(computedObservable)
       }
-      if (state.isDirty || (state.isSleeping && computedObservable.haveDependenciesChanged())) {
-        computedObservable.evaluateImmediate()
+      if (state.isDirty || (state.isSleeping && (computedObservable as any).haveDependenciesChanged())) {
+        (computedObservable as any).evaluateImmediate()
       }
       return state.latestValue
     }
@@ -137,18 +155,18 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget, o
 
     // Evaluate, unless sleeping or deferEvaluation is true
   if (!state.isSleeping && !options.deferEvaluation) {
-    computedObservable.evaluateImmediate()
+    (computedObservable as any).evaluateImmediate()
   }
 
     // Attach a DOM node disposal callback so that the computed will be proactively disposed as soon as the node is
     // removed using ko.removeNode. But skip if isActive is false (there will never be any dependencies to dispose).
-  if (state.disposeWhenNodeIsRemoved && computedObservable.isActive()) {
+  if (state.disposeWhenNodeIsRemoved && (computedObservable as any).isActive()) {
     addDisposeCallback(state.disposeWhenNodeIsRemoved, state.domNodeDisposalCallback = function () {
-      computedObservable.dispose()
+      (computedObservable as any).dispose()
     })
   }
 
-  return computedObservable
+  return computedObservable as any;
 }
 
 // Utility function that disposes a given dependencyTracking entry
@@ -183,13 +201,13 @@ function computedBeginDependencyDetectionCallback (subscribable, id) {
 
 computed.fn = {
   equalityComparer: valuesArePrimitiveAndEqual,
-  getDependenciesCount () {
+  getDependenciesCount () : number {
     return this[computedState].dependenciesCount
   },
 
   getDependencies () {
     const dependencyTracking = this[computedState].dependencyTracking
-    const dependentObservables = []
+    const dependentObservables = new Array()
 
     objectForEach(dependencyTracking, function (id, dependency) {
       dependentObservables[dependency._order] = dependency._target
@@ -403,9 +421,9 @@ computed.fn = {
   },
 
   limit (limitFunction) {
-    const state = this[computedState]
+    const state = this[computedState];
     // Override the limit function with one that delays evaluation as well
-    subscribable.fn.limit.call(this, limitFunction)
+    (subscribable.fn as any).limit.call(this, limitFunction)
     Object.assign(this, {
       _evalIfChanged () {
         if (!this[computedState].isSleeping) {
@@ -463,7 +481,7 @@ var pureComputedOverrides = {
         }
       } else {
         // First put the dependencies in order
-        var dependenciesOrder = []
+        var dependenciesOrder = new Array()
         objectForEach(state.dependencyTracking, function (id, dependency) {
           dependenciesOrder[dependency._order] = id
         })
@@ -534,22 +552,24 @@ var protoProp = observable.protoProperty // == "__ko_proto__"
 computed.fn[protoProp] = computed
 
 /* This is used by ko.isObservable */
-observable.observablePrototypes.add(computed)
+observable.observablePrototypes.add(computed as any)
 
-export function isComputed (instance) {
+export function isComputed<T= any> (instance: any):instance is Computed<T> {
   return (typeof instance === 'function' && instance[protoProp] === computed)
 }
 
-export function isPureComputed (instance) {
+export function isPureComputed<T=any> (instance:any): instance is PureComputed<T> {
   return isComputed(instance) && instance[computedState] && instance[computedState].pure
 }
 
-export function pureComputed (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {
+export function pureComputed<T = any> (evaluatorFunctionOrOptions: ComputedOptions|ComputedReadFunction, evaluatorFunctionTarget?):Computed<T> {
   if (typeof evaluatorFunctionOrOptions === 'function') {
-    return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure': true})
+    let evaluator = evaluatorFunctionOrOptions as ComputedReadFunction;
+    return computed(evaluator, evaluatorFunctionTarget, {'pure': true})
   } else {
-    evaluatorFunctionOrOptions = extend({}, evaluatorFunctionOrOptions)   // make a copy of the parameter object
-    evaluatorFunctionOrOptions.pure = true
-    return computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget)
+    let options = evaluatorFunctionOrOptions as ComputedOptions;
+    options = extend({}, options)   // make a copy of the parameter object
+    options.pure = true
+    return computed(options, evaluatorFunctionTarget)
   }
 }

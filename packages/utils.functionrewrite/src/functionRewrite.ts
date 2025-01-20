@@ -6,7 +6,7 @@
 
 const FUNCTION_REX = /\bfunction\s*\(([^)]*)\)\s*\{\s*(?:(return\s)?([^}]+?)[;\s]*)?\}/g
 
-export default function functionRewrite (bindingString) {
+export default function functionRewrite (bindingString:string):string {
   return bindingString
     .replace(FUNCTION_REX, (match, args, returnKeyword, rv) => {
       if (rv && !returnKeyword) {
@@ -19,3 +19,5 @@ export default function functionRewrite (bindingString) {
       return out
   })
 }
+
+functionRewrite.silent = false;

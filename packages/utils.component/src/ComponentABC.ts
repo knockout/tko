@@ -47,7 +47,7 @@ export class ComponentABC extends LifeCycle {
 	 * 4. An AMD module (with `{require: 'some/template'}`)
 	 * @return {mixed} One of the accepted template types for the ComponentBinding.
 	 */
-  static get template () {
+  static get template (): any {
     if ('template' in this.prototype) { return }
     return { element: this.element }
   }
@@ -73,8 +73,8 @@ export class ComponentABC extends LifeCycle {
    * @param {Object} params
    * @param {{element: HTMLElement, templateNodes: [HTMLElement]}} componentInfo
    */
-  static [VIEW_MODEL_FACTORY] (params, componentInfo) {
-    return new this(params, componentInfo)
+  static [VIEW_MODEL_FACTORY] (params: object, componentInfo: ComponentInfo): ComponentABC {
+    return new (this as any)(params, componentInfo)
   }
 
   static register (name = this.customElementName) {
@@ -83,4 +83,8 @@ export class ComponentABC extends LifeCycle {
     const synchronous = this.sync
     register(name, { viewModel, template, synchronous })
   }
+}
+interface ComponentInfo{
+  element: HTMLElement;
+  templateNodes: HTMLElement[];
 }

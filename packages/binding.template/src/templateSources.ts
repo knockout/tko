@@ -34,7 +34,7 @@ var templateScript = 1,
   templateTemplate = 3,
   templateElement = 4
 
-export function domElement (element) {
+export function domElement (element?) {
   this.domElement = element
 
   if (!element) { return }
@@ -61,11 +61,11 @@ domElement.prototype.text = function (/* valueToWrite */) {
 }
 
 var dataDomDataPrefix = domData.nextKey() + '_'
-domElement.prototype.data = function (key /*, valueToWrite */) {
+domElement.prototype.data = function (key : string, valueToWrite? : any) {
   if (arguments.length === 1) {
     return domData.get(this.domElement, dataDomDataPrefix + key)
   } else {
-    domData.set(this.domElement, dataDomDataPrefix + key, arguments[1])
+    domData.set(this.domElement, dataDomDataPrefix + key, valueToWrite)
   }
 }
 
@@ -77,7 +77,7 @@ function setTemplateDomData (element, data) {
   domData.set(element, templatesDomDataKey, data)
 }
 
-domElement.prototype.nodes = function (/* valueToWrite */) {
+domElement.prototype.nodes = function (valueToWrite? : any) {
   var element = this.domElement
   if (arguments.length == 0) {
     const templateData = getTemplateDomData(element)
@@ -100,7 +100,6 @@ domElement.prototype.nodes = function (/* valueToWrite */) {
 
     return nodes
   } else {
-    var valueToWrite = arguments[0]
     setTemplateDomData(element, {containerData: valueToWrite})
   }
 }

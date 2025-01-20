@@ -8,7 +8,8 @@ const OUTER_EXPRESSION = /^([\s\S]*?)\{\{([\s\S]*)}}([\s\S]*)$/
 const BINDING_EXPRESSION = /^([^,"'{}()/:[\]\s]+)\s+([^\s:].*)/
 
 class Interpolated {
-  constructor (text) {
+  text: string
+  constructor (text:string) {
     this.text = text
   }
 
@@ -89,7 +90,7 @@ export function * parseOuterMatch (outerMatch) {
   yield new Text(post)
 }
 
-export function * parseInterpolation (text) {
+export function * parseInterpolation (text: string) {
   for (const textOrExpr of parseOuterMatch(text.match(OUTER_EXPRESSION))) {
     if (textOrExpr.text) { yield textOrExpr }
   }

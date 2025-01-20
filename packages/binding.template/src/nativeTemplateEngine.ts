@@ -17,7 +17,13 @@ export function nativeTemplateEngine () {
 nativeTemplateEngine.prototype = new templateEngine()
 nativeTemplateEngine.prototype.constructor = nativeTemplateEngine
 nativeTemplateEngine.prototype.renderTemplateSource = function (templateSource, bindingContext, options, templateDocument) {
-  var useNodesIfAvailable = !(ieVersion < 9), // IE<9 cloneNode doesn't work properly
+  let version: number;
+  if (ieVersion instanceof Array) {
+    version = parseInt(ieVersion[1], 10);
+  } else {
+    version = ieVersion ?? 0;
+  }
+  var useNodesIfAvailable = !(version < 9), // IE<9 cloneNode doesn't work properly
     templateNodesFunc = useNodesIfAvailable ? templateSource.nodes : null,
     templateNodes = templateNodesFunc ? templateSource.nodes() : null
 

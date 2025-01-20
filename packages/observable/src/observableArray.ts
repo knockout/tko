@@ -9,29 +9,29 @@ import {
 import { observable, isObservable } from './observable'
 
 import { trackArrayChanges } from './observableArray.changeTracking'
+import { ObservableArray } from '../types/Observable';
 
-export function observableArray (initialValues) {
+export function observableArray<T = any> (initialValues?: T[]): ObservableArray<T> {
   initialValues = initialValues || []
 
   if (typeof initialValues !== 'object' || !('length' in initialValues)) { throw new Error('The argument passed when initializing an observable array must be an array, or null, or undefined.') }
 
-  var result = observable(initialValues)
-  Object.setPrototypeOf(result, observableArray.fn)
+  var result = Object.setPrototypeOf(observable(initialValues), observableArray.fn) as ObservableArray<T>
   trackArrayChanges(result)
         // ^== result.extend({ trackArrayChanges: true })
-  overwriteLengthPropertyIfSupported(result, { get: () => result().length })
+  overwriteLengthPropertyIfSupported(result, { get: () => result()?.length })
   return result
 }
 
-export function isObservableArray (instance) {
+export function isObservableArray (instance: { remove: any; push: any }) {
   return isObservable(instance) && typeof instance.remove === 'function' && typeof instance.push === 'function'
 }
 
 observableArray.fn = {
-  remove (valueOrPredicate) {
+  remove (valueOrPredicate: any): any[] {
     var underlyingArray = this.peek()
-    var removedValues = []
-    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
+    var removedValues = new Array()
+    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value: any) { return value === valueOrPredicate }
     for (var i = 0; i < underlyingArray.length; i++) {
       var value = underlyingArray[i]
       if (predicate(value)) {
@@ -52,7 +52,7 @@ observableArray.fn = {
     return removedValues
   },
 
-  removeAll (arrayOfValues) {
+  removeAll (arrayOfValues: undefined): any {
         // If you passed zero args, we remove everything
     if (arrayOfValues === undefined) {
       var underlyingArray = this.peek()
@@ -66,14 +66,14 @@ observableArray.fn = {
     if (!arrayOfValues) {
       return []
     }
-    return this['remove'](function (value) {
+    return this['remove'](function (value: any) {
       return arrayIndexOf(arrayOfValues, value) >= 0
     })
   },
 
-  destroy (valueOrPredicate) {
+  destroy (valueOrPredicate: any): void {
     var underlyingArray = this.peek()
-    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate }
+    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value: any) { return value === valueOrPredicate }
     this.valueWillMutate()
     for (var i = underlyingArray.length - 1; i >= 0; i--) {
       var value = underlyingArray[i]
@@ -84,7 +84,7 @@ observableArray.fn = {
     this.valueHasMutated()
   },
 
-  destroyAll (arrayOfValues) {
+  destroyAll (arrayOfValues: undefined): any {
         // If you passed zero args, we destroy everything
     if (arrayOfValues === undefined) { return this.destroy(function () { return true }) }
 
@@ -92,16 +92,16 @@ observableArray.fn = {
     if (!arrayOfValues) {
       return []
     }
-    return this.destroy(function (value) {
+    return this.destroy(function (value: any) {
       return arrayIndexOf(arrayOfValues, value) >= 0
     })
   },
 
-  indexOf (item) {
+  indexOf (item: any): number {
     return arrayIndexOf(this(), item)
   },
 
-  replace (oldItem, newItem) {
+  replace (oldItem: any, newItem: any): void {
     var index = this.indexOf(oldItem)
     if (index >= 0) {
       this.valueWillMutate()
@@ -110,25 +110,27 @@ observableArray.fn = {
     }
   },
 
-  sorted (compareFn) {
+  sorted (compareFn: ((a: any, b: any) => number) | undefined): any[] {
     return [...this()].sort(compareFn)
   },
 
-  reversed () {
+  reversed (): any[] {
     return [...this()].reverse()
   },
 
-  [Symbol.iterator]: function * () {
+  [Symbol.iterator]: function * (): Generator<any, void, any> {
     yield * this()
   }
 }
+
+
 
 Object.setPrototypeOf(observableArray.fn, observable.fn)
 
 // Populate ko.observableArray.fn with read/write functions from native arrays
 // Important: Do not add any additional functions here that may reasonably be used to *read* data from the array
 // because we'll eval them without causing subscriptions, so ko.computed output could end up getting stale
-arrayForEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (methodName) {
+arrayForEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (methodName: string | number) {
   observableArray.fn[methodName] = function () {
         // Use "peek" to avoid creating a subscription in any computed that we're executing in the context of
         // (for consistency with mutating regular observables)
@@ -143,7 +145,7 @@ arrayForEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], f
 })
 
 // Populate ko.observableArray.fn with read-only functions from native arrays
-arrayForEach(['slice'], function (methodName) {
+arrayForEach(['slice'], function (methodName: string | number) {
   observableArray.fn[methodName] = function () {
     var underlyingArray = this()
     return underlyingArray[methodName].apply(underlyingArray, arguments)

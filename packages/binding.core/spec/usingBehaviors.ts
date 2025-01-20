@@ -18,6 +18,7 @@ import {bindings as templateBindings} from '@tko/binding.template'
 import {bindings as coreBindings} from '@tko/binding.core'
 
 import '@tko/utils/helpers/jasmine-13-helper'
+import { ObservableArray } from 'packages/observable/types/Observable'
 
 describe('Binding: Using', function () {
   beforeEach(jasmine.prepareTestNode)
@@ -120,15 +121,15 @@ describe('Binding: Using', function () {
 
         // Also check that, when we later retrieve the binding contexts, we get consistent results
     expect(contextFor(testNode).$data.name).toEqual('outer')
-    expect(contextFor(testNode.childNodes[0]).$data.name).toEqual('outer')
-    expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('top')
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('middle')
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('bottom')
-    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+    expect(contextFor(testNode.childNodes[0] as HTMLElement).$data.name).toEqual('outer')
+    expect(contextFor(testNode.childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('top')
+    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('middle')
+    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('bottom')
+    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
     expect(firstSpan.tagName).toEqual('SPAN')
-    expect(contextFor(firstSpan).$data.name).toEqual('bottom')
-    expect(contextFor(firstSpan).$root.name).toEqual('outer')
-    expect(contextFor(firstSpan).$parents[1].name).toEqual('top')
+    expect(contextFor(firstSpan as HTMLElement).$data.name).toEqual('bottom')
+    expect(contextFor(firstSpan as HTMLElement).$root.name).toEqual('outer')
+    expect(contextFor(firstSpan as HTMLElement).$parents[1].name).toEqual('top')
   })
 
   it('Should be able to define a \"using\" region using a containerless binding', function () {
@@ -157,7 +158,7 @@ describe('Binding: Using', function () {
     testNode.innerHTML = "<div data-bind='using: someitem'>" +
             "<div data-bind='foreach: childprop'><span data-bind='text: $data'></span></div></div>"
 
-    var childprop = observableArray([])
+    var childprop = observableArray(new Array())
     var someitem = observable({childprop: childprop})
     var viewModel = {someitem: someitem}
     applyBindings(viewModel, testNode)
@@ -183,7 +184,7 @@ describe('Binding: Using', function () {
     testNode.innerHTML = "<div data-bind='using: someitem'>text" +
             "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
 
-    var childprop = observableArray([])
+    var childprop: ObservableArray = observableArray([])
     var someitem = observable({childprop: childprop})
     var viewModel = {someitem: someitem}
     applyBindings(viewModel, testNode)
@@ -214,8 +215,9 @@ describe('Binding: Using', function () {
     expect(testNode.childNodes[0]).toHaveValues(['one'])
 
         // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'two'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    var inputElement = testNode?.childNodes[0]?.childNodes[0] as HTMLInputElement
+    inputElement.value = 'two'
+    triggerEvent(inputElement, 'change')
     expect(item()).toEqual('two')
 
         // Should update the input when the observable changes

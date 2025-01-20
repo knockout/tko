@@ -63,12 +63,12 @@ describe('Binding: Event', function () {
 
   it('Should invoke lambda when the event occurs, using model as \'this\' param and first arg, and event as second arg', function () {
     testNode.innerHTML = "<button data-bind='event: { click: (data, event) => data.log(event) }'>hey</button>"
-    let thing = null;
+    let thing: any = null;
     applyBindings({
       log (arg) {
         thing = arg
       }
-    })
+    }, testNode, null)
     triggerEvent(testNode.childNodes[0], 'click')
     expect(thing)
     expect(thing.type).toEqual('click')

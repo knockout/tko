@@ -48,7 +48,7 @@ describe('Parse HTML fragment', function () {
             // Early out if Simple HTML parser is known to fail for this data.
       if (!supportsTemplateTag) {
         if (!jQueryInstance && data.simpleParserFails) { return }
-        if (jQueryInstance && jQueryInstance.fn.jquery[0] < 3 &&
+        if (jQueryInstance && parseFloat(jQueryInstance.fn.jquery[0]) < 3 &&
                     data.OldjQueryFails) { return }
       }
 
@@ -72,9 +72,9 @@ describe('Parse HTML fragment', function () {
     var html = '<div><i></i></div>'
     var parsedNodes1 = parseHtmlFragment(html, document)
     var parsedNodes2 = parseHtmlFragment(html, document)
-    expect(parsedNodes1).toNotEqual(parsedNodes2)
-    expect(parsedNodes1[0]).toNotEqual(parsedNodes2[0])
+    expect(parsedNodes1).not.toEqual(parsedNodes2)
+    expect(parsedNodes1[0]).not.toEqual(parsedNodes2[0])
         // We need to test for deep inequality
-    expect(parsedNodes1[0].children[0]).toNotEqual(parsedNodes2[0].children[0])
+    expect(parsedNodes1[0].children[0]).not.toEqual(parsedNodes2[0].children[0])
   })
 })

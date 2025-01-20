@@ -3,6 +3,8 @@ import {
   AttributeProvider
 } from '../dist'
 
+import { assert } from "chai"
+
 describe('Attribute Provider Behavior', function () {
   describe('nodeHasBindings', function () {
     it('is false if there is no ko-{binding} attribute', function () {

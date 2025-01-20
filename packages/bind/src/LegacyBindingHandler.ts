@@ -14,6 +14,13 @@ const PossibleWeakMap = options.global.WeakMap || Map
 const legacyBindingMap = new PossibleWeakMap()
 
 export class LegacyBindingHandler extends BindingHandler {
+  get handler(): any {
+    // Needed to prevent tsc error for using this.handler
+    // is overriden in factory functions. Any must be used for return type
+    return undefined;
+  }
+  initReturn: any;
+  onError: any;
   constructor (params) {
     super(params)
     const handler = this.handler

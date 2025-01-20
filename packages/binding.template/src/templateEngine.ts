@@ -41,7 +41,7 @@ extend(templateEngine.prototype, {
   },
 
   createJavaScriptEvaluatorBlock: function (script) {
-    options.onError('Override createJavaScriptEvaluatorBlock')
+    options.onError(new Error('Override createJavaScriptEvaluatorBlock'))
   },
 
   makeTemplateSource: function (template, templateDocument) {
@@ -49,12 +49,12 @@ extend(templateEngine.prototype, {
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
       var elem = templateDocument.getElementById(template)
-      if (!elem) { options.onError('Cannot find template with ID ' + template) }
+      if (!elem) { options.onError(new Error('Cannot find template with ID ' + template)) }
       return new domElement(elem)
     } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
           // Anonymous template
       return new anonymousTemplate(template)
-    } else { options.onError('Unknown template type: ' + template) }
+    } else { options.onError(new Error('Unknown template type: ' + template)) }
   },
 
   renderTemplate: function (template, bindingContext, options, templateDocument) {

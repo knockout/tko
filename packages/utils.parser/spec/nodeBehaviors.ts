@@ -8,11 +8,13 @@ import {
   Parser, Node, Arguments, Identifier, Ternary
 } from '../dist';
 
+import {assert} from "chai"
+
 var op = Node.operators
 var operators = Node.operators
 var nodes_to_tree
 
-function ctxStub (ctx) {
+function ctxStub (ctx?) {
   return { lookup (v) { return ctx ? ctx[v] : null } }
 }
 
@@ -21,7 +23,7 @@ beforeEach(function () {
 })
 
 describe('Operators', function () {
-  function test (nodes, val, name) {
+  function test (nodes, val, name?) {
     assert.strictEqual(Node.create_root(nodes).get_value(), val, name);
   }
 

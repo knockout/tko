@@ -18,7 +18,7 @@ var cleanableNodeTypesWithDescendants = { 1: true, 9: true }
 function getDisposeCallbacksCollection (node, createIfNotFound) {
   var allDisposeCallbacks = domData.get(node, domDataKey)
   if ((allDisposeCallbacks === undefined) && createIfNotFound) {
-    allDisposeCallbacks = []
+    allDisposeCallbacks = new Array()
     domData.set(node, domDataKey, allDisposeCallbacks)
   }
   return allDisposeCallbacks
@@ -54,8 +54,8 @@ function cleanSingleNode (node) {
   }
 }
 
-function cleanNodesInList (nodeList, onlyComments) {
-  const cleanedNodes = []
+function cleanNodesInList (nodeList, onlyComments?) {
+  const cleanedNodes = new Array()
   let lastCleanedNode
   for (var i = 0; i < nodeList.length; i++) {
     if (!onlyComments || nodeList[i].nodeType === 8) {
@@ -68,12 +68,12 @@ function cleanNodesInList (nodeList, onlyComments) {
 }
 
 // Exports
-export function addDisposeCallback (node, callback) {
+export function addDisposeCallback (node : Node, callback : (node: Node) => void) {
   if (typeof callback !== 'function') { throw new Error('Callback must be a function') }
   getDisposeCallbacksCollection(node, true).push(callback)
 }
 
-export function removeDisposeCallback (node, callback) {
+export function removeDisposeCallback (node : Node, callback : (node: Node) => void) {
   var callbacksCollection = getDisposeCallbacksCollection(node, false)
   if (callbacksCollection) {
     arrayRemoveItem(callbacksCollection, callback)
@@ -81,26 +81,29 @@ export function removeDisposeCallback (node, callback) {
   }
 }
 
-export function cleanNode (node) {
+export function cleanNode (node : Node) : typeof node {  
   // First clean this node, where applicable
   if (cleanableNodeTypes[node.nodeType]) {
     cleanSingleNode(node)
 
     // ... then its descendants, where applicable
-    if (cleanableNodeTypesWithDescendants[node.nodeType]) {
+    if (cleanableNodeTypesWithDescendants[node.nodeType] && node instanceof Element) {
       cleanNodesInList(node.getElementsByTagName("*"))
     }
   }
   return node
 }
 
-export function removeNode (node) {
+export function removeNode (node : Node | null) {
+  if(!node)
+    return;
+
   cleanNode(node)
   if (node.parentNode) { node.parentNode.removeChild(node) }
 }
 
 // Expose supplemental node cleaning functions.
-export const otherNodeCleanerFunctions = []
+export const otherNodeCleanerFunctions = new Array()
 
 export function addCleaner (fn) {
   otherNodeCleanerFunctions.push(fn)

@@ -35,6 +35,7 @@ import {
 import $ from 'jquery'
 
 import { assert } from "chai"
+import { ObservableArray } from 'packages/observable/types/Observable'
 
 beforeEach(function () {
   var provider = new MultiProvider({
@@ -182,7 +183,7 @@ describe('each binding', function () {
 describe('is empty/conditional', function () {
   it('sets `elseChainSatisfied` to false for an empty array', function () {
     var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>")
-    var obs = []
+    var obs = new Array()
     var view = {obs: obs}
     applyBindings(view, div[0])
     assert.equal(domData.get(div[0], 'conditional').elseChainSatisfied(), false)
@@ -222,7 +223,7 @@ describe('is empty/conditional', function () {
 
   it('sets `elseChainSatisfied` to true after array is filled', function () {
     var div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>")
-    var obs = observableArray([])
+    var obs: ObservableArray<number> = observableArray([])
     var view = {obs: obs}
     applyBindings(view, div[0])
     obs([1, 2, 3])
@@ -485,7 +486,7 @@ describe('observable array changes', function () {
       var itemNumber = 100
       div = $("<div data-bind='foreach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>")
       applyBindings(view, div[0])
-      var arr = [], i
+      var arr = new Array(), i
       for (i = 0; i != itemNumber; ++i) {
         arr.push({ id: Math.floor(Math.random() * itemNumber), testHtml: '<span>Item ' + i + '</span>' })
       }
@@ -511,7 +512,7 @@ describe('observable array changes', function () {
       var itemNumber = 100
       div = $("<div data-bind='foreach: { data: obs }'><div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div><div data-bind='html: testHtml'></div></div></div>")
       applyBindings(view, div[0])
-      var arr = [], i
+      var arr = new Array(), i
       for (i = 0; i != itemNumber; ++i) {
         arr.push({ id: Math.floor(Math.random() * itemNumber), testHtml: '<span>Item ' + i + '</span>' })
       }
@@ -668,7 +669,7 @@ describe('observable array changes', function () {
     it('emits on changes to an observable array', function () {
       var calls = 0
       var nodes = 0
-      var arr = observableArray([])
+      var arr: ObservableArray = observableArray([])
       function cb (v) { calls++; nodes += v.nodeOrArrayInserted.length }
       var target = $("<ul data-bind='foreach: { data: arr, afterAdd: cb }'><li data-bind='text: $data'></li></div>")
       applyBindings({arr: arr, cb: cb}, target[0])
@@ -808,7 +809,7 @@ describe('observable array changes', function () {
 
     it('updates the first list item', function () {
       var target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>")
-      var list = observableArray([])
+      var list: ObservableArray<string> = observableArray([])
       applyBindings(list, target[0])
       list.push('a')
       assert.equal(contextFor(target.children()[0]).$index(), 0)
@@ -884,9 +885,9 @@ describe('observable array changes', function () {
       var target = $("<ul data-bind='foreach: { data: $data, as: \"xyz\" }'><li data-bind='text: xyz'></li></ul>")
       var list = ['a', 'b', 'c']
       applyBindings(list, target[0])
-      assert.strictEqual(dataFor(target.children()[0]).$data, dataFor(target))
-      assert.strictEqual(dataFor(target.children()[1]).$data, dataFor(target))
-      assert.strictEqual(dataFor(target.children()[2]).$data, dataFor(target))
+      assert.strictEqual(dataFor(target.children()[0]).$data, dataFor(target as any))
+      assert.strictEqual(dataFor(target.children()[1]).$data, dataFor(target as any))
+      assert.strictEqual(dataFor(target.children()[2]).$data, dataFor(target as any))
     })
 
     it('has an $index', function () {

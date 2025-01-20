@@ -25,6 +25,8 @@ import {bindings as coreBindings} from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
+declare var testNode : any
+
 describe('Binding: Value', function () {
   beforeEach(jasmine.prepareTestNode)
 
@@ -201,7 +203,7 @@ describe('Binding: Value', function () {
   })
 
   it('Should only register one single onchange handler', function () {
-    var notifiedValues = []
+    var notifiedValues = new Array()
     var myObservable = observable(123)
     myObservable.subscribe(function (value) { notifiedValues.push(value) })
     expect(notifiedValues.length).toEqual(0)
