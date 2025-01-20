@@ -43,7 +43,7 @@ function getWrap (tags) {
   return (m && lookup[m[1]]) || none
 }
 
-function simpleHtmlParse (html: string, documentContext) {
+function simpleHtmlParse (html: string, documentContext? : Document) {
   documentContext || (documentContext = document)
   var windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
 
@@ -56,13 +56,14 @@ function simpleHtmlParse (html: string, documentContext) {
     // (possibly a text node) in front of the comment. So, KO does not attempt to workaround this IE issue automatically at present.
 
     // Trim whitespace, otherwise indexOf won't work as expected
-  var tags = stringTrim(html).toLowerCase(), div = documentContext.createElement('div'),
+  let div : any = documentContext.createElement('div')
+  let tags = stringTrim(html).toLowerCase(), 
     wrap = getWrap(tags),
     depth = wrap[0]
 
     // Go to html and back, then peel off extra wrappers
     // Note that we always prefix with some dummy text, because otherwise, IE<9 will strip out leading comment nodes in descendants. Total madness.
-  var markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
+  let markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
   if (typeof windowContext['innerShiv'] === 'function') {
         // Note that innerShiv is deprecated in favour of html5shiv. We should consider adding
         // support for html5shiv (except if no explicit support is needed, e.g., if html5shiv
@@ -78,14 +79,14 @@ function simpleHtmlParse (html: string, documentContext) {
   return makeArray(div.lastChild.childNodes)
 }
 
-function templateHtmlParse (html: string, documentContext): ChildNode[] {
+function templateHtmlParse (html: string, documentContext? : Document): ChildNode[] {
   if (!documentContext) { documentContext = document }
   var template = documentContext.createElement('template') as HTMLTemplateElement
   template.innerHTML = html
   return makeArray(template.content.childNodes)
 }
 
-function jQueryHtmlParse (html: string, documentContext: any) {
+function jQueryHtmlParse (html: string, documentContext?: Document) {
     // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
   if (jQueryInstance.parseHTML) {
     return jQueryInstance.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
@@ -115,8 +116,8 @@ function jQueryHtmlParse (html: string, documentContext: any) {
  * straightforward parser.
  *
  * @param  {string} html            To be parsed.
- * @param  {Object} documentContext That owns the executing code.
- * @return {[DOMNode]}              Parsed DOM Nodes
+ * @param  {Document} documentContext That owns the executing code.
+ * @return {[Node]}              Parsed DOM Nodes
  */
 export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {
     // Prefer <template>-tag based HTML parsing.

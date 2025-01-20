@@ -6,7 +6,7 @@
 
 const {isArray} = Array
 
-export function arrayForEach<T = any>(array: T[], action: (item: T, index: number, array? : T[]) => void, actionOwner?: any): void {
+export function arrayForEach<T = any>(array: T[], action: (item: T, index?: number, array? : T[]) => void, actionOwner?: any): void {
   if (arguments.length > 2) { action = action.bind(actionOwner) }
   for (let i = 0, j = array.length; i < j; ++i) {
     action(array[i], i, array)
@@ -17,7 +17,7 @@ export function arrayIndexOf<T = any>(array: Array<T>, item: T): number {
   return (isArray(array) ? array : [...array]).indexOf(item)
 }
 
-export function arrayFirst<T = any>(array: T[], predicate: (item: T, index: number) => boolean, predicateOwner?: any): T | undefined {
+export function arrayFirst<T = any>(array: T[], predicate: (item: T, index?: number) => boolean, predicateOwner?: any): T | undefined {
   return (isArray(array) ? array : [...array])
     .find(predicate, predicateOwner)
 }
@@ -43,7 +43,7 @@ export function arrayGetDistinctValues<T = any>(array: T[]): T[] {
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
-export function arrayFilter<T = any>(array: T[], predicate: (item: T, index: number) => boolean, predicateOwner?: any): T[] {
+export function arrayFilter<T = any>(array: T[], predicate: (item: T, index?: number) => boolean, predicateOwner?: any): T[] {
   if (arguments.length > 2) { predicate = predicate.bind(predicateOwner) }
   return array === null ? [] : (isArray(array) ? array : [...array]).filter(predicate)
 }
