@@ -281,31 +281,6 @@ declare global {
 
     //#endregion
 
-    //#region binding/expressionRewriting.js
-    export module expressionRewriting {
-        export interface KeyValue {
-            key?: string;
-            value?: string;
-            unknown?: string;
-        }
-
-        export interface TwoWayBindings {
-            [name: string]: boolean | string;
-        }
-
-        export const bindingRewriteValidators: any[];
-
-        export function parseObjectLiteral(objectLiteralString: string): KeyValue[];
-
-        export function preProcessBindings(bindingsString: string, bindingOptions?: BindingOptions): string;
-        export function preProcessBindings(keyValueArray: KeyValue[], bindingOptions?: BindingOptions): string;
-
-        export const _twoWayBindings: TwoWayBindings;
-    }
-
-    //#endregion
-
-
     //#region binding/defaultBindings/
 
     export interface BindingHandlers {

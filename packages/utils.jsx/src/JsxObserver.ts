@@ -62,7 +62,7 @@ export class JsxObserver extends LifeCycle {
   adoptedInsertBefore: boolean
   noInitialBinding: boolean
   insertBefore: Node|null
-  parentNode:HTMLElement|Comment|HTMLTemplateElement
+  parentNode:Node
   parentNodeTarget: Comment | ParentNode | null
   subscriptionsForNode: any
   nodeArrayOrObservableAtIndex: any
@@ -71,7 +71,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode:HTMLElement|Comment|HTMLTemplateElement, insertBefore:Node | null = null, xmlns, noInitialBinding) {
+  constructor (jsxOrObservable, parentNode:Node, insertBefore:Node | null = null, xmlns, noInitialBinding) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -119,8 +119,8 @@ export class JsxObserver extends LifeCycle {
     this.noInitialBinding = false
   }
 
-  getParentTarget (parentNode:HTMLElement|Comment|HTMLTemplateElement): Comment | ParentNode | null {
-    if ('content' in parentNode) { return parentNode.content }
+  getParentTarget (parentNode:Node): Node | null {
+    if ('content' in parentNode) { return (parentNode as HTMLTemplateElement).content }
     if (parentNode.nodeType === 8) { return (parentNode as Comment).parentNode }
     return parentNode
   }

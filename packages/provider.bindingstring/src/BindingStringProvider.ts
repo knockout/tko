@@ -17,7 +17,7 @@ export default class BindingStringProvider extends Provider {
    * The `preprocess` property of bindingHandler must be a static
    * function (i.e. on the object or constructor).
    */
-  * processBinding (key, value) {
+  * processBinding (key : string, value) {
     // Get the "on" binding from "on.click"
     const [handlerName, property] = key.split('.')
     const handler = this.bindingHandlers.get(handlerName)

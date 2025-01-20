@@ -50,14 +50,14 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     if (maybeJsx(template)) {
       virtualElements.emptyNode(element)
-      this.addDisposable(new JsxObserver(template, element as HTMLElement, null, undefined, true))
+      this.addDisposable(new JsxObserver(template, element, null, undefined, true))
     } else {
       const clonedNodesArray = cloneNodes(template)
       virtualElements.setDomNodeChildren(element, clonedNodesArray)
     }
   }
 
-  createViewModel(componentDefinition: any, element: HTMLElement, originalChildNodes: Node[], componentParams: any) {
+  createViewModel(componentDefinition: any, element: Node, originalChildNodes: Node[], componentParams: any) {
     const componentViewModelFactory = componentDefinition.createViewModel
     return componentViewModelFactory
       ? componentViewModelFactory.call(componentDefinition, componentParams, { element, templateNodes: originalChildNodes })
