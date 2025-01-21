@@ -9,7 +9,6 @@ import {
 import { observable, isObservable } from './observable'
 
 import { trackArrayChanges } from './observableArray.changeTracking'
-import { ObservableArray } from '../types/Observable';
 
 export function observableArray<T = any> (initialValues?: T[]): ObservableArray<T> {
   initialValues = initialValues || []

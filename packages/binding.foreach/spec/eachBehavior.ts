@@ -35,7 +35,6 @@ import {
 import $ from 'jquery'
 
 import { assert } from "chai"
-import { ObservableArray } from 'packages/observable/types/Observable'
 
 beforeEach(function () {
   var provider = new MultiProvider({

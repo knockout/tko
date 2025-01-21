@@ -24,7 +24,6 @@ import {
 import {
   queueCleanNode
 } from './jsxClean'
-import { Observable } from 'packages/observable/types/Observable'
 
 export const ORIGINAL_JSX_SYM = Symbol('Knockout - Original JSX')
 
@@ -51,7 +50,7 @@ function isIterable (v) {
 interface Changes {
   index: number;
   status: string;
-  value: any 
+  value: any
 }
 
 /**

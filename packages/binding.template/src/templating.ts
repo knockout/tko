@@ -24,7 +24,6 @@ import {
 import {
   anonymousTemplate as AnonymousTemplate
 } from './templateSources'
-import { Computed } from 'packages/computed/types/computed'
 
 var _templateEngine
 const cleanContainerDomDataKey = domData.nextKey()

@@ -11,8 +11,6 @@ import {
 } from '@tko/observable'
 
 import { computed } from '@tko/computed'
-import { Computed } from 'node_modules/@tko/computed/types/computed'
-import { Observable } from 'packages/observable/types/Observable'
 
 // Objective:
 // * Given an input array, a container DOM node, and a function from array elements to arrays of DOM nodes,

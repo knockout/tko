@@ -10,7 +10,6 @@ import * as dependencyDetection from './dependencyDetection'
 import { deferUpdates } from './defer'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
-import { Observable } from '../types/Observable'
 
 export function observable(initialValue?: any): Observable{
   function Observable () {

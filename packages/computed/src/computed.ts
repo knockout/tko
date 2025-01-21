@@ -25,7 +25,6 @@ import {
     subscribable,
     LATEST_VALUE
 } from '@tko/observable'
-import { Computed, ComputedOptions, ComputedReadFunction, PureComputed } from '../types/computed'
 
 const computedState = createSymbolOrString('_state')
 const DISPOSED_STATE = {

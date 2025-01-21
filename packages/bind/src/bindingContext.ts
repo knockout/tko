@@ -11,7 +11,6 @@ import {
 import {
   contextAncestorBindingInfo
 } from './bindingEvent'
-import { Computed } from 'packages/computed/types/computed'
 
 export const boundElementDomDataKey = domData.nextKey()
 

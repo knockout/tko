@@ -42,10 +42,6 @@ import components from '@tko/utils.component'
 import {
     useMockForTasks
 } from '@tko/utils/helpers/jasmine-13-helper'
-import { ObservableArray } from 'packages/observable/types/Observable'
-
-
-
 
 describe('Components: Component binding', function () {
   var testComponentName = 'test-component',

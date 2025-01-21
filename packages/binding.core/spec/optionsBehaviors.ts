@@ -25,7 +25,6 @@ import '@tko/utils/helpers/jasmine-13-helper'
 import {
     matchers
 } from '../dist/test-helper'
-import { Observable, ObservableArray } from 'packages/observable/types/Observable'
 
 describe('Binding: Options', function () {
   beforeEach(jasmine.prepareTestNode)

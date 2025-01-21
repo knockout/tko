@@ -18,7 +18,6 @@ import {bindings as templateBindings} from '@tko/binding.template'
 import {bindings as coreBindings} from '@tko/binding.core'
 
 import '@tko/utils/helpers/jasmine-13-helper'
-import { ObservableArray } from 'packages/observable/types/Observable'
 
 describe('Binding: Using', function () {
   beforeEach(jasmine.prepareTestNode)

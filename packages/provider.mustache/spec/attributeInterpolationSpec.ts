@@ -26,7 +26,6 @@ import {
 
 import '@tko/utils/helpers/jasmine-13-helper';
 import { AttributeMustacheProvider } from '../src';
-import { ObservableArray } from 'packages/observable/types/Observable';
 
 function ctxStub (obj = {}) { return { lookup (v) { return obj[v] } } }
 

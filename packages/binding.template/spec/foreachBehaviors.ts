@@ -20,7 +20,6 @@ import {bindings as ifBindings} from '@tko/binding.if'
 import {bindings as coreBindings} from '@tko/binding.core'
 
 import '@tko/utils/helpers/jasmine-13-helper'
-import { ObservableArray } from 'packages/observable/types/Observable'
 
 // virtualEvents, removeNode
 describe('Binding: Foreach', function () {
