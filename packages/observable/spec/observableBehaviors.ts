@@ -15,6 +15,11 @@ describe('Observable', function () {
     expect(isSubscribable(instance)).toEqual(true)
   })
 
+  it('observable has limit', function () {
+    var instance = observable()
+    expect(instance.limit).not.toBeUndefined()
+  })
+
   it('should have an `undefined` length', function () {
     expect(observable().length).toEqual(undefined)
   })

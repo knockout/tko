@@ -9,6 +9,11 @@ describe('Subscribable', function () {
     expect(isSubscribable(instance)).toEqual(true)
   })
 
+  it('subscribable has limit', function () {
+    var instance = new subscribable()
+    expect(instance.limit).not.toBeUndefined()
+  })
+
   it('isSubscribable should return false for undefined', function () {
     expect(isSubscribable(undefined)).toEqual(false)
   })
