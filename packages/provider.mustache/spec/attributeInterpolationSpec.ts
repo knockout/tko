@@ -304,7 +304,7 @@ describe('Attribute Interpolation Markup bindings', function () {
     expect(node.value).toEqual('default value');
 
     node.value = 'user-enterd value';
-    triggerEvent(testNode.childNodes[0], 'change');
+    triggerEvent(testNode.children[0], 'change');
     expect(observable()).toEqual('user-enterd value');
   });
 

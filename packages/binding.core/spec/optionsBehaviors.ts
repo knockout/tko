@@ -183,7 +183,7 @@ describe('Binding: Options', function () {
   it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
     var myObservable: ObservableArray<string | number> = observableArray(['A', 'B', 'C']), changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues'></select>"
-    registerEventHandler(testNode.childNodes[0], 'change', function () {
+    registerEventHandler(testNode.childNodes[0] as HTMLSelectElement, 'change', function () {
       changeHandlerFireCount++
     })
     applyBindings({ myValues: myObservable }, testNode)
@@ -214,7 +214,7 @@ describe('Binding: Options', function () {
   it('Should trigger a change event when the options selection is changed by modifying the options data (multiple select)', function () {
     var myObservable: ObservableArray<any> = observableArray(['A', 'B', 'C']), changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues' multiple='multiple'></select>"
-    registerEventHandler(testNode.childNodes[0], 'change', function () {
+    registerEventHandler(testNode.childNodes[0] as HTMLSelectElement, 'change', function () {
       changeHandlerFireCount++
     })
     applyBindings({ myValues: myObservable }, testNode)

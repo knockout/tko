@@ -664,7 +664,7 @@ describe('Binding: Foreach', function () {
 
         // Should update observable when input is changed
     (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'third'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(x()).toEqual('third')
 
         // Should update the input when the observable changes
@@ -764,7 +764,7 @@ describe('Binding: Foreach', function () {
 
       // Should update observable when input is changed
     (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'third'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(x()).toEqual('third')
 
       // Should update the input when the observable changes

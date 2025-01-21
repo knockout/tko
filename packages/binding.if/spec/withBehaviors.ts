@@ -104,7 +104,7 @@ describe('Binding: With', function () {
         // Initial state is one subscriber, one click handler
     expect(testNode.childNodes[0].childNodes[0]).toContainText('Hello')
     expect(someItem().childProp.getSubscriptionsCount()).toEqual(1)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(countedClicks).toEqual(1)
 
         // Force "update" binding handler to fire, then check we still have one subscriber...
@@ -113,7 +113,7 @@ describe('Binding: With', function () {
 
         // ... and one click handler
     countedClicks = 0
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(countedClicks).toEqual(1)
   })
 
@@ -222,7 +222,7 @@ describe('Binding: With', function () {
 
       // Should update observable when input is changed
     (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'Goodbye'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(someItem()).toEqual('Goodbye')
 
       // Should update the input when the observable changes
@@ -314,7 +314,7 @@ describe('Binding: With', function () {
 
         // Should update observable when input is changed
     (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'two'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(item()).toEqual('two')
     expect(testNode.childNodes[0]).toContainText('two')
 

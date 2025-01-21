@@ -57,15 +57,15 @@ describe('Binding: Using', function () {
     })
 
     testNode.innerHTML = "<div data-bind='using: someItem'><span data-bind='text: childProp, click: handleClick'></span></div>"
-    var originalNode = testNode.childNodes[0].childNodes[0]
+    var originalNode = testNode.children[0].children[0]
 
     applyBindings({ someItem: someItem }, testNode)
-    expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
+    expect(testNode.children[0].children[0]).toEqual(originalNode)
 
         // Initial state is one subscriber, one click handler
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('Hello')
+    expect(testNode.children[0].children[0]).toContainText('Hello')
     expect(someItem().childProp.getSubscriptionsCount()).toEqual(1)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(countedClicks).toEqual(1)
 
         // Force "update" binding handler to fire, then check we still have one subscriber...
@@ -74,11 +74,11 @@ describe('Binding: Using', function () {
 
         // ... and one click handler
     countedClicks = 0
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(countedClicks).toEqual(1)
 
         // and the node is still the same
-    expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
+    expect(testNode.children[0].children[0]).toEqual(originalNode)
   })
 
   it('Should be able to access parent binding context via $parent', function () {

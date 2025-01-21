@@ -37,7 +37,7 @@ describe('Binding: Click', function () {
     }
     testNode.innerHTML = "<button data-bind='click:doCall'>hey</button>"
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(model.wasCalled).toEqual(true)
   })
 })

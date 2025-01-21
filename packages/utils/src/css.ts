@@ -8,12 +8,12 @@ import { arrayForEach, addOrRemoveItem } from './array'
 // see: https://github.com/knockout/knockout/issues/1597
 var cssClassNameRegex = /\S+/g
 
-function toggleDomNodeCssClass (node, classNames, shouldHaveClass) {
+function toggleDomNodeCssClass (node: Element, classNames:string, shouldHaveClass?: boolean): void {
   var addOrRemoveFn
   if (!classNames) { return }
   if (typeof node.classList === 'object') {
     addOrRemoveFn = node.classList[shouldHaveClass ? 'add' : 'remove']
-    arrayForEach(classNames.match(cssClassNameRegex), function (className) {
+    arrayForEach(classNames.match(cssClassNameRegex)!, function (className) {
       addOrRemoveFn.call(node.classList, className)
     })
   } else if (typeof node.className['baseVal'] === 'string') {

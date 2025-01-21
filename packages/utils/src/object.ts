@@ -2,32 +2,33 @@
 // Object functions
 //
 
-export function hasOwnProperty(obj, propName) {
+export function hasOwnProperty<T = any>(obj: T, propName: keyof T | any): boolean {
   return Object.prototype.hasOwnProperty.call(obj, propName)
 }
 
 /**
  * True when obj is a non-null object, or a function.
- * @param obj 
- * @returns 
+ * @param obj
+ * @returns
  */
 export function isObjectLike(obj) {
   if (obj === null) { return false }
   return typeof obj === 'object' || typeof obj === 'function'
 }
 
-export function extend (target, source) {
+export function extend<T, U>  (target:T , source: U): T & U {
   if (source) {
-    for (var prop in source) {
+    for (const prop of Object.keys(source) as Array<keyof U>) {
       if (hasOwnProperty(source, prop)) {
-        target[prop] = source[prop]
+        (target as T & U)[prop] = source[prop] as any;
       }
     }
   }
-  return target
+  return target as T & U
 }
 
-export function objectForEach (obj, action) {
+export function objectForEach<T=any> (obj: { [key:string]: T },
+                                      action: (key: string, value: T) => void): void {
   for (var prop in obj) {
     if (hasOwnProperty(obj, prop)) {
       action(prop, obj[prop])

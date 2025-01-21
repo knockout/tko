@@ -120,7 +120,7 @@ describe('Binding: Checked', function () {
     var myobservable = observable('another value')
     testNode.innerHTML = "<input type='radio' value='this radio button value' data-bind='checked:someProp' />"
     applyBindings({ someProp: myobservable }, testNode)
-    
+
     expect(myobservable()).toEqual('another value')
     var input = testNode.children[0] as HTMLInputElement
     input.click()
@@ -142,8 +142,8 @@ describe('Binding: Checked', function () {
     expect(timesNotified).toEqual(1)
 
         // ... until you click something with a different value
-    triggerEvent(testNode.childNodes[1], 'click')
-    triggerEvent(testNode.childNodes[1], 'change')
+    triggerEvent(testNode.children[1], 'click')
+    triggerEvent(testNode.children[1], 'change')
     expect(timesNotified).toEqual(2)
   })
 
@@ -167,11 +167,11 @@ describe('Binding: Checked', function () {
     // Checkbox initial state is determined by whether the value is in the array
     expect(testNode).toHaveCheckedStates([true, false])
         // Checking the checkbox puts it in the array
-    triggerEvent(testNode.childNodes[1], 'click')
+    triggerEvent(testNode.children[1], 'click')
     expect(testNode).toHaveCheckedStates([true, true])
     expect(model.myArray).toEqual(['Existing value', 'Unrelated value', 'New value'])
         // Unchecking the checkbox removes it from the array
-    triggerEvent(testNode.childNodes[1], 'click')
+    triggerEvent(testNode.children[1], 'click')
     expect(testNode).toHaveCheckedStates([true, false])
     expect(model.myArray).toEqual(['Existing value', 'Unrelated value'])
   })
@@ -205,7 +205,7 @@ describe('Binding: Checked', function () {
     applyBindings({ myComputed: myComputed }, testNode)
 
         // Binding adds an item to the observable
-    triggerEvent(testNode.childNodes[1], 'click')
+    triggerEvent(testNode.children[1], 'click')
     expect(testNode).toHaveCheckedStates([false, true])
     expect(myObservable()).toEqual(['B'])
 
@@ -257,11 +257,11 @@ describe('Binding: Checked', function () {
     expect(testNode).toHaveCheckedStates([true, false, false])
 
         // Click on item 2; verify it's selected
-    triggerEvent(testNode.childNodes[1], 'click')
+    triggerEvent(testNode.children[1], 'click')
     expect(testNode).toHaveCheckedStates([false, true, false])
 
         // Click on item 3; verify item 1 is selected
-    triggerEvent(testNode.childNodes[2], 'click')
+    triggerEvent(testNode.children[2], 'click')
     expect(testNode).toHaveCheckedStates([true, false, false])
   })
 
@@ -287,12 +287,12 @@ describe('Binding: Checked', function () {
         expect(testNode).toHaveValues(['1', '2'])
 
                   // Checking the checkbox puts it in the array
-        triggerEvent(testNode.childNodes[1], 'click')
+        triggerEvent(testNode.children[1], 'click')
         expect(testNode).toHaveCheckedStates([true, true])
         expect(model.myArray()).toEqual([1, 3, 2])
 
                   // Unchecking the checkbox removes it from the array
-        triggerEvent(testNode.childNodes[1], 'click')
+        triggerEvent(testNode.children[1], 'click')
         expect(testNode).toHaveCheckedStates([true, false])
         expect(model.myArray()).toEqual([1, 3])
 
@@ -316,12 +316,12 @@ describe('Binding: Checked', function () {
         expect(testNode.children[0]).toHaveCheckedStates([true, false])
 
                   // Checking the checkbox puts it in the array
-        triggerEvent(testNode.children[0].childNodes[1], 'click')
+        triggerEvent(testNode.children[0].children[1], 'click')
         expect(testNode.children[0]).toHaveCheckedStates([true, true])
         expect(model.values).toEqual([object1, object2])
 
                   // Unchecking the checkbox removes it from the array
-        triggerEvent(testNode.children[0].childNodes[1], 'click')
+        triggerEvent(testNode.children[0].children[1], 'click')
         expect(testNode.children[0]).toHaveCheckedStates([true, false])
         expect(model.values).toEqual([object1])
       })

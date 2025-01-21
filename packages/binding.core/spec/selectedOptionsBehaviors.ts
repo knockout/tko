@@ -66,7 +66,7 @@ describe('Binding: Selected Options', function () {
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0], true)
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[1], false)
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[2], true)
-    triggerEvent(testNode.childNodes[0], 'change')
+    triggerEvent(testNode.children[0], 'change')
 
     expect(selection()).toEqual(['A', cObject])
     expect(selection()[1] === cObject).toEqual(true) // Also check with strict equality, because we don't want to falsely accept [object Object] == cObject
@@ -89,7 +89,7 @@ describe('Binding: Selected Options', function () {
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0], true)
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[1], false)
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[2], true)
-    triggerEvent(testNode.childNodes[0], 'change')
+    triggerEvent(testNode.children[0], 'change')
 
     expect(myModel.mySelection).toEqual(['A', cObject])
     expect(myModel.mySelection[1] === cObject).toEqual(true) // Also check with strict equality, because we don't want to falsely accept [object Object] == cObject
@@ -110,7 +110,7 @@ describe('Binding: Selected Options', function () {
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0].childNodes[0], true)
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0].childNodes[1], false)
     setMultiSelectOptionSelectionState(testNode.childNodes[0].childNodes[0].childNodes[2], true)
-    triggerEvent(testNode.childNodes[0], 'change')
+    triggerEvent(testNode.children[0], 'change')
 
     expect(selection()).toEqual(['a', 'c'])
   })

@@ -187,7 +187,7 @@ export function setHtml (node : Node, html : Function | string) {
 }
 
 
-export function setTextContent (element, textContent) {
+export function setTextContent (element: Node, textContent: MaybeSubscribable<string> ):void {
   var value = typeof textContent === 'function' ? textContent() : textContent
   if ((value === null) || (value === undefined)) { value = '' }
 
@@ -196,7 +196,7 @@ export function setTextContent (element, textContent) {
     // we'll clear everything and create a single text node.
   var innerTextNode = virtualElements.firstChild(element)
   if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
-    virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)])
+    virtualElements.setDomNodeChildren(element, [element.ownerDocument!.createTextNode(value)])
   } else {
     (innerTextNode as Text).data = value
   }

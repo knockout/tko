@@ -631,41 +631,54 @@ declare global {
     //#region utils.js
 
     export module utils {
-        export interface PostJsonOptions {
-            params?: object;
-            includeFields?: string[];
-            submitter?: (form: HTMLFormElement) => void;
-        }
+        //#region Functions
+        //! no implementation in TKO
+        ////export function postJson(urlOrForm: string | HTMLFormElement, data: MaybeSubscribable<object>, options?: PostJsonOptions): void;
 
-        export function extend<T = any, U = any>(target: T, source: U): T & U;
+        //// export interface PostJsonOptions {
+        ////     params?: object;
+        ////     includeFields?: string[];
+        ////     submitter?: (form: HTMLFormElement) => void;
+        //// }
 
-        export const fieldsIncludedWithJsonPost: Array<string | RegExp>;
+        //// export const fieldsIncludedWithJsonPost: Array<string | RegExp>;
 
-        export function getFormFields(form: HTMLFormElement, fieldName: string | RegExp): any[];
+        //// export function stringifyJson(data: MaybeSubscribable<any>, replacer?: Function, space?: string | number): string;
+        ////export function getFormFields(form: HTMLFormElement, fieldName: string | RegExp): any[];
 
-        export function objectForEach(obj: object, action: (key: string, value: any) => void): void;
-        export function objectForEach<T = any>(obj: { [key: string]: T }, action: (key: string, value: T) => void): void;
+        // * Done
+        // in observable/observable.ts
+        // export function peekObservable<T = any>(value: MaybeSubscribable<T>): T;
+        //  INFO: rename in builder peekObservable => Observable.peek
+        // export function unwrapObservable<T = any>(value: MaybeSubscribable<T>): T;
+        // INFO: rename in builder unwrapObservable => Observable.unwrap;
+        // changed some test  childNodes=>children returns Element and avoids text Nodes that might occure in the testnode definition
 
-        export function peekObservable<T = any>(value: MaybeSubscribable<T>): T;
+        // in utils/object.ts
+        //// export function objectForEach(obj: object, action: (key: string, value: any) => void): void;
+        // export function objectForEach<T = any>(obj: { [key: string]: T }, action: (key: string, value: T) => void): void;
+        // export function extend<T = any, U = any>(target: T, source: U): T & U; // little bit of rewriting needed
 
-        export function postJson(urlOrForm: string | HTMLFormElement, data: MaybeSubscribable<object>, options?: PostJsonOptions): void;
+        // in utils/string.ts
+        //// export function parseJson(jsonString: string): any;
+        // export function parseJson<T = any>(jsonString: string): T;
 
-        export function parseJson(jsonString: string): any;
-        export function parseJson<T = any>(jsonString: string): T;
+        // in utils/array.ts
+        // export function range(min: MaybeSubscribable<number>, max: MaybeSubscribable<number>): number[];
 
-        export function range(min: MaybeSubscribable<number>, max: MaybeSubscribable<number>): number[];
+        // in utils/event.ts
+        // export function registerEventHandler(element: Element, eventType: string, handler: EventListener): void;
+        //  typeguards for IE support added
+        // export function triggerEvent(element: Element, eventType: string): void;
+        //  typeguards for IE support added
 
-        export function registerEventHandler(element: Element, eventType: string, handler: EventListener): void;
+        // in utils/html.ts
+        // export function setTextContent(element: Node, textContent: MaybeSubscribable<string>): void;
 
-        export function setTextContent(element: Node, textContent: MaybeSubscribable<string>): void;
+        // in utils/css.ts
+        // export function toggleDomNodeCssClass(node: Element, className: string, shouldHaveClass?: boolean): void;
 
-        export function stringifyJson(data: MaybeSubscribable<any>, replacer?: Function, space?: string | number): string;
-
-        export function toggleDomNodeCssClass(node: Element, className: string, shouldHaveClass?: boolean): void;
-
-        export function triggerEvent(element: Element, eventType: string): void;
-
-        export function unwrapObservable<T = any>(value: MaybeSubscribable<T>): T;
+        //#endregion
     }
 
     export function unwrap<T = any>(value: MaybeSubscribable<T>): T;

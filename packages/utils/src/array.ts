@@ -70,11 +70,13 @@ export function makeArray<T=any> (arrayLikeObject:ArrayLike<T>):T[] {
   return Array.from(arrayLikeObject)
 }
 
-export function range (min, max) {
-  min = typeof min === 'function' ? min() : min
-  max = typeof max === 'function' ? max() : max
-  var result = new Array()
-  for (var i = min; i <= max; i++) { result.push(i) }
+export function range (min: MaybeSubscribable<number>, max: MaybeSubscribable<number>): number[] {
+  min = typeof min === 'function' ? min() as number : min
+  max = typeof max === 'function' ? max() as number : max
+  var result: number[] = []
+  for (var i = min; i <= max; i++) {
+    result.push(i)
+  }
   return result
 }
 

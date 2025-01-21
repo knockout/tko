@@ -156,7 +156,7 @@ export function unwrap (value) {
   return isObservable(value) ? value() : value
 }
 
-export function peek (value) {
+export function peek<T=any> (value: MaybeSubscribable<T>): T {
   return isObservable(value) ? value.peek() : value
 }
 
