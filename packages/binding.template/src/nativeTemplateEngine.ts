@@ -1,22 +1,13 @@
 
-import {
-  extend, options, ieVersion, makeArray, parseHtmlFragment
-} from '@tko/utils'
+import { ieVersion, makeArray, parseHtmlFragment } from '@tko/utils'
+import { templateEngine } from './templateEngine'
+import { setTemplateEngine } from './templating'
 
-import {
-  templateEngine
-} from './templateEngine'
-
-import {
-  setTemplateEngine
-} from './templating'
-
-export function nativeTemplateEngine () {
-}
+export function nativeTemplateEngine () { }
 
 nativeTemplateEngine.prototype = new templateEngine()
 nativeTemplateEngine.prototype.constructor = nativeTemplateEngine
-nativeTemplateEngine.prototype.renderTemplateSource = function (templateSource, bindingContext: BindingContext, options, templateDocument) {
+nativeTemplateEngine.prototype.renderTemplateSource = function (templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[] {
   let version: number;
   if (ieVersion instanceof Array) {
     version = parseInt(ieVersion[1], 10);
@@ -25,7 +16,7 @@ nativeTemplateEngine.prototype.renderTemplateSource = function (templateSource, 
   }
   var useNodesIfAvailable = !(version < 9), // IE<9 cloneNode doesn't work properly
     templateNodesFunc = useNodesIfAvailable ? templateSource.nodes : null,
-    templateNodes = templateNodesFunc ? templateSource.nodes() : null
+    templateNodes = templateNodesFunc ? templateSource.nodes?.() : null
 
   if (templateNodes) {
     return makeArray(templateNodes.cloneNode(true).childNodes)

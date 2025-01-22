@@ -46,14 +46,14 @@ describe('Binding: If', function () {
   })
 
   xit('Should leave descendant nodes in the document (and bind them) if the value is truthy, independently of the active template engine', function () {
-    this.after(function () { setTemplateEngine(new nativeTemplateEngine()) })
+    // this.after(function () { setTemplateEngine(new nativeTemplateEngine()) })
 
-    setTemplateEngine(new nativeTemplateEngine()) // This template engine will just throw errors if you try to use it
-    testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem.existentChildProp'></span></div>"
-    expect(testNode.childNodes.length).toEqual(1)
-    applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode)
-    expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('Child prop value')
+    // setTemplateEngine(new nativeTemplateEngine()) // This template engine will just throw errors if you try to use it
+    // testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem.existentChildProp'></span></div>"
+    // expect(testNode.childNodes.length).toEqual(1)
+    // applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode)
+    // expect(testNode.childNodes[0].childNodes.length).toEqual(1)
+    // expect(testNode.childNodes[0].childNodes[0]).toContainText('Child prop value')
   })
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
