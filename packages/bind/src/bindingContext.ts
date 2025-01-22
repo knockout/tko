@@ -25,7 +25,7 @@ export interface BindingContextSetting {
 
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting) {
+export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -82,7 +82,9 @@ export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingC
         // The extendCallback function is provided when creating a child context or extending a context.
         // It handles the specific actions needed to finish setting up the binding context. Actions in this
         // function could also add dependencies to this binding context.
-    if (extendCallback) { extendCallback(self, parentContext, dataItem) }
+    if (extendCallback) {
+      extendCallback(self, parentContext, dataItem)
+    }
 
     return self.$data
   }
@@ -139,12 +141,12 @@ Object.assign(bindingContext.prototype, {
   // But this does not mean that the $data value of the child context will also get updated. If the child
   // view model also depends on the parent view model, you must provide a function that returns the correct
   // view model on each update.
-  createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext {
+  createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext {
     return new bindingContext(dataItemOrAccessor, this, dataItemAlias, function (self, parentContext) {
           // Extend the context hierarchy by setting the appropriate pointers
       self.$parentContext = parentContext
-      self.$parent = parentContext.$data
-      self.$parents = (parentContext.$parents || []).slice(0)
+      self.$parent = parentContext?.$data
+      self.$parents = (parentContext?.$parents || []).slice(0)
       self.$parents.unshift(self.$parent)
       if (extendCallback) {
         extendCallback(self)
@@ -181,7 +183,7 @@ export function contextFor (node: Node) {
   }
 }
 
-export function dataFor (node: Node) {
+export function dataFor<T = any>(node: Node): T | undefined {
   var context = contextFor(node)
   return context ? context.$data : undefined
 }

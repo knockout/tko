@@ -368,7 +368,7 @@ function triggerDescendantsComplete (node : HTMLElement, bindings : Object, node
 }
 
 
-function getBindingContext (viewModelOrBindingContext: any, extendContextCallback?: Function) {
+function getBindingContext (viewModelOrBindingContext: any, extendContextCallback?: BindingContextExtendCallback) {
   return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)
     ? viewModelOrBindingContext
     : new bindingContext(viewModelOrBindingContext, undefined, undefined, extendContextCallback)
@@ -399,7 +399,7 @@ export function applyBindingsToDescendants(viewModelOrBindingContext: BindingCon
   return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
 }
 
-export function applyBindings(viewModelOrBindingContext: BindingContext | Observable<any> | any, rootNode: HTMLElement, extendContextCallback?: Function): Promise<unknown> {
+export function applyBindings(viewModelOrBindingContext: BindingContext | Observable<any> | any, rootNode: HTMLElement, extendContextCallback?: BindingContextExtendCallback): Promise<unknown> {
   const asyncBindingsApplied = new Set()
   // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
   if (!options.jQuery === undefined && options.jQuery) {

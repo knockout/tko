@@ -206,8 +206,8 @@ const knockout = {
 }
 
 export class Builder {
-  providedProperties: { extenders: any; bindingHandlers: any; bindingProvider: any }
-  
+  providedProperties: { extenders: any; bindingHandlers: BindingHandlers; bindingProvider: any }
+
   constructor ({ provider, bindings, extenders, filters, options }) {
     Object.assign(knockout.options, options, {
       filters,

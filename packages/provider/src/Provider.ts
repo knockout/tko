@@ -35,15 +35,15 @@ export default class Provider {
     this.globals = globals
   }
   get preemptive () { return false }
-  nodeHasBindings (node) {}
-  getBindingAccessors (node, context) {}
+  nodeHasBindings (node: Node) {}
+  getBindingAccessors (node: Node, context: BindingContext) {}
 
   /**
    * Preprocess a given node.
    * @param {HTMLElement} node
    * @returns {[HTMLElement]|undefined}
    */
-  preprocessNode (node) {}
+  preprocessNode (node: Node) {}
   postProcess (/* node */) {}
 
   bindingHandlers : BindingHandlerObject

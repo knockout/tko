@@ -244,158 +244,164 @@ declare global {
     // export function applyBindingsToNode<T = any>(node: Node, bindings: object | (() => object), viewModel: T | BindingContext<T>): void;
     // export function applyBindingAccessorsToNode<T = any>(node: Node, bindings: BindingAccessors | (() => BindingAccessors), viewModel: T | BindingContext<T>): void;
 
+    // used in bindingContext.ts
     // export function dataFor<T = any>(node: Node): T;
     // export function contextFor<T = any>(node: Node): BindingContext<T>;
 
     // export const bindingHandlers: BindingHandlers;
     // defined in applyBindings
-    export function getBindingHandler(handler: string): BindingHandler;
+    // export function getBindingHandler(handler: string): BindingHandler;
 
-    export type BindingContextExtendCallback<T = any> = (self: BindingContext<T>, parentContext: BindingContext<T> | null, dataItem: T) => void;
+    // used in applyBinding, bindingContext.ts
+    export type BindingContextExtendCallback<T = any> = (self: BindingContext<T>, parentContext?: BindingContext<T>, dataItem?: T) => void;
 
-    export module bindingEvent {
-        export function subscribe(node: Node, event: "childrenComplete" | "descendantsComplete", callback: (node: Node) => void, callbackContext?: any): Subscription;
-        export function startPossiblyAsyncContentBinding(node: Element, bindingContext: BindingContext): BindingContext;
-    }
+    // obsolete through bindingevent
+    // export module bindingEvent {
+    //     export function subscribe(node: Node, event: "childrenComplete" | "descendantsComplete", callback: (node: Node) => void, callbackContext?: any): Subscription;
+    //     export function startPossiblyAsyncContentBinding(node: Element, bindingContext: BindingContext): BindingContext;
+    // }
 
     //#endregion
 
     //#region binding/bindingProvider.js
 
-    export interface BindingOptions {
-        valueAccessors?: boolean;
-        bindingParams?: boolean;
-    }
+    // no usage
+    // export interface BindingOptions {
+    //     valueAccessors?: boolean;
+    //     bindingParams?: boolean;
+    // }
 
-    export interface IBindingProvider {
-        nodeHasBindings(node: Node): boolean;
-        getBindings?(node: Node, bindingContext: BindingContext<any>): object;
-        getBindingAccessors(node: Node, bindingContext: BindingContext<any>): BindingAccessors;
-        preprocessNode?(node: Node): Node[] | undefined;
-    }
+    // export interface IBindingProvider {
+    //     nodeHasBindings(node: Node): boolean;
+    //     getBindings?(node: Node, bindingContext: BindingContext<any>): object;
+    //     getBindingAccessors(node: Node, bindingContext: BindingContext<any>): BindingAccessors;
+    //     preprocessNode?(node: Node): Node[] | undefined;
+    // }
 
-    export class bindingProvider implements IBindingProvider {
-        nodeHasBindings(node: Node): boolean;
+    // // implemented in Provider.ts
+    // export class bindingProvider implements IBindingProvider {
+    //     nodeHasBindings(node: Node): boolean;
 
-        getBindings(node: Node, bindingContext: BindingContext<any>): object;
-        getBindingAccessors(node: Node, bindingContext: BindingContext<any>): BindingAccessors;
+    //     getBindings(node: Node, bindingContext: BindingContext<any>): object;
+    //     getBindingAccessors(node: Node, bindingContext: BindingContext<any>): BindingAccessors;
 
-        getBindingsString(node: Node, bindingContext?: BindingContext<any>): string;
+    //     getBindingsString(node: Node, bindingContext?: BindingContext<any>): string;
 
-        parseBindingsString(bindingsString: string, bindingContext: BindingContext<any>, node: Node): object;
-        parseBindingsString(bindingsString: string, bindingContext: BindingContext<any>, node: Node, options: BindingOptions): object | BindingAccessors;
+    //     parseBindingsString(bindingsString: string, bindingContext: BindingContext<any>, node: Node): object;
+    //     parseBindingsString(bindingsString: string, bindingContext: BindingContext<any>, node: Node, options: BindingOptions): object | BindingAccessors;
 
-        static instance: IBindingProvider;
-    }
+    //     static instance: IBindingProvider;
+    // }
 
     //#endregion
 
     //#region binding/defaultBindings/
 
-    export interface BindingHandlers {
-        // Controlling text and appearance
-        visible: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        hidden: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        text: {
-            init(): BindingHandlerControlsDescendant;
-            update(element: Node, valueAccessor: () => MaybeSubscribable<string>): void;
-        };
-        html: {
-            init(): BindingHandlerControlsDescendant;
-            update(element: Node, valueAccessor: () => MaybeSubscribable<string>): void;
-        };
-        class: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
-        };
-        css: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string | object>): void;
-        };
-        style: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<object>): void;
-        };
-        attr: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<object>): void;
-        };
+    // not in use
+    // export interface BindingHandlers {
+    //     // Controlling text and appearance
+    //     visible: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     hidden: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     text: {
+    //         init(): BindingHandlerControlsDescendant;
+    //         update(element: Node, valueAccessor: () => MaybeSubscribable<string>): void;
+    //     };
+    //     html: {
+    //         init(): BindingHandlerControlsDescendant;
+    //         update(element: Node, valueAccessor: () => MaybeSubscribable<string>): void;
+    //     };
+    //     class: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
+    //     };
+    //     css: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string | object>): void;
+    //     };
+    //     style: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<object>): void;
+    //     };
+    //     attr: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<object>): void;
+    //     };
 
-        // Control Flow
-        foreach: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<any[] | any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
-        };
-        if: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
-        };
-        ifnot: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
-        };
-        with: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
-        };
-        let: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<object>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
-        };
-        using: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
-        };
+    //     // Control Flow
+    //     foreach: {
+    //         init(element: Node, valueAccessor: () => MaybeSubscribable<any[] | any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
+    //     };
+    //     if: {
+    //         init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
+    //     };
+    //     ifnot: {
+    //         init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
+    //     };
+    //     with: {
+    //         init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
+    //     };
+    //     let: {
+    //         init(element: Node, valueAccessor: () => MaybeSubscribable<object>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
+    //     };
+    //     using: {
+    //         init(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): BindingHandlerControlsDescendant;
+    //     };
 
-        // Working with form fields
-        event: {
-            init(element: HTMLElement, valueAccessor: () => object, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
-        };
-        click: {
-            init(element: HTMLElement, valueAccessor: () => Function, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
-        };
-        submit: {
-            init(element: HTMLElement, valueAccessor: () => Function, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
-        };
-        enable: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        disable: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        value: {
-            after: string[];
-            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
-            update(...args: any[]): void; // Keep for backwards compatibility with code that may have wrapped value binding
-        };
-        textInput: {
-            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>, allBindings: AllBindings): void;
-        };
-        textinput: {
-            preprocess(value: string | undefined, name: string, addBinding: BindingHandlerAddBinding): void;
-        };
-        hasfocus: {
-            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        hasFocus: {
-            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        checked: {
-            after: string[];
-            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
-        };
-        checkedValue: {
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        options: {
-            init(element: HTMLElement): BindingHandlerControlsDescendant;
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
-        };
-        selectedOptions: {
-            after: string[];
-            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
-            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
-        };
-        uniqueName: {
-            init(element: HTMLElement, valueAccessor: () => boolean): void;
-        };
-    }
+    //     // Working with form fields
+    //     event: {
+    //         init(element: HTMLElement, valueAccessor: () => object, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
+    //     };
+    //     click: {
+    //         init(element: HTMLElement, valueAccessor: () => Function, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
+    //     };
+    //     submit: {
+    //         init(element: HTMLElement, valueAccessor: () => Function, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
+    //     };
+    //     enable: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     disable: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     value: {
+    //         after: string[];
+    //         init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
+    //         update(...args: any[]): void; // Keep for backwards compatibility with code that may have wrapped value binding
+    //     };
+    //     textInput: {
+    //         init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>, allBindings: AllBindings): void;
+    //     };
+    //     textinput: {
+    //         preprocess(value: string | undefined, name: string, addBinding: BindingHandlerAddBinding): void;
+    //     };
+    //     hasfocus: {
+    //         init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     hasFocus: {
+    //         init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     checked: {
+    //         after: string[];
+    //         init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
+    //     };
+    //     checkedValue: {
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     options: {
+    //         init(element: HTMLElement): BindingHandlerControlsDescendant;
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
+    //     };
+    //     selectedOptions: {
+    //         after: string[];
+    //         init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings): void;
+    //         update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>): void;
+    //     };
+    //     uniqueName: {
+    //         init(element: HTMLElement, valueAccessor: () => boolean): void;
+    //     };
+    // }
 
     //#endregion
 
