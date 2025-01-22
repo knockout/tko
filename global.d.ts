@@ -213,8 +213,7 @@ declare global {
     export interface BindingContext<T = any> {
         ko: any; // typeof ko;
 
-        [name: string]: any;
-
+        [symbol: symbol]: any
         $parent?: any;
         $parents: any[];
         $root: any;

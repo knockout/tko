@@ -404,7 +404,7 @@ describe('all bindings', function () {
 
 describe('The lookup of variables (get_lookup_root)', function () {
   function makeBindings (binding, context, globals?, node?) {
-    const ctx = new bindingContext(context, null, null)
+    const ctx = new bindingContext(context)
     return new Parser().parse(binding, ctx, globals, node)
   }
 
