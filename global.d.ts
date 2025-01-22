@@ -485,22 +485,23 @@ declare global {
 
     //#endregion
 
-    //#region templating/templateEngine.js
+    //#region templating/templateEngine.js //! DONE
 
-    export abstract class templateEngine {
-        allowTemplateRewriting: boolean;
-
-        abstract renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
-        createJavaScriptEvaluatorBlock(script: string): string;
-
-        makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource;
-
-        renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
-
-        isTemplateRewritten(template: string | Node, templateDocument?: Document): boolean;
-
-        rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
-    }
+    // moved in binding.template/templateEngine
+    ////export abstract class templateEngine {
+    ////    allowTemplateRewriting: boolean;
+    ////
+    ////    abstract renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+    ////    createJavaScriptEvaluatorBlock(script: string): string;
+    ////
+    ////    makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource;
+    ////
+    ////    renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+    ////
+    ////    isTemplateRewritten(template: string | Node, templateDocument?: Document): boolean;
+    ////
+    ////    rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
+    ////}
 
     //#endregion
 
