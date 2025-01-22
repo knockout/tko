@@ -542,11 +542,12 @@ declare global {
 
     //#endregion
 
-    //#region templating/native/nativeTemplateEngine.js
+    //#region templating/native/nativeTemplateEngine.js //! DONE
 
-    export class nativeTemplateEngine extends templateEngine {
-        renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
-    }
+    // in binding.template/nativeTemplateEngine.ts
+    //// export class nativeTemplateEngine extends templateEngine {
+    ////     renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+    //// }
 
     //#endregion
 
