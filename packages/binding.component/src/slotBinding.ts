@@ -80,7 +80,7 @@ export default class SlotBinding extends DescendantBindingHandler {
 
     if (!slotName) {
       return $componentTemplateSlotNodes[''] ||
-        [...this.$context.$componentTemplateNodes]
+        [...(this.$context as any).$componentTemplateNodes]
           .filter(n => !n.getAttribute || !n.getAttribute('slot'))
     }
 
