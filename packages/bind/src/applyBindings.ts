@@ -389,7 +389,7 @@ export function applyBindingsToNode (node: HTMLElement, bindings : Record<string
   return new BindingResult({asyncBindingsApplied, rootNode: node, bindingContext})
 }
 
-export function applyBindingsToDescendants (viewModelOrBindingContext: any, rootNode: HTMLElement): BindingResult {
+export function applyBindingsToDescendants(viewModelOrBindingContext: BindingContext | Observable<any> | any, rootNode: HTMLElement): BindingResult {
   const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     const bindingContext = getBindingContext(viewModelOrBindingContext)
@@ -399,7 +399,7 @@ export function applyBindingsToDescendants (viewModelOrBindingContext: any, root
   return new BindingResult({asyncBindingsApplied, rootNode, bindingContext})
 }
 
-export function applyBindings (viewModelOrBindingContext: any, rootNode: HTMLElement, extendContextCallback?: Function): Promise<unknown> {
+export function applyBindings(viewModelOrBindingContext: BindingContext | Observable<any> | any, rootNode: HTMLElement, extendContextCallback?: Function): Promise<unknown> {
   const asyncBindingsApplied = new Set()
   // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
   if (!options.jQuery === undefined && options.jQuery) {

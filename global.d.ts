@@ -1,6 +1,7 @@
 /// <reference types="jasmine" />
 /// <reference types="jquery" />
 
+import { BindingContextSetting } from 'packages/bind';
 import { Observable, ObservableArray } from "packages/observable/types/Observable";
 
 export { };
@@ -227,28 +228,27 @@ declare global {
         extend(properties: object): BindingContext<T>;
         extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
 
-        createChildContext<X>(dataItem: T | Observable<T>, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<X>): BindingContext<X>;
-        createChildContext<X>(accessor: () => T | Observable<T>, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<X>): BindingContext<X>;
-        createChildContext<X>(dataItem: T | Observable<T>, options: BindingChildContextOptions<X>): BindingContext<X>;
-        createChildContext<X>(accessor: () => T | Observable<T>, options: BindingChildContextOptions<X>): BindingContext<X>;
+        createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
     }
 
-    export interface BindingChildContextOptions<T = any> {
-        as?: string;
-        extend?: BindingContextExtendCallback<T>;
-        noChildContext?: boolean;
-    }
+    // no usage
+    // export interface BindingChildContextOptions<T = any> {
+    //     as?: string;
+    //     extend?: BindingContextExtendCallback<T>;
+    //     noChildContext?: boolean;
+    // }
 
-    export function applyBindings<T = any>(bindingContext: T | BindingContext<T>): void;
-    export function applyBindings<T = any>(bindingContext: T | BindingContext<T>, rootNode: Node, extendCallback?: BindingContextExtendCallback<T>): void;
-    export function applyBindingsToDescendants<T = any>(bindingContext: T | BindingContext<T>, rootNode?: Node): void;
-    export function applyBindingsToNode<T = any>(node: Node, bindings: object | (() => object), viewModel: T | BindingContext<T>): void;
-    export function applyBindingAccessorsToNode<T = any>(node: Node, bindings: BindingAccessors | (() => BindingAccessors), viewModel: T | BindingContext<T>): void;
+    // export function applyBindings<T = any>(bindingContext: T | BindingContext<T>): void;
+    // export function applyBindings<T = any>(bindingContext: T | BindingContext<T>, rootNode: Node, extendCallback?: BindingContextExtendCallback<T>): void;
+    // export function applyBindingsToDescendants<T = any>(bindingContext: T | BindingContext<T>, rootNode?: Node): void;
+    // export function applyBindingsToNode<T = any>(node: Node, bindings: object | (() => object), viewModel: T | BindingContext<T>): void;
+    // export function applyBindingAccessorsToNode<T = any>(node: Node, bindings: BindingAccessors | (() => BindingAccessors), viewModel: T | BindingContext<T>): void;
 
-    export function dataFor<T = any>(node: Node): T;
-    export function contextFor<T = any>(node: Node): BindingContext<T>;
+    // export function dataFor<T = any>(node: Node): T;
+    // export function contextFor<T = any>(node: Node): BindingContext<T>;
 
-    export const bindingHandlers: BindingHandlers;
+    // export const bindingHandlers: BindingHandlers;
+    // defined in applyBindings
     export function getBindingHandler(handler: string): BindingHandler;
 
     export type BindingContextExtendCallback<T = any> = (self: BindingContext<T>, parentContext: BindingContext<T> | null, dataItem: T) => void;
