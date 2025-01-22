@@ -439,27 +439,29 @@ declare global {
     //#region binding/editDetection/arrayToDomNodeChildren.js
 
     export module utils {
-        export type MappingFunction<T = any> = (valueToMap: T, index: number, nodes: Node[]) => Node[];
-        export type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
-        export type MappingHookFunction<T = any> = (nodes: Node[], index: number, arrayEntry: T) => void;
+        
+        // Moved in bind/arrayToDomNodeChildren.ts
+        ////export type MappingFunction<T = any> = (valueToMap: T, index: number, nodes: Node[]) => Node[];
+        ////export type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
+        ////export type MappingHookFunction<T = any> = (nodes: Node[], index: number, arrayEntry: T) => void;
+////
+        ////export interface MappingOptions<T = any> {
+        ////    dontLimitMoves?: boolean;
+        ////    beforeMove?: MappingHookFunction<T>;
+        ////    beforeRemove?: MappingHookFunction<T>;
+        ////    afterAdd?: MappingHookFunction<T>;
+        ////    afterMove?: MappingHookFunction<T>;
+        ////    afterRemove?: MappingHookFunction<T>;
+        ////    sparse?: boolean;
+        ////}
 
-        export interface MappingOptions<T = any> {
-            dontLimitMoves?: boolean;
-            beforeMove?: MappingHookFunction<T>;
-            beforeRemove?: MappingHookFunction<T>;
-            afterAdd?: MappingHookFunction<T>;
-            afterMove?: MappingHookFunction<T>;
-            afterRemove?: MappingHookFunction<T>;
-            sparse?: boolean;
-        }
-
-        //! FOUND in ./packages/bind/src/arrayToDomNodeChildren.ts
-        export function setDomNodeChildrenFromArrayMapping<T = any>(
-            domNode: Node,
-            array: T[],
-            mapping: MappingFunction<T>,
-            options?: MappingOptions<T>,
-            callbackAfterAddingNodes?: MappingAfterAddFunction<T>): void;
+        //! Applied in  in ./packages/bind/src/arrayToDomNodeChildren.ts
+        ////export function setDomNodeChildrenFromArrayMapping<T = any>(
+        ////    domNode: Node,
+        ////    array: T[],
+        ////    mapping: MappingFunction<T>,
+        ////    options?: MappingOptions<T>,
+        ////    callbackAfterAddingNodes?: MappingAfterAddFunction<T>): void;
     }
 
     //#endregion
