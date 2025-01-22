@@ -76,7 +76,7 @@ export default class SlotBinding extends DescendantBindingHandler {
 
 
   getSlot(slotName: string): Node {
-    const {$componentTemplateSlotNodes} = this.$context
+    const {$componentTemplateSlotNodes}: any = this.$context
 
     if (!slotName) {
       return $componentTemplateSlotNodes[''] ||

@@ -300,7 +300,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     if (as) {
       return v => this._contextExtensions($ctx.extend({ [as]: v }))
     } else {
-      return v => $ctx.createChildContext(v, null, ctx => this._contextExtensions(ctx))
+      return v => $ctx.createChildContext(v, undefined, ctx => this._contextExtensions(ctx))
     }
   }
 

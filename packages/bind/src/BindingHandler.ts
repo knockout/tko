@@ -4,7 +4,7 @@ import { isWriteableObservable } from '@tko/observable'
 import { LifeCycle } from '@tko/lifecycle'
 
 export class BindingHandler extends LifeCycle {
-  $context: any // most likly BindingContext but params must be typed first
+  $context: BindingContext // most likly BindingContext but params must be typed first
   $element: HTMLElement
   $data: any
   bindingCompletion: any
@@ -15,13 +15,12 @@ export class BindingHandler extends LifeCycle {
   constructor (params) {
     super()
     const {$element, valueAccessor, allBindings, $context} = params
-    Object.assign(this, {
-      valueAccessor,
-      allBindings,
-      $element,
-      $context,
-      $data: $context.$data
-    })
+
+    this.valueAccessor = valueAccessor;
+    this.$element = $element;
+    this.allBindings = allBindings;
+    this.$context = $context;
+    this.$data = $context.$data;
 
     this.anchorTo($element)
   }

@@ -165,7 +165,7 @@ Object.assign(bindingContext.prototype, {
     })
   },
 
-  createStaticChildContext (dataItemOrAccessor: any, dataItemAlias: any) {
+  createStaticChildContext (dataItemOrAccessor: any, dataItemAlias: any): BindingContext {
     return this.createChildContext(dataItemOrAccessor, dataItemAlias, null, { 'exportDependencies': true })
   }
 })

@@ -222,6 +222,8 @@ declare global {
         $rawData: T | Observable<T>;
         $index?: Observable<number>;
         $parentContext?: BindingContext<any>;
+        // $componentTemplateNodes: any; added in makeChildBindingContext to context
+        // $componentTemplateSlotNodes; added in makeChildBindingContext to context
 
         $component?: any;
 
@@ -229,6 +231,7 @@ declare global {
         extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
 
         createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
+        createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
     }
 
     // no usage
