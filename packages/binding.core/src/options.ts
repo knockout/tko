@@ -3,16 +3,10 @@ import {
     tagNameLower, arrayFilter, arrayMap, setTextContent, arrayIndexOf,
     setOptionNodeSelectionState, triggerEvent,
     ensureSelectElementIsRenderedCorrectly, selectExtensions,
-    CompareOptions
 } from '@tko/utils'
 
-import {
-    unwrap, dependencyDetection
-} from '@tko/observable'
-
-import {
-    setDomNodeChildrenFromArrayMapping
-} from '@tko/bind'
+import { unwrap, dependencyDetection } from '@tko/observable'
+import { setDomNodeChildrenFromArrayMapping } from '@tko/bind'
 
 var captionPlaceholder = {}
 
@@ -140,7 +134,7 @@ export var options = {
       }
     }
 
-    setDomNodeChildrenFromArrayMapping(element, filteredArray, optionForArrayItem, arrayToDomNodeChildrenOptions as CompareOptions, callback)
+    setDomNodeChildrenFromArrayMapping(element, filteredArray, optionForArrayItem, arrayToDomNodeChildrenOptions, callback)
 
     dependencyDetection.ignore(function () {
       if (valueAllowUnset) {

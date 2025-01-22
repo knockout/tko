@@ -3,7 +3,7 @@ import {
   fixUpContinuousNodeArray, replaceDomNodes, arrayPushAll,
   anyDomNodeIsAttachedToDocument, domData, arrayMap, arrayForEach,
   virtualElements, extend, cleanNode, removeNode, compareArrays,
-  CompareOptions
+  CompareArraysOptions,
 } from '@tko/utils'
 
 import {
@@ -47,13 +47,13 @@ function mapNodeAndRefreshWhenChanged (containerNode: Node, mapping: Function, v
 var lastMappingResultDomDataKey = domData.nextKey()
 let deletedItemDummyValue = domData.nextKey()
 
-export function setDomNodeChildrenFromArrayMapping (domNode: Node, array: any[], mapping: Function, options: CompareOptions | boolean, callbackAfterAddingNodes: Function, editScript?: any[]) {
+export function setDomNodeChildrenFromArrayMapping (domNode: Node, array: any[], mapping: Function, options: CompareArraysOptions | boolean, callbackAfterAddingNodes: Function, editScript?: any[]) {
   // Compare the provided array against the previous one
   array = array || []
   if (typeof array.length === 'undefined') {
     array = [array]
   }
-  options = options || {} as CompareOptions;
+  options = options || {} as CompareArraysOptions;
   let lastMappingResult = domData.get(domNode, lastMappingResultDomDataKey)
   let isFirstExecution = !lastMappingResult
 

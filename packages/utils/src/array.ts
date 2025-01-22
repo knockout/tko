@@ -102,23 +102,40 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares?: n
 const statusNotInOld = 'added'
 const statusNotInNew = 'deleted'
 
-export interface CompareOptions {
-  dontLimitMoves: boolean,
-  sparse?: boolean
+export interface ArrayChange<T = any> {
+  status: "added" | "deleted" | "retained";
+  value: T;
+  index: number;
+  moved?: number;
+}
+
+export type ArrayChanges<T = any> = ArrayChange<T>[];
+
+export interface CompareArraysOptions {
+  dontLimitMoves?: boolean;
+  sparse?: boolean;
 }
 
     // Simple calculation based on Levenshtein distance.
-export function compareArrays (oldArray: any[], newArray: any[], options: CompareOptions | boolean) {
+export function compareArrays<T = any> (oldArray: T[], newArray: T[], options?: CompareArraysOptions | boolean): ArrayChanges<T> {
     // For backward compatibility, if the third arg is actually a bool, interpret
     // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
   options = (typeof options === 'boolean') ? { dontLimitMoves: options } : (options || {})
   oldArray = oldArray || []
   newArray = newArray || []
 
-  if (oldArray.length < newArray.length) { return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options) } else { return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options) }
+  if (oldArray.length < newArray.length) {
+    return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options)
+  } else {
+    return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options)
+  }
 }
 
-function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, statusNotInBig, options) {
+function compareSmallArrayToBigArray<T = any> (smlArray: T[],
+                                               bigArray: T[],
+                                               statusNotInSml: 'added'|'deleted',
+                                               statusNotInBig: 'added'|'deleted',
+                                               options: CompareArraysOptions): ArrayChanges<T> {
   var myMin = Math.min,
     myMax = Math.max,
     editDistanceMatrix = new Array(),
@@ -166,7 +183,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     } else {
       --bigIndex
       --smlIndex
-      if (!options.sparse) {
+      if (!options?.sparse) {
         editScript.push({
           'status': 'retained',
           'value': bigArray[bigIndex] })

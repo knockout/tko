@@ -411,23 +411,27 @@ declare global {
     //#region binding/editDetection/compareArrays.js
 
     export module utils {
-        export interface ArrayChange<T = any> {
-            status: "added" | "deleted" | "retained";
-            value: T;
-            index: number;
-            moved?: number;
-        }
 
-        export type ArrayChanges<T = any> = ArrayChange<T>[];
+        // in utils/array.ts
+        // moved into utils/array.ts
+        ////export interface ArrayChange<T = any> {
+        ////    status: "added" | "deleted" | "retained";
+        ////    value: T;
+        ////    index: number;
+        ////    moved?: number;
+        ////}
 
-        export interface CompareArraysOptions {
-            dontLimitMoves?: boolean;
-            sparse?: boolean;
-        }
+        ////export type ArrayChanges<T = any> = ArrayChange<T>[];
 
-        export function compareArrays<T = any>(a: T[], b: T[]): ArrayChanges<T>;
-        export function compareArrays<T = any>(a: T[], b: T[], dontLimitMoves: boolean): ArrayChanges<T>;
-        export function compareArrays<T = any>(a: T[], b: T[], options: CompareArraysOptions): ArrayChanges<T>;
+        ////export interface CompareArraysOptions {
+        ////    dontLimitMoves?: boolean;
+        ////    sparse?: boolean;
+        ////}
+
+        // combined and applied
+        //// export function compareArrays<T = any>(a: T[], b: T[]): ArrayChanges<T>;
+        //// export function compareArrays<T = any>(a: T[], b: T[], dontLimitMoves: boolean): ArrayChanges<T>;
+        //// export function compareArrays<T = any>(a: T[], b: T[], options: CompareArraysOptions): ArrayChanges<T>;
     }
 
     //#endregion
@@ -446,9 +450,16 @@ declare global {
             afterAdd?: MappingHookFunction<T>;
             afterMove?: MappingHookFunction<T>;
             afterRemove?: MappingHookFunction<T>;
+            sparse?: boolean;
         }
 
-        export function setDomNodeChildrenFromArrayMapping<T = any>(domNode: Node, array: T[], mapping: MappingFunction<T>, options?: MappingOptions<T>, callbackAfterAddingNodes?: MappingAfterAddFunction<T>): void;
+        //! FOUND in ./packages/bind/src/arrayToDomNodeChildren.ts
+        export function setDomNodeChildrenFromArrayMapping<T = any>(
+            domNode: Node,
+            array: T[],
+            mapping: MappingFunction<T>,
+            options?: MappingOptions<T>,
+            callbackAfterAddingNodes?: MappingAfterAddFunction<T>): void;
     }
 
     //#endregion
