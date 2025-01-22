@@ -553,82 +553,76 @@ declare global {
 
 
 
-    //#region components/defaultLoader.js
+    //#region components/defaultLoader.js //! DONE
 
     export module components {
-        export interface ViewModelConstructor {
-            new(params?: ViewModelParams): ViewModel;
-        }
+        // * Done
+        // in utils.component/loaders.ts
+        //// export interface DefaultLoader extends Loader {
+        ////     getConfig(componentName: string, callback: (config: Config | object) => void): void; // ! DONE
+        ////     loadComponent(componentName: string, config: Config, callback: (component: Component) => void): void; // ! DONE
+        ////     loadTemplate(componentName: string, config: TemplateConfig, callback: (resolvedTemplate: Node[]) => void): void; // ! DONE
+        ////     loadViewModel(componentName: string, config: ViewModelConfig, callback: (resolvedViewModel: CreateViewModel) => void): void; // ! DONE
+        //// }
+        //// export function register(componentName: string, config: Config | object): void;
+        //// export const defaultLoader: DefaultLoader;
+        //// export function unregister(componentName: string): void;
+        //// export function isRegistered(componentName: string): boolean;
+        // just moved into loaders.ts
+        ////export interface ViewModelConstructor {
+        ////    new(params?: ViewModelParams): ViewModel;
+        ////}
+        ////export interface ViewModel {
+        ////    dispose?: () => void;
+        ////    koDescendantsComplete?: (node: Node) => void;
+        ////}
+        ////export interface ViewModelParams {
+        ////    [name: string]: any;
+        ////}
+        ////export interface ComponentInfo {
+        ////    element: Node;
+        ////    templateNodes: Node[];
+        ////}
+        ////export type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
+        ////export interface Component {
+        ////    template: Node[];
+        ////    createViewModel?: CreateViewModel;
+        ////}
+        ////export interface ViewModelStatic {
+        ////    instance: any;
+        ////}
+        ////export interface ViewModelFactory {
+        ////    createViewModel: CreateViewModel;
+        ////}
+        ////export interface TemplateElement {
+        ////    element: string | Node;
+        ////}
+        ////export type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
+        ////export type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
+        ////export interface RequireConfig {
+        ////    require: string;
+        ////}
+        ////export interface Config {
+        ////    require?: string;
+        ////    viewModel?: RequireConfig | ViewModelConfig | any;
+        ////    template?: RequireConfig | TemplateConfig | any;
+        ////    synchronous?: boolean;
+        ////}
 
-        export interface ViewModel {
-            dispose?: () => void;
-            koDescendantsComplete?: (node: Node) => void;
-        }
-
-        export interface ViewModelParams {
-            [name: string]: any;
-        }
-
-        export interface ComponentInfo {
-            element: Node;
-            templateNodes: Node[];
-        }
-
-        export type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
-
-        export interface Component {
-            template: Node[];
-            createViewModel?: CreateViewModel;
-        }
-
-        export interface ViewModelStatic {
-            instance: any;
-        }
-        export interface ViewModelFactory {
-            createViewModel: CreateViewModel;
-        }
-        export interface TemplateElement {
-            element: string | Node;
-        }
-
-        export type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
-        export type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
-        export interface RequireConfig {
-            require: string;
-        }
-        export interface Config {
-            require?: string;
-            viewModel?: RequireConfig | ViewModelConfig | any;
-            template?: RequireConfig | TemplateConfig | any;
-            synchronous?: boolean;
-        }
-
-        export function register(componentName: string, config: Config | object): void;
-        export function unregister(componentName: string): void;
-        export function isRegistered(componentName: string): boolean;
-
+        // in utils.component/registry.ts
+        //// export const loaders: Loader[];
+        // ? Needs to be global
         export interface Loader {
             getConfig?(componentName: string, callback: (config: Config | object) => void): void;
             loadComponent?(componentName: string, config: Config | object, callback: (component: Component | null) => void): void;
             loadTemplate?(componentName: string, config: TemplateConfig | any, callback: (resolvedTemplate: Node[] | null) => void): void;
             loadViewModel?(componentName: string, config: ViewModelConfig | any, callback: (resolvedViewModel: CreateViewModel | null) => void): void;
         }
-
-        export const loaders: Loader[];
-
-        export interface DefaultLoader extends Loader {
-            getConfig(componentName: string, callback: (config: Config | object) => void): void;
-            loadComponent(componentName: string, config: Config, callback: (component: Component) => void): void;
-            loadTemplate(componentName: string, config: TemplateConfig, callback: (resolvedTemplate: Node[]) => void): void;
-            loadViewModel(componentName: string, config: ViewModelConfig, callback: (resolvedViewModel: CreateViewModel) => void): void;
-        }
-
-        export const defaultLoader: DefaultLoader;
     }
 
     //#endregion
 
-    //#region utils.js
+    //#region utils.js //! DONE
 
     export module utils {
         //#region Functions
@@ -680,8 +674,8 @@ declare global {
 
         //#endregion
     }
+    ////export function unwrap<T = any>(value: MaybeSubscribable<T>): T;
 
-    export function unwrap<T = any>(value: MaybeSubscribable<T>): T;
 
     //#endregion
 

@@ -47,7 +47,7 @@ export function objectMap (source, mapping, thisArg? : any) {
   }
   return target
 }
-export function getObjectOwnProperty (obj, propName) {
+export function getObjectOwnProperty (obj, propName: string) {
   return hasOwnProperty(obj, propName) ? obj[propName] : undefined
 }
 

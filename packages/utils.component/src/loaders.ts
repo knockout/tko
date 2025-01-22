@@ -19,7 +19,64 @@ import {registry} from './registry'
 export var defaultConfigRegistry = {}
 export const VIEW_MODEL_FACTORY = Symbol('Knockout View Model ViewModel factory')
 
-export function register (componentName, config) {
+//#region  Typedefinition
+interface Component {
+  template: Node[];
+  createViewModel?: CreateViewModel;
+}
+type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
+
+interface ViewModelParams {
+  [name: string]: any;
+}
+
+interface ComponentInfo {
+  element: Node;
+  templateNodes: Node[];
+}
+
+interface ViewModel {
+  dispose?: () => void;
+  koDescendantsComplete?: (node: Node) => void;
+}
+
+interface Config {
+  require?: string;
+  viewModel?: RequireConfig | ViewModelConfig | any;
+  template?: RequireConfig | TemplateConfig | any;
+  synchronous?: boolean;
+}
+
+interface ViewModelConstructor {
+  new(params?: ViewModelParams): ViewModel;
+}
+
+interface ViewModelStatic {
+  instance: any;
+}
+interface ViewModelFactory {
+  createViewModel: CreateViewModel;
+}
+interface TemplateElement {
+  element: string | Node;
+}
+
+type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
+type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
+
+interface RequireConfig {
+  require: string;
+}
+
+type RegisterCustomOptions = { ignoreCustomElementWarning: boolean }
+
+//#endregion
+
+function isIgnoreCustomElementWarning(config): config is RegisterCustomOptions{
+  return (config as any).ignoreCustomElementWarning !== 'undefined';
+}
+
+export function register (componentName: string, config: RegisterCustomOptions | Config ) {
   if (!config) {
     throw new Error('Invalid configuration for ' + componentName)
   }
@@ -29,8 +86,8 @@ export function register (componentName, config) {
   }
 
   const ceok = componentName.includes('-') && componentName.toLowerCase() === componentName
-
-  if (!config.ignoreCustomElementWarning && !ceok) {
+  
+  if (isIgnoreCustomElementWarning(config) && !config.ignoreCustomElementWarning && !ceok) {
     console.log(`
 🥊  Knockout warning: components for custom elements must be lowercase and contain a dash.  To ignore this warning, add to the 'config' of .register(componentName, config):
 
@@ -41,35 +98,35 @@ export function register (componentName, config) {
   defaultConfigRegistry[componentName] = config
 }
 
-export function isRegistered (componentName) {
+export function isRegistered (componentName: string): boolean {
   return hasOwnProperty(defaultConfigRegistry, componentName)
 }
 
-export function unregister (componentName) {
+export function unregister (componentName: string): void {
   delete defaultConfigRegistry[componentName]
   registry.clearCachedDefinition(componentName)
 }
 
 export var defaultLoader = {
-  getConfig: function (componentName, callback) {
+  getConfig(componentName: string, callback: (config: Config | object) => void): void {
     var result = hasOwnProperty(defaultConfigRegistry, componentName)
             ? defaultConfigRegistry[componentName]
             : null
     callback(result)
   },
 
-  loadComponent: function (componentName, config, callback) {
+  loadComponent(componentName: string, config: Config, callback: (component: Component) => void): void {
     var errorCallback = makeErrorCallback(componentName)
     possiblyGetConfigFromAmd(errorCallback, config, function (loadedConfig) {
       resolveConfig(componentName, errorCallback, loadedConfig, callback)
     })
   },
 
-  loadTemplate: function (componentName, templateConfig, callback) {
+  loadTemplate(componentName: string, templateConfig: TemplateConfig, callback:  (resolvedTemplate: Node[]) => void): void {
     resolveTemplate(makeErrorCallback(componentName), templateConfig, callback)
   },
 
-  loadViewModel: function (componentName, viewModelConfig, callback) {
+  loadViewModel(componentName: string, viewModelConfig: ViewModelConfig, callback: (resolvedViewModel: CreateViewModel) => void): void {
     resolveViewModel(makeErrorCallback(componentName), viewModelConfig, callback)
   }
 }

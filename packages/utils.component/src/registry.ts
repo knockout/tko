@@ -1,16 +1,11 @@
 
-import {
-  subscribable, dependencyDetection
-} from '@tko/observable'
-
-import {
-  getObjectOwnProperty, tasks
-} from '@tko/utils'
+import { subscribable, dependencyDetection } from '@tko/observable'
+import { getObjectOwnProperty, tasks } from '@tko/utils'
 
 var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
   loadedDefinitionsCache = {}    // Tracks component loads that have already completed
 
-function loadComponentAndNotify (componentName, callback) {
+function loadComponentAndNotify (componentName: string, callback: any): void {
   var _subscribable = getObjectOwnProperty(loadingSubscribablesCache, componentName),
     completedAsync
   if (!_subscribable) {
@@ -135,5 +130,5 @@ export var registry = {
 
   _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-  loaders: new Array()
+  loaders: new Array<components.Loader>()
 }
