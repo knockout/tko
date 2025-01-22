@@ -1,14 +1,12 @@
 import { extenders as baseExtenders } from '@tko/observable'
 import { computed } from './computed'
+import { BaseExtendersType } from 'packages/observable/src/extenders'
 
-interface ExtendersType{
-  notify (target, notifyWhen) 
-  deferred (target, option) 
-  rateLimit (target, options) 
-  throttle (target, timout)
+interface ExtendersType extends BaseExtendersType {
+  throttle(target: any, timout: number): void
 }
 
-export function throttleExtender (target, timeout) {
+export function throttleExtender (target: any, timeout: number) {
     // Throttling means two things:
 
     // (1) For dependent observables, we throttle *evaluations* so that, no matter how fast its dependencies
@@ -29,6 +27,6 @@ export function throttleExtender (target, timeout) {
   })
 }
 
-const extenders = baseExtenders as ExtendersType;
+const extenders = baseExtenders as BaseExtendersType;
 
-extenders.throttle = throttleExtender
+(extenders as ExtendersType).throttle = throttleExtender

@@ -37,7 +37,7 @@ export function dummyTemplateEngine(templates?) {
             return new anonymousTemplate(template); // Anonymous template
     };
 
-    this.renderTemplateSource = function (templateSource, bindingContext, rt_options, templateDocument) {
+    this.renderTemplateSource = function (templateSource, bindingContext: BindingContext, rt_options, templateDocument) {
         var data = bindingContext['$data'];
         if (data && typeof data.get_value === 'function') {
             // For cases when data is an Identifier/Expression.

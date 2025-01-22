@@ -87,14 +87,15 @@ declare global {
 
     //#region subscribables/dependencyDetection.js
 
-    export interface ComputedContext {
-        getDependenciesCount(): number;
-        getDependencies(): Subscribable[];
-        isInitial(): boolean;
-        registerDependency(subscribable: Subscribable): void;
-    }
+    // transfered types to dependencyDetection.ts
+    // export interface ComputedContext {
+    //     getDependenciesCount(): number;
+    //     getDependencies(): Subscribable[];
+    //     isInitial(): boolean;
+    //     registerDependency(subscribable: Subscribable): void;
+    // }
 
-    export const computedContext: ComputedContext;
+    // export const computedContext: ComputedContext;
 
     /**
      * Executes a function and returns the result, while disabling depdendency tracking
@@ -102,75 +103,80 @@ declare global {
      * @param callbackTarget - the `this` binding for `callback`
      * @param callbackArgs - the args to provide to `callback`
      */
-    export function ignoreDependencies<Return, Target, Args extends any[]>(
-        callback: (this: Target, ...args: Args) => Return,
-        callbackTarget?: Target,
-        callbackArgs?: Args
-    ): Return;
+    // types transfered to dependencyDetection.ts
+    // export function ignoreDependencies<Return, Target, Args extends any[]>(
+    //     callback: (this: Target, ...args: Args) => Return,
+    //     callbackTarget?: Target,
+    //     callbackArgs?: Args
+    // ): Return;
 
     //#endregion
 
     //#region subscribables/extenders.js
 
-    export type RateLimitMethod = (callback: () => void, timeout: number, options: any) => (() => void);
+    // no usage anymore
+    // export type RateLimitMethod = (callback: () => void, timeout: number, options: any) => (() => void);
 
-    export interface RateLimitOptions {
-        timeout: number;
-        method?: "notifyAtFixedRate" | "notifyWhenChangesStop" | RateLimitMethod;
-        [option: string]: any;
-    }
+    // export interface RateLimitOptions {
+    //     timeout: number;
+    //     method?: "notifyAtFixedRate" | "notifyWhenChangesStop" | RateLimitMethod;
+    //     [option: string]: any;
+    // }
 
-    export interface ExtendersOptions<T = any> {
-        trackArrayChanges: true | utils.CompareArraysOptions;
-        throttle: number;
-        rateLimit: number | RateLimitOptions;
-        deferred: true;
-        notify: "always" | any;
-    }
+    // types transfered to extenders.ts and throttleExpanders.ts
+    // export interface ExtendersOptions<T = any> {
+    //     trackArrayChanges: true | utils.CompareArraysOptions;
+    //     throttle: number;
+    //     rateLimit: number | RateLimitOptions;
+    //     deferred: true;
+    //     notify: "always" | any;
+    // }
 
-    export interface Extender<T extends Subscribable = any, O = any> {
-        (target: T, options: O): T;
-    }
+    // export interface Extender<T extends Subscribable = any, O = any> {
+    //     (target: T, options: O): T;
+    // }
 
-    type AsExtenders<T> = { [P in keyof T]: Extender<Subscribable, T[P]> }
+    // type AsExtenders<T> = { [P in keyof T]: Extender<Subscribable, T[P]> }
 
-    export interface Extenders<T> extends AsExtenders<ExtendersOptions<T>> {
-        [name: string]: Extender;
-    }
+    // export interface Extenders<T> extends AsExtenders<ExtendersOptions<T>> {
+    //     [name: string]: Extender;
+    // }
 
-    export interface ObservableExtenderOptions<T> extends Partial<ExtendersOptions<T>> { }
+    // export interface ObservableExtenderOptions<T> extends Partial<ExtendersOptions<T>> { }
 
-    export const extenders: Extenders<any>;
+    // export const extenders: Extenders<any>;
 
     //#endregion
 
     //#region subscribables/mappingHelpers.js
 
-    export type Unwrapped<T> = T extends ko.ObservableArray<infer R>
-        ? Unwrapped<R>[]
-        : T extends ko.Subscribable<infer R>
-        ? (
-            R extends ko.Subscribable
-            ? unknown
-            : R extends Record<any, any>
-            ? { [P in keyof R]: Unwrapped<R[P]> }
-            : R
-        )
-        : T extends Date | RegExp | Function
-        ? T
-        : T extends Record<any, any>
-        ? { [P in keyof T]: Unwrapped<T[P]> }
-        : T
+    // transfered to mappingHelpers.ts
+    // export type Unwrapped<T> = T extends ko.ObservableArray<infer R>
+    //     ? Unwrapped<R>[]
+    //     : T extends ko.Subscribable<infer R>
+    //     ? (
+    //         R extends ko.Subscribable
+    //         ? unknown
+    //         : R extends Record<any, any>
+    //         ? { [P in keyof R]: Unwrapped<R[P]> }
+    //         : R
+    //     )
+    //     : T extends Date | RegExp | Function
+    //     ? T
+    //     : T extends Record<any, any>
+    //     ? { [P in keyof T]: Unwrapped<T[P]> }
+    //     : T
 
-    export function toJS<T>(rootObject: T): Unwrapped<T>;
-    export function toJSON(rootObject: any, replacer?: Function, space?: number): string;
+    // export function toJS<T>(rootObject: T): Unwrapped<T>;
+    // export function toJSON(rootObject: any, replacer?: Function, space?: number): string;
 
     //#endregion
 
     //#region subscribables/observableUtils.js
 
-    export function when<T, TTarget = void>(predicate: ComputedReadFunction<T, TTarget>, callback: SubscriptionCallback<T, TTarget>, context?: TTarget): Subscription;
-    export function when<T>(predicate: ComputedReadFunction<T, void>): Promise<T>;
+    // types to subscribable
+    // export function when<T, TTarget = void>(predicate: ComputedReadFunction<T, TTarget>, callback: SubscriptionCallback<T, TTarget>, context?: TTarget): Subscription;
+    // export function when<T>(predicate: ComputedReadFunction<T, void>): Promise<T>;
 
     //#endregion
 
@@ -178,6 +184,7 @@ declare global {
 
     export type BindingAccessors = { [name: string]: Function; };
 
+    // usage in applyBindings, BindingHandler, event, checked, options
     export interface AllBindings {
         (): any;
 
@@ -186,8 +193,10 @@ declare global {
 
         has(name: string): boolean;
     }
-    export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
-    export type BindingHandlerAddBinding = (name: string, value: any) => void;
+    // transfered to LegacyBindingHandler.ts
+    // export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
+    // export type BindingHandlerAddBinding = (name: string, value: any) => void;
+    // used as Base for all BindingHandlers
     export interface BindingHandler<T = any> {
         after?: string[];
         init?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void | BindingHandlerControlsDescendant;
@@ -200,6 +209,7 @@ declare global {
         [name: string]: BindingHandler;
     }
 
+    // global usage. defined in bindingContext.ts
     export interface BindingContext<T = any> {
         ko: any; // typeof ko;
 

@@ -29,7 +29,7 @@ import registry from '@tko/utils.component'
 var componentLoadingOperationUniqueId = 0
 
 export default class ComponentBinding extends DescendantBindingHandler {
-  childBindingContext: any;
+  childBindingContext: BindingContext;
   currentLoadingOperationId: number | null;
   currentViewModel: any;
   latestComponentName: string;

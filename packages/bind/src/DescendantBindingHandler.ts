@@ -11,7 +11,7 @@ import { AsyncBindingHandler } from './BindingHandler'
 export class DescendantBindingHandler extends AsyncBindingHandler {
   get controlsDescendants () { return true }
 
-  async applyBindingsToDescendants (childContext: any, callback?: Function) {
+  async applyBindingsToDescendants (childContext: BindingContext, callback?: Function) {
     const bindingResult = applyBindingsToDescendants(childContext, this.$element)
     if (bindingResult.isSync) {
       this.bindingCompletion = bindingResult

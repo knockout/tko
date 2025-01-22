@@ -34,9 +34,9 @@ interface BindingError {
   during: string,
   errorCaptured: any,
   bindings?: any,
-  allBindings?: any,
+  allBindings?: AllBindings,
   bindingKey?: string,
-  bindingContext: any,
+  bindingContext: BindingContext,
   element: HTMLElement,
   valueAccessor?: Function,
   message?: string,
@@ -263,7 +263,7 @@ function applyBindingsToNodeInternal (node: HTMLElement, sourceBindings: any, bi
             } : (bindingKey) => bindings[bindingKey]
 
         // Use of allBindings as a function is maintained for backwards compatibility, but its use is deprecated
-    const allBindings = function () {
+    const allBindings: AllBindings = function () {
       return objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor)
     }
 

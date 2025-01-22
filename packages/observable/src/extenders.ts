@@ -38,20 +38,20 @@ export function applyExtenders (requestedExtenders?) {
  */
 
 // Change when notifications are published.
-export function notify (target, notifyWhen) {
+export function notify(target: any, notifyWhen: string) {
   target.equalityComparer = notifyWhen == 'always'
         ? null  // null equalityComparer means to always notify
         : valuesArePrimitiveAndEqual
 }
 
-export function deferred (target, option) {
+export function deferred(target: any, option: boolean) {
   if (option !== true) {
     throw new Error('The \'deferred\' extender only accepts the value \'true\', because it is not supported to turn deferral off once enabled.')
   }
   deferUpdates(target)
 }
 
-export function rateLimit (target, options) {
+export function rateLimit(target: any, options: string | any) {
   var timeout, method, limitFunction
 
   if (typeof options === 'number') {
@@ -61,7 +61,7 @@ export function rateLimit (target, options) {
     method = options.method
   }
 
-    // rateLimit supersedes deferred updates
+  // rateLimit supersedes deferred updates
   target._deferUpdates = false
 
   limitFunction = method === 'notifyWhenChangesStop' ? debounceFn : throttleFn
@@ -71,13 +71,13 @@ export function rateLimit (target, options) {
   })
 }
 
-interface ExtendersType{
-  notify (target, notifyWhen) 
-  deferred (target, option) 
-  rateLimit (target, options) 
+export interface BaseExtendersType{
+  notify(target: any, notifyWhen: string): void,
+  deferred(target: any, option: boolean): void,
+  rateLimit(target: any, options: string | any): void
 }
 
-export var extenders: ExtendersType = {
+export var extenders: BaseExtendersType = {
   notify: notify,
   deferred: deferred,
   rateLimit: rateLimit

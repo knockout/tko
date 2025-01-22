@@ -16,7 +16,7 @@ export function nativeTemplateEngine () {
 
 nativeTemplateEngine.prototype = new templateEngine()
 nativeTemplateEngine.prototype.constructor = nativeTemplateEngine
-nativeTemplateEngine.prototype.renderTemplateSource = function (templateSource, bindingContext, options, templateDocument) {
+nativeTemplateEngine.prototype.renderTemplateSource = function (templateSource, bindingContext: BindingContext, options, templateDocument) {
   let version: number;
   if (ieVersion instanceof Array) {
     version = parseInt(ieVersion[1], 10);

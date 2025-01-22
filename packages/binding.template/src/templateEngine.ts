@@ -36,7 +36,7 @@ import {
 export function templateEngine () { };
 
 extend(templateEngine.prototype, {
-  renderTemplateSource: function (templateSource, bindingContext, options, templateDocument) {
+  renderTemplateSource: function (templateSource, bindingContext: BindingContext, options, templateDocument) { // templateSource, bindingContext, templateDocument not in use
     options.onError('Override renderTemplateSource')
   },
 
@@ -57,7 +57,7 @@ extend(templateEngine.prototype, {
     } else { options.onError(new Error('Unknown template type: ' + template)) }
   },
 
-  renderTemplate: function (template, bindingContext, options, templateDocument) {
+  renderTemplate: function (template, bindingContext: BindingContext, options, templateDocument) {
     var templateSource = this['makeTemplateSource'](template, templateDocument)
     return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }

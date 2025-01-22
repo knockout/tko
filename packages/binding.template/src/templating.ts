@@ -46,7 +46,7 @@ function invokeForEachNodeInContinuousRange (firstNode, lastNode, action) {
   }
 }
 
-function activateBindingsOnContinuousNodeArray (continuousNodeArray, bindingContext, afterBindingCallback) {
+function activateBindingsOnContinuousNodeArray (continuousNodeArray, bindingContext: BindingContext, afterBindingCallback) {
   // To be used on any nodes that have been rendered by a template and have been inserted into some parent element
   // Walks through continuousNodeArray (which *must* be continuous, i.e., an uninterrupted sequence of sibling nodes, because
   // the algorithm for walking them relies on this), and for each top-level item in the virtual-element sense,

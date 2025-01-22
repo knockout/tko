@@ -136,7 +136,7 @@ var ko_subscribable_fn = {
     })
   },
 
-  when (test, returnValue) {
+  when (test: any, returnValue: unknown) {
     const current = this.peek()
     const givenRv = arguments.length > 1
     const testFn = typeof test === 'function' ? test : v => v === test

@@ -4,6 +4,7 @@
 //
 // In KO 3.x, dependencyDetection was also known as computedContext.
 //
+import { Func } from 'mocha'
 import { isSubscribable } from './subscribableSymbol'
 
 const outerFrames = new Array()
@@ -29,14 +30,17 @@ export function end () {
   currentFrame = outerFrames.pop()
 }
 
-export function registerDependency (subscribable) {
+export function registerDependency (subscribable): void {
   if (currentFrame) {
     if (!isSubscribable(subscribable)) { throw new Error('Only subscribable things can act as dependencies') }
     currentFrame.callback.call(currentFrame.callbackTarget, subscribable, subscribable._id || (subscribable._id = getId()))
   }
 }
 
-export function ignore (callback, callbackTarget?, callbackArgs?) {
+export function ignore(
+  callback: Function,
+  callbackTarget?: any,
+  callbackArgs?: any[]): any {
   try {
     begin()
     return callback.apply(callbackTarget, callbackArgs || [])
@@ -45,16 +49,22 @@ export function ignore (callback, callbackTarget?, callbackArgs?) {
   }
 }
 
-export function getDependenciesCount () {
-  if (currentFrame) { return currentFrame.computed.getDependenciesCount() }
+export function getDependenciesCount(): number | undefined {
+  if (currentFrame) {
+    return currentFrame.computed.getDependenciesCount();
+  }
 }
 
-export function getDependencies () {
-  if (currentFrame) { return currentFrame.computed.getDependencies() }
+export function getDependencies(): Subscribable[] | undefined{
+  if (currentFrame) {
+    return currentFrame.computed.getDependencies();
+  }
 }
 
-export function isInitial () {
-  if (currentFrame) { return currentFrame.isInitial }
+export function isInitial(): boolean | undefined {
+  if (currentFrame) {
+    return currentFrame.isInitial;
+  }
 }
 
 export { ignore as ignoreDependencies }

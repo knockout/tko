@@ -56,7 +56,7 @@ export class LegacyBindingHandler extends BindingHandler {
     ]
   }
 
-  get controlsDescendants(): any {
+  get controlsDescendants(): boolean {
     const objectToTest = this.initReturn || this.handler || {}
     return objectToTest.controlsDescendantBindings
   }

@@ -75,7 +75,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   //    computed
   //    {data: array, name: string, as: string}
   afterAdd;
-  allBindings;
+  allBindings: AllBindings;
   static animateFrame;
   as;
   beforeRemove;

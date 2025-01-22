@@ -12,7 +12,7 @@ import {
 // e.g. click:handler instead of the usual full-length event:{click:handler}
 export function makeEventHandlerShortcut (eventName) {
   return {
-    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    init: function (element, valueAccessor, allBindings: AllBindings, viewModel, bindingContext: BindingContext) {
       var newValueAccessor = function () {
         var result = {}
         result[eventName] = valueAccessor()
@@ -28,7 +28,7 @@ function makeDescriptor (handlerOrObject) {
 }
 
 export const eventHandler = {
-  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext: BindingContext) {
     var eventsToHandle = valueAccessor() || {}
     objectForEach(eventsToHandle, function (eventName, descriptor) {
       const {passive, capture, once, debounce, throttle} = makeDescriptor(descriptor)
