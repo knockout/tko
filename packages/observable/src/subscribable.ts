@@ -14,7 +14,6 @@ export { isSubscribable } from './subscribableSymbol'
 // subscribed.
 export const LATEST_VALUE = Symbol('Knockout latest value')
 
-
 if (!Symbol.observable) {
   Symbol.observable = Symbol.for('@tko/Symbol.observable')
 }
@@ -26,7 +25,7 @@ export function subscribable () {
 
 export var defaultEvent = 'change'
 
-var ko_subscribable_fn = {
+var ko_subscribable_fn: SubscribableFunctions = {
   [SUBSCRIBABLE_SYM]: true,
   [Symbol.observable as any] () { return this },
 
@@ -37,7 +36,7 @@ var ko_subscribable_fn = {
 
   subscribe (callback, callbackTarget, event) {
     // TC39 proposed standard Observable { next: () => ... }
-    const isTC39Callback = typeof callback === 'object' && callback.next
+    const isTC39Callback = typeof callback === 'object' && (callback as any).next
 
     event = event || defaultEvent
     const observer = isTC39Callback ? callback : {

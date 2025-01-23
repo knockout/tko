@@ -71,10 +71,10 @@ export function makeArray<T=any> (arrayLikeObject:ArrayLike<T>):T[] {
 }
 
 export function range (min: MaybeSubscribable<number>, max: MaybeSubscribable<number>): number[] {
-  min = typeof min === 'function' ? min() as number : min
-  max = typeof max === 'function' ? max() as number : max
+  const minimum = typeof min === 'function' ? (min as () => number)() : min as number
+  const maximum = typeof max === 'function' ? (max as () => number)() : max as number
   var result: number[] = []
-  for (var i = min; i <= max; i++) {
+  for (let i = minimum as number; i <= maximum; i++) {
     result.push(i)
   }
   return result

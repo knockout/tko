@@ -26,7 +26,7 @@ import {
     LATEST_VALUE
 } from '@tko/observable'
 
-const computedState = createSymbolOrString('_state')
+const computedState: symbol = createSymbolOrString('_state')
 const DISPOSED_STATE = {
   dependencyTracking: null,
   dependenciesCount: 0,
@@ -39,15 +39,34 @@ const DISPOSED_STATE = {
   _options: null
 }
 
-export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, options?: ComputedOptions): Computed {
+interface State {
+  latestValue?: any,
+  isStale: boolean,
+  isDirty: boolean,
+  isBeingEvaluated: boolean,
+  suppressDisposalUntilDisposeWhenReturnsFalse: boolean,
+  isDisposed: boolean,
+  pure: boolean,
+  isSleeping: boolean,
+  readFunction: ComputedReadFunction,
+  evaluatorFunctionTarget: any,
+  disposeWhenNodeIsRemoved: Node | null,
+  disposeWhen?: () => boolean,
+  domNodeDisposalCallback: (() => void) | null,
+  dependencyTracking: any,
+  dependenciesCount: number,
+  evaluationTimeoutInstance: any
+}
+
+export function computed(evaluatorFunctionOrOptions?: ComputedOptions<any, void> | ComputedReadFunction<any, any>, evaluatorFunctionTarget?: any, options?: ComputedOptions): Computed {
   if (typeof evaluatorFunctionOrOptions === 'object') {
-        // Single-parameter syntax - everything is on this "options" param
-    options = evaluatorFunctionOrOptions
+    // Single-parameter syntax - everything is on this "options" param
+    options = evaluatorFunctionOrOptions as ComputedOptions
   } else {
-        // Multi-parameter syntax - construct the options according to the params passed
+    // Multi-parameter syntax - construct the options according to the params passed
     options = options || {}
     if (evaluatorFunctionOrOptions) {
-      options.read = evaluatorFunctionOrOptions
+      options!.read = evaluatorFunctionOrOptions
     }
   }
   if (typeof options?.read !== 'function') {
@@ -55,7 +74,7 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
   }
 
   var writeFunction = options.write
-  var state: state = {
+  var state: State = {
     latestValue: undefined,
     isStale: true,
     isDirty: true,
@@ -73,25 +92,8 @@ export function computed (evaluatorFunctionOrOptions, evaluatorFunctionTarget?, 
     dependenciesCount: 0,
     evaluationTimeoutInstance: null
   }
-  interface state {
-    latestValue: any,
-    isStale: boolean,
-    isDirty: boolean,
-    isBeingEvaluated: boolean,
-    suppressDisposalUntilDisposeWhenReturnsFalse: boolean,
-    isDisposed: boolean,
-    pure: boolean,
-    isSleeping: boolean,
-    readFunction: ComputedReadFunction,
-    evaluatorFunctionTarget: any,
-    disposeWhenNodeIsRemoved: Node | null,
-    disposeWhen?: () => boolean,
-    domNodeDisposalCallback: (() => void) | null,
-    dependencyTracking: any,
-    dependenciesCount: number,
-    evaluationTimeoutInstance: any
-  }
-  function computedObservable () {
+
+  function computedObservable() {
     if (arguments.length > 0) {
       if (typeof writeFunction === 'function') {
                 // Writing a value
@@ -553,15 +555,15 @@ computed.fn[protoProp] = computed
 /* This is used by ko.isObservable */
 observable.observablePrototypes.add(computed as any)
 
-export function isComputed<T= any> (instance: any):instance is Computed<T> {
+export function isComputed<T= any> (instance: any): instance is Computed<T> {
   return (typeof instance === 'function' && instance[protoProp] === computed)
 }
 
-export function isPureComputed<T=any> (instance:any): instance is PureComputed<T> {
-  return isComputed(instance) && instance[computedState] && instance[computedState].pure
+export function isPureComputed<T=any> (instance: any): instance is PureComputed<T> {
+  return isComputed(instance) && instance[computedState] && (instance[computedState] as unknown as State).pure
 }
 
-export function pureComputed<T = any> (evaluatorFunctionOrOptions: ComputedOptions|ComputedReadFunction, evaluatorFunctionTarget?):Computed<T> {
+export function pureComputed<T = any> (evaluatorFunctionOrOptions: ComputedOptions | ComputedReadFunction, evaluatorFunctionTarget?): Computed<T> {
   if (typeof evaluatorFunctionOrOptions === 'function') {
     let evaluator = evaluatorFunctionOrOptions as ComputedReadFunction;
     return computed(evaluator, evaluatorFunctionTarget, {'pure': true})

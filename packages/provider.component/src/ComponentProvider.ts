@@ -34,14 +34,14 @@ export default class ComponentProvider extends Provider {
       const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
       const closeNode = document.createComment('/ko')
-      
+
       if(!parent)
         throw Error("Missing parent node")
-      
+
       parent.insertBefore(openNode, node)
       parent.insertBefore(closeNode, node)
       parent.removeChild(node)
-      
+
       return [openNode, closeNode]
     }
   }
@@ -100,7 +100,7 @@ export default class ComponentProvider extends Provider {
 
     return computed({
       read: () => unwrap(paramValueComputed()),
-      write: isWriteable ? (v) => paramValueComputed()(v) : null,
+      write: isWriteable ? (v) => paramValueComputed()(v) : undefined,
       disposeWhenNodeIsRemoved: node
     })
   }

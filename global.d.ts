@@ -116,22 +116,22 @@ declare global {
     //#region subscribables/extenders.js
 
     // no usage anymore
-    // export type RateLimitMethod = (callback: () => void, timeout: number, options: any) => (() => void);
+    export type RateLimitMethod = (callback: () => void, timeout: number, options: any) => (() => void);
 
-    // export interface RateLimitOptions {
-    //     timeout: number;
-    //     method?: "notifyAtFixedRate" | "notifyWhenChangesStop" | RateLimitMethod;
-    //     [option: string]: any;
-    // }
+    // used in ExtendersOptions
+    export interface RateLimitOptions {
+        timeout: number;
+        method?: "notifyAtFixedRate" | "notifyWhenChangesStop" | RateLimitMethod;
+        [option: string]: any;
+    }
 
-    // types transfered to extenders.ts and throttleExpanders.ts
-    // export interface ExtendersOptions<T = any> {
-    //     trackArrayChanges: true | utils.CompareArraysOptions;
-    //     throttle: number;
-    //     rateLimit: number | RateLimitOptions;
-    //     deferred: true;
-    //     notify: "always" | any;
-    // }
+    export interface ExtendersOptions<T = any> {
+        trackArrayChanges: true | utils.CompareArraysOptions;
+        throttle: number;
+        rateLimit: number | RateLimitOptions;
+        deferred: true;
+        notify: "always" | any;
+    }
 
     // export interface Extender<T extends Subscribable = any, O = any> {
     //     (target: T, options: O): T;
@@ -143,7 +143,7 @@ declare global {
     //     [name: string]: Extender;
     // }
 
-    // export interface ObservableExtenderOptions<T> extends Partial<ExtendersOptions<T>> { }
+    export interface ObservableExtenderOptions<T> extends Partial<ExtendersOptions<T>> { }
 
     // export const extenders: Extenders<any>;
 
@@ -439,7 +439,7 @@ declare global {
     //#region binding/editDetection/arrayToDomNodeChildren.js
 
     export module utils {
-        
+
         // Moved in bind/arrayToDomNodeChildren.ts
         ////export type MappingFunction<T = any> = (valueToMap: T, index: number, nodes: Node[]) => Node[];
         ////export type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
@@ -793,7 +793,7 @@ export interface Computed<T = any> extends ComputedFunctions<T> {
     getDependencies(): Subscribable[];
   }
 
-
+  // used in computed, but empty interface is pointless. Check if it's needed
   export interface PureComputed<T = any> extends Computed<T> { }
 
   export type ComputedReadFunction<T = any, TTarget = void> = Subscribable<T> | Observable<T> | Computed<T> | ((this: TTarget) => T);
@@ -811,22 +811,21 @@ export interface Computed<T = any> extends ComputedFunctions<T> {
       disposeWhen?: () => boolean;
   }
 
-  export function computed<T = any, TTarget = any>(options: ComputedOptions<T, TTarget>): Computed<T>;
-  export function computed<T = any>(evaluator: ComputedReadFunction<T>): Computed<T>;
-  export function computed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget): Computed<T>;
-  export function computed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget, options: ComputedOptions<T, TTarget>): Computed<T>;
+  // defined in computed.ts
+  // export function computed<T = any, TTarget = any>(options: ComputedOptions<T, TTarget>): Computed<T>;
+  // export function computed<T = any>(evaluator: ComputedReadFunction<T>): Computed<T>;
+  // export function computed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget): Computed<T>;
+  // export function computed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget, options: ComputedOptions<T, TTarget>): Computed<T>;
   export module computed {
       export const fn: ComputedFunctions;
   }
 
-  export function pureComputed<T = any, TTarget = any>(options: ComputedOptions<T, TTarget>): PureComputed<T>;
-  export function pureComputed<T = any>(evaluator: ComputedReadFunction<T>): PureComputed<T>;
-  export function pureComputed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget): PureComputed<T>;
-
-
-
-  export function isComputed<T = any>(instance: any): instance is Computed<T>;
-  export function isPureComputed<T = any>(instance: any): instance is PureComputed<T>;
+  // defined in computed.ts
+  // export function pureComputed<T = any, TTarget = any>(options: ComputedOptions<T, TTarget>): PureComputed<T>;
+  // export function pureComputed<T = any>(evaluator: ComputedReadFunction<T>): PureComputed<T>;
+  // export function pureComputed<T = any, TTarget = any>(evaluator: ComputedReadFunction<T, TTarget>, evaluatorTarget: TTarget): PureComputed<T>;
+  // export function isComputed<T = any>(instance: any): instance is Computed<T>;
+  // export function isPureComputed<T = any>(instance: any): instance is PureComputed<T>;
 
   //#region Subscribable
 
@@ -834,36 +833,44 @@ export interface Computed<T = any> extends ComputedFunctions<T> {
 export type SubscriptionCallback<T = any, TTarget = void> = (this: TTarget, val: T) => void;
 export type MaybeSubscribable<T = any> = T | Subscribable<T>;
 
-export interface Subscription {
-    dispose(): void;
-    disposeWhenNodeIsRemoved(node: Node): void;
-}
+// not in use
+// export interface Subscription {
+//     dispose(): void;
+//     disposeWhenNodeIsRemoved(node: Node): void;
+// }
 
-type Flatten<T> = T extends Array<infer U> ? U : T;
+// type Flatten<T> = T extends Array<infer U> ? U : T;
 
-export interface SubscribableFunctions<T = any> extends Function {
-    init<S extends Subscribable<any>>(instance: S): void;
+//moved to subribable.ts
+export interface SubscribableFunctions<T = any> {
+    [symbol: symbol]: boolean;
+    init<any>(instance: any): void;
 
     notifySubscribers(valueToWrite?: T, event?: string): void;
 
-    subscribe<TTarget = void>(callback: SubscriptionCallback<utils.ArrayChanges<Flatten<T>>, TTarget>, callbackTarget: TTarget, event: "arrayChange"): Subscription;
-
-    subscribe<TTarget = void>(callback: SubscriptionCallback<T, TTarget>, callbackTarget: TTarget, event: "beforeChange" | "spectate" | "awake"): Subscription;
-    subscribe<TTarget = void>(callback: SubscriptionCallback<undefined, TTarget>, callbackTarget: TTarget, event: "asleep"): Subscription;
-    subscribe<TTarget = void>(callback: SubscriptionCallback<T, TTarget>, callbackTarget?: TTarget, event?: "change"): Subscription;
-    subscribe<X = any, TTarget = void>(callback: SubscriptionCallback<X, TTarget>, callbackTarget: TTarget, event: string): Subscription;
-
+    subscribe<TTarget = void>(callback: SubscriptionCallback<T, TTarget> | any, callbackTarget?: TTarget, event?: string): Subscription;
     extend(requestedExtenders: ObservableExtenderOptions<T>): this;
     extend<S extends Subscribable<T>>(requestedExtenders: ObservableExtenderOptions<T>): S;
 
     getSubscriptionsCount(event?: string): number;
-
     // TKO
 
-    when(test, returnValue?)
+    getVersion(): number;
+    hasChanged(versionToCheck: number): boolean;
+    updateVersion(): void;
+    hasSubscriptionsForEvent(event: string): boolean;
+    isDifferent<T>(oldValue?: T, newValue?: T): boolean;
+    once(cb: Function): void;
+    when(test, returnValue?);
+    yet(test: Function | any, args: any[]): void;
+    next(): Promise<unknown>;
+    toString(): string;
 }
 
-export interface Subscribable<T = any> extends SubscribableFunctions<T> { }
+export interface Subscribable<T = any> extends SubscribableFunctions<T> {
+  _subscriptions: any;
+  _versionNumber: number;
+}
 
 export const subscribable: {
     new <T = any>(): Subscribable<T>;

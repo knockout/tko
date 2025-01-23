@@ -57,7 +57,7 @@ function simpleHtmlParse (html: string, documentContext? : Document) {
 
     // Trim whitespace, otherwise indexOf won't work as expected
   let div : any = documentContext.createElement('div')
-  let tags = stringTrim(html).toLowerCase(), 
+  let tags = stringTrim(html).toLowerCase(),
     wrap = getWrap(tags),
     depth = wrap[0]
 
@@ -168,9 +168,9 @@ export function setHtml (node : Node, html : Function | string) {
     } else {
             // ... otherwise, use KO's own parsing logic.
       var parsedNodes : Node[]
-      if(node.ownerDocument) 
+      if(node.ownerDocument)
         parsedNodes = parseHtmlFragment(html, node.ownerDocument)
-      else 
+      else
         parsedNodes = parseHtmlFragment(html)
 
       if (node.nodeType === 8) {
@@ -188,7 +188,7 @@ export function setHtml (node : Node, html : Function | string) {
 
 
 export function setTextContent (element: Node, textContent: MaybeSubscribable<string> ):void {
-  var value = typeof textContent === 'function' ? textContent() : textContent
+  var value = typeof textContent === 'function' ? (textContent as () => string)() : textContent as string
   if ((value === null) || (value === undefined)) { value = '' }
 
     // We need there to be exactly one child: a text node.
