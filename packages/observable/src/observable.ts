@@ -11,11 +11,12 @@ import { deferUpdates } from './defer'
 import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
 
-export function observable(initialValue?: any): Observable{
+export function observable(initialValue?: any): Observable {
   function Observable () {
     if (arguments.length > 0) {
-            // Write
-            // Ignore writes if the value hasn't changed
+      // Write
+      // Ignore writes if the value hasn't changed
+      // inherits from interface SubscribableFunctions
       if ((Observable as any).isDifferent(Observable[LATEST_VALUE], arguments[0])) {
         (Observable as any).valueWillMutate();
         Observable[LATEST_VALUE] = arguments[0];
@@ -35,14 +36,15 @@ export function observable(initialValue?: any): Observable{
 
   subscribable.fn.init(Observable)
 
-    // Inherit from 'observable'
+  // Inherit from 'observable'
   Object.setPrototypeOf(Observable, observable.fn)
 
   if (options.deferUpdates) {
     deferUpdates(Observable)
   }
 
-  return (Observable as any)
+  // through setPrototypeOf we can cast to Observable
+  return Observable as unknown as Observable
 }
 
 // Define prototype for observables
@@ -66,7 +68,7 @@ observable.fn = {
 }
 
 // Moved out of "limit" to avoid the extra closure
-function limitNotifySubscribers (value, event) {
+function limitNotifySubscribers (value, event?: string) {
   if (!event || event === defaultEvent) {
     this._limitChange(value)
   } else if (event === 'beforeChange') {
@@ -81,7 +83,7 @@ function limitNotifySubscribers (value, event) {
   var self = this
   var selfIsObservable = isObservable(self)
   var beforeChange = 'beforeChange'
-  var ignoreBeforeChange, notifyNextChange, previousValue, pendingValue, didUpdate
+  var ignoreBeforeChange: boolean, notifyNextChange: boolean, previousValue: any, pendingValue: any, didUpdate: boolean
 
   if (!self._origNotifySubscribers) {
     self._origNotifySubscribers = self.notifySubscribers
@@ -106,7 +108,7 @@ function limitNotifySubscribers (value, event) {
   })
 
   Object.assign(self, {
-    _limitChange  (value, isDirty) {
+    _limitChange  (value: any, isDirty: boolean) {
       if (!isDirty || !self._notificationIsPending) {
         didUpdate = !isDirty
       }
@@ -116,7 +118,7 @@ function limitNotifySubscribers (value, event) {
       finish()
     },
 
-    _limitBeforeChange (value) {
+    _limitBeforeChange (value: any) {
       if (!ignoreBeforeChange) {
         previousValue = value
         self._origNotifySubscribers(value, beforeChange)
@@ -144,7 +146,7 @@ observable.fn[protoProperty] = observable
 // isObservable will be `true`.
 observable.observablePrototypes = new Set([observable])
 
-export function isObservable<T=any> (instance:any): instance is Observable<T> {
+export function isObservable<T = any> (instance:any): instance is Observable<T> {
   const proto = typeof instance === 'function' && instance[protoProperty]
   if (proto && !observable.observablePrototypes.has(proto)) {
     throw Error('Invalid object that looks like an observable; possibly from another Knockout instance')

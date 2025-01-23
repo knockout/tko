@@ -423,10 +423,10 @@ declare global {
 
         ////export type ArrayChanges<T = any> = ArrayChange<T>[];
 
-        ////export interface CompareArraysOptions {
-        ////    dontLimitMoves?: boolean;
-        ////    sparse?: boolean;
-        ////}
+        // export interface CompareArraysOptions {
+        //    dontLimitMoves?: boolean;
+        //    sparse?: boolean;
+        // }
 
         // combined and applied
         //// export function compareArrays<T = any>(a: T[], b: T[]): ArrayChanges<T>;
@@ -898,23 +898,24 @@ export interface ObservableFunctions<T = any> extends Subscribable<T> {
 }
 
 export interface Observable<T = any> extends ObservableFunctions<T> {
-    subprop: string; // for some test
+    subprop?: string; // for some test
+    [symbol: symbol]: any;
     (): T;
     (value: T): any;
-    valueWillMutate();
 }
-export function observable<T>(value: T): Observable<T>;
-export function observable<T = any>(value: null): Observable<T | null>
+export function observable<T>(initialValue?: T): Observable<T>;
+// export function observable<T = any>(value: null): Observable<T | null>
 /** No initial value provided, so implicitly includes `undefined` as a possible value */
-export function observable<T = any>(): Observable<T | undefined>
+// export function observable<T = any>(): Observable<T | undefined>
 export module observable {
     export const fn: ObservableFunctions;
 }
 
-export function isObservable<T = any>(instance: any): instance is Observable<T>;
+// in observable.ts
+// export function isObservable<T = any>(instance: any): instance is Observable<T>;
 
-export function isWriteableObservable<T = any>(instance: any): instance is Observable<T>;
-export function isWritableObservable<T = any>(instance: any): instance is Observable<T>;
+// export function isWriteableObservable<T = any>(instance: any): instance is Observable<T>;
+// export function isWritableObservable<T = any>(instance: any): instance is Observable<T>;
 
 //#endregion Observable
 
@@ -1050,13 +1051,13 @@ export interface ObservableArray<T = any> extends Observable<T[]>, ObservableArr
     (value: T[] | null | undefined): this;
 }
 
-export function observableArray<T = any>(): ObservableArray<T>;
 export function observableArray<T = any>(initialValue: T[]): ObservableArray<T>;
 export module observableArray {
     export const fn: ObservableArrayFunctions;
 }
 
-export function isObservableArray<T = any>(instance: any): instance is ObservableArray<T>;
+// in observablearray
+// export function isObservableArray<T = any>(instance: any): instance is ObservableArray<T>;
 
 //#endregion ObservableArray
 }
