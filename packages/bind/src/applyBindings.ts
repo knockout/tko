@@ -389,7 +389,7 @@ export function applyBindingsToNode (node: HTMLElement, bindings : Record<string
   return new BindingResult({asyncBindingsApplied, rootNode: node, bindingContext})
 }
 
-export function applyBindingsToDescendants(viewModelOrBindingContext: BindingContext | Observable<any> | any, rootNode: HTMLElement): BindingResult {
+export function applyBindingsToDescendants<T = any>(viewModelOrBindingContext: T | BindingContext<T>, rootNode: Node): BindingResult {
   const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     const bindingContext = getBindingContext(viewModelOrBindingContext)
