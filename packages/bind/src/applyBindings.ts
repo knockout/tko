@@ -37,7 +37,7 @@ interface BindingError {
   allBindings?: AllBindings,
   bindingKey?: string,
   bindingContext: BindingContext,
-  element: HTMLElement,
+  element: Node,
   valueAccessor?: Function,
   message?: string,
   stack?: any
@@ -59,7 +59,7 @@ function getBindingProvider() {
   return options.bindingProviderInstance.instance || options.bindingProviderInstance
 }
 
-function isProviderForNode(provider, node: HTMLElement): boolean {
+function isProviderForNode(provider, node: Node): boolean {
   const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
   return nodeTypes.includes(node.nodeType)
 }
@@ -117,22 +117,22 @@ function applyBindingsToDescendantsInternal (bindingContext: BindingContext, ele
   while (currentChild = nextInQueue) {
     // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
     nextInQueue = virtualElements.nextSibling(currentChild)
-    applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild as HTMLElement, asyncBindingsApplied)
+    applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
   }
 
   bindingEvent.notify(elementOrVirtualElement, bindingEvent.childrenComplete)
 }
 
-function hasBindings (node: HTMLElement) : boolean {
+function hasBindings (node: Node) : boolean {
   const provider = getBindingProvider()
   return isProviderForNode(provider, node) && provider.nodeHasBindings(node)
 }
 
-function nodeOrChildHasBindings (node: HTMLElement) : boolean {
-  return hasBindings(node) || [...node.childNodes].some(c => nodeOrChildHasBindings(c as HTMLElement))
+function nodeOrChildHasBindings (node: Node) : boolean {
+  return hasBindings(node) || [...node.childNodes].some(c => nodeOrChildHasBindings(c))
 }
 
-function applyBindingsToNodeAndDescendantsInternal(bindingContext: BindingContext, nodeVerified: HTMLElement, asyncBindingsApplied) {
+function applyBindingsToNodeAndDescendantsInternal(bindingContext: BindingContext, nodeVerified: Node, asyncBindingsApplied) {
   var isElement = nodeVerified.nodeType === 1
   if (isElement) { // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -193,7 +193,7 @@ function * topologicalSortBindings (bindings: any, $component: any) {
   for (const result of results) { yield result }
 }
 
-function applyBindingsToNodeInternal (node: HTMLElement, sourceBindings: any, bindingContext: any, asyncBindingsApplied?: Set<any>) {
+function applyBindingsToNodeInternal (node: Node, sourceBindings: any, bindingContext: any, asyncBindingsApplied?: Set<any>) {
   const bindingInfo = domData.getOrSet(node, boundElementDomDataKey, {})
   // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
   const alreadyBound = bindingInfo.alreadyBound
@@ -350,7 +350,7 @@ function applyBindingsToNodeInternal (node: HTMLElement, sourceBindings: any, bi
  * @param {Object} bindings
  * @param {[Promise]} nodeAsyncBindingPromises
  */
-function triggerDescendantsComplete (node : HTMLElement, bindings : Object, nodeAsyncBindingPromises : any) {
+function triggerDescendantsComplete (node : Node, bindings : Object, nodeAsyncBindingPromises : any) {
   /** descendantsComplete ought to be an instance of the descendantsComplete
     *  binding handler. */
   const hasBindingHandler = bindingEvent.descendantsComplete in bindings
@@ -389,7 +389,7 @@ export function applyBindingsToNode (node: HTMLElement, bindings : Record<string
   return new BindingResult({asyncBindingsApplied, rootNode: node, bindingContext})
 }
 
-export function applyBindingsToDescendants(viewModelOrBindingContext: BindingContext | Observable<any> | any, rootNode: HTMLElement): BindingResult {
+export function applyBindingsToDescendants<T = any>(viewModelOrBindingContext: T | BindingContext<T>, rootNode: Node): BindingResult {
   const asyncBindingsApplied = new Set()
   if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
     const bindingContext = getBindingContext(viewModelOrBindingContext)

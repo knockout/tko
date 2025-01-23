@@ -860,7 +860,6 @@ describe('Components: Component binding', function () {
         static get template () {
           return {
             elementName: 'div',
-            element: undefined,
             attributes: { attr: '123' },
             children: ['téxt']
           }
@@ -882,7 +881,6 @@ describe('Components: Component binding', function () {
           // babel-plugin-transform-jsx will yield:
           return {
             elementName: 'div',
-            element: undefined,
             attributes: { attr: obs },
             children: [o2]
           }
@@ -911,9 +909,9 @@ describe('Components: Component binding', function () {
       class ViewModel extends components.ComponentABC {
         static get template () {
           return [
-            { elementName: 'b', attributes: { }, children: ['x'], element: undefined },
-            { elementName: 'i', attributes: { }, children: ['y'], element: undefined },
-            { elementName: 'em', attributes: { }, children: ['z'], element: undefined }
+            { elementName: 'b', attributes: { }, children: ['x'] },
+            { elementName: 'i', attributes: { }, children: ['y'] },
+            { elementName: 'em', attributes: { }, children: ['z'] }
           ]
         }
       }
@@ -933,7 +931,7 @@ describe('Components: Component binding', function () {
       class ViewModel extends components.ComponentABC {
         static get template () {
           return [
-            { element: undefined, elementName: 'b', attributes: { }, children: ['x', children] }
+            { elementName: 'b', attributes: { }, children: ['x', children] }
           ]
         }
       }

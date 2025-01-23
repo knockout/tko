@@ -170,7 +170,7 @@ Object.assign(bindingContext.prototype, {
   }
 })
 
-export function storedBindingContextForNode (node: HTMLElement|Comment) {
+export function storedBindingContextForNode (node: Node) {
   const bindingInfo = domData.get(node, boundElementDomDataKey)
   return bindingInfo && bindingInfo.context
 }
@@ -179,7 +179,7 @@ export function storedBindingContextForNode (node: HTMLElement|Comment) {
 export function contextFor (node: Node) {
   // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
   if (node && (node.nodeType === 1 || node.nodeType === 8)) {
-    return storedBindingContextForNode(node as HTMLElement|Comment)
+    return storedBindingContextForNode(node)
   }
 }
 
