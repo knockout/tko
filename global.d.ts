@@ -3,6 +3,7 @@
 
 import { BindingContextSetting } from 'packages/bind';
 import { Observable, ObservableArray } from "packages/observable/types/Observable";
+import { CompareArraysOptions } from 'packages/utils';
 
 export { };
 
@@ -865,6 +866,10 @@ export interface SubscribableFunctions<T = any> {
     yet(test: Function | any, args: any[]): void;
     next(): Promise<unknown>;
     toString(): string;
+
+    // From pureComputedOverrides in computed.ts
+    beforeSubscriptionAdd?: (event: string) => void;
+    afterSubscriptionRemove?: (event: string) => void;
 }
 
 export interface Subscribable<T = any> extends SubscribableFunctions<T> {
@@ -894,7 +899,7 @@ export interface ObservableFunctions<T = any> extends Subscribable<T> {
     valueWillMutate(): void;
 
     //TKO
-    modify(fn,peek=true):Observable
+    modify(fn,peek=true): Observable
 }
 
 export interface Observable<T = any> extends ObservableFunctions<T> {
@@ -1049,6 +1054,8 @@ export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T
 
 export interface ObservableArray<T = any> extends Observable<T[]>, ObservableArrayFunctions<T> {
     (value: T[] | null | undefined): this;
+    compareArrayOptions?: CompareArraysOptions;
+    cacheDiffForKnownOperation?: (rawArray: any[], operationName: string, args: any[]) => void;
 }
 
 export function observableArray<T = any>(initialValue: T[]): ObservableArray<T>;

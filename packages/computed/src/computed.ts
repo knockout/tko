@@ -468,7 +468,7 @@ computed.fn = {
 }
 
 var pureComputedOverrides = {
-  beforeSubscriptionAdd (event) {
+  beforeSubscriptionAdd (event: string) {
         // If asleep, wake up the computed by subscribing to any dependencies.
     var computedObservable = this,
       state = computedObservable[computedState]
@@ -508,7 +508,7 @@ var pureComputedOverrides = {
       }
     }
   },
-  afterSubscriptionRemove (event) {
+  afterSubscriptionRemove (event: string) {
     var state = this[computedState]
     if (!state.isDisposed && event === 'change' && !this.hasSubscriptionsForEvent('change')) {
       objectForEach(state.dependencyTracking, function (id, dependency) {

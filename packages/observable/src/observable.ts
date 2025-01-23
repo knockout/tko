@@ -30,7 +30,7 @@ export function observable(initialValue?: any): Observable {
     }
   }
 
-  overwriteLengthPropertyIfSupported(Observable, { value: undefined })
+  overwriteLengthPropertyIfSupported(Observable as any, { value: undefined })
 
   Observable[LATEST_VALUE] = initialValue
 

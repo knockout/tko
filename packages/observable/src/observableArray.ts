@@ -17,7 +17,7 @@ export function observableArray<T = any> (initialValues?: T[]): ObservableArray<
 
   var result = Object.setPrototypeOf(observable(initialValues), observableArray.fn) as ObservableArray<T>
   trackArrayChanges(result)
-        // ^== result.extend({ trackArrayChanges: true })
+  // ^== result.extend({ trackArrayChanges: true })
   overwriteLengthPropertyIfSupported(result, { get: () => result()?.length })
   return result
 }

@@ -5,7 +5,8 @@
 /* eslint no-fallthrough: 0 */
 
 import {
-    extend, compareArrays, findMovesInArrayComparison
+    extend, compareArrays, findMovesInArrayComparison,
+    CompareArraysOptions
 } from '@tko/utils'
 
 import { defaultEvent } from './subscribable'
@@ -13,7 +14,7 @@ import { extenders } from './extenders'
 
 export var arrayChangeEventName = 'arrayChange'
 
-export function trackArrayChanges (target, options?) {
+export function trackArrayChanges (target: ObservableArray, options?: CompareArraysOptions) {
     // Use the provided options--each call to trackArrayChanges overwrites the previously set options
   target.compareArrayOptions = {}
   if (options && typeof options === 'object') {
@@ -26,7 +27,7 @@ export function trackArrayChanges (target, options?) {
     return
   }
   let trackingChanges = false
-  let cachedDiff:any|null = null
+  let cachedDiff: any | null = null
   let arrayChangeSubscription
   let pendingNotifications = 0
   let underlyingNotifySubscribersFunction
