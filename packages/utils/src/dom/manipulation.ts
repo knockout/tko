@@ -39,7 +39,7 @@ export function setDomNodeChildren (domNode: Node, childNodes:ArrayLike<Node>) {
   }
 }
 
-export function replaceDomNodes (nodeToReplaceOrNodeArray:Node[] | Node, newNodesArray:Node[]) {
+export function replaceDomNodes (nodeToReplaceOrNodeArray: Node[] | Node, newNodesArray: Node[]) {
   let nodesToReplaceArray = Array.isArray(nodeToReplaceOrNodeArray) ? nodeToReplaceOrNodeArray:  [nodeToReplaceOrNodeArray]
   if (nodesToReplaceArray.length > 0) {
     const insertionPoint = nodesToReplaceArray[0]

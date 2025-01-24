@@ -4,14 +4,14 @@ export class BindingResult {
   isSync: boolean
   isComplete: boolean
   completionPromise: Promise<BindingResult>
+  rootNode: Node;
+  bindingContext: BindingContext;
 
   constructor({asyncBindingsApplied, rootNode, bindingContext}) {
-    Object.assign(this, {
-      rootNode,
-      bindingContext,
-      isSync: asyncBindingsApplied.size === 0,
-      isComplete: this.isSync
-    })
+    this.rootNode = rootNode;
+    this.bindingContext = bindingContext;
+    this.isSync = asyncBindingsApplied.size === 0
+    this.isComplete = this.isSync;
 
     if (!this.isSync) {
       this.completionPromise = this.completeWhenBindingsFinish(asyncBindingsApplied)

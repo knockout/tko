@@ -38,9 +38,9 @@ interface MappingOptions<T = any> {
 
 function mapNodeAndRefreshWhenChanged (containerNode: Node, mapping: MappingFunction, valueToMap: any, callbackAfterAddingNodes: MappingAfterAddFunction | undefined, index: any) {
   // Map this array value inside a dependentObservable so we re-map when any dependency changes
-  const mappedNodes = new Array()
+  const mappedNodes: Node[] = []
   const dependentObservable: Computed<void> = computed(function () {
-    var newMappedNodes = mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
+    var newMappedNodes: Node[] = mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
 
     // On subsequent evaluations, just replace the previously-inserted DOM nodes
     if (mappedNodes.length > 0) {

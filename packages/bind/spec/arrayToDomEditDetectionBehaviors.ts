@@ -1,21 +1,14 @@
 
-import {
-    arrayMap
-} from '@tko/utils'
+import { observable as Observable, unwrap } from '@tko/observable'
+import { arrayMap } from '@tko/utils'
+import '@tko/utils/helpers/jasmine-13-helper'
+import { setDomNodeChildrenFromArrayMapping } from '../dist'
 
-import {
-    unwrap, observable as Observable
-} from '@tko/observable'
-
-import {
-    setDomNodeChildrenFromArrayMapping
-} from '../dist'
-
-import  '@tko/utils/helpers/jasmine-13-helper'
-
-function copyDomNodeChildren (domNode : HTMLElement) {
-  var copy = new Array()
-  for (var i = 0; i < domNode.childNodes.length; i++) { copy.push(domNode.childNodes[i]) }
+function copyDomNodeChildren (domNode: HTMLElement) {
+  var copy: ChildNode[] = []
+  for (var i = 0; i < domNode.childNodes.length; i++) {
+    copy.push(domNode.childNodes[i])
+  }
   return copy
 }
 
@@ -41,9 +34,9 @@ describe('Array to DOM node children mapping', function () {
 
   it('Should only call the mapping function for new array elements', function () {
     var mappingInvocations = new Array()
-    var mapping = function (arrayItem) {
+    var mapping = function (arrayItem: string) {
       mappingInvocations.push(arrayItem)
-      return null
+
     }
     setDomNodeChildrenFromArrayMapping(testNode, ['A', 'B'], mapping)
     expect(mappingInvocations).toEqual(['A', 'B'])
@@ -55,7 +48,7 @@ describe('Array to DOM node children mapping', function () {
 
   it('Should retain existing node instances if the array is unchanged', function () {
     var array = ['A', 'B']
-    var mapping = function (arrayItem) {
+    var mapping = function (arrayItem: string) {
       var output1 = document.createElement('DIV')
       var output2 = document.createElement('DIV')
       output1.innerHTML = arrayItem + '1'
@@ -73,8 +66,8 @@ describe('Array to DOM node children mapping', function () {
   })
 
   it('Should insert added nodes at the corresponding place in the DOM', function () {
-    var mappingInvocations = new Array()
-    var mapping = function (arrayItem) {
+    var mappingInvocations: string[] = []
+    var mapping = function (arrayItem: string) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
       output.innerHTML = arrayItem
@@ -93,7 +86,7 @@ describe('Array to DOM node children mapping', function () {
 
   it('Should remove deleted nodes from the DOM', function () {
     var mappingInvocations = new Array()
-    var mapping = function (arrayItem) {
+    var mapping = function (arrayItem: string) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
       output.innerHTML = arrayItem
@@ -114,7 +107,7 @@ describe('Array to DOM node children mapping', function () {
         // Represents https://github.com/SteveSanderson/knockout/issues/413
         // Ideally, people wouldn't be mutating the generated DOM manually. But this didn't error in v2.0, so we should try to avoid introducing a break.
     var mappingInvocations = new Array()
-    var mapping = function (arrayItem) {
+    var mapping = function (arrayItem: string) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
       output.innerHTML = arrayItem
@@ -136,7 +129,7 @@ describe('Array to DOM node children mapping', function () {
 
   it('Should handle sequences of mixed insertions and deletions', function () {
     var mappingInvocations = new Array(), countCallbackInvocations = 0
-    var mapping = function (arrayItem) {
+    var mapping = function (arrayItem: string) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
       output.innerHTML = unwrap(arrayItem) || 'null'
