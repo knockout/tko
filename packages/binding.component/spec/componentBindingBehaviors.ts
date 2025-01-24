@@ -992,8 +992,8 @@ describe('Components: Component binding', function () {
         }
       }
       ViewModel.register('test-component')
-      NativeProvider.addValueToNode(testNode.children[0] as HTMLElement, 'x', x)
-      NativeProvider.addValueToNode(testNode.children[0] as HTMLElement, 'y', () => x)
+      NativeProvider.addValueToNode(testNode.children[0], 'x', x)
+      NativeProvider.addValueToNode(testNode.children[0], 'y', () => x)
       applyBindings(outerViewModel, testNode)
       expect(seen.x).toEqual(x)
       expect(seen.y()).toEqual(x)
