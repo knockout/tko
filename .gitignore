@@ -27,4 +27,3 @@ coverage/
 *-error.log
 
 .vscode
-yarn.lock
