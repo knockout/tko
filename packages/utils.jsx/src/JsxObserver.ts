@@ -68,7 +68,7 @@ export class JsxObserver extends LifeCycle {
   noInitialBinding: boolean
   insertBefore: Node | null
   parentNode: Node
-  parentNodeTarget: Comment | ParentNode | null
+  parentNodeTarget: Node | null
   subscriptionsForNode: any
   nodeArrayOrObservableAtIndex: any
   xmlns: any

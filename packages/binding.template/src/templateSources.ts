@@ -34,6 +34,7 @@ var templateScript = 1,
   templateTemplate = 3,
   templateElement = 4
 
+//TODO: Candidate for converting to class
 export function domElement (element?) {
   this.domElement = element
 
@@ -47,7 +48,7 @@ export function domElement (element?) {
         : templateElement
 }
 
-domElement.prototype.text = function (/* valueToWrite */) {
+domElement.prototype.text = function (valueToWrite? : string) {
   var elemContentsProperty = this.templateType === templateScript ? 'text'
                              : this.templateType === templateTextArea ? 'value'
                              : 'innerHTML'
@@ -55,13 +56,12 @@ domElement.prototype.text = function (/* valueToWrite */) {
   if (arguments.length == 0) {
     return this.domElement[elemContentsProperty]
   } else {
-    var valueToWrite = arguments[0]
-    if (elemContentsProperty === 'innerHTML') { setHtml(this.domElement, valueToWrite) } else { this.domElement[elemContentsProperty] = valueToWrite }
+    if (elemContentsProperty === 'innerHTML') { setHtml(this.domElement, valueToWrite!) } else { this.domElement[elemContentsProperty] = valueToWrite }
   }
 }
 
 var dataDomDataPrefix = domData.nextKey() + '_'
-domElement.prototype.data = function (key : string, valueToWrite? : any) {
+domElement.prototype.data = function<T = any>(key : string, valueToWrite? : T) : T | void {
   if (arguments.length === 1) {
     return domData.get(this.domElement, dataDomDataPrefix + key)
   } else {
@@ -77,7 +77,7 @@ function setTemplateDomData (element, data) {
   domData.set(element, templatesDomDataKey, data)
 }
 
-domElement.prototype.nodes = function (valueToWrite? : any) {
+domElement.prototype.nodes = function (valueToWrite? : any) : Node | void {
   var element = this.domElement
   if (arguments.length == 0) {
     const templateData = getTemplateDomData(element)
