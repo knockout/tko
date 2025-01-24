@@ -14,7 +14,7 @@ import {
 export default class TextMustacheProvider extends Provider {
   get FOR_NODE_TYPES () { return [ 3 ] } // document.TEXT_NODE
 
-  * textToNodes (textNode) {
+  * textToNodes (textNode: Node) {
     const parent = textNode.parentNode
     const isTextarea = parent && parent.nodeName === 'TEXTAREA'
     const hasStash = textNode.nodeValue && textNode.nodeValue.includes('{{')
@@ -26,7 +26,7 @@ export default class TextMustacheProvider extends Provider {
     }
   }
 
-  textInterpolation (textNode) {
+  textInterpolation (textNode: Node) {
     const newNodes = Array.from(this.textToNodes(textNode))
 
     if (newNodes.length === 0) { return }
@@ -54,7 +54,7 @@ export default class TextMustacheProvider extends Provider {
    *
    * VirtualProvider can then pick up and do the actual binding.
    */
-  preprocessNode (node) {
+  preprocessNode (node: Node) {
     return this.textInterpolation(node)
   }
 }

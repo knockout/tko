@@ -40,7 +40,7 @@ export default class MultiProvider extends Provider {
     this.nodeTypes = Object.keys(this.nodeTypeMap).map(k => parseInt(k, 10))
   }
 
-  providersFor (node: HTMLElement) {
+  providersFor (node: HTMLElement): any[] {
     return this.nodeTypeMap[node.nodeType] || []
   }
 

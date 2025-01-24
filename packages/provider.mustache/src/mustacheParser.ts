@@ -60,7 +60,9 @@ class Expression extends Interpolated {
 }
 
 class Text extends Interpolated {
-  asAttr () { return this.text }
+  asAttr(): string {
+    return this.text;
+  }
 
   * textNodeReplacement () {
     yield document.createTextNode(this.text.replace(/"/g, '\\"'))
@@ -70,7 +72,7 @@ class Text extends Interpolated {
 /**
  *          Interpolation Parsing
  */
-export function * innerParse (text) {
+export function * innerParse (text: string) {
   const innerMatch = text.match(INNER_EXPRESSION)
   if (innerMatch) {
     const [pre, inner, post] = innerMatch.slice(1)
@@ -82,7 +84,7 @@ export function * innerParse (text) {
   }
 }
 
-export function * parseOuterMatch (outerMatch) {
+export function * parseOuterMatch (outerMatch?: RegExpMatchArray | null) {
   if (!outerMatch) { return }
   let [pre, inner, post] = outerMatch.slice(1)
   yield new Text(pre)
@@ -90,8 +92,8 @@ export function * parseOuterMatch (outerMatch) {
   yield new Text(post)
 }
 
-export function * parseInterpolation (text: string) {
-  for (const textOrExpr of parseOuterMatch(text.match(OUTER_EXPRESSION))) {
+export function * parseInterpolation (text: string | null) {
+  for (const textOrExpr of parseOuterMatch(text?.match(OUTER_EXPRESSION))) {
     if (textOrExpr.text) { yield textOrExpr }
   }
 }
