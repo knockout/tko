@@ -1,7 +1,7 @@
 
 import {
   BindingStringProvider
-} from '../../provider.bindingstring'
+} from '../src'
 
 import { assert } from "chai"
 
