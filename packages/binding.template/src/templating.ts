@@ -18,6 +18,7 @@ import {
 } from '@tko/observable'
 
 import {
+  TemplateEngine,
     templateEngine
 } from './templateEngine'
 
@@ -25,15 +26,15 @@ import {
   anonymousTemplate as AnonymousTemplate
 } from './templateSources'
 
-var _templateEngine
+var _templateEngine : TemplateEngine
 const cleanContainerDomDataKey = domData.nextKey()
 
-export function setTemplateEngine (tEngine) {
+export function setTemplateEngine (tEngine : TemplateEngine | undefined) : void {
   if ((tEngine !== undefined) && !(tEngine instanceof templateEngine)) {
         // TODO: ko.templateEngine to appropriate name
     throw new Error('templateEngine must inherit from ko.templateEngine')
   }
-  _templateEngine = tEngine
+  _templateEngine = tEngine!
 }
 
 function invokeForEachNodeInContinuousRange (firstNode, lastNode, action) {

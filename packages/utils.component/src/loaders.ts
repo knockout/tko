@@ -107,7 +107,14 @@ export function unregister (componentName: string): void {
   registry.clearCachedDefinition(componentName)
 }
 
-export var defaultLoader = {
+export interface Loader {
+      getConfig?(componentName: string, callback: (config: Config | object) => void): void;
+      loadComponent?(componentName: string, config: Config | object, callback: (component: Component | null) => void): void;
+      loadTemplate?(componentName: string, config: TemplateConfig | any, callback: (resolvedTemplate: Node[] | null) => void): void;
+      loadViewModel?(componentName: string, config: ViewModelConfig | any, callback: (resolvedViewModel: CreateViewModel | null) => void): void;
+  }
+
+export var defaultLoader : Loader = {
   getConfig(componentName: string, callback: (config: Config | object) => void): void {
     var result = hasOwnProperty(defaultConfigRegistry, componentName)
             ? defaultConfigRegistry[componentName]

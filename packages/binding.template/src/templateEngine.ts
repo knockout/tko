@@ -29,20 +29,20 @@ import { extend, options } from '@tko/utils'
 import { domElement, anonymousTemplate } from './templateSources'
 
 
-//abstract class templateEngine {
-//  allowTemplateRewriting: boolean;
-//
-//  abstract renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
-//  createJavaScriptEvaluatorBlock(script: string): string;
-//
-//  makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource;
-//
-//  renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
-//
-//  isTemplateRewritten(template: string | Node, templateDocument?: Document): boolean;
-//
-//  rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
-//}
+export interface TemplateEngine {
+ allowTemplateRewriting: boolean;
+
+ renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+ createJavaScriptEvaluatorBlock(script: string): string;
+
+ makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource;
+
+ renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+
+ isTemplateRewritten(template: string | Node, templateDocument?: Document): boolean;
+
+ rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
+}
 
 
 export function templateEngine () { };

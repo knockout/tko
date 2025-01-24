@@ -1,6 +1,7 @@
 
 import { subscribable, dependencyDetection } from '@tko/observable'
 import { getObjectOwnProperty, tasks } from '@tko/utils'
+import { Loader } from './loaders'
 
 var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
   loadedDefinitionsCache = {}    // Tracks component loads that have already completed
@@ -130,5 +131,5 @@ export var registry = {
 
   _getFirstResultFromLoaders: getFirstResultFromLoaders,
 
-  loaders: new Array<components.Loader>()
+  loaders: new Array<Loader>()
 }
