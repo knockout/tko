@@ -160,10 +160,10 @@ export function firstChild (node : Node) {
   return node.nextSibling
 }
 
-export function lastChild (node : Node) {  
+export function lastChild (node : Node) {
   let nextChild = firstChild(node)
   if(!nextChild)
-    return null;  
+    return null;
 
   let lastChildNode
 
@@ -206,8 +206,8 @@ export function previousSibling (node) {
   } while (node = node.previousSibling)
 }
 
-export function virtualNodeBindingValue (node) {
-  var regexMatch = (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(startCommentRegex)
+export function virtualNodeBindingValue (node): string | null {
+  var regexMatch = (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(startCommentRegex) as RegExpMatchArray
   return regexMatch ? regexMatch[1] : null
 }
 
