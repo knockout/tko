@@ -5,37 +5,77 @@ export { };
 
 declare global {
 
+
+    //Some definitions for the jasmine-spec
+
+    var testNode: HTMLElement;
+    var jQueryInstance: JQueryStatic;
+
+    interface Window {
+        // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
+        DEBUG: boolean
+        amdRequire: any
+        require: any
+        jQuery: JQueryStatic
+        jQueryInstance: JQueryStatic
+        testDivTemplate: HTMLElement
+        templateOutput: HTMLElement
+        innerShiv // For IE
+        o: () => ObservableArray // For jsxBehaviors Test
+    }
+
+    //Jasmine and Mocha define duplicated functions, is a problem for the type system
+    //This namespace merges the jasmine namespace to correct same tsc warnings
+    namespace jasmine {
+        function setNodeText(node, text: string): void
+        var Spec: any;
+        function getGlobal(): any;
+        var updateInterval: number
+        function resolve(promise: Promise<boolean>)
+        function prepareTestNode()
+        function nodeText(node)
+        var Clock: Clock
+        function getEnv(): any;
+
+        var FakeTimer: any
+        var undefined: undefined
+        var browserSupportsProtoAssignment: any
+        var ieVersion: any
+
+        var Matchers: Matchers
+
+        interface Matchers<T> {
+            toContainText(expected: string, ignoreSpaces: boolean): boolean
+            toHaveOwnProperties(expectedProperties: any): boolean
+            toHaveTexts(expectedTexts: any): boolean
+            toHaveValues(expectedValues: any): boolean
+            toHaveCheckedStates(expectedValues: any): boolean
+            toThrowContaining(expected: any): boolean
+            toEqualOneOf(expectedPossibilities: any): boolean
+            toContainHtml(expectedHtml: any, postProcessCleanedHtml: any): boolean
+            toHaveSelectedValues(expectedValues: any): boolean
+            toContainHtml(expectedValues: any): boolean
+            toHaveNodeTypes(expectedTypes: any): boolean
+            toContainHtmlElementsAndText(expectedHtml: any): boolean
+        }
+
+        interface Clock {
+            mockScheduler: any
+        }
+
+        interface Spy {
+            reset(): any
+        }
+    }
+
+
     //#region Knockout Types https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
 
     // Type definitions for Knockout v3.5.0
     // Project: http://knockoutjs.com
     // Definitions by: Maxime LUCE <https://github.com/SomaticIT>, Michael Best <https://github.com/mbest>
 
-    //#region subscribables/extenders.js
-
-    // no usage anymore
-    export type RateLimitMethod = (callback: () => void, timeout: number, options: any) => (() => void);
-
-    // used in ExtendersOptions
-    export interface RateLimitOptions {
-        timeout: number;
-        method?: "notifyAtFixedRate" | "notifyWhenChangesStop" | RateLimitMethod;
-        [option: string]: any;
-    }
-
-    export interface ExtendersOptions<T = any> {
-        trackArrayChanges: true | utils.CompareArraysOptions;
-        throttle: number;
-        rateLimit: number | RateLimitOptions;
-        deferred: true;
-        notify: "always" | any;
-    }
-
-    export interface ObservableExtenderOptions<T> extends Partial<ExtendersOptions<T>> { }
-
     //#region binding/bindingAttributeSyntax.js
-
-    export type BindingAccessors = { [name: string]: Function; };
 
     // usage in applyBindings, BindingHandler, event, checked, options
     export interface AllBindings {
@@ -46,9 +86,10 @@ declare global {
 
         has(name: string): boolean;
     }
+
     // transfered to LegacyBindingHandler.ts
-    // export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
-    // export type BindingHandlerAddBinding = (name: string, value: any) => void;
+    export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
+    export type BindingHandlerAddBinding = (name: string, value: any) => void;
     // used as Base for all BindingHandlers
     export interface BindingHandler<T = any> {
         after?: string[];
@@ -86,45 +127,14 @@ declare global {
         createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
     }
 
-    // used in applyBinding, bindingContext.ts
-    export type BindingContextExtendCallback<T = any> = (self: BindingContext<T>, parentContext?: BindingContext<T>, dataItem?: T) => void;
-   
     //#region templating/templating.js
-
-    export interface TemplateOptions<T = any> {
-        afterRender?: (elements: Node[], dataItem: T) => void;
-        templateEngine?: templateEngine;
-    }
-
-    export interface TemplateForeachOptions<T = any> extends TemplateOptions<T[]>, utils.MappingOptions<T> {
-        as?: string;
-        includeDestroyed?: boolean;
-    }
-
-    export interface BindingTemplateOptions extends TemplateOptions, utils.MappingOptions {
-        name?: string | ((val: any) => string);
-        nodes?: Node[];
-
-        if?: boolean;
-        ifnot?: boolean;
-
-        data?: any;
-        foreach?: any[];
-
-        as?: string;
-        includeDestroyed?: boolean;
-    }
 
     export interface BindingHandlers {
         template: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<string | BindingTemplateOptions>): BindingHandlerControlsDescendant;
-            update(element: Node, valueAccessor: () => MaybeSubscribable<string | BindingTemplateOptions>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
+            init(element: Node, valueAccessor: () => MaybeSubscribable<any>): BindingHandlerControlsDescendant;
+            update(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
         };
     }
-
-    export function renderTemplate(template: string | Node | (() => string | Node)): string;
-    export function renderTemplate<T = any>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T> | null | undefined, options?: TemplateOptions<T> | null | undefined): string;
-    export function renderTemplate<T = any>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T> | null | undefined, options: TemplateOptions<T> | null | undefined, targetNodeOrNodeArray: Node | Node[], renderMode?: "replaceChildren" | "replaceNode" | "ignoreTargetNode"): Computed<void>;
 
     //#endregion
 
@@ -175,331 +185,269 @@ declare global {
     }
 
     //#endregion
-    
+
     interface SymbolConstructor {
         observable?: Symbol;
     }
 
-
-    var testNode: HTMLElement;
-    var jQueryInstance: JQueryStatic;
-
-    interface Window {
-        // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
-        DEBUG: boolean
-        amdRequire: any
-        require: any
-        jQuery: JQueryStatic
-        jQueryInstance: JQueryStatic
-        testDivTemplate: HTMLElement
-        templateOutput: HTMLElement
-        innerShiv // For IE
-        o: () => ObservableArray // For jsxBehaviors Test
+    export interface Computed<T = any> extends ComputedFunctions<T> {
+        (): T;
+        (value: T): this;
     }
 
-    //Jasmine and Mocha define duplicated functions, is a problem for the type system
-    //This namespace merges the jasmine namespace to correct same tsc warnings
-    namespace jasmine {
-        function setNodeText (node, text:string):void
-        var Spec: any;
-        function getGlobal(): any;
-        var updateInterval: number
-        function resolve(promise: Promise<boolean>)
-        function prepareTestNode()
-        function nodeText(node)
-        var Clock: Clock
-        function getEnv(): any;
-
-        var FakeTimer: any
-        var undefined: undefined
-        var browserSupportsProtoAssignment: any
-        var ieVersion: any
-
-        var Matchers:Matchers
-
-        interface Matchers<T> {
-            toContainText(expected: string, ignoreSpaces: boolean): boolean
-            toHaveOwnProperties(expectedProperties: any): boolean
-            toHaveTexts(expectedTexts: any): boolean
-            toHaveValues(expectedValues: any): boolean
-            toHaveCheckedStates(expectedValues: any): boolean
-            toThrowContaining(expected: any): boolean
-            toEqualOneOf(expectedPossibilities: any): boolean
-            toContainHtml(expectedHtml: any, postProcessCleanedHtml: any): boolean
-            toHaveSelectedValues(expectedValues: any): boolean
-            toContainHtml(expectedValues: any): boolean
-            toHaveNodeTypes  (expectedTypes: any): boolean
-            toContainHtmlElementsAndText (expectedHtml : any) : boolean
-        }
-
-        interface Clock {
-            mockScheduler: any
-        }
-
-        interface Spy {
-            reset(): any
-        }
+    export interface ComputedFunctions<T = any> extends Subscribable<T> {
+        // It's possible for a to be undefined, since the equalityComparer is run on the initial
+        // computation with undefined as the first argument. This is user-relevant for deferred computeds.
+        equalityComparer(a: T | undefined, b: T): boolean;
+        peek(): T;
+        dispose(): void;
+        isActive(): boolean;
+        getDependenciesCount(): number;
+        getDependencies(): Subscribable[];
     }
 
-export interface Computed<T = any> extends ComputedFunctions<T> {
-    (): T;
-    (value: T): this;
-  }
+    // used in computed, but empty interface is pointless. Check if it's needed
+    export interface PureComputed<T = any> extends Computed<T> { }
 
-  export interface ComputedFunctions<T = any> extends Subscribable<T> {
-    // It's possible for a to be undefined, since the equalityComparer is run on the initial
-    // computation with undefined as the first argument. This is user-relevant for deferred computeds.
-    equalityComparer(a: T | undefined, b: T): boolean;
-    peek(): T;
-    dispose(): void;
-    isActive(): boolean;
-    getDependenciesCount(): number;
-    getDependencies(): Subscribable[];
-  }
-
-  // used in computed, but empty interface is pointless. Check if it's needed
-  export interface PureComputed<T = any> extends Computed<T> { }
-
-  export type ComputedReadFunction<T = any, TTarget = void> = Subscribable<T> | Observable<T> | Computed<T> | ((this: TTarget) => T);
-  export type ComputedWriteFunction<T = any, TTarget = void> = (this: TTarget, val: T) => void;
-  export type MaybeComputed<T = any> = T | Computed<T>;
+    export type ComputedReadFunction<T = any, TTarget = void> = Subscribable<T> | Observable<T> | Computed<T> | ((this: TTarget) => T);
+    export type ComputedWriteFunction<T = any, TTarget = void> = (this: TTarget, val: T) => void;
+    export type MaybeComputed<T = any> = T | Computed<T>;
 
 
-  export interface ComputedOptions<T = any, TTarget = void> {
-      read?: ComputedReadFunction<T, TTarget>;
-      write?: ComputedWriteFunction<T, TTarget>;
-      owner?: TTarget;
-      pure?: boolean;
-      deferEvaluation?: boolean;
-      disposeWhenNodeIsRemoved?: Node;
-      disposeWhen?: () => boolean;
-  }
+    export interface ComputedOptions<T = any, TTarget = void> {
+        read?: ComputedReadFunction<T, TTarget>;
+        write?: ComputedWriteFunction<T, TTarget>;
+        owner?: TTarget;
+        pure?: boolean;
+        deferEvaluation?: boolean;
+        disposeWhenNodeIsRemoved?: Node;
+        disposeWhen?: () => boolean;
+    }
 
-   export module computed {
-      export const fn: ComputedFunctions;
-  }
-
-  
-  //#region Subscribable
+    export module computed {
+        export const fn: ComputedFunctions;
+    }
 
 
-export type SubscriptionCallback<T = any, TTarget = void> = (this: TTarget, val: T) => void;
-export type MaybeSubscribable<T = any> = T | Subscribable<T>;
+    //#region Subscribable
 
-//moved to subribable.ts
-export interface SubscribableFunctions<T = any> {
-    [symbol: symbol]: boolean;
-    init<any>(instance: any): void;
+    export type SubscriptionCallback<T = any, TTarget = void> = (this: TTarget, val: T) => void;
+    export type MaybeSubscribable<T = any> = T | Subscribable<T>;
 
-    notifySubscribers(valueToWrite?: T, event?: string): void;
+    //moved to subribable.ts
+    export interface SubscribableFunctions<T = any> {
+        [symbol: symbol]: boolean;
+        init<any>(instance: any): void;
 
-    subscribe<TTarget = void>(callback: SubscriptionCallback<T, TTarget> | any, callbackTarget?: TTarget, event?: string): Subscription;
-    extend(requestedExtenders: ObservableExtenderOptions<T>): this;
-    extend<S extends Subscribable<T>>(requestedExtenders: ObservableExtenderOptions<T>): S;
+        notifySubscribers(valueToWrite?: T, event?: string): void;
 
-    getSubscriptionsCount(event?: string): number;
-    // TKO
+        subscribe<TTarget = void>(callback: SubscriptionCallback<T, TTarget> | any, callbackTarget?: TTarget, event?: string): Subscription;
+        extend(requestedExtenders: any): this;
+        extend<S extends Subscribable<T>>(requestedExtenders: any): S;
 
-    getVersion(): number;
-    hasChanged(versionToCheck: number): boolean;
-    updateVersion(): void;
-    hasSubscriptionsForEvent(event: string): boolean;
-    isDifferent<T>(oldValue?: T, newValue?: T): boolean;
-    once(cb: Function): void;
-    when(test, returnValue?);
-    yet(test: Function | any, args: any[]): void;
-    next(): Promise<unknown>;
-    toString(): string;
+        getSubscriptionsCount(event?: string): number;
+        // TKO
 
-    // From pureComputedOverrides in computed.ts
-    beforeSubscriptionAdd?: (event: string) => void;
-    afterSubscriptionRemove?: (event: string) => void;
-}
+        getVersion(): number;
+        hasChanged(versionToCheck: number): boolean;
+        updateVersion(): void;
+        hasSubscriptionsForEvent(event: string): boolean;
+        isDifferent<T>(oldValue?: T, newValue?: T): boolean;
+        once(cb: Function): void;
+        when(test, returnValue?);
+        yet(test: Function | any, args: any[]): void;
+        next(): Promise<unknown>;
+        toString(): string;
 
-export interface Subscribable<T = any> extends SubscribableFunctions<T> {
-  _subscriptions: any;
-  _versionNumber: number;
-}
+        // From pureComputedOverrides in computed.ts
+        beforeSubscriptionAdd?: (event: string) => void;
+        afterSubscriptionRemove?: (event: string) => void;
+    }
 
-export const subscribable: {
-    new <T = any>(): Subscribable<T>;
-    fn: SubscribableFunctions;
-};
+    export interface Subscribable<T = any> extends SubscribableFunctions<T> {
+        _subscriptions: any;
+        _versionNumber: number;
+    }
 
-export function isSubscribable<T = any>(instance: any): instance is Subscribable<T>;
+    export const subscribable: {
+        new <T = any>(): Subscribable<T>;
+        fn: SubscribableFunctions;
+    };
+
+    export function isSubscribable<T = any>(instance: any): instance is Subscribable<T>;
 
 
-//#endregion
-
-
-//#region Observable
-
-export type MaybeObservable<T = any> = T | Observable<T>;
-
-export interface ObservableFunctions<T = any> extends Subscribable<T> {
-    equalityComparer(a: T, b: T): boolean;
-    peek(): T;
-    valueHasMutated(): void;
-    valueWillMutate(): void;
-
-    //TKO
-    modify(fn,peek=true): Observable
-}
-
-export interface Observable<T = any> extends ObservableFunctions<T> {
-    subprop?: string; // for some test
-    [symbol: symbol]: any;
-    (): T;
-    (value: T): any;
-}
-export function observable<T>(initialValue?: T): Observable<T>;
-// export function observable<T = any>(value: null): Observable<T | null>
-/** No initial value provided, so implicitly includes `undefined` as a possible value */
-// export function observable<T = any>(): Observable<T | undefined>
-export module observable {
-    export const fn: ObservableFunctions;
-}
-
-//#endregion Observable
-
-//#region ObservableArray
-
-export type MaybeObservableArray<T = any> = T[] | ObservableArray<T>;
-
-export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T[]> {
-    //#region observableArray/generalFunctions
-    /**
-      * Returns the index of the first occurrence of a value in an array.
-      * @param searchElement The value to locate in the array.
-      * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
-      */
-    indexOf(searchElement: T, fromIndex?: number): number;
-
-    /**
-      * Returns a section of an array.
-      * @param start The beginning of the specified portion of the array.
-      * @param end The end of the specified portion of the array. If omitted, all items after start are included
-      */
-    slice(start: number, end?: number): T[];
-
-    /**
-     * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
-     * @param start The zero-based location in the array from which to start removing elements.
-     * @param deleteCount The number of elements to remove. Defaults to removing everything after `start`
-     * @param items Elements to insert into the array in place of the deleted elements.
-     */
-    splice(start: number, deleteCount?: number, ...items: T[]): T[];
-
-    /**
-     * Removes the last value from the array and returns it.
-     */
-    pop(): T;
-    /**
-     * Adds a new item to the end of array.
-     * @param items Items to be added
-     */
-    push(...items: T[]): number;
-    /**
-     * Removes the first value from the array and returns it.
-     */
-    shift(): T;
-    /**
-     * Inserts a new item at the beginning of the array.
-     * @param items Items to be added
-     */
-    unshift(...items: T[]): number;
-
-    /**
-     * Reverses the order of the array and returns the observableArray.
-     * Modifies the underlying array.
-     */
-    reverse(): this;
-
-    /**
-     * Sorts the array contents and returns the observableArray.
-     * Modifies the underlying array.
-     */
-    sort(compareFunction?: (left: T, right: T) => number): this;
     //#endregion
 
-    //#region observableArray/koSpecificFunctions
-    /**
-     * Returns a reversed copy of the array.
-     * Does not modify the underlying array.
-     */
-    reversed(): T[];
 
-    /**
-     * Returns a reversed copy of the array.
-     * Does not modify the underlying array.
-     */
-    sorted(compareFunction?: (left: T, right: T) => number): T[];
-    /**
-     * Replaces the first value that equals oldItem with newItem
-     * @param oldItem Item to be replaced
-     * @param newItem Replacing item
-     */
-    replace(oldItem: T, newItem: T): void;
+    //#region Observable
 
-    /**
-     * Removes all values that equal item and returns them as an array.
-     * @param item The item to be removed
-     */
-    remove(item: T): T[];
-    /**
-     * Removes all values  and returns them as an array.
-     * @param removeFunction A function used to determine true if item should be removed and fasle otherwise
-     */
-    remove(removeFunction: (item: T) => boolean): T[];
+    export type MaybeObservable<T = any> = T | Observable<T>;
 
-    /**
-     * Removes all values and returns them as an array.
-     */
-    removeAll(): T[];
-    /**
-     * Removes all values that equal any of the supplied items
-     * @param items Items to be removed
-     */
-    removeAll(items: T[]): T[];
+    export interface ObservableFunctions<T = any> extends Subscribable<T> {
+        equalityComparer(a: T, b: T): boolean;
+        peek(): T;
+        valueHasMutated(): void;
+        valueWillMutate(): void;
 
-    // Ko specific Usually relevant to Ruby on Rails developers only
-    /**
-     * Finds any objects in the array that equal someItem and gives them a special property called _destroy with value true.
-     * Usually only relevant to Ruby on Rails development
-     * @param item Items to be marked with the property.
-     */
-    destroy(item: T): void;
-    /**
-     * Finds any objects in the array filtered by a function and gives them a special property called _destroy with value true.
-     * Usually only relevant to Ruby on Rails development
-     * @param destroyFunction A function used to determine which items should be marked with the property.
-     */
-    destroy(destroyFunction: (item: T) => boolean): void;
+        //TKO
+        modify(fn, peek = true): Observable
+    }
 
-    /**
-     * Gives a special property called _destroy with value true to all objects in the array.
-     * Usually only relevant to Ruby on Rails development
-     */
-    destroyAll(): void;
-    /**
-     * Finds any objects in the array that equal supplied items and gives them a special property called _destroy with value true.
-     * Usually only relevant to Ruby on Rails development
-     * @param items
-     */
-    destroyAll(items: T[]): void;
-    //#endregion
-}
+    export interface Observable<T = any> extends ObservableFunctions<T> {
+        subprop?: string; // for some test
+        [symbol: symbol]: any;
+        (): T;
+        (value: T): any;
+    }
+    export function observable<T>(initialValue?: T): Observable<T>;
+    // export function observable<T = any>(value: null): Observable<T | null>
+    /** No initial value provided, so implicitly includes `undefined` as a possible value */
+    // export function observable<T = any>(): Observable<T | undefined>
+    export module observable {
+        export const fn: ObservableFunctions;
+    }
 
-export interface ObservableArray<T = any> extends Observable<T[]>, ObservableArrayFunctions<T> {
-    (value: T[] | null | undefined): this;
-    compareArrayOptions?: CompareArraysOptions;
-    cacheDiffForKnownOperation?: (rawArray: any[], operationName: string, args: any[]) => void;
-}
+    //#endregion Observable
 
-export function observableArray<T = any>(initialValue: T[]): ObservableArray<T>;
-export module observableArray {
-    export const fn: ObservableArrayFunctions;
-}
+    //#region ObservableArray
 
-//#endregion ObservableArray
+    export type MaybeObservableArray<T = any> = T[] | ObservableArray<T>;
+
+    export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T[]> {
+        //#region observableArray/generalFunctions
+        /**
+          * Returns the index of the first occurrence of a value in an array.
+          * @param searchElement The value to locate in the array.
+          * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.
+          */
+        indexOf(searchElement: T, fromIndex?: number): number;
+
+        /**
+          * Returns a section of an array.
+          * @param start The beginning of the specified portion of the array.
+          * @param end The end of the specified portion of the array. If omitted, all items after start are included
+          */
+        slice(start: number, end?: number): T[];
+
+        /**
+         * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
+         * @param start The zero-based location in the array from which to start removing elements.
+         * @param deleteCount The number of elements to remove. Defaults to removing everything after `start`
+         * @param items Elements to insert into the array in place of the deleted elements.
+         */
+        splice(start: number, deleteCount?: number, ...items: T[]): T[];
+
+        /**
+         * Removes the last value from the array and returns it.
+         */
+        pop(): T;
+        /**
+         * Adds a new item to the end of array.
+         * @param items Items to be added
+         */
+        push(...items: T[]): number;
+        /**
+         * Removes the first value from the array and returns it.
+         */
+        shift(): T;
+        /**
+         * Inserts a new item at the beginning of the array.
+         * @param items Items to be added
+         */
+        unshift(...items: T[]): number;
+
+        /**
+         * Reverses the order of the array and returns the observableArray.
+         * Modifies the underlying array.
+         */
+        reverse(): this;
+
+        /**
+         * Sorts the array contents and returns the observableArray.
+         * Modifies the underlying array.
+         */
+        sort(compareFunction?: (left: T, right: T) => number): this;
+        //#endregion
+
+        //#region observableArray/koSpecificFunctions
+        /**
+         * Returns a reversed copy of the array.
+         * Does not modify the underlying array.
+         */
+        reversed(): T[];
+
+        /**
+         * Returns a reversed copy of the array.
+         * Does not modify the underlying array.
+         */
+        sorted(compareFunction?: (left: T, right: T) => number): T[];
+        /**
+         * Replaces the first value that equals oldItem with newItem
+         * @param oldItem Item to be replaced
+         * @param newItem Replacing item
+         */
+        replace(oldItem: T, newItem: T): void;
+
+        /**
+         * Removes all values that equal item and returns them as an array.
+         * @param item The item to be removed
+         */
+        remove(item: T): T[];
+        /**
+         * Removes all values  and returns them as an array.
+         * @param removeFunction A function used to determine true if item should be removed and fasle otherwise
+         */
+        remove(removeFunction: (item: T) => boolean): T[];
+
+        /**
+         * Removes all values and returns them as an array.
+         */
+        removeAll(): T[];
+        /**
+         * Removes all values that equal any of the supplied items
+         * @param items Items to be removed
+         */
+        removeAll(items: T[]): T[];
+
+        // Ko specific Usually relevant to Ruby on Rails developers only
+        /**
+         * Finds any objects in the array that equal someItem and gives them a special property called _destroy with value true.
+         * Usually only relevant to Ruby on Rails development
+         * @param item Items to be marked with the property.
+         */
+        destroy(item: T): void;
+        /**
+         * Finds any objects in the array filtered by a function and gives them a special property called _destroy with value true.
+         * Usually only relevant to Ruby on Rails development
+         * @param destroyFunction A function used to determine which items should be marked with the property.
+         */
+        destroy(destroyFunction: (item: T) => boolean): void;
+
+        /**
+         * Gives a special property called _destroy with value true to all objects in the array.
+         * Usually only relevant to Ruby on Rails development
+         */
+        destroyAll(): void;
+        /**
+         * Finds any objects in the array that equal supplied items and gives them a special property called _destroy with value true.
+         * Usually only relevant to Ruby on Rails development
+         * @param items
+         */
+        destroyAll(items: T[]): void;
+        //#endregion
+    }
+
+    export interface ObservableArray<T = any> extends Observable<T[]>, ObservableArrayFunctions<T> {
+        (value: T[] | null | undefined): this;
+        compareArrayOptions?: CompareArraysOptions;
+        cacheDiffForKnownOperation?: (rawArray: any[], operationName: string, args: any[]) => void;
+    }
+
+    export function observableArray<T = any>(initialValue: T[]): ObservableArray<T>;
+    export module observableArray {
+        export const fn: ObservableArrayFunctions;
+    }
+
+    //#endregion ObservableArray
 }

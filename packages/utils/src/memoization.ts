@@ -24,7 +24,7 @@ function findMemoNodes (rootNode : Node, appendToArray : any[]) {
   }
 }
 
-export function memoize (callback : (val: any) => void) : any {
+export function memoize (callback : (val: any) => void) : string {
   if (typeof callback !== 'function') { throw new Error('You can only pass a function to memoization.memoize()') }
   var memoId = generateRandomId()
   memos[memoId] = callback

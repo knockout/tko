@@ -12,6 +12,8 @@ import {
   contextAncestorBindingInfo
 } from './bindingEvent'
 
+import { BindingContextExtendCallback } from './applyBindings'
+
 export const boundElementDomDataKey = domData.nextKey()
 
 export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')

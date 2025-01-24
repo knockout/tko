@@ -263,13 +263,13 @@ function applyBindingsToNodeInternal (node: Node, sourceBindings: any, bindingCo
             } : (bindingKey) => bindings[bindingKey]
 
         // Use of allBindings as a function is maintained for backwards compatibility, but its use is deprecated
-    const allBindings: AllBindings = function () {
+    const allBindings: AllBindings = function () : any {
       return objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor)
     }
 
         // The following is the 3.x allBindings API
-    allBindings.has = (key) => key in bindings
-    allBindings.get = (key) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
+    allBindings.has = (key : string) => key in bindings
+    allBindings.get = (key : string) => bindings[key] && evaluateValueAccessor(getValueAccessor(key))
 
     if (bindingEvent.childrenComplete in bindings) {
       bindingEvent.subscribe(node, bindingEvent.childrenComplete, () => {
@@ -281,7 +281,7 @@ function applyBindingsToNodeInternal (node: Node, sourceBindings: any, bindingCo
     }
 
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
-    const nodeAsyncBindingPromises = new Set()
+    const nodeAsyncBindingPromises = new Set<Promise<any>>()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
         // Go through the sorted bindings, calling init and update for each
       const reportBindingError = function (during, errorCaptured) {
@@ -350,7 +350,7 @@ function applyBindingsToNodeInternal (node: Node, sourceBindings: any, bindingCo
  * @param {Object} bindings
  * @param {[Promise]} nodeAsyncBindingPromises
  */
-function triggerDescendantsComplete (node : Node, bindings : Object, nodeAsyncBindingPromises : any) {
+function triggerDescendantsComplete (node : Node, bindings : Object, nodeAsyncBindingPromises : Set<Promise<any>>) {
   /** descendantsComplete ought to be an instance of the descendantsComplete
     *  binding handler. */
   const hasBindingHandler = bindingEvent.descendantsComplete in bindings
@@ -367,6 +367,8 @@ function triggerDescendantsComplete (node : Node, bindings : Object, nodeAsyncBi
   }
 }
 
+// used in applyBinding, bindingContext.ts
+export type BindingContextExtendCallback<T = any> = (self: BindingContext<T>, parentContext?: BindingContext<T>, dataItem?: T) => void;
 
 function getBindingContext (viewModelOrBindingContext: any, extendContextCallback?: BindingContextExtendCallback) {
   return viewModelOrBindingContext && (viewModelOrBindingContext instanceof bindingContext)

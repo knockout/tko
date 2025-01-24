@@ -1,6 +1,6 @@
 
 import { ieVersion, makeArray, parseHtmlFragment } from '@tko/utils'
-import { templateEngine } from './templateEngine'
+import { templateEngine, TemplateOptions } from './templateEngine'
 import { setTemplateEngine } from './templating'
 
 export function nativeTemplateEngine () { }

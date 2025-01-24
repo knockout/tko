@@ -28,6 +28,10 @@
 import { extend, options } from '@tko/utils'
 import { domElement, anonymousTemplate } from './templateSources'
 
+export interface TemplateOptions<T = any> {
+  afterRender?: (elements: Node[], dataItem: T) => void;
+  templateEngine?: TemplateEngine;
+}   
 
 export interface TemplateEngine {
  allowTemplateRewriting: boolean;

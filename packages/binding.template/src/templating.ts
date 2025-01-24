@@ -19,7 +19,8 @@ import {
 
 import {
   TemplateEngine,
-    templateEngine
+    templateEngine,
+    TemplateOptions
 } from './templateEngine'
 
 import {
@@ -156,7 +157,9 @@ function resolveTemplateName (template, data, context) {
   }
 }
 
-export function renderTemplate (template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode?, afterBindingCallback?) {
+export type RenderModeEnum = "replaceChildren" | "replaceNode" | "ignoreTargetNode"
+
+export function renderTemplate<T=any>(template : string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T> | null | undefined, options : TemplateOptions<T> | null | undefined, targetNodeOrNodeArray : Node | Node[], renderMode? : RenderModeEnum, afterBindingCallback?) : Computed<void> | string {
   options = options || {}
   if ((options.templateEngine || _templateEngine) === undefined) { throw new Error('Set a template engine before calling renderTemplate') }
   renderMode = renderMode || 'replaceChildren'
