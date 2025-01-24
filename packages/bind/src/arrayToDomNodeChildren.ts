@@ -82,11 +82,11 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   var lastMappingResultIndex = 0
   var newMappingResultIndex = 0
 
-  var nodesToDelete = new Array()
-  var itemsToProcess = new Array()
-  var itemsForBeforeRemoveCallbacks = new Array()
-  var itemsForMoveCallbacks = new Array()
-  var itemsForAfterAddCallbacks = new Array()
+  var nodesToDelete: Node[] = []
+  var itemsToProcess: MapDataType[] = []
+  var itemsForBeforeRemoveCallbacks: MapDataType[] = []
+  var itemsForMoveCallbacks: MapDataType[] = []
+  var itemsForAfterAddCallbacks: MapDataType[] = []
   var mapData: MapDataType | null
   let countWaitingForRemove = 0
 
@@ -110,13 +110,13 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   function itemMovedOrRetained(oldPosition: number) {
     mapData = lastMappingResult[oldPosition]
     if (newMappingResultIndex !== oldPosition) {
-      itemsForMoveCallbacks.push(mapData)
+      itemsForMoveCallbacks.push(mapData!)
     }
     // Since updating the index might change the nodes, do so before calling fixUpContinuousNodeArray
     mapData!.indexObservable(newMappingResultIndex++)
     fixUpContinuousNodeArray(mapData!.mappedNodes, domNode)
     newMappingResult.push(mapData)
-    itemsToProcess.push(mapData)
+    itemsToProcess.push(mapData!)
   }
 
   function callCallback(callback: MappingHookFunction<T> | undefined, items: any[]) {
@@ -163,12 +163,12 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
             if (fixUpContinuousNodeArray(mapData!.mappedNodes, domNode).length) {
               if (options.beforeRemove) {
                 newMappingResult.push(mapData)
-                itemsToProcess.push(mapData)
+                itemsToProcess.push(mapData!)
                 countWaitingForRemove++
                 if (mapData!.arrayEntry === deletedItemDummyValue) {
                   mapData = null
                 } else {
-                  itemsForBeforeRemoveCallbacks.push(mapData)
+                  itemsForBeforeRemoveCallbacks.push(mapData!)
                 }
               }
               if (mapData) {
