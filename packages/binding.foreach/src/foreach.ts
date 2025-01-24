@@ -22,9 +22,23 @@ import {
 const MAX_LIST_SIZE = 9007199254740991
 
 // from https://github.com/jonschlinkert/is-plain-object
-function isPlainObject (o) {
+function isPlainObject (o): o is Object {
   return !!o && typeof o === 'object' && o.constructor === Object
 }
+
+interface ChangeMap {
+  added: ChangeAddItem[]
+  deleted: any[]
+}
+
+interface ChangeAddItem{
+  status: 'added';
+  index: number;
+  isBatch?: boolean; // if true values else value
+  values?: any[];
+  value?: any;
+}
+
 
 const supportsDocumentFragment = options.document && typeof options.document.createDocumentFragment === 'function'
 
@@ -55,7 +69,7 @@ function makeTemplateNode (sourceNode) {
 }
 
 // Mimic a KO change item 'add'
-function valueToChangeAddItem (value, index) {
+function valueToChangeAddItem (value, index): ChangeAddItem {
   return {
     status: 'added',
     value: value,
@@ -86,7 +100,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   $indexHasBeenRequested: boolean;
   templateNode;
   changeQueue: any[];
-  firstLastNodesList: any[];
+  firstLastNodesList: { first: Node, last:Node }[];
   indexesToDelete: any[];
   isNotEmpty: any;
   rendering_queued: boolean;
@@ -162,7 +176,7 @@ export class ForEachBinding extends AsyncBindingHandler {
 
   // If the array changes we register the change.
   onArrayChange (changeSet, isInitial) {
-    var changeMap: { added: any[], deleted: any[] } = {
+    var changeMap: ChangeMap = {
       added: [],
       deleted: []
     }
@@ -174,8 +188,8 @@ export class ForEachBinding extends AsyncBindingHandler {
     // because of this, when checking for possible batch additions, any delete can be between to adds with neighboring indexes, so only additions should be checked
     for (var i = 0, len = changeSet.length; i < len; i++) {
       if (changeMap.added.length && changeSet[i].status === 'added') {
-        var lastAdd: any = changeMap.added[changeMap.added.length - 1]
-        var lastIndex = lastAdd.isBatch ? lastAdd.index + lastAdd.values.length - 1 : lastAdd.index
+        var lastAdd = changeMap.added[changeMap.added.length - 1]
+        var lastIndex = lastAdd.isBatch ? lastAdd.index + lastAdd.values!.length - 1 : lastAdd.index
         if (lastIndex + 1 === changeSet[i].index) {
           if (!lastAdd.isBatch) {
             // transform the last addition into a batch addition object
@@ -187,7 +201,7 @@ export class ForEachBinding extends AsyncBindingHandler {
             }
             changeMap.added.splice(changeMap.added.length - 1, 1, lastAdd)
           }
-          lastAdd.values.push(changeSet[i].value)
+          lastAdd.values!.push(changeSet[i].value)
           continue
         }
       }
@@ -311,12 +325,12 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   // Process a changeItem with {status: 'added', ...}
-  added (changeItem) {
+  added (changeItem: ChangeAddItem) {
     var index = changeItem.index
-    var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value]
+    var valuesToAdd = changeItem.isBatch ? changeItem.values! : [changeItem.value!]
     var referenceElement = this.getLastNodeBeforeIndex(index)
     // gather all childnodes for a possible batch insertion
-    const allChildNodes = new Array()
+    const allChildNodes: Node[] = []
     const asyncBindingResults = new Array()
     var children
 
@@ -360,7 +374,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     let last = this.firstLastNodesList[index].last
     result.push(ptr)
     while (ptr && ptr !== last) {
-      ptr = ptr.nextSibling
+      ptr = ptr.nextSibling!
       result.push(ptr)
     }
     return result
@@ -428,7 +442,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   // gets the pending deletion info for this data item
-  getPendingDeleteFor (data) {
+  getPendingDeleteFor (data: any[]) {
     var index = data && data[PENDING_DELETE_INDEX_SYM]
     if (index === undefined) return null
     return this.pendingDeletes[index]
