@@ -70,10 +70,13 @@ declare global {
 
 
     //#region Knockout Types https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
-
-    // Type definitions for Knockout v3.5.0
+    // Type definitions for Knockout
     // Project: http://knockoutjs.com
     // Definitions by: Maxime LUCE <https://github.com/SomaticIT>, Michael Best <https://github.com/mbest>
+
+    // Treeshaked for TKO: Many type definitions are moved to the TKO source.
+    // Some global types remain here because refactoring leads to invasive changes. 
+    // Change prototype-chains of the TKO base classes to js/ts classes can be later steps.
 
     //#region binding/bindingAttributeSyntax.js
 
