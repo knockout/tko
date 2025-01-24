@@ -49,12 +49,12 @@ export default class BindingStringProvider extends Provider {
       .join(',')
   }
 
-  getBindingAccessors (node:Node, context) {
+  getBindingAccessors (node: Node, context) {
     const bindingString = node && this.getBindingString(node)
     if (!bindingString) { return }
     const processed = this.preProcessBindings(bindingString)
     return new Parser().parse(processed, context, this.globals, node)
   }
 
-  getBindingString (...params:any[]):string|null { throw new Error('Overload getBindingString.') }
+  getBindingString (node: Node): string | null | undefined { throw new Error('Overload getBindingString.') }
 }

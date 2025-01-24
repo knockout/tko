@@ -36,7 +36,7 @@ export default class VirtualProvider extends BindingStringProvider {
     }
   }
 
-  getBindingString (node:Node) {
+  getBindingString (node: Node) {
     if (node.nodeType === document.COMMENT_NODE) {
       return virtualElements.virtualNodeBindingValue(node)
     }
