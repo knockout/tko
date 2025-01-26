@@ -12,7 +12,7 @@ import {
 
 import { computed } from '@tko/computed'
 
-type MappingFunction<T = any> = (valueToMap: T, index: number, nodes: Node[]) => Node[];
+type MappingFunction<T = any> = (valueToMap: T, index: number | Observable<number>, nodes: Node[]) => Node[];
 type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
 type MappingHookFunction<T = any> = (nodes: Node[], index: number, arrayEntry: T) => void;
 
@@ -36,7 +36,7 @@ interface MappingOptions<T = any> {
 // "callbackAfterAddingNodes" will be invoked after any "mapping"-generated nodes are inserted into the container node
 // You can use this, for example, to activate bindings on those nodes.
 
-function mapNodeAndRefreshWhenChanged (containerNode: Node, mapping: MappingFunction, valueToMap: any, callbackAfterAddingNodes: MappingAfterAddFunction | undefined, index: any) {
+function mapNodeAndRefreshWhenChanged (containerNode: Node, mapping: MappingFunction, valueToMap: any, callbackAfterAddingNodes: MappingAfterAddFunction | undefined, index: number | Observable<number>) {
   // Map this array value inside a dependentObservable so we re-map when any dependency changes
   const mappedNodes: Node[] = []
   const dependentObservable: Computed<void> = computed(function () {

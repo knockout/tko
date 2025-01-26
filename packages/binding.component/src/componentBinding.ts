@@ -99,8 +99,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
       componentName = value
     } else {
       componentName = unwrap(value.name)
-      componentParams = NativeProvider.getNodeValues(this.$element as HTMLElement) ||
-        unwrap(value.params)
+      componentParams = NativeProvider.getNodeValues(this.$element) || unwrap(value.params)
     }
 
     this.latestComponentName = componentName

@@ -16,8 +16,8 @@ export class BindingHandler extends LifeCycle {
     super()
     const {$element, valueAccessor, allBindings, $context} = params
 
-    this.valueAccessor = valueAccessor;
     this.$element = $element;
+    this.valueAccessor = valueAccessor;    
     this.allBindings = allBindings;
     this.$context = $context;
     this.$data = $context.$data;

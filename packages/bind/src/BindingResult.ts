@@ -18,7 +18,7 @@ export class BindingResult {
     }
   }
 
-  async completeWhenBindingsFinish(asyncBindingsApplied: any) {
+  async completeWhenBindingsFinish(asyncBindingsApplied: Set<any>) {
     await Promise.all(asyncBindingsApplied)
     this.isComplete = true
     return this
