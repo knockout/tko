@@ -29,6 +29,7 @@ import {
 import {
   LegacyBindingHandler
 } from './LegacyBindingHandler'
+import { Provider } from '@tko/provider'
 
 interface BindingError {
   during: string,
@@ -55,11 +56,11 @@ const bindingDoesNotRecurseIntoElementTypes = {
   'template': true
 }
 
-function getBindingProvider() {
+function getBindingProvider() : Provider {
   return options.bindingProviderInstance.instance || options.bindingProviderInstance
 }
 
-function isProviderForNode(provider, node: Node): boolean {
+function isProviderForNode(provider : Provider, node: Node): boolean {
   const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
   return nodeTypes.includes(node.nodeType)
 }
@@ -123,9 +124,9 @@ function applyBindingsToDescendantsInternal (bindingContext: BindingContext, ele
   bindingEvent.notify(elementOrVirtualElement, bindingEvent.childrenComplete)
 }
 
-function hasBindings (node: Node) : boolean {
+function hasBindings (node: Node) : boolean | undefined {
   const provider = getBindingProvider()
-  return isProviderForNode(provider, node) && provider.nodeHasBindings(node)
+  return isProviderForNode(provider, node) && provider.nodeHasBindings(node as Element)
 }
 
 function nodeOrChildHasBindings (node: Node) : boolean {

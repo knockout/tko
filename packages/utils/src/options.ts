@@ -1,3 +1,5 @@
+import { Provider } from "@tko/provider";
+
 interface CustomBindingGlobalProperties {
   String;
   isObservable;
@@ -29,7 +31,7 @@ export class Options {
   bindingGlobals: Object & CustomBindingGlobalProperties = Object.create(null)
 
     // An instance of the binding provider.
-  bindingProviderInstance: Object | any = null
+  bindingProviderInstance: Provider
 
   // Whether the `with` binding creates a child context when used with `as`.
   createChildContextWithAs: boolean = false

@@ -42,7 +42,7 @@ export default class VirtualProvider extends BindingStringProvider {
     }
   }
 
-  nodeHasBindings (node: Element) {
+  nodeHasBindings (node: Element, context?: BindingContext) : boolean | undefined {
     if (node.nodeType === document.COMMENT_NODE) {
       return virtualElements.isStartComment(node)
     }

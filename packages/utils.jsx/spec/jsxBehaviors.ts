@@ -914,7 +914,7 @@ describe('jsx', function () {
 
       TestComponent.register()
       options.bindingProviderInstance = new ComponentProvider()
-      options.bindingProviderInstance.bindingHandlers.component = componentBindings.component
+      options.bindingProviderInstance.bindingHandlers.set('component', componentBindings.component)
 
       const parent = document.createElement('div')
       const jsx = {
@@ -943,7 +943,7 @@ describe('jsx', function () {
       TestComponentOuter.register('t-o')
       TestComponentInner.register('t-i')
       options.bindingProviderInstance = new ComponentProvider()
-      options.bindingProviderInstance.bindingHandlers.component = componentBindings.component
+      options.bindingProviderInstance.bindingHandlers.set('component', componentBindings.component)
 
       const parent = document.createElement('div')
       const jsx = {

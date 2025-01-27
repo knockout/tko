@@ -39,7 +39,7 @@ export default class MultiProvider extends Provider {
     return this.nodeTypeMap[node.nodeType] || []
   }
 
-  nodeHasBindings (node: Element) {
+  nodeHasBindings (node: Element, context?: BindingContext) : boolean | undefined  {
     return this.providersFor(node).some(p => p.nodeHasBindings(node))
   }
 
@@ -50,18 +50,18 @@ export default class MultiProvider extends Provider {
     }
   }
 
-  * enumerateProviderBindings (node: Element, ctx) {
+  * enumerateProviderBindings (node: Element, context) {
     for (const provider of this.providersFor(node)) {
-      const bindings = provider.getBindingAccessors(node, ctx)
+      const bindings = provider.getBindingAccessors(node, context)
       if (!bindings) { continue }
       yield * Object.entries(bindings || {})
       if (provider.preemptive) { return }
     }
   }
 
-  getBindingAccessors (node: Element, ctx) {
+  getBindingAccessors (node: Element, context?: BindingContext) {
     const bindings = {}
-    for (const [key, accessor] of this.enumerateProviderBindings(node, ctx)) {
+    for (const [key, accessor] of this.enumerateProviderBindings(node, context)) {
       if (key in bindings) {
         throw new Error(`The binding "${key}" is duplicated by multiple providers`)
       }

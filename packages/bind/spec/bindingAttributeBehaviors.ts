@@ -26,6 +26,8 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
 import '@tko/utils/helpers/jasmine-13-helper'
+import { Provider } from '@tko/provider'
+
 
 describe('Binding attribute syntax', function () {
   var bindingHandlers
@@ -750,9 +752,9 @@ describe('Binding attribute syntax', function () {
       // content with a special message, via a binding handler that operates on text nodes
 
       var originalBindingProvider = options.bindingProviderInstance
-      options.bindingProviderInstance = {
-        get FOR_NODE_TYPES () { return [3] },
-        nodeHasBindings: function (node) {
+      class TestProvider extends Provider {
+        get FOR_NODE_TYPES () { return [3] }
+        nodeHasBindings(node) {
           // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
           // This will still prove that the binding provider was not executed on the children of a restricted element.
           if (node.nodeType === 3 && jasmine.ieVersion < 9) {
@@ -761,8 +763,8 @@ describe('Binding attribute syntax', function () {
           }
 
           return true
-        },
-        getBindingAccessors: function (node, bindingContext) {
+        }
+        getBindingAccessors(node, bindingContext) {
           if (node.nodeType === 3) {
             return {
               replaceTextNodeContent: function () { return 'replaced' }
@@ -770,13 +772,18 @@ describe('Binding attribute syntax', function () {
           } else {
             return originalBindingProvider.getBindingAccessors(node, bindingContext)
           }
-        },
-        bindingHandlers: originalBindingProvider.bindingHandlers
-      }
+        }      
+      }      
+    
+      var tp = new TestProvider()
+      tp.bindingHandlers = originalBindingProvider.bindingHandlers
       bindingHandlers.replaceTextNodeContent = {
         update: function (textNode, valueAccessor) { textNode.data = valueAccessor() }
       }
-    })
+
+      options.bindingProviderInstance = tp
+    }
+  )
 
     it('<script>', function () {
       testNode.innerHTML = '<p>Hello</p><script>alert(123);</script><p>Goodbye</p>'

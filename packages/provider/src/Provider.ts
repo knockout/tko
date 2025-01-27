@@ -29,8 +29,8 @@ export default class Provider {
     this.globals = globals
   }
   get preemptive () { return false }
-  nodeHasBindings (node: Element) {}
-  getBindingAccessors (node: Element, context: BindingContext) {}
+  nodeHasBindings (node: Element, context?: BindingContext) : boolean | undefined { return undefined }
+  getBindingAccessors (node: Element, context?: BindingContext) {}
 
   /**
    * Preprocess a given node.

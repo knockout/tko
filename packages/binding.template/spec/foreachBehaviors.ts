@@ -263,15 +263,16 @@ describe('Binding: Foreach', function () {
     preprocessingBindingProvider.prototype = originalBindingProvider
     options.bindingProviderInstance = new preprocessingBindingProvider()
     options.bindingProviderInstance.preprocessNode = function (node) {
-      if (node.nodeType === 3 && node.data.charAt(0) === '$') {
+      var dataNode : any = node
+      if (node.nodeType === 3 && dataNode.data.charAt(0) === '$') {
         var newNodes = [
-          document.createComment('ko text: ' + node.data),
+          document.createComment('ko text: ' + dataNode.data),
           document.createComment('/ko')
         ]
         for (var i = 0; i < newNodes.length; i++) {
-          node.parentNode.insertBefore(newNodes[i], node)
+          node.parentNode?.insertBefore(newNodes[i], node)
         }
-        node.parentNode.removeChild(node)
+        node.parentNode?.removeChild(node)
         return newNodes
       }
     }
@@ -794,14 +795,14 @@ describe('Binding: Foreach', function () {
       if (node.tagName && node.tagName.toLowerCase() === 'data') {
         var newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: $data')
-        node.parentNode.insertBefore(newNode, node)
-        node.parentNode.removeChild(node)
+        node.parentNode?.insertBefore(newNode, node)
+        node.parentNode?.removeChild(node)
         return [newNode]
       }
 
             // Delete any <button> elements
       if (node.tagName && node.tagName.toLowerCase() === 'button') {
-        node.parentNode.removeChild(node)
+        node.parentNode?.removeChild(node)
         return []
       }
     }

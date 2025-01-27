@@ -16,7 +16,7 @@ export default class DataBindProvider extends BindingStringProvider {
     }
   }
 
-  nodeHasBindings(node: HTMLElement): boolean | undefined {
+  nodeHasBindings(node: HTMLElement, context?: BindingContext): boolean | undefined {
     if (node.nodeType === document.ELEMENT_NODE) {
       return node.hasAttribute(this.BIND_ATTRIBUTE)
     }

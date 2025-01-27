@@ -31,6 +31,7 @@ import '@tko/utils/helpers/jasmine-13-helper'
 import {
   dummyTemplateEngine
 } from '../helpers/dummyTemplateEngine'
+import { Provider } from '@tko/provider'
 
 describe('Templating', function () {
   var bindingHandlers
@@ -439,16 +440,18 @@ describe('Templating', function () {
   it('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindingAccessors', function () {
     this.restoreAfter(options, 'bindingProviderInstance')
 
-        // Will verify that bindings are applied only once for both inline (rewritten) bindings,
-        // and external (non-rewritten) ones
+    // Will verify that bindings are applied only once for both inline (rewritten) bindings,
+    // and external (non-rewritten) ones
     var originalBindingProvider = options.bindingProviderInstance
-    options.bindingProviderInstance = {
-      FOR_NODE_TYPES: [document.ELEMENT_NODE],
-      bindingHandlers: originalBindingProvider.bindingHandlers,
-      nodeHasBindings: function (node, bindingContext) {
+
+    class TestProvider extends Provider {
+      get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
+      
+      nodeHasBindings(node, bindingContext) {
         return (node.tagName == 'EM') || originalBindingProvider.nodeHasBindings(node, bindingContext)
-      },
-      getBindingAccessors: function (node, bindingContext) {
+      }
+
+      getBindingAccessors(node, bindingContext) {
         if (node.tagName == 'EM') {
           return {
             text: function () {
@@ -459,7 +462,12 @@ describe('Templating', function () {
         return originalBindingProvider.getBindingAccessors(node, bindingContext)
       }
     }
-
+  
+    var tp = new TestProvider()
+    tp.bindingHandlers = originalBindingProvider.bindingHandlers
+    options.bindingProviderInstance = tp;
+       
+   
     setTemplateEngine(new dummyTemplateEngine({
       outerTemplate: "Outer <div data-bind='template: { name: \"innerTemplate\", bypassDomNodeWrap: true }'></div>",
       innerTemplate: "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>" +
@@ -488,16 +496,25 @@ describe('Templating', function () {
         // and external (non-rewritten) ones. Because getBindings actually gets called twice, we need
         // to expect two calls (but still it's a single binding).
     var originalBindingProvider = options.bindingProviderInstance
-    options.bindingProviderInstance = {
-      bindingHandlers: originalBindingProvider.bindingHandlers,
-      nodeHasBindings: function (node, bindingContext) {
+    class TestProvider extends MultiProvider {
+      get FOR_NODE_TYPES () { return [1, 3, 8] }
+      
+      nodeHasBindings(node:Element, bindingContext?: BindingContext) {
         return (node.tagName == 'EM') || originalBindingProvider.nodeHasBindings(node, bindingContext)
-      },
-      getBindings: function (node, bindingContext) {
+      }
+      getBindingAccessors(node: Element, bindingContext?: BindingContext) {
         if (node.tagName == 'EM') { return { text: ++model.numExternalBindings } }
-        return originalBindingProvider.getBindings(node, bindingContext)
+        return super.getBindingAccessors(node, bindingContext) //todo getBinding???
       }
     }
+
+    var testProvider = new TestProvider()
+    testProvider.addProvider(new DataBindProvider())
+    testProvider.addProvider(new VirtualProvider())   
+
+    testProvider.bindingHandlers = originalBindingProvider.bindingHandlers
+
+    options.bindingProviderInstance = testProvider;
 
     setTemplateEngine(new dummyTemplateEngine({
       outerTemplate: "Outer <div data-bind='template: { name: \"innerTemplate\", bypassDomNodeWrap: true }'></div>",
