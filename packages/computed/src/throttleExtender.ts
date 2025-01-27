@@ -1,10 +1,6 @@
 import { extenders as baseExtenders } from '@tko/observable'
 import { computed } from './computed'
-import { BaseExtendersType } from 'packages/observable/src/extenders'
 
-interface ExtendersType extends BaseExtendersType {
-  throttle(target: any, timout: number): void
-}
 
 export function throttleExtender (target: any, timeout: number) {
     // Throttling means two things:
@@ -27,6 +23,6 @@ export function throttleExtender (target: any, timeout: number) {
   })
 }
 
-const extenders = baseExtenders as BaseExtendersType;
+const extenders = baseExtenders;
 
-(extenders as ExtendersType).throttle = throttleExtender
+extenders.throttle = throttleExtender
