@@ -774,13 +774,13 @@ describe('Binding attribute syntax', function () {
           }
         }      
       }      
-    
-      var tp = new TestProvider()
-      tp.bindingHandlers = originalBindingProvider.bindingHandlers
+
       bindingHandlers.replaceTextNodeContent = {
         update: function (textNode, valueAccessor) { textNode.data = valueAccessor() }
       }
-
+    
+      var tp = new TestProvider()
+      tp.bindingHandlers = originalBindingProvider.bindingHandlers
       options.bindingProviderInstance = tp
     }
   )

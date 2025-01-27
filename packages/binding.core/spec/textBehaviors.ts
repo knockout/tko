@@ -113,11 +113,12 @@ describe('Binding: Text', function () {
       }
     }
 
-    var tp = new TestProvider()
-    tp.bindingHandlers = originalBindingProvider.bindingHandlers
     bindingHandlers.replaceTextNodeContent = {
       update: function (textNode, valueAccessor) { textNode.data = valueAccessor() }
     }
+
+    var tp = new TestProvider()
+    tp.bindingHandlers = originalBindingProvider.bindingHandlers
     options.bindingProviderInstance = tp
 
     // Now check that, after applying the "text" binding, the emitted text node does *not*
