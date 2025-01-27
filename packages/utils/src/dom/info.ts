@@ -24,7 +24,7 @@ export function anyDomNodeIsAttachedToDocument (nodes) {
   return !!arrayFirst(nodes, domNodeIsAttachedToDocument)
 }
 
-export function tagNameLower (element) {
+export function tagNameLower (element: Element) {
     // For HTML elements, tagName will always be upper case; for XHTML elements, it'll be lower case.
     // Possible future optimization: If we know it's an element from an XHTML document (not HTML),
     // we don't need to do the .toLowerCase() as it will always be lower case anyway.

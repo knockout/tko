@@ -29,10 +29,10 @@ objectForEach(knownEvents, function (eventType, knownEventsForType) {
   }
 })
 
-function isClickOnCheckableElement (element, eventType) {
-  if ((tagNameLower(element) !== 'input') || !element.type) return false
+function isClickOnCheckableElement (element: Element, eventType: string) {
+  if ((tagNameLower(element) !== 'input') || !(element as HTMLInputElement).type) return false
   if (eventType.toLowerCase() != 'click') return false
-  var inputType = element.type
+  var inputType = (element as HTMLInputElement).type
   return (inputType == 'checkbox') || (inputType == 'radio')
 }
 
