@@ -23,6 +23,8 @@ export default class Provider {
     this.globals = params?.globals || {}
   }
 
+  get FOR_NODE_TYPES () : number[] { throw new Error('Providers must override FOR_NODE_TYPES property') }
+
   setGlobals (globals) {
     this.globals = globals
   }

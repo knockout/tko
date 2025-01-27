@@ -2,9 +2,6 @@
 import {
   Provider
 } from '@tko/provider'
-import { DataBindProvider } from '@tko/provider.databind'
-import { AttributeMustacheProvider, TextMustacheProvider } from '@tko/provider.mustache'
-
 
 export default class MultiProvider extends Provider {
   nodeTypes: any[]
@@ -26,7 +23,7 @@ export default class MultiProvider extends Provider {
     [this, ...this.providers].forEach(p => (p.globals = globals))
   }
 
-  addProvider (provider: MultiProvider | DataBindProvider | AttributeMustacheProvider | TextMustacheProvider ) {
+  addProvider (provider: Provider ) {
     this.providers.push(provider)
     provider.bindingHandlers = this.bindingHandlers
     provider.globals = this.globals
