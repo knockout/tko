@@ -64,7 +64,7 @@ function isProviderForNode(provider, node: Node): boolean {
   return nodeTypes.includes(node.nodeType)
 }
 
-function asProperHandlerClass(handler: any, bindingKey?: string): BindingHandler | undefined {
+function asProperHandlerClass(handler?: any, bindingKey?: string): BindingHandler | undefined {
   if (!handler) {
     return;
   }
