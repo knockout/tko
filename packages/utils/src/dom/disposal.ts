@@ -6,7 +6,6 @@ import * as domData from './data'
 import { default as options } from '../options'
 import {arrayRemoveItem, arrayIndexOf} from '../array'
 import {jQueryInstance} from '../jquery'
-import { Func } from 'mocha'
 
 var domDataKey = domData.nextKey()
 // Node types:
