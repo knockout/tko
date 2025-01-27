@@ -14,8 +14,8 @@ describe('Provider', function () {
 
   it('throws an error FOR_NODE_TYPEs is missing', function () {
     class SubProvider extends Provider {}
-    const fn = () => new SubProvider()
-    assert.throws(fn, /must have FOR_NODE_TYPES/)
+    const fn = () => new SubProvider().FOR_NODE_TYPES
+    assert.throws(fn, /must override FOR_NODE_TYPES/)
   })
 
   it('sets globals and bindingHandlers from params', function () {

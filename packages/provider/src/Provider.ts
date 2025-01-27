@@ -9,14 +9,6 @@ import {
 
 import BindingHandlerObject from './BindingHandlerObject'
 
-export interface ProviderParamsInput{
-  bindingHandlers?: BindingHandlerObject;
-  globals?:any;
-  attributesToSkip?:any;
-  attributesBindingMap?:any;
-  providers?:any[];
-}
-
 export default class Provider {
   constructor (params: ProviderParamsInput | null = null) {
     if (this.constructor === Provider) {
@@ -30,6 +22,8 @@ export default class Provider {
     this.bindingHandlers = params?.bindingHandlers || new BindingHandlerObject()
     this.globals = params?.globals || {}
   }
+
+  get FOR_NODE_TYPES () : number[] { throw new Error('Providers must override FOR_NODE_TYPES property') }
 
   setGlobals (globals) {
     this.globals = globals

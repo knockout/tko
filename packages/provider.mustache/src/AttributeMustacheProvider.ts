@@ -10,7 +10,6 @@ import {
 import {
   parseInterpolation
 } from './mustacheParser'
-import { ProviderParamsInput } from 'packages/provider/src/Provider'
 
 /**
  * These are bindings that are mapped specific attributes, such as
