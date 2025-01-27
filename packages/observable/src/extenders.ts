@@ -4,7 +4,8 @@
 //
 import {
     options, objectForEach,
-    throttle as throttleFn, debounce as debounceFn
+    throttle as throttleFn, debounce as debounceFn,
+    CompareArraysOptions
 } from '@tko/utils'
 
 import { deferUpdates } from './defer'
@@ -74,7 +75,8 @@ export function rateLimit(target: any, options: string | any) {
 export interface BaseExtendersType{
   notify(target: any, notifyWhen: string): void,
   deferred(target: any, option: boolean): void,
-  rateLimit(target: any, options: string | any): void
+  rateLimit(target: any, options: string | any): void,
+  trackArrayChanges? (target: ObservableArray, options?: CompareArraysOptions) : void
 }
 
 export var extenders: BaseExtendersType = {

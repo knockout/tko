@@ -174,4 +174,4 @@ trackArrayChanges.compareArrays = compareArrays;
 
 // Add the trackArrayChanges extender so we can use
 // obs.extend({ trackArrayChanges: true })
-(extenders as any).trackArrayChanges = trackArrayChanges
+extenders.trackArrayChanges = trackArrayChanges
