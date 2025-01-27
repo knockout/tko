@@ -159,9 +159,9 @@ export class ForEachBinding extends AsyncBindingHandler {
 
     // Watch for changes
     if (isObservable(this.data)) {
-      if (!(this.data as any).indexOf) {
+      if (!(this.data as ObservableArray).indexOf) {
         // Make sure the observable is trackable.
-        this.data = (this.data as any).extend({ trackArrayChanges: true })
+        this.data = this.data.extend({ trackArrayChanges: true })
       }
       this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange')
     }
