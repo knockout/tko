@@ -149,7 +149,7 @@ function applyBindingsToNodeAndDescendantsInternal(bindingContext: BindingContex
     ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
     : { shouldBindDescendants: true }
 
-  if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified)]) {
+  if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified as Element)]) {
     // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
     //  * For children of a *real* element, the binding context is certainly the same as on their DOM .parentNode,
     //    hence bindingContextsMayDifferFromDomParentElement is false
