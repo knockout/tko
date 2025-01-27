@@ -85,7 +85,7 @@ describe('Array to DOM node children mapping', function () {
   })
 
   it('Should remove deleted nodes from the DOM', function () {
-    var mappingInvocations = new Array()
+    var mappingInvocations = new Array<string>()
     var mapping = function (arrayItem: string) {
       mappingInvocations.push(arrayItem)
       var output = document.createElement('DIV')
