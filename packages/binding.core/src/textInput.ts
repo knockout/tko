@@ -1,7 +1,9 @@
 
 import {
     ieVersion, safeSetTimeout, options,
-    arrayForEach
+    arrayForEach,
+    domData,
+    registerEventHandler
 } from '@tko/utils'
 
 import {
@@ -152,21 +154,25 @@ class TextInputIE extends TextInput {
   // fired at the document level only and doesn't directly indicate which element changed. We
   // set up just one event handler for the document and use 'activeElement' to determine which
   // element was changed.
-  // selectionChangeHandler (event) {
-  //     const target = this.activeElement
-  //     const handler = target && domData.get(target, selectionChangeHandlerName) // cannot find name selectionChangeHandlerName
-  //     if (handler) { handler(event) }
-  // }
+  selectionChangeHandler (event) {
+      const target = this.activeElement
+      // @ts-ignore
+      const handler = target && domData.get(target, selectionChangeHandlerName) // cannot find name selectionChangeHandlerName
+      if (handler) { handler(event) }
+  }
 
   // All variables are not found!
-  // watchForSelectionChangeEvent (element?) {
-  //   const ownerDoc = element.ownerDocument;
-  //   if (!domData.get(ownerDoc, selectionChangeRegisteredName)) {
-  //       domData.set(ownerDoc, selectionChangeRegisteredName, true)
-  //       registerEventHandler(ownerDoc, 'selectionchange', this.selectionChangeHandler.bind(ownerDoc))
-  //   }
-  //   domData.set(element, selectionChangeHandlerName, handler)
-  // }
+  watchForSelectionChangeEvent (element?) {
+    const ownerDoc = element.ownerDocument;
+    // @ts-ignore
+    if (!domData.get(ownerDoc, selectionChangeRegisteredName)) { // cannot find name selectionChangeRegisteredName
+        // @ts-ignore
+        domData.set(ownerDoc, selectionChangeRegisteredName, true)
+        registerEventHandler(ownerDoc, 'selectionchange', this.selectionChangeHandler.bind(ownerDoc))
+    }
+    // @ts-ignore
+    domData.set(element, selectionChangeHandlerName, handler) // cannot find name selectionChangeRegisteredName, handler
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +203,8 @@ class TextInputIE8 extends TextInputIE {
 
 
     // No eventsIndicatingValueChange in super class!! Obsolete?
-    // return [...super.eventsIndicatingValueChange(), 'keyup', 'keydown']
+    // @ts-ignore
+    return [...super.eventsIndicatingValueChange(), 'keyup', 'keydown']
   }
 }
 
