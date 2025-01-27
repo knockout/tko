@@ -135,18 +135,15 @@ class TextInputIE extends TextInput {
     }
 
     if (version >= 8 && version < 10) {
-      // this.watchForSelectionChangeEvent()
+      //this.watchForSelectionChangeEvent() //FIXME: Cannot work without element => EXCEPTION
       this.addEventListener('dragend', 'deferUpdateModel')
     }
   }
 
-
-  // entire block below is not working due to missing variables, check if IE Support is neccessary /////////////////////////////////////////////////////////
-
-  // eventsIndicatingSyncValueChange () {
-    // keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
-    // return [...super.eventsIndicatingValueChange(), 'keypress']
-  // }
+  eventsIndicatingSyncValueChange () {
+    //keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
+    return [...super.eventsIndicatingSyncValueChange(), 'keypress']
+  }
 
   // IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
   // But it does fire the 'selectionchange' event on many of those, presumably because the
@@ -156,22 +153,24 @@ class TextInputIE extends TextInput {
   // element was changed.
   selectionChangeHandler (event) {
       const target = this.activeElement
-      // @ts-ignore
-      const handler = target && domData.get(target, selectionChangeHandlerName) // cannot find name selectionChangeHandlerName
+      
+      const handler = target && domData.get(target, 'selectionChangeHandlerName')
       if (handler) { handler(event) }
   }
 
+  
   // All variables are not found!
   watchForSelectionChangeEvent (element?) {
+    if(!element)
+      throw new Error("Broken IE-Support: 8 to 9")
+
     const ownerDoc = element.ownerDocument;
-    // @ts-ignore
-    if (!domData.get(ownerDoc, selectionChangeRegisteredName)) { // cannot find name selectionChangeRegisteredName
-        // @ts-ignore
-        domData.set(ownerDoc, selectionChangeRegisteredName, true)
+  
+    if (!domData.get(ownerDoc, 'selectionChangeRegisteredName')) { // cannot find name selectionChangeRegisteredName       
+      domData.set(ownerDoc, 'selectionChangeRegisteredName', true)
         registerEventHandler(ownerDoc, 'selectionchange', this.selectionChangeHandler.bind(ownerDoc))
     }
-    // @ts-ignore
-    domData.set(element, selectionChangeHandlerName, handler) // cannot find name selectionChangeRegisteredName, handler
+    //domData.set(ownerDoc, 'selectionChangeRegisteredName', handler) //FIXME: handler not defined
   }
 }
 
@@ -201,10 +200,7 @@ class TextInputIE8 extends TextInputIE {
     // keyup: A single keystoke
     // keydown: First character when a key is held down
 
-
-    // No eventsIndicatingValueChange in super class!! Obsolete?
-    // @ts-ignore
-    return [...super.eventsIndicatingValueChange(), 'keyup', 'keydown']
+     return [...super.eventsIndicatingSyncValueChange(), 'keyup', 'keydown']
   }
 }
 
