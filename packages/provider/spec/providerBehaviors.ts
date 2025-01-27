@@ -1,10 +1,9 @@
 
 import {
-  Provider
+  Provider, BindingHandlerObject
 } from '../src'
 
 import { assert } from "chai";
-import BindingHandlerObject from '../src/BindingHandlerObject';
 
 describe('Provider', function () {
   it('throws an error if not subclassed', function () {
