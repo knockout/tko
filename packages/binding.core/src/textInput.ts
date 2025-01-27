@@ -166,7 +166,7 @@ class TextInputIE extends TextInput {
 
     const ownerDoc = element.ownerDocument;
   
-    if (!domData.get(ownerDoc, 'selectionChangeRegisteredName')) { // cannot find name selectionChangeRegisteredName       
+    if (!domData.get(ownerDoc, 'selectionChangeRegisteredName')) {     
       domData.set(ownerDoc, 'selectionChangeRegisteredName', true)
         registerEventHandler(ownerDoc, 'selectionchange', this.selectionChangeHandler.bind(ownerDoc))
     }
