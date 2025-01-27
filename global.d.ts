@@ -80,6 +80,15 @@ declare global {
 
     //#region binding/bindingAttributeSyntax.js
 
+    // usage in multiprovider.ts, provider.ts, attributeMustacheProvider.ts
+    export interface ProviderParamsInput{
+        bindingHandlers?: BindingHandlerObject;
+        globals?:any;
+        attributesToSkip?:any;
+        attributesBindingMap?:any;
+        providers?:any[];
+      }
+
     // usage in applyBindings, BindingHandler, event, checked, options
     export interface AllBindings {
         (): any;

@@ -9,14 +9,6 @@ import {
 
 import BindingHandlerObject from './BindingHandlerObject'
 
-export interface ProviderParamsInput{
-  bindingHandlers?: BindingHandlerObject;
-  globals?:any;
-  attributesToSkip?:any;
-  attributesBindingMap?:any;
-  providers?:any[];
-}
-
 export default class Provider {
   constructor (params: ProviderParamsInput | null = null) {
     if (this.constructor === Provider) {

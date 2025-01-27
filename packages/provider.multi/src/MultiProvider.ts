@@ -1,11 +1,9 @@
 
 import {
-  Provider,
+  Provider
 } from '@tko/provider'
-import { DataBindProvider } from 'packages/provider.databind'
-import { AttributeMustacheProvider, TextMustacheProvider } from 'packages/provider.mustache'
-import { ProviderParamsInput } from 'packages/provider/src/Provider'
-
+import { DataBindProvider } from '@tko/provider.databind'
+import { AttributeMustacheProvider, TextMustacheProvider } from '@tko/provider.mustache'
 
 
 export default class MultiProvider extends Provider {
