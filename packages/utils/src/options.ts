@@ -64,8 +64,8 @@ export class Options {
   }
 
   // Overload getBindingHandler to have a custom lookup function.
-  getBindingHandler (key) : any { return null; }
-  cleanExternalData (node : Node, callback?) {}
+  getBindingHandler (key : string) : any { return null; }
+  cleanExternalData (node : Node, callback? : Function) {}
 }
 
 const options = new Options()

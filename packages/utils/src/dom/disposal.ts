@@ -55,8 +55,8 @@ function cleanSingleNode (node: Node) {
   }
 }
 
-function cleanNodesInList (nodeList: NodeListOf<ChildNode> | HTMLCollectionOf<Element>, onlyComments?: boolean) {
-  const cleanedNodes = new Array()
+function cleanNodesInList (nodeList: NodeList | HTMLCollectionBase, onlyComments?: boolean) {
+  const cleanedNodes = new Array<Node>()
   let lastCleanedNode
   for (var i = 0; i < nodeList.length; i++) {
     if (!onlyComments || nodeList[i].nodeType === 8) {

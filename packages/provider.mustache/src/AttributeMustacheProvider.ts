@@ -44,14 +44,14 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  nodeHasBindings (node: HTMLElement) {
+  nodeHasBindings (node: Element) {
     return !this.attributesToInterpolate(node.attributes).next().done
   }
 
-  partsTogether (parts: any[], context: any, node: HTMLElement, ...valueToWrite: any[]) {
+  partsTogether (parts: any[], context: any, node: Element, ...valueToWrite: any[]) {
     if (parts.length > 1) {
       return parts
-        .map((p: { asAttr: (arg0: any, arg1: any, arg2: HTMLElement) => any }) => unwrap(p.asAttr(context, this.globals, node))).join('')
+        .map((p: { asAttr: (arg0: any, arg1: any, arg2: Element) => any }) => unwrap(p.asAttr(context, this.globals, node))).join('')
     }
     // It may be a writeable observable e.g. value="{{ value }}".
     const part = parts[0].asAttr(context, this.globals)
@@ -63,7 +63,7 @@ export default class AttributeMustacheProvider extends Provider {
     return [name, parts]
   }
 
-  * bindingParts (node: HTMLElement, context: any) {
+  * bindingParts (node: Element, context: any) {
     for (const attr of this.attributesToInterpolate(node.attributes)) {
       const parts = Array.from(parseInterpolation(attr.value))
       if (parts.length) { yield this.attributeBinding(attr.name, parts) }
@@ -75,7 +75,7 @@ export default class AttributeMustacheProvider extends Provider {
     return bindingName && this.bindingHandlers.get(attrName)
   }
 
-  * bindingObjects (node: HTMLElement, context: any) {
+  * bindingObjects (node: Element, context: any) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
       const bindingForAttribute = this.getPossibleDirectBinding(attrName as string)
       const handler: string = bindingForAttribute ? attrName as string : `attr.${attrName}`
@@ -87,7 +87,7 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  getBindingAccessors (node: HTMLElement, context?: {}) {
+  getBindingAccessors (node: Element, context?: {}) {
     return Object.assign({}, ...this.bindingObjects(node, context))
   }
 }

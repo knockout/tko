@@ -35,15 +35,15 @@ export default class Provider {
     this.globals = globals
   }
   get preemptive () { return false }
-  nodeHasBindings (node: Node) {}
-  getBindingAccessors (node: Node, context: BindingContext) {}
+  nodeHasBindings (node: Element) {}
+  getBindingAccessors (node: Element, context: BindingContext) {}
 
   /**
    * Preprocess a given node.
-   * @param {HTMLElement} node
+   * @param {Element} Element
    * @returns {[HTMLElement]|undefined}
    */
-  preprocessNode (node: Node) {}
+  preprocessNode (node: Element) {}
   postProcess (/* node */) {}
 
   bindingHandlers : BindingHandlerObject
@@ -119,7 +119,7 @@ class LegacyProvider extends Provider {
       : this.getBindingsAndMakeAccessors(node, context)
   }
 
-  nodeHasBindings (node : HTMLElement) : boolean {
+  nodeHasBindings (node : Element) : boolean {
     return this.providerObject.nodeHasBindings(node)
   }
 

@@ -40,22 +40,22 @@ export default class MultiProvider extends Provider {
     this.nodeTypes = Object.keys(this.nodeTypeMap).map(k => parseInt(k, 10))
   }
 
-  providersFor (node: HTMLElement): any[] {
+  providersFor (node: Element): any[] {
     return this.nodeTypeMap[node.nodeType] || []
   }
 
-  nodeHasBindings (node: HTMLElement) {
+  nodeHasBindings (node: Element) {
     return this.providersFor(node).some(p => p.nodeHasBindings(node))
   }
 
-  preprocessNode (node: HTMLElement) {
+  preprocessNode (node: Element) {
     for (const provider of this.providersFor(node)) {
       const newNodes = provider.preprocessNode(node)
       if (newNodes) { return newNodes }
     }
   }
 
-  * enumerateProviderBindings (node: HTMLElement, ctx) {
+  * enumerateProviderBindings (node: Element, ctx) {
     for (const provider of this.providersFor(node)) {
       const bindings = provider.getBindingAccessors(node, ctx)
       if (!bindings) { continue }
@@ -64,7 +64,7 @@ export default class MultiProvider extends Provider {
     }
   }
 
-  getBindingAccessors (node: HTMLElement, ctx) {
+  getBindingAccessors (node: Element, ctx) {
     const bindings = {}
     for (const [key, accessor] of this.enumerateProviderBindings(node, ctx)) {
       if (key in bindings) {

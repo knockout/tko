@@ -26,9 +26,9 @@ export default class ComponentProvider extends Provider {
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
-   * @param {HTMLElement} node
+   * @param {Element} node
    */
-  preprocessNode (node : HTMLElement) {
+  preprocessNode (node : Element) {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
@@ -46,11 +46,11 @@ export default class ComponentProvider extends Provider {
     }
   }
 
-  nodeHasBindings (node : HTMLElement) : boolean {
+  nodeHasBindings (node : Element) : boolean {
     return Boolean(this.getComponentNameForNode(node))
   }
 
-  getBindingAccessors (node: HTMLElement, context) {
+  getBindingAccessors (node: Element, context) {
     const componentName = this.getComponentNameForNode(node)
     if (!componentName) { return }
     const component = () => ({
@@ -60,7 +60,7 @@ export default class ComponentProvider extends Provider {
     return { component }
   }
 
-  getComponentNameForNode (node: HTMLElement) : string | undefined {
+  getComponentNameForNode (node: Element) : string | undefined {
     if (node.nodeType !== node.ELEMENT_NODE) { return }
     const tagName = tagNameLower(node)
     if (registry.isRegistered(tagName)) {
@@ -70,7 +70,7 @@ export default class ComponentProvider extends Provider {
     }
   }
 
-  getComponentParams (node: HTMLElement, context) {
+  getComponentParams (node: Element, context) {
     const parser = new (Parser as any)(node, context, this.globals) as Parser
     const paramsString = (node.getAttribute('params') || '').trim()
     const accessors = parser.parse(paramsString, context, undefined, node)
@@ -84,7 +84,7 @@ export default class ComponentProvider extends Provider {
     return Object.assign({ $raw }, params)
   }
 
-  makeParamValue (node: HTMLElement, paramValueComputed) {
+  makeParamValue (node: Element, paramValueComputed) {
     const paramValue = paramValueComputed.peek()
     // Does the evaluation of the parameter value unwrap any observables?
     if (!paramValueComputed.isActive()) {
