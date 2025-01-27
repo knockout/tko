@@ -380,7 +380,7 @@ describe('Binding dependencies', function () {
 
       // a change to the input value should be written to the model
       child.value = 'some user-entered value';
-      triggerEvent(testNode.children[0].children[0], 'change');
+      triggerEvent(child, 'change');
       expect(vm().someProp).toEqual('some user-entered value');
             // a click should use correct view model
       triggerEvent(testNode.children[0].children[1], 'click');
