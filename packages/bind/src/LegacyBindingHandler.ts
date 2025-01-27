@@ -70,16 +70,16 @@ export class LegacyBindingHandler extends BindingHandler {
    * If given an object (the only kind supported in knockout 3.x and before), it
    * shall draw the `init`, `update`, and `allowVirtualElements` properties
    */
-  static getOrCreateFor(handler: any, key?: string): any {
+  static getOrCreateFor(key: string | undefined, handler: any): any {
     if (legacyBindingMap.has(handler)) {
       return legacyBindingMap.get(handler)
     }
-    const newLegacyHandler = this.createFor(handler, key)
+    const newLegacyHandler = this.createFor(key, handler)
     legacyBindingMap.set(handler, newLegacyHandler)
     return newLegacyHandler
   }
 
-  static createFor(handler: any, key?: string): any {
+  static createFor(key: string | undefined, handler: any): any {
     if (typeof handler === 'function') {
       const [initFn, disposeFn] = [handler, handler.dispose]
       return class extends LegacyBindingHandler {

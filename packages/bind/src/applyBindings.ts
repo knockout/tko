@@ -69,7 +69,7 @@ function asProperHandlerClass(handler: any, bindingKey?: string): BindingHandler
     return;
   }
   return handler.isBindingHandlerClass ? handler
-    : LegacyBindingHandler.getOrCreateFor(handler, bindingKey)
+    : LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
 }
 
 function getBindingHandlerFromComponent (bindingKey: string, $component: any) {
