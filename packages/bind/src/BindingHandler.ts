@@ -3,7 +3,13 @@ import { options } from '@tko/utils'
 import { isWriteableObservable } from '@tko/observable'
 import { LifeCycle } from '@tko/lifecycle'
 
-export class BindingHandler extends LifeCycle {
+export class BindingHandler<T = any> extends LifeCycle implements globalThis.BindingHandler {
+  after?: string[];
+  init?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void | BindingHandlerControlsDescendant;
+  update?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void;
+  options?: any;
+  preprocess?: (value: string | undefined, name: string, addBinding: BindingHandlerAddBinding) => string | undefined | void;
+
   $context: BindingContext // most likly BindingContext but params must be typed first
   $element: HTMLElement
   $data: any
@@ -17,7 +23,7 @@ export class BindingHandler extends LifeCycle {
     const {$element, valueAccessor, allBindings, $context} = params
 
     this.$element = $element;
-    this.valueAccessor = valueAccessor;    
+    this.valueAccessor = valueAccessor;
     this.allBindings = allBindings;
     this.$context = $context;
     this.$data = $context.$data;
@@ -48,7 +54,7 @@ export class BindingHandler extends LifeCycle {
      A binding should be complete when it has run through once, notably
      in server-side bindings for pre-rendering.
   */
-  get bindingCompleted (): any { return true }
+  get bindingCompleted (): Promise<boolean> | boolean { return true };
 
   static registerAs (name, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
@@ -74,5 +80,5 @@ export class AsyncBindingHandler extends BindingHandler {
     this.completeBinding = bindingResult => this[ResolveSymbol](bindingResult)
   }
 
-  get bindingCompleted () { return this.bindingCompletion }
+  get bindingCompleted (): Promise<boolean> { return this.bindingCompletion }
 }

@@ -103,6 +103,8 @@ declare global {
     export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
     export type BindingHandlerAddBinding = (name: string, value: any) => void;
     // used as Base for all BindingHandlers
+
+    //!  => moved into bind/BindingHandler.ts
     export interface BindingHandler<T = any> {
         after?: string[];
         init?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void | BindingHandlerControlsDescendant;

@@ -31,6 +31,8 @@ import {
 } from './LegacyBindingHandler'
 import { Provider } from '@tko/provider'
 
+import { BindingHandler } from './BindingHandler'
+
 interface BindingError {
   during: string,
   errorCaptured: any,
@@ -65,7 +67,7 @@ function isProviderForNode(provider : Provider, node: Node): boolean {
   return nodeTypes.includes(node.nodeType)
 }
 
-function asProperHandlerClass(handler?: any, bindingKey?: string): BindingHandler | undefined {
+function asProperHandlerClass(handler?: any, bindingKey?: string): typeof BindingHandler & BindingHandler | undefined {
   if (!handler) {
     return;
   }
@@ -73,14 +75,14 @@ function asProperHandlerClass(handler?: any, bindingKey?: string): BindingHandle
     : LegacyBindingHandler.getOrCreateFor(bindingKey, handler)
 }
 
-function getBindingHandlerFromComponent (bindingKey: string, $component: any) {
+function getBindingHandlerFromComponent (bindingKey: string, $component: any): typeof BindingHandler & BindingHandler | undefined {
   if (!$component || typeof $component.getBindingHandler !== 'function') {
     return;
   }
   return asProperHandlerClass($component.getBindingHandler(bindingKey))
 }
 
-export function getBindingHandler(bindingKey: string): BindingHandler | undefined {
+export function getBindingHandler(bindingKey: string): typeof BindingHandler & BindingHandler | undefined {
   const bindingDefinition = options.getBindingHandler(bindingKey) || getBindingProvider().bindingHandlers.get(bindingKey)
   return asProperHandlerClass(bindingDefinition, bindingKey)
 }
@@ -163,7 +165,7 @@ function applyBindingsToNodeAndDescendantsInternal(bindingContext: BindingContex
 
 
 function * topologicalSortBindings (bindings: any, $component: any) {
-  const results = new Array()
+  const results:[string, typeof BindingHandler][] = []
   // Depth-first sort
   const bindingsConsidered = {}    // A temporary record of which bindings are already in 'result'
   const cyclicDependencyStack = new Array() // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
