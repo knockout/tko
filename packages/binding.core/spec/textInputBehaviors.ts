@@ -23,8 +23,6 @@ const DEBUG = true
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
-declare var testNode : any
-
 describe('Binding: TextInput', function () {
   var bindingHandlers
   beforeEach(jasmine.prepareTestNode)
@@ -39,50 +37,50 @@ describe('Binding: TextInput', function () {
   it('Should assign the value to the node', function () {
     testNode.innerHTML = "<input data-bind='textInput:123' />"
     applyBindings(null, testNode)
-    expect(testNode.children[0].value).toEqual('123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
   })
 
   it('Should treat null values as empty strings', function () {
     testNode.innerHTML = "<input data-bind='textInput:myProp' />"
     applyBindings({ myProp: observable(0) }, testNode)
-    expect(testNode.children[0].value).toEqual('0')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('0')
   })
 
   it('Should assign an empty string as value if the model value is null', function () {
     testNode.innerHTML = "<input data-bind='textInput:(null)' />"
     applyBindings(null, testNode)
-    expect(testNode.children[0].value).toEqual('')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('')
   })
 
   it('Should assign an empty string as value if the model value is undefined', function () {
     testNode.innerHTML = "<input data-bind='textInput:undefined' />"
     applyBindings(null, testNode)
-    expect(testNode.children[0].value).toEqual('')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('')
   })
 
   it('For observable values, should unwrap the value and update on change', function () {
     var myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='textInput:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
-    expect(testNode.children[0].value).toEqual('123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
     myObservable(456)
-    expect(testNode.children[0].value).toEqual('456')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('456')
   })
 
   it('For observable values, should update on change if new value is \'strictly\' different from previous value', function () {
     var myObservable = observable('+123')
     testNode.innerHTML = "<input data-bind='textInput:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
-    expect(testNode.children[0].value).toEqual('+123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('+123')
     myObservable(123)
-    expect(testNode.children[0].value).toEqual('123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
   })
 
   it('For writeable observable values, should catch the node\'s onchange and write values back to the observable', function () {
     var myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='textInput:someProp' />"
-    applyBindings({ someProp: myObservable }, testNode)
-    testNode.children[0].value = 'some user-entered value'
+    applyBindings({ someProp: myObservable }, testNode);
+    (testNode.children[0] as HTMLInputElement).value = 'some user-entered value'
     triggerEvent(testNode.children[0], 'change')
     expect(myObservable()).toEqual('some user-entered value')
   })
@@ -103,28 +101,28 @@ describe('Binding: TextInput', function () {
     })
 
     testNode.innerHTML = "<input data-bind='textInput: valueForEditing' />"
-    applyBindings({ valueForEditing: valueForEditing }, testNode)
+    applyBindings({ valueForEditing: valueForEditing }, testNode);
 
         // set initial valid value
-    testNode.children[0].value = '1234'
+    (testNode.children[0] as HTMLInputElement).value = '1234'
     triggerEvent(testNode.children[0], 'change')
     expect(validValue()).toEqual('1234')
     expect(isValid()).toEqual(true)
-    expect(testNode.children[0].value).toEqual('1234')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('1234');
 
         // set to an invalid value
-    testNode.children[0].value = '1234a'
+    (testNode.children[0] as HTMLInputElement).value = '1234a'
     triggerEvent(testNode.children[0], 'change')
     expect(validValue()).toEqual('1234')
     expect(isValid()).toEqual(false)
-    expect(testNode.children[0].value).toEqual('1234a')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('1234a');
 
         // set to a valid value where the current value of the writeable computed is the same as the written value
-    testNode.children[0].value = '1234'
+    (testNode.children[0] as HTMLInputElement).value = '1234'
     triggerEvent(testNode.children[0], 'change')
     expect(validValue()).toEqual('1234')
     expect(isValid()).toEqual(true)
-    expect(testNode.children[0].value).toEqual('1234')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('1234')
   })
 
   it('Should ignore node changes when bound to a read-only observable', function () {
@@ -133,10 +131,10 @@ describe('Binding: TextInput', function () {
 
     testNode.innerHTML = "<input data-bind='textInput: prop' />"
     applyBindings(vm, testNode)
-    expect(testNode.children[0].value).toEqual('zzz')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('zzz');
 
         // Change the input value and trigger change event; verify that the view model wasn't changed
-    testNode.children[0].value = 'yyy'
+    (testNode.children[0] as HTMLInputElement).value = 'yyy'
     triggerEvent(testNode.children[0], 'change')
     expect(vm.prop).toEqual(computedValue)
     expect(computedValue()).toEqual('zzz')
@@ -146,9 +144,9 @@ describe('Binding: TextInput', function () {
     var model = { modelProperty123: 456 }
     testNode.innerHTML = "<input data-bind='textInput: modelProperty123' />"
     applyBindings(model, testNode)
-    expect(testNode.children[0].value).toEqual('456')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('456');
 
-    testNode.children[0].value = 789
+    ((testNode.children[0] as HTMLInputElement).value as any) = 789 // only string values are accepted
     triggerEvent(testNode.children[0], 'change')
     expect(model.modelProperty123).toEqual('789')
   })
@@ -156,16 +154,16 @@ describe('Binding: TextInput', function () {
   it('Should support alias "textinput"', function () {
     testNode.innerHTML = "<input data-bind='textinput:123' />"
     applyBindings(null, testNode)
-    expect(testNode.children[0].value).toEqual('123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
   })
 
   it('Should write to non-observable property values using "textinput" alias', function () {
     var model = { modelProperty123: 456 }
     testNode.innerHTML = "<input data-bind='textinput: modelProperty123' />"
     applyBindings(model, testNode)
-    expect(testNode.children[0].value).toEqual('456')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('456');
 
-    testNode.children[0].value = 789
+    ((testNode.children[0] as HTMLInputElement).value as any) = 789;
     triggerEvent(testNode.children[0], 'change')
     expect(model.modelProperty123).toEqual('789')
   })
@@ -182,53 +180,53 @@ describe('Binding: TextInput', function () {
             "<input data-bind='textInput: getSetter()[\"set\"]' />" +
             "<input data-bind=\"textInput: getSetter()['set']\" />"
     applyBindings(model, testNode)
-    expect(testNode.children[0].value).toEqual('666')
-    expect(testNode.children[1].value).toEqual('666')
-    expect(testNode.children[2].value).toEqual('666')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('666')
+    expect((testNode.children[1] as HTMLInputElement).value).toEqual('666');
+    expect((testNode.children[2]  as HTMLInputElement).value).toEqual('666');
 
-        // .property
-    testNode.children[0].value = 667
+    // .property
+    ((testNode.children[0] as HTMLInputElement).value as any) = 667
     triggerEvent(testNode.children[0], 'change')
-    expect(mySetter.set).toEqual('667')
+    expect(mySetter.set).toEqual('667');
 
-        // ["property"]
-    testNode.childNodes[1].value = 668
-    triggerEvent(testNode.childNodes[1], 'change')
-    expect(mySetter.set).toEqual('668')
+    // ["property"]
+    ((testNode.childNodes[1] as HTMLInputElement).value as any) = 668;
+    triggerEvent(testNode.childNodes[1] as Element, 'change')
+    expect(mySetter.set).toEqual('668');
 
-        // ['property']
-    testNode.children[0].value = 669
+    // ['property']
+    ((testNode.children[0] as HTMLInputElement).value as any) = 669
     triggerEvent(testNode.children[0], 'change')
-    expect(mySetter.set).toEqual('669')
+    expect(mySetter.set).toEqual('669');
   })
 
   it('Should be able to write to observable subproperties of an observable, even after the parent observable has changed', function () {
         // This spec represents https://github.com/SteveSanderson/knockout/issues#issue/13
-    var originalSubproperty = observable('original value')
-    var newSubproperty = observable()
-    var model = { myprop: observable({ subproperty: originalSubproperty }) }
+        var originalSubproperty = observable('original value')
+        var newSubproperty = observable()
+        var model = { myprop: observable({ subproperty: originalSubproperty }) }
 
-        // Set up a text box whose value is linked to the subproperty of the observable's current value
-    testNode.innerHTML = "<input data-bind='textInput: myprop().subproperty' />"
-    applyBindings(model, testNode)
-    expect(testNode.children[0].value).toEqual('original value')
+            // Set up a text box whose value is linked to the subproperty of the observable's current value
+        testNode.innerHTML = "<input data-bind='textInput: myprop().subproperty' />"
+        applyBindings(model, testNode)
+        expect((testNode.children[0] as HTMLInputElement).value).toEqual('original value')
 
-    model.myprop({ subproperty: newSubproperty }) // Note that myprop (and hence its subproperty) is changed *after* the bindings are applied
-    testNode.children[0].value = 'Some new value'
-    triggerEvent(testNode.children[0], 'change')
+        model.myprop({ subproperty: newSubproperty }); // Note that myprop (and hence its subproperty) is changed *after* the bindings are applied
+        (testNode.children[0] as HTMLInputElement).value = 'Some new value'
+        triggerEvent(testNode.children[0], 'change')
 
-        // Verify that the change was written to the *new* subproperty, not the one referenced when the bindings were first established
-    expect(newSubproperty()).toEqual('Some new value')
-    expect(originalSubproperty()).toEqual('original value')
+            // Verify that the change was written to the *new* subproperty, not the one referenced when the bindings were first established
+        expect(newSubproperty()).toEqual('Some new value')
+        expect(originalSubproperty()).toEqual('original value')
   })
 
   it('Should update observable on input event (on supported browsers) or propertychange event (on old IE)', function () {
     var myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='textInput: someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
-    expect(testNode.children[0].value).toEqual('123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('123');
 
-    testNode.children[0].value = 'some user-entered value'   // setting the value triggers the propertychange event on IE
+    (testNode.children[0] as HTMLInputElement).value = 'some user-entered value'   // setting the value triggers the propertychange event on IE
     if (!jasmine.ieVersion || jasmine.ieVersion >= 9) {
       triggerEvent(testNode.children[0], 'input')
     }
@@ -246,11 +244,11 @@ describe('Binding: TextInput', function () {
     var myobservable = observable(123)
     testNode.innerHTML = "<input data-bind='textInput: someProp' /><input />"
     applyBindings({ someProp: myobservable }, testNode)
-    expect(testNode.children[0].value).toEqual('123')
+    expect((testNode.children[0] as HTMLInputElement).value).toEqual('123');
 
-    testNode.children[0].focus()
-    testNode.children[0].value = 'some user-entered value'
-    testNode.children[1].focus() // focus on a different input to blur the previous one
+    (testNode.children[0] as HTMLInputElement).focus();
+    (testNode.children[0] as HTMLInputElement).value = 'some user-entered value';
+    (testNode.children[1] as HTMLInputElement).focus() // focus on a different input to blur the previous one
     triggerEvent(testNode.children[0], 'blur')
     expect(myobservable()).toEqual('some user-entered value')
   })
@@ -264,9 +262,9 @@ describe('Binding: TextInput', function () {
     var model : ModelType = { writtenValue: '', someProp: undefined }
 
     testNode.innerHTML = "<input data-bind='textInput: writtenValue' />"
-    applyBindings(model, testNode)
+    applyBindings(model, testNode);
 
-    testNode.children[0].value = '1234'
+    (testNode.children[0] as HTMLInputElement).value = '1234'
     triggerEvent(testNode.children[0], 'change')
     expect(model.writtenValue).toEqual('1234')
 
@@ -287,10 +285,10 @@ describe('Binding: TextInput', function () {
 
     // No user change; verify that model isn't changed (note that the view's value may be different)
     triggerEvent(testNode.children[0], 'blur')
-    expect(model.writtenValue()).toEqual(originalValue)
+    expect(model.writtenValue()).toEqual(originalValue);
 
     // A change by the user is written to the model
-    testNode.children[0].value = '1234'
+    (testNode.children[0] as HTMLInputElement).value = '1234'
     triggerEvent(testNode.children[0], 'change')
     expect(model.writtenValue()).toEqual('1234')
 
@@ -320,8 +318,8 @@ describe('Binding: TextInput', function () {
         var myObservable = observable('123')
         testNode.innerHTML = "<input data-bind='textInput:someProp' />"
         applyBindings({ someProp: myObservable }, testNode)
-        triggerEvent(testNode.children[0], 'keydown')
-        testNode.children[0].value = 'some user-entered value'
+        triggerEvent(testNode.children[0], 'keydown');
+        (testNode.children[0] as HTMLInputElement).value = 'some user-entered value'
         expect(myObservable()).toEqual('123')  // observable is not changed yet
 
         jasmine.Clock.tick(20)
@@ -332,12 +330,12 @@ describe('Binding: TextInput', function () {
         var myObservable = observable('123')
         testNode.innerHTML = "<input data-bind='textInput:someProp' />"
         applyBindings({ someProp: myObservable }, testNode)
-        triggerEvent(testNode.children[0], 'keydown')
-        testNode.children[0].value = 'some user-entered value'
+        triggerEvent(testNode.children[0], 'keydown');
+        (testNode.children[0] as HTMLInputElement).value = 'some user-entered value'
 
                 // Notification of previous value (unchanged) is ignored
         myObservable.valueHasMutated()
-        expect(testNode.children[0].value).toEqual('some user-entered value')
+        expect((testNode.children[0] as HTMLInputElement).value).toEqual('some user-entered value')
 
                 // Observable is updated to new element value
         jasmine.Clock.tick(20)
@@ -348,12 +346,12 @@ describe('Binding: TextInput', function () {
         var myObservable = observable('123')
         testNode.innerHTML = "<input data-bind='textInput:someProp' />"
         applyBindings({ someProp: myObservable }, testNode)
-        triggerEvent(testNode.children[0], 'keydown')
-        testNode.children[0].value = 'some user-entered value'
+        triggerEvent(testNode.children[0], 'keydown');
+        (testNode.children[0] as HTMLInputElement).value = 'some user-entered value'
 
                 // New value is written to input element
         myObservable('some value from the server')
-        expect(testNode.children[0].value).toEqual('some value from the server')
+        expect((testNode.children[0] as HTMLInputElement).value).toEqual('some value from the server')
 
                 // New value remains when event is processed
         jasmine.Clock.tick(20)
@@ -365,17 +363,17 @@ describe('Binding: TextInput', function () {
         testNode.innerHTML = "<input data-bind='textInput:someProp' />"
         applyBindings(model, testNode)
 
-        triggerEvent(testNode.children[0], 'keydown')
-        testNode.children[0].value = 'some user-entered value'
+        triggerEvent(testNode.children[0], 'keydown');
+        (testNode.children[0] as HTMLInputElement).value = 'some user-entered value'
         triggerEvent(testNode.children[0], 'change')
         expect(model.someProp).toEqual('some user-entered value')  // it's changed immediately
-        expect(testNode.children[0]._ko_textInputProcessedEvent).toEqual('change')   // using the change event
+        expect((testNode.children[0] as any)._ko_textInputProcessedEvent).toEqual('change')   // using the change event
 
                 // even after a delay, the keydown event isn't processed
         model.someProp = undefined
         jasmine.Clock.tick(20)
         expect(model.someProp).toBeUndefined()
-        expect(testNode.children[0]._ko_textInputProcessedEvent).toEqual('change')
+        expect((testNode.children[0] as any)._ko_textInputProcessedEvent).toEqual('change')
       })
     })
   }
