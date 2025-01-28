@@ -70,7 +70,7 @@ export class value extends BindingHandler {
   // Workaround for https://github.com/SteveSanderson/knockout/issues/122
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded () {
-    return ieVersion && // isInputElement && // Not in use? comment for tsc error
+    return ieVersion &&  this.isInput &&
       this.$element.type == 'text' && this.$element.autocomplete != 'off' &&
       (!this.$element.form || this.$element.form.autocomplete != 'off')
   }
