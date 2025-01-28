@@ -1,10 +1,5 @@
-
-import { ieVersion } from '../ie'
-import { safeSetTimeout } from '../error'
-
 import { tagNameLower } from './info'
 import * as domData from './data'
-import { ensureSelectElementIsRenderedCorrectly } from './fixes'
 
 var hasDomDataExpandoProperty = Symbol('Knockout selectExtensions hasDomDataProperty')
 
