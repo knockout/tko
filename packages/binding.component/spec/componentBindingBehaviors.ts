@@ -1297,7 +1297,7 @@ describe('Components: Component binding', function () {
           }]
         }]
       }
-      new JsxObserver(jsx, testNode, null, null, null)
+      new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
         static get template () {
@@ -1355,7 +1355,7 @@ describe('Components: Component binding', function () {
         }]
       }
 
-      new JsxObserver(jsx, testNode, null, null, null)
+      new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
         static get template () {
@@ -1406,7 +1406,7 @@ describe('Components: Component binding', function () {
         }]
       }
 
-      const jo = new JsxObserver(jsx, testNode, null, null, null)
+      const jo = new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
         static get template () {

@@ -76,7 +76,7 @@ export class JsxObserver extends LifeCycle {
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable: any, parentNode:Node, insertBefore:Node | null = null, xmlns: any, noInitialBinding?: boolean | null) {
+  constructor (jsxOrObservable: any, parentNode:Node, insertBefore:Node | null = null, xmlns?: any, noInitialBinding?: boolean | null) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
