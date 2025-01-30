@@ -4,7 +4,8 @@ import {
 } from '@tko/utils'
 
 import {
-    unwrap, dependencyDetection
+    unwrap, dependencyDetection,
+    isWriteableObservable
 } from '@tko/observable'
 
 var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
@@ -31,8 +32,9 @@ export var hasfocus = {
         }
         isFocused = (active === element)
       }
-            // var modelValue = valueAccessor();
-      valueAccessor(isFocused, {onlyIfChanged: true})
+      var modelValue = valueAccessor(isFocused, {onlyIfChanged: true});
+      // Transfered from ko 3.5. Focusout event was not fired
+      writeValueToProperty(modelValue, isFocused, true)
 
             // cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
       element[hasfocusLastValue] = isFocused
@@ -62,5 +64,11 @@ export var hasfocus = {
             // For IE, which doesn't reliably fire "focus" or "blur" events synchronously
       dependencyDetection.ignore(triggerEvent, null, [element, value ? 'focusin' : 'focusout'])
     }
+  }
+}
+
+export function writeValueToProperty (property: any, value: any, checkIfDifferent: boolean) {
+  if (isWriteableObservable(property) && (!checkIfDifferent || property.peek() !== value)) {
+      property(value);
   }
 }
