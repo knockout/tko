@@ -40,6 +40,7 @@ export var hasfocus = {
       element[hasfocusLastValue] = isFocused
       element[hasfocusUpdatingProperty] = false
     }
+
     var handleElementFocusIn = handleElementFocusChange.bind(null, true)
     var handleElementFocusOut = handleElementFocusChange.bind(null, false)
 

@@ -99,6 +99,35 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
       expect(model.myVal).toEqual(false)
     })
 
+    it('Modern browser: non-observable and Observerble value to be true on focus and false on blur', function () {
+      var model = { myVal: null,  myVal2: observable(true)  }
+      testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input data-bind='${binding}: myVal2' />`
+      applyBindings(model, testNode);
+
+      const input0 = testNode.children[0] as HTMLInputElement;
+      const input1 = testNode.children[1] as HTMLInputElement;
+
+      expect(model.myVal2()).toEqual(true);
+      input0.focus();
+      //triggerEvent(testNode.children[0], 'focusin')
+      expect(model.myVal).toEqual(true);
+      expect(model.myVal2()).toEqual(false);
+
+      input0.blur();
+      expect(model.myVal).toEqual(false);
+      expect(model.myVal2()).toEqual(false);
+
+      // Move the focus elsewhere
+      input1.focus();
+      //triggerEvent(testNode.children[0], 'focusout')
+      expect(model.myVal).toEqual(false)
+      expect(model.myVal2()).toEqual(true);
+
+      input1.blur();
+      expect(model.myVal).toEqual(false);
+      expect(model.myVal2()).toEqual(false);
+    })
+
 
     it('Should not unnecessarily focus or blur an element that is already focused/blurred', function () {
           // This is the closest we can get to representing issue #698 as a spec
