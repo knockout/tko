@@ -27,9 +27,9 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Native template engine', function () {
-  function ensureNodeExistsAndIsEmpty (id, tagName, type) {
+  function ensureNodeExistsAndIsEmpty (id, tagName?, type?) {
     var existingNode = document.getElementById(id)
-    if (existingNode != null) { existingNode.parentNode.removeChild(existingNode) }
+    if (existingNode != null) { existingNode?.parentNode?.removeChild(existingNode) }
     var resultNode = document.createElement(tagName || 'div')
     resultNode.id = id
     if (type) { resultNode.setAttribute('type', type) }
@@ -47,7 +47,7 @@ describe('Native template engine', function () {
   })
 
   describe('Named templates', function () {
-    function testRenderTemplate (templateElem, templateElemId, templateElementProp) {
+    function testRenderTemplate (templateElem, templateElemId?, templateElementProp?) {
       templateElementProp || (templateElementProp = 'innerHTML')
       templateElem[templateElementProp] = "name: <div data-bind='text: name'></div>"
 
@@ -173,7 +173,8 @@ describe('Native template engine', function () {
           children: observableArray(['A1', 'A2', 'A3'])
         }, {
           children: observableArray(['B1', 'B2'])
-        }])
+        }]),
+        invocationCount: undefined
       }
       viewModel.invocationCount = function () {
         return ++this.invocations

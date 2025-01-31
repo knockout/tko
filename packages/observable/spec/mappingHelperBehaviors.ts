@@ -60,14 +60,14 @@ describe('Mapping helpers', function () {
   })
 
   it('toJS should resolve reference cycles', function () {
-    var obj = {}
+    var obj: any = {}
     obj.someProp = { owner: observable(obj) }
     var result = toJS(obj)
     expect(result.someProp.owner).toEqual(result)
   })
 
   it('toJS should treat RegExp, Date, Number, String and Boolean instances as primitives (and not walk their subproperties)', function () {
-    var regExp = new RegExp()
+    var regExp = new RegExp('')
     var date = new Date()
     var string = new String()
     var number = new Number()
@@ -122,7 +122,7 @@ describe('Mapping helpers', function () {
   })
 
   it('toJSON should respect .toJSON functions on objects', function () {
-    var data = {
+    var data: {a: any, b: observable} = {
       a: { one: 'one', two: 'two'},
       b: observable({ one: 'one', two: 'two' })
     }
@@ -137,7 +137,7 @@ describe('Mapping helpers', function () {
   })
 
   it('toJSON should respect .toJSON functions on arrays', function () {
-    var data = {
+    var data: {a: any, b: observableArray} = {
       a: [1, 2],
       b: observableArray([3, 4])
     }

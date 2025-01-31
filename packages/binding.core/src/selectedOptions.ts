@@ -11,9 +11,9 @@ import {
 export var selectedOptions = {
   after: ['options', 'foreach'],
 
-  init: function (element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings: AllBindings) { // allBindings not in use
     registerEventHandler(element, 'change', function () {
-      var value = valueAccessor(), valueToWrite = []
+      var value = valueAccessor(), valueToWrite = new Array()
       arrayForEach(element.getElementsByTagName('option'), function (node) {
         if (node.selected) { valueToWrite.push(selectExtensions.readValue(node)) }
       })

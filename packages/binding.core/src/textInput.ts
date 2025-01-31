@@ -1,7 +1,9 @@
 
 import {
-    domData, registerEventHandler, ieVersion, safeSetTimeout, options,
-    arrayForEach, tagNameLower
+    ieVersion, safeSetTimeout, options,
+    arrayForEach,
+    domData,
+    registerEventHandler
 } from '@tko/utils'
 
 import {
@@ -9,14 +11,10 @@ import {
 } from '@tko/observable'
 
 import {
-    computed
-} from '@tko/computed'
-
-import {
   BindingHandler
 } from '@tko/bind'
 
-var parseVersion, operaVersion, safariVersion, firefoxVersion
+var operaVersion, safariVersion, firefoxVersion
 
 
 /**
@@ -26,13 +24,18 @@ var parseVersion, operaVersion, safariVersion, firefoxVersion
 class TextInput extends BindingHandler {
   get aliases () { return 'textinput' }
 
-  constructor (...args) {
+  $element: HTMLInputElement
+  previousElementValue: any;
+  elementValueBeforeEvent?: ReturnType<typeof setTimeout>;
+  timeoutHandle?: ReturnType<typeof setTimeout>;
+
+  constructor (...args: [any]) {
     super(...args)
     this.previousElementValue = this.$element.value
 
-    if (options.debug && this.constructor._forceUpdateOn) {
+    if (options.debug && (this.constructor as any)._forceUpdateOn) {
       // Provide a way for tests to specify exactly which events are bound
-      arrayForEach(this.constructor._forceUpdateOn, (eventName) => {
+      arrayForEach((this.constructor as any)._forceUpdateOn, (eventName) => {
         if (eventName.slice(0, 5) === 'after') {
           this.addEventListener(eventName.slice(5), 'deferUpdateModel')
         } else {
@@ -57,7 +60,7 @@ class TextInput extends BindingHandler {
     return ['input', 'change', 'blur']
   }
 
-  eventsIndicatingDeferValueChange () {
+  eventsIndicatingDeferValueChange(): any[] {
     return []
   }
 
@@ -69,21 +72,21 @@ class TextInput extends BindingHandler {
     if (this.previousElementValue !== elementValue) {
               // Provide a way for tests to know exactly which event was processed
       if (options.debug && event) {
-        element._ko_textInputProcessedEvent = event.type
+        (element as any)._ko_textInputProcessedEvent = event.type
       }
       this.previousElementValue = elementValue
       this.value = elementValue
     }
   }
 
-  deferUpdateModel (event) {
+  deferUpdateModel (event: any) {
     const element = this.$element
     if (!this.timeoutHandle) {
       // The elementValueBeforeEvent variable is set *only* during the brief gap between an
       // event firing and the updateModel function running. This allows us to ignore model
       // updates that are from the previous state of the element, usually due to techniques
       // such as rateLimit. Such updates, if not ignored, can cause keystrokes to be lost.
-      this.elementValueBeforeEvent = element.value
+      this.elementValueBeforeEvent = element.value as any
       const handler = options.debug ? this.updateModel.bind(this, { type: event.type }) : this.updateModel
       this.timeoutHandle = safeSetTimeout(handler, 4)
     }
@@ -111,10 +114,17 @@ class TextInput extends BindingHandler {
  * Legacy Input Classes, below
  */
 class TextInputIE extends TextInput {
-  constructor (...args) {
+  activeElement: any;
+  constructor (...args: [any]) {
     super(...args)
 
-    if (ieVersion < 11) {
+    let version: number;
+    if (ieVersion instanceof Array) {
+      version = parseInt(ieVersion[1], 10);
+    } else {
+      version = ieVersion ?? 0;
+    }
+    if (version < 11) {
       // Internet Explorer <= 8 doesn't support the 'input' event, but does include 'propertychange' that fires whenever
       // any property of an element changes. Unlike 'input', it also fires if a property is changed from JavaScript code,
       // but that's an acceptable compromise for this binding. IE 9 and 10 support 'input', but since they don't always
@@ -124,15 +134,15 @@ class TextInputIE extends TextInput {
       )
     }
 
-    if (ieVersion >= 8 && ieVersion < 10) {
-      this.watchForSelectionChangeEvent()
+    if (version >= 8 && version < 10) {
+      //this.watchForSelectionChangeEvent() //FIXME: Cannot work without element => EXCEPTION
       this.addEventListener('dragend', 'deferUpdateModel')
     }
   }
 
   eventsIndicatingSyncValueChange () {
-    // keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
-    return [...super.eventsIndicatingValueChange(), 'keypress']
+    //keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
+    return [...super.eventsIndicatingSyncValueChange(), 'keypress']
   }
 
   // IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
@@ -143,20 +153,28 @@ class TextInputIE extends TextInput {
   // element was changed.
   selectionChangeHandler (event) {
       const target = this.activeElement
-      const handler = target && domData.get(target, selectionChangeHandlerName)
+      
+      const handler = target && domData.get(target, 'selectionChangeHandlerName')
       if (handler) { handler(event) }
   }
 
-  watchForSelectionChangeEvent (element, ieUpdateModel) {
+  
+  // All variables are not found!
+  watchForSelectionChangeEvent (element?) {
+    if(!element)
+      throw new Error("Broken IE-Support: 8 to 9")
+
     const ownerDoc = element.ownerDocument;
-    if (!domData.get(ownerDoc, selectionChangeRegisteredName)) {
-        domData.set(ownerDoc, selectionChangeRegisteredName, true)
+  
+    if (!domData.get(ownerDoc, 'selectionChangeRegisteredName')) {     
+      domData.set(ownerDoc, 'selectionChangeRegisteredName', true)
         registerEventHandler(ownerDoc, 'selectionchange', this.selectionChangeHandler.bind(ownerDoc))
     }
-    domData.set(element, selectionChangeHandlerName, handler)
+    //domData.set(ownerDoc, 'selectionChangeRegisteredName', handler) //FIXME: handler not defined
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
 // But it does fire the 'selectionchange' event on many of those, presumably because the
@@ -165,7 +183,7 @@ class TextInputIE extends TextInput {
 // set up just one event handler for the document and use 'activeElement' to determine which
 // element was changed.
 class TextInputIE9 extends TextInputIE {
-  updateModel (...args) {
+  updateModel (...args: [any]) {
     // IE9 will mess up the DOM if you handle events synchronously which results in DOM changes (such as other bindings);
     // so we'll make sure all updates are asynchronous
     this.deferUpdateModel(...args)
@@ -181,7 +199,8 @@ class TextInputIE8 extends TextInputIE {
     // keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
     // keyup: A single keystoke
     // keydown: First character when a key is held down
-    return [...super.eventsIndicatingValueChange(), 'keyup', 'keydown']
+
+     return [...super.eventsIndicatingSyncValueChange(), 'keyup', 'keydown']
   }
 }
 
@@ -196,7 +215,7 @@ class TextInputLegacySafari extends TextInput {
 
 
 class TextInputLegacyOpera extends TextInput {
-  eventsIndicatingDeferValueChange () {
+  eventsIndicatingDeferValueChange(): string[] {
     // Opera 10 doesn't always fire the 'input' event for cut, paste, undo & drop operations.
     // We can try to catch some of those using 'keydown'.
     return ['keydown']
@@ -205,7 +224,7 @@ class TextInputLegacyOpera extends TextInput {
 
 
 class TextInputLegacyFirefox extends TextInput {
-  eventsIndicatingValueChange () {
+  eventsIndicatingValueChange(): string[] {
     return [
       ...super.eventsIndicatingSyncValueChange(),
       // Firefox <= 3.6 doesn't fire the 'input' event when text is filled in through autocomplete

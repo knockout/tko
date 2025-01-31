@@ -11,7 +11,7 @@ export function catchFunctionErrors (delegate) {
     try {
       return delegate(...args)
     } catch (err) {
-      options.onError(err)
+      options.onError(err as Error)
     }
   }
 }
@@ -20,6 +20,6 @@ export function deferError (error) {
   safeSetTimeout(function () { throw error }, 0)
 }
 
-export function safeSetTimeout (handler, timeout) {
+export function safeSetTimeout (handler, timeout: number) {
   return setTimeout(catchFunctionErrors(handler), timeout)
 }

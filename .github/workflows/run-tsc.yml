@@ -33,4 +33,3 @@ jobs:
 
       - name: Run tsc
         run: npx tsc
-        continue-on-error: true

@@ -1,17 +1,12 @@
 
 import {
     tagNameLower, arrayFilter, arrayMap, setTextContent, arrayIndexOf,
-    setOptionNodeSelectionState, triggerEvent, domData,
-    ensureSelectElementIsRenderedCorrectly, selectExtensions
+    setOptionNodeSelectionState, triggerEvent,
+    ensureSelectElementIsRenderedCorrectly, selectExtensions,
 } from '@tko/utils'
 
-import {
-    unwrap, dependencyDetection
-} from '@tko/observable'
-
-import {
-    setDomNodeChildrenFromArrayMapping
-} from '@tko/bind'
+import { unwrap, dependencyDetection } from '@tko/observable'
+import { setDomNodeChildrenFromArrayMapping } from '@tko/bind'
 
 var captionPlaceholder = {}
 
@@ -27,7 +22,7 @@ export var options = {
         // Ensures that the binding processor doesn't try to bind the options
     return { 'controlsDescendantBindings': true }
   },
-  update: function (element, valueAccessor, allBindings) {
+  update: function (element, valueAccessor, allBindings: AllBindings) {
     function selectedOptions () {
       return arrayFilter(element.options, function (node) { return node.selected })
     }
@@ -41,7 +36,7 @@ export var options = {
       arrayToDomNodeChildrenOptions = {},
       captionValue,
       filteredArray,
-      previousSelectedValues = []
+      previousSelectedValues = new Array()
 
     if (!valueAllowUnset) {
       if (multiple) {

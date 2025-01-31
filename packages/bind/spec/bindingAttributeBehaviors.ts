@@ -26,6 +26,8 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
 import '@tko/utils/helpers/jasmine-13-helper'
+import { Provider } from '@tko/provider'
+
 
 describe('Binding attribute syntax', function () {
   var bindingHandlers
@@ -162,7 +164,7 @@ describe('Binding attribute syntax', function () {
     this.after(function () {
       options.onError = saved_obe
     })
-    options.onError = function (spec) {
+    options.onError = function (spec: any) {
       obe_calls++
       expect(spec.during).toEqual('init')
       expect(spec.errorCaptured.message).toMatch(/Message: A moth!$/)
@@ -187,7 +189,7 @@ describe('Binding attribute syntax', function () {
     this.after(function () {
       options.onError = saved_obe
     })
-    options.onError = function (spec) {
+    options.onError = function (spec: any) {
       obe_calls++
       expect(spec.during).toEqual('update')
       expect(spec.errorCaptured.message).toMatch(/A beetle!$/)
@@ -215,7 +217,7 @@ describe('Binding attribute syntax', function () {
       options.onError = saved_obe
     })
 
-    options.onError = function (spec) {
+    options.onError = function (spec: any) {
       obe_calls++
       expect(spec.during).toEqual('update')
       expect(spec.errorCaptured.message).toMatch(/Observable: 42$/)
@@ -264,7 +266,7 @@ describe('Binding attribute syntax', function () {
     var oxy = koObservable()
     this.after(function () { options.set('onError', undefined) })
     options.set('onError', function (err) {
-      expect(err.message.indexOf('turtle')).toNotEqual(-1)
+      expect(err.message.indexOf('turtle')).not.toEqual(-1)
       // Check for the `spec` properties
       expect(err.bindingKey).toEqual('test')
       oe_calls++
@@ -284,7 +286,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should invoke registered handlers\'s init() then update() methods passing binding data', function () {
-    var methodsInvoked = []
+    var methodsInvoked = new Array()
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings) {
         methodsInvoked.push('init')
@@ -307,7 +309,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should invoke each handlers\'s init() and update() before running the next one', function () {
-    var methodsInvoked = []
+    var methodsInvoked = new Array()
     bindingHandlers.test1 = bindingHandlers.test2 = {
       init: function (element, valueAccessor) {
         methodsInvoked.push('init' + valueAccessor())
@@ -349,8 +351,8 @@ describe('Binding attribute syntax', function () {
                            "<div data-bind='text: 123'>456</div>"
     applyBindings(null, testNode)
 
-    expect(testNode.childNodes[0].childNodes[0].innerHTML).toEqual('456')
-    expect(testNode.childNodes[1].innerHTML).toEqual('123')
+    expect(testNode.children[0].children[0].innerHTML).toEqual('456')
+    expect(testNode.children[1].innerHTML).toEqual('123')
   })
 
   it('Should not be allowed to have multiple bindings on the same element that claim to control descendant bindings', function () {
@@ -384,12 +386,12 @@ describe('Binding attribute syntax', function () {
     var vm = { sub: {} }
     applyBindings(vm, testNode)
     expect(testNode).toContainText('my value')
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$customProp).toEqual('my value')
-    expect(contextFor(testNode.childNodes[0].childNodes[0]).$customProp).toBeUndefined() // Should not affect original binding context
+    expect(contextFor(testNode.children[0].children[0].children[0]).$customProp).toEqual('my value')
+    expect(contextFor(testNode.children[0].children[0]).$customProp).toBeUndefined() // Should not affect original binding context
 
     // value of $data and $parent should be unchanged in extended context
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data).toEqual(vm.sub)
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$parent).toEqual(vm)
+    expect(contextFor(testNode.children[0].children[0].children[0]).$data).toEqual(vm.sub)
+    expect(contextFor(testNode.children[0].children[0].children[0]).$parent).toEqual(vm)
   })
 
   it('Binding contexts should inherit any custom properties from ancestor binding contexts', function () {
@@ -412,27 +414,27 @@ describe('Binding attribute syntax', function () {
     if (typeof Symbol('') !== 'symbol') { // Test for shim
       allowedProperties.push('_subscribable')
     }
-    objectForEach(contextFor(testNode.childNodes[0].childNodes[0]),
+    objectForEach(contextFor(testNode.children[0].children[0]),
       (prop) => expect(allowedProperties).toContain(prop))
   })
 
   it('Should be able to retrieve the binding context associated with any node', function () {
     testNode.innerHTML = "<div><div data-bind='text: name'></div></div>"
-    applyBindings({ name: 'Bert' }, testNode.childNodes[0])
+    applyBindings({ name: 'Bert' }, testNode.children[0])
 
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('Bert')
+    expect(testNode.children[0].children[0]).toContainText('Bert')
 
     // Can't get binding context for unbound nodes
     expect(dataFor(testNode)).toBeUndefined()
     expect(contextFor(testNode)).toBeUndefined()
 
     // Can get binding context for directly bound nodes
-    expect(dataFor(testNode.childNodes[0]).name).toEqual('Bert')
-    expect(contextFor(testNode.childNodes[0]).$data.name).toEqual('Bert')
+    expect(dataFor(testNode.children[0]).name).toEqual('Bert')
+    expect(contextFor(testNode.children[0]).$data.name).toEqual('Bert')
 
     // Can get binding context for descendants of directly bound nodes
-    expect(dataFor(testNode.childNodes[0].childNodes[0]).name).toEqual('Bert')
-    expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('Bert')
+    expect(dataFor(testNode.children[0].children[0]).name).toEqual('Bert')
+    expect(contextFor(testNode.children[0].children[0]).$data.name).toEqual('Bert')
 
     // Also test that a non-node object returns nothing and doesn't crash
     expect(dataFor({})).toBeUndefined()
@@ -454,14 +456,14 @@ describe('Binding attribute syntax', function () {
     applyBindings(vm, testNode)
 
     // All of the bound nodes return the viewmodel
-    expect(dataFor(testNode.childNodes[0])).toBe(vm)
-    expect(dataFor(testNode.childNodes[0].childNodes[0])).toBe(vm)
-    expect(dataFor(testNode.childNodes[0].childNodes[1])).toBe(vm)
-    expect(contextFor(testNode.childNodes[0].childNodes[1]).$data).toBe(vm)
+    expect(dataFor(testNode.children[0])).toBe(vm)
+    expect(dataFor(testNode.children[0].children[0])).toBe(vm)
+    expect(dataFor(testNode.children[0].children[1])).toBe(vm)
+    expect(contextFor(testNode.children[0].children[1]).$data).toBe(vm)
 
     // The unbound child node returns undefined
-    expect(dataFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined()
-    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined()
+    expect(dataFor(testNode.children[0].children[1].children[0])).toBeUndefined()
+    expect(contextFor(testNode.children[0].children[1].children[0])).toBeUndefined()
   })
 
   it('Should return the context object for nodes specifically bound, but override with general binding', function () {
@@ -469,16 +471,16 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = '<div data-bind="text: name"></div>'
 
     var vm1 = { name: 'specific' }
-    applyBindingsToNode(testNode.childNodes[0], { text: vm1.name }, vm1)
+    applyBindingsToNode(testNode.children[0], { text: vm1.name }, vm1)
     expect(testNode).toContainText(vm1.name)
-    expect(dataFor(testNode.childNodes[0])).toBe(vm1)
-    expect(contextFor(testNode.childNodes[0]).$data).toBe(vm1)
+    expect(dataFor(testNode.children[0])).toBe(vm1)
+    expect(contextFor(testNode.children[0]).$data).toBe(vm1)
 
     var vm2 = { name: 'general' }
     applyBindings(vm2, testNode)
     expect(testNode).toContainText(vm2.name)
-    expect(dataFor(testNode.childNodes[0])).toBe(vm2)
-    expect(contextFor(testNode.childNodes[0]).$data).toBe(vm2)
+    expect(dataFor(testNode.children[0])).toBe(vm2)
+    expect(contextFor(testNode.children[0]).$data).toBe(vm2)
   })
 
   it('Should not be allowed to use containerless binding syntax for bindings other than whitelisted ones', function () {
@@ -554,7 +556,7 @@ describe('Binding attribute syntax', function () {
         // Counts the number of virtual children, and overwrites the text contents of any text nodes
         for (var node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
           countNodes++
-          if (node.nodeType === 3) { node.data = 'new text' }
+          if (node.nodeType === 3) { (node as Text).data = 'new text' }
         }
       }
     }
@@ -713,8 +715,8 @@ describe('Binding attribute syntax', function () {
 
   it(`Should allow delegation with applyBindingsToNode`, () => {
     testNode.innerHTML = `<i data-bind='myBinding: o'></i>`
-    let read = false
-    let write = false
+    let read = 'false'
+    let write = 'false'
 
     bindingHandlers.myBinding = {
       init: function(element, valueAccessor, allBindings, data, context) {
@@ -750,9 +752,9 @@ describe('Binding attribute syntax', function () {
       // content with a special message, via a binding handler that operates on text nodes
 
       var originalBindingProvider = options.bindingProviderInstance
-      options.bindingProviderInstance = {
-        get FOR_NODE_TYPES () { return [3] },
-        nodeHasBindings: function (node) {
+      class TestProvider extends Provider {
+        get FOR_NODE_TYPES () { return [3] }
+        nodeHasBindings(node) {
           // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
           // This will still prove that the binding provider was not executed on the children of a restricted element.
           if (node.nodeType === 3 && jasmine.ieVersion < 9) {
@@ -761,8 +763,8 @@ describe('Binding attribute syntax', function () {
           }
 
           return true
-        },
-        getBindingAccessors: function (node, bindingContext) {
+        }
+        getBindingAccessors(node, bindingContext) {
           if (node.nodeType === 3) {
             return {
               replaceTextNodeContent: function () { return 'replaced' }
@@ -770,13 +772,18 @@ describe('Binding attribute syntax', function () {
           } else {
             return originalBindingProvider.getBindingAccessors(node, bindingContext)
           }
-        },
-        bindingHandlers: originalBindingProvider.bindingHandlers
-      }
+        }      
+      }      
+
       bindingHandlers.replaceTextNodeContent = {
         update: function (textNode, valueAccessor) { textNode.data = valueAccessor() }
       }
-    })
+    
+      var tp = new TestProvider()
+      tp.bindingHandlers = originalBindingProvider.bindingHandlers
+      options.bindingProviderInstance = tp
+    }
+  )
 
     it('<script>', function () {
       testNode.innerHTML = '<p>Hello</p><script>alert(123);</script><p>Goodbye</p>'
@@ -802,7 +809,7 @@ describe('Binding attribute syntax', function () {
     var callbacks = 0,
       callback = function (nodes, data) {
         expect(nodes.length).toEqual(1)
-        expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0])
+        expect(nodes[0]).toEqual(testNode.children[0].children[0])
         expect(data).toEqual(vm)
         callbacks++
       },

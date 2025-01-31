@@ -33,7 +33,7 @@ describe('Binding: Submit', function () {
     testNode.innerHTML = "<form data-bind='submit:doCall' />"
     var formNode = testNode.childNodes[0]
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0], 'submit')
+    triggerEvent(testNode.children[0], 'submit')
     expect(model.wasCalled).toEqual(true)
     expect(firstParamStored).toEqual(formNode)
   })

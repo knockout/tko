@@ -67,7 +67,7 @@ describe('Components: Default loader', function () {
 
     waitsFor(function () {
       return didComplete
-    }, 100)
+    }, "timeout", 100)
   })
 
   it('getConfig supplies null for unknown components', function () {
@@ -80,7 +80,7 @@ describe('Components: Default loader', function () {
 
     waitsFor(function () {
       return didComplete
-    }, 100)
+    }, "timeout", 100)
   })
 
   it('Can load a template and viewmodel simultaneously', function () {
@@ -88,7 +88,7 @@ describe('Components: Default loader', function () {
     var templateProviderCallback,
       viewModelProviderCallback,
       createViewModelFunction = function () {},
-      domNodeArray = [],
+      domNodeArray = new Array(),
       didResolveDefinition = false,
       config = {
         template: {
@@ -548,10 +548,10 @@ describe('Components: Default loader', function () {
 
     waitsFor(function () {
       return didComplete
-    }, 1000)
+    }, "timeout", 1000)
   }
 
-  function testTemplateFromElement (wrapperMarkup, elementId, extraAssertsCallback) {
+  function testTemplateFromElement (wrapperMarkup, elementId, extraAssertsCallback?) {
     var testElem = document.createElement('div')
     document.body.appendChild(testElem) // Needed so it can be found by ID, and because IE<=8 won't parse its .innerHTML properly otherwise
 

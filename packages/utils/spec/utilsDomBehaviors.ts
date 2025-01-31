@@ -1,12 +1,21 @@
 import '../helpers/jasmine-13-helper'
 
 import * as utils from '../dist'
-import { registerEventHandler } from '../dist'
+import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
 
 var ko = ko || {}
 ko.utils = utils
 ko.options = options
+
+describe('startCommentRegex', function () {
+
+  it('only ie8 has a text property at comment nodes', function () {
+    const reg : RegExp = virtualElements.startCommentRegex
+    expect(reg.source).not.toContain('<!..')
+  })
+
+})
 
 describe('setTextContent', function () {
   var element
@@ -19,7 +28,7 @@ describe('setTextContent', function () {
   it('defaults to empty string', function () {
     ko.utils.setTextContent(element)
     expect(element.innerHTML).toEqual('')
-  })
+  }) 
 
   it('sets text from plain values or observables', function () {
     ko.utils.setTextContent(element, 'test')

@@ -30,8 +30,8 @@ import {
  * SlotBinding replaces a slot with
  */
 export default class SlotBinding extends DescendantBindingHandler {
-  constructor (...params) {
-    super(...params)
+  constructor (params: any) {
+    super(params)
     const slotNode = this.getSlot(this.value)
     const $slotContext = contextFor(slotNode)
 
@@ -48,40 +48,46 @@ export default class SlotBinding extends DescendantBindingHandler {
   /**
    *
    * @param {HTMLElement} nodeToReplace
-   * @param {HTMLElement}} slotValue
+   * @param {HTMLElement} slotValue
    */
-  replaceSlotWithNode (nodeInComponentTemplate, slotNode) {
+  replaceSlotWithNode (nodeInComponentTemplate: HTMLElement, slotNode: Node): void {
     const nodes = this.cloneNodeFromOriginal(slotNode)
     virtualElements.emptyNode(nodeInComponentTemplate)
     this.addDisposable(new JsxObserver(nodes, nodeInComponentTemplate, undefined, undefined, true))
   }
 
-  cloneNodeFromOriginal (node) {
-    if (!node) { return [] }
+  cloneNodeFromOriginal(node: Node): any[] {
+    if (!node) {
+      return [];
+    }
     const jsx = getOriginalJsxForNode(node)
-    if (jsx) { return jsx.children }
-
-    if ('content' in node) {
-      const clone = document.importNode(node.content, true)
-      return [...clone.childNodes]
+    if (jsx) {
+      return jsx.children;
     }
 
-    const nodeArray = Array.isArray(node) ? node : [node]
-    return nodeArray.map(n => n.cloneNode(true))
+    if ('content' in node) {
+      const clone = document.importNode(node.content as Node, true);
+      return [...clone.childNodes];
+    }
+
+    const nodeArray = Array.isArray(node) ? node : [node];
+    return nodeArray.map(n => n.cloneNode(true));
   }
 
 
-  getSlot (slotName) {
-    const {$componentTemplateSlotNodes} = this.$context
+  getSlot(slotName: string): Node {
+    const {$componentTemplateSlotNodes}: any = this.$context
 
     if (!slotName) {
       return $componentTemplateSlotNodes[''] ||
-        [...this.$context.$componentTemplateNodes]
+        [...(this.$context as any).$componentTemplateNodes]
           .filter(n => !n.getAttribute || !n.getAttribute('slot'))
     }
 
     return $componentTemplateSlotNodes[slotName]
   }
 
-  static get allowVirtualElements () { return true }
+  static get allowVirtualElements (): true {
+    return true
+  }
 }

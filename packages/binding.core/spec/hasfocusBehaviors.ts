@@ -47,8 +47,8 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
       var model = { myVal: observable() }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
       applyBindings(model, testNode)
-      registerEventHandler(testNode.childNodes[0], 'focusin', function () { currentState = true })
-      registerEventHandler(testNode.childNodes[0], 'focusout', function () { currentState = false })
+      registerEventHandler(testNode.childNodes[0] as HTMLInputElement, 'focusin', function () { currentState = true })
+      registerEventHandler(testNode.childNodes[0] as HTMLInputElement, 'focusout', function () { currentState = false })
 
           // When the value becomes true, we focus
       model.myVal(true)
@@ -62,24 +62,24 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
     it('Should set an observable value to be true on focus and false on blur', function () {
       var model = { myVal: observable() }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
-      applyBindings(model, testNode)
+      applyBindings(model, testNode);
 
           // Need to raise "focusin" and "focusout" manually, because simply calling ".focus()" and ".blur()"
           // in IE doesn't reliably trigger the "focus" and "blur" events synchronously
 
-      testNode.childNodes[0].focus()
-      triggerEvent(testNode.childNodes[0], 'focusin')
-      expect(model.myVal()).toEqual(true)
+      (testNode.children[0] as HTMLInputElement).focus()
+      triggerEvent(testNode.children[0], 'focusin')
+      expect(model.myVal()).toEqual(true);
 
           // Move the focus elsewhere
-      testNode.childNodes[1].focus()
-      triggerEvent(testNode.childNodes[0], 'focusout')
+      (testNode.childNodes[1] as HTMLElement).focus()
+      triggerEvent(testNode.children[0], 'focusout')
       expect(model.myVal()).toEqual(false)
 
           // If the model value becomes true after a blur, we re-focus the element
           // (Represents issue #672, where this wasn't working)
       var didFocusExpectedElement = false
-      registerEventHandler(testNode.childNodes[0], 'focusin', function () { didFocusExpectedElement = true })
+      registerEventHandler(testNode.childNodes[0] as HTMLInputElement, 'focusin', function () { didFocusExpectedElement = true })
       model.myVal(true)
       expect(didFocusExpectedElement).toEqual(true)
     })
@@ -87,16 +87,45 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
     it('Should set a non-observable value to be true on focus and false on blur', function () {
       var model = { myVal: null }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
-      applyBindings(model, testNode)
+      applyBindings(model, testNode);
 
-      testNode.childNodes[0].focus()
-      triggerEvent(testNode.childNodes[0], 'focusin')
-      expect(model.myVal).toEqual(true)
+      (testNode.childNodes[0] as HTMLElement).focus()
+      triggerEvent(testNode.children[0], 'focusin')
+      expect(model.myVal).toEqual(true);
 
           // Move the focus elsewhere
-      testNode.childNodes[1].focus()
-      triggerEvent(testNode.childNodes[0], 'focusout')
+      (testNode.childNodes[1] as HTMLElement).focus()
+      triggerEvent(testNode.children[0], 'focusout')
       expect(model.myVal).toEqual(false)
+    })
+
+    it('Modern browser: non-observable and Observerble value to be true on focus and false on blur', function () {
+      var model = { myVal: null,  myVal2: observable(true)  }
+      testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input data-bind='${binding}: myVal2' />`
+      applyBindings(model, testNode);
+
+      const input0 = testNode.children[0] as HTMLInputElement;
+      const input1 = testNode.children[1] as HTMLInputElement;
+
+      expect(model.myVal2()).toEqual(true);
+      input0.focus();
+      //triggerEvent(testNode.children[0], 'focusin')
+      expect(model.myVal).toEqual(true);
+      expect(model.myVal2()).toEqual(false);
+
+      input0.blur();
+      expect(model.myVal).toEqual(false);
+      expect(model.myVal2()).toEqual(false);
+
+      // Move the focus elsewhere
+      input1.focus();
+      //triggerEvent(testNode.children[0], 'focusout')
+      expect(model.myVal).toEqual(false)
+      expect(model.myVal2()).toEqual(true);
+
+      input1.blur();
+      expect(model.myVal).toEqual(false);
+      expect(model.myVal2()).toEqual(false);
     })
 
 
@@ -109,7 +138,7 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
           // The elem is already focused, so changing the model value to a different truthy value
           // shouldn't cause any additional focus events
       var didFocusAgain = false
-      registerEventHandler(testNode.childNodes[0], 'focusin', function () { didFocusAgain = true })
+      registerEventHandler(testNode.childNodes[0] as HTMLInputElement, 'focusin', function () { didFocusAgain = true })
       model.isFocused.valueHasMutated()
       expect(didFocusAgain).toEqual(false)
 
@@ -117,7 +146,7 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
           // falsy value shouldn't cause any additional blur events
       model.isFocused(false)
       var didBlurAgain = false
-      registerEventHandler(testNode.childNodes[0], 'focusout', function () { didBlurAgain = true })
+      registerEventHandler(testNode.childNodes[0] as HTMLInputElement, 'focusout', function () { didBlurAgain = true })
       model.isFocused(null)
       expect(didBlurAgain).toEqual(false)
     })
