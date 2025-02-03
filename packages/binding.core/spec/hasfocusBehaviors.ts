@@ -119,7 +119,7 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
       return null;
   }
 
-  arrayForEach(['beforeChange', 'change', 'spectate'], event => {
+  arrayForEach(['beforeChange', 'change', 'spectate', 'asleep', 'awake'], event => {
     it('Modern browser: non-observable and Observerble value to be true on focus and false on blur', function () {
       var model = { myVal: observable(false),  myVal2: observable(false)  }
       var displayVal = observable(undefined)
@@ -129,6 +129,7 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
       const input0 = testNode.children[0] as HTMLInputElement;
       const input1 = testNode.children[1] as HTMLInputElement;
       const doc = testNode.ownerDocument;      
+      let changeCounter = 0;
       
       defineSubscription(model.myVal, (newValue) => {
         //console.log('fire -' + event + ' myVal:' + newValue + ' / ' + model.myVal() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
@@ -144,32 +145,40 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
           }
       }, false, event);
 
+      defineSubscription(displayVal, (newValue) => {
+        //console.log('fire -' + event + ' displayVal:' + newValue)          
+        changeCounter++
+      }, false, 'change');
+
       testNode.focus();
       expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
 
-      console.log('focus input 0-myVal')
+      //console.log('focus input 0-myVal')
       input0.focus();
       //triggerEvent(testNode.children[0], 'focusin')
       expect(model.myVal()).toEqual(true);
       expect(model.myVal2()).toEqual(false);
 
-      console.log('focusout input 0-myVal')
+      //console.log('focusout input 0-myVal')
       input0.blur();
       expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
 
       // Move the focus elsewhere
-      console.log('focus input 1-myVal2')
+      //console.log('focus input 1-myVal2')
       input1.focus();
       //triggerEvent(testNode.children[0], 'focusout')
       expect(model.myVal()).toEqual(false)
       expect(model.myVal2()).toEqual(true);
 
-      console.log('focusout input 1-myVal2')
+      //console.log('focusout input 1-myVal2')
       input1.blur();
       expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
+
+      expect(displayVal()).toEqual(false);
+      expect(changeCounter).toEqual(4);
     })
   })
 
