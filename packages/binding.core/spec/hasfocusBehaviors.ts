@@ -99,34 +99,79 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
       expect(model.myVal).toEqual(false)
     })
 
+    function defineSubscription<T>(observable: Observable<T>, func: (widget: T) => void, disposeImmediately?: boolean, eventType?: any): any {
+      if (func != null) {
+  
+          if (eventType == undefined) {
+              eventType = 'change';
+          }
+  
+          let subscription = observable.subscribe((value) => {
+              if (disposeImmediately === true) {
+                  subscription.dispose();
+              }  
+              func(value);
+          }, eventType);
+ 
+          return func;
+      }
+  
+      return null;
+  }
+
+  arrayForEach(['beforeChange', 'change', 'spectate'], event => {
     it('Modern browser: non-observable and Observerble value to be true on focus and false on blur', function () {
-      var model = { myVal: null,  myVal2: observable(true)  }
-      testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input data-bind='${binding}: myVal2' />`
+      var model = { myVal: observable(false),  myVal2: observable(false)  }
+      var displayVal = observable(undefined)
+      testNode.innerHTML = `<input class='myVal' data-bind='${binding}: myVal' /><input class='myVal2' data-bind='${binding}: myVal2' />`
       applyBindings(model, testNode);
 
       const input0 = testNode.children[0] as HTMLInputElement;
       const input1 = testNode.children[1] as HTMLInputElement;
+      const doc = testNode.ownerDocument;      
+      
+      defineSubscription(model.myVal, (newValue) => {
+        //console.log('fire -' + event + ' myVal:' + newValue + ' / ' + model.myVal() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
+        if (newValue !== displayVal()) {
+            displayVal(newValue);
+          }
+      }, false, event);
 
-      expect(model.myVal2()).toEqual(true);
-      input0.focus();
-      //triggerEvent(testNode.children[0], 'focusin')
-      expect(model.myVal).toEqual(true);
+      defineSubscription(model.myVal2, (newValue) => {
+        //console.log('fire -' + event + ' myVal2:' + newValue + ' / ' + model.myVal2() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
+        if (newValue !== displayVal()) {
+            displayVal(newValue);
+          }
+      }, false, event);
+
+      testNode.focus();
+      expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
 
+      console.log('focus input 0-myVal')
+      input0.focus();
+      //triggerEvent(testNode.children[0], 'focusin')
+      expect(model.myVal()).toEqual(true);
+      expect(model.myVal2()).toEqual(false);
+
+      console.log('focusout input 0-myVal')
       input0.blur();
-      expect(model.myVal).toEqual(false);
+      expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
 
       // Move the focus elsewhere
+      console.log('focus input 1-myVal2')
       input1.focus();
       //triggerEvent(testNode.children[0], 'focusout')
-      expect(model.myVal).toEqual(false)
+      expect(model.myVal()).toEqual(false)
       expect(model.myVal2()).toEqual(true);
 
+      console.log('focusout input 1-myVal2')
       input1.blur();
-      expect(model.myVal).toEqual(false);
+      expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
     })
+  })
 
 
     it('Should not unnecessarily focus or blur an element that is already focused/blurred', function () {
