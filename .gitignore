@@ -26,4 +26,5 @@ coverage/
 *-debug.log
 *-error.log
 
-.vscode
+.vscode/extensions.json
+.vscode/settings.json

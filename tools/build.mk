@@ -117,6 +117,9 @@ test: esm
 test-headless: esm
 	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome
 
+test-debug: esm
+	$(KARMA) start $(tools_dir)/karma.conf --headless-chrome --debug
+
 watch: esm
 	$(KARMA) start $(tools_dir)/karma.conf
 
