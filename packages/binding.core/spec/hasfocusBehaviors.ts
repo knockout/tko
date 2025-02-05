@@ -30,12 +30,6 @@ import { MultiProvider } from '@tko/provider.multi'
 var hasfocusUpdatingProperty = '__ko_hasfocusKnockoutUpdating';
 var hasfocusLastValue = '__ko_hasfocusKnockoutLastValue';
 
-function writeValueToProperty (property: any, value: any, checkIfDifferent: boolean) {
-  if (isWriteableObservable(property) && (!checkIfDifferent || property.peek() !== value)) {
-      property.valueHasMutated()
-  }
-}
-
 arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
   describe(`Binding: ${binding}`, function () {
     var bindingHandlers
@@ -206,21 +200,21 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       let changeCounter = 0;
       
       defineSubscription(model.myVal, (newValue) => {
-        console.log('fire -' + event + ' myVal:' + newValue + ' / ' + model.myVal() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
+        //console.log('fire -' + event + ' myVal:' + newValue + ' / ' + model.myVal() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
         if (newValue !== displayVal()) {
             displayVal(newValue);
           }
       }, false, event);
 
       defineSubscription(model.myVal2, (newValue) => {
-        console.log('fire -' + event + ' myVal2:' + newValue + ' / ' + model.myVal2() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
+        //console.log('fire -' + event + ' myVal2:' + newValue + ' / ' + model.myVal2() + ' / ' +  doc.activeElement?.tagName + ' ' + doc.activeElement?.className)  
         if (newValue !== displayVal()) {
             displayVal(newValue);
           }
       }, false, event);
 
       defineSubscription(displayVal, (newValue) => {
-        console.log('fire -' + event + ' displayVal:' + newValue)          
+        //console.log('fire -' + event + ' displayVal:' + newValue)          
         changeCounter++
       }, false, 'change');
 
@@ -228,26 +222,26 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
 
-      console.log(binding + ': focus input 0-myVal ' + event)
+      //console.log(binding + ': focus input 0-myVal ' + event)
       input0.focus();
       triggerEvent(input0, 'focusin')
       expect(model.myVal()).toEqual(true);
       expect(model.myVal2()).toEqual(false);
 
-      console.log('focusout input 0-myVal')
+      //console.log('focusout input 0-myVal')
       input0.blur();
       triggerEvent(input0, 'focusout')
       expect(model.myVal()).toEqual(false);
       expect(model.myVal2()).toEqual(false);
 
       // Move the focus elsewhere
-      console.log('focus input 1-myVal2')
+      //console.log('focus input 1-myVal2')
       input1.focus();
       triggerEvent(input1, 'focusout')
       expect(model.myVal()).toEqual(false)
       expect(model.myVal2()).toEqual(true);
 
-      console.log('focusout input 1-myVal2')
+      //console.log('focusout input 1-myVal2')
       input1.blur();
       triggerEvent(input1, 'focusout')
       expect(model.myVal()).toEqual(false);
