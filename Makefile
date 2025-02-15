@@ -35,6 +35,9 @@ lint:
 tsc:
 	$(NPX) tsc
 
+eslint:
+	$(NPX) eslint .
+
 docker-build:
 	$(DOCKER) build . --tag tko
 
