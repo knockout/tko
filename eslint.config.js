@@ -14,7 +14,7 @@ export default [
       "prefer-rest-params" : "off",
       "prefer-spread": "off",
       "no-useless-escape": "off",
-      "no-var": "off",
+  //    "no-var": "off",
       "no-array-constructor": "off",
       "@typescript-eslint/no-array-constructor": "off",
       "@typescript-eslint/no-explicit-any": "off",
