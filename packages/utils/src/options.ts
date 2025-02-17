@@ -39,7 +39,7 @@ export class Options {
     // jQuery will be automatically set to globalThis.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
-  jQuery: any = globalThis.jQueryInstance
+  jQuery : JQueryStatic | boolean | null = (globalThis as any).jQuery
 
   Promise: PromiseConstructor = globalThis.Promise
 
