@@ -1,8 +1,10 @@
 {
-  "semi": true,
+  "semi": false,
   "trailingComma": "none",
   "singleQuote": true,
   "arrowParens": "avoid",
   "printWidth": 120,
-  "proseWrap": "preserve"
+  "proseWrap": "never",
+  "experimentalOperatorPosition": "start",
+  "objectWrap": "collapse"
 }
