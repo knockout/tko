@@ -5,7 +5,7 @@
 [![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 [![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) via Prettier
 
 <!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/tko.svg)](https://saucelabs.com/u/tko) -->
 
@@ -95,6 +95,8 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
 
 - Test-Runner -> Karma
 - Test-Environment -> electron and headless-chrome
+- Linting -> Eslint
+- Formating -> Prettier (configured like StandardJS)
 - TDD/BDD-Frameworks -> 
     - Jasmine 1.3
     - Mocha + Chai
