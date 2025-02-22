@@ -22,7 +22,8 @@ import { Provider } from '@tko/provider'
 describe('Binding: Text', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({

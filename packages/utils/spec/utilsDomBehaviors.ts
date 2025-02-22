@@ -48,7 +48,8 @@ describe('setTextContent', function () {
 })
 
 describe('registerEventHandler', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
     if (typeof jQuery === 'undefined') {
@@ -112,7 +113,8 @@ describe('registerEventHandler', function () {
 })
 
 describe('cloneNodes', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
     var newNodes = ko.utils.cloneNodes([testNode])
@@ -134,7 +136,8 @@ describe('cloneNodes', function () {
 })
 
 describe('selectExtensions', () => {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should use loose equality for select value', () => {
     const select = document.createElement('select')

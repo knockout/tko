@@ -21,8 +21,6 @@ window.amdRequire = window.require;
 // window.jQuery with 'undefined' on IE < 9
 window.jQueryInstance = window.jQuery;
 
-
-//export var testNode;
 jasmine.updateInterval = 500;
 
 /*
@@ -34,15 +32,17 @@ jasmine.resolve = function (promise : Promise<boolean>) {
   waitsFor(() => complete)
 }
 
-jasmine.prepareTestNode = function() {
+jasmine.prepareTestNode = function() : HTMLElement {
     // The bindings specs make frequent use of this utility function to set up
     // a clean new DOM node they can execute code against
     var existingNode = document.getElementById("testNode");
     if (existingNode !== null && existingNode.parentNode)
         existingNode.parentNode.removeChild(existingNode);
-    window.testNode = document.createElement("div");
-    window.testNode.id = "testNode";
-    document.body.appendChild(window.testNode);
+    var testNode = document.createElement("div");
+    testNode.id = "testNode";
+    document.body.appendChild(testNode);
+
+    return testNode;
 };
 
 jasmine.Clock.mockScheduler = function (callback) {

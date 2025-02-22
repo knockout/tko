@@ -1,15 +1,10 @@
 /// <reference types="jasmine" />
 /// <reference types="jquery" />
 
+//export {} allows redefining window module, see https://bobbyhadz.com/blog/typescript-make-types-global
 export { };
 
 declare global {
-
-
-    //Some definitions for the jasmine-spec
-
-    var testNode: HTMLElement;
-    var jQueryInstance: JQueryStatic;
 
     interface Window {
         // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
@@ -26,13 +21,14 @@ declare global {
 
     //Jasmine and Mocha define duplicated functions, is a problem for the type system
     //This namespace merges the jasmine namespace to correct same tsc warnings
-    namespace jasmine {
+    namespace jasmine {      
+       
         function setNodeText(node, text: string): void
         var Spec: any;
         function getGlobal(): any;
         var updateInterval: number
         function resolve(promise: Promise<boolean>)
-        function prepareTestNode()
+        function prepareTestNode() : HTMLElement
         function nodeText(node)
         var Clock: Clock
         function getEnv(): any;

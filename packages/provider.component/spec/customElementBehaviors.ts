@@ -44,9 +44,10 @@ import {
 
 describe('Components: Custom elements', function () {
   var bindingHandlers
+  var testNode : HTMLElement
 
   beforeEach(function () {
-    jasmine.prepareTestNode()
+    testNode = jasmine.prepareTestNode()
     useMockForTasks(options)
     var provider = new MultiProvider({
       providers: [new DataBindProvider(), new ComponentProvider()]

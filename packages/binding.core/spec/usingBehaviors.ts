@@ -20,7 +20,8 @@ import {bindings as coreBindings} from '@tko/binding.core'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Using', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({

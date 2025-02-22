@@ -23,7 +23,8 @@ import '@tko/utils/helpers/jasmine-13-helper'
 
 // virtualEvents, removeNode
 describe('Binding: Foreach', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
   var bindingHandlers
 
   beforeEach(function () {

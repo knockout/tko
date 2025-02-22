@@ -19,7 +19,8 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Visible', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()

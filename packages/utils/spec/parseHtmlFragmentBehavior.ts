@@ -8,7 +8,8 @@ import '../helpers/jasmine-13-helper'
 describe('Parse HTML fragment', function () {
   var supportsTemplateTag = 'content' in document.createElement('template')
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
     // See: https://github.com/knockout/knockout/issues/1880
   arrayForEach([
@@ -47,8 +48,8 @@ describe('Parse HTML fragment', function () {
     it('should parse ' + data.html + ' correctly', function () {
             // Early out if Simple HTML parser is known to fail for this data.
       if (!supportsTemplateTag) {
-        if (!jQueryInstance && data.simpleParserFails) { return }
-        if (jQueryInstance && parseFloat(jQueryInstance.fn.jquery[0]) < 3 &&
+        if (!window.jQueryInstance && data.simpleParserFails) { return }
+        if (window.jQueryInstance && parseFloat(window.jQueryInstance.fn.jquery[0]) < 3 &&
                     data.OldjQueryFails) { return }
       }
 

@@ -21,7 +21,8 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Node preprocessing', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     options.bindingProviderInstance = new DataBindProvider()

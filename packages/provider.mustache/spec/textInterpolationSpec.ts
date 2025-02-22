@@ -180,7 +180,8 @@ describe('Interpolation Markup preprocessor', function () {
 describe('Interpolation Markup bindings', function () {
   var bindingHandlers;
 
-  beforeEach(jasmine.prepareTestNode);
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
     var provider = new MultiProvider({

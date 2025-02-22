@@ -36,7 +36,8 @@ import { Provider } from '@tko/provider'
 describe('Templating', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     options.bindingGlobals = Object.create(null)

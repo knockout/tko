@@ -32,7 +32,8 @@ import { Provider } from '@tko/provider'
 describe('Binding attribute syntax', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     // Set up the default binding handlers.

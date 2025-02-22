@@ -34,7 +34,8 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
   describe(`Binding: ${binding}`, function () {
     var bindingHandlers
 
-    beforeEach(jasmine.prepareTestNode)
+    var testNode : HTMLElement
+    beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
     beforeEach(function () {
 

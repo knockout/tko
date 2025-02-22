@@ -8,7 +8,8 @@ import '../helpers/jasmine-13-helper'
 
 describe('DOM node disposal', function () {
   var jQuery = options.jQuery
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
   afterEach(function () {
     otherNodeCleanerFunctions.length = 0
     otherNodeCleanerFunctions.push(cleanjQueryData)
