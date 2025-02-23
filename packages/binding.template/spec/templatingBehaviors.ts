@@ -13,6 +13,7 @@ import {
 import { MultiProvider } from '@tko/provider.multi'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { DataBindProvider } from '@tko/provider.databind'
+import type { BindingContext } from '@tko/bind';
 
 import {
     options

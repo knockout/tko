@@ -15,6 +15,8 @@ import {
 
 import type { Computed } from '@tko/computed'
 
+import type { BindingContext } from '@tko/bind';
+
 import {
     isObservable, dependencyDetection, unwrap, observable, isObservableArray
 } from '@tko/observable'

@@ -35,7 +35,9 @@ import {
 } from './LegacyBindingHandler'
 
 import type { Provider } from '@tko/provider'
-import type { BindingHandler } from './BindingHandler'
+import type { BindingHandler, AllBindings } from './BindingHandler'
+import type { BindingContext } from './bindingContext';
+
 
 interface BindingError {
   during: string,

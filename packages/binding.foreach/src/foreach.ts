@@ -20,6 +20,8 @@ import {
   contextFor, applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'
 
+import type { AllBindings } from '@tko/bind'
+
 //      Utilities
 const MAX_LIST_SIZE = 9007199254740991
 

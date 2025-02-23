@@ -78,118 +78,6 @@ declare global {
         observable?: Symbol;
     }
 
-    //#region binding/bindingAttributeSyntax.js
-
-    // usage in multiprovider.ts, provider.ts, attributeMustacheProvider.ts
-    export interface ProviderParamsInput{
-        bindingHandlers?: BindingHandlerObject;
-        globals?:any;
-        attributesToSkip?:any;
-        attributesBindingMap?:any;
-        providers?:any[];
-      }
-
-    // usage in applyBindings, BindingHandler, event, checked, options
-    export interface AllBindings {
-        (): any;
-
-        get(name: string): any;
-        get<T>(name: string): T;
-
-        has(name: string): boolean;
-    }
-
-    // transfered to LegacyBindingHandler.ts
-    export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
-    export type BindingHandlerAddBinding = (name: string, value: any) => void;
-    // used as Base for all BindingHandlers
-
-    //!  => moved into bind/BindingHandler.ts
-    export interface BindingHandler<T = any> {
-        after?: string[];
-        init?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void | BindingHandlerControlsDescendant;
-        update?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void;
-        options?: any;
-        preprocess?: (value: string | undefined, name: string, addBinding: BindingHandlerAddBinding) => string | undefined | void;
-    }
-
-    export interface BindingHandlers {
-        [name: string]: BindingHandler;
-    }
-
-    // global usage. defined in bindingContext.ts
-    export interface BindingContext<T = any> {
-        ko: any; // typeof ko;
-
-        [symbol: symbol]: any
-        $parent?: any;
-        $parents: any[];
-        $root: any;
-        $data: T;
-        $rawData: T | Observable<T>;
-        $index?: Observable<number>;
-        $parentContext?: BindingContext<any>;
-        // $componentTemplateNodes: any; added in makeChildBindingContext to context
-        // $componentTemplateSlotNodes; added in makeChildBindingContext to context
-
-        $component?: any;
-
-        extend(properties: object): BindingContext<T>;
-        extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
-
-        createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
-        createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
-    }
-
-    //#region templating/templating.js
-
-    export interface BindingHandlers {
-        template: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<any>): BindingHandlerControlsDescendant;
-            update(element: Node, valueAccessor: () => MaybeSubscribable<any>, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>): void;
-        };
-    }
-
-    //#endregion
-
-    //#region templating/templateSources.js
-
-    export interface TemplateSource {
-        text(): string;
-        text(valueToWrite: string): void;
-
-        data(key: string): any;
-        data<T>(key: string): T;
-        data<T>(key: string, valueToWrite: T): void;
-
-        nodes?: {
-            (): Node;
-            (valueToWrite: Node): void;
-        };
-    }
-
-    export module templateSources {
-        export class domElement implements TemplateSource {
-            constructor(element: Node);
-
-            text(): string;
-            text(valueToWrite: string): void;
-
-            data(key: string): any;
-            data<T>(key: string): T;
-            data<T>(key: string, valueToWrite: T): void;
-
-            nodes(): Node;
-            nodes(valueToWrite: Node): void;
-        }
-
-        export class anonymousTemplate extends domElement {
-            constructor(element: Node);
-        }
-    }
-
-    //#endregion
-
     //#region Subscribable - TODO need help - can move this def to package, constructor-methode from subscribable is to special
 
     export type SubscriptionCallback<T = any, TTarget = void> = (this: TTarget, val: T) => void;
@@ -228,15 +116,13 @@ declare global {
     export interface Subscribable<T = any> extends SubscribableFunctions<T> {
         _subscriptions: any;
         _versionNumber: number;
+        _id: number;
     }
 
     export const subscribable: {
         new <T = any>(): Subscribable<T>;
         fn: SubscribableFunctions;
     };
-
-    export function isSubscribable<T = any>(instance: any): instance is Subscribable<T>;
-
 
     //#endregion
   

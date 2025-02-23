@@ -3,6 +3,6 @@
  */
 export const SUBSCRIBABLE_SYM = Symbol('Knockout Subscribable')
 
-export function isSubscribable (instance) {
+export function isSubscribable<T = any>(instance : any) : instance is Subscribable<T> {
   return (instance && instance[SUBSCRIBABLE_SYM]) || false
 }

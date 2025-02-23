@@ -26,7 +26,7 @@ import {LifeCycle} from '@tko/lifecycle'
 
 import registry from '@tko/utils.component'
 
-
+import type { BindingContext } from '@tko/bind';
 
 var componentLoadingOperationUniqueId = 0
 

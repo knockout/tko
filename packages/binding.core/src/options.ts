@@ -7,7 +7,7 @@ import {
 
 import { unwrap, dependencyDetection } from '@tko/observable'
 import { setDomNodeChildrenFromArrayMapping } from '@tko/bind'
-
+import type { AllBindings } from '@tko/bind'
 var captionPlaceholder = {}
 
 export var options = {
