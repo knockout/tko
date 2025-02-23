@@ -4,6 +4,7 @@
 //
 // In KO 3.x, dependencyDetection was also known as computedContext.
 //
+import type { Subscribable } from './subscribable'
 import { isSubscribable } from './subscribableSymbol'
 
 const outerFrames = new Array()

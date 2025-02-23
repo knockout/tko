@@ -1,3 +1,5 @@
+import type { Subscribable } from "./subscribable"
+
 /**
  * Create a subscribable symbol that's used to identify subscribables.
  */

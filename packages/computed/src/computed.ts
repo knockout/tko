@@ -26,7 +26,7 @@ import {
     LATEST_VALUE    
 } from '@tko/observable'
 
-import type { Observable } from '@tko/observable'
+import type { Observable, Subscribable } from '@tko/observable'
 
 const computedState: symbol = createSymbolOrString('_state')
 const DISPOSED_STATE = {
