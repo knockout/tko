@@ -11,6 +11,8 @@ import {
   isWriteableObservable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
     DataBindProvider
 } from '@tko/provider.databind'

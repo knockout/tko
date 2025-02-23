@@ -14,6 +14,8 @@ import {
   isObservable, unwrap, observable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import {
   contextFor, applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'

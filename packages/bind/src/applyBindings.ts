@@ -10,6 +10,10 @@ import {
     dependencyDetection
 } from '@tko/observable'
 
+import type {
+  Observable
+} from '@tko/observable'
+
 import {
     computed
 } from '@tko/computed'
@@ -29,9 +33,9 @@ import {
 import {
   LegacyBindingHandler
 } from './LegacyBindingHandler'
-import { Provider } from '@tko/provider'
 
-import { BindingHandler } from './BindingHandler'
+import type { Provider } from '@tko/provider'
+import type { BindingHandler } from './BindingHandler'
 
 interface BindingError {
   during: string,

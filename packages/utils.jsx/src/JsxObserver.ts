@@ -13,6 +13,8 @@ import {
   isObservable, unwrap, observable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
   isComputed
 } from '@tko/computed'

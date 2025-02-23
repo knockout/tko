@@ -10,6 +10,8 @@ import {
     observable, observableArray
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import { DataBindProvider } from '@tko/provider.databind'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { MultiProvider } from '@tko/provider.multi'

@@ -11,6 +11,8 @@ import {
     observable, observableArray
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import { MultiProvider } from '@tko/provider.multi'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { DataBindProvider } from '@tko/provider.databind'

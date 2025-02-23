@@ -7,6 +7,8 @@ import {
     observableArray, observable, isWritableObservable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import { MultiProvider } from '@tko/provider.multi'
 import { DataBindProvider } from '@tko/provider.databind'
 import { VirtualProvider } from '@tko/provider.virtual'
@@ -42,6 +44,7 @@ import components from '@tko/utils.component'
 import {
     useMockForTasks
 } from '@tko/utils/helpers/jasmine-13-helper'
+
 
 describe('Components: Component binding', function () {
   var testComponentName = 'test-component',

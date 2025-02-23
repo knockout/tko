@@ -7,6 +7,8 @@ import {
     isWritableObservable, isWriteableObservable, observableArray, subscribable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import {
     computed, isPureComputed, isComputed
 } from '../dist'

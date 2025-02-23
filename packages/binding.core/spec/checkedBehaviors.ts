@@ -12,6 +12,8 @@ import {
     observableArray
 } from '@tko/observable'
 
+import type { Observable, ObservableArray } from '@tko/observable';
+
 import {
     computed
 } from '@tko/computed'

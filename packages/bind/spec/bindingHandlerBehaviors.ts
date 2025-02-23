@@ -6,6 +6,8 @@ import {
     observable as koObservable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
   MultiProvider
 } from '@tko/provider.multi'

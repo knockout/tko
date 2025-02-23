@@ -12,6 +12,8 @@ export {
     pureComputed
 } from './computed'
 
+export type { Computed } from './computed'
+
 export {
     throttleExtender
 } from './throttleExtender'

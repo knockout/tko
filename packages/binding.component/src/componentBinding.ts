@@ -26,6 +26,8 @@ import {LifeCycle} from '@tko/lifecycle'
 
 import registry from '@tko/utils.component'
 
+
+
 var componentLoadingOperationUniqueId = 0
 
 export default class ComponentBinding extends DescendantBindingHandler {

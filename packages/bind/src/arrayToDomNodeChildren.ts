@@ -2,15 +2,18 @@
 import {
   fixUpContinuousNodeArray, replaceDomNodes, arrayPushAll,
   anyDomNodeIsAttachedToDocument, domData, arrayMap, arrayForEach,
-  virtualElements, extend, cleanNode, removeNode, compareArrays,
-  CompareArraysOptions,
+  virtualElements, extend, cleanNode, removeNode, compareArrays
 } from '@tko/utils'
 
 import {
   dependencyDetection, observable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable';
+
 import { computed } from '@tko/computed'
+
+import type { Computed } from '@tko/computed'
 
 type MappingFunction<T = any> = (valueToMap: T, index: number | Observable<number>, nodes: Node[]) => Node[];
 type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
