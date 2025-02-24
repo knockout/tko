@@ -219,13 +219,14 @@ describe('Native template engine', function () {
     })
 
     it('with no content should be rejected', function () {
-      window.testDivTemplate.innerHTML = "<div data-bind='template: { data: someItem }'></div>"
+      let anyWindow = window as any
+      anyWindow.testDivTemplate.innerHTML = "<div data-bind='template: { data: someItem }'></div>"
 
       var viewModel = {
         someItem: { val: 'abc' }
       }
       expect(function () {
-        applyBindings(viewModel, window.testDivTemplate)
+        applyBindings(viewModel, anyWindow.testDivTemplate)
       }).toThrowContaining('no template content')
     })
   })

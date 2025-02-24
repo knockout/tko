@@ -13,10 +13,7 @@ declare global {
         require: any
         jQuery: JQueryStatic
         jQueryInstance: JQueryStatic
-        testDivTemplate: HTMLElement
-        templateOutput: HTMLElement
-        innerShiv // For IE
-        o: () => ObservableArray // For jsxBehaviors Test
+        innerShiv // TODO: For IE<9.. we could also remove it
     }
 
     //Jasmine and Mocha define duplicated functions, is a problem for the type system
