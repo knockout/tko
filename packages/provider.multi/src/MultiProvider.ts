@@ -3,6 +3,12 @@ import {
   Provider
 } from '@tko/provider'
 
+import type {
+  ProviderParamsInput
+} from '@tko/provider'
+
+import type { BindingContext } from '@tko/bind';
+
 export default class MultiProvider extends Provider {
   nodeTypes: any[]
   nodeTypeMap: {}

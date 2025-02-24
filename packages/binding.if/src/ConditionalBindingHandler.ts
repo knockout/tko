@@ -6,6 +6,8 @@ import {
     dependencyDetection, observable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
     applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'

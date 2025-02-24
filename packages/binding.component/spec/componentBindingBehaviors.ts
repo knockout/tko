@@ -7,6 +7,8 @@ import {
     observableArray, observable, isWritableObservable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import { MultiProvider } from '@tko/provider.multi'
 import { DataBindProvider } from '@tko/provider.databind'
 import { VirtualProvider } from '@tko/provider.virtual'
@@ -43,15 +45,16 @@ import {
     useMockForTasks
 } from '@tko/utils/helpers/jasmine-13-helper'
 
+
 describe('Components: Component binding', function () {
   var testComponentName = 'test-component',
     testComponentBindingValue,
     testComponentParams,
     outerViewModel
-
+  var testNode : HTMLElement
   beforeEach(function () {
     useMockForTasks(options)
-    jasmine.prepareTestNode()
+    testNode = jasmine.prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
@@ -120,9 +123,9 @@ describe('Components: Component binding', function () {
     var testTemplate = document.createDocumentFragment()
     testTemplate.appendChild(document.createElement('div'))
     testTemplate.appendChild(document.createTextNode(' '))
-    testTemplate.appendChild(document.createElement('span'))
-    testTemplate.children[0].innerHTML = 'hello'
-    testTemplate.children[2-1].innerHTML = 'world' //-1 for skipping text node
+    testTemplate.appendChild(document.createElement('span')) //TODO good example for ASI..
+    ;(testTemplate.childNodes[0] as HTMLElement).innerHTML = 'hello'
+    ;(testTemplate.childNodes[2] as HTMLElement).innerHTML = 'world'
     components.register(testComponentName, { template: testTemplate })
 
         // Bind using just the component name since we're not setting any params

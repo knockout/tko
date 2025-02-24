@@ -8,6 +8,8 @@ import {
     unwrap
 } from '@tko/observable'
 
+import type { AllBindings } from '@tko/bind'
+
 export var selectedOptions = {
   after: ['options', 'foreach'],
 

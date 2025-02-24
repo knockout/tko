@@ -70,7 +70,8 @@ export function makeArray<T=any> (arrayLikeObject:ArrayLike<T>):T[] {
   return Array.from(arrayLikeObject)
 }
 
-export function range (min: MaybeSubscribable<number>, max: MaybeSubscribable<number>): number[] {
+//TODO May be MaybeSubscribable<number> -> I actually don't want the dependency
+export function range (min: () =>number | number, max: () =>number | number): number[] {
   const minimum = typeof min === 'function' ? (min as () => number)() : min as number
   const maximum = typeof max === 'function' ? (max as () => number)() : max as number
   var result: number[] = []

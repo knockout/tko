@@ -224,7 +224,8 @@ describe('Attribute Interpolation Markup Provider', function () {
 });
 
 describe('Attribute Interpolation Markup bindings', function () {
-  beforeEach(jasmine.prepareTestNode);
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   var bindingHandlers;
 

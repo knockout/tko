@@ -13,6 +13,7 @@ import {
 import { MultiProvider } from '@tko/provider.multi'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { DataBindProvider } from '@tko/provider.databind'
+import type { BindingContext } from '@tko/bind';
 
 import {
     options
@@ -36,7 +37,8 @@ import { Provider } from '@tko/provider'
 describe('Templating', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     options.bindingGlobals = Object.create(null)

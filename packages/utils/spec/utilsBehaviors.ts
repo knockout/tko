@@ -418,7 +418,8 @@ describe('objectMap', function () {
 })
 
 describe('cloneNodes', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
     var newNodes = ko.utils.cloneNodes([testNode])

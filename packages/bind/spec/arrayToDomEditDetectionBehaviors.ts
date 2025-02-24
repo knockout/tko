@@ -13,7 +13,8 @@ function copyDomNodeChildren (domNode: HTMLElement) {
 }
 
 describe('Array to DOM node children mapping', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('Should populate the DOM node by mapping array elements', function () {
     var array = ['A', 'B']

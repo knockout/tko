@@ -13,15 +13,19 @@ import {
     computed
 } from '@tko/computed'
 
+import type { Computed } from '@tko/computed'
+
+import type { BindingContext } from '@tko/bind';
+
 import {
     isObservable, dependencyDetection, unwrap, observable, isObservableArray
 } from '@tko/observable'
 
 import {
-  TemplateEngine,
-    templateEngine,
-    TemplateOptions
+    templateEngine
 } from './templateEngine'
+
+import type { TemplateEngine, TemplateOptions } from './templateEngine'
 
 import {
   anonymousTemplate as AnonymousTemplate

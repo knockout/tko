@@ -25,8 +25,8 @@ describe('onError handler', function () {
       return resultNode
     }
 
-    window.testDivTemplate = ensureNodeExistsAndIsEmpty('testDivTemplate')
-    window.templateOutput = ensureNodeExistsAndIsEmpty('templateOutput')
+    ;(window as any).testDivTemplate = ensureNodeExistsAndIsEmpty('testDivTemplate')
+    ;(window as any).templateOutput = ensureNodeExistsAndIsEmpty('templateOutput')
 
     koOnErrorCount = 0
     windowOnErrorCount = 0

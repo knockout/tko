@@ -27,7 +27,8 @@ import {bindings as coreBindings} from '@tko/binding.core'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: If', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({
@@ -96,7 +97,7 @@ describe('Binding: If', function () {
     testNode.innerHTML = "<div data-bind='if: true'>Parents: <span data-bind='text: $parents.length'></span></div>"
     applyBindings({ }, testNode)
     expect(testNode.childNodes[0]).toContainText('Parents: 0')
-    expect(contextFor((testNode.childNodes[0].childNodes[1] as HTMLElement)).$parents.length).toEqual(0)
+    expect(contextFor(testNode.childNodes[0].childNodes[1]).$parents.length).toEqual(0)
   })
 
   it('Should be able to define an \"if\" region using a containerless template', function () {

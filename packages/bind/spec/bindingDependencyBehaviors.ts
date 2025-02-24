@@ -33,7 +33,8 @@ import '@tko/utils/helpers/jasmine-13-helper';
 describe('Binding dependencies', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode);
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
     var provider = new MultiProvider({providers: [
@@ -449,7 +450,8 @@ describe('Binding dependencies', function () {
       applyBindings(vm, testNode);
       expect(vm.getSubscriptionsCount()).toEqual(1);
 
-            // remove the element and re-set the view-model; the subscription should be cleared
+      // remove the element and re-set the view-model; the subscription should be cleared
+      expect(testNode.parentElement).not.toBeNull();
       testNode.parentNode?.removeChild(testNode);
       vm(null);
       expect(vm.getSubscriptionsCount()).toEqual(0);

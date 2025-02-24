@@ -7,6 +7,10 @@ import {
   Provider
 } from '@tko/provider'
 
+import type {
+  ProviderParamsInput
+} from '@tko/provider'
+
 import {
   parseInterpolation
 } from './mustacheParser'

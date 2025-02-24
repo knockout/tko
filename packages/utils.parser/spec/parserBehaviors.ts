@@ -10,6 +10,8 @@ import {
   isObservable
 } from '@tko/observable';
 
+import type { Observable } from '@tko/observable'
+
 import {
   applyBindings
 } from '@tko/bind';

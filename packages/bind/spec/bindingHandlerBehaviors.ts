@@ -6,6 +6,8 @@ import {
     observable as koObservable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
   MultiProvider
 } from '@tko/provider.multi'
@@ -31,7 +33,8 @@ import '@tko/utils/helpers/jasmine-13-helper'
 describe('BindingHandler behaviors', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
         // Set up the default binding handlers.
@@ -54,10 +57,11 @@ describe('BindingHandler behaviors', function () {
         yCalls = 0
       bindingHandlers.fnHandler = class extends BindingHandler {
 
-        v : any
-        x : any
-        y : any
+        v : Observable
+        x : Observable
+        y : Observable        
         computed;
+
         constructor (...args) {
           super(...args)
           var v = this.v = koObservable(0)
@@ -77,7 +81,7 @@ describe('BindingHandler behaviors', function () {
             }
           })
         }
-            }
+      }
       testNode.innerHTML = '<i data-bind="fnHandler"></i>'
       applyBindings({}, testNode)
       expect(xCalls).toEqual(1)

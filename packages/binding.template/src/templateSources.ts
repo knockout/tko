@@ -34,7 +34,23 @@ var templateScript = 1,
   templateTemplate = 3,
   templateElement = 4
 
-//TODO: Candidate for converting to class
+export interface TemplateSource {
+    //constructor(element: Node);
+
+    text(): string;
+    text(valueToWrite: string): void;
+
+    data(key: string): any;
+    data<T>(key: string): T;
+    data<T>(key: string, valueToWrite: T): void;
+
+    nodes?: {
+        (): Node;
+        (valueToWrite: Node): void;
+    };
+}
+
+//TODO: Candidate for converting to class implements TemplateSource
 export function domElement (element?) {
   this.domElement = element
 

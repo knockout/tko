@@ -4,9 +4,11 @@
 //
 import {
     options, objectForEach,
-    throttle as throttleFn, debounce as debounceFn,
-    CompareArraysOptions
+    throttle as throttleFn, debounce as debounceFn    
 } from '@tko/utils'
+
+import type { CompareArraysOptions } from '@tko/utils'
+import type { ObservableArray } from '@tko/observable'
 
 import { deferUpdates } from './defer'
 

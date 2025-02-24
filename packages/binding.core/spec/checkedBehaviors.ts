@@ -12,6 +12,8 @@ import {
     observableArray
 } from '@tko/observable'
 
+import type { Observable, ObservableArray } from '@tko/observable';
+
 import {
     computed
 } from '@tko/computed'
@@ -24,7 +26,8 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Checked', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()

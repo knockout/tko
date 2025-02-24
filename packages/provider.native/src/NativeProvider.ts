@@ -7,6 +7,8 @@ import {
   Provider
 } from '@tko/provider'
 
+import type { BindingContext } from '@tko/bind';
+
 export const NATIVE_BINDINGS = Symbol('Knockout native bindings')
 
 /**

@@ -11,6 +11,8 @@ import {
     computed, pureComputed
 } from '@tko/computed'
 
+import type { AllBindings } from '@tko/bind'
+
 export var checked = {
   after: ['value', 'attr'],
   init: function (element, valueAccessor, allBindings: AllBindings) {

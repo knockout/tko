@@ -5,8 +5,10 @@ import {
 } from '@tko/computed'
 
 import {
-    unwrap, isObservable
+    unwrap, isObservable    
 } from '@tko/observable'
+
+import type { Observable } from '@tko/observable'
 
 import {
   contextAncestorBindingInfo
@@ -23,6 +25,29 @@ const inheritParentIndicator = Symbol('Knockout Parent Indicator')
 
 export interface BindingContextSetting {
   exportDependencies?: boolean;
+}
+
+export interface BindingContext<T = any> {
+  ko: any; // typeof ko;
+
+  [symbol: symbol]: any
+  $parent?: any;
+  $parents: any[];
+  $root: any;
+  $data: T;
+  $rawData: T | Observable<T>;
+  $index?: Observable<number>;
+  $parentContext?: BindingContext<any>;
+  // $componentTemplateNodes: any; added in makeChildBindingContext to context
+  // $componentTemplateSlotNodes; added in makeChildBindingContext to context
+
+  $component?: any;
+
+  extend(properties: object): BindingContext<T>;
+  extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
+
+  createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
+  createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
 }
 
 // The bindingContext constructor is only called directly to create the root context. For child

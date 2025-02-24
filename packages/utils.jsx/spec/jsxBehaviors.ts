@@ -71,7 +71,6 @@ function jsxToNode (jsx, xmlns?, node = document.createElement('div')) : HTMLEle
 
 describe('jsx', function () {
   it('converts a simple node', () => {
-    window.o = observableArray
     const node = jsxToNode({
       elementName: "abc-def",
       children: [],

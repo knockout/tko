@@ -2,7 +2,8 @@
 
 import { applyBindingsToDescendants } from './applyBindings'
 import { AsyncBindingHandler } from './BindingHandler'
-import { BindingResult } from "./BindingResult";
+import type { BindingResult } from "./BindingResult";
+import type { BindingContext } from './bindingContext';
 
 /**
  * This DescendantBindingHandler is a base class for bindings that control

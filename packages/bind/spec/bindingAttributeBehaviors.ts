@@ -32,7 +32,8 @@ import { Provider } from '@tko/provider'
 describe('Binding attribute syntax', function () {
   var bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     // Set up the default binding handlers.
@@ -378,20 +379,20 @@ describe('Binding attribute syntax', function () {
   it('Should be able to extend a binding context, adding new custom properties, without mutating the original binding context', function () {
     bindingHandlers.addCustomProperty = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        applyBindingsToDescendants(bindingContext.extend({ '$customProp': 'my value' }), element)
+        applyBindingsToDescendants(bindingContext.extend({ '$customProp': 'MyValue' }), element)
         return { controlsDescendantBindings: true }
       }
     }
-    testNode.innerHTML = "<div data-bind='with: sub'><div data-bind='addCustomProperty: true'><div data-bind='text: $customProp'></div></div></div>"
+    testNode.innerHTML = "<div data-bind='with: sub'>Static<div data-bind='addCustomProperty: true'>Text-<div data-bind='text: $customProp'></div></div></div>"
     var vm = { sub: {} }
     applyBindings(vm, testNode)
-    expect(testNode).toContainText('my value')
-    expect(contextFor(testNode.children[0].children[0].children[0]).$customProp).toEqual('my value')
-    expect(contextFor(testNode.children[0].children[0]).$customProp).toBeUndefined() // Should not affect original binding context
+    expect(testNode).toContainText('StaticText-MyValue')
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$customProp).toEqual('MyValue')
+    expect(contextFor(testNode.childNodes[0].childNodes[1]).$customProp).toBeUndefined() // Should not affect original binding context
 
     // value of $data and $parent should be unchanged in extended context
-    expect(contextFor(testNode.children[0].children[0].children[0]).$data).toEqual(vm.sub)
-    expect(contextFor(testNode.children[0].children[0].children[0]).$parent).toEqual(vm)
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$data).toEqual(vm.sub)
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$parent).toEqual(vm)
   })
 
   it('Binding contexts should inherit any custom properties from ancestor binding contexts', function () {

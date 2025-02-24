@@ -186,8 +186,8 @@ export function setHtml (node : Node, html : Function | string) {
   }
 }
 
-
-export function setTextContent (element: Node, textContent: MaybeSubscribable<string> ):void {
+//TODO May be MaybeSubscribable<string> -> I actually don't want the dependency
+export function setTextContent (element: Node, textContent: ()=> string | string ):void {
   var value = typeof textContent === 'function' ? (textContent as () => string)() : textContent as string
   if ((value === null) || (value === undefined)) { value = '' }
 

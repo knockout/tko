@@ -28,10 +28,11 @@ describe('ComponentABC', function () {
     testComponentBindingValue,
     testComponentParams,
     outerViewModel
-
+  var testNode : HTMLElement
+  
   beforeEach(function () {
     useMockForTasks(options)
-    jasmine.prepareTestNode()
+    testNode = jasmine.prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }

@@ -129,7 +129,8 @@ describe('Text filters preprocessor', function () {
 
 /* Skip this since */
 xdescribe('Text filter bindings', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('Should convert input into appropriate output', function () {
     testNode.innerHTML = "<div data-bind='text: input | lowercase | fit:10 | json'></div>"
