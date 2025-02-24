@@ -48,9 +48,8 @@ describe('Parse HTML fragment', function () {
     it('should parse ' + data.html + ' correctly', function () {
             // Early out if Simple HTML parser is known to fail for this data.
       if (!supportsTemplateTag) {
-        if (!window.jQueryInstance && data.simpleParserFails) { return }
-        if (window.jQueryInstance && parseFloat(window.jQueryInstance.fn.jquery[0]) < 3 &&
-                    data.OldjQueryFails) { return }
+        if (!window.jQuery && data.simpleParserFails) { return }
+        if (window.jQuery && parseFloat(window.jQuery.fn.jquery[0]) < 3 && data.OldjQueryFails) { return }
       }
 
       var parsedNodes = parseHtmlFragment(data.html, document)

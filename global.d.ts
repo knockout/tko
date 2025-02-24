@@ -6,13 +6,12 @@ export { };
 
 declare global {
 
+    // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
     interface Window {
-        // Below just informs IDE and/or TS-compiler (it's set in `.js` file).
         DEBUG: boolean
         amdRequire: any
         require: any
         jQuery: JQueryStatic
-        jQueryInstance: JQueryStatic
         innerShiv // TODO: For IE<9.. we could also remove it
     }
 
@@ -60,7 +59,6 @@ declare global {
             reset(): any
         }
     }
-
 
     //Knockout Types https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
     // Type definitions for Knockout
