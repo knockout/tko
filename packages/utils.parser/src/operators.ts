@@ -15,15 +15,15 @@ function unwrapOrCall (a, b) {
   return b
 }
 
-type OperatorFunction = (a: any, b: any, ...args: any[]) => any;
+export type OperatorFunction = (a: any, b: any, ...args: any[]) => any;
 
 
-interface OperatorWithProperties extends OperatorFunction{
+export interface OperatorWithProperties extends OperatorFunction{
   earlyOut?: (a: any) => any;
   precedence?:number;
 }
 
-interface Operators{
+export interface Operators{
   [key: string]:OperatorWithProperties;
 }
 const operators:Operators = {

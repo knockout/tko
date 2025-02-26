@@ -1,7 +1,7 @@
 {
-  "compileOnSave": false,
-  "declaration": true,
+  "compileOnSave": false,  
   "compilerOptions": {
+    "declaration": true,
     "downlevelIteration": true,
     "target": "ES6",
     "module": "ES2015",
@@ -11,7 +11,9 @@
     "allowSyntheticDefaultImports":  true,
     "strict": true,
     "baseUrl": ".",
-    "noEmit": true,
+    "noEmit": true, //Deactivite "noEmit" to generating d.ts-File to 'builds/dts/dist' via "make dts"
+    "emitDeclarationOnly": true,
+    "outDir": "builds/dts/dist",
     /*Disable some typing feature from ts to detect first steps to a strong typed version*/
     "noImplicitAny": false,
     "noImplicitThis": false,

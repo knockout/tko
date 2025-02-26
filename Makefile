@@ -35,6 +35,9 @@ lint:
 tsc:
 	$(NPX) tsc
 
+dts:
+	$(NPX) tsc --noEmit false
+
 docker-build:
 	$(DOCKER) build . --tag tko
 
