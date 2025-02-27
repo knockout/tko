@@ -31,6 +31,8 @@ overloadOperator('!=', (a, b) => a !== b)
 
 const builder = new Builder({
   filters,
+  extenders: {},
+  options: {},
   provider: new MultiProvider({
     providers: [
       new ComponentProvider(),
@@ -52,6 +54,7 @@ const builder = new Builder({
   ]
 })
 
+// @ts-ignore: Build-Parameter
 const version = BUILD_VERSION
 export default builder.create({
   jsx: {

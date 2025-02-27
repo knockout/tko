@@ -21,7 +21,7 @@ export interface ProviderParamsInput{
 }
 
 export default class Provider {
-  constructor (params: ProviderParamsInput | null = null) {
+  constructor (params?: ProviderParamsInput | null) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')
     }

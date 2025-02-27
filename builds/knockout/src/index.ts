@@ -29,16 +29,15 @@ const expressionRewriting = {
   preProcessBindings: s => dataBindProvider.preProcessBindings(s)
 }
 
+const provider = new MultiProvider({providers: [
+  new ComponentProvider(),
+  dataBindProvider,
+  new VirtualProvider(),
+  new AttributeProvider()
+]})
+
 const builder = new Builder({
-  filters,
-  provider: new MultiProvider({
-    providers: [
-      new ComponentProvider(),
-      dataBindProvider,
-      new VirtualProvider(),
-      new AttributeProvider()
-    ]
-  }),
+  provider: provider,
   bindings: [
     coreBindings,
     templateBindings,
@@ -46,12 +45,15 @@ const builder = new Builder({
     componentBindings,
     { each: foreachBindings.foreach }
   ],
+  extenders: {},
+  filters,
   options: {
     bindingGlobals: defaultOptions.global,
     bindingStringPreparsers: [functionRewrite]
   }
 })
 
+// @ts-ignore: Build-Parameter
 const version = BUILD_VERSION
 export default builder.create({
   version,
