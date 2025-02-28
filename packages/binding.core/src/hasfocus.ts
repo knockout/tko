@@ -4,7 +4,9 @@ import {
 } from '@tko/utils'
 
 import {
-    unwrap, dependencyDetection
+    unwrap
+    , dependencyDetection
+    , isWriteableObservable
 } from '@tko/observable'
 
 var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
@@ -31,9 +33,15 @@ export var hasfocus = {
         }
         isFocused = (active === element)
       }
-            // var modelValue = valueAccessor();
-      valueAccessor(isFocused, {onlyIfChanged: true})
-
+      var modelValue = valueAccessor(isFocused, {onlyIfChanged: true});
+      // In the scenario that hasFocus is binded not via the DataBindProvider
+      // but as an example as a LegacyBinding HasFocus value changes were not fired
+      // the fix was transfered from ko 3.5 (Focusout event was not fired)
+      // This only replies the value if there are changes
+      // it won't effect if already set by valueAccessor (Parser.convertToAccessors)
+      if (isWriteableObservable(modelValue) && (modelValue.peek() !== isFocused)) {
+        modelValue(isFocused);
+      }
             // cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
       element[hasfocusLastValue] = isFocused
       element[hasfocusUpdatingProperty] = false
