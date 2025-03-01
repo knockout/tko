@@ -46,13 +46,20 @@ export interface BindingContext<T = any> {
   extend(properties: object): BindingContext<T>;
   extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
 
+  lookup (token: string, globals: any, node: any);
+
   createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
   createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
 }
 
+// This interface is for the JS-Factory-Method 'bindingContext' to returns a typed BindingContext
+export interface bindingContext {
+  new <T = any>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext<T>;
+};
+
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting) {
+export const bindingContext = function<T>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<T>, settings?: BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -137,7 +144,7 @@ export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingC
       self[contextSubscribeSymbol] = undefined
     }
   }
-}
+} as unknown as bindingContext;
 
 Object.assign(bindingContext.prototype, {
 
