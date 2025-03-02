@@ -13,7 +13,6 @@ export * from './function'
 export * from './string'
 export * from './symbol'
 export * from './css'
-export { jQuerySetInstance } from './jquery'
 export { default as options } from './options'
 
 // DOM;

@@ -131,6 +131,9 @@ function localConfig(config, useChrome) {
       fullscreenable: false,
       hasShadow: false
     },
+    client: {
+      args: argv,
+    },
     //browserDisconnectTimeout: 100000,
     //browserNoActivityTimeout: 100000,
     browsers: useChrome ? 

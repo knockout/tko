@@ -1,6 +1,8 @@
 /// <reference types="jasmine" />
 /// <reference types="jquery" />
 
+import jQuery from "jquery";
+window.jQuery = jQuery;
 
 /*
  * Configure the Jasmine testing framework.
@@ -8,7 +10,7 @@
  /* globals runs, waitsFor, jasmine */
  
 import {
-  arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty
+  arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty, options
 } from '../dist/'
 
 window.DEBUG = true;
@@ -232,4 +234,21 @@ jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMil
 
 beforeEach(function() {
     this.addMatchers(matchers);
+
+    switchJQueryState();
 });
+
+afterEach(function() {
+    expect(disableJQueryUsage).toEqual(options.disableJQueryUsage);
+})
+
+const KARMA_STRING = '__karma__'
+var disableJQueryUsage = true;
+function switchJQueryState() {
+    if (window[KARMA_STRING] && window[KARMA_STRING].config.args.includes('--noJQuery')) {
+        options.disableJQueryUsage = disableJQueryUsage = true;
+    } else {
+        options.disableJQueryUsage = disableJQueryUsage = false;
+    }
+}
+
