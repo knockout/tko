@@ -746,6 +746,12 @@ describe('Binding: Foreach', function () {
    */
 
   it('Should not create a child context when `as` is used', function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip "as-item-usage" because createChildContextWithAs is enabled')
+      return;
+    }
+    
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'><span data-bind='text: item'></span></div>"
     var someItems = ['alpha', 'beta']
     applyBindings({ someItems: someItems }, testNode)
@@ -758,6 +764,12 @@ describe('Binding: Foreach', function () {
   })
 
   it('Should provide access to observable items', function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip "as-item-usage" because createChildContextWithAs is enabled')
+      return;
+    }
+    
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, as: \"item\" }'><input data-bind='value: item'/></div>"
     var x = observable('first'), y = observable('second'), someItems = observableArray([ x, y ])
     applyBindings({ someItems: someItems }, testNode)

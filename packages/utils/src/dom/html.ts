@@ -35,7 +35,7 @@ var none = [0, '', ''],
   },
 
     // The canonical way to test that the HTML5 <template> tag is supported
-  supportsTemplateTag = options.document && 'content' in options.document.createElement('template')
+  supportsTemplateTag = options.useTemplateTag && options.document && 'content' in options.document.createElement('template')
 
 function getWrap (tags) {
   const m = tags.match(/^(?:<!--.*?-->\s*?)*?<([a-z]+)[\s>]/)

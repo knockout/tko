@@ -19,6 +19,9 @@ export class Options {
   // Don't set this false, with jquery 3.7+
   useOnlyNativeEvents: boolean = true 
 
+  // Use HTML5 <template> tags if is supported
+  useTemplateTag: boolean = true
+
   protoProperty: string = '__ko_proto__'
 
   // Modify the default attribute from `data-bind`.
