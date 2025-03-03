@@ -27,8 +27,10 @@ export interface BindingContextSetting {
   exportDependencies?: boolean;
 }
 
+export type KnockoutInternalInstance = any // typeof ko;
+
 export interface BindingContext<T = any> {
-  ko: any; // typeof ko;
+  ko: KnockoutInternalInstance; 
 
   [symbol: symbol]: any
   $parent?: any;
