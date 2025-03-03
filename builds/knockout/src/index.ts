@@ -37,7 +37,7 @@ const provider = new MultiProvider({providers: [
 ]})
 
 const builder = new Builder({
-  provider: provider,
+  provider,
   bindings: [
     coreBindings,
     templateBindings,
