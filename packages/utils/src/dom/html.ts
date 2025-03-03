@@ -86,10 +86,10 @@ function templateHtmlParse (html: string, documentContext? : Document): Node[] {
 }
 
 function jQueryHtmlParse (html: string, documentContext?: Document) : Node[] {
-  const {jQuery} = options
+  const jQuery = options.jQuery
 
   // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
-  if (jQuery && jQuery.parseHTML) {
+  if (jQuery) {
     return jQuery.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
   } 
 

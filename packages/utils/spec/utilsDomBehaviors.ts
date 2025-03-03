@@ -50,8 +50,8 @@ describe('setTextContent', function () {
 describe('registerEventHandler', function () {
   var testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
-/* //TODO it looks like jquery3.7+ and trigger doesn't works with tko, useOnlyNativeEvents should be always true if jquery is used.
-  it('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
+  //TODO it looks like jquery3.7+ and trigger doesn't works with tko, useOnlyNativeEvents should be always true if jquery is used.
+  xit('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
     const jQuery = options.jQuery
     
     if(!options.jQuery)
@@ -86,7 +86,7 @@ describe('registerEventHandler', function () {
     eventFired = jQueryModified = false
     ko.utils.triggerEvent(element, 'click')
     expect(eventFired && !jQueryModified).toBe(true)
-  }) */
+  })
 
   it('if jQuery is referenced, useOnlyNativeEvents option set to true', function () {
 
