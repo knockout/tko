@@ -6,6 +6,8 @@ import {
     dependencyDetection, observable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
     applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'
@@ -35,6 +37,12 @@ import {
  * and this.computed('render') must be called in the child constructor.
  */
 export default class ConditionalBindingHandler extends AsyncBindingHandler {
+  get bindingContext(): any {
+    return;
+  }
+  completesElseChain: Observable;
+  hasElse: boolean;
+  ifElseNodes?: any;
   constructor (params) {
     super(params)
     this.hasElse = this.detectElse(this.$element)
@@ -43,11 +51,16 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
   }
 
   getIfElseNodes () {
-    if (this.ifElseNodes) { return this.ifElseNodes }
+    if (this.ifElseNodes) {
+      return this.ifElseNodes
+    }
     if (dependencyDetection.getDependenciesCount() || this.hasElse) {
       return this.cloneIfElseNodes(this.$element, this.hasElse)
     }
   }
+
+  // Set to hide tsc error for using this in line 63, but must be overriden by design (see line 34)
+  renderStatus():any  {};
 
   render () {
     const isFirstRender = !this.ifElseNodes
@@ -66,7 +79,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     }
   }
 
-  async renderAndApplyBindings (nodes, useOriginalNodes) {
+  async renderAndApplyBindings (nodes: ArrayLike<Node>, useOriginalNodes?: boolean) {
     if (!useOriginalNodes) {
       virtualElements.setDomNodeChildren(this.$element, cloneNodes(nodes))
     }
@@ -107,8 +120,8 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
    */
   cloneIfElseNodes (element, hasElse) {
     const children = virtualElements.childNodes(element)
-    const ifNodes = []
-    const elseNodes = []
+    const ifNodes = new Array()
+    const elseNodes = new Array()
     let target = ifNodes
 
     for (var i = 0, j = children.length; i < j; ++i) {

@@ -13,6 +13,8 @@ import {
   isObservable, unwrap, observable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
   isComputed
 } from '@tko/computed'
@@ -47,15 +49,36 @@ function isIterable (v) {
  * @property {object} attributes
  */
 
+interface JSX {
+  elementName: string;
+  children: Array<JSX>;
+  attributes: any;
+}
+
+interface Changes {
+  index: number;
+  status: string;
+  value: any
+}
+
 /**
  * Observe a variety of possible cases from JSX, modifying the
  * `parentNode` at `insertBefore` with the result.
  */
 export class JsxObserver extends LifeCycle {
+  adoptedInsertBefore: boolean
+  noInitialBinding: boolean
+  insertBefore: Node | null
+  parentNode: Node
+  parentNodeTarget: Node | null
+  subscriptionsForNode: any
+  nodeArrayOrObservableAtIndex: any
+  xmlns: any
+
   /**
    * @param {any} jsxOrObservable take a long list of permutations
    */
-  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns, noInitialBinding) {
+  constructor (jsxOrObservable: any, parentNode:Node, insertBefore:Node | null = null, xmlns?: any, noInitialBinding?: boolean | null) {
     super()
 
     const parentNodeIsComment = parentNode.nodeType === 8
@@ -69,7 +92,7 @@ export class JsxObserver extends LifeCycle {
       if (!insertBefore) {
         const insertAt = parentNodeIsComment ? parentNode.nextSibling : null
         insertBefore = this.createComment('O')
-        parentNodeTarget.insertBefore(insertBefore, insertAt)
+        parentNodeTarget?.insertBefore(insertBefore, insertAt)
       } else {
         this.adoptedInsertBefore = true
       }
@@ -103,12 +126,9 @@ export class JsxObserver extends LifeCycle {
     this.noInitialBinding = false
   }
 
-  /**
-   * @param {HTMLElement|Comment|HTMLTemplateElement} parentNode
-   */
-  getParentTarget (parentNode) {
-    if ('content' in parentNode) { return parentNode.content }
-    if (parentNode.nodeType === 8) { return parentNode.parentNode }
+  getParentTarget (parentNode: Node):  Node | null {
+    if ('content' in parentNode) { return (parentNode as HTMLTemplateElement).content }
+    if (parentNode.nodeType === 8) { return (parentNode as Comment).parentNode }
     return parentNode
   }
 
@@ -118,7 +138,7 @@ export class JsxObserver extends LifeCycle {
     const ib = this.insertBefore
     const insertBeforeIsChild = ib && this.parentNodeTarget === ib.parentNode
     if (insertBeforeIsChild && !this.adoptedInsertBefore) {
-      this.parentNodeTarget.removeChild(ib)
+      this.parentNodeTarget?.removeChild(ib)
     }
     this.removeAllPriorNodes()
     Object.assign(this, {
@@ -133,7 +153,7 @@ export class JsxObserver extends LifeCycle {
     this.subscriptionsForNode.clear()
   }
 
-  createInitialAdditions (possibleIterable) {
+  createInitialAdditions (possibleIterable): Changes[] {
     const status = 'added'
     if (typeof possibleIterable === 'object' &&
       possibleIterable !== null &&
@@ -152,9 +172,10 @@ export class JsxObserver extends LifeCycle {
    *   - to the new array indexes for adds
    *   - sorted by index in ascending order
    */
-  observableArrayChange (changes) {
-    let adds = []
-    let dels = []
+  observableArrayChange (changes: Changes[]) {
+    let adds: [number, any][] = []
+    let dels: [number, any][] = []
+
     for (const index in changes) {
       const change = changes[index]
       if (change.status === 'added') {
@@ -163,6 +184,7 @@ export class JsxObserver extends LifeCycle {
         dels.unshift([change.index, change.value])
       }
     }
+
     dels.forEach(change => this.delChange(...change))
     adds.forEach(change => this.addChange(...change))
   }
@@ -173,12 +195,12 @@ export class JsxObserver extends LifeCycle {
    * @param {int} index
    * @param {string|object|Array|Observable.string|Observable.Array|Observable.object} jsx
    */
-  addChange (index, jsx) {
+  addChange (index: number, jsx: string | object | Array<any> | Observable<string> | Observable<any[]> | Observable<object>) {
     this.nodeArrayOrObservableAtIndex.splice(index, 0,
-      this.injectNode(jsx, this.lastNodeFor(index)))
+      this.injectNode(jsx, this.lastNodeFor(index)!))
   }
 
-  injectNode (jsx, nextNode) {
+  injectNode (jsx, nextNode: Node) {
     let nodeArrayOrObservable
 
     if (isObservable(jsx)) {
@@ -186,13 +208,13 @@ export class JsxObserver extends LifeCycle {
       const observer = new JsxObserver(jsx, parentNode, nextNode, xmlns, this.noInitialBinding)
       nodeArrayOrObservable = [observer]
     } else if (typeof jsx !== 'string' && isIterable(jsx)) {
-      nodeArrayOrObservable = []
+      nodeArrayOrObservable = new Array()
       for (const child of jsx) {
         nodeArrayOrObservable.unshift(
           this.injectNode(child, nextNode))
       }
     } else {
-      const $context = contextFor(this.parentNode)
+      const $context = contextFor(this.parentNode as HTMLElement)
       const isInsideTemplate = 'content' in this.parentNode
       const shouldApplyBindings = $context && !isInsideTemplate && !this.noInitialBinding
 
@@ -203,7 +225,7 @@ export class JsxObserver extends LifeCycle {
       }
 
       for (const node of nodeArrayOrObservable) {
-        this.parentNodeTarget.insertBefore(node, nextNode)
+        this.parentNodeTarget?.insertBefore(node, nextNode)
         if (shouldApplyBindings && this.canApplyBindings(node)) {
           applyBindings($context, node)
         }
@@ -213,31 +235,32 @@ export class JsxObserver extends LifeCycle {
     return nodeArrayOrObservable
   }
 
+
   /**
    * True when Node is a type suitable for applyBindings i.e. a HTMLElement
    * or a Comment.
    * @param {Node} node
    */
-  canApplyBindings (node) {
+  canApplyBindings (node: Node): boolean {
     return node.nodeType === 1 || node.nodeType === 8
   }
 
-  delChange (index) {
+  delChange (index: number, _: any) {
     this.removeNodeArrayOrObservable(
       this.nodeArrayOrObservableAtIndex[index])
     this.nodeArrayOrObservableAtIndex.splice(index, 1)
   }
 
-  getSubscriptionsForNode (node) {
+  getSubscriptionsForNode (node: Node) {
     if (!this.subscriptionsForNode.has(node)) {
-      const subscriptions = []
+      const subscriptions = new Array()
       this.subscriptionsForNode.set(node, subscriptions)
       return subscriptions
     }
     return this.subscriptionsForNode.get(node)
   }
 
-  isJsx (jsx) {
+  isJsx (jsx): jsx is JSX {
     return typeof jsx.elementName === 'string' &&
       'children' in jsx &&
       'attributes' in jsx
@@ -302,16 +325,16 @@ export class JsxObserver extends LifeCycle {
    *
    * @param {HTMLElement} node
    */
-  cloneJSXorMoveNode (node) {
+  cloneJSXorMoveNode (node: Node) {
     return ORIGINAL_JSX_SYM in node
-      ? this.jsxToNode(node[ORIGINAL_JSX_SYM])
+      ? this.jsxToNode(node[ORIGINAL_JSX_SYM] as JSX)
       : node
   }
 
   /**
    * @param {JSX} jsx to convert to a node.
    */
-  jsxToNode (jsx) {
+  jsxToNode (jsx: JSX) {
     const xmlns = jsx.attributes.xmlns || NAMESPACES[jsx.elementName] || this.xmlns
     const node = document.createElementNS(xmlns || NAMESPACES.html, jsx.elementName)
 
@@ -364,7 +387,7 @@ export class JsxObserver extends LifeCycle {
    * @param {string} attr element attribute
    * @return {string} namespace argument for setAtttributeNS
    */
-  getNamespaceOfAttribute (attr) {
+  getNamespaceOfAttribute (attr: string): string | null {
     const [prefix, ...unqualifiedName] = attr.split(':')
     if (prefix === 'xmlns' || (unqualifiedName.length && NAMESPACES[prefix])) {
       return NAMESPACES[prefix]
@@ -378,7 +401,7 @@ export class JsxObserver extends LifeCycle {
    * @param {string} name
    * @param {any} valueOrObservable
    */
-  setNodeAttribute (node, name, valueOrObservable) {
+  setNodeAttribute (node: HTMLElement, name: string, valueOrObservable: any) {
     const value = unwrap(valueOrObservable)
     NativeProvider.addValueToNode(node, name, valueOrObservable)
     if (value === undefined) {
@@ -396,7 +419,7 @@ export class JsxObserver extends LifeCycle {
    * @param {int} index
    * @return {Comment} that immediately precedes this.
    */
-  lastNodeFor (index) {
+  lastNodeFor (index: number): Comment | null {
     const nodesAtIndex = this.nodeArrayOrObservableAtIndex[index] || []
     const [lastNodeOfPrior] = nodesAtIndex.slice(-1)
     const insertBefore = lastNodeOfPrior instanceof JsxObserver

@@ -15,13 +15,16 @@ export function stringStartsWith (string, startsWith) {
   return string.substring(0, startsWith.length) === startsWith
 }
 
-export function parseJson (jsonString) {
+export function parseJson<T = any> (jsonString: string): T | null {
   if (typeof jsonString === 'string') {
     jsonString = stringTrim(jsonString)
     if (jsonString) {
-      if (JSON && JSON.parse) // Use native parsing where available
-            { return JSON.parse(jsonString) }
-      return (new Function('return ' + jsonString))() // Fallback on less safe parsing for older browsers
+      if (JSON && JSON.parse) {
+        // Use native parsing where available
+        return JSON.parse(jsonString) as T;
+      }
+      // Fallback on less safe parsing for older browsers
+      return (new Function('return ' + jsonString))() as T
     }
   }
   return null

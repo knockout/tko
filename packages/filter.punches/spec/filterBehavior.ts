@@ -5,14 +5,18 @@ import {
 
 import { filters } from '../dist'
 
+
+declare var ko : any
+/* can be remove https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array.isarray
 if (!Array.isArray) {
   Array.isArray = function (arg) {
     return Object.prototype.toString.call(arg) === '[object Array]'
   }
 }
+*/
 
 describe('Text filters preprocessor', function () {
-    // var filterPreprocessor = ko.punches.textFilter.preprocessor;
+  var filterPreprocessor = function(string) { return "todo deactivated, see xit" } //var filterPreprocessor = ko.punches.textFilter.preprocessor;
 
     /* Skipping the following five since they are tests that apply to the
        filter-runner moreso than any specific filter exported here. */
@@ -125,7 +129,8 @@ describe('Text filters preprocessor', function () {
 
 /* Skip this since */
 xdescribe('Text filter bindings', function () {
-  beforeEach(jasmine.prepareTestNode)
+  var testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('Should convert input into appropriate output', function () {
     testNode.innerHTML = "<div data-bind='text: input | lowercase | fit:10 | json'></div>"
