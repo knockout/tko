@@ -66,7 +66,7 @@ class JsxTestObserver extends JsxObserver {
  */
 function jsxToNode (jsx, xmlns?, node = document.createElement('div')) : HTMLElement {
   new JsxTestObserver(jsx, node, null, xmlns)
-  return node.children[0] as HTMLElement
+  return node.childNodes[0] as HTMLElement
 }
 
 describe('jsx', function () {
@@ -224,8 +224,8 @@ describe('jsx', function () {
     assert.instanceOf(node.childNodes[0], SVGElement)
     assert.lengthOf(node.childNodes, 2)
     obs({ elementName: 'rect', children: [], attributes: {} })
-    assert.equal(node.children[1].tagName, 'rect')
-    assert.instanceOf(node.children[1], SVGElement)
+    assert.equal(node.childNodes[1]['tagName'], 'rect')
+    assert.instanceOf(node.childNodes[1], SVGElement)
     assert.equal(node.outerHTML, '<svg abc="123"><circle></circle><rect></rect><!--O--></svg>')
   })
 
@@ -271,7 +271,7 @@ describe('jsx', function () {
 
     applyBindings({ abc: '123' }, parent)
     assert.equal(counter, 1)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     io(inode) // <i ko-counter />
     assert.equal(counter, 2)
     jo.dispose()
@@ -291,7 +291,7 @@ describe('jsx', function () {
 
     applyBindings({ abc: '123' }, parent)
     assert.equal(counter, 1)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     delete inode[ORIGINAL_JSX_SYM]
     assert.throws(() => io(inode), /You cannot apply bindings multiple times/)
     jo.dispose()
@@ -312,7 +312,7 @@ describe('jsx', function () {
 
     applyBindings({ abc: '123' }, parent)
     assert.equal(counter, 1)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     delete inode[ORIGINAL_JSX_SYM]
     assert.throws(() => io(inode), /You cannot apply bindings multiple times/)
     jo.dispose()
@@ -331,7 +331,7 @@ describe('jsx', function () {
     provider.bindingHandlers.set({ counter: () => ++counter })
 
     applyBindings({abc: '123'}, parent)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     delete inode[ORIGINAL_JSX_SYM]
     const p = Symbol('An arbitrary property')
     inode[p] = 12341
@@ -957,7 +957,7 @@ describe('jsx', function () {
   })
 
   describe('$context', () => {
-    function testContext (jsxConvertible, nodeToTest = n => n.children[0]) {
+    function testContext (jsxConvertible, nodeToTest = n => n.childNodes[0]) {
       const parent = document.createElement('div')
       const view = {}
       options.bindingProviderInstance = new VirtualProvider()
@@ -994,7 +994,7 @@ describe('jsx', function () {
         children: [ { elementName: 'y', children: [], attributes: {} } ],
         attributes: {}
       }
-      testContext(jsx, n => n.children[0].children[0])
+      testContext(jsx, n => n.childNodes[0].childNodes[0])
     })
 
     it('applies to observable jsx children', () => {
@@ -1005,7 +1005,7 @@ describe('jsx', function () {
         ),
         attributes: {}
       }
-      testContext(jsx, n => n.children[0].children[0])
+      testContext(jsx, n => n.childNodes[0].childNodes[0])
     })
 
     it('applies to jsx children that are observable', () => {
@@ -1016,14 +1016,14 @@ describe('jsx', function () {
         ],
         attributes: {}
       })
-      testContext(jsx, n => n.children[0].children[0])
+      testContext(jsx, n => n.childNodes[0].childNodes[0])
     })
 
     it('applies to observables when they are updated', () => {
       const obs = observable()
       testContext(obs, n => {
         obs({ elementName: 'x', children: [], attributes: {} })
-        return n.children[0]
+        return n.childNodes[0]
       })
     })
   })

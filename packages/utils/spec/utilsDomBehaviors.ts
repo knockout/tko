@@ -127,7 +127,7 @@ describe('cloneNodes', function () {
     testNode.appendChild(child)
 
     var newNodes = ko.utils.cloneNodes([testNode])
-    var newChild = newNodes[0].children[0]
+    var newChild = newNodes[0].childNodes[0]
 
     var childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
 

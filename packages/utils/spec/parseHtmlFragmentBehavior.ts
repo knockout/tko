@@ -75,6 +75,6 @@ describe('Parse HTML fragment', function () {
     expect(parsedNodes1).not.toEqual(parsedNodes2)
     expect(parsedNodes1[0]).not.toEqual(parsedNodes2[0])
         // We need to test for deep inequality
-    expect(parsedNodes1[0].children[0]).not.toEqual(parsedNodes2[0].children[0])
+    expect(parsedNodes1[0].childNodes[0]).not.toEqual(parsedNodes2[0].childNodes[0])
   })
 })
