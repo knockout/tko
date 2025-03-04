@@ -5,6 +5,7 @@ import {
 
 import {
     applyBindings
+    , applyBindingsToNode
 } from '@tko/bind'
 
 import {
@@ -23,6 +24,8 @@ import { bindings as templateBindings } from '@tko/binding.template'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
+import $ from 'jquery'
+
 describe('Binding: Checked', function () {
   beforeEach(jasmine.prepareTestNode)
 
@@ -31,6 +34,45 @@ describe('Binding: Checked', function () {
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(templateBindings)
+  })
+
+  it('Checked Binding should update observable value if checked binding is applied in another CustomBinding', function () {
+    const RadioGroupExample  = {
+      init: (element: HTMLElement, valueAccessor: () => any) => {
+        let group = $(element);
+        let options = valueAccessor();
+        let items = options.items();
+
+        for (let i = 0; i < items.length; i++) {
+          let radioBox = $('<input type="radio">').appendTo(group);
+
+          applyBindingsToNode(radioBox[0], {
+            checked: items[i].checked,
+            attr:{
+              value: items[i].value
+            }
+          })
+        }
+      }
+    };
+
+    options.bindingProviderInstance.bindingHandlers.set("customBinding",  RadioGroupExample)
+
+    var $decision = observable("")
+    var yesOption = { value: "True", checked: $decision }
+    var noOption = { value: "False", checked: $decision }
+    
+    testNode.innerHTML = '<div data-bind="customBinding: radioBoxProp"></div>'
+    applyBindings({radioBoxProp: { items: observable([yesOption, noOption]) } }, testNode);
+
+    const yesRadio = testNode.children[0].children[0]
+    const noRadio = testNode.children[0].children[1]
+
+    expect($decision()).toEqual("")
+    triggerEvent(yesRadio, 'click')
+    expect($decision()).toEqual("True")
+    triggerEvent(noRadio, 'click')
+    expect($decision()).toEqual("False")
   })
 
   it('Triggering a click should toggle a checkbox\'s checked state before the event handler fires', function () {
