@@ -376,12 +376,12 @@ describe('Binding dependencies', function () {
       applyBindings(vm, testNode);
       expect(vm.getSubscriptionsCount()).toEqual(1);
 
-      const child = testNode.childNodes[0].childNodes[0] as HTMLInputElement;
-      expect(child.value).toEqual('My prop value');
+      const child : Function = () => testNode.childNodes[0].childNodes[0] as HTMLInputElement
+      expect(child().value).toEqual('My prop value');
 
       // a change to the input value should be written to the model
-      child.value = 'some user-entered value';
-      triggerEvent(child, 'change');
+      child().value = 'some user-entered value';
+      triggerEvent(child(), 'change');
       expect(vm().someProp).toEqual('some user-entered value');
             // a click should use correct view model
       triggerEvent(testNode.childNodes[0].childNodes[1] as Element, 'click');
@@ -389,10 +389,10 @@ describe('Binding dependencies', function () {
 
             // set the view-model to a new object
       vm({ someProp: observableConstructor('My new prop value'), checkVM: checkVM });
-      expect(child.value).toEqual('My new prop value');
+      expect(child().value).toEqual('My new prop value');
 
             // a change to the input value should be written to the new model
-      child.value = 'some new user-entered value';
+      child().value = 'some new user-entered value';
       triggerEvent(testNode.childNodes[0].childNodes[0] as Element, 'change');
       expect(vm().someProp()).toEqual('some new user-entered value');
             // a click should use correct view model
