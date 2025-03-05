@@ -6,6 +6,7 @@ queries:
 paths-ignore:
     - 'node_modules'
     - '**/spec/*.ts'
+    - '**/*jasmine*.ts'
     - 'builds'
     - 'docs'
 query-filters:
