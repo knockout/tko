@@ -4,13 +4,11 @@ import {
 } from '@tko/utils'
 
 import {
-    applyBindings
-    , applyBindingsToNode
+    applyBindings, applyBindingsToNode
 } from '@tko/bind'
 
 import {
-    observable,
-    observableArray
+    observable, observableArray
 } from '@tko/observable'
 
 import {
@@ -23,8 +21,6 @@ import { bindings as coreBindings } from '../dist'
 import { bindings as templateBindings } from '@tko/binding.template'
 
 import '@tko/utils/helpers/jasmine-13-helper'
-
-import $ from 'jquery'
 
 describe('Binding: Checked', function () {
   beforeEach(jasmine.prepareTestNode)
@@ -39,14 +35,17 @@ describe('Binding: Checked', function () {
   it('Checked Binding should update observable value if checked binding is applied in another CustomBinding', function () {
     const RadioGroupExample  = {
       init: (element: HTMLElement, valueAccessor: () => any) => {
-        let group = $(element);
-        let options = valueAccessor();
-        let items = options.items();
+        const group = element;
+        const options = valueAccessor();
+        const items = options.items();
 
         for (let i = 0; i < items.length; i++) {
-          let radioBox = $('<input type="radio">').appendTo(group);
+          //let radioBox = $('<input type="radio">').appendTo(group);
+          const radioInput = document.createElement('input');
+          radioInput.type = 'radio';
+          group.appendChild(radioInput);
 
-          applyBindingsToNode(radioBox[0], {
+          applyBindingsToNode(radioInput, {
             checked: items[i].checked,
             attr:{
               value: items[i].value
@@ -58,9 +57,9 @@ describe('Binding: Checked', function () {
 
     options.bindingProviderInstance.bindingHandlers.set("customBinding",  RadioGroupExample)
 
-    var $decision = observable("")
-    var yesOption = { value: "True", checked: $decision }
-    var noOption = { value: "False", checked: $decision }
+    const $decision = observable("")
+    const yesOption = { value: "True", checked: $decision }
+    const noOption = { value: "False", checked: $decision }
     
     testNode.innerHTML = '<div data-bind="customBinding: radioBoxProp"></div>'
     applyBindings({radioBoxProp: { items: observable([yesOption, noOption]) } }, testNode);

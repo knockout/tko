@@ -3,8 +3,7 @@ import {
 } from '@tko/utils'
 
 import {
-    applyBindings
-    , applyBindingsToNode
+    applyBindings, applyBindingsToNode
 } from '@tko/bind'
 
 import {
@@ -22,8 +21,6 @@ import {
 import * as coreBindings from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
-
-import $ from 'jquery';
 
 arrayForEach(['hasfocus', 'hasFocus'], binding => {
   describe(`Binding: ${binding}`, function () {
@@ -47,17 +44,17 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
     it('Should set an observable value to be true on focus and false on blur even if the binding is applied through another binding', function () {
       const createElementWithHasFocusBinding  = {
         init: (element: HTMLElement, valueAccessor: () => any) => {
-          let parent = $(element);
-          let $hasFocus = valueAccessor();
+          const parent = element;
+          const $hasFocus = valueAccessor();
 
-          applyBindingsToNode(parent[0], { hasFocus: $hasFocus })
+          applyBindingsToNode(parent, { hasFocus: $hasFocus })
         }
       };
       options.bindingProviderInstance.bindingHandlers.set("customBinding",  createElementWithHasFocusBinding)
 
       testNode.innerHTML = `<input data-bind='customBinding: customProps' /><input />`
 
-      var $myVal = observable(false)
+      const $myVal = observable(false)
       applyBindings({customProps: $myVal}, testNode );
       const input = testNode.children[0] as HTMLInputElement;
 
