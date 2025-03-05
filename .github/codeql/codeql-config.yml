@@ -17,5 +17,8 @@ query-filters:
         -/cwe/-79/        
         -/cwe/-94/
         -/cwe/-116/
+        -/cwe/-400/
         -/cwe/-471/
+        -/cwe/-700/
         -/cwe/-915/
+        -/cwe/-1333/
