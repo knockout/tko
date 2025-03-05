@@ -35,6 +35,8 @@ const options = {
 
   taskScheduler: null,
 
+  templateSizeLimit: 8000,
+
   debug: false,
 
   global: globalThis,

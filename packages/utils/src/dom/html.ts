@@ -118,8 +118,12 @@ function jQueryHtmlParse (html, documentContext) {
  * @param  {Object} documentContext That owns the executing code.
  * @return {[DOMNode]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html, documentContext) {
-    // Prefer <template>-tag based HTML parsing.
+export function parseHtmlFragment (html, documentContext) {  
+  if (options.templateSizeLimit && html && html.length > options.templateSizeLimit) {
+    throw new Error("Input too long. Please configure the 'templateSizeLimit'")
+  }
+
+  // Prefer <template>-tag based HTML parsing.
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
 
         // Benefit from jQuery's on old browsers, where possible
