@@ -133,7 +133,7 @@ export function parseHtmlFragment (html, documentContext) {
         : simpleHtmlParse(html, documentContext))
 }
 
-const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[\s\S]*>/gi
+const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/gi;
 function validateHTMLInput(html: string) {
   if (options.templateSizeLimit && html && html.length > options.templateSizeLimit) {
     throw new Error("Input too long. Please configure the 'templateSizeLimit'")
@@ -164,9 +164,7 @@ export function setHtml (node, html) {
     // function, so we unwrap it.
   if (typeof html === 'function') {
     html = html()
-  }
-
-  
+  } 
 
   if ((html !== null) && (html !== undefined)) {
     if (typeof html !== 'string') { 
