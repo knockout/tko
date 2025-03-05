@@ -119,9 +119,7 @@ function jQueryHtmlParse (html, documentContext) {
  * @return {[DOMNode]}              Parsed DOM Nodes
  */
 export function parseHtmlFragment (html, documentContext) {  
-  if (options.templateSizeLimit && html && html.length > options.templateSizeLimit) {
-    throw new Error("Input too long. Please configure the 'templateSizeLimit'")
-  }
+  validateHTMLInput(html)
 
   // Prefer <template>-tag based HTML parsing.
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
@@ -133,6 +131,18 @@ export function parseHtmlFragment (html, documentContext) {
 
         // ... otherwise, this simple logic will do in most common cases.
         : simpleHtmlParse(html, documentContext))
+}
+
+function validateHTMLInput(html: string) {
+  if (options.templateSizeLimit && html && html.length > options.templateSizeLimit) {
+    throw new Error("Input too long. Please configure the 'templateSizeLimit'")
+  }
+
+  const scriptTagPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi
+  if(scriptTagPattern.test(html)) {
+    throw new Error("HTML-Script-tag in template detected.")
+  }
+
 }
 
 export function parseHtmlForTemplateNodes (html, documentContext) {
@@ -157,15 +167,21 @@ export function setHtml (node, html) {
     html = html()
   }
 
-  if ((html !== null) && (html !== undefined)) {
-    if (typeof html !== 'string') { html = html.toString() }
+  
 
-        // If the browser supports <template> tags, prefer that, as
-        // it obviates all the complex workarounds of jQuery.
-        //
-        // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
-        // for example <tr> elements which are not normally allowed to exist on their own.
-        // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
+  if ((html !== null) && (html !== undefined)) {
+    if (typeof html !== 'string') { 
+      html = html.toString() 
+    }
+
+    validateHTMLInput(html)
+
+    // If the browser supports <template> tags, prefer that, as
+    // it obviates all the complex workarounds of jQuery.
+    //
+    // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
+    // for example <tr> elements which are not normally allowed to exist on their own.
+    // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
     if (jQueryInstance && !supportsTemplateTag) {
       jQueryInstance(node).html(html)
     } else {
