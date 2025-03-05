@@ -133,16 +133,15 @@ export function parseHtmlFragment (html, documentContext) {
         : simpleHtmlParse(html, documentContext))
 }
 
+const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[\s\S]*>/gi
 function validateHTMLInput(html: string) {
   if (options.templateSizeLimit && html && html.length > options.templateSizeLimit) {
     throw new Error("Input too long. Please configure the 'templateSizeLimit'")
   }
 
-  const scriptTagPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi
   if(scriptTagPattern.test(html)) {
     throw new Error("HTML-Script-tag in template detected.")
   }
-
 }
 
 export function parseHtmlForTemplateNodes (html, documentContext) {
