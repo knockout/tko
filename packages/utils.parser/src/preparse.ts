@@ -11,16 +11,16 @@ import {
 const specials = ',"\'`{}()/:[\\]'
 const bindingToken = RegExp([
     // These match strings, either with double quotes, single quotes, or backticks
-  '"(?:\\\\.|[^"])*"',
-  "'(?:\\\\.|[^'])*'",
-  '`(?:\\\\.|[^`])*`',
+  '"(?:\\\\.|[^"\\\\])*"',
+  "'(?:\\\\.|(?!')[^\\\\])*'",
+  '`(?:\\\\.|[^`\\\\])*`',
     // Match C style comments
   '/\\*(?:[^*]|\\*+[^*/])*\\*+/',
     // Match C++ style comments
   '//.*\n',
     // Match a regular expression (text enclosed by slashes), but will also match sets of divisions
     // as a regular expression (this is handled by the parsing loop below).
-  '/(?:\\\\.|[^/])+/\\w*',
+  '/(?:\\\\[^/]|[^/\\\\])+/\\w*',
     // Match text (at least two characters) that does not contain any of the above special characters,
     // although some of the special characters are allowed to start it (all but the colon and comma).
     // The text can contain spaces, but leading or trailing spaces are skipped.
