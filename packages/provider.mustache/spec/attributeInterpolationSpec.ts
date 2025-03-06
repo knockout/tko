@@ -30,8 +30,8 @@ import { AttributeMustacheProvider } from '../src';
 function ctxStub (obj = {}) { return { lookup (v) { return obj[v] } } }
 
 describe('Attribute Interpolation Markup Provider', function () {
-  var testNode: HTMLElement;
-  var provider: AttributeMustacheProvider;
+  let testNode: HTMLElement;
+  let provider: AttributeMustacheProvider;
 
   beforeEach(function () {
     provider = new AttributeMustacheProvider()
@@ -224,7 +224,7 @@ describe('Attribute Interpolation Markup Provider', function () {
 });
 
 describe('Attribute Interpolation Markup bindings', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   var bindingHandlers;

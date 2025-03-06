@@ -30,9 +30,9 @@ import { Provider } from '@tko/provider'
 
 
 describe('Binding attribute syntax', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

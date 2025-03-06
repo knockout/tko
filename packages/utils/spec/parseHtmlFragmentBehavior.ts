@@ -6,9 +6,9 @@ import {
 import '../helpers/jasmine-13-helper'
 
 describe('Parse HTML fragment', function () {
-  var supportsTemplateTag = 'content' in document.createElement('template')
+  const supportsTemplateTag = 'content' in document.createElement('template')
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
     // See: https://github.com/knockout/knockout/issues/1880

@@ -35,9 +35,9 @@ import {
 import { Provider } from '@tko/provider'
 
 describe('Templating', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

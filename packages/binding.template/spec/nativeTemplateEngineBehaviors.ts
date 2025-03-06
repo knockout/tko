@@ -37,7 +37,7 @@ describe('Native template engine', function () {
     return resultNode
   }
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

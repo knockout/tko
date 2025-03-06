@@ -43,8 +43,8 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Components: Custom elements', function () {
-  var bindingHandlers
-  var testNode : HTMLElement
+  let bindingHandlers
+  let testNode : HTMLElement
 
   beforeEach(function () {
     testNode = jasmine.prepareTestNode()

@@ -418,7 +418,7 @@ describe('objectMap', function () {
 })
 
 describe('cloneNodes', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {

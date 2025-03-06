@@ -28,8 +28,8 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Deferred bindings', function () {
-  var bindingSpy, bindingHandlers
-  var testNode : HTMLElement
+  let bindingSpy, bindingHandlers
+  let testNode : HTMLElement
 
   beforeEach(function () {
     testNode = jasmine.prepareTestNode()

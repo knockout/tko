@@ -31,9 +31,9 @@ import {bindings as coreBindings} from '@tko/binding.core';
 import '@tko/utils/helpers/jasmine-13-helper';
 
 describe('Binding dependencies', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {

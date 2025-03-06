@@ -48,7 +48,7 @@ describe('setTextContent', function () {
 })
 
 describe('registerEventHandler', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
@@ -113,7 +113,7 @@ describe('registerEventHandler', function () {
 })
 
 describe('cloneNodes', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
@@ -136,7 +136,7 @@ describe('cloneNodes', function () {
 })
 
 describe('selectExtensions', () => {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should use loose equality for select value', () => {

@@ -34,9 +34,9 @@ var hasfocusLastValue = '__ko_hasfocusKnockoutLastValue';
 
 arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
   describe(`Binding: ${binding}`, function () {
-    var bindingHandlers
+    let bindingHandlers
 
-    var testNode : HTMLElement
+    let testNode : HTMLElement
     beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
     beforeEach(function () {

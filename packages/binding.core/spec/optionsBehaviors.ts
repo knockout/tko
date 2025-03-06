@@ -29,7 +29,7 @@ import {
 } from '../dist/test-helper'
 
 describe('Binding: Options', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

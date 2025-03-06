@@ -28,10 +28,10 @@ jasmine.resolve = function (promise : Promise<boolean>) {
 jasmine.prepareTestNode = function() : HTMLElement {
     // The bindings specs make frequent use of this utility function to set up
     // a clean new DOM node they can execute code against
-    var existingNode = document.getElementById("testNode");
+    const existingNode = document.getElementById("testNode");
     if (existingNode !== null && existingNode.parentNode)
         existingNode.parentNode.removeChild(existingNode);
-    var testNode = document.createElement("div");
+    const testNode = document.createElement("div");
     testNode.id = "testNode";
     document.body.appendChild(testNode);
 

@@ -47,11 +47,11 @@ import {
 
 
 describe('Components: Component binding', function () {
-  var testComponentName = 'test-component',
+  let testComponentName = 'test-component',
     testComponentBindingValue,
     testComponentParams,
     outerViewModel
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function () {
     useMockForTasks(options)
     testNode = jasmine.prepareTestNode()
