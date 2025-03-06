@@ -9,13 +9,12 @@ paths-ignore:
     - '**/*jasmine*.ts'
     - 'builds'
     - 'docs'
+    - 'tko.io'
+    - 'tools'
 query-filters:
 - exclude:
     tags:   
-        -/cwe/-20/     
-        -/cwe/-78/
-        -/cwe/-79/        
-        -/cwe/-94/
+        -/cwe/-78/       
         -/cwe/-116/
         -/cwe/-400/
         -/cwe/-471/
