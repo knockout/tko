@@ -1,10 +1,9 @@
 
 import {
-    arrayForEach, parseHtmlFragment
+    arrayForEach, parseHtmlFragment, options
 } from '../dist'
 
 import '../helpers/jasmine-13-helper'
-import { options } from '../src'
 
 describe('Parse HTML fragment', function () {
   var supportsTemplateTag = 'content' in document.createElement('template')
