@@ -35,7 +35,18 @@ const options = {
 
   taskScheduler: null,
 
-  templateSizeLimit: 8000,
+  /**
+   * The maximum size of template to parse.
+   * Set to 0 to disable the limit.
+   */
+  templateSizeLimit: 4096,
+
+  /**
+   * Whether or not to allow script tags in templates.
+   * If false, an error will be thrown if a script tag is detected in the template.
+   * It is not recommended to set this to true.
+   */
+  allowScriptTagsInTemplates: false,
 
   debug: false,
 
