@@ -182,7 +182,7 @@ Object.assign(bindingContext.prototype, {
           // Extend the context hierarchy by setting the appropriate pointers
       self.$parentContext = parentContext
       self.$parent = parentContext?.$data
-      self.$parents = (parentContext?.$parents || []).slice(0)
+      self.$parents = (parentContext?.$parents ?? []).slice(0)
       self.$parents.unshift(self.$parent)
       if (extendCallback) {
         extendCallback(self)
