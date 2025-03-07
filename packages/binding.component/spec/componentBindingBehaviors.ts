@@ -124,6 +124,8 @@ describe('Components: Component binding', function () {
     testTemplate.appendChild(document.createElement('div'))
     testTemplate.appendChild(document.createTextNode(' '))
     testTemplate.appendChild(document.createElement('span')) //TODO good example for ASI..
+    expect(testTemplate.childNodes.length).toBe(3)
+
     ;(testTemplate.childNodes[0] as HTMLElement).innerHTML = 'hello'
     ;(testTemplate.childNodes[2] as HTMLElement).innerHTML = 'world'
     components.register(testComponentName, { template: testTemplate })
@@ -134,6 +136,7 @@ describe('Components: Component binding', function () {
         // See the template asynchronously shows up
     jasmine.Clock.tick(1)
     expect(testNode.children[0]).toContainHtml('<div>hello</div> <span>world</span>')
+    expect(testTemplate.children[0].childNodes.length).toBe(1)
 
         // Also be sure it's a clone
     expect(testNode.children[0].children[0]).not.toBe(testTemplate[0])
@@ -920,10 +923,10 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<b>x</b><i>y</i><em>z</em>')
-      expect(testNode.children[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.children[0].children[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.children[0].children[1] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0]['innerHTML']).toEqual('<b>x</b><i>y</i><em>z</em>')
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[1] instanceof HTMLElement).toBeTruthy()
     })
 
     it('inserts partials from `children`', function () {
@@ -1000,8 +1003,8 @@ describe('Components: Component binding', function () {
       applyBindings(outerViewModel, testNode)
       expect(seen.x).toEqual(x)
       expect(seen.y()).toEqual(x)
-      expect(testNode.children[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.children[0].children[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
     })
 
     it('binds context for ViewModel::template', () => {
@@ -1012,7 +1015,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(dataFor(testNode.children[0] as HTMLElement)).toEqual(outerViewModel)
+      expect(dataFor(testNode.childNodes[0])).toEqual(outerViewModel)
     })
 
     it('binds context for ViewModel.template', () => {
@@ -1023,7 +1026,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(dataFor(testNode.children[0] as HTMLElement)).toEqual(outerViewModel)
+      expect(dataFor(testNode.childNodes[0])).toEqual(outerViewModel)
     })
   }) // /jsx
 
@@ -1338,8 +1341,8 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       expect(testNode.innerText).toEqual('text')
-      expect(testNode.children[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.children[0].children[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
 
       obs('téx†')
       expect(testNode.innerText).toEqual('téx†')
@@ -1378,8 +1381,8 @@ describe('Components: Component binding', function () {
       applyBindings(outerViewModel, testNode)
 
       expect(testNode.innerText).toEqual('')
-      expect(testNode.children[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.children[0].children[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
 
       arr(['abcdef']);
       expect(testNode.innerHTML).toEqual(
@@ -1429,8 +1432,8 @@ describe('Components: Component binding', function () {
       applyBindings(outerViewModel, testNode)
 
       expect(testNode.innerText).toEqual('')
-      expect(testNode.children[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.children[0].children[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
 
       // <div x="1">r</div>
       arr([{elementName: 'div', children: ['r'], attributes: {x: 1}}, 'text'])
