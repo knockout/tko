@@ -3,10 +3,11 @@
 
 [![npm version](https://badge.fury.io/js/@tko%2Fbuild.reference.svg)](https://badge.fury.io/js/@tko%2Fbuild.reference)
 [![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
-[![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+[![Check 'Main' (build+tsc)](https://github.com/knockout/tko/actions/workflows/run-tsc.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/run-tsc.yml)
+[![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
+[![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 <!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/tko.svg)](https://saucelabs.com/u/tko) -->
 
 **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout).
@@ -124,7 +125,8 @@ Install electron-deps for "make test":
 sudo apt-get install build-essential clang libdbus-1-dev libgtk-3-dev \
 libnotify-dev libasound2-dev libcap-dev \
 libcups2-dev libxtst-dev \
-libxss1 libnss3-dev gcc-multilib g++-multilib curl
+libxss1 libnss3-dev gcc-multilib g++-multilib curl \
+gperf bison python3-dbusmock openjdk-8-jre
 ```
 
 Install Chrome for "make test-headless":
