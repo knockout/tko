@@ -63,6 +63,7 @@ In each individual `packages/*/` directory, you can also run:
 | Command | Effect |
 | --- | --- |
 | $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run` |
+| $ `make test-debug` | Runs all tests in the current package in debug- and watch-mode: Attach vscode, set a breakpoint, press save and debug |
 
 ### Testing
 
