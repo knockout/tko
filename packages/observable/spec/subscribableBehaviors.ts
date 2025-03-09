@@ -9,6 +9,11 @@ describe('Subscribable', function () {
     expect(isSubscribable(instance)).toEqual(true)
   })
 
+  it('subscribable has limit', function () {
+    var instance = new subscribable()
+    expect(instance.limit).not.toBeUndefined()
+  })
+
   it('isSubscribable should return false for undefined', function () {
     expect(isSubscribable(undefined)).toEqual(false)
   })
@@ -119,7 +124,7 @@ describe('Subscribable', function () {
 
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
     var instance = new subscribable()
-    var interceptedNotifications = []
+    var interceptedNotifications = new Array()
     instance.subscribe(function () { throw new Error('Should not notify subscribers by default once notifySubscribers is overridden') })
     instance.notifySubscribers = function (newValue, eventName) {
       interceptedNotifications.push({ eventName: eventName, value: newValue })

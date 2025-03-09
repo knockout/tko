@@ -7,7 +7,7 @@ import {
     unwrap
 } from '@tko/observable'
 
-const {jQueryInstance} = options
+const {jQueryInstance} = options //TODO jQueryInstance is never set, see comments in #207
 
 export var style = {
   update: function (element, valueAccessor) {

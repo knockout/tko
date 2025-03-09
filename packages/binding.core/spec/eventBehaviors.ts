@@ -21,7 +21,8 @@ import {bindings as coreBindings} from '../dist'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Event', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()
@@ -53,23 +54,23 @@ describe('Binding: Event', function () {
     }
     testNode.innerHTML = "<button data-bind='event:{click:firstHandler, mouseover:secondHandler, mouseout:null}'>hey</button>"
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(model.firstWasCalled).toEqual(true)
     expect(model.secondWasCalled).toEqual(false)
-    triggerEvent(testNode.childNodes[0], 'mouseover')
+    triggerEvent(testNode.children[0], 'mouseover')
     expect(model.secondWasCalled).toEqual(true)
-    triggerEvent(testNode.childNodes[0], 'mouseout') // Shouldn't do anything (specifically, shouldn't throw)
+    triggerEvent(testNode.children[0], 'mouseout') // Shouldn't do anything (specifically, shouldn't throw)
   })
 
   it('Should invoke lambda when the event occurs, using model as \'this\' param and first arg, and event as second arg', function () {
     testNode.innerHTML = "<button data-bind='event: { click: (data, event) => data.log(event) }'>hey</button>"
-    let thing = null;
+    let thing: any = null;
     applyBindings({
       log (arg) {
         thing = arg
       }
-    })
-    triggerEvent(testNode.childNodes[0], 'click')
+    }, testNode)
+    triggerEvent(testNode.children[0], 'click')
     expect(thing)
     expect(thing.type).toEqual('click')
   })
@@ -77,7 +78,7 @@ describe('Binding: Event', function () {
   it('Should prevent default action', function () {
     testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: noop }'>hey</a>"
     applyBindings({ noop: function () {} }, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
         // Assuming we haven't been redirected to http://www.example.com/, this spec has now passed
   })
 
@@ -87,7 +88,7 @@ describe('Binding: Event', function () {
     applyBindings({
         test: (_, event) => prevented = event.defaultPrevented,
     }, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(prevented).toEqual(false)
   })
 
@@ -99,10 +100,10 @@ describe('Binding: Event', function () {
         test: (_, event) => prevented = event.defaultPrevented,
         obs: obs
     }, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(prevented).toEqual(true)
     obs(false)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(prevented).toEqual(false)
   })
 
@@ -115,7 +116,7 @@ describe('Binding: Event', function () {
     }
     testNode.innerHTML = "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}'>hey</button></div>"
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(model.innerWasCalled).toEqual(true)
     expect(model.outerWasCalled).toEqual(true)
   })
@@ -129,7 +130,7 @@ describe('Binding: Event', function () {
     }
     testNode.innerHTML = "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}, clickBubble:false'>hey</button></div>"
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(model.innerWasCalled).toEqual(true)
     expect(model.outerWasCalled).toEqual(false)
   })
@@ -155,7 +156,7 @@ describe('Binding: Event', function () {
     testNode.innerHTML = "<button data-bind='event:{ mouseover: myHandler.bind(someObj, 123, \"another\", { something: true }) }'>hey</button>"
     var viewModel = { myHandler: myHandler, someObj: someObj }
     applyBindings(viewModel, testNode)
-    triggerEvent(testNode.childNodes[0], 'mouseover')
+    triggerEvent(testNode.children[0], 'mouseover')
     expect(didCallHandler).toEqual(true)
   })
 
@@ -167,9 +168,9 @@ describe('Binding: Event', function () {
       expect(evt.eventPhase).toEqual(3) // bubbling
     }
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(handlerCalls).toEqual(1)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(handlerCalls).toEqual(2)
   })
 
@@ -178,7 +179,7 @@ describe('Binding: Event', function () {
     testNode.innerHTML = "<a data-bind='click: fn'><b data-bind='event: {click: { bubble: false }}'></b></a>"
     const fn = () => handlerCalls++
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(handlerCalls).toEqual(0)
   })
 
@@ -187,9 +188,9 @@ describe('Binding: Event', function () {
     testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, once: true}}'></a>"
     const fn = () => handlerCalls++
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(handlerCalls).toEqual(1)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(handlerCalls).toEqual(1)
   })
 
@@ -199,7 +200,7 @@ describe('Binding: Event', function () {
       expect(evt.eventPhase).toEqual(1) // capturing
     }
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
   })
 
   xit('respects the `passive` param', function () {
@@ -218,7 +219,7 @@ describe('Binding: Event', function () {
       }
     }
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(preventDefaultThrows).toEqual(true)
   })
 
@@ -228,11 +229,11 @@ describe('Binding: Event', function () {
     var calls = 0
     const fn = () => calls++
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
-    triggerEvent(testNode.childNodes[0], 'click')
-    triggerEvent(testNode.childNodes[0], 'click')
-    triggerEvent(testNode.childNodes[0], 'click')
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(calls).toEqual(0)
     jasmine.Clock.tick(500)
     expect(calls).toEqual(1)
@@ -244,17 +245,17 @@ describe('Binding: Event', function () {
     let calls = 0
     const fn = () => calls++
     applyBindings({ fn }, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(calls).toEqual(0)
     jasmine.Clock.tick(100)
     expect(calls).toEqual(1)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(calls).toEqual(1)
     jasmine.Clock.tick(100)
     expect(calls).toEqual(2)
-    triggerEvent(testNode.childNodes[0], 'click')
-    triggerEvent(testNode.childNodes[0], 'click')
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(calls).toEqual(2)
     jasmine.Clock.tick(100)
     expect(calls).toEqual(3)
@@ -262,7 +263,8 @@ describe('Binding: Event', function () {
 })
 
 describe('Binding: on.', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()
@@ -275,7 +277,7 @@ describe('Binding: on.', function () {
     testNode.innerHTML = "<button data-bind='on.click: obs(true)'>hey</button>"
     applyBindings({ obs: obs }, testNode)
     expect(obs()).toEqual(false)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(obs()).toEqual(true)
   })
 })

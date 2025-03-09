@@ -2,6 +2,8 @@
 
 import { applyBindingsToDescendants } from './applyBindings'
 import { AsyncBindingHandler } from './BindingHandler'
+import type { BindingResult } from "./BindingResult";
+import type { BindingContext } from './bindingContext';
 
 /**
  * This DescendantBindingHandler is a base class for bindings that control
@@ -11,7 +13,7 @@ import { AsyncBindingHandler } from './BindingHandler'
 export class DescendantBindingHandler extends AsyncBindingHandler {
   get controlsDescendants () { return true }
 
-  async applyBindingsToDescendants (childContext, callback) {
+  async applyBindingsToDescendants (childContext: BindingContext, callback?: (result: BindingResult) => void ) {
     const bindingResult = applyBindingsToDescendants(childContext, this.$element)
     if (bindingResult.isSync) {
       this.bindingCompletion = bindingResult

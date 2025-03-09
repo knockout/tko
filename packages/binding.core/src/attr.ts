@@ -7,8 +7,10 @@ import {
   unwrap
 } from '@tko/observable'
 
+import type { AllBindings } from '@tko/bind'
+
 export var attr = {
-  update: function (element, valueAccessor, allBindings) {
+  update: function (element, valueAccessor, allBindings: AllBindings) { // allBindings not used!
     var value = unwrap(valueAccessor()) || {}
     objectForEach(value, function (attrName, attrValue) {
       attrValue = unwrap(attrValue)

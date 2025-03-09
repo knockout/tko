@@ -5,6 +5,13 @@ import {
 
 
 export default class Subscription {
+  private _disposeCallback: any
+  private _target: any
+  private _callback: any
+  private _isDisposed: boolean
+  private _domNodeDisposalCallback: null
+  private _node: Node
+
   constructor (target, observer, disposeCallback) {
     this._target = target
     this._callback = observer.next
@@ -13,7 +20,7 @@ export default class Subscription {
     this._domNodeDisposalCallback = null
   }
 
-  dispose () {
+  dispose (): void {
     if (this._domNodeDisposalCallback) {
       removeDisposeCallback(this._node, this._domNodeDisposalCallback)
     }
@@ -21,7 +28,7 @@ export default class Subscription {
     this._disposeCallback()
   }
 
-  disposeWhenNodeIsRemoved (node) {
+  disposeWhenNodeIsRemoved (node: Node): void {
     this._node = node
     addDisposeCallback(node, this._domNodeDisposalCallback = this.dispose.bind(this))
   }

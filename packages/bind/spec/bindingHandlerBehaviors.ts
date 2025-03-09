@@ -6,6 +6,8 @@ import {
     observable as koObservable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
   MultiProvider
 } from '@tko/provider.multi'
@@ -29,9 +31,10 @@ import { bindings as ifBindings } from '@tko/binding.if'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('BindingHandler behaviors', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
         // Set up the default binding handlers.
@@ -53,6 +56,12 @@ describe('BindingHandler behaviors', function () {
       var xCalls = 0,
         yCalls = 0
       bindingHandlers.fnHandler = class extends BindingHandler {
+
+        v : Observable
+        x : Observable
+        y : Observable        
+        computed;
+
         constructor (...args) {
           super(...args)
           var v = this.v = koObservable(0)
@@ -72,7 +81,7 @@ describe('BindingHandler behaviors', function () {
             }
           })
         }
-            }
+      }
       testNode.innerHTML = '<i data-bind="fnHandler"></i>'
       applyBindings({}, testNode)
       expect(xCalls).toEqual(1)
@@ -96,6 +105,7 @@ describe('BindingHandler behaviors', function () {
       var obs = koObservable(),
         handlerInstance
       bindingHandlers.fnHandler = class extends BindingHandler {
+        subscribe;
         constructor (...args) {
           super(...args)
           handlerInstance = this
@@ -104,7 +114,7 @@ describe('BindingHandler behaviors', function () {
         cb () {
           expect(this).toEqual(handlerInstance)
         }
-            }
+      }
       testNode.innerHTML = "<i data-bind='fnHandler'></i>"
       applyBindings({}, testNode)
       expect(obs.getSubscriptionsCount()).toEqual(1)
@@ -114,7 +124,8 @@ describe('BindingHandler behaviors', function () {
 
     it('registers a kind with HandlerClass.register', function () {
       class HC extends BindingHandler {}
-      HC.registerAs('testHCregistration')
+
+      BindingHandler.registerBindingHandler(HC, 'testHCregistration')
       expect(bindingHandlers.testHCregistration).toEqual(HC)
     })
   })

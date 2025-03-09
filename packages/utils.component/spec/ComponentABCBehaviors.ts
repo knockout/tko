@@ -24,14 +24,15 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('ComponentABC', function () {
-  var testComponentName = 'test-component',
+  let testComponentName = 'test-component',
     testComponentBindingValue,
     testComponentParams,
     outerViewModel
-
+  let testNode : HTMLElement
+  
   beforeEach(function () {
     useMockForTasks(options)
-    jasmine.prepareTestNode()
+    testNode = jasmine.prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
@@ -60,26 +61,27 @@ describe('ComponentABC', function () {
 
   it("throws when there's no overloading", function () {
     class CX extends ComponentABC {}
-    expect(() => CX.register()).toThrowContaining('overload')
+    expect(() => (CX as any).register()).toThrowContaining('overload')
   })
 
   it('throws when template or element is not overloaded', function () {
     class CX extends ComponentABC {
       customElementName () { return 'a-b' }
     }
-    expect(() => CX.register()).toThrowContaining('overload')
+    expect(() => (CX as any).register()).toThrowContaining('overload')
   })
 
   it('uses the class name kebab-case elementName is not overloaded', function () {
     class CaaXbbb extends ComponentABC {
       template () { return 'a-b' }
     }
-    CaaXbbb.register()
-    expect(CaaXbbb.customElementName).toEqual('caa-xbbb')
+    (CaaXbbb as any).register()
+    expect((CaaXbbb as any).customElementName).toEqual('caa-xbbb')
   })
 
   it('binds when registered like a normal component', function () {
     class CX extends ComponentABC {
+      myvalue: string;
       constructor (...args) {
         super(...args)
         this.myvalue = 'some parameter value'
@@ -87,7 +89,7 @@ describe('ComponentABC', function () {
       static get customElementName () { return 'test-component' }
       static get template () { return '<div data-bind="text: myvalue"></div>' }
 		}
-    CX.register()
+    (CX as any).register()
     applyBindings(outerViewModel, testNode)
     jasmine.Clock.tick(1)
 
@@ -97,14 +99,15 @@ describe('ComponentABC', function () {
 
   it('registers on the components', function () {
     class CX extends ComponentABC {
+      myvalue: string;
       constructor (...args) {
         super(...args)
         this.myvalue = 'some parameter value'
       }
       static get customElementName () { return 'test-component' }
       static get template () { return '<div data-bind="text: myvalue"></div>' }
-        }
-    CX.register()
+    }
+    (CX as any).register()
     expect(components._allRegisteredComponents['test-component'].viewModel)
             .toEqual(CX)
   })
@@ -118,7 +121,7 @@ describe('ComponentABC', function () {
         return node
       }
         }
-    CX.register()
+    (CX as any).register()
     applyBindings(outerViewModel, testNode)
     jasmine.Clock.tick(1)
 
@@ -136,7 +139,7 @@ describe('ComponentABC', function () {
       static get customElementName () { return 'test-component' }
       static get template () { return '<i></i>' }
         }
-    CX.register()
+    (CX as any).register()
     applyBindings(outerViewModel, testNode)
     cleanNode(testNode)
     expect(disp).toEqual(true)

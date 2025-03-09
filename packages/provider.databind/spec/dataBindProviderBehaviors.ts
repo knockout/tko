@@ -38,6 +38,9 @@ import {
 
 import * as coreBindings from '@tko/binding.core';
 
+import { assert} from "chai"
+import * as sinon from "sinon"
+
 var instance
 
 beforeEach(function () {
@@ -229,7 +232,7 @@ describe('all bindings', function () {
     var input = document.createElement('input'),
       evt = new CustomEvent('change'),
       obs = observable(),
-      context = {};
+      context: any = {};
     Object.defineProperty(context, 'pobs', {
       configurable: true,
       enumerable: true,
@@ -247,7 +250,7 @@ describe('all bindings', function () {
     var input = document.createElement('input'),
       // evt = new CustomEvent("change"),
       obs = observable(),
-      context = {};
+      context: any = {};
     Object.defineProperty(context, 'pobs', {
       configurable: true,
       enumerable: true,
@@ -269,7 +272,9 @@ describe('all bindings', function () {
       // evt = new CustomEvent("change"),
       obs = observable(),
       context = {
-        obj: {}
+        obj: {
+          sobs: ''
+        }
       };
     Object.defineProperty(context.obj, 'sobs', {
       configurable: true,
@@ -296,7 +301,7 @@ describe('all bindings', function () {
     var input = document.createElement('input'),
       // evt = new CustomEvent("change"),
       obs = observable(),
-      context = {},
+      context: any = {},
       obj = {},
       oo = observable(obj); // es5 wraps obj in an observable
 
@@ -330,7 +335,7 @@ describe('all bindings', function () {
       evt = new CustomEvent('change'),
       obs = observable(),
       oo = observable({}),
-      context = {};
+      context: any = {};
 
     Object.defineProperty(context, 'obj', {
       configurable: true,
@@ -359,7 +364,7 @@ describe('all bindings', function () {
       o0 = observable({}),
       o1 = observable({}),
       o2 = observable({}),
-      context = {};
+      context: any = {}
 
     Object.defineProperty(context, 'o0', {
       configurable: true,
@@ -398,7 +403,7 @@ describe('all bindings', function () {
 })
 
 describe('The lookup of variables (get_lookup_root)', function () {
-  function makeBindings (binding, context, globals, node) {
+  function makeBindings (binding, context, globals?, node?) {
     const ctx = new bindingContext(context)
     return new Parser().parse(binding, ctx, globals, node)
   }
@@ -481,9 +486,9 @@ describe('The lookup of variables (get_lookup_root)', function () {
 
   it('accesses $data before $context', function () {
     const binding = 'x: value'
-    const outerContext = new bindingContext({ value: 21 })
+    const outerContext = new bindingContext({ value: 21 }, undefined, undefined, undefined)
     const innerContext = outerContext.createChildContext({ value: 42 })
-    const bindings = new Parser().parse(binding, innerContext)
+    const bindings = new Parser().parse(binding, innerContext, undefined, undefined)
     assert.equal(bindings.x(), 42)
   })
 
@@ -502,7 +507,7 @@ describe('The lookup of variables (get_lookup_root)', function () {
   it('accesses properties created with defineProperty', function () {
     // style of e.g. knockout-es5
     var binding = 'a: z',
-      context = {},
+      context: any = {},
       bindings = makeBindings(binding, context),
       obs = observable();
 

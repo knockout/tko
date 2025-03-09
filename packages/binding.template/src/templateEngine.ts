@@ -25,39 +25,57 @@
 //     If you don't want to allow that, you can set the property 'allowTemplateRewriting' to false (like ko.nativeTemplateEngine does)
 //     and then you don't need to override 'createJavaScriptEvaluatorBlock'.
 
-import {
-  extend, options
-} from '@tko/utils'
+import { extend, options } from '@tko/utils'
+import { domElement, anonymousTemplate } from './templateSources'
+import type { TemplateSource } from './templateSources'
+import type { BindingContext } from '@tko/bind';
 
-import {
-  domElement, anonymousTemplate
-} from './templateSources'
+export interface TemplateOptions<T = any> {
+  afterRender?: (elements: Node[], dataItem: T) => void;
+  templateEngine?: TemplateEngine;
+}   
 
+export interface TemplateEngine {
+ allowTemplateRewriting: boolean;
+
+ renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+ createJavaScriptEvaluatorBlock(script: string): string;
+
+ makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource;
+
+ renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
+
+ isTemplateRewritten(template: string | Node, templateDocument?: Document): boolean;
+
+ rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
+}
+
+//TODO Class-Migration implements TemplateEngine
 export function templateEngine () { };
 
 extend(templateEngine.prototype, {
-  renderTemplateSource: function (templateSource, bindingContext, options, templateDocument) {
+  renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options, templateDocument?: Document) { // templateSource, bindingContext, templateDocument not in use
     options.onError('Override renderTemplateSource')
   },
 
-  createJavaScriptEvaluatorBlock: function (script) {
-    options.onError('Override createJavaScriptEvaluatorBlock')
+  createJavaScriptEvaluatorBlock(script: string) {
+    options.onError(new Error('Override createJavaScriptEvaluatorBlock'))
   },
 
-  makeTemplateSource: function (template, templateDocument) {
+  makeTemplateSource(template: string | Node, templateDocument?: Document) {
       // Named template
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
       var elem = templateDocument.getElementById(template)
-      if (!elem) { options.onError('Cannot find template with ID ' + template) }
+      if (!elem) { options.onError(new Error('Cannot find template with ID ' + template)) }
       return new domElement(elem)
     } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
           // Anonymous template
       return new anonymousTemplate(template)
-    } else { options.onError('Unknown template type: ' + template) }
+    } else { options.onError(new Error('Unknown template type: ' + template)) }
   },
 
-  renderTemplate: function (template, bindingContext, options, templateDocument) {
+  renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[] {
     var templateSource = this['makeTemplateSource'](template, templateDocument)
     return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }
