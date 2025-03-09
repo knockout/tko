@@ -4,7 +4,8 @@ import {
 } from '@tko/utils'
 
 import {
-    observable, isWritableObservable, isObservable
+    observable, isWritableObservable, isObservable,
+    Observable
 } from '@tko/observable'
 
 import {
@@ -293,8 +294,12 @@ describe('Components: Custom elements', function () {
       }
     })
 
+    interface myObs extends Observable {
+      subprop?: string;
+    }
+
         // See we can supply an observable instance, which is received with no wrapper around it
-    var myobservable = observable(1)
+    var myobservable = observable(1) as myObs
     myobservable.subprop = 'subprop'
     testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>'
     applyBindings({ myobservable: myobservable }, testNode)
