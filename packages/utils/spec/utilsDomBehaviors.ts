@@ -113,7 +113,7 @@ describe('registerEventHandler', function () {
         // Set the option to true.
     ko.options.useOnlyNativeEvents = true
 
-        // Verify jQuery is not used in event binding.
+    // Verify jQuery is not used in event binding.
     registerEventHandler(element, 'click', function (eventArgs) {
       eventFired = true
       jQueryModified = !!eventArgs.originalEvent

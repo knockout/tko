@@ -52,6 +52,7 @@ const operators:Operators = {
   '>=': function ge (a, b) { return a >= b },
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
+  //    TODO: 'typeof': function (a, b) { return a typeof b; },
   // equality
   '==': function equal (a, b) { return a == b },
   '!=': function ne (a, b) { return a != b },
