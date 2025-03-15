@@ -47,7 +47,25 @@ export class Options {
   get jQuery(): JQueryStatic | undefined {
     if (this.disableJQueryUsage)
       return;
-    return (globalThis as any).jQuery;
+    return this._jQuery ?? (globalThis as any).jQuery;
+  }
+
+  private _jQuery: JQueryStatic | undefined;
+  /**
+   * Set jQuery manuall to be used by TKO. 
+   * @param jQuery If jQuery set to undefined, TKO will not use jQuery and this.disableJQueryUsage to true.
+   */
+  set jQuery(jQuery: JQueryStatic | undefined) {
+    if(!jQuery)
+    {
+      this.disableJQueryUsage = true
+      this._jQuery = undefined
+    } 
+    else 
+    {
+      this._jQuery = jQuery
+      this.disableJQueryUsage = false
+    }
   }
 
   Promise: PromiseConstructor = globalThis.Promise
