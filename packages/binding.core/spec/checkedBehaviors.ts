@@ -39,7 +39,7 @@ describe('Binding: Checked', function () {
   it('Triggering a click should toggle a checkbox\'s checked state before the event handler fires', function () {
         // This isn't strictly to do with the checked binding, but if this doesn't work, the rest of the specs aren't meaningful
     testNode.innerHTML = "<input type='checkbox' />"
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     var clickHandlerFireCount = 0, expectedCheckedStateInHandler
     registerEventHandler(input, 'click', function () {
       clickHandlerFireCount++
@@ -60,7 +60,7 @@ describe('Binding: Checked', function () {
   it('Should be able to control a checkbox\'s checked state', function () {
     var myobservable = observable(true)
     testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />"
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
 
     applyBindings({ someProp: myobservable }, testNode)
     expect(input.checked).toEqual(true)
@@ -111,7 +111,7 @@ describe('Binding: Checked', function () {
     testNode.innerHTML = "<input type='radio' value='This Radio Button Value' data-bind='checked:someProp' />"
 
     applyBindings({ someProp: myobservable }, testNode)
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
 
     expect(input.checked).toEqual(false)
 
@@ -125,7 +125,7 @@ describe('Binding: Checked', function () {
     applyBindings({ someProp: myobservable }, testNode)
 
     expect(myobservable()).toEqual('another value')
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     input.click()
     expect(myobservable()).toEqual('this radio button value')
   })
@@ -183,7 +183,7 @@ describe('Binding: Checked', function () {
     var model = { myObservableArray: observableArray(['Unrelated value']) }
     testNode.innerHTML = "<input type='checkbox' value='My value' data-bind='checked:myObservableArray' />"
     applyBindings(model, testNode)
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.checked).toEqual(false)
 
         // Put the value in the array; observe the checkbox reflect this
@@ -227,7 +227,7 @@ describe('Binding: Checked', function () {
     testNode.innerHTML = "<input type='radio' data-bind='attr:{value:\"this radio button value\"}, checked:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
 
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.checked).toEqual(true)
     myObservable('another value')
     expect(input.checked).toEqual(false)
@@ -238,7 +238,7 @@ describe('Binding: Checked', function () {
     testNode.innerHTML = "<input type='radio' data-bind='checked:someProp, attr:{value:\"this radio button value\"}' />"
     applyBindings({ someProp: myobservable }, testNode)
 
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.checked).toEqual(true)
     myobservable('another value')
     expect(input.checked).toEqual(false)
@@ -370,7 +370,7 @@ describe('Binding: Checked', function () {
         testNode.innerHTML = "<input type='checkbox' data-bind='" + binding + ":checkedValue, checked:values' />"
         applyBindings(model, testNode)
 
-        var input = testNode.children[0] as HTMLInputElement
+        const input = testNode.children[0] as HTMLInputElement
         expect(model.values).toEqual([1])
         expect(input.checked).toEqual(true)
         expect(model.checkedValue.getSubscriptionsCount()).toBeGreaterThan(0)
@@ -394,7 +394,7 @@ describe('Binding: Checked', function () {
         expect(testNode).toHaveCheckedStates([true, false])
 
         // "Click" a button; verify observable and elements
-        var inputElement = testNode.children[1] as HTMLInputElement;
+        const inputElement = testNode.children[1] as HTMLInputElement;
         inputElement.click()
         expect(myobservable()).toEqual(false)
         expect(testNode).toHaveCheckedStates([false, true])
@@ -457,7 +457,7 @@ describe('Binding: Checked', function () {
           myobservable(true)
           expect(testNode).toHaveCheckedStates([true, false])
 
-          var inputElement = testNode.children[1] as HTMLInputElement;
+          const inputElement = testNode.children[1] as HTMLInputElement;
 
           // "check" a box; verify observable and elements
           inputElement.click()
@@ -512,7 +512,7 @@ describe('Binding: Checked', function () {
         testNode.innerHTML = "<input type='checkbox' data-bind='checked: someProp, " + binding + ":undefined' />"
         applyBindings({ someProp: myobservable }, testNode)
 
-        var input = testNode.children[0] as HTMLInputElement
+        const input = testNode.children[0] as HTMLInputElement
         // ignores 'undefined' value and treats checkbox value as true/false
         expect(input.checked).toEqual(true)
         myobservable(false)
