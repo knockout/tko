@@ -51,6 +51,9 @@ export function getObjectOwnProperty (obj, propName: string) {
   return hasOwnProperty(obj, propName) ? obj[propName] : undefined
 }
 
+/** 
+ * @deprecated Methode is unused
+ * */
 export function clonePlainObjectDeep (obj, seen?: any[]) {
   if (!seen) { seen = new Array() }
 
