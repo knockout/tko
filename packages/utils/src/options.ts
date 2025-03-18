@@ -1,8 +1,7 @@
 import { Provider } from "@tko/provider";
 
 interface CustomBindingGlobalProperties {
-  String;
-  isObservable;
+  [customBindingName: string]: any;
 }
 
 
@@ -25,7 +24,6 @@ export class Options {
 
     // Enable/disable <!-- ko binding: ... -> style bindings
   allowVirtualElements: boolean = true
-
 
     // Global variables that can be accessed from bindings.
   bindingGlobals: Object & CustomBindingGlobalProperties = Object.create(null)
