@@ -3,10 +3,11 @@ import {
   observable
 } from '@tko/observable'
 
+import type { KnockoutStatic } from '@tko/utils'
+
 import { filters } from '../dist'
 
-
-declare var ko : any
+declare var ko : KnockoutStatic
 /* can be remove https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array.isarray
 if (!Array.isArray) {
   Array.isArray = function (arg) {
