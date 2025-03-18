@@ -5,7 +5,7 @@ import {
 
 var sproto = String.prototype
 
-interface Filters {
+export interface Filters {
   uppercase(value);
   lowercase(value);
   default(value, defaultValue);

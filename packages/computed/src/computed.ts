@@ -23,7 +23,7 @@ import {
     valuesArePrimitiveAndEqual,
     observable,
     subscribable,
-    LATEST_VALUE    
+    LATEST_VALUE
 } from '@tko/observable'
 
 import type { Observable, Subscribable } from '@tko/observable'
