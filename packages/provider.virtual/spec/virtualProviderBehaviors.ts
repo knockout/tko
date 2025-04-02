@@ -1,9 +1,9 @@
 
+import { assert } from "chai";
+
 import {
   VirtualProvider
 } from '../dist'
-
-import { assert } from "chai";
 
 /**
  * There aren't many tests here because virtual bindings are used throughout
