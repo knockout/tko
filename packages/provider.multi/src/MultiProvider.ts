@@ -11,7 +11,7 @@ import type { BindingContext } from '@tko/bind';
 
 export default class MultiProvider extends Provider {
   nodeTypes: any[]
-  nodeTypeMap: {}
+  nodeTypeMap: Record<string, any[]>
   providers: any[]
 
   get FOR_NODE_TYPES () { return this.nodeTypes }

@@ -19,22 +19,21 @@ declare global {
     //This namespace merges the jasmine namespace to correct same tsc warnings
     namespace jasmine {      
        
-        function setNodeText(node, text: string): void
-        var Spec: any;
-        function getGlobal(): any;
-        var updateInterval: number
+        function setNodeText(node, text: string): void        
+        function getGlobal(): any        
         function resolve(promise: Promise<boolean>)
         function prepareTestNode() : HTMLElement
-        function nodeText(node)
-        var Clock: Clock
-        function getEnv(): any;
+        function nodeText(node)        
+        function getEnv(): any
 
-        var FakeTimer: any
-        var undefined: undefined
-        var browserSupportsProtoAssignment: any
-        var ieVersion: any
+        const Matchers: Matchers
+        const Spec: any;
+        const FakeTimer: any
+        const undefined: undefined
 
-        var Matchers: Matchers
+        let browserSupportsProtoAssignment: any
+        let ieVersion: any
+        let updateInterval: number        
 
         interface Matchers<T> {
             toContainText(expected: string, ignoreSpaces: boolean): boolean
@@ -68,6 +67,6 @@ declare global {
     // Treeshaked for TKO: Almost all type definitions are moved to the TKO source.
 
     interface SymbolConstructor {
-        observable?: Symbol;
+        observable?: symbol;
     } 
 }
