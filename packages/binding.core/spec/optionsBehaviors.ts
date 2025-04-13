@@ -24,10 +24,6 @@ import type { ObservableArray } from '@tko/observable'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
-import {
-    matchers
-} from '../dist/test-helper'
-
 describe('Binding: Options', function () {
   var testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
@@ -36,7 +32,6 @@ describe('Binding: Options', function () {
     var provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
-    this.addMatchers(matchers)
   })
 
   it('Should only be applicable to SELECT nodes', function () {
