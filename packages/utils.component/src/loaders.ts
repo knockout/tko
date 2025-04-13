@@ -19,56 +19,55 @@ import {registry} from './registry'
 export const defaultConfigRegistry : Record<string, RegisterCustomOptions | Config> = {}
 export const VIEW_MODEL_FACTORY = Symbol('Knockout View Model ViewModel factory')
 
-//#region  Typedefinition
-interface Component {
+export interface Component {
   template: Node[];
   createViewModel?: CreateViewModel;
 }
-type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
+export type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
 
-interface ViewModelParams {
+export interface ViewModelParams {
   [name: string]: any;
 }
 
-interface ComponentInfo {
+export interface ComponentInfo {
   element: Node;
   templateNodes: Node[];
 }
 
-interface ViewModel {
+export interface ViewModel {
   dispose?: () => void;
   koDescendantsComplete?: (node: Node) => void;
 }
 
-interface Config {
+export interface Config {
   require?: string;
   viewModel?: RequireConfig | ViewModelConfig | any;
   template?: RequireConfig | TemplateConfig | any;
   synchronous?: boolean;
 }
 
-interface ViewModelConstructor {
+export interface ViewModelConstructor {
   new(params?: ViewModelParams): ViewModel;
 }
 
-interface ViewModelStatic {
+export interface ViewModelStatic {
   instance: any;
 }
-interface ViewModelFactory {
+export interface ViewModelFactory {
   createViewModel: CreateViewModel;
 }
-interface TemplateElement {
+export interface TemplateElement {
   element: string | Node;
 }
 
-type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
-type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
+export type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
+export type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
 
-interface RequireConfig {
+export interface RequireConfig {
   require: string;
 }
 
-type RegisterCustomOptions = { ignoreCustomElementWarning: boolean }
+export type RegisterCustomOptions = { ignoreCustomElementWarning: boolean }
 
 //#endregion
 
