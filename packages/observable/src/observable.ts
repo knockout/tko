@@ -182,7 +182,7 @@ export function unwrap(value) {
 }
 
 export function peek<T = any>(value: MaybeSubscribable<T>): T {
-  return isObservable(value) ? value.peek() : value
+  return isObservable(value) ? value.peek() : value as T
 }
 
 export function isWriteableObservable<T = any>(instance: any): instance is Observable<T> {
