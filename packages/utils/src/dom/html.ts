@@ -168,10 +168,12 @@ export function setHtml (node : Node, html : Function | string) {
     } else {
             // ... otherwise, use KO's own parsing logic.
       var parsedNodes : Node[]
-      if(node.ownerDocument)
+      if(node.ownerDocument) {
         parsedNodes = parseHtmlFragment(html, node.ownerDocument)
-      else
+      }
+      else {
         parsedNodes = parseHtmlFragment(html)
+      }
 
       if (node.nodeType === 8) {
         if (html === null) {
