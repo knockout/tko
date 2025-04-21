@@ -54,6 +54,11 @@ export interface ObservableFunctions<T = any> extends Subscribable<T> {
    * @returns The modified observable.
    */
   modify(fn, peek? : Boolean): Observable
+
+  /**
+   * Some observables may not always be writeable, notably computeds.
+   */
+  isWriteable: boolean
 }
 
 /**
@@ -293,7 +298,7 @@ export function peek<T = any>(value: MaybeSubscribable<T>): T {
  * @returns True if the instance is a writeable observable, otherwise false.
  */
 export function isWriteableObservable<T = any>(instance: any): instance is Observable<T> {
-  return isObservable(instance) && (instance as any).isWriteable
+  return isObservable(instance) && instance.isWriteable
 }
 
 export { isWriteableObservable as isWritableObservable }
