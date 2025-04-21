@@ -203,7 +203,7 @@ export function computed(evaluatorFunctionOrOptions?: ComputedOptions<any, void>
     })
   }
 
-  return computedObservable as any;
+  return computedObservable as unknown as Computed;
 }
 
 // Utility function that disposes a given dependencyTracking entry
