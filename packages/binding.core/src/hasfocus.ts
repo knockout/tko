@@ -8,11 +8,13 @@ import {
     isWriteableObservable
 } from '@tko/observable'
 
+import type { AllBindings } from '@tko/bind'
+
 var hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
 var hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue')
 
 export var hasfocus = {
-  init: function (element, valueAccessor /*, allBindings */) {
+  init: function (element, valueAccessor , _allBindings : AllBindings) {
     var handleElementFocusChange = function (isFocused) {
             // Where possible, ignore which event was raised and determine focus state using activeElement,
             // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.

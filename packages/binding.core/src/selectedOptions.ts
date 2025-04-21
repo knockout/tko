@@ -13,7 +13,7 @@ import type { AllBindings } from '@tko/bind'
 export var selectedOptions = {
   after: ['options', 'foreach'],
 
-  init: function (element, valueAccessor, allBindings: AllBindings) { // allBindings not in use
+  init: function (element, valueAccessor, _allBindings: AllBindings) {
     registerEventHandler(element, 'change', function () {
       var value = valueAccessor(), valueToWrite = new Array()
       arrayForEach(element.getElementsByTagName('option'), function (node) {
