@@ -3,7 +3,7 @@ import {
 } from '@tko/utils'
 
 import {
-    applyBindings
+    applyBindings, applyBindingsToNode
 } from '@tko/bind'
 
 import {
@@ -21,7 +21,6 @@ import {
 import * as coreBindings from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
-
 
 arrayForEach(['hasfocus', 'hasFocus'], binding => {
   describe(`Binding: ${binding}`, function () {
@@ -41,6 +40,33 @@ arrayForEach(['hasfocus', 'hasFocus'], binding => {
       // (issue knockout/knockout#736)
       beforeEach(function () { waits(100) })
     }
+
+    it('Should set an observable value to be true on focus and false on blur even if the binding is applied through another binding', function () {
+      const createElementWithHasFocusBinding  = {
+        init: (element: HTMLElement, valueAccessor: () => any) => {
+          const parent = element;
+          const $hasFocus = valueAccessor();
+
+          applyBindingsToNode(parent, { hasFocus: $hasFocus })
+        }
+      };
+      options.bindingProviderInstance.bindingHandlers.set("customBinding",  createElementWithHasFocusBinding)
+
+      testNode.innerHTML = `<input data-bind='customBinding: customProps' /><input />`
+
+      const $myVal = observable(false)
+      applyBindings({customProps: $myVal}, testNode );
+      const input = testNode.children[0] as HTMLInputElement;
+
+      input.focus()
+      triggerEvent(input, 'focusin')
+      expect($myVal()).toEqual(true);
+
+      // Move the focus elsewhere
+      (testNode.childNodes[1] as HTMLElement).focus()
+      triggerEvent(input, 'focusout')
+      expect($myVal()).toEqual(false)
+    })
 
     it('Should respond to changes on an observable value by blurring or focusing the element', function () {
       var currentState
