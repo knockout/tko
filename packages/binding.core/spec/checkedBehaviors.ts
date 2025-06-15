@@ -53,7 +53,7 @@ describe('Binding: Checked', function () {
             attr:{
               value: items[i].value
             }
-          })
+          }, {})
         }
       }
     };

@@ -118,7 +118,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
           const parent = element;
           const $hasFocus = valueAccessor();
 
-          applyBindingsToNode(parent, { hasFocus: $hasFocus })
+          applyBindingsToNode(parent, { hasFocus: $hasFocus }, {})
         }
       };
       options.bindingProviderInstance.bindingHandlers.set("customBinding",  createElementWithHasFocusBinding)
