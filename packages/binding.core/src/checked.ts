@@ -79,7 +79,11 @@ export var checked = {
             elemValue = undefined
           }
         }
-        valueAccessor(elemValue, {onlyIfChanged: true})
+        // valueAccessor(elemValue, {onlyIfChanged: true})
+        const modelValue = valueAccessor(elemValue, {onlyIfChanged: true});
+        if (isWriteableObservable(modelValue) && (modelValue.peek() !== elemValue)) {
+          modelValue(elemValue);
+        }
       }
     };
 
