@@ -12,8 +12,6 @@ import { subscribable, defaultEvent, LATEST_VALUE } from './subscribable'
 import { valuesArePrimitiveAndEqual } from './extenders'
 import type { Subscribable, MaybeSubscribable } from './subscribable'
 
-//#region Observable
-
 /**
  * Represents a value that can be either a plain value or an observable.
  */
@@ -51,9 +49,13 @@ export interface ObservableFunctions<T = any> extends Subscribable<T> {
    * Modifies the value of the observable using a function.
    * @param fn The function to modify the value.
    * @param peek Whether to use the current value without creating a dependency.
-   * @returns The modified observable.
    */
-  modify(fn, peek? : Boolean): Observable
+  modify(fn: (v: T) => T, peek? : boolean)
+
+  /**
+   * Some observables may not always be writeable, notably computeds.
+   */
+  isWriteable: boolean
 }
 
 /**
@@ -79,14 +81,12 @@ export interface Observable<T = any> extends ObservableFunctions<T> {
   (value: T): any;
 }
 
-//#endregion Observable  
-
 /**
  * Creates an observable object.
  * @param initialValue The initial value of the observable.
  * @returns The observable object.
  */
-export function observable(initialValue?: any): Observable {
+export function observable<T=any>(initialValue?: T): Observable {
   function Observable() {
     if (arguments.length > 0) {
       // Write
@@ -161,8 +161,8 @@ observable.fn = {
    * @param peek Whether to use the current value without creating a dependency.
    * @returns The modified observable.
    */
-  modify(fn, peek = true) {
-    return this(fn(peek ? this.peek() : this()))
+  modify<T=any>(fn: (v: T) => T, peek = true) {
+    this(fn(peek ? this.peek() : this()))
   },
 
   // Some observables may not always be writeable, notably computeds.
@@ -274,8 +274,8 @@ export function isObservable<T = any>(instance: any): instance is Observable<T> 
  * @param value The value to unwrap.
  * @returns The unwrapped value.
  */
-export function unwrap(value) {
-  return isObservable(value) ? value() : value
+export function unwrap<T=any> (value: MaybeObservable<T>): T {
+  return isObservable<T>(value) ? value() : value as T
 }
 
 /**
@@ -284,7 +284,7 @@ export function unwrap(value) {
  * @returns The peeked value.
  */
 export function peek<T = any>(value: MaybeSubscribable<T>): T {
-  return isObservable(value) ? value.peek() : value as T
+  return isObservable<T>(value) ? value.peek() : value as T
 }
 
 /**
@@ -293,7 +293,7 @@ export function peek<T = any>(value: MaybeSubscribable<T>): T {
  * @returns True if the instance is a writeable observable, otherwise false.
  */
 export function isWriteableObservable<T = any>(instance: any): instance is Observable<T> {
-  return isObservable(instance) && (instance as any).isWriteable
+  return isObservable<T>(instance) && instance.isWriteable
 }
 
 export { isWriteableObservable as isWritableObservable }

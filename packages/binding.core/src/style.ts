@@ -7,7 +7,7 @@ import {
     unwrap
 } from '@tko/observable'
 
-const {jQueryInstance} = options //TODO jQueryInstance is never set, see comments in #207
+const {jQuery} = options
 
 export var style = {
   update: function (element, valueAccessor) {
@@ -20,8 +20,8 @@ export var style = {
         styleValue = ''
       }
 
-      if (jQueryInstance) {
-        jQueryInstance(element).css(styleName, styleValue)
+      if (jQuery) {
+        jQuery(element).css(styleName, styleValue)
       } else {
         styleName = styleName.replace(/-(\w)/g, (all, letter) => letter.toUpperCase())
         const previousStyle = element.style[styleName]

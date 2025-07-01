@@ -460,20 +460,21 @@ describe('Components: Custom elements', function () {
 
   it('Disposes the component when the custom element is cleaned', function () {
 
-
-    interface myModel {
-      wasDisposed : boolean
-      dispose() : void
-    }
-
     // This is really a behavior of the component binding, not custom elements.
     // This spec just shows that custom elements don't break it for any reason.
-    var componentViewModel : myModel = {
-      wasDisposed: false,
-      dispose: function () {
+    class myViewModel {
+      wasDisposed : boolean
+
+      constructor() {
+        this.wasDisposed = false
+      }
+
+      dispose() : void {
         this.wasDisposed = true
       }
     }
+    var componentViewModel = new myViewModel()
+    
     components.register('test-component', {
       template: 'custom element',
       viewModel: { instance: componentViewModel }

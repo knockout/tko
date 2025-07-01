@@ -9,8 +9,15 @@ import {
 import type { Observable } from '@tko/observable'
 
 import {
-    applyBindingsToDescendants, AsyncBindingHandler
+    applyBindingsToDescendants, AsyncBindingHandler    
 } from '@tko/bind'
+
+import type {  
+  BindingContext
+} from '@tko/bind'
+
+//todo signature of renderStatus but be discussed
+export type RenderStatusKeys = "shouldDisplay";
 
 /**
  * Create a DOMbinding that controls DOM nodes presence
@@ -37,8 +44,8 @@ import {
  * and this.computed('render') must be called in the child constructor.
  */
 export default class ConditionalBindingHandler extends AsyncBindingHandler {
-  get bindingContext(): any {
-    return;
+  get bindingContext(): BindingContext {
+    throw new Error('BindingContext must be implemented in the child class')
   }
   completesElseChain: Observable;
   hasElse: boolean;
@@ -58,9 +65,10 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
       return this.cloneIfElseNodes(this.$element, this.hasElse)
     }
   }
-
-  // Set to hide tsc error for using this in line 63, but must be overriden by design (see line 34)
-  renderStatus():any  {};
+  
+  renderStatus(): Record<RenderStatusKeys, any> { 
+    throw new Error('BindingContext must be implemented in the child class')
+  }
 
   render () {
     const isFirstRender = !this.ifElseNodes

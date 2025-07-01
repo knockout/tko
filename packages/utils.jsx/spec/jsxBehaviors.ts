@@ -1,3 +1,4 @@
+import { assert } from "chai"
 
 import {
   options, cleanNode
@@ -37,11 +38,9 @@ import {
 
 import {
   JsxObserver
-} from '../dist'
+} from '../src'
 
-import { ORIGINAL_JSX_SYM } from '../dist/JsxObserver';
-
-import { assert } from "chai"
+import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
 
 class JsxTestObserver extends JsxObserver {
 
@@ -53,10 +52,6 @@ class JsxTestObserver extends JsxObserver {
   detachAndDispose (node) {
     super.detachAndDispose(node)
     cleanNode(node)
-  }
-
-  dispose () {
-    super.dispose()
   }
 }
 
