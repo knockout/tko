@@ -1,12 +1,8 @@
-import {
-    extenders
-} from '@tko/observable'
+import { extenders as baseExtenders } from '@tko/observable'
+import { computed } from './computed'
 
-import {
-    computed
-} from './computed'
 
-export function throttleExtender (target, timeout) {
+export function throttleExtender (target: any, timeout: number) {
     // Throttling means two things:
 
     // (1) For dependent observables, we throttle *evaluations* so that, no matter how fast its dependencies
@@ -15,7 +11,7 @@ export function throttleExtender (target, timeout) {
 
     // (2) For writable targets (observables, or writable dependent observables), we throttle *writes*
     //     so the target cannot change value synchronously or faster than a certain rate
-  var writeTimeoutInstance = null
+  var writeTimeoutInstance: ReturnType<typeof setTimeout> | undefined = undefined
   return computed({
     read: target,
     write: function (value) {
@@ -26,5 +22,7 @@ export function throttleExtender (target, timeout) {
     }
   })
 }
+
+const extenders = baseExtenders;
 
 extenders.throttle = throttleExtender

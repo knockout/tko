@@ -17,11 +17,13 @@ import {
 import * as coreBindings from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
+import { Provider } from '@tko/provider'
 
 describe('Binding: Text', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({
@@ -36,20 +38,20 @@ describe('Binding: Text', function () {
     var model = { textProp: "'Val <with> \"special\" <i>characters</i>'" }
     testNode.innerHTML = "<span data-bind='text:textProp'></span>"
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0].textContent || testNode.childNodes[0].innerText).toEqual(model.textProp)
+    expect(testNode.childNodes[0].textContent || (testNode.childNodes[0] as HTMLElement).innerText).toEqual(model.textProp)
   })
 
   it('Should assign an empty string as value if the model value is null', function () {
     testNode.innerHTML = "<span data-bind='text:(null)' ></span>"
     applyBindings(null, testNode)
-    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : testNode.childNodes[0].innerText
+    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : (testNode.childNodes[0] as HTMLElement).innerText
     expect(actualText).toEqual('')
   })
 
   it('Should assign an empty string as value if the model value is undefined', function () {
     testNode.innerHTML = "<span data-bind='text:undefined' ></span>"
     applyBindings(null, testNode)
-    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : testNode.childNodes[0].innerText
+    var actualText = 'textContent' in testNode.childNodes[0] ? testNode.childNodes[0].textContent : (testNode.childNodes[0] as HTMLElement).innerText
     expect(actualText).toEqual('')
   })
 
@@ -87,9 +89,10 @@ describe('Binding: Text', function () {
         // First replace the binding provider with one that's hardcoded to replace all text
         // content with a special message, via a binding handler that operates on text nodes
     var originalBindingProvider = options.bindingProviderInstance
-    options.bindingProviderInstance = {
-      FOR_NODE_TYPES: [document.ELEMENT_NODE],
-      nodeHasBindings: function (/* node, bindingContext */) {
+    
+    class TestProvider extends Provider {
+      get FOR_NODE_TYPES () { return [document.ELEMENT_NODE] }
+      nodeHasBindings (/* node, bindingContext */) {
                 /* // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                 // This will still prove that the binding provider was not executed on the children of a restricted element.
                 if (node.nodeType === 3 && jasmine.ieVersion < 9) {
@@ -98,8 +101,8 @@ describe('Binding: Text', function () {
                 } */
 
         return true
-      },
-      getBindingAccessors: function (node, bindingContext) {
+      }
+      getBindingAccessors(node, bindingContext) {
         var bindings = originalBindingProvider.getBindingAccessors(node, bindingContext)
         if (node.nodeType === 3) {
           return {
@@ -108,17 +111,21 @@ describe('Binding: Text', function () {
         } else {
           return bindings
         }
-      },
-      bindingHandlers: originalBindingProvider.bindingHandlers
+      }
     }
+
     bindingHandlers.replaceTextNodeContent = {
       update: function (textNode, valueAccessor) { textNode.data = valueAccessor() }
     }
 
-        // Now check that, after applying the "text" binding, the emitted text node does *not*
-        // get replaced by the special message.
+    var tp = new TestProvider()
+    tp.bindingHandlers = originalBindingProvider.bindingHandlers
+    options.bindingProviderInstance = tp
+
+    // Now check that, after applying the "text" binding, the emitted text node does *not*
+    // get replaced by the special message.
     testNode.innerHTML = "<span data-bind='text: sometext'></span>"
     applyBindings({ sometext: 'hello' }, testNode)
-    expect('textContent' in testNode ? testNode.textContent : testNode.innerText).toEqual('hello')
+    expect('textContent' in testNode ? testNode.textContent : (testNode as HTMLElement).innerText).toEqual('hello')
   })
 })

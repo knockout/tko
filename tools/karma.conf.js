@@ -22,10 +22,11 @@ const CommonConfig = {
   esbuild: {
     // See: https://esbuild.github.io/api/
     format: 'iife',
+    sourcemap: "inline",
     bundle: false,
     define: {
       BUILD_VERSION: '"test"',
-    }
+    } 
   }
 }
 
@@ -130,14 +131,21 @@ function localConfig(config, useChrome) {
       fullscreenable: false,
       hasShadow: false
     },
+    //browserDisconnectTimeout: 100000,
+    //browserNoActivityTimeout: 100000,
     browsers: useChrome ? 
     ['testRunner'] : ['Electron'],
 	  customLaunchers: {
       testRunner: {
         base: "ChromeHeadless",
-        flags: ["--no-sandbox"]
-      }
+        flags: ["--no-sandbox", 
+          "--remote-debugging-address=0.0.0.0",
+          "--remote-debugging-port=9222"]
+      }      
     },
+    debug: argv.includes('--debug'),
+    debugger: argv.includes('--debug'),
+    //logLevel: "DEBUG",
     singleRun: argv.includes('--once')
   })
 }

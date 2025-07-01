@@ -1,7 +1,8 @@
 import * as utils from '../dist'
 import '../helpers/jasmine-13-helper'
+import { KnockoutStatic } from '../src'
 
-var ko = ko || {}
+var ko : KnockoutStatic = ko || {}
 ko.utils = utils
 ko.tasks = utils.tasks
 
@@ -75,7 +76,7 @@ describe('arrayRemoveItem', function () {
   })
 
   it('Should do nothing for empty arrays', function () {
-    var input = []
+    var input = new Array()
     ko.utils.arrayRemoveItem(input, 'a')
     expect(input).toEqual([])
   })
@@ -359,7 +360,7 @@ describe('Function.bind', function () {
     expect(actual[0]).toEqualOneOf([undefined, global])
     expect(actual[1]).toEqual('b')
 
-    bound = fn.bind()
+    bound = fn.bind(null)
     actual = bound('b')
 
     expect(actual[0]).toEqualOneOf([undefined, global])
@@ -418,7 +419,8 @@ describe('objectMap', function () {
 })
 
 describe('cloneNodes', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
     var newNodes = ko.utils.cloneNodes([testNode])
@@ -446,7 +448,12 @@ describe('cloneNodes', function () {
     })
 
     it('stringifies recursive objects', () => {
-      const recursive = { b: 1, c: 1 }
+      type Recursive = {
+        b:number;
+        c:number;
+        a?:Recursive;
+      };      
+      const recursive: Recursive = { b: 1, c: 1 }
       recursive.a = recursive
 
       const expectObj = { b: 1, c: 1, a: '...' }

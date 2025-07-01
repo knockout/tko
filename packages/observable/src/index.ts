@@ -14,6 +14,9 @@ export { observableArray, isObservableArray } from './observableArray'
 export { trackArrayChanges, arrayChangeEventName } from './observableArray.changeTracking'
 export { toJS, toJSON } from './mappingHelpers'
 export { deferUpdates } from './defer'
+export type { ObservableArray } from './observableArray'
+export type { Observable } from './observable'
+export type { MaybeSubscribable, Subscribable, SubscriptionCallback } from './subscribable'
 
 export { valuesArePrimitiveAndEqual, applyExtenders, extenders } from './extenders'
 

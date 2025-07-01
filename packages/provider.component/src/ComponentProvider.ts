@@ -26,26 +26,32 @@ export default class ComponentProvider extends Provider {
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
-   * @param {HTMLElement} node
+   * @param {Element} node
    */
-  preprocessNode (node) {
+  preprocessNode (node : Element) {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
       const closeNode = document.createComment('/ko')
+
+      if(!parent) {
+        throw Error("Missing parent node")
+      }
+
       parent.insertBefore(openNode, node)
       parent.insertBefore(closeNode, node)
       parent.removeChild(node)
+
       return [openNode, closeNode]
     }
   }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node : Element) : boolean {
     return Boolean(this.getComponentNameForNode(node))
   }
 
-  getBindingAccessors (node, context) {
+  getBindingAccessors (node: Element, context) {
     const componentName = this.getComponentNameForNode(node)
     if (!componentName) { return }
     const component = () => ({
@@ -55,7 +61,7 @@ export default class ComponentProvider extends Provider {
     return { component }
   }
 
-  getComponentNameForNode (node) {
+  getComponentNameForNode (node: Element) : string | undefined {
     if (node.nodeType !== node.ELEMENT_NODE) { return }
     const tagName = tagNameLower(node)
     if (registry.isRegistered(tagName)) {
@@ -65,10 +71,10 @@ export default class ComponentProvider extends Provider {
     }
   }
 
-  getComponentParams (node, context) {
-    const parser = new Parser(node, context, this.globals)
+  getComponentParams (node: Element, context) {
+    const parser = new (Parser as any)(node, context, this.globals) as Parser
     const paramsString = (node.getAttribute('params') || '').trim()
-    const accessors = parser.parse(paramsString, context, node)
+    const accessors = parser.parse(paramsString, context, undefined, node)
     if (!accessors || Object.keys(accessors).length === 0) {
       return { $raw: {} }
     }
@@ -79,7 +85,7 @@ export default class ComponentProvider extends Provider {
     return Object.assign({ $raw }, params)
   }
 
-  makeParamValue (node, paramValueComputed) {
+  makeParamValue (node: Element, paramValueComputed) {
     const paramValue = paramValueComputed.peek()
     // Does the evaluation of the parameter value unwrap any observables?
     if (!paramValueComputed.isActive()) {
@@ -95,7 +101,7 @@ export default class ComponentProvider extends Provider {
 
     return computed({
       read: () => unwrap(paramValueComputed()),
-      write: isWriteable ? (v) => paramValueComputed()(v) : null,
+      write: isWriteable ? (v) => paramValueComputed()(v) : undefined,
       disposeWhenNodeIsRemoved: node
     })
   }

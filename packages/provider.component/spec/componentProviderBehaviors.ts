@@ -138,7 +138,8 @@ describe('Components: Provider', function () {
         attribute: 'data-bind',
         globals: window,
         bindings: bindingHandlers,
-        noVirtualElements: false
+        noVirtualElements: false,
+        bindingProviderInstance: {}
       }
       options.bindingProviderInstance = new DataBindProvider(options)
       applyBindings(viewModel, div)

@@ -22,7 +22,8 @@ import {bindings as templateBindings} from '@tko/binding.template'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: With', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({
@@ -104,7 +105,7 @@ describe('Binding: With', function () {
         // Initial state is one subscriber, one click handler
     expect(testNode.childNodes[0].childNodes[0]).toContainText('Hello')
     expect(someItem().childProp.getSubscriptionsCount()).toEqual(1)
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(countedClicks).toEqual(1)
 
         // Force "update" binding handler to fire, then check we still have one subscriber...
@@ -113,7 +114,7 @@ describe('Binding: With', function () {
 
         // ... and one click handler
     countedClicks = 0
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'click')
+    triggerEvent(testNode.children[0].children[0], 'click')
     expect(countedClicks).toEqual(1)
   })
 
@@ -160,7 +161,7 @@ describe('Binding: With', function () {
     expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('top')
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('middle')
     expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual('bottom')
-    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+    var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
     expect(firstSpan.tagName).toEqual('SPAN')
     expect(contextFor(firstSpan).$data.name).toEqual('bottom')
     expect(contextFor(firstSpan).$root.name).toEqual('outer')
@@ -191,7 +192,7 @@ describe('Binding: With', function () {
         }
       }
     }, testNode)
-    const finalContainer = testNode.childNodes[0].children[0].children[0]
+    const finalContainer = (testNode.childNodes[0] as HTMLElement).children[0].children[0]
     // This differs from ko 3.x in that `with` does not create a child context
     // when using `as`.
     const [name, parentName, middleName, parent1Name, rootName] = finalContainer.children
@@ -216,18 +217,18 @@ describe('Binding: With', function () {
     testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><input data-bind='value: item'/></div>"
     var someItem = observable('Hello')
     applyBindings({ someItem: someItem }, testNode)
-    expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello')
+    expect((testNode.childNodes[0].childNodes[0] as HTMLInputElement).value).toEqual('Hello')
 
-    expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode))
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode));
 
       // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'Goodbye'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'Goodbye'
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(someItem()).toEqual('Goodbye')
 
       // Should update the input when the observable changes
     someItem('Hello again')
-    expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello again')
+    expect((testNode.childNodes[0].childNodes[0] as HTMLInputElement).value).toEqual('Hello again')
   })
 
   it('Should not re-render the nodes when an observable value changes', function () {
@@ -310,11 +311,11 @@ describe('Binding: With', function () {
     applyBindings({ item: item }, testNode)
     expect(item.getSubscriptionsCount('change')).toEqual(3)    // subscriptions are the with and value bindings, and the binding contex
     expect(testNode.childNodes[0]).toHaveValues(['one'])
-    expect(testNode.childNodes[0]).toContainText('one')
+    expect(testNode.childNodes[0]).toContainText('one');
 
         // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'two'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'two'
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(item()).toEqual('two')
     expect(testNode.childNodes[0]).toContainText('two')
 

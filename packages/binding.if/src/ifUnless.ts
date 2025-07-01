@@ -9,7 +9,8 @@ import ConditionalBindingHandler from './ConditionalBindingHandler'
  * For the `if:` binding.
  */
 export class IfBindingHandler extends ConditionalBindingHandler {
-  constructor (...args) {
+  ifCondition: any;
+  constructor (...args: [any]) {
     super(...args)
     this.ifCondition = this.computed(() => !!unwrap(this.value))
     this.computed('render')

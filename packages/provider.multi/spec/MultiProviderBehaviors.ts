@@ -1,4 +1,6 @@
 
+import { assert } from "chai"
+
 import {
   MultiProvider
 } from '../dist'
