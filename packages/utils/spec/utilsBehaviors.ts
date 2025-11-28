@@ -1,6 +1,6 @@
 import * as utils from '../dist'
 import '../helpers/jasmine-13-helper'
-import { KnockoutStatic } from '../src'
+import type { KnockoutStatic } from '../src'
 
 var ko : KnockoutStatic = ko || {}
 ko.utils = utils

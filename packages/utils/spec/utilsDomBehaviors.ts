@@ -3,7 +3,7 @@ import '../helpers/jasmine-13-helper'
 import * as utils from '../dist'
 import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
-import { KnockoutStatic } from '../src'
+import type { KnockoutStatic } from '../src'
 
 var ko : KnockoutStatic = ko || {}
 ko.utils = utils

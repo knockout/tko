@@ -45,7 +45,7 @@ export type RenderStatusKeys = "shouldDisplay";
  */
 export default class ConditionalBindingHandler extends AsyncBindingHandler {
   get bindingContext(): BindingContext {
-    throw new Error('BindingContext must be implemented in the child class')
+    throw new Error('bindingContext() must be implemented in the child class')
   }
   completesElseChain: Observable;
   hasElse: boolean;
@@ -67,7 +67,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
   }
   
   renderStatus(): Record<RenderStatusKeys, any> { 
-    throw new Error('BindingContext must be implemented in the child class')
+    throw new Error('renderStatus() must be implemented in the child class')
   }
 
   render () {
