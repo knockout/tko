@@ -766,7 +766,7 @@ describe('Deferred', function () {
 
       observable.extend({deferred: true});
       expect(function () {
-        observable.extend(Object.assign({deferred: false}))
+        observable.extend({deferred: false})
       }).toThrow('The \'deferred\' extender only accepts the value \'true\', because it is not supported to turn deferral off once enabled.')
     })
 

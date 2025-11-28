@@ -1,10 +1,12 @@
 import { Provider } from "@tko/provider";
 
-interface CustomBindingGlobalProperties {
-  String;
-  isObservable;
+export interface CustomBindingGlobalProperties {
+  [customBindingName: string]: any;
 }
 
+export type BindingStringPreparsersFunction = (bindingString: string) => string;
+
+export type KnockoutStatic = any // typeof ko;
 
 //
 // This becomes ko.options
@@ -12,7 +14,11 @@ interface CustomBindingGlobalProperties {
 //
 // This is the root 'options', which must be extended by others.
 export class Options {
-  [key: string]: any;
+  // The following options can be set on ko.options to make a function rewriting or something similar.
+  bindingStringPreparsers: BindingStringPreparsersFunction[] = []
+  
+  // Reference to the own knockout instance
+  knockoutInstance: KnockoutStatic = null
   
   deferUpdates: boolean = false
 
@@ -26,7 +32,6 @@ export class Options {
     // Enable/disable <!-- ko binding: ... -> style bindings
   allowVirtualElements: boolean = true
 
-
     // Global variables that can be accessed from bindings.
   bindingGlobals: Object & CustomBindingGlobalProperties = Object.create(null)
 
@@ -39,7 +44,7 @@ export class Options {
     // jQuery will be automatically set to globalThis.jQuery in applyBindings
     // if it is (strictly equal to) undefined.  Set it to false or null to
     // disable automatically setting jQuery.
-  jQuery : JQueryStatic | boolean | null = (globalThis as any).jQuery
+  jQuery : JQueryStatic | false | null = (globalThis as any).jQuery
 
   Promise: PromiseConstructor = globalThis.Promise
 

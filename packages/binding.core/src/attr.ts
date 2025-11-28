@@ -10,7 +10,7 @@ import {
 import type { AllBindings } from '@tko/bind'
 
 export var attr = {
-  update: function (element, valueAccessor, allBindings: AllBindings) { // allBindings not used!
+  update: function (element, valueAccessor, _allBindings: AllBindings) {
     var value = unwrap(valueAccessor()) || {}
     objectForEach(value, function (attrName, attrValue) {
       attrValue = unwrap(attrValue)

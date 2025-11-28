@@ -1,4 +1,5 @@
 import { extend, options, domData, isObjectLike } from '@tko/utils'
+import type { KnockoutStatic } from '@tko/utils'
 
 import {
     pureComputed
@@ -16,6 +17,7 @@ import {
 
 import { BindingContextExtendCallback } from './applyBindings'
 
+
 export const boundElementDomDataKey = domData.nextKey()
 
 export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')
@@ -27,10 +29,8 @@ export interface BindingContextSetting {
   exportDependencies?: boolean;
 }
 
-export type KnockoutInternalInstance = any // typeof ko;
-
 export interface BindingContext<T = any> {
-  ko: KnockoutInternalInstance; 
+  ko: KnockoutStatic; 
 
   [symbol: symbol]: any
   $parent?: any;
