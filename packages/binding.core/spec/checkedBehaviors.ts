@@ -4,12 +4,11 @@ import {
 } from '@tko/utils'
 
 import {
-    applyBindings
+    applyBindings, applyBindingsToNode
 } from '@tko/bind'
 
 import {
-    observable,
-    observableArray
+    observable, observableArray
 } from '@tko/observable'
 
 import type { Observable, ObservableArray } from '@tko/observable';
@@ -34,6 +33,48 @@ describe('Binding: Checked', function () {
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(templateBindings)
+  })
+
+  it('Checked Binding should update observable value if checked binding is applied in another CustomBinding', function () {
+    const RadioGroupExample  = {
+      init: (element: HTMLElement, valueAccessor: () => any) => {
+        const group = element;
+        const options = valueAccessor();
+        const items = options.items();
+
+        for (let i = 0; i < items.length; i++) {
+          //let radioBox = $('<input type="radio">').appendTo(group);
+          const radioInput = document.createElement('input');
+          radioInput.type = 'radio';
+          group.appendChild(radioInput);
+
+          applyBindingsToNode(radioInput, {
+            checked: items[i].checked,
+            attr:{
+              value: items[i].value
+            }
+          }, {})
+        }
+      }
+    };
+
+    options.bindingProviderInstance.bindingHandlers.set("customBinding",  RadioGroupExample)
+
+    const $decision = observable("")
+    const yesOption = { value: "True", checked: $decision }
+    const noOption = { value: "False", checked: $decision }
+    
+    testNode.innerHTML = '<div data-bind="customBinding: radioBoxProp"></div>'
+    applyBindings({radioBoxProp: { items: observable([yesOption, noOption]) } }, testNode);
+
+    const yesRadio = testNode.children[0].children[0]
+    const noRadio = testNode.children[0].children[1]
+
+    expect($decision()).toEqual("")
+    triggerEvent(yesRadio, 'click')
+    expect($decision()).toEqual("True")
+    triggerEvent(noRadio, 'click')
+    expect($decision()).toEqual("False")
   })
 
   it('Triggering a click should toggle a checkbox\'s checked state before the event handler fires', function () {
