@@ -1,6 +1,6 @@
 
 import {
-    arrayForEach, parseHtmlFragment
+    arrayForEach, parseHtmlFragment, options
 } from '../dist'
 
 import '../helpers/jasmine-13-helper'
@@ -76,5 +76,60 @@ describe('Parse HTML fragment', function () {
     expect(parsedNodes1[0]).toNotEqual(parsedNodes2[0])
         // We need to test for deep inequality
     expect(parsedNodes1[0].children[0]).toNotEqual(parsedNodes2[0].children[0])
+  })
+
+  it('template is to long', function () {
+
+    if(options.templateSizeLimit === 0)
+      return;
+
+    function makeString(length: number) {
+      let result = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const charactersLength = characters.length;
+      let counter = 0;
+      while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+      }
+      return result;
+    }    
+    let isfired = false
+
+    try {
+      let html = '<div><i>'+ makeString(options.templateSizeLimit) +'</i></div>'
+      parseHtmlFragment(html, document)
+    } catch (e : any) {
+      expect(e.message).toContain('Template is too long')
+      isfired = true
+    }
+   
+    expect(isfired).toBe(true)
+  })
+
+  it('template contains script-tag', function () {
+
+    if(options.allowScriptTagsInTemplates)
+      return;
+
+    let htmlArray = new Array()
+    htmlArray.push('<script type="application/javascript">console.log(\'oups\')</script>')
+    htmlArray.push('<div><i><script crossorigin="anonymous" defer="defer" type="application/javascript" src="https://github.githubassets.com/assets/vendors-node_modules_github_filter-input-element_dist_index_js-node_modules_github_remote-inp-b5f1d7-a1760ffda83d.js"></script></i></div>')
+    htmlArray.push('<div><i><script type="application/javascript"    >console.log(\'oups\')</script    ></i></div>')
+    htmlArray.push('<div><i><script           type="application/javascript"    >console.log(\'oups\')</script    ></i></div>')
+        
+    htmlArray.forEach(html => {      
+      let isfired = false
+
+      try {    
+        let ret = parseHtmlFragment(html, document)
+        console.log(ret)
+      } catch (e : any) {
+        expect(e.message).toContain('detected')
+        isfired = true
+      }
+      
+      expect(isfired).toBe(true)
+    });
   })
 })

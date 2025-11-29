@@ -1,0 +1,23 @@
+name: "CodeQL config"
+queries: 
+#  - name: Run custom queries
+#    uses: ./queries
+  - uses: security-and-quality
+paths-ignore:
+    - 'node_modules'
+    - '**/spec/*.ts'
+    - '**/*jasmine*.ts'
+    - 'builds'
+    - 'docs'
+    - 'tko.io'
+    - 'tools'
+query-filters:
+- exclude:
+    tags:   
+        -/cwe/-78/       
+        -/cwe/-116/
+        -/cwe/-400/
+        -/cwe/-471/
+        -/cwe/-700/
+        -/cwe/-915/
+        -/cwe/-1333/
