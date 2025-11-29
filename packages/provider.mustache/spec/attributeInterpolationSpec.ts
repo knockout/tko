@@ -109,6 +109,18 @@ describe('Attribute Interpolation Markup Provider', function () {
     }
   });
 
+  it('Should support two expressions (quotation marks and backspaces)', function () {
+    testNode.setAttribute('title', 'some {{expr1}} middle // "Test" \\ {{expr2}} text');
+    const bindings = Array.from(provider.bindingParts(testNode, {}))
+    expect(bindings.length).toBe(1)
+    const [handler, parts] = bindings[0]
+    expect(parts.length).toBe(5)
+    const expected = ['some ', 'expr1', ' middle // "Test" \\ ', 'expr2', ' text']
+    for (let i = 0; i < expected.length; ++i) {
+      expect(parts[i].text).toEqual(expected[i])
+    }
+  });
+
   it('Should skip empty text', function () {
     testNode.setAttribute('title', '{{expr1}}{{expr2}}');
     const bindings = Array.from(provider.bindingParts(testNode, {}))
@@ -294,6 +306,15 @@ describe('Attribute Interpolation Markup bindings', function () {
     expect(node.title).toEqual('The best time.');
     observable('fun');
     expect(node.title).toEqual('The best fun.');
+  });
+
+  it('Should update when observable changes (quotation marks and backspaces)', function () {
+    testNode.innerHTML = "<div title='The \"best\" {{what}}.'></div>";
+    var observable = Observable('time "test"');
+    applyBindings({what: observable}, testNode);
+    expect((testNode.childNodes[0] as HTMLDivElement).title).toEqual('The \"best\" time "test".');
+    observable('fun \\ test');
+    expect((testNode.childNodes[0] as HTMLDivElement).title).toEqual('The \"best\" fun \\ test.');
   });
 
   it('Should convert value attribute to two-way binding', function () {

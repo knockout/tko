@@ -39,7 +39,7 @@ var none = [0, '', ''],
   supportsTemplateTag = options.document && 'content' in options.document.createElement('template')
 
 function getWrap (tags) {
-  const m = tags.match(/^(?:<!--.*?-->\s*?)*?<([a-z]+)[\s>]/)
+  const m = tags.match(/^(?:<!--[^]*?-->\s*?)*?<([a-z]+)[\s>]/)
   return (m && lookup[m[1]]) || none
 }
 
@@ -119,8 +119,10 @@ function jQueryHtmlParse (html: string, documentContext?: Document) {
  * @param  {Document} documentContext That owns the executing code.
  * @return {[Node]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {
-    // Prefer <template>-tag based HTML parsing.
+export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {  
+  validateHTMLInput(html)
+
+  // Prefer <template>-tag based HTML parsing.
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
 
         // Benefit from jQuery's on old browsers, where possible
@@ -130,6 +132,20 @@ export function parseHtmlFragment (html: string , documentContext?: Document): N
 
         // ... otherwise, this simple logic will do in most common cases.
         : simpleHtmlParse(html, documentContext))
+}
+
+const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/i;
+function validateHTMLInput(html: string) {  
+  if(!html)
+    return;
+  
+  if (options.templateSizeLimit > 0 && html.length > options.templateSizeLimit) {
+    throw new Error("Template is too long. Please configure the 'templateSizeLimit'")
+  }
+  
+  if(!options.allowScriptTagsInTemplates && scriptTagPattern.test(html)) {
+    throw new Error("Script-tag in template detected.")
+  }
 }
 
 export function parseHtmlForTemplateNodes (html, documentContext) {
@@ -152,17 +168,21 @@ export function setHtml (node : Node, html : Function | string) {
     // function, so we unwrap it.
   if (typeof html === 'function') {
     html = html()
-  }
+  } 
 
   if ((html !== null) && (html !== undefined)) {
-    if (typeof html !== 'string') { html = html.toString() }
+    if (typeof html !== 'string') { 
+      html = html.toString() 
+    }
 
-        // If the browser supports <template> tags, prefer that, as
-        // it obviates all the complex workarounds of jQuery.
-        //
-        // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
-        // for example <tr> elements which are not normally allowed to exist on their own.
-        // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
+    validateHTMLInput(html)
+
+    // If the browser supports <template> tags, prefer that, as
+    // it obviates all the complex workarounds of jQuery.
+    //
+    // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
+    // for example <tr> elements which are not normally allowed to exist on their own.
+    // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
     if (jQueryInstance && !supportsTemplateTag) {
       jQueryInstance(node).html(html)
     } else {
