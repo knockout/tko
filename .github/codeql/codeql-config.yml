@@ -13,11 +13,6 @@ paths-ignore:
     - 'tools'
 query-filters:
 - exclude:
-    tags:   
-        -/cwe/-78/       
-        -/cwe/-116/
-        -/cwe/-400/
-        -/cwe/-471/
-        -/cwe/-700/
-        -/cwe/-915/
-        -/cwe/-1333/
+    id:
+        - js/polynomial-redos
+        - js/redos
