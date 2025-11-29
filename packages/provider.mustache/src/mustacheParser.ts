@@ -62,7 +62,7 @@ class Text extends Interpolated {
   asAttr () { return this.text }
 
   * textNodeReplacement () {
-    yield document.createTextNode(this.text.replace(/\\/g, '\\\\').replace(/"/g, '\\"'))
+    yield document.createTextNode(this.text.replace(/"/g, '\\"'))
   }
 }
 

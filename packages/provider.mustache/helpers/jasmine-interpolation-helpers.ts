@@ -19,13 +19,13 @@ jasmine.Matchers.prototype.toHaveNodeTypes = function (expectedTypes) {
 function cleanedHtml(node) {
     var cleanedHtml = node.innerHTML.toLowerCase().replace(/\r\n/g, "");
     // IE < 9 strips whitespace immediately following comment nodes. Normalize by doing the same on all browsers.
-    cleanedHtml = cleanedHtml.replace(/(<!--[^]*?-->)\s*/g, "$1");
+    cleanedHtml = cleanedHtml.replace(/(<!--.*?-->)\s*/g, "$1");
     // Also remove __ko__ expando properties (for DOM data) - most browsers hide these anyway but IE < 9 includes them in innerHTML
     cleanedHtml = cleanedHtml.replace(/ __ko__\d+=\"(ko\d+|null)\"/g, "");
     return cleanedHtml;
 }
 
 jasmine.Matchers.prototype.toContainHtmlElementsAndText = function (expectedHtml) {
-    this.actual = cleanedHtml(this.actual).replace(/<!--[^]+?-->/g, "");  // remove comments
+    this.actual = cleanedHtml(this.actual).replace(/<!--.+?-->/g, "");  // remove comments
     return this.actual === expectedHtml;
 };
