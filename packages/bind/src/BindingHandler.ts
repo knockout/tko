@@ -70,7 +70,7 @@ export class BindingHandler<T = any> extends LifeCycle {
   */
   get bindingCompleted (): Promise<boolean> | boolean { return true };
 
-  static registerAs (name, provider = options.bindingProviderInstance) {
+  static registerAs (name: string, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
   }
 

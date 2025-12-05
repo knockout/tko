@@ -19,7 +19,6 @@ import {registry} from './registry'
 export var defaultConfigRegistry = {}
 export const VIEW_MODEL_FACTORY = Symbol('Knockout View Model ViewModel factory')
 
-//#region  Typedefinition
 interface Component {
   template: Node[];
   createViewModel?: CreateViewModel;
@@ -69,8 +68,6 @@ interface RequireConfig {
 }
 
 type RegisterCustomOptions = { ignoreCustomElementWarning: boolean }
-
-//#endregion
 
 function isIgnoreCustomElementWarning(config): config is RegisterCustomOptions{
   return (config as any).ignoreCustomElementWarning !== 'undefined';
