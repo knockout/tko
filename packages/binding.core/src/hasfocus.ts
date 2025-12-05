@@ -22,9 +22,9 @@ export var hasfocus = {
             // from calling 'blur()' on the element when it loses focus.
             // Discussion at https://github.com/SteveSanderson/knockout/pull/352
       element[hasfocusUpdatingProperty] = true
-      var ownerDoc = element.ownerDocument
+      const ownerDoc = element.ownerDocument
       if ('activeElement' in ownerDoc) {
-        var active
+        let active
         try {
           active = ownerDoc.activeElement
         } catch (e) {
@@ -34,7 +34,7 @@ export var hasfocus = {
         isFocused = (active === element)
       }
       
-      var modelValue = valueAccessor(isFocused, {onlyIfChanged: true});
+      const modelValue = valueAccessor(isFocused, {onlyIfChanged: true});
       // Found a scenario where hasFocus changes were not fired
       // the fix was transfered from ko 3.5 (Focusout event was not fired)
       // This only replies the value if there are changes
