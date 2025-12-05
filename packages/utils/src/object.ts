@@ -52,7 +52,7 @@ export function getObjectOwnProperty (obj, propName: string) {
 }
 
 /** 
- * @deprecated Methode is unused
+ * @deprecated Function is unused
  * */
 export function clonePlainObjectDeep (obj, seen?: any[]) {
   if (!seen) { seen = new Array() }
