@@ -60,13 +60,6 @@ declare global {
         }
     }
 
-    //Knockout Types https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
-    // Type definitions for Knockout
-    // Project: http://knockoutjs.com
-    // Definitions by: Maxime LUCE <https://github.com/SomaticIT>, Michael Best <https://github.com/mbest>
-
-    // Treeshaked for TKO: Almost all type definitions are moved to the TKO source.
-
     interface SymbolConstructor {
         observable?: Symbol;
     } 

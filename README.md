@@ -145,6 +145,12 @@ There's an [issue for that](https://github.com/knockout/tko/issues/1).
 
 MIT license - [http://www.opensource.org/licenses/mit-license.php.](http://www.opensource.org/licenses/mit-license.php)
 
+## Credits
+- Knockout Type Definitions by: [Maxime LUCE](https://github.com/SomaticIT), [Michael Best](https://github.com/mbest)  
+    - https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
+- Team-Project: https://github.com/knockout
+- http://knockoutjs.com / [Steve Sanderson](https://github.com/SteveSanderson), [Michael Best](https://github.com/mbest)
+
 ## Shout Outs
 
 <div>
