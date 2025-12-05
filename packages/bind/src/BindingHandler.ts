@@ -12,7 +12,7 @@ export interface AllBindings {
     (): any;
 
     get(name: string): any;
-    get<T>(name: string): T;
+    get<T = any>(name: string): T;
 
     has(name: string): boolean;
 }
