@@ -54,7 +54,7 @@ export interface BindingContext<T = any> {
   createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
 }
 
-// This interface is for the JS-Factory-Method 'bindingContext' to returns a typed BindingContext
+// Interface for the factory method 'bindingContext', which creates and returns a typed instance of BindingContext<T>
 export interface bindingContext {
   new <T = any>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext<T>;
 };
