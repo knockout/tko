@@ -206,6 +206,9 @@ export type KnockoutInstance = {
   virtualElements: typeof virtualElements
   domNodeDisposal: typeof domNodeDisposal
   bindingEvent: typeof bindingEvent
+
+  get getBindingHandler() 
+  set getBindingHandler(fn)
 }
 
 const knockout : KnockoutInstance = {
@@ -223,7 +226,7 @@ const knockout : KnockoutInstance = {
   utils,
   LifeCycle,
 
-    // -- Observable ---
+  // -- Observable ---
   isObservable,
   isSubscribable,
   isWriteableObservable,
@@ -238,7 +241,7 @@ const knockout : KnockoutInstance = {
   toJSON,
   proxy,
 
-    // ... Computed ...
+  // ... Computed ...
   computed,
   dependentObservable: computed,
   isComputed,
@@ -246,14 +249,14 @@ const knockout : KnockoutInstance = {
   pureComputed,
   when: when,
 
-    // --- Templates ---
+  // --- Templates ---
   nativeTemplateEngine,
   renderTemplate,
   setTemplateEngine,
   templateEngine,
   templateSources: { domElement, anonymousTemplate },
 
-    // --- Binding ---
+  // --- Binding ---
   applyBindingAccessorsToNode,
   applyBindings,
   applyBindingsToDescendants,
@@ -265,6 +268,7 @@ const knockout : KnockoutInstance = {
   virtualElements,
   domNodeDisposal,
   bindingEvent,
+  getBindingHandler: undefined
 }
 
 export class Builder {
@@ -297,14 +301,18 @@ export class Builder {
    * @return {KnockoutInstance} An instance of Knockout.
    */
   create (...additionalProperties) : KnockoutInstance {
-    const instance : KnockoutInstance = Object.assign({
-      get getBindingHandler () { return options.getBindingHandler },
-      set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
-    },
-    knockout,
-    this.providedProperties,
-    ...additionalProperties)
+    
+    const instance : KnockoutInstance =  Object.assign(
+      knockout,
+      {
+        get getBindingHandler () { return options.getBindingHandler },
+        set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
+      },      
+      this.providedProperties,
+      ...additionalProperties)
+
     instance.options.knockoutInstance = instance
+
     return instance
   }
 }
