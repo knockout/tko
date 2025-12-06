@@ -1,6 +1,7 @@
 For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 
-## Next
+## 💪 Next
+- #202 Make TKO more type-safe @mcselle, @Auge19, @phillipc
 - #194 fix userAgent typo in IE check @phillipc
 - #196 fix `**` operator precedence @mcselle
 - #195 add docker container for headless tests, upgrade packages, README fixes @Auge19
