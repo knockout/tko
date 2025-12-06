@@ -25,12 +25,16 @@ import { createElement, Fragment } from '@tko/utils.jsx'
 
 import { overloadOperator } from '@tko/utils.parser'
 
+declare const BUILD_VERSION: string
+
 /** Overload "evil twins" with strict equivalents */
 overloadOperator('==', (a, b) => a === b)
 overloadOperator('!=', (a, b) => a !== b)
 
 const builder = new Builder({
   filters,
+  extenders: {},
+  options: {},
   provider: new MultiProvider({
     providers: [
       new ComponentProvider(),

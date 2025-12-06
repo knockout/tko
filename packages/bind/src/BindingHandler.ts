@@ -2,23 +2,52 @@
 import { options } from '@tko/utils'
 import { isWriteableObservable } from '@tko/observable'
 import { LifeCycle } from '@tko/lifecycle'
+import type { BindingContext } from './bindingContext';
 
-export class BindingHandler extends LifeCycle {
+export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
+export type BindingHandlerAddBinding = (name: string, value: any) => void;
+
+// usage in applyBindings, BindingHandler, event, checked, options
+export interface AllBindings {
+    (): any;
+
+    get(name: string): any;
+    get<T = any>(name: string): T;
+
+    has(name: string): boolean;
+}
+
+export class BindingHandler<T = any> extends LifeCycle {
+  after?: string[];
+  init?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void | BindingHandlerControlsDescendant;
+  update?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void;
+  options?: any;
+  preprocess?: (value: string | undefined, name: string, addBinding: BindingHandlerAddBinding) => string | undefined | void;
+
+  $context: BindingContext // most likly BindingContext but params must be typed first
+  $element: HTMLElement
+  $data: any
+  bindingCompletion: any
+  valueAccessor: Function
+  completeBinding: any
+  allBindings: AllBindings
+
   constructor (params) {
     super()
     const {$element, valueAccessor, allBindings, $context} = params
-    Object.assign(this, {
-      valueAccessor,
-      allBindings,
-      $element,
-      $context,
-      $data: $context.$data
-    })
+
+    this.$element = $element;
+    this.valueAccessor = valueAccessor;
+    this.allBindings = allBindings;
+    this.$context = $context;
+    this.$data = $context.$data;
 
     this.anchorTo($element)
   }
 
-  get value () { return this.valueAccessor() }
+  get value () {
+    return this.valueAccessor()
+  }
   set value (v) {
     const va = this.valueAccessor()
     if (isWriteableObservable(va)) {
@@ -39,10 +68,14 @@ export class BindingHandler extends LifeCycle {
      A binding should be complete when it has run through once, notably
      in server-side bindings for pre-rendering.
   */
-  get bindingCompleted () { return true }
+  get bindingCompleted (): Promise<boolean> | boolean { return true };
 
-  static registerAs (name, provider = options.bindingProviderInstance) {
-    provider.bindingHandlers.set(name, this)
+  static registerAs (name: string, provider = options.bindingProviderInstance) {
+    provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
+  }
+
+  static registerBindingHandler(handler: BindingHandler, name: string, provider = options.bindingProviderInstance) {
+    provider.bindingHandlers.set(name, handler)
   }
 }
 
@@ -61,5 +94,5 @@ export class AsyncBindingHandler extends BindingHandler {
     this.completeBinding = bindingResult => this[ResolveSymbol](bindingResult)
   }
 
-  get bindingCompleted () { return this.bindingCompletion }
+  get bindingCompleted (): Promise<boolean> { return this.bindingCompletion }
 }

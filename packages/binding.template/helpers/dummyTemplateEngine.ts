@@ -7,8 +7,9 @@ import {
     renderTemplate, anonymousTemplate, templateEngine
 } from '../dist';
 
+import type { BindingContext } from '@tko/bind';
 
-export function dummyTemplateEngine(templates) {
+export function dummyTemplateEngine(templates?) {
     var inMemoryTemplates = templates || {};
     var inMemoryTemplateData = {};
 
@@ -37,7 +38,7 @@ export function dummyTemplateEngine(templates) {
             return new anonymousTemplate(template); // Anonymous template
     };
 
-    this.renderTemplateSource = function (templateSource, bindingContext, rt_options, templateDocument) {
+    this.renderTemplateSource = function (templateSource, bindingContext: BindingContext, rt_options, templateDocument) {
         var data = bindingContext['$data'];
         if (data && typeof data.get_value === 'function') {
             // For cases when data is an Identifier/Expression.
@@ -58,9 +59,9 @@ export function dummyTemplateEngine(templates) {
         // Builders (e.g. rollup) mangle `data` to e.g. `data$$1`.
         // This workaround works as long as nomangle$data doesn't
         // appear anywhere not in tests.
-        const nomangle$data = data
-        window.__prevent_tree_shaking__ = nomangle$data
-        delete window.__prevent_tree_shaking__
+        const nomangle$data: any = data;
+        (window as any).__prevent_tree_shaking__ = nomangle$data
+        delete (window as any).__prevent_tree_shaking__
 
         rt_options.templateRenderingVariablesInScope = rt_options.templateRenderingVariablesInScope || {};
 
@@ -76,7 +77,7 @@ export function dummyTemplateEngine(templates) {
             try {
                 var evalResult = eval(script);
                 return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
-            } catch (ex) {
+            } catch (ex: any) {
                 throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
             }
         };

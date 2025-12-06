@@ -7,6 +7,8 @@ import {
   Provider
 } from '@tko/provider'
 
+import type { BindingContext } from '@tko/bind';
+
 export const NATIVE_BINDINGS = Symbol('Knockout native bindings')
 
 /**
@@ -19,7 +21,7 @@ export default class NativeProvider extends Provider {
   get FOR_NODE_TYPES () { return [ 1, 3 ] }
   get preemptive () { return true }
 
-  nodeHasBindings (node) {
+  nodeHasBindings (node: Element, context?: BindingContext) : boolean | undefined {
     if (!node[NATIVE_BINDINGS]) { return false }
     return Object.keys(node[NATIVE_BINDINGS] || {})
       .some(key => key.startsWith('ko-'))
@@ -29,7 +31,7 @@ export default class NativeProvider extends Provider {
    * There can be only one preprocessor; when there are native bindings,
    * prevent re-entrance (and likely XSS) from the `{{ }}` provider.
    */
-  preprocessNode (node) {
+  preprocessNode (node : Element) {
     return node[NATIVE_BINDINGS] ? node : null
   }
 
@@ -45,10 +47,10 @@ export default class NativeProvider extends Provider {
 
   /**
    * Return as valueAccessor function all the entries matching `ko-*`
-   * @param {HTMLElement} node
+   * @param {Element} node
    */
-  getBindingAccessors (node) {
-    const bindings = Object.entries(node[NATIVE_BINDINGS] || {})
+  getBindingAccessors (node : Element, context?: BindingContext) {
+    const bindings = (Object.entries(node[NATIVE_BINDINGS] || {}) as any)
       .filter(this.onlyBindings)
     if (!bindings.length) { return null }
     return Object.assign({}, ...bindings.map(this.valueAsAccessor))
@@ -56,21 +58,21 @@ export default class NativeProvider extends Provider {
 
   /**
    * Add a named-value to the given node.
-   * @param {HTMLElement} node
+   * @param {Element} node
    * @param {string} name
    * @param {any} value
    */
-  static addValueToNode (node, name, value) {
+  static addValueToNode (node : Element, name: string, value: any) {
     const obj = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
     obj[name] = value
   }
 
   /**
    *
-   * @param {HTMLElement} node
+   * @param {Element} node
    * @return {object} the stored values
    */
-  static getNodeValues (node) {
+  static getNodeValues (node : Element): any {
     return node[NATIVE_BINDINGS]
   }
 }

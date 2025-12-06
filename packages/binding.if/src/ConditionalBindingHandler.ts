@@ -6,9 +6,18 @@ import {
     dependencyDetection, observable
 } from '@tko/observable'
 
+import type { Observable } from '@tko/observable'
+
 import {
-    applyBindingsToDescendants, AsyncBindingHandler
+    applyBindingsToDescendants, AsyncBindingHandler    
 } from '@tko/bind'
+
+import type {  
+  BindingContext
+} from '@tko/bind'
+
+//todo signature of renderStatus but be discussed
+export type RenderStatusKeys = "shouldDisplay";
 
 /**
  * Create a DOMbinding that controls DOM nodes presence
@@ -35,6 +44,12 @@ import {
  * and this.computed('render') must be called in the child constructor.
  */
 export default class ConditionalBindingHandler extends AsyncBindingHandler {
+  get bindingContext(): BindingContext {
+    throw new Error('bindingContext() must be implemented in the child class')
+  }
+  completesElseChain: Observable;
+  hasElse: boolean;
+  ifElseNodes?: any;
   constructor (params) {
     super(params)
     this.hasElse = this.detectElse(this.$element)
@@ -43,10 +58,16 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
   }
 
   getIfElseNodes () {
-    if (this.ifElseNodes) { return this.ifElseNodes }
+    if (this.ifElseNodes) {
+      return this.ifElseNodes
+    }
     if (dependencyDetection.getDependenciesCount() || this.hasElse) {
       return this.cloneIfElseNodes(this.$element, this.hasElse)
     }
+  }
+  
+  renderStatus(): Record<RenderStatusKeys, any> { 
+    throw new Error('renderStatus() must be implemented in the child class')
   }
 
   render () {
@@ -66,7 +87,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     }
   }
 
-  async renderAndApplyBindings (nodes, useOriginalNodes) {
+  async renderAndApplyBindings (nodes: ArrayLike<Node>, useOriginalNodes?: boolean) {
     if (!useOriginalNodes) {
       virtualElements.setDomNodeChildren(this.$element, cloneNodes(nodes))
     }
@@ -107,8 +128,8 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
    */
   cloneIfElseNodes (element, hasElse) {
     const children = virtualElements.childNodes(element)
-    const ifNodes = []
-    const elseNodes = []
+    const ifNodes = new Array()
+    const elseNodes = new Array()
     let target = ifNodes
 
     for (var i = 0, j = children.length; i < j; ++i) {

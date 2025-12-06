@@ -99,6 +99,8 @@ import {
     // templateSources
 } from '@tko/binding.template'
 
+import type { BindingHandlerObject } from '@tko/provider'
+
 const domNodeDisposal = {
   addDisposeCallback,
   removeDisposeCallback,
@@ -113,7 +115,40 @@ const domNodeDisposal = {
   }
 }
 
-const utils = Object.assign({
+export type Utils = {
+  addOrRemoveItem: typeof addOrRemoveItem
+  arrayFilter: typeof arrayFilter
+  arrayFirst: typeof arrayFirst
+  arrayForEach: typeof arrayForEach
+  arrayGetDistinctValues: typeof arrayGetDistinctValues
+  arrayIndexOf: typeof arrayIndexOf
+  arrayMap: typeof arrayMap
+  arrayPushAll: typeof arrayPushAll
+  arrayRemoveItem: typeof arrayRemoveItem
+  cloneNodes: typeof cloneNodes
+  compareArrays: typeof compareArrays
+  createSymbolOrString: typeof createSymbolOrString
+  domData: typeof domData
+  domNodeDisposal: typeof domNodeDisposal
+  extend: typeof extend
+  filters: typeof options.filters
+  objectForEach: typeof objectForEach
+  objectMap: typeof objectMap
+  parseHtmlFragment: typeof parseHtmlFragment
+  parseJson: typeof parseJson
+  parseObjectLiteral: typeof parseObjectLiteral
+  peekObservable: typeof peek
+  range: typeof range
+  registerEventHandler: typeof registerEventHandler
+  setDomNodeChildrenFromArrayMapping: typeof setDomNodeChildrenFromArrayMapping
+  setHtml: typeof setHtml
+  setTextContent: typeof setTextContent
+  toggleDomNodeCssClass: typeof toggleDomNodeCssClass
+  triggerEvent: typeof triggerEvent
+  unwrapObservable: typeof unwrap
+}
+
+const utils : Utils = {
   addOrRemoveItem,
   arrayFilter,
   arrayFirst,
@@ -144,9 +179,69 @@ const utils = Object.assign({
   toggleDomNodeCssClass,
   triggerEvent,
   unwrapObservable: unwrap
-})
+}
 
-const knockout = {
+
+export type KnockoutInstance = {
+  // --- Utilities ---
+  cleanNode: typeof cleanNode
+  dependencyDetection: typeof dependencyDetection
+  computedContext: typeof dependencyDetection
+  filters: typeof options.filters
+  ignoreDependencies: typeof dependencyDetection.ignore
+  memoization: typeof memoization
+  options: typeof options
+  removeNode: typeof removeNode
+  selectExtensions: typeof selectExtensions
+  tasks: typeof tasks
+  utils: typeof utils
+  LifeCycle: typeof LifeCycle
+
+  // -- Observable ---
+  isObservable: typeof isObservable
+  isSubscribable: typeof isSubscribable
+  isWriteableObservable: typeof isWriteableObservable
+  isWritableObservable: typeof isWriteableObservable
+  observable: typeof observable
+  observableArray: typeof observableArray
+  isObservableArray: typeof isObservableArray
+  peek: typeof peek
+  subscribable: typeof subscribable
+  unwrap: typeof unwrap
+  toJS: typeof toJS
+  toJSON: typeof toJSON
+  proxy: typeof proxy
+
+  // ... Computed ...
+  computed: typeof computed
+  dependentObservable: typeof computed
+  isComputed: typeof isComputed
+  isPureComputed: typeof isPureComputed
+  pureComputed: typeof pureComputed
+  when: typeof when
+
+  // --- Templates ---
+  nativeTemplateEngine: typeof nativeTemplateEngine
+  renderTemplate: typeof renderTemplate
+  setTemplateEngine: typeof setTemplateEngine
+  templateEngine: typeof templateEngine
+  templateSources: { domElement: typeof domElement; anonymousTemplate: typeof anonymousTemplate }
+
+  // --- Binding ---
+  applyBindingAccessorsToNode: typeof applyBindingAccessorsToNode
+  applyBindings: typeof applyBindings
+  applyBindingsToDescendants: typeof applyBindingsToDescendants
+  applyBindingsToNode: typeof applyBindingsToNode
+  contextFor: typeof contextFor
+  dataFor: typeof dataFor
+  BindingHandler: typeof BindingHandler
+  AsyncBindingHandler: typeof AsyncBindingHandler
+  virtualElements: typeof virtualElements
+  domNodeDisposal: typeof domNodeDisposal
+  bindingEvent: typeof bindingEvent
+}
+
+const knockout : KnockoutInstance = {
   // --- Utilities ---
   cleanNode,
   dependencyDetection,
@@ -161,7 +256,7 @@ const knockout = {
   utils,
   LifeCycle,
 
-    // -- Observable ---
+  // -- Observable ---
   isObservable,
   isSubscribable,
   isWriteableObservable,
@@ -176,7 +271,7 @@ const knockout = {
   toJSON,
   proxy,
 
-    // ... Computed ...
+  // ... Computed ...
   computed,
   dependentObservable: computed,
   isComputed,
@@ -184,14 +279,14 @@ const knockout = {
   pureComputed,
   when: when,
 
-    // --- Templates ---
+  // --- Templates ---
   nativeTemplateEngine,
   renderTemplate,
   setTemplateEngine,
   templateEngine,
   templateSources: { domElement, anonymousTemplate },
 
-    // --- Binding ---
+  // --- Binding ---
   applyBindingAccessorsToNode,
   applyBindings,
   applyBindingsToDescendants,
@@ -202,10 +297,12 @@ const knockout = {
   AsyncBindingHandler,
   virtualElements,
   domNodeDisposal,
-  bindingEvent,
+  bindingEvent
 }
 
 export class Builder {
+  providedProperties: { extenders: any; bindingHandlers: BindingHandlerObject; bindingProvider: any }
+
   constructor ({ provider, bindings, extenders, filters, options }) {
     Object.assign(knockout.options, options, {
       filters,
@@ -230,17 +327,21 @@ export class Builder {
   }
 
   /**
-   * @return {Object} An instance of Knockout.
+   * @return {KnockoutInstance} An instance of Knockout.
    */
-  create (...additionalProperties) {
-    const instance = Object.assign({
-      get getBindingHandler () { return options.getBindingHandler },
-      set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
-    },
-    knockout,
-    this.providedProperties,
-    ...additionalProperties)
+  create (...additionalProperties) : KnockoutInstance {
+    
+    const instance : KnockoutInstance =  Object.assign(      
+      {
+        get getBindingHandler () { return options.getBindingHandler },
+        set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
+      },      
+      knockout, //never change the order of these
+      this.providedProperties,
+      ...additionalProperties)
+
     instance.options.knockoutInstance = instance
+
     return instance
   }
 }

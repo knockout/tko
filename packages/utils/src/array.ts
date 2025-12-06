@@ -6,28 +6,28 @@
 
 const {isArray} = Array
 
-export function arrayForEach (array, action, thisArg) {
-  if (arguments.length > 2) { action = action.bind(thisArg) }
+export function arrayForEach<T = any>(array: T[], action: (item: T, index?: number, array? : T[]) => void, actionOwner?: any): void {
+  if (arguments.length > 2) { action = action.bind(actionOwner) }
   for (let i = 0, j = array.length; i < j; ++i) {
     action(array[i], i, array)
   }
 }
 
-export function arrayIndexOf (array, item) {
+export function arrayIndexOf<T = any>(array: Array<T>, item: T): number {
   return (isArray(array) ? array : [...array]).indexOf(item)
 }
 
-export function arrayFirst (array, predicate, predicateOwner) {
+export function arrayFirst<T = any>(array: T[], predicate: (item: T, index?: number) => boolean, predicateOwner?: any): T | undefined {
   return (isArray(array) ? array : [...array])
     .find(predicate, predicateOwner)
 }
 
-export function arrayMap (array = [], mapping, thisArg) {
+export function arrayMap<T = any, U = any> (array: ArrayLike<T>, mapping: (item: T, index?: number) => U, thisArg?) {
   if (arguments.length > 2) { mapping = mapping.bind(thisArg) }
   return array === null ? [] : Array.from(array, mapping)
 }
 
-export function arrayRemoveItem (array, itemToRemove) {
+export function arrayRemoveItem<T = any>(array: Array<T>, itemToRemove: T): void {
   var index = arrayIndexOf(array, itemToRemove)
   if (index > 0) {
     array.splice(index, 1)
@@ -36,19 +36,19 @@ export function arrayRemoveItem (array, itemToRemove) {
   }
 }
 
-export function arrayGetDistinctValues (array = []) {
+export function arrayGetDistinctValues<T = any>(array: T[]): T[] {
   const seen = new Set()
   if (array === null) { return [] }
   return (isArray(array) ? array : [...array])
     .filter(item => seen.has(item) ? false : seen.add(item))
 }
 
-export function arrayFilter (array, predicate, thisArg) {
-  if (arguments.length > 2) { predicate = predicate.bind(thisArg) }
+export function arrayFilter<T = any>(array: T[], predicate: (item: T, index?: number) => boolean, predicateOwner?: any): T[] {
+  if (arguments.length > 2) { predicate = predicate.bind(predicateOwner) }
   return array === null ? [] : (isArray(array) ? array : [...array]).filter(predicate)
 }
 
-export function arrayPushAll (array, valuesToPush) {
+export function arrayPushAll<T = any>(array: Array<T>, valuesToPush: ArrayLike<T>): T[] {
   if (isArray(valuesToPush)) {
     array.push.apply(array, valuesToPush)
   } else {
@@ -57,7 +57,7 @@ export function arrayPushAll (array, valuesToPush) {
   return array
 }
 
-export function addOrRemoveItem (array, value, included) {
+export function addOrRemoveItem (array, value, included : boolean) {
   var existingEntryIndex = arrayIndexOf(typeof array.peek === 'function' ? array.peek() : array, value)
   if (existingEntryIndex < 0) {
     if (included) { array.push(value) }
@@ -66,20 +66,23 @@ export function addOrRemoveItem (array, value, included) {
   }
 }
 
-export function makeArray (arrayLikeObject) {
+export function makeArray<T=any> (arrayLikeObject:ArrayLike<T>):T[] {
   return Array.from(arrayLikeObject)
 }
 
-export function range (min, max) {
-  min = typeof min === 'function' ? min() : min
-  max = typeof max === 'function' ? max() : max
-  var result = []
-  for (var i = min; i <= max; i++) { result.push(i) }
+//TODO May be MaybeSubscribable<number> -> I actually don't want the dependency
+export function range (min: () =>number | number, max: () =>number | number): number[] {
+  const minimum = typeof min === 'function' ? (min as () => number)() : min as number
+  const maximum = typeof max === 'function' ? (max as () => number)() : max as number
+  var result: number[] = []
+  for (let i = minimum as number; i <= maximum; i++) {
+    result.push(i)
+  }
   return result
 }
 
 // Go through the items that have been added and deleted and try to find matches between them.
-export function findMovesInArrayComparison (left, right, limitFailedCompares) {
+export function findMovesInArrayComparison (left, right, limitFailedCompares?: number| boolean) {
   if (left.length && right.length) {
     var failedCompares, l, r, leftItem, rightItem
     for (failedCompares = l = 0; (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]); ++l) {
@@ -100,21 +103,43 @@ export function findMovesInArrayComparison (left, right, limitFailedCompares) {
 const statusNotInOld = 'added'
 const statusNotInNew = 'deleted'
 
+export interface ArrayChange<T = any> {
+  status: "added" | "deleted" | "retained";
+  value: T;
+  index: number;
+  moved?: number;
+}
+
+export type ArrayChanges<T = any> = ArrayChange<T>[];
+
+export interface CompareArraysOptions {
+  dontLimitMoves?: boolean;
+  sparse?: boolean;
+}
+
     // Simple calculation based on Levenshtein distance.
-export function compareArrays (oldArray, newArray, options) {
+export function compareArrays<T = any> (oldArray: T[], newArray: T[], options?: CompareArraysOptions | boolean): ArrayChanges<T> {
     // For backward compatibility, if the third arg is actually a bool, interpret
     // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
   options = (typeof options === 'boolean') ? { dontLimitMoves: options } : (options || {})
   oldArray = oldArray || []
   newArray = newArray || []
 
-  if (oldArray.length < newArray.length) { return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options) } else { return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options) }
+  if (oldArray.length < newArray.length) {
+    return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options)
+  } else {
+    return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options)
+  }
 }
 
-function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, statusNotInBig, options) {
+function compareSmallArrayToBigArray<T = any> (smlArray: T[],
+                                               bigArray: T[],
+                                               statusNotInSml: 'added'|'deleted',
+                                               statusNotInBig: 'added'|'deleted',
+                                               options: CompareArraysOptions): ArrayChanges<T> {
   var myMin = Math.min,
     myMax = Math.max,
-    editDistanceMatrix = [],
+    editDistanceMatrix = new Array(),
     smlIndex, smlIndexMax = smlArray.length,
     bigIndex, bigIndexMax = bigArray.length,
     compareRange = (bigIndexMax - smlIndexMax) || 1,
@@ -124,7 +149,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
 
   for (smlIndex = 0; smlIndex <= smlIndexMax; smlIndex++) {
     lastRow = thisRow
-    editDistanceMatrix.push(thisRow = [])
+    editDistanceMatrix.push(thisRow = new Array())
     bigIndexMaxForRow = myMin(bigIndexMax, smlIndex + compareRange)
     bigIndexMinForRow = myMax(0, smlIndex - 1)
     for (bigIndex = bigIndexMinForRow; bigIndex <= bigIndexMaxForRow; bigIndex++) {
@@ -143,7 +168,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     }
   }
 
-  var editScript = [], meMinusOne, notInSml = [], notInBig = []
+  var editScript = new Array(), meMinusOne, notInSml = new Array(), notInBig = new Array()
   for (smlIndex = smlIndexMax, bigIndex = bigIndexMax; smlIndex || bigIndex;) {
     meMinusOne = editDistanceMatrix[smlIndex][bigIndex] - 1
     if (bigIndex && meMinusOne === editDistanceMatrix[smlIndex][bigIndex - 1]) {
@@ -159,7 +184,7 @@ function compareSmallArrayToBigArray (smlArray, bigArray, statusNotInSml, status
     } else {
       --bigIndex
       --smlIndex
-      if (!options.sparse) {
+      if (!options?.sparse) {
         editScript.push({
           'status': 'retained',
           'value': bigArray[bigIndex] })

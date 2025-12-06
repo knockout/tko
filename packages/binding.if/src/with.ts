@@ -14,7 +14,9 @@ import ConditionalBindingHandler from './ConditionalBindingHandler'
  * it's an issue related to async/deferUpdates.
  */
 export class WithBindingHandler extends ConditionalBindingHandler {
-  constructor (...args) {
+  asOption: any;
+  conditional: any;
+  constructor (...args: [any]) {
     super(...args)
     this.asOption = this.allBindings.get('as')
 

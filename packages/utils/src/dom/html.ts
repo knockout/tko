@@ -43,7 +43,7 @@ function getWrap (tags) {
   return (m && lookup[m[1]]) || none
 }
 
-function simpleHtmlParse (html, documentContext) {
+function simpleHtmlParse (html: string, documentContext? : Document) {
   documentContext || (documentContext = document)
   var windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
 
@@ -56,13 +56,14 @@ function simpleHtmlParse (html, documentContext) {
     // (possibly a text node) in front of the comment. So, KO does not attempt to workaround this IE issue automatically at present.
 
     // Trim whitespace, otherwise indexOf won't work as expected
-  var tags = stringTrim(html).toLowerCase(), div = documentContext.createElement('div'),
+  let div : any = documentContext.createElement('div')
+  let tags = stringTrim(html).toLowerCase(),
     wrap = getWrap(tags),
     depth = wrap[0]
 
     // Go to html and back, then peel off extra wrappers
     // Note that we always prefix with some dummy text, because otherwise, IE<9 will strip out leading comment nodes in descendants. Total madness.
-  var markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
+  let markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
   if (typeof windowContext['innerShiv'] === 'function') {
         // Note that innerShiv is deprecated in favour of html5shiv. We should consider adding
         // support for html5shiv (except if no explicit support is needed, e.g., if html5shiv
@@ -78,20 +79,20 @@ function simpleHtmlParse (html, documentContext) {
   return makeArray(div.lastChild.childNodes)
 }
 
-function templateHtmlParse (html, documentContext) {
+function templateHtmlParse (html: string, documentContext? : Document): ChildNode[] {
   if (!documentContext) { documentContext = document }
-  var template = documentContext.createElement('template')
+  var template = documentContext.createElement('template') as HTMLTemplateElement
   template.innerHTML = html
   return makeArray(template.content.childNodes)
 }
 
-function jQueryHtmlParse (html, documentContext) {
+function jQueryHtmlParse (html: string, documentContext?: Document) {
     // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
   if (jQueryInstance.parseHTML) {
     return jQueryInstance.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
   } else {
         // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-    var elems = jQueryInstance.clean([html], documentContext)
+    var elems = (jQueryInstance as any).clean([html], documentContext)
 
         // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
         // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
@@ -115,10 +116,10 @@ function jQueryHtmlParse (html, documentContext) {
  * straightforward parser.
  *
  * @param  {string} html            To be parsed.
- * @param  {Object} documentContext That owns the executing code.
- * @return {[DOMNode]}              Parsed DOM Nodes
+ * @param  {Document} documentContext That owns the executing code.
+ * @return {[Node]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html, documentContext) {  
+export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {  
   validateHTMLInput(html)
 
   // Prefer <template>-tag based HTML parsing.
@@ -160,7 +161,7 @@ export function parseHtmlForTemplateNodes (html, documentContext) {
   * @param {DOMNode} html HTML to be inserted in node
   * @returns undefined
   */
-export function setHtml (node, html) {
+export function setHtml (node : Node, html : Function | string) {
   emptyDomNode(node)
 
     // There's few cases where we would want to display a stringified
@@ -186,7 +187,13 @@ export function setHtml (node, html) {
       jQueryInstance(node).html(html)
     } else {
             // ... otherwise, use KO's own parsing logic.
-      var parsedNodes = parseHtmlFragment(html, node.ownerDocument)
+      var parsedNodes : Node[]
+      if(node.ownerDocument) {
+        parsedNodes = parseHtmlFragment(html, node.ownerDocument)
+      }
+      else {
+        parsedNodes = parseHtmlFragment(html)
+      }
 
       if (node.nodeType === 8) {
         if (html === null) {
@@ -201,9 +208,10 @@ export function setHtml (node, html) {
   }
 }
 
-
-export function setTextContent (element, textContent) {
-  var value = typeof textContent === 'function' ? textContent() : textContent
+//TODO May be MaybeSubscribable<string> -> I actually don't want the dependency
+type TextContent = string | null | undefined | Function;
+export function setTextContent (element: Node, textContent?: TextContent):void {
+  var value = typeof textContent === 'function' ? (textContent as Function)() : textContent
   if ((value === null) || (value === undefined)) { value = '' }
 
     // We need there to be exactly one child: a text node.
@@ -211,9 +219,9 @@ export function setTextContent (element, textContent) {
     // we'll clear everything and create a single text node.
   var innerTextNode = virtualElements.firstChild(element)
   if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
-    virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)])
+    virtualElements.setDomNodeChildren(element, [element.ownerDocument!.createTextNode(value)])
   } else {
-    innerTextNode.data = value
+    (innerTextNode as Text).data = value
   }
 
   forceRefresh(element)

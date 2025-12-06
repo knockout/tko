@@ -11,9 +11,11 @@ import {
     computed, pureComputed
 } from '@tko/computed'
 
+import type { AllBindings } from '@tko/bind'
+
 export var checked = {
   after: ['value', 'attr'],
-  init: function (element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings: AllBindings) {
     var checkedValue = pureComputed(function () {
       // Treat "value" like "checkedValue" when it is included with "checked" binding
       if (allBindings.has('checkedValue')) {
