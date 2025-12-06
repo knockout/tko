@@ -1,8 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-   
-    "noEmit": false, //Deactivate "noEmit" to generating d.ts-File to 'builds/dts/dist' via "make dts"
+  "compilerOptions": {   
+    "noEmit": false,
     "emitDeclarationOnly": true,
     "outFile": "builds/dts/dist/tko.d.ts",
   },

@@ -75,7 +75,7 @@ export class Options {
 
   foreachHidesDestroyed: boolean = false
 
-  onError (e : Error) : void { throw e }
+  onError (e) : void { throw e }
 
   set(name : string, value : any) : void {
     this[name] = value
