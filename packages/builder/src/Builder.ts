@@ -148,7 +148,67 @@ const utils = Object.assign({
   unwrapObservable: unwrap
 })
 
-const knockout = {
+
+export type KnockoutInstance = {
+  // --- Utilities ---
+  cleanNode: typeof cleanNode
+  dependencyDetection: typeof dependencyDetection
+  computedContext: typeof dependencyDetection
+  filters: typeof options.filters
+  ignoreDependencies: typeof dependencyDetection.ignore
+  memoization: typeof memoization
+  options: typeof options
+  removeNode: typeof removeNode
+  selectExtensions: typeof selectExtensions
+  tasks: typeof tasks
+  utils: typeof utils
+  LifeCycle: typeof LifeCycle
+
+  // -- Observable ---
+  isObservable: typeof isObservable
+  isSubscribable: typeof isSubscribable
+  isWriteableObservable: typeof isWriteableObservable
+  isWritableObservable: typeof isWriteableObservable
+  observable: typeof observable
+  observableArray: typeof observableArray
+  isObservableArray: typeof isObservableArray
+  peek: typeof peek
+  subscribable: typeof subscribable
+  unwrap: typeof unwrap
+  toJS: typeof toJS
+  toJSON: typeof toJSON
+  proxy: typeof proxy
+
+  // ... Computed ...
+  computed: typeof computed
+  dependentObservable: typeof computed
+  isComputed: typeof isComputed
+  isPureComputed: typeof isPureComputed
+  pureComputed: typeof pureComputed
+  when: typeof when
+
+  // --- Templates ---
+  nativeTemplateEngine: typeof nativeTemplateEngine
+  renderTemplate: typeof renderTemplate
+  setTemplateEngine: typeof setTemplateEngine
+  templateEngine: typeof templateEngine
+  templateSources: { domElement: typeof domElement; anonymousTemplate: typeof anonymousTemplate }
+
+  // --- Binding ---
+  applyBindingAccessorsToNode: typeof applyBindingAccessorsToNode
+  applyBindings: typeof applyBindings
+  applyBindingsToDescendants: typeof applyBindingsToDescendants
+  applyBindingsToNode: typeof applyBindingsToNode
+  contextFor: typeof contextFor
+  dataFor: typeof dataFor
+  BindingHandler: typeof BindingHandler
+  AsyncBindingHandler: typeof AsyncBindingHandler
+  virtualElements: typeof virtualElements
+  domNodeDisposal: typeof domNodeDisposal
+  bindingEvent: typeof bindingEvent
+}
+
+const knockout : KnockoutInstance = {
   // --- Utilities ---
   cleanNode,
   dependencyDetection,
@@ -234,10 +294,10 @@ export class Builder {
   }
 
   /**
-   * @return {Object} An instance of Knockout.
+   * @return {KnockoutInstance} An instance of Knockout.
    */
-  create (...additionalProperties) {
-    const instance = Object.assign({
+  create (...additionalProperties) : KnockoutInstance {
+    const instance : KnockoutInstance = Object.assign({
       get getBindingHandler () { return options.getBindingHandler },
       set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
     },

@@ -1,8 +1,9 @@
 import * as utils from '../dist'
 import '../helpers/jasmine-13-helper'
-import type { KnockoutStatic } from '../src'
+import type { KnockoutInstance } from '@tko/builder'
 
-var ko : KnockoutStatic = ko || {}
+var ko : KnockoutInstance = globalThis.ko || {}
+
 ko.utils = utils
 ko.tasks = utils.tasks
 

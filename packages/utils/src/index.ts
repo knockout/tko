@@ -15,7 +15,6 @@ export * from './symbol'
 export * from './css'
 export { jQuerySetInstance } from './jquery'
 export { default as options } from './options'
-export type { KnockoutStatic } from './options'
 
 // DOM;
 export * from './dom/event'

@@ -3,9 +3,9 @@ import '../helpers/jasmine-13-helper'
 import * as utils from '../dist'
 import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
-import type { KnockoutStatic } from '../src'
+import type { KnockoutInstance } from '@tko/builder'
 
-var ko : KnockoutStatic = ko || {}
+var ko : KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
 ko.options = options
 

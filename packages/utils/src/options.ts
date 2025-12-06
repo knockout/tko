@@ -1,12 +1,11 @@
 import { Provider } from "@tko/provider";
+import type { KnockoutInstance } from "@tko/builder";
 
 export interface CustomBindingGlobalProperties {
   [customBindingName: string]: any;
 }
 
 export type BindingStringPreparsersFunction = (bindingString: string) => string;
-
-export type KnockoutStatic = any // typeof ko;
 
 //
 // This becomes ko.options
@@ -18,7 +17,7 @@ export class Options {
   bindingStringPreparsers: BindingStringPreparsersFunction[] = []
   
   // Reference to the own knockout instance
-  knockoutInstance: KnockoutStatic = null
+  knockoutInstance: KnockoutInstance | null = null
   
   deferUpdates: boolean = false
 
