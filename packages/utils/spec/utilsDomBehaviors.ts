@@ -19,7 +19,7 @@ describe('startCommentRegex', function () {
 })
 
 describe('setTextContent', function () {
-  var element
+  var element : HTMLElement
 
   beforeEach(function () {
     element = document.createElement('DIV')

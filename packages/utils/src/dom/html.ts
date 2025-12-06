@@ -209,8 +209,9 @@ export function setHtml (node : Node, html : Function | string) {
 }
 
 //TODO May be MaybeSubscribable<string> -> I actually don't want the dependency
-export function setTextContent (element: Node, textContent: ()=> string | string ):void {
-  var value = typeof textContent === 'function' ? (textContent as () => string)() : textContent as string
+type TextContent = string | null | undefined | Function;
+export function setTextContent (element: Node, textContent?: TextContent):void {
+  var value = typeof textContent === 'function' ? (textContent as Function)() : textContent
   if ((value === null) || (value === undefined)) { value = '' }
 
     // We need there to be exactly one child: a text node.

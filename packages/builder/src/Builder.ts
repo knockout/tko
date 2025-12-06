@@ -115,7 +115,40 @@ const domNodeDisposal = {
   }
 }
 
-const utils = Object.assign({
+export type Utils = {
+  addOrRemoveItem: typeof addOrRemoveItem
+  arrayFilter: typeof arrayFilter
+  arrayFirst: typeof arrayFirst
+  arrayForEach: typeof arrayForEach
+  arrayGetDistinctValues: typeof arrayGetDistinctValues
+  arrayIndexOf: typeof arrayIndexOf
+  arrayMap: typeof arrayMap
+  arrayPushAll: typeof arrayPushAll
+  arrayRemoveItem: typeof arrayRemoveItem
+  cloneNodes: typeof cloneNodes
+  compareArrays: typeof compareArrays
+  createSymbolOrString: typeof createSymbolOrString
+  domData: typeof domData
+  domNodeDisposal: typeof domNodeDisposal
+  extend: typeof extend
+  filters: typeof options.filters
+  objectForEach: typeof objectForEach
+  objectMap: typeof objectMap
+  parseHtmlFragment: typeof parseHtmlFragment
+  parseJson: typeof parseJson
+  parseObjectLiteral: typeof parseObjectLiteral
+  peekObservable: typeof peek
+  range: typeof range
+  registerEventHandler: typeof registerEventHandler
+  setDomNodeChildrenFromArrayMapping: typeof setDomNodeChildrenFromArrayMapping
+  setHtml: typeof setHtml
+  setTextContent: typeof setTextContent
+  toggleDomNodeCssClass: typeof toggleDomNodeCssClass
+  triggerEvent: typeof triggerEvent
+  unwrapObservable: typeof unwrap
+}
+
+const utils : Utils = {
   addOrRemoveItem,
   arrayFilter,
   arrayFirst,
@@ -146,7 +179,7 @@ const utils = Object.assign({
   toggleDomNodeCssClass,
   triggerEvent,
   unwrapObservable: unwrap
-})
+}
 
 
 export type KnockoutInstance = {
@@ -206,9 +239,6 @@ export type KnockoutInstance = {
   virtualElements: typeof virtualElements
   domNodeDisposal: typeof domNodeDisposal
   bindingEvent: typeof bindingEvent
-
-  get getBindingHandler() 
-  set getBindingHandler(fn)
 }
 
 const knockout : KnockoutInstance = {
@@ -267,8 +297,7 @@ const knockout : KnockoutInstance = {
   AsyncBindingHandler,
   virtualElements,
   domNodeDisposal,
-  bindingEvent,
-  getBindingHandler: undefined
+  bindingEvent
 }
 
 export class Builder {
@@ -302,12 +331,12 @@ export class Builder {
    */
   create (...additionalProperties) : KnockoutInstance {
     
-    const instance : KnockoutInstance =  Object.assign(
-      knockout,
+    const instance : KnockoutInstance =  Object.assign(      
       {
         get getBindingHandler () { return options.getBindingHandler },
         set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
       },      
+      knockout, //never change the order of these
       this.providedProperties,
       ...additionalProperties)
 
