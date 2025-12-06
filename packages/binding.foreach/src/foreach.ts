@@ -341,7 +341,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   // Process a changeItem with {status: 'added', ...}
   added (changeItem: ChangeAddItem) {
     var index = changeItem.index
-    var valuesToAdd = changeItem.isBatch ? changeItem.values! : [changeItem.value!]
+    var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value]
     var referenceElement = this.getLastNodeBeforeIndex(index)
     // gather all childnodes for a possible batch insertion
     const allChildNodes: Node[] = []
