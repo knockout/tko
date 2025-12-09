@@ -44,6 +44,7 @@ interface Config {
   viewModel?: RequireConfig | ViewModelConfig | any;
   template?: RequireConfig | TemplateConfig | any;
   synchronous?: boolean;
+  ignoreCustomElementWarning?: boolean 
 }
 
 interface ViewModelConstructor {
@@ -67,13 +68,7 @@ interface RequireConfig {
   require: string;
 }
 
-type RegisterCustomOptions = { ignoreCustomElementWarning: boolean }
-
-function isIgnoreCustomElementWarning(config): config is RegisterCustomOptions{
-  return (config as any).ignoreCustomElementWarning !== 'undefined';
-}
-
-export function register (componentName: string, config: RegisterCustomOptions | Config ) {
+export function register (componentName: string, config: Config ) {
   if (!config) {
     throw new Error('Invalid configuration for ' + componentName)
   }
@@ -84,7 +79,7 @@ export function register (componentName: string, config: RegisterCustomOptions |
 
   const ceok = componentName.includes('-') && componentName.toLowerCase() === componentName
   
-  if (isIgnoreCustomElementWarning(config) && !config.ignoreCustomElementWarning && !ceok) {
+  if (!config.ignoreCustomElementWarning && !ceok) {
     console.log(`
 🥊  Knockout warning: components for custom elements must be lowercase and contain a dash.  To ignore this warning, add to the 'config' of .register(componentName, config):
 

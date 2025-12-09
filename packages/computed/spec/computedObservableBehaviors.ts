@@ -656,7 +656,7 @@ describe('Dependent Observable', function () {
     var computedInstance = computed(function () {})
 
     var customFunction1 = function () {};
-    var customFunction2 = function () {};
+    var customFunction2 = function () {}; // TODO ASI example
 
     (subscribable.fn as any).customFunction1 = customFunction1
     computed.fn.customFunction2 = customFunction2
