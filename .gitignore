@@ -29,4 +29,5 @@ coverage/
 yarn.lock
 
 .vscode/extensions.json
+!.vscode/launch.json
 .vscode/settings.json

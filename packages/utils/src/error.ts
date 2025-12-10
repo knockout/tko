@@ -11,7 +11,7 @@ export function catchFunctionErrors (delegate) {
     try {
       return delegate(...args)
     } catch (err) {
-      options.onError(err as Error)
+      options.onError(err)
     }
   }
 }

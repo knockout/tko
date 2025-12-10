@@ -3,8 +3,9 @@ import '../helpers/jasmine-13-helper'
 import * as utils from '../dist'
 import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
+import type { KnockoutInstance } from '@tko/builder'
 
-var ko = ko || {}
+var ko : KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
 ko.options = options
 
@@ -18,7 +19,7 @@ describe('startCommentRegex', function () {
 })
 
 describe('setTextContent', function () {
-  var element
+  var element : HTMLElement
 
   beforeEach(function () {
     element = document.createElement('DIV')
@@ -48,7 +49,7 @@ describe('setTextContent', function () {
 })
 
 describe('registerEventHandler', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
@@ -113,7 +114,7 @@ describe('registerEventHandler', function () {
 })
 
 describe('cloneNodes', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
@@ -127,7 +128,7 @@ describe('cloneNodes', function () {
     testNode.appendChild(child)
 
     var newNodes = ko.utils.cloneNodes([testNode])
-    var newChild = newNodes[0].children[0]
+    var newChild = newNodes[0].childNodes[0]
 
     var childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
 
@@ -136,7 +137,7 @@ describe('cloneNodes', function () {
 })
 
 describe('selectExtensions', () => {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should use loose equality for select value', () => {

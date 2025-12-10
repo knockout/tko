@@ -6,7 +6,7 @@ import { setDomNodeChildrenFromArrayMapping } from '../dist'
 
 function copyDomNodeChildren (domNode: HTMLElement) {
   const copy: ChildNode[] = []
-  for (let i = 0; i < domNode.childNodes.length; i++) {
+  for (var i = 0; i < domNode.childNodes.length; i++) {
     copy.push(domNode.childNodes[i])
   }
   return copy

@@ -19,7 +19,7 @@ import {bindings as coreBindings} from '../dist'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Selected Options', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

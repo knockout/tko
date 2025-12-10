@@ -1,7 +1,7 @@
 
 import { subscribable, dependencyDetection } from '@tko/observable'
 import { getObjectOwnProperty, tasks } from '@tko/utils'
-import { Loader } from './loaders'
+import type { Loader } from './loaders'
 
 var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
   loadedDefinitionsCache = {}    // Tracks component loads that have already completed

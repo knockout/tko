@@ -26,7 +26,7 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper';
 
 describe('else inside an if binding', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
@@ -81,7 +81,7 @@ describe('else inside an if binding', function () {
 });
 
 describe('Else binding', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {

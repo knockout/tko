@@ -20,6 +20,8 @@ import { functionRewrite } from '@tko/utils.functionrewrite'
 
 import { options as defaultOptions } from '@tko/utils'
 
+declare const BUILD_VERSION: string
+
 /**
  * expressionRewriting is deprecated in TKO because we have our own JS
  * parser now.  This is here only for legacy compatibility.
@@ -29,16 +31,15 @@ const expressionRewriting = {
   preProcessBindings: s => dataBindProvider.preProcessBindings(s)
 }
 
+const provider = new MultiProvider({providers: [
+  new ComponentProvider(),
+  dataBindProvider,
+  new VirtualProvider(),
+  new AttributeProvider()
+]})
+
 const builder = new Builder({
-  filters,
-  provider: new MultiProvider({
-    providers: [
-      new ComponentProvider(),
-      dataBindProvider,
-      new VirtualProvider(),
-      new AttributeProvider()
-    ]
-  }),
+  provider,
   bindings: [
     coreBindings,
     templateBindings,
@@ -46,6 +47,8 @@ const builder = new Builder({
     componentBindings,
     { each: foreachBindings.foreach }
   ],
+  extenders: {},
+  filters,
   options: {
     bindingGlobals: defaultOptions.global,
     bindingStringPreparsers: [functionRewrite]

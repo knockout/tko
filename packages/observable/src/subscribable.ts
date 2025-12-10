@@ -50,12 +50,14 @@ export interface SubscribableFunctions<T = any> {
   afterSubscriptionRemove?: (event: string) => void;
 }
 
+
 export interface Subscribable<T = any> extends SubscribableFunctions<T> {
   _subscriptions: any;
   _versionNumber: number;
   _id: number;
 }
 
+// This interface is for the JS-Factory-Method 'subscribable' to returns a typed Subscribable
 export interface subscribable {
   new <T = any>(): Subscribable<T>;
   fn: SubscribableFunctions;
@@ -63,7 +65,7 @@ export interface subscribable {
 
 // https://stackoverflow.com/questions/75658736/is-there-any-way-to-create-object-using-function-in-typescript-like-javascript
 // TODO need help for refactoring to typescript-class without breaking the api
-export const subscribable = function () {
+export const subscribable = function subscribableFactory() {
   Object.setPrototypeOf(this, ko_subscribable_fn)
   ko_subscribable_fn.init(this)
 } as unknown as subscribable

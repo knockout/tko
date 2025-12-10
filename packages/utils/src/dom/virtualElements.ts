@@ -96,7 +96,6 @@ export interface VirtualElementsAllowedBindings {
   using: boolean;
   template: boolean;
   component: boolean;
-  [name: string]: boolean;
 }
 
 export var allowedBindings : VirtualElementsAllowedBindings = Object.create(null)

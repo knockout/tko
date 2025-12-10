@@ -16,7 +16,7 @@ export default class MultiProvider extends Provider {
 
   get FOR_NODE_TYPES () { return this.nodeTypes }
 
-  constructor (params: ProviderParamsInput | null = null) {
+  constructor (params?: ProviderParamsInput | null) {
     super(params)
     const providers = params?.providers || []
     this.nodeTypeMap = {}

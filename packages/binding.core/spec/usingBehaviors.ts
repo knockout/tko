@@ -22,7 +22,7 @@ import {bindings as coreBindings} from '@tko/binding.core'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Using', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
@@ -186,7 +186,7 @@ describe('Binding: Using', function () {
     testNode.innerHTML = "<div data-bind='using: someitem'>text" +
             "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
 
-    var childprop: ObservableArray = observableArray([])
+    var childprop = observableArray<string>([])
     var someitem = observable({childprop: childprop})
     var viewModel = {someitem: someitem}
     applyBindings(viewModel, testNode)
@@ -217,7 +217,7 @@ describe('Binding: Using', function () {
     expect(testNode.childNodes[0]).toHaveValues(['one'])
 
         // Should update observable when input is changed
-    var inputElement = testNode?.childNodes[0]?.childNodes[0] as HTMLInputElement
+    const inputElement = testNode?.childNodes[0]?.childNodes[0] as HTMLInputElement
     inputElement.value = 'two'
     triggerEvent(inputElement, 'change')
     expect(item()).toEqual('two')

@@ -3,7 +3,7 @@ import {
 } from '@tko/utils'
 
 import {
-    applyBindings
+    applyBindings, applyBindingsToNode
 } from '@tko/bind'
 
 import {
@@ -32,11 +32,66 @@ import { MultiProvider } from '@tko/provider.multi'
 var hasfocusUpdatingProperty = '__ko_hasfocusKnockoutUpdating';
 var hasfocusLastValue = '__ko_hasfocusKnockoutLastValue';
 
+const legacyCustomBinding = {
+  'init': function(element, valueAccessor, allBindings) {
+      var handleElementFocusChange = function(isFocused) {
+
+          element[hasfocusUpdatingProperty] = true;
+          var ownerDoc = element.ownerDocument;
+          if ("activeElement" in ownerDoc) {
+              var active;
+              try {
+                  active = ownerDoc.activeElement;
+              } catch(e) {
+                  // IE9 throws if you access activeElement during page load (see issue #703)
+                  active = ownerDoc.body;
+              }
+              isFocused = (active === element);
+          }
+          var modelValue = valueAccessor(isFocused, {onlyIfChanged: true});
+          if (isWriteableObservable(modelValue) && (modelValue.peek() !== isFocused)) {
+              modelValue(isFocused);
+          }
+
+          //cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
+          element[hasfocusLastValue] = isFocused;
+          element[hasfocusUpdatingProperty] = false;
+      };
+      var handleElementFocusIn = handleElementFocusChange.bind(null, true);
+      var handleElementFocusOut = handleElementFocusChange.bind(null, false);
+
+      registerEventHandler(element, "focus", handleElementFocusIn);
+      registerEventHandler(element, "focusin", handleElementFocusIn); // For IE
+      registerEventHandler(element, "blur",  handleElementFocusOut);
+      registerEventHandler(element, "focusout",  handleElementFocusOut); // For IE
+
+      // Assume element is not focused (prevents "blur" being called initially)
+      element[hasfocusLastValue] = false;
+  },
+  'update': function(element, valueAccessor) {
+      var value = !!unwrap(valueAccessor());
+
+      if (!element[hasfocusUpdatingProperty] && element[hasfocusLastValue] !== value) {
+          value ? element.focus() : element.blur();
+
+          // In IE, the blur method doesn't always cause the element to lose focus (for example, if the window is not in focus).
+          // Setting focus to the body element does seem to be reliable in IE, but should only be used if we know that the current
+          // element was focused already.
+          if (!value && element[hasfocusLastValue]) {
+              element.ownerDocument.body.focus();
+          }
+
+          // For IE, which doesn't reliably fire "focus" or "blur" events synchronously
+          dependencyDetection.ignore(triggerEvent, null, [element, value ? "focusin" : "focusout"]);
+      }
+  }
+};
+
 arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
   describe(`Binding: ${binding}`, function () {
-    var bindingHandlers
+    let bindingHandlers
 
-    var testNode : HTMLElement
+    let testNode : HTMLElement
     beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
     beforeEach(function () {
@@ -46,63 +101,8 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       })
       options.bindingProviderInstance = provider
       bindingHandlers = provider.bindingHandlers
-      bindingHandlers.set(coreBindings.bindings)      
-      
-
-      bindingHandlers.focusKnockout351 = {
-        'init': function(element, valueAccessor, allBindings) {
-            var handleElementFocusChange = function(isFocused) {
-    
-                element[hasfocusUpdatingProperty] = true;
-                var ownerDoc = element.ownerDocument;
-                if ("activeElement" in ownerDoc) {
-                    var active;
-                    try {
-                        active = ownerDoc.activeElement;
-                    } catch(e) {
-                        // IE9 throws if you access activeElement during page load (see issue #703)
-                        active = ownerDoc.body;
-                    }
-                    isFocused = (active === element);
-                }
-                var modelValue = valueAccessor(isFocused, {onlyIfChanged: true});
-                if (isWriteableObservable(modelValue) && (modelValue.peek() !== isFocused)) {
-                   modelValue(isFocused);
-                }
-    
-                //cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
-                element[hasfocusLastValue] = isFocused;
-                element[hasfocusUpdatingProperty] = false;
-            };
-            var handleElementFocusIn = handleElementFocusChange.bind(null, true);
-            var handleElementFocusOut = handleElementFocusChange.bind(null, false);
-    
-            registerEventHandler(element, "focus", handleElementFocusIn);
-            registerEventHandler(element, "focusin", handleElementFocusIn); // For IE
-            registerEventHandler(element, "blur",  handleElementFocusOut);
-            registerEventHandler(element, "focusout",  handleElementFocusOut); // For IE
-    
-            // Assume element is not focused (prevents "blur" being called initially)
-            element[hasfocusLastValue] = false;
-        },
-        'update': function(element, valueAccessor) {
-            var value = !!unwrap(valueAccessor());
-    
-            if (!element[hasfocusUpdatingProperty] && element[hasfocusLastValue] !== value) {
-                value ? element.focus() : element.blur();
-    
-                // In IE, the blur method doesn't always cause the element to lose focus (for example, if the window is not in focus).
-                // Setting focus to the body element does seem to be reliable in IE, but should only be used if we know that the current
-                // element was focused already.
-                if (!value && element[hasfocusLastValue]) {
-                    element.ownerDocument.body.focus();
-                }
-    
-                // For IE, which doesn't reliably fire "focus" or "blur" events synchronously
-                dependencyDetection.ignore(triggerEvent, null, [element, value ? "focusin" : "focusout"]);
-            }
-        }
-      };
+      bindingHandlers.set(coreBindings.bindings) 
+      bindingHandlers.focusKnockout351 = legacyCustomBinding;
 
     })
 
@@ -111,6 +111,33 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       // (issue knockout/knockout#736)
       beforeEach(function () { waits(100) })
     }
+
+    it('Should set an observable value to be true on focus and false on blur even if the binding is applied through another binding', function () {
+      const createElementWithHasFocusBinding  = {
+        init: (element: HTMLElement, valueAccessor: () => any) => {
+          const parent = element;
+          const $hasFocus = valueAccessor();
+
+          applyBindingsToNode(parent, { hasFocus: $hasFocus }, {})
+        }
+      };
+      options.bindingProviderInstance.bindingHandlers.set("customBinding",  createElementWithHasFocusBinding)
+
+      testNode.innerHTML = `<input data-bind='customBinding: customProps' /><input />`
+
+      const $myVal = observable(false)
+      applyBindings({customProps: $myVal}, testNode );
+      const input = testNode.children[0] as HTMLInputElement;
+
+      input.focus()
+      triggerEvent(input, 'focusin')
+      expect($myVal()).toEqual(true);
+
+      // Move the focus elsewhere
+      (testNode.childNodes[1] as HTMLElement).focus()
+      triggerEvent(input, 'focusout')
+      expect($myVal()).toEqual(false)
+    })
 
     it('Should respond to changes on an observable value by blurring or focusing the element', function () {
       var currentState

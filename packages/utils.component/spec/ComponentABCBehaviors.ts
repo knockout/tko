@@ -24,11 +24,11 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('ComponentABC', function () {
-  var testComponentName = 'test-component',
+  let testComponentName = 'test-component',
     testComponentBindingValue,
     testComponentParams,
     outerViewModel
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   
   beforeEach(function () {
     useMockForTasks(options)

@@ -1,4 +1,6 @@
 
+import { assert } from 'chai'
+
 import {
   observable
 } from '@tko/observable'
@@ -13,7 +15,6 @@ import {
   TextMustacheProvider, AttributeMustacheProvider
 } from '@tko/provider.mustache'
 
-import { assert } from 'chai'
 
 describe('Native Provider Behavior', function () {
   it('returns native bindings', function () {

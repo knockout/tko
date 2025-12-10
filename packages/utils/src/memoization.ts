@@ -54,8 +54,10 @@ export function unmemoizeDomNodeAndDescendants (domNode : Node, extraCallbackPar
 }
 
 export function parseMemoText (memoText : string | null) : string | null {
-  if(!memoText)
+  if(!memoText) {
     return null
+  }
+  
   var match = memoText.match(/^\[ko_memo\:(.*?)\]$/)
   return match ? match[1] : null
 }

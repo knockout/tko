@@ -4,7 +4,8 @@ import {
 } from '@tko/utils'
 
 import {
-    observable, isWritableObservable, isObservable
+    observable, isWritableObservable, isObservable,
+    Observable
 } from '@tko/observable'
 
 import {
@@ -43,8 +44,8 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Components: Custom elements', function () {
-  var bindingHandlers
-  var testNode : HTMLElement
+  let bindingHandlers
+  let testNode : HTMLElement
 
   beforeEach(function () {
     testNode = jasmine.prepareTestNode()
@@ -293,8 +294,12 @@ describe('Components: Custom elements', function () {
       }
     })
 
+    interface myObs extends Observable {
+      subprop?: string;
+    }
+
         // See we can supply an observable instance, which is received with no wrapper around it
-    var myobservable = observable(1)
+    var myobservable = observable(1) as myObs
     myobservable.subprop = 'subprop'
     testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>'
     applyBindings({ myobservable: myobservable }, testNode)
@@ -455,20 +460,21 @@ describe('Components: Custom elements', function () {
 
   it('Disposes the component when the custom element is cleaned', function () {
 
-
-    interface myModel {
-      wasDisposed : boolean
-      dispose() : void
-    }
-
     // This is really a behavior of the component binding, not custom elements.
     // This spec just shows that custom elements don't break it for any reason.
-    var componentViewModel : myModel = {
-      wasDisposed: false,
-      dispose: function () {
+    class myViewModel {
+      wasDisposed : boolean
+
+      constructor() {
+        this.wasDisposed = false
+      }
+
+      dispose() : void {
         this.wasDisposed = true
       }
     }
+    var componentViewModel = new myViewModel()
+    
     components.register('test-component', {
       template: 'custom element',
       viewModel: { instance: componentViewModel }
