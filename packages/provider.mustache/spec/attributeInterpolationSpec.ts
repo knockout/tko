@@ -24,16 +24,14 @@ import {
   DataBindProvider
 } from '@tko/provider.databind'
 
-import {
-    AttributeMustacheProvider
-} from '../dist';
-
 import '@tko/utils/helpers/jasmine-13-helper';
+import { AttributeMustacheProvider } from '../src';
 
 function ctxStub (obj = {}) { return { lookup (v) { return obj[v] } } }
 
 describe('Attribute Interpolation Markup Provider', function () {
-  var testNode, provider;
+  let testNode: HTMLElement;
+  let provider: AttributeMustacheProvider;
 
   beforeEach(function () {
     provider = new AttributeMustacheProvider()
@@ -165,12 +163,12 @@ describe('Attribute Interpolation Markup Provider', function () {
     testNode.setAttribute('id', '{{expr2}}');
     testNode.setAttribute('data-test', '{{expr3}}');
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(3)
-    const [p0, p1, p2, p3] = bindings
+    expect(bindings.length).toBe(3);
+    const [p0, p1, p2, p3] = bindings;
     const map = { title: 'expr1', id: 'expr2', 'data-test': 'expr3' }
     bindings.forEach(b => {
       const [handler, [part]] = b
-      expect(map[handler]).toEqual(part.text)
+      expect(map[handler as string]).toEqual(part.text)
     })
     expect(testNode.getAttribute('class')).toEqual('test')
   });
@@ -182,7 +180,7 @@ describe('Attribute Interpolation Markup Provider', function () {
     input.setAttribute('value', '{{expr1}}')
 
     const ctx = { expr1: Observable(), expr2: Observable() }
-    const bindings = Array.from(
+    const bindings: any[] = Array.from(
           provider.bindingObjects(testNode, ctxStub(ctx))
         )
     for (const binding of bindings) {
@@ -229,7 +227,7 @@ describe('Attribute Interpolation Markup Provider', function () {
   it('should set the style attribute (when there is a `style` binding)', function () {
     var obs = Observable()
     testNode.innerHTML = '<div style="color: {{ obs }}"></div>'
-    var div = testNode.childNodes[0]
+    var div = testNode.childNodes[0] as HTMLDivElement
     applyBindings({obs: obs}, testNode)
     expect(div.getAttribute('style')).toEqual('color: ')
     obs('red')
@@ -238,7 +236,8 @@ describe('Attribute Interpolation Markup Provider', function () {
 });
 
 describe('Attribute Interpolation Markup bindings', function () {
-  beforeEach(jasmine.prepareTestNode);
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   var bindingHandlers;
 
@@ -256,69 +255,78 @@ describe('Attribute Interpolation Markup bindings', function () {
   it('Should replace {{...}} expression in attribute', function () {
     testNode.innerHTML = "<div title='hello {{\"name\"}}!'></div>";
     applyBindings(null, testNode);
-    expect(testNode.childNodes[0].title).toEqual('hello name!');
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual('hello name!');
   });
 
   it('Should replace multiple expressions', function () {
     testNode.innerHTML = "<div title='hello {{\"name\"}}{{\"!\"}}'></div>";
     applyBindings(null, testNode);
-    expect(testNode.childNodes[0].title).toEqual('hello name!');
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual('hello name!');
   });
 
   it('Should support backtick interpolation', function () {
     testNode.innerHTML = "<div title='hello {{ `a${name}b` }}!'></div>";
     applyBindings({ name: 'n' }, testNode);
-    expect(testNode.childNodes[0].title).toEqual('hello anb!');
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual('hello anb!');
   });
 
   it('Should properly handle quotes in text sections', function () {
     testNode.innerHTML = "<div title='This is \"great\" {{\"fun\"}} with &apos;friends&apos;'></div>";
     applyBindings(null, testNode);
-    expect(testNode.childNodes[0].title).toEqual("This is \"great\" fun with 'friends'");
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual("This is \"great\" fun with 'friends'");
   });
 
   it('Should ignore unmatched }} and {{', function () {
     testNode.innerHTML = "<div title='hello }}\"name\"{{\"!\"}}{{'></div>";
     applyBindings(null, testNode);
-    expect(testNode.childNodes[0].title).toEqual('hello }}"name"!{{');
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual('hello }}"name"!{{');
   });
 
   it('Should support expressions in multiple attributes', function () {
     testNode.innerHTML = "<div title='{{title}}' id='{{id}}' class='test class' data-test='hello {{\"name\"}}!' data-bind='text:content'></div>";
     applyBindings({title: 'the title', id: 'test id', content: 'content'}, testNode);
     expect(testNode).toContainText('content');
-    expect(testNode.childNodes[0].title).toEqual('the title');
-    expect(testNode.childNodes[0].id).toEqual('test id');
-    expect(testNode.childNodes[0].className).toEqual('test class');
-    expect(testNode.childNodes[0].getAttribute('data-test')).toEqual('hello name!');
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual('the title');
+    expect(node.id).toEqual('test id');
+    expect(node.className).toEqual('test class');
+    expect(node.getAttribute('data-test')).toEqual('hello name!');
   });
 
   it('Should update when observable changes', function () {
     testNode.innerHTML = "<div title='The best {{what}}.'></div>";
     var observable = Observable('time');
     applyBindings({what: observable}, testNode);
-    expect(testNode.childNodes[0].title).toEqual('The best time.');
+    const node = testNode.childNodes[0] as HTMLDivElement
+    expect(node.title).toEqual('The best time.');
     observable('fun');
-    expect(testNode.childNodes[0].title).toEqual('The best fun.');
+    expect(node.title).toEqual('The best fun.');
   });
 
   it('Should update when observable changes (quotation marks and backspaces)', function () {
     testNode.innerHTML = "<div title='The \"best\" {{what}}.'></div>";
     var observable = Observable('time "test"');
     applyBindings({what: observable}, testNode);
-    expect(testNode.childNodes[0].title).toEqual('The \"best\" time "test".');
+    expect((testNode.childNodes[0] as HTMLDivElement).title).toEqual('The \"best\" time "test".');
     observable('fun \\ test');
-    expect(testNode.childNodes[0].title).toEqual('The \"best\" fun \\ test.');
+    expect((testNode.childNodes[0] as HTMLDivElement).title).toEqual('The \"best\" fun \\ test.');
   });
 
   it('Should convert value attribute to two-way binding', function () {
     testNode.innerHTML = "<input value='{{value}}'/>";
     var observable = Observable('default value');
     applyBindings({value: observable}, testNode);
-    expect(testNode.childNodes[0].value).toEqual('default value');
+    const node = testNode.childNodes[0] as HTMLInputElement
 
-    testNode.childNodes[0].value = 'user-enterd value';
-    triggerEvent(testNode.childNodes[0], 'change');
+    expect(node.value).toEqual('default value');
+
+    node.value = 'user-enterd value';
+    triggerEvent(testNode.children[0], 'change');
     expect(observable()).toEqual('user-enterd value');
   });
 
@@ -326,9 +334,11 @@ describe('Attribute Interpolation Markup bindings', function () {
     testNode.innerHTML = "<input type='checkbox' checked='{{isChecked}}'/>";
     var observable = Observable(true);
     applyBindings({isChecked: observable}, testNode);
-    expect(testNode.childNodes[0].checked).toBe(true);
+    const node = testNode.childNodes[0] as HTMLInputElement
 
-    testNode.childNodes[0].click();
+    expect(node.checked).toBe(true);
+
+    node.click();
     expect(observable()).toBe(false);
   });
 });

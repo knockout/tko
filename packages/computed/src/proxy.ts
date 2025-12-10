@@ -53,8 +53,8 @@ export function proxy (object) {
       return true
     },
     deleteProperty (property) {
-      delete mirror[property]
-      return delete object[property]
+      delete mirror[property as any]
+      return delete object[property as any]
     },
     apply (target, thisArg, [props]) {
       if (props) {

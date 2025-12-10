@@ -13,6 +13,10 @@ import {
     computed
 } from '@tko/computed'
 
+import type { Computed } from '@tko/computed'
+
+import type { BindingContext } from '@tko/bind'
+
 import {
     isObservable, dependencyDetection, unwrap, observable, isObservableArray
 } from '@tko/observable'
@@ -21,19 +25,21 @@ import {
     templateEngine
 } from './templateEngine'
 
+import type { TemplateEngine, TemplateOptions } from './templateEngine'
+
 import {
   anonymousTemplate as AnonymousTemplate
 } from './templateSources'
 
-var _templateEngine
+var _templateEngine : TemplateEngine
 const cleanContainerDomDataKey = domData.nextKey()
 
-export function setTemplateEngine (tEngine) {
+export function setTemplateEngine (tEngine : TemplateEngine | undefined) : void {
   if ((tEngine !== undefined) && !(tEngine instanceof templateEngine)) {
         // TODO: ko.templateEngine to appropriate name
     throw new Error('templateEngine must inherit from ko.templateEngine')
   }
-  _templateEngine = tEngine
+  _templateEngine = tEngine!
 }
 
 function invokeForEachNodeInContinuousRange (firstNode, lastNode, action) {
@@ -46,7 +52,7 @@ function invokeForEachNodeInContinuousRange (firstNode, lastNode, action) {
   }
 }
 
-function activateBindingsOnContinuousNodeArray (continuousNodeArray, bindingContext, afterBindingCallback) {
+function activateBindingsOnContinuousNodeArray (continuousNodeArray, bindingContext: BindingContext, afterBindingCallback) {
   // To be used on any nodes that have been rendered by a template and have been inserted into some parent element
   // Walks through continuousNodeArray (which *must* be continuous, i.e., an uninterrupted sequence of sibling nodes, because
   // the algorithm for walking them relies on this), and for each top-level item in the virtual-element sense,
@@ -155,7 +161,9 @@ function resolveTemplateName (template, data, context) {
   }
 }
 
-export function renderTemplate (template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode, afterBindingCallback) {
+export type RenderModeEnum = "replaceChildren" | "replaceNode" | "ignoreTargetNode"
+
+export function renderTemplate<T=any>(template : string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T> | null | undefined, options : TemplateOptions<T> | null | undefined, targetNodeOrNodeArray : Node | Node[], renderMode? : RenderModeEnum, afterBindingCallback?) : Computed<void> | string {
   options = options || {}
   if ((options.templateEngine || _templateEngine) === undefined) { throw new Error('Set a template engine before calling renderTemplate') }
   renderMode = renderMode || 'replaceChildren'
@@ -171,7 +179,7 @@ export function renderTemplate (template, dataOrBindingContext, options, targetN
         // Ensure we've got a proper binding context to work with
         var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof BindingContextConstructor))
               ? dataOrBindingContext
-              : new BindingContextConstructor(dataOrBindingContext, null, null, null, { 'exportDependencies': true })
+              : new BindingContextConstructor(dataOrBindingContext, undefined, undefined, undefined, { 'exportDependencies': true })
 
         var templateName = resolveTemplateName(template, bindingContext.$data, bindingContext)
         const renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options, afterBindingCallback)
@@ -231,12 +239,12 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
 
   // Call setDomNodeChildrenFromArrayMapping, ignoring any observables unwrapped within (most likely from a callback function).
   // If the array items are observables, though, they will be unwrapped in executeTemplateForArrayItem and managed within setDomNodeChildrenFromArrayMapping.
-  function localSetDomNodeChildrenFromArrayMapping (newArray, changeList) {
+  function localSetDomNodeChildrenFromArrayMapping (newArray, changeList?) {
     dependencyDetection.ignore(setDomNodeChildrenFromArrayMapping, null, [targetNode, newArray, executeTemplateForArrayItem, options, activateBindingsCallback, changeList])
     bindingEvent.notify(targetNode, bindingEvent.childrenComplete)
   }
 
-  const shouldHideDestroyed = (options.includeDestroyed === false) || (koOptions.foreachHidesDestroyed && !options.includeDestroyed);
+  const shouldHideDestroyed = (options.includeDestroyed === false) || (koOptions.foreachHidesDestroyed && !options.includeDestroyed)
   if (!shouldHideDestroyed && !options.beforeRemove && isObservableArray(arrayOrObservableArray)) {
     localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray.peek())
     var subscription = arrayOrObservableArray.subscribe(function (changeList) {
@@ -252,7 +260,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
       if (shouldHideDestroyed) {
         // Filter out any entries marked as destroyed
         unwrappedArray = arrayFilter(unwrappedArray, function (item) {
-          return item === undefined || item === null || !unwrap(item._destroy);
+          return item === undefined || item === null || !unwrap(item._destroy)
         })
       }
       localSetDomNodeChildrenFromArrayMapping(unwrappedArray)
@@ -324,7 +332,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     var value = this.value
     var options = unwrap(value)
     var shouldDisplay = true
-    var templateComputed = null
+    let templateComputed: string | Computed<any> | null = null
     var elseChainSatisfied = domData.get(element, 'conditional').elseChainSatisfied
     var templateName
 
@@ -354,7 +362,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
       // Render once for this single data point (or use the viewModel if no data was provided)
       var innerBindingContext = ('data' in options)
         ? bindingContext.createStaticChildContext(options.data, options.as)  // Given an explicit 'data' value, we create a child binding context for it
-        : bindingContext                                                        // Given no explicit 'data' value, we retain the same binding context
+        : bindingContext                                                     // Given no explicit 'data' value, we retain the same binding context
       templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding)
       elseChainSatisfied(true)
     } else {

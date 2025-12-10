@@ -1,7 +1,9 @@
 
 import {
   BindingStringProvider
-} from '../dist'
+} from '../src'
+
+import { assert } from "chai"
 
 describe('Binding String Provider behavior', function () {
   describe('getBindingAccessors', function () {

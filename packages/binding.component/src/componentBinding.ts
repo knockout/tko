@@ -7,11 +7,11 @@ import {
 } from '@tko/utils'
 
 import {
-  unwrap, isObservable
+  unwrap
 } from '@tko/observable'
 
 import {
-  DescendantBindingHandler, applyBindingsToDescendants
+  DescendantBindingHandler
 } from '@tko/bind'
 
 import {
@@ -26,18 +26,26 @@ import {LifeCycle} from '@tko/lifecycle'
 
 import registry from '@tko/utils.component'
 
+import type { BindingContext } from '@tko/bind';
+
 var componentLoadingOperationUniqueId = 0
 
 export default class ComponentBinding extends DescendantBindingHandler {
-  constructor (params) {
+  childBindingContext: BindingContext;
+  currentLoadingOperationId: number | null;
+  currentViewModel: any;
+  latestComponentName: string;
+  loadingOperationId: number;
+  originalChildNodes: Node[];
+  constructor (params: any) {
     super(params)
     this.originalChildNodes = makeArray(
-      virtualElements.childNodes(this.$element)
+      virtualElements.childNodes(this.$element as Node)
     )
     this.computed('computeApplyComponent')
   }
 
-  cloneTemplateIntoElement (componentName, template, element) {
+  cloneTemplateIntoElement (componentName: string, template: any, element: Node) {
     if (!template) {
       throw new Error('Component \'' + componentName + '\' has no template')
     }
@@ -45,14 +53,13 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (maybeJsx(template)) {
       virtualElements.emptyNode(element)
       this.addDisposable(new JsxObserver(template, element, null, undefined, true))
-
     } else {
       const clonedNodesArray = cloneNodes(template)
       virtualElements.setDomNodeChildren(element, clonedNodesArray)
     }
   }
 
-  createViewModel (componentDefinition, element, originalChildNodes, componentParams) {
+  createViewModel(componentDefinition: any, element: Node, originalChildNodes: Node[], componentParams: any) {
     const componentViewModelFactory = componentDefinition.createViewModel
     return componentViewModelFactory
       ? componentViewModelFactory.call(componentDefinition, componentParams, { element, templateNodes: originalChildNodes })
@@ -63,35 +70,38 @@ export default class ComponentBinding extends DescendantBindingHandler {
    * Return the $componentTemplateSlotNodes for the given template
    * @param {HTMLElement|jsx} template
    */
-  makeTemplateSlotNodes (originalChildNodes) {
+  makeTemplateSlotNodes (originalChildNodes: HTMLElement[]) {
     return Object.assign({}, ...this.genSlotsByName(originalChildNodes))
   }
 
   /**
    * Iterate over the templateNodes, yielding each '<element slot=name>'
    * as an object * of {name: element}.
-   * @param {HTMLElement} templateNodes
+   * @param {HTMLElement[]} templateNodes
    */
-  * genSlotsByName (templateNodes) {
+  * genSlotsByName (templateNodes: HTMLElement[]): Generator<{[key: string]: HTMLElement}, void, unknown> {
     for (const node of templateNodes) {
-      if (node.nodeType !== 1) { continue }
+      if (node.nodeType !== 1) {
+        continue;
+      }
       const slotName = node.getAttribute('slot')
-      if (!slotName) { continue }
+      if (!slotName) {
+        continue;
+      }
       yield {[slotName]: node}
     }
   }
 
   computeApplyComponent () {
     const value = unwrap(this.value)
-    let componentName
-    let componentParams
+    let componentName: string;
+    let componentParams: any
 
     if (typeof value === 'string') {
       componentName = value
     } else {
       componentName = unwrap(value.name)
-      componentParams = NativeProvider.getNodeValues(this.$element) ||
-        unwrap(value.params)
+      componentParams = NativeProvider.getNodeValues(this.$element) || unwrap(value.params)
     }
 
     this.latestComponentName = componentName
@@ -101,24 +111,26 @@ export default class ComponentBinding extends DescendantBindingHandler {
     }
 
     this.loadingOperationId = this.currentLoadingOperationId = ++componentLoadingOperationUniqueId
-    registry.get(componentName, (defn) => this.applyComponentDefinition(componentName, componentParams, defn))
+    registry.get(componentName, (defn: any) => this.applyComponentDefinition(componentName, componentParams, defn))
   }
 
-  makeChildBindingContext ($component) {
-    const ctxExtender = (ctx) => Object.assign(ctx, {
+  makeChildBindingContext ($component: any): any {
+    const ctxExtender = (ctx: any) => Object.assign(ctx, {
       $component,
       $componentTemplateNodes: this.originalChildNodes,
       $componentTemplateSlotNodes: this.makeTemplateSlotNodes(
-        this.originalChildNodes)
+        this.originalChildNodes as HTMLElement[])
     })
 
     return this.$context.createChildContext($component, undefined, ctxExtender)
   }
 
-  applyComponentDefinition (componentName, componentParams, componentDefinition) {
+  applyComponentDefinition(componentName: string, componentParams: any, componentDefinition: any) {
     // If this is not the current load operation for this element, ignore it.
     if (this.currentLoadingOperationId !== this.loadingOperationId ||
-        this.latestComponentName !== componentName) { return }
+        this.latestComponentName !== componentName) {
+          return;
+        }
 
     // Clean up previous state
     this.cleanUpState()

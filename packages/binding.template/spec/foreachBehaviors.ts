@@ -11,6 +11,8 @@ import {
     observable, observableArray
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import { MultiProvider } from '@tko/provider.multi'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { DataBindProvider } from '@tko/provider.databind'
@@ -23,7 +25,8 @@ import '@tko/utils/helpers/jasmine-13-helper'
 
 // virtualEvents, removeNode
 describe('Binding: Foreach', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
   var bindingHandlers
 
   beforeEach(function () {
@@ -73,7 +76,7 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: [1, 2]'><span></span></div>"
 
         // Apply some DOM Data to the SPAN
-    var span = testNode.childNodes[0].childNodes[0]
+    var span = testNode.childNodes[0].childNodes[0] as HTMLSpanElement
     expect(span.tagName).toEqual('SPAN')
     domData.set(span, 'mydata', 123)
 
@@ -84,8 +87,8 @@ describe('Binding: Foreach', function () {
 
         // Also be sure the DOM Data doesn't appear in the output
     expect(testNode.childNodes[0]).toContainHtml('<span></span><span></span>')
-    expect(domData.get(testNode.childNodes[0].childNodes[0], 'mydata')).toEqual(undefined)
-    expect(domData.get(testNode.childNodes[0].childNodes[1], 'mydata')).toEqual(undefined)
+    expect(domData.get(testNode.childNodes[0].childNodes[0] as HTMLSpanElement, 'mydata')).toEqual(undefined)
+    expect(domData.get(testNode.childNodes[0].childNodes[1] as HTMLSpanElement, 'mydata')).toEqual(undefined)
   })
 
   it('Should be able to use $data to reference each array item being bound', function () {
@@ -190,20 +193,20 @@ describe('Binding: Foreach', function () {
   it('Should be able to supply afterAdd and beforeRemove callbacks', function () {
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, afterAdd: myAfterAdd, beforeRemove: myBeforeRemove }'><span data-bind='text: $data'></span></div>"
     var someItems = observableArray(['first child'])
-    var afterAddCallbackData = [], beforeRemoveCallbackData = []
+    var afterAddCallbackData = new Array(), beforeRemoveCallbackData = new Array()
     applyBindings({
       someItems: someItems,
       myAfterAdd: function (elem, index, value) { afterAddCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }) },
       myBeforeRemove: function (elem, index, value) { beforeRemoveCallbackData.push({ elem: elem, value: value, currentParentClone: elem.parentNode.cloneNode(true) }) }
     }, testNode)
-
-    expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">first child</span>')
+    const divNode = testNode.childNodes[0] as HTMLDivElement;
+    expect(divNode).toContainHtml('<span data-bind="text: $data">first child</span>')
 
         // Try adding
     someItems.push('added child')
-    expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
+    expect(divNode).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
     expect(afterAddCallbackData.length).toEqual(1)
-    expect(afterAddCallbackData[0].elem).toEqual(testNode.childNodes[0].childNodes[1])
+    expect(afterAddCallbackData[0].elem).toEqual(divNode.childNodes[1])
     expect(afterAddCallbackData[0].value).toEqual('added child')
     expect(afterAddCallbackData[0].currentParentClone).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
 
@@ -214,25 +217,25 @@ describe('Binding: Foreach', function () {
     expect(beforeRemoveCallbackData[0].value).toEqual('first child')
         // Note that when using "beforeRemove", we *don't* remove the node from the doc - it's up to the beforeRemove callback to do it. So, check it's still there.
     expect(beforeRemoveCallbackData[0].currentParentClone).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
-    expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
+    expect(divNode).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
 
         // Remove another item
-    beforeRemoveCallbackData = []
+    beforeRemoveCallbackData = new Array()
     someItems.shift()
     expect(beforeRemoveCallbackData.length).toEqual(1)
     expect(beforeRemoveCallbackData[0].elem).toContainText('added child')
     expect(beforeRemoveCallbackData[0].value).toEqual('added child')
         // Neither item has yet been removed and both are still in their original locations
     expect(beforeRemoveCallbackData[0].currentParentClone).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
-    expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
+    expect(divNode).toContainHtml('<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>')
 
         // Try adding the item back; it should be added and not confused with the removed item
-    testNode.childNodes[0].innerHTML = ''  // Actually remove *removed* nodes to check that they are not added back in
-    afterAddCallbackData = []
+    divNode.innerHTML = ''  // Actually remove *removed* nodes to check that they are not added back in
+    afterAddCallbackData = new Array()
     someItems.push('added child')
-    expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: $data">added child</span>')
+    expect(divNode).toContainHtml('<span data-bind="text: $data">added child</span>')
     expect(afterAddCallbackData.length).toEqual(1)
-    expect(afterAddCallbackData[0].elem).toEqual(testNode.childNodes[0].childNodes[0])
+    expect(afterAddCallbackData[0].elem).toEqual(divNode.childNodes[0])
     expect(afterAddCallbackData[0].value).toEqual('added child')
     expect(afterAddCallbackData[0].currentParentClone).toContainHtml('<span data-bind="text: $data">added child</span>')
   })
@@ -263,15 +266,16 @@ describe('Binding: Foreach', function () {
     preprocessingBindingProvider.prototype = originalBindingProvider
     options.bindingProviderInstance = new preprocessingBindingProvider()
     options.bindingProviderInstance.preprocessNode = function (node) {
-      if (node.nodeType === 3 && node.data.charAt(0) === '$') {
+      var dataNode : any = node
+      if (node.nodeType === 3 && dataNode.data.charAt(0) === '$') {
         var newNodes = [
-          document.createComment('ko text: ' + node.data),
+          document.createComment('ko text: ' + dataNode.data),
           document.createComment('/ko')
         ]
         for (var i = 0; i < newNodes.length; i++) {
-          node.parentNode.insertBefore(newNodes[i], node)
+          node.parentNode?.insertBefore(newNodes[i], node)
         }
-        node.parentNode.removeChild(node)
+        node.parentNode?.removeChild(node)
         return newNodes
       }
     }
@@ -279,7 +283,7 @@ describe('Binding: Foreach', function () {
         // Now perform a foreach binding, and see that afterRender gets the output from the preprocessor and bindings
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, afterRender: callback }'><span>[</span>$data<span>]</span></div>"
     var someItems = observableArray(['Alpha', 'Beta']),
-      callbackReceivedArrayValues = []
+      callbackReceivedArrayValues = new Array()
     applyBindings({
       someItems: someItems,
       callback: function (nodes, arrayValue) {
@@ -318,7 +322,7 @@ describe('Binding: Foreach', function () {
   it('Should call an afterAdd callback function and not cause updates if an observable accessed in the callback is changed', function () {
     testNode.innerHTML = "<div data-bind='foreach: { data: someItems, afterAdd: callback }'><span data-bind='text: childprop'></span></div>"
     var callbackObservable = observable(1),
-      someItems = observableArray([]),
+      someItems: ObservableArray = observableArray([]),
       callbacks = 0
     applyBindings({ someItems: someItems, callback: function () { callbackObservable(); callbacks++ } }, testNode)
     someItems.push({ childprop: 'added child'})
@@ -437,7 +441,7 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0].childNodes[1]).toContainText('(Val: B1, Parents: 2, Rootval: ROOTVAL)(Val: B2, Parents: 2, Rootval: ROOTVAL)')
 
         // Verify we can access them later
-    var firstInnerTextNode = testNode.childNodes[0].childNodes[0].childNodes[1]
+    var firstInnerTextNode = testNode.childNodes[0].childNodes[0].childNodes[1] as HTMLElement
     expect(firstInnerTextNode.nodeType).toEqual(1) // The first span associated with A1
     expect(dataFor(firstInnerTextNode)).toEqual('A1')
     expect(contextFor(firstInnerTextNode).$parent.children()[2]).toEqual('A3')
@@ -482,7 +486,7 @@ describe('Binding: Foreach', function () {
     expect(testNode).toContainText('(Val: A1, Parents: 2, Rootval: ROOTVAL)(Val: A2, Parents: 2, Rootval: ROOTVAL)(Val: A3, Parents: 2, Rootval: ROOTVAL)(Val: B1, Parents: 2, Rootval: ROOTVAL)(Val: B2, Parents: 2, Rootval: ROOTVAL)')
 
         // Verify we can access them later
-    var firstInnerSpan = testNode.childNodes[3]
+    var firstInnerSpan = testNode.childNodes[3] as HTMLSpanElement
     expect(firstInnerSpan).toContainText('A1') // It is the first span bound in the context of A1
     expect(dataFor(firstInnerSpan)).toEqual('A1')
     expect(contextFor(firstInnerSpan).$parent.children()[2]).toEqual('A3')
@@ -491,13 +495,14 @@ describe('Binding: Foreach', function () {
   })
 
   it('Should be able to nest \'if\' inside \'foreach\' defined using containerless templates', function () {
-    testNode.innerHTML = '<ul></ul>'
-    testNode.childNodes[0].appendChild(document.createComment('ko foreach: items'))
-    testNode.childNodes[0].appendChild(document.createElement('li'))
-    testNode.childNodes[0].childNodes[1].innerHTML = "<span data-bind='text: childval.childprop'></span>"
-    testNode.childNodes[0].childNodes[1].insertBefore(document.createComment('ko if: childval'), testNode.childNodes[0].childNodes[1].firstChild)
-    testNode.childNodes[0].childNodes[1].appendChild(document.createComment('/ko'))
-    testNode.childNodes[0].appendChild(document.createComment('/ko'))
+    testNode.innerHTML = '<ul></ul>';
+
+    testNode.childNodes[0].appendChild(document.createComment('ko foreach: items'));
+    testNode.childNodes[0].appendChild(document.createElement('li'));
+    (testNode.childNodes[0].childNodes[1] as HTMLLIElement).innerHTML = "<span data-bind='text: childval.childprop'></span>"
+    testNode.childNodes[0].childNodes[1].insertBefore(document.createComment('ko if: childval'), testNode.childNodes[0].childNodes[1].firstChild);
+    testNode.childNodes[0].childNodes[1].appendChild(document.createComment('/ko'));
+    testNode.childNodes[0].appendChild(document.createComment('/ko'));
 
     var viewModel = {
       items: [
@@ -572,17 +577,18 @@ describe('Binding: Foreach', function () {
         // It would be a more authentic test if we could set up the scenario using .innerHTML and then let the browser do whatever parsing it does normally,
         // but unfortunately IE varies its weirdness according to whether it's really parsing an HTML doc, or whether you're using .innerHTML.
 
-    testNode.innerHTML = ''
-    testNode.appendChild(document.createElement('ul'))
-    testNode.firstChild.appendChild(document.createComment("ko foreach: ['A', 'B']"))
-    testNode.firstChild.appendChild(document.createComment("ko if: $data == 'B'"))
-    testNode.firstChild.appendChild(document.createElement('li'))
-    testNode.firstChild.lastChild.setAttribute('data-bind', 'text: $data')
-    testNode.firstChild.lastChild.appendChild(document.createComment('/ko'))
-    testNode.firstChild.lastChild.appendChild(document.createComment('/ko'))
+    testNode.innerHTML = '';
+    testNode.appendChild(document.createElement('ul'));
+    const listElement = testNode.childNodes[0] as HTMLUListElement;
+    listElement.appendChild(document.createComment("ko foreach: ['A', 'B']"));
+    listElement.appendChild(document.createComment("ko if: $data == 'B'"));
+    listElement.appendChild(document.createElement('li'));
+    (listElement.lastChild! as HTMLLIElement).setAttribute('data-bind', 'text: $data');
+    listElement.lastChild!.appendChild(document.createComment('/ko'));
+    listElement.lastChild!.appendChild(document.createComment('/ko'));
 
-    applyBindings(null, testNode)
-    expect(testNode).toContainText('B')
+    applyBindings(null, testNode);
+    expect(testNode).toContainText('B');
   })
 
   it('Should be able to give an alias to $data using \"as\"', function () {
@@ -658,11 +664,11 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><input data-bind='value: $rawData'/></div>"
     var x = observable('first'), y = observable('second'), someItems = observableArray([ x, y ])
     applyBindings({ someItems: someItems }, testNode)
-    expect(testNode.childNodes[0]).toHaveValues(['first', 'second'])
+    expect(testNode.childNodes[0]).toHaveValues(['first', 'second']);
 
         // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'third'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'third'
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(x()).toEqual('third')
 
         // Should update the input when the observable changes
@@ -758,11 +764,11 @@ describe('Binding: Foreach', function () {
     expect(testNode.childNodes[0]).toHaveValues(['first', 'second'])
 
     expect(dataFor(testNode.childNodes[0].childNodes[0])).toEqual(dataFor(testNode))
-    expect(dataFor(testNode.childNodes[0].childNodes[1])).toEqual(dataFor(testNode))
+    expect(dataFor(testNode.childNodes[0].childNodes[1])).toEqual(dataFor(testNode));
 
       // Should update observable when input is changed
-    testNode.childNodes[0].childNodes[0].value = 'third'
-    triggerEvent(testNode.childNodes[0].childNodes[0], 'change')
+    (testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'third'
+    triggerEvent(testNode.children[0].children[0], 'change')
     expect(x()).toEqual('third')
 
       // Should update the input when the observable changes
@@ -792,14 +798,14 @@ describe('Binding: Foreach', function () {
       if (node.tagName && node.tagName.toLowerCase() === 'data') {
         var newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: $data')
-        node.parentNode.insertBefore(newNode, node)
-        node.parentNode.removeChild(node)
+        node.parentNode?.insertBefore(newNode, node)
+        node.parentNode?.removeChild(node)
         return [newNode]
       }
 
             // Delete any <button> elements
       if (node.tagName && node.tagName.toLowerCase() === 'button') {
-        node.parentNode.removeChild(node)
+        node.parentNode?.removeChild(node)
         return []
       }
     }

@@ -17,13 +17,13 @@ export default class BindingStringProvider extends Provider {
    * The `preprocess` property of bindingHandler must be a static
    * function (i.e. on the object or constructor).
    */
-  * processBinding (key, value) {
+  * processBinding (key : string, value) {
     // Get the "on" binding from "on.click"
     const [handlerName, property] = key.split('.')
     const handler = this.bindingHandlers.get(handlerName)
 
     if (handler && handler.preprocess) {
-      const bindingsAddedByHandler = []
+      const bindingsAddedByHandler = new Array()
       const chainFn = (...args) => bindingsAddedByHandler.push(args)
       value = handler.preprocess(value, key, chainFn)
       for (const [key, value] of bindingsAddedByHandler) {
@@ -49,12 +49,12 @@ export default class BindingStringProvider extends Provider {
       .join(',')
   }
 
-  getBindingAccessors (node, context) {
+  getBindingAccessors (node: Node, context) {
     const bindingString = node && this.getBindingString(node)
     if (!bindingString) { return }
     const processed = this.preProcessBindings(bindingString)
     return new Parser().parse(processed, context, this.globals, node)
   }
 
-  getBindingString () { throw new Error('Overload getBindingString.') }
+  getBindingString (node: Node): string | null | undefined { throw new Error('Overload getBindingString.') }
 }

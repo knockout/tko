@@ -32,6 +32,12 @@ ci:
 lint:
 	$(NPX) standard
 
+tsc:
+	$(NPX) tsc
+
+dts:
+	$(NPX) tsc --build tsconfig.dts.json
+
 docker-build:
 	$(DOCKER) build . --tag tko
 

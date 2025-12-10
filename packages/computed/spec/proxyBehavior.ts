@@ -23,7 +23,7 @@ describe('Proxy', function () {
   })
 
   it('Should expose properties of the proxy', function () {
-    const x = { a: 123 }
+    const x: {a, b?} = { a: 123 }
     const p = proxy(x)
     expect(p.a).toBe(123)
     expect(peek(p, 'a')).toBe(123)
@@ -43,7 +43,7 @@ describe('Proxy', function () {
   })
 
   it('assigns own properties when the proxy is called with an object', function () {
-    const x = { a: 9, b: 4 }
+    const x: {a, b, c?} = { a: 9, b: 4 }
     const p = proxy(x)
     p({ b: 5, c: 12 })
     expect(p.a).toBe(9)

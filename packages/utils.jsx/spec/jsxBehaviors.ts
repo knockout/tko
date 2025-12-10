@@ -1,3 +1,4 @@
+import { assert } from "chai"
 
 import {
   options, cleanNode
@@ -37,12 +38,16 @@ import {
 
 import {
   JsxObserver
-} from '../dist'
+} from '../src'
 
-import { ORIGINAL_JSX_SYM } from '../dist/JsxObserver';
-
+import { ORIGINAL_JSX_SYM } from '../src/JsxObserver';
 
 class JsxTestObserver extends JsxObserver {
+
+  constructor (jsxOrObservable, parentNode, insertBefore = null, xmlns?, noInitialBinding?) {
+    super(jsxOrObservable, parentNode, insertBefore, xmlns, noInitialBinding)
+  }
+
   // For testing purposes, we make this synchronous.
   detachAndDispose (node) {
     super.detachAndDispose(node)
@@ -54,14 +59,13 @@ class JsxTestObserver extends JsxObserver {
 /**
  * Simple wrapper for testing.
  */
-function jsxToNode (jsx, xmlns, node = document.createElement('div')) {
+function jsxToNode (jsx, xmlns?, node = document.createElement('div')) : HTMLElement {
   new JsxTestObserver(jsx, node, null, xmlns)
-  return node.childNodes[0]
+  return node.childNodes[0] as HTMLElement
 }
 
 describe('jsx', function () {
   it('converts a simple node', () => {
-    window.o = observableArray
     const node = jsxToNode({
       elementName: "abc-def",
       children: [],
@@ -215,7 +219,7 @@ describe('jsx', function () {
     assert.instanceOf(node.childNodes[0], SVGElement)
     assert.lengthOf(node.childNodes, 2)
     obs({ elementName: 'rect', children: [], attributes: {} })
-    assert.equal(node.childNodes[1].tagName, 'rect')
+    assert.equal(node.childNodes[1]['tagName'], 'rect')
     assert.instanceOf(node.childNodes[1], SVGElement)
     assert.equal(node.outerHTML, '<svg abc="123"><circle></circle><rect></rect><!--O--></svg>')
   })
@@ -262,7 +266,7 @@ describe('jsx', function () {
 
     applyBindings({ abc: '123' }, parent)
     assert.equal(counter, 1)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     io(inode) // <i ko-counter />
     assert.equal(counter, 2)
     jo.dispose()
@@ -282,7 +286,7 @@ describe('jsx', function () {
 
     applyBindings({ abc: '123' }, parent)
     assert.equal(counter, 1)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     delete inode[ORIGINAL_JSX_SYM]
     assert.throws(() => io(inode), /You cannot apply bindings multiple times/)
     jo.dispose()
@@ -303,7 +307,7 @@ describe('jsx', function () {
 
     applyBindings({ abc: '123' }, parent)
     assert.equal(counter, 1)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     delete inode[ORIGINAL_JSX_SYM]
     assert.throws(() => io(inode), /You cannot apply bindings multiple times/)
     jo.dispose()
@@ -316,12 +320,13 @@ describe('jsx', function () {
     const jsx = { elementName: 'div', children: [itag, io], attributes: {} }
     const jo = new JsxTestObserver(jsx, parent)
 
+    let counter = 0;
     const provider = new NativeProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set({ counter: () => ++counter })
 
     applyBindings({abc: '123'}, parent)
-    const inode = parent.children[0].children[0]
+    const inode = parent.childNodes[0].childNodes[0]
     delete inode[ORIGINAL_JSX_SYM]
     const p = Symbol('An arbitrary property')
     inode[p] = 12341
@@ -368,7 +373,7 @@ describe('jsx', function () {
     // The JSX preprocessor can generate sparse arrays with e.g.
     //  <div>{/* thing */}</div>
     const parent = document.createElement('div')
-    const jsx = []
+    const jsx: string[] = []
     jsx[0] = 'a'
     jsx[2] = 'b'
     const jo = new JsxTestObserver(jsx, parent)
@@ -903,7 +908,7 @@ describe('jsx', function () {
 
       TestComponent.register()
       options.bindingProviderInstance = new ComponentProvider()
-      options.bindingProviderInstance.bindingHandlers.component = componentBindings.component
+      options.bindingProviderInstance.bindingHandlers.set('component', componentBindings.component)
 
       const parent = document.createElement('div')
       const jsx = {
@@ -916,7 +921,7 @@ describe('jsx', function () {
     })
 
     it('binds components array', () => {
-      const arr = observableArray([])
+      const arr = observableArray<any>([])
       class TestComponentInner extends ComponentABC {
         get template () {
           return { elementName: 'i', children: ['I'], attributes: {} }
@@ -932,7 +937,7 @@ describe('jsx', function () {
       TestComponentOuter.register('t-o')
       TestComponentInner.register('t-i')
       options.bindingProviderInstance = new ComponentProvider()
-      options.bindingProviderInstance.bindingHandlers.component = componentBindings.component
+      options.bindingProviderInstance.bindingHandlers.set('component', componentBindings.component)
 
       const parent = document.createElement('div')
       const jsx = {
@@ -1080,7 +1085,7 @@ describe('jsx', function () {
       assert.equal(parent.innerHTML, 'yz<!--O-->')
       obs(['z', '2'])
       assert.equal(parent.innerHTML, 'z2<!--O-->')
-      obs('r')
+      obs(['r'])
       assert.equal(parent.innerHTML, 'r<!--O-->')
       jo.dispose()
     })

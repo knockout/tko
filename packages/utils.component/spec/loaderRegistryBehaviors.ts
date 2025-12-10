@@ -12,7 +12,7 @@ import components from '../dist'
 describe('Components: Loader registry', function () {
   var testAsyncDelay = 20,
     testComponentName = 'test-component',
-    testComponentConfig = {},
+    testComponentConfig: any = {},
     testComponentDefinition = { template: {} },
     loaderThatDoesNotReturnAnything = {
       getConfig: function (name, callback) {
@@ -76,7 +76,7 @@ describe('Components: Loader registry', function () {
         onLoaded()
       } else {
                 // Will complete asynchronously
-        window.waitsFor(function () { return loadedDefinition !== 'Not yet loaded' }, 300)
+        window.waitsFor(function () { return loadedDefinition !== 'Not yet loaded' }, "timeout", 300)
         runs(onLoaded)
       }
     }
@@ -90,7 +90,7 @@ describe('Components: Loader registry', function () {
   })
 
   it("issues a PEBKAC when a component name does not have a dash", function () {
-    const logs = []
+    const logs = new Array()
     const orlog = console.log
     console.log = (v) => logs.push(v)
 
@@ -103,7 +103,7 @@ describe('Components: Loader registry', function () {
   })
 
   it("does not issue a PEBCAK when `ignoreCustomElementWarning` is true", function () {
-    const logs = []
+    const logs = new Array()
     const orlog = console.log
     console.log = (v) => logs.push(v)
 
@@ -351,9 +351,9 @@ describe('Components: Loader registry', function () {
 
   it('Only commences a single loading process, even if multiple requests arrive before loading has completed', function () {
         // Set up a mock AMD environment that logs calls
-    var someModuleTemplate = [],
+    var someModuleTemplate = new Array(),
       someComponentModule = { template: someModuleTemplate },
-      requireCallLog = []
+      requireCallLog = new Array()
     this.restoreAfter(window, 'require')
     window.require = function (modules, callback) {
       requireCallLog.push(modules.slice(0))
@@ -385,7 +385,7 @@ describe('Components: Loader registry', function () {
     })
 
         // And when the loading eventually completes, both requests are satisfied with the same definition
-    window.waitsFor(function () { return definition1 }, 300)
+    window.waitsFor(function () { return definition1 }, "timeout", 300)
     runs(function () {
       expect(definition1.template).toBe(someModuleTemplate)
       expect(definition2).toBe(definition1)

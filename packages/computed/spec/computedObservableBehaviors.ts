@@ -7,6 +7,8 @@ import {
     isWritableObservable, isWriteableObservable, observableArray, subscribable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import {
     computed, isPureComputed, isComputed
 } from '../dist'
@@ -95,7 +97,7 @@ describe('Dependent Observable', function () {
     var someContainer = { depObs: instance }
     someContainer.depObs('some value')
     expect(invokedWriteWithValue).toEqual('some value')
-    expect(invokedWriteWithThis).toEqual(function () { return this }.call()) // Since no owner was specified
+    expect(invokedWriteWithThis).toEqual(function () { return this }.call(null)) // Since no owner was specified
   })
 
   it('Should be able to write to multiple computed properties on a model object using chaining syntax', function () {
@@ -171,7 +173,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should automatically update value when a dependency changes', function () {
-    var observableInstance = new observable(1)
+    var observableInstance = observable(1)
     var dependantObservable = computed(function () { return observableInstance() + 1 })
     expect(dependantObservable()).toEqual(2)
 
@@ -200,8 +202,8 @@ describe('Dependent Observable', function () {
   })
 
   it('Should unsubscribe from previous dependencies each time a dependency changes', function () {
-    var observableA = new observable('A')
-    var observableB = new observable('B')
+    var observableA = observable('A')
+    var observableB = observable('B')
     var observableToUse = 'A'
     var timesEvaluated = 0
     var dependantObservable = computed(function () {
@@ -229,7 +231,7 @@ describe('Dependent Observable', function () {
 
   it('Should notify subscribers of changes', function () {
     var notifiedValue
-    var observableInstance = new observable(1)
+    var observableInstance = observable(1)
     var dependantObservable = computed(function () { return observableInstance() + 1 })
     dependantObservable.subscribe(function (value) { notifiedValue = value })
 
@@ -239,9 +241,9 @@ describe('Dependent Observable', function () {
   })
 
   it('Should notify "spectator" subscribers about changes', function () {
-    var obs = new observable()
+    var obs = observable()
     var comp = computed(() => obs())
-    var notifiedValues = []
+    var notifiedValues = new Array()
     comp.subscribe(function (value) {
       notifiedValues.push(value)
     }, null, 'spectate')
@@ -253,7 +255,7 @@ describe('Dependent Observable', function () {
 
   it('Should notify "beforeChange" subscribers before changes', function () {
     var notifiedValue
-    var observableInstance = new observable(1)
+    var observableInstance = observable(1)
     var dependantObservable = computed(function () { return observableInstance() + 1 })
     dependantObservable.subscribe(function (value) { notifiedValue = value }, null, 'beforeChange')
 
@@ -264,8 +266,8 @@ describe('Dependent Observable', function () {
   })
 
   it('Should only update once when each dependency changes, even if evaluation calls the dependency multiple times', function () {
-    var notifiedValues = []
-    var observableInstance = new observable()
+    var notifiedValues = new Array()
+    var observableInstance = observable()
     var dependantObservable = computed(function () { return observableInstance() * observableInstance() })
     dependantObservable.subscribe(function (value) { notifiedValues.push(value) })
     observableInstance(2)
@@ -274,7 +276,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should be able to chain computed observables', function () {
-    var underlyingObservable = new observable(1)
+    var underlyingObservable = observable(1)
     var computed1 = computed(function () { return underlyingObservable() + 1 })
     var computed2 = computed(function () { return computed1() + 1 })
     expect(computed2()).toEqual(3)
@@ -284,7 +286,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should be able to use \'peek\' on a computed observable to avoid a dependency', function () {
-    var underlyingObservable = new observable(1)
+    var underlyingObservable = observable(1)
     var computed1 = computed(function () { return underlyingObservable() + 1 })
     var computed2 = computed(function () { return computed1.peek() + 1 })
     expect(computed2()).toEqual(3)
@@ -305,7 +307,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should dispose and not call its evaluator function when the disposeWhen function returns true', function () {
-    var underlyingObservable = new observable(100)
+    var underlyingObservable = observable(100)
     var timeToDispose = false
     var timesEvaluated = 0
     var computedInstance = computed(
@@ -563,7 +565,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should expose a "notify" extender that can configure a computed to notify on all changes', function () {
-    var notifiedValues = []
+    var notifiedValues = new Array()
     var observableInstance = observable(1)
     var computedInstance = computed(function () { return observableInstance() })
     computedInstance.subscribe(function (value) { notifiedValues.push(value) })
@@ -626,13 +628,13 @@ describe('Dependent Observable', function () {
 
   it('Should inherit any properties defined on ko.subscribable.fn or computed.fn', function () {
     this.after(function () {
-      delete subscribable.fn.customProp       // Will be able to reach this
-      delete subscribable.fn.customFunc       // Overridden on computed.fn
+      delete (subscribable.fn as any).customProp       // Will be able to reach this
+      delete (subscribable.fn as any).customFunc       // Overridden on computed.fn
       delete computed.fn.customFunc         // Will be able to reach this
-    })
+    });
 
-    subscribable.fn.customProp = 'subscribable value'
-    subscribable.fn.customFunc = function () { throw new Error('Shouldn\'t be reachable') }
+    (subscribable.fn as any).customProp = 'subscribable value';
+    (subscribable.fn as any).customFunc = function () { throw new Error('Shouldn\'t be reachable') }
     computed.fn.customFunc = function () { return this() }
 
     var instance = computed(function () { return 123 })
@@ -647,16 +649,16 @@ describe('Dependent Observable', function () {
     }
 
     this.after(function () {
-      delete subscribable.fn.customFunction1
+      delete (subscribable.fn as any).customFunction1
       delete computed.fn.customFunction2
     })
 
     var computedInstance = computed(function () {})
 
-    var customFunction1 = function () {}
-    var customFunction2 = function () {}
+    var customFunction1 = function () {};
+    var customFunction2 = function () {}; // TODO ASI example
 
-    subscribable.fn.customFunction1 = customFunction1
+    (subscribable.fn as any).customFunction1 = customFunction1
     computed.fn.customFunction2 = customFunction2
 
     expect(computedInstance.customFunction1).toBe(customFunction1)
@@ -686,7 +688,7 @@ describe('Dependent Observable', function () {
       observableInstance = observable(0),
       computedInstance = computed({
         read: function () {
-          return ++evaluateCount + observable()
+          return ++evaluateCount + observableInstance()
         },
         deferEvaluation: true
       })
@@ -811,7 +813,7 @@ describe('Dependent Observable', function () {
   describe('observableArray properties', function () {
     it('Should be able to call standard mutators without creating a subscription', function () {
       var timesEvaluated = 0,
-        newArray = observableArray(['Alpha', 'Beta', 'Gamma'])
+        newArray: ObservableArray = observableArray(['Alpha', 'Beta', 'Gamma'])
 
       computed(function () {
                 // Make a few standard mutations

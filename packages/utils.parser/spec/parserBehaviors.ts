@@ -1,4 +1,5 @@
 /* eslint semi: 0 */
+import { assert } from "chai"
 
 import {
   options
@@ -9,6 +10,8 @@ import {
   unwrap,
   isObservable
 } from '@tko/observable';
+
+import type { Observable } from '@tko/observable'
 
 import {
   applyBindings
@@ -24,7 +27,7 @@ import {
   Parser
 } from '../dist';
 
-function ctxStub (ctx) {
+function ctxStub (ctx?) {
   return {
     lookup (v) { return ctx ? ctx[v] : null },
     extend (vals) {
@@ -461,16 +464,14 @@ describe('unary operations', function () {
     assert.equal(bindings.neg(), 3)
   })
 
-  it.skip('negates an expression eg !(a || b)'
-    /*, function () {
-            var binding = 'ne: !(a || b)',
-                context = { a: observable(true), b: observable(false) },
-                bindings = makeBindings(binding, context);
-            assert.equal(bindings.ne(), false)
-            context.a(false)
-            assert.equal(bindings.ne(), true)
-        } */
-  )
+  // it.skip('negates an expression eg !(a || b)', function () {
+  //     var binding = 'ne: !(a || b)',
+  //         context = { a: observable(true), b: observable(false) },
+  //         bindings = makeBindings(binding, context);
+  //     assert.equal(bindings.ne(), false)
+  //     context.a(false)
+  //     assert.equal(bindings.ne(), true)
+  // })
 
   describe('lambdas (=>)', function () {
     it('evaluates the expression when called', function () {
@@ -681,15 +682,15 @@ describe('anonymous functions', function () {
     function b () { new Parser(null, {}).parse(binding) }
     assert.throws(b, 'Anonymous functions are no longer')
   })
-
-  it.skip('parses a function () { return v }', function () {
-    var binding = 'x: function () { return v() }',
-      val = observable(125),
-      context = { v: function () { return val(val() + 1) } },
-      bindings = makeBindings(binding, context);
-    assert.equal(typeof bindings.x()(), '126')
-    assert.equal(val(), 126);
-  })
+ 
+  // it.skip('parses a function () { return v }', function () {
+  //   var binding = 'x: function () { return v() }',
+  //     val = observable(125),
+  //     context = { v: function () { return val(val() + 1) } },
+  //     bindings = makeBindings(binding, context);
+  //   assert.equal(typeof bindings.x()(), '126')
+  //   assert.equal(val(), 126);
+  // })
 })
 
 describe('array accessors - []', function () {
@@ -724,7 +725,7 @@ describe('array accessors - []', function () {
         x: x
       },
       bindings;
-    context.a[x] = 12;
+    context.a[x as any] = 12;
     bindings = makeBindings(binding, context);
     assert.equal(bindings.neg(), 12)
   })
@@ -763,16 +764,17 @@ describe('array accessors - []', function () {
   })
 
   it('unwraps Identifier/Expression contents'
-    /*, function () {
-            var binding = "arr: [a, a && b]",
+    , function () {
+        /*    var binding = "arr: [a, a && b]",
                 context = { a: observable(true), b: observable(false) },
                 bindings = makeBindings(binding, context);
             assert.equal(bindings.arr()[0], true)
             assert.equal(bindings.arr()[1], false)
             context.b(true)
-            assert.equal(bindings.arr()[1], true)
-        } */
+            assert.equal(bindings.arr()[1], true) */
+        }
   )
+
 })
 
 describe('Virtual elements', function () {
@@ -876,6 +878,10 @@ describe('ES6-style interpolated strings', function () {
   })
 })
 
+interface ExtendedObservable{
+  P?: any;
+}
+
 describe('compound expressions', function () {
   var d = 42,
     e = [9, 8],
@@ -920,7 +926,7 @@ describe('compound expressions', function () {
     },
     context,
     $context,
-    obs = observable({
+    obs:Observable<any> & ExtendedObservable = observable({
       d: d
     });
 
@@ -974,13 +980,13 @@ describe('compound expressions', function () {
     expect_equal('u', undefined)
   })
 
-  it.skip("throws 'missing'", function () {
-    /* It's up to the BindingContext instance to decide whether to
-       throw on a missing property */
-    assert.throws(function () {
-      new Parser(null).parse('v: missing', $context).v()
-    }, 'not found')
-  })
+  // it.skip("throws 'missing'", function () {
+  //   /* It's up to the BindingContext instance to decide whether to
+  //      throw on a missing property */
+  //   assert.throws(function () {
+  //     new Parser(null).parse('v: missing', $context).v()
+  //   }, 'not found')
+  // })
 
   it("returns undefined when 'r' is not on u", function () {
     expect_equal('u.r', undefined) // undefined
@@ -996,12 +1002,12 @@ describe('compound expressions', function () {
   })
 
   it("gets 'brick' from x.y[0]()()[1].yf2b", function () {
-    var expect = x.y[0]()()[1].yf2b;
+    var expect = (x.y[0]()as any)()[1].yf2b;
     expect_equal('x.y[0]()()[1].yf2b', expect)
   })
 
   it("gets 'air' from x . y [ 0 ] ( ) ( ) [ 0 ] . yf2a", function () {
-    var expect = x.y[0]()()[0].yf2a;
+    var expect = (x.y[0]() as any)()[0].yf2a;
     expect_equal('\n\r\t x\n\r\t  .\n\r\t  y\n\r\t  [\n\r\t  0' +
       '\n\r\t  ]\n\r\t  (\n\r\t  )\n\r\t  (\n\r\t  )\n\r\t  [' +
       '\n\r\t  0\n\r\t  ]\n\r\t .\n\r\t yf2a', expect)
@@ -1053,7 +1059,7 @@ describe('compound expressions', function () {
   })
 
   describe('function expressions', function () {
-    function R () { return arguments }
+    function R (...args:any[]) { return arguments }
     function R0 () { return arguments[0] }
     function B () { return { self: this, args: arguments } }
     beforeEach(function () { context = { R: R, B: B, R0: R0 } })
@@ -1092,8 +1098,8 @@ describe('compound expressions', function () {
       )
     })
 
-    it.skip('calls functions with .bind', function () {
-      expect_deep_equal("B.bind('x')()", { self: 'x', args: [] })
-    })
+    // it.skip('calls functions with .bind', function () {
+    //   expect_deep_equal("B.bind('x')()", { self: 'x', args: [] })
+    // })
   })
 }); //  compound functions

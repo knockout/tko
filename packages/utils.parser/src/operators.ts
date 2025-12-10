@@ -15,7 +15,18 @@ function unwrapOrCall (a, b) {
   return b
 }
 
-const operators = {
+export type OperatorFunction = (a: any, b: any, ...args: any[]) => any;
+
+
+export interface OperatorWithProperties extends OperatorFunction{
+  earlyOut?: (a: any) => any;
+  precedence?:number;
+}
+
+export interface Operators{
+  [key: string]:OperatorWithProperties;
+}
+const operators:Operators = {
   // unary
   '@': unwrapOrCall,
   '#': (a, b) => () => unwrap(b), // Convert to read-only.

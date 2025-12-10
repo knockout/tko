@@ -21,7 +21,8 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Node preprocessing', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     options.bindingProviderInstance = new DataBindProvider()
@@ -42,8 +43,9 @@ describe('Node preprocessing', function () {
       if (node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
         var newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: someValue')
-        node.parentNode.insertBefore(newNode, node)
-        node.parentNode.removeChild(node)
+        expect(node.parentNode).not.toBe(null)
+        node.parentNode?.insertBefore(newNode, node)
+        node.parentNode?.removeChild(node)
         return [newNode]
       }
     }
@@ -109,10 +111,12 @@ describe('Node preprocessing', function () {
         }
       }
     }
-    options.bindingProviderInstance = new TestProvider()
-    options.bindingProviderInstance.bindingHandlers.set(coreBindings)
-    options.bindingProviderInstance.addProvider(new DataBindProvider())
-    options.bindingProviderInstance.addProvider(new VirtualProvider())
+    var testProvider = new TestProvider()
+    testProvider.bindingHandlers.set(coreBindings)
+    testProvider.addProvider(new DataBindProvider())
+    testProvider.addProvider(new VirtualProvider())
+
+    options.bindingProviderInstance = testProvider
 
     // Now perform bindings, and see that childrenComplete gets the output from the preprocessor and bindings
     var callbacks = 0,

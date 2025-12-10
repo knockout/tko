@@ -6,9 +6,10 @@ import {
 import '../helpers/jasmine-13-helper'
 
 describe('Parse HTML fragment', function () {
-  var supportsTemplateTag = 'content' in document.createElement('template')
+  const supportsTemplateTag = 'content' in document.createElement('template')
 
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
     // See: https://github.com/knockout/knockout/issues/1880
   arrayForEach([
@@ -47,9 +48,8 @@ describe('Parse HTML fragment', function () {
     it('should parse ' + data.html + ' correctly', function () {
             // Early out if Simple HTML parser is known to fail for this data.
       if (!supportsTemplateTag) {
-        if (!jQueryInstance && data.simpleParserFails) { return }
-        if (jQueryInstance && jQueryInstance.fn.jquery[0] < 3 &&
-                    data.OldjQueryFails) { return }
+        if (!window.jQuery && data.simpleParserFails) { return }
+        if (window.jQuery && parseFloat(window.jQuery.fn.jquery[0]) < 3 && data.OldjQueryFails) { return }
       }
 
       var parsedNodes = parseHtmlFragment(data.html, document)
@@ -72,10 +72,10 @@ describe('Parse HTML fragment', function () {
     var html = '<div><i></i></div>'
     var parsedNodes1 = parseHtmlFragment(html, document)
     var parsedNodes2 = parseHtmlFragment(html, document)
-    expect(parsedNodes1).toNotEqual(parsedNodes2)
-    expect(parsedNodes1[0]).toNotEqual(parsedNodes2[0])
+    expect(parsedNodes1).not.toEqual(parsedNodes2)
+    expect(parsedNodes1[0]).not.toEqual(parsedNodes2[0])
         // We need to test for deep inequality
-    expect(parsedNodes1[0].children[0]).toNotEqual(parsedNodes2[0].children[0])
+    expect(parsedNodes1[0].childNodes[0]).not.toEqual(parsedNodes2[0].childNodes[0])
   })
 
   it('template is to long', function () {

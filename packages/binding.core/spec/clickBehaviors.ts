@@ -18,7 +18,8 @@ import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Click', function () {
     // This is just a special case of the "event" binding, so not necessary to respecify all its behaviors
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()
@@ -37,7 +38,7 @@ describe('Binding: Click', function () {
     }
     testNode.innerHTML = "<button data-bind='click:doCall'>hey</button>"
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0], 'click')
+    triggerEvent(testNode.children[0], 'click')
     expect(model.wasCalled).toEqual(true)
   })
 })

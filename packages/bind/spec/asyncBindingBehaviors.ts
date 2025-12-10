@@ -28,10 +28,11 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Deferred bindings', function () {
-  var bindingSpy, bindingHandlers
+  let bindingSpy, bindingHandlers
+  let testNode : HTMLElement
 
   beforeEach(function () {
-    jasmine.prepareTestNode()
+    testNode = jasmine.prepareTestNode()
     useMockForTasks(options)
     options.deferUpdates = true
     var provider = new DataBindProvider()
@@ -244,14 +245,16 @@ describe('Deferred bindings', function () {
 
       // Value is initially true, so nodes are retained
     applyBindings({ someItem: someItem, counter: 0 }, testNode)
-    expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
+
+    expect(testNode.childNodes[0].childNodes[0]['tagName']['toLowerCase']()).toEqual('span')
     expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
     expect(testNode).toContainText('1')
 
       // Change the value to a different truthy value; see the previous SPAN remains
     someItem('different truthy value')
     jasmine.Clock.tick(1)
-    expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual('span')
+
+    expect(testNode.childNodes[0].childNodes[0]['tagName']['toLowerCase']()).toEqual('span')
     expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
     expect(testNode).toContainText('1')
   })

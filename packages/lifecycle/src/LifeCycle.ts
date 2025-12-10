@@ -73,7 +73,7 @@ export default class LifeCycle {
     this.addDisposable({ dispose })
   }
 
-  anchorTo (nodeOrLifeCycle) {
+  anchorTo (nodeOrLifeCycle:Node|LifeCycle) {
     if ('addDisposable' in nodeOrLifeCycle) {
       nodeOrLifeCycle.addDisposable(this)
       this[ANCHOR_NODE] = null // re-anchor on `anchorTo` calls
@@ -86,7 +86,7 @@ export default class LifeCycle {
   dispose () {
     const subscriptions = this[SUBSCRIPTIONS] || []
     subscriptions.forEach(s => s.dispose())
-    this[SUBSCRIPTIONS] = []
+    this[SUBSCRIPTIONS] = new Array()
     this[ANCHOR_NODE] = null
   }
 

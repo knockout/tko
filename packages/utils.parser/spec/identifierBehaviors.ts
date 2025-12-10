@@ -29,6 +29,8 @@ import {
   Identifier, Arguments
 } from '../dist'
 
+import { assert } from "chai"
+
 describe('Identifier', function () {
   function testLookup (identifier, $data) {
     const ctx = new bindingContext($data)
@@ -102,7 +104,7 @@ describe('Identifier', function () {
     })
 
     it('does nothing with empty array references', function () {
-      var refs = [],
+      var refs = new Array(),
         ident = new Identifier({}, 'x', refs)
       assert.equal(ident.dereference('1', {}), 1)
     })
@@ -186,9 +188,9 @@ describe('Identifier', function () {
     })
 
     it('sets `this` of a top-level item to $data', function () {
-      options.bindingGlobals = {
+      options.bindingGlobals = Object.create({
         Ramanujan: '1729'
-      }
+      })
       var div = document.createElement('div'),
         context = {
           fn: function () {

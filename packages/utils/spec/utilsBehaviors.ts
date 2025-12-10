@@ -1,7 +1,9 @@
 import * as utils from '../dist'
 import '../helpers/jasmine-13-helper'
+import type { KnockoutInstance } from '@tko/builder'
 
-var ko = ko || {}
+var ko : KnockoutInstance = globalThis.ko || {}
+
 ko.utils = utils
 ko.tasks = utils.tasks
 
@@ -34,7 +36,8 @@ describe('arrayForEach', function () {
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      ko.utils.arrayForEach(null, function () {})
+      var nullArray: Array<any> = null as unknown as Array<any>
+      ko.utils.arrayForEach(nullArray, function () {})
     }).toThrow()
   })
 })
@@ -62,7 +65,8 @@ describe('arrayIndexOf', function () {
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      ko.utils.arrayIndexOf(null, 'a')
+      var nullArray: Array<string> = null as unknown as Array<string>
+      ko.utils.arrayIndexOf(nullArray, 'a')
     }).toThrow()
   })
 })
@@ -75,7 +79,7 @@ describe('arrayRemoveItem', function () {
   })
 
   it('Should do nothing for empty arrays', function () {
-    var input = []
+    var input = new Array()
     ko.utils.arrayRemoveItem(input, 'a')
     expect(input).toEqual([])
   })
@@ -94,7 +98,8 @@ describe('arrayRemoveItem', function () {
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      ko.utils.arrayRemoteItem(null, 'a')
+      var nullArray: Array<string> = null as unknown as Array<string>
+      ko.utils.arrayRemoveItem(nullArray, 'a')
     }).toThrow()
   })
 })
@@ -151,7 +156,8 @@ describe('arrayFirst', function () {
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      ko.utils.arrayFirst(null, function () {})
+      var nullArray: Array<any> = null as unknown as Array<any>
+      ko.utils.arrayFirst(nullArray, function () { return false})
     }).toThrow()
   })
 })
@@ -186,7 +192,8 @@ describe('arrayGetDistinctValues', function () {
   })
 
   it('Should return an empty array when called with a null array', function () {
-    var result = ko.utils.arrayGetDistinctValues(null)
+    var nullArray: Array<any> = null as unknown as Array<any>
+    var result = ko.utils.arrayGetDistinctValues(nullArray)
     expect(result).toEqual([])
   })
 })
@@ -237,7 +244,8 @@ describe('arrayMap', function () {
   })
 
   it('Should return an empty array when called with a null array', function () {
-    var result = ko.utils.arrayMap(null, function () {})
+    var nullArray: Array<any> = null as unknown as Array<any>
+    var result = ko.utils.arrayMap(nullArray, function () {})
     expect(result).toEqual([])
   })
 })
@@ -288,7 +296,8 @@ describe('arrayFilter', function () {
   })
 
   it('Should return an empty array when called with a null array', function () {
-    var result = ko.utils.arrayFilter(null, function () {})
+    var nullArray: Array<any> = null as unknown as Array<any>
+    var result = ko.utils.arrayFilter(nullArray, function () { return true})
     expect(result).toEqual([])
   })
 })
@@ -296,11 +305,12 @@ describe('arrayFilter', function () {
 describe('arrayPushAll', function () {
   it('appends the second array elements to the first array', function () {
     var targetArray = [1, 2, 3]
-    var extraArray = ['a', 'b', 'c']
+    //var extraArray = ['a', 'b', 'c']
+    var extraArray = [4, 5, 6]
 
     ko.utils.arrayPushAll(targetArray, extraArray)
 
-    expect(targetArray).toEqual([1, 2, 3, 'a', 'b', 'c'])
+    expect(targetArray).toEqual([1, 2, 3, 4, 5, 6])
   })
 
   it('does nothing if the second array is empty', function () {
@@ -311,13 +321,15 @@ describe('arrayPushAll', function () {
 
   it('Should throw an error for a null first array', function () {
     expect(function () {
-      ko.utils.arrayPushAll(null, [])
+      var nullArray: Array<never> = null as unknown as Array<never>
+      ko.utils.arrayPushAll(nullArray, [])
     }).toThrow()
   })
 
   it('Should throw an error for a null second array', function () {
     expect(function () {
-      ko.utils.arrayPushAll([], null)
+      var nullArray: Array<never> = null as unknown as Array<never>
+      ko.utils.arrayPushAll([], nullArray)
     }).toThrow()
   })
 })
@@ -359,7 +371,7 @@ describe('Function.bind', function () {
     expect(actual[0]).toEqualOneOf([undefined, global])
     expect(actual[1]).toEqual('b')
 
-    bound = fn.bind()
+    bound = fn.bind(null)
     actual = bound('b')
 
     expect(actual[0]).toEqualOneOf([undefined, global])
@@ -418,7 +430,8 @@ describe('objectMap', function () {
 })
 
 describe('cloneNodes', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
     var newNodes = ko.utils.cloneNodes([testNode])
@@ -446,7 +459,12 @@ describe('cloneNodes', function () {
     })
 
     it('stringifies recursive objects', () => {
-      const recursive = { b: 1, c: 1 }
+      type Recursive = {
+        b:number;
+        c:number;
+        a?:Recursive;
+      };      
+      const recursive: Recursive = { b: 1, c: 1 }
       recursive.a = recursive
 
       const expectObj = { b: 1, c: 1, a: '...' }

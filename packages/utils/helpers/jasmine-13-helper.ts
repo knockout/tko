@@ -1,41 +1,41 @@
+/// <reference types="jasmine" />
+/// <reference types="jquery" />
+
+
 /*
  * Configure the Jasmine testing framework.
  */
  /* globals runs, waitsFor, jasmine */
-
+ 
 import {
   arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty
 } from '../dist/'
 
-
 window.DEBUG = true;
 window.amdRequire = window.require;
 
-// Use a different variable name (not 'jQuery') to avoid overwriting
-// window.jQuery with 'undefined' on IE < 9
-window.jQueryInstance = window.jQuery;
-
-// export var testNode;
 jasmine.updateInterval = 500;
 
 /*
     Some helper functions for jasmine on the browser
  */
-jasmine.resolve = function (promise) {
+jasmine.resolve = function (promise : Promise<boolean>) {
   let complete = false
   runs(() => promise.then((result) => { complete = result || true }))
   waitsFor(() => complete)
 }
 
-jasmine.prepareTestNode = function() {
+jasmine.prepareTestNode = function() : HTMLElement {
     // The bindings specs make frequent use of this utility function to set up
     // a clean new DOM node they can execute code against
-    var existingNode = document.getElementById("testNode");
-    if (existingNode !== null)
+    const existingNode = document.getElementById("testNode");
+    if (existingNode !== null && existingNode.parentNode)
         existingNode.parentNode.removeChild(existingNode);
-    window.testNode = document.createElement("div");
-    window.testNode.id = "testNode";
-    document.body.appendChild(window.testNode);
+    const testNode = document.createElement("div");
+    testNode.id = "testNode";
+    document.body.appendChild(testNode);
+
+    return testNode;
 };
 
 jasmine.Clock.mockScheduler = function (callback) {
@@ -68,11 +68,39 @@ jasmine.browserSupportsProtoAssignment = { __proto__: [] } instanceof Array;
 
 
 jasmine.ieVersion = ieVersion;
+
+jasmine.setNodeText = function(node, text:string) {
+    'textContent' in node ? node.textContent = text : node.innerText = text;
+};
+
+
+function cleanedHtml(node) {
+    var cleanedHtml = node.innerHTML.toLowerCase().replace(/\r\n/g, "");
+    // IE < 9 strips whitespace immediately following comment nodes. Normalize by doing the same on all browsers.
+    cleanedHtml = cleanedHtml.replace(/(<!--.*?-->)\s*/g, "$1");
+    // Also remove __ko__ expando properties (for DOM data) - most browsers hide these anyway but IE < 9 includes them in innerHTML
+    cleanedHtml = cleanedHtml.replace(/ __ko__\d+=\"(ko\d+|null)\"/g, "");
+    return cleanedHtml;
+}
+
 /*
     Custom Matchers
     ~~~~~~~~~~~~~~~
  */
 var matchers = {
+
+    toHaveNodeTypes  (expectedTypes) {
+        var values = arrayMap(this.actual, function (node) {
+            return node.nodeType;
+        });
+        this.actual = values;   // Fix explanatory message
+        return this.env.equals_(values, expectedTypes);
+    },
+
+    toContainHtmlElementsAndText (expectedHtml) {
+        this.actual = cleanedHtml(this.actual).replace(/<!--.+?-->/g, "");  // remove comments
+        return this.actual === expectedHtml;
+    },
 
   toContainText (expectedText, ignoreSpaces) {
       if (ignoreSpaces) {
@@ -90,7 +118,7 @@ var matchers = {
   },
 
   toHaveOwnProperties (expectedProperties) {
-      var ownProperties = [];
+      var ownProperties = new Array();
       for (var prop in this.actual) {
           if (hasOwnProperty(this.actual, prop)) {
               ownProperties.push(prop);
@@ -168,7 +196,7 @@ var matchers = {
 //
 jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMillis) {
     var scheduledFunc;
-    var funcsToRun = [];
+    var funcsToRun = new Array();
     for (var timeoutKey in this.scheduledFunctions) {
         scheduledFunc = this.scheduledFunctions[timeoutKey];
         if (scheduledFunc != jasmine.undefined &&
@@ -180,7 +208,7 @@ jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMil
     }
 
     if (funcsToRun.length > 0) {
-        funcsToRun.sort(function(a, b) {
+        funcsToRun.sort(function(a : any, b : any) {
             return a.runAtMillis - b.runAtMillis;
         });
 

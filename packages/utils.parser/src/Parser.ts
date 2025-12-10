@@ -29,6 +29,13 @@ const escapee = {
   t: '\t'
 }
 
+type InnerFilterType = (value: any, ignored: any, context: any, globals: any, node: any) => any
+
+type FilterType = (InnerFilterType) & {
+  precedence:number
+}
+
+
 /**
  * Construct a new Parser instance with new Parser(node, context)
  * @param {Node} node    The DOM element from which we parsed the
@@ -37,6 +44,11 @@ const escapee = {
  * @param {object} globals An object containing any desired globals.
  */
 export default class Parser {
+  ch: any
+  at: any
+  text: any
+  currentContextGlobals: [context:object, globals:object, node:any]
+
   white () {
     var ch = this.ch
     while (ch && ch <= ' ') {
@@ -75,7 +87,7 @@ export default class Parser {
     return ch
   };
 
-  next (c) {
+  next (c?:string) {
     if (c && c !== this.ch) {
       this.error("Expected '" + c + "' but got '" + this.ch + "'")
     }
@@ -195,7 +207,7 @@ export default class Parser {
   }
 
   object () {
-    let key
+    let key:string
     let object = {}
     let ch = this.ch
 
@@ -248,7 +260,7 @@ export default class Parser {
   readString (delim) {
     let string = ''
     let nodes = ['']
-    let plusOp = operators['+']
+    let plusOp:any = operators['+']
     let hex
     let i
     let uffff
@@ -304,9 +316,9 @@ export default class Parser {
   string () {
     var ch = this.ch
     if (ch === '"') {
-      return this.readString('"').join('')
+      return this.readString('"')?.join('')
     } else if (ch === "'") {
-      return this.readString("'").join('')
+      return this.readString("'")?.join('')
     } else if (ch === '`') {
       return Node.create_root(this.readString('`'))
     }
@@ -315,7 +327,7 @@ export default class Parser {
   }
 
   array () {
-    let array = []
+    let array = new Array()
     let ch = this.ch
 
     if (ch === '[') {
@@ -405,14 +417,17 @@ export default class Parser {
  * e.g.
  *   <span data-bind="text: name | fit:20 | uppercase"></span>
  */
-  filter () {
+  filter (): FilterType 
+  {
     let ch = this.next()
-    let args = []
-    let nextFilter = function (v) { return v }
+    let args = new Array()
+    
+
+    let nextFilter: ((any) => any) | InnerFilterType = function (v) { return v };
     let name = this.name()
 
     if (!options.filters[name]) {
-      options.onError('Cannot find filter by the name of: ' + name)
+      options.onError(new Error('Cannot find filter by the name of: ' + name))
     }
 
     ch = this.white()
@@ -464,9 +479,9 @@ export default class Parser {
  * @returns a function that computes the value of the expression
  *    when called or a primitive.
  */
-  expression (filterable: string | bool = false, allowMultipleValues: bool = true) {
+  expression (filterable: string | boolean = false, allowMultipleValues: boolean = true) {
     let op
-    let nodes = []
+    let nodes = new Array()
     let ch = this.white()
 
     while (ch) {
@@ -559,7 +574,7 @@ export default class Parser {
  * @returns an expression that cannot contain multiple values separated by commas.
  * @see {@link Parser.expression}
  */
-  singleValueExpression (filterable: bool | string) {
+  singleValueExpression (filterable: boolean | string = false) {
     return this.expression(filterable, false)
   }
 
@@ -577,7 +592,7 @@ export default class Parser {
  *
  */
   funcArguments () {
-    let args = []
+    let args = new Array()
     let ch = this.next('(')
 
     while (ch) {
@@ -648,7 +663,7 @@ export default class Parser {
 
   dereferences () {
     let ch = this.white()
-    let dereferences = []
+    let dereferences = new Array()
     let deref
 
     while (ch) {
@@ -716,9 +731,9 @@ export default class Parser {
           bindings[key[0]] = bindings[key[0]] || {}
 
           if (key.length !== 2) {
-            options.onError('Binding ' + key + ' should have two parts (a.b).')
+            options.onError(new Error('Binding ' + key + ' should have two parts (a.b).'))
           } else if (bindings[key[0]].constructor !== Object) {
-            options.onError('Binding ' + key[0] + '.' + key[1] + ' paired with a non-object.')
+            options.onError(new Error('Binding ' + key[0] + '.' + key[1] + ' paired with a non-object.'))
           }
 
           ch = this.next(':')
@@ -730,7 +745,7 @@ export default class Parser {
           // on.x, now we're seeing on: { 'abc' }.
             expr = this.singleValueExpression(true)
             if (typeof expr !== 'object' || expr.constructor !== Object) {
-              options.onError('Expected plain object for ' + key + ' value.')
+              options.onError(new Error('Expected plain object for ' + key + ' value.'))
             } else {
               extend(bindings[key], expr)
             }

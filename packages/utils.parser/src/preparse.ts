@@ -51,10 +51,10 @@ export default function parseObjectLiteral (objectLiteralString) {
   str += '\n,'
 
   // Split into tokens
-  var result = []
+  var result = new Array()
   var toks = str.match(bindingToken)
   var key
-  var values = []
+  var values = new Array()
   var depth = 0
 
   if (toks.length <= 1) { return [] }
@@ -71,7 +71,7 @@ export default function parseObjectLiteral (objectLiteralString) {
           'unknown': key || values.join('')
         })
         key = depth = 0
-        values = []
+        values = new Array()
         continue
       }
       // Simply skip the colon that separates the name and value

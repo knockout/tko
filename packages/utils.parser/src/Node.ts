@@ -11,15 +11,20 @@ import {
 const IS_EXPR_OR_IDENT = Symbol('Node - Is Expression Or Identifier')
 
 export default class Node {
-  constructor (lhs, op, rhs) {
+  lhs: any
+  op: any
+  rhs: any
+
+
+  constructor(lhs, op, rhs) {
     this.lhs = lhs
     this.op = op
     this.rhs = rhs
   }
 
-  static get operators () { return operators }
+  static get operators() { return operators }
 
-  get_leaf_value (leaf, context, globals, node) {
+  get_leaf_value(leaf, context, globals, node) {
     if (typeof leaf === 'function') {
       // Expressions on observables are nonsensical, so we unwrap any
       // function values (e.g. identifiers).
@@ -49,8 +54,8 @@ export default class Node {
    * Note that for a lambda, we do not evaluate the RHS expression until
    * the lambda is called.
    */
-  get_value (notused, context, globals, node) {
-    var node = this
+  get_value(notused, context, globals, node: Node) {
+    var node: Node = this;
 
     if (node.op === LAMBDA) {
       return (...args) => {
@@ -74,10 +79,10 @@ export default class Node {
   //
   // Class variables.
   //
-  static get isExpressionOrIdentifierSymbol () { return IS_EXPR_OR_IDENT }
-  get [IS_EXPR_OR_IDENT] () { return true }
+  static get isExpressionOrIdentifierSymbol() { return IS_EXPR_OR_IDENT }
+  get [IS_EXPR_OR_IDENT]() { return true }
 
-  static value_of (item, context, globals, node) {
+  static value_of(item, context?, globals?, node?: Node) {
     if (item && item[Node.isExpressionOrIdentifierSymbol]) {
       return item.get_value(item, context, globals, node)
     }
@@ -90,17 +95,17 @@ export default class Node {
   *                      to the left hand side, right hand side, and
   *                      operation function.
   */
-  static create_root (nodes, debug=false) {
+  static create_root(nodes, debug = false) {
     // shunting yard algorithm with output to an abstact syntax tree of Nodes
-    const out = []
-    const ops = []
+    const out = new Array()
+    const ops = new Array()
     for (let i = 0; i < nodes.length; i += 2) {
       out.push(nodes[i]) // next value
-      const op = nodes[i+1]
+      const op = nodes[i + 1]
 
       // only left-associative operators are currently defined and handled here
       const prec = op?.precedence || 0 // no op for last value
-      while (ops.length && prec <= ops[ops.length-1].precedence) {
+      while (ops.length && prec <= ops[ops.length - 1].precedence) {
         const rhs = out.pop()
         const lhs = out.pop()
         out.push(new Node(lhs, ops.pop(), rhs))
@@ -118,7 +123,7 @@ export default class Node {
  * Because of cyclical dependencies on operators <-> Node <-> value_of,
  * we need to patch this in here.
  */
-operators['?'] = function ternary (a, b, context, globals, node) {
+operators['?'] = function ternary(a, b, context, globals, node) {
   return Node.value_of(a ? b.yes : b.no, context, globals, node)
 }
 operators['?'].precedence = 4

@@ -14,17 +14,45 @@ import {
   isObservable, unwrap, observable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import {
   contextFor, applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'
+
+import type { AllBindings } from '@tko/bind'
 
 //      Utilities
 const MAX_LIST_SIZE = 9007199254740991
 
 // from https://github.com/jonschlinkert/is-plain-object
-function isPlainObject (o) {
+function isPlainObject (o): o is Record<string, any> {
   return !!o && typeof o === 'object' && o.constructor === Object
 }
+
+interface ChangeMap {
+  added: ChangeAddItem[]
+  deleted: any[]
+}
+
+interface ChangeAddItemBase {
+  status: 'added'
+  index: number
+}
+
+interface ChangeAddBatchItem extends ChangeAddItemBase {
+  isBatch: true
+  values: any[]
+}
+
+interface ChangeAddOneItem extends ChangeAddItemBase {
+  isBatch?: false
+  value: any
+}
+
+type ChangeAddItem = 
+  | ChangeAddBatchItem
+  | ChangeAddOneItem
 
 const supportsDocumentFragment = options.document && typeof options.document.createDocumentFragment === 'function'
 
@@ -55,7 +83,7 @@ function makeTemplateNode (sourceNode) {
 }
 
 // Mimic a KO change item 'add'
-function valueToChangeAddItem (value, index) {
+function valueToChangeAddItem (value, index): ChangeAddItem {
   return {
     status: 'added',
     value: value,
@@ -74,10 +102,29 @@ export class ForEachBinding extends AsyncBindingHandler {
   //    observableArray([])
   //    computed
   //    {data: array, name: string, as: string}
+  afterAdd;
+  allBindings: AllBindings;
+  static animateFrame;
+  as;
+  beforeRemove;
+  container;
+  changeSubs: any;
+  data;
+  generateContext;
+  $indexHasBeenRequested: boolean;
+  templateNode;
+  changeQueue: any[];
+  firstLastNodesList: { first: Node, last:Node }[];
+  indexesToDelete: any[];
+  isNotEmpty: any;
+  rendering_queued: boolean;
+  pendingDeletes: any[];
+  afterQueueFlush;
+  beforeQueueFlush;
 
   constructor (params) {
     super(params)
-    const settings = {}
+    const settings: any = {}
     if (isPlainObject(this.value)) {
       Object.assign(settings, this.value)
     }
@@ -93,18 +140,18 @@ export class ForEachBinding extends AsyncBindingHandler {
 
     this.templateNode = makeTemplateNode(
       settings.templateNode || (settings.name
-        ? document.getElementById(settings.name).cloneNode(true)
+        ? document.getElementById(settings.name)?.cloneNode(true)
         : this.$element)
     )
 
     ;['afterAdd', 'beforeRemove', 'afterQueueFlush', 'beforeQueueFlush']
       .forEach(p => { this[p] = settings[p] || this.allBindings.get(p) })
 
-    this.changeQueue = []
-    this.firstLastNodesList = []
-    this.indexesToDelete = []
+    this.changeQueue = new Array()
+    this.firstLastNodesList = new Array()
+    this.indexesToDelete = new Array()
     this.rendering_queued = false
-    this.pendingDeletes = []
+    this.pendingDeletes = new Array()
 
     // Expose the conditional so that if the `foreach` data is empty, successive
     // 'else' bindings will appear.
@@ -126,7 +173,7 @@ export class ForEachBinding extends AsyncBindingHandler {
 
     // Watch for changes
     if (isObservable(this.data)) {
-      if (!this.data.indexOf) {
+      if (!(this.data as ObservableArray).indexOf) {
         // Make sure the observable is trackable.
         this.data = this.data.extend({ trackArrayChanges: true })
       }
@@ -143,7 +190,7 @@ export class ForEachBinding extends AsyncBindingHandler {
 
   // If the array changes we register the change.
   onArrayChange (changeSet, isInitial) {
-    var changeMap = {
+    var changeMap: ChangeMap = {
       added: [],
       deleted: []
     }
@@ -156,7 +203,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     for (var i = 0, len = changeSet.length; i < len; i++) {
       if (changeMap.added.length && changeSet[i].status === 'added') {
         var lastAdd = changeMap.added[changeMap.added.length - 1]
-        var lastIndex = lastAdd.isBatch ? lastAdd.index + lastAdd.values.length - 1 : lastAdd.index
+        var lastIndex = lastAdd.isBatch ? lastAdd.index + lastAdd.values!.length - 1 : lastAdd.index
         if (lastIndex + 1 === changeSet[i].index) {
           if (!lastAdd.isBatch) {
             // transform the last addition into a batch addition object
@@ -168,7 +215,7 @@ export class ForEachBinding extends AsyncBindingHandler {
             }
             changeMap.added.splice(changeMap.added.length - 1, 1, lastAdd)
           }
-          lastAdd.values.push(changeSet[i].value)
+          lastAdd.values!.push(changeSet[i].value)
           continue
         }
       }
@@ -229,7 +276,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     }
 
     this.endQueueFlush()
-    this.changeQueue = []
+    this.changeQueue = new Array()
 
     // Update the conditional exposed on the domData
     if (isEmpty !== !this.isNotEmpty()) {
@@ -281,7 +328,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     if (as) {
       return v => this._contextExtensions($ctx.extend({ [as]: v }))
     } else {
-      return v => $ctx.createChildContext(v, null, ctx => this._contextExtensions(ctx))
+      return v => $ctx.createChildContext(v, undefined, ctx => this._contextExtensions(ctx))
     }
   }
 
@@ -292,13 +339,13 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   // Process a changeItem with {status: 'added', ...}
-  added (changeItem) {
+  added (changeItem: ChangeAddItem) {
     var index = changeItem.index
     var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value]
     var referenceElement = this.getLastNodeBeforeIndex(index)
     // gather all childnodes for a possible batch insertion
-    const allChildNodes = []
-    const asyncBindingResults = []
+    const allChildNodes: Node[] = []
+    const asyncBindingResults = new Array()
     var children
 
     for (var i = 0, len = valuesToAdd.length; i < len; ++i) {
@@ -336,12 +383,12 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   getNodesForIndex (index) {
-    let result = []
+    let result = new Array()
     let ptr = this.firstLastNodesList[index].first
     let last = this.firstLastNodesList[index].last
     result.push(ptr)
     while (ptr && ptr !== last) {
-      ptr = ptr.nextSibling
+      ptr = ptr.nextSibling!
       result.push(ptr)
     }
     return result
@@ -357,7 +404,7 @@ export class ForEachBinding extends AsyncBindingHandler {
    */
   activeChildElement (node) {
     var active = document.activeElement
-    if (domNodeIsContainedBy(active, node)) {
+    if (domNodeIsContainedBy(active!, node)) {
       return active
     }
   }
@@ -366,7 +413,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     let frag
     let len
     let i
-    let active = null
+    let active: any = null
     let containerNode = this.$element
 
     // Poor man's node and array check.
@@ -409,7 +456,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   // gets the pending deletion info for this data item
-  getPendingDeleteFor (data) {
+  getPendingDeleteFor (data: any[]) {
     var index = data && data[PENDING_DELETE_INDEX_SYM]
     if (index === undefined) return null
     return this.pendingDeletes[index]
@@ -480,7 +527,7 @@ export class ForEachBinding extends AsyncBindingHandler {
       }
       if (pd.data && pd.data[PENDING_DELETE_INDEX_SYM] !== undefined) { delete pd.data[PENDING_DELETE_INDEX_SYM] }
     }
-    this.pendingDeletes = []
+    this.pendingDeletes = new Array()
   }
 
   // We batch our deletion of item indexes in our parallel array.
@@ -491,7 +538,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     for (let i = this.indexesToDelete.length - 1; i >= 0; --i) {
       this.firstLastNodesList.splice(this.indexesToDelete[i], 1)
     }
-    this.indexesToDelete = []
+    this.indexesToDelete = new Array()
   }
 
   updateIndexes (fromIndex) {

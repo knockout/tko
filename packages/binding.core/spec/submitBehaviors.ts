@@ -19,7 +19,8 @@ import {bindings as coreBindings} from '../dist'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Submit', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()
@@ -33,7 +34,7 @@ describe('Binding: Submit', function () {
     testNode.innerHTML = "<form data-bind='submit:doCall' />"
     var formNode = testNode.childNodes[0]
     applyBindings(model, testNode)
-    triggerEvent(testNode.childNodes[0], 'submit')
+    triggerEvent(testNode.children[0], 'submit')
     expect(model.wasCalled).toEqual(true)
     expect(firstParamStored).toEqual(formNode)
   })

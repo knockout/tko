@@ -1,4 +1,6 @@
 
+import { assert } from "chai";
+
 import {
   VirtualProvider
 } from '../dist'
@@ -7,7 +9,6 @@ import {
  * There aren't many tests here because virtual bindings are used throughout
  * the system.
  */
-
 describe('Virtual Provider', function () {
   it('binds a node as expected', function () {
     const node = document.createElement('div')
@@ -29,7 +30,7 @@ describe('Virtual Provider', function () {
   })
 
   describe('the <ko> element', function () {
-    function tryKoConvert (attributes, node = document.createElement('ko')) {
+    function tryKoConvert (attributes: Record<string,string>, node = document.createElement('ko')) {
       const provider = new VirtualProvider()
       const parent = document.createElement('div')
       for (const [name, value] of Object.entries(attributes)) {
@@ -50,7 +51,7 @@ describe('Virtual Provider', function () {
       assert.equal(open.nodeValue, 'ko t1: x,t2: "Y"')
       assert.equal(close.nodeValue, '/ko')
     })
-
+    
     it('replaces "ko-" prefix', function () {
       const [open, close] = tryKoConvert({ 'ko-t1': 'x', 'ko-t2': '"Y"' })
       assert.equal(open.nodeValue, 'ko t1: x,t2: "Y"')

@@ -1,4 +1,6 @@
 
+import { assert } from 'chai'
+
 import {
   observable
 } from '@tko/observable'
@@ -12,6 +14,7 @@ import { DataBindProvider } from '@tko/provider.databind'
 import {
   TextMustacheProvider, AttributeMustacheProvider
 } from '@tko/provider.mustache'
+
 
 describe('Native Provider Behavior', function () {
   it('returns native bindings', function () {
@@ -67,7 +70,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new DataBindProvider())
       const div = divWithNativeBindings({ 'ko-native': '123' })
       div.setAttribute('data-bind', '{ databind: 345 }')
-      const bindings = mp.getBindingAccessors(div, {})
+      const bindings = mp.getBindingAccessors(div)
       assert.ok('native' in bindings, 'native in bindings')
       assert.notOk('databind' in bindings, 'databind in bindings')
       assert.equal(Object.keys(bindings).length, 1)
@@ -79,7 +82,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new DataBindProvider())
       const div = divWithNativeBindings({  })
       div.setAttribute('data-bind', '{ databind: 345 }')
-      const bindings = mp.getBindingAccessors(div, {})
+      const bindings = mp.getBindingAccessors(div)
       assert.notOk('native' in bindings, 'native in bindings')
       assert.ok('databind' in bindings, 'databind in bindings')
       assert.equal(Object.keys(bindings).length, 1)
@@ -91,7 +94,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new DataBindProvider())
       const div = divWithNativeBindings({ random: 'value' })
       div.setAttribute('data-bind', '{ databind: 345 }')
-      const bindings = mp.getBindingAccessors(div, {})
+      const bindings = mp.getBindingAccessors(div);
       assert.notOk('native' in bindings, 'native in bindings')
       assert.ok('databind' in bindings, 'databind in bindings')
       assert.equal(Object.keys(bindings).length, 1)
@@ -103,7 +106,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new AttributeMustacheProvider())
       const div = divWithNativeBindings({ 'ko-native': '123' })
       div.setAttribute('hello', '{{ 345 }}')
-      const bindings = mp.getBindingAccessors(div, {})
+      const bindings = mp.getBindingAccessors(div)
       assert.ok('native' in bindings, 'native in bindings')
       assert.notOk('text' in bindings, 'text in bindings')
       assert.equal(Object.keys(bindings).length, 1)
@@ -117,7 +120,7 @@ describe('Native Provider Behavior', function () {
       const child = document.createTextNode('{{ child }}')
       child[NATIVE_BINDINGS] = {}
       div.appendChild(child)
-      const nodes = mp.preprocessNode(div.childNodes[0])
+      const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
       assert.ok(nodes instanceof Text)
       assert.equal(nodes.nodeValue, '{{ child }}')
     })
@@ -128,7 +131,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new TextMustacheProvider())
       const div = divWithNativeBindings({ 'ko-native': '123' })
       div.appendChild(document.createTextNode('{{ child }}'))
-      const nodes = mp.preprocessNode(div.childNodes[0])
+      const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
       assert.equal(nodes.length, 2)
       assert.equal(nodes[0].textContent, 'ko text:child')
     })

@@ -1,4 +1,3 @@
-
 function testOverwrite () {
   try {
     Object.defineProperty(function x () {}, 'length', {})

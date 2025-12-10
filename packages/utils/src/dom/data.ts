@@ -15,7 +15,7 @@ let uniqueId = 0
  * on the node. See https://github.com/knockout/knockout/issues/2141
  */
 const modern = {
-  getDataForNode (node, createIfNotFound) {
+  getDataForNode (node : Node, createIfNotFound: boolean) {
     let dataForNode = node[dataStoreSymbol]
     if (!dataForNode && createIfNotFound) {
       dataForNode = node[dataStoreSymbol] = {}
@@ -23,7 +23,7 @@ const modern = {
     return dataForNode
   },
 
-  clear (node) {
+  clear (node : Node) {
     if (node[dataStoreSymbol]) {
       delete node[dataStoreSymbol]
       return true
@@ -37,7 +37,7 @@ const modern = {
  * use a separate data storage and link to it from the node using a string key.
  */
 const IE = {
-  getDataforNode (node, createIfNotFound) {
+  getDataForNode (node: Node, createIfNotFound: boolean) {
     let dataStoreKey = node[dataStoreKeyExpandoPropertyName]
     const hasExistingDataStore = dataStoreKey && (dataStoreKey !== 'null') && dataStore[dataStoreKey]
     if (!hasExistingDataStore) {
@@ -50,7 +50,7 @@ const IE = {
     return dataStore[dataStoreKey]
   },
 
-  clear (node) {
+  clear (node : Node) {
     const dataStoreKey = node[dataStoreKeyExpandoPropertyName]
     if (dataStoreKey) {
       delete dataStore[dataStoreKey]
@@ -70,18 +70,18 @@ export function nextKey () {
   return (uniqueId++) + dataStoreKeyExpandoPropertyName
 }
 
-function get (node, key) {
+function get (node: Node, key: string) {
   const dataForNode = getDataForNode(node, false)
   return dataForNode && dataForNode[key]
 }
 
-function set (node, key, value) {
+function set (node : Node, key : string, value : any) {
   // Make sure we don't actually create a new domData key if we are actually deleting a value
   var dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
   dataForNode && (dataForNode[key] = value)
 }
 
-function getOrSet (node, key, value) {
+function getOrSet (node : Node, key : string, value : any) {
   const dataForNode = getDataForNode(node, true, /* createIfNotFound */)
   return dataForNode[key] || (dataForNode[key] = value)
 }

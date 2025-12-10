@@ -1,16 +1,22 @@
 import { extend, options, domData, isObjectLike } from '@tko/utils'
+import type { KnockoutInstance } from '@tko/builder'
 
 import {
     pureComputed
 } from '@tko/computed'
 
 import {
-    unwrap, isObservable
+    unwrap, isObservable    
 } from '@tko/observable'
+
+import type { Observable } from '@tko/observable'
 
 import {
   contextAncestorBindingInfo
 } from './bindingEvent'
+
+import { BindingContextExtendCallback } from './applyBindings'
+
 
 export const boundElementDomDataKey = domData.nextKey()
 
@@ -19,9 +25,43 @@ export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')
 // Unique stub to indicate inheritance.
 const inheritParentIndicator = Symbol('Knockout Parent Indicator')
 
+export interface BindingContextSetting {
+  exportDependencies?: boolean;
+}
+
+export interface BindingContext<T = any> {
+  ko: KnockoutInstance; 
+
+  [symbol: symbol]: any
+  $parent?: any;
+  $parents: any[];
+  $root: any;
+  $data: T;
+  $rawData: T | Observable<T>;
+  $index?: Observable<number>;
+  $parentContext?: BindingContext<any>;
+  // $componentTemplateNodes: any; added in makeChildBindingContext to context
+  // $componentTemplateSlotNodes; added in makeChildBindingContext to context
+
+  $component?: any;
+
+  extend(properties: object): BindingContext<T>;
+  extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
+
+  lookup (token: string, globals: any, node: any);
+
+  createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
+  createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
+}
+
+// Interface for the factory method 'bindingContext', which creates and returns a typed instance of BindingContext<T>
+export interface bindingContext {
+  new <T = any>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext<T>;
+};
+
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, settings) {
+export const bindingContext = function bindingContextFactory<T>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<T>, settings?: BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -32,8 +72,7 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
   // See https://github.com/SteveSanderson/knockout/issues/490
   self.ko = options.knockoutInstance
 
-  let nodes
-  let subscribable
+  let subscribable: any;
 
     // The binding context object includes static properties for the current, parent, and root view models.
     // If a view model is actually stored in an observable, the corresponding binding context object, and
@@ -61,7 +100,7 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
         self[contextAncestorBindingInfo] = parentContext[contextAncestorBindingInfo]
       }
     } else {
-      self.$parents = []
+      self.$parents = new Array()
       self.$root = dataItem
     }
 
@@ -79,7 +118,9 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
         // The extendCallback function is provided when creating a child context or extending a context.
         // It handles the specific actions needed to finish setting up the binding context. Actions in this
         // function could also add dependencies to this binding context.
-    if (extendCallback) { extendCallback(self, parentContext, dataItem) }
+    if (extendCallback) {
+      extendCallback(self, parentContext, dataItem)
+    }
 
     return self.$data
   }
@@ -105,11 +146,11 @@ export function bindingContext (dataItemOrAccessor, parentContext, dataItemAlias
       self[contextSubscribeSymbol] = undefined
     }
   }
-}
+} as unknown as bindingContext;
 
 Object.assign(bindingContext.prototype, {
 
-  lookup (token, globals, node) {
+  lookup (token: string, globals: any, node: any) {
     // short circuits
     switch (token) {
       case '$element': return node
@@ -118,9 +159,15 @@ Object.assign(bindingContext.prototype, {
     }
     const $data = this.$data
     // instanceof Object covers 1. {}, 2. [], 3. function() {}, 4. new *;  it excludes undefined, null, primitives.
-    if (isObjectLike($data) && token in $data) { return $data[token] }
-    if (token in this) { return this[token] }
-    if (token in globals) { return globals[token] }
+    if (isObjectLike($data) && token in $data) {
+      return $data[token]
+    }
+    if (token in this) {
+      return this[token]
+    }
+    if (token in globals) {
+      return globals[token]
+    }
 
     throw new Error(`The variable "${token}" was not found on $data, $context, or globals.`)
   },
@@ -130,14 +177,16 @@ Object.assign(bindingContext.prototype, {
   // But this does not mean that the $data value of the child context will also get updated. If the child
   // view model also depends on the parent view model, you must provide a function that returns the correct
   // view model on each update.
-  createChildContext (dataItemOrAccessor, dataItemAlias, extendCallback, settings) {
+  createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext {
     return new bindingContext(dataItemOrAccessor, this, dataItemAlias, function (self, parentContext) {
           // Extend the context hierarchy by setting the appropriate pointers
       self.$parentContext = parentContext
-      self.$parent = parentContext.$data
-      self.$parents = (parentContext.$parents || []).slice(0)
+      self.$parent = parentContext?.$data
+      self.$parents = (parentContext?.$parents ?? []).slice(0)
       self.$parents.unshift(self.$parent)
-      if (extendCallback) { extendCallback(self) }
+      if (extendCallback) {
+        extendCallback(self)
+      }
     }, settings)
   },
 
@@ -147,30 +196,30 @@ Object.assign(bindingContext.prototype, {
   extend (properties) {
     // If the parent context references an observable view model, "_subscribable" will always be the
     // latest view model object. If not, "_subscribable" isn't set, and we can use the static "$data" value.
-    return new bindingContext(inheritParentIndicator, this, null, function (self, parentContext) {
+    return new bindingContext(inheritParentIndicator, this, undefined, function (self, parentContext) {
       extend(self, typeof properties === 'function' ? properties.call(self) : properties)
     })
   },
 
-  createStaticChildContext (dataItemOrAccessor, dataItemAlias) {
+  createStaticChildContext (dataItemOrAccessor: any, dataItemAlias: any): BindingContext {
     return this.createChildContext(dataItemOrAccessor, dataItemAlias, null, { 'exportDependencies': true })
   }
 })
 
-export function storedBindingContextForNode (node) {
+export function storedBindingContextForNode (node: Node) {
   const bindingInfo = domData.get(node, boundElementDomDataKey)
   return bindingInfo && bindingInfo.context
 }
 
 // Retrieving binding context from arbitrary nodes
-export function contextFor (node) {
+export function contextFor (node: Node) {
   // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
   if (node && (node.nodeType === 1 || node.nodeType === 8)) {
     return storedBindingContextForNode(node)
   }
 }
 
-export function dataFor (node) {
+export function dataFor<T = any>(node: Node): T | undefined {
   var context = contextFor(node)
   return context ? context.$data : undefined
 }

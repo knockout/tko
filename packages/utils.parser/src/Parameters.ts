@@ -4,24 +4,26 @@ import Expression from './Expression'
 import Identifier from './Identifier'
 
 export default class Parameters {
+  #names: any[]
+
   constructor (parser, node) {
     // convert a node of comma-separated Identifiers to Parameters
     if (node instanceof Expression) {
       node = node.root
     }
     try {
-      this.names = Parameters.nodeTreeToNames(node)
+      this.#names = Parameters.nodeTreeToNames(node)
     } catch (e) {
       parser.error(e)
     }
   }
 
   extendContext (context, args) {
-    if (!this.names) {
+    if (!this.#names) {
       return context
     } else {
       const newValues = {}
-      this.names.forEach((name, index) => {
+      this.#names.forEach((name, index) => {
         newValues[name] = args[index]
       })
       return context.extend(newValues)
@@ -32,7 +34,7 @@ export default class Parameters {
 
   static nodeTreeToNames (node) {
     // left-associative series of commas produces a tree with children only on the lhs, so we can extract the leaves with a simplified depth-first traversal
-    const names = []
+    const names = new Array()
     while (node) {
       if (node instanceof Identifier) {
         names.push(node.token)

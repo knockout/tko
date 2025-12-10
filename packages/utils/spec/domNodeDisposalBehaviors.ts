@@ -7,8 +7,9 @@ import {
 import '../helpers/jasmine-13-helper'
 
 describe('DOM node disposal', function () {
-  var jQuery = options.jQuery
-  beforeEach(jasmine.prepareTestNode)
+  let jQuery = options.jQuery
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
   afterEach(function () {
     otherNodeCleanerFunctions.length = 0
     otherNodeCleanerFunctions.push(cleanjQueryData)
@@ -104,8 +105,8 @@ describe('DOM node disposal', function () {
   })
 
   it('Should continue cleaning if a cleaned node is removed in a handler', function () {
-    var childNode = document.createElement("DIV");
-    var childNode2 = document.createElement("DIV");
+    var childNode :Node = document.createElement("DIV");
+    var childNode2:Node  = document.createElement("DIV");
     var removeChildSpy = jasmine.createSpy('removeChildSpy')
         .andCallFake(function() {
             testNode.removeChild(childNode);
@@ -141,7 +142,7 @@ describe('DOM node disposal', function () {
     childSpy.reset();
 
     // Test by removing a comment node
-    var childNode = document.createComment("ko comment");
+    var childNode = document.createComment("ko comment") as Node;
     testNode.appendChild(childNode);
     testNode.appendChild(childNode2);
     addDisposeCallback(childNode, removeChildSpy);

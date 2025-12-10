@@ -8,12 +8,14 @@ import {
     unwrap
 } from '@tko/observable'
 
+import type { AllBindings } from '@tko/bind'
+
 export var selectedOptions = {
   after: ['options', 'foreach'],
 
-  init: function (element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, _allBindings: AllBindings) {
     registerEventHandler(element, 'change', function () {
-      var value = valueAccessor(), valueToWrite = []
+      var value = valueAccessor(), valueToWrite = new Array()
       arrayForEach(element.getElementsByTagName('option'), function (node) {
         if (node.selected) { valueToWrite.push(selectExtensions.readValue(node)) }
       })
