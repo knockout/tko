@@ -1,0 +1,57 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: My Testworkflow
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run lint (optional)
+        run: make lint
+        continue-on-error: true
+
+      - name: Run Build
+        run: make
+
+      - name: Run tests
+        run: make test-headless
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tko
+          path: builds/knockout/dist  
