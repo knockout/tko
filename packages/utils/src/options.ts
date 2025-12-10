@@ -45,7 +45,7 @@ export class Options {
   createChildContextWithAs: boolean = false
 
   // jQuery will be automatically set to globalThis.jQuery in applyBindings
-  // if it is (strictly equal to) undefined.  Set it to false or null to
+  // if it is (strictly equal to) undefined.  Set it to true to
   // disable automatically setting jQuery.
   disableJQueryUsage: boolean = false;
 
@@ -104,7 +104,7 @@ export class Options {
 
   foreachHidesDestroyed: boolean = false
 
-  onError (e : Error) : void { throw e }
+  onError (e : any) : void { throw e }
 
   set(name: string, value: any): void {
     this[name] = value
