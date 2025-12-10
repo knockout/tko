@@ -16,7 +16,7 @@ import {registry} from './registry'
 // 1. To supply configuration objects from some other source (e.g., conventions)
 // 2. Or, to resolve configuration objects by loading viewmodels/templates via arbitrary logic.
 
-export const defaultConfigRegistry : Record<string, RegisterCustomOptions | Config> = {}
+export const defaultConfigRegistry : Record<string, Config> = {}
 export const VIEW_MODEL_FACTORY = Symbol('Knockout View Model ViewModel factory')
 
 export interface Component {
@@ -100,14 +100,14 @@ export function unregister (componentName: string): void {
 }
 
 export interface Loader {
-      getConfig?(componentName: string, callback: (config: RegisterCustomOptions | Config | null) => void): void;
+      getConfig?(componentName: string, callback: (config: Config | null) => void): void;
       loadComponent?(componentName: string, config: Config | object, callback: (component: Component | null) => void): void;
       loadTemplate?(componentName: string, config: TemplateConfig | any, callback: (resolvedTemplate: Node[] | null) => void): void;
       loadViewModel?(componentName: string, config: ViewModelConfig | any, callback: (resolvedViewModel: CreateViewModel | null) => void): void;
   }
 
 export const defaultLoader : Loader = {
-  getConfig(componentName: string, callback: (config: RegisterCustomOptions | Config | null) => void): void {
+  getConfig(componentName: string, callback: (config: Config | null) => void): void {
     const result = hasOwnProperty(defaultConfigRegistry, componentName)
             ? defaultConfigRegistry[componentName]
             : null
