@@ -26,7 +26,7 @@ import {bindings as coreBindings} from '../dist'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Value', function () {
-  var testNode : any //TODO HTMLElement will be better
+  let testNode : any //TODO HTMLElement will be better
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

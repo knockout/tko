@@ -28,8 +28,8 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Deferred bindings', function () {
-  var bindingSpy, bindingHandlers
-  var testNode : HTMLElement
+  let bindingSpy, bindingHandlers
+  let testNode : HTMLElement
 
   beforeEach(function () {
     testNode = jasmine.prepareTestNode()
@@ -241,20 +241,21 @@ describe('Deferred bindings', function () {
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
     var someItem = Observable(true)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: (++counter)'></span></div>"
-    var originalNode = testNode.children[0].children[0]
+    var originalNode = testNode.childNodes[0].childNodes[0]
 
       // Value is initially true, so nodes are retained
     applyBindings({ someItem: someItem, counter: 0 }, testNode)
 
-    expect(testNode.children[0].children[0].tagName.toLowerCase()).toEqual('span')
-    expect(testNode.children[0].children[0]).toEqual(originalNode)
+    expect(testNode.childNodes[0].childNodes[0]['tagName']['toLowerCase']()).toEqual('span')
+    expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
     expect(testNode).toContainText('1')
 
       // Change the value to a different truthy value; see the previous SPAN remains
     someItem('different truthy value')
     jasmine.Clock.tick(1)
-    expect(testNode.children[0].children[0].tagName.toLowerCase()).toEqual('span')
-    expect(testNode.children[0].children[0]).toEqual(originalNode)
+
+    expect(testNode.childNodes[0].childNodes[0]['tagName']['toLowerCase']()).toEqual('span')
+    expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode)
     expect(testNode).toContainText('1')
   })
 })

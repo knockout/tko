@@ -1,4 +1,5 @@
 import { extend, options, domData, isObjectLike } from '@tko/utils'
+import type { KnockoutInstance } from '@tko/builder'
 
 import {
     pureComputed
@@ -16,6 +17,7 @@ import {
 
 import { BindingContextExtendCallback } from './applyBindings'
 
+
 export const boundElementDomDataKey = domData.nextKey()
 
 export const contextSubscribeSymbol = Symbol('Knockout Context Subscription')
@@ -28,7 +30,7 @@ export interface BindingContextSetting {
 }
 
 export interface BindingContext<T = any> {
-  ko: any; // typeof ko;
+  ko: KnockoutInstance; 
 
   [symbol: symbol]: any
   $parent?: any;
@@ -52,14 +54,14 @@ export interface BindingContext<T = any> {
   createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
 }
 
-// This interface is for the JS-Factory-Method 'bindingContext' to returns a typed BindingContext
+// Interface for the factory method 'bindingContext', which creates and returns a typed instance of BindingContext<T>
 export interface bindingContext {
   new <T = any>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext<T>;
 };
 
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export const bindingContext = function<T>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<T>, settings?: BindingContextSetting) {
+export const bindingContext = function bindingContextFactory<T>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<T>, settings?: BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -180,7 +182,7 @@ Object.assign(bindingContext.prototype, {
           // Extend the context hierarchy by setting the appropriate pointers
       self.$parentContext = parentContext
       self.$parent = parentContext?.$data
-      self.$parents = (parentContext?.$parents || []).slice(0)
+      self.$parents = (parentContext?.$parents ?? []).slice(0)
       self.$parents.unshift(self.$parent)
       if (extendCallback) {
         extendCallback(self)

@@ -1,10 +1,11 @@
 import { Provider } from "@tko/provider";
+import type { KnockoutInstance } from "@tko/builder";
 
-interface CustomBindingGlobalProperties {
-  String;
-  isObservable;
+export interface CustomBindingGlobalProperties {
+  [customBindingName: string]: any;
 }
 
+export type BindingStringPreparsersFunction = (bindingString: string) => string;
 
 //
 // This becomes ko.options
@@ -12,8 +13,12 @@ interface CustomBindingGlobalProperties {
 //
 // This is the root 'options', which must be extended by others.
 export class Options {
-  [key: string]: any;
-
+  // The following options can be set on ko.options to make a function rewriting or something similar.
+  bindingStringPreparsers: BindingStringPreparsersFunction[] = []
+  
+  // Reference to the own knockout instance
+  knockoutInstance: KnockoutInstance | null = null
+  
   deferUpdates: boolean = false
 
   // Don't set this false, with jquery 3.7+
@@ -73,6 +78,18 @@ export class Options {
   taskScheduler: any = null
 
   debug: boolean = false
+  /**
+   * The maximum size of template to parse.
+   * Set to 0 to disable the limit.
+   */
+  templateSizeLimit: number = 4096
+
+  /**
+   * Whether or not to allow script tags in templates.
+   * If false, an error will be thrown if a script tag is detected in the template.
+   * It is not recommended to set this to true.
+   */
+  allowScriptTagsInTemplates: boolean = false
 
   global: any = globalThis
 
@@ -87,7 +104,7 @@ export class Options {
 
   foreachHidesDestroyed: boolean = false
 
-  onError(e: Error): void { throw e }
+  onError (e : Error) : void { throw e }
 
   set(name: string, value: any): void {
     this[name] = value

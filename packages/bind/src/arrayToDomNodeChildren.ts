@@ -211,7 +211,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   callCallback(options.beforeMove, itemsForMoveCallbacks)
 
   // Next remove nodes for deleted items (or just clean if there's a beforeRemove callback)
-  arrayForEach(nodesToDelete, options['beforeRemove'] ? cleanNode : removeNode)
+  arrayForEach(nodesToDelete, options.beforeRemove ? cleanNode : removeNode)
 
   // Next add/reorder the remaining items (will include deleted items if there's a beforeRemove callback)
   i = 0

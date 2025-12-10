@@ -17,7 +17,7 @@ import { bindings as coreBindings } from '../dist'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Enable/Disable', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
@@ -30,7 +30,7 @@ describe('Binding: Enable/Disable', function () {
     var myObservable = observable()
     testNode.innerHTML = "<input data-bind='enable:myModelProperty()' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.disabled).toEqual(true)
     myObservable(1)
     expect(input.disabled).toEqual(false)
@@ -41,7 +41,7 @@ describe('Binding: Enable/Disable', function () {
     testNode.innerHTML = "<input data-bind='disable:myModelProperty()' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.disabled).toEqual(false)
     myObservable(1)
     expect(input.disabled).toEqual(true)
@@ -52,7 +52,7 @@ describe('Binding: Enable/Disable', function () {
     testNode.innerHTML = "<input data-bind='enable:myModelProperty' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.disabled).toEqual(true)
   })
 
@@ -61,7 +61,7 @@ describe('Binding: Enable/Disable', function () {
     testNode.innerHTML = "<input data-bind='disable:myModelProperty' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
-    var input = testNode.children[0] as HTMLInputElement
+    const input = testNode.children[0] as HTMLInputElement
     expect(input.disabled).toEqual(false)
   })
 })

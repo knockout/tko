@@ -19,7 +19,7 @@ import '@tko/utils/helpers/jasmine-13-helper'
 describe('Binding: CSS classes', function () {
   var bindingHandlers
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

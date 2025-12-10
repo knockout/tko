@@ -14,12 +14,11 @@ import { trackArrayChanges } from './observableArray.changeTracking'
 
 import type { Observable, ObservableFunctions } from './observable';
 
-//#region ObservableArray
 
 export type MaybeObservableArray<T = any> = T[] | ObservableArray<T>;
 
 export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T[]> {
-    //#region observableArray/generalFunctions
+    
     /**
       * Returns the index of the first occurrence of a value in an array.
       * @param searchElement The value to locate in the array.
@@ -72,9 +71,7 @@ export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T
      * Modifies the underlying array.
      */
     sort(compareFunction?: (left: T, right: T) => number): this;
-    //#endregion
-
-    //#region observableArray/koSpecificFunctions
+    
     /**
      * Returns a reversed copy of the array.
      * Does not modify the underlying array.
@@ -139,7 +136,6 @@ export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T
      * @param items
      */
     destroyAll(items: T[]): void;
-    //#endregion
 }
 
 export interface ObservableArray<T = any> extends Observable<T[]>, ObservableArrayFunctions<T> {
@@ -147,9 +143,6 @@ export interface ObservableArray<T = any> extends Observable<T[]>, ObservableArr
     compareArrayOptions?: CompareArraysOptions;
     cacheDiffForKnownOperation?: (rawArray: any[], operationName: string, args: any[]) => void;
 }
-
-
-//#endregion ObservableArray
 
 
 export function observableArray<T = any> (initialValues?: T[]): ObservableArray<T> {

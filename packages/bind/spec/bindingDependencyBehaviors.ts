@@ -31,9 +31,9 @@ import {bindings as coreBindings} from '@tko/binding.core';
 import '@tko/utils/helpers/jasmine-13-helper';
 
 describe('Binding dependencies', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
@@ -321,15 +321,15 @@ describe('Binding dependencies', function () {
 
     // Change the childprop which is not an observable so should not change the bound element
     vm.childprop = 'new child';
-    expect(testNode.children[0]).toContainText('child');
+    expect(testNode.childNodes[0]).toContainText('child');
 
     // Update callback observable and check that the binding wasn't updated
     callbackObservable(2);
-    expect(testNode.children[0]).toContainText('child');
+    expect(testNode.childNodes[0]).toContainText('child');
 
     // Update the bound observable and verify that the binding is now updated
     bindingObservable(2);
-    expect(testNode.children[0]).toContainText('new child');
+    expect(testNode.childNodes[0]).toContainText('new child');
     expect(callbacks).toEqual(2);
   });
 
@@ -360,7 +360,7 @@ describe('Binding dependencies', function () {
     vm.callback = callbackSpy2;
 
     vm.observable('new value');
-    expect(testNode.children[0]).toContainText('new value');
+    expect(testNode.childNodes[0]).toContainText('new value');
     expect(callbackSpy1).not.toHaveBeenCalled();
     expect(callbackSpy2).toHaveBeenCalled();
   });
@@ -376,27 +376,27 @@ describe('Binding dependencies', function () {
       applyBindings(vm, testNode);
       expect(vm.getSubscriptionsCount()).toEqual(1);
 
-      const child = testNode.children[0].children[0] as HTMLInputElement;
-      expect(child.value).toEqual('My prop value');
+      const child : Function = () => testNode.childNodes[0].childNodes[0] as HTMLInputElement
+      expect(child().value).toEqual('My prop value');
 
       // a change to the input value should be written to the model
-      child.value = 'some user-entered value';
-      triggerEvent(child, 'change');
+      child().value = 'some user-entered value';
+      triggerEvent(child(), 'change');
       expect(vm().someProp).toEqual('some user-entered value');
             // a click should use correct view model
-      triggerEvent(testNode.children[0].children[1], 'click');
+      triggerEvent(testNode.childNodes[0].childNodes[1] as Element, 'click');
       expect(clickedVM).toEqual(vm());
 
             // set the view-model to a new object
       vm({ someProp: observableConstructor('My new prop value'), checkVM: checkVM });
-      expect(child.value).toEqual('My new prop value');
+      expect(child().value).toEqual('My new prop value');
 
             // a change to the input value should be written to the new model
-      child.value = 'some new user-entered value';
-      triggerEvent(testNode.children[0].children[0], 'change');
+      child().value = 'some new user-entered value';
+      triggerEvent(testNode.childNodes[0].childNodes[0] as Element, 'change');
       expect(vm().someProp()).toEqual('some new user-entered value');
             // a click should use correct view model
-      triggerEvent(testNode.children[0].children[1], 'click');
+      triggerEvent(testNode.childNodes[0].childNodes[1] as Element, 'click');
       expect(clickedVM).toEqual(vm());
 
             // clear the element and the view-model (shouldn't be any errors) and the subscription should be cleared
@@ -530,7 +530,7 @@ describe('Binding dependencies', function () {
       expect(testNode).toContainText('vm1');
 
       var parentContext = contextFor(testNode),
-        childContext = contextFor(testNode.children[0].children[0]);
+        childContext = contextFor(testNode.childNodes[0].childNodes[0]);
 
       expect(parentContext.$data).toEqual('vm1');
       expect(parentContext.$rawData).toBe(vm1);

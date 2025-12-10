@@ -12,7 +12,7 @@ export interface AllBindings {
     (): any;
 
     get(name: string): any;
-    get<T>(name: string): T;
+    get<T = any>(name: string): T;
 
     has(name: string): boolean;
 }
@@ -70,11 +70,11 @@ export class BindingHandler<T = any> extends LifeCycle {
   */
   get bindingCompleted (): Promise<boolean> | boolean { return true };
 
-  static registerAs (name, provider = options.bindingProviderInstance) {
+  static registerAs (name: string, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
   }
 
-  static registerBindingHandler(handler: BindingHandler, name, provider = options.bindingProviderInstance) {
+  static registerBindingHandler(handler: BindingHandler, name: string, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, handler)
   }
 }

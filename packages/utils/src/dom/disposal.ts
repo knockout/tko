@@ -94,8 +94,9 @@ export function cleanNode (node: Node) : typeof node {
 }
 
 export function removeNode (node: Node | null) {
-  if(!node)
+  if(!node) {
     return;
+  }
 
   cleanNode(node)
   if (node.parentNode) { node.parentNode.removeChild(node) }

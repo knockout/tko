@@ -21,7 +21,7 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Node preprocessing', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
@@ -43,6 +43,7 @@ describe('Node preprocessing', function () {
       if (node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
         var newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: someValue')
+        expect(node.parentNode).not.toBe(null)
         node.parentNode?.insertBefore(newNode, node)
         node.parentNode?.removeChild(node)
         return [newNode]

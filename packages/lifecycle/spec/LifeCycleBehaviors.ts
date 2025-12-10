@@ -1,18 +1,13 @@
 /* globals assert, it, describe */
+import { assert } from 'chai';
 
 import {
     observable
 } from '@tko/observable'
 
 import {
-    cleanNode
-} from '@tko/utils'
-
-import {
   LifeCycle
 } from '../src'
-
-import { assert } from 'chai';
 
 describe('KO LifeCycle', function () {
   describe('mixInto', function () {

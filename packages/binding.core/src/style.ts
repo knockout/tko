@@ -18,8 +18,8 @@ export var style = {
         styleValue = ''
       }
 
-      if (options.jQuery) {
-        options.jQuery(element).css(styleName, styleValue)
+      if (jQuery) {
+        jQuery(element).css(styleName, styleValue)
       } else {
         styleName = styleName.replace(/-(\w)/g, (all, letter) => letter.toUpperCase())
         const previousStyle = element.style[styleName]

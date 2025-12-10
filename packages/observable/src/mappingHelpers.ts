@@ -13,9 +13,9 @@ export function toJS<T = any>(rootObject: T): T {
     throw new Error('When calling ko.toJS, pass the object you want to convert.');
   }
 
-    // We just unwrap everything at every level in the object graph
+  // We just unwrap everything at every level in the object graph
   return mapJsObjectGraph(rootObject, function (valueToMap: any) {
-        // Loop because an observable's value might in turn be another observable wrapper
+    // Loop because an observable's value might in turn be another observable wrapper
     for (var i = 0; isObservable(valueToMap) && (i < maxNestedObservableDepth); i++) { valueToMap = valueToMap() }
     return valueToMap
   })
@@ -50,8 +50,8 @@ function mapJsObjectGraph<T = any>(rootObject: T, mapInputCallback: (value: any)
       case 'undefined':
         var previouslyMappedValue = visitedObjects.get(propertyValue)
         outputProperties[indexer] = (previouslyMappedValue !== undefined)
-                ? previouslyMappedValue
-                : mapJsObjectGraph(propertyValue, mapInputCallback, visitedObjects)
+          ? previouslyMappedValue
+          : mapJsObjectGraph(propertyValue, mapInputCallback, visitedObjects)
         break
     }
   })
@@ -65,8 +65,10 @@ function visitPropertiesOrArrayEntries<T = any>(rootObject: T, visitorCallback: 
       visitorCallback(i)
     }
 
-        // For arrays, also respect toJSON property for custom mappings (fixes #278)
-  if (typeof rootObject['toJSON'] === 'function') { visitorCallback('toJSON') }
+    // For arrays, also respect toJSON property for custom mappings (fixes #278)
+    if (typeof rootObject['toJSON'] === 'function') {
+      visitorCallback('toJSON')
+    }
   } else {
     for (var propertyName in rootObject) {
       visitorCallback(propertyName)

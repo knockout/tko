@@ -23,7 +23,7 @@ export function parseJson<T = any> (jsonString: string): T | null {
         // Use native parsing where available
         return JSON.parse(jsonString) as T;
       }
-      // Fallback on less safe parsing for older browsers
+      //IE < 8: Fallback on less safe parsing for older browsers
       return (new Function('return ' + jsonString))() as T
     }
   }

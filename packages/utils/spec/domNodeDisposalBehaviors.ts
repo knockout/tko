@@ -8,7 +8,7 @@ import '../helpers/jasmine-13-helper'
 
 describe('DOM node disposal', function () {
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { 
     testNode = jasmine.prepareTestNode()     
   })

@@ -11,7 +11,6 @@ import BindingHandlerObject from './BindingHandlerObject'
 
 import type { BindingContext } from '@tko/bind';
 
-    // usage in multiprovider.ts, provider.ts, attributeMustacheProvider.ts
 export interface ProviderParamsInput{
   bindingHandlers?: BindingHandlerObject;
   globals?:any;

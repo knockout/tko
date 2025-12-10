@@ -27,7 +27,7 @@ import {bindings as coreBindings} from '@tko/binding.core'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: If', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {

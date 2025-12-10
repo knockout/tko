@@ -5,7 +5,7 @@ import '@tko/utils/helpers/jasmine-13-helper'
 import { setDomNodeChildrenFromArrayMapping } from '../dist'
 
 function copyDomNodeChildren (domNode: HTMLElement) {
-  var copy: ChildNode[] = []
+  const copy: ChildNode[] = []
   for (var i = 0; i < domNode.childNodes.length; i++) {
     copy.push(domNode.childNodes[i])
   }
@@ -13,7 +13,7 @@ function copyDomNodeChildren (domNode: HTMLElement) {
 }
 
 describe('Array to DOM node children mapping', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('Should populate the DOM node by mapping array elements', function () {

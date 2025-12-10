@@ -35,8 +35,9 @@ export default class ComponentProvider extends Provider {
       const openNode = document.createComment(`ko slot: "${slotName}"`)
       const closeNode = document.createComment('/ko')
 
-      if(!parent)
+      if(!parent) {
         throw Error("Missing parent node")
+      }
 
       parent.insertBefore(openNode, node)
       parent.insertBefore(closeNode, node)

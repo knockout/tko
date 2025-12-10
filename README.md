@@ -1,15 +1,21 @@
 
 # TKO (“Technical Knockout”)
 
-[![npm version](https://badge.fury.io/js/tko.svg)](https://badge.fury.io/js/tko)
+[![npm version](https://badge.fury.io/js/@tko%2Fbuild.reference.svg)](https://badge.fury.io/js/@tko%2Fbuild.reference)
 [![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
-[![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+[![Check 'Main' (build+tsc)](https://github.com/knockout/tko/actions/workflows/run-tsc.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/run-tsc.yml)
+[![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
+[![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 <!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/tko.svg)](https://saucelabs.com/u/tko) -->
 
 **TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout).
+TKO, or Technical Knockout, is a JavaScript web framework for data binding and templating. It is a fork of the original Knockout.js, which was created to enhance and modernize the framework while maintaining its core principles. TKO and Knockout implement the [MVVM pattern](http://en.wikipedia.org/wiki/Model_View_ViewModel) (a modern variant of MVC) as a zero-dependency and small sized library. TKO makes it easy to create rich, desktop-like user interfaces with JavaScript/Typescript and HTML. It uses *observers* to automatically keep your UI in sync with an underlying data model, along with a powerful and extensible set of *declarative bindings* to enable productive development. 
+
+TKO aims to provide developers with a more robust, modular, and maintainable codebase in [Typescript](https://www.typescriptlang.org/), making it easier to build rich, responsive, and maintainable web applications.
+
+
 
 ## Getting Started
 
@@ -17,10 +23,19 @@ To install use one of the usual package managers e.g.
 
 - $ `yarn add @tko/build.reference`
 - $ `npm install @tko/build.reference`
+- $ `pnpm install @tko/build.reference`
+
 
 Over CDN
 
-- Reference Build: https://cdn.jsdelivr.net/npm/@tko/build.reference@4.0.0-alpha8/dist/build.reference.min.js
+- Reference Build: https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/build.reference.min.js
+
+For more details, see
+
+ * TKO - Documentation (https://tko.io)
+ * Knockout - Documentation (http://knockoutjs.com/documentation/introduction.html)
+ * Online examples at [http://knockoutjs.com/examples/](http://knockoutjs.com/examples/)
+ * Stackoverflow https://stackoverflow.com/questions/tagged/knockout.js
 
 ## Knockout Build
 
@@ -28,7 +43,7 @@ The Knockout build has some backwards compatibility that is not in the reference
 
 It's available as `@tko/build.knockout`, and over CDN:
 
-- Knockout Build https://cdn.jsdelivr.net/npm/@tko/build.knockout@4.0.0-alpha8/dist/build.knockout.min.js
+- Knockout Build https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/build.knockout.min.js
 
 ### Using the Monorepo
 
@@ -48,6 +63,7 @@ In each individual `packages/*/` directory, you can also run:
 | Command | Effect |
 | --- | --- |
 | $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run` |
+| $ `make test-debug` | Runs all tests in the current package in debug- and watch-mode: Attach vscode, set a breakpoint, press save and debug |
 
 ### Testing
 
@@ -134,6 +150,12 @@ There's an [issue for that](https://github.com/knockout/tko/issues/1).
 ## License
 
 MIT license - [http://www.opensource.org/licenses/mit-license.php.](http://www.opensource.org/licenses/mit-license.php)
+
+## Credits
+- Knockout Type Definitions by: [Maxime LUCE](https://github.com/SomaticIT), [Michael Best](https://github.com/mbest)  
+    - https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
+- Team-Project: https://github.com/knockout
+- http://knockoutjs.com / [Steve Sanderson](https://github.com/SteveSanderson), [Michael Best](https://github.com/mbest)
 
 ## Shout Outs
 

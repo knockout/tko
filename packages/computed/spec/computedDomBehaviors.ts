@@ -13,7 +13,7 @@ import {
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Dependent Observable DOM', function () {
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('Should register DOM node disposal callback only if active after the initial evaluation', function () {

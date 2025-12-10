@@ -71,11 +71,11 @@ export function registerEventHandler (element: Element, eventType: string, handl
 }
 
 function hasClick(element:Element): element is Element & { click(): void} {
-  return typeof( element as any).click === 'function';
+  return typeof(element as any).click === 'function';
 }
 
 function hasFireEvent(element:Element): element is Element & { fireEvent(eventType: string): void } {
-  return typeof( element as any).click === 'function';
+  return typeof(element as any).click === 'function';
 }
 
 export function triggerEvent (element: Element, eventType: string): void {

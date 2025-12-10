@@ -20,6 +20,8 @@ import { functionRewrite } from '@tko/utils.functionrewrite'
 
 import { options as defaultOptions } from '@tko/utils'
 
+declare const BUILD_VERSION: string
+
 /**
  * expressionRewriting is deprecated in TKO because we have our own JS
  * parser now.  This is here only for legacy compatibility.
@@ -37,7 +39,7 @@ const provider = new MultiProvider({providers: [
 ]})
 
 const builder = new Builder({
-  provider: provider,
+  provider,
   bindings: [
     coreBindings,
     templateBindings,
@@ -53,7 +55,6 @@ const builder = new Builder({
   }
 })
 
-// @ts-ignore: Build-Parameter
 const version = BUILD_VERSION
 export default builder.create({
   version,

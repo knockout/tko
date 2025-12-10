@@ -178,9 +178,9 @@ describe('Interpolation Markup preprocessor', function () {
 });
 
 describe('Interpolation Markup bindings', function () {
-  var bindingHandlers;
+  let bindingHandlers;
 
-  var testNode : HTMLElement
+  let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
