@@ -102,7 +102,7 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
 
 ## JQUERY and TKO
 
-Optionally TKO can use JQuery for CSS-Manipulation and HTML-Templates (only if HTML5-Template-Tag no supported), if is available. All tests are based on JQuery 3.7. 
+Optionally TKO can use JQuery for CSS-Manipulation and HTML-Templates (only if HTML5-Template-Tag no supported). All tests are based on JQuery 3.7. 
 In the future we will probably remove the usage of JQuery in TKO, as many features have already been migrated to native APIs. Compatibility with JQuery in an application will remain.
 You can set useOnlyNativeEvents to false, so JQuery is also use for event-registration. Note: Some tests fails in this case ('change'-event doesn't fire).
 
