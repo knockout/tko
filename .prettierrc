@@ -1,0 +1,10 @@
+{
+  "semi": false,
+  "trailingComma": "none",
+  "singleQuote": true,
+  "arrowParens": "avoid",
+  "printWidth": 120,
+  "proseWrap": "never",
+  "experimentalOperatorPosition": "start",
+  "objectWrap": "collapse"
+}
