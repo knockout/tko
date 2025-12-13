@@ -16,67 +16,59 @@ import {registry} from './registry'
 // 1. To supply configuration objects from some other source (e.g., conventions)
 // 2. Or, to resolve configuration objects by loading viewmodels/templates via arbitrary logic.
 
-export var defaultConfigRegistry = {}
+export const defaultConfigRegistry : Record<string, Config> = {}
 export const VIEW_MODEL_FACTORY = Symbol('Knockout View Model ViewModel factory')
 
-//#region  Typedefinition
-interface Component {
+export interface Component {
   template: Node[];
   createViewModel?: CreateViewModel;
 }
-type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
+export type CreateViewModel = (params: ViewModelParams, componentInfo: ComponentInfo) => ViewModel;
 
-interface ViewModelParams {
+export interface ViewModelParams {
   [name: string]: any;
 }
 
-interface ComponentInfo {
+export interface ComponentInfo {
   element: Node;
   templateNodes: Node[];
 }
 
-interface ViewModel {
+export interface ViewModel {
   dispose?: () => void;
   koDescendantsComplete?: (node: Node) => void;
 }
 
-interface Config {
+export interface Config {
   require?: string;
   viewModel?: RequireConfig | ViewModelConfig | any;
   template?: RequireConfig | TemplateConfig | any;
   synchronous?: boolean;
+  ignoreCustomElementWarning?: boolean 
 }
 
-interface ViewModelConstructor {
+export interface ViewModelConstructor {
   new(params?: ViewModelParams): ViewModel;
 }
 
-interface ViewModelStatic {
+export interface ViewModelStatic {
   instance: any;
 }
-interface ViewModelFactory {
+export interface ViewModelFactory {
   createViewModel: CreateViewModel;
 }
-interface TemplateElement {
+export interface TemplateElement {
   element: string | Node;
 }
 
-type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
-type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
+export type ViewModelConfig = ViewModelConstructor | ViewModelStatic | ViewModelFactory;
+export type TemplateConfig = string | Node[] | DocumentFragment | TemplateElement;
 
-interface RequireConfig {
+export interface RequireConfig {
   require: string;
 }
 
-type RegisterCustomOptions = { ignoreCustomElementWarning: boolean }
-
-//#endregion
-
-function isIgnoreCustomElementWarning(config): config is RegisterCustomOptions{
-  return (config as any).ignoreCustomElementWarning !== 'undefined';
-}
-
-export function register (componentName: string, config: RegisterCustomOptions | Config ) {
+export function register (componentName: string, config: Config ) {
   if (!config) {
     throw new Error('Invalid configuration for ' + componentName)
   }
@@ -87,7 +79,7 @@ export function register (componentName: string, config: RegisterCustomOptions |
 
   const ceok = componentName.includes('-') && componentName.toLowerCase() === componentName
   
-  if (isIgnoreCustomElementWarning(config) && !config.ignoreCustomElementWarning && !ceok) {
+  if (!config.ignoreCustomElementWarning && !ceok) {
     console.log(`
 🥊  Knockout warning: components for custom elements must be lowercase and contain a dash.  To ignore this warning, add to the 'config' of .register(componentName, config):
 
@@ -108,22 +100,22 @@ export function unregister (componentName: string): void {
 }
 
 export interface Loader {
-      getConfig?(componentName: string, callback: (config: Config | object) => void): void;
+      getConfig?(componentName: string, callback: (config: Config | null) => void): void;
       loadComponent?(componentName: string, config: Config | object, callback: (component: Component | null) => void): void;
       loadTemplate?(componentName: string, config: TemplateConfig | any, callback: (resolvedTemplate: Node[] | null) => void): void;
       loadViewModel?(componentName: string, config: ViewModelConfig | any, callback: (resolvedViewModel: CreateViewModel | null) => void): void;
   }
 
-export var defaultLoader : Loader = {
-  getConfig(componentName: string, callback: (config: Config | object) => void): void {
-    var result = hasOwnProperty(defaultConfigRegistry, componentName)
+export const defaultLoader : Loader = {
+  getConfig(componentName: string, callback: (config: Config | null) => void): void {
+    const result = hasOwnProperty(defaultConfigRegistry, componentName)
             ? defaultConfigRegistry[componentName]
             : null
     callback(result)
   },
 
   loadComponent(componentName: string, config: Config, callback: (component: Component) => void): void {
-    var errorCallback = makeErrorCallback(componentName)
+    const errorCallback = makeErrorCallback(componentName)
     possiblyGetConfigFromAmd(errorCallback, config, function (loadedConfig) {
       resolveConfig(componentName, errorCallback, loadedConfig, callback)
     })
@@ -138,7 +130,7 @@ export var defaultLoader : Loader = {
   }
 }
 
-var createViewModelKey = 'createViewModel'
+const createViewModelKey = 'createViewModel'
 
 // Takes a config object of the form { template: ..., viewModel: ... }, and asynchronously convert it
 // into the standard component definition format:
@@ -147,16 +139,16 @@ var createViewModelKey = 'createViewModel'
 // in parallel, and the results joined when both are ready. We don't depend on any promises infrastructure,
 // so this is implemented manually below.
 function resolveConfig (componentName, errorCallback, config, callback) {
-  var result = {},
-    makeCallBackWhenZero = 2,
-    tryIssueCallback = function () {
-      if (--makeCallBackWhenZero === 0) {
-        callback(result)
-      }
-    },
-    templateConfig = config['template'],
-    viewModelConfig = config['viewModel']
+  const result = {},
+  tryIssueCallback = function () {
+    if (--makeCallBackWhenZero === 0) {
+      callback(result)
+    }
+  },
+  templateConfig = config['template'],
+  viewModelConfig = config['viewModel']
 
+  let makeCallBackWhenZero = 2
   if (templateConfig) {
     possiblyGetConfigFromAmd(errorCallback, templateConfig, function (loadedConfig) {
       registry._getFirstResultFromLoaders('loadTemplate', [componentName, loadedConfig], function (resolvedTemplate) {
@@ -191,13 +183,13 @@ function resolveTemplate (errorCallback, templateConfig, callback) {
         // Document fragment - use its child nodes
     callback(makeArray(templateConfig.childNodes))
   } else if (templateConfig.element) {
-    var element = templateConfig.element
+    const element = templateConfig.element
     if (isDomElement(element)) {
             // Element instance - copy its child nodes
       callback(cloneNodesFromTemplateSourceElement(element))
     } else if (typeof element === 'string') {
             // Element ID - find it, then copy its child nodes
-      var elemInstance = document.getElementById(element)
+      const elemInstance = document.getElementById(element)
       if (elemInstance) {
         callback(cloneNodesFromTemplateSourceElement(elemInstance))
       } else {
@@ -230,7 +222,7 @@ function resolveViewModel (errorCallback, viewModelConfig, callback) {
     callback(viewModelConfig[createViewModelKey])
   } else if ('instance' in viewModelConfig) {
         // Fixed object instance - promote to createViewModel format for API consistency
-    var fixedInstance = viewModelConfig['instance']
+    const fixedInstance = viewModelConfig['instance']
     callback(function (/* params, componentInfo */) {
       return fixedInstance
     })

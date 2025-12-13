@@ -5,12 +5,14 @@
 /* eslint no-fallthrough: 0 */
 
 import {
-    extend, compareArrays, findMovesInArrayComparison,
-    CompareArraysOptions
+    extend, compareArrays, findMovesInArrayComparison    
 } from '@tko/utils'
+
+import type { CompareArraysOptions } from '@tko/utils'
 
 import { defaultEvent } from './subscribable'
 import { extenders } from './extenders'
+import type { ObservableArray } from './observableArray'
 
 export var arrayChangeEventName = 'arrayChange'
 

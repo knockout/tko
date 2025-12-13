@@ -20,20 +20,18 @@ import {
 
 import {bindings as coreBindings} from '../dist'
 
+import type { ObservableArray } from '@tko/observable'
+
 import '@tko/utils/helpers/jasmine-13-helper'
 
-import {
-    matchers
-} from '../dist/test-helper'
-
 describe('Binding: Options', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
-    this.addMatchers(matchers)
   })
 
   it('Should only be applicable to SELECT nodes', function () {

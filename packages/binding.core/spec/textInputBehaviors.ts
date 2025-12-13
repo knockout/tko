@@ -24,8 +24,9 @@ const DEBUG = true
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: TextInput', function () {
-  var bindingHandlers
-  beforeEach(jasmine.prepareTestNode)
+  let bindingHandlers
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()

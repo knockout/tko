@@ -112,10 +112,13 @@ clean:
 	rm -rf dist/*
 
 test: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once
+	$(KARMA) start $(tools_dir)/karma.conf --once --noJQuery
 
 test-headless: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome
+	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery
+
+test-headless-jquery: esm
+	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome 
 
 test-debug: esm
 	$(KARMA) start $(tools_dir)/karma.conf --headless-chrome --debug

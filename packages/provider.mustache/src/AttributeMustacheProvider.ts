@@ -7,6 +7,10 @@ import {
   Provider
 } from '@tko/provider'
 
+import type {
+  ProviderParamsInput
+} from '@tko/provider'
+
 import {
   parseInterpolation
 } from './mustacheParser'
@@ -21,6 +25,8 @@ const DEFAULT_ATTRIBUTE_BINDING_MAP = {
   checked: 'checked',
   class: 'css'
 }
+
+type AttributeBindingTuple = [string, any[]]
 
 /**
  *  Interpret {{ }} inside DOM attributes e.g. <div class='{{ classes }}'>
@@ -58,11 +64,11 @@ export default class AttributeMustacheProvider extends Provider {
     return part
   }
 
-  attributeBinding (name: string, parts: any[]): (string | any[])[] {
-    return [name, parts]
+  attributeBinding (name: string, parts: any[]) : AttributeBindingTuple {
+    return [name, parts] 
   }
 
-  * bindingParts (node: Element, context: any) {
+  * bindingParts (node: Element, context: any) : Generator<AttributeBindingTuple> {
     for (const attr of this.attributesToInterpolate(node.attributes)) {
       const parts = Array.from(parseInterpolation(attr.value))
       if (parts.length) { yield this.attributeBinding(attr.name, parts) }
@@ -76,12 +82,12 @@ export default class AttributeMustacheProvider extends Provider {
 
   * bindingObjects (node: Element, context: any) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
-      const bindingForAttribute = this.getPossibleDirectBinding(attrName as string)
-      const handler: string = bindingForAttribute ? attrName as string : `attr.${attrName}`
+      const bindingForAttribute = this.getPossibleDirectBinding(attrName)
+      const handler: string = bindingForAttribute ? attrName : `attr.${attrName}`
       const accessorFn = bindingForAttribute
-        ? (...v: any) => this.partsTogether(parts as any[], context, node, ...v)
-        : (...v: any) => ({[attrName as string]: this.partsTogether(parts as any[], context, node, ...v)})
-      node.removeAttribute(attrName as string)
+        ? (...v: any) => this.partsTogether(parts, context, node, ...v)
+        : (...v: any) => ({[attrName]: this.partsTogether(parts, context, node, ...v)})
+      node.removeAttribute(attrName)
       yield { [handler]: accessorFn }
     }
   }

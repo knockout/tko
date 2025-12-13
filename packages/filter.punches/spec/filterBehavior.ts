@@ -3,10 +3,11 @@ import {
   observable
 } from '@tko/observable'
 
+import type { KnockoutInstance } from '@tko/builder'
+
 import { filters } from '../dist'
 
-
-declare var ko : any
+declare var ko : KnockoutInstance
 /* can be remove https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array.isarray
 if (!Array.isArray) {
   Array.isArray = function (arg) {
@@ -129,7 +130,8 @@ describe('Text filters preprocessor', function () {
 
 /* Skip this since */
 xdescribe('Text filter bindings', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('Should convert input into appropriate output', function () {
     testNode.innerHTML = "<div data-bind='text: input | lowercase | fit:10 | json'></div>"

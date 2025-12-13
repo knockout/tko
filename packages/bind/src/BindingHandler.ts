@@ -2,8 +2,22 @@
 import { options } from '@tko/utils'
 import { isWriteableObservable } from '@tko/observable'
 import { LifeCycle } from '@tko/lifecycle'
+import type { BindingContext } from './bindingContext';
 
-export class BindingHandler<T = any> extends LifeCycle implements globalThis.BindingHandler {
+export type BindingHandlerControlsDescendant = { controlsDescendantBindings: boolean; }
+export type BindingHandlerAddBinding = (name: string, value: any) => void;
+
+// usage in applyBindings, BindingHandler, event, checked, options
+export interface AllBindings {
+    (): any;
+
+    get(name: string): any;
+    get<T = any>(name: string): T;
+
+    has(name: string): boolean;
+}
+
+export class BindingHandler<T = any> extends LifeCycle {
   after?: string[];
   init?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void | BindingHandlerControlsDescendant;
   update?: (element: any, valueAccessor: () => T, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void;
@@ -56,11 +70,11 @@ export class BindingHandler<T = any> extends LifeCycle implements globalThis.Bin
   */
   get bindingCompleted (): Promise<boolean> | boolean { return true };
 
-  static registerAs (name, provider = options.bindingProviderInstance) {
+  static registerAs (name: string, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
   }
 
-  static registerBindingHandler(handler: BindingHandler, name, provider = options.bindingProviderInstance) {
+  static registerBindingHandler(handler: BindingHandler, name: string, provider = options.bindingProviderInstance) {
     provider.bindingHandlers.set(name, handler)
   }
 }

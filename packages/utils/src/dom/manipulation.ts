@@ -62,7 +62,9 @@ export function setElementName (element : any, name: string) {
     // - http://www.matts411.com/post/setting_the_name_attribute_in_ie_dom/
   if ((ieVersion as any) <= 7) {
     try {
-      element.mergeAttributes(document.createElement("<input name='" + element.name + "'/>"), false)
+      const safeInput = document.createElement('input');
+      safeInput.name = element.name;
+      element.mergeAttributes(safeInput, false);
     } catch (e) {} // For IE9 with doc mode "IE9 Standards" and browser mode "IE9 Compatibility View"
   }
 }

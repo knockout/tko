@@ -20,9 +20,10 @@ import '@tko/utils/helpers/jasmine-13-helper'
 import { Provider } from '@tko/provider'
 
 describe('Binding: Text', function () {
-  var bindingHandlers
+  let bindingHandlers
 
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({

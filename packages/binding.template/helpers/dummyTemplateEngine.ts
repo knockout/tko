@@ -7,6 +7,7 @@ import {
     renderTemplate, anonymousTemplate, templateEngine
 } from '../dist';
 
+import type { BindingContext } from '@tko/bind';
 
 export function dummyTemplateEngine(templates?) {
     var inMemoryTemplates = templates || {};

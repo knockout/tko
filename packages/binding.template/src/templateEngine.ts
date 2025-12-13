@@ -27,6 +27,8 @@
 
 import { extend, options } from '@tko/utils'
 import { domElement, anonymousTemplate } from './templateSources'
+import type { TemplateSource } from './templateSources'
+import type { BindingContext } from '@tko/bind';
 
 export interface TemplateOptions<T = any> {
   afterRender?: (elements: Node[], dataItem: T) => void;
@@ -48,7 +50,7 @@ export interface TemplateEngine {
  rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
 }
 
-
+//TODO Class-Migration implements TemplateEngine
 export function templateEngine () { };
 
 extend(templateEngine.prototype, {

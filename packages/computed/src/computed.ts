@@ -26,6 +26,8 @@ import {
     LATEST_VALUE
 } from '@tko/observable'
 
+import type { Observable, Subscribable } from '@tko/observable'
+
 const computedState: symbol = createSymbolOrString('_state')
 const DISPOSED_STATE = {
   dependencyTracking: null,
@@ -37,6 +39,40 @@ const DISPOSED_STATE = {
   disposeWhenNodeIsRemoved: null,
   readFunction: null,
   _options: null
+}
+
+export interface Computed<T = any> extends ComputedFunctions<T> {
+  (): T;
+  (value: T): this;
+}
+
+export interface ComputedFunctions<T = any> extends Subscribable<T> {
+  // It's possible for a to be undefined, since the equalityComparer is run on the initial
+  // computation with undefined as the first argument. This is user-relevant for deferred computeds.
+  equalityComparer(a: T | undefined, b: T): boolean;
+  peek(): T;
+  dispose(): void;
+  isActive(): boolean;
+  getDependenciesCount(): number;
+  getDependencies(): Subscribable[];
+}
+
+// used in computed, but empty interface is pointless. Check if it's needed
+export interface PureComputed<T = any> extends Computed<T> { }
+
+export type ComputedReadFunction<T = any, TTarget = void> = Subscribable<T> | Observable<T> | Computed<T> | ((this: TTarget) => T);
+export type ComputedWriteFunction<T = any, TTarget = void> = (this: TTarget, val: T) => void;
+export type MaybeComputed<T = any> = T | Computed<T>;
+
+
+export interface ComputedOptions<T = any, TTarget = void> {
+  read?: ComputedReadFunction<T, TTarget>;
+  write?: ComputedWriteFunction<T, TTarget>;
+  owner?: TTarget;
+  pure?: boolean;
+  deferEvaluation?: boolean;
+  disposeWhenNodeIsRemoved?: Node;
+  disposeWhen?: () => boolean;
 }
 
 interface State {
@@ -167,7 +203,7 @@ export function computed(evaluatorFunctionOrOptions?: ComputedOptions<any, void>
     })
   }
 
-  return computedObservable as any;
+  return computedObservable as unknown as Computed;
 }
 
 // Utility function that disposes a given dependencyTracking entry

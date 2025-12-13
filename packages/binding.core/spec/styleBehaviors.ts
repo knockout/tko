@@ -19,7 +19,8 @@ import {bindings as coreBindings} from '../dist'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: CSS style', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new DataBindProvider()

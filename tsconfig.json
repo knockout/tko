@@ -1,7 +1,7 @@
 {
-  "compileOnSave": false,
-  "declaration": true,
+  "compileOnSave": false,  
   "compilerOptions": {
+    "declaration": true,
     "downlevelIteration": true,
     "target": "ES6",
     "module": "ES2015",

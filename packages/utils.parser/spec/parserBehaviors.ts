@@ -1,4 +1,5 @@
 /* eslint semi: 0 */
+import { assert } from "chai"
 
 import {
   options
@@ -9,6 +10,8 @@ import {
   unwrap,
   isObservable
 } from '@tko/observable';
+
+import type { Observable } from '@tko/observable'
 
 import {
   applyBindings
@@ -23,8 +26,6 @@ import {
 import {
   Parser
 } from '../dist';
-
-import { assert } from "chai"
 
 function ctxStub (ctx?) {
   return {
@@ -463,6 +464,15 @@ describe('unary operations', function () {
     assert.equal(bindings.neg(), 3)
   })
 
+  // it.skip('negates an expression eg !(a || b)', function () {
+  //     var binding = 'ne: !(a || b)',
+  //         context = { a: observable(true), b: observable(false) },
+  //         bindings = makeBindings(binding, context);
+  //     assert.equal(bindings.ne(), false)
+  //     context.a(false)
+  //     assert.equal(bindings.ne(), true)
+  // })
+
   describe('lambdas (=>)', function () {
     it('evaluates the expression when called', function () {
       var binding = 'x: => y(true)',
@@ -672,6 +682,15 @@ describe('anonymous functions', function () {
     function b () { new Parser(null, {}).parse(binding) }
     assert.throws(b, 'Anonymous functions are no longer')
   })
+ 
+  // it.skip('parses a function () { return v }', function () {
+  //   var binding = 'x: function () { return v() }',
+  //     val = observable(125),
+  //     context = { v: function () { return val(val() + 1) } },
+  //     bindings = makeBindings(binding, context);
+  //   assert.equal(typeof bindings.x()(), '126')
+  //   assert.equal(val(), 126);
+  // })
 })
 
 describe('array accessors - []', function () {
@@ -743,6 +762,18 @@ describe('array accessors - []', function () {
       bindings = makeBindings(binding, context);
     assert.deepEqual(bindings.neg(), [1, o, 'z', 'E', 'aOc'])
   })
+
+  it('unwraps Identifier/Expression contents'
+    , function () {
+        /*    var binding = "arr: [a, a && b]",
+                context = { a: observable(true), b: observable(false) },
+                bindings = makeBindings(binding, context);
+            assert.equal(bindings.arr()[0], true)
+            assert.equal(bindings.arr()[1], false)
+            context.b(true)
+            assert.equal(bindings.arr()[1], true) */
+        }
+  )
 
 })
 
@@ -949,6 +980,14 @@ describe('compound expressions', function () {
     expect_equal('u', undefined)
   })
 
+  // it.skip("throws 'missing'", function () {
+  //   /* It's up to the BindingContext instance to decide whether to
+  //      throw on a missing property */
+  //   assert.throws(function () {
+  //     new Parser(null).parse('v: missing', $context).v()
+  //   }, 'not found')
+  // })
+
   it("returns undefined when 'r' is not on u", function () {
     expect_equal('u.r', undefined) // undefined
     expect_equal('u.r.q', undefined) // undefined
@@ -1058,5 +1097,9 @@ describe('compound expressions', function () {
         '1i3'
       )
     })
+
+    // it.skip('calls functions with .bind', function () {
+    //   expect_deep_equal("B.bind('x')()", { self: 'x', args: [] })
+    // })
   })
 }); //  compound functions

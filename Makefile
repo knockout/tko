@@ -26,6 +26,9 @@ test:
 test-headless:
 	$(LERNA) exec --stream -- $(MAKE) test-headless
 
+test-headless-jquery:
+	$(LERNA) exec --stream -- $(MAKE) test-headless-jquery
+
 ci:
 	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
 
@@ -37,6 +40,9 @@ tsc:
 
 eslint:
 	$(NPX) eslint .
+	
+dts:
+	$(NPX) tsc --build tsconfig.dts.json
 
 docker-build:
 	$(DOCKER) build . --tag tko

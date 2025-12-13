@@ -22,7 +22,8 @@ import {bindings as templateBindings} from '@tko/binding.template'
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: With', function () {
-  beforeEach(jasmine.prepareTestNode)
+  let testNode : HTMLElement
+  beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
     var provider = new MultiProvider({
@@ -168,6 +169,12 @@ describe('Binding: With', function () {
   })
 
   it('Should be able to access all parent bindings when using "as"', async function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip with-as because createChildContextWithAs is enabled')
+      return;
+    }
+    
     testNode.innerHTML = `<div data-bind='with: topItem'>
         <div data-bind="with: middleItem, as: 'middle'">
             <div data-bind='with: middle.bottomItem'>
@@ -204,6 +211,12 @@ describe('Binding: With', function () {
   })
 
   it('Should not create a child context', function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip with-as because createChildContextWithAs is enabled')
+      return;
+    }
+    
     testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item.childProp'></span></div>"
     var someItem = { childProp: 'Hello' }
     applyBindings({ someItem: someItem }, testNode)
@@ -213,6 +226,12 @@ describe('Binding: With', function () {
   })
 
   it('Should provide access to observable value', function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip with-as because createChildContextWithAs is enabled')
+      return;
+    }
+    
     testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><input data-bind='value: item'/></div>"
     var someItem = observable('Hello')
     applyBindings({ someItem: someItem }, testNode)
@@ -231,6 +250,12 @@ describe('Binding: With', function () {
   })
 
   it('Should not re-render the nodes when an observable value changes', function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip with-as because createChildContextWithAs is enabled')
+      return;
+    }
+    
     testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item'></span></div>"
     var someItem = observable('first')
     applyBindings({ someItem }, testNode)
@@ -243,6 +268,12 @@ describe('Binding: With', function () {
   })
 
   it('Should remove nodes with an observable value become falsy', function () {
+    
+    if(options.createChildContextWithAs) {
+      console.log('Skip with-as because createChildContextWithAs is enabled')
+      return;
+    }
+    
     var someItem = observable(undefined)
     testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item().occasionallyExistentChildProp'></span></div>"
     applyBindings({ someItem: someItem }, testNode)

@@ -15,15 +15,15 @@ function unwrapOrCall (a, b) {
   return b
 }
 
-type OperatorFunction = (a: any, b: any, ...args: any[]) => any;
+export type OperatorFunction = (a: any, b: any, ...args: any[]) => any;
 
 
-interface OperatorWithProperties extends OperatorFunction{
+export interface OperatorWithProperties extends OperatorFunction{
   earlyOut?: (a: any) => any;
   precedence?:number;
 }
 
-interface Operators{
+export interface Operators{
   [key: string]:OperatorWithProperties;
 }
 const operators:Operators = {
@@ -52,6 +52,7 @@ const operators:Operators = {
   '>=': function ge (a, b) { return a >= b },
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
+  //    TODO: 'typeof': function (a, b) { return typeof b; },
   // equality
   '==': function equal (a, b) { return a == b },
   '!=': function ne (a, b) { return a != b },

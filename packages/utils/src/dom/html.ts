@@ -4,7 +4,6 @@
 import { stringTrim } from '../string'
 import { makeArray } from '../array'
 import { emptyDomNode, moveCleanedNodesToContainerElement } from './manipulation'
-import { jQueryInstance } from '../jquery'
 import { forceRefresh } from './fixes'
 import * as virtualElements from './virtualElements'
 import options from '../options'
@@ -36,14 +35,14 @@ var none = [0, '', ''],
   },
 
     // The canonical way to test that the HTML5 <template> tag is supported
-  supportsTemplateTag = options.document && 'content' in options.document.createElement('template')
+  supportsTemplateTag = options.useTemplateTag && options.document && 'content' in options.document.createElement('template')
 
 function getWrap (tags) {
-  const m = tags.match(/^(?:<!--.*?-->\s*?)*?<([a-z]+)[\s>]/)
+  const m = tags.match(/^(?:<!--[^]*?-->\s*?)*?<([a-z]+)[\s>]/)
   return (m && lookup[m[1]]) || none
 }
 
-function simpleHtmlParse (html: string, documentContext? : Document) {
+function simpleHtmlParse (html: string, documentContext? : Document) : Node[] {
   documentContext || (documentContext = document)
   var windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
 
@@ -56,7 +55,7 @@ function simpleHtmlParse (html: string, documentContext? : Document) {
     // (possibly a text node) in front of the comment. So, KO does not attempt to workaround this IE issue automatically at present.
 
     // Trim whitespace, otherwise indexOf won't work as expected
-  let div : any = documentContext.createElement('div')
+  let div : Element = documentContext.createElement('div')
   let tags = stringTrim(html).toLowerCase(),
     wrap = getWrap(tags),
     depth = wrap[0]
@@ -72,41 +71,29 @@ function simpleHtmlParse (html: string, documentContext? : Document) {
   } else {
     div.innerHTML = markup
   }
-
+  let n : ChildNode = div
     // Move to the right depth
-  while (depth--) { div = div.lastChild }
+  while (depth--) { n = n.lastChild! }
 
-  return makeArray(div.lastChild.childNodes)
+  return makeArray(n.lastChild!.childNodes)
 }
 
-function templateHtmlParse (html: string, documentContext? : Document): ChildNode[] {
+function templateHtmlParse (html: string, documentContext? : Document): Node[] {
   if (!documentContext) { documentContext = document }
   var template = documentContext.createElement('template') as HTMLTemplateElement
   template.innerHTML = html
   return makeArray(template.content.childNodes)
 }
 
-function jQueryHtmlParse (html: string, documentContext?: Document) {
-    // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
-  if (jQueryInstance.parseHTML) {
-    return jQueryInstance.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
-  } else {
-        // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-    var elems = (jQueryInstance as any).clean([html], documentContext)
+function jQueryHtmlParse (html: string, documentContext?: Document) : Node[] {
+  const jQuery = options.jQuery
 
-        // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
-        // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
-        // Fix this by finding the top-most dummy parent element, and detaching it from its owner fragment.
-    if (elems && elems[0]) {
-            // Find the top-most parent element that's a direct child of a document fragment
-      var elem = elems[0]
-      while (elem.parentNode && elem.parentNode.nodeType !== 11 /* i.e., DocumentFragment */) { elem = elem.parentNode }
-            // ... then detach it
-      if (elem.parentNode) { elem.parentNode.removeChild(elem) }
-    }
+  // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
+  if (jQuery) {
+    return jQuery.parseHTML(html, documentContext) || [] // Ensure we always return an array and never null
+  } 
 
-    return elems
-  }
+  return []
 }
 
 /**
@@ -119,17 +106,33 @@ function jQueryHtmlParse (html: string, documentContext?: Document) {
  * @param  {Document} documentContext That owns the executing code.
  * @return {[Node]}              Parsed DOM Nodes
  */
-export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {
-    // Prefer <template>-tag based HTML parsing.
+export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {  
+  validateHTMLInput(html)
+  // Prefer <template>-tag based HTML parsing.
+  //TODO: It is always true in modern browsers (higher IE11), so we can theoretically remove jQueryHtmlParse and simpleHtmlParse
   return supportsTemplateTag ? templateHtmlParse(html, documentContext)
 
         // Benefit from jQuery's on old browsers, where possible
         // NOTE: jQuery's HTML parsing fails on element names like tr-*.
         // See: https://github.com/jquery/jquery/pull/1988
-        : (jQueryInstance ? jQueryHtmlParse(html, documentContext)
+        : (options.jQuery ? jQueryHtmlParse(html, documentContext)
 
         // ... otherwise, this simple logic will do in most common cases.
         : simpleHtmlParse(html, documentContext))
+}
+
+const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/i;
+function validateHTMLInput(html: string) {  
+  if(!html)
+    return;
+  
+  if (options.templateSizeLimit > 0 && html.length > options.templateSizeLimit) {
+    throw new Error("Template is too long. Please configure the 'templateSizeLimit'")
+  }
+  
+  if(!options.allowScriptTagsInTemplates && scriptTagPattern.test(html)) {
+    throw new Error("Script-tag in template detected.")
+  }
 }
 
 export function parseHtmlForTemplateNodes (html, documentContext) {
@@ -152,26 +155,32 @@ export function setHtml (node : Node, html : Function | string) {
     // function, so we unwrap it.
   if (typeof html === 'function') {
     html = html()
-  }
+  } 
 
   if ((html !== null) && (html !== undefined)) {
-    if (typeof html !== 'string') { html = html.toString() }
+    if (typeof html !== 'string') { 
+      html = html.toString() 
+    }
 
-        // If the browser supports <template> tags, prefer that, as
-        // it obviates all the complex workarounds of jQuery.
-        //
-        // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
-        // for example <tr> elements which are not normally allowed to exist on their own.
-        // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
-    if (jQueryInstance && !supportsTemplateTag) {
-      jQueryInstance(node).html(html)
+    validateHTMLInput(html)
+    const jQuery = options.jQuery
+    // If the browser supports <template> tags, prefer that, as
+    // it obviates all the complex workarounds of jQuery.
+    //
+    // However, jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
+    // for example <tr> elements which are not normally allowed to exist on their own.
+    // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
+    if (jQuery && !supportsTemplateTag) {
+      jQuery(node).html(html)
     } else {
             // ... otherwise, use KO's own parsing logic.
       var parsedNodes : Node[]
-      if(node.ownerDocument)
+      if(node.ownerDocument) {
         parsedNodes = parseHtmlFragment(html, node.ownerDocument)
-      else
+      }
+      else {
         parsedNodes = parseHtmlFragment(html)
+      }
 
       if (node.nodeType === 8) {
         if (html === null) {
@@ -186,9 +195,10 @@ export function setHtml (node : Node, html : Function | string) {
   }
 }
 
-
-export function setTextContent (element: Node, textContent: MaybeSubscribable<string> ):void {
-  var value = typeof textContent === 'function' ? (textContent as () => string)() : textContent as string
+//TODO May be MaybeSubscribable<string> -> I actually don't want the dependency
+type TextContent = string | null | undefined | Function;
+export function setTextContent (element: Node, textContent?: TextContent):void {
+  var value = typeof textContent === 'function' ? (textContent as Function)() : textContent
   if ((value === null) || (value === undefined)) { value = '' }
 
     // We need there to be exactly one child: a text node.

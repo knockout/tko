@@ -14,15 +14,19 @@ import {
   isObservable, unwrap, observable
 } from '@tko/observable'
 
+import type { ObservableArray } from '@tko/observable'
+
 import {
   contextFor, applyBindingsToDescendants, AsyncBindingHandler
 } from '@tko/bind'
+
+import type { AllBindings } from '@tko/bind'
 
 //      Utilities
 const MAX_LIST_SIZE = 9007199254740991
 
 // from https://github.com/jonschlinkert/is-plain-object
-function isPlainObject (o): o is Object {
+function isPlainObject (o): o is Record<string, any> {
   return !!o && typeof o === 'object' && o.constructor === Object
 }
 
@@ -31,14 +35,24 @@ interface ChangeMap {
   deleted: any[]
 }
 
-interface ChangeAddItem{
-  status: 'added';
-  index: number;
-  isBatch?: boolean; // if true values else value
-  values?: any[];
-  value?: any;
+interface ChangeAddItemBase {
+  status: 'added'
+  index: number
 }
 
+interface ChangeAddBatchItem extends ChangeAddItemBase {
+  isBatch: true
+  values: any[]
+}
+
+interface ChangeAddOneItem extends ChangeAddItemBase {
+  isBatch?: false
+  value: any
+}
+
+type ChangeAddItem = 
+  | ChangeAddBatchItem
+  | ChangeAddOneItem
 
 const supportsDocumentFragment = options.document && typeof options.document.createDocumentFragment === 'function'
 
@@ -327,7 +341,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   // Process a changeItem with {status: 'added', ...}
   added (changeItem: ChangeAddItem) {
     var index = changeItem.index
-    var valuesToAdd = changeItem.isBatch ? changeItem.values! : [changeItem.value!]
+    var valuesToAdd = changeItem.isBatch ? changeItem.values : [changeItem.value]
     var referenceElement = this.getLastNodeBeforeIndex(index)
     // gather all childnodes for a possible batch insertion
     const allChildNodes: Node[] = []

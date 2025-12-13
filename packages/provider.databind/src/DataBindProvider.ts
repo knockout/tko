@@ -3,6 +3,8 @@ import {
    BindingStringProvider
  } from '@tko/provider.bindingstring'
 
+ import type { BindingContext } from '@tko/bind';
+
 export default class DataBindProvider extends BindingStringProvider {
   get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
 

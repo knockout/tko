@@ -3,8 +3,10 @@ import {
     registerEventHandler
 } from '@tko/utils'
 
+import type { BindingContext } from '@tko/bind'
+
 export var submit = {
-  init: function (element, valueAccessor, allBindings, viewModel, bindingContext: BindingContext) { // allBindings and viewModel not in use
+  init: function (element, valueAccessor, _allBindings, _viewModel, bindingContext: BindingContext) {
     if (typeof valueAccessor() !== 'function') { throw new Error('The value for a submit binding must be a function') }
     registerEventHandler(element, 'submit', function (event) {
       var handlerReturnValue

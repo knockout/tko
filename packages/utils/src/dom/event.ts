@@ -3,7 +3,6 @@
 //
 
 import { objectForEach } from '../object'
-import { jQueryInstance } from '../jquery'
 import { ieVersion } from '../ie'
 import { catchFunctionErrors } from '../error'
 
@@ -50,12 +49,10 @@ export function registerEventHandler (element: Element, eventType: string, handl
   const wrappedHandler = catchFunctionErrors(handler)
   const mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType]
   const mustUseNative = Boolean(eventOptions)
+  const jQuery = options.jQuery;
 
-  if (!options.useOnlyNativeEvents && !mustUseAttachEvent && !mustUseNative && jQueryInstance) {
-    if (!jQueryEventAttachName) {
-      jQueryEventAttachName = (typeof jQueryInstance(element).on === 'function') ? 'on' : 'bind'
-    }
-    jQueryInstance(element)[jQueryEventAttachName](eventType, wrappedHandler)
+  if (!options.useOnlyNativeEvents && !mustUseAttachEvent && !mustUseNative && jQuery) {    
+    jQuery(element).on(eventType, wrappedHandler)
   } else if (!mustUseAttachEvent && typeof element.addEventListener === 'function') {
     element.addEventListener(eventType, wrappedHandler, eventOptions)
   } else if (hasIEAttachEvents(element)) {
@@ -74,11 +71,11 @@ export function registerEventHandler (element: Element, eventType: string, handl
 }
 
 function hasClick(element:Element): element is Element & { click(): void} {
-  return typeof( element as any).click === 'function';
+  return typeof(element as any).click === 'function';
 }
 
 function hasFireEvent(element:Element): element is Element & { fireEvent(eventType: string): void } {
-  return typeof( element as any).click === 'function';
+  return typeof(element as any).click === 'function';
 }
 
 export function triggerEvent (element: Element, eventType: string): void {
@@ -90,8 +87,8 @@ export function triggerEvent (element: Element, eventType: string): void {
     // In both cases, we'll use the click method instead.
   var useClickWorkaround = isClickOnCheckableElement(element, eventType)
 
-  if (!options.useOnlyNativeEvents && jQueryInstance && !useClickWorkaround) {
-    jQueryInstance(element).trigger(eventType)
+  if (!options.useOnlyNativeEvents && options.jQuery && !useClickWorkaround) {
+    options.jQuery(element).trigger(eventType)
   } else if (typeof document.createEvent === 'function') {
     if (typeof element.dispatchEvent === 'function') {
       var eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'

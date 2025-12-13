@@ -3,14 +3,20 @@ import {
   Provider
 } from '@tko/provider'
 
+import type {
+  ProviderParamsInput
+} from '@tko/provider'
+
+import type { BindingContext } from '@tko/bind';
+
 export default class MultiProvider extends Provider {
   nodeTypes: any[]
-  nodeTypeMap: {}
+  nodeTypeMap: Record<string, any[]>
   providers: any[]
 
   get FOR_NODE_TYPES () { return this.nodeTypes }
 
-  constructor (params: ProviderParamsInput | null = null) {
+  constructor (params?: ProviderParamsInput | null) {
     super(params)
     const providers = params?.providers || []
     this.nodeTypeMap = {}

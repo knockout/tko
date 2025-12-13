@@ -8,6 +8,8 @@ import {
     unwrap
 } from '@tko/observable'
 
+import type { AllBindings, BindingContext } from '@tko/bind'
+
 // For certain common events (currently just 'click'), allow a simplified data-binding syntax
 // e.g. click:handler instead of the usual full-length event:{click:handler}
 export function makeEventHandlerShortcut (eventName) {

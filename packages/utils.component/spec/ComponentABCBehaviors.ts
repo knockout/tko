@@ -24,14 +24,15 @@ import {
 } from '@tko/utils/helpers/jasmine-13-helper'
 
 describe('ComponentABC', function () {
-  var testComponentName = 'test-component',
+  let testComponentName = 'test-component',
     testComponentBindingValue,
     testComponentParams,
     outerViewModel
-
+  let testNode : HTMLElement
+  
   beforeEach(function () {
     useMockForTasks(options)
-    jasmine.prepareTestNode()
+    testNode = jasmine.prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }

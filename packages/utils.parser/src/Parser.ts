@@ -832,7 +832,7 @@ export default class Parser {
       }
       return result
     } catch (e) {
-      options.onError(e as Error)
+      options.onError(e)
     }
   }
 

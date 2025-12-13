@@ -9,8 +9,18 @@ import {
 
 import BindingHandlerObject from './BindingHandlerObject'
 
+import type { BindingContext } from '@tko/bind';
+
+export interface ProviderParamsInput{
+  bindingHandlers?: BindingHandlerObject;
+  globals?:any;
+  attributesToSkip?:any;
+  attributesBindingMap?:any;
+  providers?:any[];
+}
+
 export default class Provider {
-  constructor (params: ProviderParamsInput | null = null) {
+  constructor (params?: ProviderParamsInput | null) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')
     }

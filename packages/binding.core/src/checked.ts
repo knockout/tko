@@ -11,6 +11,8 @@ import {
     computed, pureComputed
 } from '@tko/computed'
 
+import type { AllBindings } from '@tko/bind'
+
 export var checked = {
   after: ['value', 'attr'],
   init: function (element, valueAccessor, allBindings: AllBindings) {
@@ -77,7 +79,11 @@ export var checked = {
             elemValue = undefined
           }
         }
-        valueAccessor(elemValue, {onlyIfChanged: true})
+        // valueAccessor(elemValue, {onlyIfChanged: true})
+        const modelValue = valueAccessor(elemValue, {onlyIfChanged: true});
+        if (isWriteableObservable(modelValue) && (modelValue.peek() !== elemValue)) {
+          modelValue(elemValue);
+        }
       }
     };
 

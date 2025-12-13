@@ -1,18 +1,22 @@
 import { extend, options, domData, isObjectLike } from '@tko/utils'
+import type { KnockoutInstance } from '@tko/builder'
 
 import {
     pureComputed
 } from '@tko/computed'
 
 import {
-    unwrap, isObservable
+    unwrap, isObservable    
 } from '@tko/observable'
+
+import type { Observable } from '@tko/observable'
 
 import {
   contextAncestorBindingInfo
 } from './bindingEvent'
 
 import { BindingContextExtendCallback } from './applyBindings'
+
 
 export const boundElementDomDataKey = domData.nextKey()
 
@@ -25,9 +29,39 @@ export interface BindingContextSetting {
   exportDependencies?: boolean;
 }
 
+export interface BindingContext<T = any> {
+  ko: KnockoutInstance; 
+
+  [symbol: symbol]: any
+  $parent?: any;
+  $parents: any[];
+  $root: any;
+  $data: T;
+  $rawData: T | Observable<T>;
+  $index?: Observable<number>;
+  $parentContext?: BindingContext<any>;
+  // $componentTemplateNodes: any; added in makeChildBindingContext to context
+  // $componentTemplateSlotNodes; added in makeChildBindingContext to context
+
+  $component?: any;
+
+  extend(properties: object): BindingContext<T>;
+  extend(properties: (self: BindingContext<T>) => object): BindingContext<T>;
+
+  lookup (token: string, globals: any, node: any);
+
+  createChildContext(dataItemOrAccessor: any, dataItemAlias?: string, extendCallback?: Function, settings?: BindingContextSetting): BindingContext;
+  createStaticChildContext(dataItemOrAccessor: any, dataItemAlias: any): BindingContext;
+}
+
+// Interface for the factory method 'bindingContext', which creates and returns a typed instance of BindingContext<T>
+export interface bindingContext {
+  new <T = any>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting): BindingContext<T>;
+};
+
 // The bindingContext constructor is only called directly to create the root context. For child
 // contexts, use bindingContext.createChildContext or bindingContext.extend.
-export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback, settings?: BindingContextSetting) {
+export const bindingContext = function bindingContextFactory<T>(dataItemOrAccessor: any, parentContext?: BindingContext, dataItemAlias?: string, extendCallback?: BindingContextExtendCallback<T>, settings?: BindingContextSetting) {
   const self = this
   const shouldInheritData = dataItemOrAccessor === inheritParentIndicator
   const realDataItemOrAccessor = shouldInheritData ? undefined : dataItemOrAccessor
@@ -112,7 +146,7 @@ export function bindingContext(dataItemOrAccessor: any, parentContext?: BindingC
       self[contextSubscribeSymbol] = undefined
     }
   }
-}
+} as unknown as bindingContext;
 
 Object.assign(bindingContext.prototype, {
 
@@ -148,7 +182,7 @@ Object.assign(bindingContext.prototype, {
           // Extend the context hierarchy by setting the appropriate pointers
       self.$parentContext = parentContext
       self.$parent = parentContext?.$data
-      self.$parents = (parentContext?.$parents || []).slice(0)
+      self.$parents = (parentContext?.$parents ?? []).slice(0)
       self.$parents.unshift(self.$parent)
       if (extendCallback) {
         extendCallback(self)

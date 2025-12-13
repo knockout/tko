@@ -1,10 +1,11 @@
 import { Provider } from "@tko/provider";
+import type { KnockoutInstance } from "@tko/builder";
 
-interface CustomBindingGlobalProperties {
-  String;
-  isObservable;
+export interface CustomBindingGlobalProperties {
+  [customBindingName: string]: any;
 }
 
+export type BindingStringPreparsersFunction = (bindingString: string) => string;
 
 //
 // This becomes ko.options
@@ -12,46 +13,90 @@ interface CustomBindingGlobalProperties {
 //
 // This is the root 'options', which must be extended by others.
 export class Options {
-  [key: string]: any;
+  // The following options can be set on ko.options to make a function rewriting or something similar.
+  bindingStringPreparsers: BindingStringPreparsersFunction[] = []
+  
+  // Reference to the own knockout instance
+  knockoutInstance: KnockoutInstance | null = null
   
   deferUpdates: boolean = false
 
-  useOnlyNativeEvents: boolean = false
+  // Don't set this false, with jquery 3.7+
+  useOnlyNativeEvents: boolean = true 
+
+  // Use HTML5 <template> tags if is supported
+  useTemplateTag: boolean = true
 
   protoProperty: string = '__ko_proto__'
 
-    // Modify the default attribute from `data-bind`.
+  // Modify the default attribute from `data-bind`.
   defaultBindingAttribute: string = 'data-bind'
 
-    // Enable/disable <!-- ko binding: ... -> style bindings
+  // Enable/disable <!-- ko binding: ... -> style bindings
   allowVirtualElements: boolean = true
 
-
-    // Global variables that can be accessed from bindings.
+  // Global variables that can be accessed from bindings.
   bindingGlobals: Object & CustomBindingGlobalProperties = Object.create(null)
 
-    // An instance of the binding provider.
+  // An instance of the binding provider.
   bindingProviderInstance: Provider
 
   // Whether the `with` binding creates a child context when used with `as`.
   createChildContextWithAs: boolean = false
 
-    // jQuery will be automatically set to globalThis.jQuery in applyBindings
-    // if it is (strictly equal to) undefined.  Set it to false or null to
-    // disable automatically setting jQuery.
-  jQuery: any = globalThis.jQueryInstance
+  // jQuery will be automatically set to globalThis.jQuery in applyBindings
+  // if it is (strictly equal to) undefined.  Set it to true to
+  // disable automatically setting jQuery.
+  disableJQueryUsage: boolean = false;
+
+  get jQuery(): JQueryStatic | undefined {
+    if (this.disableJQueryUsage)
+      return;
+    return this._jQuery ?? (globalThis as any).jQuery;
+  }
+
+  private _jQuery: JQueryStatic | undefined;
+  /**
+   * Set jQuery manuall to be used by TKO. 
+   * @param jQuery If jQuery set to undefined, TKO will not use jQuery and this.disableJQueryUsage to true.
+   */
+  set jQuery(jQuery: JQueryStatic | undefined) {
+    if(!jQuery)
+    {
+      this.disableJQueryUsage = true
+      this._jQuery = undefined
+    } 
+    else 
+    {
+      this._jQuery = jQuery
+      this.disableJQueryUsage = false
+    }
+  }
 
   Promise: PromiseConstructor = globalThis.Promise
 
   taskScheduler: any = null
 
   debug: boolean = false
+  /**
+   * The maximum size of template to parse.
+   * Set to 0 to disable the limit.
+   */
+  templateSizeLimit: number = 4096
+
+  /**
+   * Whether or not to allow script tags in templates.
+   * If false, an error will be thrown if a script tag is detected in the template.
+   * It is not recommended to set this to true.
+   */
+  allowScriptTagsInTemplates: boolean = false
 
   global: any = globalThis
+
   document: Document = globalThis.document
 
-    // Filters for bindings
-    //   data-bind="expression | filter_1 | filter_2"
+  // Filters for bindings
+  //   data-bind="expression | filter_1 | filter_2"
   filters: any = {}
 
   // Used by the template binding.
@@ -59,21 +104,17 @@ export class Options {
 
   foreachHidesDestroyed: boolean = false
 
-  onError (e : Error) : void { throw e }
+  onError (e : any) : void { throw e }
 
-  set(name : string, value : any) : void {
+  set(name: string, value: any): void {
     this[name] = value
   }
 
   // Overload getBindingHandler to have a custom lookup function.
-  getBindingHandler (key : string) : any { return null; }
-  cleanExternalData (node : Node, callback? : Function) {}
+  getBindingHandler(key: string): any { return null; }
+  cleanExternalData(node: Node, callback?: Function) { }
 }
 
 const options = new Options()
-
-Object.defineProperty(options, '$', {
-  get: function () { return options.jQuery }
-})
 
 export default options

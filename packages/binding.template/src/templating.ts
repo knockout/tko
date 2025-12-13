@@ -13,15 +13,19 @@ import {
     computed
 } from '@tko/computed'
 
+import type { Computed } from '@tko/computed'
+
+import type { BindingContext } from '@tko/bind'
+
 import {
     isObservable, dependencyDetection, unwrap, observable, isObservableArray
 } from '@tko/observable'
 
 import {
-  TemplateEngine,
-    templateEngine,
-    TemplateOptions
+    templateEngine
 } from './templateEngine'
+
+import type { TemplateEngine, TemplateOptions } from './templateEngine'
 
 import {
   anonymousTemplate as AnonymousTemplate
@@ -240,7 +244,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
     bindingEvent.notify(targetNode, bindingEvent.childrenComplete)
   }
 
-  const shouldHideDestroyed = (options.includeDestroyed === false) || (koOptions.foreachHidesDestroyed && !options.includeDestroyed);
+  const shouldHideDestroyed = (options.includeDestroyed === false) || (koOptions.foreachHidesDestroyed && !options.includeDestroyed)
   if (!shouldHideDestroyed && !options.beforeRemove && isObservableArray(arrayOrObservableArray)) {
     localSetDomNodeChildrenFromArrayMapping(arrayOrObservableArray.peek())
     var subscription = arrayOrObservableArray.subscribe(function (changeList) {
@@ -256,7 +260,7 @@ export default function renderTemplateForEach (template, arrayOrObservableArray,
       if (shouldHideDestroyed) {
         // Filter out any entries marked as destroyed
         unwrappedArray = arrayFilter(unwrappedArray, function (item) {
-          return item === undefined || item === null || !unwrap(item._destroy);
+          return item === undefined || item === null || !unwrap(item._destroy)
         })
       }
       localSetDomNodeChildrenFromArrayMapping(unwrappedArray)
@@ -328,46 +332,46 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
     var value = this.value
     var options = unwrap(value)
     var shouldDisplay = true
-    let templateComputed: string | Computed<any> | null = null;
-    var elseChainSatisfied = domData.get(element, 'conditional').elseChainSatisfied;
-    var templateName;
+    let templateComputed: string | Computed<any> | null = null
+    var elseChainSatisfied = domData.get(element, 'conditional').elseChainSatisfied
+    var templateName
 
     if (typeof options === 'string') {
-      templateName = value;
-      options = {};
+      templateName = value
+      options = {}
     } else {
-      templateName = options.name;
+      templateName = options.name
 
       // Support "if"/"ifnot" conditions
       if ('if' in options) {
-        shouldDisplay = unwrap(options.if);
+        shouldDisplay = unwrap(options.if)
       }
 
       if (shouldDisplay && 'ifnot' in options) {
-        shouldDisplay = !unwrap(options.ifnot);
+        shouldDisplay = !unwrap(options.ifnot)
       }
     }
 
     if ('foreach' in options) {
       // Render once for each data point (treating data set as empty if shouldDisplay==false)
-      var dataArray = (shouldDisplay && options.foreach) || [];
-      templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding);
+      var dataArray = (shouldDisplay && options.foreach) || []
+      templateComputed = renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext, this.completeBinding)
 
-      elseChainSatisfied((unwrap(dataArray) || []).length !== 0);
+      elseChainSatisfied((unwrap(dataArray) || []).length !== 0)
     } else if (shouldDisplay) {
       // Render once for this single data point (or use the viewModel if no data was provided)
       var innerBindingContext = ('data' in options)
         ? bindingContext.createStaticChildContext(options.data, options.as)  // Given an explicit 'data' value, we create a child binding context for it
-        : bindingContext;                                                        // Given no explicit 'data' value, we retain the same binding context
-      templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding);
-      elseChainSatisfied(true);
+        : bindingContext                                                     // Given no explicit 'data' value, we retain the same binding context
+      templateComputed = renderTemplate(templateName || element, innerBindingContext, options, element, undefined, this.completeBinding)
+      elseChainSatisfied(true)
     } else {
-      virtualElements.emptyNode(element);
-      elseChainSatisfied(false);
+      virtualElements.emptyNode(element)
+      elseChainSatisfied(false)
     }
 
     // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
-    this.disposeOldComputedAndStoreNewOne(element, templateComputed);
+    this.disposeOldComputedAndStoreNewOne(element, templateComputed)
   }
 
   disposeOldComputedAndStoreNewOne (element, newComputed) {

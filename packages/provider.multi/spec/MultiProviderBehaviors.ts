@@ -1,9 +1,9 @@
 
+import { assert } from "chai"
+
 import {
   MultiProvider
 } from '../dist'
-
-import { assert } from "chai"
 
 describe('MultiProvider Behavior', function () {
   describe('nodeHasBindings', function () {

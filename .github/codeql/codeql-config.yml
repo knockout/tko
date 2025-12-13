@@ -1,0 +1,18 @@
+name: "CodeQL config"
+queries: 
+#  - name: Run custom queries
+#    uses: ./queries
+  - uses: security-and-quality
+paths-ignore:
+    - 'node_modules'
+    - '**/spec/*.ts'
+    - '**/*jasmine*.ts'
+    - 'builds'
+    - 'docs'
+    - 'tko.io'
+    - 'tools'
+query-filters:
+- exclude:
+    id:
+        - js/polynomial-redos
+        - js/redos

@@ -1,4 +1,3 @@
-
 function testOverwrite () {
   try {
     Object.defineProperty(function x () {}, 'length', {})
@@ -10,7 +9,7 @@ function testOverwrite () {
 
 export const functionSupportsLengthOverwrite = testOverwrite()
 
-export function overwriteLengthPropertyIfSupported (fn: Observable, descriptor) {
+export function overwriteLengthPropertyIfSupported (fn, descriptor) {
   if (functionSupportsLengthOverwrite) {
     Object.defineProperty(fn, 'length', descriptor)
   }
