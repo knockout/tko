@@ -78,7 +78,9 @@ function get (node: Node, key: string) {
 function set (node : Node, key : string, value : any) {
   // Make sure we don't actually create a new domData key if we are actually deleting a value
   var dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
-  dataForNode && (dataForNode[key] = value)
+  if (dataForNode) {
+    dataForNode[key] = value
+  }
 }
 
 function getOrSet (node : Node, key : string, value : any) {

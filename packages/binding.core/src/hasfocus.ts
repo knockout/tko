@@ -60,7 +60,7 @@ export var hasfocus = {
     var value = !!unwrap(valueAccessor())
 
     if (!element[hasfocusUpdatingProperty] && element[hasfocusLastValue] !== value) {
-      value ? element.focus() : element.blur()
+      if(value) { element.focus() } else { element.blur() }
 
             // In IE, the blur method doesn't always cause the element to lose focus (for example, if the window is not in focus).
             // Setting focus to the body element does seem to be reliable in IE, but should only be used if we know that the current
