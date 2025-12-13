@@ -38,6 +38,9 @@ lint:
 tsc:
 	$(NPX) tsc
 
+eslint:
+	$(NPX) eslint .
+	
 dts:
 	$(NPX) tsc --build tsconfig.dts.json
 
