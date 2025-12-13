@@ -381,7 +381,7 @@ describe('Dependent Observable', function () {
 
   it('Should describe itself as inactive if subsequent runs of the evaluator result in there being no dependencies', function () {
     const someObservable = observable('initial')
-    let shouldHaveDependency = true;    
+    let shouldHaveDependency = true    
     const computedInstance = computed(function () { if(shouldHaveDependency) someObservable() })
     expect(computedInstance.isActive()).toEqual(true)
 
