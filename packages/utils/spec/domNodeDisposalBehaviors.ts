@@ -7,9 +7,11 @@ import {
 import '../helpers/jasmine-13-helper'
 
 describe('DOM node disposal', function () {
-  let jQuery = options.jQuery
+
   let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  beforeEach(function() { 
+    testNode = jasmine.prepareTestNode()     
+  })
   afterEach(function () {
     otherNodeCleanerFunctions.length = 0
     otherNodeCleanerFunctions.push(cleanjQueryData)
@@ -186,7 +188,10 @@ describe('DOM node disposal', function () {
   })
 
   it('If jQuery is referenced, should clear jQuery data when a node is cleaned', function () {
-    if (typeof jQuery === 'undefined') {
+    const jQuery = options.jQuery
+
+    if (!jQuery) {
+      console.log('------- JQUERY is disabled -------')
       return // Nothing to test. Run the specs with jQuery referenced for this to do anything.
     }
 
@@ -199,7 +204,10 @@ describe('DOM node disposal', function () {
   })
 
   it('If jQuery is referenced, should be able to prevent jQuery data from being cleared by overwriting "cleanExternalData"', function () {
-    if (typeof jQuery === 'undefined') {
+    const jQuery = options.jQuery
+
+    if (!jQuery) {
+      console.log('------- JQUERY is disabled -------')
       return // Nothing to test. Run the specs with jQuery referenced for this to do anything.
     }
     otherNodeCleanerFunctions.length = 0

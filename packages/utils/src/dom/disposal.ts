@@ -5,7 +5,6 @@
 import * as domData from './data'
 import { default as options } from '../options'
 import {arrayRemoveItem, arrayIndexOf} from '../array'
-import {jQueryInstance} from '../jquery'
 
 var domDataKey = domData.nextKey()
 // Node types:
@@ -119,7 +118,7 @@ export function removeCleaner (fn: Function) {
 // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
 // so notify it to tear down any resources associated with the node & descendants here.
 export function cleanjQueryData (node: Node) {
-  var jQueryCleanNodeFn = jQueryInstance ? jQueryInstance.cleanData : null
+  var jQueryCleanNodeFn = options.jQuery ? options.jQuery.cleanData : null
 
   if (jQueryCleanNodeFn) {
     jQueryCleanNodeFn([node])

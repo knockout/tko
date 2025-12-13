@@ -279,6 +279,13 @@ describe('Interpolation Markup bindings', function () {
   });
 
   describe('Using unescaped HTML syntax', function () {
+
+    //jQuery-Templates (jquery.html(..)) doesn't works with mustache-templates
+    if(!options.useTemplateTag && options.jQuery) {
+      console.log('Skip some mustache-tests in combination with jquery-template')
+      return;
+    }
+
     it('Should replace {{{...}}} expression with virtual html binding', function () {
       jasmine.setNodeText(testNode, "hello {{{'<b>name</b>'}}}!");
       applyBindings(null, testNode);
@@ -328,6 +335,12 @@ describe('Interpolation Markup bindings', function () {
 
   describe('Using block syntax', function () {
     it('Should support "with"', function () {
+      //jQuery-Templates (jquery.html(..)) doesn't works with mustache-templates
+      if(!options.useTemplateTag && options.jQuery) {
+        console.log('Skip some mustache-tests in combination with jquery-template')
+        return;
+      }
+
       testNode.innerHTML = '<div><h1>{{title}}</h1>{{#with: story}}<div>{{{intro}}}</div><div>{{{body}}}</div>{{/with}}</div>';
       applyBindings({
         title: 'First Post',

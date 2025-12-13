@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         node-version: [22.x]
+        jquery: ['off','on']
 
     steps:
       - name: Checkout code
@@ -31,5 +32,10 @@ jobs:
       - name: Run Build
         run: make
 
-      - name: Run Test-Headless
+      - name: Run Test-Headless (without JQuery)
+        if: "contains(${{ matrix.jquery }}, 'off')"
         run: make test-headless
+
+      - name: Run Test-Headless (with JQuery)
+        if: "contains(${{matrix.jquery }}, 'on')"
+        run: make test-headless-jquery
