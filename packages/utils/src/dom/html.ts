@@ -108,17 +108,20 @@ function jQueryHtmlParse (html: string, documentContext?: Document) : Node[] {
  */
 export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {  
   validateHTMLInput(html)
+
   // Prefer <template>-tag based HTML parsing.
+  if(supportsTemplateTag)
+    return templateHtmlParse(html, documentContext)
+
   //TODO: It is always true in modern browsers (higher IE11), so we can theoretically remove jQueryHtmlParse and simpleHtmlParse
-  return supportsTemplateTag ? templateHtmlParse(html, documentContext)
-
-        // Benefit from jQuery's on old browsers, where possible
-        // NOTE: jQuery's HTML parsing fails on element names like tr-*.
-        // See: https://github.com/jquery/jquery/pull/1988
-        : (options.jQuery ? jQueryHtmlParse(html, documentContext)
-
-        // ... otherwise, this simple logic will do in most common cases.
-        : simpleHtmlParse(html, documentContext))
+  if(options.jQuery) {
+    // Benefit from jQuery's on old browsers, where possible
+    // NOTE: jQuery's HTML parsing fails on element names like tr-*.
+    // See: https://github.com/jquery/jquery/pull/1988
+    return jQueryHtmlParse(html, documentContext)
+  }
+  
+  return simpleHtmlParse(html, documentContext)
 }
 
 const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/i;
