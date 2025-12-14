@@ -28,7 +28,7 @@ import registry from '@tko/utils.component'
 
 import type { BindingContext } from '@tko/bind';
 
-var componentLoadingOperationUniqueId = 0
+let componentLoadingOperationUniqueId = 0
 
 export default class ComponentBinding extends DescendantBindingHandler {
   childBindingContext: BindingContext;

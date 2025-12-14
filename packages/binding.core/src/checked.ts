@@ -16,7 +16,7 @@ import type { AllBindings } from '@tko/bind'
 export var checked = {
   after: ['value', 'attr'],
   init: function (element, valueAccessor, allBindings: AllBindings) {
-    var checkedValue = pureComputed(function () {
+    let checkedValue = pureComputed(function () {
       // Treat "value" like "checkedValue" when it is included with "checked" binding
       if (allBindings.has('checkedValue')) {
         return unwrap(allBindings.get('checkedValue'))
@@ -32,7 +32,7 @@ export var checked = {
     function updateModel () {
       // This updates the model value from the view value.
       // It runs in response to DOM events (click) and changes in checkedValue.
-      var isChecked = element.checked,
+      let isChecked = element.checked,
         elemValue = checkedValue()
 
       // When we're first setting up this computed, don't change any model state.
@@ -47,9 +47,9 @@ export var checked = {
         return
       }
 
-      var modelValue = dependencyDetection.ignore(valueAccessor)
+      let modelValue = dependencyDetection.ignore(valueAccessor)
       if (valueIsArray) {
-        var writableValue = rawValueIsNonArrayObservable ? modelValue.peek() : modelValue,
+        let writableValue = rawValueIsNonArrayObservable ? modelValue.peek() : modelValue,
           saveOldValue = oldElemValue
         oldElemValue = elemValue
 
@@ -91,7 +91,7 @@ export var checked = {
             // This updates the view value from the model value.
             // It runs in response to changes in the bound (checked) value.
       var modelValue = modelValue = unwrap(valueAccessor())
-      var elemValue = checkedValue()
+      let elemValue = checkedValue()
 
       if (valueIsArray) {
                 // When a checkbox is bound to an array, being checked represents its value being present in that array

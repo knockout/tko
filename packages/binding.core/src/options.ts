@@ -8,7 +8,7 @@ import {
 import { unwrap, dependencyDetection } from '@tko/observable'
 import { setDomNodeChildrenFromArrayMapping } from '@tko/bind'
 import type { AllBindings } from '@tko/bind'
-var captionPlaceholder = {}
+let captionPlaceholder = {}
 
 export var options = {
   init: function (element) {
@@ -27,7 +27,7 @@ export var options = {
       return arrayFilter(element.options, function (node) { return node.selected })
     }
 
-    var selectWasPreviouslyEmpty = element.length == 0,
+    let selectWasPreviouslyEmpty = element.length == 0,
       multiple = element.multiple,
       previousScrollTop = (!selectWasPreviouslyEmpty && multiple) ? element.scrollTop : null,
       unwrappedArray = unwrap(valueAccessor()),
@@ -68,7 +68,7 @@ export var options = {
     }
 
     function applyToObject (object, predicate, defaultValue) {
-      var predicateType = typeof predicate
+      let predicateType = typeof predicate
       if (predicateType === 'function')    // Given a function; run it against the data value
               { return predicate(object) } else if (predicateType == 'string') // Given a string; treat it as a property name on the data value
               { return object[predicate] } else                                // Given no optionsText arg; use the data value itself
@@ -79,23 +79,23 @@ export var options = {
         // The first is when the whole array is being updated directly from this binding handler.
         // The second is when an observable value for a specific array entry is updated.
         // oldOptions will be empty in the first case, but will be filled with the previously generated option in the second.
-    var itemUpdate = false
+    let itemUpdate = false
     function optionForArrayItem (arrayEntry, index, oldOptions) {
       if (oldOptions.length) {
         previousSelectedValues = !valueAllowUnset && oldOptions[0].selected ? [ selectExtensions.readValue(oldOptions[0]) ] : []
         itemUpdate = true
       }
-      var option = element.ownerDocument.createElement('option')
+      let option = element.ownerDocument.createElement('option')
       if (arrayEntry === captionPlaceholder) {
         setTextContent(option, allBindings.get('optionsCaption'))
         selectExtensions.writeValue(option, undefined)
       } else {
                 // Apply a value to the option element
-        var optionValue = applyToObject(arrayEntry, allBindings.get('optionsValue'), arrayEntry)
+        let optionValue = applyToObject(arrayEntry, allBindings.get('optionsValue'), arrayEntry)
         selectExtensions.writeValue(option, unwrap(optionValue))
 
                 // Apply some text to the option element
-        var optionText = applyToObject(arrayEntry, allBindings.get('optionsText'), optionValue)
+        let optionText = applyToObject(arrayEntry, allBindings.get('optionsText'), optionValue)
         setTextContent(option, optionText)
       }
       return [option]
@@ -116,7 +116,7 @@ export var options = {
       } else if (previousSelectedValues.length) {
                 // IE6 doesn't like us to assign selection to OPTION nodes before they're added to the document.
                 // That's why we first added them without selection. Now it's time to set the selection.
-        var isSelected = arrayIndexOf(previousSelectedValues, selectExtensions.readValue(newOptions[0])) >= 0
+        let isSelected = arrayIndexOf(previousSelectedValues, selectExtensions.readValue(newOptions[0])) >= 0
         setOptionNodeSelectionState(newOptions[0], isSelected)
 
                 // If this option was changed from being selected during a single-item update, notify the change
@@ -126,7 +126,7 @@ export var options = {
       }
     }
 
-    var callback = setSelectionCallback
+    let callback = setSelectionCallback
     if (allBindings['has']('optionsAfterRender') && typeof allBindings.get('optionsAfterRender') === 'function') {
       callback = function (arrayEntry, newOptions) {
         setSelectionCallback(arrayEntry, newOptions)
@@ -142,7 +142,7 @@ export var options = {
         selectExtensions.writeValue(element, unwrap(allBindings.get('value')), true /* allowUnset */)
       } else {
                 // Determine if the selection has changed as a result of updating the options list
-        var selectionChanged
+        let selectionChanged
         if (multiple) {
                     // For a multiple-select box, compare the new selection count to the previous one
                     // But if nothing was selected before, the selection can't have changed

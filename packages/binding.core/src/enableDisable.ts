@@ -5,7 +5,7 @@ import {
 
 export var enable = {
   update: function (element, valueAccessor) {
-    var value = unwrap(valueAccessor())
+    let value = unwrap(valueAccessor())
     if (value && element.disabled) {
       element.removeAttribute('disabled')
     } else if ((!value) && (!element.disabled)) {

@@ -85,7 +85,7 @@ export class value extends BindingHandler {
     // The syntax "after<eventname>" means "run the handler asynchronously after the event"
     // This is useful, for example, to catch "keydown" events after the browser has updated the control
     // (otherwise, selectExtensions.readValue(this) will receive the control's value *before* the key event)
-    var handler = this.valueUpdateHandler.bind(this)
+    let handler = this.valueUpdateHandler.bind(this)
     if (stringStartsWith(eventName, 'after')) {
       handler = () => {
         // The elementValueBeforeEvent variable is non-null *only* during the brief gap between
@@ -105,7 +105,7 @@ export class value extends BindingHandler {
 
   updateFromModelForFile () {
     // For file input elements, can only write the empty string
-    var newValue = unwrap(this.value)
+    let newValue = unwrap(this.value)
     if (newValue === null || newValue === undefined || newValue === '') {
       this.$element.value = ''
     } else {
@@ -115,8 +115,8 @@ export class value extends BindingHandler {
 
   updateFromModelForValue () {
     const element = this.$element
-    var newValue = unwrap(this.value)
-    var elementValue = selectExtensions.readValue(element)
+    let newValue = unwrap(this.value)
+    let elementValue = selectExtensions.readValue(element)
 
     if (this.elementValueBeforeEvent !== null && newValue === this.elementValueBeforeEvent) {
       safeSetTimeout(this.updateFromModel.bind(this), 0)

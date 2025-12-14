@@ -41,7 +41,7 @@ const keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 }
  */
 export default function parseObjectLiteral (objectLiteralString) {
   // Trim leading and trailing spaces from the string
-  var str = stringTrim(objectLiteralString)
+  let str = stringTrim(objectLiteralString)
 
   // Trim braces '{' surrounding the whole object literal
   if (str.charCodeAt(0) === 123) str = str.slice(1, -1)
@@ -51,16 +51,16 @@ export default function parseObjectLiteral (objectLiteralString) {
   str += '\n,'
 
   // Split into tokens
-  var result = new Array()
-  var toks = str.match(bindingToken)
-  var key
-  var values = new Array()
-  var depth = 0
+  let result = new Array()
+  let toks = str.match(bindingToken)
+  let key
+  let values = new Array()
+  let depth = 0
 
   if (toks.length <= 1) { return [] }
 
   for (var i = 0, tok; tok = toks[i]; ++i) {
-    var c = tok.charCodeAt(0)
+    let c = tok.charCodeAt(0)
     // A comma signals the end of a key/value pair if depth is zero
     if (c === 44) { // ","
       if (depth <= 0) {
@@ -86,7 +86,7 @@ export default function parseObjectLiteral (objectLiteralString) {
       continue
     } else if (c === 47 && i && tok.length > 1) { // "/"
       // Look at the end of the previous token to determine if the slash is actually division
-      var match = toks[i - 1].match(divisionLookBehind)
+      let match = toks[i - 1].match(divisionLookBehind)
       if (match && !keywordRegexLookBehind[match[0]]) {
         // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
         str = str.substr(str.indexOf(tok) + 1)
