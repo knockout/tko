@@ -10,7 +10,7 @@ import { setDomNodeChildrenFromArrayMapping } from '@tko/bind'
 import type { AllBindings } from '@tko/bind'
 let captionPlaceholder = {}
 
-export var options = {
+export const options = {
   init: function (element) {
     if (tagNameLower(element) !== 'select') { throw new Error('options binding applies only to SELECT elements') }
 

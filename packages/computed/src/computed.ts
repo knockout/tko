@@ -504,7 +504,7 @@ computed.fn = {
   }
 }
 
-var pureComputedOverrides = {
+const pureComputedOverrides = {
   beforeSubscriptionAdd (event: string) {
         // If asleep, wake up the computed by subscribing to any dependencies.
     let computedObservable = this,
@@ -574,7 +574,7 @@ var pureComputedOverrides = {
   }
 }
 
-var deferEvaluationOverrides = {
+const deferEvaluationOverrides = {
   beforeSubscriptionAdd (event) {
         // This will force a computed with deferEvaluation to evaluate when the first subscription is registered.
     if (event === 'change' || event === 'beforeChange') {

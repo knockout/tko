@@ -13,7 +13,7 @@ import {
 
 import type { AllBindings } from '@tko/bind'
 
-export var checked = {
+export const checked = {
   after: ['value', 'attr'],
   init: function (element, valueAccessor, allBindings: AllBindings) {
     let checkedValue = pureComputed(function () {
@@ -90,7 +90,7 @@ export var checked = {
     function updateView () {
             // This updates the view value from the model value.
             // It runs in response to changes in the bound (checked) value.
-      var modelValue = modelValue = unwrap(valueAccessor())
+      const modelValue = unwrap(valueAccessor())
       let elemValue = checkedValue()
 
       if (valueIsArray) {
@@ -134,7 +134,7 @@ export var checked = {
   }
 }
 
-export var checkedValue = {
+export const checkedValue = {
   update: function (element, valueAccessor) {
     element.value = unwrap(valueAccessor())
   }
