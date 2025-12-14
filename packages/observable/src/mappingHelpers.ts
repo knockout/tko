@@ -26,7 +26,7 @@ export function toJSON<T = any>(rootObject: T, replacer?: (key: string, value: a
   return JSON.stringify(plainJavaScriptObject, replacer, space)
 }
 
-function mapJsObjectGraph<T = any>(rootObject: T, mapInputCallback: (value: any) => any, visitedObjects = new Map()): any {
+function mapJsObjectGraph<T = any>(rootObject: T | undefined, mapInputCallback: (value: any) => any, visitedObjects = new Map()): any {
   rootObject = mapInputCallback(rootObject)
   var canHaveProperties = (typeof rootObject === 'object') && (rootObject !== null) && (rootObject !== undefined) && (!(rootObject instanceof RegExp)) && (!(rootObject instanceof Date)) && (!(rootObject instanceof String)) && (!(rootObject instanceof Number)) && (!(rootObject instanceof Boolean))
   if (!canHaveProperties) {
@@ -37,7 +37,7 @@ function mapJsObjectGraph<T = any>(rootObject: T, mapInputCallback: (value: any)
   visitedObjects.set(rootObject, outputProperties)
 
   visitPropertiesOrArrayEntries(rootObject, function (indexer: any) {
-    var propertyValue = mapInputCallback(rootObject[indexer])
+    var propertyValue = mapInputCallback(rootObject![indexer])
 
     switch (typeof propertyValue) {
       case 'boolean':
