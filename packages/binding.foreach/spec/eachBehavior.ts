@@ -46,6 +46,11 @@ beforeEach(function () {
   provider.bindingHandlers.set(coreBindings)
   provider.bindingHandlers.set({ foreach: ForEachBinding })
   // provider.bindingHandlers.set(ifBindings);
+
+  // flooding the test-logs with sanitization is not useful
+  options.sanitizeHtmlTemplate = function(html: string) {
+      return html
+  }
 })
 
 beforeEach(function () {

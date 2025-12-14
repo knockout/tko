@@ -189,3 +189,26 @@ jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMil
       this.runFunctionsWithinRange(oldMillis, nowMillis);
   }
 };
+
+beforeEach(function() {
+    switchJQueryState();
+
+    // flooding the test-logs with sanitization is not useful
+    ko.options.sanitizeHtmlTemplate = function(html) {
+        return html
+    }
+});
+
+afterEach(function() {
+    expect(disableJQueryUsage).toEqual(ko.options.disableJQueryUsage);
+})
+
+const KARMA_STRING = '__karma__'
+var disableJQueryUsage = true;
+function switchJQueryState() {
+    if (window[KARMA_STRING] && window[KARMA_STRING].config.args.includes('--noJQuery')) {
+        ko.options.disableJQueryUsage = disableJQueryUsage = true;
+    } else {
+        ko.options.disableJQueryUsage = disableJQueryUsage = false;
+    }
+}

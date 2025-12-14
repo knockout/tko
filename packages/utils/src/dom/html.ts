@@ -107,27 +107,27 @@ function jQueryHtmlParse (html: string, documentContext?: Document) : Node[] {
  * @return {[Node]}              Parsed DOM Nodes
  */
 export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {  
-  validateHTMLInput(html)
+  const saferHtml = validateHTMLInput(html)
 
   // Prefer <template>-tag based HTML parsing.
   if(supportsTemplateTag)
-    return templateHtmlParse(html, documentContext)
+    return templateHtmlParse(saferHtml, documentContext)
 
   //TODO: It is always true in modern browsers (higher IE11), so we can theoretically remove jQueryHtmlParse and simpleHtmlParse
   if(options.jQuery) {
     // Benefit from jQuery's on old browsers, where possible
     // NOTE: jQuery's HTML parsing fails on element names like tr-*.
     // See: https://github.com/jquery/jquery/pull/1988
-    return jQueryHtmlParse(html, documentContext)
+    return jQueryHtmlParse(saferHtml, documentContext)
   }
   
-  return simpleHtmlParse(html, documentContext)
+  return simpleHtmlParse(saferHtml, documentContext)
 }
 
 const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/i;
-function validateHTMLInput(html: string) {  
+function validateHTMLInput(html: string) : string  {  
   if(!html)
-    return;
+    return '';
   
   if (options.templateSizeLimit > 0 && html.length > options.templateSizeLimit) {
     throw new Error("Template is too long. Please configure the 'templateSizeLimit'")
@@ -135,7 +135,9 @@ function validateHTMLInput(html: string) {
   
   if(!options.allowScriptTagsInTemplates && scriptTagPattern.test(html)) {
     throw new Error("Script-tag in template detected.")
-  }
+  }  
+
+  return options.sanitizeHtmlTemplate(html);
 }
 
 export function parseHtmlForTemplateNodes (html, documentContext) {
