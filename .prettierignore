@@ -12,3 +12,6 @@ tko.io
 package.json
 package-lock.json
 .github/**
+*.json
+*.md
+*.config.js

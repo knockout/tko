@@ -33,6 +33,9 @@ ci:
 	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
 
 format:
+	$(NPX) prettier . --check
+
+format-fix:
 	$(NPX) prettier . --write
 
 tsc:

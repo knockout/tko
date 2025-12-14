@@ -52,7 +52,7 @@
     "karma-sinon": "^1.0.5",
     "lerna": "^9.0.3",
     "mocha": "^11.0.1",
-    "prettier": "^3.5.1",
+    "prettier": "^3.7.4",
     "sinon": "^19.0.2",
     "typescript-eslint": "^8.23.0",
     "typescript": "^5.9.3"
