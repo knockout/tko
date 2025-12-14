@@ -22,8 +22,8 @@ import options from '../options'
 
 let commentNodesHaveTextProperty = options.document && ("text" in options.document.createComment('test')) //in case of IE8..
 
-export var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/
-export var endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
+export const startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/
+export const endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
 let htmlTagsWithOptionallyClosingChildren = { 'ul': true, 'ol': true }
 
 export function isStartComment (node) {
@@ -98,8 +98,8 @@ export interface VirtualElementsAllowedBindings {
   component: boolean;
 }
 
-export var allowedBindings : VirtualElementsAllowedBindings = Object.create(null)
-export var hasBindingValue = isStartComment
+export let allowedBindings : VirtualElementsAllowedBindings = Object.create(null)
+export let hasBindingValue = isStartComment
 
 export function childNodes (node : Node) : any {
   return isStartComment(node) ? getVirtualChildren(node) : node.childNodes

@@ -107,7 +107,7 @@ export var checked = {
       }
     };
 
-    var isCheckbox = element.type == 'checkbox',
+    const isCheckbox = element.type == 'checkbox',
       isRadio = element.type == 'radio'
 
         // Only bind to check boxes and radio buttons
@@ -115,7 +115,7 @@ export var checked = {
       return
     }
 
-    var rawValue = valueAccessor(),
+    let rawValue = valueAccessor(),
       valueIsArray = isCheckbox && (unwrap(rawValue) instanceof Array),
       rawValueIsNonArrayObservable = !(valueIsArray && rawValue.push && rawValue.splice),
       useElementValue = isRadio || valueIsArray,

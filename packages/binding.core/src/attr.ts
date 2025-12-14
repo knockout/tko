@@ -9,7 +9,7 @@ import {
 
 import type { AllBindings } from '@tko/bind'
 
-export var attr = {
+export const attr = {
   update: function (element, valueAccessor, _allBindings: AllBindings) {
     let value = unwrap(valueAccessor()) || {}
     objectForEach(value, function (attrName, attrValue) {

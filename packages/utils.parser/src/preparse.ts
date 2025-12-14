@@ -59,7 +59,7 @@ export default function parseObjectLiteral (objectLiteralString) {
 
   if (toks.length <= 1) { return [] }
 
-  for (var i = 0, tok; tok = toks[i]; ++i) {
+  for (let i = 0, tok; tok = toks[i]; ++i) {
     let c = tok.charCodeAt(0)
     // A comma signals the end of a key/value pair if depth is zero
     if (c === 44) { // ","
