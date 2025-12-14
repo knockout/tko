@@ -43,7 +43,7 @@ function getWrap (tags) {
 }
 
 function simpleHtmlParse (html: string, documentContext? : Document) : Node[] {
-  documentContext || (documentContext = document)
+  if (!documentContext) { documentContext = document }
   var windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
 
     // Based on jQuery's "clean" function, but only accounting for table-related elements.

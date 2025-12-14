@@ -361,7 +361,7 @@ function applyBindingsToNodeInternal<T>(node: Node, sourceBindings: Record<strin
  * @param {Object} bindings
  * @param {[Promise]} nodeAsyncBindingPromises
  */
-function triggerDescendantsComplete (node : Node, bindings : Object, nodeAsyncBindingPromises : Set<Promise<any>>) {
+function triggerDescendantsComplete (node : Node, bindings : object, nodeAsyncBindingPromises : Set<Promise<any>>) {
   /** descendantsComplete ought to be an instance of the descendantsComplete
     *  binding handler. */
   const hasBindingHandler = bindingEvent.descendantsComplete in bindings

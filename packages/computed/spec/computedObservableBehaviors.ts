@@ -380,9 +380,9 @@ describe('Dependent Observable', function () {
   })
 
   it('Should describe itself as inactive if subsequent runs of the evaluator result in there being no dependencies', function () {
-    var someObservable = observable('initial'),
-      shouldHaveDependency = true,
-      computedInstance = computed(function () { shouldHaveDependency && someObservable() })
+    const someObservable = observable('initial')
+    let shouldHaveDependency = true    
+    const computedInstance = computed(function () { if(shouldHaveDependency) someObservable() })
     expect(computedInstance.isActive()).toEqual(true)
 
         // Trigger a refresh
@@ -392,10 +392,10 @@ describe('Dependent Observable', function () {
   })
 
   it('Should be inactive if it depends on an inactive computed', function () {
-    var someObservable = observable('initial'),
-      shouldHaveDependency = true,
-      computed1 = computed(function () { shouldHaveDependency && someObservable() }),
-      computed2 = computed(computed1)
+    const someObservable = observable('initial')
+    let shouldHaveDependency = true
+    const computed1 = computed(function () { if(shouldHaveDependency) someObservable() })
+    const computed2 = computed(computed1)
     expect(computed2.isActive()).toEqual(true)
 
         // Trigger a refresh
