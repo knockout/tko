@@ -13,11 +13,15 @@ export var selectExtensions = {
   readValue: function (element : HTMLElement) {
     switch (tagNameLower(element)) {
       case 'option':
-        if (element[hasDomDataExpandoProperty] === true) { return domData.get(element, selectExtensions.optionValueDomDataKey) }
-        return (element as HTMLOptionElement).value
+        {
+          if (element[hasDomDataExpandoProperty] === true) { return domData.get(element, selectExtensions.optionValueDomDataKey) }
+          return (element as HTMLOptionElement).value
+        }
       case 'select':
-        const selectElement = element as HTMLSelectElement
-        return selectElement.selectedIndex >= 0 ? selectExtensions.readValue(selectElement.options[selectElement.selectedIndex]) : undefined
+        {
+          const selectElement = element as HTMLSelectElement
+          return selectElement.selectedIndex >= 0 ? selectExtensions.readValue(selectElement.options[selectElement.selectedIndex]) : undefined
+        }
       default:
         return (element as HTMLInputElement).value
     }
@@ -43,28 +47,30 @@ export var selectExtensions = {
 
         break
       case 'select':
-        if (value === '' || value === null) {
-          // A blank string or null value will select the caption
-          value = undefined
-        }
-        var selection = -1
-
-        const selectElement = element as HTMLSelectElement
-
-        for (let i = 0, n = selectElement.options.length, optionValue; i < n; ++i) {
-          optionValue = selectExtensions.readValue(selectElement.options[i])
-          // Include special check to handle selecting a caption with a blank string value
-          // Note that the looser == check here is intentional so that integer model values will match string element values.
-          const strictEqual = optionValue === value
-          const blankEqual = optionValue === '' && value === undefined
-          const numericEqual = typeof value === 'number' && Number(optionValue) === value
-          if (strictEqual || blankEqual || numericEqual) {
-            selection = i
-            break
+        {
+          if (value === '' || value === null) {
+            // A blank string or null value will select the caption
+            value = undefined
           }
-        }
-        if (allowUnset || selection >= 0 || (value === undefined && selectElement.size > 1)) {
-          selectElement.selectedIndex = selection
+          var selection = -1
+
+          const selectElement = element as HTMLSelectElement
+
+          for (let i = 0, n = selectElement.options.length, optionValue; i < n; ++i) {
+            optionValue = selectExtensions.readValue(selectElement.options[i])
+            // Include special check to handle selecting a caption with a blank string value
+            // Note that the looser == check here is intentional so that integer model values will match string element values.
+            const strictEqual = optionValue === value
+            const blankEqual = optionValue === '' && value === undefined
+            const numericEqual = typeof value === 'number' && Number(optionValue) === value
+            if (strictEqual || blankEqual || numericEqual) {
+              selection = i
+              break
+            }
+          }
+          if (allowUnset || selection >= 0 || (value === undefined && selectElement.size > 1)) {
+            selectElement.selectedIndex = selection
+          }
         }
         break
       default:

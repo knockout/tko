@@ -92,7 +92,8 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  getBindingAccessors (node: Element, context?: {}) {
+  getBindingAccessors (node: Element, context?) {
+    if(context === undefined) context = {}
     return Object.assign({}, ...this.bindingObjects(node, context))
   }
 }

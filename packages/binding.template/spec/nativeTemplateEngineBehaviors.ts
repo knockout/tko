@@ -49,7 +49,7 @@ describe('Native template engine', function () {
 
   describe('Named templates', function () {
     function testRenderTemplate (templateElem, templateElemId?, templateElementProp?) {
-      templateElementProp || (templateElementProp = 'innerHTML')
+      templateElementProp = templateElementProp || 'innerHTML'
       templateElem[templateElementProp] = "name: <div data-bind='text: name'></div>"
 
       renderTemplate(templateElemId, {

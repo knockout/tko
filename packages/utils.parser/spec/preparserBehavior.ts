@@ -122,7 +122,7 @@ describe('Expression Rewriting', function () {
 
     var model = { firstName, lastName, boss, getAssistant }
 
-    const parsed = eval('({' + rewritten + '})')   // eslint-disable-line
+    const parsed = eval('({' + rewritten + '})')    
           // test values of property
     expect(parsed.a).to.equal(1)
     expect(parsed.b).to.equal('bob')
@@ -139,13 +139,13 @@ describe('Expression Rewriting', function () {
   it('Should be able to eval rewritten literals that contain unquoted keywords as keys', function () {
     var rewritten = preProcessBindings('if: true')
     expect(rewritten).to.equal("'if':true")
-    var evaluated = eval('({' + rewritten + '})')   // eslint-disable-line
+    var evaluated = eval('({' + rewritten + '})')    
     expect(evaluated['if']).to.equal(true)
   })
 
   it('Should eval keys without a value as if the value is undefined', function () {
     var rewritten = preProcessBindings('a: 1, b')
-    var parsedRewritten = eval('({' + rewritten + '})')  // eslint-disable-line
+    var parsedRewritten = eval('({' + rewritten + '})')   
     expect(parsedRewritten.a).to.equal(1)
     expect('b' in parsedRewritten).to.be.ok // eslint-disable-line
     expect(parsedRewritten.b).to.be.undefined // eslint-disable-line
@@ -155,7 +155,7 @@ describe('Expression Rewriting', function () {
     // Deprecated
     var rewritten = preProcessBindings('a: 1', {valueAccessors: true})
     expect(rewritten).to.equal("'a':function(){return 1 }")
-    var evaluated = eval('({' + rewritten + '})')   // eslint-disable-line
+    var evaluated = eval('({' + rewritten + '})')    
     expect(evaluated['a']()).to.equal(1)
   })
 
@@ -170,7 +170,7 @@ describe('Expression Rewriting', function () {
       {key: 'd', value: '\'2\'/2'},
       {key: 'r', value: '/a regex/'}])
     var rewritten = preProcessBindings(result)
-    var evaluated = eval('({' + rewritten + '})')   // eslint-disable-line
+    var evaluated = eval('({' + rewritten + '})')    
     expect(evaluated.a).to.equal(0)
     expect(evaluated.b).to.equal(2)
     expect(evaluated.c).to.equal(3)

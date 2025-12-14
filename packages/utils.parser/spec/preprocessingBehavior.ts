@@ -48,7 +48,7 @@ describe('Binding preprocessing', function () {
     expect(parsedRewritten.a).to.equal(1)
     expect(parsedRewritten.a2).to.equal(1)
 
-    expect(parsedRewritten.b).to.be.undefined
+    expect(parsedRewritten.b).to.equal(undefined)
     expect(parsedRewritten.b2).to.equal(2)
   })
 
@@ -67,7 +67,7 @@ describe('Binding preprocessing', function () {
     }
     var rewritten = preProcessBindings('a: 2')
     var parsedRewritten = eval('({' + rewritten + '})')
-    expect(parsedRewritten.a).to.be.undefined
+    expect(parsedRewritten.a).to.equal(undefined)
     expect(parsedRewritten.b).to.equal(3)
   })
 
