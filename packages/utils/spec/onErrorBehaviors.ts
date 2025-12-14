@@ -3,11 +3,11 @@ import {
 } from '../dist'
 
 describe('onError handler', function () {
-  var koOnErrorCount = 0
-  var windowOnErrorCount = 0
-  var windowOnErrorOriginal = window.onerror
-  var optionsOnErrorOriginal = options.onError
-  var lastSeenError = null
+  let koOnErrorCount = 0
+  let windowOnErrorCount = 0
+  let windowOnErrorOriginal = window.onerror
+  let optionsOnErrorOriginal = options.onError
+  let lastSeenError = null
 
   beforeEach(function () {
     options.onError = function (error) {
@@ -16,9 +16,9 @@ describe('onError handler', function () {
     }
 
     function ensureNodeExistsAndIsEmpty (id:string, tagName?:string, type?:string):HTMLElement {
-      var existingNode = document.getElementById(id)
+      let existingNode = document.getElementById(id)
       if (existingNode != null) { existingNode.parentNode?.removeChild(existingNode) }
-      var resultNode = document.createElement(tagName || 'div')
+      let resultNode = document.createElement(tagName || 'div')
       resultNode.id = id
       if (type) { resultNode.setAttribute('type', type) }
       document.body.appendChild(resultNode)
@@ -37,7 +37,7 @@ describe('onError handler', function () {
             // Don't spam the console, since these were triggered deliberately
             // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
             // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
-      var isPhantom = !!(window as any)._phantom
+      let isPhantom = !!(window as any)._phantom
       return !isPhantom
     }
   })
@@ -103,7 +103,7 @@ describe('onError handler', function () {
     // });
 
   it('does not re-throw the error', function () {
-    var expectedInstance
+    let expectedInstance
     tasks.schedule(function () {
       expectedInstance = new Error('Some error')
       throw expectedInstance

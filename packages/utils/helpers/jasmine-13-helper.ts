@@ -253,7 +253,7 @@ afterEach(function() {
 })
 
 const KARMA_STRING = '__karma__'
-var disableJQueryUsage = true;
+let disableJQueryUsage = true;
 function switchJQueryState() {
     if (window[KARMA_STRING] && window[KARMA_STRING].config.args.includes('--noJQuery')) {
         options.disableJQueryUsage = disableJQueryUsage = true;

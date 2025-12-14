@@ -40,6 +40,9 @@ tsc:
 
 eslint:
 	$(NPX) eslint .
+
+eslint-fix:
+	$(NPX) eslint . --fix
 	
 dts:
 	$(NPX) tsc --build tsconfig.dts.json

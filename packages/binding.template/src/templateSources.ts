@@ -29,7 +29,7 @@ import {
 // ---- ko.templateSources.domElement -----
 
 // template types
-var templateScript = 1,
+let templateScript = 1,
   templateTextArea = 2,
   templateTemplate = 3,
   templateElement = 4
@@ -55,7 +55,7 @@ export function domElement (element?) {
   this.domElement = element
 
   if (!element) { return }
-  var tagNameLower = tagNameLowerFn(element)
+  let tagNameLower = tagNameLowerFn(element)
   this.templateType =
         tagNameLower === 'script' ? templateScript
         : tagNameLower === 'textarea' ? templateTextArea
@@ -65,7 +65,7 @@ export function domElement (element?) {
 }
 
 domElement.prototype.text = function (valueToWrite? : string) {
-  var elemContentsProperty = this.templateType === templateScript ? 'text'
+  let elemContentsProperty = this.templateType === templateScript ? 'text'
                              : this.templateType === templateTextArea ? 'value'
                              : 'innerHTML'
 
@@ -76,7 +76,7 @@ domElement.prototype.text = function (valueToWrite? : string) {
   }
 }
 
-var dataDomDataPrefix = domData.nextKey() + '_'
+let dataDomDataPrefix = domData.nextKey() + '_'
 domElement.prototype.data = function<T = any>(key : string, valueToWrite? : T) : T | void {
   if (arguments.length === 1) {
     return domData.get(this.domElement, dataDomDataPrefix + key)
@@ -85,7 +85,7 @@ domElement.prototype.data = function<T = any>(key : string, valueToWrite? : T) :
   }
 }
 
-var templatesDomDataKey = domData.nextKey()
+let templatesDomDataKey = domData.nextKey()
 function getTemplateDomData (element) {
   return domData.get(element, templatesDomDataKey) || {}
 }
@@ -94,7 +94,7 @@ function setTemplateDomData (element, data) {
 }
 
 domElement.prototype.nodes = function (valueToWrite? : any) : Node | void {
-  var element = this.domElement
+  let element = this.domElement
   if (arguments.length == 0) {
     const templateData = getTemplateDomData(element)
     let nodes = templateData.containerData || (
@@ -133,11 +133,11 @@ anonymousTemplate.prototype = new domElement()
 anonymousTemplate.prototype.constructor = anonymousTemplate
 anonymousTemplate.prototype.text = function (/* valueToWrite */) {
   if (arguments.length == 0) {
-    var templateData = getTemplateDomData(this.domElement)
+    let templateData = getTemplateDomData(this.domElement)
     if (templateData.textData === undefined && templateData.containerData) { templateData.textData = templateData.containerData.innerHTML }
     return templateData.textData
   } else {
-    var valueToWrite = arguments[0]
+    let valueToWrite = arguments[0]
     setTemplateDomData(this.domElement, {textData: valueToWrite})
   }
 }

@@ -5,7 +5,7 @@ import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
 import type { KnockoutInstance } from '@tko/builder'
 
-var ko : KnockoutInstance = globalThis.ko || {}
+let ko : KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
 ko.options = options
 
@@ -19,7 +19,7 @@ describe('startCommentRegex', function () {
 })
 
 describe('setTextContent', function () {
-  var element : HTMLElement
+  let element : HTMLElement
 
   beforeEach(function () {
     element = document.createElement('DIV')
@@ -64,9 +64,9 @@ describe('registerEventHandler', function () {
 
     this.restoreAfter(ko.options, 'useOnlyNativeEvents')
 
-    var element = document.createElement('button')
-    var eventFired = false
-    var jQueryModified = false
+    let element = document.createElement('button')
+    let eventFired = false
+    let jQueryModified = false
 
     testNode.appendChild(element)
 
@@ -105,9 +105,9 @@ describe('registerEventHandler', function () {
   it('should not use jQuery eventing with useOnlyNativeEvents option set to true', function () {
     this.restoreAfter(ko.options, 'useOnlyNativeEvents')
 
-    var element = document.createElement('button')
-    var eventFired = false
-    var jQueryModified = false
+    let element = document.createElement('button')
+    let eventFired = false
+    let jQueryModified = false
 
     testNode.appendChild(element)
 
@@ -136,19 +136,19 @@ describe('cloneNodes', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   it('should return clones', function () {
-    var newNodes = ko.utils.cloneNodes([testNode])
-    var isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
+    let newNodes = ko.utils.cloneNodes([testNode])
+    let isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
     expect(isClone).toBe(true)
   })
 
   it('should clone deeply', function () {
-    var child = document.createElement('DIV')
+    let child = document.createElement('DIV')
     testNode.appendChild(child)
 
-    var newNodes = ko.utils.cloneNodes([testNode])
-    var newChild = newNodes[0].childNodes[0]
+    let newNodes = ko.utils.cloneNodes([testNode])
+    let newChild = newNodes[0].childNodes[0]
 
-    var childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
+    let childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
 
     expect(childIsClone).toBe(true)
   })

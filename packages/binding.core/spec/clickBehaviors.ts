@@ -22,13 +22,13 @@ describe('Binding: Click', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
-    var provider = new DataBindProvider()
+    let provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
 
   it('Should invoke the supplied function on click, using model as \'this\' param and first arg, and event as second arg', function () {
-    var model = {
+    const model = {
       wasCalled: false,
       doCall: function (arg1, arg2) {
         this.wasCalled = true

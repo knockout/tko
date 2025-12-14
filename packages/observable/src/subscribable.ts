@@ -70,9 +70,9 @@ export const subscribable = function subscribableFactory() {
   ko_subscribable_fn.init(this)
 } as unknown as subscribable
 
-export var defaultEvent = 'change'
+export const defaultEvent = 'change'
 
-var ko_subscribable_fn: SubscribableFunctions = {
+const ko_subscribable_fn: SubscribableFunctions = {
   [SUBSCRIBABLE_SYM]: true,
   [Symbol.observable as any]() { return this },
 
@@ -160,7 +160,7 @@ var ko_subscribable_fn: SubscribableFunctions = {
     if (event) {
       return this._subscriptions[event] && this._subscriptions[event].length || 0
     } else {
-      var total = 0
+      let total = 0
       objectForEach(this._subscriptions, function (eventName, subscriptions) {
         if (eventName !== 'dirty') {
           total += subscriptions.length

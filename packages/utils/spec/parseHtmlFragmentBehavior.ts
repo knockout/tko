@@ -5,7 +5,7 @@ import {
 import '../helpers/jasmine-13-helper'
 
 describe('Parse HTML fragment', function () {
-  var supportsTemplateTag = options.useTemplateTag && 'content' in document.createElement('template')
+  let supportsTemplateTag = options.useTemplateTag && 'content' in document.createElement('template')
 
   let testNode : HTMLElement
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
@@ -51,11 +51,11 @@ describe('Parse HTML fragment', function () {
         if (window.jQuery && parseFloat(window.jQuery.fn.jquery[0]) < 3 && data.OldjQueryFails) { return }
       }
 
-      var parsedNodes = parseHtmlFragment(data.html, document)
+      let parsedNodes = parseHtmlFragment(data.html, document)
 
             // Assert that we have the expected collection of elements (not just the correct .innerHTML string)
       expect(parsedNodes.length).toEqual(data.parsed.length)
-      for (var i = 0; i < parsedNodes.length; i++) {
+      for (let i = 0; i < parsedNodes.length; i++) {
         testNode.innerHTML = ''
         testNode.appendChild(parsedNodes[i])
         expect(testNode).toContainHtml(data.parsed[i], function (htmlToClean) {
@@ -68,9 +68,9 @@ describe('Parse HTML fragment', function () {
   })
 
   it('returns copies of the nodes', function () {
-    var html = '<div><i></i></div>'
-    var parsedNodes1 = parseHtmlFragment(html, document)
-    var parsedNodes2 = parseHtmlFragment(html, document)
+    let html = '<div><i></i></div>'
+    let parsedNodes1 = parseHtmlFragment(html, document)
+    let parsedNodes2 = parseHtmlFragment(html, document)
     expect(parsedNodes1).not.toEqual(parsedNodes2)
     expect(parsedNodes1[0]).not.toEqual(parsedNodes2[0])
         // We need to test for deep inequality

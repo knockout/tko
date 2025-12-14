@@ -55,7 +55,7 @@ export default class Node {
    * the lambda is called.
    */
   get_value(notused, context, globals, node: Node) {
-    var node: Node = this;
+    var node: Node = this; //eslint-disable-line no-var
 
     if (node.op === LAMBDA) {
       return (...args) => {

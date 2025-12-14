@@ -30,7 +30,7 @@ describe('else inside an if binding', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
-    var provider = new MultiProvider({
+    let provider = new MultiProvider({
       providers: [new DataBindProvider(), new VirtualProvider()]
     })
     options.bindingProviderInstance = provider;
@@ -67,7 +67,7 @@ describe('else inside an if binding', function () {
       testNode.innerHTML = "<i data-bind='if: x'>" +
                 'abc <!-- else --> def ' +
                 '</i>';
-      var x = observable(false)
+      let x = observable(false)
       expect(testNode.childNodes[0].childNodes.length).toEqual(3);
       applyBindings({
         x: x
@@ -85,7 +85,7 @@ describe('Else binding', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() });
 
   beforeEach(function () {
-    var provider = new MultiProvider({
+    let provider = new MultiProvider({
       providers: [new DataBindProvider(), new VirtualProvider()]
     })
     options.bindingProviderInstance = provider;
@@ -96,7 +96,7 @@ describe('Else binding', function () {
   it('DOM node after DOM if condition', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             "<b data-bind='else'>b</b>";
-    var x = observable(false)
+    let x = observable(false)
     applyBindings({ x: x }, testNode);
     expect(testNode.innerText).toEqual('b')
     x(true)
@@ -108,7 +108,7 @@ describe('Else binding', function () {
   it('DOM node after DOM if condition, initially true', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             "<b data-bind='else'>b</b>";
-    var x = observable(true)
+    let x = observable(true)
     applyBindings({ x: x }, testNode);
     expect(testNode.innerText).toEqual('a')
     x(false)
@@ -120,7 +120,7 @@ describe('Else binding', function () {
   it('DOM node after virtual if condition', function () {
     testNode.innerHTML = '<!-- ko if: x -->a<!-- /ko -->' +
             "<b data-bind='else'>b</b>";
-    var x = observable(false)
+    let x = observable(false)
     applyBindings({ x: x }, testNode);
     expect(testNode.innerText).toEqual('b')
     x(true)
@@ -130,7 +130,7 @@ describe('Else binding', function () {
   it('virtual node after DOM if condition', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             '<!-- ko else: -->b<!-- /ko -->';
-    var x = observable(false)
+    let x = observable(false)
     applyBindings({ x: x }, testNode);
     expect(testNode.innerText).toEqual('b')
     x(true)
@@ -140,7 +140,7 @@ describe('Else binding', function () {
   it('virtual node after virtual if condition', function () {
     testNode.innerHTML = '<!-- ko if: x -->a<!-- /ko -->' +
             '<!-- ko else: -->b<!-- /ko -->';
-    var x = observable(false)
+    let x = observable(false)
     applyBindings({ x: x }, testNode);
     expect(testNode.innerText).toEqual('b')
     x(true)
@@ -150,8 +150,8 @@ describe('Else binding', function () {
   it('elseif after if condition', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             '<!-- ko elseif: y -->b<!-- /ko -->';
-    var x = observable(false)
-    var y = observable(false)
+    let x = observable(false)
+    let y = observable(false)
     applyBindings({ x: x, y: y }, testNode);
     expect(testNode.innerText).toEqual('')
     y(true)
@@ -164,8 +164,8 @@ describe('Else binding', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             '<!-- ko elseif: y -->b<!-- /ko -->' +
             '<!-- ko else -->c<!-- /ko -->'
-    var x = observable(true)
-    var y = observable(true)
+    let x = observable(true)
+    let y = observable(true)
     applyBindings({ x: x, y: y }, testNode);
     expect(testNode.innerText).toEqual('a')
     x(false)
@@ -186,8 +186,8 @@ describe('Else binding', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             '<!-- ko elseif: y -->b<!-- /ko -->' +
             '<!-- ko else -->c<!-- /ko -->';
-    var x = observable(true)
-    var y = observable(false)
+    let x = observable(true)
+    let y = observable(false)
     applyBindings({ x: x, y: y }, testNode);
     expect(testNode.innerText).toEqual('a')
     x(false)
@@ -206,8 +206,8 @@ describe('Else binding', function () {
   it('elseif after if condition, initially false/true', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             '<!-- ko elseif: y -->b<!-- /ko -->';
-    var x = observable(false)
-    var y = observable(true)
+    let x = observable(false)
+    let y = observable(true)
     applyBindings({ x: x, y: y }, testNode);
     expect(testNode.innerText).toEqual('b')
     y(false)
@@ -229,8 +229,8 @@ describe('Else binding', function () {
     testNode.innerHTML = "<i data-bind='if: x'>a</i>" +
             '<!-- ko elseif: y -->b<!-- /ko -->' +
             '<!-- ko else -->z<!-- /ko -->'
-    var x = observable(false)
-    var y = observable(false)
+    let x = observable(false)
+    let y = observable(false)
     applyBindings({ x: x, y: y }, testNode);
     expect(testNode.innerText).toEqual('z')
     y(true)
@@ -251,10 +251,10 @@ describe('Else binding', function () {
             '<!-- ko elseif: y2 -->y2<!-- /ko -->' +
             '<!-- ko elseif: y3 -->y3<!-- /ko -->' +
             '<!-- ko else -->else<!-- /ko -->'
-    var x = observable(false)
-    var y1 = observable(false)
-    var y2 = observable(false)
-    var y3 = observable(false)
+    let x = observable(false)
+    let y1 = observable(false)
+    let y2 = observable(false)
+    let y3 = observable(false)
     applyBindings({ x: x, y1: y1, y2: y2, y3: y3 }, testNode);
     expect(testNode.innerText).toEqual('else')
     y3(true)
@@ -279,8 +279,8 @@ describe('Else binding', function () {
     testNode.innerHTML = '<!-- ko if: x -->x<!-- /ko -->' +
             '<!-- ko else -->!X<!-- /ko -->' +
             '<!-- ko if: y -->y<!-- /ko -->'
-    var x = observable(false)
-    var y = observable(false)
+    let x = observable(false)
+    let y = observable(false)
     applyBindings({ x: x, y: y }, testNode);
     expect(testNode.innerText).toEqual('!X')
     y(true)

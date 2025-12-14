@@ -66,7 +66,7 @@ extend(templateEngine.prototype, {
       // Named template
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
-      var elem = templateDocument.getElementById(template)
+      let elem = templateDocument.getElementById(template)
       if (!elem) { options.onError(new Error('Cannot find template with ID ' + template)) }
       return new domElement(elem)
     } else if ((template.nodeType == 1) || (template.nodeType == 8)) {
@@ -76,7 +76,7 @@ extend(templateEngine.prototype, {
   },
 
   renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[] {
-    var templateSource = this['makeTemplateSource'](template, templateDocument)
+    let templateSource = this['makeTemplateSource'](template, templateDocument)
     return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }
 })

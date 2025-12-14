@@ -10,7 +10,7 @@ interface HTMLScriptElementOld extends HTMLScriptElement {
   onreadystatechange: any;
 }
 
-var taskQueue = new Array(),
+let taskQueue = new Array(),
   taskQueueLength = 0,
   nextHandle = 1,
   nextIndexToProcess = 0,
@@ -20,7 +20,7 @@ if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
     // Chrome 27+, Firefox 14+, IE 11+, Opera 15+, Safari 6.1+, node
     // From https://github.com/petkaantonov/bluebird * Copyright (c) 2014 Petka Antonov * License: MIT
   options.taskScheduler = (function (callback) {
-    var div = w.document.createElement('div')
+    let div = w.document.createElement('div')
     new w.MutationObserver(callback).observe(div, {attributes: true})
     return function () { div.classList.toggle('foo') }
   })(scheduledProcess)
@@ -28,7 +28,7 @@ if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
     // IE 6-10
     // From https://github.com/YuzuJS/setImmediate * Copyright (c) 2012 Barnesandnoble.com, llc, Donavon West, and Domenic Denicola * License: MIT
   options.taskScheduler = function (callback) {
-    var script : HTMLScriptElementOld  | null = document.createElement('script') as HTMLScriptElementOld
+    let script : HTMLScriptElementOld  | null = document.createElement('script') as HTMLScriptElementOld
     script.onreadystatechange = function () {
       if(script) {
         script.onreadystatechange = null
@@ -49,10 +49,10 @@ function processTasks () {
   if (taskQueueLength) {
         // Each mark represents the end of a logical group of tasks and the number of these groups is
         // limited to prevent unchecked recursion.
-    var mark = taskQueueLength, countMarks = 0
+    let mark = taskQueueLength, countMarks = 0
 
         // nextIndexToProcess keeps track of where we are in the queue; processTasks can be called recursively without issue
-    for (var task; nextIndexToProcess < taskQueueLength;) {
+    for (let task; nextIndexToProcess < taskQueueLength;) {
       if (task = taskQueue[nextIndexToProcess++]) {
         if (nextIndexToProcess > mark) {
           if (++countMarks >= 5000) {
@@ -93,7 +93,7 @@ export function schedule (func: () => any) : number {
 }
 
 export function cancel (handle : number) {
-  var index = handle - (nextHandle - taskQueueLength)
+  let index = handle - (nextHandle - taskQueueLength)
   if (index >= nextIndexToProcess && index < taskQueueLength) {
     taskQueue[index] = null
   }
@@ -101,7 +101,7 @@ export function cancel (handle : number) {
 
 // For testing only: reset the queue and return the previous queue length
 export function resetForTesting () {
-  var length = taskQueueLength - nextIndexToProcess
+  let length = taskQueueLength - nextIndexToProcess
   nextIndexToProcess = taskQueueLength = taskQueue.length = 0
   return length
 }

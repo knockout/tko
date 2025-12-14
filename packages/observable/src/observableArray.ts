@@ -150,7 +150,7 @@ export function observableArray<T = any> (initialValues?: T[]): ObservableArray<
 
   if (typeof initialValues !== 'object' || !('length' in initialValues)) { throw new Error('The argument passed when initializing an observable array must be an array, or null, or undefined.') }
 
-  var result = Object.setPrototypeOf(observable(initialValues), observableArray.fn) as ObservableArray<T>
+  let result = Object.setPrototypeOf(observable(initialValues), observableArray.fn) as ObservableArray<T>
   trackArrayChanges(result)
   // ^== result.extend({ trackArrayChanges: true })
   overwriteLengthPropertyIfSupported(result, { get: () => result()?.length })
@@ -163,11 +163,11 @@ export function isObservableArray (instance: { remove: any; push: any }) {
 
 observableArray.fn = {
   remove (valueOrPredicate: any): any[] {
-    var underlyingArray = this.peek()
-    var removedValues = new Array()
-    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value: any) { return value === valueOrPredicate }
-    for (var i = 0; i < underlyingArray.length; i++) {
-      var value = underlyingArray[i]
+    let underlyingArray = this.peek()
+    let removedValues = new Array()
+    let predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value: any) { return value === valueOrPredicate }
+    for (let i = 0; i < underlyingArray.length; i++) {
+      let value = underlyingArray[i]
       if (predicate(value)) {
         if (removedValues.length === 0) {
           this.valueWillMutate()
@@ -189,8 +189,8 @@ observableArray.fn = {
   removeAll (arrayOfValues: undefined): any {
         // If you passed zero args, we remove everything
     if (arrayOfValues === undefined) {
-      var underlyingArray = this.peek()
-      var allValues = underlyingArray.slice(0)
+      let underlyingArray = this.peek()
+      let allValues = underlyingArray.slice(0)
       this.valueWillMutate()
       underlyingArray.splice(0, underlyingArray.length)
       this.valueHasMutated()
@@ -206,11 +206,11 @@ observableArray.fn = {
   },
 
   destroy (valueOrPredicate: any): void {
-    var underlyingArray = this.peek()
-    var predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value: any) { return value === valueOrPredicate }
+    let underlyingArray = this.peek()
+    let predicate = typeof valueOrPredicate === 'function' && !isObservable(valueOrPredicate) ? valueOrPredicate : function (value: any) { return value === valueOrPredicate }
     this.valueWillMutate()
-    for (var i = underlyingArray.length - 1; i >= 0; i--) {
-      var value = underlyingArray[i]
+    for (let i = underlyingArray.length - 1; i >= 0; i--) {
+      let value = underlyingArray[i]
       if (predicate(value)) {
         value['_destroy'] = true
       }
@@ -236,7 +236,7 @@ observableArray.fn = {
   },
 
   replace (oldItem: any, newItem: any): void {
-    var index = this.indexOf(oldItem)
+    let index = this.indexOf(oldItem)
     if (index >= 0) {
       this.valueWillMutate()
       this.peek()[index] = newItem
@@ -268,10 +268,10 @@ arrayForEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], f
   observableArray.fn[methodName] = function () {
         // Use "peek" to avoid creating a subscription in any computed that we're executing in the context of
         // (for consistency with mutating regular observables)
-    var underlyingArray = this.peek()
+    let underlyingArray = this.peek()
     this.valueWillMutate()
     this.cacheDiffForKnownOperation(underlyingArray, methodName, arguments)
-    var methodCallResult = underlyingArray[methodName].apply(underlyingArray, arguments)
+    let methodCallResult = underlyingArray[methodName].apply(underlyingArray, arguments)
     this.valueHasMutated()
         // The native sort and reverse methods return a reference to the array, but it makes more sense to return the observable array instead.
     return methodCallResult === underlyingArray ? this : methodCallResult
@@ -281,7 +281,7 @@ arrayForEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], f
 // Populate ko.observableArray.fn with read-only functions from native arrays
 arrayForEach(['slice'], function (methodName: string | number) {
   observableArray.fn[methodName] = function () {
-    var underlyingArray = this()
+    let underlyingArray = this()
     return underlyingArray[methodName].apply(underlyingArray, arguments)
   }
 })

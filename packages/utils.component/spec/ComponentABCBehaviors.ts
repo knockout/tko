@@ -38,7 +38,7 @@ describe('ComponentABC', function () {
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
     testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"></div>'
 
-    var provider = new MultiProvider({
+    let provider = new MultiProvider({
       providers: [
         new DataBindProvider(),
         new ComponentProvider(),
@@ -130,7 +130,7 @@ describe('ComponentABC', function () {
   })
 
   it('disposes when the node is removed', function () {
-    var disp = false
+    let disp = false
     class CX extends ComponentABC {
       dispose () {
         super.dispose()
