@@ -124,7 +124,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
 
   function callCallback(callback: MappingHookFunction<T> | undefined, items: any[]) {
     if (callback) {
-      for (var i = 0, n = items.length; i < n; i++) {
+      for (let i = 0, n = items.length; i < n; i++) {
         arrayForEach(items[i].mappedNodes, function (node) {
           callback(node, i, items[i].arrayEntry)
         })
@@ -145,7 +145,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
       editScript = compareArrays(lastArray, array, compareOptions)
     }
 
-    for (var i = 0, editScriptItem: number[], movedIndex: number, itemIndex: number; editScriptItem = editScript[i]; i++) {
+    for (let i = 0, editScriptItem: number[], movedIndex: number, itemIndex: number; editScriptItem = editScript[i]; i++) {
       movedIndex = editScriptItem['moved']
       itemIndex = editScriptItem['index']
       switch (editScriptItem['status']) {
@@ -214,8 +214,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   arrayForEach(nodesToDelete, options.beforeRemove ? cleanNode : removeNode)
 
   // Next add/reorder the remaining items (will include deleted items if there's a beforeRemove callback)
-  i = 0
-  for (var nextNode = virtualElements.firstChild(domNode), lastNode, node; mapData = itemsToProcess[i]; i++) {
+  for (let k = 0, nextNode = virtualElements.firstChild(domNode), lastNode, node; mapData = itemsToProcess[k]; k++) {
     // Get nodes for newly added items
     if (!mapData.mappedNodes) {
       extend(mapData, mapNodeAndRefreshWhenChanged(domNode, mapping, mapData.arrayEntry, callbackAfterAddingNodes, mapData.indexObservable))
@@ -245,8 +244,8 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   // Replace the stored values of deleted items with a dummy value. This provides two benefits: it marks this item
   // as already "removed" so we won't call beforeRemove for it again, and it ensures that the item won't match up
   // with an actual item in the array and appear as "retained" or "moved".
-  for (i = 0; i < itemsForBeforeRemoveCallbacks.length; ++i) {
-    itemsForBeforeRemoveCallbacks[i].arrayEntry = deletedItemDummyValue
+  for (let x = 0; x < itemsForBeforeRemoveCallbacks.length; ++x) {
+    itemsForBeforeRemoveCallbacks[x].arrayEntry = deletedItemDummyValue
   }
 
   // Finally call afterMove and afterAdd callbacks
