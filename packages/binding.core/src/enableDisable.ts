@@ -3,7 +3,7 @@ import {
     unwrap
 } from '@tko/observable'
 
-export var enable = {
+export const enable = {
   update: function (element, valueAccessor) {
     let value = unwrap(valueAccessor())
     if (value && element.disabled) {
@@ -14,7 +14,7 @@ export var enable = {
   }
 }
 
-export var disable = {
+export const disable = {
   update: function (element, valueAccessor) {
     enable.update(element, function () { return !unwrap(valueAccessor()) })
   }

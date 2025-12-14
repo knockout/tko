@@ -15,6 +15,7 @@ import type {
 } from '@tko/observable'
 
 import {
+  Computed,
     computed
 } from '@tko/computed'
 
@@ -228,6 +229,7 @@ function applyBindingsToNodeInternal<T>(node: Node, sourceBindings: Record<strin
 
   // Use bindings if given, otherwise fall back on asking the bindings provider to give us some bindings
   let bindings : Record<string,any> | null = null
+  let bindingsUpdater: Computed | null = null
   if (sourceBindings && typeof sourceBindings !== 'function') {
     bindings = sourceBindings
   } else {
@@ -237,7 +239,7 @@ function applyBindingsToNodeInternal<T>(node: Node, sourceBindings: Record<strin
     if (isProviderForNode(provider, node)) {
           // Get the binding from the provider within a computed observable so that we can update the bindings whenever
           // the binding context is updated or if the binding provider accesses observables.
-      var bindingsUpdater: any = computed(
+      bindingsUpdater = computed(
               function () {
                 bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext)
                   // Register a dependency on the binding context to support observable view models.

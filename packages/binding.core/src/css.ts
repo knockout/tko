@@ -7,7 +7,7 @@ import {
     unwrap
 } from '@tko/observable'
 
-export var css = {
+export const css = {
   aliases: ['class'],
   update: function (element, valueAccessor) {
     let value = unwrap(valueAccessor())

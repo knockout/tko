@@ -12,7 +12,7 @@ import type { AllBindings } from '@tko/bind'
 let hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
 let hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue')
 
-export var hasfocus = {
+export const hasfocus = {
   init: function (element, valueAccessor , _allBindings : AllBindings) {
     let handleElementFocusChange = function (isFocused) {
             // Where possible, ignore which event was raised and determine focus state using activeElement,
