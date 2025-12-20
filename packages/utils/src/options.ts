@@ -101,7 +101,7 @@ export class Options {
    */
   sanitizeHtmlTemplate(html: string): string {
     if (!this._sanitizeWarningLogged) {
-      console.log('WARNING -- You don\'t have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities.')
+      console.warn('WARNING -- You don\'t have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities.')
       this._sanitizeWarningLogged = true
     }
     return html

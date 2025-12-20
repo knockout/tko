@@ -163,11 +163,11 @@ export function setHtml (node : Node, html : Function | string) {
   } 
 
   if ((html !== null) && (html !== undefined)) {
+    
     if (typeof html !== 'string') { 
       html = html.toString() 
     }
-
-    html = validateHTMLInput(html)
+    
     const jQuery = options.jQuery
     // If the browser supports <template> tags, prefer that, as
     // it obviates all the complex workarounds of jQuery.
@@ -176,7 +176,8 @@ export function setHtml (node : Node, html : Function | string) {
     // for example <tr> elements which are not normally allowed to exist on their own.
     // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
     if (jQuery && !supportsTemplateTag) {
-      jQuery(node).html(html)
+      const saferHtml = validateHTMLInput(html)
+      jQuery(node).html(saferHtml)
     } else {
             // ... otherwise, use KO's own parsing logic.
       let parsedNodes : Node[]
