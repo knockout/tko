@@ -1,0 +1,16 @@
+# Ignore artifacts:
+builds
+docs
+coverage
+.vscode
+.devcontainer
+node_modules
+tools
+tko.io
+**/dist/*
+package.json
+package-lock.json
+.github/**
+*.json
+*.md
+*.config.js
