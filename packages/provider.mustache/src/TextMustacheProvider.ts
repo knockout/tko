@@ -1,10 +1,6 @@
-import {
-  Provider
-} from '@tko/provider'
+import { Provider } from '@tko/provider'
 
-import {
-  parseInterpolation
-} from './mustacheParser'
+import { parseInterpolation } from './mustacheParser'
 
 /**
  * Interpret {{ }}, {{{ }}}, {{# /}}, and {{# }} ... {{/ }} inside text nodes.
@@ -12,24 +8,30 @@ import {
  * This binding must come before the VirtualProvider.
  */
 export default class TextMustacheProvider extends Provider {
-  get FOR_NODE_TYPES () { return [ 3 ] } // document.TEXT_NODE
+  get FOR_NODE_TYPES() {
+    return [3]
+  } // document.TEXT_NODE
 
-  * textToNodes (textNode: Node) {
+  *textToNodes(textNode: Node) {
     const parent = textNode.parentNode
     const isTextarea = parent && parent.nodeName === 'TEXTAREA'
     const hasStash = textNode.nodeValue && textNode.nodeValue.includes('{{')
 
-    if (!hasStash || isTextarea) { return }
+    if (!hasStash || isTextarea) {
+      return
+    }
 
     for (const part of parseInterpolation(textNode.nodeValue)) {
-      yield * part.textNodeReplacement(textNode)
+      yield* part.textNodeReplacement(textNode)
     }
   }
 
-  textInterpolation (textNode: Node) {
+  textInterpolation(textNode: Node) {
     const newNodes = Array.from(this.textToNodes(textNode))
 
-    if (newNodes.length === 0) { return }
+    if (newNodes.length === 0) {
+      return
+    }
 
     if (textNode.parentNode) {
       const parent = textNode.parentNode
@@ -54,7 +56,7 @@ export default class TextMustacheProvider extends Provider {
    *
    * VirtualProvider can then pick up and do the actual binding.
    */
-  preprocessNode (node: Node) {
+  preprocessNode(node: Node) {
     return this.textInterpolation(node)
   }
 }

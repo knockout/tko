@@ -1,2 +1,1 @@
-
-export {default as LifeCycle} from './LifeCycle'
+export { default as LifeCycle } from './LifeCycle'

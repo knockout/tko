@@ -1,42 +1,33 @@
-
-import {
-  tagNameLower, objectMap
-} from '@tko/utils'
+import { tagNameLower, objectMap } from '@tko/utils'
 
 import registry from '@tko/utils.component'
 
-import {
-  unwrap, isWriteableObservable
-} from '@tko/observable'
+import { unwrap, isWriteableObservable } from '@tko/observable'
 
-import {
-  computed
-} from '@tko/computed'
+import { computed } from '@tko/computed'
 
-import {
-  Provider
-} from '@tko/provider'
+import { Provider } from '@tko/provider'
 
-import {
-  Parser
-} from '@tko/utils.parser'
+import { Parser } from '@tko/utils.parser'
 
 export default class ComponentProvider extends Provider {
-  get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
+  get FOR_NODE_TYPES() {
+    return [1]
+  } // document.ELEMENT_NODE
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
    * @param {Element} node
    */
-  preprocessNode (node : Element) {
+  preprocessNode(node: Element) {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
       const closeNode = document.createComment('/ko')
 
-      if(!parent) {
-        throw Error("Missing parent node")
+      if (!parent) {
+        throw Error('Missing parent node')
       }
 
       parent.insertBefore(openNode, node)
@@ -47,45 +38,46 @@ export default class ComponentProvider extends Provider {
     }
   }
 
-  nodeHasBindings (node : Element) : boolean {
+  nodeHasBindings(node: Element): boolean {
     return Boolean(this.getComponentNameForNode(node))
   }
 
-  getBindingAccessors (node: Element, context) {
+  getBindingAccessors(node: Element, context) {
     const componentName = this.getComponentNameForNode(node)
-    if (!componentName) { return }
-    const component = () => ({
-      name: componentName,
-      params: this.getComponentParams(node, context)
-    })
+    if (!componentName) {
+      return
+    }
+    const component = () => ({ name: componentName, params: this.getComponentParams(node, context) })
     return { component }
   }
 
-  getComponentNameForNode (node: Element) : string | undefined {
-    if (node.nodeType !== node.ELEMENT_NODE) { return }
+  getComponentNameForNode(node: Element): string | undefined {
+    if (node.nodeType !== node.ELEMENT_NODE) {
+      return
+    }
     const tagName = tagNameLower(node)
     if (registry.isRegistered(tagName)) {
       const hasDash = tagName.includes('-')
-      const isUnknownEntity = ('' + node) === '[object HTMLUnknownElement]'
-      if (hasDash || isUnknownEntity) { return tagName }
+      const isUnknownEntity = '' + node === '[object HTMLUnknownElement]'
+      if (hasDash || isUnknownEntity) {
+        return tagName
+      }
     }
   }
 
-  getComponentParams (node: Element, context) {
+  getComponentParams(node: Element, context) {
     const parser = new (Parser as any)(node, context, this.globals) as Parser
     const paramsString = (node.getAttribute('params') || '').trim()
     const accessors = parser.parse(paramsString, context, undefined, node)
     if (!accessors || Object.keys(accessors).length === 0) {
       return { $raw: {} }
     }
-    const $raw = objectMap(accessors,
-      (value) => computed(value, null, { disposeWhenNodeIsRemoved: node })
-    )
-    const params = objectMap($raw, (v) => this.makeParamValue(node, v))
+    const $raw = objectMap(accessors, value => computed(value, null, { disposeWhenNodeIsRemoved: node }))
+    const params = objectMap($raw, v => this.makeParamValue(node, v))
     return Object.assign({ $raw }, params)
   }
 
-  makeParamValue (node: Element, paramValueComputed) {
+  makeParamValue(node: Element, paramValueComputed) {
     const paramValue = paramValueComputed.peek()
     // Does the evaluation of the parameter value unwrap any observables?
     if (!paramValueComputed.isActive()) {
@@ -101,7 +93,7 @@ export default class ComponentProvider extends Provider {
 
     return computed({
       read: () => unwrap(paramValueComputed()),
-      write: isWriteable ? (v) => paramValueComputed()(v) : undefined,
+      write: isWriteable ? v => paramValueComputed()(v) : undefined,
       disposeWhenNodeIsRemoved: node
     })
   }

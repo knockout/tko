@@ -1,21 +1,18 @@
-
-import {
-    unwrap, toJS
-} from '@tko/observable'
+import { unwrap, toJS } from '@tko/observable'
 
 let sproto = String.prototype
 
 export interface Filters {
-  uppercase(value);
-  lowercase(value);
-  default(value, defaultValue);
-  replace(value, search, replace);
-  fit(value, length, replacement, trimWhere);
-  json(rootObject, space, replacer);
-  number(value);
+  uppercase(value)
+  lowercase(value)
+  default(value, defaultValue)
+  replace(value, search, replace)
+  fit(value, length, replacement, trimWhere)
+  json(rootObject, space, replacer)
+  number(value)
 }
 
-let filters:Filters = {
+let filters: Filters = {
   // Convert value to uppercase
   uppercase: function (value) {
     return sproto.toUpperCase.call(unwrap(value))
@@ -52,11 +49,10 @@ let filters:Filters = {
       switch (trimWhere) {
         case 'left':
           return replacement + value.slice(-length)
-        case 'middle':
-          {
+        case 'middle': {
           const leftLen = Math.ceil(length / 2)
           return value.substr(0, leftLen) + replacement + value.slice(leftLen - length)
-          }
+        }
         default:
           return value.substr(0, length) + replacement
       }
@@ -67,14 +63,14 @@ let filters:Filters = {
 
   // Convert a model object to JSON
   json: function (rootObject, space, replacer) {
-        // replacer and space are optional
+    // replacer and space are optional
     return JSON.stringify(toJS(rootObject), replacer, space)
   },
 
   // Format a number using the browser's toLocaleString
   number: function (value) {
     return (+unwrap(value)).toLocaleString()
-  },
+  }
 }
 
 // Export the filters object for general access

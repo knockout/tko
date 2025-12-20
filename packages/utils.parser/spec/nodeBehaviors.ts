@@ -1,86 +1,86 @@
 /* eslint semi: 0 */
 
-import {
-  observable
-} from '@tko/observable';
+import { observable } from '@tko/observable'
 
-import {
-  Parser, Node, Arguments, Identifier, Ternary
-} from '../dist';
+import { Parser, Node, Arguments, Identifier, Ternary } from '../dist'
 
-import {assert} from "chai"
+import { assert } from 'chai'
 
 let op = Node.operators
 let operators = Node.operators
 let nodes_to_tree
 
-function ctxStub (ctx?) {
-  return { lookup (v) { return ctx ? ctx[v] : null } }
+function ctxStub(ctx?) {
+  return {
+    lookup(v) {
+      return ctx ? ctx[v] : null
+    }
+  }
 }
 
 beforeEach(function () {
-  nodes_to_tree = Node.create_root;
+  nodes_to_tree = Node.create_root
 })
 
 describe('Operators', function () {
-  function test (nodes, val, name?) {
-    assert.strictEqual(Node.create_root(nodes).get_value(), val, name);
+  function test(nodes, val, name?) {
+    assert.strictEqual(Node.create_root(nodes).get_value(), val, name)
   }
 
   it('does simple arithmetic', function () {
-    test([1, op['+'], 1], 2);
-    test([1, op['+'], 1, op['*'], 3], 4);
-    test([2, op['*'], 1, op['+'], 3], 5);
-    test([2, op['*'], 2, op['*'], 3], 12);
-  });
+    test([1, op['+'], 1], 2)
+    test([1, op['+'], 1, op['*'], 3], 4)
+    test([2, op['*'], 1, op['+'], 3], 5)
+    test([2, op['*'], 2, op['*'], 3], 12)
+  })
 
   it('performs binary logic', function () {
-    test([true, op['&&'], true], true);
-    test([true, op['&&'], false], false);
-    test([false, op['&&'], true], false);
-    test([false, op['&&'], false], false);
-    test([true, op['||'], true], true);
-    test([true, op['||'], false], true);
-    test([false, op['||'], true], true);
-    test([false, op['||'], false], false);
+    test([true, op['&&'], true], true)
+    test([true, op['&&'], false], false)
+    test([false, op['&&'], true], false)
+    test([false, op['&&'], false], false)
+    test([true, op['||'], true], true)
+    test([true, op['||'], false], true)
+    test([false, op['||'], true], true)
+    test([false, op['||'], false], false)
   })
 
   it('performs ?? nullish coalesce', () => {
-    test([false, op['??'], true], false);
-    test([true, op['??'], false], true);
-    test([undefined, op['??'], true], true);
-    test([null, op['??'], false], false);
+    test([false, op['??'], true], false)
+    test([true, op['??'], false], true)
+    test([undefined, op['??'], true], true)
+    test([null, op['??'], false], false)
   })
 
-  it('performs ?. optional chaining', () => { 
-    test([{}, op['?.'], 'a'], undefined);
-    test([null, op['?.'], 'a'], undefined);
-    test([{ a: 1 }, op['?.'], 'a'], 1);
-    test([{ a: 'b' }, op['?.'], 'a'], 'b');
+  it('performs ?. optional chaining', () => {
+    test([{}, op['?.'], 'a'], undefined)
+    test([null, op['?.'], 'a'], undefined)
+    test([{ a: 1 }, op['?.'], 'a'], 1)
+    test([{ a: 'b' }, op['?.'], 'a'], 'b')
   })
 
   it('mixes binary logic and simple arithemtic', function () {
-    test([0, op['||'], 1, op['+'], 2], 3, 'a');
-    test([0, op['&&'], 1, op['+'], 2], 0, 'b');
-    test([0, op['&&'], 0, op['+'], 2], 0, 'c');
-    test([1, op['&&'], 2, op['+'], 2], 4, 'd');
+    test([0, op['||'], 1, op['+'], 2], 3, 'a')
+    test([0, op['&&'], 1, op['+'], 2], 0, 'b')
+    test([0, op['&&'], 0, op['+'], 2], 0, 'c')
+    test([1, op['&&'], 2, op['+'], 2], 4, 'd')
 
-    test([0, op['+'], 1, op['||'], 2], 1, 'e');
-    test([1, op['+'], 0, op['&&'], 2], 2, 'f');
-    test([0, op['+'], 0, op['&&'], 2], 0, 'g');
-    test([1, op['+'], 2, op['&&'], 2], 2, 'h');
+    test([0, op['+'], 1, op['||'], 2], 1, 'e')
+    test([1, op['+'], 0, op['&&'], 2], 2, 'f')
+    test([0, op['+'], 0, op['&&'], 2], 0, 'g')
+    test([1, op['+'], 2, op['&&'], 2], 2, 'h')
   })
 
   it('mixes (in)equality and binary logic', function () {
-    test([0, op['||'], 0, op['!=='], 2], true, 'a');
-    test([1, op['||'], 0, op['!=='], 2], 1, 'b');
-    test([0, op['&&'], 1, op['!=='], 2], 0, 'c');
-    test([0, op['&&'], 0, op['!=='], 2], 0, 'c2');
+    test([0, op['||'], 0, op['!=='], 2], true, 'a')
+    test([1, op['||'], 0, op['!=='], 2], 1, 'b')
+    test([0, op['&&'], 1, op['!=='], 2], 0, 'c')
+    test([0, op['&&'], 0, op['!=='], 2], 0, 'c2')
 
-    test([0, op['!=='], 1, op['||'], 2], true, 'd');
-    test([0, op['!=='], 1, op['||'], 0], true, 'e');
-    test([0, op['!=='], 0, op['||'], 0], 0, 'f');
-    test([0, op['!=='], 0, op['||'], 1], 1, 'g');
+    test([0, op['!=='], 1, op['||'], 2], true, 'd')
+    test([0, op['!=='], 1, op['||'], 0], true, 'e')
+    test([0, op['!=='], 0, op['||'], 0], 0, 'f')
+    test([0, op['!=='], 0, op['||'], 1], 1, 'g')
   })
 
   it('early outs from or- operator computations', function () {
@@ -96,43 +96,53 @@ describe('Operators', function () {
     let root = Node.create_root([false, op['&&'], new Identifier(null, 'z', ['q'])])
     assert.equal(root.get_value(null, fakeContext), false)
   })
-});
+})
 
 describe('the create_root function', function () {
   it('converts a simple array to a tree', function () {
     let nodes = ['a', operators['*'], 'b'],
-      tree = nodes_to_tree(nodes.slice(0));
+      tree = nodes_to_tree(nodes.slice(0))
     // we use nodes.slice(0) to make a copy.
-    assert.equal(tree.lhs, 'a');
-    assert.equal(tree.rhs, 'b');
-    assert.equal(tree.op, operators['*']);
+    assert.equal(tree.lhs, 'a')
+    assert.equal(tree.rhs, 'b')
+    assert.equal(tree.op, operators['*'])
   })
 
   it('converts multiple * to a tree', function () {
     // expr: a * b / c
     // sexp: (/ (* a b) c)
     let nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
-      tree = nodes_to_tree(nodes.slice(0));
-    assert.equal(tree.lhs.lhs, 'a');
-    assert.equal(tree.lhs.op, operators['*']);
-    assert.equal(tree.lhs.rhs, 'b');
-    assert.equal(tree.op, operators['/']);
-    assert.equal(tree.rhs, 'c');
+      tree = nodes_to_tree(nodes.slice(0))
+    assert.equal(tree.lhs.lhs, 'a')
+    assert.equal(tree.lhs.op, operators['*'])
+    assert.equal(tree.lhs.rhs, 'b')
+    assert.equal(tree.op, operators['/'])
+    assert.equal(tree.rhs, 'c')
   })
 
   it('converts a complex set as expected', function () {
     // expr: a * b + c * d * e > f + g % h
-    // prec:   4   3   4   4   1   3   4   
+    // prec:   4   3   4   4   1   3   4
     // sexp: (> (+ (* a b) (* (* c d) e))
     //          (+ f (% g h)))
     let nodes = [
-        'a', operators['*'], 'b',
+        'a',
+        operators['*'],
+        'b',
         operators['+'],
-        'c', operators['*'], 'd', operators['*'], 'e',
+        'c',
+        operators['*'],
+        'd',
+        operators['*'],
+        'e',
         operators['>'],
-        'f', operators['+'], 'g', operators['%'], 'h'
+        'f',
+        operators['+'],
+        'g',
+        operators['%'],
+        'h'
       ],
-      root = nodes_to_tree(nodes.slice(0), true);
+      root = nodes_to_tree(nodes.slice(0), true)
     // console.log(JSON.stringify(root, null, 2))
     assert.equal(root.op, operators['>'], '>')
 
@@ -156,12 +166,7 @@ describe('the create_root function', function () {
   })
 
   it('converts a lambda with ternary operator', function () {
-    const root = nodes_to_tree([
-      undefined, op['=>'],
-      -1, op['>'], 0,
-      op['?'],
-      new Ternary('positive', 'negative')
-    ])
+    const root = nodes_to_tree([undefined, op['=>'], -1, op['>'], 0, op['?'], new Ternary('positive', 'negative')])
     // console.log(JSON.stringify(root, null, 2))
     assert.equal(root.op, op['=>'])
     assert.equal(root.rhs.op, op['?'])
@@ -174,7 +179,7 @@ describe('the create_root function', function () {
 
 describe('Node', function () {
   it('traverses the tree 19 * -2 + 4', function () {
-    let root = new Node();
+    let root = new Node()
     root.op = operators['+']
     root.lhs = new Node(19, operators['*'], -2)
     root.rhs = 4
@@ -185,7 +190,7 @@ describe('Node', function () {
     let root = new Node(),
       context = ctxStub({ x: 19 }),
       parser = new Parser(),
-      ident = new Identifier(parser, 'x');
+      ident = new Identifier(parser, 'x')
     root.op = operators['+']
     root.lhs = ident
     root.rhs = 23
@@ -193,18 +198,20 @@ describe('Node', function () {
   })
 
   it('converts function calls (a())', function () {
-    let context = ctxStub({ x: observable(0x0F) }),
-      parser, nodes, root;
-    parser = new Parser(null);
+    let context = ctxStub({ x: observable(0x0f) }),
+      parser,
+      nodes,
+      root
+    parser = new Parser(null)
     let fake_args = new Arguments(null, [])
     nodes = [
       // the third argument is the same as _deref_call
       new Identifier(parser, 'x', [fake_args]),
       operators['|'],
       0x80
-    ];
-    root = nodes_to_tree(nodes.slice(0));
+    ]
+    root = nodes_to_tree(nodes.slice(0))
 
-    assert.equal(root.get_value(undefined, context), 0x8F)
+    assert.equal(root.get_value(undefined, context), 0x8f)
   })
 })

@@ -1,18 +1,10 @@
+import { TemplateForEachBindingHandler } from './foreach'
 
-import {
-  TemplateForEachBindingHandler
-} from './foreach'
-
-import {
-  TemplateBindingHandler
-} from './templating'
+import { TemplateBindingHandler } from './templating'
 //    'let': letBinding,
 //    template: template,
 
-export const bindings = {
-  foreach: TemplateForEachBindingHandler,
-  template: TemplateBindingHandler
-}
+export const bindings = { foreach: TemplateForEachBindingHandler, template: TemplateBindingHandler }
 
 export * from './nativeTemplateEngine'
 export * from './templateEngine'

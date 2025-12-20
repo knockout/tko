@@ -1,7 +1,4 @@
-
-import {
-    observableArray, isObservableArray, observable, isObservable, subscribable
-} from '../dist'
+import { observableArray, isObservableArray, observable, isObservable, subscribable } from '../dist'
 
 describe('Observable Array', function () {
   let testObservableArray, notifiedValues, beforeNotifiedValues
@@ -13,9 +10,13 @@ describe('Observable Array', function () {
       notifiedValues.push(value ? value.slice(0) : value)
     })
     beforeNotifiedValues = new Array()
-    testObservableArray.subscribe(function (value) {
-      beforeNotifiedValues.push(value ? value.slice(0) : value)
-    }, null, 'beforeChange')
+    testObservableArray.subscribe(
+      function (value) {
+        beforeNotifiedValues.push(value ? value.slice(0) : value)
+      },
+      null,
+      'beforeChange'
+    )
   })
 
   it('Should be observable', function () {
@@ -27,14 +28,7 @@ describe('Observable Array', function () {
   })
 
   it('isObservableArray should return false for non-observable array values', function () {
-    const types = [
-      undefined,
-      null,
-      'x',
-          {},
-      function () {},
-      observable([])
-    ]
+    const types = [undefined, null, 'x', {}, function () {}, observable([])]
 
     types.forEach(value => expect(isObservableArray(value)).toEqual(false))
   })
@@ -49,14 +43,18 @@ describe('Observable Array', function () {
   })
 
   it('Should require constructor arg, if given, to be array-like or null or undefined', function () {
-        // Try non-array-like args
-    expect(function () { observableArray(1) }).toThrow()
-    expect(function () { observableArray({}) }).toThrow()
+    // Try non-array-like args
+    expect(function () {
+      observableArray(1)
+    }).toThrow()
+    expect(function () {
+      observableArray({})
+    }).toThrow()
 
-        // Try allowed args
-    expect((observableArray([1, 2, 3]))().length).toEqual(3)
-    expect((observableArray(null))().length).toEqual(0)
-    expect((observableArray(undefined))().length).toEqual(0)
+    // Try allowed args
+    expect(observableArray([1, 2, 3])().length).toEqual(3)
+    expect(observableArray(null)().length).toEqual(0)
+    expect(observableArray(undefined)().length).toEqual(0)
   })
 
   it('Should be able to write values to it', function () {
@@ -67,12 +65,12 @@ describe('Observable Array', function () {
   })
 
   interface MyModel {
-    _destroy : any
+    _destroy: any
   }
 
   it('Should be able to mark single items as destroyed', function () {
-    let x : MyModel = { _destroy : null}
-    let y : MyModel = { _destroy : null}
+    let x: MyModel = { _destroy: null }
+    let y: MyModel = { _destroy: null }
     testObservableArray([x, y])
     testObservableArray.destroy(y)
     expect(testObservableArray().length).toEqual(2)
@@ -81,9 +79,9 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark multiple items as destroyed', function () {
-    let x : MyModel = { _destroy : null}
-    let y : MyModel = { _destroy : null}
-    let z : MyModel = { _destroy : null}
+    let x: MyModel = { _destroy: null }
+    let y: MyModel = { _destroy: null }
+    let z: MyModel = { _destroy: null }
 
     testObservableArray([x, y, z])
     testObservableArray.destroyAll([x, z])
@@ -94,7 +92,8 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark observable items as destroyed', function () {
-    let x = observable(), y = observable()
+    let x = observable(),
+      y = observable()
     testObservableArray([x, y])
     testObservableArray.destroy(y)
     expect(testObservableArray().length).toEqual(2)
@@ -103,9 +102,9 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark all items as destroyed by passing no args to destroyAll()', function () {
-    let x : MyModel = { _destroy : null}
-    let y : MyModel = { _destroy : null}
-    let z : MyModel = { _destroy : null}
+    let x: MyModel = { _destroy: null }
+    let y: MyModel = { _destroy: null }
+    let z: MyModel = { _destroy: null }
 
     testObservableArray([x, y, z])
     testObservableArray.destroyAll()
@@ -160,7 +159,9 @@ describe('Observable Array', function () {
   it('Should notify subscribers on remove by predicate', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     notifiedValues = new Array()
-    let removed = testObservableArray.remove(function (value) { return value == 'Beta' })
+    let removed = testObservableArray.remove(function (value) {
+      return value == 'Beta'
+    })
     expect(removed).toEqual(['Beta'])
     expect(notifiedValues).toEqual([['Alpha', 'Gamma']])
   })
@@ -222,7 +223,8 @@ describe('Observable Array', function () {
   })
 
   it('Should remove matching observable items', function () {
-    let x = observable(), y = observable()
+    let x = observable(),
+      y = observable()
     testObservableArray([x, y])
     notifiedValues = new Array()
     let removed = testObservableArray.remove(y)
@@ -260,8 +262,8 @@ describe('Observable Array', function () {
   })
 
   it('Should notify subscribers after marking items as destroyed', function () {
-    let x : MyModel = { _destroy : null}
-    let y : MyModel = { _destroy : null}
+    let x: MyModel = { _destroy: null }
+    let y: MyModel = { _destroy: null }
     let didNotify = false
 
     testObservableArray([x, y])
@@ -275,16 +277,20 @@ describe('Observable Array', function () {
   })
 
   it('Should notify "beforeChange" subscribers before marking items as destroyed', function () {
-    let x : MyModel = { _destroy : null}
-    let y : MyModel = { _destroy : null}
+    let x: MyModel = { _destroy: null }
+    let y: MyModel = { _destroy: null }
     let didNotify = false
 
     testObservableArray([x, y])
-    testObservableArray.subscribe(function (/* value */) {
-      expect(x._destroy).toEqual(undefined)
-      expect(y._destroy).toEqual(undefined)
-      didNotify = true
-    }, null, 'beforeChange')
+    testObservableArray.subscribe(
+      function (/* value */) {
+        expect(x._destroy).toEqual(undefined)
+        expect(y._destroy).toEqual(undefined)
+        didNotify = true
+      },
+      null,
+      'beforeChange'
+    )
     testObservableArray.destroy(y)
     expect(didNotify).toEqual(true)
   })
@@ -307,21 +313,24 @@ describe('Observable Array', function () {
     expect(testObservableArray.reverse()).toBe(testObservableArray)
     expect(testObservableArray.sort()).toBe(testObservableArray)
 
-        // Verify that reverse and sort notified their changes
-    expect(notifiedValues).toEqual([ [3, 2, 1], [1, 2, 3] ])
+    // Verify that reverse and sort notified their changes
+    expect(notifiedValues).toEqual([
+      [3, 2, 1],
+      [1, 2, 3]
+    ])
   })
 
   it('Should return a new sorted array from "sorted"', function () {
-          // set some unsorted values so we can see that the new array is sorted
-    testObservableArray([ 5, 7, 3, 1 ])
+    // set some unsorted values so we can see that the new array is sorted
+    testObservableArray([5, 7, 3, 1])
     notifiedValues = new Array()
 
     let newArray = testObservableArray.sorted()
-    expect(newArray).toEqual([ 1, 3, 5, 7 ])
+    expect(newArray).toEqual([1, 3, 5, 7])
     expect(newArray).not.toBe(testObservableArray())
 
     const newArray2 = testObservableArray.sorted((a, b) => b - a)
-    expect(newArray2).toEqual([ 7, 5, 3, 1 ])
+    expect(newArray2).toEqual([7, 5, 3, 1])
     expect(newArray2).not.toBe(testObservableArray())
     expect(newArray2).not.toBe(newArray)
 
@@ -330,7 +339,7 @@ describe('Observable Array', function () {
 
   it('Should return a new reversed array from "reversed"', function () {
     let newArray = testObservableArray.reversed()
-    expect(newArray).toEqual([ 3, 2, 1 ])
+    expect(newArray).toEqual([3, 2, 1])
     expect(newArray).not.toBe(testObservableArray())
     expect(notifiedValues).toEqual([])
   })
@@ -338,18 +347,22 @@ describe('Observable Array', function () {
   it('Should inherit any properties defined on subscribable.fn, observable.fn, or observableArray.fn', function () {
     this.after(function () {
       delete subscribable.fn.subscribableProp // Will be able to reach this
-      delete subscribable.fn.customProp       // Overridden on observable.fn
-      delete subscribable.fn.customFunc       // Overridden on observableArray.fn
-      delete observable.fn.customProp         // Overridden on observableArray.fn
-      delete observable.fn.customFunc         // Will be able to reach this
-      delete observableArray.fn.customProp    // Will be able to reach this
+      delete subscribable.fn.customProp // Overridden on observable.fn
+      delete subscribable.fn.customFunc // Overridden on observableArray.fn
+      delete observable.fn.customProp // Overridden on observableArray.fn
+      delete observable.fn.customFunc // Will be able to reach this
+      delete observableArray.fn.customProp // Will be able to reach this
     })
 
     subscribable.fn.subscribableProp = 'subscribable value'
     subscribable.fn.customProp = 'subscribable value - will be overridden'
-    subscribable.fn.customFunc = function () { throw new Error('Shouldn\'t be reachable') }
+    subscribable.fn.customFunc = function () {
+      throw new Error("Shouldn't be reachable")
+    }
     observable.fn.customProp = 'observable prop value - will be overridden'
-    observable.fn.customFunc = function () { return this() }
+    observable.fn.customFunc = function () {
+      return this()
+    }
     observableArray.fn.customProp = 'observableArray value'
 
     let instance = observableArray([123])
@@ -359,7 +372,7 @@ describe('Observable Array', function () {
   })
 
   it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
-        // On unsupported browsers, there's nothing to test
+    // On unsupported browsers, there's nothing to test
     if (!jasmine.browserSupportsProtoAssignment) {
       return
     }

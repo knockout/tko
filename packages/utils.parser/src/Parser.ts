@@ -3,17 +3,15 @@
  * https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
  */
 
-import {
-  options, objectForEach, clonePlainObjectDeep, extend, hasOwnProperty
-} from '@tko/utils'
+import { options, objectForEach, clonePlainObjectDeep, extend, hasOwnProperty } from '@tko/utils'
 
-import {default as Expression} from './Expression'
-import {default as Identifier} from './Identifier'
-import {default as Arguments} from './Arguments'
-import {default as Parameters} from './Parameters'
-import {default as Ternary} from './Ternary'
-import {default as Node} from './Node'
-import {default as operators} from './operators'
+import { default as Expression } from './Expression'
+import { default as Identifier } from './Identifier'
+import { default as Arguments } from './Arguments'
+import { default as Parameters } from './Parameters'
+import { default as Ternary } from './Ternary'
+import { default as Node } from './Node'
+import { default as operators } from './operators'
 
 const escapee = {
   "'": "'",
@@ -21,7 +19,7 @@ const escapee = {
   '`': '`',
   '\\': '\\',
   '/': '/',
-  '$': '$',
+  $: '$',
   b: '\b',
   f: '\f',
   n: '\n',
@@ -31,10 +29,7 @@ const escapee = {
 
 type InnerFilterType = (value: any, ignored: any, context: any, globals: any, node: any) => any
 
-type FilterType = (InnerFilterType) & {
-  precedence:number
-}
-
+type FilterType = InnerFilterType & { precedence: number }
 
 /**
  * Construct a new Parser instance with new Parser(node, context)
@@ -47,9 +42,9 @@ export default class Parser {
   ch: any
   at: any
   text: any
-  currentContextGlobals: [context:object, globals:object, node:any]
+  currentContextGlobals: [context: object, globals: object, node: any]
 
-  white () {
+  white() {
     let ch = this.ch
     while (ch && ch <= ' ') {
       ch = this.next()
@@ -57,17 +52,21 @@ export default class Parser {
     return this.comment(ch)
   }
 
-/**
- * Slurp any C or C++ style comments
- */
-  comment (ch) {
-    if (ch !== '/') { return ch }
+  /**
+   * Slurp any C or C++ style comments
+   */
+  comment(ch) {
+    if (ch !== '/') {
+      return ch
+    }
     let p = this.at
     let second = this.lookahead()
     if (second === '/') {
       while (ch) {
         ch = this.next()
-        if (ch === '\n' || ch === '\r') { break }
+        if (ch === '\n' || ch === '\r') {
+          break
+        }
       }
       ch = this.next()
     } else if (second === '*') {
@@ -85,9 +84,9 @@ export default class Parser {
       return this.white()
     }
     return ch
-  };
+  }
 
-  next (c?:string) {
+  next(c?: string) {
     if (c && c !== this.ch) {
       this.error("Expected '" + c + "' but got '" + this.ch + "'")
     }
@@ -96,20 +95,25 @@ export default class Parser {
     return this.ch
   }
 
-  lookahead () {
+  lookahead() {
     return this.text[this.at]
   }
 
-  error (m) {
-    if (m instanceof Error) { throw m }
+  error(m) {
+    if (m instanceof Error) {
+      throw m
+    }
     let [name, msg] = m.name ? [m.name, m.message] : [m, '']
-    const message = `\n${name} ${msg} of
-    ${this.text}\n` + Array(this.at).join(' ') + '_/ 🔥 \\_\n'
+    const message =
+      `\n${name} ${msg} of
+    ${this.text}\n`
+      + Array(this.at).join(' ')
+      + '_/ 🔥 \\_\n'
     throw new Error(message)
   }
 
-  name () {
-  // A name of a binding
+  name() {
+    // A name of a binding
     let name = ''
     let enclosedBy
     this.white()
@@ -126,9 +130,7 @@ export default class Parser {
         this.white()
         ch = this.next()
         if (ch !== ':' && ch !== ',') {
-          this.error(
-          'Object name: ' + name + ' missing closing ' + enclosedBy
-        )
+          this.error('Object name: ' + name + ' missing closing ' + enclosedBy)
         }
         return name
       } else if (ch === ':' || ch <= ' ' || ch === ',' || ch === '|') {
@@ -141,7 +143,7 @@ export default class Parser {
     return name
   }
 
-  number () {
+  number() {
     let number
     let string = ''
     let ch = this.ch
@@ -182,14 +184,14 @@ export default class Parser {
     }
   }
 
-/**
- * Add a property to 'object' that equals the given value.
- * @param  {Object} object The object to add the value to.
- * @param  {String} key    object[key] is set to the given value.
- * @param  {mixed}  value  The value, may be a primitive or a function. If a
- *                         function it is unwrapped as a property.
- */
-  objectAddValue (object, key, value) {
+  /**
+   * Add a property to 'object' that equals the given value.
+   * @param  {Object} object The object to add the value to.
+   * @param  {String} key    object[key] is set to the given value.
+   * @param  {mixed}  value  The value, may be a primitive or a function. If a
+   *                         function it is unwrapped as a property.
+   */
+  objectAddValue(object, key, value) {
     if (value && value[Node.isExpressionOrIdentifierSymbol]) {
       Object.defineProperty(object, key, {
         get: () => Node.value_of(value, ...this.currentContextGlobals),
@@ -201,13 +203,13 @@ export default class Parser {
         enumerable: true
       })
     } else {
-    // primitives
+      // primitives
       object[key] = value
     }
   }
 
-  object () {
-    let key:string
+  object() {
+    let key: string
     let object = {}
     let ch = this.ch
 
@@ -252,15 +254,15 @@ export default class Parser {
     this.error('Bad object')
   }
 
-/**
- * Read up to delim and return the string
- * @param  {string} delim The delimiter, either ' or "
- * @return {string}       The string read.
- */
-  readString (delim) {
+  /**
+   * Read up to delim and return the string
+   * @param  {string} delim The delimiter, either ' or "
+   * @return {string}       The string read.
+   */
+  readString(delim) {
     let string = ''
     let nodes = ['']
-    let plusOp:any = operators['+']
+    let plusOp: any = operators['+']
     let hex
     let i
     let uffff
@@ -270,7 +272,9 @@ export default class Parser {
     while (ch) {
       if (ch === delim) {
         ch = this.next()
-        if (interpolate) { nodes.push(plusOp) }
+        if (interpolate) {
+          nodes.push(plusOp)
+        }
         nodes.push(string)
         return nodes
       }
@@ -279,7 +283,7 @@ export default class Parser {
         if (ch === 'u') {
           uffff = 0
           for (i = 0; i < 4; i += 1) {
-            hex = parseInt(ch = this.next(), 16)
+            hex = parseInt((ch = this.next()), 16)
             if (!isFinite(hex)) {
               break
             }
@@ -300,7 +304,7 @@ export default class Parser {
           nodes.push(plusOp)
           nodes.push(this.expression())
           string = ''
-        // this.next('}');
+          // this.next('}');
         } else {
           string += '$' + ch
         }
@@ -313,7 +317,7 @@ export default class Parser {
     this.error('Bad string')
   }
 
-  string () {
+  string() {
     let ch = this.ch
     if (ch === '"') {
       return this.readString('"')?.join('')
@@ -326,7 +330,7 @@ export default class Parser {
     this.error('Bad string')
   }
 
-  array () {
+  array() {
     let array = new Array()
     let ch = this.ch
 
@@ -351,35 +355,50 @@ export default class Parser {
     this.error('Bad array')
   }
 
-  value () {
+  value() {
     this.white()
     let ch = this.ch
     switch (ch) {
-      case '{': return this.object()
-      case '[': return this.array()
-      case '"': case "'": case '`': return this.string()
-      case '-': return this.number()
+      case '{':
+        return this.object()
+      case '[':
+        return this.array()
+      case '"':
+      case "'":
+      case '`':
+        return this.string()
+      case '-':
+        return this.number()
       default:
         return ch >= '0' && ch <= '9' ? this.number() : this.identifier()
     }
   }
 
-/**
- * Get the function for the given operator.
- * A `.precedence` value is added to the function, with increasing
- * precedence having a higher number.
- * @return {function} The function that performs the infix operation
- */
-  operator (opts) {
+  /**
+   * Get the function for the given operator.
+   * A `.precedence` value is added to the function, with increasing
+   * precedence having a higher number.
+   * @return {function} The function that performs the infix operation
+   */
+  operator(opts) {
     let op = ''
     let opFn
     let ch = this.white()
     let isIdentifierChar = Identifier.is_valid_start_char
 
     while (ch) {
-      if (isIdentifierChar(ch) || ch <= ' ' || ch === '' ||
-        ch === '"' || ch === "'" || ch === '{' || ch === '(' ||
-        ch === '`' || ch === ')' || (ch <= '9' && ch >= '0')) {
+      if (
+        isIdentifierChar(ch)
+        || ch <= ' '
+        || ch === ''
+        || ch === '"'
+        || ch === "'"
+        || ch === '{'
+        || ch === '('
+        || ch === '`'
+        || ch === ')'
+        || (ch <= '9' && ch >= '0')
+      ) {
         break
       }
 
@@ -390,8 +409,8 @@ export default class Parser {
       op += ch
       ch = this.next()
 
-    // An infix followed by the prefix e.g. a + @b
-    // TODO: other prefix unary operators
+      // An infix followed by the prefix e.g. a + @b
+      // TODO: other prefix unary operators
       if (ch === '@') {
         break
       }
@@ -400,7 +419,9 @@ export default class Parser {
     }
 
     if (op !== '') {
-      if (opts.prefix && op === '-') { op = '&-' }
+      if (opts.prefix && op === '-') {
+        op = '&-'
+      }
       opFn = operators[op]
 
       if (!opFn) {
@@ -411,19 +432,19 @@ export default class Parser {
     return opFn
   }
 
-/**
- * Filters
- * Returns what the Node interprets as an "operator".
- * e.g.
- *   <span data-bind="text: name | fit:20 | uppercase"></span>
- */
-  filter (): FilterType 
-  {
+  /**
+   * Filters
+   * Returns what the Node interprets as an "operator".
+   * e.g.
+   *   <span data-bind="text: name | fit:20 | uppercase"></span>
+   */
+  filter(): FilterType {
     let ch = this.next()
     let args = new Array()
-    
 
-    let nextFilter: ((any) => any) | InnerFilterType = function (v) { return v };
+    let nextFilter: ((any) => any) | InnerFilterType = function (v) {
+      return v
+    }
     let name = this.name()
 
     if (!options.filters[name]) {
@@ -443,12 +464,14 @@ export default class Parser {
         break
       }
 
-      if (ch === ',') { break }
+      if (ch === ',') {
+        break
+      }
 
       ch = this.white()
     }
 
-    function filter (value, ignored, context, globals, node) {
+    function filter(value, ignored, context, globals, node) {
       let argValues = [value]
 
       for (let i = 0, j = args.length; i < j; ++i) {
@@ -458,37 +481,37 @@ export default class Parser {
       return nextFilter(options.filters[name].apply(context, argValues), ignored, context, globals, node)
     }
 
-  // Lowest precedence.
+    // Lowest precedence.
     filter.precedence = 1
     return filter
   }
 
-/**
- * Parse an expression – builds an operator tree, in something like
- * Shunting-Yard.
- *   See: http://en.wikipedia.org/wiki/Shunting-yard_algorithm
- *
- * @param filterable - Whether the expression can include jinga-style filters.
- *    An argument of '|' is used only by the filter() method to parse subsequent
- *    filters.
- * @param allowMultipleValues - Whether multiple values separated by commas are
- *    allowed in this expression. When true (default), this method consumes
- *    subsequent comma-separated values.
- * @see {@link Parser.singleValueExpression}
- *
- * @returns a function that computes the value of the expression
- *    when called or a primitive.
- */
-  expression (filterable: string | boolean = false, allowMultipleValues: boolean = true) {
+  /**
+   * Parse an expression – builds an operator tree, in something like
+   * Shunting-Yard.
+   *   See: http://en.wikipedia.org/wiki/Shunting-yard_algorithm
+   *
+   * @param filterable - Whether the expression can include jinga-style filters.
+   *    An argument of '|' is used only by the filter() method to parse subsequent
+   *    filters.
+   * @param allowMultipleValues - Whether multiple values separated by commas are
+   *    allowed in this expression. When true (default), this method consumes
+   *    subsequent comma-separated values.
+   * @see {@link Parser.singleValueExpression}
+   *
+   * @returns a function that computes the value of the expression
+   *    when called or a primitive.
+   */
+  expression(filterable: string | boolean = false, allowMultipleValues: boolean = true) {
     let op
     let nodes = new Array()
     let ch = this.white()
 
     while (ch) {
-    // unary prefix operators
+      // unary prefix operators
       op = this.operator({ prefix: true })
       if (op) {
-        nodes.push(undefined)  // LHS Tree node.
+        nodes.push(undefined) // LHS Tree node.
         nodes.push(op)
         ch = this.white()
       }
@@ -502,21 +525,27 @@ export default class Parser {
       }
       ch = this.white()
 
-      if (ch === ':' || ch === '}' || ch === ']' ||
-        ch === ')' || ch === '' || ch === '`' ||
-        (ch === '|' && filterable === '|') ||
-        (ch === ',' && !allowMultipleValues)) {
+      if (
+        ch === ':'
+        || ch === '}'
+        || ch === ']'
+        || ch === ')'
+        || ch === ''
+        || ch === '`'
+        || (ch === '|' && filterable === '|')
+        || (ch === ',' && !allowMultipleValues)
+      ) {
         break
       }
 
-    // filters
+      // filters
       if (ch === '|' && this.lookahead() !== '|' && filterable) {
         nodes.push(this.filter())
         nodes.push(undefined)
         break
       }
 
-    // infix or postfix operators
+      // infix or postfix operators
       op = this.operator({ not_an_array: true })
 
       if (op === operators['?']) {
@@ -533,7 +562,7 @@ export default class Parser {
         op = null
       } else if (op === operators['=>']) {
         // convert the last node to Parameters
-        nodes[nodes.length-1] = new Parameters(this, nodes[nodes.length-1])
+        nodes[nodes.length - 1] = new Parameters(this, nodes[nodes.length - 1])
         nodes.push(op)
       } else if (op) {
         nodes.push(op)
@@ -541,7 +570,9 @@ export default class Parser {
 
       ch = this.white()
 
-      if (ch === ']' || (!op && ch === '(')) { break }
+      if (ch === ']' || (!op && ch === '(')) {
+        break
+      }
     }
 
     if (nodes.length === 0) {
@@ -567,18 +598,18 @@ export default class Parser {
     return new Expression(nodes)
   }
 
-/**
- * Use this method to parse expressions that can be followed by additional markup
- * seperated by a comma, such as in bindings strings.
- *
- * @returns an expression that cannot contain multiple values separated by commas.
- * @see {@link Parser.expression}
- */
-  singleValueExpression (filterable: boolean | string = false) {
+  /**
+   * Use this method to parse expressions that can be followed by additional markup
+   * seperated by a comma, such as in bindings strings.
+   *
+   * @returns an expression that cannot contain multiple values separated by commas.
+   * @see {@link Parser.expression}
+   */
+  singleValueExpression(filterable: boolean | string = false) {
     return this.expression(filterable, false)
   }
 
-  ternary (nodes) {
+  ternary(nodes) {
     let ternary = new Ternary()
     ternary.yes = this.singleValueExpression()
     this.next(':')
@@ -587,11 +618,11 @@ export default class Parser {
     nodes.push(ternary)
   }
 
-/**
- * Parse the arguments to a function, returning an Array.
- *
- */
-  funcArguments () {
+  /**
+   * Parse the arguments to a function, returning an Array.
+   *
+   */
+  funcArguments() {
     let args = new Array()
     let ch = this.next('(')
 
@@ -604,16 +635,18 @@ export default class Parser {
         args.push(this.singleValueExpression())
         ch = this.white()
       }
-      if (ch !== ')') { this.next(',') }
+      if (ch !== ')') {
+        this.next(',')
+      }
     }
 
     this.error('Bad arguments to function')
   }
 
-/**
- * The literal string reference `abc` in an `x.abc` expression.
- */
-  member () {
+  /**
+   * The literal string reference `abc` in an `x.abc` expression.
+   */
+  member() {
     let member = ''
     let ch = this.white()
     let isIdentifierChar = Identifier.is_valid_start_char
@@ -629,22 +662,22 @@ export default class Parser {
     return member
   }
 
-/**
- * A dereference applies to an identifer, being either a function
- * call "()" or a membership lookup with square brackets "[member]".
- * @return {fn or undefined}  Dereference function to be applied to the
- *                            Identifier
- */
-  dereference () {
+  /**
+   * A dereference applies to an identifer, being either a function
+   * call "()" or a membership lookup with square brackets "[member]".
+   * @return {fn or undefined}  Dereference function to be applied to the
+   *                            Identifier
+   */
+  dereference() {
     let member
     let ch = this.white()
 
     while (ch) {
       if (ch === '(') {
-      // a(...) function call
+        // a(...) function call
         return this.funcArguments()
       } else if (ch === '[') {
-      // a[x] membership
+        // a[x] membership
         this.next('[')
         member = this.expression()
         this.white()
@@ -652,7 +685,7 @@ export default class Parser {
 
         return member
       } else if (ch === '.') {
-      // a.x membership
+        // a.x membership
         this.next('.')
         return this.member()
       } else {
@@ -661,7 +694,7 @@ export default class Parser {
     }
   }
 
-  dereferences () {
+  dereferences() {
     let ch = this.white()
     let dereferences = new Array()
     let deref
@@ -677,7 +710,7 @@ export default class Parser {
     return dereferences
   }
 
-  identifier () {
+  identifier() {
     let token = ''
     let isIdentifierChar = Identifier.is_valid_start_char
     let ch = this.white()
@@ -691,18 +724,22 @@ export default class Parser {
       isIdentifierChar = Identifier.is_valid_continue_char
     }
     switch (token) {
-      case 'true': return true
-      case 'false': return false
-      case 'null': return null
-      case 'undefined': return void 0
+      case 'true':
+        return true
+      case 'false':
+        return false
+      case 'null':
+        return null
+      case 'undefined':
+        return void 0
       case 'function':
         throw new Error('Knockout: Anonymous functions are no longer supported, but `=>` lambdas are. In: ' + this.text)
-    // return this.anonymous_fn();
+      // return this.anonymous_fn();
     }
     return new Identifier(this, token, this.dereferences())
   }
 
-  readBindings () {
+  readBindings() {
     let key
     let bindings = {}
     let sep
@@ -719,14 +756,14 @@ export default class Parser {
         } else {
           ch = ''
         }
-      // A "bare" binding e.g. "text"; substitute value of 'null'
-      // so it becomes "text: null".
+        // A "bare" binding e.g. "text"; substitute value of 'null'
+        // so it becomes "text: null".
         bindings[key] = null
       } else {
         if (key.indexOf('.') !== -1) {
-        // Namespaced – i.e.
-        //    `attr.css: x` becomes `attr: { css: x }`
-        //     ^^^ - key
+          // Namespaced – i.e.
+          //    `attr.css: x` becomes `attr: { css: x }`
+          //     ^^^ - key
           key = key.split('.')
           bindings[key[0]] = bindings[key[0]] || {}
 
@@ -741,8 +778,8 @@ export default class Parser {
         } else {
           ch = this.next(':')
           if (bindings[key] && typeof bindings[key] === 'object' && bindings[key].constructor === Object) {
-          // Extend a namespaced bindings e.g. we've previously seen
-          // on.x, now we're seeing on: { 'abc' }.
+            // Extend a namespaced bindings e.g. we've previously seen
+            // on.x, now we're seeing on: { 'abc' }.
             expr = this.singleValueExpression(true)
             if (typeof expr !== 'object' || expr.constructor !== Object) {
               options.onError(new Error('Expected plain object for ' + key + ' value.'))
@@ -765,9 +802,13 @@ export default class Parser {
     return bindings
   }
 
-  valueAsAccessor (value, context, globals, node) {
-    if (!value) { return () => value }
-    if (typeof value === 'function') { return value }
+  valueAsAccessor(value, context, globals, node) {
+    if (!value) {
+      return () => value
+    }
+    if (typeof value === 'function') {
+      return value
+    }
 
     if (value[Node.isExpressionOrIdentifierSymbol]) {
       return () => Node.value_of(value, context, globals, node)
@@ -777,7 +818,7 @@ export default class Parser {
       return () => value.map(v => Node.value_of(v, context, globals, node))
     }
 
-    if (typeof (value) !== 'function') {
+    if (typeof value !== 'function') {
       return () => clonePlainObjectDeep(value)
     }
 
@@ -785,14 +826,14 @@ export default class Parser {
   }
 
   /**
-  * Convert result[name] from a value to a function (i.e. `valueAccessor()`)
-  * @param  {object} result [Map of top-level names to values]
-  * @return {object}        [Map of top-level names to functions]
-  *
-  * Accessors may be one of (below) constAccessor, identifierAccessor,
-  * expressionAccessor, or nodeAccessor.
-  */
-  convertToAccessors (result, context, globals, node) {
+   * Convert result[name] from a value to a function (i.e. `valueAccessor()`)
+   * @param  {object} result [Map of top-level names to values]
+   * @return {object}        [Map of top-level names to functions]
+   *
+   * Accessors may be one of (below) constAccessor, identifierAccessor,
+   * expressionAccessor, or nodeAccessor.
+   */
+  convertToAccessors(result, context, globals, node) {
     objectForEach(result, (name, value) => {
       if (value instanceof Identifier) {
         // Return a function that, with no arguments returns
@@ -801,9 +842,13 @@ export default class Parser {
         Object.defineProperty(result, name, {
           value: function (optionalValue, options) {
             const currentValue = value.get_value(undefined, context, globals, node)
-            if (arguments.length === 0) { return currentValue }
+            if (arguments.length === 0) {
+              return currentValue
+            }
             const unchanged = optionalValue === currentValue
-            if (options && options.onlyIfChanged && unchanged) { return }
+            if (options && options.onlyIfChanged && unchanged) {
+              return
+            }
             return value.set_value(optionalValue, context, globals)
           }
         })
@@ -814,12 +859,12 @@ export default class Parser {
     return result
   }
 
-  preparse (source = '') {
+  preparse(source = '') {
     const preparsers = options.bindingStringPreparsers || []
     return preparsers.reduce((acc, fn) => fn(acc), source.trim())
   }
 
-  runParse (source, fn) {
+  runParse(source, fn) {
     this.text = this.preparse(source)
     this.at = 0
     this.ch = ' '
@@ -841,8 +886,10 @@ export default class Parser {
    * @param  {string} source The binding string to parse.
    * @return {object}        Map of name to accessor function.
    */
-  parse (source, context = {}, globals = {}, node) {
-    if (!source) { return () => null }
+  parse(source, context = {}, globals = {}, node) {
+    if (!source) {
+      return () => null
+    }
     this.currentContextGlobals = [context, globals, node]
     const parseFn = () => this.readBindings()
     const bindingAccessors = this.runParse(source, parseFn)
@@ -852,8 +899,10 @@ export default class Parser {
   /**
    * Return a function that evaluates and returns the result of the expression.
    */
-  parseExpression (source, context = {}, globals = {}, node) {
-    if (!source) { return () => '' }
+  parseExpression(source, context = {}, globals = {}, node) {
+    if (!source) {
+      return () => ''
+    }
     this.currentContextGlobals = [context, globals, node]
     const parseFn = () => this.singleValueExpression(true)
     const bindingAccessors = this.runParse(source, parseFn)

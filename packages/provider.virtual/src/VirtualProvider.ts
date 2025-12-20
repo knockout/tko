@@ -1,21 +1,19 @@
-import {
-  virtualElements
-} from '@tko/utils'
+import { virtualElements } from '@tko/utils'
 
-import {
-  BindingStringProvider
-} from '@tko/provider.bindingstring'
+import { BindingStringProvider } from '@tko/provider.bindingstring'
 
-import type { BindingContext } from '@tko/bind';
+import type { BindingContext } from '@tko/bind'
 
 export default class VirtualProvider extends BindingStringProvider {
-  get FOR_NODE_TYPES () { return [ 1, 8 ] }
+  get FOR_NODE_TYPES() {
+    return [1, 8]
+  }
 
   /**
    * Convert <ko binding='...'> into <!-- ko binding: ... -->
    * @param {HTMLElement} node
    */
-  preprocessNode (node: Element) {
+  preprocessNode(node: Element) {
     if (node.tagName === 'KO') {
       const parent = node.parentNode
       const childNodes = [...node.childNodes]
@@ -32,19 +30,19 @@ export default class VirtualProvider extends BindingStringProvider {
     }
   }
 
-  * genElementBindingStrings (node: Element) {
-    for (const {name, value} of node.attributes) {
+  *genElementBindingStrings(node: Element) {
+    for (const { name, value } of node.attributes) {
       yield `${name.replace(/^ko-/, '')}: ${value}`
     }
   }
 
-  getBindingString (node: Element) {
+  getBindingString(node: Element) {
     if (node.nodeType === document.COMMENT_NODE) {
       return virtualElements.virtualNodeBindingValue(node)
     }
   }
 
-  nodeHasBindings (node: Element, context?: BindingContext) : boolean | undefined {
+  nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
     if (node.nodeType === document.COMMENT_NODE) {
       return virtualElements.isStartComment(node)
     }

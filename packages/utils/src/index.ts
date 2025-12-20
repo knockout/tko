@@ -30,4 +30,4 @@ import * as tasks from './tasks'
 import * as virtualElements from './dom/virtualElements'
 import * as domData from './dom/data'
 
-export {tasks, virtualElements, domData, memoization}
+export { tasks, virtualElements, domData, memoization }

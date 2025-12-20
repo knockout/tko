@@ -1,23 +1,18 @@
-
 import Node from './Node'
 import Arguments from './Arguments'
 import Parser from './Parser'
 import { hasOwnProperty, isObjectLike } from '@tko/utils'
 
-import {
-  isWriteableObservable, isObservable
-} from '@tko/observable'
+import { isWriteableObservable, isObservable } from '@tko/observable'
 
-import {
-  IDStart, IDContinue
-} from './identifierExpressions'
+import { IDStart, IDContinue } from './identifierExpressions'
 
 export default class Identifier {
-   token: string
-   dereferences: any
-   parser: Parser
+  token: string
+  dereferences: any
+  parser: Parser
 
-  constructor (parser: Parser, token: string, dereferences: any[]) {
+  constructor(parser: Parser, token: string, dereferences: any[]) {
     this.token = token
     this.dereferences = dereferences
     this.parser = parser
@@ -44,11 +39,11 @@ export default class Identifier {
    *
    *     See: `this` tests of our dereference function.
    */
-  dereference (value, $context, globals, node) {
+  dereference(value, $context, globals, node) {
     let member
     let refs = this.dereferences || []
     const $data = $context.$data || {}
-    let lastValue  // becomes `this` in function calls to object properties.
+    let lastValue // becomes `this` in function calls to object properties.
     let i, n
 
     for (i = 0, n = refs.length; i < n; ++i) {
@@ -69,13 +64,12 @@ export default class Identifier {
     }
 
     // [1] See note above.
-    if (typeof value === 'function' && n > 0 && lastValue !== value &&
-        !hasOwnProperty(lastValue, member)) {
+    if (typeof value === 'function' && n > 0 && lastValue !== value && !hasOwnProperty(lastValue, member)) {
       return value.bind(lastValue)
     }
 
     return value
-  };
+  }
 
   /**
    * Return the value as one would get it from the top-level i.e.
@@ -87,30 +81,31 @@ export default class Identifier {
    * @param  {object | Identifier | Expression} parent
    * @return {mixed}  Return the primitive or an accessor.
    */
-  get_value (parent, context, globals, node) {
-    const intermediate = parent && !(parent instanceof Identifier)
-      ? Node.value_of(parent, context, globals, node)[this.token]
-      : context.lookup(this.token, globals, node)
+  get_value(parent, context, globals, node) {
+    const intermediate =
+      parent && !(parent instanceof Identifier)
+        ? Node.value_of(parent, context, globals, node)[this.token]
+        : context.lookup(this.token, globals, node)
     return this.dereference(intermediate, context, globals, node)
   }
 
-  assign (object, property, value) {
+  assign(object, property, value) {
     if (isWriteableObservable(object[property])) {
       object[property](value)
     } else if (!isObservable(object[property])) {
       object[property] = value
     }
-  };
+  }
 
   /**
    * Set the value of the Identifier.
    *
    * @param {Mixed} new_value The value that Identifier is to be set to.
    */
-  set_value (new_value, $context, globals) {
+  set_value(new_value, $context, globals) {
     const $data = $context.$data || {}
     const refs = this.dereferences || []
-    let leaf:any = this.token
+    let leaf: any = this.token
     let i, n, root
 
     if (isObjectLike($data) && leaf in $data) {
@@ -120,9 +115,13 @@ export default class Identifier {
     } else if (leaf in globals) {
       root = globals
     } else {
-      throw new Error('Identifier::set_value -- ' +
-        "The property '" + leaf + "' does not exist " +
-        'on the $data, $context, or globals.')
+      throw new Error(
+        'Identifier::set_value -- '
+          + "The property '"
+          + leaf
+          + "' does not exist "
+          + 'on the $data, $context, or globals.'
+      )
     }
 
     // Degenerate case. {$data|$context|global}[leaf] = something;
@@ -155,7 +154,7 @@ export default class Identifier {
     if (refs[i]) {
       this.assign(root, Node.value_of(refs[i]), new_value)
     }
-  };
+  }
 
   /**
    * Determine if a character is a valid item in an identifier.
@@ -172,13 +171,15 @@ export default class Identifier {
   //          (ch >= '0' && ch <= 9) ||
   //           ch === '_' || ch === '$';
   // }
-  static is_valid_start_char (ch) {
+  static is_valid_start_char(ch) {
     return IDStart.test(ch)
   }
 
-  static is_valid_continue_char (ch) {
+  static is_valid_continue_char(ch) {
     return IDContinue.test(ch)
   }
 
-  get [Node.isExpressionOrIdentifierSymbol] () { return true }
+  get [Node.isExpressionOrIdentifierSymbol]() {
+    return true
+  }
 }

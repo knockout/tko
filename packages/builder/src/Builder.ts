@@ -40,63 +40,52 @@ import {
   virtualElements
 } from '@tko/utils'
 
-import {
-  parseObjectLiteral
-} from '@tko/utils.parser'
+import { parseObjectLiteral } from '@tko/utils.parser'
+
+import { LifeCycle } from '@tko/lifecycle'
 
 import {
-  LifeCycle
-} from '@tko/lifecycle'
-
-import {
-    // applyExtenders,
-    // arrayChangeEventName,
-    // deferUpdates,
-    dependencyDetection,
-    extenders as defaultExtenders,
-    isObservable,
-    isSubscribable,
-    isWriteableObservable,
-    observable,
-    observableArray,
-    isObservableArray,
-    peek,
-    subscribable,
-    toJS,
-    toJSON,
-    unwrap
+  // applyExtenders,
+  // arrayChangeEventName,
+  // deferUpdates,
+  dependencyDetection,
+  extenders as defaultExtenders,
+  isObservable,
+  isSubscribable,
+  isWriteableObservable,
+  observable,
+  observableArray,
+  isObservableArray,
+  peek,
+  subscribable,
+  toJS,
+  toJSON,
+  unwrap
 } from '@tko/observable'
 
-import {
-    computed,
-    isComputed,
-    isPureComputed,
-    proxy,
-    pureComputed,
-    when
-} from '@tko/computed'
+import { computed, isComputed, isPureComputed, proxy, pureComputed, when } from '@tko/computed'
 
 import {
-    applyBindingAccessorsToNode,
-    applyBindings,
-    applyBindingsToDescendants,
-    applyBindingsToNode,
-    contextFor,
-    dataFor,
-    bindingEvent,
-    BindingHandler,
-    AsyncBindingHandler,
-    setDomNodeChildrenFromArrayMapping
+  applyBindingAccessorsToNode,
+  applyBindings,
+  applyBindingsToDescendants,
+  applyBindingsToNode,
+  contextFor,
+  dataFor,
+  bindingEvent,
+  BindingHandler,
+  AsyncBindingHandler,
+  setDomNodeChildrenFromArrayMapping
 } from '@tko/bind'
 
 import {
-    anonymousTemplate,
-    domElement,
-    nativeTemplateEngine,
-    renderTemplate,
-    setTemplateEngine,
-    templateEngine
-    // templateSources
+  anonymousTemplate,
+  domElement,
+  nativeTemplateEngine,
+  renderTemplate,
+  setTemplateEngine,
+  templateEngine
+  // templateSources
 } from '@tko/binding.template'
 
 import type { BindingHandlerObject } from '@tko/provider'
@@ -107,10 +96,10 @@ const domNodeDisposal = {
   removeNode,
   addCleaner,
   removeCleaner,
-  get cleanExternalData () {
+  get cleanExternalData() {
     return options.cleanExternalData
   },
-  set cleanExternalData (cleanerFn) {
+  set cleanExternalData(cleanerFn) {
     options.set('cleanExternalData', cleanerFn)
   }
 }
@@ -148,7 +137,7 @@ export type Utils = {
   unwrapObservable: typeof unwrap
 }
 
-const utils : Utils = {
+const utils: Utils = {
   addOrRemoveItem,
   arrayFilter,
   arrayFirst,
@@ -180,7 +169,6 @@ const utils : Utils = {
   triggerEvent,
   unwrapObservable: unwrap
 }
-
 
 export type KnockoutInstance = {
   // --- Utilities ---
@@ -241,7 +229,7 @@ export type KnockoutInstance = {
   bindingEvent: typeof bindingEvent
 }
 
-const knockout : KnockoutInstance = {
+const knockout: KnockoutInstance = {
   // --- Utilities ---
   cleanNode,
   dependencyDetection,
@@ -303,11 +291,8 @@ const knockout : KnockoutInstance = {
 export class Builder {
   providedProperties: { extenders: any; bindingHandlers: BindingHandlerObject; bindingProvider: any }
 
-  constructor ({ provider, bindings, extenders, filters, options }) {
-    Object.assign(knockout.options, options, {
-      filters,
-      bindingProviderInstance: provider
-    })
+  constructor({ provider, bindings, extenders, filters, options }) {
+    Object.assign(knockout.options, options, { filters, bindingProviderInstance: provider })
 
     provider.setGlobals(knockout.options.bindingGlobals)
 
@@ -329,16 +314,20 @@ export class Builder {
   /**
    * @return {KnockoutInstance} An instance of Knockout.
    */
-  create (...additionalProperties) : KnockoutInstance {
-    
-    const instance : KnockoutInstance =  Object.assign(      
+  create(...additionalProperties): KnockoutInstance {
+    const instance: KnockoutInstance = Object.assign(
       {
-        get getBindingHandler () { return options.getBindingHandler },
-        set getBindingHandler (fn) { options.set('getBindingHandler', fn) }
-      },      
+        get getBindingHandler() {
+          return options.getBindingHandler
+        },
+        set getBindingHandler(fn) {
+          options.set('getBindingHandler', fn)
+        }
+      },
       knockout, //never change the order of these
       this.providedProperties,
-      ...additionalProperties)
+      ...additionalProperties
+    )
 
     instance.options.knockoutInstance = instance
 

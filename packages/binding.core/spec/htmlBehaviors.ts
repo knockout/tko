@@ -1,22 +1,18 @@
-import {
-    applyBindings
-} from '@tko/bind'
+import { applyBindings } from '@tko/bind'
 
-import {
-    DataBindProvider
-} from '@tko/provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
-import {
-    options
-} from '@tko/utils'
+import { options } from '@tko/utils'
 
-import {bindings as coreBindings} from '../dist'
+import { bindings as coreBindings } from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: HTML', function () {
-  let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  let testNode: HTMLElement
+  beforeEach(function () {
+    testNode = jasmine.prepareTestNode()
+  })
 
   beforeEach(function () {
     let provider = new DataBindProvider()
@@ -45,9 +41,9 @@ describe('Binding: HTML', function () {
   })
 
   it('Should be able to write arbitrary HTML, even if it is not semantically correct', function () {
-        // Represents issue #98 (https://github.com/SteveSanderson/knockout/issues/98)
-        // IE 8 and earlier is excessively strict about the use of .innerHTML - it throws
-        // if you try to write a <P> tag inside an existing <P> tag, for example.
+    // Represents issue #98 (https://github.com/SteveSanderson/knockout/issues/98)
+    // IE 8 and earlier is excessively strict about the use of .innerHTML - it throws
+    // if you try to write a <P> tag inside an existing <P> tag, for example.
     let model = { textProp: "<p>hello</p><p>this isn't semantically correct</p>" }
     testNode.innerHTML = "<p data-bind='html:textProp'></p>"
     applyBindings(model, testNode)
@@ -55,16 +51,18 @@ describe('Binding: HTML', function () {
   })
 
   it('Should be able to write arbitrary HTML, including <tr> elements into tables', function () {
-        // Some HTML elements are awkward, because the browser implicitly adds surrounding
-        // elements, or won't allow those elements to be direct children of others.
-        // The most common examples relate to tables.
+    // Some HTML elements are awkward, because the browser implicitly adds surrounding
+    // elements, or won't allow those elements to be direct children of others.
+    // The most common examples relate to tables.
     let model = { textProp: '<tr><td>hello</td></tr>' }
     testNode.innerHTML = "<table data-bind='html:textProp'></table>"
     applyBindings(model, testNode)
 
-        // Accept either of the following outcomes - there may or may not be an implicitly added <tbody>.
+    // Accept either of the following outcomes - there may or may not be an implicitly added <tbody>.
     let tr = testNode.children[0].children[0]
-    if (tr.tagName == 'TBODY') { tr = tr.children[0] }
+    if (tr.tagName == 'TBODY') {
+      tr = tr.children[0]
+    }
 
     let td = tr.children[0]
 

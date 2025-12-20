@@ -5,10 +5,7 @@
 // The following are added to the root `[t]ko` object.
 //
 
-export {
-    observable, isObservable, unwrap, peek,
-    isWriteableObservable, isWritableObservable
-} from './observable'
+export { observable, isObservable, unwrap, peek, isWriteableObservable, isWritableObservable } from './observable'
 export { isSubscribable, subscribable, LATEST_VALUE } from './subscribable'
 export { observableArray, isObservableArray } from './observableArray'
 export { trackArrayChanges, arrayChangeEventName } from './observableArray.changeTracking'

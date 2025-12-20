@@ -1,18 +1,17 @@
-import type { BindingContext } from './bindingContext';
-
+import type { BindingContext } from './bindingContext'
 
 export class BindingResult {
   isSync: boolean
   isComplete: boolean
   completionPromise: Promise<BindingResult>
-  rootNode: Node;
-  bindingContext: BindingContext;
+  rootNode: Node
+  bindingContext: BindingContext
 
-  constructor({asyncBindingsApplied, rootNode, bindingContext}) {
-    this.rootNode = rootNode;
-    this.bindingContext = bindingContext;
+  constructor({ asyncBindingsApplied, rootNode, bindingContext }) {
+    this.rootNode = rootNode
+    this.bindingContext = bindingContext
     this.isSync = asyncBindingsApplied.size === 0
-    this.isComplete = this.isSync;
+    this.isComplete = this.isSync
 
     if (!this.isSync) {
       this.completionPromise = this.completeWhenBindingsFinish(asyncBindingsApplied)

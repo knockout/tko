@@ -1,9 +1,6 @@
+import { AttributeProvider } from '../dist'
 
-import {
-  AttributeProvider
-} from '../dist'
-
-import { assert } from "chai"
+import { assert } from 'chai'
 
 describe('Attribute Provider Behavior', function () {
   describe('nodeHasBindings', function () {
@@ -26,7 +23,7 @@ describe('Attribute Provider Behavior', function () {
       const provider = new AttributeProvider()
       const div = document.createElement('div')
       div.setAttribute('ko-text', 'a')
-      const bindings = provider.getBindingAccessors(div, {a: 123})
+      const bindings = provider.getBindingAccessors(div, { a: 123 })
       assert.deepEqual(Object.keys(bindings), ['text'])
       assert.equal(bindings.text(), '123')
     })

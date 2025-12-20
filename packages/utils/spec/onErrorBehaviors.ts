@@ -1,6 +1,4 @@
-import {
-    options, tasks
-} from '../dist'
+import { options, tasks } from '../dist'
 
 describe('onError handler', function () {
   let koOnErrorCount = 0
@@ -15,12 +13,16 @@ describe('onError handler', function () {
       koOnErrorCount++
     }
 
-    function ensureNodeExistsAndIsEmpty (id:string, tagName?:string, type?:string):HTMLElement {
+    function ensureNodeExistsAndIsEmpty(id: string, tagName?: string, type?: string): HTMLElement {
       let existingNode = document.getElementById(id)
-      if (existingNode != null) { existingNode.parentNode?.removeChild(existingNode) }
+      if (existingNode != null) {
+        existingNode.parentNode?.removeChild(existingNode)
+      }
       let resultNode = document.createElement(tagName || 'div')
       resultNode.id = id
-      if (type) { resultNode.setAttribute('type', type) }
+      if (type) {
+        resultNode.setAttribute('type', type)
+      }
       document.body.appendChild(resultNode)
       return resultNode
     }
@@ -34,9 +36,9 @@ describe('onError handler', function () {
     window.onerror = function () {
       windowOnErrorCount++
 
-            // Don't spam the console, since these were triggered deliberately
-            // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
-            // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
+      // Don't spam the console, since these were triggered deliberately
+      // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
+      // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
       let isPhantom = !!(window as any)._phantom
       return !isPhantom
     }
@@ -48,59 +50,59 @@ describe('onError handler', function () {
     lastSeenError = null
   })
 
-    // FIXME
-    // it('does not fire on sync errors', function () {
-    //     window.testDivTemplate.innerHTML = "name: <div data-bind='text: name'></div>";
-    //
-    //     var syncError = false;
-    //
-    //     try {
-    //         ko.renderTemplate("testDivTemplate", {
-    //             name: ko.computed(function () {
-    //                 return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
-    //             })
-    //         }, null, window.templateOutput);
-    //     }
-    //     catch (e) {
-    //         syncError = true;
-    //     }
-    //
-    //     expect(syncError).toBe(true);
-    //
-    //     expect(koOnErrorCount).toBe(0);
-    //     expect(windowOnErrorCount).toBe(0);
-    // });
-    //
-    // it('fires on async component errors', function () {
-    //     runs(function () {
-    //         var component = {
-    //             tagName: 'test-onerror',
-    //             template: "<div data-bind='text: name'></div>",
-    //             viewModel: function () {
-    //                 this.name = ko.computed(function () {
-    //                     return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
-    //                 });
-    //             }
-    //         };
-    //
-    //         if (!ko.components.isRegistered(component.tagName)) {
-    //             ko.components.register(component.tagName, component);
-    //         }
-    //
-    //         window.testDivTemplate.innerHTML = "<test-onerror></test-onerror>";
-    //         ko.renderTemplate("testDivTemplate", {
-    //         }, null, window.templateOutput);
-    //     });
-    //
-    //     waitsFor(function () {
-    //         return koOnErrorCount > 0 && windowOnErrorCount > 0;
-    //     }, 'Error counts were not updated', 500);
-    //
-    //     runs(function () {
-    //         expect(koOnErrorCount).toBe(1);
-    //         expect(windowOnErrorCount).toBe(1);
-    //     });
-    // });
+  // FIXME
+  // it('does not fire on sync errors', function () {
+  //     window.testDivTemplate.innerHTML = "name: <div data-bind='text: name'></div>";
+  //
+  //     var syncError = false;
+  //
+  //     try {
+  //         ko.renderTemplate("testDivTemplate", {
+  //             name: ko.computed(function () {
+  //                 return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
+  //             })
+  //         }, null, window.templateOutput);
+  //     }
+  //     catch (e) {
+  //         syncError = true;
+  //     }
+  //
+  //     expect(syncError).toBe(true);
+  //
+  //     expect(koOnErrorCount).toBe(0);
+  //     expect(windowOnErrorCount).toBe(0);
+  // });
+  //
+  // it('fires on async component errors', function () {
+  //     runs(function () {
+  //         var component = {
+  //             tagName: 'test-onerror',
+  //             template: "<div data-bind='text: name'></div>",
+  //             viewModel: function () {
+  //                 this.name = ko.computed(function () {
+  //                     return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
+  //                 });
+  //             }
+  //         };
+  //
+  //         if (!ko.components.isRegistered(component.tagName)) {
+  //             ko.components.register(component.tagName, component);
+  //         }
+  //
+  //         window.testDivTemplate.innerHTML = "<test-onerror></test-onerror>";
+  //         ko.renderTemplate("testDivTemplate", {
+  //         }, null, window.templateOutput);
+  //     });
+  //
+  //     waitsFor(function () {
+  //         return koOnErrorCount > 0 && windowOnErrorCount > 0;
+  //     }, 'Error counts were not updated', 500);
+  //
+  //     runs(function () {
+  //         expect(koOnErrorCount).toBe(1);
+  //         expect(windowOnErrorCount).toBe(1);
+  //     });
+  // });
 
   it('does not re-throw the error', function () {
     let expectedInstance

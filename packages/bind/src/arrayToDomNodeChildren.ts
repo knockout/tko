@@ -1,32 +1,39 @@
 /* eslint no-cond-assign: 0 */
 import {
-  fixUpContinuousNodeArray, replaceDomNodes, arrayPushAll,
-  anyDomNodeIsAttachedToDocument, domData, arrayMap, arrayForEach,
-  virtualElements, extend, cleanNode, removeNode, compareArrays
+  fixUpContinuousNodeArray,
+  replaceDomNodes,
+  arrayPushAll,
+  anyDomNodeIsAttachedToDocument,
+  domData,
+  arrayMap,
+  arrayForEach,
+  virtualElements,
+  extend,
+  cleanNode,
+  removeNode,
+  compareArrays
 } from '@tko/utils'
 
-import {
-  dependencyDetection, observable
-} from '@tko/observable'
+import { dependencyDetection, observable } from '@tko/observable'
 
-import type { Observable } from '@tko/observable';
+import type { Observable } from '@tko/observable'
 
 import { computed } from '@tko/computed'
 
 import type { Computed } from '@tko/computed'
 
-type MappingFunction<T = any> = (valueToMap: T, index: number | Observable<number>, nodes: Node[]) => Node[];
-type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
-type MappingHookFunction<T = any> = (nodes: Node[], index: number, arrayEntry: T) => void;
+type MappingFunction<T = any> = (valueToMap: T, index: number | Observable<number>, nodes: Node[]) => Node[]
+type MappingAfterAddFunction<T = any> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[]
+type MappingHookFunction<T = any> = (nodes: Node[], index: number, arrayEntry: T) => void
 
 interface MappingOptions<T = any> {
-    dontLimitMoves?: boolean;
-    beforeMove?: MappingHookFunction<T>;
-    beforeRemove?: MappingHookFunction<T>;
-    afterAdd?: MappingHookFunction<T>;
-    afterMove?: MappingHookFunction<T>;
-    afterRemove?: MappingHookFunction<T>;
-    sparse?: boolean;
+  dontLimitMoves?: boolean
+  beforeMove?: MappingHookFunction<T>
+  beforeRemove?: MappingHookFunction<T>
+  afterAdd?: MappingHookFunction<T>
+  afterMove?: MappingHookFunction<T>
+  afterRemove?: MappingHookFunction<T>
+  sparse?: boolean
 }
 
 // Objective:
@@ -39,44 +46,65 @@ interface MappingOptions<T = any> {
 // "callbackAfterAddingNodes" will be invoked after any "mapping"-generated nodes are inserted into the container node
 // You can use this, for example, to activate bindings on those nodes.
 
-function mapNodeAndRefreshWhenChanged (containerNode: Node, mapping: MappingFunction, valueToMap: any, callbackAfterAddingNodes: MappingAfterAddFunction | undefined, index: number | Observable<number>) {
+function mapNodeAndRefreshWhenChanged(
+  containerNode: Node,
+  mapping: MappingFunction,
+  valueToMap: any,
+  callbackAfterAddingNodes: MappingAfterAddFunction | undefined,
+  index: number | Observable<number>
+) {
   // Map this array value inside a dependentObservable so we re-map when any dependency changes
   const mappedNodes: Node[] = []
-  const dependentObservable: Computed<void> = computed(function () {
-    let newMappedNodes: Node[] = mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
+  const dependentObservable: Computed<void> = computed(
+    function () {
+      let newMappedNodes: Node[] =
+        mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
 
-    // On subsequent evaluations, just replace the previously-inserted DOM nodes
-    if (mappedNodes.length > 0) {
-      replaceDomNodes(mappedNodes, newMappedNodes)
-      if (callbackAfterAddingNodes) {
-        dependencyDetection.ignore(callbackAfterAddingNodes, null, [valueToMap, newMappedNodes, index])
+      // On subsequent evaluations, just replace the previously-inserted DOM nodes
+      if (mappedNodes.length > 0) {
+        replaceDomNodes(mappedNodes, newMappedNodes)
+        if (callbackAfterAddingNodes) {
+          dependencyDetection.ignore(callbackAfterAddingNodes, null, [valueToMap, newMappedNodes, index])
+        }
+      }
+
+      // Replace the contents of the mappedNodes array, thereby updating the record
+      // of which nodes would be deleted if valueToMap was itself later removed
+      mappedNodes.length = 0
+      arrayPushAll(mappedNodes, newMappedNodes)
+    },
+    null,
+    {
+      disposeWhenNodeIsRemoved: containerNode,
+      disposeWhen: function () {
+        return !anyDomNodeIsAttachedToDocument(mappedNodes)
       }
     }
-
-    // Replace the contents of the mappedNodes array, thereby updating the record
-    // of which nodes would be deleted if valueToMap was itself later removed
-    mappedNodes.length = 0
-    arrayPushAll(mappedNodes, newMappedNodes)
-  }, null, { disposeWhenNodeIsRemoved: containerNode, disposeWhen: function () { return !anyDomNodeIsAttachedToDocument(mappedNodes) } })
-  return { mappedNodes: mappedNodes, dependentObservable: (dependentObservable.isActive() ? dependentObservable : undefined) }
+  )
+  return {
+    mappedNodes: mappedNodes,
+    dependentObservable: dependentObservable.isActive() ? dependentObservable : undefined
+  }
 }
 
 let lastMappingResultDomDataKey = domData.nextKey()
 let deletedItemDummyValue = domData.nextKey()
 
-export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
-                                                              array: any,
-                                                              mapping: MappingFunction<T>,
-                                                              options?: MappingOptions<T>,
-                                                              callbackAfterAddingNodes?: MappingAfterAddFunction<T> | ((...params: any) => any),
-                                                              editScript?: any[]) {
+export function setDomNodeChildrenFromArrayMapping<T = any>(
+  domNode: Node,
+  array: any,
+  mapping: MappingFunction<T>,
+  options?: MappingOptions<T>,
+  callbackAfterAddingNodes?: MappingAfterAddFunction<T> | ((...params: any) => any),
+  editScript?: any[]
+) {
   // Compare the provided array against the previous one
   array = array || []
   if (typeof array.length === 'undefined') {
     array = [array]
   }
 
-  options = options || {};
+  options = options || {}
   let lastMappingResult = domData.get(domNode, lastMappingResultDomDataKey)
   let isFirstExecution = !lastMappingResult
 
@@ -93,11 +121,11 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   let mapData: MapDataType | null
   let countWaitingForRemove = 0
 
-  type MapDataType ={
-    arrayEntry: any,
-    indexObservable: Observable<number>,
-    mappedNodes?: Node[],
-    dependentObservable?: Computed<void>,
+  type MapDataType = {
+    arrayEntry: any
+    indexObservable: Observable<number>
+    mappedNodes?: Node[]
+    dependentObservable?: Computed<void>
     initialized?: boolean
   }
 
@@ -137,15 +165,18 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   } else {
     if (!editScript || (lastMappingResult && lastMappingResult['_countWaitingForRemove'])) {
       // Compare the provided array against the previous one
-      let lastArray = arrayMap(lastMappingResult, function (x) { return x.arrayEntry })
-      let compareOptions = {
-        'dontLimitMoves': options.dontLimitMoves,
-        'sparse': true
-      }
+      let lastArray = arrayMap(lastMappingResult, function (x) {
+        return x.arrayEntry
+      })
+      let compareOptions = { dontLimitMoves: options.dontLimitMoves, sparse: true }
       editScript = compareArrays(lastArray, array, compareOptions)
     }
 
-    for (let i = 0, editScriptItem: number[], movedIndex: number, itemIndex: number; editScriptItem = editScript[i]; i++) {
+    for (
+      let i = 0, editScriptItem: number[], movedIndex: number, itemIndex: number;
+      (editScriptItem = editScript[i]);
+      i++
+    ) {
       movedIndex = editScriptItem['moved']
       itemIndex = editScriptItem['index']
       switch (editScriptItem['status']) {
@@ -214,14 +245,23 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   arrayForEach(nodesToDelete, options.beforeRemove ? cleanNode : removeNode)
 
   // Next add/reorder the remaining items (will include deleted items if there's a beforeRemove callback)
-  for (let k = 0, nextNode = virtualElements.firstChild(domNode), lastNode, node; mapData = itemsToProcess[k]; k++) {
+  for (let k = 0, nextNode = virtualElements.firstChild(domNode), lastNode, node; (mapData = itemsToProcess[k]); k++) {
     // Get nodes for newly added items
     if (!mapData.mappedNodes) {
-      extend(mapData, mapNodeAndRefreshWhenChanged(domNode, mapping, mapData.arrayEntry, callbackAfterAddingNodes, mapData.indexObservable))
+      extend(
+        mapData,
+        mapNodeAndRefreshWhenChanged(
+          domNode,
+          mapping,
+          mapData.arrayEntry,
+          callbackAfterAddingNodes,
+          mapData.indexObservable
+        )
+      )
     }
 
     // Put nodes in the right place if they aren't there already
-    for (let j = 0; node = mapData.mappedNodes![j]; nextNode = node.nextSibling, lastNode = node, j++) {
+    for (let j = 0; (node = mapData.mappedNodes![j]); nextNode = node.nextSibling, lastNode = node, j++) {
       if (node !== nextNode) {
         virtualElements.insertAfter(domNode, node, lastNode)
       }

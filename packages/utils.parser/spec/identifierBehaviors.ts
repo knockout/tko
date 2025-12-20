@@ -1,43 +1,26 @@
+import { options, triggerEvent } from '@tko/utils'
 
-import {
-  options, triggerEvent
-} from '@tko/utils'
+import { DataBindProvider } from '@tko/provider.databind'
 
-import {
-  DataBindProvider
-} from '@tko/provider.databind'
+import { bindings as coreBindings } from '@tko/binding.core'
 
-import {
-  bindings as coreBindings
-} from '@tko/binding.core'
+import { observable } from '@tko/observable'
 
-import {
-  observable
-} from '@tko/observable'
+import { computed } from '@tko/computed'
 
-import {
-  computed
-} from '@tko/computed'
+import { applyBindings, dataFor, bindingContext } from '@tko/bind'
 
-import {
-  applyBindings,
-  dataFor,
-  bindingContext
-} from '@tko/bind'
+import { Identifier, Arguments } from '../dist'
 
-import {
-  Identifier, Arguments
-} from '../dist'
-
-import { assert } from "chai"
+import { assert } from 'chai'
 
 describe('Identifier', function () {
-  function testLookup (identifier, $data) {
+  function testLookup(identifier, $data) {
     const ctx = new bindingContext($data)
     return new Identifier(null, identifier).get_value(undefined, ctx, {})
   }
 
-  function testWrite (identifier, $data, newValue) {
+  function testWrite(identifier, $data, newValue) {
     const ctx = new bindingContext($data)
     return new Identifier(null, identifier).set_value(newValue, ctx, {})
   }
@@ -143,10 +126,10 @@ describe('Identifier', function () {
       let div = document.createElement('div'),
         P = function () {},
         thisIs = observable(),
-        context = {
-          p: new P()
-        }
-      P.prototype.fn = function p_fn () { thisIs(this) }
+        context = { p: new P() }
+      P.prototype.fn = function p_fn() {
+        thisIs(this)
+      }
       div.setAttribute('data-bind', 'click: p.fn')
       options.bindingProviderInstance = new DataBindProvider()
       options.bindingProviderInstance.bindingHandlers.set(coreBindings)
@@ -171,11 +154,13 @@ describe('Identifier', function () {
 
     it('does not break `this`/prototype of observable/others', function () {
       let div = document.createElement('div'),
-        comp = computed(function () { return 'rrr' }),
-        Fn = function ffn () { this.comp = comp },
-        context = {
-          instance: new Fn()
-        }
+        comp = computed(function () {
+          return 'rrr'
+        }),
+        Fn = function ffn() {
+          this.comp = comp
+        },
+        context = { instance: new Fn() }
       div.setAttribute('data-bind', 'check: instance.comp')
       options.bindingProviderInstance = new DataBindProvider()
       options.bindingProviderInstance.bindingHandlers.set({
@@ -188,9 +173,7 @@ describe('Identifier', function () {
     })
 
     it('sets `this` of a top-level item to $data', function () {
-      options.bindingGlobals = Object.create({
-        Ramanujan: '1729'
-      })
+      options.bindingGlobals = Object.create({ Ramanujan: '1729' })
       let div = document.createElement('div'),
         context = {
           fn: function () {

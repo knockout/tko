@@ -1,16 +1,16 @@
 /**
  * A simple callback binding.
  */
-import {
-  BindingHandler
-} from '@tko/bind'
+import { BindingHandler } from '@tko/bind'
 
 export default class DescendantsCompleteHandler extends BindingHandler {
-  onDescendantsComplete () {
+  onDescendantsComplete() {
     if (typeof this.value === 'function') {
       this.value(this.$element)
     }
   }
 
-  static get allowVirtualElements () { return true }
+  static get allowVirtualElements() {
+    return true
+  }
 }

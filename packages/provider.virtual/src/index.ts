@@ -1,1 +1,1 @@
-export {default as VirtualProvider} from './VirtualProvider'
+export { default as VirtualProvider } from './VirtualProvider'

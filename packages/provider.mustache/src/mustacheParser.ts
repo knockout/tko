@@ -1,7 +1,4 @@
-
-import {
-  Parser
-} from '@tko/utils.parser'
+import { Parser } from '@tko/utils.parser'
 
 const INNER_EXPRESSION = /^([\s\S]*)}}([\s\S]*?)\{\{([\s\S]*)$/
 const OUTER_EXPRESSION = /^([\s\S]*?)\{\{([\s\S]*)}}([\s\S]*)$/
@@ -9,21 +6,21 @@ const BINDING_EXPRESSION = /^([^,"'{}()/:[\]\s]+)\s+([^\s:].*)/
 
 class Interpolated {
   text: string
-  constructor (text:string) {
+  constructor(text: string) {
     this.text = text
   }
 
-  trim (string) {
+  trim(string) {
     return string === null ? '' : string.trim()
   }
 }
 
 class Expression extends Interpolated {
-  asAttr (context, globals, node) {
+  asAttr(context, globals, node) {
     return new Parser().parseExpression(this.text, context, globals, node)()
   }
 
-  * textNodeReplacement (textNode) {
+  *textNodeReplacement(textNode) {
     const text = this.trim(this.text)
     const ownerDocument = textNode ? textNode.ownerDocument : document
     const firstChar = text[0]
@@ -61,10 +58,10 @@ class Expression extends Interpolated {
 
 class Text extends Interpolated {
   asAttr(): string {
-    return this.text;
+    return this.text
   }
 
-  * textNodeReplacement () {
+  *textNodeReplacement() {
     yield document.createTextNode(this.text.replace(/"/g, '\\"'))
   }
 }
@@ -72,11 +69,11 @@ class Text extends Interpolated {
 /**
  *          Interpolation Parsing
  */
-export function * innerParse (text: string) {
+export function* innerParse(text: string) {
   const innerMatch = text.match(INNER_EXPRESSION)
   if (innerMatch) {
     const [pre, inner, post] = innerMatch.slice(1)
-    yield * innerParse(pre)
+    yield* innerParse(pre)
     yield new Text(inner)
     yield new Expression(post)
   } else {
@@ -84,16 +81,20 @@ export function * innerParse (text: string) {
   }
 }
 
-export function * parseOuterMatch (outerMatch?: RegExpMatchArray | null) {
-  if (!outerMatch) { return }
+export function* parseOuterMatch(outerMatch?: RegExpMatchArray | null) {
+  if (!outerMatch) {
+    return
+  }
   let [pre, inner, post] = outerMatch.slice(1)
   yield new Text(pre)
-  yield * innerParse(inner)
+  yield* innerParse(inner)
   yield new Text(post)
 }
 
-export function * parseInterpolation (text: string | null) {
+export function* parseInterpolation(text: string | null) {
   for (const textOrExpr of parseOuterMatch(text?.match(OUTER_EXPRESSION))) {
-    if (textOrExpr.text) { yield textOrExpr }
+    if (textOrExpr.text) {
+      yield textOrExpr
+    }
   }
 }

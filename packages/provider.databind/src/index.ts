@@ -1,1 +1,1 @@
-export {default as DataBindProvider} from './DataBindProvider'
+export { default as DataBindProvider } from './DataBindProvider'

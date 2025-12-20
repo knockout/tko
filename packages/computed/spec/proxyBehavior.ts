@@ -1,20 +1,15 @@
+import { proxy, peek, isProxied, getObservable } from '../dist/proxy'
 
-import {
-  proxy, peek, isProxied, getObservable
-} from '../dist/proxy'
+import { observable } from '@tko/observable'
 
-import {
-  observable
-} from '@tko/observable'
-
-import {
-  computed
-} from '@tko/computed'
+import { computed } from '@tko/computed'
 
 const proxySupport = 'Proxy' in window
 
 describe('Proxy', function () {
-  if (!proxySupport) { return }
+  if (!proxySupport) {
+    return
+  }
 
   it('Should wrap a plain object', function () {
     const x = {}
@@ -23,7 +18,7 @@ describe('Proxy', function () {
   })
 
   it('Should expose properties of the proxy', function () {
-    const x: {a, b?} = { a: 123 }
+    const x: { a; b? } = { a: 123 }
     const p = proxy(x)
     expect(p.a).toBe(123)
     expect(peek(p, 'a')).toBe(123)
@@ -43,7 +38,7 @@ describe('Proxy', function () {
   })
 
   it('assigns own properties when the proxy is called with an object', function () {
-    const x: {a, b, c?} = { a: 9, b: 4 }
+    const x: { a; b; c? } = { a: 9, b: 4 }
     const p = proxy(x)
     p({ b: 5, c: 12 })
     expect(p.a).toBe(9)
@@ -63,7 +58,12 @@ describe('Proxy', function () {
   })
 
   it('does not create dependencies with `peek`', function () {
-    const p = proxy({ a: 123, b () { return this.a + 7 } })
+    const p = proxy({
+      a: 123,
+      b() {
+        return this.a + 7
+      }
+    })
     let pa = 0
     let pb = 0
     computed(() => {
@@ -85,8 +85,12 @@ describe('Proxy', function () {
   it('converts functions to deferred, pure computeds', function () {
     const x = observable(9)
     const p = proxy({
-      a() { return x() * 2 }, // readable computed
-      b(nv) { x(nv) } // writeable computed
+      a() {
+        return x() * 2
+      }, // readable computed
+      b(nv) {
+        x(nv)
+      } // writeable computed
     })
     expect(p.a).toBe(18)
     p.b = 8
@@ -96,7 +100,9 @@ describe('Proxy', function () {
 
   it('allow adding computeds', function () {
     const p = proxy({ x: 4 })
-    p.x2 = function () { return this.x * this.x }
+    p.x2 = function () {
+      return this.x * this.x
+    }
     expect(p.x2).toBe(16)
   })
 })

@@ -1,28 +1,22 @@
-import {
-    arrayForEach
-} from '@tko/utils'
+import { arrayForEach } from '@tko/utils'
 
-import {
-  observable
-} from '@tko/observable'
+import { observable } from '@tko/observable'
 
-import {
-    applyBindings
-} from '@tko/bind'
+import { applyBindings } from '@tko/bind'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import {
-    options
-} from '@tko/utils'
+import { options } from '@tko/utils'
 
 import * as coreBindings from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Attr', function () {
-  let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  let testNode: HTMLElement
+  beforeEach(function () {
+    testNode = jasmine.prepareTestNode()
+  })
 
   beforeEach(function () {
     let provider = new DataBindProvider()
@@ -32,7 +26,7 @@ describe('Binding: Attr', function () {
 
   it('Should be able to set arbitrary attribute values', function () {
     let model = { myValue: 'first value' }
-    testNode.innerHTML = "<div data-bind='attr: {firstAttribute: myValue, \"second-attribute\": true}'></div>"
+    testNode.innerHTML = '<div data-bind=\'attr: {firstAttribute: myValue, "second-attribute": true}\'></div>'
     applyBindings(model, testNode)
     expect(testNode.children[0].getAttribute('firstAttribute')).toEqual('first value')
     expect(testNode.children[0].getAttribute('second-attribute')).toEqual('true')
@@ -51,7 +45,7 @@ describe('Binding: Attr', function () {
     ].join('')
 
     applyBindings(model, testNode)
-    let anchor = testNode.children[0]/* svg */.children[0]/* g */.children[0]/* a */
+    let anchor = testNode.children[0] /* svg */.children[0] /* g */.children[0] /* a */
     let href = anchor.getAttributeNode('xlink:href')
     expect(href?.value).toEqual('first value')
     expect(href?.namespaceURI).toEqual('http://www.w3.org/1999/xlink')
@@ -62,15 +56,17 @@ describe('Binding: Attr', function () {
     testNode.innerHTML = "<input data-bind='attr: { name: myValue }' />"
     applyBindings({ myValue: myValue }, testNode)
     expect((testNode.children[0] as HTMLInputElement).name).toEqual('myName')
-    if (testNode.children[0].outerHTML) { // Old Firefox doesn't support outerHTML
+    if (testNode.children[0].outerHTML) {
+      // Old Firefox doesn't support outerHTML
       expect(testNode.children[0].outerHTML).toMatch('name="?myName"?')
     }
     expect(testNode.children[0].getAttribute('name')).toEqual('myName')
 
-        // Also check we can remove it (which, for a name attribute, means setting it to an empty string)
+    // Also check we can remove it (which, for a name attribute, means setting it to an empty string)
     myValue(false)
     expect((testNode.children[0] as HTMLInputElement).name).toEqual('')
-    if (testNode.children[0].outerHTML) { // Old Firefox doesn't support outerHTML
+    if (testNode.children[0].outerHTML) {
+      // Old Firefox doesn't support outerHTML
       expect(testNode.children[0].outerHTML).not.toMatch('name="?([^">]+)')
     }
     expect(testNode.children[0].getAttribute('name')).toEqual('')
@@ -82,7 +78,7 @@ describe('Binding: Attr', function () {
     applyBindings(model, testNode)
     expect(testNode.children[0].getAttribute('someAttrib')).toEqual('initial value')
 
-        // Change the observable; observe it reflected in the DOM
+    // Change the observable; observe it reflected in the DOM
     model.myprop('new value')
     expect(testNode.children[0].getAttribute('someAttrib')).toEqual('new value')
   })
@@ -105,7 +101,7 @@ describe('Binding: Attr', function () {
     expect(testNode.children[0].className).toEqual('oldClass')
     applyBindings(model, testNode)
     expect(testNode.children[0].className).toEqual('newClass')
-        // Should be able to clear class also
+    // Should be able to clear class also
     model.myprop(undefined)
     expect(testNode.children[0].className).toEqual('')
     expect(testNode.children[0].getAttribute('class')).toEqual(null)

@@ -14,39 +14,45 @@ import { bindings as eachBindings } from '@tko/binding.foreach'
 import { BindingHandlerObject } from '@tko/provider'
 
 describe('Binding Application Promise', function () {
-  let bindingHandlers : BindingHandlerObject
+  let bindingHandlers: BindingHandlerObject
 
   class SyncBinding extends BindingHandler {
-    get bindingCompleted () {
+    get bindingCompleted() {
       return this.value(true)
     }
-    static get allowVirtualElements () { return true }
+    static get allowVirtualElements() {
+      return true
+    }
   }
 
   class AsyncBinding extends BindingHandler {
-    get bindingCompleted () {
+    get bindingCompleted() {
       return options.Promise.resolve().then(() => this.value(true))
     }
-    static get allowVirtualElements () { return true }
+    static get allowVirtualElements() {
+      return true
+    }
   }
 
   class AsyncContainerBinding extends BindingHandler {
-    constructor (params) {
+    constructor(params) {
       super(params)
-      this.bindingCompletion = options.Promise.resolve()
-        .then(() => applyBindingsToDescendants(this.$context, this.$element))
+      this.bindingCompletion = options.Promise.resolve().then(() =>
+        applyBindingsToDescendants(this.$context, this.$element)
+      )
     }
 
-    get controlsDescendants () { return true }
-    get bindingCompleted () { return this.bindingCompletion.then(() => this.value(true)) }
+    get controlsDescendants() {
+      return true
+    }
+    get bindingCompleted() {
+      return this.bindingCompletion.then(() => this.value(true))
+    }
   }
 
   beforeEach(function () {
     // Set up the default binding handlers.
-    let provider = new MultiProvider({providers: [
-      new VirtualProvider(),
-      new DataBindProvider()
-    ]})
+    let provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
@@ -54,7 +60,9 @@ describe('Binding Application Promise', function () {
     bindingHandlers.set(ifBindings)
     bindingHandlers.set(eachBindings)
     bindingHandlers.set({ sync: SyncBinding, async: AsyncBinding, asynccb: AsyncContainerBinding })
-    options.onError = function (e) { throw e }
+    options.onError = function (e) {
+      throw e
+    }
   })
 
   afterEach(function () {
@@ -70,9 +78,7 @@ describe('Binding Application Promise', function () {
   it('completes immediately when there are no bindings', function () {
     const div = document.createElement('div')
     const abr = applyBindings({}, div)
-    jasmine.resolve(
-      abr.then(() => expect(div.outerHTML).toEqual('<div></div>'))
-    )
+    jasmine.resolve(abr.then(() => expect(div.outerHTML).toEqual('<div></div>')))
   })
 
   it('completes immediately with synchronous bindings and no descendants', function () {
@@ -89,8 +95,11 @@ describe('Binding Application Promise', function () {
     div.innerHTML = '<span data-bind="template: { foreach: y }"><i data-bind="css: $data"></i></span>'
     const abr = applyBindings({ y: ['a', 'b'] }, div)
     jasmine.resolve(
-      abr.then(() => expect(div.outerHTML)
-        .toEqual('<div><span data-bind="template: { foreach: y }"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'))
+      abr.then(() =>
+        expect(div.outerHTML).toEqual(
+          '<div><span data-bind="template: { foreach: y }"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
+        )
+      )
     )
   })
 
@@ -134,7 +143,7 @@ describe('Binding Application Promise', function () {
     const div = document.createElement('div')
     div.innerHTML = '<i data-bind="asynccb: a"><i data-bind="asynccb: b"><i data-bind="asynccb: c"></i></i></i>'
     const [a, b, c] = [observable(false), observable(false), observable(false)]
-    const abr = applyBindings({a, b, c}, div)
+    const abr = applyBindings({ a, b, c }, div)
     expect(a()).toEqual(false)
     expect(b()).toEqual(false)
     expect(c()).toEqual(false)
@@ -143,7 +152,8 @@ describe('Binding Application Promise', function () {
         expect(a()).toEqual(true)
         expect(b()).toEqual(true)
         expect(c()).toEqual(true)
-      }))
+      })
+    )
   })
 
   it('completes with asynchronous (foreach) bindings and synchronous descendants', function () {
@@ -151,8 +161,11 @@ describe('Binding Application Promise', function () {
     div.innerHTML = '<span data-bind="foreach: y"><i data-bind="css: $data"></i></span>'
     const abr = applyBindings({ y: ['a', 'b'] }, div)
     jasmine.resolve(
-      abr.then(() => expect(div.outerHTML)
-        .toEqual('<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'))
+      abr.then(() =>
+        expect(div.outerHTML).toEqual(
+          '<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
+        )
+      )
     )
   })
 
@@ -162,19 +175,26 @@ describe('Binding Application Promise', function () {
     eachBindings.foreach.setSync(false)
     const abr = applyBindings({ y: ['a', 'b'] }, div)
     jasmine.resolve(
-      abr.then(() => expect(div.outerHTML)
-        .toEqual('<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'))
+      abr.then(() =>
+        expect(div.outerHTML).toEqual(
+          '<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
+        )
+      )
     )
   })
 
   it('completes with synchronous bindings and asynchronous (foreach) descendants', function () {
     const div = document.createElement('div')
-    div.innerHTML = '<span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data"></i></i></span>'
+    div.innerHTML =
+      '<span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data"></i></i></span>'
     eachBindings.foreach.setSync(false)
-    const abr = applyBindings({ y: [{z: ['a', 'b']}] }, div)
+    const abr = applyBindings({ y: [{ z: ['a', 'b'] }] }, div)
     jasmine.resolve(
-      abr.then(() => expect(div.outerHTML)
-        .toEqual('<div><span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data">a</i><i data-bind="text: $data">b</i></i></span></div>'))
+      abr.then(() =>
+        expect(div.outerHTML).toEqual(
+          '<div><span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data">a</i><i data-bind="text: $data">b</i></i></span></div>'
+        )
+      )
     )
   })
 })

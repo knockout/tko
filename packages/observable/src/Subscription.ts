@@ -1,8 +1,4 @@
-
-import {
-  removeDisposeCallback, addDisposeCallback
-} from '@tko/utils'
-
+import { removeDisposeCallback, addDisposeCallback } from '@tko/utils'
 
 export default class Subscription {
   private _disposeCallback: any
@@ -12,7 +8,7 @@ export default class Subscription {
   private _domNodeDisposalCallback: null
   private _node: Node
 
-  constructor (target, observer, disposeCallback) {
+  constructor(target, observer, disposeCallback) {
     this._target = target
     this._callback = observer.next
     this._disposeCallback = disposeCallback
@@ -20,7 +16,7 @@ export default class Subscription {
     this._domNodeDisposalCallback = null
   }
 
-  dispose (): void {
+  dispose(): void {
     if (this._domNodeDisposalCallback) {
       removeDisposeCallback(this._node, this._domNodeDisposalCallback)
     }
@@ -28,12 +24,16 @@ export default class Subscription {
     this._disposeCallback()
   }
 
-  disposeWhenNodeIsRemoved (node: Node): void {
+  disposeWhenNodeIsRemoved(node: Node): void {
     this._node = node
-    addDisposeCallback(node, this._domNodeDisposalCallback = this.dispose.bind(this))
+    addDisposeCallback(node, (this._domNodeDisposalCallback = this.dispose.bind(this)))
   }
 
   // TC39 Observable API
-  unsubscribe () { this.dispose() }
-  get closed () { return this._isDisposed }
+  unsubscribe() {
+    this.dispose()
+  }
+  get closed() {
+    return this._isDisposed
+  }
 }
