@@ -1,4 +1,4 @@
-# Workflow for checking tsc compile errors
+# Workflow for checking eslint compile errors
 name: Check eslint
 
 on:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  tsc:
+  eslint:
     runs-on: ubuntu-latest
 
     steps:
