@@ -29,7 +29,7 @@ import {
 // ---- ko.templateSources.domElement -----
 
 // template types
-let templateScript = 1,
+const templateScript = 1,
   templateTextArea = 2,
   templateTemplate = 3,
   templateElement = 4

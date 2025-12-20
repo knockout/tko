@@ -60,7 +60,7 @@ describe('Binding: If', function () {
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
     let someItem = observable(true)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: ++counter'></span></div>"
-    let originalNode = testNode.childNodes[0].childNodes[0]
+    const originalNode = testNode.childNodes[0].childNodes[0]
 
         // Value is initially true, so nodes are retained
     applyBindings({ someItem, counter: 0 }, testNode)
@@ -137,9 +137,9 @@ describe('Binding: If', function () {
 
   it('Should call a childrenComplete callback function', function () {
     testNode.innerHTML = "<div data-bind='if: condition, childrenComplete: callback'><span data-bind='text: someText'></span></div>"
-    let someItem = observable({ childprop: 'child' }),
-      callbacks = 0
-    let viewModel = { condition: observable(true), someText: 'hello', callback: function () { callbacks++ } }
+    //const someItem = observable({ childprop: 'child' })
+    let callbacks = 0
+    const viewModel = { condition: observable(true), someText: 'hello', callback: function () { callbacks++ } }
     applyBindings(viewModel, testNode)
     expect(callbacks).toEqual(1)
     expect(testNode.childNodes[0]).toContainText('hello')

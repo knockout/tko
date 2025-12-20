@@ -82,7 +82,7 @@ export interface BaseExtendersType{
   throttle?(target: any, timout: number): void
 }
 
-export let extenders: BaseExtendersType = {
+export const extenders: BaseExtendersType = {
   notify: notify,
   deferred: deferred,
   rateLimit: rateLimit

@@ -105,7 +105,7 @@ export class value extends BindingHandler {
 
   updateFromModelForFile () {
     // For file input elements, can only write the empty string
-    let newValue = unwrap(this.value)
+    const newValue = unwrap(this.value)
     if (newValue === null || newValue === undefined || newValue === '') {
       this.$element.value = ''
     } else {
@@ -115,8 +115,8 @@ export class value extends BindingHandler {
 
   updateFromModelForValue () {
     const element = this.$element
-    let newValue = unwrap(this.value)
-    let elementValue = selectExtensions.readValue(element)
+    const newValue = unwrap(this.value)
+    const elementValue = selectExtensions.readValue(element)
 
     if (this.elementValueBeforeEvent !== null && newValue === this.elementValueBeforeEvent) {
       safeSetTimeout(this.updateFromModel.bind(this), 0)
