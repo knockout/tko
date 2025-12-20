@@ -9,7 +9,7 @@ import type { BindingContext } from './bindingContext'
  * bindings.
  */
 export class DescendantBindingHandler extends AsyncBindingHandler {
-  get controlsDescendants() {
+  override get controlsDescendants() {
     return true
   }
 

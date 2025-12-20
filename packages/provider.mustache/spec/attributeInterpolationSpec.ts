@@ -188,7 +188,7 @@ describe('Attribute Interpolation Markup Provider', function () {
 
   it('Should support custom attribute binding using "attributeBinding" overloading', function () {
     class KOAttr extends AttributeMustacheProvider {
-      attributeBinding(name, value) {
+      override attributeBinding(name, value) {
         const parsedName = name.match(/^ko-(.*)$/)
         if (parsedName) {
           return super.attributeBinding(parsedName[1], value)

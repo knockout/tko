@@ -117,7 +117,7 @@ export class AsyncBindingHandler extends BindingHandler {
     this.completeBinding = bindingResult => this[ResolveSymbol](bindingResult)
   }
 
-  get bindingCompleted(): Promise<boolean> {
+  override get bindingCompleted(): Promise<boolean> {
     return this.bindingCompletion
   }
 }

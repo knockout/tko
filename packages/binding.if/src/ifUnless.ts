@@ -17,20 +17,19 @@ export class IfBindingHandler extends ConditionalBindingHandler {
     return this.ifCondition()
   }
 
-  get bindingContext() {
+  override get bindingContext() {
     return this.ifCondition.isActive()
       ? this.$context.extend(() => {
           // Ensure that this context is dependant upon the conditional, so the
           // order of binding application is: conditional before its children.
-          // See https://github.com/knockout/kn
-          // ockout/pull/2226
+          // See https://github.com/knockout/knockout/pull/2226
           this.ifCondition()
           return null
         })
       : this.$context
   }
 
-  renderStatus() {
+  override renderStatus() {
     let shouldDisplay = this.shouldDisplayIf()
 
     if (this.elseChainIsAlreadySatisfied) {
@@ -45,7 +44,7 @@ export class IfBindingHandler extends ConditionalBindingHandler {
 }
 
 export class UnlessBindingHandler extends IfBindingHandler {
-  shouldDisplayIf() {
+  override shouldDisplayIf() {
     return !super.shouldDisplayIf()
   }
 }

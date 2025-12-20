@@ -10,7 +10,7 @@ export default class DescendantsCompleteHandler extends BindingHandler {
     }
   }
 
-  static get allowVirtualElements() {
+  static override get allowVirtualElements() {
     return true
   }
 }

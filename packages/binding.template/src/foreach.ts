@@ -7,7 +7,7 @@ import { TemplateBindingHandler } from './templating'
 // "foreach: someExpression" is equivalent to "template: { foreach: someExpression }"
 // "foreach: { data: someExpression, afterAdd: myfn }" is equivalent to "template: { foreach: someExpression, afterAdd: myfn }"
 export class TemplateForEachBindingHandler extends TemplateBindingHandler {
-  get value() {
+  override get value() {
     const modelValue = this.valueAccessor()
     const unwrappedValue = peek(modelValue) // Unwrap without setting a dependency here
 

@@ -183,15 +183,15 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.currentLoadingOperationId = null
   }
 
-  dispose() {
+  override dispose() {
     this.cleanUpState()
     super.dispose()
   }
 
-  get controlsDescendants() {
+  override get controlsDescendants() {
     return true
   }
-  static get allowVirtualElements() {
+  static override get allowVirtualElements() {
     return true
   }
 }

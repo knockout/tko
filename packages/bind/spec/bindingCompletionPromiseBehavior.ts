@@ -17,19 +17,19 @@ describe('Binding Application Promise', function () {
   let bindingHandlers: BindingHandlerObject
 
   class SyncBinding extends BindingHandler {
-    get bindingCompleted() {
+    override get bindingCompleted() {
       return this.value(true)
     }
-    static get allowVirtualElements() {
+    static override get allowVirtualElements() {
       return true
     }
   }
 
   class AsyncBinding extends BindingHandler {
-    get bindingCompleted() {
+    override get bindingCompleted() {
       return options.Promise.resolve().then(() => this.value(true))
     }
-    static get allowVirtualElements() {
+    static override get allowVirtualElements() {
       return true
     }
   }
@@ -42,10 +42,10 @@ describe('Binding Application Promise', function () {
       )
     }
 
-    get controlsDescendants() {
+    override get controlsDescendants() {
       return true
     }
-    get bindingCompleted() {
+    override get bindingCompleted() {
       return this.bindingCompletion.then(() => this.value(true))
     }
   }

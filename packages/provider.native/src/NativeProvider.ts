@@ -13,14 +13,14 @@ export const NATIVE_BINDINGS = Symbol('Knockout native bindings')
  * Used by the jsxToNode function.
  */
 export default class NativeProvider extends Provider {
-  get FOR_NODE_TYPES() {
+  override get FOR_NODE_TYPES() {
     return [1, 3]
   }
-  get preemptive() {
+  override get preemptive() {
     return true
   }
 
-  nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
+  override nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
     if (!node[NATIVE_BINDINGS]) {
       return false
     }
@@ -31,7 +31,7 @@ export default class NativeProvider extends Provider {
    * There can be only one preprocessor; when there are native bindings,
    * prevent re-entrance (and likely XSS) from the `{{ }}` provider.
    */
-  preprocessNode(node: Element) {
+  override preprocessNode(node: Element) {
     return node[NATIVE_BINDINGS] ? node : null
   }
 
@@ -49,7 +49,7 @@ export default class NativeProvider extends Provider {
    * Return as valueAccessor function all the entries matching `ko-*`
    * @param {Element} node
    */
-  getBindingAccessors(node: Element, context?: BindingContext) {
+  override getBindingAccessors(node: Element, context?: BindingContext) {
     const bindings = (Object.entries(node[NATIVE_BINDINGS] || {}) as any).filter(this.onlyBindings)
     if (!bindings.length) {
       return null

@@ -878,7 +878,7 @@ describe('Components: Component binding', function () {
   describe('jsx', function () {
     it('accepts and uses jsx', function () {
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return { elementName: 'div', attributes: { attr: '123' }, children: ['téxt'] }
         }
       }
@@ -893,7 +893,7 @@ describe('Components: Component binding', function () {
       const obs = observable('v0')
       const o2 = observable('text')
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           // Passing <div attr={obs}>{o2}</div> through
           // babel-plugin-transform-jsx will yield:
           return { elementName: 'div', attributes: { attr: obs }, children: [o2] }
@@ -920,7 +920,7 @@ describe('Components: Component binding', function () {
 
     it('inserts a partial when the `template` is an array', function () {
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return [
             { elementName: 'b', attributes: {}, children: ['x'] },
             { elementName: 'i', attributes: {}, children: ['y'] },
@@ -939,7 +939,7 @@ describe('Components: Component binding', function () {
     it('inserts partials from `children`', function () {
       const children = ['abc', { elementName: 'c', attributes: {}, children: [['C']] }]
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return [{ elementName: 'b', attributes: {}, children: ['x', children] }]
         }
       }
@@ -951,7 +951,7 @@ describe('Components: Component binding', function () {
     it('inserts & updates observable partials from `children`', function () {
       const children = observableArray(['abc', { elementName: 'c', attributes: {}, children: [['C']] }])
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return [{ elementName: 'b', attributes: {}, children: ['x', children] }]
         }
       }
@@ -990,7 +990,7 @@ describe('Components: Component binding', function () {
           seen = params
         }
 
-        static get template() {
+        static override get template() {
           return { elementName: 'name', attributes: {}, children: [] }
         }
       }
@@ -1017,7 +1017,7 @@ describe('Components: Component binding', function () {
 
     it('binds context for ViewModel.template', () => {
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return { elementName: 'a', children: [], attributes: {} }
         }
       }
@@ -1035,7 +1035,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               <i data-bind='slot: "alpha"'></i>
@@ -1056,7 +1056,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               <!-- ko slot: "alpha" --><!-- /ko -->
@@ -1077,7 +1077,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               <!-- ko slot: "alpha" --><!-- /ko --> /
@@ -1099,7 +1099,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div><i><span>
               <!-- ko slot: "alpha" --><!-- /ko -->
@@ -1120,7 +1120,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               <!-- ko slot: "alpha" --><!-- /ko -->
@@ -1144,7 +1144,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               <!-- ko slot: "alpha" --><!-- /ko -->
@@ -1165,7 +1165,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               <slot name='alpha'></slot>
@@ -1188,7 +1188,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               X <slot name='alpha'></slot> Y <slot></slot> Q
@@ -1210,7 +1210,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return `
             <div>
               A.
@@ -1237,7 +1237,7 @@ describe('Components: Component binding', function () {
         </test-component>
       `
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           return ` <div> <slot></slot> </div> `
         }
       }
@@ -1264,7 +1264,7 @@ describe('Components: Component binding', function () {
       )
 
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           // As-if it's from JSX:
           return {
             elementName: 'div',
@@ -1298,7 +1298,7 @@ describe('Components: Component binding', function () {
       new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           // As-if it's from JSX:
           return {
             elementName: 'div',
@@ -1321,7 +1321,7 @@ describe('Components: Component binding', function () {
       const obs = observable('text')
 
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           // As-if it's from JSX:
           return { elementName: 'div', attributes: {}, children: [obs] }
         }
@@ -1350,7 +1350,7 @@ describe('Components: Component binding', function () {
       new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           // As-if it's from JSX:
           return {
             elementName: 'div',
@@ -1393,7 +1393,7 @@ describe('Components: Component binding', function () {
       const jo = new JsxObserver(jsx, testNode)
 
       class ViewModel extends components.ComponentABC {
-        static get template() {
+        static override get template() {
           // <div><slot name='X'></slot><div>
           return {
             elementName: 'div',

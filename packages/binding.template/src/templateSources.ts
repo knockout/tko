@@ -145,9 +145,9 @@ export class anonymousTemplate extends domElement {
     super(element)
   }
 
-  text(): string
-  text(valueToWrite: string): void
-  text(/* valueToWrite */): string | void {
+  override text(): string
+  override text(valueToWrite: string): void
+  override text(/* valueToWrite */): string | void {
     if (arguments.length == 0) {
       const templateData = getTemplateDomData(this.domElement)
       if (templateData.textData === undefined && templateData.containerData) {

@@ -101,7 +101,7 @@ export default class Provider {
  * }
  */
 class LegacyProvider extends Provider {
-  get FOR_NODE_TYPES() {
+  override get FOR_NODE_TYPES() {
     return [1, 3, 8]
   }
 
@@ -120,17 +120,17 @@ class LegacyProvider extends Provider {
     return this.makeAccessorsFromFunction(bindingsFn)
   }
 
-  getBindingAccessors(node, context) {
+  override getBindingAccessors(node, context) {
     return this.providerObject.getBindingAccessors
       ? this.providerObject.getBindingAccessors(node, context)
       : this.getBindingsAndMakeAccessors(node, context)
   }
 
-  nodeHasBindings(node: Element): boolean {
+  override nodeHasBindings(node: Element): boolean {
     return this.providerObject.nodeHasBindings(node)
   }
 
-  preprocessNode(node) {
+  override preprocessNode(node) {
     if (this.providerObject.preprocessNode) {
       return this.providerObject.preprocessNode(node)
     }

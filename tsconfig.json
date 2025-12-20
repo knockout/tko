@@ -15,7 +15,7 @@
     /*Disable some typing feature from ts to detect first steps to a strong typed version*/
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "noImplicitOverride": false,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,

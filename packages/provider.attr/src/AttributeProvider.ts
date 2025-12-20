@@ -7,7 +7,7 @@ import { Provider } from '@tko/provider'
  * <div ko-visible='value'></div>
  */
 export default class AttrProvider extends Provider {
-  get FOR_NODE_TYPES() {
+  override get FOR_NODE_TYPES() {
     return [1]
   } // document.ELEMENT_NODE
 
@@ -22,11 +22,11 @@ export default class AttrProvider extends Provider {
     return Array.from(node.attributes).filter(attr => attr.name.startsWith(this.PREFIX))
   }
 
-  nodeHasBindings(node: Element) {
+  override nodeHasBindings(node: Element) {
     return this.getBindingAttributesList(node).length > 0
   }
 
-  getBindingAccessors(node: Element, context) {
+  override getBindingAccessors(node: Element, context) {
     return Object.assign({}, ...this.handlersFromAttributes(node, context))
   }
 

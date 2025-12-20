@@ -139,10 +139,10 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     return { ifNodes, elseNodes }
   }
 
-  get controlsDescendants() {
+  override get controlsDescendants() {
     return true
   }
-  static get allowVirtualElements() {
+  static override get allowVirtualElements() {
     return true
   }
 }

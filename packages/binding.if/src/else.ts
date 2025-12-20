@@ -11,7 +11,7 @@ import { IfBindingHandler } from './ifUnless'
 export class ElseBindingHandler extends IfBindingHandler {
   _elseChain: any
 
-  shouldDisplayIf() {
+  override shouldDisplayIf() {
     return super.shouldDisplayIf() || this.value === undefined
   }
 
@@ -19,7 +19,7 @@ export class ElseBindingHandler extends IfBindingHandler {
    * Return any conditional that precedes the given node.
    * @return {object}      { elseChainSatisfied: observable }
    */
-  get elseChainIsAlreadySatisfied() {
+  override get elseChainIsAlreadySatisfied() {
     if (!this._elseChain) {
       this._elseChain = this.readElseChain()
     }

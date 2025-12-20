@@ -477,15 +477,15 @@ describe('Templating', function () {
     let originalBindingProvider = options.bindingProviderInstance
 
     class TestProvider extends Provider {
-      get FOR_NODE_TYPES() {
+      override get FOR_NODE_TYPES() {
         return [document.ELEMENT_NODE]
       }
 
-      nodeHasBindings(node, bindingContext) {
+      override nodeHasBindings(node, bindingContext) {
         return node.tagName == 'EM' || originalBindingProvider.nodeHasBindings(node, bindingContext)
       }
 
-      getBindingAccessors(node, bindingContext) {
+      override getBindingAccessors(node, bindingContext) {
         if (node.tagName == 'EM') {
           return {
             text: function () {
@@ -535,14 +535,14 @@ describe('Templating', function () {
     // to expect two calls (but still it's a single binding).
     let originalBindingProvider = options.bindingProviderInstance
     class TestProvider extends MultiProvider {
-      get FOR_NODE_TYPES() {
+      override get FOR_NODE_TYPES() {
         return [1, 3, 8]
       }
 
-      nodeHasBindings(node: Element, bindingContext?: BindingContext) {
+      override nodeHasBindings(node: Element, bindingContext?: BindingContext) {
         return node.tagName == 'EM' || originalBindingProvider.nodeHasBindings(node, bindingContext)
       }
-      getBindingAccessors(node: Element, bindingContext?: BindingContext) {
+      override getBindingAccessors(node: Element, bindingContext?: BindingContext) {
         if (node.tagName == 'EM') {
           return { text: ++model.numExternalBindings }
         }
@@ -1317,7 +1317,7 @@ describe('Templating', function () {
     // In this case we rely on fixUpContinuousNodeArray to work out which remaining nodes correspond to the 'foreach'
     // output so they can later be removed when the model array changes.
     class TemplateTestProvider extends DataBindProvider {
-      preprocessNode(node) {
+      override preprocessNode(node) {
         // This preprocessor doesn't change the rendered nodes. But simply having a preprocessor means
         // that templating.js has to recompute which DOM nodes correspond to the foreach output, since
         // you might have modified that set.

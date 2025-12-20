@@ -52,7 +52,7 @@ export class LegacyBindingHandler extends BindingHandler {
     return [this.$element, this.valueAccessor, this.allBindings, this.$data, this.$context]
   }
 
-  get controlsDescendants(): boolean {
+  override get controlsDescendants(): boolean {
     const objectToTest = this.initReturn || this.handler || {}
     return objectToTest.controlsDescendantBindings
   }
@@ -79,7 +79,7 @@ export class LegacyBindingHandler extends BindingHandler {
     if (typeof handler === 'function') {
       const [initFn, disposeFn] = [handler, handler.dispose]
       return class extends LegacyBindingHandler {
-        get handler() {
+        override get handler() {
           const init = initFn.bind(this)
           const dispose = disposeFn ? disposeFn.bind(this) : null
           return { init, dispose }
@@ -87,7 +87,7 @@ export class LegacyBindingHandler extends BindingHandler {
         static get after() {
           return handler.after
         }
-        static get allowVirtualElements() {
+        static override get allowVirtualElements() {
           return handler.allowVirtualElements || virtualElements.allowedBindings[key!]
         }
       }
@@ -95,13 +95,13 @@ export class LegacyBindingHandler extends BindingHandler {
 
     if (typeof handler === 'object') {
       return class extends LegacyBindingHandler {
-        get handler() {
+        override get handler() {
           return handler
         }
         static get after() {
           return handler.after
         }
-        static get allowVirtualElements() {
+        static override get allowVirtualElements() {
           return handler.allowVirtualElements || virtualElements.allowedBindings[key!]
         }
       }

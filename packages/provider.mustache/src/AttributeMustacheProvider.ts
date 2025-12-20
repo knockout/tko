@@ -21,7 +21,7 @@ type AttributeBindingTuple = [string, any[]]
 export default class AttributeMustacheProvider extends Provider {
   ATTRIBUTES_TO_SKIP: Set<string>
   ATTRIBUTES_BINDING_MAP: any
-  get FOR_NODE_TYPES() {
+  override get FOR_NODE_TYPES() {
     return [1]
   } // document.ELEMENT_NODE
 
@@ -42,7 +42,7 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  nodeHasBindings(node: Element) {
+  override nodeHasBindings(node: Element) {
     return !this.attributesToInterpolate(node.attributes).next().done
   }
 
@@ -92,7 +92,7 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  getBindingAccessors(node: Element, context?) {
+  override getBindingAccessors(node: Element, context?) {
     if (context === undefined) context = {}
     return Object.assign({}, ...this.bindingObjects(node, context))
   }
