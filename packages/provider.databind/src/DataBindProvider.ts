@@ -11,15 +11,17 @@ export default class DataBindProvider extends BindingStringProvider {
     return 'data-bind'
   }
 
-  getBindingString(node: Node): string | null | undefined {
+  getBindingString(node: Node): string | null {
     if (node.nodeType === document.ELEMENT_NODE) {
       return (node as Element).getAttribute(this.BIND_ATTRIBUTE)
     }
+    return null
   }
 
-  nodeHasBindings(node: HTMLElement, context?: BindingContext): boolean | undefined {
+  nodeHasBindings(node: HTMLElement, context?: BindingContext): boolean {
     if (node.nodeType === document.ELEMENT_NODE) {
       return node.hasAttribute(this.BIND_ATTRIBUTE)
     }
+    return false
   }
 }

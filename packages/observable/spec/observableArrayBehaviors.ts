@@ -242,6 +242,7 @@ describe('Observable Array', function () {
           testObservableArray.splice(0, 1)
           return true
         }
+        return false
       })
     }).toThrow()
     expect(testObservableArray()).toEqual(['Beta', 'Gamma'])

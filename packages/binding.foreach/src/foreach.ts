@@ -390,6 +390,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     if (domNodeIsContainedBy(active!, node)) {
       return active
     }
+    return null
   }
 
   insertAllAfter(nodeOrNodeArrayToInsert, insertAfterNode) {

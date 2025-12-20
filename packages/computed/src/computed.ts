@@ -294,6 +294,7 @@ computed.fn = {
         }
       }
     }
+    return false
   },
   markDirty() {
     // Process "dirty" events if we can handle delayed notifications

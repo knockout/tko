@@ -321,6 +321,7 @@ describe('Binding: Foreach', function () {
         node.parentNode?.removeChild(node)
         return newNodes
       }
+      return undefined
     }
 
     // Now perform a foreach binding, and see that afterRender gets the output from the preprocessor and bindings
@@ -954,6 +955,7 @@ describe('Binding: Foreach', function () {
         node.parentNode?.removeChild(node)
         return []
       }
+      return undefined
     }
     testNode.innerHTML =
       "<div data-bind='foreach: items'>"

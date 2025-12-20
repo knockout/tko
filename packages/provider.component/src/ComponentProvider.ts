@@ -19,7 +19,7 @@ export default class ComponentProvider extends Provider {
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
    * @param {Element} node
    */
-  preprocessNode(node: Element) {
+  preprocessNode(node: Element): Node[] | undefined {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
@@ -36,6 +36,7 @@ export default class ComponentProvider extends Provider {
 
       return [openNode, closeNode]
     }
+    return undefined
   }
 
   nodeHasBindings(node: Element): boolean {
@@ -63,6 +64,7 @@ export default class ComponentProvider extends Provider {
         return tagName
       }
     }
+    return
   }
 
   getComponentParams(node: Element, context) {

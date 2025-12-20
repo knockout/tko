@@ -13,7 +13,7 @@ export default class VirtualProvider extends BindingStringProvider {
    * Convert <ko binding='...'> into <!-- ko binding: ... -->
    * @param {HTMLElement} node
    */
-  preprocessNode(node: Element) {
+  preprocessNode(node: Element): Node[] | undefined {
     if (node.tagName === 'KO') {
       const parent = node.parentNode
       const childNodes = [...node.childNodes]
@@ -28,6 +28,7 @@ export default class VirtualProvider extends BindingStringProvider {
       node.remove()
       return [openNode, ...childNodes, closeNode]
     }
+    return undefined
   }
 
   *genElementBindingStrings(node: Element) {
@@ -36,15 +37,17 @@ export default class VirtualProvider extends BindingStringProvider {
     }
   }
 
-  getBindingString(node: Element) {
+  getBindingString(node: Element): string | null {
     if (node.nodeType === document.COMMENT_NODE) {
       return virtualElements.virtualNodeBindingValue(node)
     }
+    return null
   }
 
-  nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
+  nodeHasBindings(node: Element, context?: BindingContext): boolean {
     if (node.nodeType === document.COMMENT_NODE) {
       return virtualElements.isStartComment(node)
     }
+    return false
   }
 }

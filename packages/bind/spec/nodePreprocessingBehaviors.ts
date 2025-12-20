@@ -44,6 +44,7 @@ describe('Node preprocessing', function () {
         node.parentNode?.removeChild(node)
         return [newNode]
       }
+      return undefined
     }
     testNode.innerHTML = '<span>a</span><mySpecialNode></mySpecialNode><span>b</span>'
     let someValue = observable('hello')
@@ -76,6 +77,7 @@ describe('Node preprocessing', function () {
           node.parentNode.removeChild(node)
           return newNodes
         }
+        return undefined
       }
     }
     options.bindingProviderInstance = new TestProvider()
@@ -102,6 +104,7 @@ describe('Node preprocessing', function () {
           node.parentNode.removeChild(node)
           return newNodes
         }
+        return undefined
       }
     }
     let testProvider = new TestProvider()

@@ -251,7 +251,7 @@ export default class Parser {
         }
       }
     }
-    this.error('Bad object')
+    throw new Error('Bad object')
   }
 
   /**
@@ -314,7 +314,7 @@ export default class Parser {
       ch = this.next()
     }
 
-    this.error('Bad string')
+    throw new Error('Bad string')
   }
 
   string() {
@@ -352,7 +352,7 @@ export default class Parser {
         ch = this.white()
       }
     }
-    this.error('Bad array')
+    throw new Error('Bad array')
   }
 
   value() {
@@ -640,7 +640,7 @@ export default class Parser {
       }
     }
 
-    this.error('Bad arguments to function')
+    throw new Error('Bad arguments to function')
   }
 
   /**

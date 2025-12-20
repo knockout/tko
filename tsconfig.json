@@ -16,7 +16,7 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "noImplicitOverride": false,
-    "noImplicitReturns": false,
+    "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
