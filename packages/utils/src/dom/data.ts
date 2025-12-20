@@ -6,7 +6,7 @@ import { ieVersion } from '../ie'
 const datastoreTime = new Date().getTime()
 const dataStoreKeyExpandoPropertyName = `__ko__${datastoreTime}`
 const dataStoreSymbol = Symbol('Knockout data')
-var dataStore = {}
+let dataStore = {}
 let uniqueId = 0
 
 // Prevent prototype pollution by restricting special property names
@@ -85,7 +85,7 @@ function get (node: Node, key: string) {
 function set (node : Node, key : string, value : any) {
    if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
   // Make sure we don't actually create a new domData key if we are actually deleting a value
-  var dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
+  let dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
   if (dataForNode) {
     dataForNode[key] = value
   }

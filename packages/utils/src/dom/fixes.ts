@@ -32,7 +32,7 @@ export function fixUpContinuousNodeArray (continuousNodeArray, parentNode) {
 
         // Rule [C]
     if (continuousNodeArray.length > 1) {
-      var current = continuousNodeArray[0], last = continuousNodeArray[continuousNodeArray.length - 1]
+      let current = continuousNodeArray[0], last = continuousNodeArray[continuousNodeArray.length - 1]
             // Replace with the actual new continuous node set
       continuousNodeArray.length = 0
       while (current !== last) {
@@ -54,7 +54,7 @@ export function forceRefresh (node) {
     // Workaround for an IE9 rendering bug - https://github.com/SteveSanderson/knockout/issues/209
   if ((ieVersion as any) >= 9) {
         // For text nodes and comment nodes (most likely virtual elements), we will have to refresh the container
-    var elem = node.nodeType == 1 ? node : node.parentNode
+    let elem = node.nodeType == 1 ? node : node.parentNode
     // eslint-disable-next-line no-self-assign
     if (elem.style) { elem.style.zoom = elem.style.zoom }
   }
@@ -65,7 +65,7 @@ export function ensureSelectElementIsRenderedCorrectly (selectElement) {
     // (See https://github.com/SteveSanderson/knockout/issues/312, http://stackoverflow.com/questions/5908494/select-only-shows-first-char-of-selected-option)
     // Also fixes IE7 and IE8 bug that causes selects to be zero width if enclosed by 'if' or 'with'. (See issue #839)
   if (ieVersion) {
-    var originalWidth = selectElement.style.width
+    let originalWidth = selectElement.style.width
     selectElement.style.width = 0
     selectElement.style.width = originalWidth
   }

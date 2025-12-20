@@ -20,7 +20,7 @@ import {value} from './value'
 import {visible, hidden} from './visible'
 import {using} from './using'
 
-export var bindings = {
+export const bindings = {
   attr,
   checked,
   checkedValue,

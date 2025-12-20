@@ -42,13 +42,13 @@ describe('Identifier', function () {
     return new Identifier(null, identifier).set_value(newValue, ctx, {})
   }
 
-  var c = 'Z',
+  let c = 'Z',
     f = function () {
       return 'Fv'
     }
 
   it('looks up values on the parser context', function () {
-    var context = { c: c, f: f }
+    let context = { c: c, f: f }
     assert.equal(testLookup('c', context), 'Z')
     assert.equal(testLookup('f', context), f)
   })
@@ -89,28 +89,28 @@ describe('Identifier', function () {
   })
 
   it('dereferences values on the parser', function () {
-    var context = new bindingContext({ f: f })
-    var fake_args = new Arguments(null, [])
-    var derefs = [fake_args]
+    let context = new bindingContext({ f: f })
+    let fake_args = new Arguments(null, [])
+    let derefs = [fake_args]
     const identifier = new Identifier(null, 'f', derefs)
     assert.equal(identifier.get_value(undefined, context), 'Fv')
   })
 
   describe('the dereference function', function () {
     it('does nothing with no references', function () {
-      var refs,
+      let refs,
         ident = new Identifier({}, 'x', refs)
       assert.equal(ident.dereference('1', {}), 1)
     })
 
     it('does nothing with empty array references', function () {
-      var refs = new Array(),
+      let refs = new Array(),
         ident = new Identifier({}, 'x', refs)
       assert.equal(ident.dereference('1', {}), 1)
     })
 
     it('applies the functions of the refs to the value', function () {
-      var fake_args = new Arguments(null, []),
+      let fake_args = new Arguments(null, []),
         refs = [fake_args, fake_args],
         ident = new Identifier({}, 'x', refs),
         g = function () {
@@ -123,7 +123,7 @@ describe('Identifier', function () {
     })
 
     it('sets `this` to the parent member', function () {
-      var div = document.createElement('div'),
+      const div = document.createElement('div'),
         context = {
           fn: function () {
             assert.isObject(this)
@@ -140,7 +140,7 @@ describe('Identifier', function () {
     })
 
     it('sets `this` of a called function', function () {
-      var div = document.createElement('div'),
+      let div = document.createElement('div'),
         P = function () {},
         thisIs = observable(),
         context = {
@@ -157,7 +157,7 @@ describe('Identifier', function () {
     })
 
     it('uses `$data` as explicit `this` reference', function () {
-      var div = document.createElement('div'),
+      let div = document.createElement('div'),
         obs = observable(),
         context = { fn: obs }
       div.setAttribute('data-bind', 'click: => fn(this)')
@@ -170,7 +170,7 @@ describe('Identifier', function () {
     })
 
     it('does not break `this`/prototype of observable/others', function () {
-      var div = document.createElement('div'),
+      let div = document.createElement('div'),
         comp = computed(function () { return 'rrr' }),
         Fn = function ffn () { this.comp = comp },
         context = {
@@ -191,7 +191,7 @@ describe('Identifier', function () {
       options.bindingGlobals = Object.create({
         Ramanujan: '1729'
       })
-      var div = document.createElement('div'),
+      let div = document.createElement('div'),
         context = {
           fn: function () {
             assert.isObject(this)

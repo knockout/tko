@@ -15,6 +15,7 @@ export default [
       "prefer-spread": "off",
       "prefer-const": "off",
       "no-useless-escape": "off",
+//    "no-var": "off",
       "no-array-constructor": "off",
       "no-misleading-character-class": "off",
       "@typescript-eslint/no-this-alias": "off",

@@ -30,7 +30,7 @@ describe('Binding: Value', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
-    var provider = new DataBindProvider()
+    let provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
@@ -60,7 +60,7 @@ describe('Binding: Value', function () {
   })
 
   it('For observable values, should unwrap the value and update on change', function () {
-    var myObservable = observable(123)
+    let myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='value:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
     expect(testNode.childNodes[0].value).toEqual('123')
@@ -69,7 +69,7 @@ describe('Binding: Value', function () {
   })
 
   it('For observable values, should update on change if new value is \'strictly\' different from previous value', function () {
-    var myObservable = observable('+123')
+    let myObservable = observable('+123')
     testNode.innerHTML = "<input data-bind='value:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
     expect(testNode.childNodes[0].value).toEqual('+123')
@@ -78,7 +78,7 @@ describe('Binding: Value', function () {
   })
 
   it('For writeable observable values, should catch the node\'s onchange and write values back to the observable', function () {
-    var myObservable = observable(123)
+    let myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='value:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
     testNode.childNodes[0].value = 'some user-entered value'
@@ -87,9 +87,9 @@ describe('Binding: Value', function () {
   })
 
   it('For writeable observable values, should always write when triggered, even when value is the same', function () {
-    var validValue = observable(123)
-    var isValid = observable(true)
-    var valueForEditing = computed({
+    let validValue = observable(123)
+    let isValid = observable(true)
+    let valueForEditing = computed({
       read: validValue,
       write: function (newValue) {
         if (!isNaN(newValue)) {
@@ -124,8 +124,8 @@ describe('Binding: Value', function () {
   })
 
   it('Should ignore node changes when bound to a read-only observable', function () {
-    var computedValue = computed(function () { return 'zzz' })
-    var vm = { prop: computedValue }
+    let computedValue = computed(function () { return 'zzz' })
+    let vm = { prop: computedValue }
 
     testNode.innerHTML = "<input data-bind='value: prop' />"
     applyBindings(vm, testNode)
@@ -139,7 +139,7 @@ describe('Binding: Value', function () {
   })
 
   it('For non-observable property values, should catch the node\'s onchange and write values back to the property', function () {
-    var model = { modelProperty123: 456 }
+    let model = { modelProperty123: 456 }
     testNode.innerHTML = "<input data-bind='value: modelProperty123' />"
     applyBindings(model, testNode)
     expect(testNode.childNodes[0].value).toEqual('456')
@@ -150,8 +150,8 @@ describe('Binding: Value', function () {
   })
 
   it('Should be able to read and write to a property of an object returned by a function', function () {
-    var mySetter = { set: 666 }
-    var model = {
+    let mySetter = { set: 666 }
+    let model = {
       getSetter: function () {
         return mySetter
       }
@@ -183,9 +183,9 @@ describe('Binding: Value', function () {
 
   it('Should be able to write to observable subproperties of an observable, even after the parent observable has changed', function () {
         // This spec represents https://github.com/SteveSanderson/knockout/issues#issue/13
-    var originalSubproperty = observable('original value')
-    var newSubproperty = observable()
-    var model = { myprop: observable({ subproperty: originalSubproperty }) }
+    let originalSubproperty = observable('original value')
+    let newSubproperty = observable()
+    let model = { myprop: observable({ subproperty: originalSubproperty }) }
 
         // Set up a text box whose value is linked to the subproperty of the observable's current value
     testNode.innerHTML = "<input data-bind='value: myprop().subproperty' />"
@@ -202,8 +202,8 @@ describe('Binding: Value', function () {
   })
 
   it('Should only register one single onchange handler', function () {
-    var notifiedValues = new Array()
-    var myObservable = observable(123)
+    let notifiedValues = new Array()
+    let myObservable = observable(123)
     myObservable.subscribe(function (value) { notifiedValues.push(value) })
     expect(notifiedValues.length).toEqual(0)
 
@@ -223,7 +223,7 @@ describe('Binding: Value', function () {
   })
 
   it('Should be able to catch updates after specific events (e.g., keyup) instead of onchange', function () {
-    var myObservable = observable(123)
+    let myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"keyup\"' />"
     applyBindings({ someProp: myObservable }, testNode)
     testNode.childNodes[0].value = 'some user-entered value'
@@ -233,7 +233,7 @@ describe('Binding: Value', function () {
 
   it('Should catch updates on change as well as the nominated valueUpdate event', function () {
         // Represents issue #102 (https://github.com/SteveSanderson/knockout/issues/102)
-    var myObservable = observable(123)
+    let myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"keyup\"' />"
     applyBindings({ someProp: myObservable }, testNode)
     testNode.childNodes[0].value = 'some user-entered value'
@@ -244,7 +244,7 @@ describe('Binding: Value', function () {
   it('Should delay reading value and updating observable when prefixing an event with "after"', function () {
     jasmine.Clock.useMock()
 
-    var myObservable = observable('123')
+    let myObservable = observable('123')
     testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />"
     applyBindings({ someProp: myObservable }, testNode)
     triggerEvent(testNode.childNodes[0], 'keyup')
@@ -258,7 +258,7 @@ describe('Binding: Value', function () {
   it('Should ignore "unchanged" notifications from observable during delayed event processing', function () {
     jasmine.Clock.useMock()
 
-    var myObservable = observable('123')
+    let myObservable = observable('123')
     testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />"
     applyBindings({ someProp: myObservable }, testNode)
     triggerEvent(testNode.childNodes[0], 'keyup')
@@ -276,7 +276,7 @@ describe('Binding: Value', function () {
   it('Should not ignore actual change notifications from observable during delayed event processing', function () {
     jasmine.Clock.useMock()
 
-    var myObservable = observable('123')
+    let myObservable = observable('123')
     testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />"
     applyBindings({ someProp: myObservable }, testNode)
     triggerEvent(testNode.childNodes[0], 'keyup')
@@ -295,11 +295,11 @@ describe('Binding: Value', function () {
         // This spec describes the awkward choreography of events needed to detect changes to text boxes on IE < 10,
         // because it doesn't fire regular "change" events when the user selects an autofill entry. It isn't applicable
         // on IE 10+ or other browsers, because they don't have that problem with autofill.
-    var isOldIE = jasmine.ieVersion && jasmine.ieVersion < 10
+    let isOldIE = jasmine.ieVersion && jasmine.ieVersion < 10
 
     if (isOldIE) {
-      var myObservable = observable(123).extend({ notify: 'always' })
-      var numUpdates = 0
+      let myObservable = observable(123).extend({ notify: 'always' })
+      let numUpdates = 0
       myObservable.subscribe(function () { numUpdates++ })
       testNode.innerHTML = "<input data-bind='value:someProp' />"
       applyBindings({ someProp: myObservable }, testNode)
@@ -339,8 +339,8 @@ describe('Binding: Value', function () {
   })
 
   it('Should bind to file inputs but not allow setting an non-empty value', function () {
-    var prop = observable('zzz')
-    var vm = { prop }
+    let prop = observable('zzz')
+    let vm = { prop }
 
     testNode.innerHTML = "<input type='file' data-bind='value: prop' />"
     applyBindings(vm, testNode)
@@ -349,7 +349,7 @@ describe('Binding: Value', function () {
 
   describe('For select boxes', function () {
     it('Should update selectedIndex when the model changes (options specified before value)', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
       expect(testNode.childNodes[0].selectedIndex).toEqual(1)
@@ -361,7 +361,7 @@ describe('Binding: Value', function () {
     })
 
     it('Should update selectedIndex when the model changes (value specified before options)', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='value:myObservable, options:[\"A\", \"B\"]'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
       expect(testNode.childNodes[0].selectedIndex).toEqual(1)
@@ -379,7 +379,7 @@ describe('Binding: Value', function () {
     })
 
     it('Should display the caption when the model value changes to undefined, null, or \"\" when using \'options\' binding', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
 
@@ -402,7 +402,7 @@ describe('Binding: Value', function () {
     })
 
     it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='value:myObservable'><option value=''>Select...</option><option>A</option><option>B</option></select>"
       applyBindings({ myObservable: myObservable }, testNode)
 
@@ -425,7 +425,7 @@ describe('Binding: Value', function () {
     })
 
     it('When size > 1, should unselect all options when value is undefined, null, or \"\"', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select size='2' data-bind='options:[\"A\", \"B\"], value:myObservable'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
 
@@ -448,10 +448,10 @@ describe('Binding: Value', function () {
     })
 
     it('Should update the model value when the UI is changed (setting it to undefined when the caption is selected)', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
-      var dropdown = testNode.childNodes[0]
+      let dropdown = testNode.childNodes[0]
 
       dropdown.selectedIndex = 1
       triggerEvent(dropdown, 'change')
@@ -463,10 +463,10 @@ describe('Binding: Value', function () {
     })
 
     it('Should be able to associate option values with arbitrary objects (not just strings)', function () {
-      var x = {}, y = {}
-      var selectedValue = observable(y)
+      let x = {}, y = {}
+      let selectedValue = observable(y)
       testNode.innerHTML = "<select data-bind='options: myOptions, value: selectedValue'></select>"
-      var dropdown = testNode.childNodes[0]
+      let dropdown = testNode.childNodes[0]
       applyBindings({ myOptions: [x, y], selectedValue: selectedValue }, testNode)
 
             // Check the UI displays the entry corresponding to the chosen value
@@ -487,7 +487,7 @@ describe('Binding: Value', function () {
             //  * If there is *any* option value that equals the model value, we'd initalise the select box such that *that* option is the selected one
             //  * If there is *no* option value that equals the model value (often because the model value is undefined), we should set the model
             //    value to match an arbitrary option value to avoid inconsistency between the visible UI and the model
-      var myObservable = observable() // Undefined by default
+      let myObservable = observable() // Undefined by default
 
             // Should work with options specified before value
       testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable'></select>"
@@ -504,7 +504,7 @@ describe('Binding: Value', function () {
     })
 
     it('When non-empty, should reject model values that don\'t match any option value, resetting the model value to whatever is visibly selected in the UI', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\", \"C\"], value:myObservable'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
       expect(testNode.childNodes[0].selectedIndex).toEqual(1)
@@ -517,7 +517,7 @@ describe('Binding: Value', function () {
     })
 
     it('Should support numerical option values, which are not implicitly converted to strings', function () {
-      var myObservable = observable(30)
+      let myObservable = observable(30)
       testNode.innerHTML = "<select data-bind='options:[10,20,30,40], value:myObservable'></select>"
       applyBindings({ myObservable: myObservable }, testNode)
 
@@ -532,10 +532,10 @@ describe('Binding: Value', function () {
     })
 
     it('Should always use value (and not text) when options have value attributes', function () {
-      var myObservable = observable('A')
+      let myObservable = observable('A')
       testNode.innerHTML = "<select data-bind='value:myObservable'><option value=''>A</option><option value='A'>B</option></select>"
       applyBindings({ myObservable: myObservable }, testNode)
-      var dropdown = testNode.childNodes[0]
+      let dropdown = testNode.childNodes[0]
       expect(dropdown.selectedIndex).toEqual(1)
 
       dropdown.selectedIndex = 0
@@ -544,10 +544,10 @@ describe('Binding: Value', function () {
     })
 
     it('Should use text value when options have text values but no value attribute', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<select data-bind='value:myObservable'><option>A</option><option>B</option><option>C</option></select>"
       applyBindings({ myObservable: myObservable }, testNode)
-      var dropdown = testNode.childNodes[0]
+      let dropdown = testNode.childNodes[0]
       expect(dropdown.selectedIndex).toEqual(1)
 
       dropdown.selectedIndex = 0
@@ -560,7 +560,7 @@ describe('Binding: Value', function () {
 
     it('Should not throw an exception for value binding on multiple select boxes', function () {
       testNode.innerHTML = "<select data-bind=\"options: ['abc','def','ghi'], value: x\"></select><select data-bind=\"options: ['xyz','uvw'], value: x\"></select>"
-      var myObservable = observable()
+      let myObservable = observable()
       expect(function () {
         applyBindings({ x: myObservable }, testNode)
       }).not.toThrow()
@@ -569,10 +569,10 @@ describe('Binding: Value', function () {
 
     describe('Using valueAllowUnset option', function () {
       it('Should display the caption when the model value changes to undefined, null, or \"\" when using \'options\' binding', function () {
-        var myObservable = observable('B')
+        let myObservable = observable('B')
         testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable, valueAllowUnset:true'></select>"
         applyBindings({ myObservable: myObservable }, testNode)
-        var select = testNode.childNodes[0]
+        let select = testNode.childNodes[0]
 
         select.selectedIndex = 2
         myObservable(undefined)
@@ -588,10 +588,10 @@ describe('Binding: Value', function () {
       })
 
       it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function () {
-        var myObservable = observable('B')
+        let myObservable = observable('B')
         testNode.innerHTML = "<select data-bind='value:myObservable, valueAllowUnset:true'><option value=''>Select...</option><option>A</option><option>B</option></select>"
         applyBindings({ myObservable: myObservable }, testNode)
-        var select = testNode.childNodes[0]
+        let select = testNode.childNodes[0]
 
         select.selectedIndex = 2
         myObservable(undefined)
@@ -607,10 +607,10 @@ describe('Binding: Value', function () {
       })
 
       it('Should display the caption when the model value changes to undefined after having no selection', function () {
-        var myObservable = observable('B')
+        let myObservable = observable('B')
         testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable, valueAllowUnset:true'></select>"
         applyBindings({ myObservable }, testNode)
-        var select = testNode.childNodes[0]
+        let select = testNode.childNodes[0]
 
         select.selectedIndex = -1
         myObservable(undefined)
@@ -618,7 +618,7 @@ describe('Binding: Value', function () {
       })
 
       it('Should select no option value if no option value matches the current model property value', function () {
-        var myObservable = observable()
+        let myObservable = observable()
         testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable, valueAllowUnset:true'></select>"
         applyBindings({ myObservable: myObservable }, testNode)
 
@@ -627,7 +627,7 @@ describe('Binding: Value', function () {
       })
 
       it('Should select no option value if model value does\'t match any option value', function () {
-        var myObservable = observable('B')
+        let myObservable = observable('B')
         testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\", \"C\"], value:myObservable, valueAllowUnset:true'></select>"
         applyBindings({ myObservable: myObservable }, testNode)
         expect(testNode.childNodes[0].selectedIndex).toEqual(1)
@@ -637,8 +637,8 @@ describe('Binding: Value', function () {
       })
 
       it('Should maintain model value and update selection when options change', function () {
-        var myObservable = observable('D')
-        var options = observableArray(['A', 'B'])
+        let myObservable = observable('D')
+        let options = observableArray(['A', 'B'])
         testNode.innerHTML = "<select data-bind='options:myOptions, value:myObservable, valueAllowUnset:true'></select>"
         applyBindings({ myObservable: myObservable, myOptions: options }, testNode)
 
@@ -663,8 +663,8 @@ describe('Binding: Value', function () {
       })
 
       it('Should maintain model value and update selection when changing observable option text or value', function () {
-        var selected = observable('B')
-        var people = [
+        let selected = observable('B')
+        let people = [
                     { name: observable('Annie'), id: observable('A') },
                     { name: observable('Bert'), id: observable('B') }
         ]
@@ -693,8 +693,8 @@ describe('Binding: Value', function () {
       })
 
       it('Should select no options if model value is null and option value is 0', function () {
-        var myObservable = observable(null)
-        var options = [
+        let myObservable = observable(null)
+        let options = [
           { name: 'B', id: 1 },
           { name: 'A', id: 0 }
         ]
@@ -709,11 +709,11 @@ describe('Binding: Value', function () {
 
   describe('Acts like \'checkedValue\' on a checkbox or radio', function () {
     it('Should update value, but not respond to events when on a checkbox', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<input type='checkbox' data-bind='value: myObservable' />"
       applyBindings({ myObservable: myObservable }, testNode)
 
-      var checkbox = testNode.childNodes[0]
+      let checkbox = testNode.childNodes[0]
       expect(checkbox.value).toEqual('B')
 
       myObservable('C')
@@ -727,11 +727,11 @@ describe('Binding: Value', function () {
     })
 
     it('Should update value, but not respond to events when on a radio', function () {
-      var myObservable = observable('B')
+      let myObservable = observable('B')
       testNode.innerHTML = "<input type='radio' data-bind='value: myObservable' />"
       applyBindings({ myObservable: myObservable }, testNode)
 
-      var radio = testNode.childNodes[0]
+      let radio = testNode.childNodes[0]
       expect(radio.value).toEqual('B')
 
       myObservable('C')

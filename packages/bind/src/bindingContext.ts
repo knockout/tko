@@ -220,6 +220,6 @@ export function contextFor (node: Node) {
 }
 
 export function dataFor<T = any>(node: Node): T | undefined {
-  var context = contextFor(node)
+  const context = contextFor(node)
   return context ? context.$data : undefined
 }

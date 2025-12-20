@@ -35,7 +35,7 @@ describe('Deferred bindings', function () {
     testNode = jasmine.prepareTestNode()
     useMockForTasks(options)
     options.deferUpdates = true
-    var provider = new DataBindProvider()
+    let provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
@@ -60,7 +60,7 @@ describe('Deferred bindings', function () {
   })
 
   it('Should update bindings asynchronously', function () {
-    var observable = Observable('A')
+    let observable = Observable('A')
 
         // The initial "applyBindings" is synchronous
     testNode.innerHTML = "<div data-bind='test: myObservable'></div>"
@@ -82,7 +82,7 @@ describe('Deferred bindings', function () {
   })
 
   it('Should update templates asynchronously', function () {
-    var observable = Observable('A')
+    let observable = Observable('A')
 
     testNode.innerHTML = "<div data-bind='template: {data: myObservable}'><div data-bind='test: $data'></div></div>"
     applyBindings({ myObservable: observable }, testNode)
@@ -103,7 +103,7 @@ describe('Deferred bindings', function () {
   })
 
   it("Should update 'foreach' items asynchronously", function () {
-    var observable = ObservableArray(['A'])
+    let observable = ObservableArray(['A'])
 
     testNode.innerHTML = "<div data-bind='foreach: {data: myObservables}'><div data-bind='test: $data'></div></div>"
     applyBindings({ myObservables: observable }, testNode)
@@ -128,7 +128,7 @@ describe('Deferred bindings', function () {
     observable.remove('A')
     observable.push('A')
 
-    var nodeA = testNode.childNodes[0].childNodes[0],
+    let nodeA = testNode.childNodes[0].childNodes[0],
       nodeB = testNode.childNodes[0].childNodes[1]
     jasmine.Clock.tick(1)
     expect(bindingSpy).not.toHaveBeenCalled()
@@ -141,7 +141,7 @@ describe('Deferred bindings', function () {
         // is dragged and dropped in the same list, it must be deleted and re-added instead of being moved.
 
     testNode.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: childProp'></span></div>"
-    var someItems = ObservableArray([
+    let someItems = ObservableArray([
             { childProp: 'first child' },
             { childProp: 'second child' },
             { childProp: 'moving child' }
@@ -149,7 +149,7 @@ describe('Deferred bindings', function () {
     applyBindings({ someItems: someItems }, testNode)
     expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span><span data-bind="text: childprop">moving child</span>')
 
-    var sourceIndex = 2,
+    let sourceIndex = 2,
       targetIndex = 0,
       itemNode = testNode.childNodes[0].childNodes[sourceIndex],
       item = someItems()[sourceIndex]
@@ -168,7 +168,7 @@ describe('Deferred bindings', function () {
   it('Should get latest value when conditionally included', function () {
     // Test is based on example in https://github.com/knockout/knockout/issues/1975
     testNode.innerHTML = '<div data-bind="if: show"><div data-bind="text: status"></div></div>'
-    var value = Observable(0),
+    let value = Observable(0),
       is1 = pureComputed(function () { return value() === 1 }),
       status = pureComputed(function () { return is1() ? 'ok' : 'error' }),
       show = pureComputed(function () { return value() > 0 && is1() })
@@ -193,7 +193,7 @@ describe('Deferred bindings', function () {
     // Based on example at https://github.com/knockout/knockout/pull/2226
     testNode.innerHTML = `<div data-bind="if: hasAddress()"><span data-bind="text: streetNumber().toLowerCase()"></span> <span data-bind="text: street().toLowerCase()"></span></div>`
 
-    var vm = {
+    const vm = {
       street: Observable(),
       streetNumber: Observable(),
       hasAddress: pureComputed(() => vm.streetNumber() && vm.street())
@@ -217,7 +217,7 @@ describe('Deferred bindings', function () {
   it('Should update "with" binding before descendant bindings', function () {
       // Based on example at https://github.com/knockout/knockout/pull/2226
     testNode.innerHTML = `<div data-bind="with: hasAddress()"><span data-bind="text: $parent.streetNumber().toLowerCase()"></span> <span data-bind="text: $parent.street().toLowerCase()"></span></div>`
-    var vm = {
+    const vm = {
       street: Observable(),
       streetNumber: Observable(),
       hasAddress: pureComputed(() => vm.streetNumber() && vm.street())
@@ -239,9 +239,9 @@ describe('Deferred bindings', function () {
   })
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
-    var someItem = Observable(true)
+    let someItem = Observable(true)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: (++counter)'></span></div>"
-    var originalNode = testNode.childNodes[0].childNodes[0]
+    let originalNode = testNode.childNodes[0].childNodes[0]
 
       // Value is initially true, so nodes are retained
     applyBindings({ someItem: someItem, counter: 0 }, testNode)

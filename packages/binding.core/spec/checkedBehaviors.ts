@@ -29,7 +29,7 @@ describe('Binding: Checked', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
-    var provider = new DataBindProvider()
+    let provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(templateBindings)
@@ -81,7 +81,7 @@ describe('Binding: Checked', function () {
         // This isn't strictly to do with the checked binding, but if this doesn't work, the rest of the specs aren't meaningful
     testNode.innerHTML = "<input type='checkbox' />"
     const input = testNode.children[0] as HTMLInputElement
-    var clickHandlerFireCount = 0, expectedCheckedStateInHandler
+    let clickHandlerFireCount = 0, expectedCheckedStateInHandler
     registerEventHandler(input, 'click', function () {
       clickHandlerFireCount++
       expect(input.checked).toEqual(expectedCheckedStateInHandler)
@@ -99,7 +99,7 @@ describe('Binding: Checked', function () {
   })
 
   it('Should be able to control a checkbox\'s checked state', function () {
-    var myobservable = observable(true)
+    let myobservable = observable(true)
     testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />"
     const input = testNode.children[0] as HTMLInputElement
 
@@ -111,7 +111,7 @@ describe('Binding: Checked', function () {
   })
 
   it('Should update observable properties on the underlying model when the checkbox click event fires', function () {
-    var myobservable = observable(false)
+    let myobservable = observable(false)
     testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />"
     applyBindings({ someProp: myobservable }, testNode)
 
@@ -120,8 +120,8 @@ describe('Binding: Checked', function () {
   })
 
   it('Should only notify observable properties on the underlying model *once* even if the checkbox change events fire multiple times', function () {
-    var myobservable = observable()
-    var timesNotified = 0
+    let myobservable = observable()
+    let timesNotified = 0
     myobservable.subscribe(function () { timesNotified++ })
     testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />"
     applyBindings({ someProp: myobservable }, testNode)
@@ -139,7 +139,7 @@ describe('Binding: Checked', function () {
   })
 
   it('Should update non-observable properties on the underlying model when the checkbox click event fires', function () {
-    var model = { someProp: false }
+    let model = { someProp: false }
     testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />"
     applyBindings(model, testNode)
 
@@ -148,7 +148,7 @@ describe('Binding: Checked', function () {
   })
 
   it('Should make a radio button checked if and only if its value matches the bound model property', function () {
-    var myobservable = observable('another value')
+    let myobservable = observable('another value')
     testNode.innerHTML = "<input type='radio' value='This Radio Button Value' data-bind='checked:someProp' />"
 
     applyBindings({ someProp: myobservable }, testNode)
@@ -161,7 +161,7 @@ describe('Binding: Checked', function () {
   })
 
   it('Should set an observable model property to this radio button\'s value when checked', function () {
-    var myobservable = observable('another value')
+    let myobservable = observable('another value')
     testNode.innerHTML = "<input type='radio' value='this radio button value' data-bind='checked:someProp' />"
     applyBindings({ someProp: myobservable }, testNode)
 
@@ -172,8 +172,8 @@ describe('Binding: Checked', function () {
   })
 
   it('Should only notify observable properties on the underlying model *once* even if the radio button change/click events fire multiple times', function () {
-    var myobservable = observable('original value')
-    var timesNotified = 0
+    let myobservable = observable('original value')
+    let timesNotified = 0
     myobservable.subscribe(function () { timesNotified++ })
     testNode.innerHTML = "<input type='radio' value='this radio button value' data-bind='checked:someProp' /><input type='radio' value='different value' data-bind='checked:someProp' />"
     applyBindings({ someProp: myobservable }, testNode)
@@ -192,7 +192,7 @@ describe('Binding: Checked', function () {
   })
 
   it('Should set a non-observable model property to this radio button\'s value when checked', function () {
-    var model = { someProp: 'another value' }
+    let model = { someProp: 'another value' }
     testNode.innerHTML = "<input type='radio' value='this radio button value' data-bind='checked:someProp' />"
     applyBindings(model, testNode)
 
@@ -201,7 +201,7 @@ describe('Binding: Checked', function () {
   })
 
   it('When a checkbox is bound to an array, the checkbox should control whether its value is in that array', function () {
-    var model = { myArray: ['Existing value', 'Unrelated value'] }
+    let model = { myArray: ['Existing value', 'Unrelated value'] }
     testNode.innerHTML = "<input type='checkbox' value='Existing value' data-bind='checked:myArray' />" +
                            "<input type='checkbox' value='New value'      data-bind='checked:myArray' />"
     applyBindings(model, testNode)
@@ -221,7 +221,7 @@ describe('Binding: Checked', function () {
   })
 
   it('When a checkbox is bound to an observable array, the checkbox checked state responds to changes in the array', function () {
-    var model = { myObservableArray: observableArray(['Unrelated value']) }
+    let model = { myObservableArray: observableArray(['Unrelated value']) }
     testNode.innerHTML = "<input type='checkbox' value='My value' data-bind='checked:myObservableArray' />"
     applyBindings(model, testNode)
     const input = testNode.children[0] as HTMLInputElement
@@ -237,7 +237,7 @@ describe('Binding: Checked', function () {
   })
 
   it('When a checkbox is bound to a computed array, the checkbox and the computed observable should update each other', function () {
-    var myObservable = observable([]),
+    let myObservable = observable([]),
       myComputed = computed({
         read: function () {
           return myObservable().slice(0)   // return a copy of the array so that we know that writes to the computed are really working
@@ -264,7 +264,7 @@ describe('Binding: Checked', function () {
   })
 
   it('When the radio button \'value\' attribute is set via attr binding, should set initial checked state correctly (attr before checked)', function () {
-    var myObservable = observable('this radio button value')
+    let myObservable = observable('this radio button value')
     testNode.innerHTML = "<input type='radio' data-bind='attr:{value:\"this radio button value\"}, checked:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
 
@@ -275,7 +275,7 @@ describe('Binding: Checked', function () {
   })
 
   it('When the radio button \'value\' attribute is set via attr binding, should set initial checked state correctly (checked before attr)', function () {
-    var myobservable = observable('this radio button value')
+    let myobservable = observable('this radio button value')
     testNode.innerHTML = "<input type='radio' data-bind='checked:someProp, attr:{value:\"this radio button value\"}' />"
     applyBindings({ someProp: myobservable }, testNode)
 
@@ -290,7 +290,7 @@ describe('Binding: Checked', function () {
     testNode.innerHTML = '<input type="radio" value="1" name="x" data-bind="checked: choice" />' +
             '<input type="radio" value="2" name="x" data-bind="checked: choice" />' +
             '<input type="radio" value="3" name="x" data-bind="checked: choice" />'
-    var choice = observable('1')
+    let choice = observable('1')
     choice.subscribe(function (newValue) {
       if (newValue == '3')        // don't allow item 3 to be selected; revert to item 1
             {
@@ -313,11 +313,11 @@ describe('Binding: Checked', function () {
     { binding: 'checkedValue', label: "With \'checkedValue\'" },
     { binding: 'value', label: 'With \'value\' treated like \'checkedValue\' when used with \'checked\'' }
   ], function (data) {
-    var binding = data.binding
+    let binding = data.binding
 
     describe(data.label, function () {
       it('Should use that value as the checkbox value in the array', function () {
-        var model = { myArray: observableArray([1, 3]) }
+        let model = { myArray: observableArray([1, 3]) }
         testNode.innerHTML = "<input type='checkbox' data-bind='checked:myArray, " + binding + ":1' />"
                       + "<input value='off' type='checkbox' data-bind='checked:myArray, " + binding + ":2' />"
         applyBindings(model, testNode)
@@ -350,7 +350,7 @@ describe('Binding: Checked', function () {
       })
 
       it('Should be able to use objects as value of checkboxes', function () {
-        var object1 = {x: 1},
+        let object1 = {x: 1},
           object2 = {y: 1},
           model = { values: [object1], choices: [object1, object2] }
         testNode.innerHTML = "<div data-bind='foreach: choices'><input type='checkbox' data-bind='checked:$parent.values, " + binding + ":$data' /></div>"
@@ -371,7 +371,7 @@ describe('Binding: Checked', function () {
       })
 
       it('Should be able to use observables as value of checkboxes', function () {
-        var object1 = {id: observable(1)},
+        let object1 = {id: observable(1)},
           object2 = {id: observable(2)},
           model = { values: observableArray([1]), choices: [object1, object2] }
         testNode.innerHTML = "<div data-bind='foreach: choices'><input type='checkbox' data-bind='" + binding + ":id, checked:$parent.values' /></div>"
@@ -407,7 +407,7 @@ describe('Binding: Checked', function () {
       })
 
       it('When node is removed, subscription to observable bound to \'' + binding + '\' is disposed', function () {
-        var model = { values: [1], checkedValue: observable(1) }
+        let model = { values: [1], checkedValue: observable(1) }
         testNode.innerHTML = "<input type='checkbox' data-bind='" + binding + ":checkedValue, checked:values' />"
         applyBindings(model, testNode)
 
@@ -421,7 +421,7 @@ describe('Binding: Checked', function () {
       })
 
       it('Should use that value as the radio button\'s value', function () {
-        var myobservable = observable(false)
+        let myobservable = observable(false)
         testNode.innerHTML = "<input type='radio' data-bind='checked:someProp, " + binding + ":true' />" +
                       "<input type='radio' data-bind='checked:someProp, " + binding + ":false' />"
         applyBindings({ someProp: myobservable }, testNode)
@@ -442,7 +442,7 @@ describe('Binding: Checked', function () {
       })
 
       it('Should be able to use observables as value of radio buttons', function () {
-        var object1 = {id: observable(1)},
+        let object1 = {id: observable(1)},
           object2 = {id: observable(2)},
           model = { value: observable(1), choices: [object1, object2] }
         testNode.innerHTML = "<div data-bind='foreach: choices'><input type='radio' data-bind='" + binding + ":id, checked:$parent.value' /></div>"
@@ -482,7 +482,7 @@ describe('Binding: Checked', function () {
                   // "checked" binding, but "value" won't.
 
         it('Should use that value as the checkbox\'s value when not bound to an array', function () {
-          var myobservable = observable('random value')
+          let myobservable = observable('random value')
           testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp, " + binding + ":true' />" +
                           "<input type='checkbox' data-bind='checked:someProp, " + binding + ":false' />"
           applyBindings({ someProp: myobservable }, testNode)
@@ -512,7 +512,7 @@ describe('Binding: Checked', function () {
         })
 
         it('Should be able to use observables as value of checkboxes when not bound to an array', function () {
-          var object1 = {id: observable(1)},
+          let object1 = {id: observable(1)},
             object2 = {id: observable(2)},
             model = { value: observable(1), choices: [object1, object2] }
           testNode.innerHTML = "<div data-bind='foreach: choices'><input type='checkbox' data-bind='" + binding + ":id, checked:$parent.value' /></div>"
@@ -549,7 +549,7 @@ describe('Binding: Checked', function () {
       }
 
       it('Should ignore \'undefined\' value for checkbox', function () {
-        var myobservable = observable(true)
+        let myobservable = observable(true)
         testNode.innerHTML = "<input type='checkbox' data-bind='checked: someProp, " + binding + ":undefined' />"
         applyBindings({ someProp: myobservable }, testNode)
 

@@ -1,12 +1,8 @@
 import {
-    setHtml, parseHtmlFragment, virtualElements
+    setHtml
 } from '@tko/utils'
 
-import {
-    unwrap
-} from '@tko/observable'
-
-export var html = {
+export const html = {
   init: function () {
         // Prevent binding on the dynamically-injected HTML (as developers are unlikely to expect that, and it has security implications)
     return {
