@@ -1,10 +1,8 @@
-import { triggerEvent } from '@tko/utils'
+import { triggerEvent, options } from '@tko/utils'
 
 import { applyBindings } from '@tko/bind'
 
 import { DataBindProvider } from '@tko/provider.databind'
-
-import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
