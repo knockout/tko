@@ -142,7 +142,6 @@ describe('Binding: TextInput', function () {
     testNode.innerHTML = "<input data-bind='textInput: modelProperty123' />"
     applyBindings(model, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).toEqual('456')
-
     ;((testNode.children[0] as HTMLInputElement).value as any) = 789 // only string values are accepted
     triggerEvent(testNode.children[0], 'change')
     expect(model.modelProperty123).toEqual('789')
@@ -159,7 +158,6 @@ describe('Binding: TextInput', function () {
     testNode.innerHTML = "<input data-bind='textinput: modelProperty123' />"
     applyBindings(model, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).toEqual('456')
-
     ;((testNode.children[0] as HTMLInputElement).value as any) = 789
     triggerEvent(testNode.children[0], 'change')
     expect(model.modelProperty123).toEqual('789')
@@ -222,7 +220,6 @@ describe('Binding: TextInput', function () {
     testNode.innerHTML = "<input data-bind='textInput: someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
-
     ;(testNode.children[0] as HTMLInputElement).value = 'some user-entered value' // setting the value triggers the propertychange event on IE
     if (!jasmine.ieVersion || jasmine.ieVersion >= 9) {
       triggerEvent(testNode.children[0], 'input')
@@ -246,7 +243,6 @@ describe('Binding: TextInput', function () {
     testNode.innerHTML = "<input data-bind='textInput: someProp' /><input />"
     applyBindings({ someProp: myobservable }, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
-
     ;(testNode.children[0] as HTMLInputElement).focus()
     ;(testNode.children[0] as HTMLInputElement).value = 'some user-entered value'
     ;(testNode.children[1] as HTMLInputElement).focus() // focus on a different input to blur the previous one
@@ -264,7 +260,6 @@ describe('Binding: TextInput', function () {
 
     testNode.innerHTML = "<input data-bind='textInput: writtenValue' />"
     applyBindings(model, testNode)
-
     ;(testNode.children[0] as HTMLInputElement).value = '1234'
     triggerEvent(testNode.children[0], 'change')
     expect(model.writtenValue).toEqual('1234')

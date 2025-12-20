@@ -114,7 +114,6 @@ export function findMovesInArrayComparison(left, right, limitFailedCompares?: nu
       (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]);
       ++l
     ) {
-      // eslint-disable-next-line no-cond-assign
       for (r = 0; (rightItem = right[r]); ++r) {
         if (leftItem.value === rightItem.value) {
           leftItem.moved = rightItem.index

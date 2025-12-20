@@ -67,9 +67,8 @@ export function forceRefresh(node) {
   if ((ieVersion as any) >= 9) {
     // For text nodes and comment nodes (most likely virtual elements), we will have to refresh the container
     let elem = node.nodeType == 1 ? node : node.parentNode
-    // eslint-disable-next-line no-self-assign
     if (elem.style) {
-      elem.style.zoom = elem.style.zoom
+      elem.style.zoom = elem.style.zoom // eslint-disable-line no-self-assign
     }
   }
 }

@@ -775,7 +775,6 @@ describe('Dependent Observable', function () {
       delete (subscribable.fn as any).customFunc // Overridden on computed.fn
       delete computed.fn.customFunc // Will be able to reach this
     })
-
     ;(subscribable.fn as any).customProp = 'subscribable value'
     ;(subscribable.fn as any).customFunc = function () {
       throw new Error("Shouldn't be reachable")

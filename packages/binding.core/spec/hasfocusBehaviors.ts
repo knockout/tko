@@ -157,7 +157,6 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
       // Need to raise "focusin" and "focusout" manually, because simply calling ".focus()" and ".blur()"
       // in IE doesn't reliably trigger the "focus" and "blur" events synchronously
-
       ;(testNode.children[0] as HTMLInputElement).focus()
       triggerEvent(testNode.children[0], 'focusin')
       expect(model.myVal()).toEqual(true)
@@ -181,7 +180,6 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       let model = { myVal: null }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
       applyBindings(model, testNode)
-
       ;(testNode.childNodes[0] as HTMLElement).focus()
       triggerEvent(testNode.children[0], 'focusin')
       expect(model.myVal).toEqual(true)

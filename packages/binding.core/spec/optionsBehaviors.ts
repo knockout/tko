@@ -287,7 +287,6 @@ describe('Binding: Options', function () {
     let myCaption = observable('Initial caption')
     testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
     applyBindings({ myCaption: myCaption }, testNode)
-
     ;(testNode.childNodes[0] as HTMLSelectElement).options[2].selected = true
     expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(2)
     expect(testNode.childNodes[0]).toHaveTexts(['Initial caption', 'A', 'B'])
