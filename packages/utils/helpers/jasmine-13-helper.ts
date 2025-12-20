@@ -246,11 +246,6 @@ beforeEach(function() {
     this.addMatchers(matchers);
 
     switchJQueryState();
-
-    // flooding the test-logs with sanitization is not useful
-    options.sanitizeHtmlTemplate = function(html: string) {
-        return html
-    }
 });
 
 afterEach(function() {

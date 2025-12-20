@@ -92,6 +92,7 @@ export class Options {
    */
   allowScriptTagsInTemplates: boolean = false
 
+  private _sanitizeWarningLogged: boolean = false
   /** 
    * Sanitize HTML templates before parsing them. Default is a no-op. 
    * Please configure something like DOMPurify or validator.js for your environment.
@@ -99,7 +100,10 @@ export class Options {
    * @returns Sanitized HTML string
    */
   sanitizeHtmlTemplate(html: string): string {
-    console.log('WARNING -- You don\'t have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities.')
+    if (!this._sanitizeWarningLogged) {
+      console.log('WARNING -- You don\'t have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities.')
+      this._sanitizeWarningLogged = true
+    }
     return html
   }
 

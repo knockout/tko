@@ -192,11 +192,6 @@ jasmine.FakeTimer.prototype.runFunctionsWithinRange = function(oldMillis, nowMil
 
 beforeEach(function() {
     switchJQueryState();
-
-    // flooding the test-logs with sanitization is not useful
-    ko.options.sanitizeHtmlTemplate = function(html) {
-        return html
-    }
 });
 
 afterEach(function() {

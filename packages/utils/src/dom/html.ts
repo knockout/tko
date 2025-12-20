@@ -167,7 +167,7 @@ export function setHtml (node : Node, html : Function | string) {
       html = html.toString() 
     }
 
-    validateHTMLInput(html)
+    html = validateHTMLInput(html)
     const jQuery = options.jQuery
     // If the browser supports <template> tags, prefer that, as
     // it obviates all the complex workarounds of jQuery.
