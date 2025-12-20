@@ -92,6 +92,7 @@ extend(templateEngine.prototype, {
       return new anonymousTemplate(template)
     } else {
       options.onError(new Error('Unknown template type: ' + template))
+      return undefined
     }
   },
 
