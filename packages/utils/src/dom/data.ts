@@ -6,8 +6,13 @@ import { ieVersion } from '../ie'
 const datastoreTime = new Date().getTime()
 const dataStoreKeyExpandoPropertyName = `__ko__${datastoreTime}`
 const dataStoreSymbol = Symbol('Knockout data')
-let dataStore
+let dataStore = {}
 let uniqueId = 0
+
+// Prevent prototype pollution by restricting special property names
+function isSafeKey(key: string): boolean {
+  return key !== '__proto__' && key !== 'constructor' && key !== 'prototype';
+}
 
 /*
  * We considered using WeakMap, but it has a problem in IE 11 and Edge that
@@ -71,11 +76,14 @@ export function nextKey () {
 }
 
 function get (node: Node, key: string) {
+  if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
+
   const dataForNode = getDataForNode(node, false)
   return dataForNode && dataForNode[key]
 }
 
 function set (node : Node, key : string, value : any) {
+   if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
   // Make sure we don't actually create a new domData key if we are actually deleting a value
   let dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
   if (dataForNode) {
@@ -84,6 +92,7 @@ function set (node : Node, key : string, value : any) {
 }
 
 function getOrSet (node : Node, key : string, value : any) {
+  if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
   const dataForNode = getDataForNode(node, true, /* createIfNotFound */)
   return dataForNode[key] || (dataForNode[key] = value)
 }

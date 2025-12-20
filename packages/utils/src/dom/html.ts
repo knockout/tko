@@ -107,24 +107,27 @@ function jQueryHtmlParse (html: string, documentContext?: Document) : Node[] {
  * @return {[Node]}              Parsed DOM Nodes
  */
 export function parseHtmlFragment (html: string , documentContext?: Document): Node[] {  
-  validateHTMLInput(html)
+  const saferHtml = validateHTMLInput(html)
+
   // Prefer <template>-tag based HTML parsing.
+  if(supportsTemplateTag)
+    return templateHtmlParse(saferHtml, documentContext)
+
   //TODO: It is always true in modern browsers (higher IE11), so we can theoretically remove jQueryHtmlParse and simpleHtmlParse
-  return supportsTemplateTag ? templateHtmlParse(html, documentContext)
-
-        // Benefit from jQuery's on old browsers, where possible
-        // NOTE: jQuery's HTML parsing fails on element names like tr-*.
-        // See: https://github.com/jquery/jquery/pull/1988
-        : (options.jQuery ? jQueryHtmlParse(html, documentContext)
-
-        // ... otherwise, this simple logic will do in most common cases.
-        : simpleHtmlParse(html, documentContext))
+  if(options.jQuery) {
+    // Benefit from jQuery's on old browsers, where possible
+    // NOTE: jQuery's HTML parsing fails on element names like tr-*.
+    // See: https://github.com/jquery/jquery/pull/1988
+    return jQueryHtmlParse(saferHtml, documentContext)
+  }
+  
+  return simpleHtmlParse(saferHtml, documentContext)
 }
 
 const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/i;
-function validateHTMLInput(html: string) {  
+function validateHTMLInput(html: string) : string  {  
   if(!html)
-    return;
+    return '';
   
   if (options.templateSizeLimit > 0 && html.length > options.templateSizeLimit) {
     throw new Error("Template is too long. Please configure the 'templateSizeLimit'")
@@ -132,7 +135,9 @@ function validateHTMLInput(html: string) {
   
   if(!options.allowScriptTagsInTemplates && scriptTagPattern.test(html)) {
     throw new Error("Script-tag in template detected.")
-  }
+  }  
+
+  return options.sanitizeHtmlTemplate(html);
 }
 
 export function parseHtmlForTemplateNodes (html, documentContext) {
@@ -158,11 +163,11 @@ export function setHtml (node : Node, html : Function | string) {
   } 
 
   if ((html !== null) && (html !== undefined)) {
+    
     if (typeof html !== 'string') { 
       html = html.toString() 
     }
-
-    validateHTMLInput(html)
+    
     const jQuery = options.jQuery
     // If the browser supports <template> tags, prefer that, as
     // it obviates all the complex workarounds of jQuery.
@@ -171,7 +176,8 @@ export function setHtml (node : Node, html : Function | string) {
     // for example <tr> elements which are not normally allowed to exist on their own.
     // If you've referenced jQuery (and template tags are not supported) we'll use that rather than duplicating its code.
     if (jQuery && !supportsTemplateTag) {
-      jQuery(node).html(html)
+      const saferHtml = validateHTMLInput(html)
+      jQuery(node).html(saferHtml)
     } else {
             // ... otherwise, use KO's own parsing logic.
       let parsedNodes : Node[]

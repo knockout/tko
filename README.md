@@ -106,6 +106,13 @@ Optionally TKO can use JQuery for CSS-Manipulation and HTML-Templates (only if H
 In the future we will probably remove the usage of JQuery in TKO, as many features have already been migrated to native APIs. Compatibility with JQuery in an application will remain.
 You can set useOnlyNativeEvents to false, so JQuery is also use for event-registration. Note: Some tests fails in this case ('change'-event doesn't fire). You can set useTemplateTag to false, so disable using HTML5-Template-Tags.
 
+## Sanitizing HTML-Templates
+
+TKO supports HTML sanitization through configurable options. To sanitize HTML templates, you can override `options.sanitizeHtmlTemplate` with a library like [DOMPurify](https://github.com/cure53/DOMPurify) or [validator.js](https://github.com/validatorjs/validator.js).
+
+Additionally, implement a well-configured [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) to provide an extra layer of protection against XSS attacks.
+
+
 ## Overview of the development stack
 
 - **make** -> Build tasks

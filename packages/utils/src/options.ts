@@ -13,6 +13,7 @@ export type BindingStringPreparsersFunction = (bindingString: string) => string;
 //
 // This is the root 'options', which must be extended by others.
 export class Options {
+  
   // The following options can be set on ko.options to make a function rewriting or something similar.
   bindingStringPreparsers: BindingStringPreparsersFunction[] = []
   
@@ -90,6 +91,21 @@ export class Options {
    * It is not recommended to set this to true.
    */
   allowScriptTagsInTemplates: boolean = false
+
+  private _sanitizeWarningLogged: boolean = false
+  /** 
+   * Sanitize HTML templates before parsing them. Default is a no-op. 
+   * Please configure something like DOMPurify or validator.js for your environment.
+   * @param html HTML string to be sanitized
+   * @returns Sanitized HTML string
+   */
+  sanitizeHtmlTemplate(html: string): string {
+    if (!this._sanitizeWarningLogged) {
+      console.warn('WARNING -- You don\'t have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities.')
+      this._sanitizeWarningLogged = true
+    }
+    return html
+  }
 
   global: any = globalThis
 

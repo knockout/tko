@@ -1,5 +1,5 @@
 import {
-    arrayForEach, parseHtmlFragment, options
+    arrayForEach, parseHtmlFragment, options, setHtml
 } from '../dist'
 
 import '../helpers/jasmine-13-helper'
@@ -122,6 +122,21 @@ describe('Parse HTML fragment', function () {
 
       try {    
         let ret = parseHtmlFragment(html, document)
+        console.log(ret)
+      } catch (e : any) {
+        expect(e.message).toContain('detected')
+        isfired = true
+      }
+      
+      expect(isfired).toBe(true)
+    });
+
+    htmlArray.forEach(html => {      
+      let isfired = false
+      const node = document.createElement('div')
+
+      try {    
+        let ret = setHtml(node, html)
         console.log(ret)
       } catch (e : any) {
         expect(e.message).toContain('detected')

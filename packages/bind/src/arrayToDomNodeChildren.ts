@@ -137,7 +137,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any> (domNode: Node,
   } else {
     if (!editScript || (lastMappingResult && lastMappingResult['_countWaitingForRemove'])) {
       // Compare the provided array against the previous one
-      let lastArray = isFirstExecution ? [] : arrayMap(lastMappingResult, function (x) { return x.arrayEntry })
+      let lastArray = arrayMap(lastMappingResult, function (x) { return x.arrayEntry })
       let compareOptions = {
         'dontLimitMoves': options.dontLimitMoves,
         'sparse': true

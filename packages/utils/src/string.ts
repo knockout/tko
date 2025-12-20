@@ -18,13 +18,8 @@ export function stringStartsWith (string, startsWith) {
 export function parseJson<T = any> (jsonString: string): T | null {
   if (typeof jsonString === 'string') {
     jsonString = stringTrim(jsonString)
-    if (jsonString) {
-      if (JSON && JSON.parse) {
-        // Use native parsing where available
-        return JSON.parse(jsonString) as T;
-      }
-      //IE < 8: Fallback on less safe parsing for older browsers
-      return (new Function('return ' + jsonString))() as T
+    if (jsonString) {      
+      return JSON.parse(jsonString) as T;
     }
   }
   return null
