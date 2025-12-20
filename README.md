@@ -118,7 +118,7 @@ You can set useOnlyNativeEvents to false, so JQuery is also use for event-regist
 - Test-Runner -> Karma
 - Test-Environment -> electron and headless-chrome
 - Linting -> Eslint
-- Formating -> Prettier (configured like StandardJS)
+- Formatting -> Prettier (configured like StandardJS)
 - TDD/BDD-Frameworks -> 
     - Jasmine 1.3
     - Mocha + Chai
