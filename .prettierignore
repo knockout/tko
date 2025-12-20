@@ -4,7 +4,6 @@ docs
 coverage
 .vscode
 .devcontainer
-docs
 node_modules
 tools
 tko.io
