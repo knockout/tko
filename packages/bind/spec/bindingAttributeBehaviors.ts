@@ -37,7 +37,7 @@ describe('Binding attribute syntax', function () {
 
   beforeEach(function () {
     // Set up the default binding handlers.
-    var provider = new MultiProvider({providers: [
+    let provider = new MultiProvider({providers: [
       new VirtualProvider(),
       new DataBindProvider()
     ]})
@@ -52,7 +52,7 @@ describe('Binding attribute syntax', function () {
   it('applyBindings should accept no parameters and then act on document.body with undefined model', function () {
     this.after(function () { cleanNode(document.body) }) // Just to avoid interfering with other specs
 
-    var didInit = false
+    let didInit = false
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
         expect(element.id).toEqual('testElement')
@@ -68,8 +68,8 @@ describe('Binding attribute syntax', function () {
   it('applyBindings should accept one parameter and then act on document.body with parameter as model', function () {
     this.after(function () { cleanNode(document.body) }) // Just to avoid interfering with other specs
 
-    var didInit = false
-    var suppliedViewModel = {}
+    let didInit = false
+    let suppliedViewModel = {}
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
         expect(element.id).toEqual('testElement')
@@ -83,8 +83,8 @@ describe('Binding attribute syntax', function () {
   })
 
   it('applyBindings should accept two parameters and then act on second param as DOM node with first param as model', function () {
-    var didInit = false
-    var suppliedViewModel = {}
+    let didInit = false
+    let suppliedViewModel = {}
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
         expect(element.id).toEqual('testElement')
@@ -94,7 +94,7 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div id='testElement' data-bind='test'></div>"
 
-    var shouldNotMatchNode = document.createElement('DIV')
+    let shouldNotMatchNode = document.createElement('DIV')
     shouldNotMatchNode.innerHTML = "<div id='shouldNotMatchThisElement' data-bind='test'></div>"
     document.body.appendChild(shouldNotMatchNode)
     this.after(function () { document.body.removeChild(shouldNotMatchNode) })
@@ -104,7 +104,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('applyBindings should accept three parameters and use the third parameter as a callback for modifying the root context', function () {
-    var didInit = false
+    let didInit = false
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         expect(bindingContext.extraValue).toEqual('extra')
@@ -160,7 +160,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should call onBindingError with relevant details of a bindingHandler init error', function () {
-    var saved_obe = options.onError,
+    let saved_obe = options.onError,
       obe_calls = 0
     this.after(function () {
       options.onError = saved_obe
@@ -185,7 +185,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should call onBindingError with relevant details of a bindingHandler update error', function () {
-    var saved_obe = options.onError,
+    let saved_obe = options.onError,
       obe_calls = 0
     this.after(function () {
       options.onError = saved_obe
@@ -210,7 +210,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should call onBindingError with relevant details when an update fails', function () {
-    var saved_obe = options.onError,
+    let saved_obe = options.onError,
       obe_calls = 0,
       observable = koObservable()
 
@@ -250,7 +250,7 @@ describe('Binding attribute syntax', function () {
 
   // * This is probably poor policy, but it only applies to legacy handlers. *
   it('Calls the `update` even if `init` fails', function () {
-    var cc = false
+    let cc = false
     this.after(function () { options.set('onError', undefined) })
     options.set('onError', function () {})
     bindingHandlers.test = {
@@ -263,8 +263,8 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Calls options.onError, if it is defined', function () {
-    var oe_calls = 0
-    var oxy = koObservable()
+    let oe_calls = 0
+    let oxy = koObservable()
     this.after(function () { options.set('onError', undefined) })
     options.set('onError', function (err) {
       expect(err.message.indexOf('turtle')).not.toEqual(-1)
@@ -287,7 +287,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should invoke registered handlers\'s init() then update() methods passing binding data', function () {
-    var methodsInvoked = new Array()
+    let methodsInvoked = new Array()
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings) {
         methodsInvoked.push('init')
@@ -310,7 +310,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should invoke each handlers\'s init() and update() before running the next one', function () {
-    var methodsInvoked = new Array()
+    let methodsInvoked = new Array()
     bindingHandlers.test1 = bindingHandlers.test2 = {
       init: function (element, valueAccessor) {
         methodsInvoked.push('init' + valueAccessor())
@@ -370,8 +370,8 @@ describe('Binding attribute syntax', function () {
   it('Should use properties on the view model in preference to properties on the binding context', function () {
     // In KO 3.5 this test relied on a bit of duck-typing (it has a $data).
     testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>"
-    var outer = new bindingContext({ someProp: 'Outer value' })
-    var inner = new bindingContext({ someProp: 'Inner value' }, outer)
+    let outer = new bindingContext({ someProp: 'Outer value' })
+    let inner = new bindingContext({ someProp: 'Inner value' }, outer)
     applyBindings(inner, testNode)
     expect(testNode).toContainText('Inner value')
   })
@@ -384,7 +384,7 @@ describe('Binding attribute syntax', function () {
       }
     }
     testNode.innerHTML = "<div data-bind='with: sub'>Static<div data-bind='addCustomProperty: true'>Text-<div data-bind='text: $customProp'></div></div></div>"
-    var vm = { sub: {} }
+    let vm = { sub: {} }
     applyBindings(vm, testNode)
     expect(testNode).toContainText('StaticText-MyValue')
     expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$customProp).toEqual('MyValue')
@@ -411,7 +411,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='with: $data'><div></div></div>"
     applyBindings({}, testNode)
 
-    var allowedProperties = ['$parents', '$root', 'ko', '$rawData', '$data', '$parentContext', '$parent']
+    let allowedProperties = ['$parents', '$root', 'ko', '$rawData', '$data', '$parentContext', '$parent']
     if (typeof Symbol('') !== 'symbol') { // Test for shim
       allowedProperties.push('_subscribable')
     }
@@ -449,11 +449,11 @@ describe('Binding attribute syntax', function () {
     bindingHandlers.allowBindings = {
       init: function (elem, valueAccessor) {
         // Let bindings proceed as normal *only if* my value is false
-        var shouldAllowBindings = unwrap(valueAccessor())
+        let shouldAllowBindings = unwrap(valueAccessor())
         return { controlsDescendantBindings: !shouldAllowBindings }
       }
     }
-    var vm = {isVisible: true}
+    let vm = {isVisible: true}
     applyBindings(vm, testNode)
 
     // All of the bound nodes return the viewmodel
@@ -471,13 +471,13 @@ describe('Binding attribute syntax', function () {
     // See https://github.com/knockout/knockout/issues/231#issuecomment-388210267
     testNode.innerHTML = '<div data-bind="text: name"></div>'
 
-    var vm1 = { name: 'specific' }
+    let vm1 = { name: 'specific' }
     applyBindingsToNode(testNode.childNodes[0], { text: vm1.name }, vm1)
     expect(testNode).toContainText(vm1.name)
     expect(dataFor(testNode.childNodes[0])).toBe(vm1)
     expect(contextFor(testNode.childNodes[0]).$data).toBe(vm1)
 
-    var vm2 = { name: 'general' }
+    let vm2 = { name: 'general' }
     applyBindings(vm2, testNode)
     expect(testNode).toContainText(vm2.name)
     expect(dataFor(testNode.childNodes[0])).toBe(vm2)
@@ -492,7 +492,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should be able to set a custom binding to use containerless binding', function () {
-    var initCalls = 0
+    let initCalls = 0
     bindingHandlers.test = { init: function () { initCalls++ } }
     virtualElements.allowedBindings['test'] = true
 
@@ -551,11 +551,11 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should be able to access virtual children in custom containerless binding', function () {
-    var countNodes = 0
+    let countNodes = 0
     bindingHandlers.test = {
       init: function (element) {
         // Counts the number of virtual children, and overwrites the text contents of any text nodes
-        for (var node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
+        for (let node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
           countNodes++
           if (node.nodeType === 3) { (node as Text).data = 'new text' }
         }
@@ -571,7 +571,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should only bind containerless binding once inside template', function () {
-    var initCalls = 0
+    let initCalls = 0
     bindingHandlers.test = { init: function () { initCalls++ } }
     virtualElements.allowedBindings['test'] = true
 
@@ -584,7 +584,7 @@ describe('Binding attribute syntax', function () {
 
   it('Bindings in containerless binding in templates should be bound only once', function () {
     delete bindingHandlers.nonexistentHandler
-    var initCalls = 0
+    let initCalls = 0
     bindingHandlers.test = { init: function () { initCalls++ } }
     testNode.innerHTML = `
           <div data-bind='template: { if: true }'>
@@ -606,7 +606,7 @@ describe('Binding attribute syntax', function () {
   it('Should be able to set and access correct context in custom containerless binding', function () {
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        var innerContext = bindingContext.createChildContext({ myCustomData: 123 })
+        let innerContext = bindingContext.createChildContext({ myCustomData: 123 })
         applyBindingsToDescendants(innerContext, element)
         return { 'controlsDescendantBindings': true }
       }
@@ -623,7 +623,7 @@ describe('Binding attribute syntax', function () {
     delete bindingHandlers.nonexistentHandler
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        var innerContext = bindingContext.createChildContext({ myCustomData: 123 })
+        let innerContext = bindingContext.createChildContext({ myCustomData: 123 })
         applyBindingsToDescendants(innerContext, element)
         return { 'controlsDescendantBindings': true }
       }
@@ -639,7 +639,7 @@ describe('Binding attribute syntax', function () {
   it('Should be able to access custom context variables in child context', function () {
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        var innerContext = bindingContext.createChildContext({ myCustomData: 123 })
+        let innerContext = bindingContext.createChildContext({ myCustomData: 123 })
         innerContext.customValue = 'xyz'
         applyBindingsToDescendants(innerContext, element)
         return { 'controlsDescendantBindings': true }
@@ -656,7 +656,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should be able to use value-less binding in containerless binding', function () {
-    var initCalls = 0
+    let initCalls = 0
     bindingHandlers.test = { init: function () { initCalls++ } }
     virtualElements.allowedBindings['test'] = true
 
@@ -752,7 +752,7 @@ describe('Binding attribute syntax', function () {
       // First replace the binding provider with one that's hardcoded to replace all text
       // content with a special message, via a binding handler that operates on text nodes
 
-      var originalBindingProvider = options.bindingProviderInstance
+      let originalBindingProvider = options.bindingProviderInstance
       class TestProvider extends Provider {
         get FOR_NODE_TYPES () { return [3] }
         nodeHasBindings(node) {
@@ -780,7 +780,7 @@ describe('Binding attribute syntax', function () {
         update: function (textNode, valueAccessor) { textNode.data = valueAccessor() }
       }
     
-      var tp = new TestProvider()
+      let tp = new TestProvider()
       tp.bindingHandlers = originalBindingProvider.bindingHandlers
       options.bindingProviderInstance = tp
     }
@@ -807,7 +807,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should call a childrenComplete callback function after descendent elements are bound', function () {
-    var callbacks = 0,
+    let callbacks = 0,
       callback = function (nodes, data) {
         expect(nodes.length).toEqual(1)
         expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0])
@@ -822,7 +822,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should call a childrenComplete callback function when bound to a virtual element', function () {
-    var callbacks = 0,
+    let callbacks = 0,
       callback = function (nodes, data) {
         expect(nodes.length).toEqual(1)
         expect(nodes[0]).toEqual(testNode.childNodes[1])
@@ -837,7 +837,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should not call a childrenComplete callback function when there are no descendant nodes', function () {
-    var callbacks = 0
+    let callbacks = 0
 
     testNode.innerHTML = "<div data-bind='childrenComplete: callback'></div>"
     applyBindings({ callback: function () { callbacks++ } }, testNode)
@@ -850,7 +850,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it('Should call childrenComplete callback registered with bindingEvent.subscribe', function () {
-    var callbacks = 0,
+    let callbacks = 0,
       vm = {}
 
     bindingEvent.subscribe(testNode, 'childrenComplete', function (node) {

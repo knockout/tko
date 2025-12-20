@@ -26,7 +26,7 @@ describe('filters', function () {
   }
 
   function trial (context, binding, expect) {
-    var p = new Parser().parse('b: ' + binding, ctxStub(context))
+    let p = new Parser().parse('b: ' + binding, ctxStub(context))
     assert.equal(p.b(), expect)
   }
 
@@ -84,7 +84,7 @@ describe('filters', function () {
   })
 
   it('multiple variables with filters', function () {
-    var p = new Parser()
+    let p = new Parser()
       .parse("b: v|tail:'e':'y', c: v|tail:'e':'z'", ctxStub({v: 'tt'}))
     assert.equal(p.b(), 'ttey')
     assert.equal(p.c(), 'ttez')

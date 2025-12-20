@@ -3,7 +3,7 @@ import {
     unwrap, toJS
 } from '@tko/observable'
 
-var sproto = String.prototype
+let sproto = String.prototype
 
 export interface Filters {
   uppercase(value);
@@ -15,7 +15,7 @@ export interface Filters {
   number(value);
 }
 
-var filters:Filters = {
+let filters:Filters = {
   // Convert value to uppercase
   uppercase: function (value) {
     return sproto.toUpperCase.call(unwrap(value))
@@ -53,8 +53,10 @@ var filters:Filters = {
         case 'left':
           return replacement + value.slice(-length)
         case 'middle':
-          var leftLen = Math.ceil(length / 2)
+          {
+          const leftLen = Math.ceil(length / 2)
           return value.substr(0, leftLen) + replacement + value.slice(leftLen - length)
+          }
         default:
           return value.substr(0, length) + replacement
       }

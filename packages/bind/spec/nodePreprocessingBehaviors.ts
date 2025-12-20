@@ -41,7 +41,7 @@ describe('Node preprocessing', function () {
             // Example: replace <mySpecialNode /> with <span data-bind='text: someValue'></span>
             // This technique could be the basis for implementing custom element types that render templates
       if (node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
-        var newNode = document.createElement('span')
+        let newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: someValue')
         expect(node.parentNode).not.toBe(null)
         node.parentNode?.insertBefore(newNode, node)
@@ -50,7 +50,7 @@ describe('Node preprocessing', function () {
       }
     }
     testNode.innerHTML = '<span>a</span><mySpecialNode></mySpecialNode><span>b</span>'
-    var someValue = observable('hello')
+    let someValue = observable('hello')
     applyBindings({ someValue: someValue }, testNode)
     expect(testNode).toContainText('ahellob')
 
@@ -65,7 +65,7 @@ describe('Node preprocessing', function () {
             // Example: Replace {{ someValue }} with text from that property.
             // This could be generalized to full support for string interpolation in text nodes.
         if (node.nodeType === 3 && node.data.indexOf('{{ someValue }}') >= 0) {
-          var prefix = node.data.substring(0, node.data.indexOf('{{ someValue }}')),
+          let prefix = node.data.substring(0, node.data.indexOf('{{ someValue }}')),
             suffix = node.data.substring(node.data.indexOf('{{ someValue }}') + '{{ someValue }}'.length),
             newNodes = [
               document.createTextNode(prefix),
@@ -74,7 +74,7 @@ describe('Node preprocessing', function () {
               document.createTextNode(suffix)
             ]
                 // Manually reimplement ko.utils.replaceDomNodes, since it's not available in minified build
-          for (var i = 0; i < newNodes.length; i++) {
+          for (let i = 0; i < newNodes.length; i++) {
             node.parentNode.insertBefore(newNodes[i], node)
           }
           node.parentNode.removeChild(node)
@@ -86,7 +86,7 @@ describe('Node preprocessing', function () {
     options.bindingProviderInstance.bindingHandlers.set(coreBindings)
 
     testNode.innerHTML = "the value is <span data-bind='text: someValue'></span>."
-    var someValue = observable('hello')
+    let someValue = observable('hello')
     applyBindings({ someValue: someValue }, testNode)
     expect(testNode).toContainText('the value is hello.')
 
@@ -99,11 +99,11 @@ describe('Node preprocessing', function () {
     class TestProvider extends MultiProvider {
       preprocessNode (node) {
         if (node.nodeType === 3 && node.data.charAt(0) === '$') {
-          var newNodes = [
+          let newNodes = [
             document.createComment('ko text: ' + node.data),
             document.createComment('/ko')
           ]
-          for (var i = 0; i < newNodes.length; i++) {
+          for (let i = 0; i < newNodes.length; i++) {
             node.parentNode.insertBefore(newNodes[i], node)
           }
           node.parentNode.removeChild(node)
@@ -111,7 +111,7 @@ describe('Node preprocessing', function () {
         }
       }
     }
-    var testProvider = new TestProvider()
+    let testProvider = new TestProvider()
     testProvider.bindingHandlers.set(coreBindings)
     testProvider.addProvider(new DataBindProvider())
     testProvider.addProvider(new VirtualProvider())
@@ -119,7 +119,7 @@ describe('Node preprocessing', function () {
     options.bindingProviderInstance = testProvider
 
     // Now perform bindings, and see that childrenComplete gets the output from the preprocessor and bindings
-    var callbacks = 0,
+    let callbacks = 0,
       vm = {
         childprop: 'child property',
         callback: function (nodes, data) {

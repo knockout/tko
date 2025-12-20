@@ -21,13 +21,13 @@ describe('Binding: Enable/Disable', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
-    var provider = new DataBindProvider()
+    let provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
 
   it('Enable means the node is enabled only when the value is true', function () {
-    var myObservable = observable()
+    let myObservable = observable()
     testNode.innerHTML = "<input data-bind='enable:myModelProperty()' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
     const input = testNode.children[0] as HTMLInputElement
@@ -37,7 +37,7 @@ describe('Binding: Enable/Disable', function () {
   })
 
   it('Disable means the node is enabled only when the value is false', function () {
-    var myObservable = observable()
+    let myObservable = observable()
     testNode.innerHTML = "<input data-bind='disable:myModelProperty()' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
@@ -48,7 +48,7 @@ describe('Binding: Enable/Disable', function () {
   })
 
   it('Enable should unwrap observables implicitly', function () {
-    var myObservable = observable(false)
+    let myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='enable:myModelProperty' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
@@ -57,7 +57,7 @@ describe('Binding: Enable/Disable', function () {
   })
 
   it('Disable should unwrap observables implicitly', function () {
-    var myObservable = observable(false)
+    let myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='disable:myModelProperty' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 

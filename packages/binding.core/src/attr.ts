@@ -9,15 +9,15 @@ import {
 
 import type { AllBindings } from '@tko/bind'
 
-export var attr = {
+export const attr = {
   update: function (element, valueAccessor, _allBindings: AllBindings) {
-    var value = unwrap(valueAccessor()) || {}
+    let value = unwrap(valueAccessor()) || {}
     objectForEach(value, function (attrName, attrValue) {
       attrValue = unwrap(attrValue)
 
       // Find the namespace of this attribute, if any.
-      var prefixLen = attrName.indexOf(':')
-      var namespace = prefixLen > 0 && element.lookupNamespaceURI(attrName.substr(0, prefixLen))
+      let prefixLen = attrName.indexOf(':')
+      let namespace = prefixLen > 0 && element.lookupNamespaceURI(attrName.substr(0, prefixLen))
 
       // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
       // when someProp is a "no value"-like value (strictly null, false, or undefined)

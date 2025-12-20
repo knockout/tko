@@ -25,13 +25,13 @@ describe('Binding: Attr', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
-    var provider = new DataBindProvider()
+    let provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings.bindings)
   })
 
   it('Should be able to set arbitrary attribute values', function () {
-    var model = { myValue: 'first value' }
+    let model = { myValue: 'first value' }
     testNode.innerHTML = "<div data-bind='attr: {firstAttribute: myValue, \"second-attribute\": true}'></div>"
     applyBindings(model, testNode)
     expect(testNode.children[0].getAttribute('firstAttribute')).toEqual('first value')
@@ -51,14 +51,14 @@ describe('Binding: Attr', function () {
     ].join('')
 
     applyBindings(model, testNode)
-    var anchor = testNode.children[0]/* svg */.children[0]/* g */.children[0]/* a */
-    var href = anchor.getAttributeNode('xlink:href')
+    let anchor = testNode.children[0]/* svg */.children[0]/* g */.children[0]/* a */
+    let href = anchor.getAttributeNode('xlink:href')
     expect(href?.value).toEqual('first value')
     expect(href?.namespaceURI).toEqual('http://www.w3.org/1999/xlink')
   })
 
   it('Should be able to set \"name\" attribute, even on IE6-7', function () {
-    var myValue = observable('myName')
+    let myValue = observable('myName')
     testNode.innerHTML = "<input data-bind='attr: { name: myValue }' />"
     applyBindings({ myValue: myValue }, testNode)
     expect((testNode.children[0] as HTMLInputElement).name).toEqual('myName')
@@ -77,7 +77,7 @@ describe('Binding: Attr', function () {
   })
 
   it('Should respond to changes in an observable value', function () {
-    var model = { myprop: observable('initial value') }
+    let model = { myprop: observable('initial value') }
     testNode.innerHTML = "<div data-bind='attr: { someAttrib: myprop }'></div>"
     applyBindings(model, testNode)
     expect(testNode.children[0].getAttribute('someAttrib')).toEqual('initial value')
@@ -88,7 +88,7 @@ describe('Binding: Attr', function () {
   })
 
   it('Should remove the attribute if the value is strictly false, null, or undefined', function () {
-    var model = { myprop: observable() }
+    let model = { myprop: observable() }
     testNode.innerHTML = "<div data-bind='attr: { someAttrib: myprop }'></div>"
     applyBindings(model, testNode)
     arrayForEach([false, null, undefined], function (testValue) {
@@ -100,7 +100,7 @@ describe('Binding: Attr', function () {
   })
 
   it('Should be able to set class attribute and access it using className property', function () {
-    var model = { myprop: observable('newClass') }
+    let model = { myprop: observable('newClass') }
     testNode.innerHTML = "<div class='oldClass' data-bind=\"attr: {'class': myprop}\"></div>"
     expect(testNode.children[0].className).toEqual('oldClass')
     applyBindings(model, testNode)

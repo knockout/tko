@@ -1,6 +1,6 @@
 import { ForEachBinding } from './foreach'
 
-export var bindings = {
+export const bindings = {
   foreach: ForEachBinding
 }
 

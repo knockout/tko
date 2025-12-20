@@ -10,8 +10,8 @@ import {
 import type { BindingContext } from '@tko/bind';
 
 export function dummyTemplateEngine(templates?) {
-    var inMemoryTemplates = templates || {};
-    var inMemoryTemplateData = {};
+    let inMemoryTemplates = templates || {};
+    let inMemoryTemplateData = {};
 
     function dummyTemplateSource(id) {
         this.id = id;
@@ -39,21 +39,21 @@ export function dummyTemplateEngine(templates?) {
     };
 
     this.renderTemplateSource = function (templateSource, bindingContext: BindingContext, rt_options, templateDocument) {
-        var data = bindingContext['$data'];
+        let data = bindingContext['$data'];
         if (data && typeof data.get_value === 'function') {
             // For cases when data is an Identifier/Expression.
             data = data.get_value(data, bindingContext);
         }
         templateDocument = templateDocument || document;
         rt_options = rt_options || {};
-        var templateText = templateSource.text();
+        let templateText = templateSource.text();
         if (typeof templateText == "function")
             templateText = templateText(data, rt_options);
 
         templateText = rt_options.showParams ? templateText + ", data=" + data + ", options=" + rt_options : templateText;
         // var templateOptions = options.templateOptions; // Have templateOptions in scope to support [js:templateOptions.foo] syntax
 
-        var result;
+        let result;
 
         data = data || {};
         // Builders (e.g. rollup) mangle `data` to e.g. `data$$1`.
@@ -73,9 +73,9 @@ export function dummyTemplateEngine(templates?) {
         });
 
 
-        var evalHandler = function (match, script) {
+        let evalHandler = function (match, script) {
             try {
-                var evalResult = eval(script);
+                let evalResult = eval(script);
                 return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
             } catch (ex: any) {
                 throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
@@ -102,7 +102,7 @@ export function dummyTemplateEngine(templates?) {
 
     this.rewriteTemplate = function (template, rewriterCallback, templateDocument) {
         // Only rewrite if the template isn't a function (can't rewrite those)
-        var templateSource = this.makeTemplateSource(template, templateDocument);
+        let templateSource = this.makeTemplateSource(template, templateDocument);
         if (typeof templateSource.text() != "function")
             return templateEngine.prototype.rewriteTemplate.call(this, template, rewriterCallback, templateDocument);
     };

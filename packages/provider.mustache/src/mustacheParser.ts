@@ -28,8 +28,8 @@ class Expression extends Interpolated {
     const ownerDocument = textNode ? textNode.ownerDocument : document
     const firstChar = text[0]
     const lastChar = text[text.length - 1]
-    var closeComment = true
-    var binding
+    let closeComment = true
+    let binding
 
     if (firstChar === '#') {
       if (lastChar === '/') {

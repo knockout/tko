@@ -14,7 +14,7 @@ import { defaultEvent } from './subscribable'
 import { extenders } from './extenders'
 import type { ObservableArray } from './observableArray'
 
-export var arrayChangeEventName = 'arrayChange'
+export const arrayChangeEventName = 'arrayChange'
 
 export function trackArrayChanges (target: ObservableArray, options?: CompareArraysOptions) {
     // Use the provided options--each call to trackArrayChanges overwrites the previously set options
@@ -83,7 +83,7 @@ export function trackArrayChanges (target: ObservableArray, options?: CompareArr
 
         // Each time the array changes value, capture a clone so that on the next
         // change it's possible to produce a diff
-    var previousContents = new Array().concat(target.peek() === undefined ? [] : target.peek())
+    let previousContents = new Array().concat(target.peek() === undefined ? [] : target.peek())
     cachedDiff = null
     arrayChangeSubscription = target.subscribe(function (currentContents) {
       let changes
@@ -124,7 +124,7 @@ export function trackArrayChanges (target: ObservableArray, options?: CompareArr
     if (!trackingChanges || pendingNotifications) {
       return
     }
-    var diff = new Array(),
+    let diff = new Array(),
       arrayLength = rawArray.length,
       argsLength = args.length,
       offset = 0
@@ -150,18 +150,20 @@ export function trackArrayChanges (target: ObservableArray, options?: CompareArr
         break
 
       case 'splice':
-            // Negative start index means 'from end of array'. After that we clamp to [0...arrayLength].
-            // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-        var startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
-          endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
-          endAddIndex = startIndex + argsLength - 2,
-          endIndex = Math.max(endDeleteIndex, endAddIndex),
-          additions = new Array(), deletions = new Array()
-        for (let index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
-          if (index < endDeleteIndex) { deletions.push(pushDiff('deleted', rawArray[index], index)) }
-          if (index < endAddIndex) { additions.push(pushDiff('added', args[argsIndex], index)) }
+        {
+          // Negative start index means 'from end of array'. After that we clamp to [0...arrayLength].
+          // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+          let startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
+            endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
+            endAddIndex = startIndex + argsLength - 2,
+            endIndex = Math.max(endDeleteIndex, endAddIndex),
+            additions = new Array(), deletions = new Array()
+          for (let index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
+            if (index < endDeleteIndex) { deletions.push(pushDiff('deleted', rawArray[index], index)) }
+            if (index < endAddIndex) { additions.push(pushDiff('added', args[argsIndex], index)) }
+          }
+          findMovesInArrayComparison(deletions, additions)
         }
-        findMovesInArrayComparison(deletions, additions)
         break
 
       default:

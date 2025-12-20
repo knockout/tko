@@ -31,7 +31,7 @@ describe('Binding: If', function () {
   beforeEach(function() { testNode = jasmine.prepareTestNode() })
 
   beforeEach(function () {
-    var provider = new MultiProvider({
+    let provider = new MultiProvider({
       providers: [new DataBindProvider(), new VirtualProvider()]
     })
     options.bindingProviderInstance = provider
@@ -58,9 +58,9 @@ describe('Binding: If', function () {
   })
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
-    var someItem = observable(true)
+    let someItem = observable(true)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: ++counter'></span></div>"
-    var originalNode = testNode.childNodes[0].childNodes[0]
+    const originalNode = testNode.childNodes[0].childNodes[0]
 
         // Value is initially true, so nodes are retained
     applyBindings({ someItem, counter: 0 }, testNode)
@@ -76,7 +76,7 @@ describe('Binding: If', function () {
   })
 
   it('Should toggle the presence and bindedness of descendant nodes according to the truthiness of the value', function () {
-    var someItem = observable(undefined)
+    let someItem = observable(undefined)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem().occasionallyExistentChildProp'></span></div>"
     applyBindings({ someItem }, testNode)
 
@@ -101,7 +101,7 @@ describe('Binding: If', function () {
   })
 
   it('Should be able to define an \"if\" region using a containerless template', function () {
-    var someitem = observable(undefined)
+    let someitem = observable(undefined)
     testNode.innerHTML = 'hello <!-- ko if: someitem --><span data-bind="text: someitem().occasionallyexistentchildprop"></span><!-- /ko --> goodbye'
     applyBindings({ someitem }, testNode)
 
@@ -118,8 +118,8 @@ describe('Binding: If', function () {
   })
 
   it('Should be able to nest \"if\" regions defined by containerless templates', function () {
-    var condition1 = observable(false)
-    var condition2 = observable(false)
+    let condition1 = observable(false)
+    let condition2 = observable(false)
     testNode.innerHTML = 'hello <!-- ko if: condition1 -->First is true<!-- ko if: condition2 -->Both are true<!-- /ko --><!-- /ko -->'
     applyBindings({ condition1: condition1, condition2: condition2 }, testNode)
 
@@ -137,9 +137,9 @@ describe('Binding: If', function () {
 
   it('Should call a childrenComplete callback function', function () {
     testNode.innerHTML = "<div data-bind='if: condition, childrenComplete: callback'><span data-bind='text: someText'></span></div>"
-    var someItem = observable({ childprop: 'child' }),
-      callbacks = 0
-    var viewModel = { condition: observable(true), someText: 'hello', callback: function () { callbacks++ } }
+    //const someItem = observable({ childprop: 'child' })
+    let callbacks = 0
+    const viewModel = { condition: observable(true), someText: 'hello', callback: function () { callbacks++ } }
     applyBindings(viewModel, testNode)
     expect(callbacks).toEqual(1)
     expect(testNode.childNodes[0]).toContainText('hello')
