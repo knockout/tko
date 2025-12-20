@@ -378,7 +378,7 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML =
       "<div data-bind='foreach: { data: someItems, afterAdd: callback }'><span data-bind='text: childprop'></span></div>"
     let callbackObservable = observable(1),
-      someItems: ObservableArray = observableArray([]),
+      someItems: ObservableArray = observableArray<any>([]),
       callbacks = 0
     applyBindings(
       {

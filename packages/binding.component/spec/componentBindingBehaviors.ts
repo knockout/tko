@@ -1340,7 +1340,7 @@ describe('Components: Component binding', function () {
 
     it('respects observable array changes with text', function () {
       testNode.innerHTML = ''
-      const arr: ObservableArray = observableArray([])
+      const arr: ObservableArray<string> = observableArray<string>([])
       const jsx = {
         elementName: 'test-component',
         attributes: {},
@@ -1379,7 +1379,7 @@ describe('Components: Component binding', function () {
 
     it('respects observable array changes with JSX', function () {
       testNode.innerHTML = ''
-      const arr: ObservableArray<any> = observableArray([])
+      const arr: ObservableArray<any> = observableArray<any>([])
 
       // <test-component>
       //   <template slot='X'>{arr}</template>

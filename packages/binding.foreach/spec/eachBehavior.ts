@@ -227,7 +227,7 @@ describe('is empty/conditional', function () {
 
   it('sets `elseChainSatisfied` to true after array is filled', function () {
     let div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>")
-    let obs: ObservableArray<number> = observableArray([])
+    let obs: ObservableArray<number> = observableArray<number>([])
     let view = { obs: obs }
     applyBindings(view, div[0])
     obs([1, 2, 3])
@@ -752,7 +752,7 @@ describe('observable array changes', function () {
     it('emits on changes to an observable array', function () {
       let calls = 0
       let nodes = 0
-      let arr: ObservableArray = observableArray([])
+      let arr: ObservableArray = observableArray<any>([])
       function cb(v) {
         calls++
         nodes += v.nodeOrArrayInserted.length
@@ -903,7 +903,7 @@ describe('observable array changes', function () {
 
     it('updates the first list item', function () {
       let target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>")
-      let list: ObservableArray<string> = observableArray([])
+      let list: ObservableArray<string> = observableArray<string>([])
       applyBindings(list, target[0])
       list.push('a')
       assert.equal(contextFor(target.children()[0]).$index(), 0)

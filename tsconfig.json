@@ -20,7 +20,7 @@
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
-    "strictFunctionTypes": false,
+    "strictFunctionTypes": true,
     "skipLibCheck": true,
     /* END Disabling */
     "paths": {
