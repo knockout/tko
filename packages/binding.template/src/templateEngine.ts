@@ -99,7 +99,7 @@ extend(templateEngine.prototype, {
   },
 
   renderTemplate(
-    template: string | Element,
+    template: string | Node,
     bindingContext: BindingContext<any>,
     options: TemplateOptions<any>,
     templateDocument?: Document

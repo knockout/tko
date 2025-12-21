@@ -472,8 +472,8 @@ export function applyBindingsToDescendants<T = any>(
   rootNode: Node
 ): BindingResult {
   const asyncBindingsApplied = new Set()
+  const bindingContext = getBindingContext(viewModelOrBindingContext)
   if (rootNode.nodeType === Node.ELEMENT_NODE || rootNode.nodeType === Node.COMMENT_NODE) {
-    const bindingContext = getBindingContext(viewModelOrBindingContext)
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({ asyncBindingsApplied, rootNode, bindingContext })
   }
@@ -493,7 +493,7 @@ export function applyBindings<T = any>(
     if (!rootNode) {
       throw Error('ko.applyBindings: could not find window.document.body; has the document been loaded?')
     }
-  } else if (rootNode.nodeType !== 1 && rootNode.nodeType !== 8) {
+  } else if (rootNode.nodeType !== Node.ELEMENT_NODE && rootNode.nodeType !== Node.COMMENT_NODE) {
     throw Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node')
   }
   const rootContext = getBindingContext<T>(viewModelOrBindingContext, extendContextCallback)

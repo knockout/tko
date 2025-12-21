@@ -72,7 +72,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
    */
   *genSlotsByName(templateNodes: HTMLElement[]): Generator<{ [key: string]: HTMLElement }, void, unknown> {
     for (const node of templateNodes) {
-      if (node.nodeType !== 1) {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
         continue
       }
       const slotName = node.getAttribute('slot')

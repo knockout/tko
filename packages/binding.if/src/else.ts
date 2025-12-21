@@ -30,7 +30,7 @@ export class ElseBindingHandler extends IfBindingHandler {
     let node: ChildNode | null = this.$element
     do {
       node = node.previousSibling
-    } while (node && node.nodeType !== 1 && node.nodeType !== 8)
+    } while (node && node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.COMMENT_NODE)
 
     if (!node) {
       return false
