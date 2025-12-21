@@ -171,7 +171,7 @@ class TextInputIE extends TextInput {
 // set up just one event handler for the document and use 'activeElement' to determine which
 // element was changed.
 class TextInputIE9 extends TextInputIE {
-  overrideupdateModel(...args: [any]) {
+  override updateModel(...args: [any]) {
     // IE9 will mess up the DOM if you handle events synchronously which results in DOM changes (such as other bindings);
     // so we'll make sure all updates are asynchronous
     this.deferUpdateModel(...args)

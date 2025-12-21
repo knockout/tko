@@ -328,7 +328,7 @@ function applyBindingsToNodeInternal<T>(
     const nodeAsyncBindingPromises = new Set<Promise<any>>()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
       // Go through the sorted bindings, calling init and update for each
-      const reportBindingError = function (during, errorCaptured) {
+      const reportBindingError = function (during: string, errorCaptured: Error) {
         onBindingError({
           during,
           errorCaptured,
@@ -384,7 +384,8 @@ function applyBindingsToNodeInternal<T>(
           nodeAsyncBindingPromises.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
-        reportBindingError('creation', err)
+        const error = err instanceof Error ? err : new Error(String(err))
+        reportBindingError('creation', error)
       }
     }
 
@@ -522,9 +523,8 @@ function onBindingError(spec: BindingError) {
     // Read-only error e.g. a DOMEXception.
     spec.stack = error.stack
 
-    if (error.message) {
-      error = new Error(error.message)
-    }
+    const message = error.message || String(error)
+    error = new Error(message)
     extend(error, spec)
   }
   options.onError(error)

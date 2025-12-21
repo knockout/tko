@@ -117,8 +117,9 @@ export class Options {
 
   foreachHidesDestroyed: boolean = false
 
-  onError(e: any): void {
-    throw e
+  onError(e: any, throws: boolean = true): typeof e {
+    if (throws) throw e
+    return e
   }
 
   set(name: string, value: any): void {

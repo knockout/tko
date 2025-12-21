@@ -78,21 +78,20 @@ extend(templateEngine.prototype, {
     options.onError(new Error('Override createJavaScriptEvaluatorBlock'))
   },
 
-  makeTemplateSource(template: string | Node, templateDocument?: Document) {
+  makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource {
     // Named template
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
       let elem = templateDocument.getElementById(template)
       if (!elem) {
-        options.onError(new Error('Cannot find template with ID ' + template))
+        throw options.onError(new Error('Cannot find template with ID ' + template), false)
       }
       return new domElement(elem)
     } else if (template.nodeType == 1 || template.nodeType == 8) {
       // Anonymous template
       return new anonymousTemplate(template)
     } else {
-      options.onError(new Error('Unknown template type: ' + template))
-      return undefined
+      throw options.onError(new Error('Unknown template type: ' + template), false)
     }
   },
 

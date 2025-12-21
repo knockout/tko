@@ -56,13 +56,9 @@ function setTemplateDomData(element, data) {
 
 export class domElement implements TemplateSource {
   domElement: Element
-  templateType: number | undefined
+  templateType: number
 
-  constructor(element: Element | null) {
-    if (!element) {
-      return
-    }
-
+  constructor(element: Element) {
     this.domElement = element
 
     let tagNameLower = tagNameLowerFn(element)
