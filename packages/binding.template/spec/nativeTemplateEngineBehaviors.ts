@@ -209,6 +209,33 @@ describe('Native template engine', function () {
     })
   })
 
+  describe('Template data context', function () {
+    it('should set $data to the template data value', function () {
+      const fragment = document.createDocumentFragment()
+      const template = document.createElement('template') as HTMLTemplateElement
+      fragment.appendChild(template)
+
+      template.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+      applyBindings({ someItem: { val: 'abc' } }, template)
+      console.log(template.content.childNodes[0])
+      expect(template.content.childNodes[0]).toContainText('Value: abc')
+    })
+
+    it('should set $data to the DIV at DocumentFragment', function () {
+      const fragment = document.createDocumentFragment()
+      const div = document.createElement('div') as HTMLDivElement
+
+      div.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+
+      fragment.appendChild(div)
+      applyBindings({ someItem: { val: 'abc' } }, div)
+      console.log(div.childNodes[0])
+      expect(div.childNodes[0]).toContainText('Value: abc')
+    })
+  })
+
   describe('Data-bind syntax', function () {
     it('should expose parent binding context as $parent if binding with an explicit \"data\" value', function () {
       testNode.innerHTML =

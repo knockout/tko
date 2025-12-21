@@ -49,12 +49,8 @@ type BindingHandlerOrUndefined = (typeof BindingHandler & BindingHandler) | unde
 const bindingDoesNotRecurseIntoElementTypes = {
   // Don't want bindings that operate on text nodes to mutate <script> and <textarea> contents,
   // because it's unexpected and a potential XSS issue.
-  // Also bindings should not operate on <template> elements since this breaks in Internet Explorer
-  // and because such elements' contents are always intended to be bound in a different context
-  // from where they appear in the document.
   script: true,
-  textarea: true,
-  template: true
+  textarea: true
 }
 
 function getBindingProvider(): Provider {
@@ -62,7 +58,12 @@ function getBindingProvider(): Provider {
 }
 
 function isProviderForNode(provider: Provider, node: Node): boolean {
-  const nodeTypes = provider.FOR_NODE_TYPES || [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
+  const nodeTypes = provider.FOR_NODE_TYPES || [
+    Node.ELEMENT_NODE,
+    Node.TEXT_NODE,
+    Node.COMMENT_NODE,
+    Node.DOCUMENT_FRAGMENT_NODE
+  ]
   return nodeTypes.includes(node.nodeType)
 }
 
@@ -473,7 +474,11 @@ export function applyBindingsToDescendants<T = any>(
 ): BindingResult {
   const asyncBindingsApplied = new Set()
   const bindingContext = getBindingContext(viewModelOrBindingContext)
-  if (rootNode.nodeType === Node.ELEMENT_NODE || rootNode.nodeType === Node.COMMENT_NODE) {
+  if (
+    rootNode.nodeType === Node.ELEMENT_NODE
+    || rootNode.nodeType === Node.COMMENT_NODE
+    || rootNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+  ) {
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({ asyncBindingsApplied, rootNode, bindingContext })
   }
@@ -493,7 +498,11 @@ export function applyBindings<T = any>(
     if (!rootNode) {
       throw Error('ko.applyBindings: could not find window.document.body; has the document been loaded?')
     }
-  } else if (rootNode.nodeType !== Node.ELEMENT_NODE && rootNode.nodeType !== Node.COMMENT_NODE) {
+  } else if (
+    rootNode.nodeType !== Node.ELEMENT_NODE
+    && rootNode.nodeType !== Node.COMMENT_NODE
+    && rootNode.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+  ) {
     throw Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node')
   }
   const rootContext = getBindingContext<T>(viewModelOrBindingContext, extendContextCallback)

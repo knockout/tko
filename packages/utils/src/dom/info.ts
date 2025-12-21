@@ -9,7 +9,11 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
   }
   if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
     return false
-  } // Fixes issue #1162 - can't use node.contains for document fragments on IE8
+  }
+  if (!containedByNode) {
+    return false
+  }
+  // Fixes issue #1162 - can't use node.contains for document fragments on IE8
   if (containedByNode.contains) {
     return containedByNode.contains(node.nodeType !== Node.ELEMENT_NODE ? node.parentNode : node)
   }

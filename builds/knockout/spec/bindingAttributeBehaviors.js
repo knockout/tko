@@ -594,7 +594,7 @@ describe('Binding attribute syntax', function() {
             expect(testNode).toContainHtml('<p>replaced</p><textarea>test</textarea><p>replaced</p>');
         });
 
-        it('<template>', function() {
+        xit('<template>', function() {
             document.createElement('template'); // For old IE
             testNode.innerHTML = "<p>Hello</p><template>test</template><p>Goodbye</p>";
             ko.applyBindings({ sometext: 'hello' }, testNode);

@@ -28,6 +28,10 @@ export const startCommentRegex = commentNodesHaveTextProperty
 export const endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
 let htmlTagsWithOptionallyClosingChildren = { ul: true, ol: true }
 
+export function isTemplate(node) {
+  return node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'template'
+}
+
 export function isStartComment(node) {
   return (
     node.nodeType === Node.COMMENT_NODE
@@ -186,6 +190,10 @@ export function insertAfter(containerNode: Node, nodeToInsert: Node, insertAfter
 }
 
 export function firstChild(node: Node) {
+  if (isTemplate(node)) {
+    return (node as HTMLTemplateElement).content.firstChild
+  }
+
   if (!isStartComment(node)) {
     if (node.firstChild && isEndComment(node.firstChild)) {
       throw new Error('Found invalid end comment, as the first child of ' + (node as Element).outerHTML)
