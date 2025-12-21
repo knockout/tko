@@ -32,7 +32,7 @@ import type { BindingContext } from './bindingContext'
 
 interface BindingError {
   during: string
-  errorCaptured: any
+  errorCaptured: Error
   bindings?: any
   allBindings?: AllBindings
   bindingKey?: string
@@ -501,7 +501,7 @@ export function applyBindings<T = any>(
 }
 
 function onBindingError(spec: BindingError) {
-  let error: any
+  let error: Error
   if (spec.bindingKey) {
     // During: 'init' or initial 'update'
     error = spec.errorCaptured
@@ -518,10 +518,13 @@ function onBindingError(spec: BindingError) {
   }
   try {
     extend(error, spec)
-  } catch (e) {
+  } catch (e : any) {   
     // Read-only error e.g. a DOMEXception.
     spec.stack = error.stack
-    error = new Error(error.message ? error.message : error)
+
+    if(error.message) {
+      error = new Error(error.message)
+    } 
     extend(error, spec)
   }
   options.onError(error)
