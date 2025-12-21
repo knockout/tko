@@ -524,7 +524,11 @@ function onBindingError(spec: BindingError) {
     spec.stack = error.stack
 
     const message = error.message || String(error)
+    const originalName = error.name
     error = new Error(message)
+    if (originalName && originalName !== 'Error') {
+      error.name = originalName
+    }
     extend(error, spec)
   }
   options.onError(error)

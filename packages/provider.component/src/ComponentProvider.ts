@@ -53,7 +53,7 @@ export default class ComponentProvider extends Provider {
   }
 
   getComponentNameForNode(node: Element): string | undefined {
-    if (node.nodeType !== node.ELEMENT_NODE) {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
       return
     }
     const tagName = tagNameLower(node)
