@@ -117,10 +117,10 @@ export class domElement implements TemplateSource {
         // If the template is associated with an element that stores the template as text,
         // parse and cache the nodes whenever there's new text content available. This allows
         // the user to update the template content by updating the text of template node.
-        const text = (this as any)['text']()
+        const text = this.text()
         if (text) {
           nodes = parseHtmlForTemplateNodes(text, element.ownerDocument)
-          ;(this as any)['text']('') // clear the text from the node
+          this.text('') // clear the text from the node
           setTemplateDomData(element, { containerData: nodes, alwaysCheckText: true })
         }
       }
