@@ -134,7 +134,7 @@ describe('Binding attribute syntax', function () {
 
   it('Should tolerate arbitrary literals as the values for a handler', function () {
     testNode.innerHTML =
-      '<div data-bind=\'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, lambdaLiteral: => null, nullLiteral: null, undefinedLiteral: undefined\'></div>'
+      '<div data-bind=\'stringLiteral: "hello", numberLiteral: 123, boolLiteralTrue: true, boolLiteralFalse: false, objectLiteral: {}, nakedLambdaLiteral: => null, normalLambdaLiteral: () => null, nullLiteral: null, undefinedLiteral: undefined\'></div>'
     applyBindings(null, testNode) // No exception means success
   })
 
