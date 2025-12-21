@@ -1,24 +1,20 @@
-import {
-    applyBindings
-} from '@tko/bind'
+import { applyBindings } from '@tko/bind'
 
-import {
-    observable
-} from '@tko/observable'
+import { observable } from '@tko/observable'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import {
-    options
-} from '@tko/utils'
+import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Enable/Disable', function () {
-  let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  let testNode: HTMLElement
+  beforeEach(function () {
+    testNode = jasmine.prepareTestNode()
+  })
 
   beforeEach(function () {
     let provider = new DataBindProvider()

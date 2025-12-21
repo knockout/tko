@@ -1,12 +1,13 @@
+import { arrayForEach } from '@tko/utils'
 
 import {
-  arrayForEach
-} from '@tko/utils'
-
-import {
-    observable, isSubscribable, isObservable,
-    isWriteableObservable, isWritableObservable, subscribable,
-    unwrap
+  observable,
+  isSubscribable,
+  isObservable,
+  isWriteableObservable,
+  isWritableObservable,
+  subscribable,
+  unwrap
 } from '../dist'
 
 describe('Observable', function () {
@@ -34,14 +35,7 @@ describe('Observable', function () {
   })
 
   it('ko.isObservable should return false for non-observable values', function () {
-    arrayForEach([
-      undefined,
-      null,
-      'x',
-             {},
-      function () {},
-      new subscribable()
-    ], function (value) {
+    arrayForEach([undefined, null, 'x', {}, function () {}, new subscribable()], function (value) {
       expect(isObservable(value)).toEqual(false)
     })
   })
@@ -58,10 +52,7 @@ describe('Observable', function () {
   })
 
   it('Should be able to write to multiple observable properties on a model object using chaining syntax', function () {
-    let model = {
-      prop1: observable(),
-      prop2: observable()
-    }
+    let model = { prop1: observable(), prop2: observable() }
     model.prop1('A').prop2('B')
 
     expect(model.prop1()).toEqual('A')
@@ -78,7 +69,7 @@ describe('Observable', function () {
   })
 
   it('Should advertise that instances can have values written to them', function () {
-    let instance = observable(function () { })
+    let instance = observable(function () {})
     expect(isWriteableObservable(instance)).toEqual(true)
     expect(isWritableObservable(instance)).toEqual(true)
   })
@@ -110,19 +101,23 @@ describe('Observable', function () {
     instance('A')
     instance('B')
 
-    expect(notifiedValues).toEqual([ 'A', 'B' ])
+    expect(notifiedValues).toEqual(['A', 'B'])
   })
 
   it('Should notify "spectator" subscribers about each new value', function () {
     let instance = observable()
     let notifiedValues = new Array()
-    instance.subscribe(function (value) {
-      notifiedValues.push(value)
-    }, null, 'spectate')
+    instance.subscribe(
+      function (value) {
+        notifiedValues.push(value)
+      },
+      null,
+      'spectate'
+    )
 
     instance('A')
     instance('B')
-    expect(notifiedValues).toEqual([ 'A', 'B' ])
+    expect(notifiedValues).toEqual(['A', 'B'])
   })
 
   it('Should be able to tell it that its value has mutated, at which point it notifies subscribers', function () {
@@ -146,9 +141,13 @@ describe('Observable', function () {
   it('Should notify "beforeChange" subscribers before each new value', function () {
     let instance = observable()
     let notifiedValues = new Array()
-    instance.subscribe(function (value) {
-      notifiedValues.push(value)
-    }, null, 'beforeChange')
+    instance.subscribe(
+      function (value) {
+        notifiedValues.push(value)
+      },
+      null,
+      'beforeChange'
+    )
 
     instance('A')
     instance('B')
@@ -161,9 +160,13 @@ describe('Observable', function () {
   it('Should be able to tell it that its value will mutate, at which point it notifies "beforeChange" subscribers', function () {
     let instance = observable()
     let notifiedValues = new Array()
-    instance.subscribe(function (value) {
-      notifiedValues.push(value ? value.childProperty : value)
-    }, null, 'beforeChange')
+    instance.subscribe(
+      function (value) {
+        notifiedValues.push(value ? value.childProperty : value)
+      },
+      null,
+      'beforeChange'
+    )
 
     let someUnderlyingObject = { childProperty: 'A' }
     instance(someUnderlyingObject)
@@ -213,8 +216,8 @@ describe('Observable', function () {
   })
 
   it('Should notify subscribers of a change when an object value is written, even if it is identical to the old value', function () {
-        // Because we can't tell whether something further down the object graph has changed, we regard
-        // all objects as new values. To override this, set an "equalityComparer" callback
+    // Because we can't tell whether something further down the object graph has changed, we regard
+    // all objects as new values. To override this, set an "equalityComparer" callback
     let constantObject = {}
     let instance = observable(constantObject)
     let notifiedValues = new Array()
@@ -223,16 +226,16 @@ describe('Observable', function () {
     expect(notifiedValues).toEqual([constantObject])
   })
 
-  it('Should notify subscribers of a change even when an identical primitive is written if you\'ve set the equality comparer to null', function () {
+  it("Should notify subscribers of a change even when an identical primitive is written if you've set the equality comparer to null", function () {
     let instance = observable('A')
     let notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
-        // No notification by default
+    // No notification by default
     instance('A')
     expect(notifiedValues).toEqual([])
 
-        // But there is a notification if we null out the equality comparer
+    // But there is a notification if we null out the equality comparer
     instance.equalityComparer = null
     instance('A')
     expect(notifiedValues).toEqual(['A'])
@@ -250,27 +253,27 @@ describe('Observable', function () {
     instance({ id: 1 })
     expect(notifiedValues.length).toEqual(1)
 
-        // Same key - no change
+    // Same key - no change
     instance({ id: 1, ignoredProp: 'abc' })
     expect(notifiedValues.length).toEqual(1)
 
-        // Different key - change
+    // Different key - change
     instance({ id: 2, ignoredProp: 'abc' })
     expect(notifiedValues.length).toEqual(2)
 
-        // Null vs not-null - change
+    // Null vs not-null - change
     instance(null)
     expect(notifiedValues.length).toEqual(3)
 
-        // Null vs null - no change
+    // Null vs null - no change
     instance(null)
     expect(notifiedValues.length).toEqual(3)
 
-        // Null vs undefined - change
+    // Null vs undefined - change
     instance(undefined)
     expect(notifiedValues.length).toEqual(4)
 
-        // undefined vs object - change
+    // undefined vs object - change
     instance({ id: 1 })
     expect(notifiedValues.length).toEqual(5)
   })
@@ -283,16 +286,16 @@ describe('Observable', function () {
     instance(123)
     expect(notifiedValues.length).toEqual(1)
 
-        // Typically, unchanged values don't trigger a notification
+    // Typically, unchanged values don't trigger a notification
     instance(123)
     expect(notifiedValues.length).toEqual(1)
 
-        // ... but you can enable notifications regardless of change
+    // ... but you can enable notifications regardless of change
     instance.extend({ notify: 'always' })
     instance(123)
     expect(notifiedValues.length).toEqual(2)
 
-        // ... or later disable that
+    // ... or later disable that
     instance.extend({ notify: null })
     instance(123)
     expect(notifiedValues.length).toEqual(2)
@@ -301,30 +304,36 @@ describe('Observable', function () {
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
     let instance = observable(123)
     let interceptedNotifications = new Array()
-    instance.subscribe(function () { throw new Error('Should not notify subscribers by default once notifySubscribers is overridden') })
+    instance.subscribe(function () {
+      throw new Error('Should not notify subscribers by default once notifySubscribers is overridden')
+    })
     instance.notifySubscribers = function (newValue, eventName) {
       interceptedNotifications.push({ eventName: eventName || 'None', value: newValue })
     }
     instance(456)
     // This represents the current set of events that are generated for an observable. This set might
-           // expand in the future.
+    // expand in the future.
     expect(interceptedNotifications).toEqual([
-               { eventName: 'beforeChange', value: 123 },
-               { eventName: 'spectate', value: 456 },
-               { eventName: 'None', value: 456 }
+      { eventName: 'beforeChange', value: 123 },
+      { eventName: 'spectate', value: 456 },
+      { eventName: 'None', value: 456 }
     ])
   })
 
   it('Should inherit any properties defined on subscribable.fn or observable.fn', function () {
     this.after(function () {
-      delete subscribable.fn.customProp       // Will be able to reach this
-      delete subscribable.fn.customFunc       // Overridden on observable.fn
-      delete observable.fn.customFunc         // Will be able to reach this
+      delete subscribable.fn.customProp // Will be able to reach this
+      delete subscribable.fn.customFunc // Overridden on observable.fn
+      delete observable.fn.customFunc // Will be able to reach this
     })
 
     subscribable.fn.customProp = 'subscribable value'
-    subscribable.fn.customFunc = function () { throw new Error('Shouldn\'t be reachable') }
-    observable.fn.customFunc = function () { return this() }
+    subscribable.fn.customFunc = function () {
+      throw new Error("Shouldn't be reachable")
+    }
+    observable.fn.customFunc = function () {
+      return this()
+    }
 
     let instance = observable(123)
     expect(instance.customProp).toEqual('subscribable value')
@@ -332,7 +341,7 @@ describe('Observable', function () {
   })
 
   it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
-        // On unsupported browsers, there's nothing to test
+    // On unsupported browsers, there's nothing to test
     if (!jasmine.browserSupportsProtoAssignment) {
       return
     }
@@ -357,13 +366,12 @@ describe('Observable', function () {
   it('immediately emits any value when called with {next: ...}', function () {
     const instance = observable(1)
     let x
-    instance.subscribe({next: v => (x = v)})
+    instance.subscribe({ next: v => (x = v) })
     expect(x).toEqual(1)
     observable(2)
     expect(x).toEqual(1)
   })
 })
-
 
 describe('unwrap', function () {
   it('Should return the supplied value for non-observables', function () {

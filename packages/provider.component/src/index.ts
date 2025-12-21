@@ -1,1 +1,1 @@
-export {default as ComponentProvider} from './ComponentProvider'
+export { default as ComponentProvider } from './ComponentProvider'

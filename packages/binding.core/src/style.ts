@@ -1,11 +1,6 @@
+import { objectForEach, options } from '@tko/utils'
 
-import {
-    objectForEach, options
-} from '@tko/utils'
-
-import {
-    unwrap
-} from '@tko/observable'
+import { unwrap } from '@tko/observable'
 
 export const style = {
   update: function (element, valueAccessor) {

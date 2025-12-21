@@ -1,12 +1,6 @@
+import { unwrap } from '@tko/observable'
 
-import {
-  unwrap
-} from '@tko/observable'
-
-import {
-  default as operators,
-  LAMBDA
-} from './operators'
+import { default as operators, LAMBDA } from './operators'
 
 const IS_EXPR_OR_IDENT = Symbol('Node - Is Expression Or Identifier')
 
@@ -15,14 +9,15 @@ export default class Node {
   op: any
   rhs: any
 
-
   constructor(lhs, op, rhs) {
     this.lhs = lhs
     this.op = op
     this.rhs = rhs
   }
 
-  static get operators() { return operators }
+  static get operators() {
+    return operators
+  }
 
   get_leaf_value(leaf, context, globals, node) {
     if (typeof leaf === 'function') {
@@ -32,7 +27,9 @@ export default class Node {
     }
 
     // primitives
-    if (typeof leaf !== 'object' || leaf === null) { return leaf }
+    if (typeof leaf !== 'object' || leaf === null) {
+      return leaf
+    }
 
     // Identifiers and Expressions
     if (leaf[Node.isExpressionOrIdentifierSymbol]) {
@@ -55,7 +52,7 @@ export default class Node {
    * the lambda is called.
    */
   get_value(notused, context, globals, node: Node) {
-    var node: Node = this; //eslint-disable-line no-var
+    var node: Node = this //eslint-disable-line no-var
 
     if (node.op === LAMBDA) {
       return (...args) => {
@@ -70,7 +67,9 @@ export default class Node {
     const lhv = node.get_leaf_value(node.lhs, context, globals, node)
     const earlyOut = node.op.earlyOut
 
-    if (earlyOut && earlyOut(lhv)) { return lhv }
+    if (earlyOut && earlyOut(lhv)) {
+      return lhv
+    }
     const rhv = node.get_leaf_value(node.rhs, context, globals, node)
 
     return node.op(lhv, rhv, context, globals)
@@ -79,8 +78,12 @@ export default class Node {
   //
   // Class variables.
   //
-  static get isExpressionOrIdentifierSymbol() { return IS_EXPR_OR_IDENT }
-  get [IS_EXPR_OR_IDENT]() { return true }
+  static get isExpressionOrIdentifierSymbol() {
+    return IS_EXPR_OR_IDENT
+  }
+  get [IS_EXPR_OR_IDENT]() {
+    return true
+  }
 
   static value_of(item, context?, globals?, node?: Node) {
     if (item && item[Node.isExpressionOrIdentifierSymbol]) {
@@ -90,11 +93,11 @@ export default class Node {
   }
 
   /**
-  *  Convert an array of nodes to an executable tree.
-  *  @return {object} An object with a `lhs`, `rhs` and `op` key, corresponding
-  *                      to the left hand side, right hand side, and
-  *                      operation function.
-  */
+   *  Convert an array of nodes to an executable tree.
+   *  @return {object} An object with a `lhs`, `rhs` and `op` key, corresponding
+   *                      to the left hand side, right hand side, and
+   *                      operation function.
+   */
   static create_root(nodes, debug = false) {
     // shunting yard algorithm with output to an abstact syntax tree of Nodes
     const out = new Array()

@@ -1,8 +1,4 @@
-
-import {
-    subscribable as Subscribable,
-    extenders
-} from '../dist'
+import { subscribable as Subscribable, extenders } from '../dist'
 
 describe('Extenders', function () {
   it('Should be able to extend any subscribable', function () {

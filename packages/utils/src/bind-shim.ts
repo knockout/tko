@@ -1,7 +1,6 @@
-
 if (!Function.prototype['bind']) {
-    // Shim/polyfill JavaScript Function.bind.
-    // This implementation is based on the one in prototype.js
+  // Shim/polyfill JavaScript Function.bind.
+  // This implementation is based on the one in prototype.js
   Function.prototype['bind'] = function (object) {
     let originalFunction = this
     if (arguments.length === 1) {

@@ -1,15 +1,8 @@
-
-import {registry} from './registry'
+import { registry } from './registry'
 
 import { ComponentABC } from './ComponentABC'
 
-import {
-  register,
-  isRegistered,
-  unregister,
-  defaultLoader,
-  defaultConfigRegistry
-} from './loaders'
+import { register, isRegistered, unregister, defaultLoader, defaultConfigRegistry } from './loaders'
 
 export { ComponentABC }
 
@@ -27,6 +20,10 @@ export default {
   // "Privately" expose the underlying config registry for use in old-IE shim
   _allRegisteredComponents: defaultConfigRegistry,
 
-  get loaders () { return registry.loaders },
-  set loaders (loaders) { registry.loaders = loaders }
+  get loaders() {
+    return registry.loaders
+  },
+  set loaders(loaders) {
+    registry.loaders = loaders
+  }
 }

@@ -1,13 +1,9 @@
 /* globals assert, it, describe */
-import { assert } from 'chai';
+import { assert } from 'chai'
 
-import {
-    observable
-} from '@tko/observable'
+import { observable } from '@tko/observable'
 
-import {
-  LifeCycle
-} from '../src'
+import { LifeCycle } from '../src'
 
 describe('KO LifeCycle', function () {
   describe('mixInto', function () {
@@ -50,7 +46,7 @@ describe('KO LifeCycle', function () {
     })
 
     it('extends a class instance', function () {
-      class X extends LifeCycle {};
+      class X extends LifeCycle {}
       const c = new X()
       LifeCycle.mixInto(c)
       assert.isFunction(c.subscribe)
@@ -70,7 +66,9 @@ describe('KO LifeCycle', function () {
     beforeEach(() => (lastThis = null))
 
     class LcComputedTest extends LifeCycle {
-      method () { lastThis = this }
+      method() {
+        lastThis = this
+      }
     }
 
     it('calls a named function', () => {
@@ -87,14 +85,19 @@ describe('KO LifeCycle', function () {
 
     it('calls a bound method', () => {
       const lf = new LcComputedTest()
-      function fn () { lastThis = this }
+      function fn() {
+        lastThis = this
+      }
       lf.computed(fn.bind(lf))
       assert.strictEqual(lastThis, lf)
     })
 
     it('calls a function (unbound)', () => {
       const lf = new LcComputedTest()
-      lf.computed(function y () { 'use strict'; lastThis = this })
+      lf.computed(function y() {
+        'use strict'
+        lastThis = this
+      })
       assert.strictEqual(lastThis, undefined)
     })
 
@@ -122,7 +125,7 @@ describe('KO LifeCycle', function () {
       let Ctr, c, o
       o = observable()
       Ctr = (function () {
-        function Ctr () {
+        function Ctr() {
           this.ons = () => {}
           this.subscribe(o, this.ons)
         }
@@ -139,7 +142,7 @@ describe('KO LifeCycle', function () {
       let Ctr, c, o
       o = observable()
       Ctr = (function () {
-        function Ctr () {
+        function Ctr() {
           this.computed(o, 'comp')
         }
         Ctr.prototype.comp = function () {
@@ -159,7 +162,7 @@ describe('KO LifeCycle', function () {
       o = observable(0)
       div = document.createElement('div')
       Ctr = (function () {
-        function Ctr () {
+        function Ctr() {
           this.addEventListener(div, 'click', function () {
             return o(o() + 1)
           })
@@ -182,7 +185,7 @@ describe('KO LifeCycle', function () {
       const div = document.createElement('div')
       const anchor = document.createElement('em')
       class NodeLifeCycle extends LifeCycle {
-        constructor () {
+        constructor() {
           super()
           this.computed(() => o())
           this.anchorTo(anchor)

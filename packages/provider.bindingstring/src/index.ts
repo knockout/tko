@@ -1,1 +1,1 @@
-export {default as BindingStringProvider} from './BindingStringProvider'
+export { default as BindingStringProvider } from './BindingStringProvider'

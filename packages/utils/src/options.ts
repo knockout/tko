@@ -1,11 +1,11 @@
-import { Provider } from "@tko/provider";
-import type { KnockoutInstance } from "@tko/builder";
+import { Provider } from '@tko/provider'
+import type { KnockoutInstance } from '@tko/builder'
 
 export interface CustomBindingGlobalProperties {
-  [customBindingName: string]: any;
+  [customBindingName: string]: any
 }
 
-export type BindingStringPreparsersFunction = (bindingString: string) => string;
+export type BindingStringPreparsersFunction = (bindingString: string) => string
 
 //
 // This becomes ko.options
@@ -13,17 +13,16 @@ export type BindingStringPreparsersFunction = (bindingString: string) => string;
 //
 // This is the root 'options', which must be extended by others.
 export class Options {
-  
   // The following options can be set on ko.options to make a function rewriting or something similar.
   bindingStringPreparsers: BindingStringPreparsersFunction[] = []
-  
+
   // Reference to the own knockout instance
   knockoutInstance: KnockoutInstance | null = null
-  
+
   deferUpdates: boolean = false
 
   // Don't set this false, with jquery 3.7+
-  useOnlyNativeEvents: boolean = true 
+  useOnlyNativeEvents: boolean = true
 
   // Use HTML5 <template> tags if is supported
   useTemplateTag: boolean = true
@@ -48,27 +47,23 @@ export class Options {
   // jQuery will be automatically set to globalThis.jQuery in applyBindings
   // if it is (strictly equal to) undefined.  Set it to true to
   // disable automatically setting jQuery.
-  disableJQueryUsage: boolean = false;
+  disableJQueryUsage: boolean = false
 
   get jQuery(): JQueryStatic | undefined {
-    if (this.disableJQueryUsage)
-      return;
-    return this._jQuery ?? (globalThis as any).jQuery;
+    if (this.disableJQueryUsage) return
+    return this._jQuery ?? (globalThis as any).jQuery
   }
 
-  private _jQuery: JQueryStatic | undefined;
+  private _jQuery: JQueryStatic | undefined
   /**
-   * Set jQuery manuall to be used by TKO. 
+   * Set jQuery manuall to be used by TKO.
    * @param jQuery If jQuery set to undefined, TKO will not use jQuery and this.disableJQueryUsage to true.
    */
   set jQuery(jQuery: JQueryStatic | undefined) {
-    if(!jQuery)
-    {
+    if (!jQuery) {
       this.disableJQueryUsage = true
       this._jQuery = undefined
-    } 
-    else 
-    {
+    } else {
       this._jQuery = jQuery
       this.disableJQueryUsage = false
     }
@@ -93,15 +88,17 @@ export class Options {
   allowScriptTagsInTemplates: boolean = false
 
   private _sanitizeWarningLogged: boolean = false
-  /** 
-   * Sanitize HTML templates before parsing them. Default is a no-op. 
+  /**
+   * Sanitize HTML templates before parsing them. Default is a no-op.
    * Please configure something like DOMPurify or validator.js for your environment.
    * @param html HTML string to be sanitized
    * @returns Sanitized HTML string
    */
   sanitizeHtmlTemplate(html: string): string {
     if (!this._sanitizeWarningLogged) {
-      console.warn('WARNING -- You don\'t have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities.')
+      console.warn(
+        "WARNING -- You don't have a HTML sanitizer configured. Please configure options.sanitizeHtmlTemplate to avoid XSS vulnerabilities."
+      )
       this._sanitizeWarningLogged = true
     }
     return html
@@ -120,15 +117,19 @@ export class Options {
 
   foreachHidesDestroyed: boolean = false
 
-  onError (e : any) : void { throw e }
+  onError(e: any): void {
+    throw e
+  }
 
   set(name: string, value: any): void {
     this[name] = value
   }
 
   // Overload getBindingHandler to have a custom lookup function.
-  getBindingHandler(key: string): any { return null; }
-  cleanExternalData(node: Node, callback?: Function) { }
+  getBindingHandler(key: string): any {
+    return null
+  }
+  cleanExternalData(node: Node, callback?: Function) {}
 }
 
 const options = new Options()

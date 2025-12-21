@@ -1,11 +1,6 @@
+import { isObservable, unwrap } from '@tko/observable'
 
-import {
-  isObservable, unwrap
-} from '@tko/observable'
-
-import {
-  ORIGINAL_JSX_SYM
- } from './JsxObserver'
+import { ORIGINAL_JSX_SYM } from './JsxObserver'
 
 /**
  *
@@ -22,20 +17,29 @@ import {
  *
  * There's a bit of guesswork here that we could nail down with more test cases.
  */
-export function maybeJsx (possibleJsx) {
-  if (isObservable(possibleJsx)) { return true }
+export function maybeJsx(possibleJsx) {
+  if (isObservable(possibleJsx)) {
+    return true
+  }
   const value = unwrap(possibleJsx)
-  if (!value) { return false }
-  if (value.elementName) { return true }
-  if (!Array.isArray(value) || !value.length) { return false }
-  if (value[0] instanceof window.Node) { return false }
+  if (!value) {
+    return false
+  }
+  if (value.elementName) {
+    return true
+  }
+  if (!Array.isArray(value) || !value.length) {
+    return false
+  }
+  if (value[0] instanceof window.Node) {
+    return false
+  }
   return true
 }
 
-export function getOriginalJsxForNode (node) {
+export function getOriginalJsxForNode(node) {
   return node[ORIGINAL_JSX_SYM]
 }
-
 
 /**
  * Convert JSX into an object that can be consumed by TKO.
@@ -44,14 +48,10 @@ export function getOriginalJsxForNode (node) {
  * @param {object|null} a attributes of the element
  * @param  {...string|object} c children of the element
  */
-export function createElement (elementName, attributes, ...children) {
-  return elementName === Fragment ? children
-    : {
-      elementName: elementName,
-      attributes: attributes || {},
-      children: [...children]
-    }
+export function createElement(elementName, attributes, ...children) {
+  return elementName === Fragment
+    ? children
+    : { elementName: elementName, attributes: attributes || {}, children: [...children] }
 }
 
 export const Fragment = Symbol('JSX Fragment')
-

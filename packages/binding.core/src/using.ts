@@ -1,6 +1,4 @@
-import {
-  applyBindingsToDescendants
-} from '@tko/bind'
+import { applyBindingsToDescendants } from '@tko/bind'
 
 import type { BindingContext, AllBindings } from '@tko/bind'
 

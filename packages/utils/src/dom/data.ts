@@ -11,7 +11,7 @@ let uniqueId = 0
 
 // Prevent prototype pollution by restricting special property names
 function isSafeKey(key: string): boolean {
-  return key !== '__proto__' && key !== 'constructor' && key !== 'prototype';
+  return key !== '__proto__' && key !== 'constructor' && key !== 'prototype'
 }
 
 /*
@@ -20,7 +20,7 @@ function isSafeKey(key: string): boolean {
  * on the node. See https://github.com/knockout/knockout/issues/2141
  */
 const modern = {
-  getDataForNode (node : Node, createIfNotFound: boolean) {
+  getDataForNode(node: Node, createIfNotFound: boolean) {
     let dataForNode = node[dataStoreSymbol]
     if (!dataForNode && createIfNotFound) {
       dataForNode = node[dataStoreSymbol] = {}
@@ -28,7 +28,7 @@ const modern = {
     return dataForNode
   },
 
-  clear (node : Node) {
+  clear(node: Node) {
     if (node[dataStoreSymbol]) {
       delete node[dataStoreSymbol]
       return true
@@ -42,9 +42,9 @@ const modern = {
  * use a separate data storage and link to it from the node using a string key.
  */
 const IE = {
-  getDataForNode (node: Node, createIfNotFound: boolean) {
+  getDataForNode(node: Node, createIfNotFound: boolean) {
     let dataStoreKey = node[dataStoreKeyExpandoPropertyName]
-    const hasExistingDataStore = dataStoreKey && (dataStoreKey !== 'null') && dataStore[dataStoreKey]
+    const hasExistingDataStore = dataStoreKey && dataStoreKey !== 'null' && dataStore[dataStoreKey]
     if (!hasExistingDataStore) {
       if (!createIfNotFound) {
         return undefined
@@ -55,7 +55,7 @@ const IE = {
     return dataStore[dataStoreKey]
   },
 
-  clear (node : Node) {
+  clear(node: Node) {
     const dataStoreKey = node[dataStoreKeyExpandoPropertyName]
     if (dataStoreKey) {
       delete dataStore[dataStoreKey]
@@ -66,24 +66,24 @@ const IE = {
   }
 }
 
-const {getDataForNode, clear} = ieVersion ? IE : modern
+const { getDataForNode, clear } = ieVersion ? IE : modern
 
 /**
  * Create a unique key-string identifier.
  */
-export function nextKey () {
-  return (uniqueId++) + dataStoreKeyExpandoPropertyName
+export function nextKey() {
+  return uniqueId++ + dataStoreKeyExpandoPropertyName
 }
 
-function get (node: Node, key: string) {
+function get(node: Node, key: string) {
   if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
 
   const dataForNode = getDataForNode(node, false)
   return dataForNode && dataForNode[key]
 }
 
-function set (node : Node, key : string, value : any) {
-   if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
+function set(node: Node, key: string, value: any) {
+  if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
   // Make sure we don't actually create a new domData key if we are actually deleting a value
   let dataForNode = getDataForNode(node, value !== undefined /* createIfNotFound */)
   if (dataForNode) {
@@ -91,9 +91,9 @@ function set (node : Node, key : string, value : any) {
   }
 }
 
-function getOrSet (node : Node, key : string, value : any) {
+function getOrSet(node: Node, key: string, value: any) {
   if (!isSafeKey(key)) throw new Error('Unsafe key for DOM data: ' + key)
-  const dataForNode = getDataForNode(node, true, /* createIfNotFound */)
+  const dataForNode = getDataForNode(node, true /* createIfNotFound */)
   return dataForNode[key] || (dataForNode[key] = value)
 }
 

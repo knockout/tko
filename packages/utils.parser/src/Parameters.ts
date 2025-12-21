@@ -6,7 +6,7 @@ import Identifier from './Identifier'
 export default class Parameters {
   #names: any[]
 
-  constructor (parser, node) {
+  constructor(parser, node) {
     // convert a node of comma-separated Identifiers to Parameters
     if (node instanceof Expression) {
       node = node.root
@@ -18,7 +18,7 @@ export default class Parameters {
     }
   }
 
-  extendContext (context, args) {
+  extendContext(context, args) {
     if (!this.#names) {
       return context
     } else {
@@ -30,9 +30,11 @@ export default class Parameters {
     }
   }
 
-  get [Node.isExpressionOrIdentifierSymbol] () { return true }
+  get [Node.isExpressionOrIdentifierSymbol]() {
+    return true
+  }
 
-  static nodeTreeToNames (node) {
+  static nodeTreeToNames(node) {
     // left-associative series of commas produces a tree with children only on the lhs, so we can extract the leaves with a simplified depth-first traversal
     const names = new Array()
     while (node) {
@@ -43,18 +45,16 @@ export default class Parameters {
         names.push(node.rhs.token)
         node = node.lhs
       } else {
-        throw new Error(`only simple identifiers allowed in lambda parameter list but found ${JSON.stringify(node, null, 2)}`)
+        throw new Error(
+          `only simple identifiers allowed in lambda parameter list but found ${JSON.stringify(node, null, 2)}`
+        )
       }
     }
     names.reverse()
     return names
   }
 
-  static isCommaNode (node) {
-    return (
-      (node instanceof Node) &&
-      node.op === operators[','] &&
-      (node.rhs instanceof Identifier)
-    )
+  static isCommaNode(node) {
+    return node instanceof Node && node.op === operators[','] && node.rhs instanceof Identifier
   }
 }

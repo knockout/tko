@@ -1,4 +1,3 @@
-
 import { domData } from '@tko/utils'
 import { subscribable } from '@tko/observable'
 import type { Subscribable, SubscriptionCallback } from '@tko/observable'
@@ -22,9 +21,8 @@ export const bindingEvent = {
     const bindingInfo = domData.get(node, boundElementDomDataKey)
     if (bindingInfo) {
       if (bindingInfo.eventSubscribable) {
-        (bindingInfo.eventSubscribable as Subscribable).notifySubscribers(node, event)
+        ;(bindingInfo.eventSubscribable as Subscribable).notifySubscribers(node, event)
       }
     }
   }
 }
-

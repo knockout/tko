@@ -1,8 +1,6 @@
-import { assert } from "chai";
+import { assert } from 'chai'
 
-import {
-  Provider, BindingHandlerObject
-} from '../src'
+import { Provider, BindingHandlerObject } from '../src'
 
 describe('Provider', function () {
   it('throws an error if not subclassed', function () {
@@ -18,7 +16,9 @@ describe('Provider', function () {
 
   it('sets globals and bindingHandlers from params', function () {
     class SubProvider extends Provider {
-      get FOR_NODE_TYPES () { return [] }
+      get FOR_NODE_TYPES() {
+        return []
+      }
     }
     const globals = {}
     const bindingHandlers = {} as BindingHandlerObject

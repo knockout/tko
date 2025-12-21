@@ -10,32 +10,35 @@ let hasDomDataExpandoProperty = Symbol('Knockout selectExtensions hasDomDataProp
 export const selectExtensions = {
   optionValueDomDataKey: domData.nextKey(),
 
-  readValue: function (element : HTMLElement) {
+  readValue: function (element: HTMLElement) {
     switch (tagNameLower(element)) {
-      case 'option':
-        {
-          if (element[hasDomDataExpandoProperty] === true) { return domData.get(element, selectExtensions.optionValueDomDataKey) }
-          return (element as HTMLOptionElement).value
+      case 'option': {
+        if (element[hasDomDataExpandoProperty] === true) {
+          return domData.get(element, selectExtensions.optionValueDomDataKey)
         }
-      case 'select':
-        {
-          const selectElement = element as HTMLSelectElement
-          return selectElement.selectedIndex >= 0 ? selectExtensions.readValue(selectElement.options[selectElement.selectedIndex]) : undefined
-        }
+        return (element as HTMLOptionElement).value
+      }
+      case 'select': {
+        const selectElement = element as HTMLSelectElement
+        return selectElement.selectedIndex >= 0
+          ? selectExtensions.readValue(selectElement.options[selectElement.selectedIndex])
+          : undefined
+      }
       default:
         return (element as HTMLInputElement).value
     }
   },
 
-  writeValue: function (element : HTMLElement, value?: any, allowUnset?: boolean) {
+  writeValue: function (element: HTMLElement, value?: any, allowUnset?: boolean) {
     switch (tagNameLower(element)) {
       case 'option':
         if (typeof value === 'string') {
           domData.set(element, selectExtensions.optionValueDomDataKey, undefined)
-          if (hasDomDataExpandoProperty in element) { // IE <= 8 throws errors if you delete non-existent properties from a DOM node
+          if (hasDomDataExpandoProperty in element) {
+            // IE <= 8 throws errors if you delete non-existent properties from a DOM node
             delete element[hasDomDataExpandoProperty]
           }
-          (element as HTMLOptionElement).value = value
+          ;(element as HTMLOptionElement).value = value
         } else {
           let el = element as any //TODO Custom-Type with hasDomDataExpandoProperty
           // Store arbitrary object using DomData
@@ -74,8 +77,10 @@ export const selectExtensions = {
         }
         break
       default:
-        if ((value === null) || (value === undefined)) { value = '' }
-        (element as HTMLInputElement).value = value
+        if (value === null || value === undefined) {
+          value = ''
+        }
+        ;(element as HTMLInputElement).value = value
         break
     }
   }

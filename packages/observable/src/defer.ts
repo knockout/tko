@@ -5,7 +5,9 @@
 import { tasks } from '@tko/utils'
 
 export function deferUpdates(target: any) {
-  if (target._deferUpdates) { return }
+  if (target._deferUpdates) {
+    return
+  }
   target._deferUpdates = true
   target.limit(function (callback) {
     let handle

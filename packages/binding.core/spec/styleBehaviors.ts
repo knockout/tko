@@ -1,26 +1,20 @@
-import {
-  applyBindings
-} from '@tko/bind'
+import { applyBindings } from '@tko/bind'
 
-import {
-  observable
-} from '@tko/observable'
+import { observable } from '@tko/observable'
 
-import {
-  DataBindProvider
-} from '@tko/provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
-import {
-  options
-} from '@tko/utils'
+import { options } from '@tko/utils'
 
-import {bindings as coreBindings} from '../dist'
+import { bindings as coreBindings } from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: CSS style', function () {
-  let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  let testNode: HTMLElement
+  beforeEach(function () {
+    testNode = jasmine.prepareTestNode()
+  })
 
   beforeEach(function () {
     let provider = new DataBindProvider()
@@ -30,7 +24,7 @@ describe('Binding: CSS style', function () {
 
   it('Should be able to use standard CSS style name (rather than JavaScript name)', function () {
     let myObservable = observable('red')
-    testNode.innerHTML = "<div data-bind='style: { \"background-color\": colorValue }'>Hallo</div>"
+    testNode.innerHTML = '<div data-bind=\'style: { "background-color": colorValue }\'>Hallo</div>'
     applyBindings({ colorValue: myObservable }, testNode)
     let divEl = testNode.children[0] as HTMLDivElement
     expect(divEl.style.backgroundColor).toEqualOneOf(['red', '#ff0000']) // Opera returns style color values in #rrggbb notation, unlike other browsers
@@ -60,7 +54,7 @@ describe('Binding: CSS style', function () {
     expect(divEl.style.backgroundColor).toEqual('')
   })
 
-  it('Should be able to apply the numeric value to a style that doesn\'t accept pixels', function () {
+  it("Should be able to apply the numeric value to a style that doesn't accept pixels", function () {
     testNode.innerHTML = "<div data-bind='style: { zIndex: 10 }'></div>"
     applyBindings(null, testNode)
     let divEl = testNode.children[0] as HTMLDivElement
@@ -87,7 +81,7 @@ describe('Binding: CSS style', function () {
     let width = observable()
     testNode.innerHTML = "<div data-bind='style: { width: width }'></div>"
 
-    applyBindings({width: width}, testNode)
+    applyBindings({ width: width }, testNode)
 
     let divEl = testNode.children[0] as HTMLDivElement
     expect(divEl.style.width).toBe('')

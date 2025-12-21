@@ -1,23 +1,15 @@
-import {
-    cloneNodes, virtualElements, cleanNode, domData
-} from '@tko/utils'
+import { cloneNodes, virtualElements, cleanNode, domData } from '@tko/utils'
 
-import {
-    dependencyDetection, observable
-} from '@tko/observable'
+import { dependencyDetection, observable } from '@tko/observable'
 
 import type { Observable } from '@tko/observable'
 
-import {
-    applyBindingsToDescendants, AsyncBindingHandler    
-} from '@tko/bind'
+import { applyBindingsToDescendants, AsyncBindingHandler } from '@tko/bind'
 
-import type {  
-  BindingContext
-} from '@tko/bind'
+import type { BindingContext } from '@tko/bind'
 
 //todo signature of renderStatus but be discussed
-export type RenderStatusKeys = "shouldDisplay";
+export type RenderStatusKeys = 'shouldDisplay'
 
 /**
  * Create a DOMbinding that controls DOM nodes presence
@@ -47,17 +39,17 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
   get bindingContext(): BindingContext {
     throw new Error('bindingContext() must be implemented in the child class')
   }
-  completesElseChain: Observable;
-  hasElse: boolean;
-  ifElseNodes?: any;
-  constructor (params) {
+  completesElseChain: Observable
+  hasElse: boolean
+  ifElseNodes?: any
+  constructor(params) {
     super(params)
     this.hasElse = this.detectElse(this.$element)
-    const elseChainSatisfied = this.completesElseChain = observable()
+    const elseChainSatisfied = (this.completesElseChain = observable())
     domData.set(this.$element, 'conditional', { elseChainSatisfied })
   }
 
-  getIfElseNodes () {
+  getIfElseNodes() {
     if (this.ifElseNodes) {
       return this.ifElseNodes
     }
@@ -65,14 +57,14 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
       return this.cloneIfElseNodes(this.$element, this.hasElse)
     }
   }
-  
-  renderStatus(): Record<RenderStatusKeys, any> { 
+
+  renderStatus(): Record<RenderStatusKeys, any> {
     throw new Error('renderStatus() must be implemented in the child class')
   }
 
-  render () {
+  render() {
     const isFirstRender = !this.ifElseNodes
-    const {shouldDisplay} = this.renderStatus()
+    const { shouldDisplay } = this.renderStatus()
 
     // Save the nodes before we possibly remove them from the DOM.
     this.ifElseNodes = this.getIfElseNodes() || {}
@@ -87,7 +79,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     }
   }
 
-  async renderAndApplyBindings (nodes: ArrayLike<Node>, useOriginalNodes?: boolean) {
+  async renderAndApplyBindings(nodes: ArrayLike<Node>, useOriginalNodes?: boolean) {
     if (!useOriginalNodes) {
       virtualElements.setDomNodeChildren(this.$element, cloneNodes(nodes))
     }
@@ -98,7 +90,9 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
   /**
    * This may be truthy for the `else` binding.
    */
-  get elseChainIsAlreadySatisfied () { return false }
+  get elseChainIsAlreadySatisfied() {
+    return false
+  }
 
   /**
    * Test a node for whether it represents an 'else' condition.
@@ -107,15 +101,16 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
    *
    * Matches <!-- else -->
    */
-  isElseNode (node) {
-    return node.nodeType === 8 &&
-          node.nodeValue.trim().toLowerCase() === 'else'
+  isElseNode(node) {
+    return node.nodeType === 8 && node.nodeValue.trim().toLowerCase() === 'else'
   }
 
-  detectElse (element) {
+  detectElse(element) {
     const children = virtualElements.childNodes(element)
     for (let i = 0, j = children.length; i < j; ++i) {
-      if (this.isElseNode(children[i])) { return true }
+      if (this.isElseNode(children[i])) {
+        return true
+      }
     }
     return false
   }
@@ -126,7 +121,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
    * @param  {boolean}    hasElse short-circuit to speed up the inner-loop.
    * @return {object}         Containing the cloned nodes.
    */
-  cloneIfElseNodes (element, hasElse) {
+  cloneIfElseNodes(element, hasElse) {
     const children = virtualElements.childNodes(element)
     const ifNodes = new Array()
     const elseNodes = new Array()
@@ -144,6 +139,10 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     return { ifNodes, elseNodes }
   }
 
-  get controlsDescendants () { return true }
-  static get allowVirtualElements () { return true }
+  get controlsDescendants() {
+    return true
+  }
+  static get allowVirtualElements() {
+    return true
+  }
 }

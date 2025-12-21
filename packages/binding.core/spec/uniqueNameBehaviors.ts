@@ -1,22 +1,18 @@
-import {
-    applyBindings
-} from '@tko/bind'
+import { applyBindings } from '@tko/bind'
 
-import {
-    DataBindProvider
-} from '@tko/provider.databind'
+import { DataBindProvider } from '@tko/provider.databind'
 
-import {
-    options
-} from '@tko/utils'
+import { options } from '@tko/utils'
 
-import {bindings as coreBindings} from '../dist'
+import { bindings as coreBindings } from '../dist'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Binding: Unique Name', function () {
-  let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  let testNode: HTMLElement
+  beforeEach(function () {
+    testNode = jasmine.prepareTestNode()
+  })
 
   beforeEach(function () {
     let provider = new DataBindProvider()
@@ -30,6 +26,8 @@ describe('Binding: Unique Name', function () {
 
     expect((testNode.childNodes[0] as HTMLInputElement).name.length > 0).toEqual(true)
     expect((testNode.childNodes[1] as HTMLInputElement).name.length > 0).toEqual(true)
-    expect((testNode.childNodes[0] as HTMLInputElement).name === (testNode.childNodes[1] as HTMLInputElement).name).toEqual(false)
+    expect(
+      (testNode.childNodes[0] as HTMLInputElement).name === (testNode.childNodes[1] as HTMLInputElement).name
+    ).toEqual(false)
   })
 })

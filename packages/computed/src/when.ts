@@ -1,10 +1,7 @@
+import { pureComputed } from './computed'
 
-import {
-  pureComputed
-} from './computed'
-
-function kowhen (predicate, context, resolve) {
-  const observable = pureComputed(predicate, context).extend({notify: 'always'});
+function kowhen(predicate, context, resolve) {
+  const observable = pureComputed(predicate, context).extend({ notify: 'always' })
   const subscription = observable.subscribe(value => {
     if (value) {
       subscription.dispose()
@@ -16,7 +13,7 @@ function kowhen (predicate, context, resolve) {
   return subscription
 }
 
-export function when (predicate, callback, context) {
+export function when(predicate, callback, context) {
   const whenFn = kowhen.bind(null, predicate, context)
   return callback ? whenFn(callback.bind(context)) : new Promise(whenFn)
 }

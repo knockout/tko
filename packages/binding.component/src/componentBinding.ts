@@ -2,52 +2,40 @@
 // Binding Handler for Components
 //
 
-import {
-  virtualElements, makeArray, cloneNodes
-} from '@tko/utils'
+import { virtualElements, makeArray, cloneNodes } from '@tko/utils'
 
-import {
-  unwrap
-} from '@tko/observable'
+import { unwrap } from '@tko/observable'
 
-import {
-  DescendantBindingHandler
-} from '@tko/bind'
+import { DescendantBindingHandler } from '@tko/bind'
 
-import {
-  JsxObserver, maybeJsx
-} from '@tko/utils.jsx'
+import { JsxObserver, maybeJsx } from '@tko/utils.jsx'
 
-import {
-  NativeProvider
-} from '@tko/provider.native'
+import { NativeProvider } from '@tko/provider.native'
 
-import {LifeCycle} from '@tko/lifecycle'
+import { LifeCycle } from '@tko/lifecycle'
 
 import registry from '@tko/utils.component'
 
-import type { BindingContext } from '@tko/bind';
+import type { BindingContext } from '@tko/bind'
 
 let componentLoadingOperationUniqueId = 0
 
 export default class ComponentBinding extends DescendantBindingHandler {
-  childBindingContext: BindingContext;
-  currentLoadingOperationId: number | null;
-  currentViewModel: any;
-  latestComponentName: string;
-  loadingOperationId: number;
-  originalChildNodes: Node[];
-  constructor (params: any) {
+  childBindingContext: BindingContext
+  currentLoadingOperationId: number | null
+  currentViewModel: any
+  latestComponentName: string
+  loadingOperationId: number
+  originalChildNodes: Node[]
+  constructor(params: any) {
     super(params)
-    this.originalChildNodes = makeArray(
-      virtualElements.childNodes(this.$element as Node)
-    )
+    this.originalChildNodes = makeArray(virtualElements.childNodes(this.$element as Node))
     this.computed('computeApplyComponent')
   }
 
-  cloneTemplateIntoElement (componentName: string, template: any, element: Node) {
+  cloneTemplateIntoElement(componentName: string, template: any, element: Node) {
     if (!template) {
-      throw new Error('Component \'' + componentName + '\' has no template')
+      throw new Error("Component '" + componentName + "' has no template")
     }
 
     if (maybeJsx(template)) {
@@ -62,7 +50,10 @@ export default class ComponentBinding extends DescendantBindingHandler {
   createViewModel(componentDefinition: any, element: Node, originalChildNodes: Node[], componentParams: any) {
     const componentViewModelFactory = componentDefinition.createViewModel
     return componentViewModelFactory
-      ? componentViewModelFactory.call(componentDefinition, componentParams, { element, templateNodes: originalChildNodes })
+      ? componentViewModelFactory.call(componentDefinition, componentParams, {
+          element,
+          templateNodes: originalChildNodes
+        })
       : componentParams // Template-only component
   }
 
@@ -70,7 +61,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
    * Return the $componentTemplateSlotNodes for the given template
    * @param {HTMLElement|jsx} template
    */
-  makeTemplateSlotNodes (originalChildNodes: HTMLElement[]) {
+  makeTemplateSlotNodes(originalChildNodes: HTMLElement[]) {
     return Object.assign({}, ...this.genSlotsByName(originalChildNodes))
   }
 
@@ -79,22 +70,22 @@ export default class ComponentBinding extends DescendantBindingHandler {
    * as an object * of {name: element}.
    * @param {HTMLElement[]} templateNodes
    */
-  * genSlotsByName (templateNodes: HTMLElement[]): Generator<{[key: string]: HTMLElement}, void, unknown> {
+  *genSlotsByName(templateNodes: HTMLElement[]): Generator<{ [key: string]: HTMLElement }, void, unknown> {
     for (const node of templateNodes) {
       if (node.nodeType !== 1) {
-        continue;
+        continue
       }
       const slotName = node.getAttribute('slot')
       if (!slotName) {
-        continue;
+        continue
       }
-      yield {[slotName]: node}
+      yield { [slotName]: node }
     }
   }
 
-  computeApplyComponent () {
+  computeApplyComponent() {
     const value = unwrap(this.value)
-    let componentName: string;
+    let componentName: string
     let componentParams: any
 
     if (typeof value === 'string') {
@@ -114,23 +105,22 @@ export default class ComponentBinding extends DescendantBindingHandler {
     registry.get(componentName, (defn: any) => this.applyComponentDefinition(componentName, componentParams, defn))
   }
 
-  makeChildBindingContext ($component: any): any {
-    const ctxExtender = (ctx: any) => Object.assign(ctx, {
-      $component,
-      $componentTemplateNodes: this.originalChildNodes,
-      $componentTemplateSlotNodes: this.makeTemplateSlotNodes(
-        this.originalChildNodes as HTMLElement[])
-    })
+  makeChildBindingContext($component: any): any {
+    const ctxExtender = (ctx: any) =>
+      Object.assign(ctx, {
+        $component,
+        $componentTemplateNodes: this.originalChildNodes,
+        $componentTemplateSlotNodes: this.makeTemplateSlotNodes(this.originalChildNodes as HTMLElement[])
+      })
 
     return this.$context.createChildContext($component, undefined, ctxExtender)
   }
 
   applyComponentDefinition(componentName: string, componentParams: any, componentDefinition: any) {
     // If this is not the current load operation for this element, ignore it.
-    if (this.currentLoadingOperationId !== this.loadingOperationId ||
-        this.latestComponentName !== componentName) {
-          return;
-        }
+    if (this.currentLoadingOperationId !== this.loadingOperationId || this.latestComponentName !== componentName) {
+      return
+    }
 
     // Clean up previous state
     this.cleanUpState()
@@ -139,21 +129,26 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     // Instantiate and bind new component. Implicitly this cleans any old DOM nodes.
     if (!componentDefinition) {
-      throw new Error('Unknown component \'' + componentName + '\'')
+      throw new Error("Unknown component '" + componentName + "'")
     }
 
     if (componentDefinition.template) {
       this.cloneTemplateIntoElement(componentName, componentDefinition.template, element)
     }
 
-    const componentViewModel = this.createViewModel(componentDefinition, element, this.originalChildNodes, componentParams)
+    const componentViewModel = this.createViewModel(
+      componentDefinition,
+      element,
+      this.originalChildNodes,
+      componentParams
+    )
 
     this.childBindingContext = this.makeChildBindingContext(componentViewModel)
 
     const viewTemplate = componentViewModel && componentViewModel.template
 
     if (!viewTemplate && !componentDefinition.template) {
-      throw new Error('Component \'' + componentName + '\' has no template')
+      throw new Error("Component '" + componentName + "' has no template")
     }
 
     if (!componentDefinition.template) {
@@ -170,14 +165,14 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.applyBindingsToDescendants(this.childBindingContext, onBinding)
   }
 
-  onBindingComplete (componentViewModel, bindingResult) {
+  onBindingComplete(componentViewModel, bindingResult) {
     if (componentViewModel && componentViewModel.koDescendantsComplete) {
       componentViewModel.koDescendantsComplete(this.$element)
     }
     this.completeBinding(bindingResult)
   }
 
-  cleanUpState () {
+  cleanUpState() {
     const currentView = this.currentViewModel
     const currentViewDispose = currentView && currentView.dispose
     if (typeof currentViewDispose === 'function') {
@@ -188,11 +183,15 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.currentLoadingOperationId = null
   }
 
-  dispose () {
+  dispose() {
     this.cleanUpState()
     super.dispose()
   }
 
-  get controlsDescendants () { return true }
-  static get allowVirtualElements () { return true }
+  get controlsDescendants() {
+    return true
+  }
+  static get allowVirtualElements() {
+    return true
+  }
 }

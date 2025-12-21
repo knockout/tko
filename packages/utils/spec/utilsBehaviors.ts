@@ -2,7 +2,7 @@ import * as utils from '../dist'
 import '../helpers/jasmine-13-helper'
 import type { KnockoutInstance } from '@tko/builder'
 
-let ko : KnockoutInstance = globalThis.ko || {}
+let ko: KnockoutInstance = globalThis.ko || {}
 
 ko.utils = utils
 ko.tasks = utils.tasks
@@ -30,7 +30,13 @@ describe('arrayForEach', function () {
   it('Should alter "this" context when defined as an argument', function () {
     let expectedContext = {}
     let actualContext = null
-    utils.arrayForEach(['a'], function () { actualContext = this }, expectedContext)
+    utils.arrayForEach(
+      ['a'],
+      function () {
+        actualContext = this
+      },
+      expectedContext
+    )
     expect(actualContext).toBe(expectedContext)
   })
 
@@ -136,8 +142,8 @@ describe('arrayFirst', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchB)
 
     expect(matchB.calls.length).toBe(2)
-    expect(matchB.calls[0].args).toEqual(['a', 0, [ 'a', 'b', 'c' ]])
-    expect(matchB.calls[1].args).toEqual(['b', 1, [ 'a', 'b', 'c' ]])
+    expect(matchB.calls[0].args).toEqual(['a', 0, ['a', 'b', 'c']])
+    expect(matchB.calls[1].args).toEqual(['b', 1, ['a', 'b', 'c']])
   })
 
   it('Should return undefined if no element matches', function () {
@@ -149,15 +155,17 @@ describe('arrayFirst', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
 
     expect(matchD.calls.length).toBe(3)
-    expect(matchD.calls[0].args).toEqual(['a', 0, [ 'a', 'b', 'c' ]])
-    expect(matchD.calls[1].args).toEqual(['b', 1, [ 'a', 'b', 'c' ]])
-    expect(matchD.calls[2].args).toEqual(['c', 2, [ 'a', 'b', 'c' ]])
+    expect(matchD.calls[0].args).toEqual(['a', 0, ['a', 'b', 'c']])
+    expect(matchD.calls[1].args).toEqual(['b', 1, ['a', 'b', 'c']])
+    expect(matchD.calls[2].args).toEqual(['c', 2, ['a', 'b', 'c']])
   })
 
   it('Should throw an error for a null array', function () {
     expect(function () {
       let nullArray: Array<any> = null as unknown as Array<any>
-      ko.utils.arrayFirst(nullArray, function () { return false})
+      ko.utils.arrayFirst(nullArray, function () {
+        return false
+      })
     }).toThrow()
   })
 })
@@ -297,7 +305,9 @@ describe('arrayFilter', function () {
 
   it('Should return an empty array when called with a null array', function () {
     let nullArray: Array<any> = null as unknown as Array<any>
-    let result = ko.utils.arrayFilter(nullArray, function () { return true})
+    let result = ko.utils.arrayFilter(nullArray, function () {
+      return true
+    })
     expect(result).toEqual([])
   })
 })
@@ -337,7 +347,7 @@ describe('arrayPushAll', function () {
 describe('Function.bind', function () {
   // In most browsers, this will be testing the native implementation
   // Adapted from Lo-Dash (https://github.com/lodash/lodash)
-  function fn () {
+  function fn() {
     let result = [this]
     result.push.apply(result, arguments)
     return result
@@ -420,18 +430,20 @@ describe('objectMap', function () {
     let actualContext = null
     let identityFunction = function (obj) {
       actualContext = this
-      return {x: obj.x}
+      return { x: obj.x }
     }
 
-    ko.utils.objectMap({x: 1}, identityFunction, expectedContext)
+    ko.utils.objectMap({ x: 1 }, identityFunction, expectedContext)
 
     expect(expectedContext).toEqual(actualContext)
   })
 })
 
 describe('cloneNodes', function () {
-  let testNode : HTMLElement
-  beforeEach(function() { testNode = jasmine.prepareTestNode() })
+  let testNode: HTMLElement
+  beforeEach(function () {
+    testNode = jasmine.prepareTestNode()
+  })
 
   it('should return clones', function () {
     let newNodes = ko.utils.cloneNodes([testNode])
@@ -452,18 +464,14 @@ describe('cloneNodes', function () {
   })
 
   describe('safeStringfy', () => {
-    const {safeStringify} = utils
+    const { safeStringify } = utils
 
     it('stringifies plain objects', () => {
       expect(safeStringify({})).toEqual('{}')
     })
 
     it('stringifies recursive objects', () => {
-      type Recursive = {
-        b:number;
-        c:number;
-        a?:Recursive;
-      };      
+      type Recursive = { b: number; c: number; a?: Recursive }
       const recursive: Recursive = { b: 1, c: 1 }
       recursive.a = recursive
 

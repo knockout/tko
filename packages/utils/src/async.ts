@@ -3,7 +3,7 @@
 // ---
 import { safeSetTimeout } from './error'
 
-export function throttle (callback, timeout) {
+export function throttle(callback, timeout) {
   let timeoutInstance: ReturnType<typeof setTimeout> | undefined
   return function (...args) {
     if (!timeoutInstance) {
@@ -15,7 +15,7 @@ export function throttle (callback, timeout) {
   }
 }
 
-export function debounce (callback, timeout: number) {
+export function debounce(callback, timeout: number) {
   let timeoutInstance: ReturnType<typeof setTimeout>
   return function (...args) {
     clearTimeout(timeoutInstance)

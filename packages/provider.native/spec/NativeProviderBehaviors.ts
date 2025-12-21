@@ -1,26 +1,18 @@
-
 import { assert } from 'chai'
 
-import {
-  observable
-} from '@tko/observable'
+import { observable } from '@tko/observable'
 
-import {
-  default as NativeProvider, NATIVE_BINDINGS
-} from '../dist/NativeProvider'
+import { default as NativeProvider, NATIVE_BINDINGS } from '../dist/NativeProvider'
 
 import { MultiProvider } from '@tko/provider.multi'
 import { DataBindProvider } from '@tko/provider.databind'
-import {
-  TextMustacheProvider, AttributeMustacheProvider
-} from '@tko/provider.mustache'
-
+import { TextMustacheProvider, AttributeMustacheProvider } from '@tko/provider.mustache'
 
 describe('Native Provider Behavior', function () {
   it('returns native bindings', function () {
     const p = new NativeProvider()
     const div = document.createElement('div')
-    const attr = {'ko-thing': {}}
+    const attr = { 'ko-thing': {} }
     div[NATIVE_BINDINGS] = attr
     assert.ok(p.nodeHasBindings(div), true)
     const accessors = p.getBindingAccessors(div)
@@ -31,7 +23,7 @@ describe('Native Provider Behavior', function () {
   it('has no bindings when no `ko-*` is present', function () {
     const p = new NativeProvider()
     const div = document.createElement('div')
-    const attr = {'thing': {}}
+    const attr = { thing: {} }
     div[NATIVE_BINDINGS] = attr
     assert.notOk(p.nodeHasBindings(div), false)
     assert.equal(p.getBindingAccessors(div), null)
@@ -48,7 +40,7 @@ describe('Native Provider Behavior', function () {
     const p = new NativeProvider()
     const div = document.createElement('div')
     const obs = observable('iI')
-    const attr = {'ko-oo': obs, 'ko-fn': () => 'ø'}
+    const attr = { 'ko-oo': obs, 'ko-fn': () => 'ø' }
     div[NATIVE_BINDINGS] = attr
     const accessors = p.getBindingAccessors(div)
     assert.equal(accessors.oo(), 'iI')
@@ -80,7 +72,7 @@ describe('Native Provider Behavior', function () {
       const mp = new MultiProvider()
       mp.addProvider(new NativeProvider())
       mp.addProvider(new DataBindProvider())
-      const div = divWithNativeBindings({  })
+      const div = divWithNativeBindings({})
       div.setAttribute('data-bind', '{ databind: 345 }')
       const bindings = mp.getBindingAccessors(div)
       assert.notOk('native' in bindings, 'native in bindings')
@@ -94,7 +86,7 @@ describe('Native Provider Behavior', function () {
       mp.addProvider(new DataBindProvider())
       const div = divWithNativeBindings({ random: 'value' })
       div.setAttribute('data-bind', '{ databind: 345 }')
-      const bindings = mp.getBindingAccessors(div);
+      const bindings = mp.getBindingAccessors(div)
       assert.notOk('native' in bindings, 'native in bindings')
       assert.ok('databind' in bindings, 'databind in bindings')
       assert.equal(Object.keys(bindings).length, 1)

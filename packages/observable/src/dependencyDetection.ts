@@ -17,30 +17,33 @@ let lastId = 0
 // or 9,007,199,254,740,992. If you created 1,000,000 IDs per second, it would
 // take over 285 years to reach that number.
 // Reference http://blog.vjeux.com/2010/javascript/javascript-max_int-number-limits.html
-function getId () {
+function getId() {
   return ++lastId
 }
 
-export function begin (options?) {
+export function begin(options?) {
   outerFrames.push(currentFrame)
   currentFrame = options
 }
 
-export function end () {
+export function end() {
   currentFrame = outerFrames.pop()
 }
 
-export function registerDependency (subscribable): void {
+export function registerDependency(subscribable): void {
   if (currentFrame) {
-    if (!isSubscribable(subscribable)) { throw new Error('Only subscribable things can act as dependencies') }
-    currentFrame.callback.call(currentFrame.callbackTarget, subscribable, subscribable._id || (subscribable._id = getId()))
+    if (!isSubscribable(subscribable)) {
+      throw new Error('Only subscribable things can act as dependencies')
+    }
+    currentFrame.callback.call(
+      currentFrame.callbackTarget,
+      subscribable,
+      subscribable._id || (subscribable._id = getId())
+    )
   }
 }
 
-export function ignore(
-  callback: Function,
-  callbackTarget?: any,
-  callbackArgs?: any[]): any {
+export function ignore(callback: Function, callbackTarget?: any, callbackArgs?: any[]): any {
   try {
     begin()
     return callback.apply(callbackTarget, callbackArgs || [])
@@ -51,19 +54,19 @@ export function ignore(
 
 export function getDependenciesCount(): number | undefined {
   if (currentFrame) {
-    return currentFrame.computed.getDependenciesCount();
+    return currentFrame.computed.getDependenciesCount()
   }
 }
 
-export function getDependencies(): Subscribable[] | undefined{
+export function getDependencies(): Subscribable[] | undefined {
   if (currentFrame) {
-    return currentFrame.computed.getDependencies();
+    return currentFrame.computed.getDependencies()
   }
 }
 
 export function isInitial(): boolean | undefined {
   if (currentFrame) {
-    return currentFrame.isInitial;
+    return currentFrame.isInitial
   }
 }
 

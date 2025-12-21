@@ -1,8 +1,6 @@
-import {
-  unwrap
-} from '@tko/observable'
+import { unwrap } from '@tko/observable'
 
-export function LAMBDA () {}
+export function LAMBDA() {}
 
 /**
  * @ operator - recursively call the identifier if it's a function
@@ -10,142 +8,203 @@ export function LAMBDA () {}
  * @param  {operand} b The variable to be called (if a function) and unwrapped
  * @return {value}   The result.
  */
-function unwrapOrCall (a, b) {
-  while (typeof b === 'function') { b = b() }
+function unwrapOrCall(a, b) {
+  while (typeof b === 'function') {
+    b = b()
+  }
   return b
 }
 
-export type OperatorFunction = (a: any, b: any, ...args: any[]) => any;
+export type OperatorFunction = (a: any, b: any, ...args: any[]) => any
 
-
-export interface OperatorWithProperties extends OperatorFunction{
-  earlyOut?: (a: any) => any;
-  precedence?:number;
+export interface OperatorWithProperties extends OperatorFunction {
+  earlyOut?: (a: any) => any
+  precedence?: number
 }
 
-export interface Operators{
-  [key: string]:OperatorWithProperties;
+export interface Operators {
+  [key: string]: OperatorWithProperties
 }
-const operators:Operators = {
+const operators: Operators = {
   // unary
   '@': unwrapOrCall,
   '#': (a, b) => () => unwrap(b), // Convert to read-only.
   '=>': LAMBDA,
-  '!': function not (a, b) { return !b },
-  '!!': function notnot (a, b) { return !!b },
-  '++': function preinc (a, b) { return ++b },
-  '--': function preinc (a, b) { return --b },
+  '!': function not(a, b) {
+    return !b
+  },
+  '!!': function notnot(a, b) {
+    return !!b
+  },
+  '++': function preinc(a, b) {
+    return ++b
+  },
+  '--': function preinc(a, b) {
+    return --b
+  },
   // exponent
-  '**': function exp (a, b) { return a ** b },
+  '**': function exp(a, b) {
+    return a ** b
+  },
   // mul/div
-  '*': function mul (a, b) { return a * b },
-  '/': function div (a, b) { return a / b },
-  '%': function mod (a, b) { return a % b },
+  '*': function mul(a, b) {
+    return a * b
+  },
+  '/': function div(a, b) {
+    return a / b
+  },
+  '%': function mod(a, b) {
+    return a % b
+  },
   // sub/add
-  '+': function add (a, b) { return a + b },
-  '-': function sub (a, b) { return (a || 0) - (b || 0) },
-  '&-': function neg (a, b) { return -1 * b }, // unary -
+  '+': function add(a, b) {
+    return a + b
+  },
+  '-': function sub(a, b) {
+    return (a || 0) - (b || 0)
+  },
+  '&-': function neg(a, b) {
+    return -1 * b
+  }, // unary -
   // relational
-  '<': function lt (a, b) { return a < b },
-  '<=': function le (a, b) { return a <= b },
-  '>': function gt (a, b) { return a > b },
-  '>=': function ge (a, b) { return a >= b },
+  '<': function lt(a, b) {
+    return a < b
+  },
+  '<=': function le(a, b) {
+    return a <= b
+  },
+  '>': function gt(a, b) {
+    return a > b
+  },
+  '>=': function ge(a, b) {
+    return a >= b
+  },
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
   //    TODO: 'typeof': function (a, b) { return typeof b; },
   // equality
-  '==': function equal (a, b) { return a == b },
-  '!=': function ne (a, b) { return a != b },
-  '===': function sequal (a, b) { return a === b },
-  '!==': function sne (a, b) { return a !== b },
+  '==': function equal(a, b) {
+    return a == b
+  },
+  '!=': function ne(a, b) {
+    return a != b
+  },
+  '===': function sequal(a, b) {
+    return a === b
+  },
+  '!==': function sne(a, b) {
+    return a !== b
+  },
   // bitwise
-  '&': function bitAnd (a, b) { return a & b },
-  '^': function xor (a, b) { return a ^ b },
-  '|': function bitOr (a, b) { return a | b },
+  '&': function bitAnd(a, b) {
+    return a & b
+  },
+  '^': function xor(a, b) {
+    return a ^ b
+  },
+  '|': function bitOr(a, b) {
+    return a | b
+  },
   // logic
-  '&&': function logicAnd (a, b) { return a && b },
-  '||': function logicOr (a, b) { return a || b },
-  '??': function nullishCoalesce (a, b) { return a ?? b },
+  '&&': function logicAnd(a, b) {
+    return a && b
+  },
+  '||': function logicOr(a, b) {
+    return a || b
+  },
+  '??': function nullishCoalesce(a, b) {
+    return a ?? b
+  },
   // Access
-  '.': function member (a, b) { return a?.[b] },
-  '?.': function omember (a, b) { return a?.[b] },
-  '[': function bmember (a, b) { return a?.[b] },
-  ',': function comma (a, b) { return b },
+  '.': function member(a, b) {
+    return a?.[b]
+  },
+  '?.': function omember(a, b) {
+    return a?.[b]
+  },
+  '[': function bmember(a, b) {
+    return a?.[b]
+  },
+  ',': function comma(a, b) {
+    return b
+  },
   // conditional/ternary
   // '?': ternary See Node.js
   // Function-Call
-  'call': function callOp (a, b) { return a.apply(null, b) }
+  call: function callOp(a, b) {
+    return a.apply(null, b)
+  }
 }
 
 /* Order of precedence from:
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#Table
 */
 
-  // Our operator - unwrap/call
+// Our operator - unwrap/call
 operators['@'].precedence = 21
 operators['#'].precedence = 21
 
-  // Member
+// Member
 operators['.'].precedence = 19
 operators['['].precedence = 19
 operators['?.'].precedence = 19
 
-  // Logical not
+// Logical not
 operators['!'].precedence = 16
 operators['!!'].precedence = 16 // explicit double-negative
 
-  // Prefix inc/dec
+// Prefix inc/dec
 operators['++'].precedence = 16
 operators['--'].precedence = 16
 operators['&-'].precedence = 16
 
-  // exponent
+// exponent
 operators['**'].precedence = 15
 
-  // mul/div/remainder
+// mul/div/remainder
 operators['%'].precedence = 14
 operators['*'].precedence = 14
 operators['/'].precedence = 14
 
-  // add/sub
+// add/sub
 operators['+'].precedence = 13
 operators['-'].precedence = 13
 
-  // bitwise
+// bitwise
 operators['|'].precedence = 12
 operators['^'].precedence = 11
 operators['&'].precedence = 10
 
-  // comparison
+// comparison
 operators['<'].precedence = 11
 operators['<='].precedence = 11
 operators['>'].precedence = 11
 operators['>='].precedence = 11
 
-  // operators['in'].precedence = 8;
-  // operators['instanceof'].precedence = 8;
-  // equality
+// operators['in'].precedence = 8;
+// operators['instanceof'].precedence = 8;
+// equality
 operators['=='].precedence = 10
 operators['!='].precedence = 10
 operators['==='].precedence = 10
 operators['!=='].precedence = 10
 
-  // logic
+// logic
 operators['&&'].precedence = 6
 operators['||'].precedence = 5
 operators['??'].precedence = 5
 
-operators['&&'].earlyOut = (a) => !a
-operators['||'].earlyOut = (a) => a
-operators['??'].earlyOut = (a) => a
+operators['&&'].earlyOut = a => !a
+operators['||'].earlyOut = a => a
+operators['??'].earlyOut = a => a
 
-  // multiple values
+// multiple values
 operators[','].precedence = 2
 
-  // Call a function
+// Call a function
 operators['call'].precedence = 1
 
-  // lambda
+// lambda
 operators['=>'].precedence = 1
 
 export { operators as default }

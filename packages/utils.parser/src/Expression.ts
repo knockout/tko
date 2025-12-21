@@ -1,11 +1,10 @@
-
 import Node from './Node'
 
 export default class Expression {
   private nodes: any
   root: any
 
-  constructor (nodes) {
+  constructor(nodes) {
     this.nodes = nodes
     this.root = Node.create_root(nodes)
   }
@@ -13,7 +12,7 @@ export default class Expression {
   /**
    * Return the value of `this` Expression instance.
    */
-  get_value (parent, context, globals, node) {
+  get_value(parent, context, globals, node) {
     if (!this.root) {
       this.root = Node.create_root(this.nodes)
     }

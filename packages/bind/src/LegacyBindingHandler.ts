@@ -1,4 +1,3 @@
-
 import { virtualElements, options } from '@tko/utils'
 import { BindingHandler } from './BindingHandler'
 
@@ -17,11 +16,11 @@ export class LegacyBindingHandler extends BindingHandler {
   get handler(): any {
     // Needed to prevent tsc error for using this.handler
     // is overriden in factory functions. Any must be used for return type
-    return undefined;
+    return undefined
   }
-  initReturn: any;
-  onError: (step: string, error: unknown) => void;
-  constructor (params: any) {
+  initReturn: any
+  onError: (step: string, error: unknown) => void
+  constructor(params: any) {
     super(params)
     const handler = this.handler
     this.onError = params.onError
@@ -40,7 +39,7 @@ export class LegacyBindingHandler extends BindingHandler {
   onValueChange(): void {
     const handler = this.handler
     if (typeof handler.update !== 'function') {
-      return;
+      return
     }
     try {
       handler.update(...this.legacyArgs)
@@ -50,10 +49,7 @@ export class LegacyBindingHandler extends BindingHandler {
   }
 
   get legacyArgs(): any[] {
-    return [
-      this.$element, this.valueAccessor, this.allBindings,
-      this.$data, this.$context
-    ]
+    return [this.$element, this.valueAccessor, this.allBindings, this.$data, this.$context]
   }
 
   get controlsDescendants(): boolean {
@@ -83,34 +79,34 @@ export class LegacyBindingHandler extends BindingHandler {
     if (typeof handler === 'function') {
       const [initFn, disposeFn] = [handler, handler.dispose]
       return class extends LegacyBindingHandler {
-        get handler () {
+        get handler() {
           const init = initFn.bind(this)
           const dispose = disposeFn ? disposeFn.bind(this) : null
-          return { init, dispose };
+          return { init, dispose }
         }
-        static get after () {
-          return handler.after;
+        static get after() {
+          return handler.after
         }
-        static get allowVirtualElements () {
-          return handler.allowVirtualElements || virtualElements.allowedBindings[key!];
+        static get allowVirtualElements() {
+          return handler.allowVirtualElements || virtualElements.allowedBindings[key!]
         }
       }
     }
 
     if (typeof handler === 'object') {
       return class extends LegacyBindingHandler {
-        get handler () {
-          return handler;
+        get handler() {
+          return handler
         }
-        static get after () {
-          return handler.after;
+        static get after() {
+          return handler.after
         }
-        static get allowVirtualElements () {
-          return handler.allowVirtualElements || virtualElements.allowedBindings[key!];
+        static get allowVirtualElements() {
+          return handler.allowVirtualElements || virtualElements.allowedBindings[key!]
         }
       }
     }
 
-    throw new Error('The given handler is not an appropriate type.');
+    throw new Error('The given handler is not an appropriate type.')
   }
 }

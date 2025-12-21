@@ -1,11 +1,6 @@
+import { setElementName, objectForEach } from '@tko/utils'
 
-import {
-  setElementName, objectForEach
-} from '@tko/utils'
-
-import {
-  unwrap
-} from '@tko/observable'
+import { unwrap } from '@tko/observable'
 
 import type { AllBindings } from '@tko/bind'
 

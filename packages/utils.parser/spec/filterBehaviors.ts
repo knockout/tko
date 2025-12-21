@@ -1,45 +1,45 @@
 /* eslint semi: 0 */
 
-import {
-  options
-} from '@tko/utils';
+import { options } from '@tko/utils'
 
-import {
-  observable
-} from '@tko/observable';
+import { observable } from '@tko/observable'
 
-import {
-  Parser
-} from '../dist';
+import { Parser } from '../dist'
 
-import { assert } from "chai"
+import { assert } from 'chai'
 
-function ctxStub (o) { return { lookup (p) { return o[p] } } }
+function ctxStub(o) {
+  return {
+    lookup(p) {
+      return o[p]
+    }
+  }
+}
 
 describe('filters', function () {
   options.filters.uppercase = function (v) {
-    return v.toUpperCase();
+    return v.toUpperCase()
   }
 
   options.filters.tail = function (v, str, str2) {
-    return v + (str || 'tail') + (str2 || '');
+    return v + (str || 'tail') + (str2 || '')
   }
 
-  function trial (context, binding, expect) {
+  function trial(context, binding, expect) {
     let p = new Parser().parse('b: ' + binding, ctxStub(context))
     assert.equal(p.b(), expect)
   }
 
   it('converts basic input', function () {
-    trial({v: 't'}, 'v | uppercase', 'T')
+    trial({ v: 't' }, 'v | uppercase', 'T')
   })
 
   it('chains input with whitespace', function () {
-    trial({v: 't'}, 'v | uppercase | tail', 'Ttail')
+    trial({ v: 't' }, 'v | uppercase | tail', 'Ttail')
   })
 
   it('chains flush input', function () {
-    trial({v: 't'}, 'v|uppercase|tail', 'Ttail')
+    trial({ v: 't' }, 'v|uppercase|tail', 'Ttail')
   })
 
   it('passes an argument', function () {
@@ -68,7 +68,15 @@ describe('filters', function () {
   })
 
   it('passes a called function', function () {
-    trial({ v: function () { return 'tf' } }, '@v|tail:@v', 'tftf')
+    trial(
+      {
+        v: function () {
+          return 'tf'
+        }
+      },
+      '@v|tail:@v',
+      'tftf'
+    )
   })
 
   it('modifies expressions', function () {
@@ -76,7 +84,7 @@ describe('filters', function () {
   })
 
   it('modifies observables', function () {
-    trial({r: observable('ee')}, 'r | uppercase', 'EE')
+    trial({ r: observable('ee') }, 'r | uppercase', 'EE')
   })
 
   it('Does not intefere with expressions', function () {
@@ -84,27 +92,26 @@ describe('filters', function () {
   })
 
   it('multiple variables with filters', function () {
-    let p = new Parser()
-      .parse("b: v|tail:'e':'y', c: v|tail:'e':'z'", ctxStub({v: 'tt'}))
+    let p = new Parser().parse("b: v|tail:'e':'y', c: v|tail:'e':'z'", ctxStub({ v: 'tt' }))
     assert.equal(p.b(), 'ttey')
     assert.equal(p.c(), 'ttez')
   })
 
   describe('root', () => {
-    let _testRoot : any = null
+    let _testRoot: any = null
     options.filters.setRoot = function (v) {
       _testRoot = this
     }
 
     it('preserves the root across a single filter', () => {
-      const ourRoot = ctxStub({v: 'tt'})
+      const ourRoot = ctxStub({ v: 'tt' })
       const p = new Parser().parse('b: v | setRoot', ourRoot)
       p.b()
       assert.equal(_testRoot, ourRoot)
     })
 
     it('preserves the root across a multiple filters', () => {
-      const ourRoot = ctxStub({v: 'tt'})
+      const ourRoot = ctxStub({ v: 'tt' })
       const p = new Parser().parse('b: v | uppercase | setRoot', ourRoot)
       p.b()
       assert.notEqual(_testRoot, null)

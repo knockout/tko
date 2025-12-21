@@ -1,6 +1,4 @@
-import {
-    setTextContent
-} from '@tko/utils'
+import { setTextContent } from '@tko/utils'
 
 export const text = {
   init: function () {

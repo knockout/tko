@@ -1,14 +1,13 @@
+import { BindingStringProvider } from '@tko/provider.bindingstring'
 
-import {
-   BindingStringProvider
- } from '@tko/provider.bindingstring'
-
- import type { BindingContext } from '@tko/bind';
+import type { BindingContext } from '@tko/bind'
 
 export default class DataBindProvider extends BindingStringProvider {
-  get FOR_NODE_TYPES () { return [ 1 ] } // document.ELEMENT_NODE
+  get FOR_NODE_TYPES() {
+    return [1]
+  } // document.ELEMENT_NODE
 
-  get BIND_ATTRIBUTE () {
+  get BIND_ATTRIBUTE() {
     return 'data-bind'
   }
 
