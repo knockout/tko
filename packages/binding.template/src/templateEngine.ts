@@ -78,7 +78,7 @@ extend(templateEngine.prototype, {
     options.onError(new Error('Override createJavaScriptEvaluatorBlock'))
   },
 
-  makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource {
+  makeTemplateSource(template: string | Element, templateDocument?: Document): TemplateSource {
     // Named template
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
@@ -96,12 +96,12 @@ extend(templateEngine.prototype, {
   },
 
   renderTemplate(
-    template: string | Node,
+    template: string | Element,
     bindingContext: BindingContext<any>,
     options: TemplateOptions<any>,
     templateDocument?: Document
   ): Node[] {
-    let templateSource = this['makeTemplateSource'](template, templateDocument)
+    let templateSource = this.makeTemplateSource(template, templateDocument)
     return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }
 })

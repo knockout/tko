@@ -137,7 +137,7 @@ export class domElement implements TemplateSource {
 // For compatibility, you can also read "text"; it will be serialized from the nodes on demand.
 // Writing to "text" is still supported, but then the template data will not be available as DOM nodes.
 export class anonymousTemplate extends domElement {
-  constructor(element?: any) {
+  constructor(element: Element) {
     super(element)
   }
 
