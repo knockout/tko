@@ -478,7 +478,7 @@ export class TemplateBindingHandler extends AsyncBindingHandler {
   override get controlsDescendants() {
     return true
   }
-   static override get allowVirtualElements() {
+  static override get allowVirtualElements() {
     return true
   }
 }
