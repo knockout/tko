@@ -14,7 +14,7 @@ export const NATIVE_BINDINGS = Symbol('Knockout native bindings')
  */
 export default class NativeProvider extends Provider {
   override get FOR_NODE_TYPES() {
-    return [1, 3]
+    return [Node.ELEMENT_NODE, Node.TEXT_NODE]
   }
   override get preemptive() {
     return true

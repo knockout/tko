@@ -827,7 +827,7 @@ describe('Binding attribute syntax', function () {
       let originalBindingProvider = options.bindingProviderInstance
       class TestProvider extends Provider {
         override get FOR_NODE_TYPES() {
-          return [3]
+          return [Node.TEXT_NODE]
         }
         override nodeHasBindings(node) {
           // IE < 9 can't bind text nodes, as expando properties are not allowed on them.

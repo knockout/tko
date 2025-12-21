@@ -102,7 +102,7 @@ export default class Provider {
  */
 class LegacyProvider extends Provider {
   override get FOR_NODE_TYPES() {
-    return [1, 3, 8]
+    return [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
   }
 
   providerObject: any

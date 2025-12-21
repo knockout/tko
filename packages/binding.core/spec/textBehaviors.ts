@@ -95,7 +95,7 @@ describe('Binding: Text', function () {
 
     class TestProvider extends Provider {
       override get FOR_NODE_TYPES() {
-        return [document.ELEMENT_NODE]
+        return [Node.ELEMENT_NODE]
       }
       override nodeHasBindings(/* node, bindingContext */) {
         /* // IE < 9 can't bind text nodes, as expando properties are not allowed on them.

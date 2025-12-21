@@ -478,7 +478,7 @@ describe('Templating', function () {
 
     class TestProvider extends Provider {
       override get FOR_NODE_TYPES() {
-        return [document.ELEMENT_NODE]
+        return [Node.ELEMENT_NODE]
       }
 
       override nodeHasBindings(node, bindingContext) {

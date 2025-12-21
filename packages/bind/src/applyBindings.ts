@@ -62,7 +62,7 @@ function getBindingProvider(): Provider {
 }
 
 function isProviderForNode(provider: Provider, node: Node): boolean {
-  const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
+  const nodeTypes = provider.FOR_NODE_TYPES || [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
   return nodeTypes.includes(node.nodeType)
 }
 

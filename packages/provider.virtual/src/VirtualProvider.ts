@@ -6,7 +6,7 @@ import type { BindingContext } from '@tko/bind'
 
 export default class VirtualProvider extends BindingStringProvider {
   override get FOR_NODE_TYPES() {
-    return [1, 8]
+    return [Node.ELEMENT_NODE, Node.COMMENT_NODE]
   }
 
   /**
