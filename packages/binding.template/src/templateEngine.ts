@@ -87,7 +87,7 @@ extend(templateEngine.prototype, {
         throw options.onError(new Error('Cannot find template with ID ' + template), false)
       }
       return new domElement(elem)
-    } else if (template.nodeType === Node.ELEMENT_NODE || template.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+    } else if (template.nodeType === Node.ELEMENT_NODE) {
       // Anonymous template
       return new anonymousTemplate(template as Element)
     } else if (template.nodeType === Node.COMMENT_NODE) {

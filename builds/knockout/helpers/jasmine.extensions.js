@@ -44,7 +44,7 @@ jasmine.Matchers.prototype.toContainHtml = function (expectedHtml, postProcessCl
 };
 
 jasmine.nodeText = function(node) {
-    return node.nodeType == 3 ? node.data : 'textContent' in node ? node.textContent : node.innerText;
+    return node.nodeType === Node.TEXT_NODE ? node.data : 'textContent' in node ? node.textContent : node.innerText;
 }
 
 jasmine.Matchers.prototype.toContainText = function (expectedText, ignoreSpaces) {

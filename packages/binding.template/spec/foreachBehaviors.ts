@@ -313,7 +313,7 @@ describe('Binding: Foreach', function () {
     options.bindingProviderInstance = new preprocessingBindingProvider()
     options.bindingProviderInstance.preprocessNode = function (node) {
       let dataNode: any = node
-      if (node.nodeType === 3 && dataNode.data.charAt(0) === '$') {
+      if (node.nodeType === Node.TEXT_NODE && dataNode.data.charAt(0) === '$') {
         let newNodes = [document.createComment('ko text: ' + dataNode.data), document.createComment('/ko')]
         for (let i = 0; i < newNodes.length; i++) {
           node.parentNode?.insertBefore(newNodes[i], node)

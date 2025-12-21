@@ -609,7 +609,7 @@ describe('Binding attribute syntax', function () {
         // Counts the number of virtual children, and overwrites the text contents of any text nodes
         for (let node = virtualElements.firstChild(element); node; node = virtualElements.nextSibling(node)) {
           countNodes++
-          if (node.nodeType === 3) {
+          if (node.nodeType === Node.TEXT_NODE) {
             ;(node as Text).data = 'new text'
           }
         }
@@ -832,7 +832,7 @@ describe('Binding attribute syntax', function () {
         override nodeHasBindings(node) {
           // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
           // This will still prove that the binding provider was not executed on the children of a restricted element.
-          if (node.nodeType === 3 && jasmine.ieVersion < 9) {
+          if (node.nodeType === Node.TEXT_NODE && jasmine.ieVersion < 9) {
             node.data = 'replaced'
             return false
           }
@@ -840,7 +840,7 @@ describe('Binding attribute syntax', function () {
           return true
         }
         override getBindingAccessors(node, bindingContext) {
-          if (node.nodeType === 3) {
+          if (node.nodeType === Node.TEXT_NODE) {
             return {
               replaceTextNodeContent: function () {
                 return 'replaced'

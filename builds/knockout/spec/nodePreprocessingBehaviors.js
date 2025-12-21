@@ -42,7 +42,7 @@ describe('Node preprocessing', function() {
         ko.bindingProvider.instance.preprocessNode = function(node) {
             // Example: Replace {{ someValue }} with text from that property.
             // This could be generalized to full support for string interpolation in text nodes.
-            if (node.nodeType === 3 && node.data.indexOf("{{ someValue }}") >= 0) {
+            if (node.nodeType === Node.TEXT_NODE && node.data.indexOf("{{ someValue }}") >= 0) {
                 var prefix = node.data.substring(0, node.data.indexOf("{{ someValue }}")),
                     suffix = node.data.substring(node.data.indexOf("{{ someValue }}") + "{{ someValue }}".length),
                     newNodes = [
@@ -107,7 +107,7 @@ describe('Node preprocessing', function() {
     it('Should call a childrenComplete callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function () {
         // Set up a binding provider that converts text nodes to expressions
         ko.bindingProvider.instance.preprocessNode = function (node) {
-            if (node.nodeType === 3 && node.data.charAt(0) === "$") {
+            if (node.nodeType === Node.TEXT_NODE && node.data.charAt(0) === "$") {
                 var newNodes = [
                     document.createComment('ko text: ' + node.data),
                     document.createComment('/ko')

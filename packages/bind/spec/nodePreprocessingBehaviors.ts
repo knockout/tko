@@ -61,7 +61,7 @@ describe('Node preprocessing', function () {
       override preprocessNode(node) {
         // Example: Replace {{ someValue }} with text from that property.
         // This could be generalized to full support for string interpolation in text nodes.
-        if (node.nodeType === 3 && node.data.indexOf('{{ someValue }}') >= 0) {
+        if (node.nodeType === Node.TEXT_NODE && node.data.indexOf('{{ someValue }}') >= 0) {
           let prefix = node.data.substring(0, node.data.indexOf('{{ someValue }}')),
             suffix = node.data.substring(node.data.indexOf('{{ someValue }}') + '{{ someValue }}'.length),
             newNodes = [
@@ -96,7 +96,7 @@ describe('Node preprocessing', function () {
   it('Should call a childrenComplete callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function () {
     class TestProvider extends MultiProvider {
       override preprocessNode(node) {
-        if (node.nodeType === 3 && node.data.charAt(0) === '$') {
+        if (node.nodeType === Node.TEXT_NODE && node.data.charAt(0) === '$') {
           let newNodes = [document.createComment('ko text: ' + node.data), document.createComment('/ko')]
           for (let i = 0; i < newNodes.length; i++) {
             node.parentNode.insertBefore(newNodes[i], node)

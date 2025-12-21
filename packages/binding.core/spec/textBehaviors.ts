@@ -100,7 +100,7 @@ describe('Binding: Text', function () {
       override nodeHasBindings(/* node, bindingContext */) {
         /* // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                 // This will still prove that the binding provider was not executed on the children of a restricted element.
-                if (node.nodeType === 3 && jasmine.ieVersion < 9) {
+                if (node.nodeType === Node.TEXT_NODE && jasmine.ieVersion < 9) {
                     node.data = "replaced";
                     return false;
                 } */
@@ -109,7 +109,7 @@ describe('Binding: Text', function () {
       }
       override getBindingAccessors(node, bindingContext) {
         let bindings = originalBindingProvider.getBindingAccessors(node, bindingContext)
-        if (node.nodeType === 3) {
+        if (node.nodeType === Node.TEXT_NODE) {
           return {
             replaceTextNodeContent: function () {
               return 'should not see this value in the output'

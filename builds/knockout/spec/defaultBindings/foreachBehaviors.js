@@ -232,7 +232,7 @@ describe('Binding: Foreach', function() {
         preprocessingBindingProvider.prototype = originalBindingProvider;
         ko.bindingProvider.instance = new preprocessingBindingProvider();
         ko.bindingProvider.instance.preprocessNode = function(node) {
-            if (node.nodeType === 3 && node.data.charAt(0) === "$") {
+            if (node.nodeType === Node.TEXT_NODE && node.data.charAt(0) === "$") {
                 var newNodes = [
                     document.createComment('ko text: ' + node.data),
                     document.createComment('/ko')
