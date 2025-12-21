@@ -38,14 +38,14 @@ export default class VirtualProvider extends BindingStringProvider {
   }
 
   override getBindingString(node: Element): string | null {
-    if (node.nodeType === document.COMMENT_NODE) {
+    if (node.nodeType === Node.COMMENT_NODE) {
       return virtualElements.virtualNodeBindingValue(node)
     }
     return null
   }
 
   override nodeHasBindings(node: Element, context?: BindingContext): boolean {
-    if (node.nodeType === document.COMMENT_NODE) {
+    if (node.nodeType === Node.COMMENT_NODE) {
       return virtualElements.isStartComment(node)
     }
     return false

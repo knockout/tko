@@ -12,8 +12,8 @@ import { Parser } from '@tko/utils.parser'
 
 export default class ComponentProvider extends Provider {
   override get FOR_NODE_TYPES() {
-    return [1]
-  } // document.ELEMENT_NODE
+    return [Node.ELEMENT_NODE]
+  }
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->

@@ -7,7 +7,7 @@ describe('Binding String Provider behavior', function () {
     it('parses the given string', function () {
       class TestBSP extends BindingStringProvider {
         override get FOR_NODE_TYPES() {
-          return [document.ELEMENT_NODE]
+          return [Node.ELEMENT_NODE]
         }
         override getBindingString() {
           return 'text: 123'

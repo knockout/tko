@@ -9,8 +9,8 @@ import { parseInterpolation } from './mustacheParser'
  */
 export default class TextMustacheProvider extends Provider {
   override get FOR_NODE_TYPES() {
-    return [3]
-  } // document.TEXT_NODE
+    return [Node.TEXT_NODE]
+  }
 
   *textToNodes(textNode: Node) {
     const parent = textNode.parentNode

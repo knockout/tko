@@ -8,8 +8,8 @@ import { Provider } from '@tko/provider'
  */
 export default class AttrProvider extends Provider {
   override get FOR_NODE_TYPES() {
-    return [1]
-  } // document.ELEMENT_NODE
+    return [Node.ELEMENT_NODE]
+  }
 
   get PREFIX() {
     return 'ko-'

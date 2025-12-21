@@ -22,8 +22,8 @@ export default class AttributeMustacheProvider extends Provider {
   ATTRIBUTES_TO_SKIP: Set<string>
   ATTRIBUTES_BINDING_MAP: any
   override get FOR_NODE_TYPES() {
-    return [1]
-  } // document.ELEMENT_NODE
+    return [Node.ELEMENT_NODE]
+  }
 
   constructor(params: ProviderParamsInput | null = null) {
     super(params)
