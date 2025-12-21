@@ -655,7 +655,7 @@ describe('Binding: Foreach', function() {
             { name: ko.observable('Moon') },
             { name: ko.observable('Ceres') }
         ]), beforeRemove = function(elem) {
-            if (elem.nodeType === 1) {
+            if (elem.nodeType === Node.ELEMENT_NODE) {
                 setTimeout(function() {
                     ko.removeNode(elem);
                 }, 1);

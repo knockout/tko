@@ -190,7 +190,7 @@ export function setHtml(node: Node, html: Function | string) {
         parsedNodes = parseHtmlFragment(html)
       }
 
-      if (node.nodeType === 8) {
+      if (node.nodeType === Node.COMMENT_NODE) {
         if (html === null) {
           virtualElements.emptyNode(node)
         } else {

@@ -55,24 +55,28 @@ function setTemplateDomData(element, data) {
 }
 
 export class domElement implements TemplateSource {
-  domElement: Element
+  domElement: Element | Comment
   templateType: number
 
-  constructor(element: Element) {
+  constructor(element: Element | Comment) {
     this.domElement = element
 
-    let tagNameLower = tagNameLowerFn(element)
-    this.templateType =
-      tagNameLower === 'script'
-        ? templateScript
-        : tagNameLower === 'textarea'
-          ? templateTextArea
-          : // For browsers with proper <template> element support, where the .content property gives a document fragment
-            tagNameLower == 'template'
-              && (element as HTMLTemplateElement).content
-              && (element as HTMLTemplateElement).content.nodeType === 11
-            ? templateTemplate
-            : templateElement
+    if (element.nodeType === Node.COMMENT_NODE) {
+      this.templateType = templateElement
+    } else {
+      let tagNameLower = tagNameLowerFn(this.domElement as Element)
+      this.templateType =
+        tagNameLower === 'script'
+          ? templateScript
+          : tagNameLower === 'textarea'
+            ? templateTextArea
+            : // For browsers with proper <template> element support, where the .content property gives a document fragment
+              tagNameLower == 'template'
+                && (element as HTMLTemplateElement).content
+                && (element as HTMLTemplateElement).content.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+              ? templateTemplate
+              : templateElement
+    }
   }
 
   text(): string
@@ -101,8 +105,8 @@ export class domElement implements TemplateSource {
   }
 
   nodes(): Node
-  nodes(valueToWrite: Node): void
-  nodes(valueToWrite?: any): Node | void {
+  nodes(valueToWrite: Node): undefined
+  nodes(valueToWrite?: any): Node | undefined {
     const element = this.domElement
     if (arguments.length == 0) {
       const templateData = getTemplateDomData(element)
@@ -124,11 +128,11 @@ export class domElement implements TemplateSource {
           setTemplateDomData(element, { containerData: nodes, alwaysCheckText: true })
         }
       }
-
       return nodes
     } else {
       setTemplateDomData(element, { containerData: valueToWrite })
     }
+    return undefined
   }
 }
 
@@ -137,13 +141,13 @@ export class domElement implements TemplateSource {
 // For compatibility, you can also read "text"; it will be serialized from the nodes on demand.
 // Writing to "text" is still supported, but then the template data will not be available as DOM nodes.
 export class anonymousTemplate extends domElement {
-  constructor(element: Element) {
+  constructor(element: Element | Comment) {
     super(element)
   }
 
   override text(): string
-  override text(valueToWrite: string): void
-  override text(/* valueToWrite */): string | void {
+  override text(valueToWrite: string): undefined
+  override text(/* valueToWrite */): string | undefined {
     if (arguments.length == 0) {
       const templateData = getTemplateDomData(this.domElement)
       if (templateData.textData === undefined && templateData.containerData) {
@@ -154,5 +158,6 @@ export class anonymousTemplate extends domElement {
       const valueToWrite = arguments[0]
       setTemplateDomData(this.domElement, { textData: valueToWrite })
     }
+    return undefined
   }
 }

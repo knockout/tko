@@ -7,11 +7,11 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
   if (node === containedByNode) {
     return true
   }
-  if (node.nodeType === 11) {
+  if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
     return false
   } // Fixes issue #1162 - can't use node.contains for document fragments on IE8
   if (containedByNode.contains) {
-    return containedByNode.contains(node.nodeType !== 1 ? node.parentNode : node)
+    return containedByNode.contains(node.nodeType !== Node.ELEMENT_NODE ? node.parentNode : node)
   }
   if (containedByNode.compareDocumentPosition) {
     return (containedByNode.compareDocumentPosition(node) & 16) == 16
@@ -43,7 +43,7 @@ export function isDomElement(obj) {
   if (window.HTMLElement) {
     return obj instanceof HTMLElement
   } else {
-    return obj && obj.tagName && obj.nodeType === 1
+    return obj && obj.tagName && obj.nodeType === Node.ELEMENT_NODE
   }
 }
 
@@ -51,6 +51,6 @@ export function isDocumentFragment(obj) {
   if (window.DocumentFragment) {
     return obj instanceof DocumentFragment
   } else {
-    return obj && obj.nodeType === 11
+    return obj && obj.nodeType === Node.DOCUMENT_FRAGMENT_NODE
   }
 }

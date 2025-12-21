@@ -36,7 +36,7 @@ export class ElseBindingHandler extends IfBindingHandler {
       return false
     }
 
-    if (node.nodeType === 8) {
+    if (node.nodeType === Node.COMMENT_NODE) {
       node = virtualElements.previousSibling(node)
     }
 

@@ -24,7 +24,7 @@ export var dummyTemplateEngine = function (templates) {
     this.makeTemplateSource = function(template) {
         if (typeof template == "string")
             return new dummyTemplateSource(template); // Named template comes from the in-memory collection
-        else if ((template.nodeType == 1) || (template.nodeType == 8))
+        else if ((template.nodeType === Node.ELEMENT_NODE) || (template.nodeType === Node.COMMENT_NODE))
             return new ko.templateSources.anonymousTemplate(template); // Anonymous template
     };
 

@@ -103,7 +103,7 @@ If you commonly include template content using virtual elements, the normal synt
 ```javascript
 ko.bindingProvider.instance.preprocessNode = function(node) {
     // Only react if this is a comment node of the form <!-- template: ... -->
-    if (node.nodeType == 8) {
+    if (node.nodeType === Node.COMMENT_NODE) {
         var match = node.nodeValue.match(/^\s*(template\s*:[\s\S]+)/);
         if (match) {
             // Create a pair of comments to replace the single comment

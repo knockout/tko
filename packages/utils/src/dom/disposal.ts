@@ -59,7 +59,7 @@ function cleanNodesInList(nodeList: NodeList | HTMLCollectionBase, onlyComments?
   const cleanedNodes = new Array<Node>()
   let lastCleanedNode
   for (let i = 0; i < nodeList.length; i++) {
-    if (!onlyComments || nodeList[i].nodeType === 8) {
+    if (!onlyComments || nodeList[i].nodeType === Node.COMMENT_NODE) {
       cleanSingleNode((cleanedNodes[cleanedNodes.length] = lastCleanedNode = nodeList[i]))
       if (nodeList[i] !== lastCleanedNode) {
         while (i-- && arrayIndexOf(cleanedNodes, nodeList[i]) === -1) {}

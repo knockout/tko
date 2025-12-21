@@ -143,7 +143,7 @@ function applyBindingsToNodeAndDescendantsInternal(
   nodeVerified: Node,
   asyncBindingsApplied
 ) {
-  let isElement = nodeVerified.nodeType === 1
+  let isElement = nodeVerified.nodeType === Node.ELEMENT_NODE
   if (isElement) {
     // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -341,7 +341,7 @@ function applyBindingsToNodeInternal<T>(
         })
       }
 
-      if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
+      if (node.nodeType === Node.COMMENT_NODE && !BindingHandlerClass.allowVirtualElements) {
         throw new Error(`The binding '${key}' cannot be used with virtual elements`)
       }
 
@@ -443,7 +443,7 @@ export function applyBindingAccessorsToNode<T = any>(
   viewModelOrBindingContext?: BindingContext<T> | Observable<T> | T,
   asyncBindingsApplied?: Set<any>
 ) {
-  if (node.nodeType === 1) {
+  if (node.nodeType === Node.ELEMENT_NODE) {
     // If it's an element, workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(node)
   }
@@ -472,7 +472,7 @@ export function applyBindingsToDescendants<T = any>(
   rootNode: Node
 ): BindingResult {
   const asyncBindingsApplied = new Set()
-  if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
+  if (rootNode.nodeType === Node.ELEMENT_NODE || rootNode.nodeType === Node.COMMENT_NODE) {
     const bindingContext = getBindingContext(viewModelOrBindingContext)
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({ asyncBindingsApplied, rootNode, bindingContext })

@@ -835,7 +835,7 @@ describe('Binding: Foreach', function () {
         { name: observable('Ceres') }
       ]),
       beforeRemove = function (elem) {
-        if (elem.nodeType === 1) {
+        if (elem.nodeType === Node.ELEMENT_NODE) {
           setTimeout(function () {
             removeNode(elem)
           }, 1)

@@ -28,7 +28,8 @@ export function dummyTemplateEngine(templates?) {
   this.makeTemplateSource = function (template) {
     if (typeof template == 'string')
       return new dummyTemplateSource(template) // Named template comes from the in-memory collection
-    else if (template.nodeType == 1 || template.nodeType == 8) return new anonymousTemplate(template) // Anonymous template
+    else if (template.nodeType === Node.ELEMENT_NODE || template.nodeType === Node.COMMENT_NODE)
+      return new anonymousTemplate(template) // Anonymous template
   }
 
   this.renderTemplateSource = function (templateSource, bindingContext: BindingContext, rt_options, templateDocument) {

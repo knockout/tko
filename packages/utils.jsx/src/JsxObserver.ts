@@ -74,7 +74,7 @@ export class JsxObserver extends LifeCycle {
   ) {
     super()
 
-    const parentNodeIsComment = parentNode.nodeType === 8
+    const parentNodeIsComment = parentNode.nodeType === Node.COMMENT_NODE
 
     const parentNodeTarget = this.getParentTarget(parentNode)
 
@@ -123,7 +123,7 @@ export class JsxObserver extends LifeCycle {
     if ('content' in parentNode) {
       return (parentNode as HTMLTemplateElement).content
     }
-    if (parentNode.nodeType === 8) {
+    if (parentNode.nodeType === Node.COMMENT_NODE) {
       return (parentNode as Comment).parentNode
     }
     return parentNode
@@ -239,7 +239,7 @@ export class JsxObserver extends LifeCycle {
    * @param {Node} node
    */
   canApplyBindings(node: Node): boolean {
-    return node.nodeType === 1 || node.nodeType === 8
+    return node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.COMMENT_NODE
   }
 
   delChange(index: number, _: any) {

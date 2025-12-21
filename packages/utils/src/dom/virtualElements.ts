@@ -29,11 +29,17 @@ export const endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*--
 let htmlTagsWithOptionallyClosingChildren = { ul: true, ol: true }
 
 export function isStartComment(node) {
-  return node.nodeType == 8 && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue)
+  return (
+    node.nodeType === Node.COMMENT_NODE
+    && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue)
+  )
 }
 
 export function isEndComment(node) {
-  return node.nodeType == 8 && endCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue)
+  return (
+    node.nodeType === Node.COMMENT_NODE
+    && endCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue)
+  )
 }
 
 function isUnmatchedEndComment(node) {
@@ -225,7 +231,7 @@ export function nextSibling(node: Node) {
 export function previousSibling(node) {
   let depth = 0
   do {
-    if (node.nodeType === 8) {
+    if (node.nodeType === Node.COMMENT_NODE) {
       if (isStartComment(node)) {
         if (--depth === 0) {
           return node
@@ -261,7 +267,7 @@ export function normaliseVirtualElementDomStructure(elementVerified) {
   let childNode = elementVerified.firstChild
   if (childNode) {
     do {
-      if (childNode.nodeType === 1) {
+      if (childNode.nodeType === Node.ELEMENT_NODE) {
         let unbalancedTags = getUnbalancedChildTags(childNode)
         if (unbalancedTags) {
           // Fix up the DOM by moving the unbalanced tags to where they most likely were intended to be placed - *after* the child

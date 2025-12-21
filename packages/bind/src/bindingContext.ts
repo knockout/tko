@@ -240,7 +240,7 @@ export function storedBindingContextForNode(node: Node) {
 // Retrieving binding context from arbitrary nodes
 export function contextFor(node: Node) {
   // We can only do something meaningful for elements and comment nodes (in particular, not text nodes, as IE can't store domdata for them)
-  if (node && (node.nodeType === 1 || node.nodeType === 8)) {
+  if (node && (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.COMMENT_NODE)) {
     return storedBindingContextForNode(node)
   }
 }

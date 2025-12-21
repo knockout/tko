@@ -17,13 +17,13 @@ function findMemoNodes(rootNode: Node, appendToArray: any[]) {
   if (!rootNode) {
     return
   }
-  if (rootNode.nodeType == 8) {
+  if (rootNode.nodeType === Node.COMMENT_NODE) {
     const comment = rootNode as Comment
     let memoId = parseMemoText(comment.nodeValue)
     if (memoId != null) {
       appendToArray.push({ domNode: rootNode, memoId: memoId })
     }
-  } else if (rootNode.nodeType == 1) {
+  } else if (rootNode.nodeType === Node.ELEMENT_NODE) {
     for (let i = 0, childNodes = rootNode.childNodes, j = childNodes.length; i < j; i++) {
       findMemoNodes(childNodes[i], appendToArray)
     }
