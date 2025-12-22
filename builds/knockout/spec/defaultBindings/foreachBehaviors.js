@@ -232,7 +232,7 @@ describe('Binding: Foreach', function() {
         preprocessingBindingProvider.prototype = originalBindingProvider;
         ko.bindingProvider.instance = new preprocessingBindingProvider();
         ko.bindingProvider.instance.preprocessNode = function(node) {
-            if (node.nodeType === 3 && node.data.charAt(0) === "$") {
+            if (node.nodeType === Node.TEXT_NODE && node.data.charAt(0) === "$") {
                 var newNodes = [
                     document.createComment('ko text: ' + node.data),
                     document.createComment('/ko')
@@ -655,7 +655,7 @@ describe('Binding: Foreach', function() {
             { name: ko.observable('Moon') },
             { name: ko.observable('Ceres') }
         ]), beforeRemove = function(elem) {
-            if (elem.nodeType === 1) {
+            if (elem.nodeType === Node.ELEMENT_NODE) {
                 setTimeout(function() {
                     ko.removeNode(elem);
                 }, 1);

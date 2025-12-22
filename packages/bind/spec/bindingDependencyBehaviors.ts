@@ -289,7 +289,7 @@ describe('Binding dependencies', function () {
     let observable = observableConstructor('substitute')
 
     class TestProvider extends DataBindProvider {
-      getBindingAccessors(node, bindingContext) {
+      override getBindingAccessors(node, bindingContext) {
         let bindings = super.getBindingAccessors(node, bindingContext)
         if (bindings && bindings.text) {
           let newValue = observable()

@@ -9,7 +9,7 @@ export default class MultiProvider extends Provider {
   nodeTypeMap: Record<string, any[]>
   providers: any[]
 
-  get FOR_NODE_TYPES() {
+  override get FOR_NODE_TYPES() {
     return this.nodeTypes
   }
 
@@ -22,7 +22,7 @@ export default class MultiProvider extends Provider {
     providers.forEach(p => this.addProvider(p))
   }
 
-  setGlobals(globals) {
+  override setGlobals(globals) {
     ;[this, ...this.providers].forEach(p => (p.globals = globals))
   }
 
@@ -44,11 +44,11 @@ export default class MultiProvider extends Provider {
     return this.nodeTypeMap[node.nodeType] || []
   }
 
-  nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
+  override nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
     return this.providersFor(node).some(p => p.nodeHasBindings(node))
   }
 
-  preprocessNode(node: Element) {
+  override preprocessNode(node: Element) {
     for (const provider of this.providersFor(node)) {
       const newNodes = provider.preprocessNode(node)
       if (newNodes) {
@@ -70,7 +70,7 @@ export default class MultiProvider extends Provider {
     }
   }
 
-  getBindingAccessors(node: Element, context?: BindingContext) {
+  override getBindingAccessors(node: Element, context?: BindingContext) {
     const bindings = {}
     for (const [key, accessor] of this.enumerateProviderBindings(node, context)) {
       if (key in bindings) {

@@ -61,7 +61,7 @@ describe('Binding: Text', function() {
                 return true;
             },
             getBindingAccessors: function(node, bindingContext) {
-                if (node.nodeType === 3) {
+                if (node.nodeType === Node.TEXT_NODE) {
                     return {
                         replaceTextNodeContent: function() { return "should not see this value in the output"; }
                     };

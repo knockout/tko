@@ -16,7 +16,7 @@ describe('Provider', function () {
 
   it('sets globals and bindingHandlers from params', function () {
     class SubProvider extends Provider {
-      get FOR_NODE_TYPES() {
+      override get FOR_NODE_TYPES() {
         return []
       }
     }

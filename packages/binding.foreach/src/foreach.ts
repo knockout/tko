@@ -97,7 +97,7 @@ export class ForEachBinding extends AsyncBindingHandler {
   //    computed
   //    {data: array, name: string, as: string}
   afterAdd
-  allBindings: AllBindings
+  override allBindings: AllBindings
   static animateFrame
   as
   beforeRemove
@@ -170,7 +170,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     }
   }
 
-  dispose() {
+  override dispose() {
     if (this.changeSubs) {
       this.changeSubs.dispose()
     }
@@ -390,6 +390,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     if (domNodeIsContainedBy(active!, node)) {
       return active
     }
+    return null
   }
 
   insertAllAfter(nodeOrNodeArrayToInsert, insertAfterNode) {
@@ -571,10 +572,10 @@ export class ForEachBinding extends AsyncBindingHandler {
     }
   }
 
-  get controlsDescendants() {
+  override get controlsDescendants() {
     return true
   }
-  static get allowVirtualElements() {
+  static override get allowVirtualElements() {
     return true
   }
 

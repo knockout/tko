@@ -22,7 +22,7 @@ export function fixUpContinuousNodeArray(continuousNodeArray, parentNode) {
 
   if (continuousNodeArray.length) {
     // The parent node can be a virtual element; so get the real parent node
-    parentNode = (parentNode.nodeType === 8 && parentNode.parentNode) || parentNode
+    parentNode = (parentNode.nodeType === Node.COMMENT_NODE && parentNode.parentNode) || parentNode
 
     // Rule [A]
     while (continuousNodeArray.length && continuousNodeArray[0].parentNode !== parentNode) {
@@ -66,7 +66,7 @@ export function forceRefresh(node) {
   // Workaround for an IE9 rendering bug - https://github.com/SteveSanderson/knockout/issues/209
   if ((ieVersion as any) >= 9) {
     // For text nodes and comment nodes (most likely virtual elements), we will have to refresh the container
-    let elem = node.nodeType == 1 ? node : node.parentNode
+    let elem = node.nodeType === Node.ELEMENT_NODE ? node : node.parentNode
     if (elem.style) {
       elem.style.zoom = elem.style.zoom // eslint-disable-line no-self-assign
     }

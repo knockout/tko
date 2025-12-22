@@ -32,7 +32,7 @@ import type { BindingContext } from './bindingContext'
 
 interface BindingError {
   during: string
-  errorCaptured: any
+  errorCaptured: Error
   bindings?: any
   allBindings?: AllBindings
   bindingKey?: string
@@ -62,7 +62,7 @@ function getBindingProvider(): Provider {
 }
 
 function isProviderForNode(provider: Provider, node: Node): boolean {
-  const nodeTypes = provider.FOR_NODE_TYPES || [1, 3, 8]
+  const nodeTypes = provider.FOR_NODE_TYPES || [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
   return nodeTypes.includes(node.nodeType)
 }
 
@@ -143,7 +143,7 @@ function applyBindingsToNodeAndDescendantsInternal(
   nodeVerified: Node,
   asyncBindingsApplied
 ) {
-  let isElement = nodeVerified.nodeType === 1
+  let isElement = nodeVerified.nodeType === Node.ELEMENT_NODE
   if (isElement) {
     // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -328,7 +328,7 @@ function applyBindingsToNodeInternal<T>(
     const nodeAsyncBindingPromises = new Set<Promise<any>>()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
       // Go through the sorted bindings, calling init and update for each
-      const reportBindingError = function (during, errorCaptured) {
+      const reportBindingError = function (during: string, errorCaptured: Error) {
         onBindingError({
           during,
           errorCaptured,
@@ -341,7 +341,7 @@ function applyBindingsToNodeInternal<T>(
         })
       }
 
-      if (node.nodeType === 8 && !BindingHandlerClass.allowVirtualElements) {
+      if (node.nodeType === Node.COMMENT_NODE && !BindingHandlerClass.allowVirtualElements) {
         throw new Error(`The binding '${key}' cannot be used with virtual elements`)
       }
 
@@ -384,7 +384,8 @@ function applyBindingsToNodeInternal<T>(
           nodeAsyncBindingPromises.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
-        reportBindingError('creation', err)
+        const error = err instanceof Error ? err : new Error(String(err))
+        reportBindingError('creation', error)
       }
     }
 
@@ -442,7 +443,7 @@ export function applyBindingAccessorsToNode<T = any>(
   viewModelOrBindingContext?: BindingContext<T> | Observable<T> | T,
   asyncBindingsApplied?: Set<any>
 ) {
-  if (node.nodeType === 1) {
+  if (node.nodeType === Node.ELEMENT_NODE) {
     // If it's an element, workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(node)
   }
@@ -471,8 +472,8 @@ export function applyBindingsToDescendants<T = any>(
   rootNode: Node
 ): BindingResult {
   const asyncBindingsApplied = new Set()
-  if (rootNode.nodeType === 1 || rootNode.nodeType === 8) {
-    const bindingContext = getBindingContext(viewModelOrBindingContext)
+  const bindingContext = getBindingContext(viewModelOrBindingContext)
+  if (rootNode.nodeType === Node.ELEMENT_NODE || rootNode.nodeType === Node.COMMENT_NODE) {
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({ asyncBindingsApplied, rootNode, bindingContext })
   }
@@ -492,7 +493,7 @@ export function applyBindings<T = any>(
     if (!rootNode) {
       throw Error('ko.applyBindings: could not find window.document.body; has the document been loaded?')
     }
-  } else if (rootNode.nodeType !== 1 && rootNode.nodeType !== 8) {
+  } else if (rootNode.nodeType !== Node.ELEMENT_NODE && rootNode.nodeType !== Node.COMMENT_NODE) {
     throw Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node')
   }
   const rootContext = getBindingContext<T>(viewModelOrBindingContext, extendContextCallback)
@@ -501,7 +502,7 @@ export function applyBindings<T = any>(
 }
 
 function onBindingError(spec: BindingError) {
-  let error: any
+  let error: Error
   if (spec.bindingKey) {
     // During: 'init' or initial 'update'
     error = spec.errorCaptured
@@ -518,10 +519,16 @@ function onBindingError(spec: BindingError) {
   }
   try {
     extend(error, spec)
-  } catch (e) {
+  } catch (e: any) {
     // Read-only error e.g. a DOMEXception.
     spec.stack = error.stack
-    error = new Error(error.message ? error.message : error)
+
+    const message = error.message || String(error)
+    const originalName = error.name
+    error = new Error(message)
+    if (originalName && originalName !== 'Error') {
+      error.name = originalName
+    }
     extend(error, spec)
   }
   options.onError(error)

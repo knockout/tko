@@ -78,20 +78,23 @@ extend(templateEngine.prototype, {
     options.onError(new Error('Override createJavaScriptEvaluatorBlock'))
   },
 
-  makeTemplateSource(template: string | Node, templateDocument?: Document) {
+  makeTemplateSource(template: string | Node, templateDocument?: Document): TemplateSource {
     // Named template
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
       let elem = templateDocument.getElementById(template)
       if (!elem) {
-        options.onError(new Error('Cannot find template with ID ' + template))
+        throw options.onError(new Error('Cannot find template with ID ' + template), false)
       }
       return new domElement(elem)
-    } else if (template.nodeType == 1 || template.nodeType == 8) {
+    } else if (template.nodeType === Node.ELEMENT_NODE) {
       // Anonymous template
-      return new anonymousTemplate(template)
+      return new anonymousTemplate(template as Element)
+    } else if (template.nodeType === Node.COMMENT_NODE) {
+      // Anonymous template stored in a comment node
+      return new anonymousTemplate(template as Comment)
     } else {
-      options.onError(new Error('Unknown template type: ' + template))
+      throw options.onError(new Error('Unknown template type: ' + template), false)
     }
   },
 
@@ -101,7 +104,7 @@ extend(templateEngine.prototype, {
     options: TemplateOptions<any>,
     templateDocument?: Document
   ): Node[] {
-    let templateSource = this['makeTemplateSource'](template, templateDocument)
+    let templateSource = this.makeTemplateSource(template, templateDocument)
     return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }
 })

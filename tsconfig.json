@@ -15,12 +15,12 @@
     /*Disable some typing feature from ts to detect first steps to a strong typed version*/
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "noImplicitOverride": false,
-    "noImplicitReturns": false,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
-    "strictFunctionTypes": false,
+    "strictFunctionTypes": true,
     "skipLibCheck": true,
     /* END Disabling */
     "paths": {

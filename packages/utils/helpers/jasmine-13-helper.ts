@@ -62,7 +62,7 @@ jasmine.Spec.prototype.restoreAfter = function (object, propertyName) {
 }
 
 jasmine.nodeText = function (node) {
-  return node.nodeType == 3 ? node.data : 'textContent' in node ? node.textContent : node.innerText
+  return node.nodeType === Node.TEXT_NODE ? node.data : 'textContent' in node ? node.textContent : node.innerText
 }
 
 jasmine.browserSupportsProtoAssignment = { __proto__: [] } instanceof Array

@@ -11,15 +11,15 @@ import { Provider } from '@tko/provider'
 import { Parser } from '@tko/utils.parser'
 
 export default class ComponentProvider extends Provider {
-  get FOR_NODE_TYPES() {
-    return [1]
-  } // document.ELEMENT_NODE
+  override get FOR_NODE_TYPES() {
+    return [Node.ELEMENT_NODE]
+  }
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
    * @param {Element} node
    */
-  preprocessNode(node: Element) {
+  override preprocessNode(node: Element): Node[] | undefined {
     if (node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
@@ -36,13 +36,14 @@ export default class ComponentProvider extends Provider {
 
       return [openNode, closeNode]
     }
+    return undefined
   }
 
-  nodeHasBindings(node: Element): boolean {
+  override nodeHasBindings(node: Element): boolean {
     return Boolean(this.getComponentNameForNode(node))
   }
 
-  getBindingAccessors(node: Element, context) {
+  override getBindingAccessors(node: Element, context) {
     const componentName = this.getComponentNameForNode(node)
     if (!componentName) {
       return
@@ -52,7 +53,7 @@ export default class ComponentProvider extends Provider {
   }
 
   getComponentNameForNode(node: Element): string | undefined {
-    if (node.nodeType !== node.ELEMENT_NODE) {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
       return
     }
     const tagName = tagNameLower(node)
@@ -63,6 +64,7 @@ export default class ComponentProvider extends Provider {
         return tagName
       }
     }
+    return
   }
 
   getComponentParams(node: Element, context) {

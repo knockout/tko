@@ -15,7 +15,7 @@ class TextInput extends BindingHandler {
     return 'textinput'
   }
 
-  $element: HTMLInputElement
+  override $element: HTMLInputElement
   previousElementValue: any
   elementValueBeforeEvent?: ReturnType<typeof setTimeout>
   timeoutHandle?: ReturnType<typeof setTimeout>
@@ -128,7 +128,7 @@ class TextInputIE extends TextInput {
     }
   }
 
-  eventsIndicatingSyncValueChange() {
+  override eventsIndicatingSyncValueChange() {
     //keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
     return [...super.eventsIndicatingSyncValueChange(), 'keypress']
   }
@@ -171,7 +171,7 @@ class TextInputIE extends TextInput {
 // set up just one event handler for the document and use 'activeElement' to determine which
 // element was changed.
 class TextInputIE9 extends TextInputIE {
-  updateModel(...args: [any]) {
+  override updateModel(...args: [any]) {
     // IE9 will mess up the DOM if you handle events synchronously which results in DOM changes (such as other bindings);
     // so we'll make sure all updates are asynchronous
     this.deferUpdateModel(...args)
@@ -194,13 +194,13 @@ class TextInputIE8 extends TextInputIE {
 // Safari <5 doesn't fire the 'input' event for <textarea> elements (it does fire 'textInput'
 // but only when typing). So we'll just catch as much as we can with keydown, cut, and paste.
 class TextInputLegacySafari extends TextInput {
-  eventsIndicatingDeferValueChange() {
+  override eventsIndicatingDeferValueChange() {
     return ['keydown', 'paste', 'cut']
   }
 }
 
 class TextInputLegacyOpera extends TextInput {
-  eventsIndicatingDeferValueChange(): string[] {
+  override eventsIndicatingDeferValueChange(): string[] {
     // Opera 10 doesn't always fire the 'input' event for cut, paste, undo & drop operations.
     // We can try to catch some of those using 'keydown'.
     return ['keydown']

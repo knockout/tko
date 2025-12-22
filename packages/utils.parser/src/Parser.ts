@@ -103,13 +103,13 @@ export default class Parser {
     if (m instanceof Error) {
       throw m
     }
+    throw this.createError(m)
+  }
+
+  createError(m) {
     let [name, msg] = m.name ? [m.name, m.message] : [m, '']
-    const message =
-      `\n${name} ${msg} of
-    ${this.text}\n`
-      + Array(this.at).join(' ')
-      + '_/ 🔥 \\_\n'
-    throw new Error(message)
+    const message = `\n${name} ${msg} of ${this.text}\n` + Array(this.at).join(' ') + '_/ 🔥 \\_\n'
+    return new Error(message)
   }
 
   name() {
@@ -251,7 +251,7 @@ export default class Parser {
         }
       }
     }
-    this.error('Bad object')
+    throw this.createError('Bad object')
   }
 
   /**
@@ -314,7 +314,7 @@ export default class Parser {
       ch = this.next()
     }
 
-    this.error('Bad string')
+    throw this.createError('Bad string')
   }
 
   string() {
@@ -352,7 +352,7 @@ export default class Parser {
         ch = this.white()
       }
     }
-    this.error('Bad array')
+    throw this.createError('Bad array')
   }
 
   value() {
@@ -640,7 +640,7 @@ export default class Parser {
       }
     }
 
-    this.error('Bad arguments to function')
+    throw this.createError('Bad arguments to function')
   }
 
   /**

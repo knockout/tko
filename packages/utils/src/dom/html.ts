@@ -190,7 +190,7 @@ export function setHtml(node: Node, html: Function | string) {
         parsedNodes = parseHtmlFragment(html)
       }
 
-      if (node.nodeType === 8) {
+      if (node.nodeType === Node.COMMENT_NODE) {
         if (html === null) {
           virtualElements.emptyNode(node)
         } else {
@@ -217,7 +217,7 @@ export function setTextContent(element: Node, textContent?: TextContent): void {
   // If there are no children, more than one, or if it's not a text node,
   // we'll clear everything and create a single text node.
   let innerTextNode = virtualElements.firstChild(element)
-  if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
+  if (!innerTextNode || innerTextNode.nodeType !== Node.TEXT_NODE || virtualElements.nextSibling(innerTextNode)) {
     virtualElements.setDomNodeChildren(element, [element.ownerDocument!.createTextNode(value)])
   } else {
     ;(innerTextNode as Text).data = value

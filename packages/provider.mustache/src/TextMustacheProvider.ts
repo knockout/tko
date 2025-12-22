@@ -8,9 +8,9 @@ import { parseInterpolation } from './mustacheParser'
  * This binding must come before the VirtualProvider.
  */
 export default class TextMustacheProvider extends Provider {
-  get FOR_NODE_TYPES() {
-    return [3]
-  } // document.TEXT_NODE
+  override get FOR_NODE_TYPES() {
+    return [Node.TEXT_NODE]
+  }
 
   *textToNodes(textNode: Node) {
     const parent = textNode.parentNode
@@ -56,7 +56,7 @@ export default class TextMustacheProvider extends Provider {
    *
    * VirtualProvider can then pick up and do the actual binding.
    */
-  preprocessNode(node: Node) {
+  override preprocessNode(node: Node) {
     return this.textInterpolation(node)
   }
 }

@@ -313,7 +313,7 @@ describe('Binding: Foreach', function () {
     options.bindingProviderInstance = new preprocessingBindingProvider()
     options.bindingProviderInstance.preprocessNode = function (node) {
       let dataNode: any = node
-      if (node.nodeType === 3 && dataNode.data.charAt(0) === '$') {
+      if (node.nodeType === Node.TEXT_NODE && dataNode.data.charAt(0) === '$') {
         let newNodes = [document.createComment('ko text: ' + dataNode.data), document.createComment('/ko')]
         for (let i = 0; i < newNodes.length; i++) {
           node.parentNode?.insertBefore(newNodes[i], node)
@@ -321,6 +321,7 @@ describe('Binding: Foreach', function () {
         node.parentNode?.removeChild(node)
         return newNodes
       }
+      return undefined
     }
 
     // Now perform a foreach binding, and see that afterRender gets the output from the preprocessor and bindings
@@ -377,7 +378,7 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML =
       "<div data-bind='foreach: { data: someItems, afterAdd: callback }'><span data-bind='text: childprop'></span></div>"
     let callbackObservable = observable(1),
-      someItems: ObservableArray = observableArray([]),
+      someItems: ObservableArray = observableArray<any>([]),
       callbacks = 0
     applyBindings(
       {
@@ -834,7 +835,7 @@ describe('Binding: Foreach', function () {
         { name: observable('Ceres') }
       ]),
       beforeRemove = function (elem) {
-        if (elem.nodeType === 1) {
+        if (elem.nodeType === Node.ELEMENT_NODE) {
           setTimeout(function () {
             removeNode(elem)
           }, 1)
@@ -954,6 +955,7 @@ describe('Binding: Foreach', function () {
         node.parentNode?.removeChild(node)
         return []
       }
+      return undefined
     }
     testNode.innerHTML =
       "<div data-bind='foreach: items'>"

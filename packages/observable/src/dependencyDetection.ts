@@ -56,18 +56,21 @@ export function getDependenciesCount(): number | undefined {
   if (currentFrame) {
     return currentFrame.computed.getDependenciesCount()
   }
+  return undefined
 }
 
 export function getDependencies(): Subscribable[] | undefined {
   if (currentFrame) {
     return currentFrame.computed.getDependencies()
   }
+  return undefined
 }
 
 export function isInitial(): boolean | undefined {
   if (currentFrame) {
     return currentFrame.isInitial
   }
+  return undefined
 }
 
 export { ignore as ignoreDependencies }

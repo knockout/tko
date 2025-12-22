@@ -78,7 +78,7 @@ export default class SlotBinding extends DescendantBindingHandler {
     return $componentTemplateSlotNodes[slotName]
   }
 
-  static get allowVirtualElements(): true {
+  static override get allowVirtualElements(): true {
     return true
   }
 }

@@ -28,7 +28,7 @@ class JsxTestObserver extends JsxObserver {
   }
 
   // For testing purposes, we make this synchronous.
-  detachAndDispose(node) {
+  override detachAndDispose(node) {
     super.detachAndDispose(node)
     cleanNode(node)
   }

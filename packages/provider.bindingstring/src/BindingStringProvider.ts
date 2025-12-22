@@ -44,7 +44,7 @@ export default class BindingStringProvider extends Provider {
     return Array.from(this.generateBindingString(bindingStringOrObjects)).join(',')
   }
 
-  getBindingAccessors(node: Node, context) {
+  override getBindingAccessors(node: Node, context) {
     const bindingString = node && this.getBindingString(node)
     if (!bindingString) {
       return

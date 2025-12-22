@@ -175,7 +175,7 @@ describe('Binding: Options', function () {
   })
 
   it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
-    let myObservable: ObservableArray<string | number> = observableArray(['A', 'B', 'C']),
+    let myObservable: ObservableArray<string | number> = observableArray<string | number>(['A', 'B', 'C']),
       changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues'></select>"
     registerEventHandler(testNode.childNodes[0] as HTMLSelectElement, 'change', function () {

@@ -24,7 +24,7 @@ export class WithBindingHandler extends ConditionalBindingHandler {
     this.computed('render')
   }
 
-  get bindingContext() {
+  override get bindingContext() {
     if (!this.asOption) {
       return this.$context.createChildContext(this.valueAccessor)
     }
@@ -33,7 +33,7 @@ export class WithBindingHandler extends ConditionalBindingHandler {
       : this.$context.extend({ [this.asOption]: this.value })
   }
 
-  renderStatus() {
+  override renderStatus() {
     const shouldDisplay = Boolean(this.conditional())
     return { shouldDisplay }
   }

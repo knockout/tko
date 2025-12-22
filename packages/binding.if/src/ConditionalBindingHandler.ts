@@ -102,7 +102,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
    * Matches <!-- else -->
    */
   isElseNode(node) {
-    return node.nodeType === 8 && node.nodeValue.trim().toLowerCase() === 'else'
+    return node.nodeType === Node.COMMENT_NODE && node.nodeValue.trim().toLowerCase() === 'else'
   }
 
   detectElse(element) {
@@ -139,10 +139,10 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     return { ifNodes, elseNodes }
   }
 
-  get controlsDescendants() {
+  override get controlsDescendants() {
     return true
   }
-  static get allowVirtualElements() {
+  static override get allowVirtualElements() {
     return true
   }
 }
