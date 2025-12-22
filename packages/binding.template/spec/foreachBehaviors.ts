@@ -613,7 +613,9 @@ describe('Binding: Foreach', function () {
     testNode.childNodes[0].childNodes[1].appendChild(document.createComment('/ko'))
     testNode.childNodes[0].appendChild(document.createComment('/ko'))
 
-    const viewModel = { items: [{ childval: { childprop: 123 } }, { childval: null }, { childval: { childprop: 456 } }] }
+    const viewModel = {
+      items: [{ childval: { childprop: 123 } }, { childval: null }, { childval: { childprop: 456 } }]
+    }
     applyBindings(viewModel, testNode)
 
     expect(testNode).toContainHtml(

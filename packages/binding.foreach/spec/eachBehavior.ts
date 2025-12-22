@@ -794,7 +794,9 @@ describe('observable array changes', function () {
         })
         cbi++
       }
-      const target = $("<ul data-bind='foreach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>")
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>"
+      )
       applyBindings({ arr: arr, cb: cb }, target[0])
       assert.equal(cbi, 0)
       assert.equal(target.text(), 'a1b1c1')
@@ -817,7 +819,9 @@ describe('observable array changes', function () {
           }
         }
       }
-      const target = $("<ul data-bind='foreach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>")
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeRemove: cb }'><li data-bind='text: $data'></li></div>"
+      )
       applyBindings({ arr: arr, cb: cb }, target[0])
       assert.equal(cbi, 0)
       assert.equal(target.text(), 'a2b2c2')

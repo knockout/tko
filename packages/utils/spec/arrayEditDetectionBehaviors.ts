@@ -96,7 +96,28 @@ describe('Compare Arrays', function () {
     // In order to test this, we must have a scenario in which a move is not recognized as such without the option.
     // This scenario doesn't represent the definition of the spec itself and may need to be modified if the move
     // detection algorithm in Knockout is changed.
-    const oldArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+    const oldArray = [
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+      'G',
+      'H',
+      'I',
+      'J',
+      'K',
+      'L',
+      'M',
+      'N',
+      'O',
+      'P',
+      'Q',
+      'R',
+      'S',
+      'T'
+    ]
     const newArray = [1, 2, 3, 4, 'T', 6, 7, 8, 9, 10]
 
     let compareResult = compareArrays(oldArray, newArray)
