@@ -28,6 +28,7 @@ declare global {
     function getEnv(): any
 
     const FakeTimer: any
+    const undefined: any // Legacy Jasmine 1.x sentinel value for deleted scheduled functions
     let browserSupportsProtoAssignment: any
     let ieVersion: any
 
