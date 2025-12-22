@@ -11,16 +11,18 @@
     "allowSyntheticDefaultImports":  true,
     "strict": true,
     "baseUrl": ".",
-    "noEmit": true,
+    "noEmit": true, //Deactivate "noEmit" to generating d.ts-File to 'builds/dts/dist' via "make dts"
+    "emitDeclarationOnly": true,
+    "outDir": "builds/dts/dist",
     /*Disable some typing feature from ts to detect first steps to a strong typed version*/
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
-    "strictFunctionTypes": true,
+    "strictFunctionTypes": false,
     "skipLibCheck": true,
     /* END Disabling */
     "paths": {
