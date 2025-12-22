@@ -6,7 +6,7 @@ describe('Binding preprocessing', function () {
   let bindingHandlers, preProcessBindings
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     bindingHandlers = provider.bindingHandlers
     preProcessBindings = provider.preProcessBindings.bind(provider)
   })
@@ -19,8 +19,8 @@ describe('Binding preprocessing', function () {
         return value || 'false'
       }
     }
-    let rewritten = preProcessBindings('a: 1, b')
-    let parsedRewritten = eval('({' + rewritten + '})')
+    const rewritten = preProcessBindings('a: 1, b')
+    const parsedRewritten = eval('({' + rewritten + '})')
     expect(parsedRewritten.a).to.equal(1)
     expect(parsedRewritten.b).to.equal(false)
   })
@@ -39,8 +39,8 @@ describe('Binding preprocessing', function () {
         addBinding(key + '2', value)
       }
     }
-    let rewritten = preProcessBindings('a: 1, b: 2')
-    let parsedRewritten = eval('({' + rewritten + '})')
+    const rewritten = preProcessBindings('a: 1, b: 2')
+    const parsedRewritten = eval('({' + rewritten + '})')
 
     expect(parsedRewritten.a).to.equal(1)
     expect(parsedRewritten.a2).to.equal(1)
@@ -62,8 +62,8 @@ describe('Binding preprocessing', function () {
         return '' + (+value + 1)
       }
     }
-    let rewritten = preProcessBindings('a: 2')
-    let parsedRewritten = eval('({' + rewritten + '})')
+    const rewritten = preProcessBindings('a: 2')
+    const parsedRewritten = eval('({' + rewritten + '})')
     expect(parsedRewritten.a).to.equal(undefined)
     expect(parsedRewritten.b).to.equal(3)
   })
@@ -79,8 +79,8 @@ describe('Binding preprocessing', function () {
         }
       }
     })
-    let rewritten = preProcessBindings('a: 1')
-    let parsedRewritten = eval('({' + rewritten + '})')
+    const rewritten = preProcessBindings('a: 1')
+    const parsedRewritten = eval('({' + rewritten + '})')
     expect(parsedRewritten.a).to.equal(12)
   })
 })

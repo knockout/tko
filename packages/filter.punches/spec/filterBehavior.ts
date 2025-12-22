@@ -14,7 +14,7 @@ if (!Array.isArray) {
 */
 
 describe('Text filters preprocessor', function () {
-  let filterPreprocessor = function (string) {
+  const filterPreprocessor = function (string) {
     return 'todo deactivated, see xit'
   } //var filterPreprocessor = ko.punches.textFilter.preprocessor;
 
@@ -93,7 +93,7 @@ describe('Text filters preprocessor', function () {
     attempt('default', [null, 'blank'], 'blank')
     attempt('default', [undefined, 'blank'], 'blank')
     // a function is not converted
-    let emptyFunction = function () {}
+    const emptyFunction = function () {}
     attempt('default', [emptyFunction, 'blank'], emptyFunction)
     // Should unwrap observable value
     attempt('default', [observable('someText'), 'blank'], 'someText')

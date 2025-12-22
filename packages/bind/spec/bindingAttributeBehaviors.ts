@@ -36,7 +36,7 @@ describe('Binding attribute syntax', function () {
 
   beforeEach(function () {
     // Set up the default binding handlers.
-    let provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
+    const provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
@@ -71,7 +71,7 @@ describe('Binding attribute syntax', function () {
     }) // Just to avoid interfering with other specs
 
     let didInit = false
-    let suppliedViewModel = {}
+    const suppliedViewModel = {}
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
         expect(element.id).toEqual('testElement')
@@ -86,7 +86,7 @@ describe('Binding attribute syntax', function () {
 
   it('applyBindings should accept two parameters and then act on second param as DOM node with first param as model', function () {
     let didInit = false
-    let suppliedViewModel = {}
+    const suppliedViewModel = {}
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
         expect(element.id).toEqual('testElement')
@@ -96,7 +96,7 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div id='testElement' data-bind='test'></div>"
 
-    let shouldNotMatchNode = document.createElement('DIV')
+    const shouldNotMatchNode = document.createElement('DIV')
     shouldNotMatchNode.innerHTML = "<div id='shouldNotMatchThisElement' data-bind='test'></div>"
     document.body.appendChild(shouldNotMatchNode)
     this.after(function () {
@@ -287,7 +287,7 @@ describe('Binding attribute syntax', function () {
 
   it('Calls options.onError, if it is defined', function () {
     let oe_calls = 0
-    let oxy = koObservable()
+    const oxy = koObservable()
     this.after(function () {
       options.set('onError', undefined)
     })
@@ -314,7 +314,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it("Should invoke registered handlers's init() then update() methods passing binding data", function () {
-    let methodsInvoked = new Array()
+    const methodsInvoked = new Array()
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings) {
         methodsInvoked.push('init')
@@ -337,7 +337,7 @@ describe('Binding attribute syntax', function () {
   })
 
   it("Should invoke each handlers's init() and update() before running the next one", function () {
-    let methodsInvoked = new Array()
+    const methodsInvoked = new Array()
     bindingHandlers.test1 = bindingHandlers.test2 = {
       init: function (element, valueAccessor) {
         methodsInvoked.push('init' + valueAccessor())
@@ -404,8 +404,8 @@ describe('Binding attribute syntax', function () {
   it('Should use properties on the view model in preference to properties on the binding context', function () {
     // In KO 3.5 this test relied on a bit of duck-typing (it has a $data).
     testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>"
-    let outer = new bindingContext({ someProp: 'Outer value' })
-    let inner = new bindingContext({ someProp: 'Inner value' }, outer)
+    const outer = new bindingContext({ someProp: 'Outer value' })
+    const inner = new bindingContext({ someProp: 'Inner value' }, outer)
     applyBindings(inner, testNode)
     expect(testNode).toContainText('Inner value')
   })
@@ -419,7 +419,7 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML =
       "<div data-bind='with: sub'>Static<div data-bind='addCustomProperty: true'>Text-<div data-bind='text: $customProp'></div></div></div>"
-    let vm = { sub: {} }
+    const vm = { sub: {} }
     applyBindings(vm, testNode)
     expect(testNode).toContainText('StaticText-MyValue')
     expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$customProp).toEqual('MyValue')
@@ -447,7 +447,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='with: $data'><div></div></div>"
     applyBindings({}, testNode)
 
-    let allowedProperties = ['$parents', '$root', 'ko', '$rawData', '$data', '$parentContext', '$parent']
+    const allowedProperties = ['$parents', '$root', 'ko', '$rawData', '$data', '$parentContext', '$parent']
     if (typeof Symbol('') !== 'symbol') {
       // Test for shim
       allowedProperties.push('_subscribable')
@@ -486,11 +486,11 @@ describe('Binding attribute syntax', function () {
     bindingHandlers.allowBindings = {
       init: function (elem, valueAccessor) {
         // Let bindings proceed as normal *only if* my value is false
-        let shouldAllowBindings = unwrap(valueAccessor())
+        const shouldAllowBindings = unwrap(valueAccessor())
         return { controlsDescendantBindings: !shouldAllowBindings }
       }
     }
-    let vm = { isVisible: true }
+    const vm = { isVisible: true }
     applyBindings(vm, testNode)
 
     // All of the bound nodes return the viewmodel
@@ -508,13 +508,13 @@ describe('Binding attribute syntax', function () {
     // See https://github.com/knockout/knockout/issues/231#issuecomment-388210267
     testNode.innerHTML = '<div data-bind="text: name"></div>'
 
-    let vm1 = { name: 'specific' }
+    const vm1 = { name: 'specific' }
     applyBindingsToNode(testNode.childNodes[0], { text: vm1.name }, vm1)
     expect(testNode).toContainText(vm1.name)
     expect(dataFor(testNode.childNodes[0])).toBe(vm1)
     expect(contextFor(testNode.childNodes[0]).$data).toBe(vm1)
 
-    let vm2 = { name: 'general' }
+    const vm2 = { name: 'general' }
     applyBindings(vm2, testNode)
     expect(testNode).toContainText(vm2.name)
     expect(dataFor(testNode.childNodes[0])).toBe(vm2)
@@ -669,7 +669,7 @@ describe('Binding attribute syntax', function () {
   it('Should be able to set and access correct context in custom containerless binding', function () {
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        let innerContext = bindingContext.createChildContext({ myCustomData: 123 })
+        const innerContext = bindingContext.createChildContext({ myCustomData: 123 })
         applyBindingsToDescendants(innerContext, element)
         return { controlsDescendantBindings: true }
       }
@@ -686,7 +686,7 @@ describe('Binding attribute syntax', function () {
     delete bindingHandlers.nonexistentHandler
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        let innerContext = bindingContext.createChildContext({ myCustomData: 123 })
+        const innerContext = bindingContext.createChildContext({ myCustomData: 123 })
         applyBindingsToDescendants(innerContext, element)
         return { controlsDescendantBindings: true }
       }
@@ -703,7 +703,7 @@ describe('Binding attribute syntax', function () {
   it('Should be able to access custom context variables in child context', function () {
     bindingHandlers.bindChildrenWithCustomContext = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        let innerContext = bindingContext.createChildContext({ myCustomData: 123 })
+        const innerContext = bindingContext.createChildContext({ myCustomData: 123 })
         innerContext.customValue = 'xyz'
         applyBindingsToDescendants(innerContext, element)
         return { controlsDescendantBindings: true }
@@ -824,7 +824,7 @@ describe('Binding attribute syntax', function () {
       // First replace the binding provider with one that's hardcoded to replace all text
       // content with a special message, via a binding handler that operates on text nodes
 
-      let originalBindingProvider = options.bindingProviderInstance
+      const originalBindingProvider = options.bindingProviderInstance
       class TestProvider extends Provider {
         override get FOR_NODE_TYPES() {
           return [Node.TEXT_NODE]
@@ -858,7 +858,7 @@ describe('Binding attribute syntax', function () {
         }
       }
 
-      let tp = new TestProvider()
+      const tp = new TestProvider()
       tp.bindingHandlers = originalBindingProvider.bindingHandlers
       options.bindingProviderInstance = tp
     })

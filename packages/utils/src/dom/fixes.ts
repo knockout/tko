@@ -66,7 +66,7 @@ export function forceRefresh(node) {
   // Workaround for an IE9 rendering bug - https://github.com/SteveSanderson/knockout/issues/209
   if ((ieVersion as any) >= 9) {
     // For text nodes and comment nodes (most likely virtual elements), we will have to refresh the container
-    let elem = node.nodeType === Node.ELEMENT_NODE ? node : node.parentNode
+    const elem = node.nodeType === Node.ELEMENT_NODE ? node : node.parentNode
     if (elem.style) {
       elem.style.zoom = elem.style.zoom // eslint-disable-line no-self-assign
     }
@@ -78,7 +78,7 @@ export function ensureSelectElementIsRenderedCorrectly(selectElement) {
   // (See https://github.com/SteveSanderson/knockout/issues/312, http://stackoverflow.com/questions/5908494/select-only-shows-first-char-of-selected-option)
   // Also fixes IE7 and IE8 bug that causes selects to be zero width if enclosed by 'if' or 'with'. (See issue #839)
   if (ieVersion) {
-    let originalWidth = selectElement.style.width
+    const originalWidth = selectElement.style.width
     selectElement.style.width = 0
     selectElement.style.width = originalWidth
   }

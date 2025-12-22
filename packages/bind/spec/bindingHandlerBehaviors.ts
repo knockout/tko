@@ -28,7 +28,7 @@ describe('BindingHandler behaviors', function () {
 
   beforeEach(function () {
     // Set up the default binding handlers.
-    let provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
+    const provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
@@ -52,7 +52,7 @@ describe('BindingHandler behaviors', function () {
 
         constructor(...args) {
           super(...args)
-          let v = (this.v = koObservable(0))
+          const v = (this.v = koObservable(0))
           instance = this
           this.x = this.computed(() => {
             xCalls++
@@ -120,7 +120,7 @@ describe('BindingHandler behaviors', function () {
 
   describe('Function binding handlers', function () {
     it('constructs the element with appropriate params', function () {
-      let obj = { canary: 42 },
+      const obj = { canary: 42 },
         viewModel = { param: obj }
       bindingHandlers.fnHandler = function (element, valueAccessor, allBindings, $data, $context) {
         expect(valueAccessor()).toEqual(obj)
@@ -153,7 +153,7 @@ describe('BindingHandler behaviors', function () {
     })
 
     it('does not error without a `dispose` property', function () {
-      let viewModel = { x: koObservable(true) }
+      const viewModel = { x: koObservable(true) }
       bindingHandlers.fnHandler = function () {}
       testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>'
       applyBindings(viewModel, testNode)

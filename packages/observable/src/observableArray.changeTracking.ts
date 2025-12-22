@@ -31,8 +31,8 @@ export function trackArrayChanges(target: ObservableArray, options?: CompareArra
   let arrayChangeSubscription
   let pendingNotifications = 0
   let underlyingNotifySubscribersFunction
-  let underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd
-  let underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove
+  const underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd
+  const underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove
 
   // Watch "subscribe" calls, and for array change events, ensure change tracking is enabled
   target.beforeSubscriptionAdd = function (event) {
@@ -151,7 +151,7 @@ export function trackArrayChanges(target: ObservableArray, options?: CompareArra
         {
           // Negative start index means 'from end of array'. After that we clamp to [0...arrayLength].
           // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-          let startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
+          const startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
             endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
             endAddIndex = startIndex + argsLength - 2,
             endIndex = Math.max(endDeleteIndex, endAddIndex),

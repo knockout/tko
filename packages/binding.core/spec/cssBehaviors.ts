@@ -19,15 +19,15 @@ describe('Binding: CSS classes', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
   })
 
   it('Should give the element the specific CSS class only when the specified value is true', function () {
-    let observable1 = observable()
-    let observable2 = observable(true)
+    const observable1 = observable()
+    const observable2 = observable(true)
     testNode.innerHTML =
       "<div class='unrelatedClass1 unrelatedClass2' data-bind='css: { myRule: someModelProperty, anotherRule: anotherModelProperty }'>Hallo</div>"
     applyBindings({ someModelProperty: observable1, anotherModelProperty: observable2 }, testNode)
@@ -40,7 +40,7 @@ describe('Binding: CSS classes', function () {
   })
 
   it('Should give the element a single CSS class without a leading space when the specified value is true', function () {
-    let observable1 = observable()
+    const observable1 = observable()
     testNode.innerHTML = "<div data-bind='css: { myRule: someModelProperty }'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
 
@@ -50,7 +50,7 @@ describe('Binding: CSS classes', function () {
   })
 
   it('Should toggle multiple CSS classes if specified as a single string separated by spaces', function () {
-    let observable1 = observable()
+    const observable1 = observable()
     testNode.innerHTML =
       "<div class='unrelatedClass1' data-bind='css: { \"myRule _another-Rule123\": someModelProperty }'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
@@ -63,7 +63,7 @@ describe('Binding: CSS classes', function () {
   })
 
   it('Should set/change dynamic CSS class(es) if string is specified', function () {
-    let observable1 = observable('')
+    const observable1 = observable('')
     testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
 
@@ -80,7 +80,7 @@ describe('Binding: CSS classes', function () {
 
   it('Should work with any arbitrary class names', function () {
     // See https://github.com/SteveSanderson/knockout/issues/704
-    let observable1 = observable()
+    const observable1 = observable()
     testNode.innerHTML =
       '<div data-bind=\'css: { "complex/className complex.className" : someModelProperty }\'>Something</div>'
     applyBindings({ someModelProperty: observable1 }, testNode)
@@ -102,11 +102,11 @@ describe('Binding: CSS classes', function () {
   // - http://voormedia.com/blog/2012/10/displaying-and-detecting-support-for-svg-images
   // - https://github.com/Modernizr/Modernizr/blob/master/feature-detects/svg.js
   // - https://github.com/eligrey/classList.js/pull/18
-  let svgTag = document.createElementNS && document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  const svgTag = document.createElementNS && document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 
   it('should update the class of an SVG tag', function () {
     if (svgTag) {
-      let myObservable = observable()
+      const myObservable = observable()
       testNode.innerHTML = "<svg class='Y' data-bind='css: {x: someModelProperty}'></svg>"
       applyBindings({ someModelProperty: myObservable }, testNode)
       expect(testNode.children[0].getAttribute('class')).toEqual('Y')
@@ -117,7 +117,7 @@ describe('Binding: CSS classes', function () {
 
   it('Should change dynamic CSS class(es) if null is specified', function () {
     // See https://github.com/knockout/knockout/issues/1468
-    let observable1 = observable({})
+    const observable1 = observable({})
     testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>"
     applyBindings({ someModelProperty: observable1 }, testNode)
     expect(testNode.children[0].className).toEqual('unrelatedClass1')
@@ -137,8 +137,8 @@ describe('Binding: CSS classes', function () {
     // This test doesn't cover cases where the static and dynamic bindings try to set or unset the same class name
     // because the behavior for that scenario isn't defined.
 
-    let booleanProp = observable(false)
-    let stringProp = observable('')
+    const booleanProp = observable(false)
+    const stringProp = observable('')
     testNode.innerHTML =
       "<div class='unrelatedClass' data-bind='css: { staticClass: booleanProp }, class: stringProp'></div>"
 

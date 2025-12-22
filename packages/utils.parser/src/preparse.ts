@@ -52,7 +52,7 @@ export default function parseObjectLiteral(objectLiteralString) {
   str += '\n,'
 
   // Split into tokens
-  let result = new Array()
+  const result = new Array()
   let toks = str.match(bindingToken)
   let key
   let values = new Array()
@@ -63,7 +63,7 @@ export default function parseObjectLiteral(objectLiteralString) {
   }
 
   for (let i = 0, tok; (tok = toks[i]); ++i) {
-    let c = tok.charCodeAt(0)
+    const c = tok.charCodeAt(0)
     // A comma signals the end of a key/value pair if depth is zero
     if (c === 44) {
       // ","
@@ -88,7 +88,7 @@ export default function parseObjectLiteral(objectLiteralString) {
     } else if (c === 47 && i && tok.length > 1) {
       // "/"
       // Look at the end of the previous token to determine if the slash is actually division
-      let match = toks[i - 1].match(divisionLookBehind)
+      const match = toks[i - 1].match(divisionLookBehind)
       if (match && !keywordRegexLookBehind[match[0]]) {
         // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
         str = str.substr(str.indexOf(tok) + 1)

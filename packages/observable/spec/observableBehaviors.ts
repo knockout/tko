@@ -12,12 +12,12 @@ import {
 
 describe('Observable', function () {
   it('Should be subscribable', function () {
-    let instance = observable()
+    const instance = observable()
     expect(isSubscribable(instance)).toEqual(true)
   })
 
   it('observable has limit', function () {
-    let instance = observable()
+    const instance = observable()
     expect(instance.limit).not.toBeUndefined()
   })
 
@@ -26,7 +26,7 @@ describe('Observable', function () {
   })
 
   it('Should advertise that instances are observable', function () {
-    let instance = observable()
+    const instance = observable()
     expect(isObservable(instance)).toEqual(true)
   })
 
@@ -41,18 +41,18 @@ describe('Observable', function () {
   })
 
   it('ko.isObservable should throw exception for value that has fake observable pointer', function () {
-    let x = observable()
+    const x = observable()
     x.__ko_proto__ = {}
     expect(() => isObservable(x)).toThrow()
   })
 
   it('Should be able to write values to it', function () {
-    let instance = observable()
+    const instance = observable()
     instance(123)
   })
 
   it('Should be able to write to multiple observable properties on a model object using chaining syntax', function () {
-    let model = { prop1: observable(), prop2: observable() }
+    const model = { prop1: observable(), prop2: observable() }
     model.prop1('A').prop2('B')
 
     expect(model.prop1()).toEqual('A')
@@ -60,8 +60,8 @@ describe('Observable', function () {
   })
 
   it('Should be able to use Function.prototype methods to access/update', function () {
-    let instance = observable('A')
-    let obj = {}
+    const instance = observable('A')
+    const obj = {}
 
     expect(instance.call(null)).toEqual('A')
     expect(instance.call(obj, 'B')).toBe(obj)
@@ -69,31 +69,31 @@ describe('Observable', function () {
   })
 
   it('Should advertise that instances can have values written to them', function () {
-    let instance = observable(function () {})
+    const instance = observable(function () {})
     expect(isWriteableObservable(instance)).toEqual(true)
     expect(isWritableObservable(instance)).toEqual(true)
   })
 
   it('Should be able to read back most recent value', function () {
-    let instance = observable()
+    const instance = observable()
     instance(123)
     instance(234)
     expect(instance()).toEqual(234)
   })
 
   it('Should initially have undefined value', function () {
-    let instance = observable()
+    const instance = observable()
     expect(instance()).toEqual(undefined)
   })
 
   it('Should be able to set initial value as constructor param', function () {
-    let instance = observable('Hi!')
+    const instance = observable('Hi!')
     expect(instance()).toEqual('Hi!')
   })
 
   it('Should notify subscribers about each new value', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value)
     })
@@ -105,8 +105,8 @@ describe('Observable', function () {
   })
 
   it('Should notify "spectator" subscribers about each new value', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(
       function (value) {
         notifiedValues.push(value)
@@ -121,13 +121,13 @@ describe('Observable', function () {
   })
 
   it('Should be able to tell it that its value has mutated, at which point it notifies subscribers', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(function (value) {
       notifiedValues.push(value.childProperty)
     })
 
-    let someUnderlyingObject = { childProperty: 'A' }
+    const someUnderlyingObject = { childProperty: 'A' }
     instance(someUnderlyingObject)
     expect(notifiedValues.length).toEqual(1)
     expect(notifiedValues[0]).toEqual('A')
@@ -139,8 +139,8 @@ describe('Observable', function () {
   })
 
   it('Should notify "beforeChange" subscribers before each new value', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(
       function (value) {
         notifiedValues.push(value)
@@ -158,8 +158,8 @@ describe('Observable', function () {
   })
 
   it('Should be able to tell it that its value will mutate, at which point it notifies "beforeChange" subscribers', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(
       function (value) {
         notifiedValues.push(value ? value.childProperty : value)
@@ -168,7 +168,7 @@ describe('Observable', function () {
       'beforeChange'
     )
 
-    let someUnderlyingObject = { childProperty: 'A' }
+    const someUnderlyingObject = { childProperty: 'A' }
     instance(someUnderlyingObject)
     expect(notifiedValues.length).toEqual(1)
     expect(notifiedValues[0]).toEqual(undefined)
@@ -184,8 +184,8 @@ describe('Observable', function () {
   })
 
   it('Should ignore writes when the new value is primitive and strictly equals the old value', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     for (let i = 0; i < 3; i++) {
@@ -200,16 +200,16 @@ describe('Observable', function () {
   })
 
   it('Should ignore writes when both the old and new values are strictly null', function () {
-    let instance = observable(null)
-    let notifiedValues = new Array()
+    const instance = observable(null)
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
     instance(null)
     expect(notifiedValues).toEqual([])
   })
 
   it('Should ignore writes when both the old and new values are strictly undefined', function () {
-    let instance = observable(undefined)
-    let notifiedValues = new Array()
+    const instance = observable(undefined)
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
     instance(undefined)
     expect(notifiedValues).toEqual([])
@@ -218,17 +218,17 @@ describe('Observable', function () {
   it('Should notify subscribers of a change when an object value is written, even if it is identical to the old value', function () {
     // Because we can't tell whether something further down the object graph has changed, we regard
     // all objects as new values. To override this, set an "equalityComparer" callback
-    let constantObject = {}
-    let instance = observable(constantObject)
-    let notifiedValues = new Array()
+    const constantObject = {}
+    const instance = observable(constantObject)
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
     instance(constantObject)
     expect(notifiedValues).toEqual([constantObject])
   })
 
   it("Should notify subscribers of a change even when an identical primitive is written if you've set the equality comparer to null", function () {
-    let instance = observable('A')
-    let notifiedValues = new Array()
+    const instance = observable('A')
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     // No notification by default
@@ -242,12 +242,12 @@ describe('Observable', function () {
   })
 
   it('Should ignore writes when the equalityComparer callback states that the values are equal', function () {
-    let instance = observable()
+    const instance = observable()
     instance.equalityComparer = function (a, b) {
       return !(a && b) ? a === b : a.id == b.id
     }
 
-    let notifiedValues = new Array()
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     instance({ id: 1 })
@@ -279,8 +279,8 @@ describe('Observable', function () {
   })
 
   it('Should expose a "notify" extender that can configure the observable to notify on all writes, even if the value is unchanged', function () {
-    let instance = observable()
-    let notifiedValues = new Array()
+    const instance = observable()
+    const notifiedValues = new Array()
     instance.subscribe(notifiedValues.push, notifiedValues)
 
     instance(123)
@@ -302,8 +302,8 @@ describe('Observable', function () {
   })
 
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
-    let instance = observable(123)
-    let interceptedNotifications = new Array()
+    const instance = observable(123)
+    const interceptedNotifications = new Array()
     instance.subscribe(function () {
       throw new Error('Should not notify subscribers by default once notifySubscribers is overridden')
     })
@@ -335,7 +335,7 @@ describe('Observable', function () {
       return this()
     }
 
-    let instance = observable(123)
+    const instance = observable(123)
     expect(instance.customProp).toEqual('subscribable value')
     expect(instance.customFunc()).toEqual(123)
   })
@@ -351,10 +351,10 @@ describe('Observable', function () {
       delete observable.fn.customFunction2
     })
 
-    let myObservable = observable()
+    const myObservable = observable()
 
-    let customFunction1 = function () {}
-    let customFunction2 = function () {}
+    const customFunction1 = function () {}
+    const customFunction2 = function () {}
 
     subscribable.fn.customFunction1 = customFunction1
     myObservable.fn.customFunction2 = customFunction2
@@ -375,7 +375,7 @@ describe('Observable', function () {
 
 describe('unwrap', function () {
   it('Should return the supplied value for non-observables', function () {
-    let someObject = { abc: 123 }
+    const someObject = { abc: 123 }
 
     expect(unwrap(123)).toBe(123)
     expect(unwrap(someObject)).toBe(someObject)

@@ -17,47 +17,47 @@ describe('Binding: Visible', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
 
   it('Visible means the node only when the value is true', function () {
-    let myObservable = observable(false)
+    const myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='visible:myModelProperty()' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
-    let node = testNode.childNodes[0] as HTMLElement
+    const node = testNode.childNodes[0] as HTMLElement
     expect(node.style.display).toEqual('none')
     myObservable(true)
     expect(node.style.display).toEqual('')
   })
 
   it('Visible should unwrap observables implicitly', function () {
-    let myObservable = observable(false)
+    const myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='visible:myModelProperty' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
-    let node = testNode.childNodes[0] as HTMLElement
+    const node = testNode.childNodes[0] as HTMLElement
     expect(node.style.display).toEqual('none')
   })
 
   it('Hidden means the node is only visible when the value is false', function () {
-    let myObservable = observable(false)
+    const myObservable = observable(false)
     testNode.innerHTML = "<input data-bind='hidden:myModelProperty()' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
-    let node = testNode.childNodes[0] as HTMLElement
+    const node = testNode.childNodes[0] as HTMLElement
     expect(node.style.display).toEqual('')
     myObservable(true)
     expect(node.style.display).toEqual('none')
   })
 
   it('Hidden should unwrap observables implicitly', function () {
-    let myObservable = observable(true)
+    const myObservable = observable(true)
     testNode.innerHTML = "<input data-bind='hidden:myModelProperty' />"
     applyBindings({ myModelProperty: myObservable }, testNode)
 
-    let node = testNode.childNodes[0] as HTMLElement
+    const node = testNode.childNodes[0] as HTMLElement
     expect(node.style.display).toEqual('none')
   })
 })

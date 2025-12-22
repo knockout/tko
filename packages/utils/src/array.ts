@@ -39,7 +39,7 @@ export function arrayMap<T = any, U = any>(array: ArrayLike<T>, mapping: (item: 
 }
 
 export function arrayRemoveItem<T = any>(array: Array<T>, itemToRemove: T): void {
-  let index = arrayIndexOf(array, itemToRemove)
+  const index = arrayIndexOf(array, itemToRemove)
   if (index > 0) {
     array.splice(index, 1)
   } else if (index === 0) {
@@ -78,7 +78,7 @@ export function arrayPushAll<T = any>(array: Array<T>, valuesToPush: ArrayLike<T
 }
 
 export function addOrRemoveItem(array, value, included: boolean) {
-  let existingEntryIndex = arrayIndexOf(typeof array.peek === 'function' ? array.peek() : array, value)
+  const existingEntryIndex = arrayIndexOf(typeof array.peek === 'function' ? array.peek() : array, value)
   if (existingEntryIndex < 0) {
     if (included) {
       array.push(value)
@@ -98,7 +98,7 @@ export function makeArray<T = any>(arrayLikeObject: ArrayLike<T>): T[] {
 export function range(min: () => number | number, max: () => number | number): number[] {
   const minimum = typeof min === 'function' ? (min as () => number)() : (min as number)
   const maximum = typeof max === 'function' ? (max as () => number)() : (max as number)
-  let result: number[] = []
+  const result: number[] = []
   for (let i = minimum as number; i <= maximum; i++) {
     result.push(i)
   }
@@ -200,8 +200,8 @@ function compareSmallArrayToBigArray<T = any>(
         thisRow[bigIndex] = lastRow[bigIndex - 1]
       } else {
         // copy value (no edit)
-        let northDistance = lastRow[bigIndex] || maxDistance // not in big (deletion)
-        let westDistance = thisRow[bigIndex - 1] || maxDistance // not in small (addition)
+        const northDistance = lastRow[bigIndex] || maxDistance // not in big (deletion)
+        const westDistance = thisRow[bigIndex - 1] || maxDistance // not in small (addition)
         thisRow[bigIndex] = myMin(northDistance, westDistance) + 1
       }
     }

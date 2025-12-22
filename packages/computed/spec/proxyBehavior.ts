@@ -51,7 +51,7 @@ describe('Proxy', function () {
 
   it('creates dependencies on the proxied elements', function () {
     const p = proxy({ a: 1 })
-    let a2 = computed(() => p.a * p.a)
+    const a2 = computed(() => p.a * p.a)
     expect(a2()).toBe(1)
     p.a++
     expect(a2()).toBe(4)

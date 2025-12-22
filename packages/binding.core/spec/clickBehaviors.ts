@@ -16,7 +16,7 @@ describe('Binding: Click', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })

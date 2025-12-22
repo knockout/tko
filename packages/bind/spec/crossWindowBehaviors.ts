@@ -31,7 +31,7 @@ const BLANK_HTML = `
 describe('Cross-window support', function () {
   beforeEach(function () {
     // Set up the default binding handlers.
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(templateBindings)
@@ -70,7 +70,7 @@ describe('Cross-window support', function () {
     // foreach
     window.runs(function () {
       body2.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: childProp'></span></div>"
-      let someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
+      const someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
       applyBindings({ someItems: someItems }, body2)
       expect(body2.childNodes[0]).toContainHtml(
         '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
@@ -83,7 +83,7 @@ describe('Cross-window support', function () {
       setTemplateEngine(new nativeTemplateEngine())
       body2.innerHTML =
         "<div id='tmpl'><span data-bind='text: childProp'></span></div><div data-bind='template: {name: \"tmpl\", foreach: someItems}'></div>"
-      let someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
+      const someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
       applyBindings({ someItems: someItems }, body2.childNodes[1])
       expect(body2.childNodes[1]).toContainHtml(
         '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
@@ -93,7 +93,7 @@ describe('Cross-window support', function () {
 
     // with
     window.runs(function () {
-      let someItem = observable(undefined)
+      const someItem = observable(undefined)
       body2.innerHTML =
         "<div data-bind='with: someItem'><span data-bind='text: occasionallyExistentChildProp'></span></div>"
       applyBindings({ someItem: someItem }, body2)

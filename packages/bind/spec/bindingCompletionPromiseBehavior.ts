@@ -52,7 +52,7 @@ describe('Binding Application Promise', function () {
 
   beforeEach(function () {
     // Set up the default binding handlers.
-    let provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
+    const provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)

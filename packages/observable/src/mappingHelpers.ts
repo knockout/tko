@@ -6,7 +6,7 @@
 
 import { isObservable } from './observable'
 
-let maxNestedObservableDepth: number = 10 // Escape the (unlikely) pathological case where an observable's current value is itself (or similar reference cycle)
+const maxNestedObservableDepth: number = 10 // Escape the (unlikely) pathological case where an observable's current value is itself (or similar reference cycle)
 
 export function toJS<T = any>(rootObject: T): T {
   if (arguments.length == 0) {
@@ -29,7 +29,7 @@ export function toJSON<T = any>(
   space?: string | number
 ): string {
   // replacer and space are optional
-  let plainJavaScriptObject = toJS(rootObject)
+  const plainJavaScriptObject = toJS(rootObject)
   return JSON.stringify(plainJavaScriptObject, replacer, space)
 }
 
@@ -39,7 +39,7 @@ function mapJsObjectGraph<T = any>(
   visitedObjects = new Map()
 ): any {
   rootObject = mapInputCallback(rootObject)
-  let canHaveProperties =
+  const canHaveProperties =
     typeof rootObject === 'object'
     && rootObject !== null
     && rootObject !== undefined
@@ -52,11 +52,11 @@ function mapJsObjectGraph<T = any>(
     return rootObject
   }
 
-  let outputProperties: any = rootObject instanceof Array ? [] : {}
+  const outputProperties: any = rootObject instanceof Array ? [] : {}
   visitedObjects.set(rootObject, outputProperties)
 
   visitPropertiesOrArrayEntries(rootObject, function (indexer: any) {
-    let propertyValue = mapInputCallback(rootObject![indexer])
+    const propertyValue = mapInputCallback(rootObject![indexer])
 
     switch (typeof propertyValue) {
       case 'boolean':
@@ -92,7 +92,7 @@ function visitPropertiesOrArrayEntries<T = any>(rootObject: T, visitorCallback: 
       visitorCallback('toJSON')
     }
   } else {
-    for (let propertyName in rootObject) {
+    for (const propertyName in rootObject) {
       visitorCallback(propertyName)
     }
   }

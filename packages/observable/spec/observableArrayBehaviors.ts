@@ -38,7 +38,7 @@ describe('Observable Array', function () {
   })
 
   it('Should initialize to empty array if you pass no args to constructor', function () {
-    let instance = observableArray()
+    const instance = observableArray()
     expect(instance().length).toEqual(0)
   })
 
@@ -69,8 +69,8 @@ describe('Observable Array', function () {
   }
 
   it('Should be able to mark single items as destroyed', function () {
-    let x: MyModel = { _destroy: null }
-    let y: MyModel = { _destroy: null }
+    const x: MyModel = { _destroy: null }
+    const y: MyModel = { _destroy: null }
     testObservableArray([x, y])
     testObservableArray.destroy(y)
     expect(testObservableArray().length).toEqual(2)
@@ -79,9 +79,9 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark multiple items as destroyed', function () {
-    let x: MyModel = { _destroy: null }
-    let y: MyModel = { _destroy: null }
-    let z: MyModel = { _destroy: null }
+    const x: MyModel = { _destroy: null }
+    const y: MyModel = { _destroy: null }
+    const z: MyModel = { _destroy: null }
 
     testObservableArray([x, y, z])
     testObservableArray.destroyAll([x, z])
@@ -92,7 +92,7 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark observable items as destroyed', function () {
-    let x = observable(),
+    const x = observable(),
       y = observable()
     testObservableArray([x, y])
     testObservableArray.destroy(y)
@@ -102,9 +102,9 @@ describe('Observable Array', function () {
   })
 
   it('Should be able to mark all items as destroyed by passing no args to destroyAll()', function () {
-    let x: MyModel = { _destroy: null }
-    let y: MyModel = { _destroy: null }
-    let z: MyModel = { _destroy: null }
+    const x: MyModel = { _destroy: null }
+    const y: MyModel = { _destroy: null }
+    const z: MyModel = { _destroy: null }
 
     testObservableArray([x, y, z])
     testObservableArray.destroyAll()
@@ -125,25 +125,25 @@ describe('Observable Array', function () {
   })
 
   it('Should notify subscribers on pop', function () {
-    let popped = testObservableArray.pop()
+    const popped = testObservableArray.pop()
     expect(popped).toEqual(3)
     expect(notifiedValues).toEqual([[1, 2]])
   })
 
   it('Should notify "beforeChange" subscribers before pop', function () {
-    let popped = testObservableArray.pop()
+    const popped = testObservableArray.pop()
     expect(popped).toEqual(3)
     expect(beforeNotifiedValues).toEqual([[1, 2, 3]])
   })
 
   it('Should notify subscribers on splice', function () {
-    let spliced = testObservableArray.splice(1, 1)
+    const spliced = testObservableArray.splice(1, 1)
     expect(spliced).toEqual([2])
     expect(notifiedValues).toEqual([[1, 3]])
   })
 
   it('Should notify "beforeChange" subscribers before splice', function () {
-    let spliced = testObservableArray.splice(1, 1)
+    const spliced = testObservableArray.splice(1, 1)
     expect(spliced).toEqual([2])
     expect(beforeNotifiedValues).toEqual([[1, 2, 3]])
   })
@@ -151,7 +151,7 @@ describe('Observable Array', function () {
   it('Should notify subscribers on remove by value', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     notifiedValues = new Array()
-    let removed = testObservableArray.remove('Beta')
+    const removed = testObservableArray.remove('Beta')
     expect(removed).toEqual(['Beta'])
     expect(notifiedValues).toEqual([['Alpha', 'Gamma']])
   })
@@ -159,7 +159,7 @@ describe('Observable Array', function () {
   it('Should notify subscribers on remove by predicate', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     notifiedValues = new Array()
-    let removed = testObservableArray.remove(function (value) {
+    const removed = testObservableArray.remove(function (value) {
       return value == 'Beta'
     })
     expect(removed).toEqual(['Beta'])
@@ -169,7 +169,7 @@ describe('Observable Array', function () {
   it('Should notify subscribers on remove multiple by value', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     notifiedValues = new Array()
-    let removed = testObservableArray.removeAll(['Gamma', 'Alpha'])
+    const removed = testObservableArray.removeAll(['Gamma', 'Alpha'])
     expect(removed).toEqual(['Alpha', 'Gamma'])
     expect(notifiedValues).toEqual([['Beta']])
   })
@@ -177,7 +177,7 @@ describe('Observable Array', function () {
   it('Should clear observable array entirely if you pass no args to removeAll()', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     notifiedValues = new Array()
-    let removed = testObservableArray.removeAll()
+    const removed = testObservableArray.removeAll()
     expect(removed).toEqual(['Alpha', 'Beta', 'Gamma'])
     expect(notifiedValues).toEqual([[]])
   })
@@ -185,7 +185,7 @@ describe('Observable Array', function () {
   it('Should notify "beforeChange" subscribers before remove', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     beforeNotifiedValues = new Array()
-    let removed = testObservableArray.remove('Beta')
+    const removed = testObservableArray.remove('Beta')
     expect(removed).toEqual(['Beta'])
     expect(beforeNotifiedValues).toEqual([['Alpha', 'Beta', 'Gamma']])
   })
@@ -193,7 +193,7 @@ describe('Observable Array', function () {
   it('Should not notify subscribers on remove by value with no match', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     notifiedValues = new Array()
-    let removed = testObservableArray.remove('Delta')
+    const removed = testObservableArray.remove('Delta')
     expect(removed).toEqual([])
     expect(notifiedValues).toEqual([])
   })
@@ -201,13 +201,13 @@ describe('Observable Array', function () {
   it('Should not notify "beforeChange" subscribers before remove by value with no match', function () {
     testObservableArray(['Alpha', 'Beta', 'Gamma'])
     beforeNotifiedValues = new Array()
-    let removed = testObservableArray.remove('Delta')
+    const removed = testObservableArray.remove('Delta')
     expect(removed).toEqual([])
     expect(beforeNotifiedValues).toEqual([])
   })
 
   it('Should modify original array on remove', function () {
-    let originalArray = ['Alpha', 'Beta', 'Gamma']
+    const originalArray = ['Alpha', 'Beta', 'Gamma']
     testObservableArray(originalArray)
     notifiedValues = new Array()
     testObservableArray.remove('Beta')
@@ -215,7 +215,7 @@ describe('Observable Array', function () {
   })
 
   it('Should modify original array on removeAll', function () {
-    let originalArray = ['Alpha', 'Beta', 'Gamma']
+    const originalArray = ['Alpha', 'Beta', 'Gamma']
     testObservableArray(originalArray)
     notifiedValues = new Array()
     testObservableArray.removeAll()
@@ -223,11 +223,11 @@ describe('Observable Array', function () {
   })
 
   it('Should remove matching observable items', function () {
-    let x = observable(),
+    const x = observable(),
       y = observable()
     testObservableArray([x, y])
     notifiedValues = new Array()
-    let removed = testObservableArray.remove(y)
+    const removed = testObservableArray.remove(y)
     expect(testObservableArray()).toEqual([x])
     expect(removed).toEqual([y])
     expect(notifiedValues).toEqual([[x]])
@@ -263,8 +263,8 @@ describe('Observable Array', function () {
   })
 
   it('Should notify subscribers after marking items as destroyed', function () {
-    let x: MyModel = { _destroy: null }
-    let y: MyModel = { _destroy: null }
+    const x: MyModel = { _destroy: null }
+    const y: MyModel = { _destroy: null }
     let didNotify = false
 
     testObservableArray([x, y])
@@ -278,8 +278,8 @@ describe('Observable Array', function () {
   })
 
   it('Should notify "beforeChange" subscribers before marking items as destroyed', function () {
-    let x: MyModel = { _destroy: null }
-    let y: MyModel = { _destroy: null }
+    const x: MyModel = { _destroy: null }
+    const y: MyModel = { _destroy: null }
     let didNotify = false
 
     testObservableArray([x, y])
@@ -326,7 +326,7 @@ describe('Observable Array', function () {
     testObservableArray([5, 7, 3, 1])
     notifiedValues = new Array()
 
-    let newArray = testObservableArray.sorted()
+    const newArray = testObservableArray.sorted()
     expect(newArray).toEqual([1, 3, 5, 7])
     expect(newArray).not.toBe(testObservableArray())
 
@@ -339,7 +339,7 @@ describe('Observable Array', function () {
   })
 
   it('Should return a new reversed array from "reversed"', function () {
-    let newArray = testObservableArray.reversed()
+    const newArray = testObservableArray.reversed()
     expect(newArray).toEqual([3, 2, 1])
     expect(newArray).not.toBe(testObservableArray())
     expect(notifiedValues).toEqual([])
@@ -366,7 +366,7 @@ describe('Observable Array', function () {
     }
     observableArray.fn.customProp = 'observableArray value'
 
-    let instance = observableArray([123])
+    const instance = observableArray([123])
     expect(instance.subscribableProp).toEqual('subscribable value')
     expect(instance.customProp).toEqual('observableArray value')
     expect(instance.customFunc()).toEqual([123])
@@ -385,8 +385,8 @@ describe('Observable Array', function () {
 
     const obsArr = observableArray()
 
-    let customFunction1 = function () {}
-    let customFunction2 = function () {}
+    const customFunction1 = function () {}
+    const customFunction2 = function () {}
 
     observable.fn.customFunction1 = customFunction1
     observableArray.fn.customFunction2 = customFunction2

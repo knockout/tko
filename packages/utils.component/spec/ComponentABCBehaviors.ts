@@ -32,7 +32,7 @@ describe('ComponentABC', function () {
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
     testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"></div>'
 
-    let provider = new MultiProvider({
+    const provider = new MultiProvider({
       providers: [new DataBindProvider(), new ComponentProvider(), new VirtualProvider()]
     })
     options.bindingProviderInstance = provider

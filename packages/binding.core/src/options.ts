@@ -13,7 +13,7 @@ import {
 import { unwrap, dependencyDetection } from '@tko/observable'
 import { setDomNodeChildrenFromArrayMapping } from '@tko/bind'
 import type { AllBindings } from '@tko/bind'
-let captionPlaceholder = {}
+const captionPlaceholder = {}
 
 export const options = {
   init: function (element) {
@@ -79,7 +79,7 @@ export const options = {
     }
 
     function applyToObject(object, predicate, defaultValue) {
-      let predicateType = typeof predicate
+      const predicateType = typeof predicate
       if (predicateType === 'function') // Given a function; run it against the data value
       {
         return predicate(object)
@@ -103,17 +103,17 @@ export const options = {
           !valueAllowUnset && oldOptions[0].selected ? [selectExtensions.readValue(oldOptions[0])] : []
         itemUpdate = true
       }
-      let option = element.ownerDocument.createElement('option')
+      const option = element.ownerDocument.createElement('option')
       if (arrayEntry === captionPlaceholder) {
         setTextContent(option, allBindings.get('optionsCaption'))
         selectExtensions.writeValue(option, undefined)
       } else {
         // Apply a value to the option element
-        let optionValue = applyToObject(arrayEntry, allBindings.get('optionsValue'), arrayEntry)
+        const optionValue = applyToObject(arrayEntry, allBindings.get('optionsValue'), arrayEntry)
         selectExtensions.writeValue(option, unwrap(optionValue))
 
         // Apply some text to the option element
-        let optionText = applyToObject(arrayEntry, allBindings.get('optionsText'), optionValue)
+        const optionText = applyToObject(arrayEntry, allBindings.get('optionsText'), optionValue)
         setTextContent(option, optionText)
       }
       return [option]
@@ -133,7 +133,7 @@ export const options = {
       } else if (previousSelectedValues.length) {
         // IE6 doesn't like us to assign selection to OPTION nodes before they're added to the document.
         // That's why we first added them without selection. Now it's time to set the selection.
-        let isSelected = arrayIndexOf(previousSelectedValues, selectExtensions.readValue(newOptions[0])) >= 0
+        const isSelected = arrayIndexOf(previousSelectedValues, selectExtensions.readValue(newOptions[0])) >= 0
         setOptionNodeSelectionState(newOptions[0], isSelected)
 
         // If this option was changed from being selected during a single-item update, notify the change

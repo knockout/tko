@@ -19,7 +19,7 @@ export default class LifeCycle {
   static mixInto(Constructor) {
     const target = Constructor.prototype || Constructor
     const mixin = LifeCycle.prototype
-    for (let prop of Object.getOwnPropertyNames(mixin)) {
+    for (const prop of Object.getOwnPropertyNames(mixin)) {
       target[prop] = mixin[prop]
     }
   }
