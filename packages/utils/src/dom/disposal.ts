@@ -6,13 +6,13 @@ import * as domData from './data'
 import { default as options } from '../options'
 import { arrayRemoveItem, arrayIndexOf } from '../array'
 
-let domDataKey = domData.nextKey()
+const domDataKey = domData.nextKey()
 // Node types:
 // 1: Element
 // 8: Comment
 // 9: Document
-let cleanableNodeTypes = { 1: true, 8: true, 9: true }
-let cleanableNodeTypesWithDescendants = { 1: true, 9: true }
+const cleanableNodeTypes = { 1: true, 8: true, 9: true }
+const cleanableNodeTypesWithDescendants = { 1: true, 9: true }
 
 function getDisposeCallbacksCollection(node: Node, createIfNotFound: boolean) {
   let allDisposeCallbacks = domData.get(node, domDataKey)
@@ -77,7 +77,7 @@ export function addDisposeCallback(node: Node, callback: (node: Node) => void) {
 }
 
 export function removeDisposeCallback(node: Node, callback: (node: Node) => void) {
-  let callbacksCollection = getDisposeCallbacksCollection(node, false)
+  const callbacksCollection = getDisposeCallbacksCollection(node, false)
   if (callbacksCollection) {
     arrayRemoveItem(callbacksCollection, callback)
     if (callbacksCollection.length === 0) {
@@ -128,7 +128,7 @@ export function removeCleaner(fn: Function) {
 // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
 // so notify it to tear down any resources associated with the node & descendants here.
 export function cleanjQueryData(node: Node) {
-  let jQueryCleanNodeFn = options.jQuery ? options.jQuery.cleanData : null
+  const jQueryCleanNodeFn = options.jQuery ? options.jQuery.cleanData : null
 
   if (jQueryCleanNodeFn) {
     jQueryCleanNodeFn([node])

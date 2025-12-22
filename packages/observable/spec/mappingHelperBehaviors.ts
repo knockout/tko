@@ -12,24 +12,24 @@ describe('Mapping helpers', function () {
   })
 
   it('toJS should unwrap observable values', function () {
-    let atomicValues = ['hello', 123, true, null, undefined, { a: 1 }]
+    const atomicValues = ['hello', 123, true, null, undefined, { a: 1 }]
     for (let i = 0; i < atomicValues.length; i++) {
-      let data = observable(atomicValues[i])
-      let result = toJS(data)
+      const data = observable(atomicValues[i])
+      const result = toJS(data)
       expect(isObservable(result)).toEqual(false)
       expect(result).toEqual(atomicValues[i])
     }
   })
 
   it('toJS should recursively unwrap observables whose values are themselves observable', function () {
-    let weirdlyNestedObservable = observable(observable(observable(observable('Hello'))))
-    let result = toJS(weirdlyNestedObservable)
+    const weirdlyNestedObservable = observable(observable(observable(observable('Hello'))))
+    const result = toJS(weirdlyNestedObservable)
     expect(result).toEqual('Hello')
   })
 
   it('toJS should unwrap observable properties, including nested ones', function () {
-    let data = { a: observable(123), b: { b1: observable(456), b2: [789, observable('X')] } }
-    let result = toJS(data)
+    const data = { a: observable(123), b: { b1: observable(456), b2: [789, observable('X')] } }
+    const result = toJS(data)
     expect(result.a).toEqual(123)
     expect(result.b.b1).toEqual(456)
     expect(result.b.b2[0]).toEqual(789)
@@ -37,8 +37,8 @@ describe('Mapping helpers', function () {
   })
 
   it('toJS should unwrap observable arrays and things inside them', function () {
-    let data = observableArray(['a', 1, { someProp: observable('Hey') }])
-    let result = toJS(data)
+    const data = observableArray(['a', 1, { someProp: observable('Hey') }])
+    const result = toJS(data)
     expect(result.length).toEqual(3)
     expect(result[0]).toEqual('a')
     expect(result[1]).toEqual(1)
@@ -46,20 +46,20 @@ describe('Mapping helpers', function () {
   })
 
   it('toJS should resolve reference cycles', function () {
-    let obj: any = {}
+    const obj: any = {}
     obj.someProp = { owner: observable(obj) }
-    let result = toJS(obj)
+    const result = toJS(obj)
     expect(result.someProp.owner).toEqual(result)
   })
 
   it('toJS should treat RegExp, Date, Number, String and Boolean instances as primitives (and not walk their subproperties)', function () {
-    let regExp = new RegExp('')
-    let date = new Date()
-    let string = new String()
-    let number = new Number()
-    let booleanValue = new Boolean() // 'boolean' is a resever word in Javascript
+    const regExp = new RegExp('')
+    const date = new Date()
+    const string = new String()
+    const number = new Number()
+    const booleanValue = new Boolean() // 'boolean' is a resever word in Javascript
 
-    let result = toJS({
+    const result = toJS({
       regExp: observable(regExp),
       due: observable(date),
       string: observable(string),
@@ -84,20 +84,20 @@ describe('Mapping helpers', function () {
   })
 
   it('toJS should serialize functions', function () {
-    let obj = { include: observable('test'), exclude: function () {} }
+    const obj = { include: observable('test'), exclude: function () {} }
 
-    let result = toJS(obj)
+    const result = toJS(obj)
     expect(result.include).toEqual('test')
     expect(result.exclude).toEqual(obj.exclude)
   })
 
   it('toJSON should unwrap everything and then stringify', function () {
-    let data = observableArray(['a', 1, { someProp: observable('Hey') }])
-    let result = toJSON(data)
+    const data = observableArray(['a', 1, { someProp: observable('Hey') }])
+    const result = toJSON(data)
 
     // Check via parsing so the specs are independent of browser-specific JSON string formatting
     expect(typeof result).toEqual('string')
-    let parsedResult = JSON.parse(result)
+    const parsedResult = JSON.parse(result)
     expect(parsedResult.length).toEqual(3)
     expect(parsedResult[0]).toEqual('a')
     expect(parsedResult[1]).toEqual(1)
@@ -105,39 +105,39 @@ describe('Mapping helpers', function () {
   })
 
   it('toJSON should respect .toJSON functions on objects', function () {
-    let data: { a: any; b: observable } = { a: { one: 'one', two: 'two' }, b: observable({ one: 'one', two: 'two' }) }
+    const data: { a: any; b: observable } = { a: { one: 'one', two: 'two' }, b: observable({ one: 'one', two: 'two' }) }
     data.a.toJSON = function () {
       return 'a-mapped'
     }
     data.b().toJSON = function () {
       return 'b-mapped'
     }
-    let result = toJSON(data)
+    const result = toJSON(data)
 
     // Check via parsing so the specs are independent of browser-specific JSON string formatting
     expect(typeof result).toEqual('string')
-    let parsedResult = JSON.parse(result)
+    const parsedResult = JSON.parse(result)
     expect(parsedResult).toEqual({ a: 'a-mapped', b: 'b-mapped' })
   })
 
   it('toJSON should respect .toJSON functions on arrays', function () {
-    let data: { a: any; b: observableArray } = { a: [1, 2], b: observableArray([3, 4]) }
+    const data: { a: any; b: observableArray } = { a: [1, 2], b: observableArray([3, 4]) }
     data.a.toJSON = function () {
       return 'a-mapped'
     }
     data.b().toJSON = function () {
       return 'b-mapped'
     }
-    let result = toJSON(data)
+    const result = toJSON(data)
 
     // Check via parsing so the specs are independent of browser-specific JSON string formatting
     expect(typeof result).toEqual('string')
-    let parsedResult = JSON.parse(result)
+    const parsedResult = JSON.parse(result)
     expect(parsedResult).toEqual({ a: 'a-mapped', b: 'b-mapped' })
   })
 
   it('toJSON should respect replacer/space options', function () {
-    let data = { a: 1 }
+    const data = { a: 1 }
 
     // Without any options
     expect(toJSON(data)).toEqual('{"a":1}')

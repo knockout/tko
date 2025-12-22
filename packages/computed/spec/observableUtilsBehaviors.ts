@@ -72,7 +72,7 @@ describe('when', function () {
     let x = observable(false),
       called = 0
 
-    let handle = when(x, function () {
+    const handle = when(x, function () {
       called++
     })
 
@@ -104,7 +104,7 @@ describe('when', function () {
   })
 
   it("Should be able to specify a 'this' pointer for the callback", function () {
-    let model = {
+    const model = {
       someProperty: 123,
       myCallback: function () {
         expect(this.someProperty).toEqual(123)

@@ -4,7 +4,7 @@ import { unwrap } from '@tko/observable'
 
 export const style = {
   update: function (element, valueAccessor) {
-    let value = unwrap(valueAccessor() || {})
+    const value = unwrap(valueAccessor() || {})
     objectForEach(value, function (styleName, styleValue) {
       styleValue = unwrap(styleValue)
 

@@ -6,8 +6,8 @@ import { Parser, Node, Arguments, Identifier, Ternary } from '../dist'
 
 import { assert } from 'chai'
 
-let op = Node.operators
-let operators = Node.operators
+const op = Node.operators
+const operators = Node.operators
 let nodes_to_tree
 
 function ctxStub(ctx?) {
@@ -86,21 +86,21 @@ describe('Operators', function () {
   it('early outs from or- operator computations', function () {
     // It's common to e.g. have `if: $data && $data.thing`, but that'll error with
     // `cannot read property '$data' of undefined` unless we early-out.
-    let fakeContext = { lookup: function () {} }
-    let root = Node.create_root([123, op['||'], new Identifier(null, 'z', ['q'])])
+    const fakeContext = { lookup: function () {} }
+    const root = Node.create_root([123, op['||'], new Identifier(null, 'z', ['q'])])
     assert.equal(root.get_value(null, fakeContext), 123)
   })
 
   it('early outs from and- operator computations', function () {
-    let fakeContext = { lookup: function () {} }
-    let root = Node.create_root([false, op['&&'], new Identifier(null, 'z', ['q'])])
+    const fakeContext = { lookup: function () {} }
+    const root = Node.create_root([false, op['&&'], new Identifier(null, 'z', ['q'])])
     assert.equal(root.get_value(null, fakeContext), false)
   })
 })
 
 describe('the create_root function', function () {
   it('converts a simple array to a tree', function () {
-    let nodes = ['a', operators['*'], 'b'],
+    const nodes = ['a', operators['*'], 'b'],
       tree = nodes_to_tree(nodes.slice(0))
     // we use nodes.slice(0) to make a copy.
     assert.equal(tree.lhs, 'a')
@@ -111,7 +111,7 @@ describe('the create_root function', function () {
   it('converts multiple * to a tree', function () {
     // expr: a * b / c
     // sexp: (/ (* a b) c)
-    let nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
+    const nodes = ['a', operators['*'], 'b', operators['/'], 'c'],
       tree = nodes_to_tree(nodes.slice(0))
     assert.equal(tree.lhs.lhs, 'a')
     assert.equal(tree.lhs.op, operators['*'])
@@ -125,7 +125,7 @@ describe('the create_root function', function () {
     // prec:   4   3   4   4   1   3   4
     // sexp: (> (+ (* a b) (* (* c d) e))
     //          (+ f (% g h)))
-    let nodes = [
+    const nodes = [
         'a',
         operators['*'],
         'b',
@@ -179,7 +179,7 @@ describe('the create_root function', function () {
 
 describe('Node', function () {
   it('traverses the tree 19 * -2 + 4', function () {
-    let root = new Node()
+    const root = new Node()
     root.op = operators['+']
     root.lhs = new Node(19, operators['*'], -2)
     root.rhs = 4
@@ -187,7 +187,7 @@ describe('Node', function () {
   })
 
   it('looks up identifiers', function () {
-    let root = new Node(),
+    const root = new Node(),
       context = ctxStub({ x: 19 }),
       parser = new Parser(),
       ident = new Identifier(parser, 'x')
@@ -203,7 +203,7 @@ describe('Node', function () {
       nodes,
       root
     parser = new Parser(null)
-    let fake_args = new Arguments(null, [])
+    const fake_args = new Arguments(null, [])
     nodes = [
       // the third argument is the same as _deref_call
       new Identifier(parser, 'x', [fake_args]),

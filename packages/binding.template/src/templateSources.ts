@@ -45,8 +45,8 @@ export interface TemplateSource {
   nodes?: { (): Node; (valueToWrite: Node): void }
 }
 
-let dataDomDataPrefix = domData.nextKey() + '_'
-let templatesDomDataKey = domData.nextKey()
+const dataDomDataPrefix = domData.nextKey() + '_'
+const templatesDomDataKey = domData.nextKey()
 function getTemplateDomData(element) {
   return domData.get(element, templatesDomDataKey) || {}
 }
@@ -64,7 +64,7 @@ export class domElement implements TemplateSource {
     if (element.nodeType === Node.COMMENT_NODE) {
       this.templateType = templateElement
     } else {
-      let tagNameLower = tagNameLowerFn(this.domElement as Element)
+      const tagNameLower = tagNameLowerFn(this.domElement as Element)
       this.templateType =
         tagNameLower === 'script'
           ? templateScript

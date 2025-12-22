@@ -27,7 +27,7 @@ describe('Binding: If', function () {
   })
 
   beforeEach(function () {
-    let provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
+    const provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(ifBindings)
@@ -52,7 +52,7 @@ describe('Binding: If', function () {
   })
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
-    let someItem = observable(true)
+    const someItem = observable(true)
     testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: ++counter'></span></div>"
     const originalNode = testNode.childNodes[0].childNodes[0]
 
@@ -70,7 +70,7 @@ describe('Binding: If', function () {
   })
 
   it('Should toggle the presence and bindedness of descendant nodes according to the truthiness of the value', function () {
-    let someItem = observable(undefined)
+    const someItem = observable(undefined)
     testNode.innerHTML =
       "<div data-bind='if: someItem'><span data-bind='text: someItem().occasionallyExistentChildProp'></span></div>"
     applyBindings({ someItem }, testNode)
@@ -96,7 +96,7 @@ describe('Binding: If', function () {
   })
 
   it('Should be able to define an \"if\" region using a containerless template', function () {
-    let someitem = observable(undefined)
+    const someitem = observable(undefined)
     testNode.innerHTML =
       'hello <!-- ko if: someitem --><span data-bind="text: someitem().occasionallyexistentchildprop"></span><!-- /ko --> goodbye'
     applyBindings({ someitem }, testNode)
@@ -116,8 +116,8 @@ describe('Binding: If', function () {
   })
 
   it('Should be able to nest \"if\" regions defined by containerless templates', function () {
-    let condition1 = observable(false)
-    let condition2 = observable(false)
+    const condition1 = observable(false)
+    const condition2 = observable(false)
     testNode.innerHTML =
       'hello <!-- ko if: condition1 -->First is true<!-- ko if: condition2 -->Both are true<!-- /ko --><!-- /ko -->'
     applyBindings({ condition1: condition1, condition2: condition2 }, testNode)

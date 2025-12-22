@@ -20,7 +20,7 @@ if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
   // Chrome 27+, Firefox 14+, IE 11+, Opera 15+, Safari 6.1+, node
   // From https://github.com/petkaantonov/bluebird * Copyright (c) 2014 Petka Antonov * License: MIT
   options.taskScheduler = (function (callback) {
-    let div = w.document.createElement('div')
+    const div = w.document.createElement('div')
     new w.MutationObserver(callback).observe(div, { attributes: true })
     return function () {
       div.classList.toggle('foo')
@@ -96,7 +96,7 @@ export function schedule(func: () => any): number {
 }
 
 export function cancel(handle: number) {
-  let index = handle - (nextHandle - taskQueueLength)
+  const index = handle - (nextHandle - taskQueueLength)
   if (index >= nextIndexToProcess && index < taskQueueLength) {
     taskQueue[index] = null
   }
@@ -104,7 +104,7 @@ export function cancel(handle: number) {
 
 // For testing only: reset the queue and return the previous queue length
 export function resetForTesting() {
-  let length = taskQueueLength - nextIndexToProcess
+  const length = taskQueueLength - nextIndexToProcess
   nextIndexToProcess = taskQueueLength = taskQueue.length = 0
   return length
 }

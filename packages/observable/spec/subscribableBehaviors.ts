@@ -2,12 +2,12 @@ import { isSubscribable, subscribable } from '../dist'
 
 describe('Subscribable', function () {
   it('Should declare that it is subscribable', function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     expect(isSubscribable(instance)).toEqual(true)
   })
 
   it('subscribable has limit', function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     expect(instance.limit).not.toBeUndefined()
   })
 
@@ -26,7 +26,7 @@ describe('Subscribable', function () {
   })
 
   it('Should be able to notify subscribers', function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     let notifiedValue
     instance.subscribe(function (value) {
       notifiedValue = value
@@ -36,9 +36,9 @@ describe('Subscribable', function () {
   })
 
   it('Should be able to unsubscribe', function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     let notifiedValue
-    let subscription = instance.subscribe(function (value) {
+    const subscription = instance.subscribe(function (value) {
       notifiedValue = value
     })
     subscription.dispose()
@@ -47,14 +47,14 @@ describe('Subscribable', function () {
   })
 
   it("Should be able to specify a 'this' pointer for the callback", function () {
-    let model = {
+    const model = {
       someProperty: 123,
       myCallback: function (arg) {
         expect(arg).toEqual('notifiedValue')
         expect(this.someProperty).toEqual(123)
       }
     }
-    let instance = new subscribable()
+    const instance = new subscribable()
     instance.subscribe(model.myCallback, model)
     instance.notifySubscribers('notifiedValue')
   })
@@ -63,12 +63,12 @@ describe('Subscribable', function () {
     // This spec represents the unusual case where during notification, subscription1's callback causes subscription2 to be disposed.
     // Since subscription2 was still active at the start of the cycle, it is scheduled to be notified. This spec verifies that
     // even though it is scheduled to be notified, it does not get notified, because the unsubscription just happened.
-    let instance = new subscribable()
+    const instance = new subscribable()
     instance.subscribe(function () {
       subscription2.dispose()
     })
     let subscription2wasNotified = false
-    let subscription2 = instance.subscribe(function () {
+    const subscription2 = instance.subscribe(function () {
       subscription2wasNotified = true
     })
 
@@ -77,7 +77,7 @@ describe('Subscribable', function () {
   })
 
   it("Should be able to notify subscribers for a specific 'event'", function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     let notifiedValue
     instance.subscribe(
       function (value) {
@@ -95,9 +95,9 @@ describe('Subscribable', function () {
   })
 
   it("Should be able to unsubscribe for a specific 'event'", function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     let notifiedValue
-    let subscription = instance.subscribe(
+    const subscription = instance.subscribe(
       function (value) {
         notifiedValue = value
       },
@@ -110,7 +110,7 @@ describe('Subscribable', function () {
   })
 
   it("Should be able to subscribe for a specific 'event' without being notified for the default event", function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     let notifiedValue
     instance.subscribe(
       function (value) {
@@ -124,9 +124,9 @@ describe('Subscribable', function () {
   })
 
   it('Should be able to retrieve the number of active subscribers', function () {
-    let instance = new subscribable()
-    let sub1 = instance.subscribe(function () {})
-    let sub2 = instance.subscribe(function () {}, null, 'someSpecificEvent')
+    const instance = new subscribable()
+    const sub1 = instance.subscribe(function () {})
+    const sub2 = instance.subscribe(function () {}, null, 'someSpecificEvent')
 
     expect(instance.getSubscriptionsCount()).toEqual(2)
     expect(instance.getSubscriptionsCount('change')).toEqual(1)
@@ -145,8 +145,8 @@ describe('Subscribable', function () {
   })
 
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
-    let instance = new subscribable()
-    let interceptedNotifications = new Array()
+    const instance = new subscribable()
+    const interceptedNotifications = new Array()
     instance.subscribe(function () {
       throw new Error('Should not notify subscribers by default once notifySubscribers is overridden')
     })
@@ -171,7 +171,7 @@ describe('Subscribable', function () {
       return this
     }
 
-    let instance = new subscribable()
+    const instance = new subscribable()
     expect(instance.customProp).toEqual('some value')
     expect(instance.customFunc()).toEqual(instance)
   })
@@ -188,7 +188,7 @@ describe('Subscribable', function () {
 
     const sub = new subscribable()
 
-    let customFunction = function () {}
+    const customFunction = function () {}
 
     sub.fn.customFunction = customFunction
 
@@ -215,7 +215,7 @@ describe('Subscribable', function () {
   })
 
   it('subscribes with TC39 Observable {next: () =>}', function () {
-    let instance = new subscribable()
+    const instance = new subscribable()
     let notifiedValue
     instance.subscribe({
       next(value) {

@@ -4,22 +4,22 @@ import { isPureComputed, isComputed, computed, pureComputed } from '../dist'
 
 describe('Pure Computed', function () {
   it('Observables should advertise that instances are not pure computed', function () {
-    let instance = observable()
+    const instance = observable()
     expect(isPureComputed(instance)).toEqual(false)
   })
 
   it('Should advertise that instances are computed', function () {
-    let computedInstance = pureComputed(function () {})
+    const computedInstance = pureComputed(function () {})
     expect(isComputed(computedInstance)).toEqual(true)
   })
 
   it('Should advertise that instances are pure computed', function () {
-    let instance = pureComputed(function () {})
+    const instance = pureComputed(function () {})
     expect(isPureComputed(instance)).toEqual(true)
   })
 
   it('Should advertise that instances are not computed', function () {
-    let instance = observable()
+    const instance = observable()
     expect(isComputed(instance)).toEqual(false)
   })
 
@@ -30,7 +30,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should be able to pass evaluator function using "options" parameter called "read"', function () {
-    let computedInstance = pureComputed({
+    const computedInstance = pureComputed({
       read: function () {
         return 123
       }
@@ -39,7 +39,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should not be able to write a value to it if there is no "write" callback', function () {
-    let computedInstance = pureComputed(function () {
+    const computedInstance = pureComputed(function () {
       return 123
     })
     expect(isWriteableObservable(computedInstance)).toEqual(false)
@@ -50,7 +50,7 @@ describe('Pure Computed', function () {
 
   it('Should invoke the "write" callback, where present, if you attempt to write a value to it', function () {
     let invokedWriteWithValue
-    let computedInstance = pureComputed({
+    const computedInstance = pureComputed({
       read: function () {},
       write: function (value) {
         invokedWriteWithValue = value
@@ -62,18 +62,18 @@ describe('Pure Computed', function () {
   })
 
   it('Should describe itself as active initially', function () {
-    let computedInstance = pureComputed(function () {})
+    const computedInstance = pureComputed(function () {})
     expect(computedInstance.isActive()).toEqual(true)
   })
 
   it('Should describe itself as inactive if the evaluator has no dependencies on its first run', function () {
-    let computedInstance = pureComputed(function () {})
+    const computedInstance = pureComputed(function () {})
     computedInstance() // access the computed to evaluate it
     expect(computedInstance.isActive()).toEqual(false)
   })
 
   it('Should describe itself as active if the evaluator has dependencies on its first run', function () {
-    let observableInstance = observable('initial'),
+    const observableInstance = observable('initial'),
       computedInstance = computed(observableInstance)
     computedInstance() // access the computed to evaluate it
     expect(computedInstance.isActive()).toEqual(true)
@@ -108,10 +108,10 @@ describe('Pure Computed', function () {
   })
 
   it('Should notify "spectator" subscribers whenever the value changes', function () {
-    let obs = observable('A')
-    let computed = pureComputed(obs)
-    let computed2 = pureComputed(computed)
-    let notifiedValues = new Array()
+    const obs = observable('A')
+    const computed = pureComputed(obs)
+    const computed2 = pureComputed(computed)
+    const notifiedValues = new Array()
 
     computed.subscribe(
       function (value) {
@@ -143,7 +143,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should not subscribe to dependencies while sleeping', function () {
-    let data = observable('A'),
+    const data = observable('A'),
       computedInstance = pureComputed(data)
 
     // Accessing the computed evaluates it
@@ -178,7 +178,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should awaken and perform dependency detection when subscribed to', function () {
-    let data = observable('A'),
+    const data = observable('A'),
       computedInstance = pureComputed(data),
       notifiedValues = new Array()
 
@@ -199,7 +199,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should go back to sleep when all subscriptions are disposed', function () {
-    let data = observable('A'),
+    const data = observable('A'),
       computedInstance = pureComputed(data),
       subscription = computedInstance.subscribe(function () {})
 
@@ -216,10 +216,10 @@ describe('Pure Computed', function () {
   })
 
   it('Should fire "awake" and "asleep" events when changing state', function () {
-    let data = observable('A'),
+    const data = observable('A'),
       computedInstance = pureComputed(data)
 
-    let notifySpy = jasmine.createSpy('notifySpy')
+    const notifySpy = jasmine.createSpy('notifySpy')
     computedInstance.subscribe(notifySpy.bind(null, 'awake'), null, 'awake')
     computedInstance.subscribe(notifySpy.bind(null, 'asleep'), null, 'asleep')
 
@@ -227,7 +227,7 @@ describe('Pure Computed', function () {
     expect(data.getSubscriptionsCount()).toEqual(0)
 
     // Subscribe to computed; notifies with value
-    let subscription = computedInstance.subscribe(function () {})
+    const subscription = computedInstance.subscribe(function () {})
     expect(notifySpy.argsForCall).toEqual([['awake', 'A']])
     expect(data.getSubscriptionsCount()).toEqual(1)
 
@@ -309,7 +309,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should evaluate latest value when chaining pure computeds', function () {
-    let data = observable('A'),
+    const data = observable('A'),
       computed1 = pureComputed(data),
       computed2 = pureComputed(computed1)
 
@@ -343,7 +343,7 @@ describe('Pure Computed', function () {
   })
 
   it('Should be able to re-evaluate a sleeping computed that previously threw an exception', function () {
-    let shouldThrow = observable(false),
+    const shouldThrow = observable(false),
       observableValue = observable(1),
       computedInstance = pureComputed(function () {
         if (shouldThrow()) {
@@ -421,7 +421,7 @@ describe('Pure Computed', function () {
     // The pure computed doesn't yet subscribe to the observable (it's still sleeping)
     expect(myArray.getSubscriptionsCount()).toBe(0)
 
-    let arrayChange = myComputed.subscribe(
+    const arrayChange = myComputed.subscribe(
       function (changes) {
         changelist = changes
       },
@@ -487,7 +487,7 @@ describe('Pure Computed', function () {
     let data, dataPureComputed
 
     function subscribeAndUpdate(computedInstance, newDataValue, expectedNotifiedValues) {
-      let notifiedValues = new Array()
+      const notifiedValues = new Array()
       computedInstance.subscribe(function (value) {
         notifiedValues.push(value)
       })
@@ -509,7 +509,7 @@ describe('Pure Computed', function () {
 
     it('base behavior: order is pure computed, observable', function () {
       // This one accesses the base observable second, so that the first update happens after both values have been updated
-      let computedInstance = pureComputed(function () {
+      const computedInstance = pureComputed(function () {
         return dataPureComputed() + data()
       })
       subscribeAndUpdate(computedInstance, 'B', ['BB'])
@@ -517,7 +517,7 @@ describe('Pure Computed', function () {
 
     it('base behavior: order is observable, pure computed', function () {
       // This one accesses the base observable first, which results in an update before 'dataPureComputed' has updated
-      let computedInstance = pureComputed(function () {
+      const computedInstance = pureComputed(function () {
         return data() + dataPureComputed()
       })
       subscribeAndUpdate(computedInstance, 'B', ['BA', 'BB'])

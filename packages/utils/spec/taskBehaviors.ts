@@ -26,7 +26,7 @@ describe('Tasks', function () {
 
   it('Should run multiple times if added more than once', function () {
     let runCount = 0
-    let func = function () {
+    const func = function () {
       runCount++
     }
     tasks.schedule(func)
@@ -38,8 +38,8 @@ describe('Tasks', function () {
   })
 
   it('Should run scheduled tasks in the order they were scheduled', function () {
-    let runValues: any = new Array()
-    let func = function (value) {
+    const runValues: any = new Array()
+    const func = function (value) {
       runValues.push(value)
     }
 
@@ -52,7 +52,7 @@ describe('Tasks', function () {
 
   it('Should run tasks again if scheduled after a previous run', function () {
     let runCount = 0
-    let func = function () {
+    const func = function () {
       runCount++
     }
     tasks.schedule(func)
@@ -69,8 +69,8 @@ describe('Tasks', function () {
   })
 
   it('Should process newly scheduled tasks during task processing', function () {
-    let runValues = new Array()
-    let func = function (value) {
+    const runValues = new Array()
+    const func = function (value) {
       runValues.push(value)
       tasks.schedule(function () {
         runValues.push('x')
@@ -85,8 +85,8 @@ describe('Tasks', function () {
   })
 
   it('Should keep correct state if a task throws an exception', function () {
-    let runValues = new Array()
-    let func = function (value) {
+    const runValues = new Array()
+    const func = function (value) {
       runValues.push(value)
     }
     tasks.schedule(func.bind(null, 1))
@@ -104,8 +104,8 @@ describe('Tasks', function () {
   })
 
   it('Should stop recursive task processing after a fixed number of iterations', function () {
-    let runValues = new Array()
-    let func = function () {
+    const runValues = new Array()
+    const func = function () {
       runValues.push('x')
       tasks.schedule(function () {})
       tasks.schedule(func)
@@ -123,8 +123,8 @@ describe('Tasks', function () {
   })
 
   it('Should not stop non-recursive task processing', function () {
-    let runValues = new Array()
-    let func = function () {
+    const runValues = new Array()
+    const func = function () {
       runValues.push('x')
     }
 
@@ -140,7 +140,7 @@ describe('Tasks', function () {
   describe('Cancel', function () {
     it('Should prevent task from running', function () {
       let runCount = 0
-      let handle = tasks.schedule(function () {
+      const handle = tasks.schedule(function () {
         runCount++
       })
       tasks.cancel(handle)
@@ -151,11 +151,11 @@ describe('Tasks', function () {
 
     it('Should prevent only the canceled task', function () {
       let runCount = 0
-      let func = function () {
+      const func = function () {
         runCount++
       }
-      let handle1 = tasks.schedule(func)
-      let handle2 = tasks.schedule(func)
+      const handle1 = tasks.schedule(func)
+      const handle2 = tasks.schedule(func)
       tasks.cancel(handle2)
 
       jasmine.Clock.tick(1)
@@ -163,17 +163,17 @@ describe('Tasks', function () {
     })
 
     it('Should do nothing if task has already run', function () {
-      let runValues = new Array()
-      let func = function (value) {
+      const runValues = new Array()
+      const func = function (value) {
         runValues.push(value)
       }
-      let handle1 = tasks.schedule(func.bind(null, 1))
+      const handle1 = tasks.schedule(func.bind(null, 1))
       expect(runValues).toEqual([])
 
       jasmine.Clock.tick(1)
       expect(runValues).toEqual([1])
 
-      let handle2 = tasks.schedule(func.bind(null, 2))
+      const handle2 = tasks.schedule(func.bind(null, 2))
 
       // Try to cancel the first task
       tasks.cancel(handle1)
@@ -186,7 +186,7 @@ describe('Tasks', function () {
     it('Should work correctly after a task throws an exception', function () {
       let runValues = new Array(),
         handle
-      let func = function (value) {
+      const func = function (value) {
         runValues.push(value)
       }
 
@@ -211,8 +211,8 @@ describe('Tasks', function () {
 
   describe('runEarly', function () {
     it('Should run tasks early', function () {
-      let runValues = new Array()
-      let func = function (value) {
+      const runValues = new Array()
+      const func = function (value) {
         runValues.push(value)
       }
       tasks.schedule(func.bind(null, 1))
@@ -226,8 +226,8 @@ describe('Tasks', function () {
     })
 
     it('Should run tasks early during task processing', function () {
-      let runValues = new Array()
-      let func = function (value) {
+      const runValues = new Array()
+      const func = function (value) {
         runValues.push(value)
       }
 
@@ -249,8 +249,8 @@ describe('Tasks', function () {
     })
 
     it('Should stop recursive task processing after a fixed number of iterations', function () {
-      let runValues = new Array()
-      let func = function () {
+      const runValues = new Array()
+      const func = function () {
         runValues.push('x')
         tasks.schedule(function () {})
         tasks.schedule(func)
@@ -272,8 +272,8 @@ describe('Tasks', function () {
     })
 
     it('Should keep correct state if a task throws an exception', function () {
-      let runValues = new Array()
-      let func = function (value) {
+      const runValues = new Array()
+      const func = function (value) {
         runValues.push(value)
       }
       tasks.schedule(func.bind(null, 1))

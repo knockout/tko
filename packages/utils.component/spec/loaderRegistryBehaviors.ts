@@ -5,7 +5,7 @@ import { computed } from '@tko/computed'
 import components from '../dist'
 
 describe('Components: Loader registry', function () {
-  let testAsyncDelay = 20,
+  const testAsyncDelay = 20,
     testComponentName = 'test-component',
     testComponentConfig: any = {},
     testComponentDefinition = { template: {} },
@@ -70,7 +70,7 @@ describe('Components: Loader registry', function () {
         loadedDefinition = definition
       })
 
-      let onLoaded = function () {
+      const onLoaded = function () {
         if ('expectedDefinition' in options) {
           expect(loadedDefinition).toBe(options.expectedDefinition)
         }
@@ -130,7 +130,7 @@ describe('Components: Loader registry', function () {
   })
 
   it('Obtains component config and component definition objects by invoking each loader in turn, asynchronously, until one supplies a value', function () {
-    let loaders = [
+    const loaders = [
       loaderThatDoesNotReturnAnything,
       loaderThatHasNoHandlers,
       loaderThatReturnsDefinition,
@@ -143,7 +143,7 @@ describe('Components: Loader registry', function () {
   })
 
   it('Supplies null if no registered loader returns a config object', function () {
-    let loaders = [
+    const loaders = [
       loaderThatDoesNotReturnAnything,
       loaderThatHasNoHandlers,
       loaderThatReturnsDefinition,
@@ -154,7 +154,7 @@ describe('Components: Loader registry', function () {
   })
 
   it('Supplies null if no registered loader returns a component for a given config object', function () {
-    let loaders = [
+    const loaders = [
       loaderThatDoesNotReturnAnything,
       loaderThatHasNoHandlers,
       loaderThatReturnsConfig,
@@ -169,7 +169,7 @@ describe('Components: Loader registry', function () {
     // We would detect that a getConfig call wants to return synchronously based on getting a
     // non-undefined return value, and in that case would not wait for the callback.
 
-    let loaders = [
+    const loaders = [
       loaderThatReturnsDefinition,
       loaderThatDoesNotReturnAnything,
       {
@@ -195,7 +195,7 @@ describe('Components: Loader registry', function () {
     // We would detect that a loadComponent call wants to return synchronously based on getting a
     // non-undefined return value, and in that case would not wait for the callback.
 
-    let loaders = [
+    const loaders = [
       loaderThatReturnsConfig,
       loaderThatDoesNotReturnAnything,
       {
@@ -382,7 +382,7 @@ describe('Components: Loader registry', function () {
 
   it('Only commences a single loading process, even if multiple requests arrive before loading has completed', function () {
     // Set up a mock AMD environment that logs calls
-    let someModuleTemplate = new Array(),
+    const someModuleTemplate = new Array(),
       someComponentModule = { template: someModuleTemplate },
       requireCallLog = new Array()
     this.restoreAfter(window, 'require')

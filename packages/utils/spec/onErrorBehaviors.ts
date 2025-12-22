@@ -3,8 +3,8 @@ import { options, tasks } from '../dist'
 describe('onError handler', function () {
   let koOnErrorCount = 0
   let windowOnErrorCount = 0
-  let windowOnErrorOriginal = window.onerror
-  let optionsOnErrorOriginal = options.onError
+  const windowOnErrorOriginal = window.onerror
+  const optionsOnErrorOriginal = options.onError
   let lastSeenError = null
 
   beforeEach(function () {
@@ -14,11 +14,11 @@ describe('onError handler', function () {
     }
 
     function ensureNodeExistsAndIsEmpty(id: string, tagName?: string, type?: string): HTMLElement {
-      let existingNode = document.getElementById(id)
+      const existingNode = document.getElementById(id)
       if (existingNode != null) {
         existingNode.parentNode?.removeChild(existingNode)
       }
-      let resultNode = document.createElement(tagName || 'div')
+      const resultNode = document.createElement(tagName || 'div')
       resultNode.id = id
       if (type) {
         resultNode.setAttribute('type', type)
@@ -39,7 +39,7 @@ describe('onError handler', function () {
       // Don't spam the console, since these were triggered deliberately
       // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
       // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
-      let isPhantom = !!(window as any)._phantom
+      const isPhantom = !!(window as any)._phantom
       return !isPhantom
     }
   })

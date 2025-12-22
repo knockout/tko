@@ -189,9 +189,9 @@ function limitNotifySubscribers(value, event?: string) {
  * @param limitFunction The function to limit notifications.
  */
 ;(subscribable.fn as any).limit = function limit(limitFunction) {
-  let self = this
-  let selfIsObservable = isObservable(self)
-  let beforeChange = 'beforeChange'
+  const self = this
+  const selfIsObservable = isObservable(self)
+  const beforeChange = 'beforeChange'
   let ignoreBeforeChange: boolean, notifyNextChange: boolean, previousValue: any, pendingValue: any, didUpdate: boolean
 
   if (!self._origNotifySubscribers) {
@@ -200,13 +200,14 @@ function limitNotifySubscribers(value, event?: string) {
     self.notifySubscribers = limitNotifySubscribers
   }
 
-  let finish = limitFunction(function () {
+  const finish = limitFunction(function () {
     self._notificationIsPending = false
 
     // If an observable provided a reference to itself, access it to get the latest value.
     // This allows computed observables to delay calculating their value until needed.
     if (selfIsObservable && pendingValue === self) {
-      pendingValue = self._evalIfChanged ? self._evalIfChanged() : self()
+      //TODO This cast is a downcast to "Computed" that should be revisited
+      pendingValue = (self as any)._evalIfChanged ? (self as any)._evalIfChanged() : self()
     }
     const shouldNotify = notifyNextChange || (didUpdate && self.isDifferent(previousValue, pendingValue))
     self._notifyNextChange = didUpdate = ignoreBeforeChange = false
@@ -247,7 +248,7 @@ function limitNotifySubscribers(value, event?: string) {
 
 Object.setPrototypeOf(observable.fn, subscribable.fn)
 
-let protoProperty = (observable.protoProperty = options.protoProperty)
+const protoProperty = (observable.protoProperty = options.protoProperty)
 observable.fn[protoProperty] = observable
 
 // Subclasses can add themselves to observableProperties so that

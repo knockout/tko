@@ -19,7 +19,7 @@ describe('Binding: Event', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
@@ -103,7 +103,7 @@ describe('Binding: Event', function () {
   })
 
   it('Should let bubblable events bubble to parent elements by default', function () {
-    let model = {
+    const model = {
       innerWasCalled: false,
       innerDoCall: function () {
         this.innerWasCalled = true
@@ -122,7 +122,7 @@ describe('Binding: Event', function () {
   })
 
   it('Should be able to prevent bubbling of bubblable events using the (eventname)Bubble:false option', function () {
-    let model = {
+    const model = {
       innerWasCalled: false,
       innerDoCall: function () {
         this.innerWasCalled = true
@@ -144,7 +144,7 @@ describe('Binding: Event', function () {
     // Using "bind" like this just eliminates the function literal wrapper - it's purely stylistic
     let didCallHandler = false,
       someObj = {}
-    let myHandler = function () {
+    const myHandler = function () {
       expect(this).toEqual(someObj)
       expect(arguments.length).toEqual(5)
 
@@ -276,13 +276,13 @@ describe('Binding: on.', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
 
   it('invokes argument as a function on event', function () {
-    let obs = observable(false)
+    const obs = observable(false)
     testNode.innerHTML = "<button data-bind='on.click: obs(true)'>hey</button>"
     applyBindings({ obs: obs }, testNode)
     expect(obs()).toEqual(false)

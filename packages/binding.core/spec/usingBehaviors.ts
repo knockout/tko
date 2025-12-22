@@ -22,7 +22,7 @@ describe('Binding: Using', function () {
   })
 
   beforeEach(function () {
-    let provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
+    const provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(templateBindings)
@@ -45,7 +45,7 @@ describe('Binding: Using', function () {
 
   it('Should leave descendant nodes unchanged and not bind them more than once if the supplied value notifies a change', function () {
     let countedClicks = 0
-    let someItem = observable({
+    const someItem = observable({
       childProp: observable('Hello'),
       handleClick: function () {
         countedClicks++
@@ -54,7 +54,7 @@ describe('Binding: Using', function () {
 
     testNode.innerHTML =
       "<div data-bind='using: someItem'><span data-bind='text: childProp, click: handleClick'></span></div>"
-    let originalNode = testNode.children[0].children[0]
+    const originalNode = testNode.children[0].children[0]
 
     applyBindings({ someItem: someItem }, testNode)
     expect(testNode.children[0].children[0]).toEqual(originalNode)
@@ -101,7 +101,7 @@ describe('Binding: Using', function () {
       { name: 'outer', topItem: { name: 'top', middleItem: { name: 'middle', bottomItem: { name: 'bottom' } } } },
       testNode
     )
-    let finalContainer = testNode.childNodes[0].childNodes[0].childNodes[0]
+    const finalContainer = testNode.childNodes[0].childNodes[0].childNodes[0]
     expect(finalContainer.childNodes[0]).toContainText('bottom')
     expect(finalContainer.childNodes[1]).toContainText('middle')
     expect(finalContainer.childNodes[2]).toContainText('top')
@@ -116,7 +116,7 @@ describe('Binding: Using', function () {
     expect(
       contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name
     ).toEqual('bottom')
-    let firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
+    const firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
     expect(firstSpan.tagName).toEqual('SPAN')
     expect(contextFor(firstSpan as HTMLElement).$data.name).toEqual('bottom')
     expect(contextFor(firstSpan as HTMLElement).$root.name).toEqual('outer')
@@ -124,7 +124,7 @@ describe('Binding: Using', function () {
   })
 
   it('Should be able to define a \"using\" region using a containerless binding', function () {
-    let someitem = observable({ someItem: 'first value' })
+    const someitem = observable({ someItem: 'first value' })
     testNode.innerHTML = 'xxx <!-- ko using: someitem --><span data-bind="text: someItem"></span><!-- /ko -->'
     applyBindings({ someitem: someitem }, testNode)
 
@@ -135,7 +135,7 @@ describe('Binding: Using', function () {
   })
 
   it('Should be able to use \"using\" within an observable top-level view model', function () {
-    let vm = observable({ someitem: observable({ someItem: 'first value' }) })
+    const vm = observable({ someitem: observable({ someItem: 'first value' }) })
     testNode.innerHTML = 'xxx <!-- ko using: someitem --><span data-bind="text: someItem"></span><!-- /ko -->'
     applyBindings(vm, testNode)
 
@@ -150,13 +150,13 @@ describe('Binding: Using', function () {
       "<div data-bind='using: someitem'>"
       + "<div data-bind='foreach: childprop'><span data-bind='text: $data'></span></div></div>"
 
-    let childprop = observableArray(new Array())
-    let someitem = observable({ childprop: childprop })
-    let viewModel = { someitem: someitem }
+    const childprop = observableArray(new Array())
+    const someitem = observable({ childprop: childprop })
+    const viewModel = { someitem: someitem }
     applyBindings(viewModel, testNode)
 
     // First it's not there (by template)
-    let container = testNode.childNodes[0]
+    const container = testNode.childNodes[0]
     expect(container).toContainHtml('<div data-bind="foreach: childprop"></div>')
 
     // Then it's there
@@ -183,9 +183,9 @@ describe('Binding: Using', function () {
       "<div data-bind='using: someitem'>text"
       + "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
 
-    let childprop = observableArray<string>([])
-    let someitem = observable({ childprop: childprop })
-    let viewModel = { someitem: someitem }
+    const childprop = observableArray<string>([])
+    const someitem = observable({ childprop: childprop })
+    const viewModel = { someitem: someitem }
     applyBindings(viewModel, testNode)
 
     // First it's not there (by template)
@@ -214,7 +214,7 @@ describe('Binding: Using', function () {
 
   it('Should provide access to an observable viewModel through $rawData', function () {
     testNode.innerHTML = "<div data-bind='using: item'><input data-bind='value: $rawData'/></div>"
-    let item = observable('one')
+    const item = observable('one')
     applyBindings({ item: item }, testNode)
     expect(item.getSubscriptionsCount('change')).toEqual(2) // only subscriptions are the using and value bindings
     expect(testNode.childNodes[0]).toHaveValues(['one'])
