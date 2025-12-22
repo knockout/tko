@@ -18,21 +18,20 @@ declare global {
   //This namespace merges the jasmine namespace to correct same tsc warnings
   namespace jasmine {
     function setNodeText(node, text: string): void
-    const Spec: any
     function getGlobal(): any
-    let updateInterval: number
     function resolve(promise: Promise<boolean>)
     function prepareTestNode(): HTMLElement
     function nodeText(node)
-    const Clock: Clock
     function getEnv(): any
 
+    const Matchers: Matchers
+    const Spec: any
     const FakeTimer: any
-    const undefined: any // Legacy Jasmine 1.x sentinel value for deleted scheduled functions
+    const undefined: any // Legacy Jasmine 1.x sentinel value
+
     let browserSupportsProtoAssignment: any
     let ieVersion: any
-
-    const Matchers: Matchers
+    let updateInterval: number
 
     interface Matchers<T> {
       toContainText(expected: string, ignoreSpaces: boolean): boolean
@@ -64,13 +63,6 @@ declare global {
   // Jasmine 1.x async test helpers (deprecated but still used in codebase)
   function waits(timeout?: number): void
   function runs(fn: Function): void
-
-  //Knockout Types https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
-  // Type definitions for Knockout
-  // Project: http://knockoutjs.com
-  // Definitions by: Maxime LUCE <https://github.com/SomaticIT>, Michael Best <https://github.com/mbest>
-
-  // Treeshaked for TKO: Almost all type definitions are moved to the TKO source.
 
   interface SymbolConstructor {
     observable?: symbol
