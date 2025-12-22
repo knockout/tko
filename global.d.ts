@@ -28,7 +28,6 @@ declare global {
     function getEnv(): any
 
     const FakeTimer: any
-    const undefined: undefined
     let browserSupportsProtoAssignment: any
     let ieVersion: any
 
