@@ -23,6 +23,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           
       - run: npm install
+      
       - run: make
+      - run: make tsc
       - run: make test-headless
-      - run: npm publish
+      - run: make test-headless-jquery
+
+      - run: npx lerna publish from-package --yes
