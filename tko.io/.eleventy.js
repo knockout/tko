@@ -9,6 +9,7 @@ export default function(eleventyConfig) {
   // Copy static assets
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/js");
+  eleventyConfig.addPassthroughCopy("src/lib");
   eleventyConfig.addPassthroughCopy("src/CNAME");
 
   // Watch for changes

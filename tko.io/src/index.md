@@ -22,14 +22,10 @@ Knockout helps you create rich, responsive, maintainable applications built on a
 
 TKO has a comprehensive suite of tests that ensure its correct functioning and allow easy verification on different Javascript browsers and platforms.
 
-## Sponsors
-
-Support Knockout [via Patreon to Brian M Hunt](https://patreon.com/brianmhunt)
 
 ## First Example
 
 ```jsx
-// Simple observable example
 const viewModel = {
   firstName: ko.observable('John'),
   lastName: ko.observable('Doe')
@@ -39,15 +35,17 @@ viewModel.fullName = ko.computed(() => {
   return viewModel.firstName() + ' ' + viewModel.lastName();
 });
 
-ko.applyBindings(viewModel);
-```
+const { node } = ko.jsx.render(
+  <div>
+    <p>First name: <input data-bind="textInput: firstName" /></p>
+    <p>Last name: <input data-bind="textInput: lastName" /></p>
+    <h2>Hello, <span data-bind="text: fullName"></span>!</h2>
+  </div>
+);
 
-```html
-<div>
-  <p>First name: <input data-bind="textInput: firstName" /></p>
-  <p>Last name: <input data-bind="textInput: lastName" /></p>
-  <h2>Hello, <span data-bind="text: fullName"></span>!</h2>
-</div>
+document.getElementById('root').appendChild(node);
+
+ko.applyBindings(viewModel);
 ```
 
 ## Supported Platforms

@@ -22,6 +22,7 @@ import { filters } from '@tko/filter.punches'
 
 import components from '@tko/utils.component'
 import { createElement, Fragment } from '@tko/utils.jsx'
+import { JsxObserver } from '@tko/utils.jsx'
 
 import { overloadOperator } from '@tko/utils.parser'
 
@@ -57,10 +58,22 @@ const builder = new Builder({
 })
 
 const version = BUILD_VERSION
+
 export default builder.create({
   jsx: {
     createElement,
     Fragment,
+    /** Public render function that converts JSX to DOM nodes */
+    render(jsx: any) {
+      const fragment = document.createDocumentFragment()
+      const observer = new JsxObserver(jsx, fragment)
+      // Return the first child if single node, or the fragment if multiple
+      const node = fragment.childNodes.length === 1 ? fragment.firstChild : fragment
+      return {
+        node,
+        dispose: () => observer.dispose()
+      }
+    },
   },
   components,
   version,

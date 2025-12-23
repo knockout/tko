@@ -4,6 +4,8 @@
   "type": "module",
   "description": "TKO documentation site",
   "scripts": {
+    "prebuild": "mkdir -p src/lib && cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/src/lib/ko.js && cd ../reference && make browser && cp dist/browser.min.js ../../tko.io/src/lib/tko.js",
+    "predev": "npm run prebuild",
     "dev": "bunx @11ty/eleventy --serve",
     "build": "bunx @11ty/eleventy",
     "start": "bunx @11ty/eleventy --serve"

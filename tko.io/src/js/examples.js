@@ -14,9 +14,12 @@ async function initEsbuild() {
 async function transformJSX(code) {
   try {
     await initEsbuild();
+
     const result = await esbuild.transform(code, {
       loader: 'jsx',
-      jsx: 'transform'
+      jsx: 'transform',
+      jsxFactory: 'ko.jsx.createElement',
+      jsxFragment: 'ko.jsx.Fragment'
     });
     return { success: true, code: result.code };
   } catch (error) {
@@ -56,6 +59,7 @@ function createExampleContainer(codeBlock) {
 async function runExample(textarea, iframe) {
   const code = textarea.value;
   const result = await transformJSX(code);
+  const container = textarea.parentElement;
 
   if (result.success) {
     // Create a complete HTML document for the iframe
@@ -72,7 +76,12 @@ async function runExample(textarea, iframe) {
         </head>
         <body>
           <div id="root"></div>
-          <script type="module">
+          <script src="/lib/tko.js?${Date.now()}"></script>
+          <script>
+            // TKO exports as 'tko', create 'ko' alias for compatibility
+            window.ko = window.tko;
+          </script>
+          <script>
             ${result.code}
           </script>
         </body>
@@ -86,17 +95,17 @@ async function runExample(textarea, iframe) {
     doc.close();
 
     // Remove any error display
-    const existingError = iframe.nextElementSibling;
-    if (existingError && existingError.className === 'example-error') {
+    const existingError = container.querySelector('.example-error');
+    if (existingError) {
       existingError.remove();
     }
   } else {
-    // Display error
-    let errorDiv = iframe.nextElementSibling;
-    if (!errorDiv || errorDiv.className !== 'example-error') {
+    // Display error overlaying the preview panel
+    let errorDiv = container.querySelector('.example-error');
+    if (!errorDiv) {
       errorDiv = document.createElement('div');
       errorDiv.className = 'example-error';
-      iframe.parentNode.insertBefore(errorDiv, iframe.nextSibling);
+      container.appendChild(errorDiv);
     }
     errorDiv.textContent = `Error: ${result.error}`;
   }
