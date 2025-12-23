@@ -1,0 +1,28 @@
+#  Publish Package Workflow for https://docs.npmjs.com/trusted-publishers
+name: Publish Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+          
+      - run: npm install
+      - run: make
+      - run: make test-headless
+      - run: npm publish
