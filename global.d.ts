@@ -27,7 +27,7 @@ declare global {
     const Matchers: Matchers
     const Spec: any
     const FakeTimer: any
-    const undefined: any // Legacy Jasmine 1.x sentinel value
+    const undefined: undefined // Legacy Jasmine 1.x sentinel value
 
     let browserSupportsProtoAssignment: any
     let ieVersion: any
