@@ -1,0 +1,325 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito|Pacifico|Source+Code+Pro');
+
+html,
+body {
+  /* Prevent scroll on narrow devices */
+  overflow-x: hidden;
+  font-family: 'Nunito', sans-serif;
+}
+
+body {
+  display: grid;
+  margin-top: 75px;
+  height: calc(100vh - 75px);
+
+  grid-template-columns: minmax(200px, max-content) auto;
+  grid-template-areas:
+    'sidebar main';
+}
+
+@media screen and (max-width: 991px) {
+  body {
+    grid-template-columns: auto;
+    grid-template-areas:
+      'sidebar'
+      'main';
+  }
+}
+
+a {
+  color: #590c12;
+  transition: 0.1s ease-in-out;
+}
+
+a:focus, a:hover, a:active {
+  color: #8e383c;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+main a {
+  border-bottom: 1px dashed #590c12;
+}
+
+td {
+  padding: 5px 1em;
+  border-bottom: 1px solid gray;
+}
+
+th {
+  padding: 5px 1em;
+  border-bottom: 1px solid black;
+}
+
+
+/* Codepen iFrames */
+iframe {
+  padding: 0px 1em;
+}
+
+
+/*
+ *       TOP - BAR
+ */
+.top-bar {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto;
+  grid-auto-flow: column;
+  justify-content: center;
+  grid-column-gap: 24px;
+
+  top: 0;
+  left: 0;
+  position: fixed;
+  z-index: 1200;
+  padding: 12px;
+
+  background-color: #931d0d;
+  font-family: Pacifico;
+}
+
+.top-bar a {
+  border-radius: 12px;
+  text-align: center;
+  padding: 0.25em 0.4em;
+  color: white;
+  font-size: 1.4rem;
+  text-shadow: 0 0 5px black;
+  line-height: 2.4rem;
+  transition: 0.4s background-color ease-in-out;
+}
+
+.top-bar a:hover {
+  background-color: #00000080;
+  text-shadow: 0 0 5px #931d0d, 0 0 10px #931d0d;
+  transition: 0.4s background-color ease-in-out;
+}
+
+.top-bar .tko {
+  color: white;
+  font-size: 1.6rem;
+  padding: 0.25em 0.4em;
+  text-shadow: 0 0 5px #efff6c, 0 0 10px #efff6c;
+}
+
+.current-page {
+  background-color: #00000040;
+}
+
+/**
+ *          SIDE-BAR
+ */
+.sidebar {
+  grid-area: sidebar;
+
+  height: calc(100vh - 75px);
+  /* Scrollable contents if viewport is shorter than content */
+  overflow-y: auto;
+  overflow-x: hidden;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  padding: 0;
+  background-color: #efebe9;
+  border-right: 1px solid #efebe9;
+
+  padding: 4px 0.75em;
+}
+
+.toc {
+  position: sticky;
+}
+
+.sidebar a {
+  padding: 1ex 0.25rem;
+  color: #931d0d;
+  border-radius: 4px;
+}
+
+.sidebar a:hover {
+  color: black;
+  background-color: #FFaFaFB0;
+  transition: 0.4s background-color ease-in-out;
+}
+
+.sidebar .section {
+  font-size: 1.2rem;
+}
+
+.sidebar .subheading {
+  padding: 0.6ex 8px;
+  font-weight: normal;
+  margin-left: 1rem;
+}
+
+ @keyframes popin {
+   from { transform: translateX(50%); }
+     to { transform: translateX(0%); }
+ }
+
+.sidebar .in-viewport::after {
+  position: absolute;
+  right: -22px;
+  background-color: #8F3F4F90;
+  width: 20px;
+  height: 20px;
+  border-radius: 12px;
+  content: ' ';
+  animation: 0.25s ease-in 0s popin;
+}
+
+/**
+ *          MAIN
+ */
+main {
+  grid-area: main;
+  height: calc(100vh - 75px);
+  background-color: #fcd4d4;
+  padding: 16px;
+  overflow: scroll;
+}
+
+h2, h3, h4 {
+  margin-top: 1.3em;
+  margin-bottom: 0.6em;
+}
+
+h2 {
+  font-weight: 800;
+}
+
+h3, h4, h2 time {
+  font-weight: 400;
+}
+
+h1 {
+  margin-top: 1.5em;
+}
+
+h1 code {
+  background-color: transparent;
+  border: 3px solid #E8D8D8;
+  font-size: inherit;
+}
+
+/**
+ *            CODE
+ */
+
+pre {
+  font-family: 'Source Code Pro', monospace;
+  background-color: #0a0909;
+  padding: 1ex 1em;
+  margin-left: 1em;
+  border-radius: 1px;
+  border: 1px black inset;
+}
+
+code {
+  background-color: #080707;
+  color: #e6c07b;
+  font-size: 0.9rem;
+}
+
+main code {
+  font-family: 'Source Code Pro', monospace;
+}
+
+code, td code {
+  white-space: nowrap;
+  padding: 2px 8px;
+}
+
+pre code {
+  color: #e6c07b;
+  white-space: pre; /* We want newlines to be newlines in code blocks */
+}
+
+/**
+ *
+ *        TITLES
+ *
+ */
+
+.section-title {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+
+
+
+
+/**
+ *         Source linking
+ */
+.source {
+  display: block;
+  text-align: right;
+  font-size: 0.9rem;
+  position: sticky;
+  top: 0px;
+}
+
+.source a {
+  padding: 2px 0.62em;
+  background-color: #E8D8D8;
+  border: 1px solid gray;
+}
+
+/**
+ *
+ *      BOOKS
+ *
+ */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 250px);
+  grid-gap: 10px;
+  justify-content: space-around;
+}
+
+.book-grid .card {
+  width: 250px;
+}
+
+/**
+ *
+ *      INTERACTIVE EXAMPLES
+ *
+ */
+.example-container {
+  margin: 2em 0;
+  border: 1px solid #931d0d;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.example-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 1em;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.9rem;
+  background-color: #0a0909;
+  color: #e6c07b;
+  border: none;
+  border-bottom: 2px solid #931d0d;
+  resize: vertical;
+}
+
+.example-result {
+  width: 100%;
+  min-height: 200px;
+  border: none;
+  background-color: white;
+}
+
+.example-error {
+  padding: 1em;
+  background-color: #ffebee;
+  color: #c62828;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.85rem;
+}

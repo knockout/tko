@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} - TKO</title>
+  <link rel="stylesheet" href="{{ '/css/tko.css' | url }}">
+</head>
+<body>
+  <nav class="top-bar">
+    <div class="tko">TKO</div>
+    <a href="{{ '/' | url }}">Introduction</a>
+    <a href="{{ '/3to4' | url }}">Knockout 3 to 4 Guide</a>
+    <a class="external" href="https://github.com/knockout/tko">Github</a>
+  </nav>
+
+  <nav class="sidebar">
+    <div class="toc">
+      {# Table of contents will be generated here #}
+    </div>
+  </nav>
+
+  <main>
+    {{ content | safe }}
+  </main>
+
+  <script type="module" src="{{ '/js/examples.js' | url }}"></script>
+</body>
+</html>
