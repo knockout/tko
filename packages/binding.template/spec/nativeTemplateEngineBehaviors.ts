@@ -153,7 +153,7 @@ describe('Native template engine', function () {
           ])
         }
 
-        invocationCount = function () {
+        invocationCount() {
           return ++this.invocations
         }
       }
