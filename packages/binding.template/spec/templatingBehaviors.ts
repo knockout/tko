@@ -540,8 +540,9 @@ describe('Templating', function () {
       }
 
       override nodeHasBindings(node: Node, bindingContext?: BindingContext) {
-        if (node instanceof Element)
+        if (node instanceof Element) {
           return node.tagName == 'EM' || originalBindingProvider.nodeHasBindings(node, bindingContext)
+        }
         return false
       }
       override getBindingAccessors(node: Node, bindingContext?: BindingContext) {
