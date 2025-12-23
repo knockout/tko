@@ -1,4 +1,7 @@
 import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.24.0/esm/browser.min.js';
+import { EditorView, basicSetup } from 'https://esm.sh/codemirror@6.0.1';
+import { javascript } from 'https://esm.sh/@codemirror/lang-javascript@6.2.2';
+import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6.1.2';
 
 let esbuildInitialized = false;
 
@@ -31,35 +34,50 @@ function createExampleContainer(codeBlock) {
   const container = document.createElement('div');
   container.className = 'example-container';
 
-  const textarea = document.createElement('textarea');
-  textarea.className = 'example-textarea';
-  textarea.value = codeBlock.textContent.trim();
+  // Create editor wrapper
+  const editorWrapper = document.createElement('div');
+  editorWrapper.className = 'example-editor';
 
   const iframe = document.createElement('iframe');
   iframe.className = 'example-result';
 
-  container.appendChild(textarea);
+  container.appendChild(editorWrapper);
   container.appendChild(iframe);
 
   // Replace the code block with our interactive container
   const pre = codeBlock.parentElement;
   pre.parentNode.replaceChild(container, pre);
 
-  // Run the code initially
-  runExample(textarea, iframe);
-
-  // Re-run on change (debounced)
+  // Create CodeMirror editor
+  const initialCode = codeBlock.textContent.trim();
   let timeout;
-  textarea.addEventListener('input', () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => runExample(textarea, iframe), 500);
+
+  const editor = new EditorView({
+    doc: initialCode,
+    extensions: [
+      basicSetup,
+      javascript({ jsx: true }),
+      oneDark,
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          // Re-run on change (debounced)
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            const code = editor.state.doc.toString();
+            runExample(code, iframe, container);
+          }, 500);
+        }
+      })
+    ],
+    parent: editorWrapper
   });
+
+  // Run the code initially
+  runExample(initialCode, iframe, container);
 }
 
-async function runExample(textarea, iframe) {
-  const code = textarea.value;
+async function runExample(code, iframe, container) {
   const result = await transformJSX(code);
-  const container = textarea.parentElement;
 
   if (result.success) {
     // Create a complete HTML document for the iframe
@@ -76,23 +94,26 @@ async function runExample(textarea, iframe) {
         </head>
         <body>
           <div id="root"></div>
-          <script src="/lib/tko.js?${Date.now()}"></script>
+          <script src="/lib/tko.js"></script>
           <script>
             // TKO exports as 'tko', create 'ko' alias for compatibility
             window.ko = window.tko;
-          </script>
-          <script>
-            ${result.code}
+
+            // Wait for next tick to ensure TKO is fully loaded
+            setTimeout(() => {
+              try {
+                ${result.code}
+              } catch (e) {
+                console.error('Example error:', e);
+              }
+            }, 0);
           </script>
         </body>
       </html>
     `;
 
-    // Write to iframe
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(html);
-    doc.close();
+    // Use srcdoc for better iframe content handling
+    iframe.srcdoc = html;
 
     // Remove any error display
     const existingError = container.querySelector('.example-error');
