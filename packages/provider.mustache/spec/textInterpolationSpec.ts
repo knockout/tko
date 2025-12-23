@@ -28,22 +28,22 @@ describe('Interpolation Markup preprocessor', function () {
 
   it('Should do nothing when there are no expressions', function () {
     const result = testPreprocess(document.createTextNode('some text'))
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('Should do nothing when empty', function () {
     const result = testPreprocess(document.createTextNode(''))
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('Should not parse unclosed binding', function () {
     const result = testPreprocess(document.createTextNode('some {{ text'))
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('Should not parse unopened binding', function () {
     const result = testPreprocess(document.createTextNode('some }} text'))
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('Should create binding from {{...}} expression', function () {
@@ -84,12 +84,12 @@ describe('Interpolation Markup preprocessor', function () {
   describe('Using unescaped HTML syntax', function () {
     it('Should not parse unclosed binding', function () {
       const result = testPreprocess(document.createTextNode('some {{{ text'))
-      expect(result).toBeUndefined()
+      expect(result).toBeNull()
     })
 
     it('Should not parse unopened binding', function () {
       const result = testPreprocess(document.createTextNode('some }}} text'))
-      expect(result).toBeUndefined()
+      expect(result).toBeNull()
     })
 
     it('Should create binding from {{{...}}} expression', function () {

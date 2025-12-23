@@ -32,7 +32,7 @@ export default class NativeProvider extends Provider {
    * prevent re-entrance (and likely XSS) from the `{{ }}` provider.
    */
   override preprocessNode(node: Element) {
-    return node[NATIVE_BINDINGS] ? node : null
+    return node[NATIVE_BINDINGS] ? [node] : null
   }
 
   onlyBindings([name]) {

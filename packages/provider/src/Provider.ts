@@ -38,17 +38,19 @@ export default class Provider {
   get preemptive() {
     return false
   }
-  nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
+  nodeHasBindings(node: Node, context?: BindingContext): boolean | undefined {
     return undefined
   }
-  getBindingAccessors(node: Element, context?: BindingContext) {}
+  getBindingAccessors(node: Node, context?: BindingContext) {}
 
   /**
    * Preprocess a given node.
-   * @param {Element} Element
-   * @returns {[HTMLElement]|undefined}
+   * @param {Node} Element
+   * @returns {[Node]|null}
    */
-  preprocessNode(node: Element) {}
+  preprocessNode(node: Node): Node[] | null {
+    return [node]
+  }
   postProcess(/* node */) {}
 
   bindingHandlers: BindingHandlerObject

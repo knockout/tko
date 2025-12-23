@@ -113,8 +113,8 @@ describe('Native Provider Behavior', function () {
       child[NATIVE_BINDINGS] = {}
       div.appendChild(child)
       const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
-      assert.ok(nodes instanceof Text)
-      assert.equal(nodes.nodeValue, '{{ child }}')
+      assert.ok(nodes instanceof Array)
+      assert.equal(nodes[0].nodeValue, '{{ child }}')
     })
 
     it('does not pre-empt text nodes w/o NATIVE_BINDINGS', () => {

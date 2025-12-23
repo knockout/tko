@@ -205,7 +205,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any>(
                   itemsForBeforeRemoveCallbacks.push(mapData!)
                 }
               }
-              if (mapData) {
+              if (mapData && mapData.mappedNodes) {
                 nodesToDelete.push.apply(nodesToDelete, mapData.mappedNodes)
               }
             }

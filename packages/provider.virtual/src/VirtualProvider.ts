@@ -13,8 +13,8 @@ export default class VirtualProvider extends BindingStringProvider {
    * Convert <ko binding='...'> into <!-- ko binding: ... -->
    * @param {HTMLElement} node
    */
-  override preprocessNode(node: Element): Node[] | undefined {
-    if (node.tagName === 'KO') {
+  override preprocessNode(node: Node): Node[] | null {
+    if (node instanceof Element && node.tagName === 'KO') {
       const parent = node.parentNode
       const childNodes = [...node.childNodes]
       const virtualBindingString = [...this.genElementBindingStrings(node)].join(',')
@@ -28,7 +28,7 @@ export default class VirtualProvider extends BindingStringProvider {
       node.remove()
       return [openNode, ...childNodes, closeNode]
     }
-    return undefined
+    return null
   }
 
   *genElementBindingStrings(node: Element) {

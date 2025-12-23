@@ -19,8 +19,8 @@ export default class ComponentProvider extends Provider {
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
    * @param {Element} node
    */
-  override preprocessNode(node: Element): Node[] | undefined {
-    if (node.tagName === 'SLOT') {
+  override preprocessNode(node: Node): Node[] | null {
+    if (node instanceof Element && node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
@@ -36,7 +36,7 @@ export default class ComponentProvider extends Provider {
 
       return [openNode, closeNode]
     }
-    return undefined
+    return null
   }
 
   override nodeHasBindings(node: Element): boolean {

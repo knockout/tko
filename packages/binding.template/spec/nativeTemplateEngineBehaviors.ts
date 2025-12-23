@@ -1,7 +1,7 @@
 /* global testNode */
 import { applyBindings } from '@tko/bind'
 
-import { observable, observableArray } from '@tko/observable'
+import { observable, ObservableArray, observableArray } from '@tko/observable'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
@@ -141,17 +141,25 @@ describe('Native template engine', function () {
         + "(Val: <span data-bind='text: $data'></span>, Invocations: <span data-bind='text: $root.invocationCount()'></span>, Parents: <span data-bind='text: $parents.length'></span>)"
         + '</div>'
         + '</div>'
-      const viewModel = {
-        invocations: 0, // Verifying # invocations to be sure we're not rendering anything multiple times and discarding the results
-        items: observableArray([
-          { children: observableArray(['A1', 'A2', 'A3']) },
-          { children: observableArray(['B1', 'B2']) }
-        ]),
-        invocationCount: undefined
+
+      class myViewModel {
+        invocations: number = 0 // Verifying # invocations to be sure we're not rendering anything multiple times and discarding the results
+        items: ObservableArray<any>
+
+        constructor() {
+          this.items = observableArray([
+            { children: observableArray(['A1', 'A2', 'A3']) },
+            { children: observableArray(['B1', 'B2']) }
+          ])
+        }
+
+        invocationCount = function () {
+          return ++this.invocations
+        }
       }
-      viewModel.invocationCount = function () {
-        return ++this.invocations
-      }.bind(viewModel)
+
+      const viewModel = new myViewModel()
+
       applyBindings(viewModel, testNode)
 
       expect(testNode.childNodes[0].childNodes[0]).toContainText(

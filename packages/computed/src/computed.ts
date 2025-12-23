@@ -141,7 +141,7 @@ export function computed(
     if (arguments.length > 0) {
       if (typeof writeFunction === 'function') {
         // Writing a value
-        writeFunction.apply(state.evaluatorFunctionTarget, arguments)
+        writeFunction.apply(state.evaluatorFunctionTarget, arguments as any)
       } else {
         throw new Error(
           "Cannot write a value to a computed unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters."

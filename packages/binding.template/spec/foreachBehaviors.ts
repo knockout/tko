@@ -321,7 +321,7 @@ describe('Binding: Foreach', function () {
         node.parentNode?.removeChild(node)
         return newNodes
       }
-      return undefined
+      return null
     }
 
     // Now perform a foreach binding, and see that afterRender gets the output from the preprocessor and bindings
@@ -944,6 +944,8 @@ describe('Binding: Foreach', function () {
   it('Can modify the set of top-level nodes in a foreach loop', function () {
     options.bindingProviderInstance.preprocessNode = function (node) {
       // Replace <data /> with <span data-bind="text: $data"></span>
+      if (!(node instanceof Element)) return null
+
       if (node.tagName && node.tagName.toLowerCase() === 'data') {
         const newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: $data')
@@ -957,7 +959,7 @@ describe('Binding: Foreach', function () {
         node.parentNode?.removeChild(node)
         return []
       }
-      return undefined
+      return null
     }
     testNode.innerHTML =
       "<div data-bind='foreach: items'>"
