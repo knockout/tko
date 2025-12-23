@@ -52,7 +52,7 @@ export default class ComponentProvider extends Provider {
     return { component }
   }
 
-  getComponentNameForNode(node: Node): string  | null{
+  getComponentNameForNode(node: Node): string | null {
     if (!(node instanceof Element) || node.nodeType !== Node.ELEMENT_NODE) {
       return null
     }

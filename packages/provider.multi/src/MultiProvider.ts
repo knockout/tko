@@ -48,13 +48,14 @@ export default class MultiProvider extends Provider {
     return this.providersFor(node).some(p => p.nodeHasBindings(node))
   }
 
-  override preprocessNode(node: Node) {
+  override preprocessNode(node: Node): Node[] | null {
     for (const provider of this.providersFor(node)) {
       const newNodes = provider.preprocessNode(node)
       if (newNodes) {
         return newNodes
       }
     }
+    return null
   }
 
   *enumerateProviderBindings(node: Node, context) {
