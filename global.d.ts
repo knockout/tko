@@ -59,10 +59,6 @@ declare global {
     }
   }
 
-  // Jasmine 1.x async test helpers (deprecated but still used in codebase)
-  function waits(timeout?: number): void
-  function runs(fn: Function): void
-
   interface SymbolConstructor {
     observable?: symbol
   }
