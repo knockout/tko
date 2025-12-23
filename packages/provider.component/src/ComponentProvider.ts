@@ -17,7 +17,7 @@ export default class ComponentProvider extends Provider {
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
-   * @param {Element} node
+   * @param {Node} node
    */
   override preprocessNode(node: Node): Node[] | null {
     if (node instanceof Element && node.tagName === 'SLOT') {
