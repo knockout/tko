@@ -27,7 +27,7 @@ declare global {
     const Matchers: Matchers
     const Spec: any
     const FakeTimer: any
-    const undefined: undefined
+    const undefined: undefined // Legacy Jasmine 1.x sentinel value
 
     let browserSupportsProtoAssignment: any
     let ieVersion: any
@@ -41,19 +41,21 @@ declare global {
       toHaveCheckedStates(expectedValues: any): boolean
       toThrowContaining(expected: any): boolean
       toEqualOneOf(expectedPossibilities: any): boolean
-      toContainHtml(expectedHtml: any, postProcessCleanedHtml: any): boolean
+      toContainHtml(expectedHtml: any, postProcessCleanedHtml?: any): boolean
       toHaveSelectedValues(expectedValues: any): boolean
-      toContainHtml(expectedValues: any): boolean
       toHaveNodeTypes(expectedTypes: any): boolean
       toContainHtmlElementsAndText(expectedHtml: any): boolean
     }
 
     interface Clock {
       mockScheduler: any
+      reset(): void
+      useMock(): void
     }
 
     interface Spy {
       reset(): any
+      andCallFake(fn: Function): Spy
     }
   }
 
