@@ -539,10 +539,14 @@ describe('Templating', function () {
         return [1, 3, 8]
       }
 
-      override nodeHasBindings(node: Element, bindingContext?: BindingContext) {
-        return node.tagName == 'EM' || originalBindingProvider.nodeHasBindings(node, bindingContext)
+      override nodeHasBindings(node: Node, bindingContext?: BindingContext) {
+        if (node instanceof Element)
+          return node.tagName == 'EM' || originalBindingProvider.nodeHasBindings(node, bindingContext)
+        return false
       }
-      override getBindingAccessors(node: Element, bindingContext?: BindingContext) {
+      override getBindingAccessors(node: Node, bindingContext?: BindingContext) {
+        if (!(node instanceof Element)) return {}
+
         if (node.tagName == 'EM') {
           return { text: ++model.numExternalBindings }
         }

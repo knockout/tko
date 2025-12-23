@@ -11,7 +11,7 @@ export default class VirtualProvider extends BindingStringProvider {
 
   /**
    * Convert <ko binding='...'> into <!-- ko binding: ... -->
-   * @param {HTMLElement} node
+   * @param {Node} node
    */
   override preprocessNode(node: Node): Node[] | null {
     if (node instanceof Element && node.tagName === 'KO') {
@@ -37,14 +37,14 @@ export default class VirtualProvider extends BindingStringProvider {
     }
   }
 
-  override getBindingString(node: Element): string | null {
+  override getBindingString(node: Node): string | null {
     if (node.nodeType === Node.COMMENT_NODE) {
       return virtualElements.virtualNodeBindingValue(node)
     }
     return null
   }
 
-  override nodeHasBindings(node: Element, context?: BindingContext): boolean {
+  override nodeHasBindings(node: Node, context?: BindingContext): boolean {
     if (node.nodeType === Node.COMMENT_NODE) {
       return virtualElements.isStartComment(node)
     }

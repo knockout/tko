@@ -14,6 +14,8 @@ export interface ProviderParamsInput {
   providers?: any[]
 }
 
+export type BindingAccessors = { [name: string]: Function }
+
 export default class Provider {
   constructor(params?: ProviderParamsInput | null) {
     if (this.constructor === Provider) {
@@ -38,14 +40,16 @@ export default class Provider {
   get preemptive() {
     return false
   }
-  nodeHasBindings(node: Node, context?: BindingContext): boolean | undefined {
-    return undefined
+  nodeHasBindings(node: Node, context?: BindingContext): boolean {
+    return false
   }
-  getBindingAccessors(node: Node, context?: BindingContext) {}
+  getBindingAccessors(node: Node, context?: BindingContext): BindingAccessors {
+    return Object.create(null)
+  }
 
   /**
    * Preprocess a given node.
-   * @param {Node} Element
+   * @param {Node} node
    * @returns {[Node]|null}
    */
   preprocessNode(node: Node): Node[] | null {
@@ -79,7 +83,7 @@ export default class Provider {
   }
 
   // Returns the valueAccessor function for a binding value
-  makeValueAccessor(value) {
+  makeValueAccessor(value): Function {
     return () => value
   }
 
@@ -128,13 +132,14 @@ class LegacyProvider extends Provider {
       : this.getBindingsAndMakeAccessors(node, context)
   }
 
-  override nodeHasBindings(node: Element): boolean {
+  override nodeHasBindings(node: Node): boolean {
     return this.providerObject.nodeHasBindings(node)
   }
 
-  override preprocessNode(node) {
+  override preprocessNode(node: Node): Node[] | null {
     if (this.providerObject.preprocessNode) {
       return this.providerObject.preprocessNode(node)
     }
+    return null
   }
 }

@@ -15,29 +15,33 @@ export default class AttrProvider extends Provider {
     return 'ko-'
   }
 
-  getBindingAttributesList(node: Element) {
+  getBindingAttributesList(node: Node) {
+    if (!(node instanceof Element)) {
+      return []
+    }
+
     if (!node.hasAttributes()) {
       return []
     }
     return Array.from(node.attributes).filter(attr => attr.name.startsWith(this.PREFIX))
   }
 
-  override nodeHasBindings(node: Element) {
+  override nodeHasBindings(node: Node) {
     return this.getBindingAttributesList(node).length > 0
   }
 
-  override getBindingAccessors(node: Element, context) {
+  override getBindingAccessors(node: Node, context) {
     return Object.assign({}, ...this.handlersFromAttributes(node, context))
   }
 
-  *handlersFromAttributes(node: Element, context) {
+  *handlersFromAttributes(node: Node, context) {
     for (const attr of this.getBindingAttributesList(node)) {
-      const name = attr.name.substr(this.PREFIX.length)
+      const name = attr.name.substring(this.PREFIX.length)
       yield { [name]: () => this.getValue(attr.value, context, node) }
     }
   }
 
-  getValue(token, $context, node: Element) {
+  getValue(token, $context, node: Node) {
     /* FIXME: This duplicates Identifier.prototype.lookup_value; it should
        be refactored into e.g. a BindingContext method */
     if (!token) {
