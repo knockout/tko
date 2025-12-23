@@ -16,7 +16,38 @@
 
   <nav class="sidebar">
     <div class="toc">
-      {# Table of contents will be generated here #}
+      <a href="{{ '/' | url }}" class="section">Introduction</a>
+      <a href="{{ '/3to4' | url }}" class="section">Knockout 3 to 4 Guide</a>
+
+      <div class="section">Bindings</div>
+      {%- for page in collections.bindingDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Observables</div>
+      {%- for page in collections.observableDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Computed</div>
+      {%- for page in collections.computedDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Components</div>
+      {%- for page in collections.componentDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Binding Context</div>
+      {%- for page in collections.bindingContextDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Advanced</div>
+      {%- for page in collections.advancedDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
     </div>
   </nav>
 
