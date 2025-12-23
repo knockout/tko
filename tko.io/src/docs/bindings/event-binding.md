@@ -75,7 +75,7 @@ function MyViewModel() {
 
 Two points to note about this example:
 
- * If you're inside a nested [binding context](binding-context.html), for example if you're inside a `foreach` or a `with` block, but your handler function
+ * If you're inside a nested [binding context](../../binding-context/binding-context/), for example if you're inside a `foreach` or a `with` block, but your handler function
    is on the root viewmodel or some other parent context, you'll need to use a prefix such as `$parent` or `$root` to locate the
    handler function.
  * In your viewmodel, it's often useful to declare `self` (or some other variable) as an alias for `this`. Doing so avoids any problems
@@ -124,7 +124,7 @@ Alternatively, if you prefer to avoid the function literal in your view, you can
 
 ### Note 3: Allowing the default action
 
-By default, Knockout will prevent the event from taking any default action. For example if you use the `event` binding to capture the `keypress` event of an `input` tag, the browser will only call your handler function and will *not* add the value of the key to the `input` element's value. A more common example is using [the click binding](click-binding.html), which internally uses this binding, where your handler function will be called, but the browser will *not* navigate to the link's `href`. This is a useful default because when you use the `click` binding, it's normally because you're using the link as part of a UI that manipulates your view model, not as a regular hyperlink to another web page.
+By default, Knockout will prevent the event from taking any default action. For example if you use the `event` binding to capture the `keypress` event of an `input` tag, the browser will only call your handler function and will *not* add the value of the key to the `input` element's value. A more common example is using [the click binding](../click-binding/), which internally uses this binding, where your handler function will be called, but the browser will *not* navigate to the link's `href`. This is a useful default because when you use the `click` binding, it's normally because you're using the link as part of a UI that manipulates your view model, not as a regular hyperlink to another web page.
 
 However, if you *do* want to let the default action proceed, just return `true` from your `event` handler function.
 

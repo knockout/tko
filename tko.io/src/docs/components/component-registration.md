@@ -92,7 +92,7 @@ ko.components.register('my-component', {
 });
 ```
 
-Note that, typically, it's best to perform direct DOM manipulation only through [custom bindings](custom-bindings.html) rather than acting on `componentInfo.element` from inside `createViewModel`. This leads to more modular, reusable code.
+Note that, typically, it's best to perform direct DOM manipulation only through [custom bindings](../../binding-context/custom-bindings/) rather than acting on `componentInfo.element` from inside `createViewModel`. This leads to more modular, reusable code.
 
 The `componentInfo.templateNodes` array is useful if you want to build a component that accepts arbitrary markup to influence its output (for example, a grid, list, dialog, or tab set that injects supplied markup into itself). For a complete example, see [passing markup into components](component-custom-elements.html#passing-markup-into-components).
 
@@ -312,7 +312,7 @@ ko.components.register('my-component', {
 
 Knockout does not call `require([moduleName], ...)` until your component is being instantiated. This is how components get loaded on demand, not up front.
 
-For example, if your component is inside some other element with an [`if` binding](if-binding.html) (or another control flow binding), then it will not cause the AMD module to be loaded until the `if` condition is true. Of course, if the AMD module was already loaded (e.g., in a preloaded bundle) then the `require` call will not trigger any additional HTTP requests, so you can control what is preloaded and what is loaded on demand.
+For example, if your component is inside some other element with an [`if` binding](../if-binding/) (or another control flow binding), then it will not cause the AMD module to be loaded until the `if` condition is true. Of course, if the AMD module was already loaded (e.g., in a preloaded bundle) then the `require` call will not trigger any additional HTTP requests, so you can control what is preloaded and what is loaded on demand.
 
 ## Registering components as a single AMD module
 

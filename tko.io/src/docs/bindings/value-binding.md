@@ -14,7 +14,7 @@ The `value` binding links the associated DOM element's value with a property on 
 
 When the user edits the value in the associated form control, it updates the value on your view model. Likewise, when you update the value in your view model, this updates the value of the form control on screen.
 
-Note: If you're working with checkboxes or radio buttons, use [the `checked` binding](checked-binding.html) to read and write your element's checked state, not the `value` binding.
+Note: If you're working with checkboxes or radio buttons, use [the `checked` binding](../checked-binding/) to read and write your element's checked state, not the `value` binding.
 
 ### Example
 
@@ -62,7 +62,7 @@ Note: If you're working with checkboxes or radio buttons, use [the `checked` bin
 
 ### Note 1: Working with drop-down lists (i.e., `<select>` elements)
 
-Knockout has special support for drop-down lists (i.e., `<select>` elements). The `value` binding works in conjunction with the `options` binding to let you read and write values that are arbitrary JavaScript objects, not just string values. This is very useful if you want to let the user select from a set of model objects. For examples of this, see [the `options` binding](options-binding.html) or for handling multi-select lists, see the documentation for [the `selectedOptions` binding](selectedOptions-binding.html).
+Knockout has special support for drop-down lists (i.e., `<select>` elements). The `value` binding works in conjunction with the `options` binding to let you read and write values that are arbitrary JavaScript objects, not just string values. This is very useful if you want to let the user select from a set of model objects. For examples of this, see [the `options` binding](../options-binding/) or for handling multi-select lists, see the documentation for [the `selectedOptions` binding](../selectedOptions-binding/).
 
 You can also use the `value` binding with a `<select>` element that does not use the `options` binding. In this case, you can choose to specify your `<option>` elements in markup or build them using the `foreach` or `template` bindings. You can even nest options within `<optgroup>` elements and Knockout will set the selected value appropriately.
 

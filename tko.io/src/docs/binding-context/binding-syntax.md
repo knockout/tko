@@ -26,7 +26,7 @@ Your value: <input data-bind="value: someValue, valueUpdate: 'afterkeydown'" />
 Cellphone: <input data-bind="value: cellphoneNumber, enable: hasCellphone" />
 ```
 
-The binding *name* should generally match a registered binding handler (either built-in or [custom](custom-bindings.html)) or be a parameter for another binding. If the name matches neither of those, Knockout will ignore it (without any error or warning). So if a binding doesn't appear to work, first check that the name is correct.
+The binding *name* should generally match a registered binding handler (either built-in or [custom](../../binding-context/custom-bindings/)) or be a parameter for another binding. If the name matches neither of those, Knockout will ignore it (without any error or warning). So if a binding doesn't appear to work, first check that the name is correct.
 
 #### Binding values
 

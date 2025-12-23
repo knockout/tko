@@ -81,7 +81,7 @@ In the following example,
         In general, if a parameter's evaluation does not involve evaluating an observable (in this case, the value did not involve observables at all), then the value is passed literally. If the value was an object, then the child component could mutate it, but since it's not observable the parent would not know the child had done so.
 
   * `simpleObservable`
-      * This will be the [`ko.observable`](observables.html) instance declared on the parent viewmodel as `myObservable`. It is not a wrapper --- it's the actual same instance as referenced by the parent. So if the child viewmodel writes to this observable, the parent viewmodel will receive that change.
+      * This will be the [`ko.observable`](../../observables/observables/) instance declared on the parent viewmodel as `myObservable`. It is not a wrapper --- it's the actual same instance as referenced by the parent. So if the child viewmodel writes to this observable, the parent viewmodel will receive that change.
 
         In general, if a parameter's evaluation does not involve evaluating an observable (in this case, the observable was simply passed without evaluating it), then the value is passed literally.
 
@@ -113,7 +113,7 @@ Consider a special list component that can be invoked as follows:
 
 By default, the DOM nodes inside `<my-special-list>` will be stripped out (without being bound to any viewmodel) and replaced by the component's output. However, those DOM nodes aren't lost: they are remembered, and are supplied to the component in two ways:
 
- * As an array, `$componentTemplateNodes`, available to any binding expression in the component's template (i.e., as a [binding context](binding-context.html) property). Usually this is the most convenient way to use the supplied markup. See the example below.
+ * As an array, `$componentTemplateNodes`, available to any binding expression in the component's template (i.e., as a [binding context](../../binding-context/binding-context/) property). Usually this is the most convenient way to use the supplied markup. See the example below.
  * As an array, `componentInfo.templateNodes`, passed to its [`createViewModel` function](component-registration.html#a-createviewmodel-factory-function)
 
 The component can then choose to use the supplied DOM nodes as part of its output however it wishes, such as by using `template: { nodes: $componentTemplateNodes }` on any element in the component's template.
@@ -175,7 +175,7 @@ A custom element can have a regular `data-bind` attribute (in addition to any `p
 </products-list>
 ```
 
-However, it does not make sense to use bindings that would modify the element's contents, such as the [`text`](text-binding.html) or [`template`](template-binding.html) bindings, since they would overwrite the template injected by your component.
+However, it does not make sense to use bindings that would modify the element's contents, such as the [`text`](../text-binding/) or [`template`](template-binding.html) bindings, since they would overwrite the template injected by your component.
 
 Knockout will prevent the use of any bindings that use [`controlsDescendantBindings`](custom-bindings-controlling-descendant-bindings.html), because this also would clash with the component when trying to bind its viewmodel to the injected template. Therefore if you want to use a control flow binding such as `if` or `foreach`, then you must wrap it around your custom element rather than using it directly on the custom element, e.g.,:
 

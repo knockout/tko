@@ -11,7 +11,7 @@ The `checked` binding links a checkable form control &mdash; i.e., a checkbox (`
 
 When the user checks the associated form control, this updates the value on your view model. Likewise, when you update the value in your view model, this checks or unchecks the form control on screen.
 
-Note: For text boxes, drop-down lists, and all non-checkable form controls, use [the `value` binding](value-binding.html) to read and write the element's value, not the `checked` binding.
+Note: For text boxes, drop-down lists, and all non-checkable form controls, use [the `value` binding](../value-binding/) to read and write the element's value, not the `checked` binding.
 
 ### Example with checkbox
 

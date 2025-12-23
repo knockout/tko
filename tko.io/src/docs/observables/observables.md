@@ -147,7 +147,7 @@ Observables implement a variety of functions useful for working in an asynchrono
 
 ## Forcing observables to always notify subscribers
 
-When writing to an observable that contains a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](extenders.html) to ensure that an observable's subscribers are always notified on a write, even if the value is the same. You would apply the extender to an observable like this:
+When writing to an observable that contains a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](../../observables/extenders/) to ensure that an observable's subscribers are always notified on a write, even if the value is the same. You would apply the extender to an observable like this:
 
 ```javascript
 myViewModel.personName.extend({ notify: 'always' });
@@ -155,7 +155,7 @@ myViewModel.personName.extend({ notify: 'always' });
 
 ## Delaying and/or suppressing change notifications
 
-Normally, an observable notifies its subscribers immediately, as soon as it's changed. But if an observable is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying the observable's change notifications. This is accomplished using the [`rateLimit` extender](rateLimit-observable.html) like this:
+Normally, an observable notifies its subscribers immediately, as soon as it's changed. But if an observable is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying the observable's change notifications. This is accomplished using the [`rateLimit` extender](../../observables/rateLimit-observable/) like this:
 
 ```javascript
 // Ensure it notifies about changes no more than once per 50-millisecond period

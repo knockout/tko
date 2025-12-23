@@ -9,7 +9,7 @@ title: If Binding
 ### Purpose
 The `if` binding causes a section of markup to appear in your document (and to have its `data-bind` attributes applied), only if a specified expression evaluates to `true` (or a `true`-ish value such as a non-`null` object or nonempty string).
 
-`if` plays a similar role to [the `visible` binding](visible-binding.html). The difference is that, with `visible`, the contained markup always remains in the DOM and always has its `data-bind` attributes applied - the `visible` binding just uses CSS to toggle the container element's visiblity. The `if` binding, however, physically adds or removes the contained markup in your DOM, and only applies bindings to descendants if the expression is `true`.
+`if` plays a similar role to [the `visible` binding](../visible-binding/). The difference is that, with `visible`, the contained markup always remains in the DOM and always has its `data-bind` attributes applied - the `visible` binding just uses CSS to toggle the container element's visiblity. The `if` binding, however, physically adds or removes the contained markup in your DOM, and only applies bindings to descendants if the expression is `true`.
 
 ### Example 1
 

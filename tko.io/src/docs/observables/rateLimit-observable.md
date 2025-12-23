@@ -8,9 +8,9 @@ title: RateLimit Observable
 
 *Note: This rate-limit API was added in Knockout 3.1.0. For previous versions, the [`throttle` extender](throttle-extender.html) provides similar functionality.*
 
-Normally, an [observable](observables.html) that is changed notifies its subscribers immediately, so that any computed observables or bindings that depend on the observable are updated synchronously. The `rateLimit` extender, however, causes an observable to suppress and delay change notifications for a specified period of time. A rate-limited observable therefore updates dependencies asynchronously.
+Normally, an [observable](../../observables/observables/) that is changed notifies its subscribers immediately, so that any computed observables or bindings that depend on the observable are updated synchronously. The `rateLimit` extender, however, causes an observable to suppress and delay change notifications for a specified period of time. A rate-limited observable therefore updates dependencies asynchronously.
 
-The `rateLimit` extender can be applied to any type of observable, including [observable arrays](observableArrays.html) and [computed observables](computedObservables.html). The main use cases for rate-limiting are:
+The `rateLimit` extender can be applied to any type of observable, including [observable arrays](../../observables/observableArrays/) and [computed observables](../../computed/computedObservables/). The main use cases for rate-limiting are:
 
  * Making things respond after a certain delay
  * Combining multiple changes into a single update

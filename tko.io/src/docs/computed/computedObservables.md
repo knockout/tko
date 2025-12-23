@@ -5,7 +5,7 @@ title: ComputedObservables
 
 # Computed Observables Overview
 
-What if you've got an [observable](observables.html) for `firstName`, and another for `lastName`, and you want to display the full name? That's where *computed observables* come in - these are functions that are dependent on one or more other observables, and will automatically update whenever any of these dependencies change.
+What if you've got an [observable](../../observables/observables/) for `firstName`, and another for `lastName`, and you want to display the full name? That's where *computed observables* come in - these are functions that are dependent on one or more other observables, and will automatically update whenever any of these dependencies change.
 
 For example, given the following view model class,
 
@@ -74,7 +74,7 @@ Then, changes to `items` or `selectedIndexes` will ripple through the chain of c
 
 ### Forcing computed observables to always notify subscribers
 
-When a computed observable returns a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](extenders.html) to ensure that a computed observable's subscribers are always notified on an update, even if the value is the same. You would apply the extender like this:
+When a computed observable returns a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](../../observables/extenders/) to ensure that a computed observable's subscribers are always notified on an update, even if the value is the same. You would apply the extender like this:
 
 ```javascript
 myViewModel.fullName = ko.computed(function() {
@@ -84,7 +84,7 @@ myViewModel.fullName = ko.computed(function() {
 
 ### Delaying and/or suppressing change notifications
 
-Normally, a computed observable updates and notifies its subscribers immediately, as soon as its dependencies change. But if a computed observable has many dependencies or involves expensive updates, you may get better performance by limiting or delaying the computed observable's updates and notifications. This is accomplished using the [`rateLimit` extender](rateLimit-observable.html) like this:
+Normally, a computed observable updates and notifies its subscribers immediately, as soon as its dependencies change. But if a computed observable has many dependencies or involves expensive updates, you may get better performance by limiting or delaying the computed observable's updates and notifications. This is accomplished using the [`rateLimit` extender](../../observables/rateLimit-observable/) like this:
 
 ```javascript
 // Ensure updates no more than once per 50-millisecond period
@@ -240,7 +240,7 @@ ko.computed(function() {
 }, this);
 ```
 
-Note: If you just want to prevent a computed observable from updating too often, see the [`rateLimit` extender](rateLimit-observable.html).
+Note: If you just want to prevent a computed observable from updating too often, see the [`rateLimit` extender](../../observables/rateLimit-observable/).
 
 ### Note: Why circular dependencies aren't meaningful
 
@@ -291,7 +291,7 @@ A computed observable can be constructed using one of the following forms:
 A computed observable provides the following functions:
 
 * `dispose()` --- Manually disposes the computed observable, clearing all subscriptions to dependencies. This function is useful if you want to stop a computed observable from being updated or want to clean up memory for a computed observable that has dependencies on observables that won't be cleaned.
-* `extend(extenders)` --- Applies the given [extenders](extenders.html) to the computed observable.
+* `extend(extenders)` --- Applies the given [extenders](../../observables/extenders/) to the computed observable.
 * `getDependenciesCount()` --- Returns the current number of dependencies of the computed observable.
 * `getSubscriptionsCount()` --- Returns the current number of subscriptions (either from other computed observables or manual subscriptions) of the computed observable.
 * `isActive()` --- Returns whether the computed observable may be updated in the future. A computed observable is inactive if it has no dependencies.

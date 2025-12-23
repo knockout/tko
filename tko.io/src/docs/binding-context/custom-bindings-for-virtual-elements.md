@@ -8,7 +8,7 @@ title: Custom Bindings For Virtual Elements
 
 *Note: Creating custom bindings that support virtual elements is an advanced technique, typically used only when creating libraries of reusable bindings. It's not something you'll normally need to do when building applications with Knockout.*
 
-Knockout's *control flow bindings* (e.g., [`if`](if-binding.html) and [`foreach`](foreach-binding.html)) can be applied not only to regular DOM elements, but also to "virtual" DOM elements defined by a special comment-based syntax. For example:
+Knockout's *control flow bindings* (e.g., [`if`](../if-binding/) and [`foreach`](../foreach-binding/)) can be applied not only to regular DOM elements, but also to "virtual" DOM elements defined by a special comment-based syntax. For example:
 
 ```html
 <ul>

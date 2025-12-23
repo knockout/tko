@@ -7,9 +7,9 @@ title: With Binding
 # `with` Binding
 
 ### Purpose
-The `with` binding creates a new [binding context](binding-context.html), so that descendant elements are bound in the context of a specified object.
+The `with` binding creates a new [binding context](../../binding-context/binding-context/), so that descendant elements are bound in the context of a specified object.
 
-Of course, you can arbitrarily nest `with` bindings along with the other control-flow bindings such as [`if`](if-binding.html) and [`foreach`](foreach-binding.html).
+Of course, you can arbitrarily nest `with` bindings along with the other control-flow bindings such as [`if`](../if-binding/) and [`foreach`](../foreach-binding/).
 
 ### Example 1
 
@@ -38,7 +38,7 @@ javascript: |-
 This interactive example demonstrates that:
 
  * The `with` binding will dynamically add or remove descendant elements depending on whether the associated value is `null`/`undefined` or not
- * If you want to access data/functions from parent binding contexts, you can use [special context properties such as `$parent` and `root`](binding-context.html).
+ * If you want to access data/functions from parent binding contexts, you can use [special context properties such as `$parent` and `root`](../../binding-context/binding-context/).
 
 ```example
 html: |-
@@ -97,7 +97,7 @@ javascript: |-
 
 ### Note 1: Using "with" without a container element
 
-Just like other control flow elements such as [`if`](if-binding.html) and [`foreach`](foreach-binding.html), you can use `with` without any container element to host it. This is useful if you need to use `with` in a place where it would not be legal to introduce a new container element just to hold the `with` binding. See the documentation for [`if`](if-binding.html) or [`foreach`](foreach-binding.html) for more details.
+Just like other control flow elements such as [`if`](../if-binding/) and [`foreach`](../foreach-binding/), you can use `with` without any container element to host it. This is useful if you need to use `with` in a place where it would not be legal to introduce a new container element just to hold the `with` binding. See the documentation for [`if`](../if-binding/) or [`foreach`](../foreach-binding/) for more details.
 
 Example:
 

@@ -9,7 +9,7 @@ title: Foreach Binding
 ### Purpose
 The `foreach` binding duplicates a section of markup for each entry in an array, and binds each copy of that markup to the corresponding array item. This is especially useful for rendering lists or tables.
 
-Assuming your array is an [observable array](observableArrays.html), whenever you later add, remove, or re-order array entries, the binding will efficiently update the UI to match - inserting or removing more copies of the markup, or re-ordering existing DOM elements, without affecting any other DOM elements. This is far faster than regenerating the entire `foreach` output after each array change.
+Assuming your array is an [observable array](../../observables/observableArrays/), whenever you later add, remove, or re-order array entries, the binding will efficiently update the UI to match - inserting or removing more copies of the markup, or re-ordering existing DOM elements, without affecting any other DOM elements. This is far faster than regenerating the entire `foreach` output after each array change.
 
 Of course, you can arbitrarily nest any number of `foreach` bindings along with other control-flow bindings such as `if` and `with`.
 
@@ -48,7 +48,7 @@ The following example shows that, if your array is observable, then the UI will 
 
 As shown in the above examples, bindings within the `foreach` block can refer to properties on the array entries. For example, [Example 1](#example_1_iterating_over_an_array) referenced the `firstName` and `lastName` properties on each array entry.
 
-But what if you want to refer to the array entry itself (not just one of its properties)? In that case, you can use the [special context property](binding-context.html) `$data`. Within a `foreach` block, it means "the current item". For example,
+But what if you want to refer to the array entry itself (not just one of its properties)? In that case, you can use the [special context property](../../binding-context/binding-context/) `$data`. Within a `foreach` block, it means "the current item". For example,
 
 <live-example params='id: "foreach-$data"'></live-example>
 
@@ -76,11 +76,11 @@ Similarly, you can use `$parent` to refer to data from outside the `foreach`, e.
 </ul>
 ```
 
-For more information about `$index` and other context properties such as `$parent`, see documentation for [binding context properties](binding-context.html).
+For more information about `$index` and other context properties such as `$parent`, see documentation for [binding context properties](../../binding-context/binding-context/).
 
 ### Note 3: Using "as" to give an alias to "foreach" items
 
-As described in Note 1, you can refer to each array entry using the `$data` [context variable](binding-context.html). In some cases though, it may be useful to give the current item a more descriptive name using the `as` option like:
+As described in Note 1, you can refer to each array entry using the `$data` [context variable](../../binding-context/binding-context/). In some cases though, it may be useful to give the current item a more descriptive name using the `as` option like:
 
 ```html
 <ul data-bind="foreach: { data: people, as: 'person' }"></ul>
@@ -142,7 +142,7 @@ By default, the `foreach` binding will skip over (i.e., hide) any array entries 
 
 If you need to run some further custom logic on the generated DOM elements, you can use any of the `afterRender`/`afterAdd`/`beforeRemove`/`beforeMove`/`afterMove` callbacks described below.
 
-> **Note:** These callbacks are *only* intended for triggering animations related to changes in a list. If your goal is actually to attach other behaviors to new DOM elements when they have been added (e.g., event handlers, or to activate third-party UI controls), then your work will be much easier if you implement that new behavior as a [custom binding](custom-bindings.html) instead, because then you can use that behavior anywhere, independently of the `foreach` binding.
+> **Note:** These callbacks are *only* intended for triggering animations related to changes in a list. If your goal is actually to attach other behaviors to new DOM elements when they have been added (e.g., event handlers, or to activate third-party UI controls), then your work will be much easier if you implement that new behavior as a [custom binding](../../binding-context/custom-bindings/) instead, because then you can use that behavior anywhere, independently of the `foreach` binding.
 
 Here's a trivial example that uses `afterAdd` to apply the classic "yellow fade" effect to newly-added items. It requires the [jQuery Color plugin](https://github.com/jquery/jquery-color) to enable animation of background colors.
 

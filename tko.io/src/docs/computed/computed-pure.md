@@ -78,7 +78,7 @@ You should not use the *pure* feature for a computed observable that is meant to
   });
   ```
 
-The reason you shouldn't use a *pure* computed if the evaluator has important side effects is simply that the evaluator will not run whenever the computed has no active subscribers (and so is sleeping). If it's important for the evaluator to always run when dependencies change, use a [regular computed](computedObservables.html) instead.
+The reason you shouldn't use a *pure* computed if the evaluator has important side effects is simply that the evaluator will not run whenever the computed has no active subscribers (and so is sleeping). If it's important for the evaluator to always run when dependencies change, use a [regular computed](../../computed/computedObservables/) instead.
 
 ### State-change notifications
 

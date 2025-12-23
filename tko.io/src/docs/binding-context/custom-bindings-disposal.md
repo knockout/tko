@@ -5,7 +5,7 @@ title: Custom Bindings Disposal
 
 # Custom Disposal Logic
 
-In a typical Knockout application, DOM elements are dynamically added and removed, for example using the [`template`](template-binding.html) binding or via control-flow bindings ([`if`](if-binding.html), [`ifnot`](ifnot-binding.html), [`with`](with-binding.html), and [`foreach`](foreach-binding.html)). When creating a custom binding, it is often desirable to add clean-up logic that runs when an element associated with your custom binding is removed by Knockout.
+In a typical Knockout application, DOM elements are dynamically added and removed, for example using the [`template`](template-binding.html) binding or via control-flow bindings ([`if`](../if-binding/), [`ifnot`](ifnot-binding.html), [`with`](../with-binding/), and [`foreach`](../foreach-binding/)). When creating a custom binding, it is often desirable to add clean-up logic that runs when an element associated with your custom binding is removed by Knockout.
 
 ### Registering a callback on the disposal of an element
 

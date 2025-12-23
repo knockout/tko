@@ -22,7 +22,7 @@ Going back to the classic "first name + last name = full name" example, you can 
 
 This is the exact opposite of the [Hello World](../examples/helloWorld.html) example, in that here the first and last names are not editable, but the combined full name is editable.
 
-The preceding view model code demonstrates the *single parameter syntax* for initializing computed observables. See the [computed observable reference](computed-reference.html) for the full list of available options.
+The preceding view model code demonstrates the *single parameter syntax* for initializing computed observables. See the [computed observable reference](../computed-reference/) for the full list of available options.
 
 ### Example 2: Selecting/deselecting all items
 

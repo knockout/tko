@@ -10,7 +10,7 @@ The `options` binding controls what options should appear in a drop-down list (i
 
 The value you assign should be an array (or observable array). The `<select>` element will then display one item for each item in your array.
 
-Note: For a multi-select list, to set which of the options are selected, or to read which of the options are selected, use [the `selectedOptions` binding](selectedOptions-binding.html). For a single-select list, you can also read and write the selected option using [the `value` binding](value-binding.html).
+Note: For a multi-select list, to set which of the options are selected, or to read which of the options are selected, use [the `selectedOptions` binding](../selectedOptions-binding/). For a single-select list, you can also read and write the selected option using [the `value` binding](../value-binding/).
 
 ### Example 1: Drop-down list
 
@@ -141,7 +141,7 @@ Note that the only difference between examples 3 and 4 is the `optionsText` valu
 
    * `selectedOptions`
 
-     For a multi-select list, you can read and write the selection state using `selectedOptions`. Technically this is a separate binding, so it has [its own documentation](selectedOptions-binding.html).
+     For a multi-select list, you can read and write the selection state using `selectedOptions`. Technically this is a separate binding, so it has [its own documentation](../selectedOptions-binding/).
 
    * `valueAllowUnset`
 

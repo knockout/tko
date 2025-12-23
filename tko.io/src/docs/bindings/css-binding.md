@@ -8,7 +8,7 @@ title: Css Binding
 ### Purpose
 The `css` binding adds or removes one or more named CSS classes to the associated DOM element. This is useful, for example, to highlight some value in red if it becomes negative.
 
-(Note: If you don't want to apply a CSS class but instead want to assign a `style` attribute value directly, see [the style binding](style-binding.html).)
+(Note: If you don't want to apply a CSS class but instead want to assign a `style` attribute value directly, see [the style binding](../style-binding/).)
 
 ### Example with static classes
 ```html

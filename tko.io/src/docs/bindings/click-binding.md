@@ -35,7 +35,7 @@ some UI for each item in a collection, and you need to know which item's UI was 
 
 Two points to note about this example:
 
- * If you're inside a nested [binding context](binding-context.html), for example if you're inside a `foreach` or a `with` block, but your handler function
+ * If you're inside a nested [binding context](../../binding-context/binding-context/), for example if you're inside a `foreach` or a `with` block, but your handler function
    is on the root viewmodel or some other parent context, you'll need to use a prefix such as `$parent` or `$root` to locate the
    handler function.
  * In your viewmodel, it's often useful to declare `self` (or some other variable) as an alias for `this`. Doing so avoids any problems

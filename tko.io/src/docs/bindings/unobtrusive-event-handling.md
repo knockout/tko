@@ -16,7 +16,7 @@ In most cases, data-bind attributes provide a clean and succinct way to bind to 
 As an alternative, Knockout provides two helper functions that allow you to identify the data associated with a DOM element:
 
  * `ko.dataFor(element)` - returns the data that was available for binding against the element
- * `ko.contextFor(element)` - returns the entire [binding context](binding-context.html) that was available to the DOM element.
+ * `ko.contextFor(element)` - returns the entire [binding context](../../binding-context/binding-context/) that was available to the DOM element.
 
 These helper functions can be used in event handlers that are attached unobtrusively using something like jQuery's `bind` or `click`. The above function could be attached to each link with a `remove` class like:
 

@@ -31,7 +31,7 @@ Typically this is useful with elements like `<span>` or `<em>` that traditionall
 
 ### Note 1: Using functions and expressions to detemine text values
 
-If you want to detemine text programmatically, one option is to create a [computed observable](computedObservables.html), and use its evaluator function as a place for your code that works out what text to display.
+If you want to detemine text programmatically, one option is to create a [computed observable](../../computed/computedObservables/), and use its evaluator function as a place for your code that works out what text to display.
 
 For example,
 
@@ -59,7 +59,7 @@ viewModel.myMessage("<i>Hello, world!</i>");
 
 ... this would *not* render as italic text, but would render as literal text with visible angle brackets.
 
-If you need to set HTML content in this manner, see [the html binding](html-binding.html).
+If you need to set HTML content in this manner, see [the html binding](../html-binding/).
 
 ### Note 3: Using "text" without a container element
 
