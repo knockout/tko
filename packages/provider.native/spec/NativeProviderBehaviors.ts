@@ -113,8 +113,9 @@ describe('Native Provider Behavior', function () {
       child[NATIVE_BINDINGS] = {}
       div.appendChild(child)
       const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
-      assert.ok(nodes instanceof Text)
-      assert.equal(nodes.nodeValue, '{{ child }}')
+      assert.notEqual(nodes, null)
+      assert.ok(nodes instanceof Array)
+      assert.equal(nodes![0].nodeValue, '{{ child }}')
     })
 
     it('does not pre-empt text nodes w/o NATIVE_BINDINGS', () => {
@@ -124,8 +125,9 @@ describe('Native Provider Behavior', function () {
       const div = divWithNativeBindings({ 'ko-native': '123' })
       div.appendChild(document.createTextNode('{{ child }}'))
       const nodes = mp.preprocessNode(div.childNodes[0] as HTMLElement)
-      assert.equal(nodes.length, 2)
-      assert.equal(nodes[0].textContent, 'ko text:child')
+      assert.notEqual(nodes, null)
+      assert.equal(nodes!.length, 2)
+      assert.equal(nodes![0].textContent, 'ko text:child')
     })
   })
 })

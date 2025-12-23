@@ -20,7 +20,7 @@ export default class NativeProvider extends Provider {
     return true
   }
 
-  override nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
+  override nodeHasBindings(node: Node, context?: BindingContext): boolean {
     if (!node[NATIVE_BINDINGS]) {
       return false
     }
@@ -31,8 +31,8 @@ export default class NativeProvider extends Provider {
    * There can be only one preprocessor; when there are native bindings,
    * prevent re-entrance (and likely XSS) from the `{{ }}` provider.
    */
-  override preprocessNode(node: Element) {
-    return node[NATIVE_BINDINGS] ? node : null
+  override preprocessNode(node: Node): Node[] | null {
+    return node[NATIVE_BINDINGS] ? [node] : null
   }
 
   onlyBindings([name]) {
@@ -47,9 +47,9 @@ export default class NativeProvider extends Provider {
 
   /**
    * Return as valueAccessor function all the entries matching `ko-*`
-   * @param {Element} node
+   * @param {Node} node
    */
-  override getBindingAccessors(node: Element, context?: BindingContext) {
+  override getBindingAccessors(node: Node, context?: BindingContext) {
     const bindings = (Object.entries(node[NATIVE_BINDINGS] || {}) as any).filter(this.onlyBindings)
     if (!bindings.length) {
       return null
@@ -59,21 +59,21 @@ export default class NativeProvider extends Provider {
 
   /**
    * Add a named-value to the given node.
-   * @param {Element} node
+   * @param {Node} node
    * @param {string} name
    * @param {any} value
    */
-  static addValueToNode(node: Element, name: string, value: any) {
+  static addValueToNode(node: Node, name: string, value: any) {
     const obj = node[NATIVE_BINDINGS] || (node[NATIVE_BINDINGS] = {})
     obj[name] = value
   }
 
   /**
    *
-   * @param {Element} node
+   * @param {Node} node
    * @return {object} the stored values
    */
-  static getNodeValues(node: Element): any {
+  static getNodeValues(node: Node): any {
     return node[NATIVE_BINDINGS]
   }
 }

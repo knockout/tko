@@ -36,7 +36,7 @@ describe('Node preprocessing', function () {
     options.bindingProviderInstance.preprocessNode = function (node) {
       // Example: replace <mySpecialNode /> with <span data-bind='text: someValue'></span>
       // This technique could be the basis for implementing custom element types that render templates
-      if (node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
+      if (node instanceof Element && node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
         const newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: someValue')
         expect(node.parentNode).not.toBe(null)
@@ -44,7 +44,7 @@ describe('Node preprocessing', function () {
         node.parentNode?.removeChild(node)
         return [newNode]
       }
-      return undefined
+      return null
     }
     testNode.innerHTML = '<span>a</span><mySpecialNode></mySpecialNode><span>b</span>'
     const someValue = observable('hello')
@@ -77,7 +77,7 @@ describe('Node preprocessing', function () {
           node.parentNode.removeChild(node)
           return newNodes
         }
-        return undefined
+        return null
       }
     }
     options.bindingProviderInstance = new TestProvider()
@@ -104,7 +104,7 @@ describe('Node preprocessing', function () {
           node.parentNode.removeChild(node)
           return newNodes
         }
-        return undefined
+        return null
       }
     }
     const testProvider = new TestProvider()

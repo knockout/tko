@@ -102,7 +102,7 @@ function applyBindingsToDescendantsInternal(
     return
   }
 
-  let currentChild: ChildNode | null
+  let currentChild: Node | null
   const provider = getBindingProvider()
   const preprocessNode = provider.preprocessNode
 

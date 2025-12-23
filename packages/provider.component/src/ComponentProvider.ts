@@ -17,10 +17,10 @@ export default class ComponentProvider extends Provider {
 
   /**
    * Convert <slot name='X'> to <!-- ko slot: 'X' --><!-- /ko -->
-   * @param {Element} node
+   * @param {Node} node
    */
-  override preprocessNode(node: Element): Node[] | undefined {
-    if (node.tagName === 'SLOT') {
+  override preprocessNode(node: Node): Node[] | null {
+    if (node instanceof Element && node.tagName === 'SLOT') {
       const parent = node.parentNode
       const slotName = node.getAttribute('name') || ''
       const openNode = document.createComment(`ko slot: "${slotName}"`)
@@ -36,25 +36,25 @@ export default class ComponentProvider extends Provider {
 
       return [openNode, closeNode]
     }
-    return undefined
+    return null
   }
 
-  override nodeHasBindings(node: Element): boolean {
+  override nodeHasBindings(node: Node): boolean {
     return Boolean(this.getComponentNameForNode(node))
   }
 
-  override getBindingAccessors(node: Element, context) {
+  override getBindingAccessors(node: Node, context) {
     const componentName = this.getComponentNameForNode(node)
     if (!componentName) {
-      return
+      return Object.create(null)
     }
     const component = () => ({ name: componentName, params: this.getComponentParams(node, context) })
     return { component }
   }
 
-  getComponentNameForNode(node: Element): string | undefined {
-    if (node.nodeType !== Node.ELEMENT_NODE) {
-      return
+  getComponentNameForNode(node: Node): string | null {
+    if (!(node instanceof Element) || node.nodeType !== Node.ELEMENT_NODE) {
+      return null
     }
     const tagName = tagNameLower(node)
     if (registry.isRegistered(tagName)) {
@@ -64,10 +64,14 @@ export default class ComponentProvider extends Provider {
         return tagName
       }
     }
-    return
+    return null
   }
 
-  getComponentParams(node: Element, context) {
+  getComponentParams(node: Node, context) {
+    if (!(node instanceof Element)) {
+      return { $raw: {} }
+    }
+
     const parser = new (Parser as any)(node, context, this.globals) as Parser
     const paramsString = (node.getAttribute('params') || '').trim()
     const accessors = parser.parse(paramsString, context, undefined, node)

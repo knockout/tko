@@ -53,7 +53,7 @@ export default class BindingStringProvider extends Provider {
     return new Parser().parse(processed, context, this.globals, node)
   }
 
-  getBindingString(node: Node): string | null | undefined {
+  getBindingString(node: Node): string | null {
     throw new Error('Overload getBindingString.')
   }
 }

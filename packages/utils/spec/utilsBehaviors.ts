@@ -347,15 +347,15 @@ describe('arrayPushAll', function () {
 describe('Function.bind', function () {
   // In most browsers, this will be testing the native implementation
   // Adapted from Lo-Dash (https://github.com/lodash/lodash)
-  function fn() {
+  function fn(...args) {
     const result = [this]
-    result.push.apply(result, arguments)
+    result.push.apply(result, args)
     return result
   }
 
   it('should bind a function to an object', function () {
     const object = {},
-      bound = fn.bind(object)
+      bound = fn.bind(object) as any
 
     expect(bound('a')).toEqual([object, 'a'])
   })
@@ -368,7 +368,7 @@ describe('Function.bind', function () {
   })
 
   it('should bind a function to `null` or `undefined`', function () {
-    let bound = fn.bind(null),
+    let bound = fn.bind(null) as any,
       actual = bound('a'),
       global = jasmine.getGlobal()
 
@@ -389,8 +389,8 @@ describe('Function.bind', function () {
   })
 
   it('should partially apply arguments', function () {
-    let object = {},
-      bound = fn.bind(object, 'a')
+    let object = {}
+    let bound = fn.bind(object, 'a') as any
 
     expect(bound()).toEqual([object, 'a'])
 
@@ -404,7 +404,7 @@ describe('Function.bind', function () {
 
   it('should append array arguments to partially applied arguments', function () {
     const object = {},
-      bound = fn.bind(object, 'a')
+      bound = fn.bind(object, 'a') as any
 
     expect(bound(['b'], 'c')).toEqual([object, 'a', ['b'], 'c'])
   })
