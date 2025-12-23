@@ -21,7 +21,7 @@
 
       <div class="section">Bindings</div>
       {%- for page in collections.bindingDocs -%}
-        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+        <a href="{{ page.url | url }}" class="subheading binding-name"><code>{{ page.fileSlug | formatBindingName }}</code></a>
       {%- endfor -%}
 
       <div class="section">Observables</div>

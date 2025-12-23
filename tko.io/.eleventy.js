@@ -69,6 +69,11 @@ export default function(eleventyConfig) {
       .join(' ');
   });
 
+  // Add filter to format binding names (keeps lowercase, removes -binding suffix)
+  eleventyConfig.addFilter("formatBindingName", function(slug) {
+    return slug.replace(/-binding$/, '');
+  });
+
   return {
     dir: {
       input: "src",

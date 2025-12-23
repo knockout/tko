@@ -305,6 +305,16 @@ blockquote {
   background-color: #3b82f6;
 }
 
+/* Binding name code styling in sidebar */
+.sidebar .binding-name code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
