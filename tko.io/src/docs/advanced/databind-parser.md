@@ -1,9 +1,9 @@
 ---
 layout: base.njk
-title: Databind Parser
+title: DataBind Parser
 ---
 
-# Databind Parser
+# DataBind Parser
 
 tko.provider is a binding provider for [Knockout](http://knockoutjs.com), namely it parses HTML attributes and converts them to handlers of bidirectional updates.
 
