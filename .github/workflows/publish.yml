@@ -29,4 +29,5 @@ jobs:
       - run: make test-headless
       - run: make test-headless-jquery
 
-      - run: npx lerna publish from-package --yes
+      - run: make link
+      - run: npx lerna publish from-package --yes --skip-npm --no-git-tag-version
