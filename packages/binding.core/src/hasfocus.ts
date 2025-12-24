@@ -4,12 +4,12 @@ import { unwrap, dependencyDetection, isWriteableObservable } from '@tko/observa
 
 import type { AllBindings } from '@tko/bind'
 
-let hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
-let hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue')
+const hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
+const hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue')
 
 export const hasfocus = {
   init: function (element, valueAccessor, _allBindings: AllBindings) {
-    let handleElementFocusChange = function (isFocused) {
+    const handleElementFocusChange = function (isFocused) {
       // Where possible, ignore which event was raised and determine focus state using activeElement,
       // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
       // However, not all KO-targeted browsers (Firefox 2) support activeElement. For those browsers,
@@ -43,8 +43,8 @@ export const hasfocus = {
       element[hasfocusUpdatingProperty] = false
     }
 
-    let handleElementFocusIn = handleElementFocusChange.bind(null, true)
-    let handleElementFocusOut = handleElementFocusChange.bind(null, false)
+    const handleElementFocusIn = handleElementFocusChange.bind(null, true)
+    const handleElementFocusOut = handleElementFocusChange.bind(null, false)
 
     registerEventHandler(element, 'focus', handleElementFocusIn)
     registerEventHandler(element, 'focusin', handleElementFocusIn) // For IE
@@ -52,7 +52,7 @@ export const hasfocus = {
     registerEventHandler(element, 'focusout', handleElementFocusOut) // For IE
   },
   update: function (element, valueAccessor) {
-    let value = !!unwrap(valueAccessor())
+    const value = !!unwrap(valueAccessor())
 
     if (!element[hasfocusUpdatingProperty] && element[hasfocusLastValue] !== value) {
       if (value) {

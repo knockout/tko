@@ -5,7 +5,7 @@ import type { ProviderParamsInput } from '@tko/provider'
 import type { BindingContext } from '@tko/bind'
 
 export default class MultiProvider extends Provider {
-  nodeTypes: any[]
+  nodeTypes: number[]
   nodeTypeMap: Record<string, any[]>
   providers: any[]
 
@@ -40,24 +40,25 @@ export default class MultiProvider extends Provider {
     this.nodeTypes = Object.keys(this.nodeTypeMap).map(k => parseInt(k, 10))
   }
 
-  providersFor(node: Element): any[] {
+  providersFor(node: Node): any[] {
     return this.nodeTypeMap[node.nodeType] || []
   }
 
-  override nodeHasBindings(node: Element, context?: BindingContext): boolean | undefined {
+  override nodeHasBindings(node: Node, context?: BindingContext): boolean {
     return this.providersFor(node).some(p => p.nodeHasBindings(node))
   }
 
-  override preprocessNode(node: Element) {
+  override preprocessNode(node: Node): Node[] | null {
     for (const provider of this.providersFor(node)) {
       const newNodes = provider.preprocessNode(node)
       if (newNodes) {
         return newNodes
       }
     }
+    return null
   }
 
-  *enumerateProviderBindings(node: Element, context) {
+  *enumerateProviderBindings(node: Node, context) {
     for (const provider of this.providersFor(node)) {
       const bindings = provider.getBindingAccessors(node, context)
       if (!bindings) {
@@ -70,7 +71,7 @@ export default class MultiProvider extends Provider {
     }
   }
 
-  override getBindingAccessors(node: Element, context?: BindingContext) {
+  override getBindingAccessors(node: Node, context?: BindingContext) {
     const bindings = {}
     for (const [key, accessor] of this.enumerateProviderBindings(node, context)) {
       if (key in bindings) {

@@ -17,7 +17,7 @@ describe('Binding: Let', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
   })
@@ -30,7 +30,7 @@ describe('Binding: Let', function () {
   })
 
   it('Should update all child contexts when custom properties are updated', function () {
-    let observable1 = observable(1)
+    const observable1 = observable(1)
     testNode.innerHTML = "<div data-bind='let: { prop1 : prop()*2 }'><div data-bind='text: prop1'></div></div>"
     applyBindings({ prop: observable1 }, testNode)
     expect(testNode).toContainText('2')
@@ -43,7 +43,7 @@ describe('Binding: Let', function () {
   it('Should update all custom properties when the parent context is updated', function () {
     testNode.innerHTML =
       "<div data-bind='let: {obj1: $data}'><span data-bind='text:obj1.prop1'></span><span data-bind='text:prop2'></span></div>"
-    let vm = observable({ prop1: 'First ', prop2: 'view model' })
+    const vm = observable({ prop1: 'First ', prop2: 'view model' })
     applyBindings(vm, testNode)
     expect(testNode).toContainText('First view model')
 

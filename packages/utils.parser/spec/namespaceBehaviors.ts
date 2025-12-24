@@ -28,7 +28,7 @@ function makeBindings(binding, context) {
 
 describe('Parser Namespace', function () {
   function trial(context, binding, expect) {
-    let p = makeBindings(binding, context)
+    const p = makeBindings(binding, context)
     assert.deepEqual(p.on(), expect)
   }
 
@@ -60,7 +60,7 @@ describe('Parser Namespace', function () {
 
     it('Supplies the event to event.click', function () {
       let clickCalled = false
-      let model = {
+      const model = {
         onClick: function () {
           clickCalled = true
         }
@@ -72,7 +72,7 @@ describe('Parser Namespace', function () {
     })
 
     it('Should set css.classname', function () {
-      let observable1 = observable()
+      const observable1 = observable()
       node.innerHTML = "<div data-bind='css.myRule: someModelProperty'>Hallo</div>"
       applyBindings({ someModelProperty: observable1 }, node)
 
@@ -82,7 +82,7 @@ describe('Parser Namespace', function () {
     })
 
     it('Should set style with style.stylename', function () {
-      let myObservable = observable('red')
+      const myObservable = observable('red')
       node.innerHTML = "<div data-bind='style.backgroundColor: colorValue'>Hallo</div>"
       applyBindings({ colorValue: myObservable }, node)
 

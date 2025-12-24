@@ -26,11 +26,11 @@ export default class TextMustacheProvider extends Provider {
     }
   }
 
-  textInterpolation(textNode: Node) {
+  textInterpolation(textNode: Node): Node[] | null {
     const newNodes = Array.from(this.textToNodes(textNode))
 
     if (newNodes.length === 0) {
-      return
+      return null
     }
 
     if (textNode.parentNode) {

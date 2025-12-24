@@ -20,14 +20,14 @@ nativeTemplateEngine.prototype.renderTemplateSource = function (
   } else {
     version = ieVersion ?? 0
   }
-  let useNodesIfAvailable = !(version < 9), // IE<9 cloneNode doesn't work properly
+  const useNodesIfAvailable = !(version < 9), // IE<9 cloneNode doesn't work properly
     templateNodesFunc = useNodesIfAvailable ? templateSource.nodes : null,
     templateNodes = templateNodesFunc ? templateSource.nodes?.() : null
 
   if (templateNodes) {
     return makeArray(templateNodes.cloneNode(true).childNodes)
   } else {
-    let templateText = templateSource.text()
+    const templateText = templateSource.text()
     return parseHtmlFragment(templateText, templateDocument)
   }
 }

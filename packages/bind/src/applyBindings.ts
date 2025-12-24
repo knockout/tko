@@ -103,7 +103,7 @@ function applyBindingsToDescendantsInternal(
     return
   }
 
-  let currentChild: ChildNode | null
+  let currentChild: Node | null
   const provider = getBindingProvider()
   const preprocessNode = provider.preprocessNode
 
@@ -144,7 +144,7 @@ function applyBindingsToNodeAndDescendantsInternal(
   nodeVerified: Node,
   asyncBindingsApplied
 ) {
-  let isElement = nodeVerified.nodeType === Node.ELEMENT_NODE
+  const isElement = nodeVerified.nodeType === Node.ELEMENT_NODE
   if (isElement) {
     // Workaround IE <= 8 HTML parsing weirdness
     virtualElements.normaliseVirtualElementDomStructure(nodeVerified)
@@ -154,7 +154,7 @@ function applyBindingsToNodeAndDescendantsInternal(
   // (1) We need to store the binding info for the node (all element nodes)
   // (2) It might have bindings (e.g., it has a data-bind attribute, or it's a marker for a containerless template)
 
-  let shouldApplyBindings =
+  const shouldApplyBindings =
     isElement // Case (1)
     || hasBindings(nodeVerified) // Case (2)
 
@@ -533,7 +533,11 @@ function onBindingError(spec: BindingError) {
     spec.stack = error.stack
 
     const message = error.message || String(error)
+    const originalName = error.name
     error = new Error(message)
+    if (originalName && originalName !== 'Error') {
+      error.name = originalName
+    }
     extend(error, spec)
   }
   options.onError(error)

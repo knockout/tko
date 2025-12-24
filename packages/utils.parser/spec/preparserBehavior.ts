@@ -12,7 +12,7 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should be able to parse simple object literals', function () {
-    let result = parseObjectLiteral('a: 1, b: 2, "quotedKey": 3, \'aposQuotedKey\': 4')
+    const result = parseObjectLiteral('a: 1, b: 2, "quotedKey": 3, \'aposQuotedKey\': 4')
     expect(result.length).to.equal(4)
     expect(result[0].key).to.equal('a')
     expect(result[0].value).to.equal('1')
@@ -25,14 +25,14 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should ignore any outer braces', function () {
-    let result = parseObjectLiteral('{a: 1}')
+    const result = parseObjectLiteral('{a: 1}')
     expect(result.length).to.equal(1)
     expect(result[0].key).to.equal('a')
     expect(result[0].value).to.equal('1')
   })
 
   it('Should be able to parse object literals containing string literals', function () {
-    let result = parseObjectLiteral(
+    const result = parseObjectLiteral(
       'a: "comma, colon: brace{ bracket[ apos\' escapedQuot\\" end", b: \'escapedApos\\\' brace} bracket] quot"\', c: `escapedTick\\` and more`'
     )
     expect(result).to.deep.equal([
@@ -44,7 +44,7 @@ describe('Expression Rewriting', function () {
 
   it('Should be able to parse object literals containing child objects, arrays, function literals, and newlines', function () {
     // The parsing may or may not keep unnecessary spaces. So to avoid confusion, avoid unnecessary spaces.
-    let result = parseObjectLiteral(
+    const result = parseObjectLiteral(
       'myObject:{someChild:{},someChildArray:[1,2,3],"quotedChildProp":\'string value\'},\n'
         + "someFn:function(a,b,c){var regex=/{/;var str='/})({';return{};},"
         + 'myArray:[{},function(){},"my\'Str",\'my"Str\']'
@@ -60,7 +60,7 @@ describe('Expression Rewriting', function () {
 
   it('Should correctly parse object literals containing property access using bracket notation', function () {
     // We can verify that strings are parsed correctly by including important characters in them (like commas)
-    let result = parseObjectLiteral('a: x[" , "], b: x[\' , \'], c: x[` , `]')
+    const result = parseObjectLiteral('a: x[" , "], b: x[\' , \'], c: x[` , `]')
     expect(result).to.deep.equal([
       { key: 'a', value: 'x[" , "]' },
       { key: 'b', value: "x[' , ']" },
@@ -69,7 +69,7 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should be able to parse object literals containing division and regular expressions', function () {
-    let result = parseObjectLiteral('div: null/5, regexpFunc: function(){var regex=/{/g;return /123/;}')
+    const result = parseObjectLiteral('div: null/5, regexpFunc: function(){var regex=/{/g;return /123/;}')
     expect(result.length).to.equal(2)
     expect(result[0].key).to.equal('div')
     expect(result[0].value).to.equal('null/5')
@@ -78,14 +78,14 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should parse a value that begins with a colon', function () {
-    let result = parseObjectLiteral('a: :-)')
+    const result = parseObjectLiteral('a: :-)')
     expect(result.length).to.equal(1)
     expect(result[0].key).to.equal('a')
     expect(result[0].value).to.equal(':-)')
   })
 
   it("Should be able to cope with malformed syntax (things that aren't key-value pairs)", function () {
-    let result = parseObjectLiteral("malformed1, 'mal:formed2', good:3, {malformed:4}, good5:5, keyonly:")
+    const result = parseObjectLiteral("malformed1, 'mal:formed2', good:3, {malformed:4}, good5:5, keyonly:")
     expect(result.length).to.equal(6)
     expect(result[0].unknown).to.equal('malformed1')
     expect(result[1].unknown).to.equal('mal:formed2')
@@ -107,19 +107,19 @@ describe('Expression Rewriting', function () {
     // We reserve the right to remove or change either or both of these, especially if we
     // create an official public property writers API.
 
-    let rewritten = preProcessBindings(
+    const rewritten = preProcessBindings(
       'a : 1, b : firstName, c : function() { return "returnValue"; }, '
         + 'd: firstName+lastName, e: boss.firstName, f: boss . lastName, '
         + 'g: getAssistant(), h: getAssistant().firstName, i: getAssistant("[dummy]")[ "lastName" ], '
         + 'j: boss.firstName + boss.lastName'
     )
     const assistant = { firstName: 'john', lastName: 'english' }
-    let firstName = 'bob'
-    let lastName = 'smith'
-    let boss = { firstName: 'rick', lastName: 'martin' }
-    let getAssistant = () => assistant
+    const firstName = 'bob'
+    const lastName = 'smith'
+    const boss = { firstName: 'rick', lastName: 'martin' }
+    const getAssistant = () => assistant
 
-    let model = { firstName, lastName, boss, getAssistant }
+    const model = { firstName, lastName, boss, getAssistant }
 
     const parsed = eval('({' + rewritten + '})')
     // test values of property
@@ -136,15 +136,15 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should be able to eval rewritten literals that contain unquoted keywords as keys', function () {
-    let rewritten = preProcessBindings('if: true')
+    const rewritten = preProcessBindings('if: true')
     expect(rewritten).to.equal("'if':true")
-    let evaluated = eval('({' + rewritten + '})')
+    const evaluated = eval('({' + rewritten + '})')
     expect(evaluated['if']).to.equal(true)
   })
 
   it('Should eval keys without a value as if the value is undefined', function () {
-    let rewritten = preProcessBindings('a: 1, b')
-    let parsedRewritten = eval('({' + rewritten + '})')
+    const rewritten = preProcessBindings('a: 1, b')
+    const parsedRewritten = eval('({' + rewritten + '})')
     expect(parsedRewritten.a).to.equal(1)
     expect('b' in parsedRewritten).to.be.ok // eslint-disable-line
     expect(parsedRewritten.b).to.be.undefined // eslint-disable-line
@@ -152,16 +152,16 @@ describe('Expression Rewriting', function () {
 
   xit('Should return accessor functions for each value when called with the valueAccessors option', function () {
     // Deprecated
-    let rewritten = preProcessBindings('a: 1', { valueAccessors: true })
+    const rewritten = preProcessBindings('a: 1', { valueAccessors: true })
     expect(rewritten).to.equal("'a':function(){return 1 }")
-    let evaluated = eval('({' + rewritten + '})')
+    const evaluated = eval('({' + rewritten + '})')
     expect(evaluated['a']()).to.equal(1)
   })
 
   it('Should be able to parse and evaluate object literals containing division', function () {
     // Test a variety of expressions that include a division
     // The final regex ensures that each of the divisions is run through the code that distinguishes between the two types of slashes
-    let result = parseObjectLiteral("a: null/1, b: 2/1, c: (6) / 2, d: '2'/2, r: /a regex/")
+    const result = parseObjectLiteral("a: null/1, b: 2/1, c: (6) / 2, d: '2'/2, r: /a regex/")
     expect(result).to.deep.equal([
       { key: 'a', value: 'null/1' },
       { key: 'b', value: '2/1' },
@@ -169,8 +169,8 @@ describe('Expression Rewriting', function () {
       { key: 'd', value: "'2'/2" },
       { key: 'r', value: '/a regex/' }
     ])
-    let rewritten = preProcessBindings(result)
-    let evaluated = eval('({' + rewritten + '})')
+    const rewritten = preProcessBindings(result)
+    const evaluated = eval('({' + rewritten + '})')
     expect(evaluated.a).to.equal(0)
     expect(evaluated.b).to.equal(2)
     expect(evaluated.c).to.equal(3)
@@ -178,13 +178,13 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should return an empty array for an empty string', function () {
-    let result = parseObjectLiteral('')
+    const result = parseObjectLiteral('')
     expect(result).to.deep.equal([])
   })
 
   it('Should be able to parse object literals containing C++ style comments', function () {
     // From https://github.com/knockout/knockout/issues/1524
-    let result = parseObjectLiteral(
+    const result = parseObjectLiteral(
       'model: router.activeItem, //wiring the router\n'
         + 'afterCompose: router.afterCompose, //wiring the router\n'
         + "//transition:'entrance', //use the 'entrance' transition when switching views\n"
@@ -200,7 +200,7 @@ describe('Expression Rewriting', function () {
   })
 
   it('Should be able to parse object literals containing C style comments', function () {
-    let result = parseObjectLiteral(
+    const result = parseObjectLiteral(
       'a: xxx, /* First comment */\n'
         + 'b: yyy, /* Multi-line comment that comments-out the next whole line\n'
         + "x: 'nothing', //this is also skipped */\n"

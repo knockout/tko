@@ -5,8 +5,8 @@ import { renderTemplate, anonymousTemplate, templateEngine } from '../dist'
 import type { BindingContext } from '@tko/bind'
 
 export function dummyTemplateEngine(templates?) {
-  let inMemoryTemplates = templates || {}
-  let inMemoryTemplateData = {}
+  const inMemoryTemplates = templates || {}
+  const inMemoryTemplateData = {}
 
   function dummyTemplateSource(id) {
     this.id = id
@@ -65,9 +65,9 @@ export function dummyTemplateEngine(templates?) {
       return renderTemplate(templateName, data, rt_options)
     })
 
-    let evalHandler = function (match, script) {
+    const evalHandler = function (match, script) {
       try {
-        let evalResult = eval(script)
+        const evalResult = eval(script)
         return evalResult === null || evalResult === undefined ? '' : evalResult.toString()
       } catch (ex: any) {
         throw new Error('Error evaluating script: [js: ' + script + ']\n\nException: ' + ex.toString())
@@ -94,7 +94,7 @@ export function dummyTemplateEngine(templates?) {
 
   this.rewriteTemplate = function (template, rewriterCallback, templateDocument) {
     // Only rewrite if the template isn't a function (can't rewrite those)
-    let templateSource = this.makeTemplateSource(template, templateDocument)
+    const templateSource = this.makeTemplateSource(template, templateDocument)
     if (typeof templateSource.text() != 'function')
       return templateEngine.prototype.rewriteTemplate.call(this, template, rewriterCallback, templateDocument)
   }

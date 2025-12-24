@@ -8,7 +8,7 @@ import { LifeCycle } from '../src'
 describe('KO LifeCycle', function () {
   describe('mixInto', function () {
     it('extends a function prototype', function () {
-      let fn = function () {}
+      const fn = function () {}
       LifeCycle.mixInto(fn)
       assert.isFunction(fn.prototype.subscribe)
       assert.isFunction(fn.prototype.computed)

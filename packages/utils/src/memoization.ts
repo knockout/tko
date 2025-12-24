@@ -3,7 +3,7 @@
 //
 import { arrayPushAll } from './array'
 
-let memos = {}
+const memos = {}
 
 function randomMax8HexChars() {
   return (((1 + Math.random()) * 0x100000000) | 0).toString(16).substring(1)
@@ -19,7 +19,7 @@ function findMemoNodes(rootNode: Node, appendToArray: any[]) {
   }
   if (rootNode.nodeType === Node.COMMENT_NODE) {
     const comment = rootNode as Comment
-    let memoId = parseMemoText(comment.nodeValue)
+    const memoId = parseMemoText(comment.nodeValue)
     if (memoId != null) {
       appendToArray.push({ domNode: rootNode, memoId: memoId })
     }
@@ -34,13 +34,13 @@ export function memoize(callback: (val: any) => void): string {
   if (typeof callback !== 'function') {
     throw new Error('You can only pass a function to memoization.memoize()')
   }
-  let memoId = generateRandomId()
+  const memoId = generateRandomId()
   memos[memoId] = callback
   return '<!--[ko_memo:' + memoId + ']-->'
 }
 
 export function unmemoize(memoId: string, callbackParams: any[]) {
-  let callback = memos[memoId]
+  const callback = memos[memoId]
   if (callback === undefined) {
     throw new Error("Couldn't find any memo with ID " + memoId + ". Perhaps it's already been unmemoized.")
   }
@@ -53,11 +53,11 @@ export function unmemoize(memoId: string, callbackParams: any[]) {
 }
 
 export function unmemoizeDomNodeAndDescendants(domNode: Node, extraCallbackParamsArray: any[]) {
-  let memos = new Array()
+  const memos = new Array()
   findMemoNodes(domNode, memos)
   for (let i = 0, j = memos.length; i < j; i++) {
-    let node = memos[i].domNode
-    let combinedParams = [node]
+    const node = memos[i].domNode
+    const combinedParams = [node]
     if (extraCallbackParamsArray) {
       arrayPushAll(combinedParams, extraCallbackParamsArray)
     }
@@ -74,6 +74,6 @@ export function parseMemoText(memoText: string | null): string | null {
     return null
   }
 
-  let match = memoText.match(/^\[ko_memo\:(.*?)\]$/)
+  const match = memoText.match(/^\[ko_memo\:(.*?)\]$/)
   return match ? match[1] : null
 }

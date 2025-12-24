@@ -1,6 +1,6 @@
 import { unwrap, toJS } from '@tko/observable'
 
-let sproto = String.prototype
+const sproto = String.prototype
 
 export interface Filters {
   uppercase(value)
@@ -12,7 +12,7 @@ export interface Filters {
   number(value)
 }
 
-let filters: Filters = {
+const filters: Filters = {
   // Convert value to uppercase
   uppercase: function (value) {
     return sproto.toUpperCase.call(unwrap(value))

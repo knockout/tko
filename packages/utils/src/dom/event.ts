@@ -11,10 +11,10 @@ import { addDisposeCallback } from './disposal'
 import options from '../options'
 
 // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
-let knownEvents = {},
+const knownEvents = {},
   knownEventTypesByEventName = {}
 
-let keyEventTypeName =
+const keyEventTypeName =
   options.global.navigator && /Firefox\/2/i.test(options.global.navigator.userAgent) ? 'KeyboardEvent' : 'UIEvents'
 
 knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress']
@@ -42,12 +42,12 @@ objectForEach(knownEvents, function (eventType, knownEventsForType) {
 function isClickOnCheckableElement(element: Element, eventType: string) {
   if (tagNameLower(element) !== 'input' || !(element as HTMLInputElement).type) return false
   if (eventType.toLowerCase() != 'click') return false
-  let inputType = (element as HTMLInputElement).type
+  const inputType = (element as HTMLInputElement).type
   return inputType == 'checkbox' || inputType == 'radio'
 }
 
 // Workaround for an IE9 issue - https://github.com/SteveSanderson/knockout/issues/406
-let eventsThatMustBeRegisteredUsingAttachEvent = { propertychange: true }
+const eventsThatMustBeRegisteredUsingAttachEvent = { propertychange: true }
 let jQueryEventAttachName
 
 function hasIEAttachEvents(
@@ -107,14 +107,14 @@ export function triggerEvent(element: Element, eventType: string): void {
   // event handler runs instead of *before*. (This was fixed in 1.9 for checkboxes but not for radio buttons.)
   // IE doesn't change the checked state when you trigger the click event using "fireEvent".
   // In both cases, we'll use the click method instead.
-  let useClickWorkaround = isClickOnCheckableElement(element, eventType)
+  const useClickWorkaround = isClickOnCheckableElement(element, eventType)
 
   if (!options.useOnlyNativeEvents && options.jQuery && !useClickWorkaround) {
     options.jQuery(element).trigger(eventType)
   } else if (typeof document.createEvent === 'function') {
     if (typeof element.dispatchEvent === 'function') {
-      let eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'
-      let event = document.createEvent(eventCategory)
+      const eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'
+      const event = document.createEvent(eventCategory)
       ;(event as any).initEvent(
         eventType,
         true,

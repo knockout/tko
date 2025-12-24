@@ -41,7 +41,7 @@ export default class Identifier {
    */
   dereference(value, $context, globals, node) {
     let member
-    let refs = this.dereferences || []
+    const refs = this.dereferences || []
     const $data = $context.$data || {}
     let lastValue // becomes `this` in function calls to object properties.
     let i, n

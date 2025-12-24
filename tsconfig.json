@@ -12,17 +12,18 @@
     "strict": true,
     "baseUrl": ".",
     "noEmit": true,
-    /*Disable some typing feature from ts to detect first steps to a strong typed version*/
+    /*Disable some typing feature from ts*/
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
-    "strictBindCallApply": false,
+    /* END Disabling */
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    /* END Disabling */
+    
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [
         "packages/utils/helpers/jasmine-13-helper.ts"

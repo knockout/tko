@@ -42,7 +42,10 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  override nodeHasBindings(node: Element) {
+  override nodeHasBindings(node: Node) {
+    if (!(node instanceof Element)) {
+      return false
+    }
     return !this.attributesToInterpolate(node.attributes).next().done
   }
 
@@ -92,7 +95,10 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  override getBindingAccessors(node: Element, context?) {
+  override getBindingAccessors(node: Node, context?) {
+    if (!(node instanceof Element)) {
+      return false
+    }
     if (context === undefined) context = {}
     return Object.assign({}, ...this.bindingObjects(node, context))
   }

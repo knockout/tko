@@ -8,7 +8,7 @@ import { forceRefresh } from './fixes'
 import * as virtualElements from './virtualElements'
 import options from '../options'
 
-let none = [0, '', ''],
+const none = [0, '', ''],
   table = [1, '<table>', '</table>'],
   tbody = [2, '<table><tbody>', '</tbody></table>'],
   colgroup = [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
@@ -46,7 +46,7 @@ function simpleHtmlParse(html: string, documentContext?: Document): Node[] {
   if (!documentContext) {
     documentContext = document
   }
-  let windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
+  const windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
 
   // Based on jQuery's "clean" function, but only accounting for table-related elements.
   // If you have referenced jQuery, this won't be used anyway - KO will use jQuery's "clean" function directly
@@ -57,14 +57,14 @@ function simpleHtmlParse(html: string, documentContext?: Document): Node[] {
   // (possibly a text node) in front of the comment. So, KO does not attempt to workaround this IE issue automatically at present.
 
   // Trim whitespace, otherwise indexOf won't work as expected
-  let div: Element = documentContext.createElement('div')
+  const div: Element = documentContext.createElement('div')
   let tags = stringTrim(html).toLowerCase(),
     wrap = getWrap(tags),
     depth = wrap[0]
 
   // Go to html and back, then peel off extra wrappers
   // Note that we always prefix with some dummy text, because otherwise, IE<9 will strip out leading comment nodes in descendants. Total madness.
-  let markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
+  const markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
   if (typeof windowContext['innerShiv'] === 'function') {
     // Note that innerShiv is deprecated in favour of html5shiv. We should consider adding
     // support for html5shiv (except if no explicit support is needed, e.g., if html5shiv
@@ -86,7 +86,7 @@ function templateHtmlParse(html: string, documentContext?: Document): Node[] {
   if (!documentContext) {
     documentContext = document
   }
-  let template = documentContext.createElement('template') as HTMLTemplateElement
+  const template = documentContext.createElement('template') as HTMLTemplateElement
   template.innerHTML = html
   return makeArray(template.content.childNodes)
 }
@@ -216,8 +216,8 @@ export function setTextContent(element: Node, textContent?: TextContent): void {
   // We need there to be exactly one child: a text node.
   // If there are no children, more than one, or if it's not a text node,
   // we'll clear everything and create a single text node.
-  let innerTextNode = virtualElements.firstChild(element)
-  if (!innerTextNode || innerTextNode.nodeType != 3 || virtualElements.nextSibling(innerTextNode)) {
+  const innerTextNode = virtualElements.firstChild(element)
+  if (!innerTextNode || innerTextNode.nodeType !== Node.TEXT_NODE || virtualElements.nextSibling(innerTextNode)) {
     virtualElements.setDomNodeChildren(element, [element.ownerDocument!.createTextNode(value)])
   } else {
     ;(innerTextNode as Text).data = value

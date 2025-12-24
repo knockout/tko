@@ -2,8 +2,8 @@ import { unwrap } from '@tko/observable'
 
 export const visible = {
   update: function (element, valueAccessor) {
-    let value = unwrap(valueAccessor())
-    let isCurrentlyVisible = !(element.style.display === 'none')
+    const value = unwrap(valueAccessor())
+    const isCurrentlyVisible = !(element.style.display === 'none')
     if (value && !isCurrentlyVisible) {
       element.style.display = ''
     } else if (!value && isCurrentlyVisible) {

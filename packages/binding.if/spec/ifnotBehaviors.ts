@@ -24,7 +24,7 @@ describe('Binding: Ifnot', function () {
   })
 
   beforeEach(function () {
-    let provider = new DataBindProvider()
+    const provider = new DataBindProvider()
     options.bindingProviderInstance = provider
     provider.bindingHandlers.set(coreBindings)
     provider.bindingHandlers.set(ifBindings)
@@ -49,9 +49,9 @@ describe('Binding: Ifnot', function () {
   })
 
   it('Should leave descendant nodes unchanged if the value is falsy and remains falsy when changed', function () {
-    let someItem = observable(false)
+    const someItem = observable(false)
     testNode.innerHTML = "<div data-bind='ifnot: someItem'><span data-bind='text: someItem()'></span></div>"
-    let originalNode = testNode.childNodes[0].childNodes[0]
+    const originalNode = testNode.childNodes[0].childNodes[0]
 
     // Value is initially true, so nodes are retained
     applyBindings({ someItem: someItem }, testNode)
@@ -65,8 +65,8 @@ describe('Binding: Ifnot', function () {
   })
 
   it('Should toggle the presence and bindedness of descendant nodes according to the falsiness of the value', function () {
-    let someItem = observable(undefined)
-    let condition = observable(true)
+    const someItem = observable(undefined)
+    const condition = observable(true)
     testNode.innerHTML =
       "<div data-bind='ifnot: condition'><span data-bind='text: someItem().occasionallyExistentChildProp'></span></div>"
     applyBindings({ someItem: someItem, condition: condition }, testNode)
@@ -98,7 +98,7 @@ describe('Binding: Ifnot', function () {
       "<div data-bind='ifnot: condition, childrenComplete: callback'><span data-bind='text: someText'></span></div>"
     let someItem = observable({ childprop: 'child' }),
       callbacks = 0
-    let viewModel = {
+    const viewModel = {
       condition: observable(false),
       someText: 'hello',
       callback: function () {

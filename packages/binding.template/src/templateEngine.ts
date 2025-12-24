@@ -82,7 +82,7 @@ extend(templateEngine.prototype, {
     // Named template
     if (typeof template === 'string') {
       templateDocument = templateDocument || document
-      let elem = templateDocument.getElementById(template)
+      const elem = templateDocument.getElementById(template)
       if (!elem) {
         throw options.onError(new Error('Cannot find template with ID ' + template), false)
       }
@@ -104,7 +104,7 @@ extend(templateEngine.prototype, {
     options: TemplateOptions<any>,
     templateDocument?: Document
   ): Node[] {
-    let templateSource = this.makeTemplateSource(template, templateDocument)
+    const templateSource = this.makeTemplateSource(template, templateDocument)
     return this.renderTemplateSource(templateSource, bindingContext, options, templateDocument)
   }
 })

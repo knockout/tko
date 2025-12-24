@@ -2,14 +2,14 @@ import * as utils from '../dist'
 import '../helpers/jasmine-13-helper'
 import type { KnockoutInstance } from '@tko/builder'
 
-let ko: KnockoutInstance = globalThis.ko || {}
+const ko: KnockoutInstance = globalThis.ko || {}
 
 ko.utils = utils
 ko.tasks = utils.tasks
 
 describe('arrayForEach', function () {
   it('Should go call the callback for each element of the array, in order', function () {
-    let callback = jasmine.createSpy('callback')
+    const callback = jasmine.createSpy('callback')
 
     ko.utils.arrayForEach(['a', 'b', 'c'], callback)
 
@@ -20,7 +20,7 @@ describe('arrayForEach', function () {
   })
 
   it('Should do nothing with empty arrays', function () {
-    let callback = jasmine.createSpy('callback')
+    const callback = jasmine.createSpy('callback')
 
     ko.utils.arrayForEach([], callback)
 
@@ -28,7 +28,7 @@ describe('arrayForEach', function () {
   })
 
   it('Should alter "this" context when defined as an argument', function () {
-    let expectedContext = {}
+    const expectedContext = {}
     let actualContext = null
     utils.arrayForEach(
       ['a'],
@@ -42,7 +42,7 @@ describe('arrayForEach', function () {
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      let nullArray: Array<any> = null as unknown as Array<any>
+      const nullArray: Array<any> = null as unknown as Array<any>
       ko.utils.arrayForEach(nullArray, function () {})
     }).toThrow()
   })
@@ -50,28 +50,28 @@ describe('arrayForEach', function () {
 
 describe('arrayIndexOf', function () {
   it('Should return the index if the element is found in the input array', function () {
-    let result = ko.utils.arrayIndexOf(['a', 'b', 'c'], 'b')
+    const result = ko.utils.arrayIndexOf(['a', 'b', 'c'], 'b')
     expect(result).toBe(1)
   })
 
   it('Should return -1 for empty arrays', function () {
-    let result = ko.utils.arrayIndexOf([], 'a')
+    const result = ko.utils.arrayIndexOf([], 'a')
     expect(result).toBe(-1)
   })
 
   it('Should return -1 if the element is not found', function () {
-    let result = ko.utils.arrayIndexOf(['a', 'b', 'c'], 'd')
+    const result = ko.utils.arrayIndexOf(['a', 'b', 'c'], 'd')
     expect(result).toBe(-1)
   })
 
   it('Should return the first index if the element is found twice', function () {
-    let result = ko.utils.arrayIndexOf(['a', 'b', 'c', 'c'], 'c')
+    const result = ko.utils.arrayIndexOf(['a', 'b', 'c', 'c'], 'c')
     expect(result).toBe(2)
   })
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      let nullArray: Array<string> = null as unknown as Array<string>
+      const nullArray: Array<string> = null as unknown as Array<string>
       ko.utils.arrayIndexOf(nullArray, 'a')
     }).toThrow()
   })
@@ -79,32 +79,32 @@ describe('arrayIndexOf', function () {
 
 describe('arrayRemoveItem', function () {
   it('Should remove the matching element if found', function () {
-    let input = ['a', 'b', 'c']
+    const input = ['a', 'b', 'c']
     ko.utils.arrayRemoveItem(input, 'a')
     expect(input).toEqual(['b', 'c'])
   })
 
   it('Should do nothing for empty arrays', function () {
-    let input = new Array()
+    const input = new Array()
     ko.utils.arrayRemoveItem(input, 'a')
     expect(input).toEqual([])
   })
 
   it('Should do nothing if no matching element is found', function () {
-    let input = ['a', 'b', 'c']
+    const input = ['a', 'b', 'c']
     ko.utils.arrayRemoveItem(input, 'd')
     expect(input).toEqual(['a', 'b', 'c'])
   })
 
   it('Should remove only the first matching element', function () {
-    let input = ['a', 'b', 'b', 'c']
+    const input = ['a', 'b', 'b', 'c']
     ko.utils.arrayRemoveItem(input, 'b')
     expect(input).toEqual(['a', 'b', 'c'])
   })
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      let nullArray: Array<string> = null as unknown as Array<string>
+      const nullArray: Array<string> = null as unknown as Array<string>
       ko.utils.arrayRemoveItem(nullArray, 'a')
     }).toThrow()
   })
@@ -124,15 +124,15 @@ describe('arrayFirst', function () {
   })
 
   it('Should return the first matching element from the input array', function () {
-    let result = ko.utils.arrayFirst(['a', 'b', 'c', 'b2'], matchB)
+    const result = ko.utils.arrayFirst(['a', 'b', 'c', 'b2'], matchB)
 
     expect(result).toBe('b')
   })
 
   it('Should return undefined with empty arrays, and not call the predicate', function () {
-    let predicate = jasmine.createSpy('predicate')
+    const predicate = jasmine.createSpy('predicate')
 
-    let result = ko.utils.arrayFirst([], predicate)
+    const result = ko.utils.arrayFirst([], predicate)
 
     expect(result).toBe(undefined)
     expect(predicate).not.toHaveBeenCalled()
@@ -147,7 +147,7 @@ describe('arrayFirst', function () {
   })
 
   it('Should return undefined if no element matches', function () {
-    let result = ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
+    const result = ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
     expect(result).toBe(undefined)
   })
 
@@ -162,7 +162,7 @@ describe('arrayFirst', function () {
 
   it('Should throw an error for a null array', function () {
     expect(function () {
-      let nullArray: Array<any> = null as unknown as Array<any>
+      const nullArray: Array<any> = null as unknown as Array<any>
       ko.utils.arrayFirst(nullArray, function () {
         return false
       })
@@ -172,76 +172,76 @@ describe('arrayFirst', function () {
 
 describe('arrayGetDistinctValues', function () {
   it('Should remove duplicates from an array of non-unique values', function () {
-    let result = ko.utils.arrayGetDistinctValues(['a', 'b', 'b', 'c', 'c'])
+    const result = ko.utils.arrayGetDistinctValues(['a', 'b', 'b', 'c', 'c'])
     expect(result).toEqual(['a', 'b', 'c'])
   })
 
   it('Should do nothing with an empty array', function () {
-    let result = ko.utils.arrayGetDistinctValues([])
+    const result = ko.utils.arrayGetDistinctValues([])
     expect(result).toEqual([])
   })
 
   it('Should do nothing with an array of unique values', function () {
-    let result = ko.utils.arrayGetDistinctValues(['a', 'b', 'c'])
+    const result = ko.utils.arrayGetDistinctValues(['a', 'b', 'c'])
     expect(result).toEqual(['a', 'b', 'c'])
   })
 
   it('Should copy the input array', function () {
-    let input = ['a', 'b', 'c', 'c']
-    let result = ko.utils.arrayGetDistinctValues(input)
+    const input = ['a', 'b', 'c', 'c']
+    const result = ko.utils.arrayGetDistinctValues(input)
     expect(result).not.toBe(input)
   })
 
   it("Should copy the input array, even if it's unchanged", function () {
-    let input = ['a', 'b', 'c']
-    let result = ko.utils.arrayGetDistinctValues(input)
+    const input = ['a', 'b', 'c']
+    const result = ko.utils.arrayGetDistinctValues(input)
     expect(result).toEqual(input)
     expect(result).not.toBe(input)
   })
 
   it('Should return an empty array when called with a null array', function () {
-    let nullArray: Array<any> = null as unknown as Array<any>
-    let result = ko.utils.arrayGetDistinctValues(nullArray)
+    const nullArray: Array<any> = null as unknown as Array<any>
+    const result = ko.utils.arrayGetDistinctValues(nullArray)
     expect(result).toEqual([])
   })
 })
 
 describe('arrayMap', function () {
   it('Should return the array with every element transformed by the map function', function () {
-    let appendIndex = function (x, i) {
+    const appendIndex = function (x, i) {
       return x + i
     }
 
-    let result = ko.utils.arrayMap(['a', 'b', 'c'], appendIndex)
+    const result = ko.utils.arrayMap(['a', 'b', 'c'], appendIndex)
 
     expect(result).toEqual(['a0', 'b1', 'c2'])
   })
 
   it('Should return empty arrays for empty arrays, and not call the map function', function () {
-    let mapFunction = jasmine.createSpy('mapFunction')
+    const mapFunction = jasmine.createSpy('mapFunction')
 
-    let result = ko.utils.arrayMap([], mapFunction)
+    const result = ko.utils.arrayMap([], mapFunction)
 
     expect(result).toEqual([])
     expect(mapFunction).not.toHaveBeenCalled()
   })
 
   it('Should copy the array before returning it', function () {
-    let identityFunction = function (x) {
+    const identityFunction = function (x) {
       return x
     }
 
-    let input = ['a', 'b', 'c']
-    let result = ko.utils.arrayMap(input, identityFunction)
+    const input = ['a', 'b', 'c']
+    const result = ko.utils.arrayMap(input, identityFunction)
 
     expect(result).toEqual(input)
     expect(result).not.toBe(input)
   })
 
   it('Should alter "this" context when defined as an argument', function () {
-    let expectedContext = {}
+    const expectedContext = {}
     let actualContext = null
-    let identityFunction = function (x) {
+    const identityFunction = function (x) {
       actualContext = this
       return x
     }
@@ -252,60 +252,60 @@ describe('arrayMap', function () {
   })
 
   it('Should return an empty array when called with a null array', function () {
-    let nullArray: Array<any> = null as unknown as Array<any>
-    let result = ko.utils.arrayMap(nullArray, function () {})
+    const nullArray: Array<any> = null as unknown as Array<any>
+    const result = ko.utils.arrayMap(nullArray, function () {})
     expect(result).toEqual([])
   })
 })
 
 describe('arrayFilter', function () {
   it('Should filter the array to only show matching members', function () {
-    let evenOnly = function (x, i) {
+    const evenOnly = function (x, i) {
       return i % 2 == 0
     }
 
-    let result = ko.utils.arrayFilter(['a', 'b', 'c', 'd'], evenOnly)
+    const result = ko.utils.arrayFilter(['a', 'b', 'c', 'd'], evenOnly)
 
     expect(result).toEqual(['a', 'c'])
   })
 
   it('Should return empty arrays for empty arrays, and not call the filter function', function () {
-    let filterFunction = jasmine.createSpy('filterFunction')
+    const filterFunction = jasmine.createSpy('filterFunction')
 
-    let result = ko.utils.arrayFilter([], filterFunction)
+    const result = ko.utils.arrayFilter([], filterFunction)
 
     expect(result).toEqual([])
     expect(filterFunction).not.toHaveBeenCalled()
   })
 
   it('Should copy the array before returning it', function () {
-    let alwaysTrue = function () {
+    const alwaysTrue = function () {
       return true
     }
 
-    let input = ['a', 'b', 'c']
-    let result = ko.utils.arrayFilter(input, alwaysTrue)
+    const input = ['a', 'b', 'c']
+    const result = ko.utils.arrayFilter(input, alwaysTrue)
 
     expect(result).toEqual(input)
     expect(result).not.toBe(input)
   })
 
   it('Should alter "this" context when defined as an argument', function () {
-    let expectedContext = {}
+    const expectedContext = {}
     let actualContext = null
-    let identityFunction = function (x) {
+    const identityFunction = function (x) {
       actualContext = this
       return x
     }
 
-    let result = utils.arrayFilter(['a'], identityFunction, expectedContext)
+    const result = utils.arrayFilter(['a'], identityFunction, expectedContext)
 
     expect(expectedContext).toEqual(actualContext)
   })
 
   it('Should return an empty array when called with a null array', function () {
-    let nullArray: Array<any> = null as unknown as Array<any>
-    let result = ko.utils.arrayFilter(nullArray, function () {
+    const nullArray: Array<any> = null as unknown as Array<any>
+    const result = ko.utils.arrayFilter(nullArray, function () {
       return true
     })
     expect(result).toEqual([])
@@ -314,9 +314,9 @@ describe('arrayFilter', function () {
 
 describe('arrayPushAll', function () {
   it('appends the second array elements to the first array', function () {
-    let targetArray = [1, 2, 3]
+    const targetArray = [1, 2, 3]
     //var extraArray = ['a', 'b', 'c']
-    let extraArray = [4, 5, 6]
+    const extraArray = [4, 5, 6]
 
     ko.utils.arrayPushAll(targetArray, extraArray)
 
@@ -324,21 +324,21 @@ describe('arrayPushAll', function () {
   })
 
   it('does nothing if the second array is empty', function () {
-    let targetArray = [1, 2, 3]
+    const targetArray = [1, 2, 3]
     ko.utils.arrayPushAll(targetArray, [])
     expect(targetArray).toEqual([1, 2, 3])
   })
 
   it('Should throw an error for a null first array', function () {
     expect(function () {
-      let nullArray: Array<never> = null as unknown as Array<never>
+      const nullArray: Array<never> = null as unknown as Array<never>
       ko.utils.arrayPushAll(nullArray, [])
     }).toThrow()
   })
 
   it('Should throw an error for a null second array', function () {
     expect(function () {
-      let nullArray: Array<never> = null as unknown as Array<never>
+      const nullArray: Array<never> = null as unknown as Array<never>
       ko.utils.arrayPushAll([], nullArray)
     }).toThrow()
   })
@@ -347,28 +347,28 @@ describe('arrayPushAll', function () {
 describe('Function.bind', function () {
   // In most browsers, this will be testing the native implementation
   // Adapted from Lo-Dash (https://github.com/lodash/lodash)
-  function fn() {
-    let result = [this]
-    result.push.apply(result, arguments)
+  function fn(...args) {
+    const result = [this]
+    result.push.apply(result, args)
     return result
   }
 
   it('should bind a function to an object', function () {
-    let object = {},
-      bound = fn.bind(object)
+    const object = {},
+      bound = fn.bind(object) as any
 
     expect(bound('a')).toEqual([object, 'a'])
   })
 
   it('should accept a falsy `thisArg` argument', function () {
     ko.utils.arrayForEach(['', 0, false, NaN], function (value) {
-      let bound = fn.bind(value)
+      const bound = fn.bind(value)
       expect(bound()[0].constructor).toEqual(Object(value).constructor)
     })
   })
 
   it('should bind a function to `null` or `undefined`', function () {
-    let bound = fn.bind(null),
+    let bound = fn.bind(null) as any,
       actual = bound('a'),
       global = jasmine.getGlobal()
 
@@ -389,8 +389,8 @@ describe('Function.bind', function () {
   })
 
   it('should partially apply arguments', function () {
-    let object = {},
-      bound = fn.bind(object, 'a')
+    let object = {}
+    let bound = fn.bind(object, 'a') as any
 
     expect(bound()).toEqual([object, 'a'])
 
@@ -403,18 +403,18 @@ describe('Function.bind', function () {
   })
 
   it('should append array arguments to partially applied arguments', function () {
-    let object = {},
-      bound = fn.bind(object, 'a')
+    const object = {},
+      bound = fn.bind(object, 'a') as any
 
     expect(bound(['b'], 'c')).toEqual([object, 'a', ['b'], 'c'])
   })
 
   it('should rebind functions correctly', function () {
-    let object1 = {},
+    const object1 = {},
       object2 = {},
       object3 = {}
 
-    let bound1 = fn.bind(object1),
+    const bound1 = fn.bind(object1),
       bound2 = bound1.bind(object2, 'a'),
       bound3 = bound1.bind(object3, 'b')
 
@@ -426,9 +426,9 @@ describe('Function.bind', function () {
 
 describe('objectMap', function () {
   it('Should alter "this" context when defined as an argument', function () {
-    let expectedContext = {}
+    const expectedContext = {}
     let actualContext = null
-    let identityFunction = function (obj) {
+    const identityFunction = function (obj) {
       actualContext = this
       return { x: obj.x }
     }
@@ -446,19 +446,19 @@ describe('cloneNodes', function () {
   })
 
   it('should return clones', function () {
-    let newNodes = ko.utils.cloneNodes([testNode])
-    let isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
+    const newNodes = ko.utils.cloneNodes([testNode])
+    const isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
     expect(isClone).toBe(true)
   })
 
   it('should clone deeply', function () {
-    let child = document.createElement('DIV')
+    const child = document.createElement('DIV')
     testNode.appendChild(child)
 
-    let newNodes = ko.utils.cloneNodes([testNode])
-    let newChild = newNodes[0].children[0]
+    const newNodes = ko.utils.cloneNodes([testNode])
+    const newChild = newNodes[0].children[0]
 
-    let childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
+    const childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
 
     expect(childIsClone).toBe(true)
   })

@@ -5,7 +5,7 @@ import type { BindingContext } from '@tko/bind'
 export default {
   init: function (element, valueAccessor, _allBindings, _viewModel, bindingContext: BindingContext) {
     // Make a modified binding context, with extra properties, and apply it to descendant elements
-    let innerContext = bindingContext['extend'](valueAccessor)
+    const innerContext = bindingContext['extend'](valueAccessor)
     applyBindingsToDescendants(innerContext, element)
 
     return { controlsDescendantBindings: true }

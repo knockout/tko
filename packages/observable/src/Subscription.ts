@@ -5,7 +5,7 @@ export default class Subscription {
   private _target: any
   private _callback: any
   private _isDisposed: boolean
-  private _domNodeDisposalCallback: null
+  private _domNodeDisposalCallback: ((node: Node) => void) | null
   private _node: Node
 
   constructor(target, observer, disposeCallback) {

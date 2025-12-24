@@ -57,7 +57,7 @@ function mapNodeAndRefreshWhenChanged(
   const mappedNodes: Node[] = []
   const dependentObservable: Computed<void> = computed(
     function () {
-      let newMappedNodes: Node[] =
+      const newMappedNodes: Node[] =
         mapping(valueToMap, index, fixUpContinuousNodeArray(mappedNodes, containerNode)) || []
 
       // On subsequent evaluations, just replace the previously-inserted DOM nodes
@@ -87,8 +87,8 @@ function mapNodeAndRefreshWhenChanged(
   }
 }
 
-let lastMappingResultDomDataKey = domData.nextKey()
-let deletedItemDummyValue = domData.nextKey()
+const lastMappingResultDomDataKey = domData.nextKey()
+const deletedItemDummyValue = domData.nextKey()
 
 export function setDomNodeChildrenFromArrayMapping<T = any>(
   domNode: Node,
@@ -105,19 +105,19 @@ export function setDomNodeChildrenFromArrayMapping<T = any>(
   }
 
   options = options || {}
-  let lastMappingResult = domData.get(domNode, lastMappingResultDomDataKey)
-  let isFirstExecution = !lastMappingResult
+  const lastMappingResult = domData.get(domNode, lastMappingResultDomDataKey)
+  const isFirstExecution = !lastMappingResult
 
   // Build the new mapping result
-  let newMappingResult = new Array()
+  const newMappingResult = new Array()
   let lastMappingResultIndex = 0
   let newMappingResultIndex = 0
 
-  let nodesToDelete: Node[] = []
-  let itemsToProcess: MapDataType[] = []
-  let itemsForBeforeRemoveCallbacks: MapDataType[] = []
-  let itemsForMoveCallbacks: MapDataType[] = []
-  let itemsForAfterAddCallbacks: MapDataType[] = []
+  const nodesToDelete: Node[] = []
+  const itemsToProcess: MapDataType[] = []
+  const itemsForBeforeRemoveCallbacks: MapDataType[] = []
+  const itemsForMoveCallbacks: MapDataType[] = []
+  const itemsForAfterAddCallbacks: MapDataType[] = []
   let mapData: MapDataType | null
   let countWaitingForRemove = 0
 
@@ -165,10 +165,10 @@ export function setDomNodeChildrenFromArrayMapping<T = any>(
   } else {
     if (!editScript || (lastMappingResult && lastMappingResult['_countWaitingForRemove'])) {
       // Compare the provided array against the previous one
-      let lastArray = arrayMap(lastMappingResult, function (x) {
+      const lastArray = arrayMap(lastMappingResult, function (x) {
         return x.arrayEntry
       })
-      let compareOptions = { dontLimitMoves: options.dontLimitMoves, sparse: true }
+      const compareOptions = { dontLimitMoves: options.dontLimitMoves, sparse: true }
       editScript = compareArrays(lastArray, array, compareOptions)
     }
 
@@ -205,7 +205,7 @@ export function setDomNodeChildrenFromArrayMapping<T = any>(
                   itemsForBeforeRemoveCallbacks.push(mapData!)
                 }
               }
-              if (mapData) {
+              if (mapData?.mappedNodes) {
                 nodesToDelete.push.apply(nodesToDelete, mapData.mappedNodes)
               }
             }

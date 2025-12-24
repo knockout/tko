@@ -16,14 +16,14 @@ import '@tko/utils/helpers/jasmine-13-helper'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { MultiProvider } from '@tko/provider.multi'
 
-let hasfocusUpdatingProperty = '__ko_hasfocusKnockoutUpdating'
-let hasfocusLastValue = '__ko_hasfocusKnockoutLastValue'
+const hasfocusUpdatingProperty = '__ko_hasfocusKnockoutUpdating'
+const hasfocusLastValue = '__ko_hasfocusKnockoutLastValue'
 
 const legacyCustomBinding = {
   init: function (element, valueAccessor, allBindings) {
-    let handleElementFocusChange = function (isFocused) {
+    const handleElementFocusChange = function (isFocused) {
       element[hasfocusUpdatingProperty] = true
-      let ownerDoc = element.ownerDocument
+      const ownerDoc = element.ownerDocument
       if ('activeElement' in ownerDoc) {
         let active
         try {
@@ -34,7 +34,7 @@ const legacyCustomBinding = {
         }
         isFocused = active === element
       }
-      let modelValue = valueAccessor(isFocused, { onlyIfChanged: true })
+      const modelValue = valueAccessor(isFocused, { onlyIfChanged: true })
       if (isWriteableObservable(modelValue) && modelValue.peek() !== isFocused) {
         modelValue(isFocused)
       }
@@ -43,8 +43,8 @@ const legacyCustomBinding = {
       element[hasfocusLastValue] = isFocused
       element[hasfocusUpdatingProperty] = false
     }
-    let handleElementFocusIn = handleElementFocusChange.bind(null, true)
-    let handleElementFocusOut = handleElementFocusChange.bind(null, false)
+    const handleElementFocusIn = handleElementFocusChange.bind(null, true)
+    const handleElementFocusOut = handleElementFocusChange.bind(null, false)
 
     registerEventHandler(element, 'focus', handleElementFocusIn)
     registerEventHandler(element, 'focusin', handleElementFocusIn) // For IE
@@ -55,7 +55,7 @@ const legacyCustomBinding = {
     element[hasfocusLastValue] = false
   },
   update: function (element, valueAccessor) {
-    let value = !!unwrap(valueAccessor())
+    const value = !!unwrap(valueAccessor())
 
     if (!element[hasfocusUpdatingProperty] && element[hasfocusLastValue] !== value) {
       if (value) {
@@ -87,7 +87,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
     })
 
     beforeEach(function () {
-      let provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
+      const provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
       options.bindingProviderInstance = provider
       bindingHandlers = provider.bindingHandlers
       bindingHandlers.set(coreBindings.bindings)
@@ -131,7 +131,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
     it('Should respond to changes on an observable value by blurring or focusing the element', function () {
       let currentState
-      let model = { myVal: observable() }
+      const model = { myVal: observable() }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
       applyBindings(model, testNode)
       registerEventHandler(testNode.childNodes[0] as HTMLInputElement, 'focusin', function () {
@@ -151,7 +151,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
     })
 
     it('Should set an observable value to be true on focus and false on blur', function () {
-      let model = { myVal: observable() }
+      const model = { myVal: observable() }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
       applyBindings(model, testNode)
 
@@ -177,7 +177,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
     })
 
     it('Should set a non-observable value to be true on focus and false on blur', function () {
-      let model = { myVal: null }
+      const model = { myVal: null }
       testNode.innerHTML = `<input data-bind='${binding}: myVal' /><input />`
       applyBindings(model, testNode)
       ;(testNode.childNodes[0] as HTMLElement).focus()
@@ -201,7 +201,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
           eventType = 'change'
         }
 
-        let subscription = observable.subscribe(value => {
+        const subscription = observable.subscribe(value => {
           if (disposeImmediately === true) {
             subscription.dispose()
           }
@@ -216,9 +216,9 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
     arrayForEach(['beforeChange', 'change', 'spectate', 'asleep', 'awake'], event => {
       it('Modern browser: non-observable and Observerble value to be true on focus and false on blur', function () {
-        let model = { myVal: observable(false), myVal2: observable(false) }
+        const model = { myVal: observable(false), myVal2: observable(false) }
         const obj: any = undefined
-        let displayVal = observable(obj)
+        const displayVal = observable(obj)
         testNode.innerHTML = `<input class='myVal' data-bind='${binding}: myVal' /><input class='myVal2' data-bind='${binding}: myVal2' />`
         applyBindings(model, testNode)
 
@@ -298,7 +298,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
     it('Should not unnecessarily focus or blur an element that is already focused/blurred', function () {
       // This is the closest we can get to representing issue #698 as a spec
       const obj: any = {}
-      let model = { isFocused: observable(obj) }
+      const model = { isFocused: observable(obj) }
       testNode.innerHTML = `<input data-bind='${binding}: isFocused' />`
       applyBindings(model, testNode)
 

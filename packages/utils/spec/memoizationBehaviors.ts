@@ -17,14 +17,14 @@ describe('Memoization', function () {
   })
 
   it('Should return an HTML comment', function () {
-    let result = memoization.memoize(function () {})
+    const result = memoization.memoize(function () {})
     expect(typeof result).toEqual('string')
     expect(result.substring(0, 4)).toEqual('<!--')
   })
 
   it('Should call the function when unmemoizing', function () {
     let didCall = false
-    let memo = memoization.memoize(function () {
+    const memo = memoization.memoize(function () {
       didCall = true
     })
     memoization.unmemoize(parseMemoCommentHtml(memo))
@@ -32,7 +32,7 @@ describe('Memoization', function () {
   })
 
   it('Should not be able to unmemoize more than once', function () {
-    let memo = memoization.memoize(function () {})
+    const memo = memoization.memoize(function () {})
     memoization.unmemoize(parseMemoCommentHtml(memo))
 
     let threw = false
@@ -45,7 +45,7 @@ describe('Memoization', function () {
   })
 
   it('Should be able to find memos in a DOM tree and unmemoize them, passing the memo node as a param', function () {
-    let containerNode = document.createElement('DIV')
+    const containerNode = document.createElement('DIV')
     let didCall = false
     containerNode.innerHTML =
       'Hello '
@@ -58,7 +58,7 @@ describe('Memoization', function () {
   })
 
   it('After unmemoizing a DOM tree, removes the memo nodes', function () {
-    let containerNode = document.createElement('DIV')
+    const containerNode = document.createElement('DIV')
     containerNode.innerHTML = 'Hello ' + memoization.memoize(function () {})
 
     expect(containerNode.childNodes.length).toEqual(2)

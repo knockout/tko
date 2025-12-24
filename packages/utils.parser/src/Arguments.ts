@@ -10,7 +10,7 @@ export default class Arguments {
   }
 
   get_value(parent, context, globals, node) {
-    let deReffedArgs = new Array()
+    const deReffedArgs = new Array()
     for (let i = 0, j = this.args.length; i < j; ++i) {
       deReffedArgs.push(Node.value_of(this.args[i], context, globals, node))
     }

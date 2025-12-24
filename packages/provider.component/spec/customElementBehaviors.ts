@@ -30,7 +30,7 @@ describe('Components: Custom elements', function () {
   beforeEach(function () {
     testNode = jasmine.prepareTestNode()
     useMockForTasks(options)
-    let provider = new MultiProvider({ providers: [new DataBindProvider(), new ComponentProvider()] })
+    const provider = new MultiProvider({ providers: [new DataBindProvider(), new ComponentProvider()] })
     options.bindingProviderInstance = provider
 
     bindingHandlers = provider.bindingHandlers
@@ -48,7 +48,7 @@ describe('Components: Custom elements', function () {
 
   it('Inserts components into custom elements with matching names', function () {
     components.register('test-component', { template: 'custom element <span data-bind="text: 123"></span>' })
-    let initialMarkup = '<div>hello <test-component></test-component></div>'
+    const initialMarkup = '<div>hello <test-component></test-component></div>'
     testNode.innerHTML = initialMarkup
 
     // Since components are loaded asynchronously, it doesn't show up synchronously
@@ -72,7 +72,7 @@ describe('Components: Custom elements', function () {
         template: 'custom element <span data-bind="text: 123"></span>',
         ignoreCustomElementWarning: true
       })
-      let initialMarkup = '<div>hello <somefaroutname></somefaroutname></div>'
+      const initialMarkup = '<div>hello <somefaroutname></somefaroutname></div>'
       testNode.innerHTML = initialMarkup
 
       // Since components are loaded asynchronously, it doesn't show up synchronously
@@ -95,7 +95,7 @@ describe('Components: Custom elements', function () {
       template: 'custom element <span data-bind="text: 123"></span>',
       ignoreCustomElementWarning: true
     })
-    let initialMarkup = '<div>hello <em></em></div>'
+    const initialMarkup = '<div>hello <em></em></div>'
     testNode.innerHTML = initialMarkup
 
     applyBindings(null, testNode)
@@ -127,7 +127,7 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = '<test-component data-bind="visible: shouldshow"></test-component>'
 
     // Bind with a viewmodel that controls visibility
-    let viewModel = { shouldshow: observable(true) }
+    const viewModel = { shouldshow: observable(true) }
     applyBindings(viewModel, testNode)
     jasmine.Clock.tick(1)
     expect(testNode).toContainHtml('<test-component data-bind="visible: shouldshow">custom element</test-component>')
@@ -157,7 +157,7 @@ describe('Components: Custom elements', function () {
   it('Is possible to call applyBindings directly on a custom element', function () {
     components.register('test-component', { template: 'custom element' })
     testNode.innerHTML = '<test-component></test-component>'
-    let customElem = testNode.childNodes[0] as HTMLElement
+    const customElem = testNode.childNodes[0] as HTMLElement
     expect(customElem.tagName.toLowerCase()).toBe('test-component')
 
     applyBindings(null, customElem)
@@ -175,7 +175,7 @@ describe('Components: Custom elements', function () {
   })
 
   it('Is possible to pass literal values', function () {
-    let suppliedParams = new Array()
+    const suppliedParams = new Array()
     components.register('test-component', {
       template: 'Ignored',
       viewModel: function (params) {
@@ -201,7 +201,7 @@ describe('Components: Custom elements', function () {
   })
 
   it('Supplies an empty params object (with empty $raw) if a custom element has no params attribute', function () {
-    let suppliedParams = new Array()
+    const suppliedParams = new Array()
     components.register('test-component', {
       template: 'Ignored',
       viewModel: function (params) {
@@ -216,7 +216,7 @@ describe('Components: Custom elements', function () {
   })
 
   it('Supplies an empty params object (with empty $raw) if a custom element has an empty whitespace params attribute', function () {
-    let suppliedParams = new Array()
+    const suppliedParams = new Array()
     components.register('test-component', {
       template: 'Ignored',
       viewModel: function (params) {
@@ -250,7 +250,7 @@ describe('Components: Custom elements', function () {
     components.register('test-component', { template: '<p>the value: <span data-bind="text: textToShow"></span></p>' })
 
     testNode.innerHTML = '<test-component params="textToShow: value"></test-component>'
-    let vm = observable({ value: 'A' })
+    const vm = observable({ value: 'A' })
     applyBindings(vm, testNode)
     jasmine.Clock.tick(1)
     expect(testNode).toContainText('the value: A')
@@ -281,13 +281,13 @@ describe('Components: Custom elements', function () {
     }
 
     // See we can supply an observable instance, which is received with no wrapper around it
-    let myobservable = observable(1) as myObs
+    const myobservable = observable(1) as myObs
     myobservable.subprop = 'subprop'
     testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>'
     applyBindings({ myobservable: myobservable }, testNode)
     jasmine.Clock.tick(1)
     const node = testNode.childNodes[0].childNodes[0] as HTMLElement
-    let viewModelInstance = dataFor(node)
+    const viewModelInstance = dataFor(node)
     expect(testNode.firstChild).toContainText('the observable: 1')
 
     // See the observable instance can mutate, without causing the component to tear down
@@ -330,7 +330,7 @@ describe('Components: Custom elements', function () {
     jasmine.Clock.tick(1)
     expect(testNode.firstChild).toContainText('the string reversed: ahplA')
     const node = testNode.childNodes[0].childNodes[0] as HTMLElement
-    let componentViewModelInstance = dataFor(node)
+    const componentViewModelInstance = dataFor(node)
     expect(constructorCallCount).toBe(1)
     expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1)
 
@@ -366,7 +366,7 @@ describe('Components: Custom elements', function () {
 
         // See we can reach the original inner observable directly if needed via $raw
         // (e.g., because it has subobservables or similar)
-        let originalObservable = params.$raw.somevalue()
+        const originalObservable = params.$raw.somevalue()
         expect(isObservable(originalObservable)).toBe(true)
         expect(isComputed(originalObservable)).toBe(false)
         if (originalObservable() === 'inner1') {
@@ -379,7 +379,7 @@ describe('Components: Custom elements', function () {
     // The component itself doesn't have to know or care that the supplied value is nested - the
     // custom element syntax takes care of producing a single computed property that gives the
     // unwrapped inner value.
-    let innerObservable = observable('inner1'),
+    const innerObservable = observable('inner1'),
       outerObservable = observable({ inner: innerObservable })
     testNode.innerHTML = '<test-component params="somevalue: outer().inner"></test-component>'
     applyBindings({ outer: outerObservable }, testNode)
@@ -403,7 +403,7 @@ describe('Components: Custom elements', function () {
     expect(innerObservable()).toEqual('inner3')
 
     // See we can mutate the outer value and see the result show up (cleaning subscriptions to the old inner value)
-    let newInnerObservable = observable('newinner')
+    const newInnerObservable = observable('newinner')
     outerObservable({ inner: newInnerObservable })
     expect(node.value).toEqual('newinner')
     expect(outerObservable.getSubscriptionsCount()).toBe(1)
@@ -455,7 +455,7 @@ describe('Components: Custom elements', function () {
         this.wasDisposed = true
       }
     }
-    let componentViewModel = new myViewModel()
+    const componentViewModel = new myViewModel()
 
     components.register('test-component', { template: 'custom element', viewModel: { instance: componentViewModel } })
     testNode.innerHTML = '<test-component></test-component>'
@@ -503,7 +503,7 @@ describe('Components: Custom elements', function () {
     components.register('outer-component', {
       template: 'the outer component [<inner-component params="innerval: outerval.innerval"></inner-component>] goodbye'
     })
-    let initialMarkup = '<div>hello [<outer-component params="outerval: outerval"></outer-component>] world</div>'
+    const initialMarkup = '<div>hello [<outer-component params="outerval: outerval"></outer-component>] world</div>'
     testNode.innerHTML = initialMarkup
 
     applyBindings({ outerval: { innerval: 'my value' } }, testNode)

@@ -36,18 +36,18 @@ describe('Node preprocessing', function () {
     options.bindingProviderInstance.preprocessNode = function (node) {
       // Example: replace <mySpecialNode /> with <span data-bind='text: someValue'></span>
       // This technique could be the basis for implementing custom element types that render templates
-      if (node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
-        let newNode = document.createElement('span')
+      if (node instanceof Element && node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
+        const newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: someValue')
         expect(node.parentNode).not.toBe(null)
         node.parentNode?.insertBefore(newNode, node)
         node.parentNode?.removeChild(node)
         return [newNode]
       }
-      return undefined
+      return null
     }
     testNode.innerHTML = '<span>a</span><mySpecialNode></mySpecialNode><span>b</span>'
-    let someValue = observable('hello')
+    const someValue = observable('hello')
     applyBindings({ someValue: someValue }, testNode)
     expect(testNode).toContainText('ahellob')
 
@@ -62,7 +62,7 @@ describe('Node preprocessing', function () {
         // Example: Replace {{ someValue }} with text from that property.
         // This could be generalized to full support for string interpolation in text nodes.
         if (node.nodeType === Node.TEXT_NODE && node.data.indexOf('{{ someValue }}') >= 0) {
-          let prefix = node.data.substring(0, node.data.indexOf('{{ someValue }}')),
+          const prefix = node.data.substring(0, node.data.indexOf('{{ someValue }}')),
             suffix = node.data.substring(node.data.indexOf('{{ someValue }}') + '{{ someValue }}'.length),
             newNodes = [
               document.createTextNode(prefix),
@@ -77,14 +77,14 @@ describe('Node preprocessing', function () {
           node.parentNode.removeChild(node)
           return newNodes
         }
-        return undefined
+        return null
       }
     }
     options.bindingProviderInstance = new TestProvider()
     options.bindingProviderInstance.bindingHandlers.set(coreBindings)
 
     testNode.innerHTML = "the value is <span data-bind='text: someValue'></span>."
-    let someValue = observable('hello')
+    const someValue = observable('hello')
     applyBindings({ someValue: someValue }, testNode)
     expect(testNode).toContainText('the value is hello.')
 
@@ -97,17 +97,17 @@ describe('Node preprocessing', function () {
     class TestProvider extends MultiProvider {
       override preprocessNode(node) {
         if (node.nodeType === Node.TEXT_NODE && node.data.charAt(0) === '$') {
-          let newNodes = [document.createComment('ko text: ' + node.data), document.createComment('/ko')]
+          const newNodes = [document.createComment('ko text: ' + node.data), document.createComment('/ko')]
           for (let i = 0; i < newNodes.length; i++) {
             node.parentNode.insertBefore(newNodes[i], node)
           }
           node.parentNode.removeChild(node)
           return newNodes
         }
-        return undefined
+        return null
       }
     }
-    let testProvider = new TestProvider()
+    const testProvider = new TestProvider()
     testProvider.bindingHandlers.set(coreBindings)
     testProvider.addProvider(new DataBindProvider())
     testProvider.addProvider(new VirtualProvider())
