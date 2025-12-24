@@ -4,7 +4,10 @@
   "type": "module",
   "description": "TKO documentation site",
   "scripts": {
-    "prebuild": "mkdir -p src/lib && cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/src/lib/ko.js && cd ../reference && make browser && cp dist/browser.min.js ../../tko.io/src/lib/tko.js",
+    "build:libdir": "mkdir -p src/lib",
+    "build:ko": "cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/src/lib/ko.js",
+    "build:tko": "cd ../builds/reference && make browser && cp dist/browser.min.js ../../tko.io/src/lib/tko.js",
+    "prebuild": "npm run build:libdir && npm run build:ko && npm run build:tko",
     "predev": "npm run prebuild",
     "dev": "bunx @11ty/eleventy --serve",
     "build": "bunx @11ty/eleventy",
