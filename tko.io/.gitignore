@@ -1,1 +1,4 @@
-build
+node_modules/
+_site/
+package-lock.json
+src/lib/

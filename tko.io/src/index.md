@@ -1,7 +1,7 @@
-
-<div class='alert alert-danger text-center'>
-	<h5>This webpage is a work in progress.</h5>
-</div>
+---
+layout: base.njk
+title: Introduction
+---
 
 # What is TKO?
 
@@ -22,47 +22,61 @@ Knockout helps you create rich, responsive, maintainable applications built on a
 
 TKO has a comprehensive suite of tests that ensure its correct functioning and allow easy verification on different Javascript browsers and platforms.
 
-## Sponsors
-
-
 
 ## First Example
 
-<p data-height="465" data-theme-id="dark" data-slug-hash="jarpvY" data-default-tab="html,result" data-user="brianmhunt" data-embed-version="2" data-pen-title="Knockout.js First Example" class="codepen">See the Pen <a href="https://codepen.io/brianmhunt/pen/jarpvY/">Knockout.js First Example</a> by Brian M Hunt (<a href="https://codepen.io/brianmhunt">@brianmhunt</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+```jsx
+const viewModel = {
+  firstName: ko.observable('John'),
+  lastName: ko.observable('Doe')
+};
 
-<!-- tutorial -->
+viewModel.fullName = ko.computed(() => {
+  return viewModel.firstName() + ' ' + viewModel.lastName();
+});
 
+const { node } = ko.jsx.render(
+  <div>
+    <p>First name: <input data-bind="textInput: firstName" /></p>
+    <p>Last name: <input data-bind="textInput: lastName" /></p>
+    <h2>Hello, <span data-bind="text: fullName"></span>!</h2>
+  </div>
+);
 
+document.getElementById('root').appendChild(node);
+
+ko.applyBindings(viewModel);
+```
 
 ## Supported Platforms
 
-TKO & Knockout should work on all modern, and many antiquated browsers, as well as Javascript engines such as Node.js.
-
+TKO & Knockout should work on all modern browsers, as well as Javascript engines such as Node.js.
 
 ## Getting started
 
-Include *alpha-3* with this `<script>`:
+Include the latest version with this `<script>`:
 
 ```html
-<script src="https://unpkg.com/tko@4.0.0-alpha3/dist/ko.js"
-integrity="sha384-W6Un9ta1JSOmCbK7YkdGGfyu+fDGY5e0II5CCyMKKXaYrpiJAt2q5YQH2ICQi4QA"
-crossorigin="anonymous"></script>
+<script src="https://unpkg.com/tko@4.0.0/dist/ko.js" crossorigin="anonymous"></script>
 ```
 
-or install the monorepo it locally with one of
+or install it locally with:
 
 ```bash
-$ npm install tko
-$ yarn add tko
+npm install tko
+# or
+yarn add tko
+# or
+bun add tko
 ```
 
-Clone the code with
+Clone the code with:
 
 ```bash
-$ git clone git@github.com/knockout/tko
+git clone git@github.com:knockout/tko
 ```
 
-# Community
+## Community
 
 Find Knockout online at:
 
