@@ -20,7 +20,7 @@ describe('startCommentRegex', function () {
 describe('DOM-Info Tool', function () {
   it('domNodeIsContainedBy with special values', function () {
     const parent = document.createElement('div')
-    var test = document.createDocumentFragment()
+    const test = document.createDocumentFragment()
 
     expect(domNodeIsContainedBy(parent, test)).toBe(false)
     expect(domNodeIsContainedBy(test, parent)).toBe(false)
@@ -35,7 +35,7 @@ describe('DOM-Info Tool', function () {
     expect(domNodeIsContainedBy(test, parent)).toBe(false)
 
     const testDiv = document.createElement('div')
-    var template = document.createElement('template')
+    const template = document.createElement('template')
     template.content.appendChild(testDiv)
     expect(domNodeIsContainedBy(testDiv, template)).toBe(false) //Because template.content is a DocumentFragment
     expect(domNodeIsContainedBy(testDiv, template.content)).toBe(true)
