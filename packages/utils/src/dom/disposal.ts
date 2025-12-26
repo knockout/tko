@@ -87,14 +87,18 @@ export function removeDisposeCallback(node: Node, callback: (node: Node) => void
   }
 }
 
-export function cleanNode(node: Node): typeof node {
+export function cleanNode(node: Node): Node {
   // First clean this node, where applicable
   if (cleanableNodeTypes[node.nodeType]) {
     cleanSingleNode(node)
 
     // ... then its descendants, where applicable
-    if (cleanableNodeTypesWithDescendants[node.nodeType] && node instanceof Element) {
-      cleanNodesInList(node.getElementsByTagName('*'))
+    if (cleanableNodeTypesWithDescendants[node.nodeType]) {
+      if (node instanceof Element) {
+        cleanNodesInList(node.getElementsByTagName('*'))
+      } else if (node instanceof Document || node instanceof DocumentFragment) {
+        cleanNodesInList(node.childNodes)
+      }
     }
   }
   return node

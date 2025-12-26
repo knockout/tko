@@ -62,6 +62,25 @@ describe('DOM node disposal', function () {
     expect(testNode.childNodes.length).toEqual(0)
   })
 
+  it('Should run registered disposal callbacks and detach from DOM when a document fragment is cleanup', function () {
+    let didRunCount = 0
+
+    const fragment = document.createDocumentFragment()
+    const childNode = document.createElement('DIV')
+    fragment.appendChild(childNode)
+
+    addDisposeCallback(childNode, function () {
+      didRunCount++
+    })
+    addDisposeCallback(fragment, function () {
+      didRunCount++
+    })
+
+    expect(didRunCount).toEqual(0)
+    cleanNode(fragment)
+    expect(didRunCount).toEqual(2)
+  })
+
   it('Should be able to remove previously-registered disposal callbacks', function () {
     let didRun = false
     const callback = function () {
