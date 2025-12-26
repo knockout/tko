@@ -594,7 +594,7 @@ describe('Binding attribute syntax', function() {
             expect(testNode).toContainHtml('<p>replaced</p><textarea>test</textarea><p>replaced</p>');
         });
 
-        xit('<template>', function() {
+        xit('<template>', function() { //Disabled because TKO allows binding in <template> elements
             document.createElement('template'); // For old IE
             testNode.innerHTML = "<p>Hello</p><template>test</template><p>Goodbye</p>";
             ko.applyBindings({ sometext: 'hello' }, testNode);

@@ -1203,6 +1203,39 @@ describe('Components: Component binding', function () {
       expect(innerText).toEqual(`X beep Y Gamma Zeta Q`)
     })
 
+    it('processes default and named slots in template', function () {
+      const fragment = document.createDocumentFragment()
+      const template = document.createElement('template') as HTMLTemplateElement
+      fragment.appendChild(template)
+
+      template.innerHTML = `
+        <test-component>
+          <template slot='alpha'>beep</template>
+          Gamma
+          <div>Zeta</div>
+        </test-component>
+      `
+      class ViewModel extends components.ComponentABC {
+        static override get template() {
+          return `
+            <div>
+              X <slot name='alpha'></slot> Y <slot></slot> Q
+            </div>
+          `
+        }
+      }
+      ViewModel.register('test-component')
+
+      const usedCopie = template.cloneNode(true) as HTMLTemplateElement
+      applyBindings(outerViewModel, usedCopie)
+
+      const innerText = (usedCopie.content.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
+      expect(innerText).toEqual(`X beep Y Gamma Zeta Q`)
+
+      const innerTextOrg = (template.content.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
+      expect(innerTextOrg).toEqual('Gamma Zeta')
+    })
+
     it('inserts all component template nodes in an unnamed (default) slot', function () {
       testNode.innerHTML = `
         <test-component>

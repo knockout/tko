@@ -16,7 +16,7 @@
 // So, use node.text where available, and node.nodeValue elsewhere
 import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation'
 import { removeNode } from './disposal'
-import { tagNameLower } from './info'
+import { tagNameLower, isTemplateTag } from './info'
 import * as domData from './data'
 import options from '../options'
 
@@ -27,10 +27,6 @@ export const startCommentRegex = commentNodesHaveTextProperty
   : /^\s*ko(?:\s+([\s\S]+))?\s*$/
 export const endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
 const htmlTagsWithOptionallyClosingChildren = { ul: true, ol: true }
-
-export function isTemplate(node) {
-  return node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'template'
-}
 
 export function isStartComment(node) {
   return (
@@ -190,8 +186,8 @@ export function insertAfter(containerNode: Node, nodeToInsert: Node, insertAfter
 }
 
 export function firstChild(node: Node) {
-  if (isTemplate(node)) {
-    return (node as HTMLTemplateElement).content.firstChild
+  if (isTemplateTag(node)) {
+    return node.content.firstChild
   }
 
   if (!isStartComment(node)) {

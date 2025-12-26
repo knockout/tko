@@ -43,7 +43,11 @@ export function tagNameLower(element: Element) {
   return element && element.tagName && element.tagName.toLowerCase()
 }
 
-export function isDomElement(obj) {
+export function isTemplateTag(node): node is HTMLTemplateElement {
+  return node && node.nodeType === Node.ELEMENT_NODE && tagNameLower(node) === 'template'
+}
+
+export function isDomElement(obj): obj is HTMLElement {
   if (window.HTMLElement) {
     return obj instanceof HTMLElement
   } else {
@@ -51,7 +55,7 @@ export function isDomElement(obj) {
   }
 }
 
-export function isDocumentFragment(obj) {
+export function isDocumentFragment(obj): obj is DocumentFragment {
   if (window.DocumentFragment) {
     return obj instanceof DocumentFragment
   } else {

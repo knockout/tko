@@ -875,11 +875,10 @@ describe('Binding attribute syntax', function () {
       expect(testNode).toContainHtml('<p>replaced</p><textarea>test</textarea><p>replaced</p>')
     })
 
-    xit('<template>', function () {
-      document.createElement('template') // For old IE
+    it('<template>', function () {
       testNode.innerHTML = '<p>Hello</p><template>test</template><p>Goodbye</p>'
       applyBindings({ sometext: 'hello' }, testNode)
-      expect(testNode).toContainHtml('<p>replaced</p><template>test</template><p>replaced</p>')
+      expect(testNode).toContainHtml('<p>replaced</p><template>replaced</template><p>replaced</p>')
     })
   })
 
