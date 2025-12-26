@@ -3,16 +3,16 @@
 //
 import { arrayFirst } from '../array'
 
-export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
+export function domNodeIsContainedBy(node: Node | null, containedByNode?: Node | null): boolean {
+  // If there is no contained node, then the node is not attached to it
+  // This case also happens when the shadow DOM from a HTMLTemplateElement is involved
+  if (!node || !containedByNode) {
+    return false
+  }
   if (node === containedByNode) {
     return true
   }
   if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-    return false
-  }
-  // If there is no contained node, then the node is not attached to it
-  // This case also happens when the shadow DOM from a HTMLTemplateElement is envolved
-  if (!containedByNode) {
     return false
   }
   // Fixes issue #1162 - can't use node.contains for document fragments on IE8
@@ -20,7 +20,10 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
     return containedByNode.contains(node.nodeType !== Node.ELEMENT_NODE ? node.parentNode : node)
   }
   if (containedByNode.compareDocumentPosition) {
-    return containedByNode.compareDocumentPosition(node) === Node.DOCUMENT_POSITION_CONTAINED_BY
+    return (
+      (containedByNode.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_CONTAINED_BY)
+      === Node.DOCUMENT_POSITION_CONTAINED_BY
+    )
   }
 
   let parentNode: Node | null = node
@@ -30,8 +33,8 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
   return !!parentNode
 }
 
-export function domNodeIsAttachedToDocument(node) {
-  return domNodeIsContainedBy(node, node.ownerDocument.documentElement)
+export function domNodeIsAttachedToDocument(node: Node): boolean {
+  return domNodeIsContainedBy(node, node.ownerDocument?.documentElement)
 }
 
 export function anyDomNodeIsAttachedToDocument(nodes) {

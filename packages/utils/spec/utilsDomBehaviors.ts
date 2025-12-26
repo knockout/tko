@@ -18,6 +18,34 @@ describe('startCommentRegex', function () {
 })
 
 describe('DOM-Info Tool', function () {
+  it('domNodeIsContainedBy with special values', function () {
+    const parent = document.createElement('div')
+    var test = document.createDocumentFragment()
+
+    expect(domNodeIsContainedBy(parent, test)).toBe(false)
+    expect(domNodeIsContainedBy(test, parent)).toBe(false)
+
+    expect(domNodeIsContainedBy(parent, undefined)).toBe(false)
+    expect(domNodeIsContainedBy(parent, null)).toBe(false)
+    expect(domNodeIsContainedBy(null, parent)).toBe(false)
+
+    test.appendChild(parent)
+
+    expect(domNodeIsContainedBy(parent, test)).toBe(true)
+    expect(domNodeIsContainedBy(test, parent)).toBe(false)
+
+    const testDiv = document.createElement('div')
+    var template = document.createElement('template')
+    template.content.appendChild(testDiv)
+    expect(domNodeIsContainedBy(testDiv, template)).toBe(false) //Because template.content is a DocumentFragment
+    expect(domNodeIsContainedBy(testDiv, template.content)).toBe(true)
+
+    parent.appendChild(template)
+    expect(domNodeIsContainedBy(template, parent)).toBe(true)
+    expect(domNodeIsContainedBy(template, test)).toBe(true)
+    expect(domNodeIsContainedBy(testDiv, parent)).toBe(false) //Because template.content is a DocumentFragment
+  })
+
   it('Parent Node contains child', function () {
     const parent = document.createElement('div')
     const child = document.createElement('span')
