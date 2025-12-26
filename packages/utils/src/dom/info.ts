@@ -10,6 +10,8 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
   if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
     return false
   }
+  // If there is no contained node, then the node is not attached to it
+  // This case also happens when the shadow DOM from a HTMLTemplateElement is envolved
   if (!containedByNode) {
     return false
   }
