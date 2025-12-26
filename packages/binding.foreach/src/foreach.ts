@@ -387,7 +387,7 @@ export class ForEachBinding extends AsyncBindingHandler {
    */
   activeChildElement(node) {
     const active = document.activeElement
-    if (domNodeIsContainedBy(active!, node)) {
+    if (domNodeIsContainedBy(active, node)) {
       return active
     }
     return null
