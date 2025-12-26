@@ -58,11 +58,7 @@ function getBindingProvider(): Provider {
 }
 
 function isProviderForNode(provider: Provider, node: Node): boolean {
-  const nodeTypes = provider.FOR_NODE_TYPES || [
-    Node.ELEMENT_NODE,
-    Node.TEXT_NODE,
-    Node.COMMENT_NODE
-  ]
+  const nodeTypes = provider.FOR_NODE_TYPES || [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
   return nodeTypes.includes(node.nodeType)
 }
 
@@ -398,7 +394,7 @@ function applyBindingsToNodeInternal<T>(
 
 /**
  *
- * @param {HTMLElement} node
+ * @param {Node} node
  * @param {Object} bindings
  * @param {[Promise]} nodeAsyncBindingPromises
  */
@@ -438,7 +434,7 @@ function getBindingContext<T = any>(
 }
 
 export function applyBindingAccessorsToNode<T = any>(
-  node: HTMLElement,
+  node: Node,
   bindings: Record<string, any>,
   viewModelOrBindingContext?: BindingContext<T> | Observable<T> | T,
   asyncBindingsApplied?: Set<any>
@@ -456,7 +452,7 @@ export function applyBindingAccessorsToNode<T = any>(
 }
 
 export function applyBindingsToNode<T = any>(
-  node: HTMLElement,
+  node: Node,
   bindings: Record<string, any>,
   viewModelOrBindingContext: BindingContext<T> | Observable<T> | T
 ): BindingResult {
@@ -486,7 +482,7 @@ export function applyBindingsToDescendants<T = any>(
 
 export function applyBindings<T = any>(
   viewModelOrBindingContext: BindingContext<T> | Observable<T> | T,
-  rootNode: HTMLElement,
+  rootNode: Node,
   extendContextCallback?: BindingContextExtendCallback<T>
 ): Promise<unknown> {
   const asyncBindingsApplied = new Set()
