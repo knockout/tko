@@ -20,7 +20,7 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
     return containedByNode.contains(node.nodeType !== Node.ELEMENT_NODE ? node.parentNode : node)
   }
   if (containedByNode.compareDocumentPosition) {
-    return (containedByNode.compareDocumentPosition(node) & 16) == 16
+    return containedByNode.compareDocumentPosition(node) === Node.DOCUMENT_POSITION_CONTAINED_BY
   }
 
   let parentNode: Node | null = node
