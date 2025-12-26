@@ -152,6 +152,16 @@ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt -y install ./google-chrome-stable_current_amd64.deb
 ```
 
+Install Firefox for "make test-headless-ff":
+```bash
+sudo add-apt-repository ppa:mozillateam/ppa
+sudo apt install xvfb firefox-esr
+sudo ln -s /usr/lib/firefox-esr/firefox.sh /usr/bin/firefox
+
+or 
+export FIREFOX_BIN=/usr/bin/firefox-esr
+```
+
 ## Next steps
 
 There's an [issue for that](https://github.com/knockout/tko/issues/1).

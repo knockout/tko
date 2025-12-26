@@ -120,8 +120,8 @@ function sauceConfig (config) {
   })
 }
 
-function localConfig(config, useChrome) {
-  config.set({
+function localConfig(config, browser) {
+  const baseconfig = {
     ...CommonConfig,
     electronOpts: {
       frame: false,
@@ -136,28 +136,53 @@ function localConfig(config, useChrome) {
     },
     //browserDisconnectTimeout: 100000,
     //browserNoActivityTimeout: 100000,
-    browsers: useChrome ? 
-    ['testRunner'] : ['Electron'],
-	  customLaunchers: {
-      testRunner: {
-        base: "ChromeHeadless",
-        flags: ["--no-sandbox", 
-          "--remote-debugging-address=0.0.0.0",
-          "--remote-debugging-port=9222"]
-      }      
-    },
+    browsers: ['Electron'],
     debug: argv.includes('--debug'),
     debugger: argv.includes('--debug'),
     //logLevel: "DEBUG",
     singleRun: argv.includes('--once')
-  })
+  }
+
+  if(browser.useChrome) {
+    const chrome = {
+      browsers: ['testRunnerChrome'],
+      customLaunchers: {
+        testRunnerChrome: {
+          base: "ChromeHeadless",
+          flags: ["--no-sandbox", 
+            "--remote-debugging-address=0.0.0.0",
+            "--remote-debugging-port=9222"]
+        }      
+      }
+    }
+    Object.assign(baseconfig, chrome)
+  } else if (browser.useFirefox) {
+    const ff = {
+      browsers: ['testRunnerFireFox'],
+      customLaunchers: {
+        testRunnerFireFox: {
+          base: "Firefox",
+          flags: ["-headless"],
+          prefs: {
+            'network.proxy.type': 0
+          }
+        }        
+      }
+    }
+    Object.assign(baseconfig, ff)
+  }
+
+  config.set(baseconfig)
 }
 
 module.exports = (config) => {
   if (argv.includes('--sauce')) {
     sauceConfig(config)
   } else {
-    const useChrome = argv.includes('--headless-chrome')
-    localConfig(config, useChrome)
+    const browser = {
+      useChrome: argv.includes('--headless-chrome'),
+      useFirefox: argv.includes('--headless-firefox')
+    }
+    localConfig(config, browser)
   }
 }

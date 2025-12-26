@@ -29,6 +29,9 @@ test-headless:
 test-headless-jquery:
 	$(LERNA) exec --stream -- $(MAKE) test-headless-jquery
 
+test-headless-ff:
+	$(LERNA) exec --stream -- $(MAKE) test-headless-ff
+
 ci:
 	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
 
