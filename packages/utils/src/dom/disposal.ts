@@ -97,7 +97,7 @@ export function cleanNode(node: Node): Node {
       if (node instanceof Element) {
         cleanNodesInList(node.getElementsByTagName('*'))
       } else if (node instanceof Document || node instanceof DocumentFragment) {
-        cleanNodesInList(node.childNodes)
+        cleanNodesInList(node.querySelectorAll('*'))
       }
     }
   }

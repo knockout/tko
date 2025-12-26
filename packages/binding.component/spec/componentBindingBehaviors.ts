@@ -1226,10 +1226,10 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
 
-      const usedCopie = template.cloneNode(true) as HTMLTemplateElement
-      applyBindings(outerViewModel, usedCopie)
+      const copy = template.cloneNode(true) as HTMLTemplateElement
+      applyBindings(outerViewModel, copy)
 
-      const innerText = (usedCopie.content.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
+      const innerText = (copy.content.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
       expect(innerText).toEqual(`X beep Y Gamma Zeta Q`)
 
       const innerTextOrg = (template.content.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
