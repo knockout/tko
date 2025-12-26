@@ -61,8 +61,7 @@ function isProviderForNode(provider: Provider, node: Node): boolean {
   const nodeTypes = provider.FOR_NODE_TYPES || [
     Node.ELEMENT_NODE,
     Node.TEXT_NODE,
-    Node.COMMENT_NODE,
-    Node.DOCUMENT_FRAGMENT_NODE
+    Node.COMMENT_NODE
   ]
   return nodeTypes.includes(node.nodeType)
 }
