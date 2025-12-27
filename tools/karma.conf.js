@@ -13,6 +13,9 @@ const pkg = JSON.parse(fs.readFileSync('package.json'))
 const coveragePlugin = {
   name: 'code-coverage',
   setup(build) {
+    if(!argv.includes('--coverage'))
+      return
+
     coverageInstrumenter = createInstrumenter({ esModules: true })
 
     build.onEnd((result) => {
@@ -42,7 +45,7 @@ const CommonConfig = {
   esbuild: {
     // See: https://esbuild.github.io/api/
     format: 'iife',
-    sourcemap: "inline",
+    sourcemap: "external",
     bundle: false,
     plugins: [coveragePlugin],
     define: {
@@ -50,13 +53,15 @@ const CommonConfig = {
     }
   },
   // optionally, configure the reporter
-  coverageReporter: {
-    dir : 'coverage/',
-    reporters: [
-   //     { type: 'html', subdir: 'report-html' },
-        { type: 'lcov', subdir: 'report-lcov' }
-    ]
-  }
+coverageReporter: {
+      // specify a common output directory
+      dir: 'coverage/',
+      reporters: [        
+        { type: 'lcovonly', file: 'report-lcovonly.txt' },
+        { type: 'json', file: 'report.json' },
+        { type: 'text-summary', file: 'text-summary.txt' }
+      ]
+    }
 }
 
 

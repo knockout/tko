@@ -117,6 +117,9 @@ test: esm
 test-headless: esm
 	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery
 
+test-coverage: esm
+	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery --coverage
+
 test-headless-ff: esm
 	$(KARMA) start $(tools_dir)/karma.conf --once --headless-firefox --noJQuery
 

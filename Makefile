@@ -26,6 +26,9 @@ test:
 test-headless:
 	$(LERNA) exec --stream -- $(MAKE) test-headless
 
+test-coverage:
+	$(LERNA) exec --stream -- $(MAKE) test-coverage
+
 test-headless-jquery:
 	$(LERNA) exec --stream -- $(MAKE) test-headless-jquery
 
