@@ -2,11 +2,30 @@
  * Config for karma.
  */
 const fs = require('fs')
+const { Buffer } = require('buffer')
+const { createInstrumenter } = require('istanbul-lib-instrument')
 
 const {argv} = process
 const {SAUCE_USERNAME, SAUCE_ACCESS_KEY} = process.env
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
+
+const coveragePlugin = {
+  name: 'code-coverage',
+  setup(build) {
+    coverageInstrumenter = createInstrumenter({ esModules: true })
+
+    build.onEnd((result) => {
+      const js = result.outputFiles.find(f => f.path.match(/\.js$/))
+      const sourceMap = result.outputFiles.find(f => f.path.match(/\.js\.map$/))
+      const sourceMapObject = JSON.parse(sourceMap.text)
+      sourceMapObject.sourceRoot = '/'
+
+      const instrumented = coverageInstrumenter.instrumentSync(js.text, null, sourceMapObject)
+      js.contents = Buffer.from(instrumented)
+    })
+  }
+}
 
 const CommonConfig = {
   basePath: process.cwd(),
@@ -15,6 +34,7 @@ const CommonConfig = {
     { pattern: 'spec/**/*.js', watched: false },
     { pattern: 'spec/**/*.ts', watched: false }
   ],
+  reporters: ['progress', 'coverage'],
   preprocessors: {
     'spec/**/*.js': ['esbuild'],
     'spec/**/*.ts': ['esbuild']
@@ -24,9 +44,18 @@ const CommonConfig = {
     format: 'iife',
     sourcemap: "inline",
     bundle: false,
+    plugins: [coveragePlugin],
     define: {
       BUILD_VERSION: '"test"',
-    } 
+    }
+  },
+  // optionally, configure the reporter
+  coverageReporter: {
+    dir : 'coverage/',
+    reporters: [
+   //     { type: 'html', subdir: 'report-html' },
+        { type: 'lcov', subdir: 'report-lcov' }
+    ]
   }
 }
 

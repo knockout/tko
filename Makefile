@@ -88,6 +88,7 @@ install: package-lock.json
 sweep:
 	rm -rf packages/*/dist/*
 	rm -rf builds/*/dist/*
+	rm -rf packages/*/coverage/*
 	
 clean: sweep
 	rm -rf node_modules/
