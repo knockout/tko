@@ -30,8 +30,10 @@ const coveragePlugin = {
   }
 }
 
+const basePath = process.cwd()
+
 const CommonConfig = {
-  basePath: process.cwd(),
+  basePath: basePath,
   frameworks: pkg.karma.frameworks,
   files: pkg.karma.files || [
     { pattern: 'spec/**/*.js', watched: false },
@@ -52,14 +54,12 @@ const CommonConfig = {
       BUILD_VERSION: '"test"',
     }
   },
-  // optionally, configure the reporter
-coverageReporter: {
-      // specify a common output directory
-      dir: 'coverage/',
+  // configure the reporter
+  coverageReporter: {
+      // specify a central output directory
+      dir: '../../coverage-temp/',
       reporters: [        
-        { type: 'lcovonly', file: 'report-lcovonly.txt' },
-        { type: 'json', file: 'report.json' },
-        { type: 'text-summary', file: 'text-summary.txt' }
+        { type: 'json', subdir: '.', file: basePath.substring(basePath.lastIndexOf('/')+1) + '_report.json' }
       ]
     }
 }

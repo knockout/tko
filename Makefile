@@ -27,7 +27,10 @@ test-headless:
 	$(LERNA) exec --stream -- $(MAKE) test-headless
 
 test-coverage:
+   # $(LERNA) exec --stream -- $(NPX) instrument dist --in-place
 	$(LERNA) exec --stream -- $(MAKE) test-coverage
+   # $(NPX) nyc merge coverage ../../coverage-temp/coverage-final.json
+	$(NPX) nyc report --reporter=html --reporter=text --reporter=lcov --reporter=clover --report-dir=coverage --temp-dir=coverage-temp > COVERAGE.md
 
 test-headless-jquery:
 	$(LERNA) exec --stream -- $(MAKE) test-headless-jquery
@@ -91,7 +94,9 @@ install: package-lock.json
 sweep:
 	rm -rf packages/*/dist/*
 	rm -rf builds/*/dist/*
-	rm -rf packages/*/coverage/*
+	rm -rf packages/*/coverage
+	rm -rf coverage/
+	rm -rf coverage-temp/
 	
 clean: sweep
 	rm -rf node_modules/
