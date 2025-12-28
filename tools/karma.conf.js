@@ -7,13 +7,14 @@ const { createInstrumenter } = require('istanbul-lib-instrument')
 
 const {argv} = process
 const {SAUCE_USERNAME, SAUCE_ACCESS_KEY} = process.env
+const coverage = argv.includes('--coverage')
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
 const coveragePlugin = {
   name: 'code-coverage',
   setup(build) {
-    if(!argv.includes('--coverage'))
+    if(!coverage)
       return
 
     coverageInstrumenter = createInstrumenter({ esModules: true })
@@ -39,7 +40,6 @@ const CommonConfig = {
     { pattern: 'spec/**/*.js', watched: false },
     { pattern: 'spec/**/*.ts', watched: false }
   ],
-  reporters: ['progress', 'coverage'],
   preprocessors: {
     'spec/**/*.js': ['esbuild'],
     'spec/**/*.ts': ['esbuild']
@@ -53,7 +53,11 @@ const CommonConfig = {
     define: {
       BUILD_VERSION: '"test"',
     }
-  },
+  }
+}
+
+const coverageConfig = {
+  reporters: ['progress', 'coverage'],
   // configure the reporter
   coverageReporter: {
       // specify a central output directory
@@ -61,8 +65,11 @@ const CommonConfig = {
       reporters: [        
         { type: 'json', subdir: '.', file: basePath.substring(basePath.lastIndexOf('/')+1) + '_report.json' }
       ]
-    }
+  }
 }
+
+if(coverage)
+  Object.assign(CommonConfig, coverageConfig)
 
 
 /**
