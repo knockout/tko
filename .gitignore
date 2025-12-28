@@ -29,3 +29,4 @@ coverage/
 .vscode/extensions.json
 !.vscode/launch.json
 .vscode/settings.json
+.playwright-mcp
