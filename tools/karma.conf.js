@@ -17,7 +17,7 @@ const coveragePlugin = {
     if(!coverage)
       return
 
-    coverageInstrumenter = createInstrumenter({ esModules: true })
+    const coverageInstrumenter = createInstrumenter({ esModules: true })
 
     build.onEnd((result) => {
       const js = result.outputFiles.find(f => f.path.match(/\.js$/))
@@ -47,7 +47,7 @@ const CommonConfig = {
   esbuild: {
     // See: https://esbuild.github.io/api/
     format: 'iife',
-    sourcemap: "external",
+    sourcemap: coverage ? "external" : "inline",
     bundle: false,
     plugins: [coveragePlugin],
     define: {
