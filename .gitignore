@@ -21,6 +21,7 @@ node_modules
 _repo
 coverage
 coverage-temp
+builds/**/meta
 .nyc_output
 **/dist/*
 !packages/tko/dist/*

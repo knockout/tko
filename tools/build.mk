@@ -87,6 +87,7 @@ dist/browser.min.js: $(src) package.json
 		--minify \
 		--sourcemap=external \
 		--outfile=$@ \
+		--metafile=meta/browser_min_meta.json \
 		./src/index.ts
 
 dist/browser.js: $(src) package.json
@@ -103,6 +104,7 @@ dist/browser.js: $(src) package.json
 		--bundle \
 		--sourcemap=external \
 		--outfile=$@ \
+		--metafile=meta/browser_meta.json \
 		./src/index.js
 
 repackage: $(tools_dir)/repackage.mjs ../../lerna.json
