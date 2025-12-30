@@ -239,7 +239,6 @@ describe('KO LifeCycle', function () {
       assert.equal(divClick, 2)
       assert.equal(anchorClick, 2)
 
-      console.log(o.getSubscriptionsCount())
       assert.equal(o.getSubscriptionsCount(), 2)
       nlc2.dispose() // --> Dispose also nlc
       assert.equal(o.getSubscriptionsCount(), 0)
