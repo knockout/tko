@@ -41,8 +41,7 @@ describe('KO LifeCycle', function () {
       assert.isFunction(Child.prototype.anchorTo)
       assert.isFunction(Child.prototype.dispose)
       assert.isFunction(Child.prototype.addDisposable)
-      // TODO: Fails with tsc, check if test is obsolte with typescript
-      // assert.isNotFunction(Child.prototype.mixInto)
+      assert.isNotFunction((Child.prototype as any).mixInto)
     })
 
     it('extends a class instance', function () {
@@ -55,8 +54,7 @@ describe('KO LifeCycle', function () {
       assert.isFunction(c.anchorTo)
       assert.isFunction(c.dispose)
       assert.isFunction(c.addDisposable)
-      // TODO: Fails with tsc, check if test is obsolte with typescript
-      // assert.isNotFunction(c.mixInto)
+      assert.isNotFunction((c as any).mixInto)
     })
   })
 
@@ -210,6 +208,46 @@ describe('KO LifeCycle', function () {
       anchor.click()
       assert.equal(divClick, 1)
       assert.equal(anchorClick, 1)
+    })
+
+    it('Lifecycle anchorTo Lifecycle: Anchored NodeLifeCycle disposed children', function () {
+      let divClick = 0
+      let anchorClick = 0
+      const o = observable()
+      const div = document.createElement('div')
+      const anchor = document.createElement('em')
+      class NodeLifeCycle extends LifeCycle {
+        constructor() {
+          super()
+          this.computed(() => o())
+          this.anchorTo(anchor)
+          this.addEventListener(div, 'click', () => divClick++)
+          this.addEventListener(anchor, 'click', () => anchorClick++)
+        }
+      }
+
+      const nlc = new NodeLifeCycle()
+      const nlc2 = new NodeLifeCycle()
+      assert.equal(o.getSubscriptionsCount(), 2)
+
+      nlc.anchorTo(nlc2)
+
+      div.click()
+      assert.equal(divClick, 2)
+      assert.equal(anchorClick, 0)
+      anchor.click()
+      assert.equal(divClick, 2)
+      assert.equal(anchorClick, 2)
+
+      console.log(o.getSubscriptionsCount())
+      assert.equal(o.getSubscriptionsCount(), 2)
+      nlc2.dispose() // --> Dispose also nlc
+      assert.equal(o.getSubscriptionsCount(), 0)
+
+      div.click()
+      anchor.click()
+      assert.equal(divClick, 2)
+      assert.equal(anchorClick, 2)
     })
   })
 })
