@@ -24,9 +24,7 @@ describe('Binding: DescendantsComplete', function () {
   beforeEach(function () {
     const provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
     options.bindingProviderInstance = provider
-    provider.bindingHandlers.set(coreBindings)
 
-    options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
     bindingHandlers.set(templateBindings)
