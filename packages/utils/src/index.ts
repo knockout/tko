@@ -7,7 +7,6 @@
 export * from './array'
 export * from './async'
 export * from './error'
-export * from './ie'
 export * from './object'
 export * from './function'
 export * from './string'

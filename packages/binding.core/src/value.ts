@@ -1,4 +1,4 @@
-import { ieVersion, stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
+import { stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
 
 import { unwrap, dependencyDetection } from '@tko/observable'
 
@@ -63,11 +63,11 @@ export class value extends BindingHandler {
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded() {
     return (
-      ieVersion
-      && this.isInput
+      this.isInput
       && this.$element.type == 'text'
       && this.$element.autocomplete != 'off'
       && (!this.$element.form || this.$element.form.autocomplete != 'off')
+      && (window.navigator.userAgent.match(/MSIE ([^ ]+)/) || window.navigator.userAgent.match(/rv:([^ )]+)/)) //only if IE10 or IE11
     )
   }
 

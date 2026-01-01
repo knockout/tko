@@ -1,7 +1,6 @@
 //
 // DOM node data
 //
-import { ieVersion } from '../ie'
 
 const datastoreTime = new Date().getTime()
 const dataStoreKeyExpandoPropertyName = `__ko__${datastoreTime}`
@@ -37,36 +36,7 @@ const modern = {
   }
 }
 
-/**
- * Old IE versions have memory issues if you store objects on the node, so we
- * use a separate data storage and link to it from the node using a string key.
- */
-const IE = {
-  getDataForNode(node: Node, createIfNotFound: boolean) {
-    let dataStoreKey = node[dataStoreKeyExpandoPropertyName]
-    const hasExistingDataStore = dataStoreKey && dataStoreKey !== 'null' && dataStore[dataStoreKey]
-    if (!hasExistingDataStore) {
-      if (!createIfNotFound) {
-        return undefined
-      }
-      dataStoreKey = node[dataStoreKeyExpandoPropertyName] = 'ko' + uniqueId++
-      dataStore[dataStoreKey] = {}
-    }
-    return dataStore[dataStoreKey]
-  },
-
-  clear(node: Node) {
-    const dataStoreKey = node[dataStoreKeyExpandoPropertyName]
-    if (dataStoreKey) {
-      delete dataStore[dataStoreKey]
-      node[dataStoreKeyExpandoPropertyName] = null
-      return true // Exposing 'did clean' flag purely so specs can infer whether things have been cleaned up as intended
-    }
-    return false
-  }
-}
-
-const { getDataForNode, clear } = ieVersion ? IE : modern
+const { getDataForNode, clear } = modern
 
 /**
  * Create a unique key-string identifier.

@@ -8,7 +8,7 @@ window.jQuery = jQuery
  */
 /* globals runs, waitsFor, jasmine */
 
-import { arrayMap, arrayFilter, ieVersion, selectExtensions, hasOwnProperty, options } from '../dist/'
+import { arrayMap, arrayFilter, selectExtensions, hasOwnProperty, options } from '../dist/'
 
 window.DEBUG = true
 window.amdRequire = window.require
@@ -67,7 +67,7 @@ jasmine.nodeText = function (node) {
 
 jasmine.browserSupportsProtoAssignment = { __proto__: [] } instanceof Array
 
-jasmine.ieVersion = ieVersion
+jasmine.ieVersion = false //TODO: Needs to be dismantled
 
 jasmine.setNodeText = function (node, text: string) {
   if ('textContent' in node) {

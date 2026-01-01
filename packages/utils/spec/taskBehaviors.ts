@@ -1,6 +1,6 @@
 import { useMockForTasks } from '../helpers/jasmine-13-helper'
 
-import { tasks, options, ieVersion } from '../dist'
+import { tasks, options } from '../dist'
 
 describe('Tasks', function () {
   beforeEach(function () {
@@ -299,7 +299,7 @@ describe('Tasks', function () {
 })
 
 describe('Tasks options.taskScheduler', function () {
-  if (ieVersion) {
+  if (jasmine.ieVersion) {
     beforeEach(function () {
       waits(100)
     })

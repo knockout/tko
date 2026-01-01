@@ -6,7 +6,6 @@ import {
   arrayIndexOf,
   setOptionNodeSelectionState,
   triggerEvent,
-  ensureSelectElementIsRenderedCorrectly,
   selectExtensions
 } from '@tko/utils'
 
@@ -190,9 +189,6 @@ export const options = {
         }
       }
     })
-
-    // Workaround for IE bug
-    ensureSelectElementIsRenderedCorrectly(element)
 
     if (previousScrollTop && Math.abs(previousScrollTop - element.scrollTop) > 20) {
       element.scrollTop = previousScrollTop

@@ -3,7 +3,6 @@
 //
 
 import { objectForEach } from '../object'
-import { ieVersion } from '../ie'
 import { catchFunctionErrors } from '../error'
 
 import { tagNameLower } from './info'
@@ -46,10 +45,6 @@ function isClickOnCheckableElement(element: Element, eventType: string) {
   return inputType == 'checkbox' || inputType == 'radio'
 }
 
-// Workaround for an IE9 issue - https://github.com/SteveSanderson/knockout/issues/406
-const eventsThatMustBeRegisteredUsingAttachEvent = { propertychange: true }
-let jQueryEventAttachName
-
 function hasIEAttachEvents(
   el: Element
 ): el is Element & { attachEvent: (event: string, handler: EventListener) => void } & {
@@ -65,13 +60,12 @@ export function registerEventHandler(
   eventOptions = false
 ): void {
   const wrappedHandler = catchFunctionErrors(handler)
-  const mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType]
   const mustUseNative = Boolean(eventOptions)
   const jQuery = options.jQuery
 
-  if (!options.useOnlyNativeEvents && !mustUseAttachEvent && !mustUseNative && jQuery) {
+  if (!options.useOnlyNativeEvents && !mustUseNative && jQuery) {
     jQuery(element).on(eventType, wrappedHandler)
-  } else if (!mustUseAttachEvent && typeof element.addEventListener === 'function') {
+  } else if (typeof element.addEventListener === 'function') {
     element.addEventListener(eventType, wrappedHandler, eventOptions)
   } else if (hasIEAttachEvents(element)) {
     const attachEventHandler = function (event) {

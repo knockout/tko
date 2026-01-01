@@ -3,7 +3,6 @@
 //
 /* eslint no-empty: 0 */
 import { makeArray } from '../array'
-import { ieVersion } from '../ie'
 import { cleanNode, removeNode } from './disposal'
 
 export function moveCleanedNodesToContainerElement(nodes: ArrayLike<Node>) {
@@ -53,21 +52,6 @@ export function replaceDomNodes(nodeToReplaceOrNodeArray: Node[] | Node, newNode
     for (let i = 0; i < nodesToReplaceArray.length; i++) {
       removeNode(nodesToReplaceArray[i])
     }
-  }
-}
-
-export function setElementName(element: any, name: string) {
-  element.name = name
-
-  // Workaround IE 6/7 issue
-  // - https://github.com/SteveSanderson/knockout/issues/197
-  // - http://www.matts411.com/post/setting_the_name_attribute_in_ie_dom/
-  if ((ieVersion as any) <= 7) {
-    try {
-      const safeInput = document.createElement('input')
-      safeInput.name = element.name
-      element.mergeAttributes(safeInput, false)
-    } catch (e) {} // For IE9 with doc mode "IE9 Standards" and browser mode "IE9 Compatibility View"
   }
 }
 

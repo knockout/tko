@@ -11,7 +11,6 @@ declare global {
     amdRequire: any
     require: any
     jQuery: JQueryStatic
-    innerShiv // TODO: For IE<9.. we could also remove it
   }
 
   //Jasmine and Mocha define duplicated functions, is a problem for the type system
