@@ -87,16 +87,14 @@ describe('Native template engine', function () {
   })
 
   describe('Anonymous templates', function () {
-    //TODO FIXME
-    xit('can display static content', function () {
+    it('can display static content', function () {
       new anonymousTemplate(testNode).text('this is some static content')
       testNode.innerHTML = 'irrelevant initial content'
       renderTemplate(testNode, null, null, testNode)
       expect(testNode).toContainHtml('this is some static content')
     })
 
-    //TODO FIXME
-    xit('can data-bind on results', function () {
+    it('can data-bind on results', function () {
       new anonymousTemplate(testNode).text("name: <div data-bind='text: name'></div>")
       testNode.innerHTML = 'irrelevant initial content'
       renderTemplate(testNode, { name: 'bert' }, null, testNode)
