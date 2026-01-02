@@ -245,7 +245,8 @@ describe('is empty/conditional', function () {
 })
 
 describe('observable array changes', function () {
-  let div, obs, view
+  let div, obs, view  
+  this.timeout(5000); //For Karma-FireFox
 
   beforeEach(function () {
     div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>")
@@ -445,6 +446,7 @@ describe('observable array changes', function () {
   })
 
   describe('DOM move capabilities', function () {
+    this.timeout(5000); //For Karma-FireFox
     it('sorting complex data moves 1 DOM node', function () {
       div = $("<div data-bind='foreach: obs'><div data-bind='html: testHtml'></div></div>")
       applyBindings(view, div[0])
@@ -1008,6 +1010,7 @@ describe('observable array changes', function () {
 
 describe('focus', function () {
   let $target
+  this.timeout(5000); //For Karma-FireFox
   beforeEach(function () {
     $target = $("<div data-bind='foreach: $data'>" + '<input />' + '</div>').appendTo(document.body)
     ForEachBinding.setSync(false)
