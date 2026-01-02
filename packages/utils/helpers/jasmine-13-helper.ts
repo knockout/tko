@@ -67,8 +67,6 @@ jasmine.nodeText = function (node) {
 
 jasmine.browserSupportsProtoAssignment = { __proto__: [] } instanceof Array
 
-jasmine.ieVersion = false //TODO: Needs to be dismantled
-
 jasmine.setNodeText = function (node, text: string) {
   if ('textContent' in node) {
     node.textContent = text

@@ -221,21 +221,9 @@ describe('Binding: TextInput', function () {
     applyBindings({ someProp: myObservable }, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
     ;(testNode.children[0] as HTMLInputElement).value = 'some user-entered value' // setting the value triggers the propertychange event on IE
-    if (!jasmine.ieVersion || jasmine.ieVersion >= 9) {
-      triggerEvent(testNode.children[0], 'input')
-    }
-    if (jasmine.ieVersion === 9) {
-      // IE 9 responds to the event asynchronously (see #1788)
-      waitsFor(
-        function () {
-          return myObservable() === 'some user-entered value'
-        },
-        'Timeout',
-        50
-      )
-    } else {
-      expect(myObservable()).toEqual('some user-entered value')
-    }
+
+    triggerEvent(testNode.children[0], 'input')
+    expect(myObservable()).toEqual('some user-entered value')
   })
 
   it('Should update observable on blur event', function () {

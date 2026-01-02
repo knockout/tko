@@ -29,7 +29,6 @@ declare global {
     const undefined: undefined // Legacy Jasmine 1.x sentinel value
 
     let browserSupportsProtoAssignment: any
-    let ieVersion: any
     let updateInterval: number
 
     interface Matchers<T> {

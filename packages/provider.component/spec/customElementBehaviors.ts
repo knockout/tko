@@ -63,28 +63,25 @@ describe('Components: Custom elements', function () {
   })
 
   it('Inserts components into custom elements with matching non-dashed names', function () {
-    if (jasmine.ieVersion || window.HTMLUnknownElement) {
-      // Phantomjs 1.x doesn't include HTMLUnknownElement and will fail this test
-      this.after(function () {
-        components.unregister('somefaroutname')
-      })
-      components.register('somefaroutname', {
-        template: 'custom element <span data-bind="text: 123"></span>',
-        ignoreCustomElementWarning: true
-      })
-      const initialMarkup = '<div>hello <somefaroutname></somefaroutname></div>'
-      testNode.innerHTML = initialMarkup
+    this.after(function () {
+      components.unregister('somefaroutname')
+    })
+    components.register('somefaroutname', {
+      template: 'custom element <span data-bind="text: 123"></span>',
+      ignoreCustomElementWarning: true
+    })
+    const initialMarkup = '<div>hello <somefaroutname></somefaroutname></div>'
+    testNode.innerHTML = initialMarkup
 
-      // Since components are loaded asynchronously, it doesn't show up synchronously
-      applyBindings(null, testNode)
-      expect(testNode).toContainHtml(initialMarkup)
+    // Since components are loaded asynchronously, it doesn't show up synchronously
+    applyBindings(null, testNode)
+    expect(testNode).toContainHtml(initialMarkup)
 
-      // ... but when the component is loaded, it does show up
-      jasmine.Clock.tick(1)
-      expect(testNode).toContainHtml(
-        '<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>'
-      )
-    }
+    // ... but when the component is loaded, it does show up
+    jasmine.Clock.tick(1)
+    expect(testNode).toContainHtml(
+      '<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>'
+    )
   })
 
   it('Does not insert components into standard elements with matching names', function () {

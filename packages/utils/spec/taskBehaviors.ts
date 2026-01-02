@@ -299,14 +299,6 @@ describe('Tasks', function () {
 })
 
 describe('Tasks options.taskScheduler', function () {
-  if (jasmine.ieVersion) {
-    beforeEach(function () {
-      waits(100)
-    })
-    // Workaround for timing-related issues in IE9, where the first few
-    // tasks will not actually run asynchronously (and therefore fail).
-  }
-
   it('Should process tasks asynchronously', function () {
     let runCount = 0
     function func() {

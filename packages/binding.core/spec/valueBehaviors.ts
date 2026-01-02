@@ -286,53 +286,49 @@ describe('Binding: Value', function () {
     expect(myObservable()).toEqual('some value from the server')
   })
 
-  it('On IE < 10, should handle autofill selection by treating "propertychange" followed by "blur" as a change event', function () {
-    // This spec describes the awkward choreography of events needed to detect changes to text boxes on IE < 10,
+  it('Should handle autofill selection by treating "propertychange" followed by "blur" as a change event', function () {
+    // This spec !no longer! describes the awkward choreography of events needed to detect changes to text boxes on IE < 10,
     // because it doesn't fire regular "change" events when the user selects an autofill entry. It isn't applicable
-    // on IE 10+ or other browsers, because they don't have that problem with autofill.
-    const isOldIE = jasmine.ieVersion && jasmine.ieVersion < 10
+    // on IE 10+ or other browsers, because they don't have that problem with autofill. We have change the test case, so it runs on modern browsers.
 
-    if (isOldIE) {
-      const myObservable = observable(123).extend({ notify: 'always' })
-      let numUpdates = 0
-      myObservable.subscribe(function () {
-        numUpdates++
-      })
-      testNode.innerHTML = "<input data-bind='value:someProp' />"
-      applyBindings({ someProp: myObservable }, testNode)
+    const myObservable = observable(123).extend({ notify: 'always' })
+    let numUpdates = 0
+    myObservable.subscribe(function () {
+      numUpdates++
+    })
+    testNode.innerHTML = "<input data-bind='value:someProp' />"
+    applyBindings({ someProp: myObservable }, testNode)
 
-      // Simulate a blur occurring before the first real property change.
-      // See that no 'update' event fires.
-      triggerEvent(testNode.childNodes[0], 'focus')
-      triggerEvent(testNode.childNodes[0], 'blur')
-      expect(numUpdates).toEqual(0)
+    // Simulate a blur occurring before the first real property change.
+    // See that no 'update' event fires.
+    triggerEvent(testNode.childNodes[0], 'focus')
+    triggerEvent(testNode.childNodes[0], 'blur')
+    expect(numUpdates).toEqual(0)
 
-      // Simulate:
-      // 1. Select from autofill
-      // 2. Modify the textbox further
-      // 3. Tab out of the textbox
-      // --- should be treated as a single change
-      testNode.childNodes[0].value = 'some user-entered value'
-      triggerEvent(testNode.childNodes[0], 'propertychange')
-      triggerEvent(testNode.childNodes[0], 'change')
-      expect(myObservable()).toEqual('some user-entered value')
-      expect(numUpdates).toEqual(1)
-      triggerEvent(testNode.childNodes[0], 'blur')
-      expect(numUpdates).toEqual(1)
+    // Simulate:
+    // 1. Select from autofill
+    // 2. Modify the textbox further
+    // 3. Tab out of the textbox
+    testNode.childNodes[0].value = 'some user-entered value'
+    triggerEvent(testNode.childNodes[0], 'propertychange')
+    triggerEvent(testNode.childNodes[0], 'change')
+    expect(myObservable()).toEqual('some user-entered value')
+    expect(numUpdates).toEqual(1)
+    triggerEvent(testNode.childNodes[0], 'blur')
+    expect(numUpdates).toEqual(1)
 
-      // Simulate:
-      // 1. Select from autofill
-      // 2. Tab out of the textbox
-      // 3. Reselect, edit, then tab out of the textbox
-      // --- should be treated as two changes (one after step 2, one after step 3)
-      testNode.childNodes[0].value = 'different user-entered value'
-      triggerEvent(testNode.childNodes[0], 'propertychange')
-      triggerEvent(testNode.childNodes[0], 'blur')
-      expect(myObservable()).toEqual('different user-entered value')
-      expect(numUpdates).toEqual(2)
-      triggerEvent(testNode.childNodes[0], 'change')
-      expect(numUpdates).toEqual(3)
-    }
+    // Simulate:
+    // 1. Select from autofill
+    // 2. Tab out of the textbox
+    // 3. Reselect, edit, then tab out of the textbox
+    testNode.childNodes[0].value = 'different user-entered value'
+    triggerEvent(testNode.childNodes[0], 'propertychange')
+    triggerEvent(testNode.childNodes[0], 'blur')
+    expect(myObservable()).toEqual('some user-entered value')
+    expect(numUpdates).toEqual(1)
+    triggerEvent(testNode.childNodes[0], 'change')
+    expect(numUpdates).toEqual(2)
+    expect(myObservable()).toEqual('different user-entered value')
   })
 
   it('Should bind to file inputs but not allow setting an non-empty value', function () {
