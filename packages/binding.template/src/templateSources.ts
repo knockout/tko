@@ -30,7 +30,8 @@ import { tagNameLower as tagNameLowerFn, setHtml, domData, parseHtmlForTemplateN
 const templateScript = 1,
   templateTextArea = 2,
   templateTemplate = 3,
-  templateElement = 4
+  templateElement = 4,
+  templateAnonymous = 5
 
 export interface TemplateSource {
   //constructor(element: Node);
@@ -55,8 +56,8 @@ function setTemplateDomData(element, data) {
 }
 
 export class domElement implements TemplateSource {
-  domElement: Element | Comment
-  templateType: number
+  protected domElement: Element | Comment
+  protected templateType: number
 
   constructor(element: Element | Comment) {
     this.domElement = element
@@ -143,6 +144,9 @@ export class domElement implements TemplateSource {
 export class anonymousTemplate extends domElement {
   constructor(element: Element | Comment) {
     super(element)
+    //The old prototyp construct uses an empty-constructor from domElement, so templateType and element was 'undefined'.
+    //With the new templateType = templateAnonymous (5) we achieve the same behave in the "nodes" Method
+    this.templateType = templateAnonymous
   }
 
   override text(): string
