@@ -11,7 +11,6 @@ declare global {
     amdRequire: any
     require: any
     jQuery: JQueryStatic
-    innerShiv // TODO: For IE<9.. we could also remove it
   }
 
   //Jasmine and Mocha define duplicated functions, is a problem for the type system
@@ -30,7 +29,6 @@ declare global {
     const undefined: undefined // Legacy Jasmine 1.x sentinel value
 
     let browserSupportsProtoAssignment: any
-    let ieVersion: any
     let updateInterval: number
 
     interface Matchers<T> {
