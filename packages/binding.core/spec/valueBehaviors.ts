@@ -310,7 +310,7 @@ describe('Binding: Value', function () {
     // 2. Modify the textbox further
     // 3. Tab out of the textbox
     testNode.childNodes[0].value = 'some user-entered value'
-    triggerEvent(testNode.childNodes[0], 'propertychange')
+    //IE: triggerEvent(testNode.childNodes[0], 'propertychange')
     triggerEvent(testNode.childNodes[0], 'change')
     expect(myObservable()).toEqual('some user-entered value')
     expect(numUpdates).toEqual(1)
@@ -322,7 +322,7 @@ describe('Binding: Value', function () {
     // 2. Tab out of the textbox
     // 3. Reselect, edit, then tab out of the textbox
     testNode.childNodes[0].value = 'different user-entered value'
-    triggerEvent(testNode.childNodes[0], 'propertychange')
+    //IE: triggerEvent(testNode.childNodes[0], 'propertychange')
     triggerEvent(testNode.childNodes[0], 'blur')
     expect(myObservable()).toEqual('some user-entered value')
     expect(numUpdates).toEqual(1)

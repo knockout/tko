@@ -29,6 +29,35 @@ describe('Binding: TextInput', function () {
     bindingHandlers.set(coreBindings)
   })
 
+  it('User-Agent detection IE10 + IE11', function () {
+    let uaList = [
+      { agent: 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/7.0', version: 9 },
+      { agent: 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)', version: 10 },
+      { agent: 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko', version: 11 },
+      {
+        agent:
+          'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0',
+        version: null
+      },
+      {
+        agent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
+        version: null
+      },
+      {
+        agent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15',
+        version: null
+      }
+    ]
+
+    uaList.forEach(userAgent => {
+      let match = userAgent['agent'].match(/MSIE ([^ ;]+)|rv:([^ )]+)/)
+      let ieVersion = match && (parseFloat(match[1]) || parseFloat(match[2]))
+      expect(ieVersion).toBe(userAgent['version'])
+    })
+  })
+
   it('Should assign the value to the node', function () {
     testNode.innerHTML = "<input data-bind='textInput:123' />"
     applyBindings(null, testNode)

@@ -4,7 +4,7 @@ import { unwrap } from '@tko/observable'
 
 import { BindingHandler } from '@tko/bind'
 
-let operaVersion, safariVersion, firefoxVersion
+let operaVersion, safariVersion, firefoxVersion, ieVersion
 
 /**
  * TextInput binding handler for modern browsers (legacy below).
@@ -100,6 +100,13 @@ class TextInput extends BindingHandler {
   }
 }
 
+class TextInputIE extends TextInput {
+  override eventsIndicatingSyncValueChange() {
+    //keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
+    return [...super.eventsIndicatingSyncValueChange(), 'keypress']
+  }
+}
+
 // Safari <5 doesn't fire the 'input' event for <textarea> elements (it does fire 'textInput'
 // but only when typing). So we'll just catch as much as we can with keydown, cut, and paste.
 class TextInputLegacySafari extends TextInput {
@@ -134,17 +141,23 @@ if (w.navigator) {
   const parseVersion = matches => matches && parseFloat(matches[1])
   const userAgent = w.navigator.userAgent
   const isChrome = userAgent.match(/Chrome\/([^ ]+)/)
-  // Detect various browser versions because some old versions don't fully support the 'input' event
-  operaVersion = w.opera && w.opera.version && parseInt(w.opera.version())
-  safariVersion = parseVersion(userAgent.match(/Version\/([^ ]+) Safari/))
-  firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/))
+  if (!isChrome) {
+    // Detect various browser versions because some old versions don't fully support the 'input' event
+    operaVersion = w.opera && w.opera.version && parseInt(w.opera.version())
+    safariVersion = parseVersion(userAgent.match(/Version\/([^ ]+) Safari/))
+    firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/))
+    const ieMatch = userAgent.match(/MSIE ([^ ;]+)|rv:([^ )]+)/)
+    ieVersion = ieMatch && (parseFloat(ieMatch[1]) || parseFloat(ieMatch[2]))
+  }
 }
 
 export const textInput =
-  safariVersion && safariVersion < 5
-    ? TextInputLegacySafari
-    : operaVersion < 11
-      ? TextInputLegacyOpera
-      : firefoxVersion && firefoxVersion < 4
-        ? TextInputLegacyFirefox
-        : TextInput
+  ieVersion && ieVersion <= 11
+    ? TextInputIE
+    : safariVersion && safariVersion < 5
+      ? TextInputLegacySafari
+      : operaVersion && operaVersion < 11
+        ? TextInputLegacyOpera
+        : firefoxVersion && firefoxVersion < 4
+          ? TextInputLegacyFirefox
+          : TextInput

@@ -67,7 +67,7 @@ export class value extends BindingHandler {
       && this.$element.type == 'text'
       && this.$element.autocomplete != 'off'
       && (!this.$element.form || this.$element.form.autocomplete != 'off')
-      && (window.navigator.userAgent.match(/MSIE ([^ ]+)/) || window.navigator.userAgent.match(/rv:([^ )]+)/)) //only if IE10 or IE11
+      && window.navigator.userAgent.match(/MSIE ([^ ;]+)|rv:([^ )]+)/) //only if IE10 or IE11
     )
   }
 

@@ -18,25 +18,21 @@ function isSafeKey(key: string): boolean {
  * prevents using it cross-window, so instead we just store the data directly
  * on the node. See https://github.com/knockout/knockout/issues/2141
  */
-const modern = {
-  getDataForNode(node: Node, createIfNotFound: boolean) {
-    let dataForNode = node[dataStoreSymbol]
-    if (!dataForNode && createIfNotFound) {
-      dataForNode = node[dataStoreSymbol] = {}
-    }
-    return dataForNode
-  },
-
-  clear(node: Node) {
-    if (node[dataStoreSymbol]) {
-      delete node[dataStoreSymbol]
-      return true
-    }
-    return false
+function getDataForNode(node: Node, createIfNotFound: boolean): any {
+  let dataForNode = node[dataStoreSymbol]
+  if (!dataForNode && createIfNotFound) {
+    dataForNode = node[dataStoreSymbol] = {}
   }
+  return dataForNode
 }
 
-const { getDataForNode, clear } = modern
+function clear(node: Node): boolean {
+  if (node[dataStoreSymbol]) {
+    delete node[dataStoreSymbol]
+    return true
+  }
+  return false
+}
 
 /**
  * Create a unique key-string identifier.
