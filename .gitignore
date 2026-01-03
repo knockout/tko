@@ -19,7 +19,10 @@ node_modules
 
 # Knockout built files
 _repo
-coverage/
+coverage
+coverage-temp
+builds/**/meta
+.nyc_output
 **/dist/*
 !packages/tko/dist/*
 
