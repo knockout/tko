@@ -8,8 +8,7 @@
     "@tko/lifecycle": "^4.0.0-beta1.3",
     "@tko/observable": "^4.0.0-beta1.3",
     "@tko/provider": "^4.0.0-beta1.3",
-    "@tko/utils": "^4.0.0-beta1.3",
-    "tslib": "^2.2.0"
+    "@tko/utils": "^4.0.0-beta1.3"
   },
   "peerDependencies": {
     "@tko/binding.foreach": "^4.0.0-alpha9.0"

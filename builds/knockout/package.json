@@ -60,8 +60,7 @@
     "@tko/provider.multi": "^4.0.0-beta1.3",
     "@tko/provider.virtual": "^4.0.0-beta1.6",
     "@tko/utils.component": "^4.0.0-beta1.3",
-    "@tko/utils.functionrewrite": "^4.0.0-beta1.3",
-    "tslib": "^2.2.0"
+    "@tko/utils.functionrewrite": "^4.0.0-beta1.3"
   },
   "exports": {
     ".": {

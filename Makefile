@@ -51,6 +51,9 @@ format-fix:
 tsc:
 	$(NPX) tsc
 
+knip:
+	$(NPX) knip
+
 eslint:
 	$(NPX) eslint .
 

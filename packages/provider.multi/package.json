@@ -9,8 +9,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0-beta1.3",
-    "tslib": "^2.2.0"
+    "@tko/bind": "^4.0.0-beta1.3",
+    "@tko/provider": "^4.0.0-beta1.3"
   },
   "karma": {
     "frameworks": [

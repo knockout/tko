@@ -9,7 +9,7 @@ import type { Observable } from '@tko/observable'
 
 import { contextAncestorBindingInfo } from './bindingEvent'
 
-import { BindingContextExtendCallback } from './applyBindings'
+import type { BindingContextExtendCallback } from './applyBindings'
 
 export const boundElementDomDataKey = domData.nextKey()
 

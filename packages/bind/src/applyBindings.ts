@@ -16,7 +16,7 @@ import { dependencyDetection } from '@tko/observable'
 
 import type { Observable } from '@tko/observable'
 
-import { Computed, computed } from '@tko/computed'
+import { type Computed, computed } from '@tko/computed'
 
 import { dataFor, bindingContext, boundElementDomDataKey, contextSubscribeSymbol } from './bindingContext'
 
