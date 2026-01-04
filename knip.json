@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true,
+    "class": true,
+    "variable": true
+  },
+  "tags": [
+    "-lintignore"
+  ],
+  "ignoreDependencies": ["@types/mocha", "chai", "electron", "esbuild", "fs-extra", "karma", "karma-[.]*", "mocha", "nyc", "prettier", "sinon", "lerna"],
+  "workspaces": {
+    "packages/*": {
+      "entry": "src/index.ts",
+      "project": "src/*.ts",
+      "ignore": ["/helpers/**"]
+    }
+  },
+  "ignoreWorkspaces": ["builds/**", "docs/**", "tko.io/**", "tools/**"]
+}

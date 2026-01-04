@@ -464,4 +464,4 @@ export class JsxObserver extends LifeCycle {
   }
 }
 
-export default JsxObserver
+//Duplicated export default JsxObserver

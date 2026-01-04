@@ -1,4 +1,4 @@
-import { Provider } from '@tko/provider'
+import type { Provider } from '@tko/provider'
 import type { KnockoutInstance } from '@tko/builder'
 
 export interface CustomBindingGlobalProperties {
