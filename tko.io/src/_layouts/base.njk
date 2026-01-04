@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} - TKO</title>
+  <link rel="stylesheet" href="{{ '/css/tko.css' | url }}">
+</head>
+<body>
+  <nav class="top-bar">
+    <div class="tko">TKO</div>
+    <a href="{{ '/' | url }}">Introduction</a>
+    <a class="external" href="https://github.com/knockout/tko">Github</a>
+  </nav>
+
+  <nav class="sidebar">
+    <div class="toc">
+      <a href="{{ '/' | url }}" class="section">Introduction</a>
+      <a href="{{ '/3to4' | url }}" class="section">Knockout 3 to 4 Guide</a>
+
+      <div class="section">Bindings</div>
+      {%- for page in collections.bindingDocs -%}
+        <a href="{{ page.url | url }}" class="subheading binding-name"><code>{{ page.fileSlug | formatBindingName }}</code></a>
+      {%- endfor -%}
+
+      <div class="section">Observables</div>
+      {%- for page in collections.observableDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Computed</div>
+      {%- for page in collections.computedDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Components</div>
+      {%- for page in collections.componentDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Binding Context</div>
+      {%- for page in collections.bindingContextDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+
+      <div class="section">Advanced</div>
+      {%- for page in collections.advancedDocs -%}
+        <a href="{{ page.url | url }}" class="subheading">{{ page.fileSlug | formatTitle }}</a>
+      {%- endfor -%}
+    </div>
+  </nav>
+
+  <main>
+    {{ content | safe }}
+  </main>
+
+  <script type="module" src="{{ '/js/examples.js' | url }}"></script>
+</body>
+</html>
