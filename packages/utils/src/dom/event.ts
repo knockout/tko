@@ -56,7 +56,7 @@ export function registerEventHandler(
   } else if (typeof element.addEventListener === 'function') {
     element.addEventListener(eventType, wrappedHandler, eventOptions)
   } else {
-    throw new Error("Browser doesn't support addEventListener or attachEvent")
+    throw new Error("Browser doesn't support addEventListener")
   }
 }
 
