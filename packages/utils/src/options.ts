@@ -1,5 +1,4 @@
-import type { Provider } from '@tko/provider'
-import type { KnockoutInstance } from '@tko/builder'
+import type { IKnockoutInstance, IProvider } from './generalTypes'
 
 export interface CustomBindingGlobalProperties {
   [customBindingName: string]: any
@@ -17,7 +16,7 @@ export class Options {
   bindingStringPreparsers: BindingStringPreparsersFunction[] = []
 
   // Reference to the own knockout instance
-  knockoutInstance: KnockoutInstance | null = null
+  knockoutInstance: IKnockoutInstance | null = null
 
   deferUpdates: boolean = false
 
@@ -39,7 +38,7 @@ export class Options {
   bindingGlobals: object & CustomBindingGlobalProperties = Object.create(null)
 
   // An instance of the binding provider.
-  bindingProviderInstance: Provider
+  bindingProviderInstance: IProvider
 
   // Whether the `with` binding creates a child context when used with `as`.
   createChildContextWithAs: boolean = false

@@ -1,6 +1,7 @@
 import { options } from '@tko/utils'
+import type { IBindingHandlerObject } from '@tko/utils'
 
-export default class BindingHandlerObject {
+export default class BindingHandlerObject implements IBindingHandlerObject {
   set(nameOrObject: string | object, value?: string | object) {
     if (typeof nameOrObject === 'string') {
       this[nameOrObject] = value

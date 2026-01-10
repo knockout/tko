@@ -1,5 +1,4 @@
-import { extend, options, domData, isObjectLike } from '@tko/utils'
-import type { KnockoutInstance } from '@tko/builder'
+import { extend, options, domData, isObjectLike, type IKnockoutInstance } from '@tko/utils'
 
 import { pureComputed } from '@tko/computed'
 
@@ -23,7 +22,7 @@ export interface BindingContextSetting {
 }
 
 export interface BindingContext<T = any> {
-  ko: KnockoutInstance
+  ko: IKnockoutInstance
 
   [symbol: symbol]: any
   $parent?: any

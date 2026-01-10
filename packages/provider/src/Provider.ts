@@ -5,6 +5,7 @@ import { dependencyDetection } from '@tko/observable'
 import BindingHandlerObject from './BindingHandlerObject'
 
 import type { BindingContext } from '@tko/bind'
+import type { BindingAccessors, IProvider } from '@tko/utils'
 
 export interface ProviderParamsInput {
   bindingHandlers?: BindingHandlerObject
@@ -14,9 +15,7 @@ export interface ProviderParamsInput {
   providers?: any[]
 }
 
-export type BindingAccessors = { [name: string]: Function }
-
-export default class Provider {
+export default class Provider implements IProvider {
   constructor(params?: ProviderParamsInput | null) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')

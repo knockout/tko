@@ -37,7 +37,8 @@ import {
   tasks,
   toggleDomNodeCssClass,
   triggerEvent,
-  virtualElements
+  virtualElements,
+  type IKnockoutInstance
 } from '@tko/utils'
 
 import { parseObjectLiteral } from '@tko/utils.parser'
@@ -170,7 +171,7 @@ const utils: Utils = {
   unwrapObservable: unwrap
 }
 
-export type KnockoutInstance = {
+export type KnockoutInstance = IKnockoutInstance & {
   // --- Utilities ---
   cleanNode: typeof cleanNode
   dependencyDetection: typeof dependencyDetection
@@ -178,7 +179,7 @@ export type KnockoutInstance = {
   filters: typeof options.filters
   ignoreDependencies: typeof dependencyDetection.ignore
   memoization: typeof memoization
-  options: typeof options
+  //Type merging from IKnockoutInstance options: typeof options
   removeNode: typeof removeNode
   selectExtensions: typeof selectExtensions
   tasks: typeof tasks
