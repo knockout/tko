@@ -1,10 +1,12 @@
-import { ieVersion, safeSetTimeout, options, arrayForEach, domData, registerEventHandler } from '@tko/utils'
+import { safeSetTimeout, options, arrayForEach } from '@tko/utils'
 
 import { unwrap } from '@tko/observable'
 
 import { BindingHandler } from '@tko/bind'
 
-let operaVersion, safariVersion, firefoxVersion
+export const MSIE_REGEX = /MSIE ([^ ;]+)|rv:([^ )]+)/
+
+let operaVersion, safariVersion, firefoxVersion, ieVersion
 
 /**
  * TextInput binding handler for modern browsers (legacy below).
@@ -100,94 +102,10 @@ class TextInput extends BindingHandler {
   }
 }
 
-/**
- * Legacy Input Classes, below
- */
 class TextInputIE extends TextInput {
-  activeElement: any
-  constructor(...args: [any]) {
-    super(...args)
-
-    let version: number
-    if (ieVersion instanceof Array) {
-      version = parseInt(ieVersion[1], 10)
-    } else {
-      version = ieVersion ?? 0
-    }
-    if (version < 11) {
-      // Internet Explorer <= 8 doesn't support the 'input' event, but does include 'propertychange' that fires whenever
-      // any property of an element changes. Unlike 'input', it also fires if a property is changed from JavaScript code,
-      // but that's an acceptable compromise for this binding. IE 9 and 10 support 'input', but since they don't always
-      // fire it when using autocomplete, we'll use 'propertychange' for them also.
-      this.addEventListener('propertychange', event => event.propertyName === 'value' && this.updateModel(event))
-    }
-
-    if (version >= 8 && version < 10) {
-      //this.watchForSelectionChangeEvent() //FIXME: Cannot work without element => EXCEPTION
-      this.addEventListener('dragend', 'deferUpdateModel')
-    }
-  }
-
   override eventsIndicatingSyncValueChange() {
     //keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
     return [...super.eventsIndicatingSyncValueChange(), 'keypress']
-  }
-
-  // IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
-  // But it does fire the 'selectionchange' event on many of those, presumably because the
-  // cursor is moving and that counts as the selection changing. The 'selectionchange' event is
-  // fired at the document level only and doesn't directly indicate which element changed. We
-  // set up just one event handler for the document and use 'activeElement' to determine which
-  // element was changed.
-  selectionChangeHandler(event) {
-    const target = this.activeElement
-
-    const handler = target && domData.get(target, 'selectionChangeHandlerName')
-    if (handler) {
-      handler(event)
-    }
-  }
-
-  // All variables are not found!
-  watchForSelectionChangeEvent(element?) {
-    if (!element) throw new Error('Broken IE-Support: 8 to 9')
-
-    const ownerDoc = element.ownerDocument
-
-    if (!domData.get(ownerDoc, 'selectionChangeRegisteredName')) {
-      domData.set(ownerDoc, 'selectionChangeRegisteredName', true)
-      registerEventHandler(ownerDoc, 'selectionchange', this.selectionChangeHandler.bind(ownerDoc))
-    }
-    //domData.set(ownerDoc, 'selectionChangeRegisteredName', handler) //FIXME: handler not defined
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
-// But it does fire the 'selectionchange' event on many of those, presumably because the
-// cursor is moving and that counts as the selection changing. The 'selectionchange' event is
-// fired at the document level only and doesn't directly indicate which element changed. We
-// set up just one event handler for the document and use 'activeElement' to determine which
-// element was changed.
-class TextInputIE9 extends TextInputIE {
-  override updateModel(...args: [any]) {
-    // IE9 will mess up the DOM if you handle events synchronously which results in DOM changes (such as other bindings);
-    // so we'll make sure all updates are asynchronous
-    this.deferUpdateModel(...args)
-  }
-}
-
-class TextInputIE8 extends TextInputIE {
-  eventsIndicatingValueChange() {
-    // IE 8 has a bug where it fails to fire 'propertychange' on the first update following a value change from
-    // JavaScript code. It also doesn't fire if you clear the entire value. To fix this, we bind to the following
-    // events too.
-    // keypress: All versions (including 11) of Internet Explorer have a bug that they don't generate an input or propertychange event when ESC is pressed
-    // keyup: A single keystoke
-    // keydown: First character when a key is held down
-
-    return [...super.eventsIndicatingSyncValueChange(), 'keyup', 'keydown']
   }
 }
 
@@ -225,23 +143,23 @@ if (w.navigator) {
   const parseVersion = matches => matches && parseFloat(matches[1])
   const userAgent = w.navigator.userAgent
   const isChrome = userAgent.match(/Chrome\/([^ ]+)/)
-  // Detect various browser versions because some old versions don't fully support the 'input' event
-  operaVersion = w.opera && w.opera.version && parseInt(w.opera.version())
-  safariVersion = parseVersion(userAgent.match(/Version\/([^ ]+) Safari/))
-  firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/))
+  if (!isChrome) {
+    // Detect various browser versions because some old versions don't fully support the 'input' event
+    operaVersion = w.opera && w.opera.version && parseInt(w.opera.version())
+    safariVersion = parseVersion(userAgent.match(/Version\/([^ ]+) Safari/))
+    firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/))
+    const ieMatch = userAgent.match(MSIE_REGEX)
+    ieVersion = ieMatch && (parseFloat(ieMatch[1]) || parseFloat(ieMatch[2]))
+  }
 }
 
 export const textInput =
-  ieVersion === 8
-    ? TextInputIE8
-    : ieVersion === 9
-      ? TextInputIE9
-      : ieVersion
-        ? TextInputIE
-        : safariVersion && safariVersion < 5
-          ? TextInputLegacySafari
-          : operaVersion < 11
-            ? TextInputLegacyOpera
-            : firefoxVersion && firefoxVersion < 4
-              ? TextInputLegacyFirefox
-              : TextInput
+  ieVersion && ieVersion <= 11
+    ? TextInputIE
+    : safariVersion && safariVersion < 5
+      ? TextInputLegacySafari
+      : operaVersion && operaVersion < 11
+        ? TextInputLegacyOpera
+        : firefoxVersion && firefoxVersion < 4
+          ? TextInputLegacyFirefox
+          : TextInput
