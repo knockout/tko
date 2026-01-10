@@ -97,7 +97,7 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
 - CSP compliant
 - JSX/TSX support
 
-## Zero-dependency and small sized - bundled only ~130KB
+## Zero-dependency and small sized - with all plugins, bundled only ~125KB
 
 Created with https://esbuild.github.io/analyze/
 ![Bundled only 130KB](assets/esbuild_analyzer.png)
