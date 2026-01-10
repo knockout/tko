@@ -100,7 +100,7 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
 ## Zero-dependency and small sized - with all plugins, bundled only ~125KB
 
 Created with https://esbuild.github.io/analyze/
-![Bundled only 130KB](assets/esbuild_analyzer.png)
+![Bundled only 125KB](assets/esbuild_analyzer.png)
 
 ## JQUERY and TKO
 
