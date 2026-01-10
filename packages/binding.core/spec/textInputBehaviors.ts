@@ -1,14 +1,10 @@
 /* global testNode */
 import { applyBindings } from '@tko/bind'
-
 import { computed } from '@tko/computed'
-
 import { observable } from '@tko/observable'
-
 import { triggerEvent, options } from '@tko/utils'
-
 import { DataBindProvider } from '@tko/provider.databind'
-
+import { MSIE_REGEX } from '../src/textInput'
 import { bindings as coreBindings } from '../dist'
 
 const DEBUG = true
@@ -52,9 +48,16 @@ describe('Binding: TextInput', function () {
     ]
 
     uaList.forEach(userAgent => {
-      let match = userAgent['agent'].match(/MSIE ([^ ;]+)|rv:([^ )]+)/)
+      let match = userAgent['agent'].match(MSIE_REGEX)
       let ieVersion = match && (parseFloat(match[1]) || parseFloat(match[2]))
       expect(ieVersion).toBe(userAgent['version'])
+
+      if (userAgent['version'] == null) {
+        expect(match).toBeFalsy()
+      } else {
+        expect(match).toBeTruthy()
+        expect(MSIE_REGEX.test(userAgent['agent'])).toBeTruthy()
+      }
     })
   })
 
