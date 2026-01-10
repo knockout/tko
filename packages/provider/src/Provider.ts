@@ -5,6 +5,7 @@ import { dependencyDetection } from '@tko/observable'
 import BindingHandlerObject from './BindingHandlerObject'
 
 import type { BindingContext } from '@tko/bind'
+
 import type { BindingAccessors, IProvider } from '@tko/utils'
 
 export interface ProviderParamsInput {
@@ -54,7 +55,8 @@ export default class Provider implements IProvider {
   preprocessNode(node: Node): Node[] | null {
     return [node]
   }
-  postProcess(/* node */) {}
+
+  //TODO unused hook? postProcess(/* node */) {}
 
   bindingHandlers: BindingHandlerObject
   globals: any | undefined
@@ -88,7 +90,7 @@ export default class Provider implements IProvider {
 
   // Given a bindings function or object, create and return a new object that contains
   // binding value-accessors functions. This is used by ko.applyBindingsToNode.
-  makeBindingAccessors(bindings, context, node) {
+  makeBindingAccessors(bindings: any, context: any, node: Node): BindingAccessors {
     if (typeof bindings === 'function') {
       return this.makeAccessorsFromFunction(bindings.bind(null, context, node))
     } else {

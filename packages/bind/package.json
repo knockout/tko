@@ -7,7 +7,6 @@
     "@tko/computed": "^4.0.0-beta1.3",
     "@tko/lifecycle": "^4.0.0-beta1.3",
     "@tko/observable": "^4.0.0-beta1.3",
-    "@tko/provider": "^4.0.0-beta1.3",
     "@tko/utils": "^4.0.0-beta1.3"
   },
   "peerDependencies": {

@@ -55,11 +55,6 @@ export interface IProvider {
   preprocessNode(node: Node): Node[] | null
 
   /**
-   * Optional post-processing hook invoked after bindings are applied.
-   */
-  postProcess?(node?: Node): void
-
-  /**
    * The provider's registered binding handlers collection.
    */
   bindingHandlers: IBindingHandlerObject
@@ -68,5 +63,11 @@ export interface IProvider {
    * Getter/setter used for legacy compatibility when assigning the global
    * binding provider instance (ko.bindingProvider.instance).
    */
-  instance: IProvider | any
+  instance: IProvider
+
+  /**
+   * Given a bindings function or object, create and return a new object that contains
+   * binding value-accessors functions. This is used by ko.applyBindingsToNode.
+   */
+  makeBindingAccessors(bindings: any, context: any, node: Node): BindingAccessors
 }

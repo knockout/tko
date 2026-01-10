@@ -7,7 +7,7 @@
     "module": "ES2015",
     "moduleResolution": "node",
     "allowJs": false,
-    "importHelpers": true,
+    "importHelpers": false,
     "allowSyntheticDefaultImports":  true,
     "strict": true,
     "baseUrl": ".",

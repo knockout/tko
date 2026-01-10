@@ -1,4 +1,4 @@
-import type { IKnockoutInstance, IProvider } from './generalTypes'
+import type { IKnockoutInstance, IProvider } from './interfaces'
 
 export interface CustomBindingGlobalProperties {
   [customBindingName: string]: any
