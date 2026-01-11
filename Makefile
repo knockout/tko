@@ -52,7 +52,7 @@ tsc:
 	$(NPX) tsc
 
 knip:
-	$(NPX) knip
+	$(NPX) knip --no-config-hints
 
 eslint:
 	$(NPX) eslint .
