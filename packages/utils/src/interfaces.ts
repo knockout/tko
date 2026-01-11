@@ -1,12 +1,46 @@
+import {
+  arrayFilter,
+  arrayFirst,
+  arrayForEach,
+  arrayGetDistinctValues,
+  arrayIndexOf,
+  arrayMap,
+  arrayPushAll,
+  arrayRemoveItem,
+  addOrRemoveItem,
+  compareArrays,
+  range
+} from './array'
+
+import { extend, objectForEach, objectMap } from './object'
 import type { Options } from './options'
+import { createSymbolOrString } from './symbol'
 
 export interface IBindingHandlerObject {
   set(nameOrObject: string | object, value?: string | object): void
   get(nameOrDotted: string): any
 }
 
-export interface IKnockoutInstance {
-  utils: any
+export interface IArrayAndObjectUtils {
+  addOrRemoveItem: typeof addOrRemoveItem
+  arrayFilter: typeof arrayFilter
+  arrayFirst: typeof arrayFirst
+  arrayForEach: typeof arrayForEach
+  arrayGetDistinctValues: typeof arrayGetDistinctValues
+  arrayIndexOf: typeof arrayIndexOf
+  arrayMap: typeof arrayMap
+  arrayPushAll: typeof arrayPushAll
+  arrayRemoveItem: typeof arrayRemoveItem
+  compareArrays: typeof compareArrays
+  createSymbolOrString: typeof createSymbolOrString
+  extend: typeof extend
+  objectForEach: typeof objectForEach
+  objectMap: typeof objectMap
+  range: typeof range
+}
+
+export interface IKnockoutUtilsInstance {
+  utils: IArrayAndObjectUtils
   options: Options
 }
 

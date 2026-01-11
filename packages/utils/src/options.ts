@@ -1,4 +1,4 @@
-import type { IKnockoutInstance, IProvider } from './interfaces'
+import type { IKnockoutUtilsInstance, IProvider } from './interfaces'
 
 export interface CustomBindingGlobalProperties {
   [customBindingName: string]: any
@@ -16,7 +16,7 @@ export class Options {
   bindingStringPreparsers: BindingStringPreparsersFunction[] = []
 
   // Reference to the own knockout instance
-  knockoutInstance: IKnockoutInstance | null = null
+  knockoutInstance: IKnockoutUtilsInstance | null = null
 
   deferUpdates: boolean = false
 

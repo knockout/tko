@@ -66,6 +66,9 @@ dts:
 docker-build:
 	$(DOCKER) build . --tag tko
 
+lerna-check:
+	$(LERNA) exec --stream -- true
+
 # Run the `repackage` target in every directory.  Essentially
 # homogenizes the `package.json`.
 repackage: tools/repackage.mjs
