@@ -1,14 +1,10 @@
 /* global testNode */
 import { applyBindings } from '@tko/bind'
-
 import { computed } from '@tko/computed'
-
 import { observable } from '@tko/observable'
-
 import { triggerEvent, options } from '@tko/utils'
-
 import { DataBindProvider } from '@tko/provider.databind'
-
+import { MSIE_REGEX } from '../src/textInput'
 import { bindings as coreBindings } from '../dist'
 
 const DEBUG = true
@@ -27,6 +23,42 @@ describe('Binding: TextInput', function () {
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
+  })
+
+  it('User-Agent detection for Internet Explorer', function () {
+    let uaList = [
+      { agent: 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/7.0', version: 9 },
+      { agent: 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)', version: 10 },
+      { agent: 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko', version: 11 },
+      {
+        agent:
+          'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0',
+        version: null
+      },
+      {
+        agent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
+        version: null
+      },
+      {
+        agent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15',
+        version: null
+      }
+    ]
+
+    uaList.forEach(userAgent => {
+      let match = userAgent['agent'].match(MSIE_REGEX)
+      let ieVersion = match && (parseFloat(match[1]) || parseFloat(match[2]))
+      expect(ieVersion).toBe(userAgent['version'])
+
+      if (userAgent['version'] == null) {
+        expect(match).toBeFalsy()
+      } else {
+        expect(match).toBeTruthy()
+        expect(MSIE_REGEX.test(userAgent['agent'])).toBeTruthy()
+      }
+    })
   })
 
   it('Should assign the value to the node', function () {
@@ -221,21 +253,9 @@ describe('Binding: TextInput', function () {
     applyBindings({ someProp: myObservable }, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).toEqual('123')
     ;(testNode.children[0] as HTMLInputElement).value = 'some user-entered value' // setting the value triggers the propertychange event on IE
-    if (!jasmine.ieVersion || jasmine.ieVersion >= 9) {
-      triggerEvent(testNode.children[0], 'input')
-    }
-    if (jasmine.ieVersion === 9) {
-      // IE 9 responds to the event asynchronously (see #1788)
-      waitsFor(
-        function () {
-          return myObservable() === 'some user-entered value'
-        },
-        'Timeout',
-        50
-      )
-    } else {
-      expect(myObservable()).toEqual('some user-entered value')
-    }
+
+    triggerEvent(testNode.children[0], 'input')
+    expect(myObservable()).toEqual('some user-entered value')
   })
 
   it('Should update observable on blur event', function () {

@@ -1,17 +1,17 @@
 # Coverage-Report
-Date: 2025-12-29
+Date: 2026-01-10
 
 File                                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s  
 --------------------------------------|---------|----------|---------|---------|--------------------
-All files                             |   88.21 |    80.71 |   84.94 |   88.15 |                    
+All files                             |   89.73 |    83.31 |   86.25 |   89.77 |                    
  builds/reference/src                 |   71.42 |      100 |       0 |     100 |                    
   index.ts                            |   71.42 |      100 |       0 |     100 |                    
- packages/bind/dist                   |   96.16 |     89.4 |   96.55 |   96.05 |                    
+ packages/bind/dist                   |   96.37 |    90.78 |   96.55 |   96.27 |                    
   BindingHandler.js                   |   93.33 |       75 |   84.61 |    93.1 | 32,47              
   BindingResult.js                    |     100 |      100 |     100 |     100 |                    
   DescendantBindingHandler.js         |     100 |      100 |     100 |     100 |                    
   LegacyBindingHandler.js             |   95.12 |    88.88 |    92.3 |   95.12 | 9,89               
-  applyBindings.js                    |   93.58 |    84.61 |     100 |    93.4 | ...316,319,336-343 
+  applyBindings.js                    |   94.11 |     87.5 |     100 |   93.95 | ...316,319,336-343 
   arrayToDomNodeChildren.js           |   99.08 |     97.5 |     100 |   99.01 | 51                 
   bindingContext.js                   |   98.52 |    93.18 |     100 |   98.52 | 26                 
   bindingEvent.js                     |     100 |      100 |     100 |     100 |                    
@@ -25,27 +25,27 @@ All files                             |   88.21 |    80.71 |   84.94 |   88.15 |
   componentBinding.js                 |    97.1 |    93.33 |     100 |   97.01 | 19,120             
   index.js                            |     100 |      100 |     100 |     100 |                    
   slotBinding.js                      |     100 |    91.66 |     100 |     100 | 11                 
- packages/binding.core/dist           |   90.12 |    83.33 |   82.22 |   90.68 |                    
+ packages/binding.core/dist           |   93.17 |    87.19 |   88.09 |   93.73 |                    
   attr.js                             |   94.73 |     87.5 |     100 |   94.73 | 15                 
   checked.js                          |   98.33 |    97.77 |     100 |   98.11 | 72                 
   click.js                            |     100 |      100 |     100 |     100 |                    
   css.js                              |     100 |      100 |     100 |     100 |                    
-  descendantsComplete.js              |      25 |        0 |       0 |      25 | 6-11               
+  descendantsComplete.js              |      50 |        0 |      50 |      50 | 6-7                
   enableDisable.js                    |     100 |      100 |     100 |     100 |                    
   event.js                            |     100 |      100 |     100 |     100 |                    
   hasfocus.js                         |   93.75 |    92.85 |     100 |   93.75 | 17,44              
   html.js                             |     100 |      100 |     100 |     100 |                    
   index.js                            |     100 |      100 |     100 |     100 |                    
   let.js                              |     100 |      100 |     100 |     100 |                    
-  options.js                          |   97.43 |    93.54 |     100 |   97.18 | 43,142             
+  options.js                          |    97.4 |    93.54 |     100 |   97.14 | 42,140             
   selectedOptions.js                  |     100 |      100 |     100 |     100 |                    
   style.js                            |   93.75 |    83.33 |     100 |   93.33 | 14                 
   submit.js                           |   83.33 |       50 |     100 |   83.33 | 7,19               
   text.js                             |     100 |      100 |     100 |     100 |                    
-  textInput.js                        |   65.85 |    50.87 |    42.1 |   67.08 | ...122,127,132,137 
+  textInput.js                        |   79.03 |    58.69 |   53.84 |   80.32 | ...0,85,90,108-112 
   uniqueName.js                       |     100 |      100 |     100 |     100 |                    
   using.js                            |     100 |      100 |     100 |     100 |                    
-  value.js                            |   87.93 |    76.31 |      80 |   92.59 | 19-21,70           
+  value.js                            |   87.93 |    86.84 |      80 |   92.59 | 19-21,70           
   visible.js                          |     100 |      100 |     100 |     100 |                    
  packages/binding.foreach/dist        |   92.18 |    86.08 |   93.02 |   91.59 |                    
   foreach.js                          |   92.11 |    86.08 |   93.02 |   91.51 | ...290,332,404,416 
@@ -56,12 +56,12 @@ All files                             |   88.21 |    80.71 |   84.94 |   88.15 |
   ifUnless.js                         |     100 |      100 |     100 |     100 |                    
   index.js                            |     100 |      100 |     100 |     100 |                    
   with.js                             |     100 |    85.71 |     100 |     100 | 18                 
- packages/binding.template/dist       |   89.18 |     80.9 |    91.3 |   88.97 |                    
+ packages/binding.template/dist       |    93.3 |    89.52 |    91.3 |    93.2 |                    
   foreach.js                          |     100 |      100 |     100 |     100 |                    
   index.js                            |     100 |      100 |     100 |     100 |                    
-  nativeTemplateEngine.js             |   86.66 |    41.66 |     100 |   84.61 | 13,19              
+  nativeTemplateEngine.js             |      80 |       50 |     100 |      80 | 15-16              
   templateEngine.js                   |      75 |    66.66 |      60 |      75 | 9-12,19,27         
-  templateSources.js                  |   67.39 |     57.5 |    87.5 |   65.11 | 31-42,48-58        
+  templateSources.js                  |    91.3 |       90 |    87.5 |   90.47 | 32,39-42           
   templating.js                       |   95.97 |    91.85 |   96.66 |   95.97 | ...111,179-180,236 
  packages/binding.template/helpers    |   77.55 |    65.62 |      70 |   78.26 |                    
   dummyTemplateEngine.ts              |   77.55 |    65.62 |      70 |   78.26 | ...39,73,97-99,102 
@@ -76,8 +76,8 @@ All files                             |   88.21 |    80.71 |   84.94 |   88.15 |
   index.js                            |   96.42 |      100 |    87.5 |   96.15 | 55                 
  packages/lifecycle/dist              |   79.59 |       68 |    90.9 |   78.72 |                    
   LifeCycle.js                        |   79.59 |       68 |    90.9 |   78.72 | ...,37,41,69-70,88 
- packages/lifecycle/src               |    87.5 |       64 |    90.9 |   89.13 |                    
-  LifeCycle.ts                        |    87.5 |       64 |    90.9 |   89.13 | 29,48,80-81,101    
+ packages/lifecycle/src               |   91.66 |       68 |    90.9 |   93.47 |                    
+  LifeCycle.ts                        |   91.66 |       68 |    90.9 |   93.47 | 29,48,101          
  packages/observable/dist             |   96.39 |    92.99 |   93.04 |   96.78 |                    
   Subscription.js                     |   88.23 |      100 |   66.66 |    87.5 | 25-28              
   defer.js                            |   93.33 |       50 |     100 |   93.33 | 6                  
@@ -104,13 +104,14 @@ All files                             |   88.21 |    80.71 |   84.94 |   88.15 |
   index.js                            |     100 |      100 |     100 |     100 |                    
  packages/provider.multi/dist         |     100 |     92.3 |     100 |     100 |                    
   MultiProvider.js                    |     100 |     92.3 |     100 |     100 | 54                 
- packages/provider.mustache/dist      |   66.36 |    63.15 |      50 |   67.92 |                    
+ packages/provider.mustache/dist      |   51.81 |    43.85 |   46.15 |   52.83 |                    
   AttributeMustacheProvider.js        |   14.63 |       28 |   15.38 |   15.78 | 17-73              
-  TextMustacheProvider.js             |     100 |      100 |     100 |     100 |                    
-  mustacheParser.js                   |   95.83 |    86.95 |   77.77 |   95.83 | 17,53              
- packages/provider.mustache/src       |   69.66 |    54.16 |   81.81 |   69.31 |                    
+  TextMustacheProvider.js             |   90.47 |    77.77 |     100 |      90 | 14,23              
+  mustacheParser.js                   |   66.66 |    47.82 |   66.66 |   66.66 | ...,53-56,62-65,72 
+ packages/provider.mustache/src       |   96.36 |    87.71 |   96.15 |   96.29 |                    
   AttributeMustacheProvider.ts        |   90.24 |       84 |    92.3 |      90 | 46-49,100          
-  mustacheParser.ts                   |   52.08 |    21.73 |   66.66 |   52.08 | 14,24-54,65        
+  TextMustacheProvider.ts             |     100 |      100 |     100 |     100 |                    
+  mustacheParser.ts                   |     100 |    86.95 |     100 |     100 | 14-25,95           
  packages/provider.native/dist        |     100 |    91.66 |     100 |     100 |                    
   NativeProvider.js                   |     100 |    91.66 |     100 |     100 | 17                 
  packages/provider.virtual/dist       |     100 |    72.72 |     100 |     100 |                    
@@ -148,30 +149,29 @@ All files                             |   88.21 |    80.71 |   84.94 |   88.15 |
   index.js                            |    90.9 |        0 |     100 |    90.9 | 13                 
   operators.js                        |   87.17 |       75 |   71.05 |   87.67 | ...66,76,86-89,115 
   preparse.js                         |     100 |      100 |     100 |     100 |                    
- packages/utils/dist                  |   88.52 |    77.58 |    90.1 |   87.28 |                    
+ packages/utils/dist                  |   90.95 |    81.98 |   91.95 |      90 |                    
   array.js                            |   92.38 |    88.31 |   93.75 |   92.04 | 50,71-77           
   async.js                            |     100 |      100 |     100 |     100 |                    
   css.js                              |   61.11 |    44.44 |   66.66 |   56.25 | 15-26              
   error.js                            |    90.9 |        0 |     100 |    90.9 | 6                  
   function.js                         |   88.88 |      100 |      75 |    87.5 | 9                  
-  ie.js                               |   85.71 |    42.85 |     100 |   84.61 | 11-12              
   index.js                            |     100 |      100 |     100 |     100 |                    
   memoization.js                      |   95.83 |    85.71 |     100 |   95.23 | 13,65              
   object.js                           |   97.56 |    95.45 |     100 |   97.56 | 32                 
   options.js                          |   86.95 |     62.5 |   88.88 |   85.36 | 60-65,85           
   string.js                           |   45.45 |    45.45 |      75 |   45.45 | 9,14-20            
   symbol.js                           |     100 |       50 |     100 |     100 | 5                  
-  tasks.js                            |   79.66 |    66.66 |      75 |      75 | 14-29              
- packages/utils/dist/dom              |   81.67 |    71.42 |   83.72 |   79.74 |                    
-  data.js                             |   69.09 |    56.52 |   81.81 |   68.18 | 30-48              
+  tasks.js                            |   95.91 |    93.33 |      90 |   94.73 | 15-16              
+ packages/utils/dist/dom              |   88.57 |    80.68 |      92 |   88.04 |                    
+  data.js                             |   90.62 |       80 |     100 |     100 | 29,34,45           
   disposal.js                         |   89.39 |       80 |   83.33 |   87.93 | 58,82,91-96,102    
-  event.js                            |   69.69 |    52.08 |   54.54 |   64.28 | ...67,71,75,99-106 
-  fixes.js                            |      75 |     62.5 |     100 |   74.07 | 27,34-36,42-44     
-  html.js                             |    69.3 |    60.37 |   63.63 |   60.81 | ...3,97-98,104,108 
+  event.js                            |   80.85 |    57.57 |   83.33 |    77.5 | ...-46,50,54,78-83 
+  fixes.js                            |     100 |      100 |     100 |     100 |                    
+  html.js                             |   74.24 |    77.77 |      80 |   71.66 | ...,61,65-66,72,76 
   info.js                             |   65.21 |       50 |     100 |   65.21 | 14-21,36,43        
-  manipulation.js                     |   90.24 |       75 |     100 |   88.57 | 47-50              
+  manipulation.js                     |     100 |    81.81 |     100 |     100 | 18,36              
   selectExtensions.js                 |   97.82 |    96.96 |     100 |   97.61 | 30                 
-  virtualElements.js                  |   94.11 |    87.05 |   94.73 |   94.16 | 145-151,180-181    
- packages/utils/helpers               |   90.07 |    69.44 |   94.28 |   89.51 |                    
-  jasmine-13-helper.ts                |   90.07 |    69.44 |   94.28 |   89.51 | ...167,179,233,258 
+  virtualElements.js                  |   93.98 |    91.78 |   94.73 |   94.06 | 143-149,178-179    
+ packages/utils/helpers               |      90 |    69.44 |   94.28 |   89.43 |                    
+  jasmine-13-helper.ts                |      90 |    69.44 |   94.28 |   89.43 | ...165,177,231,256 
 

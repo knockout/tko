@@ -1,4 +1,4 @@
-import { ieVersion, makeArray, parseHtmlFragment } from '@tko/utils'
+import { makeArray, parseHtmlFragment } from '@tko/utils'
 import { templateEngine, TemplateOptions } from './templateEngine'
 import { setTemplateEngine } from './templating'
 import type { TemplateSource } from './templateSources'

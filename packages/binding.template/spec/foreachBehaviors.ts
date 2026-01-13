@@ -760,32 +760,26 @@ describe('Binding: Foreach', function () {
   })
 
   it('Should be able to output HTML5 elements (even on IE<9, as long as you reference either innershiv.js or jQuery1.7+Modernizr)', function () {
-    const isSupported = jasmine.ieVersion >= 9 || window.innerShiv || window.jQuery
-    if (isSupported) {
-      // Represents https://github.com/SteveSanderson/knockout/issues/194
-      setHtml(testNode, "<div data-bind='foreach:someitems'><section data-bind='text: $data'></section></div>")
-      const viewModel = { someitems: ['Alpha', 'Beta'] }
-      applyBindings(viewModel, testNode)
-      expect(testNode).toContainHtml(
-        '<div data-bind="foreach:someitems"><section data-bind="text: $data">alpha</section><section data-bind="text: $data">beta</section></div>'
-      )
-    }
+    // Represents https://github.com/SteveSanderson/knockout/issues/194
+    setHtml(testNode, "<div data-bind='foreach:someitems'><section data-bind='text: $data'></section></div>")
+    const viewModel = { someitems: ['Alpha', 'Beta'] }
+    applyBindings(viewModel, testNode)
+    expect(testNode).toContainHtml(
+      '<div data-bind="foreach:someitems"><section data-bind="text: $data">alpha</section><section data-bind="text: $data">beta</section></div>'
+    )
   })
 
   it('Should be able to output HTML5 elements within container-less templates (same as above)', function () {
-    const isSupported = jasmine.ieVersion >= 9 || window.innerShiv || window.jQuery
-    if (isSupported) {
-      // Represents https://github.com/SteveSanderson/knockout/issues/194
-      setHtml(
-        testNode,
-        "xxx<!-- ko foreach:someitems --><div><section data-bind='text: $data'></section></div><!-- /ko -->"
-      )
-      const viewModel = { someitems: ['Alpha', 'Beta'] }
-      applyBindings(viewModel, testNode)
-      expect(testNode).toContainHtml(
-        'xxx<!-- ko foreach:someitems --><div><section data-bind="text: $data">alpha</section></div><div><section data-bind="text: $data">beta</section></div><!-- /ko -->'
-      )
-    }
+    // Represents https://github.com/SteveSanderson/knockout/issues/194
+    setHtml(
+      testNode,
+      "xxx<!-- ko foreach:someitems --><div><section data-bind='text: $data'></section></div><!-- /ko -->"
+    )
+    const viewModel = { someitems: ['Alpha', 'Beta'] }
+    applyBindings(viewModel, testNode)
+    expect(testNode).toContainHtml(
+      'xxx<!-- ko foreach:someitems --><div><section data-bind="text: $data">alpha</section></div><div><section data-bind="text: $data">beta</section></div><!-- /ko -->'
+    )
   })
 
   it('Should provide access to observable items through $rawData', function () {

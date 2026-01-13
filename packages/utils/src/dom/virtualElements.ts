@@ -11,35 +11,22 @@
 // The point of all this is to support containerless templates (e.g., <!-- ko foreach:someCollection -->blah<!-- /ko -->)
 // without having to scatter special cases all over the binding and templating code.
 
-// IE 9 cannot reliably read the "nodeValue" property of a comment node (see https://github.com/SteveSanderson/knockout/issues/186)
-// but it does give them a nonstandard alternative property called "text" that it can read reliably. Other browsers don't have that property.
-// So, use node.text where available, and node.nodeValue elsewhere
 import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation'
 import { removeNode } from './disposal'
 import { tagNameLower } from './info'
 import * as domData from './data'
 import options from '../options'
 
-const commentNodesHaveTextProperty = options.document && 'text' in options.document.createComment('test') //in case of IE8..
-
-export const startCommentRegex = commentNodesHaveTextProperty
-  ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/
-  : /^\s*ko(?:\s+([\s\S]+))?\s*$/
-export const endCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/
+export const startCommentRegex = /^\s*ko(?:\s+([\s\S]+))?\s*$/
+export const endCommentRegex = /^\s*\/ko\s*$/
 const htmlTagsWithOptionallyClosingChildren = { ul: true, ol: true }
 
 export function isStartComment(node) {
-  return (
-    node.nodeType === Node.COMMENT_NODE
-    && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue)
-  )
+  return node.nodeType === Node.COMMENT_NODE && startCommentRegex.test(node.nodeValue)
 }
 
 export function isEndComment(node) {
-  return (
-    node.nodeType === Node.COMMENT_NODE
-    && endCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue)
-  )
+  return node.nodeType === Node.COMMENT_NODE && endCommentRegex.test(node.nodeValue)
 }
 
 function isUnmatchedEndComment(node) {
@@ -248,9 +235,7 @@ export function previousSibling(node) {
 }
 
 export function virtualNodeBindingValue(node): string | null {
-  const regexMatch = (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(
-    startCommentRegex
-  ) as RegExpMatchArray
+  const regexMatch = node.nodeValue.match(startCommentRegex) as RegExpMatchArray
   return regexMatch ? regexMatch[1] : null
 }
 

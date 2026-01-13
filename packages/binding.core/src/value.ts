@@ -1,8 +1,10 @@
-import { ieVersion, stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
+import { stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
 
 import { unwrap, dependencyDetection } from '@tko/observable'
 
 import { applyBindingAccessorsToNode, BindingHandler } from '@tko/bind'
+
+import { MSIE_REGEX } from './textInput'
 
 export class value extends BindingHandler {
   static get after() {
@@ -63,11 +65,11 @@ export class value extends BindingHandler {
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded() {
     return (
-      ieVersion
-      && this.isInput
+      this.isInput
       && this.$element.type == 'text'
       && this.$element.autocomplete != 'off'
       && (!this.$element.form || this.$element.form.autocomplete != 'off')
+      && MSIE_REGEX.test(window.navigator.userAgent) //IE detection (primarily for IE10/11)
     )
   }
 
