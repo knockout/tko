@@ -463,5 +463,3 @@ export class JsxObserver extends LifeCycle {
     queueCleanNode(node)
   }
 }
-
-export default JsxObserver

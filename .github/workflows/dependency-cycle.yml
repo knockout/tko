@@ -1,0 +1,32 @@
+name: Checking package dependencies with knip and lerna
+
+on:
+  # Runs for every pull-requests created
+  pull_request:
+  push:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  knip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Build TKO
+        run: make
+
+      - name: Check for dependency cycles and faulty imports/exports with knip
+        run: make knip
+
+      - name: Check lerna packages
+        run: make lerna-check

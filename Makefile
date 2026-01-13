@@ -51,6 +51,9 @@ format-fix:
 tsc:
 	$(NPX) tsc
 
+knip:
+	$(NPX) knip --no-config-hints
+
 eslint:
 	$(NPX) eslint .
 
@@ -62,6 +65,9 @@ dts:
 
 docker-build:
 	$(DOCKER) build . --tag tko
+
+lerna-check:
+	$(LERNA) exec --stream -- true
 
 # Run the `repackage` target in every directory.  Essentially
 # homogenizes the `package.json`.

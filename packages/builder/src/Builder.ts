@@ -37,7 +37,9 @@ import {
   tasks,
   toggleDomNodeCssClass,
   triggerEvent,
-  virtualElements
+  virtualElements,
+  type KnockoutUtils,
+  type ArrayAndObjectUtils
 } from '@tko/utils'
 
 import { parseObjectLiteral } from '@tko/utils.parser'
@@ -104,30 +106,17 @@ const domNodeDisposal = {
   }
 }
 
-export type Utils = {
-  addOrRemoveItem: typeof addOrRemoveItem
-  arrayFilter: typeof arrayFilter
-  arrayFirst: typeof arrayFirst
-  arrayForEach: typeof arrayForEach
-  arrayGetDistinctValues: typeof arrayGetDistinctValues
-  arrayIndexOf: typeof arrayIndexOf
-  arrayMap: typeof arrayMap
-  arrayPushAll: typeof arrayPushAll
-  arrayRemoveItem: typeof arrayRemoveItem
+export type Utils = ArrayAndObjectUtils & {
   cloneNodes: typeof cloneNodes
   compareArrays: typeof compareArrays
   createSymbolOrString: typeof createSymbolOrString
   domData: typeof domData
   domNodeDisposal: typeof domNodeDisposal
-  extend: typeof extend
   filters: typeof options.filters
-  objectForEach: typeof objectForEach
-  objectMap: typeof objectMap
   parseHtmlFragment: typeof parseHtmlFragment
   parseJson: typeof parseJson
   parseObjectLiteral: typeof parseObjectLiteral
   peekObservable: typeof peek
-  range: typeof range
   registerEventHandler: typeof registerEventHandler
   setDomNodeChildrenFromArrayMapping: typeof setDomNodeChildrenFromArrayMapping
   setHtml: typeof setHtml
@@ -170,7 +159,7 @@ const utils: Utils = {
   unwrapObservable: unwrap
 }
 
-export type KnockoutInstance = {
+export type KnockoutInstance = KnockoutUtils & {
   // --- Utilities ---
   cleanNode: typeof cleanNode
   dependencyDetection: typeof dependencyDetection
@@ -178,7 +167,7 @@ export type KnockoutInstance = {
   filters: typeof options.filters
   ignoreDependencies: typeof dependencyDetection.ignore
   memoization: typeof memoization
-  options: typeof options
+  //Type merging from IKnockoutInstance options: typeof options
   removeNode: typeof removeNode
   selectExtensions: typeof selectExtensions
   tasks: typeof tasks
