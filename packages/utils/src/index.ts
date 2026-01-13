@@ -29,8 +29,7 @@ import * as tasks from './tasks'
 import * as virtualElements from './dom/virtualElements'
 import * as domData from './dom/data'
 
-export type {
-  IBindingHandlerObject,
+export type {  
   IProvider,
   BindingAccessors,
   KnockoutUtils,

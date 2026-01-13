@@ -38,11 +38,6 @@ export type KnockoutUtils = { utils: ArrayAndObjectUtils; options: Options }
 
 export type BindingAccessors = { [name: string]: Function }
 
-export interface IBindingHandlerObject {
-  set(nameOrObject: string | object, value?: string | object): void
-  get(nameOrDotted: string): any
-}
-
 /**
  * Public interface for minimal describing a binding provider.
  *
@@ -88,7 +83,7 @@ export interface IProvider {
   /**
    * The provider's registered binding handlers collection.
    */
-  bindingHandlers: IBindingHandlerObject
+  bindingHandlers: any
 
   /**
    * Getter/setter used for legacy compatibility when assigning the global
