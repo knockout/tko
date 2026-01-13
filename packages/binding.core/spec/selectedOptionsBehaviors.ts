@@ -48,12 +48,7 @@ describe('Binding: Selected Options', function () {
 
   it('Should update the model when selection in the SELECT node changes', function () {
     function setMultiSelectOptionSelectionState(optionElement, state) {
-      // Workaround an IE 6 bug (http://benhollis.net/experiments/browserdemos/ie6-adding-options.html)
-      if (/MSIE 6/i.test(navigator.userAgent)) {
-        optionElement.setAttribute('selected', state)
-      } else {
-        optionElement.selected = state
-      }
+      optionElement.selected = state
     }
 
     const cObject = {}
@@ -75,12 +70,7 @@ describe('Binding: Selected Options', function () {
 
   it('Should update the model when selection in the SELECT node changes for non-observable property values', function () {
     function setMultiSelectOptionSelectionState(optionElement, state) {
-      // Workaround an IE 6 bug (http://benhollis.net/experiments/browserdemos/ie6-adding-options.html)
-      if (/MSIE 6/i.test(navigator.userAgent)) {
-        optionElement.setAttribute('selected', state)
-      } else {
-        optionElement.selected = state
-      }
+      optionElement.selected = state
     }
 
     const cObject = {}
@@ -103,12 +93,7 @@ describe('Binding: Selected Options', function () {
 
   it('Should update the model when selection in the SELECT node inside an optgroup changes', function () {
     function setMultiSelectOptionSelectionState(optionElement, state) {
-      // Workaround an IE 6 bug (http://benhollis.net/experiments/browserdemos/ie6-adding-options.html)
-      if (/MSIE 6/i.test(navigator.userAgent)) {
-        optionElement.setAttribute('selected', state)
-      } else {
-        optionElement.selected = state
-      }
+      optionElement.selected = state
     }
 
     const selection = observableArray([])

@@ -1,14 +1,10 @@
 /* global testNode */
 import { applyBindings } from '@tko/bind'
-
 import { computed } from '@tko/computed'
-
 import { observable } from '@tko/observable'
-
 import { triggerEvent, options } from '@tko/utils'
-
 import { DataBindProvider } from '@tko/provider.databind'
-
+import { MSIE_REGEX } from '../src/textInput'
 import { bindings as coreBindings } from '../dist'
 
 const DEBUG = true
@@ -29,7 +25,7 @@ describe('Binding: TextInput', function () {
     bindingHandlers.set(coreBindings)
   })
 
-  it('User-Agent detection IE10 + IE11', function () {
+  it('User-Agent detection for Internet Explorer', function () {
     let uaList = [
       { agent: 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/7.0', version: 9 },
       { agent: 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)', version: 10 },
@@ -52,9 +48,16 @@ describe('Binding: TextInput', function () {
     ]
 
     uaList.forEach(userAgent => {
-      let match = userAgent['agent'].match(/MSIE ([^ ;]+)|rv:([^ )]+)/)
+      let match = userAgent['agent'].match(MSIE_REGEX)
       let ieVersion = match && (parseFloat(match[1]) || parseFloat(match[2]))
       expect(ieVersion).toBe(userAgent['version'])
+
+      if (userAgent['version'] == null) {
+        expect(match).toBeFalsy()
+      } else {
+        expect(match).toBeTruthy()
+        expect(MSIE_REGEX.test(userAgent['agent'])).toBeTruthy()
+      }
     })
   })
 

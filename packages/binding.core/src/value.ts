@@ -4,6 +4,8 @@ import { unwrap, dependencyDetection } from '@tko/observable'
 
 import { applyBindingAccessorsToNode, BindingHandler } from '@tko/bind'
 
+import { MSIE_REGEX } from './textInput'
+
 export class value extends BindingHandler {
   static get after() {
     return ['options', 'foreach', 'template']
@@ -67,7 +69,7 @@ export class value extends BindingHandler {
       && this.$element.type == 'text'
       && this.$element.autocomplete != 'off'
       && (!this.$element.form || this.$element.form.autocomplete != 'off')
-      && window.navigator.userAgent.match(/MSIE ([^ ;]+)|rv:([^ )]+)/) //IE detection (primarily for IE10/11)
+      && MSIE_REGEX.test(window.navigator.userAgent) //IE detection (primarily for IE10/11)
     )
   }
 

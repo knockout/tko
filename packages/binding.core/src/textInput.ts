@@ -1,8 +1,10 @@
-import { safeSetTimeout, options, arrayForEach, domData, registerEventHandler } from '@tko/utils'
+import { safeSetTimeout, options, arrayForEach } from '@tko/utils'
 
 import { unwrap } from '@tko/observable'
 
 import { BindingHandler } from '@tko/bind'
+
+export const MSIE_REGEX = /MSIE ([^ ;]+)|rv:([^ )]+)/
 
 let operaVersion, safariVersion, firefoxVersion, ieVersion
 
@@ -146,7 +148,7 @@ if (w.navigator) {
     operaVersion = w.opera && w.opera.version && parseInt(w.opera.version())
     safariVersion = parseVersion(userAgent.match(/Version\/([^ ]+) Safari/))
     firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/))
-    const ieMatch = userAgent.match(/MSIE ([^ ;]+)|rv:([^ )]+)/)
+    const ieMatch = userAgent.match(MSIE_REGEX)
     ieVersion = ieMatch && (parseFloat(ieMatch[1]) || parseFloat(ieMatch[2]))
   }
 }

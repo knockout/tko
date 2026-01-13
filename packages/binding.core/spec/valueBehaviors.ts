@@ -286,10 +286,9 @@ describe('Binding: Value', function () {
     expect(myObservable()).toEqual('some value from the server')
   })
 
-  it('Should handle autofill selection by treating "propertychange" followed by "blur" as a change event', function () {
-    // This spec !no longer! describes the awkward choreography of events needed to detect changes to text boxes on IE < 10,
-    // because it doesn't fire regular "change" events when the user selects an autofill entry. It isn't applicable
-    // on IE 10+ or other browsers, because they don't have that problem with autofill. We have change the test case, so it runs on modern browsers.
+  it('Should handle autofill selection by treating "focus", "blur" and "change" event', function () {
+    // We have change the test case, so it runs on modern browsers. Originally, this spec describes was a awkward choreography of events needed to detect changes to text boxes on IE < 10,
+    // because it doesn't fire regular "change" events when the user selects an autofill entry.
 
     const myObservable = observable(123).extend({ notify: 'always' })
     let numUpdates = 0
