@@ -33,7 +33,7 @@ export type {
   IBindingHandlerObject,
   IProvider,
   BindingAccessors,
-  IKnockoutUtilsInstance,
-  IArrayAndObjectUtils
+  KnockoutUtils,
+  ArrayAndObjectUtils
 } from './interfaces'
 export { tasks, virtualElements, domData, memoization }

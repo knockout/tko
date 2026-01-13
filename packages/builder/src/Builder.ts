@@ -38,8 +38,8 @@ import {
   toggleDomNodeCssClass,
   triggerEvent,
   virtualElements,
-  type IKnockoutUtilsInstance,
-  type IArrayAndObjectUtils
+  type KnockoutUtils,
+  type ArrayAndObjectUtils
 } from '@tko/utils'
 
 import { parseObjectLiteral } from '@tko/utils.parser'
@@ -106,8 +106,7 @@ const domNodeDisposal = {
   }
 }
 
-export type Utils = IArrayAndObjectUtils & {
-  addOrRemoveItem: typeof addOrRemoveItem
+export type Utils = ArrayAndObjectUtils & {
   cloneNodes: typeof cloneNodes
   compareArrays: typeof compareArrays
   createSymbolOrString: typeof createSymbolOrString
@@ -160,7 +159,7 @@ const utils: Utils = {
   unwrapObservable: unwrap
 }
 
-export type KnockoutInstance = IKnockoutUtilsInstance & {
+export type KnockoutInstance = KnockoutUtils & {
   // --- Utilities ---
   cleanNode: typeof cleanNode
   dependencyDetection: typeof dependencyDetection

@@ -8,7 +8,7 @@
     "-lintignore",
     "-internal"
   ],
-  "ignoreDependencies": ["@types/mocha", "chai", "electron", "esbuild", "fs-extra", "karma", "karma-[.]*", "mocha", "nyc", "prettier", "sinon", "lerna"],
+  "ignoreDependencies": ["@types/mocha", "chai", "electron", "esbuild", "fs-extra", "karma[.]*", "mocha", "nyc", "prettier", "sinon", "lerna"],
   "workspaces": {
     "packages/*": {
       "entry": "src/index.ts",

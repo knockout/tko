@@ -16,12 +16,7 @@ import { extend, objectForEach, objectMap } from './object'
 import type { Options } from './options'
 import { createSymbolOrString } from './symbol'
 
-export interface IBindingHandlerObject {
-  set(nameOrObject: string | object, value?: string | object): void
-  get(nameOrDotted: string): any
-}
-
-export interface IArrayAndObjectUtils {
+export type ArrayAndObjectUtils = {
   addOrRemoveItem: typeof addOrRemoveItem
   arrayFilter: typeof arrayFilter
   arrayFirst: typeof arrayFirst
@@ -39,12 +34,14 @@ export interface IArrayAndObjectUtils {
   range: typeof range
 }
 
-export interface IKnockoutUtilsInstance {
-  utils: IArrayAndObjectUtils
-  options: Options
-}
+export type KnockoutUtils = { utils: ArrayAndObjectUtils; options: Options }
 
 export type BindingAccessors = { [name: string]: Function }
+
+export interface IBindingHandlerObject {
+  set(nameOrObject: string | object, value?: string | object): void
+  get(nameOrDotted: string): any
+}
 
 /**
  * Public interface for minimal describing a binding provider.
