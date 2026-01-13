@@ -25,7 +25,7 @@ describe('Binding: TextInput', function () {
     bindingHandlers.set(coreBindings)
   })
 
-  it('User-Agent detection IE10 + IE11', function () {
+  it('User-Agent detection for Internet Explorer', function () {
     let uaList = [
       { agent: 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/7.0', version: 9 },
       { agent: 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)', version: 10 },
