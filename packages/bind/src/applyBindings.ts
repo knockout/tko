@@ -49,12 +49,8 @@ type BindingHandlerOrUndefined = (typeof BindingHandler & BindingHandler) | unde
 const bindingDoesNotRecurseIntoElementTypes = {
   // Don't want bindings that operate on text nodes to mutate <script> and <textarea> contents,
   // because it's unexpected and a potential XSS issue.
-  // Also bindings should not operate on <template> elements since this breaks in Internet Explorer
-  // and because such elements' contents are always intended to be bound in a different context
-  // from where they appear in the document.
   script: true,
-  textarea: true,
-  template: true
+  textarea: true
 }
 
 function getBindingProvider(): Provider {
@@ -398,7 +394,7 @@ function applyBindingsToNodeInternal<T>(
 
 /**
  *
- * @param {HTMLElement} node
+ * @param {Node} node
  * @param {Object} bindings
  * @param {[Promise]} nodeAsyncBindingPromises
  */
@@ -438,7 +434,7 @@ function getBindingContext<T = any>(
 }
 
 export function applyBindingAccessorsToNode<T = any>(
-  node: HTMLElement,
+  node: Node,
   bindings: Record<string, any>,
   viewModelOrBindingContext?: BindingContext<T> | Observable<T> | T,
   asyncBindingsApplied?: Set<any>
@@ -456,7 +452,7 @@ export function applyBindingAccessorsToNode<T = any>(
 }
 
 export function applyBindingsToNode<T = any>(
-  node: HTMLElement,
+  node: Node,
   bindings: Record<string, any>,
   viewModelOrBindingContext: BindingContext<T> | Observable<T> | T
 ): BindingResult {
@@ -473,7 +469,11 @@ export function applyBindingsToDescendants<T = any>(
 ): BindingResult {
   const asyncBindingsApplied = new Set()
   const bindingContext = getBindingContext(viewModelOrBindingContext)
-  if (rootNode.nodeType === Node.ELEMENT_NODE || rootNode.nodeType === Node.COMMENT_NODE) {
+  if (
+    rootNode.nodeType === Node.ELEMENT_NODE
+    || rootNode.nodeType === Node.COMMENT_NODE
+    || rootNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+  ) {
     applyBindingsToDescendantsInternal(bindingContext, rootNode, asyncBindingsApplied)
     return new BindingResult({ asyncBindingsApplied, rootNode, bindingContext })
   }
@@ -482,7 +482,7 @@ export function applyBindingsToDescendants<T = any>(
 
 export function applyBindings<T = any>(
   viewModelOrBindingContext: BindingContext<T> | Observable<T> | T,
-  rootNode: HTMLElement,
+  rootNode: Node,
   extendContextCallback?: BindingContextExtendCallback<T>
 ): Promise<unknown> {
   const asyncBindingsApplied = new Set()
@@ -493,7 +493,11 @@ export function applyBindings<T = any>(
     if (!rootNode) {
       throw Error('ko.applyBindings: could not find window.document.body; has the document been loaded?')
     }
-  } else if (rootNode.nodeType !== Node.ELEMENT_NODE && rootNode.nodeType !== Node.COMMENT_NODE) {
+  } else if (
+    rootNode.nodeType !== Node.ELEMENT_NODE
+    && rootNode.nodeType !== Node.COMMENT_NODE
+    && rootNode.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+  ) {
     throw Error('ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node')
   }
   const rootContext = getBindingContext<T>(viewModelOrBindingContext, extendContextCallback)

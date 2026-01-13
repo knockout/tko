@@ -95,6 +95,16 @@ describe('Binding: Foreach', function () {
     )
   })
 
+  it('Should be able to use $data to reference each array item being bound in HTMLTemplate with HTMLSlotElement', function () {
+    testNode.innerHTML =
+      "<template><div data-bind='foreach: someItems'><slot data-bind='text: $data'></slot></div></template>"
+    const someItems = ['alpha', 'beta']
+    applyBindings({ someItems: someItems }, testNode)
+    expect((testNode.childNodes[0] as HTMLTemplateElement).content.firstChild).toContainHtml(
+      '<slot data-bind="text: $data">alpha</slot><slot data-bind="text: $data">beta</slot>'
+    )
+  })
+
   it('Should add and remove nodes to match changes in the bound array', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: childProp'></span></div>"
     const someItems = observableArray([{ childProp: 'first child' }, { childProp: 'second child' }])

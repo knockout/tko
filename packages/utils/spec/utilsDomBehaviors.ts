@@ -4,6 +4,7 @@ import * as utils from '../dist'
 import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
 import type { KnockoutInstance } from '@tko/builder'
+import { domNodeIsContainedBy } from '../src'
 
 const ko: KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
@@ -13,6 +14,66 @@ describe('startCommentRegex', function () {
   it('only ie8 has a text property at comment nodes', function () {
     const reg: RegExp = virtualElements.startCommentRegex
     expect(reg.source).not.toContain('<!..')
+  })
+})
+
+describe('DOM-Info Tool', function () {
+  it('domNodeIsContainedBy with special values', function () {
+    const parent = document.createElement('div')
+    const test = document.createDocumentFragment()
+
+    expect(domNodeIsContainedBy(parent, test)).toBe(false)
+    expect(domNodeIsContainedBy(test, parent)).toBe(false)
+
+    expect(domNodeIsContainedBy(parent, undefined)).toBe(false)
+    expect(domNodeIsContainedBy(parent, null)).toBe(false)
+    expect(domNodeIsContainedBy(null, parent)).toBe(false)
+
+    test.appendChild(parent)
+
+    expect(domNodeIsContainedBy(parent, test)).toBe(true)
+    expect(domNodeIsContainedBy(test, parent)).toBe(false)
+
+    const testDiv = document.createElement('div')
+    const template = document.createElement('template')
+    template.content.appendChild(testDiv)
+    expect(domNodeIsContainedBy(testDiv, template)).toBe(false) //Because template.content is a DocumentFragment
+    expect(domNodeIsContainedBy(testDiv, template.content)).toBe(true)
+
+    parent.appendChild(template)
+    expect(domNodeIsContainedBy(template, parent)).toBe(true)
+    expect(domNodeIsContainedBy(template, test)).toBe(true)
+    expect(domNodeIsContainedBy(testDiv, parent)).toBe(false) //Because template.content is a DocumentFragment
+  })
+
+  it('Parent Node contains child', function () {
+    const parent = document.createElement('div')
+    const child = document.createElement('span')
+    parent.appendChild(child)
+
+    expect(domNodeIsContainedBy(child, parent)).toBe(true)
+  })
+
+  it('Node not contains node', function () {
+    const parent = document.createElement('div')
+    const child = document.createElement('span')
+
+    expect(domNodeIsContainedBy(child, parent)).toBe(false)
+  })
+
+  it('Parent Node contains subchild', function () {
+    const parent = document.createElement('div')
+    const child = document.createElement('span')
+    const subchild = document.createElement('em')
+    parent.appendChild(child)
+    child.appendChild(subchild)
+
+    const node = document.createTextNode('text')
+
+    expect(domNodeIsContainedBy(subchild, parent)).toBe(true)
+    expect(domNodeIsContainedBy(subchild, child)).toBe(true)
+    expect(domNodeIsContainedBy(subchild, subchild)).toBe(true)
+    expect(domNodeIsContainedBy(node, parent)).toBe(false)
   })
 })
 

@@ -13,7 +13,7 @@
 
 import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation'
 import { removeNode } from './disposal'
-import { tagNameLower } from './info'
+import { tagNameLower, isTemplateTag } from './info'
 import * as domData from './data'
 import options from '../options'
 
@@ -173,6 +173,10 @@ export function insertAfter(containerNode: Node, nodeToInsert: Node, insertAfter
 }
 
 export function firstChild(node: Node) {
+  if (isTemplateTag(node)) {
+    return node.content.firstChild
+  }
+
   if (!isStartComment(node)) {
     if (node.firstChild && isEndComment(node.firstChild)) {
       throw new Error('Found invalid end comment, as the first child of ' + (node as Element).outerHTML)

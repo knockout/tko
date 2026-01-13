@@ -11,8 +11,9 @@ const domDataKey = domData.nextKey()
 // 1: Element
 // 8: Comment
 // 9: Document
-const cleanableNodeTypes = { 1: true, 8: true, 9: true }
-const cleanableNodeTypesWithDescendants = { 1: true, 9: true }
+// 11: DocumentFragment
+const cleanableNodeTypes = { 1: true, 8: true, 9: true, 11: true }
+const cleanableNodeTypesWithDescendants = { 1: true, 9: true, 11: true }
 
 function getDisposeCallbacksCollection(node: Node, createIfNotFound: boolean) {
   let allDisposeCallbacks = domData.get(node, domDataKey)
@@ -86,14 +87,18 @@ export function removeDisposeCallback(node: Node, callback: (node: Node) => void
   }
 }
 
-export function cleanNode(node: Node): typeof node {
+export function cleanNode(node: Node): Node {
   // First clean this node, where applicable
   if (cleanableNodeTypes[node.nodeType]) {
     cleanSingleNode(node)
 
     // ... then its descendants, where applicable
-    if (cleanableNodeTypesWithDescendants[node.nodeType] && node instanceof Element) {
-      cleanNodesInList(node.getElementsByTagName('*'))
+    if (cleanableNodeTypesWithDescendants[node.nodeType]) {
+      if (node instanceof Element) {
+        cleanNodesInList(node.getElementsByTagName('*'))
+      } else if (node instanceof Document || node instanceof DocumentFragment) {
+        cleanNodesInList(node.querySelectorAll('*'))
+      }
     }
   }
   return node
