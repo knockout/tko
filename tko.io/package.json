@@ -1,18 +1,24 @@
 {
   "name": "tko.io",
   "version": "1.0.0",
-  "description": "Landing page for tko.io",
-  "main": "index.js",
-  "author": "Knockout Team",
+  "type": "module",
+  "description": "TKO documentation site",
+  "scripts": {
+    "build:libdir": "mkdir -p src/lib",
+    "build:ko": "cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/src/lib/ko.js",
+    "build:tko": "cd ../builds/reference && make browser && cp dist/browser.min.js ../../tko.io/src/lib/tko.js",
+    "prebuild": "npm run build:libdir && npm run build:ko && npm run build:tko",
+    "predev": "npm run prebuild",
+    "dev": "bunx @11ty/eleventy --serve",
+    "build": "bunx @11ty/eleventy",
+    "start": "bunx @11ty/eleventy --serve"
+  },
+  "keywords": ["tko", "knockout", "documentation"],
+  "author": "",
   "license": "MIT",
-  "dependencies": {
-    "chokidar": "^1.7.0",
-    "fs-extra": "^4.0.2",
-    "gray-matter": "^3.1.1",
-    "highlight.js": "^9.12.0",
-    "js-yaml": "^3.10.0",
-    "lodash.debounce": "^4.0.8",
-    "markdown-it": "^8.4.0",
-    "pug": "^3.0.3"
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "esbuild-wasm": "^0.24.0",
+    "markdown-it": "^14.1.0"
   }
 }

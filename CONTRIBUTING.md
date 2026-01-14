@@ -26,6 +26,39 @@ If the issue is an enhancement, consider also including:
 1. Explain why it would be **useful**.
 2. List **other applications** that have the enhancement.
 
+## Documentation
+
+All TKO documentation lives in `tko.io/src/docs/`.
+
+To contribute documentation:
+
+1. Edit files in `tko.io/src/docs/[category]/` where category is:
+   - `bindings/` - All binding handlers
+   - `observables/` - Observable and observable array docs
+   - `computed/` - Computed observable docs
+   - `components/` - Component system docs
+   - `binding-context/` - Binding context and custom bindings
+   - `advanced/` - Advanced topics (lifecycle, providers, parsers)
+
+2. Each file requires frontmatter:
+   ```yaml
+   ---
+   layout: base.njk
+   title: Page Title
+   ---
+   ```
+
+3. Test locally:
+   ```bash
+   cd tko.io
+   bun run dev
+   ```
+   Then visit http://localhost:8080
+
+4. Submit a PR with your changes
+
+The documentation site is automatically deployed when changes are merged to main.
+
 ## Pull Requests
 
 A good pull request might include:
