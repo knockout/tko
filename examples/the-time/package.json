@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@babel/core": "7.14.6",
+    "@babel/plugin-transform-typescript": "7.14.6",
+    "@tko/build.reference": "4.0.0-alpha9.0"
+  },
+  "private": true,
+  "keywords": [],
+  "name": "tko-the-time",
+  "description": ""
+}
