@@ -26,7 +26,7 @@ import { BindingResult } from './BindingResult'
 
 import { LegacyBindingHandler } from './LegacyBindingHandler'
 
-import type { IProvider } from '@tko/utils'
+import type { ProviderBase } from '@tko/utils'
 import type { BindingHandler, AllBindings } from './BindingHandler'
 import type { BindingContext } from './bindingContext'
 
@@ -57,11 +57,11 @@ const bindingDoesNotRecurseIntoElementTypes = {
   template: true
 }
 
-function getBindingProvider(): IProvider {
+function getBindingProvider(): ProviderBase {
   return options.bindingProviderInstance.instance || options.bindingProviderInstance
 }
 
-function isProviderForNode(provider: IProvider, node: Node): boolean {
+function isProviderForNode(provider: ProviderBase, node: Node): boolean {
   const nodeTypes = provider.FOR_NODE_TYPES || [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
   return nodeTypes.includes(node.nodeType)
 }

@@ -44,7 +44,7 @@ export type BindingAccessors = { [name: string]: Function }
  * Providers are responsible for detecting bindings on DOM nodes and
  * producing binding-accessor objects that the binding system consumes.
  */
-export interface IProvider {
+export interface ProviderBase {
   /**
    * List of nodeType values this provider handles (e.g. [1, 3, 8]).
    */
@@ -89,7 +89,7 @@ export interface IProvider {
    * Getter/setter used for legacy compatibility when assigning the global
    * binding provider instance (ko.bindingProvider.instance).
    */
-  instance: IProvider
+  instance: ProviderBase
 
   /**
    * Given a bindings function or object, create and return a new object that contains

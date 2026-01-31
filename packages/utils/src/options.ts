@@ -1,4 +1,4 @@
-import type { KnockoutUtils, IProvider } from './interfaces'
+import type { KnockoutUtils, ProviderBase } from './interfaces'
 
 export interface CustomBindingGlobalProperties {
   [customBindingName: string]: any
@@ -38,7 +38,7 @@ export class Options {
   bindingGlobals: object & CustomBindingGlobalProperties = Object.create(null)
 
   // An instance of the binding provider.
-  bindingProviderInstance: IProvider
+  bindingProviderInstance: ProviderBase
 
   // Whether the `with` binding creates a child context when used with `as`.
   createChildContextWithAs: boolean = false

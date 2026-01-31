@@ -167,7 +167,7 @@ export type KnockoutInstance = KnockoutUtils & {
   filters: typeof options.filters
   ignoreDependencies: typeof dependencyDetection.ignore
   memoization: typeof memoization
-  //Type merging from IKnockoutInstance options: typeof options
+  //Type merging from KnockoutUtils options: typeof options
   removeNode: typeof removeNode
   selectExtensions: typeof selectExtensions
   tasks: typeof tasks
