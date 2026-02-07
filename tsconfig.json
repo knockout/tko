@@ -7,7 +7,7 @@
     "module": "ES2015",
     "moduleResolution": "node",
     "allowJs": false,
-    "importHelpers": true,
+    "importHelpers": false,
     "allowSyntheticDefaultImports":  true,
     "strict": true,
     "baseUrl": ".",
@@ -23,7 +23,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    
+    "verbatimModuleSyntax": true,
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [
         "packages/utils/helpers/jasmine-13-helper.ts"

@@ -3,6 +3,7 @@
   "compilerOptions": {   
     "noEmit": false,
     "emitDeclarationOnly": true,
+    "verbatimModuleSyntax": null,
     "outFile": "builds/dts/dist/tko.d.ts",
   },
   "exclude": [

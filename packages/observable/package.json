@@ -31,8 +31,7 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/utils": "^4.0.0-beta1.3",
-    "tslib": "^2.2.0"
+    "@tko/utils": "^4.0.0-beta1.3"
   },
   "karma": {
     "frameworks": [

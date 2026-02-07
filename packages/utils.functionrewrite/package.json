@@ -8,9 +8,7 @@
     "helpers/"
   ],
   "license": "MIT",
-  "dependencies": {
-    "tslib": "^2.2.0"
-  },
+  "dependencies": {},
   "karma": {
     "frameworks": [
       "mocha",

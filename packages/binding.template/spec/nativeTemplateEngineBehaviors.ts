@@ -1,7 +1,7 @@
 /* global testNode */
 import { applyBindings } from '@tko/bind'
 
-import { observable, ObservableArray, observableArray } from '@tko/observable'
+import { observable, type ObservableArray, observableArray } from '@tko/observable'
 
 import { DataBindProvider } from '@tko/provider.databind'
 

@@ -78,9 +78,9 @@ export default class AttributeMustacheProvider extends Provider {
     }
   }
 
-  getPossibleDirectBinding(attrName: string | number) {
+  getPossibleDirectBinding(attrName: string) {
     const bindingName = this.ATTRIBUTES_BINDING_MAP[attrName]
-    return bindingName && this.bindingHandlers.get(attrName)
+    return bindingName && this.bindingHandlers.get(attrName) //FIXME this.bindingHandlers.get(bindingName) ?
   }
 
   *bindingObjects(node: Element, context: any) {
