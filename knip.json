@@ -8,6 +8,7 @@
     "-lintignore",
     "-internal"
   ],
+  "ignoreBinaries": ["make"],
   "ignoreDependencies": ["@types/mocha", "chai", "electron", "esbuild", "fs-extra", "karma[.]*", "mocha", "nyc", "prettier", "sinon", "lerna"],
   "workspaces": {
     "packages/*": {
