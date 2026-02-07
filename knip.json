@@ -13,7 +13,7 @@
   "workspaces": {
     "packages/*": {
       "entry": "src/index.ts",
-      "project": "src/*.ts",
+      "project": "src/**/*.ts",
       "ignore": ["/helpers/**"]
     }
   },
