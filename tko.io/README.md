@@ -1,6 +1,6 @@
 # TKO Documentation Site
 
-This is the documentation website for TKO, built with 11ty (Eleventy).
+This is the documentation website for TKO, built with Astro and Starlight.
 
 ## Development
 
@@ -13,44 +13,55 @@ bun run dev
 
 # Build for production
 bun run build
+
+# Preview the production build locally
+bun run preview
 ```
 
-The site will be available at http://localhost:8080/
+The dev site is available at `http://localhost:4321/` by default.
+Use `bun run preview` when you want to test the production build locally, including search.
 
 ## Features
 
 - Written in Markdown
+- Built with Astro + Starlight
+- Full-text search powered by Pagefind in production builds
 - Interactive JSX examples using esbuild-wasm
-- Examples are written in code blocks and automatically transformed into editable textareas with live preview
-- Styled with the classic TKO theme
+- Legacy docs links normalized during migration
+- Styled with the current TKO theme
 
 ## Structure
 
 ```
 tko.io/
+├── public/            # Static assets copied as-is
 ├── src/
-│   ├── _layouts/      # Page layouts (Nunjucks)
-│   ├── _includes/     # Reusable components
-│   ├── css/           # Stylesheets
-│   ├── js/            # JavaScript (example system)
-│   ├── docs/          # Documentation pages (Markdown)
-│   └── index.md       # Homepage
-├── _site/             # Built site (gitignored)
-└── .eleventy.js       # 11ty configuration
+│   ├── components/    # Starlight component overrides
+│   ├── content/docs/  # Documentation pages (Markdown)
+│   ├── pages/         # Custom Astro pages
+│   └── styles/        # Site styling
+├── plugins/           # Markdown migration helpers
+├── dist/              # Built site (gitignored)
+└── astro.config.mjs   # Astro/Starlight configuration
 ```
 
 ## Adding Documentation
 
-1. Create a new `.md` file in `src/docs/`
-2. Add front matter with layout and title:
+1. Create a new `.md` file in `src/content/docs/`
+2. Add front matter with at least a title:
    ```yaml
    ---
-   layout: base.njk
    title: Your Page Title
    ---
    ```
 3. Write content in Markdown
-4. Add interactive JSX examples using:
+4. For section landing pages, add sidebar metadata:
+   ```yaml
+   sidebar:
+     label: Overview
+     order: 0
+   ```
+5. Add interactive JSX examples using:
    ````markdown
    ```jsx
    function Example() {
@@ -61,4 +72,13 @@ tko.io/
 
 ## Deployment
 
-The site is automatically deployed to GitHub Pages when changes are pushed to the `main` branch.
+The site is deployed to GitHub Pages by `.github/workflows/deploy-docs.yml` when changes land on `main`.
+
+The deployment pipeline:
+
+1. Installs dependencies in `tko.io/`
+2. Builds the site with `bun run build`
+3. Uploads `tko.io/dist`
+4. Deploys that artifact to GitHub Pages
+
+The custom domain is provided by `public/CNAME`.
