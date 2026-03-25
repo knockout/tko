@@ -1,0 +1,41 @@
+---
+const { banner } = Astro.locals.starlightRoute.entry.data;
+const inProgressNote =
+  'TKO docs are in progress. Examples, API details, and migration notes are still being revised.';
+---
+
+<div class="tko-banner" data-pagefind-ignore>{inProgressNote}</div>
+{banner && <div class="sl-banner" data-pagefind-ignore set:html={banner.content} />}
+
+<style>
+  @layer starlight.core {
+    .tko-banner,
+    .sl-banner {
+      --__sl-banner-text: var(--sl-color-banner-text, var(--sl-color-text-invert));
+      padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
+      color: var(--__sl-banner-text);
+      line-height: var(--sl-line-height-headings);
+      text-align: center;
+      text-wrap: balance;
+      box-shadow: var(--sl-shadow-sm);
+    }
+
+    .tko-banner {
+      background:
+        linear-gradient(90deg, rgba(46, 99, 218, 0.94), rgba(19, 48, 109, 0.92)),
+        var(--sl-color-bg-accent);
+      font-size: var(--sl-text-sm);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .sl-banner {
+      background-color: var(--sl-color-banner-bg, var(--sl-color-bg-accent));
+    }
+
+    .sl-banner :global(a) {
+      color: var(--__sl-banner-text);
+    }
+  }
+</style>

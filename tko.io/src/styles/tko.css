@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lobster&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
   --sl-font: 'Manrope', sans-serif;
@@ -32,6 +32,15 @@ html {
 
 body {
   letter-spacing: -0.01em;
+}
+
+.site-title span[translate='no'] {
+  font-family: 'Lobster', cursive;
+  font-size: 1.85rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--sl-color-text-accent);
 }
 
 .hero {
