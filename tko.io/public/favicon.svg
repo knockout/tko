@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TKO">
+  <defs>
+    <linearGradient id="tko-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2e63da" />
+      <stop offset="100%" stop-color="#0f2f7a" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#e7efff" />
+  <path d="M14 18h36v8H36v20h-8V26H14z" fill="url(#tko-grad)" />
+  <circle cx="48" cy="42" r="8" fill="#2e63da" />
+</svg>
