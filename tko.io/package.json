@@ -4,21 +4,22 @@
   "type": "module",
   "description": "TKO documentation site",
   "scripts": {
-    "build:libdir": "mkdir -p src/lib",
-    "build:ko": "cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/src/lib/ko.js",
-    "build:tko": "cd ../builds/reference && make browser && cp dist/browser.min.js ../../tko.io/src/lib/tko.js",
-    "prebuild": "npm run build:libdir && npm run build:ko && npm run build:tko",
-    "predev": "npm run prebuild",
-    "dev": "bunx @11ty/eleventy --serve",
-    "build": "bunx @11ty/eleventy",
-    "start": "bunx @11ty/eleventy --serve"
+    "postinstall": "patch-package",
+    "prebuild": "mkdir -p public/lib && cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/public/lib/ko.js && cd ../reference && make browser && cp dist/browser.min.js ../../tko.io/public/lib/tko.js",
+    "predev": "bun run prebuild",
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro check"
   },
   "keywords": ["tko", "knockout", "documentation"],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@11ty/eleventy": "^3.0.0",
-    "esbuild-wasm": "^0.24.0",
-    "markdown-it": "^14.1.0"
+    "@astrojs/starlight": "0.37.7",
+    "@astrojs/check": "0.9.6",
+    "astro": "5.18.1",
+    "patch-package": "^8.0.1",
+    "typescript": "^5.9.3"
   }
 }
