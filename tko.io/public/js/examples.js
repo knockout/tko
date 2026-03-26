@@ -184,8 +184,11 @@ function splitHtmlAndScript(code) {
 function addPlaygroundLink(pre) {
   // Starlight/Expressive Code wraps code blocks in <figure class="frame">
   const figure = pre.closest('figure');
-  const wrapper = figure || pre;
-  if (wrapper.parentElement?.querySelector('.playground-open')) return;
+  if (!figure) return;
+
+  // Inject into the .copy action bar (alongside the copy button)
+  const copyDiv = figure.querySelector('.copy');
+  if (!copyDiv || copyDiv.querySelector('.playground-open')) return;
 
   const rawCode = pre.textContent.trim();
   const { html, js } = splitHtmlAndScript(rawCode);
@@ -198,8 +201,10 @@ function addPlaygroundLink(pre) {
   link.className = 'playground-open';
   link.href = `/playground#${hash}`;
   link.target = '_blank';
-  link.textContent = 'Open in Playground';
-  wrapper.parentNode.insertBefore(link, wrapper.nextSibling);
+  link.title = 'Open in Playground';
+  // External-link SVG icon (matches copy button sizing)
+  link.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
+  copyDiv.insertBefore(link, copyDiv.firstChild);
 }
 
 function initExamples() {
