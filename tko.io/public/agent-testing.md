@@ -70,6 +70,62 @@ Console output appears in `#console-messages` as child elements.
 
 esbuild-wasm takes a few seconds to initialize on first load. The playground shows "esbuild ready" in `#esbuild-status` when it's ready. Code auto-runs after compilation.
 
+## Option 3: Testing doc page examples
+
+The TKO docs at tko.io show code examples as paired HTML + JavaScript blocks. Each pair has:
+- **TSX/HTML tabs** on the HTML block (showing both `ko-*` and `data-bind` syntax)
+- **"Open in Playground" button** on both tabs (opens the example in the playground)
+
+### Testing an HTML example from the docs
+
+Extract the HTML and JS from the code blocks and use Option 1 (static HTML file):
+
+```html
+<!DOCTYPE html>
+<html><body>
+  <!-- paste the HTML code block here -->
+  <script src="https://tko.io/lib/tko.js"></script>
+  <script>
+    window.ko = window.tko
+    // paste the JS code block here
+  </script>
+</body></html>
+```
+
+### Testing a TSX example from the docs
+
+TSX examples use `ko-*` attributes which require JSX compilation. Use Option 2 (playground).
+
+Important: `ko-*` attribute values in `{braces}` are **compile-time JavaScript expressions**, not runtime binding strings. Variables referenced in `ko-*={expr}` must be defined in the TSX scope before the JSX expression. Binding-context variables inside `ko-foreach` children should use **string syntax**: `ko-text="name"` not `ko-text={name}`.
+
+```tsx
+// 1. Define variables that ko-* attributes reference
+const people = ko.observableArray([...])
+
+// 2. JSX template using ko-* attributes
+const view = (
+  <ul ko-foreach={people}>
+    <li ko-text="$data" />
+  </ul>
+)
+
+// 3. Render and activate bindings
+const root = document.getElementById('root')
+const { node } = tko.jsx.render(view)
+root.appendChild(node)
+ko.applyBindings({}, root)
+```
+
+### Verifying playground links from doc pages
+
+Each "Open in Playground" button encodes `{ html, js }` in the URL hash. To verify:
+
+1. Navigate to the doc page (e.g., `http://localhost:4321/bindings/foreach-binding/`)
+2. Click "Open in Playground" on the HTML tab
+3. The playground should show the HTML in the HTML editor, JS in the TSX editor
+4. Wait for "esbuild ready", then the preview should render the example
+5. For TSX tab links: the playground currently receives TSX-style HTML — this requires manual restructuring to run (defining variables, wrapping in JSX, using `tko.jsx.render()`)
+
 ## Which option to use
 
 | Scenario | Option |
@@ -78,3 +134,4 @@ esbuild-wasm takes a few seconds to initialize on first load. The playground sho
 | JSX/TSX code | **Option 2** — playground has esbuild-wasm |
 | Quick observable/computed logic test | **Option 1** — no DOM needed, just script |
 | Sharing a runnable example with a human | **Option 2** — give them the playground URL |
+| Verifying doc page examples work | **Option 1** for HTML tab, **Option 2** for TSX tab |

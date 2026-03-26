@@ -64,7 +64,33 @@ In this live example, there's an `instantaneousValue` observable that reacts imm
 
 Try it:
 
-<live-example params='id: "rate-limit"'></live-example>
+```html
+<p>Type stuff here: <input data-bind="textInput: instantaneousValue" /></p>
+<p>Current delayed value: <b data-bind="text: delayedValue"> </b></p>
+
+<div data-bind="visible: loggedValues().length > 0">
+    <h3>Stuff you have typed:</h3>
+    <ul data-bind="foreach: loggedValues">
+        <li data-bind="text: $data"></li>
+    </ul>
+</div>
+```
+
+```javascript
+function AppViewModel() {
+    this.instantaneousValue = ko.observable();
+    this.delayedValue = ko.pureComputed(this.instantaneousValue)
+        .extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+
+    this.loggedValues = ko.observableArray([]);
+    this.delayedValue.subscribe(function (val) {
+        if (val !== '')
+            this.loggedValues.push(val);
+    }, this);
+}
+
+ko.applyBindings(new AppViewModel());
+```
 
 ### Example 3: Avoiding multiple Ajax requests
 

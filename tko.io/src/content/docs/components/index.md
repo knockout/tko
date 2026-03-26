@@ -27,13 +27,95 @@ This pattern is beneficial for large applications, because it **simplifies devel
 
 To get started, you can register a component using `ko.components.register` (technically, registration is optional, but it's the easiest way to get started). A component definition specifies a `viewModel` and `template`. For example:
 
-<live-example params='id: "component-like"'></live-example>
+```html
+<ul data-bind="foreach: products">
+    <li class="product">
+        <strong data-bind="text: name"></strong>
+        <like-widget params="value: userRating"></like-widget>
+    </li>
+</ul>
+```
+
+```javascript
+ko.components.register('like-widget', {
+    viewModel: function(params) {
+        this.chosenValue = params.value;
+        this.like = function() { this.chosenValue('like'); }.bind(this);
+        this.dislike = function() { this.chosenValue('dislike'); }.bind(this);
+    },
+    template:
+        '<div class="like-or-dislike" data-bind="visible: !chosenValue()">'
+      +     '<button data-bind="click: like">Like it</button> '
+      +     '<button data-bind="click: dislike">Dislike it</button>'
+      + '</div>'
+      + '<div class="result" data-bind="visible: chosenValue">'
+      +     'You <strong data-bind="text: chosenValue"></strong> it'
+      + '</div>'
+});
+
+function Product(name, rating) {
+    this.name = name;
+    this.userRating = ko.observable(rating || null);
+}
+
+function MyViewModel() {
+    this.products = [
+        new Product('Garlic bread'),
+        new Product('Pain au chocolat'),
+        new Product('Seagull spaghetti', 'like')
+    ];
+}
+
+ko.applyBindings(new MyViewModel());
+```
 
 **Normally, you'd load the view model and template from external files** instead of declaring them inline like this. We'll get to that later.
 
 Now, to use this component, you can reference it from any other view in your application, either using the [`component` binding](#component-binding) or using a [custom element](#component-custom-elements). Here's a live example that uses it as a custom element:
 
-<live-example params='id: "component-overview"'></live-example>
+```html
+<ul data-bind="foreach: products">
+    <li class="product">
+        <strong data-bind="text: name"></strong>
+        <like-or-dislike params="value: userRating"></like-or-dislike>
+    </li>
+</ul>
+<button data-bind="click: addProduct">Add a product</button>
+```
+
+```javascript
+ko.components.register('like-or-dislike', {
+    viewModel: function(params) {
+        this.chosenValue = params.value;
+        this.like = function() { this.chosenValue('like'); }.bind(this);
+        this.dislike = function() { this.chosenValue('dislike'); }.bind(this);
+    },
+    template:
+        '<div class="like-or-dislike" data-bind="visible: !chosenValue()">'
+      +     '<button data-bind="click: like">Like it</button> '
+      +     '<button data-bind="click: dislike">Dislike it</button>'
+      + '</div>'
+      + '<div class="result" data-bind="visible: chosenValue">'
+      +     'You <strong data-bind="text: chosenValue"></strong> it'
+      + '</div>'
+});
+
+function Product(name, rating) {
+    this.name = name;
+    this.userRating = ko.observable(rating || null);
+}
+
+function MyViewModel() {
+    this.products = ko.observableArray();
+}
+
+MyViewModel.prototype.addProduct = function() {
+    var name = 'Product ' + (this.products().length + 1);
+    this.products.push(new Product(name));
+};
+
+ko.applyBindings(new MyViewModel());
+```
 
 
 In this example, the component both displays and edits an observable property called `userRating` on the `Product` view model class.
