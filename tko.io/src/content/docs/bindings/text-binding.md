@@ -11,7 +11,18 @@ The `text` binding causes the associated DOM element to display the text value o
 Typically this is useful with elements like `<span>` or `<em>` that traditionally display text, but technically you can use it with any element.
 
 ### Example
-<live-example params='id: "text-binding"'></
+```html
+Today's message is: <span data-bind="text: myMessage"></span>
+```
+
+```javascript
+var viewModel = {
+    myMessage: ko.observable() // Initially blank
+};
+viewModel.myMessage("Hello, world!"); // Text appears
+
+ko.applyBindings(viewModel);
+```
 
 
 ### Parameters
@@ -34,7 +45,20 @@ If you want to detemine text programmatically, one option is to create a [comput
 
 For example,
 
-<live-example params='id: text-computed'></live-example>
+```html
+The item is <span data-bind="text: priceRating"></span> today.
+```
+
+```javascript
+var viewModel = {
+    price: ko.observable(24.95)
+};
+viewModel.priceRating = ko.pureComputed(function() {
+    return this.price() > 50 ? "expensive" : "affordable";
+}, viewModel);
+
+ko.applyBindings(viewModel);
+```
 
 Now, the text will switch between "expensive" and "affordable" as needed whenever `price` changes.
 

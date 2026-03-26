@@ -102,11 +102,11 @@ GitHub Actions workflows (`.github/workflows/`):
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `main-build.yml` | Push to main | Build + headless test |
+| `main-build.yml` | Push to main | Build + audit + headless test |
 | `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
-| `run-tsc.yml` | PRs | TypeScript compilation check |
-| `eslint.yml` | PRs | Lint check |
-| `prettier.yml` | PRs | Format check |
+| `lint-and-typecheck.yml` | PRs | Prettier + ESLint + tsc (combined) |
+| `publish-check.yml` | PRs | Verify packages are publishable |
+| `release.yml` | Push to main | Changeset version PRs + npm publish |
 | `deploy-docs.yml` | Push to main | Deploy tko.io to GitHub Pages |
 | `codeql-analysis.yml` | Weekly + main push | Security scanning |
 
@@ -135,6 +135,27 @@ lerna version        # Bump versions (interactive)
 make                 # Rebuild everything
 lerna publish from-package  # Publish to npm
 ```
+
+## Plans
+
+Significant changes should have a plan file in `plans/` before implementation
+begins. Plans document the context, approach, and verification steps. Review
+existing plans in that directory for format examples.
+
+## Agent-First Documentation
+
+AI coding agents are first-class citizens of TKO. The docs site serves both
+humans (HTML via Starlight) and agents (plain text).
+
+Agent-facing files in `tko.io/public/`:
+- `llms.txt` — discovery entry point, points to the guides below
+- `agent-guide.md` — API reference, gotchas, examples, playground URL format
+- `agent-testing.md` — how to run and verify TKO code without human interaction
+
+When documentation changes — new APIs, new bindings, new patterns, behavioral
+changes — update **both** the Starlight docs (for humans) and the agent guide
+(for agents). The agent guide should be token-efficient: dense, code-first,
+minimal prose.
 
 ## Important Guidelines
 
