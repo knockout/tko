@@ -515,6 +515,7 @@ header {
 
 /* Playground button inside Expressive Code action bar (alongside copy) */
 .expressive-code .copy .playground-open {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -523,12 +524,28 @@ header {
   padding: 0;
   border: none;
   border-radius: 0.2rem;
-  background: var(--ec-frm-inlBtnBg, #f7f5f1);
-  color: var(--ec-frm-inlBtnFg, #403f53);
+  background: transparent;
+  color: var(--sl-color-white);
   opacity: 0;
   cursor: pointer;
   text-decoration: none;
   transition: opacity 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Background layer matching Expressive Code copy button pattern */
+.expressive-code .copy .playground-open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ec-frm-inlBtnBg);
+  opacity: var(--ec-frm-inlBtnBgIdleOpa, 0.4);
+  z-index: -1;
+  transition: opacity 0.2s;
+}
+
+.expressive-code .copy .playground-open:hover::before {
+  opacity: var(--ec-frm-inlBtnBgHoverOrFocusOpa, 0.7);
 }
 
 .expressive-code .copy .playground-open:hover,
