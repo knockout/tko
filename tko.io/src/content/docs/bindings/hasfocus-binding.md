@@ -15,14 +15,45 @@ This is useful if you're building sophisticated forms in which editable elements
 ### Example 1: The basics
 This example simply displays a message if the textbox currently has focus, and uses a button to show that you can trigger focus programmatically.
 
-<live-example params='id: "hasfocus-binding"'></live-example>
+```html
+<input data-bind="hasFocus: isSelected" />
+<button data-bind="click: setIsSelected">Focus programmatically</button>
+<span data-bind="visible: isSelected">The textbox has focus</span>
+```
+
+```javascript
+var viewModel = {
+    isSelected: ko.observable(false),
+    setIsSelected: function() { this.isSelected(true); }
+};
+
+ko.applyBindings(viewModel);
+```
 
 
 ### Example 2: Click-to-edit
 
 Because the `hasFocus` binding works in both directions (setting the associated value focuses or unfocuses the element; focusing or unfocusing the element sets the associated value), it's a convenient way to toggle an "edit" mode. In this example, the UI displays either a `<span>` or an `<input>` element depending on the model's `editing` property. Unfocusing the `<input>` element sets `editing` to `false`, so the UI switches out of "edit" mode.
 
-<live-example params='id: "hasfocus-edit"'></live-example>
+```html
+<p>
+    Name:
+    <b data-bind="visible: !editing(), text: name, click: edit">&nbsp;</b>
+    <input data-bind="visible: editing, value: name, hasFocus: editing" />
+</p>
+<p><em>Click the name to edit it; click elsewhere to apply changes.</em></p>
+```
+
+```javascript
+function PersonViewModel(name) {
+    this.name = ko.observable(name);
+    this.editing = ko.observable(false);
+
+    this.edit = function() { this.editing(true); };
+}
+
+ko.applyBindings(new PersonViewModel("Bert Bertington"));
+```
 
 
 ### Parameters

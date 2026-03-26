@@ -17,7 +17,19 @@ Note: If you're working with checkboxes or radio buttons, use [the `checked` bin
 
 ### Example
 
-<live-example params='id: "value-binding"'></live-example>
+```html
+<p>Login name: <input data-bind="value: userName" /></p>
+<p>Password: <input type="password" data-bind="value: userPassword" /></p>
+```
+
+```javascript
+var viewModel = {
+    userName: ko.observable(""),
+    userPassword: ko.observable("abc")
+};
+
+ko.applyBindings(viewModel);
+```
 
 ### Parameters
 

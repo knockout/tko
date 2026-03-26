@@ -14,7 +14,17 @@ The `if` binding causes a section of markup to appear in your document (and to h
 
 This example shows that the `if` binding can dynamically add and remove sections of markup as observable values change.
 
-<live-example params='id: "if-binding"'></live-example>
+```html
+<label><input type="checkbox" data-bind="checked: displayMessage" /> Display message</label>
+
+<div data-bind="if: displayMessage">Here is a message. Astonishing.</div>
+```
+
+```javascript
+ko.applyBindings({
+    displayMessage: ko.observable(false)
+});
+```
 
 ### Example 2
 

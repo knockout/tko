@@ -1,0 +1,564 @@
+---
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playground | TKO</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+      :root {
+        --pg-font: 'Inter', system-ui, sans-serif;
+        --pg-font-mono: 'JetBrains Mono', monospace;
+        --pg-bg: #0e1520;
+        --pg-surface: #161f2e;
+        --pg-border: rgba(220, 232, 255, 0.1);
+        --pg-text: #f8fafc;
+        --pg-text-muted: #8b97aa;
+        --pg-accent: #0f62fe;
+        --pg-accent-hover: #3b82f6;
+        --pg-error-bg: #2d1215;
+        --pg-error-text: #fca5a5;
+        --pg-error-border: rgba(252, 165, 165, 0.2);
+        --pg-console-bg: #111927;
+        --pg-tab-active: #0f62fe;
+        --pg-tab-inactive: transparent;
+        --pg-header-height: 3rem;
+        --pg-status-height: 1.75rem;
+      }
+
+      html, body {
+        height: 100%;
+        overflow: hidden;
+        font-family: var(--pg-font);
+        background: var(--pg-bg);
+        color: var(--pg-text);
+      }
+
+      .playground {
+        display: grid;
+        grid-template-rows: var(--pg-header-height) 1fr var(--pg-status-height);
+        height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 1rem;
+        background: var(--pg-surface);
+        border-bottom: 1px solid var(--pg-border);
+      }
+
+      .header-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+
+      .header-title a {
+        color: var(--pg-text-muted);
+        text-decoration: none;
+      }
+
+      .header-title a:hover { color: var(--pg-text); }
+
+      .header-title span { color: var(--pg-text); }
+
+      .header-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: auto;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--pg-border);
+        border-radius: 0.5rem;
+        background: var(--pg-surface);
+        color: var(--pg-text);
+        font-family: var(--pg-font);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 120ms, border-color 120ms;
+      }
+
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+
+      .btn--primary {
+        background: var(--pg-accent);
+        border-color: var(--pg-accent);
+        color: #fff;
+      }
+
+      .btn--primary:hover {
+        background: var(--pg-accent-hover);
+        border-color: var(--pg-accent-hover);
+      }
+
+      /* Main panels */
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 0;
+      }
+
+      /* Left: editor */
+      .editor-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        border-right: 1px solid var(--pg-border);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 0;
+        background: var(--pg-surface);
+        border-bottom: 1px solid var(--pg-border);
+        flex-shrink: 0;
+      }
+
+      .tab {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        color: var(--pg-text-muted);
+        font-family: var(--pg-font-mono);
+        font-size: 0.78rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 120ms, border-color 120ms;
+      }
+
+      .tab:hover { color: var(--pg-text); }
+
+      .tab[aria-selected="true"] {
+        color: var(--pg-text);
+        border-bottom-color: var(--pg-tab-active);
+      }
+
+      .editor-mount {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .editor-mount[hidden] { display: none; }
+
+      .editor-mount .cm-editor {
+        height: 100%;
+        font-family: var(--pg-font-mono);
+        font-size: 0.88rem;
+      }
+
+      .editor-mount .cm-focused { outline: none !important; }
+
+      /* Right: preview + console */
+      .preview-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .preview-frame {
+        flex: 1;
+        width: 100%;
+        border: none;
+        background: #fff;
+      }
+
+      .console-panel {
+        flex-shrink: 0;
+        max-height: 10rem;
+        overflow-y: auto;
+        background: var(--pg-console-bg);
+        border-top: 1px solid var(--pg-border);
+        font-family: var(--pg-font-mono);
+        font-size: 0.78rem;
+        line-height: 1.5;
+      }
+
+      .console-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.3rem 0.75rem;
+        background: var(--pg-surface);
+        border-bottom: 1px solid var(--pg-border);
+        font-family: var(--pg-font);
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--pg-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .console-clear {
+        border: none;
+        background: none;
+        color: var(--pg-text-muted);
+        font-size: 0.7rem;
+        cursor: pointer;
+      }
+
+      .console-clear:hover { color: var(--pg-text); }
+
+      .console-messages { padding: 0.25rem 0; }
+
+      .console-msg {
+        padding: 0.2rem 0.75rem;
+        color: var(--pg-text-muted);
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .console-msg--error { color: var(--pg-error-text); }
+      .console-msg--warn { color: #fbbf24; }
+
+      /* Error overlay */
+      .error-bar {
+        padding: 0.6rem 0.75rem;
+        background: var(--pg-error-bg);
+        border-top: 1px solid var(--pg-error-border);
+        color: var(--pg-error-text);
+        font-family: var(--pg-font-mono);
+        font-size: 0.8rem;
+        white-space: pre-wrap;
+        overflow-y: auto;
+        max-height: 8rem;
+      }
+
+      .error-bar[hidden] { display: none; }
+
+      /* Status bar */
+      .status-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 0.75rem;
+        background: var(--pg-surface);
+        border-top: 1px solid var(--pg-border);
+        font-size: 0.7rem;
+        color: var(--pg-text-muted);
+      }
+
+      .status-bar .dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        margin-right: 0.35rem;
+      }
+
+      .dot--loading { background: #fbbf24; }
+      .dot--ready { background: #34d399; }
+      .dot--error { background: #f87171; }
+
+      /* Loading overlay */
+      .loading-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(14, 21, 32, 0.85);
+        color: var(--pg-text-muted);
+        font-size: 0.9rem;
+        z-index: 10;
+      }
+
+      .loading-overlay[hidden] { display: none; }
+
+      /* Responsive */
+      @media (max-width: 50rem) {
+        .panels { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+        .editor-panel { border-right: none; border-bottom: 1px solid var(--pg-border); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="playground">
+      <header class="header">
+        <div class="header-title">
+          <a href="/">TKO</a> <span>/ Playground</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn--primary" id="run-btn" title="Run (Ctrl+Enter)">Run</button>
+        </div>
+      </header>
+
+      <div class="panels" style="position: relative;">
+        <div class="loading-overlay" id="loading">Initializing esbuild...</div>
+
+        <div class="editor-panel">
+          <div class="tabs" role="tablist">
+            <button class="tab" role="tab" aria-selected="false" data-tab="html">index.html</button>
+            <button class="tab" role="tab" aria-selected="true" data-tab="tsx">app.tsx</button>
+          </div>
+          <div class="editor-mount" id="editor-html" hidden></div>
+          <div class="editor-mount" id="editor-tsx"></div>
+        </div>
+
+        <div class="preview-panel">
+          <iframe class="preview-frame" id="preview" sandbox="allow-scripts"></iframe>
+          <div class="error-bar" id="error-bar" hidden></div>
+          <div class="console-panel">
+            <div class="console-header">
+              <span>Console</span>
+              <button class="console-clear" id="console-clear">Clear</button>
+            </div>
+            <div class="console-messages" id="console-messages"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <span id="esbuild-status"><span class="dot dot--loading"></span>Loading esbuild...</span>
+        <span id="compile-time"></span>
+      </div>
+    </div>
+
+    <script type="module">
+      import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esm/browser.min.js'
+      import { EditorView, basicSetup } from 'https://esm.sh/codemirror@6.0.2'
+      import { javascript } from 'https://esm.sh/@codemirror/lang-javascript@6.2.5'
+      import { html as htmlLang } from 'https://esm.sh/@codemirror/lang-html@6.4.11'
+      import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6.1.3'
+
+      // --- Default code ---
+
+      const DEFAULT_HTML = `<div id="root"></div>`
+
+      const DEFAULT_TSX = `const count = tko.observable(0)
+
+const view = (
+  <div>
+    <h1>Count: {count}</h1>
+    <button ko-click={() => count(count() + 1)}>
+      Increment
+    </button>
+  </div>
+)
+
+const root = document.getElementById('root')
+const { node } = tko.jsx.render(view)
+root.appendChild(node)
+tko.applyBindings({}, root)
+`
+
+      // --- Load code from URL hash ---
+
+      function loadFromHash() {
+        if (!location.hash) return null
+        try {
+          const json = decodeURIComponent(atob(location.hash.slice(1)))
+          return JSON.parse(json)
+        } catch { return null }
+      }
+
+      const hashData = loadFromHash()
+      const initialHtml = hashData?.html ?? DEFAULT_HTML
+      const initialJs = hashData?.js ?? DEFAULT_TSX
+
+      // --- DOM refs ---
+
+      const loading = document.getElementById('loading')
+      const preview = document.getElementById('preview')
+      const errorBar = document.getElementById('error-bar')
+      const esbuildStatus = document.getElementById('esbuild-status')
+      const compileTimeEl = document.getElementById('compile-time')
+      const consoleMessages = document.getElementById('console-messages')
+      const consoleClear = document.getElementById('console-clear')
+      const runBtn = document.getElementById('run-btn')
+      const tabs = document.querySelectorAll('.tab[role="tab"]')
+      const editorHtmlMount = document.getElementById('editor-html')
+      const editorTsxMount = document.getElementById('editor-tsx')
+
+      // --- Initialize esbuild ---
+
+      let esbuildReady = false
+
+      async function initEsbuild() {
+        try {
+          await esbuild.initialize({
+            wasmURL: 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esbuild.wasm'
+          })
+          esbuildReady = true
+          esbuildStatus.innerHTML = '<span class="dot dot--ready"></span>esbuild ready'
+          loading.hidden = true
+        } catch (e) {
+          esbuildStatus.innerHTML = '<span class="dot dot--error"></span>esbuild failed to load'
+          loading.textContent = 'Failed to load esbuild: ' + e.message
+        }
+      }
+
+      // --- Create editors ---
+
+      function makeEditor(parent, doc, langExt) {
+        let timeout
+        const editor = new EditorView({
+          doc,
+          extensions: [
+            basicSetup,
+            langExt,
+            oneDark,
+            EditorView.updateListener.of((update) => {
+              if (update.docChanged) {
+                clearTimeout(timeout)
+                timeout = setTimeout(run, 500)
+              }
+            })
+          ],
+          parent
+        })
+        return editor
+      }
+
+      const htmlEditor = makeEditor(editorHtmlMount, initialHtml, htmlLang())
+      const tsxEditor = makeEditor(editorTsxMount, initialJs, javascript({ jsx: true, typescript: true }))
+
+      // --- Tab switching ---
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.dataset.tab
+          tabs.forEach(t => t.setAttribute('aria-selected', 'false'))
+          tab.setAttribute('aria-selected', 'true')
+          editorHtmlMount.hidden = target !== 'html'
+          editorTsxMount.hidden = target !== 'tsx'
+        })
+      })
+
+      // --- Console capture ---
+
+      function addConsoleMsg(text, level = 'log') {
+        const el = document.createElement('div')
+        el.className = 'console-msg' + (level === 'error' ? ' console-msg--error' : level === 'warn' ? ' console-msg--warn' : '')
+        el.textContent = text
+        consoleMessages.appendChild(el)
+        consoleMessages.scrollTop = consoleMessages.scrollHeight
+      }
+
+      consoleClear.addEventListener('click', () => {
+        consoleMessages.innerHTML = ''
+      })
+
+      window.addEventListener('message', (e) => {
+        if (e.data?.type === 'console') {
+          addConsoleMsg(e.data.args.join(' '), e.data.method)
+        } else if (e.data?.type === 'error') {
+          addConsoleMsg(e.data.message, 'error')
+        }
+      })
+
+      // --- Transform + run ---
+
+      async function run() {
+        if (!esbuildReady) return
+
+        const tsxCode = tsxEditor.state.doc.toString()
+        const htmlCode = htmlEditor.state.doc.toString()
+
+        const start = performance.now()
+
+        try {
+          const result = await esbuild.transform(tsxCode, {
+            loader: 'tsx',
+            jsx: 'transform',
+            jsxFactory: 'tko.jsx.createElement',
+            jsxFragment: 'tko.jsx.Fragment'
+          })
+
+          const elapsed = (performance.now() - start).toFixed(0)
+          compileTimeEl.textContent = `Compiled in ${elapsed}ms`
+
+          errorBar.hidden = true
+
+          const srcdoc = `<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 16px; font-family: 'Inter', system-ui, sans-serif; color: #1a1a1a; }
+  * { box-sizing: border-box; }
+  button { cursor: pointer; }
+</style>
+</head>
+<body>
+${htmlCode}
+<script src="/lib/tko.js"><\/script>
+<script>
+window.ko = window.tko;
+
+// Forward console to parent
+['log','warn','error','info'].forEach(m => {
+  const orig = console[m];
+  console[m] = (...args) => {
+    window.parent.postMessage({ type: 'console', method: m, args: args.map(a => {
+      try { return typeof a === 'object' ? JSON.stringify(a) : String(a) } catch { return String(a) }
+    }) }, '*');
+    orig.apply(console, args);
+  };
+});
+
+window.onerror = (msg) => {
+  window.parent.postMessage({ type: 'error', message: String(msg) }, '*');
+};
+
+window.onunhandledrejection = (e) => {
+  window.parent.postMessage({ type: 'error', message: String(e.reason) }, '*');
+};
+
+setTimeout(() => {
+  try {
+    ${result.code}
+  } catch (e) {
+    console.error(e.message || e);
+  }
+}, 0);
+<\/script>
+</body>
+</html>`
+
+          preview.srcdoc = srcdoc
+        } catch (e) {
+          const elapsed = (performance.now() - start).toFixed(0)
+          compileTimeEl.textContent = `Failed in ${elapsed}ms`
+          errorBar.textContent = e.message
+          errorBar.hidden = false
+        }
+      }
+
+      // --- Run button + keyboard shortcut ---
+
+      runBtn.addEventListener('click', run)
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault()
+          run()
+        }
+      })
+
+      // --- Boot ---
+
+      await initEsbuild()
+      run()
+    </script>
+  </body>
+</html>

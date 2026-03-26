@@ -12,7 +12,28 @@ The `component` binding injects a specified [component](component-overview.html)
 
 ### Live example
 
-<live-example params='id: "component-binding"'></live-example>
+```html
+<h4>First instance, without parameters</h4>
+<div data-bind='component: "message-editor"'></div>
+
+<h4>Second instance, passing parameters</h4>
+<div data-bind='component: {
+    name: "message-editor",
+    params: { initialText: "Hello, world!" }
+}'></div>
+```
+
+```javascript
+ko.components.register('message-editor', {
+    viewModel: function(params) {
+        this.text = ko.observable(params && params.initialText || '');
+    },
+    template: 'Message: <input data-bind="value: text" /> '
+            + '(length: <span data-bind="text: text().length"></span>)'
+});
+
+ko.applyBindings();
+```
 
 Note: In more realistic cases, you would typically load component viewmodels and templates from external files, instead of hardcoding them into the registration. See [an example](#component-overview) and [registration documentation](#component-registration).
 

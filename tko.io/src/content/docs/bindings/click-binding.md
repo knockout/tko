@@ -8,7 +8,24 @@ title: Click Binding
 The `click` binding adds an event handler so that your chosen JavaScript function will be invoked when the associated DOM element is clicked. This is most commonly used with elements like `button`, `input`, and `a`, but actually works with any visible DOM element.
 
 ### Example
-<live-example params='id: "click"'></live-example>
+```html
+<div>
+    You've clicked <span data-bind="text: numberOfClicks"></span> times
+    <button data-bind="click: incrementClickCounter">Click me</button>
+</div>
+```
+
+```javascript
+var viewModel = {
+    numberOfClicks: ko.observable(0),
+    incrementClickCounter: function() {
+        var previousCount = this.numberOfClicks();
+        this.numberOfClicks(previousCount + 1);
+    }
+};
+
+ko.applyBindings(viewModel);
+```
 
 
 Each time you click the button, this will invoke `incrementClickCounter()` on the view model, which in turn changes the view model state, which causes the UI to update.
@@ -30,7 +47,27 @@ Each time you click the button, this will invoke `incrementClickCounter()` on th
 When calling your handler, Knockout will supply the current model value as the first parameter. This is particularly useful if you're rendering
 some UI for each item in a collection, and you need to know which item's UI was clicked. For example,
 
-<live-example params='id: "click-places"'></live-example>
+```html
+<ul data-bind="foreach: places">
+    <li>
+        <span data-bind="text: $data"></span>
+        <button data-bind="click: $parent.removePlace">Remove</button>
+    </li>
+</ul>
+```
+
+```javascript
+function MyViewModel() {
+    var self = this;
+    self.places = ko.observableArray(['London', 'Paris', 'Tokyo']);
+
+    self.removePlace = function(place) {
+        self.places.remove(place);
+    };
+}
+
+ko.applyBindings(new MyViewModel());
+```
 
 Two points to note about this example:
 
@@ -45,7 +82,25 @@ Two points to note about this example:
 
 In some scenarios, you may need to access the DOM event object associated with your click event. Knockout will pass the event as the second parameter to your function, as in this example:
 
-<live-example params='id: "click-event"'></live-example>
+```html
+<button data-bind="click: myFunction">
+    Click me
+</button>
+```
+
+```javascript
+var viewModel = {
+    myFunction: function(data, event) {
+        if (event.shiftKey) {
+            //do something different when user has shift key down
+        } else {
+            //do normal action
+        }
+    }
+};
+
+ko.applyBindings(viewModel);
+```
 
 If you need to pass more parameters, one way to do it is by wrapping your handler in a function literal that takes in a parameter, as in this example:
 
