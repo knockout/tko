@@ -20,6 +20,7 @@ const shouldRenderSearch =
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
 		<a class="playground-link" href="/playground">Playground</a>
+		<a class="llms-link" href="/llms.txt">llms.txt</a>
 		<div class="sl-flex social-icons">
 			<SocialIcons />
 		</div>
@@ -75,6 +76,18 @@ const shouldRenderSearch =
 		.playground-link:hover {
 			background: var(--sl-color-accent);
 			color: #fff;
+		}
+
+		.llms-link {
+			font-size: 0.82rem;
+			font-weight: 600;
+			color: var(--sl-color-gray-2);
+			text-decoration: none;
+			white-space: nowrap;
+		}
+
+		.llms-link:hover {
+			color: var(--sl-color-accent);
 		}
 
 		@media (min-width: 50rem) {
