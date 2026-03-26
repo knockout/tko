@@ -33,7 +33,23 @@ This allows for a very modern, [WebComponents](http://www.w3.org/TR/components-i
 This example declares a component, and then injects two instances of it into a view. See the source code below.
 
 ```html
-<live-example params='id: "component-custom-element"'></live-example>
+<h4>First instance, without parameters</h4>
+<message-editor></message-editor>
+
+<h4>Second instance, passing parameters</h4>
+<message-editor params='initialText: "Hello, world!"'></message-editor>
+```
+
+```javascript
+ko.components.register('message-editor', {
+    viewModel: function(params) {
+        this.text = ko.observable(params.initialText || '');
+    },
+    template: 'Message: <input data-bind="value: text" /> '
+            + '(length: <span data-bind="text: text().length"></span>)'
+});
+
+ko.applyBindings();
 ```
 
 Note: In more realistic cases, you would typically load component viewmodels and templates from external files, instead of hardcoding them into the registration. See [an example](#component-overview.html#example-loading-the-likedislike-widget-from-external-files-on-demand) and [registration documentation](#component-registration).
@@ -119,7 +135,41 @@ The component can then choose to use the supplied DOM nodes as part of its outpu
 
 For example, the `my-special-list` component's template can reference `$componentTemplateNodes` so that its output includes the supplied markup. Here's the complete working example:
 
-<live-example params='id: "component-markdown-example"'></live-example>
+```html
+<!-- This could be in a separate file -->
+<template id="my-special-list-template">
+    <h3>Here is a special list</h3>
+
+    <ul data-bind="foreach: { data: myItems, as: 'myItem' }">
+        <li>
+            <h4>Here is another one of my special items</h4>
+            <!-- ko template: { nodes: $componentTemplateNodes, data: myItem } --><!-- /ko -->
+        </li>
+    </ul>
+</template>
+
+<my-special-list params="items: someArrayOfPeople">
+    <!-- Look, I'm putting markup inside a custom element -->
+    The person <em data-bind="text: name"></em>
+    is <em data-bind="text: age"></em> years old.
+</my-special-list>
+```
+
+```javascript
+ko.components.register('my-special-list', {
+    template: { element: 'my-special-list-template' },
+    viewModel: function(params) {
+        this.myItems = params.items;
+    }
+});
+
+ko.applyBindings({
+    someArrayOfPeople: ko.observableArray([
+        { name: 'Lewis', age: 56 },
+        { name: 'Hathaway', age: 34 }
+    ])
+});
+```
 
 This "special list" example does nothing more than insert a heading above each list item. But the same technique can be used to create sophisticated grids, dialogs, tab sets, and so on, since all that is needed for such UI elements is common UI markup (e.g., to define the grid or dialog's heading and borders) wrapped around arbitrary supplied markup.
 
