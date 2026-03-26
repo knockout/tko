@@ -102,11 +102,11 @@ GitHub Actions workflows (`.github/workflows/`):
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `main-build.yml` | Push to main | Build + headless test |
+| `main-build.yml` | Push to main | Build + audit + headless test |
 | `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
-| `run-tsc.yml` | PRs | TypeScript compilation check |
-| `eslint.yml` | PRs | Lint check |
-| `prettier.yml` | PRs | Format check |
+| `lint-and-typecheck.yml` | PRs | Prettier + ESLint + tsc (combined) |
+| `publish-check.yml` | PRs | Verify packages are publishable |
+| `release.yml` | Push to main | Changeset version PRs + npm publish |
 | `deploy-docs.yml` | Push to main | Deploy tko.io to GitHub Pages |
 | `codeql-analysis.yml` | Weekly + main push | Security scanning |
 
@@ -135,6 +135,12 @@ lerna version        # Bump versions (interactive)
 make                 # Rebuild everything
 lerna publish from-package  # Publish to npm
 ```
+
+## Plans
+
+Significant changes should have a plan file in `plans/` before implementation
+begins. Plans document the context, approach, and verification steps. Review
+existing plans in that directory for format examples.
 
 ## Important Guidelines
 

@@ -1,7 +1,7 @@
-import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.24.0/esm/browser.min.js';
-import { EditorView, basicSetup } from 'https://esm.sh/codemirror@6.0.1';
-import { javascript } from 'https://esm.sh/@codemirror/lang-javascript@6.2.2';
-import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6.1.2';
+import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esm/browser.min.js';
+import { EditorView, basicSetup } from 'https://esm.sh/codemirror@6.0.2';
+import { javascript } from 'https://esm.sh/@codemirror/lang-javascript@6.2.5';
+import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6.1.3';
 
 let esbuildInitialized = false;
 
@@ -26,7 +26,7 @@ function createLegacyExamplePlaceholder(exampleNode) {
 async function initEsbuild() {
   if (!esbuildInitialized) {
     await esbuild.initialize({
-      wasmURL: 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.24.0/esbuild.wasm'
+      wasmURL: 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esbuild.wasm'
     });
     esbuildInitialized = true;
   }
