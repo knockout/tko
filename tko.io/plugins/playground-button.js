@@ -1,8 +1,12 @@
 /**
- * Expressive Code plugin: adds an "Open in Playground" button to HTML code blocks.
+ * Expressive Code plugin: adds an "Open in Playground" button to code blocks.
  *
- * The button sits inside the .copy toolbar next to the built-in copy button.
- * It encodes the block's HTML and JS into a URL hash that /playground reads.
+ * Handles two patterns:
+ *   1. Self-contained HTML blocks with inline <script> tags
+ *   2. Adjacent html + javascript code blocks (common in KO docs)
+ *
+ * For pattern 2, when a ```javascript block follows a ```html block,
+ * the plugin pairs them and adds the button to the HTML block.
  *
  * Replicates the exact same DOM structure and CSS as the built-in copy button:
  *   <a class="playground-open"><div></div></a>
@@ -50,7 +54,41 @@ function encodePlaygroundHash(html, js) {
   return Buffer.from(encodeURIComponent(data)).toString('base64')
 }
 
+function autoApplyBindings(js) {
+  if (/\.applyBindings\s*\(/.test(js)) return js
+  const matches = [...js.matchAll(/(?:var|let|const)\s+(\w+)\s*=/g)]
+  if (matches.length === 0) return js
+  const vmName = matches[matches.length - 1][1]
+  return js + `\nko.applyBindings(${vmName});`
+}
+
+function addPlaygroundButton(renderData, html, js) {
+  const hash = encodePlaygroundHash(html, autoApplyBindings(js))
+  const ast = renderData.blockAst
+
+  const copyDiv = findNode(ast, n =>
+    n.type === 'element' &&
+    n.tagName === 'div' &&
+    Array.isArray(n.properties?.className) &&
+    n.properties.className.includes('copy')
+  )
+  if (!copyDiv) return
+
+  const bgDiv = h('div', {})
+  const link = h('a', {
+    className: ['playground-open'],
+    href: `/playground#${hash}`,
+    target: '_blank',
+    title: 'Open in Playground'
+  }, [bgDiv])
+
+  copyDiv.children.unshift(link)
+}
+
 export function pluginPlaygroundButton() {
+  // Track pending HTML block for pairing with a following JS block
+  let pendingHtml = null
+
   return {
     name: 'playground-button',
 
@@ -133,33 +171,29 @@ export function pluginPlaygroundButton() {
 
     hooks: {
       postprocessRenderedBlock: ({ codeBlock, renderData }) => {
-        if (codeBlock.language !== 'html') return
+        if (codeBlock.language === 'html') {
+          const code = codeBlock.code
+          const { html, js } = splitHtmlAndScript(code)
 
-        const code = codeBlock.code
-        const { html, js } = splitHtmlAndScript(code)
-        if (!html && !js) return
-
-        const hash = encodePlaygroundHash(html, js)
-        const ast = renderData.blockAst
-
-        const copyDiv = findNode(ast, n =>
-          n.type === 'element' &&
-          n.tagName === 'div' &&
-          Array.isArray(n.properties?.className) &&
-          n.properties.className.includes('copy')
-        )
-        if (!copyDiv) return
-
-        // Match the copy button's DOM: <a><div></div></a>
-        const bgDiv = h('div', {})
-        const link = h('a', {
-          className: ['playground-open'],
-          href: `/playground#${hash}`,
-          target: '_blank',
-          title: 'Open in Playground'
-        }, [bgDiv])
-
-        copyDiv.children.unshift(link)
+          if (js) {
+            // Self-contained HTML block with inline <script> — add button now
+            pendingHtml = null
+            addPlaygroundButton(renderData, html, js)
+          } else {
+            // HTML-only block — store for potential pairing with next JS block
+            pendingHtml = { html: code.trim(), renderData }
+          }
+        } else if (codeBlock.language === 'javascript' && pendingHtml) {
+          // JS block immediately after an HTML block — pair them
+          const js = codeBlock.code.trim()
+          if (js) {
+            addPlaygroundButton(pendingHtml.renderData, pendingHtml.html, js)
+          }
+          pendingHtml = null
+        } else {
+          // Any other block type breaks the pairing
+          pendingHtml = null
+        }
       }
     }
   }
