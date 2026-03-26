@@ -4,7 +4,10 @@ const inProgressNote =
   'TKO docs are in progress. Examples, API details, and migration notes are still being revised.';
 ---
 
-<div class="tko-banner" data-pagefind-ignore>{inProgressNote}</div>
+<div class="tko-banner" data-pagefind-ignore>
+  <strong>Docs in progress</strong>
+  <span>{inProgressNote}</span>
+</div>
 {banner && <div class="sl-banner" data-pagefind-ignore set:html={banner.content} />}
 
 <style>
@@ -17,17 +20,35 @@ const inProgressNote =
       line-height: var(--sl-line-height-headings);
       text-align: center;
       text-wrap: balance;
-      box-shadow: var(--sl-shadow-sm);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
     }
 
     .tko-banner {
-      background:
-        linear-gradient(90deg, rgba(46, 99, 218, 0.94), rgba(19, 48, 109, 0.92)),
-        var(--sl-color-bg-accent);
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 248, 229, 0.88);
+      color: #7c4a03;
       font-size: var(--sl-text-sm);
-      font-weight: 700;
-      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+
+    .tko-banner strong {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(124, 74, 3, 0.12);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    .tko-banner span {
+      max-width: 64rem;
     }
 
     .sl-banner {
@@ -36,6 +57,22 @@ const inProgressNote =
 
     .sl-banner :global(a) {
       color: var(--__sl-banner-text);
+    }
+
+    :root[data-theme='dark'] .tko-banner {
+      background: rgba(64, 42, 12, 0.9);
+      color: #fde4b0;
+      border-bottom-color: rgba(253, 228, 176, 0.12);
+    }
+
+    :root[data-theme='dark'] .tko-banner strong {
+      background: rgba(253, 228, 176, 0.12);
+    }
+
+    @media (max-width: 50rem) {
+      .tko-banner {
+        flex-direction: column;
+      }
     }
   }
 </style>
