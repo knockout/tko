@@ -1,0 +1,37 @@
+# Combined lint, format, and typecheck workflow.
+# Replaces separate eslint.yml, prettier.yml, and run-tsc.yml to avoid
+# running npm install three times.
+name: Lint & Typecheck
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check Prettier
+        run: make format
+
+      - name: Check ESLint
+        run: make eslint
+
+      - name: Build (required for tsc)
+        run: make
+
+      - name: Typecheck
+        run: npx tsc

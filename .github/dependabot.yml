@@ -1,0 +1,31 @@
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      # Group minor/patch devDependency updates into a single PR
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      # Group minor/patch production dependency updates
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    # Security updates are always opened individually (ungrouped)
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
