@@ -57,13 +57,15 @@ function encodePlaygroundHash(html, js) {
 function autoApplyBindings(js) {
   if (/\.applyBindings\s*\(/.test(js)) return js
   const matches = [...js.matchAll(/(?:var|let|const)\s+(\w+)\s*=/g)]
-  if (matches.length === 0) return js
+  if (matches.length === 0) return null
   const vmName = matches[matches.length - 1][1]
   return js + `\nko.applyBindings(${vmName});`
 }
 
 function addPlaygroundButton(renderData, html, js) {
-  const hash = encodePlaygroundHash(html, autoApplyBindings(js))
+  const runnableJs = autoApplyBindings(js)
+  if (!runnableJs) return
+  const hash = encodePlaygroundHash(html, runnableJs)
   const ast = renderData.blockAst
 
   const copyDiv = findNode(ast, n =>
