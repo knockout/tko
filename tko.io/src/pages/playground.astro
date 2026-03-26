@@ -362,6 +362,20 @@ root.appendChild(node)
 tko.applyBindings({}, root)
 `
 
+      // --- Load code from URL hash ---
+
+      function loadFromHash() {
+        if (!location.hash) return null
+        try {
+          const json = decodeURIComponent(atob(location.hash.slice(1)))
+          return JSON.parse(json)
+        } catch { return null }
+      }
+
+      const hashData = loadFromHash()
+      const initialHtml = hashData?.html ?? DEFAULT_HTML
+      const initialJs = hashData?.js ?? DEFAULT_TSX
+
       // --- DOM refs ---
 
       const loading = document.getElementById('loading')
@@ -416,8 +430,8 @@ tko.applyBindings({}, root)
         return editor
       }
 
-      const htmlEditor = makeEditor(editorHtmlMount, DEFAULT_HTML, htmlLang())
-      const tsxEditor = makeEditor(editorTsxMount, DEFAULT_TSX, javascript({ jsx: true, typescript: true }))
+      const htmlEditor = makeEditor(editorHtmlMount, initialHtml, htmlLang())
+      const tsxEditor = makeEditor(editorTsxMount, initialJs, javascript({ jsx: true, typescript: true }))
 
       // --- Tab switching ---
 

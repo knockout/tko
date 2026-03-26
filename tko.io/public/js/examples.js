@@ -157,10 +157,66 @@ if (document.readyState === 'loading') {
   initExamples();
 }
 
+// --- Playground links for code blocks ---
+
+function encodePlaygroundHash(html, js) {
+  const data = JSON.stringify({ html, js });
+  return btoa(encodeURIComponent(data));
+}
+
+function splitHtmlAndScript(code) {
+  // Extract inline <script> content (not src scripts) and separate from HTML
+  let html = code;
+  let js = '';
+
+  // Remove CDN/src script tags entirely
+  html = html.replace(/<script\s+src=[^>]*><\/script>\s*/gi, '');
+
+  // Extract inline script content
+  html = html.replace(/<script\b[^>]*>([\s\S]*?)<\/script>\s*/gi, (_, content) => {
+    js += content.trim() + '\n';
+    return '';
+  });
+
+  return { html: html.trim(), js: js.trim() };
+}
+
+function addPlaygroundLink(pre) {
+  // Starlight/Expressive Code wraps code blocks in <figure class="frame">
+  const figure = pre.closest('figure');
+  const wrapper = figure || pre;
+  if (wrapper.parentElement?.querySelector('.playground-open')) return;
+
+  const rawCode = pre.textContent.trim();
+  const { html, js } = splitHtmlAndScript(rawCode);
+
+  // Skip blocks with no runnable content
+  if (!html && !js) return;
+
+  const hash = encodePlaygroundHash(html, js);
+  const link = document.createElement('a');
+  link.className = 'playground-open';
+  link.href = `/playground#${hash}`;
+  link.target = '_blank';
+  link.textContent = 'Open in Playground';
+  wrapper.parentNode.insertBefore(link, wrapper.nextSibling);
+}
+
 function initExamples() {
   document.querySelectorAll('live-example').forEach(createLegacyExamplePlaceholder);
 
   // Find all code blocks with language 'jsx'
-  const codeBlocks = document.querySelectorAll('pre code.language-jsx');
-  codeBlocks.forEach(createExampleContainer);
+  // Support both classic (code.language-jsx) and Starlight/Expressive Code (pre[data-language="jsx"])
+  const jsxBlocks = document.querySelectorAll('pre code.language-jsx');
+  jsxBlocks.forEach(createExampleContainer);
+
+  // Add "Open in Playground" to html code blocks
+  // Starlight uses pre[data-language="html"], classic uses code.language-html
+  const htmlPres = document.querySelectorAll('pre[data-language="html"]');
+  htmlPres.forEach(addPlaygroundLink);
+
+  // Fallback for classic code blocks (non-Starlight pages)
+  if (htmlPres.length === 0) {
+    document.querySelectorAll('pre code.language-html').forEach(cb => addPlaygroundLink(cb.parentElement));
+  }
 }

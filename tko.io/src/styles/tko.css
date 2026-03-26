@@ -513,7 +513,30 @@ header {
   }
 }
 
+.playground-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--tko-border);
+  background: var(--tko-surface-strong);
+  color: var(--sl-color-text-accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.playground-open:hover {
+  border-color: var(--sl-color-accent);
+  background: var(--sl-color-accent-low);
+}
+
 @media print {
+  .playground-open { display: none; }
+
   .example-container {
     display: block;
     min-height: auto;
