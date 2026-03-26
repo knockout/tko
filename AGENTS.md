@@ -142,6 +142,21 @@ Significant changes should have a plan file in `plans/` before implementation
 begins. Plans document the context, approach, and verification steps. Review
 existing plans in that directory for format examples.
 
+## Agent-First Documentation
+
+AI coding agents are first-class citizens of TKO. The docs site serves both
+humans (HTML via Starlight) and agents (plain text).
+
+Agent-facing files in `tko.io/public/`:
+- `llms.txt` — discovery entry point, points to the guides below
+- `agent-guide.md` — API reference, gotchas, examples, playground URL format
+- `agent-testing.md` — how to run and verify TKO code without human interaction
+
+When documentation changes — new APIs, new bindings, new patterns, behavioral
+changes — update **both** the Starlight docs (for humans) and the agent guide
+(for agents). The agent guide should be token-efficient: dense, code-first,
+minimal prose.
+
 ## Important Guidelines
 
 - Do not modify `tools/build.mk` or `tools/karma.conf.js` without understanding
