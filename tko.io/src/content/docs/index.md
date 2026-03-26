@@ -5,8 +5,8 @@ description: Choose the right TKO build and get started with modern Knockout.
 
 <div class="landing-hero">
   <p class="landing-kicker">Modern Knockout, clarified</p>
-  <h2>Pick the right build quickly, understand the migration path, and get to working bindings without reading the whole repo first.</h2>
-  <p class="landing-lede">This site now prioritizes the practical questions a team has when evaluating TKO: what to install, what stays familiar, and what changed from Knockout 3.x.</p>
+  <h2>Choose the right TKO build and get moving quickly.</h2>
+  <p class="landing-lede">Start with the package you actually need, understand the migration path, and move from overview to working bindings without digging through the repo first.</p>
   <div class="landing-actions">
     <a class="landing-button landing-button--primary" href="/bindings/">Start with bindings</a>
     <a class="landing-button landing-button--secondary" href="/3to4/">Read the migration guide</a>

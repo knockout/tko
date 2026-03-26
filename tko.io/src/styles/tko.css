@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Lobster&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lobster&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --sl-font: 'Manrope', sans-serif;
-  --sl-font-system: 'Manrope', sans-serif;
+  --sl-font: 'Inter', sans-serif;
+  --sl-font-system: 'Inter', sans-serif;
   --sl-font-mono: 'JetBrains Mono', monospace;
-  --tko-font-display: 'Fraunces', serif;
+  --tko-font-display: 'Source Serif 4', serif;
 
   /* Starlight semantic palette for light mode */
   --sl-color-white: #171717;
@@ -31,6 +31,8 @@
   --tko-border: rgba(23, 23, 23, 0.08);
   --tko-shadow: 0 18px 40px -32px rgba(17, 24, 39, 0.18);
   --tko-focus: #0f62fe;
+  --tko-panel-pad: 1.5rem;
+  --tko-side-panel-pad: 1rem;
 }
 
 :root[data-theme='dark'] {
@@ -85,27 +87,35 @@ body {
 }
 
 h1,
-h2,
-h3,
 .content-panel h1,
-.content-panel h2,
-.content-panel h3 {
+.landing-hero h2 {
   font-family: var(--tko-font-display);
   letter-spacing: -0.03em;
   line-height: 1.04;
   color: var(--sl-color-white);
 }
 
+.content-panel h2,
+.content-panel h3 {
+  font-family: var(--sl-font);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--sl-color-white);
+}
+
 .content-panel h1 {
-  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-size: clamp(1.85rem, 4vw, 2.75rem);
+  font-weight: 700;
 }
 
 .content-panel h2 {
-  font-size: clamp(1.7rem, 3.6vw, 2.35rem);
+  font-size: clamp(1.45rem, 2.9vw, 1.95rem);
+  font-weight: 700;
 }
 
 .content-panel h3 {
-  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+  font-weight: 700;
 }
 
 header {
@@ -131,17 +141,18 @@ header {
 }
 
 .content-panel .sl-container {
-  padding-block: 1rem;
+  padding: var(--tko-panel-pad);
 }
 
 .right-sidebar-panel .sl-container {
-  padding: 1rem;
+  padding: var(--tko-side-panel-pad);
 }
 
 .sidebar :is(a, summary) {
-  min-height: 2.75rem;
+  padding-block: 0.72rem;
   padding-inline: 0.85rem;
   border-radius: 0.85rem;
+  font-size: 0.97rem;
 }
 
 .sidebar a[aria-current='page'] {
@@ -153,6 +164,32 @@ header {
 .sidebar summary,
 .sidebar a {
   color: var(--sl-color-text);
+}
+
+.sidebar ul {
+  gap: 0.15rem;
+}
+
+.sidebar li {
+  margin-block: 0.05rem;
+}
+
+.sidebar ul ul {
+  padding-inline: 0.55rem;
+}
+
+.sidebar ul ul li {
+  margin-inline-start: 0;
+  padding-inline-start: 0;
+}
+
+.sidebar ul ul li > :is(a, summary) {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.content-panel .sl-markdown-content > .sl-heading-wrapper:first-child {
+  margin-top: 0;
 }
 
 .content-panel a {
@@ -191,8 +228,8 @@ header {
 }
 
 .landing-hero {
-  margin: 0 0 2rem;
-  padding: clamp(1.5rem, 4vw, 3rem);
+  margin: 0 0 1.4rem;
+  padding: clamp(1.25rem, 3vw, 2.1rem);
   border: 1px solid var(--tko-border);
   border-radius: 1.5rem;
   background:
@@ -208,8 +245,8 @@ header {
 }
 
 .landing-kicker {
-  margin: 0 0 0.9rem;
-  font-size: 0.78rem;
+  margin: 0 0 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -218,15 +255,17 @@ header {
 
 .landing-hero h2 {
   margin: 0;
-  max-width: 14ch;
-  font-size: clamp(1.95rem, 5.2vw, 3.85rem);
+  max-width: 11ch;
+  font-size: clamp(1.55rem, 3.7vw, 2.55rem);
+  line-height: 1.02;
+  font-weight: 600;
 }
 
 .landing-lede {
-  max-width: 44rem;
-  margin: 1rem 0 0;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  max-width: 39rem;
+  margin: 0.85rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.62;
   color: var(--sl-color-text);
 }
 
@@ -234,7 +273,7 @@ header {
   display: flex;
   flex-wrap: wrap;
   gap: 0.85rem;
-  margin-top: 1.5rem;
+  margin-top: 1.2rem;
 }
 
 .landing-button {
@@ -278,7 +317,7 @@ header {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  margin: 1.25rem 0 1.75rem;
+  margin: 1rem 0 1.45rem;
 }
 
 .landing-card {
@@ -313,12 +352,16 @@ header {
 
 .landing-card h3 {
   margin: 0 0 0.5rem;
-  font-size: 1.28rem;
+  font-size: 1.18rem;
+  font-family: var(--sl-font);
+  font-weight: 700;
 }
 
 .landing-card p {
   margin: 0;
   color: var(--sl-color-text);
+  font-size: 0.96rem;
+  line-height: 1.58;
 }
 
 .landing-card--status {
@@ -442,6 +485,10 @@ header {
   .content-panel .sl-container,
   .right-sidebar-panel .sl-container {
     border-radius: 1rem;
+  }
+
+  .content-panel .sl-container {
+    padding: 1rem;
   }
 
   .landing-hero {
