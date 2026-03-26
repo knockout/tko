@@ -8,16 +8,25 @@
 
 /**
  * Parse a KO binding string into individual {name, value} pairs.
- * Respects nested braces, parens, and brackets so that object/array
- * values and function calls are not split on internal commas.
+ * Respects nested braces, parens, brackets, and quoted strings so that
+ * object/array values and string literals are not split on internal commas.
  */
 function parseBindingString(str) {
   const bindings = []
   let depth = 0
   let start = 0
+  let quote = null
 
   for (let i = 0; i <= str.length; i++) {
-    const ch = str[i]
+    const ch = i < str.length ? str[i] : null
+
+    if (quote) {
+      if (ch === '\\') { i++; continue }
+      if (ch === quote) quote = null
+      continue
+    }
+
+    if (ch === "'" || ch === '"' || ch === '`') { quote = ch; continue }
     if (ch === '{' || ch === '(' || ch === '[') depth++
     else if (ch === '}' || ch === ')' || ch === ']') depth--
     else if ((ch === ',' || i === str.length) && depth === 0) {
@@ -42,7 +51,7 @@ function parseBindingString(str) {
  * Convert HTML with data-bind attributes to TSX with ko-* attributes.
  */
 function convertDataBindToTsx(html) {
-  return html.replace(/data-bind=(["'])(.*?)\1/g, (_match, _quote, bindingStr) => {
+  return html.replace(/data-bind=(["'])([\s\S]*?)\1/g, (_match, _quote, bindingStr) => {
     const bindings = parseBindingString(bindingStr)
     if (bindings.length === 0) return _match
     return bindings.map(({ name, value }) => `ko-${name}={${value}}`).join(' ')

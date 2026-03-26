@@ -548,6 +548,7 @@ starlight-tabs {
 
 .tab > [role='tab'] {
   --sl-tab-color-border: var(--sl-color-gray-5);
+
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -563,6 +564,7 @@ starlight-tabs {
 
 .tab [role='tab'][aria-selected='true'] {
   --sl-tab-color-border: var(--sl-color-text-accent);
+
   color: var(--sl-color-white);
   font-weight: 600;
 }
