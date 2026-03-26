@@ -18,7 +18,8 @@ export default defineConfig({
       customCss: ['./src/styles/tko.css'],
       components: {
         Banner: './src/components/Banner.astro',
-        Head: './src/components/Head.astro'
+        Head: './src/components/Head.astro',
+        Header: './src/components/Header.astro'
       },
       sidebar: [
         { label: 'Introduction', slug: 'index' },

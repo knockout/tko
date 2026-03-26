@@ -10,6 +10,7 @@ description: Choose the right TKO build and get started with modern Knockout.
   <div class="landing-actions">
     <a class="landing-button landing-button--primary" href="/bindings/">Start with bindings</a>
     <a class="landing-button landing-button--secondary" href="/3to4/">Read the migration guide</a>
+    <a class="landing-button landing-button--secondary" href="/playground">Try the Playground</a>
   </div>
 </div>
 
