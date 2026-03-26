@@ -157,71 +157,10 @@ if (document.readyState === 'loading') {
   initExamples();
 }
 
-// --- Playground links for code blocks ---
-
-function encodePlaygroundHash(html, js) {
-  const data = JSON.stringify({ html, js });
-  return btoa(encodeURIComponent(data));
-}
-
-function splitHtmlAndScript(code) {
-  // Extract inline <script> content (not src scripts) and separate from HTML
-  let html = code;
-  let js = '';
-
-  // Remove CDN/src script tags entirely
-  html = html.replace(/<script\s+src=[^>]*><\/script>\s*/gi, '');
-
-  // Extract inline script content
-  html = html.replace(/<script\b[^>]*>([\s\S]*?)<\/script>\s*/gi, (_, content) => {
-    js += content.trim() + '\n';
-    return '';
-  });
-
-  return { html: html.trim(), js: js.trim() };
-}
-
-function addPlaygroundLink(pre) {
-  // Starlight/Expressive Code wraps code blocks in <figure class="frame">
-  const figure = pre.closest('figure');
-  if (!figure) return;
-
-  // Inject into the .copy action bar (alongside the copy button)
-  const copyDiv = figure.querySelector('.copy');
-  if (!copyDiv || copyDiv.querySelector('.playground-open')) return;
-
-  const rawCode = pre.textContent.trim();
-  const { html, js } = splitHtmlAndScript(rawCode);
-
-  // Skip blocks with no runnable content
-  if (!html && !js) return;
-
-  const hash = encodePlaygroundHash(html, js);
-  const link = document.createElement('a');
-  link.className = 'playground-open';
-  link.href = `/playground#${hash}`;
-  link.target = '_blank';
-  link.title = 'Open in Playground';
-  // External-link SVG icon (matches copy button sizing)
-  link.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
-  copyDiv.insertBefore(link, copyDiv.firstChild);
-}
-
 function initExamples() {
   document.querySelectorAll('live-example').forEach(createLegacyExamplePlaceholder);
 
   // Find all code blocks with language 'jsx'
-  // Support both classic (code.language-jsx) and Starlight/Expressive Code (pre[data-language="jsx"])
   const jsxBlocks = document.querySelectorAll('pre code.language-jsx');
   jsxBlocks.forEach(createExampleContainer);
-
-  // Add "Open in Playground" to html code blocks
-  // Starlight uses pre[data-language="html"], classic uses code.language-html
-  const htmlPres = document.querySelectorAll('pre[data-language="html"]');
-  htmlPres.forEach(addPlaygroundLink);
-
-  // Fallback for classic code blocks (non-Starlight pages)
-  if (htmlPres.length === 0) {
-    document.querySelectorAll('pre code.language-html').forEach(cb => addPlaygroundLink(cb.parentElement));
-  }
 }
