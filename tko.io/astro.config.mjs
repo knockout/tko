@@ -1,12 +1,13 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import tsxTabs from './plugins/tsx-tabs.js';
 import legacyDocs from './plugins/legacy-docs.js';
 import { pluginPlaygroundButton } from './plugins/playground-button.js';
 
 export default defineConfig({
   site: 'https://tko.io',
   markdown: {
-    remarkPlugins: [legacyDocs]
+    remarkPlugins: [tsxTabs, legacyDocs]
   },
   integrations: [
     starlight({
