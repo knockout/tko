@@ -1,14 +1,19 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import tsxTabs from './plugins/tsx-tabs.js';
 import legacyDocs from './plugins/legacy-docs.js';
+import { pluginPlaygroundButton } from './plugins/playground-button.js';
 
 export default defineConfig({
   site: 'https://tko.io',
   markdown: {
-    remarkPlugins: [legacyDocs]
+    remarkPlugins: [tsxTabs, legacyDocs]
   },
   integrations: [
     starlight({
+      expressiveCode: {
+        plugins: [pluginPlaygroundButton()]
+      },
       title: 'TKO',
       description: 'Typed Knockout documentation and migration guides.',
       disable404Route: true,
@@ -18,7 +23,8 @@ export default defineConfig({
       customCss: ['./src/styles/tko.css'],
       components: {
         Banner: './src/components/Banner.astro',
-        Head: './src/components/Head.astro'
+        Head: './src/components/Head.astro',
+        Header: './src/components/Header.astro'
       },
       sidebar: [
         { label: 'Introduction', slug: 'index' },

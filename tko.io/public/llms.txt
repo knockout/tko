@@ -1,0 +1,45 @@
+# TKO (Typed Knockout)
+
+> TKO is the modern TypeScript successor to Knockout.js — an MVVM framework for
+> reactive data binding and UI templating with zero runtime dependencies. TKO
+> uniquely enables building complex UIs directly in the browser using TSX and
+> esbuild-wasm, with no local toolchain required.
+
+## Quick Start
+
+```html
+<script src="https://tko.io/lib/tko.js"></script>
+<script>window.ko = window.tko;</script>
+```
+
+## URLs
+
+- Agent Guide: /agent-guide.md (API reference, gotchas, examples)
+- Agent Testing: /agent-testing.md (how to run and verify TKO code)
+- Playground: /playground
+- GitHub: https://github.com/knockout/tko
+
+## Two Binding Syntaxes
+
+HTML: `data-bind="text: msg"` — runtime strings, works with `ko.applyBindings(vm, el)`
+TSX: `ko-text={msg}` — compile-time JSX expressions, needs esbuild + `tko.jsx.render()`
+
+Inside `ko-foreach` children, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
+
+See /agent-guide.md for details.
+
+## Docs
+
+/observables/ · /computed/ · /bindings/ · /components/ · /binding-context/ · /advanced/
+
+## Browser JSX (esbuild-wasm)
+
+```js
+import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esm/browser.min.js'
+await esbuild.initialize({ wasmURL: 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esbuild.wasm' })
+const result = await esbuild.transform(tsxCode, {
+  loader: 'tsx',
+  jsxFactory: 'tko.jsx.createElement',
+  jsxFragment: 'tko.jsx.Fragment'
+})
+```

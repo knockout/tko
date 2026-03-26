@@ -11,7 +11,19 @@ The `textInput` binding links a text box (`<input>`) or text area (`<textarea>`)
 
 ### Example
 
-<live-example params='id: "textinput-binding"'></live-example>
+```html
+<p>Login name: <input data-bind="textInput: userName" /></p>
+<p>Password: <input type="password" data-bind="textInput: userPassword" /></p>
+
+<pre data-bind="text: ko.toJSON($root, null, 2)"></pre>
+```
+
+```javascript
+ko.applyBindings({
+    userName: ko.observable(""),
+    userPassword: ko.observable("abc")
+});
+```
 
 ### Parameters
 
