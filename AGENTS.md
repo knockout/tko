@@ -114,8 +114,21 @@ All PR checks must pass before merge.
 
 ## Release Process
 
-Currently manual:
+Releases are managed with [Changesets](https://github.com/changesets/changesets).
 
+**For contributors** — when your PR changes package behavior:
+```bash
+npx changeset add    # Select affected packages, bump type, describe change
+```
+This creates a changeset file in `.changeset/` that gets committed with your PR.
+
+**For maintainers** — releasing is handled by CI:
+1. Push to main triggers `.github/workflows/release.yml`
+2. If unreleased changesets exist, the action opens a "Version Packages" PR
+3. Review the PR (it bumps versions and updates changelogs)
+4. Merge it to publish to npm
+
+**Manual release** (fallback):
 ```bash
 make repackage       # Sync package.json metadata across packages
 lerna version        # Bump versions (interactive)

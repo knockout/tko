@@ -58,27 +58,21 @@ New workflow `.github/workflows/publish-check.yml` that runs on PRs:
 
 ## Phase 2: Automate Releases
 
-### 2.1 Adopt Changesets for versioning
+### 2.1 Adopt Changesets for versioning ✅ DONE
 
-Replace manual `lerna version` with `@changesets/cli`:
-- Contributors add a changeset file with their PR describing the change
-- On merge to main, a bot opens a "Release" PR that bumps versions and
-  updates CHANGELOG.md
-- Merging that PR publishes to npm
+Installed `@changesets/cli`. Configuration in `.changeset/config.json`.
+Contributors add a changeset file with their PR: `npx changeset add`.
+On merge to main, the release workflow opens a "Version Packages" PR
+that bumps versions and updates changelogs. Merging that PR publishes
+to npm.
 
-Benefits:
-- Auto-generated changelogs
-- Contributor-authored release notes
-- One-click publishing (merge the release PR)
-- No version mistakes
+### 2.2 Add a release workflow ✅ DONE
 
-### 2.2 Add a release workflow
-
-GitHub Action triggered on changeset release PR merge:
-- Builds all packages
-- Runs full test suite
-- Publishes to npm with `--provenance`
-- Creates GitHub Release with changelog
+`.github/workflows/release.yml` — triggered on push to main:
+- Builds all packages and runs tests
+- If unreleased changesets exist, opens/updates a version PR
+- If version PR is merged, publishes to npm
+- Requires `NPM_TOKEN` secret in GitHub repo settings
 
 ---
 
