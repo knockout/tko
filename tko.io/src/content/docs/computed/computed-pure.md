@@ -49,7 +49,41 @@ You can use the *pure* feature for any computed observable that follows the [*pu
 
 In the following example of a simple wizard interface, the `fullName` *pure* computed is only bound to the view during the final step and so is only updated when that step is active.
 
-<live-example params='id: "pure-computed"'></live-example>
+```html
+<div class="log" data-bind="text: computedLog"></div>
+<!--ko if: step() == 0-->
+    <p>First name: <input data-bind="textInput: firstName" /></p>
+<!--/ko-->
+<!--ko if: step() == 1-->
+    <p>Last name: <input data-bind="textInput: lastName" /></p>
+<!--/ko-->
+<!--ko if: step() == 2-->
+    <div>Prefix: <select data-bind="value: prefix, options: ['Mr.', 'Ms.','Mrs.','Dr.']"></select></div>
+    <h2>Hello, <span data-bind="text: fullName"> </span>!</h2>
+<!--/ko-->
+<p><button type="button" data-bind="click: next">Next</button></p>
+```
+
+```javascript
+function AppData() {
+    this.firstName = ko.observable('John');
+    this.lastName = ko.observable('Burns');
+    this.prefix = ko.observable('Dr.');
+    this.computedLog = ko.observable('Log: ');
+    this.fullName = ko.pureComputed(function () {
+        var value = this.prefix() + " " + this.firstName() + " " + this.lastName();
+        this.computedLog(this.computedLog.peek() + value + '; ');
+        return value;
+    }, this);
+
+    this.step = ko.observable(0);
+    this.next = function () {
+        this.step(this.step() === 2 ? 0 : this.step() + 1);
+    };
+}
+
+ko.applyBindings(new AppData());
+```
 
 ### When *not* to use a *pure* computed observable
 

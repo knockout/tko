@@ -33,7 +33,43 @@ If the `firstName` observable's value was changed to `Ted`, then the console wou
 
 This example creates an extender that forces writes to an observable to be numeric rounded to a configurable level of precision.  In this case, the extender will return a new writeable computed observable that will sit in front of the real observable intercepting writes.
 
-<live-example params='id: "extender-numeric"'></live-example>
+```html
+<p><input data-bind="value: myNumberOne" /> (round to whole number)</p>
+<p><input data-bind="value: myNumberTwo" /> (round to two decimals)</p>
+```
+
+```javascript
+ko.extenders.numeric = function(target, precision) {
+    var result = ko.pureComputed({
+        read: target,
+        write: function(newValue) {
+            var current = target(),
+                roundingMultiplier = Math.pow(10, precision),
+                newValueAsNum = isNaN(newValue) ? 0 : +newValue,
+                valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
+
+            if (valueToWrite !== current) {
+                target(valueToWrite);
+            } else {
+                if (newValue !== current) {
+                    target.notifySubscribers(valueToWrite);
+                }
+            }
+        }
+    }).extend({ notify: 'always' });
+
+    result(target());
+
+    return result;
+};
+
+function AppViewModel(one, two) {
+    this.myNumberOne = ko.observable(one).extend({ numeric: 0 });
+    this.myNumberTwo = ko.observable(two).extend({ numeric: 2 });
+}
+
+ko.applyBindings(new AppViewModel(221.2234, 123.4525));
+```
 
 Note that for this to automatically erase rejected values from the UI, it's necessary to use `.extend({ notify: 'always' })` on the computed observable. Without this, it's possible for the user to enter an invalid `newValue` that when rounded gives an unchanged `valueToWrite`. Then, since the model value would not be changing, there would be no notification to update the textbox in the UI. Using `{ notify: 'always' }` causes the textbox to refresh (erasing rejected values) even if the computed property has not changed value.
 
@@ -41,7 +77,41 @@ Note that for this to automatically erase rejected values from the UI, it's nece
 
 This example creates an extender that allows an observable to be marked as required. Instead of returning a new object, this extender simply adds additional sub-observables to the existing observable. Since observables are functions, they can actually have their own properties. However, when the view model is converted to JSON, the sub-observables will be dropped and we will simply be left with the value of our actual observable.  This is a nice way to add additional functionality that is only relevant for the UI and does not need to be sent back to the server.
 
-<live-example params='id: "extender-validation"'></live-example>
+```html
+<p data-bind="css: { error: firstName.hasError }">
+    <input data-bind='value: firstName, valueUpdate: "afterkeydown"' />
+    <span data-bind='visible: firstName.hasError, text: firstName.validationMessage'> </span>
+</p>
+<p data-bind="css: { error: lastName.hasError }">
+    <input data-bind='value: lastName, valueUpdate: "afterkeydown"' />
+    <span data-bind='visible: lastName.hasError, text: lastName.validationMessage'> </span>
+</p>
+```
+
+```javascript
+ko.extenders.required = function(target, overrideMessage) {
+    target.hasError = ko.observable();
+    target.validationMessage = ko.observable();
+
+    function validate(newValue) {
+       target.hasError(newValue ? false : true);
+       target.validationMessage(newValue ? "" : overrideMessage || "This field is required");
+    }
+
+    validate(target());
+
+    target.subscribe(validate);
+
+    return target;
+};
+
+function AppViewModel(first, last) {
+    this.firstName = ko.observable(first).extend({ required: "Please enter a first name" });
+    this.lastName = ko.observable(last).extend({ required: "" });
+}
+
+ko.applyBindings(new AppViewModel("Bob", "Smith"));
+```
 
 ### Applying multiple extenders
 

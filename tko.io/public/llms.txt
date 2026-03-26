@@ -19,6 +19,15 @@
 - Playground: /playground
 - GitHub: https://github.com/knockout/tko
 
+## Two Binding Syntaxes
+
+HTML: `data-bind="text: msg"` — runtime strings, works with `ko.applyBindings(vm, el)`
+TSX: `ko-text={msg}` — compile-time JSX expressions, needs esbuild + `tko.jsx.render()`
+
+Inside `ko-foreach` children, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
+
+See /agent-guide.md for details.
+
 ## Docs
 
 /observables/ · /computed/ · /bindings/ · /components/ · /binding-context/ · /advanced/

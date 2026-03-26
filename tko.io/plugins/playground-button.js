@@ -1,12 +1,14 @@
 /**
  * Expressive Code plugin: adds an "Open in Playground" button to code blocks.
  *
- * Handles two patterns:
+ * Handles three patterns:
  *   1. Self-contained HTML blocks with inline <script> tags
  *   2. Adjacent html + javascript code blocks (common in KO docs)
+ *   3. TSX/HTML tab pairs followed by a javascript block
  *
  * For pattern 2, when a ```javascript block follows a ```html block,
  * the plugin pairs them and adds the button to the HTML block.
+ * For pattern 3 (tsx-tabs), the TSX block also gets a playground button.
  *
  * Replicates the exact same DOM structure and CSS as the built-in copy button:
  *   <a class="playground-open"><div></div></a>
@@ -88,8 +90,9 @@ function addPlaygroundButton(renderData, html, js) {
 }
 
 export function pluginPlaygroundButton() {
-  // Track pending HTML block for pairing with a following JS block
+  // Track pending blocks for pairing with a following JS block
   let pendingHtml = null
+  let pendingTsx = null
 
   return {
     name: 'playground-button',
@@ -173,28 +176,39 @@ export function pluginPlaygroundButton() {
 
     hooks: {
       postprocessRenderedBlock: ({ codeBlock, renderData }) => {
-        if (codeBlock.language === 'html') {
+        if (codeBlock.language === 'tsx') {
+          // TSX block (from tsx-tabs) — store for pairing with following JS block
+          pendingTsx = { html: codeBlock.code.trim(), renderData }
+        } else if (codeBlock.language === 'html') {
           const code = codeBlock.code
           const { html, js } = splitHtmlAndScript(code)
 
           if (js) {
             // Self-contained HTML block with inline <script> — add button now
             pendingHtml = null
+            pendingTsx = null
             addPlaygroundButton(renderData, html, js)
           } else {
             // HTML-only block — store for potential pairing with next JS block
             pendingHtml = { html: code.trim(), renderData }
           }
-        } else if (codeBlock.language === 'javascript' && pendingHtml) {
-          // JS block immediately after an HTML block — pair them
+        } else if (codeBlock.language === 'javascript' && (pendingHtml || pendingTsx)) {
+          // JS block after an HTML/TSX block — pair them
           const js = codeBlock.code.trim()
           if (js) {
-            addPlaygroundButton(pendingHtml.renderData, pendingHtml.html, js)
+            if (pendingHtml) {
+              addPlaygroundButton(pendingHtml.renderData, pendingHtml.html, js)
+            }
+            if (pendingTsx) {
+              addPlaygroundButton(pendingTsx.renderData, pendingTsx.html, js)
+            }
           }
           pendingHtml = null
+          pendingTsx = null
         } else {
           // Any other block type breaks the pairing
           pendingHtml = null
+          pendingTsx = null
         }
       }
     }

@@ -30,25 +30,64 @@ foreach, if, ifnot, with, template:{name:'id'}, component:{name:'n',params:{}}
 
 Context variables inside foreach: $data, $parent, $root, $index (observable), $element.
 
-## JSX
+## TSX vs HTML Syntax
 
-Use `ko-*` attributes instead of `data-bind`:
+TKO supports two binding syntaxes. The documentation shows both side-by-side in tabbed code blocks.
 
-```jsx
-<span ko-text={obs} />
-<button ko-click={fn}>Label</button>
-<input ko-value={obs} />
-<ul ko-foreach={arr}><li ko-text="$data" /></ul>
-<div ko-if={cond}>...</div>
-<div ko-css={{ active: isActive }}>...</div>
+### HTML (data-bind) — runtime bindings
+
+```html
+<span data-bind="text: message"></span>
+<button data-bind="click: handler">Label</button>
+<ul data-bind="foreach: items"><li data-bind="text: $data"></li></ul>
 ```
 
-Render pattern (required for ko-* bindings to activate):
+- Bindings are **strings** evaluated at runtime by `ko.applyBindings(viewModel, element)`
+- Binding-context variables (`$data`, `$parent`, `$index`, `$root`) resolve at runtime
+- No build step needed — works directly in the browser
+- Playground: put HTML in the HTML editor, JS in the TSX editor, run
 
-```jsx
+### TSX (ko-*) — compile-time JSX expressions
+
+```tsx
+<span ko-text={message} />
+<button ko-click={handler}>Label</button>
+<ul ko-foreach={items}><li ko-text="$data" /></ul>
+```
+
+- `ko-*` attribute values in `{}` are **JavaScript expressions** evaluated at compile time by esbuild
+- Top-level variables (`message`, `handler`, `items`) must be defined in scope before the JSX
+- Binding-context variables inside `ko-foreach` children (like `$data`, `$parent`) use **string** syntax: `ko-text="$data"` (not `ko-text={$data}`)
+- Requires esbuild JSX transform + `tko.jsx.render()` to produce DOM nodes
+- `ko.applyBindings({}, container)` then activates the `ko-*` bindings on the rendered DOM
+
+### Key difference: compile-time vs runtime
+
+In HTML, `data-bind="foreach: people"` is a string — knockout evaluates `people` in the view model at runtime.
+
+In TSX, `ko-foreach={people}` is a JSX expression — esbuild resolves `people` as a JavaScript variable at compile time. The variable must exist in scope:
+
+```tsx
+// Variables must be defined before the JSX expression
+const people = ko.observableArray([...])
+
+const view = (
+  <ul ko-foreach={people}>
+    <li ko-text="name" />   {/* string — resolved by knockout at runtime */}
+  </ul>
+)
+
+const { node } = tko.jsx.render(view)
+root.appendChild(node)
+ko.applyBindings({}, root)
+```
+
+### Render pattern (required for ko-* bindings)
+
+```tsx
 const { node, dispose } = tko.jsx.render(<Component />)
 container.appendChild(node)
-tko.applyBindings({}, container) // activates ko-* bindings
+tko.applyBindings({}, container) // activates ko-* bindings on the DOM
 ```
 
 ## Browser TSX transform (esbuild-wasm)
