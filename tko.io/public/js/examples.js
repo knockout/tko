@@ -161,6 +161,6 @@ function initExamples() {
   document.querySelectorAll('live-example').forEach(createLegacyExamplePlaceholder);
 
   // Find all code blocks with language 'jsx'
-  const codeBlocks = document.querySelectorAll('pre code.language-jsx');
-  codeBlocks.forEach(createExampleContainer);
+  const jsxBlocks = document.querySelectorAll('pre code.language-jsx');
+  jsxBlocks.forEach(createExampleContainer);
 }

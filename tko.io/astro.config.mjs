@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import legacyDocs from './plugins/legacy-docs.js';
+import { pluginPlaygroundButton } from './plugins/playground-button.js';
 
 export default defineConfig({
   site: 'https://tko.io',
@@ -9,6 +10,9 @@ export default defineConfig({
   },
   integrations: [
     starlight({
+      expressiveCode: {
+        plugins: [pluginPlaygroundButton()]
+      },
       title: 'TKO',
       description: 'Typed Knockout documentation and migration guides.',
       disable404Route: true,
