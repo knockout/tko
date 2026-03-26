@@ -38,20 +38,21 @@ on this repo: build commands, test commands, package structure, conventions,
 what not to touch. `CLAUDE.md` is a thin pointer to it. Other AI tool config
 files (`.github/copilot-instructions.md`, `.cursorrules`) can point there too.
 
-### 1.2 Add branch protection on `main`
+### 1.2 Add branch protection on `main` — MANUAL
 
-GitHub settings change (no code needed):
+GitHub settings change (no code needed) — do this at
+https://github.com/knockout/tko/settings/branches :
 - Require status checks to pass before merging
 - Require: `test-headless`, `eslint`, `prettier`, `run-tsc`
 - Require branches to be up to date before merging
 - Optionally require PR reviews
 
-### 1.3 Add a publish dry-run CI step
+### 1.3 Add a publish dry-run CI step ✅ DONE
 
 New workflow `.github/workflows/publish-check.yml` that runs on PRs:
 - Builds all packages
-- Runs `lerna publish from-package --dry-run` to catch packaging issues
-- Validates that package.json exports and dist files are correct
+- Verifies each public package has dist output
+- Runs `npm pack --dry-run` on each to validate publishability
 
 ---
 
