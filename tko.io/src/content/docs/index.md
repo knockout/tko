@@ -3,12 +3,6 @@ title: Introduction
 description: Choose the right TKO build and get started with modern Knockout.
 ---
 
-# What is TKO?
-
-TKO is the monorepo and documentation home for the modern Knockout builds.
-
-It keeps the familiar Knockout model of observables, computed values, and declarative bindings, while publishing the runtime as modular packages instead of a single legacy distribution.
-
 <div class="landing-hero">
   <p class="landing-kicker">Modern Knockout, clarified</p>
   <h2>Pick the right build quickly, understand the migration path, and get to working bindings without reading the whole repo first.</h2>
@@ -18,6 +12,12 @@ It keeps the familiar Knockout model of observables, computed values, and declar
     <a class="landing-button landing-button--secondary" href="/3to4/">Read the migration guide</a>
   </div>
 </div>
+
+## What is TKO?
+
+TKO is the monorepo and documentation home for the modern Knockout builds.
+
+It keeps the familiar Knockout model of observables, computed values, and declarative bindings, while publishing the runtime as modular packages instead of a single legacy distribution.
 
 ## Choose a build
 
