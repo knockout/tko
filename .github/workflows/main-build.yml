@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Audit for vulnerabilities
+        run: npm audit --audit-level=high
+
       - name: Run Build
         run: make
 

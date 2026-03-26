@@ -38,10 +38,9 @@ on this repo: build commands, test commands, package structure, conventions,
 what not to touch. `CLAUDE.md` is a thin pointer to it. Other AI tool config
 files (`.github/copilot-instructions.md`, `.cursorrules`) can point there too.
 
-### 1.2 Add branch protection on `main` — MANUAL
+### 1.2 Add branch protection on `main` ✅ DONE
 
-GitHub settings change (no code needed) — do this at
-https://github.com/knockout/tko/settings/branches :
+Set via `gh api`. Required checks:
 - Require status checks to pass before merging
 - Require: `test-headless`, `eslint`, `prettier`, `run-tsc`
 - Require branches to be up to date before merging
@@ -78,21 +77,22 @@ to npm.
 
 ## Phase 3: Dependency & Security Automation
 
-### 3.1 Enable Dependabot or Renovate
+### 3.1 Enable Dependabot ✅ DONE
 
-Auto-PRs for dependency updates:
-- Security patches: daily
-- devDependencies: weekly, grouped
-- CI runs tests on these PRs automatically — if green, safe to merge
+`.github/dependabot.yml` — weekly updates on Mondays:
+- npm dependencies grouped by dev/production (minor+patch batched)
+- GitHub Actions versions tracked separately
+- Security updates opened individually (ungrouped, default behavior)
 
-### 3.2 Add npm provenance to publishing
+### 3.2 Add npm provenance to publishing ✅ DONE
 
-Publish with `--provenance` flag so users can verify packages were built in
-CI, not on a local machine. Builds trust with consumers.
+Release workflow publishes with `--provenance` flag so users can verify
+packages were built in CI.
 
-### 3.3 Add `npm audit` to CI
+### 3.3 Add `npm audit` to CI ✅ DONE
 
-New step in the main build workflow that fails on known vulnerabilities.
+Added `npm audit --audit-level=high` step to `main-build.yml`.
+Fails on high or critical vulnerabilities.
 
 ---
 
