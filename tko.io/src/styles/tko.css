@@ -99,6 +99,30 @@ body {
   border-radius: 0;
 }
 
+.example-placeholder {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(46, 99, 218, 0.2);
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, rgba(46, 99, 218, 0.08), rgba(46, 99, 218, 0.02)),
+    var(--sl-color-white);
+  box-shadow: 0 18px 45px -32px rgba(15, 23, 42, 0.28);
+}
+
+.example-placeholder__label {
+  margin-bottom: 0.5rem;
+  color: var(--sl-color-accent-high);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.example-placeholder p {
+  margin: 0.4rem 0;
+}
+
 .example-container {
   margin: 1.75rem 0;
   min-height: 24rem;

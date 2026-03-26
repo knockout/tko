@@ -5,6 +5,24 @@ import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6.1.2';
 
 let esbuildInitialized = false;
 
+function parseLegacyExampleId(rawParams) {
+  const match = rawParams?.match(/id:\s*["']?([^"'}\s]+)["']?/i);
+  return match?.[1] || 'legacy-example';
+}
+
+function createLegacyExamplePlaceholder(exampleNode) {
+  const exampleId = parseLegacyExampleId(exampleNode.getAttribute('params') || '');
+  const container = document.createElement('div');
+  container.className = 'example-placeholder';
+  container.dataset.exampleId = exampleId;
+  container.innerHTML = `
+    <div class="example-placeholder__label">Live example in progress</div>
+    <p>This page still references the legacy example <code>${exampleId}</code>.</p>
+    <p>The interactive example system is being rebuilt for the Starlight site. Use the code snippets on this page as the current reference for now.</p>
+  `;
+  exampleNode.replaceWith(container);
+}
+
 async function initEsbuild() {
   if (!esbuildInitialized) {
     await esbuild.initialize({
@@ -140,6 +158,8 @@ if (document.readyState === 'loading') {
 }
 
 function initExamples() {
+  document.querySelectorAll('live-example').forEach(createLegacyExamplePlaceholder);
+
   // Find all code blocks with language 'jsx'
   const codeBlocks = document.querySelectorAll('pre code.language-jsx');
   codeBlocks.forEach(createExampleContainer);

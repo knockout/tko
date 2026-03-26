@@ -1,84 +1,94 @@
 ---
 title: Introduction
+description: Choose the right TKO build and get started with modern Knockout.
 ---
 
 # What is TKO?
 
-TKO is a Javascript web framework, and the foundation for Knockout 4.
+TKO is the monorepo and documentation home for the modern Knockout builds.
 
-Knockout helps you create rich, responsive, maintainable applications built on a clean underlying data model.
+It keeps the familiar Knockout model of observables, computed values, and declarative bindings, while publishing the runtime as modular packages instead of a single legacy distribution.
 
-- **Simple data-html bindings**
-  Easily associate DOM elements with model data using a concise, readable syntax, like this: `<input data-bind='textInput: value'/>`
-- **Two-way observables**
-  Data model and DOM stay in sync, updating the UI whenever the data changes.
-- **Computed dependencies**
-  Create chains of calculated variables dependencies.
-- **Templating**
-  Create reusable components and sophisticated web applications.
-- **Extensible**
-  Implement custom behaviors and compartmentalized code.
+## Choose a build
 
-TKO has a comprehensive suite of tests that ensure its correct functioning and allow easy verification on different Javascript browsers and platforms.
+Use this rule of thumb:
 
+- **`@tko/build.knockout`**
+  Start here if you want the compatibility-focused build and the closest match to a traditional Knockout application.
+- **`@tko/build.reference`**
+  Use this if you want the leaner reference build and are comfortable composing a more modular setup yourself.
 
-## First Example
+If you are upgrading an existing Knockout 3.x application, start with the [Knockout 3 to 4 Guide](/3to4/).
 
-```jsx
-const viewModel = {
-  firstName: ko.observable('John'),
-  lastName: ko.observable('Doe')
-};
+## Current status
 
-viewModel.fullName = ko.computed(() => {
-  return viewModel.firstName() + ' ' + viewModel.lastName();
-});
+> TKO packages are still published as 4.x prereleases. Pin the exact version you test with, and expect some docs and examples to keep evolving.
 
-const { node } = ko.jsx.render(
-  <div>
-    <p>First name: <input data-bind="textInput: firstName" /></p>
-    <p>Last name: <input data-bind="textInput: lastName" /></p>
-    <h2>Hello, <span data-bind="text: fullName"></span>!</h2>
-  </div>
-);
+## Quick start
 
-document.getElementById('root').appendChild(node);
+Install the compatibility-focused build:
 
-ko.applyBindings(viewModel);
+```bash
+npm install @tko/build.knockout
+# or
+yarn add @tko/build.knockout
+# or
+bun add @tko/build.knockout
 ```
 
-## Supported Platforms
+If you want the modular reference build instead:
 
-TKO & Knockout should work on all modern browsers, as well as Javascript engines such as Node.js.
+```bash
+npm install @tko/build.reference
+```
 
-## Getting started
-
-Include the latest version with this `<script>`:
+For a browser-global script tag, use the Knockout-compatible build:
 
 ```html
-<script src="https://unpkg.com/tko@4.0.0/dist/ko.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
 ```
 
-or install it locally with:
+## First binding example
 
-```bash
-npm install tko
-# or
-yarn add tko
-# or
-bun add tko
+```html
+<div id="app">
+  <label>
+    Name
+    <input data-bind="textInput: name" />
+  </label>
+  <p>Hello, <strong data-bind="text: name"></strong>.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
+<script>
+  const viewModel = {
+    name: ko.observable('TKO')
+  };
+
+  ko.applyBindings(viewModel, document.getElementById('app'));
+</script>
 ```
 
-Clone the code with:
+## What stays familiar
 
-```bash
-git clone git@github.com:knockout/tko
-```
+- **Observables and computed values**
+  The reactive model is still centered on `ko.observable`, `ko.observableArray`, and `ko.computed`.
+- **Declarative bindings**
+  Bind UI to state with the same `data-bind` style APIs used in classic Knockout.
+- **Components and custom bindings**
+  The component system and binding extensibility remain core parts of the framework.
+
+## What to read next
+
+- New to TKO: start with [Bindings](/bindings/), [Observables](/observables/), and [Computed](/computed/computedobservables/).
+- Migrating from Knockout 3.x: read the [Knockout 3 to 4 Guide](/3to4/).
+- Working on advanced integrations: review [Components](/components/) and [Advanced](/advanced/provider/).
 
 ## Community
 
 Find Knockout online at:
 
+- [GitHub issues](https://github.com/knockout/tko/issues)
 - [Gitter knockout/tko](https://gitter.im/knockout/tko)
 - [Gitter knockout/knockout](https://gitter.im/knockout/knockout)
 - [Reddit /r/knockoutjs](https://www.reddit.com/r/knockoutjs/)
