@@ -1,5 +1,16 @@
 {
   "name": "Technical Knockout",
-  "image": "tko:latest",
-  "workspaceFolder": "/usr/src/app"
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+  "workspaceFolder": "/usr/src/app",
+  "postCreateCommand": "npm install && make",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
 }

@@ -98,13 +98,11 @@ Fails on high or critical vulnerabilities.
 
 ## Phase 4: AI-Assisted Contribution Pipeline
 
-### 4.1 AI-assisted PR review
+### 4.1 AI-assisted PR review ✅ DONE
 
-GitHub Action triggered on PR open/update that runs an AI review step:
-- Checks for breaking API changes
-- Flags missing tests for new code
-- Validates consistency with project conventions
-- Notes if documentation updates are needed
+- **CodeRabbit**: Already enabled on the repo for automated PR review
+- **GitHub Copilot**: Enable in repo settings for AI code suggestions
+- Added `.github/copilot-instructions.md` pointing to AGENTS.md
 
 ### 4.2 Issue-to-PR automation
 
@@ -114,10 +112,17 @@ Label issues with `ai-candidate` to signal that an AI agent can:
 - Implement the fix/feature
 - Open a PR for human review
 
-### 4.3 Contributor sandbox
+This can be done with Copilot Workspace, Claude Code, or similar tools
+as they mature. No workflow needed yet — the AGENTS.md context file
+is the key enabler.
 
-Enhance the existing `.devcontainer` config + enable GitHub Codespaces so
-contributors can spin up a working environment in seconds without local setup.
+### 4.3 Contributor sandbox ✅ DONE
+
+Updated `.devcontainer/devcontainer.json` to:
+- Build from the existing Dockerfile (no pre-built image required)
+- Auto-run `npm install && make` on creation
+- Include ESLint and Prettier VS Code extensions
+- Works with GitHub Codespaces out of the box
 
 ---
 
