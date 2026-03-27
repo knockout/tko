@@ -61,6 +61,10 @@ Make targets (they include `tools/build.mk`).
 
 When writing new tests, use Mocha/Chai/Sinon (not Jasmine).
 
+Bun migration note:
+- During the current Bun migration, prefer running Bun tests from the repo root with explicit spec paths, e.g. `bun test ./packages/utils.parser/spec/*.ts`.
+- Do not add package-local Bun wrappers or rename spec files purely for Bun discovery.
+
 ## Code Style
 
 - **Formatter**: Prettier — no semicolons, single quotes, trailing commas: none, 120 char width
