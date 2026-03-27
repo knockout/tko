@@ -1,8 +1,9 @@
-import { functionRewrite } from '../dist'
-import { assert } from 'chai'
+import { describe, expect, it } from 'bun:test'
 
-describe('Function Rewrite Provider', function () {
-  describe('replaceFunctionStrings', function () {
+import { functionRewrite } from '../src'
+
+describe('Function Rewrite Provider', () => {
+  describe('replaceFunctionStrings', () => {
     const tryExpect = {
       'x: function () {}': 'x: () => undefined',
       'x: function ( ) { return t }': 'x: () => t',
@@ -19,15 +20,15 @@ describe('Function Rewrite Provider', function () {
     const idempotents = ['x: nonfunction () {}']
     functionRewrite.silent = true
 
-    for (const [given, expect] of Object.entries(tryExpect)) {
-      it(`replaces '${given}'' with '${expect}'`, () => {
-        assert.equal(functionRewrite(given), expect)
+    for (const [given, expected] of Object.entries(tryExpect)) {
+      it(`replaces '${given}'' with '${expected}'`, () => {
+        expect(functionRewrite(given)).toBe(expected)
       })
     }
 
     for (const given of idempotents) {
       it(`does not alter '${given}'`, () => {
-        assert.equal(functionRewrite(given), given)
+        expect(functionRewrite(given)).toBe(given)
       })
     }
   })
