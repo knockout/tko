@@ -20,6 +20,7 @@
 
 const MASK_SVG = `url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.75'%3E%3Cpath%20d%3D'M15%203h6v6'%2F%3E%3Cpath%20d%3D'M10%2014%2021%203'%2F%3E%3Cpath%20d%3D'M18%2013v6a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2V8a2%202%200%200%201%202-2h6'%2F%3E%3C%2Fsvg%3E")`
 const DEFAULT_PLAYGROUND_HTML = '<div id="root"></div>'
+const GET_ELEMENT_BY_ID_RE = /document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)/
 
 function h(tag, props, children = []) {
   return {
@@ -78,6 +79,11 @@ function indentBlock(code, spaces) {
     .join('\n')
 }
 
+function inferPlaygroundHtml(tsx) {
+  const mountId = tsx.match(GET_ELEMENT_BY_ID_RE)?.[2]
+  return mountId ? `<div id="${mountId}"></div>` : DEFAULT_PLAYGROUND_HTML
+}
+
 function wrapTsxForPlayground(tsx) {
   const code = tsx.trim()
   if (!code) return code
@@ -92,10 +98,13 @@ function wrapTsxForPlayground(tsx) {
   }
 
   const blocks = code.split(/\n\s*\n/)
-  const jsxBlock = blocks.at(-1)?.trim()
-  if (!jsxBlock || !looksLikeJsxExpression(jsxBlock)) return code
+  const jsxIndex = blocks.findIndex(block => looksLikeJsxExpression(block.trim()))
+  if (jsxIndex < 0) return code
 
-  const prelude = blocks.slice(0, -1).join('\n\n').trim()
+  const jsxBlock = blocks.slice(jsxIndex).join('\n\n').trim()
+  if (!jsxBlock) return code
+
+  const prelude = blocks.slice(0, jsxIndex).join('\n\n').trim()
 
   let wrapped = ''
   if (prelude) wrapped += `${prelude}\n\n`
@@ -138,7 +147,7 @@ function addHtmlPlaygroundButton(blockAst, html, js) {
 }
 
 function addTsxButton(blockAst, tsx) {
-  insertPlaygroundButton(blockAst, DEFAULT_PLAYGROUND_HTML, wrapTsxForPlayground(tsx))
+  insertPlaygroundButton(blockAst, inferPlaygroundHtml(tsx), wrapTsxForPlayground(tsx))
 }
 
 export function pluginPlaygroundButton() {
