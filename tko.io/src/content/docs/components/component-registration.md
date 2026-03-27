@@ -46,7 +46,7 @@ ko.components.register('my-component', {
 })
 ```
 
-Knockout creates a new viewmodel instance for each component instance.
+TKO creates a new viewmodel instance for each component instance.
 
 #### A shared object instance
 
@@ -153,9 +153,9 @@ Your component configuration object can include additional properties if a custo
 
 ### Controlling synchronous/asynchronous loading
 
-If your component configuration has a boolean `sync` property, Knockout uses it to determine whether the component is allowed to load and inject synchronously. The default is `false`.
+If your component configuration has a boolean `sync` property, TKO uses it to determine whether the component is allowed to load and inject synchronously. The default is `false`.
 
-Normally, Knockout keeps component loading asynchronous because a loader may need to fetch files or data. That default avoids bugs where a process sometimes completes synchronously and sometimes asynchronously.
+Normally, TKO keeps component loading asynchronous because a loader may need to fetch files or data. That default avoids bugs where a process sometimes completes synchronously and sometimes asynchronously.
 
 If you set `sync: true`, a component may load asynchronously the first time and synchronously on later uses if the definition is already cached. Use that carefully when your code depends on timing.
 

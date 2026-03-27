@@ -136,7 +136,7 @@ However, if you *do* want to let the default action proceed, just return `true` 
 
 ### Note 4: Preventing the event from bubbling
 
-By default, Knockout will allow the event to continue to bubble up to any higher level event handlers.  For example, if your element is handling a `mouseover` event and a parent of the element also handles that same event, then the event handler for both elements will be triggered.  If necessary, you can prevent the event from bubbling by including an additional binding that is named `mouseoverBubble` and passing false to it, as in this example:
+By default, Knockout will allow the event to continue to bubble up to any higher-level event handlers.  For example, if your element is handling a `mouseover` event and a parent of the element also handles that same event, then the event handler for both elements will be triggered.  If necessary, you can prevent the event from bubbling by including an additional binding that is named `mouseoverBubble` and passing false to it, as in this example:
 
 ```html
 <div data-bind="event: { mouseover: myDivHandler }">

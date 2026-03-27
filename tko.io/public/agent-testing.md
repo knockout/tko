@@ -35,7 +35,7 @@ Workflow:
 3. Navigate Playwright to `http://localhost:8765/tko-test.html`
 4. Read `document.title` or snapshot the DOM to verify
 
-This is the fastest option — no esbuild, no network dependency on the playground. Works for all `data-bind` code.
+This is the fastest option — no esbuild and no network dependency on the playground, though Option 1 still fetches `https://tko.io/lib/tko.js` unless you vendor that file locally. Works for all `data-bind` code.
 
 ## Option 2: Playground via Playwright (JSX/TSX)
 
@@ -96,7 +96,7 @@ Extract the HTML and JS from the code blocks and use Option 1 (static HTML file)
 
 TSX examples use `ko-*` attributes which require JSX compilation. Use Option 2 (playground).
 
-Important: `ko-*` attribute values in `{braces}` are **compile-time JavaScript expressions**, not runtime binding strings. Variables referenced in `ko-*={expr}` must be defined in the TSX scope before the JSX expression. Binding-context variables inside `ko-foreach` children should use **string syntax**: `ko-text="name"` not `ko-text={name}`.
+Important: `ko-*` attribute values in `{braces}` are JavaScript expressions transformed by esbuild at build time and evaluated at runtime, not runtime binding strings. Variables referenced in `ko-*={expr}` must be defined in the TSX scope before the JSX expression. Binding-context variables inside `ko-foreach` children should use **string syntax**: `ko-text="name"` not `ko-text={name}`.
 
 ```tsx
 // 1. Define variables that ko-* attributes reference

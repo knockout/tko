@@ -30,8 +30,8 @@ ko.bindingHandlers.myWidget = {
 When removing an element, Knockout runs logic to clean up any data associated with the element. In advanced scenarios, you may want to prevent or customize how external data is removed in your application. Knockout exposes a function, `ko.utils.domNodeDisposal.cleanExternalData(node)`, that can be overridden to support custom logic. For example, you can replace the standard `cleanExternalData` implementation with one that delegates to your own cleanup code:
 
 ```javascript
-ko.utils.domNodeDisposal.cleanExternalData = function () {
-    // Do nothing. Use this only if your application manages external data
-    // cleanup some other way.
+ko.utils.domNodeDisposal.cleanExternalData = function (node) {
+    // Delegate to your app-specific cleanup for this node.
+    cleanupExternalDataForNode(node);
 };
 ```

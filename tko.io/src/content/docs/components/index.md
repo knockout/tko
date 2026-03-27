@@ -26,7 +26,7 @@ TKO supports three common ways to consume a component:
 
 TKO also ships a class-based `Component` abstraction for cases where you want a richer component lifecycle than a plain registration object.
 
-### Example: a like/dislike widget
+## Example: a like/dislike widget
 
 Start with an explicit registration. Keep the example inline while you are learning the shape, then split the viewmodel and template out of line when it becomes part of a real app.
 

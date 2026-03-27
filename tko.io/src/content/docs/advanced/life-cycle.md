@@ -26,6 +26,6 @@ Call `dispose` directly, or anchor the lifecycle to a DOM node with `anchorTo(no
 | `this.anchorTo(node)` | Dispose the lifecycle when the node is removed |
 | `this.addDisposable(obj)` | Dispose a custom object during cleanup |
 
-When a lifecycle ends, its computeds, subscriptions, event handlers, and added disposables are cleaned up. If a computed is anchored to a DOM node, it is disposed when that node is removed.
+When a lifecycle ends, its computeds, subscriptions, event handlers, and added disposables are cleaned up. If the lifecycle is anchored to a DOM node, cleanup runs when that node is removed.
 
 Prefer `pureComputed` where possible, and explicitly dispose anything that outlives the object itself.

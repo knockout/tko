@@ -30,7 +30,7 @@ As illustrated in this example, KO passes the form element as a parameter to you
 
  * Extracting additional data or state from the form elements
 
- * Triggering UI-level validation using your own validation logic, or using the browser's built-in validation APIs, for example `if (formElement.checkValidity()) { /* do something */ }`.
+ * Triggering UI-level validation using your own validation logic, or using the browser's built-in validation APIs, for example `if (formElement.reportValidity()) { /* do something */ }`.
 
 ### Why not just put a `click` handler on the submit button?
 

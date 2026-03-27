@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const siteRoot = path.resolve(scriptDir, '..')
 const repoRoot = path.resolve(siteRoot, '..')
 const packagesRoot = path.join(repoRoot, 'packages')
@@ -59,7 +60,11 @@ function statusSummary(status) {
 }
 
 function lowerFirst(text) {
-  return text ? text.charAt(0).toLowerCase() + text.slice(1) : text
+  if (!text) return text
+  if (text.length > 1 && text[0] === text[0].toUpperCase() && text[1] === text[1].toUpperCase()) {
+    return text
+  }
+  return text.charAt(0).toLowerCase() + text.slice(1)
 }
 
 function deriveWhenToRead(pkg) {
@@ -156,8 +161,11 @@ async function hasSpecFiles(packageDir) {
   const specDir = path.join(packagesRoot, packageDir, 'spec')
 
   try {
-    const entries = await fs.readdir(specDir)
-    return { hasTests: entries.length > 0, specDirRelative: `packages/${packageDir}/spec` }
+    const entries = await fs.readdir(specDir, { withFileTypes: true })
+    const hasTests = entries.some(
+      entry => entry.isFile() && /\.(?:[cm]?[jt]s|tsx|jsx)$/.test(entry.name)
+    )
+    return { hasTests, specDirRelative: `packages/${packageDir}/spec` }
   } catch {
     return { hasTests: false, specDirRelative: `packages/${packageDir}/spec` }
   }

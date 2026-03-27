@@ -7,7 +7,7 @@ JSX object-to-DOM conversion, reactive children and attributes, and async child 
 
 ## When to Read This
 
-Read this when you need test-backed behavior for `@tko/utils.jsx`, especially jSX object-to-DOM conversion, reactive children and attributes, and async child handling.
+Read this when you need test-backed behavior for `@tko/utils.jsx`, especially JSX object-to-DOM conversion, reactive children and attributes, and async child handling.
 
 ## Status
 
