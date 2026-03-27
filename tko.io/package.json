@@ -8,7 +8,7 @@
     "prebuild": "node ./scripts/generate-verified-behaviors.mjs && mkdir -p public/lib && cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/public/lib/ko.js && cd ../reference && make browser && cp dist/browser.min.js ../../tko.io/public/lib/tko.js",
     "predev": "bun run prebuild",
     "dev": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro dev",
-    "build": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro build",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro build --force",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro preview",
     "check": "ASTRO_TELEMETRY_DISABLED=1 NODE_OPTIONS=--experimental-strip-types astro check"
   },
