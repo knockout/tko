@@ -21,7 +21,7 @@
     "@types/jquery": "^4.0.0",
     "@types/mocha": "^10.0.10",
     "chai": "^4.5.0",
-    "electron": "^33.2.1",
+    "electron": "^41.0.4",
     "esbuild": "^0.27.0",
     "eslint": "^10.0.3",
     "fs-extra": "^11.3.2",
