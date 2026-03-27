@@ -261,4 +261,4 @@ If you prefer, you could combine `templateFromUrlLoader` and `viewModelCustomLoa
 
 If you are using a component loader to fetch components by naming convention, and are *not* registering your components using `ko.components.register`, then those components will not automatically be usable as custom elements (because you haven't told TKO that they exist).
 
-See: [How to enable custom elements with names that don't correspond to explicitly registered components](./component-custom-elements/#register-names-before-use)
+See: [registering custom elements for custom loaders](./component-custom-elements/)

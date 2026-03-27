@@ -9,7 +9,7 @@ For most cases, inline `click` or `submit` bindings are clearer. Use delegated D
 Knockout provides two helper functions that let you identify the data associated with a DOM element:
 
 * `ko.dataFor(element)` - returns the data that was available for binding against the element
-* `ko.contextFor(element)` - returns the entire [binding context](../) that was available to the DOM element
+* `ko.contextFor(element)` - returns the entire [binding context](/binding-context/) that was available to the DOM element
 
 These helpers are useful when you attach a single event listener to a container and then inspect the clicked child with standard DOM APIs.
 

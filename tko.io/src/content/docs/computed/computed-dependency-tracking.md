@@ -38,7 +38,7 @@ ko.computed(function() {
 }, this);
 ```
 
-Note: If you just want to prevent a computed observable from updating too often, see the [`rateLimit` extender](../../observables/rateLimit-observable/).
+Note: If you just want to prevent a computed observable from updating too often, see the [`rateLimit` extender](/observables/rateLimit-observable/).
 
 ## Ignoring dependencies within a computed
 

@@ -11,7 +11,7 @@ Binding preprocessing lets you rewrite binding strings or DOM nodes during the b
 
 ## Preprocessing binding strings
 
-You can hook into Knockout's logic for interpreting `data-bind` attributes by providing a *binding preprocessor* for a specific binding handler (such as `click`, `visible`, or any [custom binding handler](../custom-bindings/)).
+You can hook into Knockout's logic for interpreting `data-bind` attributes by providing a *binding preprocessor* for a specific binding handler (such as `click`, `visible`, or any [custom binding handler](./custom-bindings/)).
 
 To do this, attach a `preprocess` function to the binding handler:
 
@@ -81,7 +81,7 @@ Now you can bind `click` like this:
 
 ## Preprocessing DOM nodes
 
-You can hook into Knockout's logic for traversing the DOM by providing a *node preprocessor*. This is a function that Knockout will call once for each DOM node that it walks over, both when the UI is first bound, and later when any new DOM subtrees are injected (e.g., via a [`foreach` binding](../foreach-binding/)).
+You can hook into Knockout's logic for traversing the DOM by providing a *node preprocessor*. This is a function that Knockout will call once for each DOM node that it walks over, both when the UI is first bound, and later when any new DOM subtrees are injected (e.g., via a [`foreach` binding](/bindings/foreach-binding/)).
 
 To do this, define a `preprocessNode` function on your binding provider:
 

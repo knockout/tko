@@ -59,15 +59,15 @@ Whenever the associated observable changes, KO calls your `update` callback with
 * `valueAccessor` - a function that returns the bound value. Call `ko.unwrap(valueAccessor())` to accept both observables and plain values.
 * `allBindings` - access to the other bindings on the same element
 * `viewModel` - the current view model value for the element; prefer `bindingContext.$data` or `bindingContext.$rawData` when you need the current item explicitly
-* `bindingContext` - the current [binding context](../)
+* `bindingContext` - the current [binding context](/binding-context/)
 
 For example, you might want a binding that fades an element in and out according to an observable:
 
 ```javascript
-ko.bindingHandlers.slideVisible = {
+ko.bindingHandlers.fadeVisible = {
     update(element, valueAccessor, allBindings) {
         const visible = !!ko.unwrap(valueAccessor())
-        const duration = allBindings.get('slideDuration') || 400
+        const duration = allBindings.get('fadeDuration') || 400
 
         element.style.transition = `opacity ${duration}ms ease`
         element.style.opacity = visible ? '1' : '0'
@@ -79,7 +79,7 @@ ko.bindingHandlers.slideVisible = {
 Now you can use this binding as follows:
 
 ```html
-<div data-bind="slideVisible: giftWrap, slideDuration:600">You have selected the option</div>
+<div data-bind="fadeVisible: giftWrap, fadeDuration: 600">You have selected the option</div>
 <label><input type="checkbox" data-bind="checked: giftWrap" /> Gift wrap</label>
 ```
 
@@ -99,10 +99,10 @@ Knockout will call your `init` function once for each DOM element that you use t
 
 KO passes the same parameters that it passes to [the `update` callback](#the-update-callback).
 
-Continuing the previous example, you might want `slideVisible` to set the element state immediately when the page first appears, so the transition only runs when the observable changes:
+Continuing the previous example, you might want `fadeVisible` to set the element state immediately when the page first appears, so the transition only runs when the observable changes:
 
 ```javascript
-ko.bindingHandlers.slideVisible = {
+ko.bindingHandlers.fadeVisible = {
     init(element, valueAccessor) {
         element.hidden = !ko.unwrap(valueAccessor())
     },

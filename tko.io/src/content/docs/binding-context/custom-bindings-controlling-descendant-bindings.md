@@ -40,7 +40,7 @@ To see this take effect, here's a sample usage:
 
 ### Example: Supplying additional values to descendant bindings
 
-Normally, bindings that use `controlsDescendantBindings` will also call `ko.applyBindingsToDescendants(someBindingContext, element)` to apply the descendant bindings against some modified [binding context](../). For example, you could have a binding called `withProperties` that attaches some extra properties to the binding context that will then be available to all descendant bindings:
+Normally, bindings that use `controlsDescendantBindings` will also call `ko.applyBindingsToDescendants(someBindingContext, element)` to apply the descendant bindings against some modified [binding context](/binding-context/). For example, you could have a binding called `withProperties` that attaches some extra properties to the binding context that will then be available to all descendant bindings:
 
 ```javascript
 ko.bindingHandlers.withProperties = {
@@ -70,7 +70,7 @@ Here's an example of using the above custom binding:
 
 ### Example: Adding extra levels in the binding context hierarchy
 
-Bindings such as [`with`](../with-binding/) and [`foreach`](../foreach-binding/) create extra levels in the binding context hierarchy. This means that their descendants can access data at outer levels by using `$parent`, `$parents`, `$root`, or `$parentContext`.
+Bindings such as [`with`](/bindings/with-binding/) and [`foreach`](/bindings/foreach-binding/) create extra levels in the binding context hierarchy. This means that their descendants can access data at outer levels by using `$parent`, `$parents`, `$root`, or `$parentContext`.
 
 If you want to do this in custom bindings, then instead of using `bindingContext.extend()`, use `bindingContext.createChildContext(someData)`. This returns a new binding context whose viewmodel is `someData` and whose `$parentContext` is `bindingContext`. If you want, you can then extend the child context with extra properties using `ko.utils.extend`. For example,
 

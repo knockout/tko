@@ -34,12 +34,12 @@ A computed observable can be constructed using one of the following forms:
 A computed observable provides the following functions:
 
 * `dispose()` --- Manually disposes the computed observable, clearing all subscriptions to dependencies. This function is useful if you want to stop a computed observable from being updated or want to clean up memory for a computed observable that has dependencies on observables that won't be cleaned.
-* `extend(extenders)` --- Applies the given [extenders](../../observables/extenders/) to the computed observable.
+* `extend(extenders)` --- Applies the given [extenders](/observables/extenders/) to the computed observable.
 * `getDependenciesCount()` --- Returns the current number of dependencies of the computed observable.
 * `getSubscriptionsCount( [event] )` --- Returns the current number of subscriptions (either from other computed observables or manual subscriptions) of the computed observable. Optionally, pass an event name (like `"change"`) to return just the count of subscriptions for that event.
 * `isActive()` --- Returns whether the computed observable currently has any dependencies. A computed observable with no dependencies is inactive.
 * `peek()` --- Returns the current value of the computed observable without creating a dependency (see [`peek`](../computed-dependency-tracking/#controlling-dependencies-using-peek)).
-* `subscribe( callback [,callbackTarget, event] )` --- Registers a [manual subscription](../../observables/#explicitly-subscribing-to-observables) to be notified of changes to the computed observable.
+* `subscribe( callback [,callbackTarget, event] )` --- Registers a [manual subscription](/observables/#explicitly-subscribing-to-observables) to be notified of changes to the computed observable.
 
 ## Using the computed context
 

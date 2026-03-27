@@ -150,7 +150,7 @@ Observables implement a variety of functions useful for working in an asynchrono
 
 ## Forcing observables to always notify subscribers
 
-When writing to an observable that contains a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](../../observables/extenders/) to ensure that an observable's subscribers are always notified on a write, even if the value is the same. You would apply the extender to an observable like this:
+When writing to an observable that contains a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](/observables/extenders/) to ensure that an observable's subscribers are always notified on a write, even if the value is the same. You would apply the extender to an observable like this:
 
 ```javascript
 myViewModel.personName.extend({ notify: 'always' });

@@ -9,17 +9,17 @@ sidebar:
 
 # Binding Context
 
-A *binding context* is the scope object that your bindings read from. When you call `ko.applyBindings(viewModel)`, Knockout creates a root binding context. Control-flow bindings such as [`with`](../with-binding/) and [`foreach`](../foreach-binding/) create child contexts for nested data.
+A *binding context* is the scope object that your bindings read from. When you call `ko.applyBindings(viewModel)`, Knockout creates a root binding context. Control-flow bindings such as [`with`](/bindings/with-binding/) and [`foreach`](/bindings/foreach-binding/) create child contexts for nested data.
 
 This section covers:
 
-* [Binding syntax](../binding-syntax/)
-* [Custom bindings](../custom-bindings/)
-* [Controlling descendant bindings](../custom-bindings-controlling-descendant-bindings/)
-* [Custom bindings disposal](../custom-bindings-disposal/)
-* [Custom bindings for virtual elements](../custom-bindings-for-virtual-elements/)
-* [Binding preprocessing](../binding-preprocessing/)
-* [Unobtrusive event handling](../unobtrusive-event-handling/)
+* [Binding syntax](./binding-syntax/)
+* [Custom bindings](./custom-bindings/)
+* [Controlling descendant bindings](./custom-bindings-controlling-descendant-bindings/)
+* [Custom bindings disposal](./custom-bindings-disposal/)
+* [Custom bindings for virtual elements](./custom-bindings-for-virtual-elements/)
+* [Binding preprocessing](./binding-preprocessing/)
+* [Unobtrusive event handling](./unobtrusive-event-handling/)
 
 Binding contexts expose the following special properties that you can reference in any binding:
 
@@ -91,4 +91,4 @@ The following special variables are also available in bindings, but are not part
 
 ### Controlling or modifying the binding context in custom bindings
 
-Just like the built-in bindings [`with`](#with-binding) and [`foreach`](#foreach-binding), custom bindings can change the binding context for their descendant elements, or provide special properties by extending the binding context object. This is described in detail under [creating custom bindings that control descendant bindings](#custom-bindings-controlling-descendant-bindings).
+Just like the built-in bindings [`with`](/bindings/with-binding/) and [`foreach`](/bindings/foreach-binding/), custom bindings can change the binding context for their descendant elements, or provide special properties by extending the binding context object. This is described in detail under [creating custom bindings that control descendant bindings](./custom-bindings-controlling-descendant-bindings/).

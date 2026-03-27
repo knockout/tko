@@ -224,9 +224,9 @@ A custom element can have a regular `data-bind` attribute (in addition to any `p
 </products-list>
 ```
 
-However, it does not make sense to use bindings that would modify the element's contents, such as the [`text`](../../bindings/text-binding/) or [`template`](../../bindings/template-binding/) bindings, since they would overwrite the template injected by your component.
+However, it does not make sense to use bindings that would modify the element's contents, such as the [`text`](/bindings/text-binding/) or [`template`](/bindings/template-binding/) bindings, since they would overwrite the template injected by your component.
 
-TKO will prevent the use of any bindings that use [`controlsDescendantBindings`](../../binding-context/custom-bindings-controlling-descendant-bindings/), because that would clash with the component when trying to bind its viewmodel to the injected template. If you want to use a control-flow binding such as `if` or `foreach`, wrap it around your custom element rather than using it directly on the custom element, e.g.:
+TKO will prevent the use of any bindings that use [`controlsDescendantBindings`](/binding-context/custom-bindings-controlling-descendant-bindings/), because that would clash with the component when trying to bind its viewmodel to the injected template. If you want to use a control-flow binding such as `if` or `foreach`, wrap it around your custom element rather than using it directly on the custom element, e.g.:
 
 ```html
 <!-- ko if: someCondition -->
