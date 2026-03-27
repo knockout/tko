@@ -5,8 +5,7 @@ title: Value Binding
 
 # `value`
 
-*Note: The [`textInput`](#textInput-binding) binding can be used in many places instead of the `value` binding, providing broader support for many edge
-  cases and textInput update the observables on a per-character change (as opposed to the default of `blur` for the `value` binding).*
+*Note: The [`textInput`](../textInput-binding/) binding can often be used instead of `value` when you want immediate updates as the user types or pastes.*
 
 ### Purpose
 The `value` binding links the associated DOM element's value with a property on your view model. This is typically useful with form elements such as `<input>`, `<select>` and `<textarea>`.
@@ -49,12 +48,12 @@ ko.applyBindings(viewModel);
 
      If your binding also includes a parameter called `valueUpdate`, this defines additional browser events KO should use to detect changes besides the `change` event. The following string values are the most commonly useful choices:
 
-     * `"input"` - updates your view model when the value of an `<input>` or `<textarea>` element changes. Note that this event is only raised by reasonably modern browsers (e.g., IE 9+).
+     * `"input"` - updates your view model when the value of an `<input>` or `<textarea>` element changes.
      * `"keyup"` - updates your view model when the user releases a key
      * `"keypress"` - updates your view model when the user has typed a key. Unlike `keyup`, this updates repeatedly while the user holds a key down
      * `"afterkeydown"` - updates your view model as soon as the user begins typing a character. This works by catching the browser's `keydown` event and handling the event asynchronously.
 
-     Of these options, `"input"` is the best choice if you want to keep your view model updated in real-time, and you only need to support reasonably modern browsers such as IE 9+ (whereas `"afterkeydown"` is a good choice for older browsers). For example:
+     Of these options, `"input"` is usually the best choice if you want live updates as the user types, while `"afterkeydown"` is useful when you want the earliest possible signal from typing. For example:
 
     ```html
     <p>Your value: <input data-bind="value: someValue, valueUpdate: 'input'" /></p>

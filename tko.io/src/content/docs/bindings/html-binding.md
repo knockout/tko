@@ -27,14 +27,14 @@ Typically this is useful when values in your view model are actually strings of 
 var viewModel = {
   details: ko.observable() // Initially blank
 };
-viewModel.details("<em>For further details, view the report <a href='report.html'>here</a>.</em>"); // HTML content appears
+viewModel.details("<em>Read the latest notes in <a href='/llms.txt'>llms.txt</a>.</em>"); // HTML content appears
 ```
 
 ### Parameters
 
  * Main parameter
 
-   KO clears the previous content and then sets the element's content to your parameter value using jQuery's `html` function or by parsing the string into HTML nodes and appending each node as a child of the element, if jQuery is not available.
+   KO clears the previous content and then sets the element's HTML from your parameter value.
 
    If this parameter is an observable value, the binding will update the element's content whenever the value changes. If the parameter isn't observable, it will only set the element's content once and will not update it again later.
 

@@ -13,7 +13,7 @@ A computed observable can be constructed using one of the following forms:
 
 1. `ko.computed( evaluator [, targetObject, options] )` --- This form supports the most common case of creating a computed observable.
   * `evaluator` --- A function that is used to evaluate the computed observable's current value.
-  * `targetObject` --- If given, defines the value of `this` whenever KO invokes your callback functions. See the section on [managing `this`](computedObservables.html#managing-this) for more information.
+  * `targetObject` --- If given, defines the value of `this` whenever KO invokes your callback functions. See [Computed Observables](./computedObservables/) for more information.
   * `options` --- An object with further properties for the computed observable. See the full list below.
 
 1. `ko.computed( options )` --- This single parameter form for creating a computed observable accepts a JavaScript object with any of the following properties.
@@ -34,12 +34,12 @@ A computed observable can be constructed using one of the following forms:
 A computed observable provides the following functions:
 
 * `dispose()` --- Manually disposes the computed observable, clearing all subscriptions to dependencies. This function is useful if you want to stop a computed observable from being updated or want to clean up memory for a computed observable that has dependencies on observables that won't be cleaned.
-* `extend(extenders)` --- Applies the given [extenders](../../observables/extenders/) to the computed observable.
+* `extend(extenders)` --- Applies the given [extenders](/observables/extenders/) to the computed observable.
 * `getDependenciesCount()` --- Returns the current number of dependencies of the computed observable.
 * `getSubscriptionsCount( [event] )` --- Returns the current number of subscriptions (either from other computed observables or manual subscriptions) of the computed observable. Optionally, pass an event name (like `"change"`) to return just the count of subscriptions for that event.
-* `isActive()` --- Returns whether the computed observable may be updated in the future. A computed observable is inactive if it has no dependencies.
-* `peek()` --- Returns the current value of the computed observable without creating a dependency (see the section on [`peek`](computed-dependency-tracking.html#controlling-dependencies-using-peek)).
-* `subscribe( callback [,callbackTarget, event] )` --- Registers a [manual subscription](observables.html#explicitly-subscribing-to-observables) to be notified of changes to the computed observable.
+* `isActive()` --- Returns whether the computed observable currently has any dependencies. A computed observable with no dependencies is inactive.
+* `peek()` --- Returns the current value of the computed observable without creating a dependency (see [`peek`](../computed-dependency-tracking/#controlling-dependencies-using-peek)).
+* `subscribe( callback [,callbackTarget, event] )` --- Registers a [manual subscription](/observables/#explicitly-subscribing-to-observables) to be notified of changes to the computed observable.
 
 ## Using the computed context
 
@@ -58,7 +58,7 @@ var myComputed = ko.computed(function() {
 
     // Now let's inspect ko.computedContext
     var isFirstEvaluation = ko.computedContext.isInitial(),
-        dependencyCount = ko.computedContext.getDependenciesCount(),
+        dependencyCount = ko.computedContext.getDependenciesCount();
     console.log("Evaluating " + (isFirstEvaluation ? "for the first time" : "again"));
     console.log("By now, this computed has " + dependencyCount + " dependencies");
 

@@ -90,7 +90,7 @@ ko.applyBindings(new MyViewModel());
 
 Two points to note about this example:
 
- * If you're inside a nested [binding context](../../binding-context/binding-context/), for example if you're inside a `foreach` or a `with` block, but your handler function
+ * If you're inside a nested [binding context](/binding-context/), for example if you're inside a `foreach` or a `with` block, but your handler function
    is on the root viewmodel or some other parent context, you'll need to use a prefix such as `$parent` or `$root` to locate the
    handler function.
  * In your viewmodel, it's often useful to declare `self` (or some other variable) as an alias for `this`. Doing so avoids any problems
@@ -177,7 +177,7 @@ However, if you *do* want to let the default click action proceed, just return `
 
 ### Note 4: Preventing the event from bubbling
 
-By default, Knockout will allow the click event to continue to bubble up to any higher level event handlers.  For example, if your element and a parent of that element are both handling the `click` event, then the click handler for both elements will be triggered.  If necessary, you can prevent the event from bubbling by including an additional binding that is named `clickBubble` and passing false to it, as in this example:
+By default, Knockout will allow the click event to continue to bubble up to any higher-level event handlers.  For example, if your element and a parent of that element are both handling the `click` event, then the click handler for both elements will be triggered.  If necessary, you can prevent the event from bubbling by including an additional binding that is named `clickBubble` and passing false to it, as in this example:
 
 ```tsx
 const myDivHandler = () => {}

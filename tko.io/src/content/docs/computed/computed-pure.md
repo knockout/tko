@@ -41,7 +41,7 @@ this.fullName = ko.computed(function() {
 }, this, { pure: true });
 ```
 
-For complete syntax, see the [computed observable reference](#computed-reference).
+For complete syntax, see the [computed observable reference](../computed-reference/).
 
 ### When to use a *pure* computed observable
 
@@ -111,11 +111,11 @@ You should not use the *pure* feature for a computed observable that is meant to
   });
   ```
 
-The reason you shouldn't use a *pure* computed if the evaluator has important side effects is simply that the evaluator will not run whenever the computed has no active subscribers (and so is sleeping). If it's important for the evaluator to always run when dependencies change, use a [regular computed](../../computed/computedObservables/) instead.
+The reason you shouldn't use a *pure* computed if the evaluator has important side effects is simply that the evaluator will not run whenever the computed has no active subscribers (and so is sleeping). If it's important for the evaluator to always run when dependencies change, use a [regular computed](../computedObservables/) instead.
 
 ### State-change notifications
 
-A pure computed observable notifies an `awake` event (using its current value) whenever it enters the *listening* state and notifies an `asleep` event (using an `undefined` value) whevener it enter the *sleeping* state. You won't normally need to know about the internal state of your computed observables. But since the internal state can correspond to whether the computed observable is bound to the view or not, you might use that information to do some view-model initialization or cleanup.
+A pure computed observable notifies an `awake` event (using its current value) whenever it enters the *listening* state and notifies an `asleep` event (using an `undefined` value) whenever it enters the *sleeping* state. You won't normally need to know about the internal state of your computed observables. But since the internal state can correspond to whether the computed observable is bound to the view or not, you might use that information to do some view-model initialization or cleanup.
 
   ```javascript
   this.someComputedThatWillBeBound = ko.pureComputed(function () {

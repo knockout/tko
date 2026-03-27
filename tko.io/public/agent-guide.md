@@ -15,7 +15,16 @@ ko.observableArray([])    // array with push/pop/remove/removeAll/splice/replace
 ko.computed(() => expr)   // auto-tracks dependencies, re-evaluates on change
 ko.pureComputed(() => expr) // same but releases subscriptions when unobserved (saves memory) — prefer this
 ko.computed({ read: () => v, write: (v) => {} }) // writable computed
+ko.when(predicate, callback) // run once when predicate becomes truthy
+ko.when(predicate).then(fn)  // promise form
 obs.subscribe(fn)         // manual subscription
+```
+
+`ko.when` accepts either an observable or a predicate function. It uses computed dependency tracking, runs once when the predicate becomes truthy, and supports both callback and promise forms.
+
+```js
+ko.when(viewModel.isReady, () => console.log('Ready'))
+ko.when(() => viewModel.isReady() && viewModel.hasData()).then(() => console.log('Ready'))
 ```
 
 ## Bindings
@@ -29,6 +38,20 @@ click, event:{name:fn}, value, textInput, checked, enable, disable,
 foreach, if, ifnot, with, template:{name:'id'}, component:{name:'n',params:{}}
 
 Context variables inside foreach: $data, $parent, $root, $index (observable), $element.
+
+Binding notes:
+- `textInput` binds an `<input>` or `<textarea>` with immediate two-way updates as the user types, pastes, drags, or accepts autofill. Prefer it over `value` when the model must update continuously.
+
+```html
+<input data-bind="textInput: query">
+<textarea data-bind="textInput: notes"></textarea>
+```
+
+## Classic data-bind parsing and CSP
+
+Classic `data-bind` parsing is provider-driven. Use `DataBindProvider` when you need binding strings, and combine it with other providers through `MultiProvider` as needed.
+
+The classic parser does not rely on `eval` or `new Function`, so `data-bind` markup works under stricter Content Security Policies than older Knockout-era parser approaches.
 
 ## TSX vs HTML Syntax
 
@@ -55,7 +78,7 @@ TKO supports two binding syntaxes. The documentation shows both side-by-side in 
 <ul ko-foreach={items}><li ko-text="$data" /></ul>
 ```
 
-- `ko-*` attribute values in `{}` are **JavaScript expressions** evaluated at compile time by esbuild
+- `ko-*` attribute values in `{}` are **JavaScript expressions** transformed by esbuild at build time, then evaluated at runtime
 - Top-level variables (`message`, `handler`, `items`) must be defined in scope before the JSX
 - Binding-context variables inside `ko-foreach` children (like `$data`, `$parent`) use **string** syntax: `ko-text="$data"` (not `ko-text={$data}`)
 - Derived binding values must stay observable or computed. `ko-visible={items().length > 0}` and `ko-style={{ color: profit() < 0 ? 'red' : 'black' }}` freeze as one-time values.
@@ -65,9 +88,9 @@ TKO supports two binding syntaxes. The documentation shows both side-by-side in 
 
 ### Key difference: compile-time vs runtime
 
-In HTML, `data-bind="foreach: people"` is a string — knockout evaluates `people` in the view model at runtime.
+In HTML, `data-bind="foreach: people"` is a string — TKO evaluates `people` in the view model at runtime.
 
-In TSX, `ko-foreach={people}` is a JSX expression — esbuild resolves `people` as a JavaScript variable at compile time. The variable must exist in scope:
+In TSX, `ko-foreach={people}` is a JSX expression — esbuild transforms the JSX syntax, and `people` must exist as a JavaScript variable in scope when the code runs:
 
 ```tsx
 // Variables must be defined before the JSX expression
@@ -102,7 +125,7 @@ const result = await esbuild.transform(code, {
   jsxFactory: 'tko.jsx.createElement',
   jsxFragment: 'tko.jsx.Fragment'
 })
-// result.code is ready to eval
+// result.code is ready to run as a JavaScript module
 ```
 
 ## Playground URLs

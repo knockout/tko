@@ -52,7 +52,7 @@ In TSX, `ko-text={...}` takes normal JavaScript expressions. Define the values y
 
 ### Note 1: Using functions and expressions to determine text values
 
-If you want to determine text programmatically, one option is to create a [computed observable](../../computed/computedObservables/), and use its evaluator function as a place for your code that works out what text to display.
+If you want to determine text programmatically, one option is to create a [computed observable](/computed/computedobservables/), and use its evaluator function as a place for your code that works out what text to display.
 
 For example,
 
@@ -139,19 +139,3 @@ To handle this, you can use the *containerless syntax*, which is based on commen
 ```
 
 The `<!--ko-->` and `<!--/ko-->` comments act as start/end markers, defining a "virtual element" that contains the markup inside. Knockout understands this virtual element syntax and binds as if you had a real container element.
-
-### Note 4: About an IE 6 whitespace quirk
-
-IE 6 has a strange quirk whereby it sometimes ignores whitespace that immediately follows an empty span. This has nothing directly to do with Knockout, but in case you do want to write:
-
-```html
-Welcome, `<span data-bind="text: userName"></span>` to our web site.
-```
-
-... and IE 6 renders no whitespace before the words `to our web site`, you can avoid the problem by putting any text into the `<span>`, e.g.:
-
-```html
-Welcome, <span data-bind="text: userName">&nbsp;</span> to our web site.
-```
-
-Other browsers, and newer versions of IE, don't have this quirk.

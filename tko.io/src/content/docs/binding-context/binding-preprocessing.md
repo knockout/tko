@@ -5,13 +5,13 @@ title: Binding Preprocessing
 
 # Binding Preprocessing
 
-*Note: Extending the binding syntax using preprocessing is an advanced technique, typically used only when creating libraries of reusable bindings or extended syntaxes. It's not something you'll normally need to do when building applications with Knockout.*
+*Note: Binding preprocessing is an advanced technique, typically used only when creating libraries of reusable bindings or custom syntaxes. Most applications should prefer ordinary bindings, custom bindings, or TSX examples instead.*
 
-Starting with Knockout 3.0, developers can define custom syntaxes by providing callbacks that rewrite DOM nodes and binding strings during the binding process.
+Binding preprocessing lets you rewrite binding strings or DOM nodes during the binding process.
 
 ## Preprocessing binding strings
 
-You can hook into Knockout's logic for interpreting `data-bind` attributes by providing a *binding preprocessor* for a specific binding handler (such as `click`, `visible`, or any [custom binding handler](../../binding-context/custom-bindings/)).
+You can hook into Knockout's logic for interpreting `data-bind` attributes by providing a *binding preprocessor* for a specific binding handler (such as `click`, `visible`, or any [custom binding handler](./custom-bindings/)).
 
 To do this, attach a `preprocess` function to the binding handler:
 
@@ -81,20 +81,18 @@ Now you can bind `click` like this:
 
 ## Preprocessing DOM nodes
 
-You can hook into Knockout's logic for traversing the DOM by providing a *node preprocessor*. This is a function that Knockout will call once for each DOM node that it walks over, both when the UI is first bound, and later when any new DOM subtrees are injected (e.g., via a [`foreach` binding](../foreach-binding/)).
+You can hook into Knockout's logic for traversing the DOM by providing a *node preprocessor*. This is a function that Knockout will call once for each DOM node that it walks over, both when the UI is first bound, and later when any new DOM subtrees are injected (e.g., via a [`foreach` binding](/bindings/foreach-binding/)).
 
 To do this, define a `preprocessNode` function on your binding provider:
 
 ```javascript
-  ko.bindingProvider.instance.preprocessNode = function(node) {
-  // Use DOM APIs such as setAttribute to modify 'node' if you wish.
-  // If you want to leave 'node' in the DOM, return null or have no 'return' statement.
-  // If you want to replace 'node' with some other set of nodes,
-  //    - Use DOM APIs such as insertChild to inject the new nodes
-  //      immediately before 'node'
-  //    - Use DOM APIs such as removeChild to remove 'node' if required
-  //    - Return an array of any new nodes that you've just inserted
-  //      so that Knockout can apply any bindings to them
+ko.bindingProvider.instance.preprocessNode = function(node) {
+    // Use DOM APIs such as setAttribute to modify node if you wish.
+    // If you want to leave node in the DOM, return null or omit a return.
+    // If you want to replace node with other nodes:
+    //   - insert new nodes immediately before node
+    //   - remove node if required
+    //   - return an array of the new nodes so Knockout can bind them
 }
 ```
 
@@ -110,7 +108,7 @@ ko.bindingProvider.instance.preprocessNode = function(node) {
     if (node.nodeType === Node.COMMENT_NODE) {
         var match = node.nodeValue.match(/^\s*(template\s*:[\s\S]+)/);
         if (match) {
-            // Create a pair of comments to replace the single comment
+            // Create a pair of comments to replace the single comment.
             var c1 = document.createComment("ko " + match[1]),
                 c2 = document.createComment("/ko");
             node.parentNode.insertBefore(c1, node);

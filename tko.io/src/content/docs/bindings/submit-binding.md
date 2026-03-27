@@ -30,7 +30,7 @@ As illustrated in this example, KO passes the form element as a parameter to you
 
  * Extracting additional data or state from the form elements
 
- * Triggering UI-level validation using a library such as [jQuery Validation](https://github.com/jzaefferer/jquery-validation), using code similar to the following snippet: `if ($(formElement).valid()) { /* do something */ }`.
+ * Triggering UI-level validation using your own validation logic, or using the browser's built-in validation APIs, for example `if (formElement.reportValidity()) { /* do something */ }`.
 
 ### Why not just put a `click` handler on the submit button?
 

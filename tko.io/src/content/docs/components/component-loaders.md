@@ -5,7 +5,7 @@ title: Component Loaders
 
 # Component Loaders
 
-Whenever you inject a [component](component-overview.html) using the [`component` binding](component-binding.html) or a [custom element](component-custom-elements.html), Knockout fetches that component's template and viewmodel using one or more *component loaders*. The job of a component loader is to asynchronously supply a template/viewmodel pair for any given component name.
+Whenever you inject a [component](./) using the [`component` binding](./component-binding/) or a [custom element](./component-custom-elements/), TKO asks one or more *component loaders* to supply that component's template and viewmodel. A loader can resolve component definitions from registrations, files, naming conventions, or any other app-specific convention.
 
 * [Table of contents injected here]
 {:toc}
@@ -14,14 +14,14 @@ Whenever you inject a [component](component-overview.html) using the [`component
 
 The built-in default component loader, `ko.components.defaultLoader`, is based around a central "registry" of component definitions. It relies on you explicitly registering a configuration for each component before you can use that component.
 
-[Learn more about configuring and registering components with the default loader](component-registration.html)
+[Learn more about configuring and registering components with the default loader](./component-registration/)
 
 # Component loader utility functions
 
 The following functions read and write the default component loader's registry:
 
  * `ko.components.register(name, configuration)`
-   * Registers a component. See: [full documentation](component-registration.html).
+   * Registers a component. See: [full documentation](./component-registration/).
 
  * `ko.components.isRegistered(name)`
    * Returns `true` if a component with the specified name is already registered; `false` otherwise.
@@ -48,7 +48,7 @@ For documentation on these standard component loader functions, see [implementin
 
 # Implementing a custom component loader {% raw %}{#custom-component-loader}{% endraw %}
 
-You might want to implement a custom component loader if you want to use naming conventions, rather than explicit registration, to load components. Or, if you want to use a third-party "loader" library to fetch component viewmodels or templates from external locations.
+You might want to implement a custom component loader if you want to use naming conventions rather than explicit registration, or if you want to fetch component viewmodels or templates from external locations.
 
 ## Functions you can implement
 
@@ -84,13 +84,13 @@ If declared, Knockout will call this function to convert a `componentConfig` obj
 
 The default component loader will call this function on any registered loaders that declare it, to convert the `template` part of a component configuration into an array of DOM nodes. The nodes are then cached and cloned for each instance of the component.
 
-The `templateConfig` value is simply the `template` property from any `componentConfig` object. For example, it may contain `"some markup"` or `{ element: "someId" }` or a custom format such as `{ loadFromUrl: "someUrl.html" }`.
+The `templateConfig` value is simply the `template` property from any `componentConfig` object. For example, it may contain `"some markup"` or `{ element: "someId" }` or a custom format such as `{ loadFromUrl: "/templates/some-url" }`.
 
   * To supply an array of DOM nodes, call `callback(domNodeArray)`.
 
   * If you do not want your loader to supply a template for the given parameters (e.g., because it does not recognize the configuration format), call `callback(null)`. Knockout will then consult any other registered loaders in sequence, until one supplies a non-`null` value.
 
-### `loadViewModel(name, templateConfig, callback)`
+### `loadViewModel(name, viewModelConfig, callback)`
 
 ***Define this if:*** *you want to use custom logic to supply a viewmodel factory for a given viewmodel configuration (e.g., integrating with a third-party module loader or dependency injection system).*
 
@@ -195,7 +195,7 @@ For example, you might want to enable configuration formats like the following:
 
 ```javascript
 ko.components.register('my-component', {
-    template: { fromUrl: 'file.html', maxCacheAge: 1234 },
+    template: { fromUrl: 'my-component', maxCacheAge: 1234 },
     viewModel: { viaLoader: '/path/myvm.js' }
 });
 ```
@@ -208,14 +208,14 @@ The following custom loader will take care of loading templates configured with 
 var templateFromUrlLoader = {
     loadTemplate: function(name, templateConfig, callback) {
         if (templateConfig.fromUrl) {
-            // Uses jQuery's ajax facility to load the markup from a file
             var fullUrl = '/templates/' + templateConfig.fromUrl + '?cacheAge=' + templateConfig.maxCacheAge;
-            $.get(fullUrl, function(markupString) {
-                // We need an array of DOM nodes, not a string.
-                // We can use the default loader to convert to the
-                // required format.
-                ko.components.defaultLoader.loadTemplate(name, markupString, callback);
-            });
+            fetch(fullUrl)
+                .then(function(response) { return response.text(); })
+                .then(function(markupString) {
+                    // We need an array of DOM nodes, not a string.
+                    // We can use the default loader to convert to the required format.
+                    ko.components.defaultLoader.loadTemplate(name, markupString, callback);
+                });
         } else {
             // Unrecognized config format. Let another loader handle it.
             callback(null);
@@ -255,31 +255,10 @@ var viewModelCustomLoader = {
 ko.components.loaders.unshift(viewModelCustomLoader);
 ```
 
-If you prefer, you could combine `templateFromUrlLoader` and `viewModelCustomLoader` into a single loader by putting the `loadTemplate` and `loadViewModel` functions on a single object. However it's quite nice to separate out these concerns, since their implementations are quite independent.
+If you prefer, you could combine `templateFromUrlLoader` and `viewModelCustomLoader` into a single loader by putting the `loadTemplate` and `loadViewModel` functions on a single object. However, it is often clearer to separate those concerns, since the implementations are independent.
 
 # Note: Custom component loaders and custom elements
 
-If you are using a component loader to fetch components by a naming convention, and are *not* registering your components using `ko.components.register`, then those components will not automatically be usable as custom elements (because you haven't told Knockout that they even exist).
+If you are using a component loader to fetch components by naming convention, and are *not* registering your components using `ko.components.register`, then those components will not automatically be usable as custom elements (because you haven't told TKO that they exist).
 
-See: [How to enable custom elements with names that don't correspond to explicitly registered components](component-custom-elements.html#registering-custom-elements)
-
-# Note: Integrating with browserify
-
-[Browserify](http://browserify.org/) is a popular library for referencing JavaScript libraries with a Node-style synchronous `require` syntax. It's often considered as an alternative to an AMD loader such as require.js. However Browserify solves a rather different problem: synchronous build-time reference resolution, rather than asynchronous runtime reference resolution as handled by AMD.
-
-Since Browserify is a build-time tool, it doesn't really need any special integration with KO components, and there's no need to implement any kind of custom component loader to work with it. You can simply use Browserify's `require` statements to grab instances of your component viewmodels, then explicitly register them, e.g.:
-
-```javascript
-// Note that the following *only* works with Browserify - not with require.js,
-// since it relies on require() returning synchronously.
-
-ko.components.register('my-browserify-component', {
-    viewModel: require('myViewModel'),
-    template: require('fs').readFileSync(__dirname + '/my-template.html', 'utf8')
-});
-```
-
-This uses the [brfs Browserify plugin](https://github.com/substack/brfs) to automatically inline the `.html` file, so you would need to build the script file using a command similar to:
-
-  * `npm install brfs`
-  * `browserify -t brfs main.js > bundle.js`
+See: [registering custom elements for custom loaders](./component-custom-elements/)

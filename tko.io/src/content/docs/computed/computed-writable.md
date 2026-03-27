@@ -3,7 +3,7 @@ title: Computed Writable
 ---
 
 
-# Writeable Computeds
+# Writable Computeds
 
 *Beginners may wish to skip this section - writable computed observables are fairly advanced and are not necessary in most situations*
 
@@ -153,4 +153,4 @@ ko.applyBindings(new MyViewModel());
 
 Now, `acceptedNumericValue` will only ever contain numeric values, and any other values entered will trigger the appearance of a validation message instead of updating `acceptedNumericValue`.
 
-**Note:** For such trivial requirements as validating that an input is numeric, this technique is overkill. It would be far easier just to use jQuery Validation and its `number` class on the `<input>` element. Knockout and jQuery Validation work together nicely in a grid-editor-style UI. However, the preceding example demonstrates a more general mechanism for filtering and validating with custom logic to control what kind of user feedback appears, which may be of use if your scenario is more complex than jQuery Validation handles natively.
+**Note:** For such trivial requirements as validating that an input is numeric, this technique is overkill. It is usually simpler to use a native `<input type="number">` or a dedicated validation layer. The preceding example demonstrates a more general mechanism for filtering and validating with custom logic to control what kind of user feedback appears, which may be of use if your scenario is more complex than a simple input constraint.

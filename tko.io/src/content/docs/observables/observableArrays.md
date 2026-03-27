@@ -5,7 +5,7 @@ title: ObservableArrays
 
 # Observable Arrays
 
-If you want to detect and respond to changes on one object, you'd use [observables](#observables). If you want to detect and respond to changes of a *collection of things*, use an `observableArray`. This is useful in many scenarios where you're displaying or editing multiple values and need repeated sections of UI to appear and disappear as items are added and removed.
+If you want to detect and respond to changes on one object, you'd use [observables](../). If you want to detect and respond to changes of a *collection of things*, use an `observableArray`. This is useful in many scenarios where you're displaying or editing multiple values and need repeated sections of UI to appear and disappear as items are added and removed.
 
 ### Example
 
@@ -35,7 +35,7 @@ var anotherObservableArray = ko.observableArray([
 
 ## Reading information from an observableArray
 
-Behind the scenes, an `observableArray` is actually an [observable](#observables) whose value is an array (plus, `observableArray` adds some additional features described below). So, you can get the underlying JavaScript array by invoking the `observableArray` as a function with no parameters, just like any other observable. Then you can read information from that underlying array. For example,
+Behind the scenes, an `observableArray` is actually an [observable](../) whose value is an array (plus, `observableArray` adds some additional features described below). So, you can get the underlying JavaScript array by invoking the `observableArray` as a function with no parameters, just like any other observable. Then you can read information from that underlying array. For example,
 
 ```javascript
 alert('The length of the array is ' + myObservableArray().length);
@@ -44,7 +44,7 @@ alert('The first element is ' + myObservableArray()[0]);
 
 Technically you can use any of the native JavaScript array functions to operate on that underlying array, but normally there's a better alternative. KO's `observableArray` has equivalent functions of its own, and they're more useful because:
 
- 1. They work on all targeted browsers. (For example, the native JavaScript `indexOf` function doesn't work on IE 8 or earlier, but KO's `indexOf` works everywhere.)
+ 1. They work consistently across the supported environments.
  1. For functions that modify the contents of the array, such as `push` and `splice`, KO's methods automatically trigger the dependency tracking mechanism so that all registered listeners are notified of the change, and your UI is automatically updated.
  1. The syntax is more convenient. To call KO's `push` method, just write `myObservableArray.push(...)`. This is slightly nicer than calling the underlying array's `push` method by writing `myObservableArray().push(...)`.
 
@@ -83,7 +83,7 @@ For more details about these `observableArray` functions, see the equivalent doc
 
  * `myObservableArray.remove(someItem)` removes all values that equal `someItem` and returns them as an array
  * `myObservableArray.remove(function(item) { return item.age < 18 })` removes all values whose `age` property is less than 18, and returns them as an array
- * `myObservableArray.removeAll(['Chad', 132, undefined])` removes all values that equal `'Chad'`, `123`, or `undefined` and returns them as an array
+ * `myObservableArray.removeAll(['Chad', 123, undefined])` removes all values that equal `'Chad'`, `123`, or `undefined` and returns them as an array
  * `myObservableArray.removeAll()` removes all values and returns them as an array
 
 ### destroy and destroyAll (Note: Usually relevant to Ruby on Rails developers only)
@@ -92,16 +92,16 @@ The `destroy` and `destroyAll` functions are mainly intended as a convenience fo
 
  * `myObservableArray.destroy(someItem)` finds any objects in the array that equal `someItem` and gives them a special property called `_destroy` with value `true`
  * `myObservableArray.destroy(function(someItem) { return someItem.age < 18 })` finds any objects in the array whose `age` property is less than 18, and gives those objects a special property called `_destroy` with value `true`
- * `myObservableArray.destroyAll(['Chad', 132, undefined])` finds any objects in the array that equal `'Chad'`, `123`, or `undefined` and gives them a special property called `_destroy` with value `true`
+ * `myObservableArray.destroyAll(['Chad', 123, undefined])` finds any objects in the array that equal `'Chad'`, `123`, or `undefined` and gives them a special property called `_destroy` with value `true`
  * `myObservableArray.destroyAll()` gives a special property called `_destroy` with value `true` to all objects in the array
 
 So, what's this `_destroy` thing all about? It's only really interesting to Rails developers. The convention in Rails is that, when you pass into an action a JSON object graph, the framework can automatically convert it to an ActiveRecord object graph and then save it to your database. It knows which of the objects are already in your database, and issues the correct INSERT or UPDATE statements. To tell the framework to DELETE a record, you just mark it with `_destroy` set to `true`.
 
-Note that when KO renders a `foreach` binding, it automatically hides any objects marked with `_destroy` equal to `true`. So, you can have some kind of "delete" button that invokes the `destroy(someItem)` method on the array, and this will immediately cause the specified item to vanish from the visible UI. Later, when you submit the JSON object graph to Rails, that item will also be deleted from the database (while the other array items will be inserted or updated as usual).
+Note that when KO renders a `foreach` binding, destroyed items are only hidden if you opt into that behavior with `includeDestroyed: false` or `ko.options.foreachHidesDestroyed = true`. So, if you want a "delete" button that invokes `destroy(someItem)` and immediately removes the item from the visible UI, make sure your `foreach` configuration hides destroyed entries before you submit the JSON object graph to Rails.
 
 ## Delaying and/or suppressing change notifications
 
-Normally, an `observableArray` notifies its subscribers immediately, as soon as it's changed. But if an `observableArray` is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying change notifications. This is accomplished using the [`rateLimit` extender](#rateLimit-observable) like this:
+Normally, an `observableArray` notifies its subscribers immediately, as soon as it's changed. But if an `observableArray` is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying change notifications. This is accomplished using the [`rateLimit` extender](../rateLimit-observable/) like this:
 
 ```javascript
 // Ensure it notifies about changes no more than once per 50-millisecond period
