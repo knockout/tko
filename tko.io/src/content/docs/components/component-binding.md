@@ -177,6 +177,12 @@ Although the DOM nodes in this element will be stripped out and not bound by def
 
 This is useful if you want to build components that represent container UI elements, such as grids, lists, dialogs, or tab sets, which need to inject and bind arbitrary markup into a common structure. See [passing markup into components](./component-custom-elements/#passing-markup-into-components), which also works without custom elements using the syntax shown above.
 
+For slot-based composition, components can expose named `<slot>` placeholders in their templates and fill them with the `slot` binding. That path is useful when you want a component template to provide a clear insertion point for authored child content.
+
+### Note: `koDescendantsComplete`
+
+If a component viewmodel defines `koDescendantsComplete(element)`, TKO calls it after the component's descendants have finished binding. Use this for post-render work that must wait until the component tree is active.
+
 ### Disposal and memory management
 
 Optionally, your viewmodel class may have a `dispose` function. If implemented, Knockout will call this whenever the component is being torn down and removed from the DOM (e.g., because the corresponding item was removed from a `foreach`, or an `if` binding has become `false`).

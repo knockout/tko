@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TKO Sample TSX Scaffold</title>
+</head>
+<body>
+  <div id="status">Initializing...</div>
+  <pre id="error"></pre>
+  <div id="root"></div>
+
+  <script src="https://tko.io/lib/tko.js"></script>
+  <script>
+    window.ko = window.tko
+  </script>
+
+  <!-- Replace the contents of this script tag with your TSX code. -->
+  <script id="user-code" type="text/tsx">
+// your code goes here
+const message = ko.observable('Hello from TKO')
+
+const view = (
+  <main>
+    <h2 ko-text={message} />
+    <button ko-click={() => message('Updated from TSX')}>Update</button>
+  </main>
+)
+
+const { node } = tko.jsx.render(view)
+root.appendChild(node)
+ko.applyBindings({}, root)
+  </script>
+
+  <script type="module">
+    import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esm/browser.min.js'
+
+    const status = document.getElementById('status')
+    const error = document.getElementById('error')
+    const root = document.getElementById('root')
+    const source = document.getElementById('user-code').textContent
+
+    try {
+      status.textContent = 'Loading esbuild'
+      await esbuild.initialize({
+        wasmURL: 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esbuild.wasm'
+      })
+
+      status.textContent = 'Compiling TSX'
+      const result = await esbuild.transform(source, {
+        loader: 'tsx',
+        format: 'esm',
+        jsxFactory: 'tko.jsx.createElement',
+        jsxFragment: 'tko.jsx.Fragment',
+        target: 'es2020'
+      })
+
+      status.textContent = 'Running'
+      const moduleSource = `
+const tko = window.tko
+const ko = window.ko
+const root = document.getElementById('root')
+${result.code}
+`
+      const moduleUrl = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }))
+      try {
+        await import(moduleUrl)
+      } finally {
+        URL.revokeObjectURL(moduleUrl)
+      }
+      status.textContent = 'Ready'
+    } catch (err) {
+      status.textContent = 'Failed'
+      error.textContent = err && err.stack ? err.stack : String(err)
+      console.error(err)
+    }
+  </script>
+</body>
+</html>

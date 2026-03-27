@@ -25,6 +25,7 @@ There are two main ways of using templates:
    * For more control, pass a JavaScript object with some combination of the following properties:
 
      * `name` --- the ID of an element that contains the template you wish to render - see [Note 5](#note_5_dynamically_choosing_which_template_is_used) for how to vary this programmatically.
+     * `nodes` --- an array of DOM nodes to use as the template source instead of a named template or inline markup. This is how component transclusion re-renders supplied child nodes, and the array must be plain rather than observable.
      * `data` --- an object to supply as the data for the template to render. If you omit this parameter, KO will look for a `foreach` parameter, or will fall back on using your current model object.
      * `if` --- if this parameter is provided, the template will only be rendered if the specified expression evaluates to `true` (or a `true`-ish value). This can be useful for preventing a null observable from being bound against a template before it is populated.
      * `foreach` --- instructs KO to render the template in "foreach" mode - see [Note 2](#note_2_using_the_foreach_option_with_a_named_template) for details.

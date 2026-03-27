@@ -58,7 +58,7 @@ var myComputed = ko.computed(function() {
 
     // Now let's inspect ko.computedContext
     var isFirstEvaluation = ko.computedContext.isInitial(),
-        dependencyCount = ko.computedContext.getDependenciesCount(),
+        dependencyCount = ko.computedContext.getDependenciesCount();
     console.log("Evaluating " + (isFirstEvaluation ? "for the first time" : "again"));
     console.log("By now, this computed has " + dependencyCount + " dependencies");
 

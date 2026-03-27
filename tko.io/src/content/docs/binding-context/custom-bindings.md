@@ -51,6 +51,22 @@ ko.bindingHandlers.yourBindingName = {
 
 You do not have to provide both `init` and `update`. Use `init` when you need one-time setup or event listeners. Use `update` when the DOM should respond to changing values.
 
+### Class-based bindings
+
+TKO also exports `BindingHandler` and `AsyncBindingHandler` for class-based bindings when you want a stronger lifecycle boundary than a plain object literal.
+
+```javascript
+class ToggleVisible extends ko.BindingHandler {
+    update(element, valueAccessor) {
+        element.hidden = !ko.unwrap(valueAccessor())
+    }
+}
+
+ToggleVisible.registerAs('toggleVisible')
+```
+
+Use `BindingHandler` for normal synchronous bindings. Use `AsyncBindingHandler` when the binding needs to signal completion after asynchronous work, such as a component-like binding that binds descendants later.
+
 ### The "update" callback
 
 Whenever the associated observable changes, KO calls your `update` callback with:

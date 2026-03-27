@@ -6,13 +6,12 @@ title: Throttle Extender
 
 *Legacy note: `throttle` is deprecated. Prefer [`rateLimit`](./rateLimit-observable/) for new code.*
 
-The old `throttle` extender delayed re-evaluation of a computed observable until its dependencies stopped changing for a specified period of time. `rateLimit` is the modern replacement, but it is broader and more configurable:
+The old `throttle` extender delayed work on both sides of a writable value:
 
-* `throttle` only applied to computed observables.
-* `rateLimit` works with both observables and computed observables.
-* `rateLimit` supports multiple notification strategies, including fixed-rate updates and "notify when changes stop" behavior.
+* For computed observables, it delayed re-evaluation until dependencies stopped changing for a specified period.
+* For writable observables and writable computed observables, it also delayed writes back to the underlying target.
 
-If you are migrating old code, treat `throttle` as a legacy shorthand for "delay notifications until changes settle," then move to `rateLimit` for new work.
+If you are modernizing code that depends on delayed writes, keep that behavior in mind: `rateLimit` is the notification-focused API, not a drop-in replacement for write throttling.
 
 If you still need to recognize the old shape in an existing codebase, it looked like this:
 
@@ -24,4 +23,4 @@ var upperCaseName = ko.computed(function() {
 }).extend({ throttle: 500 });
 ```
 
-The older API only delayed re-evaluation of computed observables. It did not change the general binding or observable model, so new docs should use `rateLimit` instead. For current guidance and migration targets, see [`rateLimit`](./rateLimit-observable/).
+The older API did not change the general binding model, but it did affect both computed timing and writes to writable targets. New docs should use `rateLimit` unless they specifically need throttled writes during migration.

@@ -14,8 +14,9 @@
 
 ## URLs
 
-- Agent Guide: /agent-guide.md (API reference, gotchas, examples)
-- Agent Testing: /agent-testing.md (how to run and verify TKO code)
+- Agent Guide: /agents/guide.md (API reference, gotchas, examples)
+- Agent Testing: /agents/testing.md (how to run and verify TKO code)
+- Agent TSX Scaffold: /agents/sample-tsx.html (minimal browser TSX + esbuild scaffold for rapid prototype work)
 - Playground: /playground
 - GitHub: https://github.com/knockout/tko
 
@@ -35,7 +36,7 @@ TSX: `ko-text={msg}` — compile-time JSX expressions, needs esbuild + `tko.jsx.
 
 Inside `ko-foreach` children, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
 
-See /agent-guide.md for details.
+See /agents/guide.md for details.
 
 ## Docs
 

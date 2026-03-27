@@ -94,7 +94,11 @@ javascript: |-
 
    * None
 
-### Note 1: Using "with" without a container element
+### Note 1: Using `as` with `with`
+
+`with` also accepts `as` so you can give the current value a local name for descendant bindings. The alias behavior depends on `ko.options.createChildContextWithAs`: when it is enabled, `as` creates a child context; otherwise it extends the current context.
+
+### Note 2: Using "with" without a container element
 
 Just like other control flow elements such as [`if`](./if-binding/) and [`foreach`](./foreach-binding/), you can use `with` without any container element to host it. This is useful if you need to use `with` in a place where it would not be legal to introduce a new container element just to hold the `with` binding. See the documentation for [`if`](./if-binding/) or [`foreach`](./foreach-binding/) for more details.
 

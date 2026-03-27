@@ -161,4 +161,4 @@ myViewModel.fullName = ko.computed(function() {
 
 ## Migrating from throttle
 
-If you are modernizing an older codebase, `rateLimit` covers the same main use cases as the deprecated `throttle` extender. The most important difference is that `rateLimit` delays notifications, not writes. For new code, prefer `rateLimit`; keep `throttle` only when you need to preserve old behavior during migration.
+If you are modernizing an older codebase, `rateLimit` covers the main notification-limiting use cases of the deprecated `throttle` extender. The important difference is that `rateLimit` delays notifications, not writes. Use it for new code; keep `throttle` only when you still need write throttling behavior during migration.

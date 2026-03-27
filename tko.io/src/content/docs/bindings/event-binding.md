@@ -38,9 +38,16 @@ Now, moving your mouse pointer on or off of the first element will invoke method
 
  * Main parameter
 
-   You should pass a JavaScript object in which the property names correspond to event names, and the values correspond to the function that you want to bind to the event.
+   You should pass a JavaScript object in which the property names correspond to event names.
 
-   You can reference any JavaScript function - it doesn't have to be a function on your view model. You can reference a function on any object by writing `event: { mouseover: someObject.someFunction }`.
+   Each value can be either a function or a descriptor object. A descriptor object can include:
+
+   * `handler` --- the function to call
+   * `passive`, `capture`, `once` --- DOM listener options
+   * `debounce`, `throttle` --- timing wrappers around the handler
+   * `bubble`, `preventDefault` --- event behavior controls
+
+   You can reference any JavaScript function - it doesn't have to be a function on your view model. You can reference a function on any object by writing `event: { mouseover: someObject.someFunction }`, or use a descriptor object when you need to tune listener behavior, for example `event: { click: { handler: save, preventDefault: true, throttle: 200 } }`.
 
  * Additional parameters
 

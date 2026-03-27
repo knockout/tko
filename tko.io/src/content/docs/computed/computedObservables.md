@@ -223,6 +223,24 @@ So, KO doesn't just detect your dependencies the first time your evaluator runs 
 
 The other neat trick is that declarative bindings are simply implemented as computed observables. So, if a binding reads the value of an observable, that binding becomes dependent on that observable, which causes that binding to be re-evaluated if the observable changes.
 
+### Waiting for a condition with `ko.when`
+
+If you want to run code once a predicate becomes truthy, `ko.when` gives you a small helper around computed dependency tracking. Pass either an observable or a predicate function.
+
+```javascript
+ko.when(function () {
+    return viewModel.isReady() && viewModel.hasData();
+}, function () {
+    console.log('Ready');
+});
+
+ko.when(function () {
+    return viewModel.isReady();
+}).then(function () {
+    console.log('Ready');
+});
+```
+
 ### Controlling dependencies using peek
 
 Knockout's automatic dependency tracking normally does exactly what you want. But you might sometimes need to control which observables will update your computed observable, especially if the computed observable performs some sort of action, such as making a network request. The `peek` function lets you access an observable or computed observable without creating a dependency.

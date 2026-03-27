@@ -226,19 +226,23 @@ When you modify the contents of your model array (by adding, moving, or deleting
 
 Note that reordering detection is not guaranteed: to ensure the algorithm completes quickly, it is optimized to detect "simple" movements of small numbers of array entries. If the algorithm detects too many simultaneous reorderings combined with unrelated insertions and deletions, then for speed it can choose to regard a reordering as an "delete" plus an "add" instead of a single "move", and in that case the corresponding DOM elements will be torn down and recreated. Most developers won't encounter this edge case, and even if you do, the end-user experience will usually be identical.
 
-### Note 6: Destroyed entries are hidden by default
+### Note 6: Destroyed entries are shown unless you opt out
 
 Sometimes you may want to mark an array entry as deleted, but without actually losing record of its existence. This is known as a *non-destructive delete*. For details of how to do this, see [the destroy function on `observableArray`](/observables/observablearrays/).
 
-By default, the `foreach` binding will skip over (i.e., hide) any array entries that are marked as destroyed. If you want to show destroyed entries, use the `includeDestroyed` option. For example,
+By default, the `foreach` binding keeps destroyed entries in the rendered list. If you want to hide them, use `includeDestroyed: false` on the binding or set `ko.options.foreachHidesDestroyed = true` globally. For example,
 
 ```html
-<div data-bind='foreach: { data: myArray, includeDestroyed: true }'>
+<div data-bind='foreach: { data: myArray, includeDestroyed: false }'>
     ...
 </div>
 ```
 
-### Note 7: Post-processing or animating the generated DOM elements
+### Note 7: `as` and child context behavior
+
+The `as` option gives each item a local name, but the exact context shape depends on `ko.options.createChildContextWithAs`. When that option is enabled, `as` creates a child context; otherwise the alias is added to the current context. If you rely on `$data`, `$rawData`, or parent lookups, set that option deliberately and test the mode you ship.
+
+### Note 8: Post-processing or animating the generated DOM elements
 
 If you need to run some further custom logic on the generated DOM elements, you can use any of the `afterRender`/`afterAdd`/`beforeRemove`/`beforeMove`/`afterMove` callbacks described below.
 
