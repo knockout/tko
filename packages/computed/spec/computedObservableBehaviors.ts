@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test'
+
 import { arrayForEach } from '@tko/utils'
 
 import {
@@ -15,6 +17,16 @@ import {
 import type { ObservableArray } from '@tko/observable'
 
 import { computed, isPureComputed, isComputed } from '../dist'
+
+let cleanup: DisposableStack
+
+beforeEach(() => {
+  cleanup = new DisposableStack()
+})
+
+afterEach(() => {
+  cleanup.dispose()
+})
 
 describe('Dependent Observable', function () {
   it('Should be subscribable', function () {
@@ -120,11 +132,7 @@ describe('Dependent Observable', function () {
     const someContainer = { depObs: instance }
     someContainer.depObs('some value')
     expect(invokedWriteWithValue).toEqual('some value')
-    expect(invokedWriteWithThis).toEqual(
-      function () {
-        return this
-      }.call(null)
-    ) // Since no owner was specified
+    expect(invokedWriteWithThis).toEqual(undefined) // Since no owner was specified
   })
 
   it('Should be able to write to multiple computed properties on a model object using chaining syntax', function () {
@@ -562,21 +570,21 @@ describe('Dependent Observable', function () {
     const data = observable('A'),
       computedInstance = computed({ read: data, deferEvaluation: true })
 
-    const notifySpy = jasmine.createSpy('notifySpy')
-    computedInstance.subscribe(notifySpy, null, 'awake')
+    const awakeSpy = mock(() => {})
+    computedInstance.subscribe(awakeSpy, null, 'awake')
 
-    expect(notifySpy).not.toHaveBeenCalled()
+    expect(awakeSpy).not.toHaveBeenCalled()
 
     expect(computedInstance()).toEqual('A')
-    expect(notifySpy).toHaveBeenCalledWith('A')
-    expect(notifySpy.calls.length).toBe(1)
+    expect(awakeSpy).toHaveBeenCalledWith('A')
+    expect(awakeSpy).toHaveBeenCalledTimes(1)
 
     // Subscribing or updating data shouldn't trigger any more notifications
-    notifySpy.reset()
+    awakeSpy.mockClear()
     computedInstance.subscribe(function () {})
     data('B')
     computedInstance()
-    expect(notifySpy).not.toHaveBeenCalled()
+    expect(awakeSpy).not.toHaveBeenCalled()
   })
 
   it('Should prevent recursive calling of read function', function () {
@@ -770,7 +778,7 @@ describe('Dependent Observable', function () {
   })
 
   it('Should inherit any properties defined on ko.subscribable.fn or computed.fn', function () {
-    this.after(function () {
+    cleanup.defer(function () {
       delete (subscribable.fn as any).customProp // Will be able to reach this
       delete (subscribable.fn as any).customFunc // Overridden on computed.fn
       delete computed.fn.customFunc // Will be able to reach this
@@ -790,13 +798,8 @@ describe('Dependent Observable', function () {
     expect(instance.customFunc()).toEqual(123)
   })
 
-  it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
-    // On unsupported browsers, there's nothing to test
-    if (!jasmine.browserSupportsProtoAssignment) {
-      return
-    }
-
-    this.after(function () {
+  it('Should have access to functions added to "fn" on existing instances', function () {
+    cleanup.defer(function () {
       delete (subscribable.fn as any).customFunction1
       delete computed.fn.customFunction2
     })

@@ -26,6 +26,7 @@ The target testing model should be:
 - no long-term Mocha dependency for the repo test strategy
 - SauceLabs only if a clearly justified coverage gap remains after Playwright
 - Karma retained only as a temporary compatibility harness during migration
+- Bun-migrated tests should target modern JavaScript directly, including native `DisposableStack` and removal of dead legacy compatibility branches
 
 ## Goals
 
@@ -132,7 +133,9 @@ Success criteria:
 
 - Identify which current Karma tests can move directly to `bun test`.
 - Split browser-real tests from pure/unit tests where they are currently mixed.
-- Establish shared Bun test helpers for common package test patterns.
+- Establish only the minimal shared Bun test support needed for DOM globals or similar runtime setup.
+- Prefer native Bun APIs and modern language features over compatibility shims in migrated specs.
+- Remove dead compatibility branches and stale browser-era guards when Bun migration shows they no longer matter.
 - Add coverage/reporting guidance for the Bun-based suite.
 
 Success criteria:

@@ -1,15 +1,17 @@
+import { beforeEach, describe, expect, it } from 'bun:test'
+
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
+
 import { domData } from '@tko/utils'
 
 import { observable as Observable } from '@tko/observable'
 
 import { computed as Computed } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
-
 describe('Dependent Observable DOM', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   it('Should register DOM node disposal callback only if active after the initial evaluation', function () {

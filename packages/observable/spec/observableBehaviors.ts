@@ -13,7 +13,7 @@ import {
 } from '../dist'
 
 const browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'function'
-let cleanup: { defer(callback: () => void): void; dispose(): void }
+let cleanup: DisposableStack
 
 beforeEach(() => {
   cleanup = new DisposableStack()

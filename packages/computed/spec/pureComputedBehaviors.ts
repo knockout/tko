@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
+
 import { isWriteableObservable, observable, dependencyDetection } from '@tko/observable'
 
 import { isPureComputed, isComputed, computed, pureComputed } from '../dist'
@@ -219,24 +221,31 @@ describe('Pure Computed', function () {
     const data = observable('A'),
       computedInstance = pureComputed(data)
 
-    const notifySpy = jasmine.createSpy('notifySpy')
-    computedInstance.subscribe(notifySpy.bind(null, 'awake'), null, 'awake')
-    computedInstance.subscribe(notifySpy.bind(null, 'asleep'), null, 'asleep')
+    const awakeSpy = mock(() => {})
+    const asleepSpy = mock(() => {})
+    computedInstance.subscribe(awakeSpy, null, 'awake')
+    computedInstance.subscribe(asleepSpy, null, 'asleep')
 
     // Subscribing to non-change events doesn't awaken computed
     expect(data.getSubscriptionsCount()).toEqual(0)
 
     // Subscribe to computed; notifies with value
     const subscription = computedInstance.subscribe(function () {})
-    expect(notifySpy.argsForCall).toEqual([['awake', 'A']])
+    expect(awakeSpy).toHaveBeenCalledWith('A')
+    expect(awakeSpy).toHaveBeenCalledTimes(1)
+    expect(asleepSpy).not.toHaveBeenCalled()
     expect(data.getSubscriptionsCount()).toEqual(1)
 
-    notifySpy.reset()
+    awakeSpy.mockClear()
+    asleepSpy.mockClear()
     data('B')
-    expect(notifySpy).not.toHaveBeenCalled()
+    expect(awakeSpy).not.toHaveBeenCalled()
+    expect(asleepSpy).not.toHaveBeenCalled()
 
     subscription.dispose()
-    expect(notifySpy.argsForCall).toEqual([['asleep', undefined]])
+    expect(asleepSpy).toHaveBeenCalledWith(undefined)
+    expect(asleepSpy).toHaveBeenCalledTimes(1)
+    expect(awakeSpy).not.toHaveBeenCalled()
     expect(data.getSubscriptionsCount()).toEqual(0)
   })
 
