@@ -11,6 +11,18 @@ The `textInput` binding links a text box (`<input>`) or text area (`<textarea>`)
 
 ### Example
 
+```tsx
+const userName = ko.observable('')
+const userPassword = ko.observable('abc')
+const stateJson = ko.computed(() => ko.toJSON({ userName, userPassword }, null, 2))
+
+<div>
+  <p>Login name: <input ko-textInput={userName} /></p>
+  <p>Password: <input type="password" ko-textInput={userPassword} /></p>
+  <pre ko-text={stateJson}></pre>
+</div>
+```
+
 ```html
 <p>Login name: <input data-bind="textInput: userName" /></p>
 <p>Password: <input type="password" data-bind="textInput: userPassword" /></p>
@@ -24,6 +36,8 @@ ko.applyBindings({
     userPassword: ko.observable("abc")
 });
 ```
+
+In TSX, `ko-textInput={...}` keeps the same two-way behavior, with the observables declared up front and a computed JSON preview derived from the current values.
 
 ### Parameters
 

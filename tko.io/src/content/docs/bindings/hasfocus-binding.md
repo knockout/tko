@@ -15,6 +15,16 @@ This is useful if you're building sophisticated forms in which editable elements
 ### Example 1: The basics
 This example simply displays a message if the textbox currently has focus, and uses a button to show that you can trigger focus programmatically.
 
+```tsx
+const isSelected = ko.observable(false)
+
+<>
+  <input ko-hasFocus={isSelected} />
+  <button ko-click={() => isSelected(true)}>Focus programmatically</button>
+  <span ko-visible={isSelected}>The textbox has focus</span>
+</>
+```
+
 ```html
 <input data-bind="hasFocus: isSelected" />
 <button data-bind="click: setIsSelected">Focus programmatically</button>
@@ -35,6 +45,20 @@ ko.applyBindings(viewModel);
 
 Because the `hasFocus` binding works in both directions (setting the associated value focuses or unfocuses the element; focusing or unfocusing the element sets the associated value), it's a convenient way to toggle an "edit" mode. In this example, the UI displays either a `<span>` or an `<input>` element depending on the model's `editing` property. Unfocusing the `<input>` element sets `editing` to `false`, so the UI switches out of "edit" mode.
 
+```tsx
+const name = ko.observable('Bert Bertington')
+const editing = ko.observable(false)
+const viewing = ko.pureComputed(() => !editing())
+
+<>
+  <p>
+    Name: <b ko-visible={viewing} ko-click={() => editing(true)}><span ko-text={name}></span></b>
+    <input ko-visible={editing} ko-value={name} ko-hasFocus={editing} />
+  </p>
+  <p><em>Click the name to edit it; click elsewhere to apply changes.</em></p>
+</>
+```
+
 ```html
 <p>
     Name:
@@ -54,6 +78,8 @@ function PersonViewModel(name) {
 
 ko.applyBindings(new PersonViewModel("Bert Bertington"));
 ```
+
+In TSX, `ko-hasFocus={...}` works alongside `ko-visible`, `ko-value`, and `ko-click`, with the observables declared up front and the playground adding the standard render/setup wrapper automatically.
 
 
 ### Parameters

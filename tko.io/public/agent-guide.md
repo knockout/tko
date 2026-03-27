@@ -58,6 +58,8 @@ TKO supports two binding syntaxes. The documentation shows both side-by-side in 
 - `ko-*` attribute values in `{}` are **JavaScript expressions** evaluated at compile time by esbuild
 - Top-level variables (`message`, `handler`, `items`) must be defined in scope before the JSX
 - Binding-context variables inside `ko-foreach` children (like `$data`, `$parent`) use **string** syntax: `ko-text="$data"` (not `ko-text={$data}`)
+- Derived binding values must stay observable or computed. `ko-visible={items().length > 0}` and `ko-style={{ color: profit() < 0 ? 'red' : 'black' }}` freeze as one-time values.
+- For control-flow negation, prefer `ko-ifnot={obs}` or `const hidden = ko.pureComputed(() => !obs())`; `ko-if={!obs()}` is only a one-time boolean
 - Requires esbuild JSX transform + `tko.jsx.render()` to produce DOM nodes
 - `ko.applyBindings({}, container)` then activates the `ko-*` bindings on the rendered DOM
 
