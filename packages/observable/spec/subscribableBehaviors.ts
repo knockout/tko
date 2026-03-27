@@ -1,4 +1,17 @@
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
+
 import { isSubscribable, subscribable } from '../dist'
+
+const browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'function'
+let cleanup: { defer(callback: () => void): void; dispose(): void }
+
+beforeEach(() => {
+  cleanup = new DisposableStack()
+})
+
+afterEach(() => {
+  cleanup.dispose()
+})
 
 describe('Subscribable', function () {
   it('Should declare that it is subscribable', function () {
@@ -161,7 +174,7 @@ describe('Subscribable', function () {
   })
 
   it('Should inherit any properties defined on subscribable.fn', function () {
-    this.after(function () {
+    cleanup.defer(function () {
       delete subscribable.fn.customProp
       delete subscribable.fn.customFunc
     })
@@ -178,11 +191,11 @@ describe('Subscribable', function () {
 
   it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
     // On unsupported browsers, there's nothing to test
-    if (!jasmine.browserSupportsProtoAssignment) {
+    if (!browserSupportsProtoAssignment) {
       return
     }
 
-    this.after(function () {
+    cleanup.defer(function () {
       delete subscribable.fn.customFunction
     })
 
@@ -190,7 +203,7 @@ describe('Subscribable', function () {
 
     const customFunction = function () {}
 
-    sub.fn.customFunction = customFunction
+    subscribable.fn.customFunction = customFunction
 
     expect(sub.customFunction).toBe(customFunction)
   })

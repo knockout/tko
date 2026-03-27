@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
+
 import { arrayForEach } from '@tko/utils'
 
 import {
@@ -9,6 +11,17 @@ import {
   subscribable,
   unwrap
 } from '../dist'
+
+const browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'function'
+let cleanup: { defer(callback: () => void): void; dispose(): void }
+
+beforeEach(() => {
+  cleanup = new DisposableStack()
+})
+
+afterEach(() => {
+  cleanup.dispose()
+})
 
 describe('Observable', function () {
   it('Should be subscribable', function () {
@@ -321,7 +334,7 @@ describe('Observable', function () {
   })
 
   it('Should inherit any properties defined on subscribable.fn or observable.fn', function () {
-    this.after(function () {
+    cleanup.defer(function () {
       delete subscribable.fn.customProp // Will be able to reach this
       delete subscribable.fn.customFunc // Overridden on observable.fn
       delete observable.fn.customFunc // Will be able to reach this
@@ -342,11 +355,11 @@ describe('Observable', function () {
 
   it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
     // On unsupported browsers, there's nothing to test
-    if (!jasmine.browserSupportsProtoAssignment) {
+    if (!browserSupportsProtoAssignment) {
       return
     }
 
-    this.after(function () {
+    cleanup.defer(function () {
       delete subscribable.fn.customFunction1
       delete observable.fn.customFunction2
     })
@@ -357,7 +370,7 @@ describe('Observable', function () {
     const customFunction2 = function () {}
 
     subscribable.fn.customFunction1 = customFunction1
-    myObservable.fn.customFunction2 = customFunction2
+    observable.fn.customFunction2 = customFunction2
 
     expect(myObservable.customFunction1).toBe(customFunction1)
     expect(myObservable.customFunction2).toBe(customFunction2)

@@ -1,9 +1,14 @@
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
+
 import { observableArray, isObservableArray, observable, isObservable, subscribable } from '../dist'
 
 describe('Observable Array', function () {
   let testObservableArray, notifiedValues, beforeNotifiedValues
+  const browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'function'
+  let cleanup: { defer(callback: () => void): void; dispose(): void }
 
   beforeEach(function () {
+    cleanup = new DisposableStack()
     testObservableArray = observableArray([1, 2, 3])
     notifiedValues = new Array()
     testObservableArray.subscribe(function (value) {
@@ -17,6 +22,10 @@ describe('Observable Array', function () {
       null,
       'beforeChange'
     )
+  })
+
+  afterEach(() => {
+    cleanup.dispose()
   })
 
   it('Should be observable', function () {
@@ -74,7 +83,7 @@ describe('Observable Array', function () {
     testObservableArray([x, y])
     testObservableArray.destroy(y)
     expect(testObservableArray().length).toEqual(2)
-    expect(x._destroy).toEqual(undefined)
+    expect(x._destroy).toEqual(null)
     expect(y._destroy).toEqual(true)
   })
 
@@ -87,7 +96,7 @@ describe('Observable Array', function () {
     testObservableArray.destroyAll([x, z])
     expect(testObservableArray().length).toEqual(3)
     expect(x._destroy).toEqual(true)
-    expect(y._destroy).toEqual(undefined)
+    expect(y._destroy).toEqual(null)
     expect(z._destroy).toEqual(true)
   })
 
@@ -269,7 +278,7 @@ describe('Observable Array', function () {
 
     testObservableArray([x, y])
     testObservableArray.subscribe(function (/* value */) {
-      expect(x._destroy).toEqual(undefined)
+      expect(x._destroy).toEqual(null)
       expect(y._destroy).toEqual(true)
       didNotify = true
     })
@@ -285,8 +294,8 @@ describe('Observable Array', function () {
     testObservableArray([x, y])
     testObservableArray.subscribe(
       function (/* value */) {
-        expect(x._destroy).toEqual(undefined)
-        expect(y._destroy).toEqual(undefined)
+        expect(x._destroy).toEqual(null)
+        expect(y._destroy).toEqual(null)
         didNotify = true
       },
       null,
@@ -346,7 +355,7 @@ describe('Observable Array', function () {
   })
 
   it('Should inherit any properties defined on subscribable.fn, observable.fn, or observableArray.fn', function () {
-    this.after(function () {
+    cleanup.defer(function () {
       delete subscribable.fn.subscribableProp // Will be able to reach this
       delete subscribable.fn.customProp // Overridden on observable.fn
       delete subscribable.fn.customFunc // Overridden on observableArray.fn
@@ -374,11 +383,11 @@ describe('Observable Array', function () {
 
   it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
     // On unsupported browsers, there's nothing to test
-    if (!jasmine.browserSupportsProtoAssignment) {
+    if (!browserSupportsProtoAssignment) {
       return
     }
 
-    this.after(function () {
+    cleanup.defer(function () {
       delete observable.fn.customFunction1
       delete observableArray.fn.customFunction2
     })
