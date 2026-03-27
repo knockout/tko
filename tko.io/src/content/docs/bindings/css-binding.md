@@ -10,10 +10,25 @@ The `css` binding adds or removes one or more named CSS classes to the associate
 (Note: If you don't want to apply a CSS class but instead want to assign a `style` attribute value directly, see [the style binding](../style-binding/).)
 
 ### Example with static classes
+```tsx
+const currentProfit = ko.observable(150000)
+const hasProfitWarning = ko.pureComputed(() => currentProfit() < 0)
+
+<>
+  <p>Current profit: $<span ko-text={currentProfit}></span></p>
+  <p>
+    <button ko-click={() => currentProfit(-50)}>Show loss</button>
+    <button ko-click={() => currentProfit(150000)}>Restore profit</button>
+  </p>
+  <div ko-css={{ profitWarning: hasProfitWarning }}>Profit Information</div>
+</>
+```
+
 ```html
 <div data-bind="css: { profitWarning: currentProfit() < 0 }">
    Profit Information
 </div>
+```
 
 ```javascript
 var viewModel = {
@@ -25,6 +40,20 @@ viewModel.currentProfit(-50); // Causes the "profitWarning" class to be applied
 This will apply the CSS class `profitWarning` whenever the `currentProfit` value dips below zero, and remove that class whenever it goes above zero.
 
 ### Example with dynamic classes
+```tsx
+const currentProfit = ko.observable(150000)
+const profitStatus = ko.computed(() => (currentProfit() < 0 ? 'profitWarning' : 'profitPositive'))
+
+<>
+  <p>Current profit: $<span ko-text={currentProfit}></span></p>
+  <p>
+    <button ko-click={() => currentProfit(-50)}>Show loss</button>
+    <button ko-click={() => currentProfit(150000)}>Restore profit</button>
+  </p>
+  <div ko-css={profitStatus}>Profit Information</div>
+</>
+```
+
 ```html
 <div data-bind="css: profitStatus">
    Profit Information
@@ -36,7 +65,7 @@ var viewModel = {
     currentProfit: ko.observable(150000)
 };
 
-// Evalutes to a positive value, so initially we apply the "profitPositive" class
+// Evaluates to a positive value, so initially we apply the "profitPositive" class
 viewModel.profitStatus = ko.computed(function() {
     return this.currentProfit() < 0 ? "profitWarning" : "profitPositive";
 }, viewModel);

@@ -19,6 +19,15 @@
 - Playground: /playground
 - GitHub: https://github.com/knockout/tko
 
+## Core Contract
+
+- TKO is responsible for connecting state to the DOM.
+- Observables, observableArrays, and computeds are the state layer.
+- Bindings are the DOM integration layer: they read state, update DOM, and write user-driven changes back to state.
+- `bindingHandlers` are the bridge between the DOM and the observable state layer.
+- `ko.applyBindings(viewModel, element)` activates that bridge on an existing DOM subtree.
+- In TSX, `tko.jsx.render()` creates DOM nodes and `ko.applyBindings({}, root)` then activates the `ko-*` bindings on that rendered DOM.
+
 ## Two Binding Syntaxes
 
 HTML: `data-bind="text: msg"` — runtime strings, works with `ko.applyBindings(vm, el)`
