@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'bun:test'
+
 /* global testNode */
 import { triggerEvent, options, arrayForEach } from '@tko/utils'
 
@@ -13,12 +15,12 @@ import { bindings as withBindings } from '../dist'
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
 describe('Binding: With', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -190,7 +192,7 @@ describe('Binding: With', function () {
     expect(middleName).toContainText('middle')
     expect(parent1Name).toContainText('outer')
     expect(rootName).toContainText('outer')
-    expect(contextFor(name).parents.length).toEqual(2)
+    expect(contextFor(name).$parents.length).toEqual(2)
   })
 
   it('Should not create a child context', function () {

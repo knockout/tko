@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'bun:test'
+
 import { applyBindings, contextFor } from '@tko/bind'
 
 import { observable } from '@tko/observable'
@@ -15,12 +17,12 @@ import {
 
 import { bindings as coreBindings } from '@tko/binding.core'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
 describe('Binding: Ifnot', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -38,7 +40,7 @@ describe('Binding: Ifnot', function () {
     expect(testNode.childNodes[0].childNodes.length).toEqual(0)
   })
 
-  xit('Should leave descendant nodes in the document (and bind them) if the value is falsy, independently of the active template engine', function () {
+  it.skip('Should leave descendant nodes in the document (and bind them) if the value is falsy, independently of the active template engine', function () {
     // this.after(function () { setTemplateEngine(new nativeTemplateEngine()) })
     // setTemplateEngine(new nativeTemplateEngine()) // This template engine will just throw errors if you try to use it
     // testNode.innerHTML = "<div data-bind='ifnot: condition'><span data-bind='text: someItem.existentChildProp'></span></div>"

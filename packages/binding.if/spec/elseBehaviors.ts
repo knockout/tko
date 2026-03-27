@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'bun:test'
+
 /* eslint semi: 0 */
 import { applyBindings } from '@tko/bind'
 
@@ -13,12 +15,12 @@ import { bindings as ifBindings } from '../dist'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
 describe('else inside an if binding', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -34,7 +36,7 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).toEqual(3)
       applyBindings({ x: true }, testNode)
       expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-      expect(testNode.innerText).toEqual('abc')
+      expect(testNode.innerText.trim()).toEqual('abc')
     })
 
     it('shows the else-block when the condition is false', function () {
@@ -42,7 +44,7 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).toEqual(3)
       applyBindings({ x: false }, testNode)
       expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-      expect(testNode.innerText).toEqual('def')
+      expect(testNode.innerText.trim()).toEqual('def')
     })
 
     it('toggles between if/else on condition change', function () {
@@ -51,9 +53,9 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).toEqual(3)
       applyBindings({ x: x }, testNode)
       expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-      expect(testNode.innerText).toEqual('def')
+      expect(testNode.innerText.trim()).toEqual('def')
       x(true)
-      expect(testNode.innerText).toEqual('abc')
+      expect(testNode.innerText.trim()).toEqual('abc')
     })
   })
 })
@@ -61,7 +63,7 @@ describe('else inside an if binding', function () {
 describe('Else binding', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {

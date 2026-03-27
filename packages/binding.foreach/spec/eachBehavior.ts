@@ -1007,20 +1007,25 @@ describe('observable array changes', function () {
 })
 
 describe('focus', function () {
-  let $target
+  let target: HTMLDivElement
+  const inputs = () => target.querySelectorAll('input')
+
   beforeEach(function () {
-    $target = $("<div data-bind='foreach: $data'>" + '<input />' + '</div>').appendTo(document.body)
+    target = document.createElement('div')
+    target.setAttribute('data-bind', 'foreach: $data')
+    target.innerHTML = '<input />'
+    document.body.appendChild(target)
     ForEachBinding.setSync(false)
   })
 
   afterEach(function () {
-    $target.remove()
+    target.remove()
   })
 
   it('does not preserve the target on apply bindings', function (done) {
     const list = ['a', 'b', 'c']
-    $target.find(':input').focus()
-    applyBindings(list, $target[0])
+    inputs()[0].focus()
+    applyBindings(list, target)
     setTimeout(function () {
       assert.strictEqual(document.activeElement, document.body)
       done()
@@ -1029,9 +1034,9 @@ describe('focus', function () {
 
   it('does not preserves primitive targets when re-ordering', function (done) {
     const list = observableArray(['a', 'b', 'c'])
-    applyBindings(list, $target[0])
-    $target.find(':input').first().focus()
-    assert.strictEqual(document.activeElement, $target.find(':input')[0])
+    applyBindings(list, target)
+    inputs()[0].focus()
+    assert.strictEqual(document.activeElement, inputs()[0])
 
     list.remove('a')
     list.push('a')
@@ -1044,14 +1049,14 @@ describe('focus', function () {
   it('preserves objects when re-ordering', function (done) {
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
-    applyBindings(list, $target[0])
-    $target.find(':input').first().focus()
-    assert.strictEqual(document.activeElement, $target.find(':input')[0], 'a')
+    applyBindings(list, target)
+    inputs()[0].focus()
+    assert.strictEqual(document.activeElement, inputs()[0], 'a')
 
     list.remove(o0)
     list.push(o0)
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
+      assert.strictEqual(document.activeElement, inputs()[2], 'o')
       done()
     }, 1000)
   })
@@ -1059,9 +1064,9 @@ describe('focus', function () {
   it('preserves objects when re-ordering multiple identical', function (done) {
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
-    applyBindings(list, $target[0])
-    $target.find(':input').first().focus()
-    assert.strictEqual(document.activeElement, $target.find(':input')[0], 'a')
+    applyBindings(list, target)
+    inputs()[0].focus()
+    assert.strictEqual(document.activeElement, inputs()[0], 'a')
 
     list.remove(o0)
     list.push('x')
@@ -1069,7 +1074,7 @@ describe('focus', function () {
     list.push('y')
 
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
+      assert.strictEqual(document.activeElement, inputs()[3], 'o')
       done()
     }, 1000)
   })
@@ -1077,16 +1082,16 @@ describe('focus', function () {
   it('preserves objects when re-ordering multiple identical, alt', function (done) {
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
-    applyBindings(list, $target[0])
-    $target.find(':input').first().focus()
-    assert.strictEqual(document.activeElement, $target.find(':input')[0], 'a')
+    applyBindings(list, target)
+    inputs()[0].focus()
+    assert.strictEqual(document.activeElement, inputs()[0], 'a')
 
     list.remove(o0)
     list.push(o0) // focused
     list.push(o0)
 
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
+      assert.strictEqual(document.activeElement, inputs()[2], 'o')
       done()
     }, 1000)
   })

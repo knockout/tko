@@ -69,10 +69,16 @@
   - Verified with `bun test ./packages/binding.foreach/spec/*.ts` from `/Users/brianhunt/repos/tko`.
   - Status: 81 pass, 0 fail.
 
+- `@tko/binding.if`
+  - Verified with `bun test ./packages/binding.if/spec/*.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 46 pass, 2 existing skip, 0 fail.
+  - Notes: converted from Jasmine-style globals to explicit `bun:test` imports and Bun-native DOM helpers.
+
 ### Shared Infrastructure
 
 - Added `happy-dom` as a dev dependency at the repo root.
 - Added `/Users/brianhunt/repos/tko/bunfig.toml` with a shared test preload.
 - Added `/Users/brianhunt/repos/tko/tools/testing/happy-dom.ts` as the shared DOM environment for Bun tests.
 - Updated the shared preload to override Bun's built-in DOM event constructors with the `happy-dom` equivalents so dispatched events match the simulated DOM.
+- Added `/Users/brianhunt/repos/tko/tools/testing/bun-dom.ts` for Bun-native DOM test helpers and shared custom matchers.
 - Added root-level package scripts: `test`, `test:coverage`, currently targeting the converted packages with explicit spec paths.
