@@ -43,7 +43,7 @@
     "nyc": "^18.0.0",
     "prettier": "^3.7.4",
     "sinon": "^19.0.2",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "typescript-eslint": "^8.56.1"
   },
   "workspaces": [
