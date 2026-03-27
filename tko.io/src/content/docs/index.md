@@ -4,9 +4,9 @@ description: Choose the right TKO build and get started with modern Knockout.
 ---
 
 <div class="landing-hero">
-  <p class="landing-kicker">Modern Knockout, clarified</p>
-  <h2>Choose the right TKO build and get moving quickly.</h2>
-  <p class="landing-lede">Start with the package you actually need, understand the migration path, and move from overview to working bindings without digging through the repo first.</p>
+  <p class="landing-kicker">Velocity-first UI with observables</p>
+  <h2>Build interactive UI with direct DOM bindings and granular updates.</h2>
+  <p class="landing-lede">Choose the right TKO build, understand the compatibility path, and move from overview to working bindings without digging through the repo first.</p>
   <div class="landing-actions">
     <a class="landing-button landing-button--primary" href="/bindings/">Start with bindings</a>
     <a class="landing-button landing-button--secondary" href="/3to4/">Read the migration guide</a>
@@ -16,9 +16,9 @@ description: Choose the right TKO build and get started with modern Knockout.
 
 ## What is TKO?
 
-TKO is the monorepo and documentation home for the modern Knockout builds.
+TKO is a velocity-first UI framework built around observables and direct DOM bindings.
 
-It keeps the familiar Knockout model of observables, computed values, and declarative bindings, while publishing the runtime as modular packages instead of a single legacy distribution.
+It keeps the familiar Knockout model of observables, computed values, and declarative bindings while delivering granular DOM updates through modular packages instead of a single legacy distribution.
 
 New examples in this docs set show both classic HTML `data-bind` and modern TSX `ko-*` authoring. Use the TSX examples when you are writing new UI with `@tko/build.reference`, and use the HTML examples when you need to mirror existing markup or compare against older code with `@tko/build.knockout`.
 
