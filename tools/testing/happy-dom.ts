@@ -1,7 +1,27 @@
 import { Window } from 'happy-dom'
 
 const windowInstance = new Window({ url: 'http://localhost/' })
-const overrideKeys = new Set(['window', 'self', 'document', 'navigator', 'location'])
+const overrideKeys = new Set([
+  'window',
+  'self',
+  'document',
+  'navigator',
+  'location',
+  'Event',
+  'CustomEvent',
+  'EventTarget',
+  'Node',
+  'Element',
+  'HTMLElement',
+  'HTMLInputElement',
+  'HTMLTextAreaElement',
+  'HTMLSelectElement',
+  'MouseEvent',
+  'KeyboardEvent',
+  'FocusEvent',
+  'InputEvent',
+  'UIEvent'
+])
 
 for (const key of Object.getOwnPropertyNames(windowInstance)) {
   if (key in globalThis && !overrideKeys.has(key)) continue
