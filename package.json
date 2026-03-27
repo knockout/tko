@@ -42,7 +42,7 @@
     "mocha": "^11.0.1",
     "nyc": "^18.0.0",
     "prettier": "^3.7.4",
-    "sinon": "^19.0.2",
+    "sinon": "^21.0.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
   },
