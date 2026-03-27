@@ -1,0 +1,47 @@
+{
+  "description": "Task scheduling, DOM disposal, memoization, HTML parsing, and array diff utilities.",
+  "behaviors": [
+    {
+      "statement": "`tasks.schedule(...)` runs callbacks asynchronously, preserves scheduling order, processes tasks scheduled during a run, and continues running remaining tasks before surfacing an exception from a throwing task.",
+      "specs": [
+        "packages/utils/spec/taskBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`tasks.cancel(handle)` skips only the canceled task, and `tasks.runEarly()` flushes queued work immediately, including work scheduled during the flush.",
+      "specs": [
+        "packages/utils/spec/taskBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "The task queue protects against runaway recursion with a fixed recursion cutoff while still allowing large nonrecursive queues.",
+      "specs": [
+        "packages/utils/spec/taskBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`addDisposeCallback`, `removeDisposeCallback`, `cleanNode`, and `removeNode` run registered disposal callbacks, recurse through descendants, and avoid double-cleaning nodes removed by another dispose handler.",
+      "specs": [
+        "packages/utils/spec/domNodeDisposalBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`memoization.memoize(fn)` returns an HTML comment token; `unmemoize(...)` invokes the callback once; `unmemoizeDomNodeAndDescendants(...)` finds memo nodes in a subtree, passes the memo node to the callback, and removes memo nodes afterward.",
+      "specs": [
+        "packages/utils/spec/memoizationBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`parseHtmlFragment(...)` parses a wide range of HTML fragment shapes into fresh node copies, rejects oversized templates when the size limit is active, and rejects script-tag content when script tags in templates are disallowed.",
+      "specs": [
+        "packages/utils/spec/parseHtmlFragmentBehavior.ts"
+      ]
+    },
+    {
+      "statement": "`compareArrays(oldArray, newArray)` reports `retained`, `added`, and `deleted` entries, annotates detected moves with `moved`, supports sparse diffs, and honors the `dontLimitMoves` option.",
+      "specs": [
+        "packages/utils/spec/arrayEditDetectionBehaviors.ts"
+      ]
+    }
+  ]
+}

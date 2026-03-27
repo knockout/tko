@@ -1,0 +1,43 @@
+{
+  "description": "Custom-element component provider behavior and component parameter handling.",
+  "behaviors": [
+    {
+      "statement": "Registered components render into matching custom elements, including overridden name resolution via `getComponentNameForNode`, but not into standard elements with the same tag name.",
+      "specs": [
+        "packages/provider.component/spec/customElementBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Custom elements may also carry regular bindings like `visible`, but bindings that also control descendants conflict with `component` and throw.",
+      "specs": [
+        "packages/provider.component/spec/customElementBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "When a custom element has no `params` or only whitespace, the component receives `{ $raw: {} }`.",
+      "specs": [
+        "packages/provider.component/spec/customElementBehaviors.ts",
+        "packages/provider.component/spec/componentProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Passing an observable instance through `params` preserves the observable instance instead of unwrapping it.",
+      "specs": [
+        "packages/provider.component/spec/componentProviderBehaviors.ts",
+        "packages/provider.component/spec/customElementBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Observable param expressions update reactively without tearing down and recreating the component viewmodel, and subscriptions are cleaned up when the custom element is cleaned.",
+      "specs": [
+        "packages/provider.component/spec/customElementBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Custom elements support transclusion via `componentInfo.templateNodes`, and `afterRender` callbacks on the custom element are invoked after render.",
+      "specs": [
+        "packages/provider.component/spec/customElementBehaviors.ts"
+      ]
+    }
+  ]
+}
