@@ -25,7 +25,7 @@ Your value: <input data-bind="value: someValue, valueUpdate: 'afterkeydown'" />
 Cellphone: <input data-bind="value: cellphoneNumber, enable: hasCellphone" />
 ```
 
-The binding *name* should generally match a registered binding handler (either built-in or [custom](../../binding-context/custom-bindings/)) or be a parameter for another binding. If the name matches neither of those, Knockout will ignore it (without any error or warning). So if a binding doesn't appear to work, first check that the name is correct.
+The binding *name* should generally match a registered binding handler (either built-in or [custom](../custom-bindings/)) or be a parameter for another binding. If the name matches neither of those, Knockout will ignore it (without any error or warning). So if a binding doesn't appear to work, first check that the name is correct.
 
 #### Binding values
 
@@ -71,10 +71,12 @@ Bindings can include any amount of *whitespace* (spaces, tab, and newlines), so 
 
 #### Skipping the binding value
 
-Starting with Knockout 3.0, you can specify bindings without a value, which will give the binding an `undefined` value. For example:
+You can also specify bindings without a value, which gives the binding an `undefined` value. For example:
 
 ```html
 <span data-bind="text">Text that will be cleared when bindings are applied.</span>
 ```
 
-This ability is especially useful when paired with [binding preprocessing](#binding-preprocessing), which can assign a default value for a binding.
+This ability is especially useful when paired with [binding preprocessing](./binding-preprocessing/), which can assign a default value for a binding.
+
+The same expression rules apply to the `ko-*` bindings used in TSX examples.

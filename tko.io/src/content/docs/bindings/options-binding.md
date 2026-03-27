@@ -128,7 +128,7 @@ Note that the only difference between examples 3 and 4 is the `optionsText` valu
 
    * `optionsIncludeDestroyed`
 
-     Sometimes you may want to mark an array entry as deleted, but without actually losing record of its existence. This is known as a non-destructive delete. For details of how to do this, see [the destroy function on `observableArray`](observableArrays.html#destroy_and_destroyall_note_usually_relevant_to_ruby_on_rails_developers_only).
+     Sometimes you may want to mark an array entry as deleted, but without actually losing record of its existence. This is known as a non-destructive delete. For details of how to do this, see [the destroy function on `observableArray`](/observables/observablearrays/).
 
      By default, the options binding will skip over (i.e., hide) any array entries that are marked as destroyed. If you want to show destroyed entries, then specify this additional parameter like:
 
@@ -144,7 +144,7 @@ Note that the only difference between examples 3 and 4 is the `optionsText` valu
 
    * `valueAllowUnset`
 
-     If you want Knockout to allow your model property to take values that have no corresponding entry in your `<select>` element (and display this by making the `<select>` element blank), then see [documentation for `valueAllowUnset`](value-binding.html#using-valueallowunset-with-select-elements).
+     If you want Knockout to allow your model property to take values that have no corresponding entry in your `<select>` element (and display this by making the `<select>` element blank), then see [documentation for `valueAllowUnset`](/bindings/value-binding/#using-valueallowunset-with-select-elements).
 
 ### Note 1: Selection is preserved when setting/changing options
 

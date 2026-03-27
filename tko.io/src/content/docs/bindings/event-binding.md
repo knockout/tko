@@ -40,7 +40,7 @@ Now, moving your mouse pointer on or off of the first element will invoke method
 
    You should pass a JavaScript object in which the property names correspond to event names, and the values correspond to the function that you want to bind to the event.
 
-   You can reference any JavaScript function - it doesn't have to be a function on your view model. You can reference a function on any object by writing `event { mouseover: someObject.someFunction }`.
+   You can reference any JavaScript function - it doesn't have to be a function on your view model. You can reference a function on any object by writing `event: { mouseover: someObject.someFunction }`.
 
  * Additional parameters
 
@@ -74,7 +74,7 @@ function MyViewModel() {
 
 Two points to note about this example:
 
- * If you're inside a nested [binding context](../../binding-context/binding-context/), for example if you're inside a `foreach` or a `with` block, but your handler function
+ * If you're inside a nested [binding context](/binding-context/), for example if you're inside a `foreach` or a `with` block, but your handler function
    is on the root viewmodel or some other parent context, you'll need to use a prefix such as `$parent` or `$root` to locate the
    handler function.
  * In your viewmodel, it's often useful to declare `self` (or some other variable) as an alias for `this`. Doing so avoids any problems
@@ -129,7 +129,7 @@ However, if you *do* want to let the default action proceed, just return `true` 
 
 ### Note 4: Preventing the event from bubbling
 
-By default, Knockout will allow the event to continue to bubble up to any higher level event handlers.  For example, if your element is handling a `mouseover` event and a parent of the element also handles that same event, then the event handler for both elements will be triggered.  If necessary, you can prevent the event from bubbling by including an additional binding that is named `youreventBubble` and passing false to it, as in this example:
+By default, Knockout will allow the event to continue to bubble up to any higher level event handlers.  For example, if your element is handling a `mouseover` event and a parent of the element also handles that same event, then the event handler for both elements will be triggered.  If necessary, you can prevent the event from bubbling by including an additional binding that is named `mouseoverBubble` and passing false to it, as in this example:
 
 ```html
 <div data-bind="event: { mouseover: myDivHandler }">

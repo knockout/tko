@@ -21,9 +21,9 @@ The other neat trick is that declarative bindings are simply implemented as comp
 
 ## Controlling dependencies using peek
 
-Knockout's automatic dependency tracking normally does exactly what you want. But you might sometimes need to control which observables will update your computed observable, especially if the computed observable performs some sort of action, such as making an Ajax request. The `peek` function lets you access an observable or computed observable without creating a dependency.
+Knockout's automatic dependency tracking normally does exactly what you want. But you might sometimes need to control which observables will update your computed observable, especially if the computed observable performs some sort of action, such as making a network request. The `peek` function lets you access an observable or computed observable without creating a dependency.
 
-In the example below, a computed observable is used to reload an observable named `currentPageData` using Ajax with data from two other observable properties. The computed observable will update whenever `pageIndex` changes, but it ignores changes to `selectedItem` because it is accessed using `peek`. In this case, the user might want to use the current value of `selectedItem` only for tracking purposes when a new set of data is loaded.
+In the example below, a computed observable is used to reload an observable named `currentPageData` using a network request with data from two other observable properties. The computed observable will update whenever `pageIndex` changes, but it ignores changes to `selectedItem` because it is accessed using `peek`. In this case, the user might want to use the current value of `selectedItem` only for tracking purposes when a new set of data is loaded.
 
 ```javascript
 ko.computed(function() {
@@ -31,7 +31,10 @@ ko.computed(function() {
         page: this.pageIndex(),
         selected: this.selectedItem.peek()
     };
-    $.getJSON('/Some/Json/Service', params, this.currentPageData);
+
+    fetch('/Some/Json/Service?' + new URLSearchParams(params))
+        .then(function(response) { return response.json(); })
+        .then(function(data) { this.currentPageData(data); }.bind(this));
 }, this);
 ```
 
@@ -57,10 +60,10 @@ ko.bindingHandlers.myBinding = {
         // the developer supplied a function to call when this binding updates, but
         // we don't really want to track any dependencies that would re-trigger this binding
         if (typeof afterUpdateHandler === "function") {
-            ko.ignoreDependencies(afterUpdateHandler, viewModel, [value, color]);
+            ko.ignoreDependencies(afterUpdateHandler, viewModel, [value]);
         }
 
-        $(element).somePlugin("value", value);
+        somePlugin(element, 'value', value);
     }
 }
 ```

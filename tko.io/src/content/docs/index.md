@@ -20,6 +20,8 @@ TKO is the monorepo and documentation home for the modern Knockout builds.
 
 It keeps the familiar Knockout model of observables, computed values, and declarative bindings, while publishing the runtime as modular packages instead of a single legacy distribution.
 
+New examples in this docs set show both classic HTML `data-bind` and modern TSX `ko-*` authoring. Use the TSX examples when you are writing new UI, and use the HTML examples when you need to mirror existing markup or compare against older code.
+
 ## Choose a build
 
 Use this rule of thumb:

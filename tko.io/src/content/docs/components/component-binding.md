@@ -5,7 +5,7 @@ title: Component Binding
 
 # `component`
 
-The `component` binding injects a specified [component](component-overview.html) into an element, and optionally passes parameters to it.
+The `component` binding injects a specified [component](./) into an element and optionally passes parameters to it.
 
 * [Table of contents injected here]
 {:toc}
@@ -35,7 +35,7 @@ ko.components.register('message-editor', {
 ko.applyBindings();
 ```
 
-Note: In more realistic cases, you would typically load component viewmodels and templates from external files, instead of hardcoding them into the registration. See [an example](#component-overview) and [registration documentation](#component-registration).
+Note: In a real app, you would usually keep component viewmodels and templates in separate files or modules. See [the overview](./) and [registration documentation](./component-registration/).
 
 ### API
 
@@ -80,9 +80,9 @@ When a `component` binding injects a component,
  1. **Your component loaders are asked to supply the viewmodel factory and template**
 
       * Multiple component loaders may be consulted, until the first one recognises the component name and supplies a viewmodel/template. This process only takes place **once per component type**, since Knockout caches the resulting definitions in memory.
-      * The default component loader supplies viewmodels/templates based on [what you have registered](#component-registration). If applicable, this is the phase where it requests any specified AMD modules from your AMD loader.
+      * The default component loader supplies viewmodels/templates based on [what you have registered](./component-registration/). Custom loaders can resolve files, naming conventions, or any other conventions your app needs.
 
-    Normally, this is an *asynchronous* process. It may involve requests to the server. For API consistency, Knockout by default ensures that the loading process completes as an asynchronous callback even if the component is already loaded and cached in memory. For more about this, and how to allow synchronous loading, see [Controlling synchronous/asynchronous loading](#component-registration).
+    Normally, this is an *asynchronous* process. It may involve requests to the server. For API consistency, Knockout by default ensures that the loading process completes as an asynchronous callback even if the component is already loaded and cached in memory. For more about this, including synchronous loading, see the synchronous/asynchronous loading section in [component registration](./component-registration/).
 
  2. **The component template is cloned and injected into the container element**
 
@@ -175,7 +175,7 @@ The element you attach a `component` binding to may contain further markup. For 
 
 Although the DOM nodes in this element will be stripped out and not bound by default, they are not lost. Instead, they are supplied to the component (in this case, `my-special-list`), which can include them in its output however it wishes.
 
-This is useful if you want to build components that represent "container" UI elements, such as grids, lists, dialogs, or tab sets, which need to inject and bind arbitrary markup into a common structure. See [a complete example for custom elements](#component-custom-elements.html), which also works without custom elements using the syntax shown above.
+This is useful if you want to build components that represent container UI elements, such as grids, lists, dialogs, or tab sets, which need to inject and bind arbitrary markup into a common structure. See [passing markup into components](./component-custom-elements/#passing-markup-into-components), which also works without custom elements using the syntax shown above.
 
 ### Disposal and memory management
 

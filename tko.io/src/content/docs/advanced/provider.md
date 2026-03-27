@@ -4,25 +4,27 @@ title: Provider
 
 # Provider
 
-The `Provider` is a class that is responsible for linking nodes to binding handlers.  Several are built into Knockout, including:
+A provider maps DOM nodes to binding accessors. TKO composes providers so different syntaxes can live side by side.
 
-| Provider  | Sample
-| --------   | --- |
-| `DataBindProvider` | `<span data-bind='text: x'></span>`
-| `VirtualProvider`  | `<!-- ko text: x --><!-- /ko -->`
-| `ComponentProvider` | `<custom-hello></custom-hello>`
-| `AttributeProvider` | `<span ko-title='x'></span>`
-| `TextMustacheProvider` | {% raw %}`{{ x_text }}`{% endraw %} <br> {% raw %}`{{{ x_html }}}`{% endraw %} <br> {% raw %}`{{# text: thing /}}`{% endraw %}
-| `AttributeMustacheProvider` | {% raw %}`<span title='The {{ x }} title'></span>`{% endraw %}
-| `MultiProvider` | Combines more than one provider together.
+Common built-in providers include:
 
-When building custom versions of tko, one can choose to use one or more binding providers, or to create a custom binding provider.
+| Provider | Example syntax |
+| --- | --- |
+| `DataBindProvider` | `<span data-bind="text: x"></span>` |
+| `VirtualProvider` | `<!-- ko text: x --><!-- /ko -->` |
+| `ComponentProvider` | `<custom-hello></custom-hello>` |
+| `AttributeProvider` | `<span ko-title="x"></span>` |
+| `TextMustacheProvider` | `{% raw %}{{ x_text }}{% endraw %}` |
+| `AttributeMustacheProvider` | `{% raw %}<span title="The {{ x }} title"></span>{% endraw %}` |
+| `MultiProvider` | Combine multiple providers together |
 
-The `Provider` class is an abstract interface, whose subclasses must contain:
+Most apps use the built-in providers that ship with TKO. If you need custom syntax or preprocessing, implement the provider interface:
 
-| Attribute | Reason |
-| -- | -- |
-| `nodeHasBindings(node)` | A method that returns true when the `node` is one that this provider can link.
-| `getBindingAccessors(node, context)` | A method that returns an object containing one or more `{handler: accessor}` where `handler` is a the name of a registered BindingHandler and `accessor` is a function that returns the `valueAccessor`.
-| `FOR_NODE_TYPES` | An array of integers corresponding to the `nodeType` attributes of nodes that shall match (i.e. `1` for `Node.ELEMENT_NODE`, `3` for `Node.TEXT_NODE`, `8` for `Node.COMMENT_NODE`)
-| `preprocessNode(node)` | Perform any preprocessing on the `node`; may replace the `node` with one or more substitute nodes or append `nodes` after it.
+| Method | Purpose |
+| --- | --- |
+| `nodeHasBindings(node)` | Return `true` when this provider should parse the node |
+| `getBindingAccessors(node, context)` | Return the binding accessors for the node |
+| `FOR_NODE_TYPES` | Declare which node types the provider handles |
+| `preprocessNode(node)` | Rewrite or expand nodes before binding starts |
+
+Use `bindingProviderInstance` to choose the provider or provider composition your app runs with.

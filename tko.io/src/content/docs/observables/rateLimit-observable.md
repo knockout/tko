@@ -5,11 +5,11 @@ title: RateLimit Observable
 
 # Extender: `rateLimit`
 
-*Note: This rate-limit API was added in Knockout 3.1.0. For previous versions, the [`throttle` extender](throttle-extender.html) provides similar functionality.*
+*Note: This rate-limit API was added in Knockout 3.1.0. For earlier codebases, the legacy [`throttle` extender](./throttle-extender/) covered similar use cases.*
 
-Normally, an [observable](../../observables/observables/) that is changed notifies its subscribers immediately, so that any computed observables or bindings that depend on the observable are updated synchronously. The `rateLimit` extender, however, causes an observable to suppress and delay change notifications for a specified period of time. A rate-limited observable therefore updates dependencies asynchronously.
+Normally, an [observable](../) that is changed notifies its subscribers immediately, so that any computed observables or bindings that depend on the observable are updated synchronously. The `rateLimit` extender, however, causes an observable to suppress and delay change notifications for a specified period of time. A rate-limited observable therefore updates dependencies asynchronously.
 
-The `rateLimit` extender can be applied to any type of observable, including [observable arrays](../../observables/observableArrays/) and [computed observables](../../computed/computedObservables/). The main use cases for rate-limiting are:
+The `rateLimit` extender can be applied to any type of observable, including [observable arrays](../observableArrays/) and [computed observables](../../computed/computedObservables/). The main use cases for rate-limiting are:
 
  * Making things respond after a certain delay
  * Combining multiple changes into a single update
@@ -92,7 +92,7 @@ function AppViewModel() {
 ko.applyBindings(new AppViewModel());
 ```
 
-### Example 3: Avoiding multiple Ajax requests
+### Example 3: Avoiding multiple network requests
 
 The following model represents data that you could render as a paged grid:
 
@@ -105,13 +105,16 @@ function GridViewModel() {
     // Query /Some/Json/Service whenever pageIndex or pageSize changes,
     // and use the results to update currentPageData
     ko.computed(function() {
-        var params = { page: this.pageIndex(), size: this.pageSize() };
-        $.getJSON('/Some/Json/Service', params, this.currentPageData);
+        var params = new URLSearchParams({ page: this.pageIndex(), size: this.pageSize() });
+
+        fetch('/Some/Json/Service?' + params)
+            .then(function(response) { return response.json(); })
+            .then(function(data) { this.currentPageData(data); }.bind(this));
     }, this);
 }
 ```
 
-Because the computed observable evaluates both `pageIndex` and `pageSize`, it becomes dependent on both of them. So, this code will use jQuery's [`$.getJSON` function](http://api.jquery.com/jQuery.getJSON/) to reload `currentPageData` when a `GridViewModel` is first instantiated *and* whenever the `pageIndex` or `pageSize` properties are later changed.
+Because the computed observable evaluates both `pageIndex` and `pageSize`, it becomes dependent on both of them. So, this code will fetch new data to reload `currentPageData` when a `GridViewModel` is first instantiated *and* whenever the `pageIndex` or `pageSize` properties are later changed.
 
 This is very simple and elegant (and it's trivial to add yet more observable query parameters that also trigger a refresh automatically whenever they change), but there is a potential efficiency problem. Suppose you add the following function to `GridViewModel` that changes both `pageIndex` and `pageSize`:
 
@@ -123,19 +126,22 @@ this.setPageSize = function(newPageSize) {
 }
 ```
 
-The problem is that this will cause *two* Ajax requests: the first one will start when you update `pageSize`, and the second one will start immediately afterwards when you update `pageIndex`. This is a waste of bandwidth and server resources, and a source of unpredictable race conditions.
+The problem is that this will cause *two* network requests: the first one will start when you update `pageSize`, and the second one will start immediately afterwards when you update `pageIndex`. This is a waste of bandwidth and server resources, and a source of unpredictable race conditions.
 
 When applied to a computed observable, the `rateLimit` extender will also avoid excess evaluation of the computed function. Using a short rate-limit timeout (e.g., 0 milliseconds) ensures that any sequence of synchronous changes to dependencies will trigger just *one* re-evaluation of your computed observable. For example:
 
 ```javascript
 ko.computed(function() {
     // This evaluation logic is exactly the same as before
-    var params = { page: this.pageIndex(), size: this.pageSize() };
-    $.getJSON('/Some/Json/Service', params, this.currentPageData);
+    var params = new URLSearchParams({ page: this.pageIndex(), size: this.pageSize() });
+
+    fetch('/Some/Json/Service?' + params)
+        .then(function(response) { return response.json(); })
+        .then(function(data) { this.currentPageData(data); }.bind(this));
 }, this).extend({ rateLimit: 0 });
 ```
 
-Now you can change `pageIndex` and `pageSize` as many times as you like, and the Ajax call will only happen once after you release your thread back to the JavaScript runtime.
+Now you can change `pageIndex` and `pageSize` as many times as you like, and the network request will only happen once after you release your thread back to the JavaScript runtime.
 
 ## Special consideration for computed observables
 
@@ -153,13 +159,6 @@ myViewModel.fullName = ko.computed(function() {
 }).extend({ notify: 'always', rateLimit: 500 });
 ```
 
-## Comparison with the throttle extender
+## Migrating from throttle
 
-If you'd like to migrate code from using the deprecated `throttle` extender, you should note the following ways that the `rateLimit` extender is different from the `throttle` extender.
-
-When using `rateLimit`:
-
-1. *Writes* to observables are not delayed; the observable's value is updated right away. For writable computed observables, this means that the write function is always run right away.
-2. All `change` notifications are delayed, including when calling `valueHasMutated` manually. This means you can't use `valueHasMutated` to force a rate-limited observable to notify an un-changed value.
-3. The default rate-limit method is different from the `throttle` algorithm. To match the `throttle` behavior, use the `notifyWhenChangesStop` method.
-4. Evaluation of a rate-limited computed observable isn't rate-limited; it will re-evaluate if you read its value.
+If you are modernizing an older codebase, `rateLimit` covers the same main use cases as the deprecated `throttle` extender. The most important difference is that `rateLimit` delays notifications, not writes. For new code, prefer `rateLimit`; keep `throttle` only when you need to preserve old behavior during migration.

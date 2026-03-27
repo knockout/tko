@@ -71,4 +71,4 @@ If you want to apply a `font-weight` or `text-decoration` style, or any other st
 * Don't write `{ font-weight: someValue }`; do write `{ fontWeight: someValue }`
 * Don't write `{ text-decoration: someValue }`; do write `{ textDecoration: someValue }`
 
-See also: [a longer list of style names and their JavaScript equivalents](http://www.comptechdoc.org/independent/web/cgi/javamanual/javastyle.html)
+See also: [MDN's CSS property reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)

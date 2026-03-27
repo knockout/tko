@@ -6,7 +6,7 @@ title: Proxy
 
 Where the [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) object is [supported](https://caniuse.com/#search=Proxy), TKO can wrap objects to make them observable.
 
-```Javascript
+```javascript
 >>> const obj = {
     x: 1,
 
@@ -50,7 +50,7 @@ Where the [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
 0
 
 // Unwrap the proxy by calling it
->>> p() === x
+>>> p() === obj
 true
 // Or assign multiple values
 >>> p({ x: 9 })

@@ -5,7 +5,7 @@ title: ObservableArrays
 
 # Observable Arrays
 
-If you want to detect and respond to changes on one object, you'd use [observables](#observables). If you want to detect and respond to changes of a *collection of things*, use an `observableArray`. This is useful in many scenarios where you're displaying or editing multiple values and need repeated sections of UI to appear and disappear as items are added and removed.
+If you want to detect and respond to changes on one object, you'd use [observables](../). If you want to detect and respond to changes of a *collection of things*, use an `observableArray`. This is useful in many scenarios where you're displaying or editing multiple values and need repeated sections of UI to appear and disappear as items are added and removed.
 
 ### Example
 
@@ -35,7 +35,7 @@ var anotherObservableArray = ko.observableArray([
 
 ## Reading information from an observableArray
 
-Behind the scenes, an `observableArray` is actually an [observable](#observables) whose value is an array (plus, `observableArray` adds some additional features described below). So, you can get the underlying JavaScript array by invoking the `observableArray` as a function with no parameters, just like any other observable. Then you can read information from that underlying array. For example,
+Behind the scenes, an `observableArray` is actually an [observable](../) whose value is an array (plus, `observableArray` adds some additional features described below). So, you can get the underlying JavaScript array by invoking the `observableArray` as a function with no parameters, just like any other observable. Then you can read information from that underlying array. For example,
 
 ```javascript
 alert('The length of the array is ' + myObservableArray().length);
@@ -44,7 +44,7 @@ alert('The first element is ' + myObservableArray()[0]);
 
 Technically you can use any of the native JavaScript array functions to operate on that underlying array, but normally there's a better alternative. KO's `observableArray` has equivalent functions of its own, and they're more useful because:
 
- 1. They work on all targeted browsers. (For example, the native JavaScript `indexOf` function doesn't work on IE 8 or earlier, but KO's `indexOf` works everywhere.)
+ 1. They work consistently across the supported environments.
  1. For functions that modify the contents of the array, such as `push` and `splice`, KO's methods automatically trigger the dependency tracking mechanism so that all registered listeners are notified of the change, and your UI is automatically updated.
  1. The syntax is more convenient. To call KO's `push` method, just write `myObservableArray.push(...)`. This is slightly nicer than calling the underlying array's `push` method by writing `myObservableArray().push(...)`.
 
@@ -101,7 +101,7 @@ Note that when KO renders a `foreach` binding, it automatically hides any object
 
 ## Delaying and/or suppressing change notifications
 
-Normally, an `observableArray` notifies its subscribers immediately, as soon as it's changed. But if an `observableArray` is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying change notifications. This is accomplished using the [`rateLimit` extender](#rateLimit-observable) like this:
+Normally, an `observableArray` notifies its subscribers immediately, as soon as it's changed. But if an `observableArray` is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying change notifications. This is accomplished using the [`rateLimit` extender](../rateLimit-observable/) like this:
 
 ```javascript
 // Ensure it notifies about changes no more than once per 50-millisecond period

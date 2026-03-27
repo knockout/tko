@@ -2,9 +2,9 @@
 title: Custom Bindings Controlling Descendant Bindings
 ---
 
-# Controlling Descendant Bindnings
+# Controlling Descendant Bindings
 
-*Note: Creating custom bindings that control descendant binding is an advanced technique, typically used only when creating libraries of reusable bindings. It's not something you'll normally need to do when building applications with Knockout.*
+*Note: Creating custom bindings that control descendant bindings is an advanced technique, typically used only when creating libraries of reusable bindings. It's not something you'll normally need to do when building applications with Knockout.*
 
 By default, bindings only affect the element to which they are applied. But what if you want to affect all descendant elements too? This is possible. Your binding can tell Knockout *not* to bind descendants at all, and then your custom binding can do whatever it likes to bind them in a different way.
 
@@ -40,12 +40,12 @@ To see this take effect, here's a sample usage:
 
 ### Example: Supplying additional values to descendant bindings
 
-Normally, bindings that use `controlsDescendantBindings` will also call `ko.applyBindingsToDescendants(someBindingContext, element)` to apply the descendant bindings against some modified [binding context](../../binding-context/binding-context/). For example, you could have a binding called `withProperties` that attaches some extra properties to the binding context that will then be available to all descendant bindings:
+Normally, bindings that use `controlsDescendantBindings` will also call `ko.applyBindingsToDescendants(someBindingContext, element)` to apply the descendant bindings against some modified [binding context](../). For example, you could have a binding called `withProperties` that attaches some extra properties to the binding context that will then be available to all descendant bindings:
 
 ```javascript
 ko.bindingHandlers.withProperties = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-        // Make a modified binding context, with a extra properties, and apply it to descendant elements
+        // Make a modified binding context, with extra properties, and apply it to descendant elements
         var innerBindingContext = bindingContext.extend(valueAccessor);
         ko.applyBindingsToDescendants(innerBindingContext, element);
 
@@ -55,7 +55,7 @@ ko.bindingHandlers.withProperties = {
 };
 ```
 
-As you can see, binding contexts have an `extend` function that produces a clone with extra properties. The `extend` function accepts either an object with the properties to copy or a function that returns such an object. The function syntax is preferred so that future changes in the binding value are always updated in the binding context. This process doesn't affect the original binding context, so there is no danger of affecting sibling-level elements - it will only affect descendants.
+As you can see, binding contexts have an `extend` function that produces a clone with extra properties. The `extend` function accepts either an object with the properties to copy or a function that returns such an object. The function syntax is preferred so that future changes in the binding value are always updated in the binding context. This process doesn't affect the original binding context, so there is no danger of affecting sibling-level elements - it only affects descendants.
 
 Here's an example of using the above custom binding:
 
@@ -70,14 +70,14 @@ Here's an example of using the above custom binding:
 
 ### Example: Adding extra levels in the binding context hierarchy
 
-Bindings such as [`with`](#with-binding) and [`foreach`](#foreach-binding) create extra levels in the binding context hierarchy. This means that their descendants can access data at outer levels by using `$parent`, `$parents`, `$root`, or `$parentContext`.
+Bindings such as [`with`](../with-binding/) and [`foreach`](../foreach-binding/) create extra levels in the binding context hierarchy. This means that their descendants can access data at outer levels by using `$parent`, `$parents`, `$root`, or `$parentContext`.
 
 If you want to do this in custom bindings, then instead of using `bindingContext.extend()`, use `bindingContext.createChildContext(someData)`. This returns a new binding context whose viewmodel is `someData` and whose `$parentContext` is `bindingContext`. If you want, you can then extend the child context with extra properties using `ko.utils.extend`. For example,
 
 ```javascript
 ko.bindingHandlers.withProperties = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-        // Make a modified binding context, with a extra properties, and apply it to descendant elements
+        // Make a modified binding context, with extra properties, and apply it to descendant elements
         var childBindingContext = bindingContext.createChildContext(
             bindingContext.$rawData,
             null, // Optionally, pass a string here as an alias for the data item in descendant contexts

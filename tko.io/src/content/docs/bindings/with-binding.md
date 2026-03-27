@@ -6,7 +6,7 @@ title: With Binding
 # `with` Binding
 
 ### Purpose
-The `with` binding creates a new [binding context](../../binding-context/binding-context/), so that descendant elements are bound in the context of a specified object.
+The `with` binding creates a new [binding context](/binding-context/), so that descendant elements are bound in the context of a specified object.
 
 Of course, you can arbitrarily nest `with` bindings along with the other control-flow bindings such as [`if`](../if-binding/) and [`foreach`](../foreach-binding/).
 
@@ -37,7 +37,7 @@ javascript: |-
 This interactive example demonstrates that:
 
  * The `with` binding will dynamically add or remove descendant elements depending on whether the associated value is `null`/`undefined` or not
- * If you want to access data/functions from parent binding contexts, you can use [special context properties such as `$parent` and `root`](../../binding-context/binding-context/).
+ * If you want to access data/functions from parent binding contexts, you can use [special context properties such as `$parent` and `$root`](/binding-context/).
 
 ```example
 html: |-

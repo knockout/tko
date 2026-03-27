@@ -8,7 +8,7 @@ title: Foreach Binding
 ### Purpose
 The `foreach` binding duplicates a section of markup for each entry in an array, and binds each copy of that markup to the corresponding array item. This is especially useful for rendering lists or tables.
 
-Assuming your array is an [observable array](../../observables/observableArrays/), whenever you later add, remove, or re-order array entries, the binding will efficiently update the UI to match - inserting or removing more copies of the markup, or re-ordering existing DOM elements, without affecting any other DOM elements. This is far faster than regenerating the entire `foreach` output after each array change.
+Assuming your array is an [observable array](/observables/observablearrays/), whenever you later add, remove, or re-order array entries, the binding will efficiently update the UI to match - inserting or removing more copies of the markup, or re-ordering existing DOM elements, without affecting any other DOM elements. This is far faster than regenerating the entire `foreach` output after each array change.
 
 Of course, you can arbitrarily nest any number of `foreach` bindings along with other control-flow bindings such as `if` and `with`.
 
@@ -101,7 +101,7 @@ ko.applyBindings(new AppViewModel());
 
 As shown in the above examples, bindings within the `foreach` block can refer to properties on the array entries. For example, [Example 1](#example_1_iterating_over_an_array) referenced the `firstName` and `lastName` properties on each array entry.
 
-But what if you want to refer to the array entry itself (not just one of its properties)? In that case, you can use the [special context property](../../binding-context/binding-context/) `$data`. Within a `foreach` block, it means "the current item". For example,
+But what if you want to refer to the array entry itself (not just one of its properties)? In that case, you can use the [special context property](/binding-context/) `$data`. Within a `foreach` block, it means "the current item". For example,
 
 ```html
 <ul data-bind="foreach: months">
@@ -141,11 +141,11 @@ Similarly, you can use `$parent` to refer to data from outside the `foreach`, e.
 </ul>
 ```
 
-For more information about `$index` and other context properties such as `$parent`, see documentation for [binding context properties](../../binding-context/binding-context/).
+For more information about `$index` and other context properties such as `$parent`, see documentation for [binding context properties](/binding-context/).
 
 ### Note 3: Using "as" to give an alias to "foreach" items
 
-As described in Note 1, you can refer to each array entry using the `$data` [context variable](../../binding-context/binding-context/). In some cases though, it may be useful to give the current item a more descriptive name using the `as` option like:
+As described in Note 1, you can refer to each array entry using the `$data` [context variable](/binding-context/). In some cases though, it may be useful to give the current item a more descriptive name using the `as` option like:
 
 ```html
 <ul data-bind="foreach: { data: people, as: 'person' }"></ul>
@@ -228,7 +228,7 @@ Note that reordering detection is not guaranteed: to ensure the algorithm comple
 
 ### Note 6: Destroyed entries are hidden by default
 
-Sometimes you may want to mark an array entry as deleted, but without actually losing record of its existence. This is known as a *non-destructive delete*. For details of how to do this, see [the destroy function on `observableArray`](observableArrays.html#destroy_and_destroyall_note_usually_relevant_to_ruby_on_rails_developers_only).
+Sometimes you may want to mark an array entry as deleted, but without actually losing record of its existence. This is known as a *non-destructive delete*. For details of how to do this, see [the destroy function on `observableArray`](/observables/observablearrays/).
 
 By default, the `foreach` binding will skip over (i.e., hide) any array entries that are marked as destroyed. If you want to show destroyed entries, use the `includeDestroyed` option. For example,
 
@@ -242,9 +242,9 @@ By default, the `foreach` binding will skip over (i.e., hide) any array entries 
 
 If you need to run some further custom logic on the generated DOM elements, you can use any of the `afterRender`/`afterAdd`/`beforeRemove`/`beforeMove`/`afterMove` callbacks described below.
 
-> **Note:** These callbacks are *only* intended for triggering animations related to changes in a list. If your goal is actually to attach other behaviors to new DOM elements when they have been added (e.g., event handlers, or to activate third-party UI controls), then your work will be much easier if you implement that new behavior as a [custom binding](../../binding-context/custom-bindings/) instead, because then you can use that behavior anywhere, independently of the `foreach` binding.
+> **Note:** These callbacks are *only* intended for triggering animations related to changes in a list. If your goal is actually to attach other behaviors to new DOM elements when they have been added (e.g., event handlers, or to activate third-party UI controls), then your work will be much easier if you implement that new behavior as a [custom binding](/binding-context/custom-bindings/) instead, because then you can use that behavior anywhere, independently of the `foreach` binding.
 
-Here's a trivial example that uses `afterAdd` to apply the classic "yellow fade" effect to newly-added items. It requires the [jQuery Color plugin](https://github.com/jquery/jquery-color) to enable animation of background colors.
+Here's a trivial example that uses `afterAdd` to apply a simple CSS-driven entrance effect to newly-added items.
 
 ```html
 <ul data-bind="foreach: { data: myItems, afterAdd: yellowFadeIn }">
@@ -277,13 +277,13 @@ Full details:
    1. An array of the inserted DOM elements
    2. The data item against which they are being bound
 
- * `afterAdd` --- is like `afterRender`, except it is invoked only when new entries are added to your array (and *not* when `foreach` first iterates over your array's initial contents). A common use for `afterAdd` is to call a method such as jQuery's `$(domNode).fadeIn()` so that you get animated transitions whenever items are added. Knockout will supply the following parameters to your callback:
+ * `afterAdd` --- is like `afterRender`, except it is invoked only when new entries are added to your array (and *not* when `foreach` first iterates over your array's initial contents). A common use for `afterAdd` is to add a class or start a CSS transition whenever items are inserted. Knockout will supply the following parameters to your callback:
 
    1. A DOM node being added to the document
    2. The index of the added array element
    3. The added array element
 
- * `beforeRemove` --- is invoked when an array item has been removed, but before the corresponding DOM nodes have been removed. If you specify a `beforeRemove` callback, then *it becomes your responsibility to remove the DOM nodes*. The obvious use case here is calling something like jQuery's `$(domNode).fadeOut()` to animate the removal of the corresponding DOM nodes --- in this case, Knockout cannot know how soon it is allowed to physically remove the DOM nodes (who knows how long your animation will take?), so it is up to you to remove them. Knockout will supply the following parameters to your callback:
+ * `beforeRemove` --- is invoked when an array item has been removed, but before the corresponding DOM nodes have been removed. If you specify a `beforeRemove` callback, then *it becomes your responsibility to remove the DOM nodes* after any exit animation completes. Knockout will supply the following parameters to your callback:
 
    1. A DOM node that you should remove
    2. The index of the removed array element
@@ -301,4 +301,4 @@ Full details:
    2. The index of the moved array element
    3. The moved array element
 
-For examples of `afterAdd` and `beforeRemove` see [animated transitions](#animated).
+For examples of `afterAdd` and `beforeRemove`, use CSS transitions or your own DOM removal logic.

@@ -68,7 +68,7 @@ However, it does *not* work with virtual elements. If you try the following:
 ko.virtualElements.allowedBindings.randomOrder = true;
 ```
 
-Now there won't be an error. However, it still won't work properly, because our `randomOrder` binding is coded using normal DOM API calls (`firstChild`, `appendChild`, etc.) which don't understand virtual elements. This is the reason why KO requires you to explicitly opt in to virtual element support: unless your custom binding is coded using virtual element APIs, it's not going to work properly!
+Now there won't be an error. However, it still won't work properly, because our `randomOrder` binding is coded using normal DOM API calls (`firstChild`, `appendChild`, etc.) which don't understand virtual elements. This is why KO requires you to explicitly opt in to virtual element support: unless your custom binding is coded using virtual element APIs, it will not work properly.
 
 Let's update the code for `randomOrder`, this time using KO's virtual element APIs:
 
@@ -94,13 +94,13 @@ ko.bindingHandlers.randomOrder = {
 };
 ```
 
-Notice how, instead of using APIs like `domElement.firstChild`, we're now using `ko.virtualElements.firstChild(domOrVirtualElement)`. The `randomOrder` binding will now correctly work with virtual elements, e.g., `<!-- ko randomOrder: true -->...<!-- /ko -->`.
+Notice how, instead of using APIs like `domElement.firstChild`, we're now using `ko.virtualElements.firstChild(domOrVirtualElement)`. The `randomOrder` binding now works with virtual elements, e.g., `<!-- ko randomOrder: true -->...<!-- /ko -->`.
 
-Also, `randomOrder` will still work with regular DOM elements, because all of the `ko.virtualElements` APIs are backwardly compatible with regular DOM elements.
+Also, `randomOrder` still works with regular DOM elements, because all of the `ko.virtualElements` APIs are backward-compatible with regular DOM elements.
 
 ### Tables and Virtual Elements
 
-In some browsers you must be careful about virtual elements inside `<tbody>` and `<thead>` tags, since they may be "hoisted" out. For example:
+Table sections can move comment markers around because the HTML parser treats them specially. Be careful about virtual elements inside `<tbody>` and `<thead>`. For example:
 
 ```html
 <table>
