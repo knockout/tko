@@ -20,7 +20,15 @@
 
 const MASK_SVG = `url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.75'%3E%3Cpath%20d%3D'M15%203h6v6'%2F%3E%3Cpath%20d%3D'M10%2014%2021%203'%2F%3E%3Cpath%20d%3D'M18%2013v6a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2V8a2%202%200%200%201%202-2h6'%2F%3E%3C%2Fsvg%3E")`
 const DEFAULT_PLAYGROUND_HTML = '<div id="root"></div>'
-const GET_ELEMENT_BY_ID_RE = /document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)/
+const DIRECT_MOUNT_PATTERNS = [
+  /document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\.\s*(?:appendChild|append|replaceChildren)\s*\(/,
+  /(?:ko|tko)\.applyBindings\s*\([\s\S]*?,\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)/,
+  /tko\.jsx\.render\s*\([\s\S]*?,\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)/,
+  /(?:ReactDOM\.)?createRoot\s*\(\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)\s*\.render\s*\(/,
+  /ReactDOM\.render\s*\([\s\S]*?,\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)/
+]
+const ELEMENT_REF_RE =
+  /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*document\.getElementById\(\s*(['"`])([^'"`]+)\2\s*\)/g
 
 function h(tag, props, children = []) {
   return {
@@ -79,8 +87,30 @@ function indentBlock(code, spaces) {
     .join('\n')
 }
 
+function findExplicitMountId(code) {
+  for (const pattern of DIRECT_MOUNT_PATTERNS) {
+    const match = code.match(pattern)
+    if (match) return match[2]
+  }
+
+  for (const match of code.matchAll(ELEMENT_REF_RE)) {
+    const [, refName, , id] = match
+    const refPattern = new RegExp(
+      String.raw`\b${refName}\b\s*\.\s*(?:appendChild|append|replaceChildren)\s*\(|` +
+      String.raw`(?:^|\W)(?:ko|tko)\.applyBindings\s*\([\s\S]*?,\s*${refName}\b|` +
+      String.raw`tko\.jsx\.render\s*\([\s\S]*?,\s*${refName}\b|` +
+      String.raw`(?:ReactDOM\.)?createRoot\s*\(\s*${refName}\b\s*\)\s*\.render\s*\(|` +
+      String.raw`ReactDOM\.render\s*\([\s\S]*?,\s*${refName}\b`,
+      'm'
+    )
+    if (refPattern.test(code)) return id
+  }
+
+  return null
+}
+
 function inferPlaygroundHtml(tsx) {
-  const mountId = tsx.match(GET_ELEMENT_BY_ID_RE)?.[2]
+  const mountId = findExplicitMountId(tsx)
   return mountId ? `<div id="${mountId}"></div>` : DEFAULT_PLAYGROUND_HTML
 }
 
@@ -88,14 +118,9 @@ function wrapTsxForPlayground(tsx) {
   const code = tsx.trim()
   if (!code) return code
 
-  // Hand-authored full examples should keep their explicit setup.
-  if (
-    /tko\.jsx\.render\s*\(/.test(code) ||
-    /(?:^|\W)(?:ko|tko)\.applyBindings\s*\(/.test(code) ||
-    /document\.getElementById\s*\(/.test(code)
-  ) {
-    return code
-  }
+  // Hand-authored full examples should keep their explicit setup only when
+  // they already include a concrete mount target.
+  if (findExplicitMountId(code)) return code
 
   const blocks = code.split(/\n\s*\n/)
   const jsxIndex = blocks.findIndex(block => looksLikeJsxExpression(block.trim()))
@@ -108,13 +133,15 @@ function wrapTsxForPlayground(tsx) {
 
   let wrapped = ''
   if (prelude) wrapped += `${prelude}\n\n`
-  wrapped += '// boilerplate added by the docs playground\n'
-  wrapped += "const root = document.getElementById('root')\n"
-  wrapped += 'const { node } = tko.jsx.render(\n'
-  wrapped += `${indentBlock(jsxBlock, 2)}\n`
-  wrapped += ')\n'
-  wrapped += 'root.appendChild(node)\n'
-  wrapped += 'tko.applyBindings({}, root)'
+  wrapped += '{\n'
+  wrapped += '  // boilerplate added by the docs playground\n'
+  wrapped += "  const __docsPlaygroundRoot = document.getElementById('root')\n"
+  wrapped += '  const __docsPlaygroundRendered = tko.jsx.render(\n'
+  wrapped += `${indentBlock(jsxBlock, 4)}\n`
+  wrapped += '  )\n'
+  wrapped += '  __docsPlaygroundRoot.appendChild(__docsPlaygroundRendered.node)\n'
+  wrapped += '  tko.applyBindings({}, __docsPlaygroundRoot)\n'
+  wrapped += '}'
   return wrapped
 }
 
