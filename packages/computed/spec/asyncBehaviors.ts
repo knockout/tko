@@ -1,10 +1,10 @@
-/* globals waits, runs, waitsFor */
-
 //
 // TODO/FIXME:
 // The following is a combination of observable and comptued behavior.  In
 // future the Observable-only parts ought to be moved to tko.observable tests.
 //
+
+import { afterEach, beforeEach, describe, expect, it, jest, mock } from 'bun:test'
 
 import { tasks, options } from '@tko/utils'
 
@@ -16,96 +16,83 @@ import {
 
 import { computed as koComputed, pureComputed as koPureComputed, when } from '../dist'
 
-import { useMockForTasks } from '@tko/utils/helpers/jasmine-13-helper'
+let cleanup: DisposableStack
+
+beforeEach(() => {
+  cleanup = new DisposableStack()
+  jest.useFakeTimers()
+})
+
+afterEach(() => {
+  cleanup.dispose()
+  jest.clearAllMocks()
+  jest.clearAllTimers()
+  jest.useRealTimers()
+})
+
+function restoreAfter<T extends object, K extends keyof T>(object: T, propertyName: K) {
+  const originalValue = object[propertyName]
+  cleanup.defer(() => {
+    object[propertyName] = originalValue
+  })
+}
+
+function useFakeTaskScheduler() {
+  restoreAfter(options, 'taskScheduler')
+  options.taskScheduler = callback => setTimeout(callback, 0)
+}
+
 
 describe('Throttled observables', function () {
-  beforeEach(function () {
-    waits(1)
-  }) // Workaround for spurious timing-related failures on IE8 (issue #736)
 
   it('Should notify subscribers asynchronously after writes stop for the specified timeout duration', function () {
     const observable = koObservable('A').extend({ throttle: 100 })
-    const notifiedValues = new Array()
+    const notifiedValues: string[] = []
     observable.subscribe(function (value) {
       notifiedValues.push(value)
     })
 
-    runs(function () {
-      // Mutate a few times
-      observable('B')
-      observable('C')
-      observable('D')
-      expect(notifiedValues.length).toEqual(0) // Should not notify synchronously
-    })
+    observable('B')
+    observable('C')
+    observable('D')
+    expect(notifiedValues.length).toEqual(0)
 
-    // Wait
-    waits(10)
-    runs(function () {
-      // Mutate more
-      observable('E')
-      observable('F')
-      expect(notifiedValues.length).toEqual(0) // Should not notify until end of throttle timeout
-    })
+    jest.advanceTimersByTime(10)
+    observable('E')
+    observable('F')
+    expect(notifiedValues.length).toEqual(0)
 
-    // Wait until after timeout
-    waitsFor(
-      function () {
-        return notifiedValues.length > 0
-      },
-      'Timeout',
-      300
-    )
-    runs(function () {
-      expect(notifiedValues.length).toEqual(1)
-      expect(notifiedValues[0]).toEqual('F')
-    })
+    jest.advanceTimersByTime(300)
+    expect(notifiedValues.length).toEqual(1)
+    expect(notifiedValues[0]).toEqual('F')
   })
 })
 
 describe('Throttled dependent observables', function () {
-  beforeEach(function () {
-    waits(1)
-  }) // Workaround for spurious timing-related failures on IE8 (issue #736)
 
   it('Should notify subscribers asynchronously after dependencies stop updating for the specified timeout duration', function () {
     const underlying = koObservable()
     const asyncDepObs = koComputed(function () {
       return underlying()
     }).extend({ throttle: 100 })
-    const notifiedValues = new Array()
+    const notifiedValues: Array<string | undefined> = []
     asyncDepObs.subscribe(function (value) {
       notifiedValues.push(value)
     })
 
-    // Check initial state
     expect(asyncDepObs()).toBeUndefined()
-    runs(function () {
-      // Mutate
-      underlying('New value')
-      expect(asyncDepObs()).toBeUndefined() // Should not update synchronously
-      expect(notifiedValues.length).toEqual(0)
-    })
+    underlying('New value')
+    expect(asyncDepObs()).toBeUndefined()
+    expect(notifiedValues.length).toEqual(0)
 
-    // Still shouldn't have evaluated
-    waits(10)
-    runs(function () {
-      expect(asyncDepObs()).toBeUndefined() // Should not update until throttle timeout
-      expect(notifiedValues.length).toEqual(0)
-    })
+    jest.advanceTimersByTime(10)
+    expect(asyncDepObs()).toBeUndefined()
+    expect(notifiedValues.length).toEqual(0)
 
-    // Now wait for throttle timeout
-    waitsFor(
-      function () {
-        return notifiedValues.length > 0
-      },
-      'Timeout',
-      300
-    )
-    runs(function () {
-      expect(asyncDepObs()).toEqual('New value')
-      expect(notifiedValues.length).toEqual(1)
-      expect(notifiedValues[0]).toEqual('New value')
-    })
+    jest.advanceTimersByTime(300)
+    expect(asyncDepObs()).toEqual('New value')
+    expect(notifiedValues.length).toEqual(1)
+    expect(notifiedValues[0]).toEqual('New value')
   })
 
   it('Should run evaluator only once when dependencies stop updating for the specified timeout duration', function () {
@@ -116,46 +103,28 @@ describe('Throttled dependent observables', function () {
       return someDependency()
     }).extend({ throttle: 100 })
 
-    runs(function () {
-      // Mutate a few times synchronously
-      expect(evaluationCount).toEqual(1) // Evaluates synchronously when first created, like all dependent observables
-      someDependency('A')
-      someDependency('B')
-      someDependency('C')
-      expect(evaluationCount).toEqual(1) // Should not re-evaluate synchronously when dependencies update
-    })
+    expect(evaluationCount).toEqual(1)
+    someDependency('A')
+    someDependency('B')
+    someDependency('C')
+    expect(evaluationCount).toEqual(1)
 
-    // Also mutate async
-    waits(10)
-    runs(function () {
-      someDependency('D')
-      expect(evaluationCount).toEqual(1)
-    })
+    jest.advanceTimersByTime(10)
+    someDependency('D')
+    expect(evaluationCount).toEqual(1)
 
-    // Now wait for throttle timeout
-    waitsFor(
-      function () {
-        return evaluationCount > 1
-      },
-      'Timeout',
-      300
-    )
-    runs(function () {
-      expect(evaluationCount).toEqual(2) // Finally, it's evaluated
-      expect(asyncDepObs()).toEqual('D')
-    })
+    jest.advanceTimersByTime(300)
+    expect(evaluationCount).toEqual(2)
+    expect(asyncDepObs()).toEqual('D')
   })
 })
 
 describe('Rate-limited', function () {
-  beforeEach(function () {
-    jasmine.Clock.useMock()
-  })
 
   describe('Subscribable', function () {
     it('Should delay change notifications', function () {
       const subscribable = new koSubscribable().extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       subscribable.subscribe(notifySpy)
       subscribable.subscribe(notifySpy, null, 'custom')
 
@@ -172,63 +141,63 @@ describe('Rate-limited', function () {
       expect(notifySpy).toHaveBeenCalledWith('c')
 
       // Advance clock; Change notification happens now using the latest value notified
-      notifySpy.reset()
-      jasmine.Clock.tick(500)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('b')
     })
 
     it('Should notify every timeout interval using notifyAtFixedRate method ', function () {
       const subscribable = new koSubscribable().extend({ rateLimit: { method: 'notifyAtFixedRate', timeout: 50 } })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       subscribable.subscribe(notifySpy)
 
       // Push 10 changes every 25 ms
       for (let i = 0; i < 10; ++i) {
         subscribable.notifySubscribers(i + 1)
-        jasmine.Clock.tick(25)
+        jest.advanceTimersByTime(25)
       }
 
       // Notification happens every 50 ms, so every other number is notified
-      expect(notifySpy.calls.length).toBe(5)
-      expect(notifySpy.argsForCall).toEqual([[2], [4], [6], [8], [10]])
+      expect(notifySpy.mock.calls.length).toBe(5)
+      expect(notifySpy.mock.calls).toEqual([[2], [4], [6], [8], [10]])
 
       // No more notifications happen
-      notifySpy.reset()
-      jasmine.Clock.tick(50)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(50)
       expect(notifySpy).not.toHaveBeenCalled()
     })
 
     it('Should notify after nothing happens for the timeout period using notifyWhenChangesStop method', function () {
       const subscribable = new koSubscribable().extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 50 } })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       subscribable.subscribe(notifySpy)
 
       // Push 10 changes every 25 ms
       for (let i = 0; i < 10; ++i) {
         subscribable.notifySubscribers(i + 1)
-        jasmine.Clock.tick(25)
+        jest.advanceTimersByTime(25)
       }
 
       // No notifications happen yet
       expect(notifySpy).not.toHaveBeenCalled()
 
       // Notification happens after the timeout period
-      jasmine.Clock.tick(50)
-      expect(notifySpy.calls.length).toBe(1)
+      jest.advanceTimersByTime(50)
+      expect(notifySpy.mock.calls.length).toBe(1)
       expect(notifySpy).toHaveBeenCalledWith(10)
     })
 
     it('Should use latest settings when applied multiple times', function () {
       const subscribable = new koSubscribable().extend({ rateLimit: 250 }).extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       subscribable.subscribe(notifySpy)
 
       subscribable.notifySubscribers('a')
 
-      jasmine.Clock.tick(250)
+      jest.advanceTimersByTime(250)
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(250)
+      jest.advanceTimersByTime(250)
       expect(notifySpy).toHaveBeenCalledWith('a')
     })
 
@@ -236,7 +205,7 @@ describe('Rate-limited', function () {
       // This test describes the current behavior for the given scenario but is not a contract for that
       // behavior, which could change in the future if convenient.
       let subscribable = new koSubscribable().extend({ rateLimit: 250 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       subscribable.subscribe(notifySpy)
 
       subscribable.notifySubscribers('a') // Pending notification
@@ -246,12 +215,12 @@ describe('Rate-limited', function () {
       subscribable.notifySubscribers('b')
 
       // First notification happens using original settings
-      jasmine.Clock.tick(250)
+      jest.advanceTimersByTime(250)
       expect(notifySpy).toHaveBeenCalledWith('a')
 
       // Second notification happends using later settings
-      notifySpy.reset()
-      jasmine.Clock.tick(250)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(250)
       expect(notifySpy).toHaveBeenCalledWith('b')
     })
   })
@@ -259,9 +228,9 @@ describe('Rate-limited', function () {
   describe('Observable', function () {
     it('Should delay change notifications', function () {
       const observable = koObservable().extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
-      const beforeChangeSpy = jasmine.createSpy('beforeChangeSpy').andCallFake(function (value) {
+      const beforeChangeSpy = mock(function (value) {
         expect(observable()).toBe(value)
       })
       observable.subscribe(beforeChangeSpy, null, 'beforeChange')
@@ -277,15 +246,15 @@ describe('Rate-limited', function () {
       expect(notifySpy).not.toHaveBeenCalled()
 
       // Advance clock; Change notification happens now using the latest value notified
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('b')
-      expect(beforeChangeSpy.calls.length).toBe(1) // Only one beforeChange notification
+      expect(beforeChangeSpy.mock.calls.length).toBe(1) // Only one beforeChange notification
     })
 
     it('Should notify "spectator" subscribers whenever the value changes', function () {
       const observable = koObservable('A').extend({ rateLimit: 500 }),
-        spectateSpy = jasmine.createSpy('notifySpy'),
-        notifySpy = jasmine.createSpy('notifySpy')
+        spectateSpy = mock(() => {}),
+        notifySpy = mock(() => {})
 
       observable.subscribe(spectateSpy, null, 'spectate')
       observable.subscribe(notifySpy)
@@ -299,26 +268,26 @@ describe('Rate-limited', function () {
       expect(spectateSpy).toHaveBeenCalledWith('C')
 
       expect(notifySpy).not.toHaveBeenCalled()
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
 
       // "spectate" was called for each new value
-      expect(spectateSpy.argsForCall).toEqual([['B'], ['C']])
+      expect(spectateSpy.mock.calls).toEqual([['B'], ['C']])
       // whereas "change" was only called for the final value
-      expect(notifySpy.argsForCall).toEqual([['C']])
+      expect(notifySpy.mock.calls).toEqual([['C']])
     })
 
     it('Should suppress change notification when value is changed/reverted', function () {
       const observable = koObservable('original').extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
-      const beforeChangeSpy = jasmine.createSpy('beforeChangeSpy')
+      const beforeChangeSpy = mock(() => {})
       observable.subscribe(beforeChangeSpy, null, 'beforeChange')
 
       observable('new') // change value
       expect(observable()).toEqual('new') // access observable to make sure it really has the changed value
       observable('original') // but then change it back
       expect(notifySpy).not.toHaveBeenCalled()
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(notifySpy).not.toHaveBeenCalled()
 
       // Check that value is correct and notification hasn't happened
@@ -327,7 +296,7 @@ describe('Rate-limited', function () {
 
       // Changing observable to a new value still works as expected
       observable('new')
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('new')
       expect(beforeChangeSpy).toHaveBeenCalledWith('original')
       expect(beforeChangeSpy).not.toHaveBeenCalledWith('new')
@@ -335,7 +304,7 @@ describe('Rate-limited', function () {
 
     it('Should support notifications from nested update', function () {
       const observable = koObservable('a').extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
 
       // Create a one-time subscription that will modify the observable
@@ -348,19 +317,19 @@ describe('Rate-limited', function () {
       expect(notifySpy).not.toHaveBeenCalled()
       expect(observable()).toEqual('b')
 
-      notifySpy.reset()
-      jasmine.Clock.tick(500)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('b')
       expect(observable()).toEqual('z')
 
-      notifySpy.reset()
-      jasmine.Clock.tick(500)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('z')
     })
 
     it('Should suppress notifications when value is changed/reverted from nested update', function () {
       const observable = koObservable('a').extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
 
       // Create a one-time subscription that will modify the observable and then revert the change
@@ -374,21 +343,21 @@ describe('Rate-limited', function () {
       expect(notifySpy).not.toHaveBeenCalled()
       expect(observable()).toEqual('b')
 
-      notifySpy.reset()
-      jasmine.Clock.tick(500)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('b')
       expect(observable()).toEqual('b')
 
-      notifySpy.reset()
-      jasmine.Clock.tick(500)
+      notifySpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(notifySpy).not.toHaveBeenCalled()
     })
 
     it('Should not notify future subscribers', function () {
       const observable = koObservable('a').extend({ rateLimit: 500 }),
-        notifySpy1 = jasmine.createSpy('notifySpy1'),
-        notifySpy2 = jasmine.createSpy('notifySpy2'),
-        notifySpy3 = jasmine.createSpy('notifySpy3')
+        notifySpy1 = mock(() => {}),
+        notifySpy2 = mock(() => {}),
+        notifySpy3 = mock(() => {})
 
       observable.subscribe(notifySpy1)
       observable('b')
@@ -400,7 +369,7 @@ describe('Rate-limited', function () {
       expect(notifySpy2).not.toHaveBeenCalled()
       expect(notifySpy3).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(notifySpy1).toHaveBeenCalledWith('c')
       expect(notifySpy2).toHaveBeenCalledWith('c')
       expect(notifySpy3).not.toHaveBeenCalled()
@@ -423,7 +392,7 @@ describe('Rate-limited', function () {
       expect(computed()).toBeUndefined()
 
       // Advance clock; Change notification happens now using the latest value notified
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(computed()).toEqual('b')
     })
 
@@ -444,7 +413,7 @@ describe('Rate-limited', function () {
       expect(computed()).toBeUndefined()
 
       // Advance clock; Change notification happens now using the latest value notified
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(computed()).toEqual('b')
     })
 
@@ -452,14 +421,14 @@ describe('Rate-limited', function () {
       const observable = koObservable('a').extend({ rateLimit: 500 })
       observable('b')
 
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       const computed = koComputed(function () {
         return evalSpy(observable())
       })
       expect(evalSpy).toHaveBeenCalledWith('b')
-      evalSpy.reset()
+      evalSpy.mockClear()
 
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(evalSpy).not.toHaveBeenCalled()
     })
   })
@@ -479,7 +448,7 @@ describe('Rate-limited', function () {
 
       myArray.push('Gamma')
       myArray.push('Delta')
-      jasmine.Clock.tick(10)
+      jest.advanceTimersByTime(10)
       expect(changelist).toEqual([
         { status: 'added', value: 'Gamma', index: 2 },
         { status: 'added', value: 'Delta', index: 3 }
@@ -488,7 +457,7 @@ describe('Rate-limited', function () {
       changelist = undefined
       myArray.shift()
       myArray.shift()
-      jasmine.Clock.tick(10)
+      jest.advanceTimersByTime(10)
       expect(changelist).toEqual([
         { status: 'deleted', value: 'Alpha', index: 0 },
         { status: 'deleted', value: 'Beta', index: 1 }
@@ -497,7 +466,7 @@ describe('Rate-limited', function () {
       changelist = undefined
       myArray.push('Epsilon')
       myArray.pop()
-      jasmine.Clock.tick(10)
+      jest.advanceTimersByTime(10)
       expect(changelist).toEqual(undefined)
     })
   })
@@ -505,40 +474,40 @@ describe('Rate-limited', function () {
   describe('Computed Observable', function () {
     it('Should delay running evaluator where there are no subscribers', function () {
       const observable = koObservable()
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       koComputed(function () {
         evalSpy(observable())
         return observable()
       }).extend({ rateLimit: 500 })
 
       // Observable is changed, but evaluation is delayed
-      evalSpy.reset()
+      evalSpy.mockClear()
       observable('a')
       observable('b')
       expect(evalSpy).not.toHaveBeenCalled()
 
       // Advance clock; Change notification happens now using the latest value notified
-      evalSpy.reset()
-      jasmine.Clock.tick(500)
+      evalSpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(evalSpy).toHaveBeenCalledWith('b')
     })
 
     it('Should delay change notifications and evaluation', function () {
       const observable = koObservable()
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       const computed = koComputed(function () {
         evalSpy(observable())
         return observable()
       }).extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       computed.subscribe(notifySpy)
-      const beforeChangeSpy = jasmine.createSpy('beforeChangeSpy').andCallFake(function (value) {
+      const beforeChangeSpy = mock(function (value) {
         expect(computed()).toBe(value)
       })
       computed.subscribe(beforeChangeSpy, null, 'beforeChange')
 
       // Observable is changed, but notification is delayed
-      evalSpy.reset()
+      evalSpy.mockClear()
       observable('a')
       expect(evalSpy).not.toHaveBeenCalled()
       expect(computed()).toEqual('a')
@@ -547,18 +516,18 @@ describe('Rate-limited', function () {
       expect(beforeChangeSpy).toHaveBeenCalledWith(undefined) // beforeChange notification happens right away
 
       // Second change notification is also delayed
-      evalSpy.reset()
+      evalSpy.mockClear()
       observable('b')
       expect(computed.peek()).toEqual('a') // peek returns previously evaluated value
       expect(evalSpy).not.toHaveBeenCalled()
       expect(notifySpy).not.toHaveBeenCalled()
 
       // Advance clock; Change notification happens now using the latest value notified
-      evalSpy.reset()
-      jasmine.Clock.tick(500)
+      evalSpy.mockClear()
+      jest.advanceTimersByTime(500)
       expect(evalSpy).toHaveBeenCalledWith('b')
       expect(notifySpy).toHaveBeenCalledWith('b')
-      expect(beforeChangeSpy.calls.length).toBe(1) // Only one beforeChange notification
+      expect(beforeChangeSpy.mock.calls.length).toBe(1) // Only one beforeChange notification
     })
 
     it('Should run initial evaluation at first subscribe when using deferEvaluation', function () {
@@ -566,7 +535,7 @@ describe('Rate-limited', function () {
       // computed also has deferEvaluation. For example, the preceding test ('Should delay change
       // notifications and evaluation') will pass just as well if using deferEvaluation.
       const observable = koObservable('a')
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       const computed = koComputed({
         read: function () {
           evalSpy(observable())
@@ -576,7 +545,7 @@ describe('Rate-limited', function () {
       }).extend({ rateLimit: 500 })
       expect(evalSpy).not.toHaveBeenCalled()
 
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       computed.subscribe(notifySpy)
       expect(evalSpy).toHaveBeenCalledWith('a')
       expect(notifySpy).not.toHaveBeenCalled()
@@ -584,7 +553,7 @@ describe('Rate-limited', function () {
 
     it('Should run initial evaluation when observable is accessed when using deferEvaluation', function () {
       const observable = koObservable('a')
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       const computed = koComputed({
         read: function () {
           evalSpy(observable())
@@ -603,16 +572,16 @@ describe('Rate-limited', function () {
       const computed = koComputed(function () {
         return observable()
       }).extend({ rateLimit: 500 })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       computed.subscribe(notifySpy)
-      const beforeChangeSpy = jasmine.createSpy('beforeChangeSpy')
+      const beforeChangeSpy = mock(() => {})
       computed.subscribe(beforeChangeSpy, null, 'beforeChange')
 
       observable('new') // change value
       expect(computed()).toEqual('new') // access computed to make sure it really has the changed value
       observable('original') // and then change the value back
       expect(notifySpy).not.toHaveBeenCalled()
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(notifySpy).not.toHaveBeenCalled()
 
       // Check that value is correct and notification hasn't happened
@@ -621,7 +590,7 @@ describe('Rate-limited', function () {
 
       // Changing observable to a new value still works as expected
       observable('new')
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(notifySpy).toHaveBeenCalledWith('new')
       expect(beforeChangeSpy).toHaveBeenCalledWith('original')
       expect(beforeChangeSpy).not.toHaveBeenCalledWith('new')
@@ -629,21 +598,21 @@ describe('Rate-limited', function () {
 
     it('Should not re-evaluate if computed is disposed before timeout', function () {
       const observable = koObservable('a')
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       const computed = koComputed(function () {
         evalSpy(observable())
         return observable()
       }).extend({ rateLimit: 500 })
 
       expect(computed()).toEqual('a')
-      expect(evalSpy.calls.length).toBe(1)
+      expect(evalSpy.mock.calls.length).toBe(1)
       expect(evalSpy).toHaveBeenCalledWith('a')
 
-      evalSpy.reset()
+      evalSpy.mockClear()
       observable('b')
       computed.dispose()
 
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(computed()).toEqual('a')
       expect(evalSpy).not.toHaveBeenCalled()
     })
@@ -703,7 +672,7 @@ describe('Rate-limited', function () {
       expect(dependentComputed()).toBeUndefined()
 
       // Advance clock; Change notification happens now using the latest value notified
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(dependentComputed()).toEqual('b')
     })
 
@@ -725,7 +694,7 @@ describe('Rate-limited', function () {
       expect(dependentComputed()).toBeUndefined()
 
       // Advance clock; Change notification happens now using the latest value notified
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(dependentComputed()).toEqual('b')
     })
 
@@ -757,7 +726,7 @@ describe('Rate-limited', function () {
         one(false)
         expect(threeNotifications).toEqual([true])
 
-        jasmine.Clock.tick(100)
+        jest.advanceTimersByTime(100)
         expect(threeNotifications).toEqual([true, false])
       }
     })
@@ -766,25 +735,24 @@ describe('Rate-limited', function () {
 
 describe('Deferred', function () {
   beforeEach(function () {
-    useMockForTasks(options)
+    useFakeTaskScheduler()
   })
 
   afterEach(function () {
     expect(tasks.resetForTesting()).toEqual(0)
-    jasmine.Clock.reset()
   })
 
   describe('Observable', function () {
     it('Should delay notifications', function () {
       const observable = koObservable().extend({ deferred: true })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
 
       observable('A')
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['A']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['A']])
     })
 
     it('Should throw if you attempt to turn off deferred', function () {
@@ -802,35 +770,35 @@ describe('Deferred', function () {
 
     it('Should notify subscribers about only latest value', function () {
       const observable = koObservable().extend({ notify: 'always', deferred: true }) // include notify:'always' to ensure notifications weren't suppressed by some other means
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
 
       observable('A')
       observable('B')
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['B']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['B']])
     })
 
     it('Should suppress notification when value is changed/reverted', function () {
       const observable = koObservable('original').extend({ deferred: true })
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
 
       observable('new')
       expect(observable()).toEqual('new')
       observable('original')
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy).not.toHaveBeenCalled()
       expect(observable()).toEqual('original')
     })
 
     it('Should not notify future subscribers', function () {
       const observable = koObservable('a').extend({ deferred: true }),
-        notifySpy1 = jasmine.createSpy('notifySpy1'),
-        notifySpy2 = jasmine.createSpy('notifySpy2'),
-        notifySpy3 = jasmine.createSpy('notifySpy3')
+        notifySpy1 = mock(() => {}),
+        notifySpy2 = mock(() => {}),
+        notifySpy3 = mock(() => {})
 
       observable.subscribe(notifySpy1)
       observable('b')
@@ -842,7 +810,7 @@ describe('Deferred', function () {
       expect(notifySpy2).not.toHaveBeenCalled()
       expect(notifySpy3).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy1).toHaveBeenCalledWith('c')
       expect(notifySpy2).toHaveBeenCalledWith('c')
       expect(notifySpy3).not.toHaveBeenCalled()
@@ -852,30 +820,30 @@ describe('Deferred', function () {
       const observable = koObservable('a').extend({ deferred: true })
       observable('b')
 
-      const evalSpy = jasmine.createSpy('evalSpy')
+      const evalSpy = mock(() => {})
       const computed = koComputed(function () {
         return evalSpy(observable())
       })
       expect(evalSpy).toHaveBeenCalledWith('b')
-      evalSpy.reset()
+      evalSpy.mockClear()
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(evalSpy).not.toHaveBeenCalled()
     })
 
     it('Is default behavior when "options.deferUpdates" is "true"', function () {
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const observable = koObservable()
-      const notifySpy = jasmine.createSpy('notifySpy')
+      const notifySpy = mock(() => {})
       observable.subscribe(notifySpy)
 
       observable('A')
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['A']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['A']])
     })
 
     it('Should not cause loss of updates when an intermediate value is read by a dependent computed observable', function () {
@@ -905,7 +873,7 @@ describe('Deferred', function () {
         one(false)
         expect(threeNotifications).toEqual([true])
 
-        jasmine.Clock.tick(100)
+        jest.advanceTimersByTime(100)
         expect(threeNotifications).toEqual([true, false])
       }
     })
@@ -926,7 +894,7 @@ describe('Deferred', function () {
 
       myArray.push('Gamma')
       myArray.push('Delta')
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(changelist).toEqual([
         { status: 'added', value: 'Gamma', index: 2 },
         { status: 'added', value: 'Delta', index: 3 }
@@ -935,7 +903,7 @@ describe('Deferred', function () {
       changelist = undefined
       myArray.shift()
       myArray.shift()
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(changelist).toEqual([
         { status: 'deleted', value: 'Alpha', index: 0 },
         { status: 'deleted', value: 'Beta', index: 1 }
@@ -944,7 +912,7 @@ describe('Deferred', function () {
       changelist = undefined
       myArray.push('Epsilon')
       myArray.pop()
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(changelist).toEqual(undefined)
     })
   })
@@ -957,13 +925,13 @@ describe('Deferred', function () {
           ++timesEvaluated
           return data()
         }).extend({ deferred: true }),
-        notifySpy = jasmine.createSpy('notifySpy')
+        notifySpy = mock(() => {})
 
       computed.subscribe(notifySpy)
 
       expect(computed()).toEqual('A')
       expect(timesEvaluated).toEqual(1)
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy).not.toHaveBeenCalled()
 
       data('B')
@@ -972,15 +940,15 @@ describe('Deferred', function () {
       expect(timesEvaluated).toEqual(2)
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.calls.length).toEqual(1)
-      expect(notifySpy.argsForCall).toEqual([['B']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls.length).toEqual(1)
+      expect(notifySpy.mock.calls).toEqual([['B']])
     })
 
     it('Should notify first change of computed with deferEvaluation if value is changed to undefined', function () {
       const data = koObservable('A'),
         computed = koComputed(data, null, { deferEvaluation: true }).extend({ deferred: true }),
-        notifySpy = jasmine.createSpy('notifySpy')
+        notifySpy = mock(() => {})
 
       computed.subscribe(notifySpy)
 
@@ -990,36 +958,36 @@ describe('Deferred', function () {
       expect(computed()).toEqual(undefined)
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.calls.length).toEqual(1)
-      expect(notifySpy.argsForCall).toEqual([[undefined]])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls.length).toEqual(1)
+      expect(notifySpy.mock.calls).toEqual([[undefined]])
     })
 
     it('Should notify first change to pure computed after awakening if value changed to last notified value', function () {
       let data = koObservable('A'),
         computed = koPureComputed(data).extend({ deferred: true }),
-        notifySpy = jasmine.createSpy('notifySpy'),
+        notifySpy = mock(() => {}),
         subscription = computed.subscribe(notifySpy)
 
       data('B')
       expect(computed()).toEqual('B')
       expect(notifySpy).not.toHaveBeenCalled()
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['B']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['B']])
 
       subscription.dispose()
-      notifySpy.reset()
+      notifySpy.mockClear()
       data('C')
       expect(computed()).toEqual('C')
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy).not.toHaveBeenCalled()
 
       subscription = computed.subscribe(notifySpy)
       data('B')
       expect(computed()).toEqual('B')
       expect(notifySpy).not.toHaveBeenCalled()
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['B']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['B']])
     })
 
     it('Should delay update of dependent computed observable', function () {
@@ -1036,7 +1004,7 @@ describe('Deferred', function () {
       data('C')
       expect(dependentComputed()).toEqual('A')
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(dependentComputed()).toEqual('C')
     })
 
@@ -1054,7 +1022,7 @@ describe('Deferred', function () {
       data('C')
       expect(dependentComputed()).toEqual('A')
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(dependentComputed()).toEqual('C')
     })
 
@@ -1076,7 +1044,7 @@ describe('Deferred', function () {
       expect(computed2()).toEqual('BXY')
       expect(timesEvaluated).toEqual(2)
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(computed2()).toEqual('BXY')
       expect(timesEvaluated).toEqual(2) // Verify that the computed wasn't evaluated again unnecessarily
     })
@@ -1091,7 +1059,7 @@ describe('Deferred', function () {
           timesEvaluated++
           return computed1() + 'Y'
         }).extend({ deferred: true }),
-        notifySpy = jasmine.createSpy('notifySpy')
+        notifySpy = mock(() => {})
 
       computed2.subscribe(notifySpy)
 
@@ -1103,17 +1071,17 @@ describe('Deferred', function () {
       expect(timesEvaluated).toEqual(2)
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(computed2()).toEqual('BXY')
       expect(timesEvaluated).toEqual(2) // Verify that the computed wasn't evaluated again unnecessarily
-      expect(notifySpy.argsForCall).toEqual([['BXY']])
+      expect(notifySpy.mock.calls).toEqual([['BXY']])
     })
 
     it('Should *not* delay update of dependent rate-limited computed observable', function () {
       const data = koObservable('A'),
         deferredComputed = koComputed(data).extend({ deferred: true }),
         dependentComputed = koComputed(deferredComputed).extend({ rateLimit: 500 }),
-        notifySpy = jasmine.createSpy('notifySpy')
+        notifySpy = mock(() => {})
 
       dependentComputed.subscribe(notifySpy)
 
@@ -1127,18 +1095,18 @@ describe('Deferred', function () {
       expect(dependentComputed()).toEqual('C')
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(500)
+      jest.advanceTimersByTime(500)
       expect(dependentComputed()).toEqual('C')
-      expect(notifySpy.argsForCall).toEqual([['C']])
+      expect(notifySpy.mock.calls).toEqual([['C']])
     })
 
     it('Is default behavior when "options.deferUpdates" is "true"', function () {
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const data = koObservable('A'),
         computed = koComputed(data),
-        notifySpy = jasmine.createSpy('notifySpy')
+        notifySpy = mock(() => {})
 
       computed.subscribe(notifySpy)
 
@@ -1146,12 +1114,12 @@ describe('Deferred', function () {
       data('B')
       expect(notifySpy).not.toHaveBeenCalled()
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['B']])
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['B']])
     })
 
     it('Is superseded by rate-limit', function () {
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const data = koObservable('A'),
@@ -1159,7 +1127,7 @@ describe('Deferred', function () {
         dependentComputed = koComputed(function () {
           return 'R' + deferredComputed()
         }).extend({ rateLimit: 500 }),
-        notifySpy = jasmine.createSpy('notifySpy')
+        notifySpy = mock(() => {})
 
       deferredComputed.subscribe(notifySpy)
       dependentComputed.subscribe(notifySpy)
@@ -1171,15 +1139,15 @@ describe('Deferred', function () {
       expect(dependentComputed()).toEqual('RB')
       expect(notifySpy).not.toHaveBeenCalled() // no notifications yet
 
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['B']]) // only the deferred computed notifies initially
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['B']]) // only the deferred computed notifies initially
 
-      jasmine.Clock.tick(499)
-      expect(notifySpy.argsForCall).toEqual([['B'], ['RB']]) // the rate-limited computed notifies after the specified timeout
+      jest.advanceTimersByTime(499)
+      expect(notifySpy.mock.calls).toEqual([['B'], ['RB']]) // the rate-limited computed notifies after the specified timeout
     })
 
     it('Should minimize evaluation at the end of a complex graph', function () {
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const a = koObservable('a'),
@@ -1207,18 +1175,18 @@ describe('Deferred', function () {
         i = koPureComputed(function i() {
           return 'i(' + a() + ',' + h() + ',' + b() + ',' + f() + ')'
         }).extend({ notify: 'always' }), // ensure we get a notification for each evaluation
-        notifySpy = jasmine.createSpy('callback')
+        notifySpy = mock(() => {})
 
       i.subscribe(notifySpy)
 
       a('x')
-      jasmine.Clock.tick(1)
-      expect(notifySpy.argsForCall).toEqual([['i(x,h(cx,g(ex,fx),d(bx,cx)),bx,fx)']]) // only one evaluation and notification
+      jest.advanceTimersByTime(1)
+      expect(notifySpy.mock.calls).toEqual([['i(x,h(cx,g(ex,fx),d(bx,cx)),bx,fx)']]) // only one evaluation and notification
     })
 
     it("Should minimize evaluation when dependent computed doesn't actually change", function () {
       // From https://github.com/knockout/knockout/issues/2174
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const source = koObservable({ key: 'value' })
@@ -1227,7 +1195,7 @@ describe('Deferred', function () {
       const c2 = koComputed(() => ++countEval && c1())
 
       source({ key: 'value' })
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(countEval).toEqual(1)
 
       // Reading it again shouldn't cause an update
@@ -1237,7 +1205,7 @@ describe('Deferred', function () {
 
     it('Should ignore recursive dirty events', function () {
       // From https://github.com/knockout/knockout/issues/1943
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const a = koObservable(),
@@ -1255,8 +1223,8 @@ describe('Deferred', function () {
           },
           deferEvaluation: true
         }),
-        bSpy = jasmine.createSpy('bSpy'),
-        dSpy = jasmine.createSpy('dSpy')
+        bSpy = mock(() => {}),
+        dSpy = mock(() => {})
 
       b.subscribe(bSpy, null, 'dirty')
       d.subscribe(dSpy, null, 'dirty')
@@ -1266,17 +1234,17 @@ describe('Deferred', function () {
       expect(dSpy).not.toHaveBeenCalled()
 
       a('something')
-      expect(bSpy.calls.length).toBe(2) // 1 for a, and 1 for d
-      expect(dSpy.calls.length).toBe(2) // 1 for a, and 1 for b
+      expect(bSpy.mock.calls.length).toBe(2) // 1 for a, and 1 for d
+      expect(dSpy.mock.calls.length).toBe(2) // 1 for a, and 1 for b
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
     })
 
     it('Should only notify changes if computed was evaluated', function () {
       // See https://github.com/knockout/knockout/issues/2240
       // Set up a scenario where a computed will be marked as dirty but won't get marked as
       // stale and so won't be re-evaluated
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       const obs = koObservable('somevalue'),
@@ -1286,28 +1254,28 @@ describe('Deferred', function () {
         objIfTruthy = koPureComputed(function () {
           return isTruthy()
         }).extend({ notify: 'always' }),
-        notifySpy = jasmine.createSpy('callback'),
+        notifySpy = mock(() => {}),
         subscription = objIfTruthy.subscribe(notifySpy)
 
       obs('someothervalue')
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy).not.toHaveBeenCalled()
 
       obs('')
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy).toHaveBeenCalled()
-      expect(notifySpy.argsForCall).toEqual([[false]])
-      notifySpy.reset()
+      expect(notifySpy.mock.calls).toEqual([[false]])
+      notifySpy.mockClear()
 
       obs(undefined)
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(notifySpy).not.toHaveBeenCalled()
     })
   })
 
   describe('ko.when', function () {
     it('Runs callback in a sepearate task when predicate function becomes true, but only once', function () {
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       let x = koObservable(3),
@@ -1325,19 +1293,19 @@ describe('Deferred', function () {
       x(4)
       expect(called).toBe(0)
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(called).toBe(1)
       expect(x.getSubscriptionsCount()).toBe(0)
 
       x(3)
       x(4)
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(called).toBe(1)
       expect(x.getSubscriptionsCount()).toBe(0)
     })
 
     it('Runs callback in a sepearate task if predicate function is already true', function () {
-      this.restoreAfter(options, 'deferUpdates')
+      restoreAfter(options, 'deferUpdates')
       options.deferUpdates = true
 
       let x = koObservable(4),
@@ -1351,13 +1319,13 @@ describe('Deferred', function () {
       expect(called).toBe(0)
       expect(x.getSubscriptionsCount()).toBe(1)
 
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(called).toBe(1)
       expect(x.getSubscriptionsCount()).toBe(0)
 
       x(3)
       x(4)
-      jasmine.Clock.tick(1)
+      jest.advanceTimersByTime(1)
       expect(called).toBe(1)
       expect(x.getSubscriptionsCount()).toBe(0)
     })

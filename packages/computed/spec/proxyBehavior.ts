@@ -4,7 +4,7 @@ import { observable } from '@tko/observable'
 
 import { computed } from '@tko/computed'
 
-const proxySupport = 'Proxy' in window
+const proxySupport = typeof Proxy === 'function'
 
 describe('Proxy', function () {
   if (!proxySupport) {

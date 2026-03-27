@@ -74,6 +74,21 @@
   - Status: 46 pass, 2 existing skip, 0 fail.
   - Notes: converted from Jasmine-style globals to explicit `bun:test` imports and Bun-native DOM helpers.
 
+- `@tko/observable`
+  - Verified with `bun test ./packages/observable/spec/*.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 113 pass, 0 fail.
+  - Notes: uses native `DisposableStack` directly in migrated specs; updated legacy Jasmine-loose `null == undefined` expectations to reflect actual runtime behavior.
+
+- `@tko/computed`
+  - Verified with `bun test ./packages/computed/spec/asyncBehaviors.ts ./packages/computed/spec/computedDomBehaviors.ts ./packages/computed/spec/computedObservableBehaviors.ts ./packages/computed/spec/observableUtilsBehaviors.ts ./packages/computed/spec/pureComputedBehaviors.ts ./packages/computed/spec/proxyBehavior.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 160 pass, 0 fail.
+  - Notes: migrated to native Bun fake timers and `mock`, removed dead browser-era compatibility guards, and kept spy assertions explicit instead of collapsing them to arrays. Cross-checked against a clean `origin/main` Karma run: `160 SUCCESS`. The only mismatch found during comparison was a stale `window`-based Proxy capability gate; Bun now checks runtime `Proxy` support directly.
+
+- `@tko/binding.component`
+  - Verified with `bun test ./packages/binding.component/spec/componentBindingBehaviors.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 53 pass, 0 fail.
+  - Notes: migrated to Bun fake timers, shared Bun DOM helpers, native `mock`, and direct `DisposableStack` cleanup/restore patterns. Cross-checked against a clean `origin/main` Karma run: `53 SUCCESS`.
+
 ### Shared Infrastructure
 
 - Added `happy-dom` as a dev dependency at the repo root.
