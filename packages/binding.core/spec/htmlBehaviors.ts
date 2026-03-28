@@ -1,4 +1,5 @@
 import { applyBindings } from '@tko/bind'
+import { expect } from 'chai'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
@@ -6,12 +7,12 @@ import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { expectContainHtml, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: HTML', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -24,20 +25,20 @@ describe('Binding: HTML', function () {
     const model = { textProp: 'My <span>HTML-containing</span> value' }
     testNode.innerHTML = "<span data-bind='html:textProp'></span>"
     applyBindings(model, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML.toLowerCase()).toEqual(model.textProp.toLowerCase())
-    expect((testNode.childNodes[0].childNodes[1] as HTMLElement).innerHTML).toEqual('HTML-containing')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML.toLowerCase()).to.equal(model.textProp.toLowerCase())
+    expect((testNode.childNodes[0].childNodes[1] as HTMLElement).innerHTML).to.equal('HTML-containing')
   })
 
   it('Should assign an empty string as value if the model value is null', function () {
     testNode.innerHTML = "<span data-bind='html:(null)' ></span>"
     applyBindings(null, testNode)
-    expect(testNode.children[0].innerHTML).toEqual('')
+    expect(testNode.children[0].innerHTML).to.equal('')
   })
 
   it('Should assign an empty string as value if the model value is undefined', function () {
     testNode.innerHTML = "<span data-bind='html:undefined' ></span>"
     applyBindings(null, testNode)
-    expect(testNode.children[0].innerHTML).toEqual('')
+    expect(testNode.children[0].innerHTML).to.equal('')
   })
 
   it('Should be able to write arbitrary HTML, even if it is not semantically correct', function () {
@@ -47,7 +48,7 @@ describe('Binding: HTML', function () {
     const model = { textProp: "<p>hello</p><p>this isn't semantically correct</p>" }
     testNode.innerHTML = "<p data-bind='html:textProp'></p>"
     applyBindings(model, testNode)
-    expect(testNode.children[0]).toContainHtml(model.textProp)
+    expectContainHtml(testNode.children[0], model.textProp)
   })
 
   it('Should be able to write arbitrary HTML, including <tr> elements into tables', function () {
@@ -66,8 +67,8 @@ describe('Binding: HTML', function () {
 
     const td = tr.children[0]
 
-    expect(tr.tagName).toEqual('TR')
-    expect(td.tagName).toEqual('TD')
-    expect('innerText' in td ? td.innerText : td.textContent).toEqual('hello')
+    expect(tr.tagName).to.equal('TR')
+    expect(td.tagName).to.equal('TD')
+    expect('innerText' in td ? td.innerText : td.textContent).to.equal('hello')
   })
 })
