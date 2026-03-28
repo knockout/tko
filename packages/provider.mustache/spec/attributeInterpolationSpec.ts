@@ -13,7 +13,7 @@ import { MultiProvider } from '@tko/provider.multi'
 import { DataBindProvider } from '@tko/provider.databind'
 
 import { assert, expect } from 'chai'
-import { expectContainText, prepareTestNode } from './mocha-test-helpers'
+import { expectContainText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 import { AttributeMustacheProvider } from '../src'
 
 function ctxStub(obj = {}) {

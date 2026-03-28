@@ -25,7 +25,7 @@ import {
   expectNodeTypes,
   prepareTestNode,
   setNodeText
-} from './mocha-test-helpers'
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Interpolation Markup preprocessor', function () {
   function testPreprocess(node): any {
