@@ -11,10 +11,7 @@ let taskQueue = new Array(),
   nextHandle = 1,
   nextIndexToProcess = 0
 
-const queueTask = options.global.queueMicrotask.bind(options.global)
-options.taskScheduler = function (callback) {
-  queueTask(callback)
-}
+options.taskScheduler = callback => queueMicrotask(callback)
 
 function processTasks() {
   if (taskQueueLength) {
