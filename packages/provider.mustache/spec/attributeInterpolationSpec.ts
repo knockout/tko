@@ -12,7 +12,8 @@ import { MultiProvider } from '@tko/provider.multi'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { assert, expect } from 'chai'
+import { expectContainText, prepareTestNode } from './mocha-test-helpers'
 import { AttributeMustacheProvider } from '../src'
 
 function ctxStub(obj = {}) {
@@ -40,114 +41,114 @@ describe('Attribute Interpolation Markup Provider', function () {
 
   it('Should do nothing when there are no expressions', function () {
     testNode.setAttribute('title', 'some text')
-    expect(testNode.title).toEqual('some text')
-    expect(Object.keys(provider.getBindingAccessors).length).toBe(0)
+    expect(testNode.title).to.equal('some text')
+    expect(Object.keys(provider.getBindingAccessors).length).to.equal(0)
   })
 
   it('Should do nothing when empty', function () {
     testNode.setAttribute('title', '')
     runAttributeInterpolation(testNode)
-    expect(testNode.title).toEqual('')
+    expect(testNode.title).to.equal('')
     const bindings = provider.getBindingAccessors(testNode)
-    expect(Object.keys(bindings).length).toBe(0)
+    expect(Object.keys(bindings).length).to.equal(0)
   })
 
   it('Should not parse unclosed binding', function () {
     testNode.setAttribute('title', 'some {{text')
     runAttributeInterpolation(testNode)
-    expect(testNode.title).toEqual('some {{text')
+    expect(testNode.title).to.equal('some {{text')
     const bindings = provider.getBindingAccessors(testNode)
-    expect(Object.keys(bindings).length).toBe(0)
+    expect(Object.keys(bindings).length).to.equal(0)
   })
 
   it('Should not parse unopened binding', function () {
     testNode.setAttribute('title', 'some}} text')
     runAttributeInterpolation(testNode)
-    expect(testNode.title).toEqual('some}} text')
+    expect(testNode.title).to.equal('some}} text')
     const bindings = provider.getBindingAccessors(testNode)
-    expect(Object.keys(bindings).length).toBe(0)
+    expect(Object.keys(bindings).length).to.equal(0)
   })
 
   it('Should create binding from {{...}} expression', function () {
     testNode.setAttribute('title', 'some {{expr}} text')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(handler).toEqual('title')
-    expect(parts.length).toBe(3)
-    expect(parts[0].text).toEqual('some ')
-    expect(parts[1].text).toEqual('expr')
-    expect(parts[2].text).toEqual(' text')
+    expect(handler).to.equal('title')
+    expect(parts.length).to.equal(3)
+    expect(parts[0].text).to.equal('some ')
+    expect(parts[1].text).to.equal('expr')
+    expect(parts[2].text).to.equal(' text')
   })
 
   it('Should ignore unmatched delimiters', function () {
     testNode.setAttribute('title', 'some {{expr1}}expr2}} text')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(parts.length).toBe(3)
-    expect(parts[0].text).toEqual('some ')
-    expect(parts[1].text).toEqual('expr1}}expr2')
-    expect(parts[2].text).toEqual(' text')
+    expect(parts.length).to.equal(3)
+    expect(parts[0].text).to.equal('some ')
+    expect(parts[1].text).to.equal('expr1}}expr2')
+    expect(parts[2].text).to.equal(' text')
   })
 
   it('Should support two expressions', function () {
     testNode.setAttribute('title', 'some {{expr1}} middle {{expr2}} text')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(parts.length).toBe(5)
+    expect(parts.length).to.equal(5)
     const expected = ['some ', 'expr1', ' middle ', 'expr2', ' text']
     for (let i = 0; i < expected.length; ++i) {
-      expect(parts[i].text).toEqual(expected[i])
+      expect(parts[i].text).to.equal(expected[i])
     }
   })
 
   it('Should support two expressions (quotation marks and backspaces)', function () {
     testNode.setAttribute('title', 'some {{expr1}} middle // "Test" \\ {{expr2}} text')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(parts.length).toBe(5)
+    expect(parts.length).to.equal(5)
     const expected = ['some ', 'expr1', ' middle // "Test" \\ ', 'expr2', ' text']
     for (let i = 0; i < expected.length; ++i) {
-      expect(parts[i].text).toEqual(expected[i])
+      expect(parts[i].text).to.equal(expected[i])
     }
   })
 
   it('Should skip empty text', function () {
     testNode.setAttribute('title', '{{expr1}}{{expr2}}')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(parts.length).toBe(2)
+    expect(parts.length).to.equal(2)
     const expected = ['expr1', 'expr2']
     for (let i = 0; i < expected.length; ++i) {
-      expect(parts[i].text).toEqual(expected[i])
+      expect(parts[i].text).to.equal(expected[i])
     }
   })
 
   it('Should support more than two expressions', function () {
     testNode.setAttribute('title', 'x {{expr1}} y {{expr2}} z {{expr3}}')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(parts.length).toBe(6)
+    expect(parts.length).to.equal(6)
     const expected = ['x ', 'expr1', ' y ', 'expr2', ' z ', 'expr3']
     for (let i = 0; i < expected.length; ++i) {
-      expect(parts[i].text).toEqual(expected[i])
+      expect(parts[i].text).to.equal(expected[i])
     }
   })
 
   it('Should create simple binding for single expression', function () {
     testNode.setAttribute('title', '{{expr1}}')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(1)
+    expect(bindings.length).to.equal(1)
     const [handler, parts] = bindings[0]
-    expect(parts.length).toBe(1)
+    expect(parts.length).to.equal(1)
     const expected = ['expr1']
     for (let i = 0; i < expected.length; ++i) {
-      expect(parts[i].text).toEqual(expected[i])
+      expect(parts[i].text).to.equal(expected[i])
     }
   })
 
@@ -157,14 +158,13 @@ describe('Attribute Interpolation Markup Provider', function () {
     testNode.setAttribute('id', '{{expr2}}')
     testNode.setAttribute('data-test', '{{expr3}}')
     const bindings = Array.from(provider.bindingParts(testNode, {}))
-    expect(bindings.length).toBe(3)
-    const [p0, p1, p2, p3] = bindings
+    expect(bindings.length).to.equal(3)
     const map = { title: 'expr1', id: 'expr2', 'data-test': 'expr3' }
     bindings.forEach(b => {
       const [handler, [part]] = b
-      expect(map[handler as string]).toEqual(part.text)
+      expect(map[handler as string]).to.equal(part.text)
     })
-    expect(testNode.getAttribute('class')).toEqual('test')
+    expect(testNode.getAttribute('class')).to.equal('test')
   })
 
   it('Should convert value and checked attributes to two-way bindings', function () {
@@ -177,9 +177,9 @@ describe('Attribute Interpolation Markup Provider', function () {
     const bindings: any[] = Array.from(provider.bindingObjects(testNode, ctxStub(ctx)))
     for (const binding of bindings) {
       if (binding.checked) {
-        expect(binding.checked).toEqual(ctx.expr2)
+        expect(binding.checked).to.equal(ctx.expr2)
       } else if (binding.value) {
-        expect(binding.value).toEqual(ctx.expr1)
+        expect(binding.value).to.equal(ctx.expr1)
       } else {
         throw new Error('Unexpected bindings.')
       }
@@ -209,11 +209,11 @@ describe('Attribute Interpolation Markup Provider', function () {
     const ctx = { expr1: 'x', expr2: 'y' }
     const bindings = provider.getBindingAccessors(testNode, ctxStub(ctx))
 
-    expect(Object.keys(bindings).length).toEqual(2)
-    expect(bindings['attr.title']().title).toEqual('x')
-    expect(bindings['attr.id']().id).toEqual('y')
+    expect(Object.keys(bindings).length).to.equal(2)
+    expect(bindings['attr.title']().title).to.equal('x')
+    expect(bindings['attr.id']().id).to.equal('y')
 
-    // expect(testNode.getAttribute('data-bind')).toEqual('attr.title:expr1,attr.id:expr2')
+    // expect(testNode.getAttribute('data-bind')).to.equal('attr.title:expr1,attr.id:expr2')
   })
 
   it('should set the style attribute (when there is a `style` binding)', function () {
@@ -221,16 +221,16 @@ describe('Attribute Interpolation Markup Provider', function () {
     testNode.innerHTML = '<div style="color: {{ obs }}"></div>'
     const div = testNode.childNodes[0] as HTMLDivElement
     applyBindings({ obs: obs }, testNode)
-    expect(div.getAttribute('style')).toEqual('color: ')
+    expect(div.getAttribute('style')).to.equal('color: ')
     obs('red')
-    expect(div.getAttribute('style')).toEqual('color: red')
+    expect(div.getAttribute('style')).to.equal('color: red')
   })
 })
 
 describe('Attribute Interpolation Markup bindings', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   let bindingHandlers
@@ -247,47 +247,47 @@ describe('Attribute Interpolation Markup bindings', function () {
     testNode.innerHTML = '<div title=\'hello {{"name"}}!\'></div>'
     applyBindings(null, testNode)
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('hello name!')
+    expect(node.title).to.equal('hello name!')
   })
 
   it('Should replace multiple expressions', function () {
     testNode.innerHTML = '<div title=\'hello {{"name"}}{{"!"}}\'></div>'
     applyBindings(null, testNode)
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('hello name!')
+    expect(node.title).to.equal('hello name!')
   })
 
   it('Should support backtick interpolation', function () {
     testNode.innerHTML = "<div title='hello {{ `a${name}b` }}!'></div>"
     applyBindings({ name: 'n' }, testNode)
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('hello anb!')
+    expect(node.title).to.equal('hello anb!')
   })
 
   it('Should properly handle quotes in text sections', function () {
     testNode.innerHTML = '<div title=\'This is "great" {{"fun"}} with &apos;friends&apos;\'></div>'
     applyBindings(null, testNode)
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('This is "great" fun with \'friends\'')
+    expect(node.title).to.equal('This is "great" fun with \'friends\'')
   })
 
   it('Should ignore unmatched }} and {{', function () {
     testNode.innerHTML = '<div title=\'hello }}"name"{{"!"}}{{\'></div>'
     applyBindings(null, testNode)
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('hello }}"name"!{{')
+    expect(node.title).to.equal('hello }}"name"!{{')
   })
 
   it('Should support expressions in multiple attributes', function () {
     testNode.innerHTML =
       "<div title='{{title}}' id='{{id}}' class='test class' data-test='hello {{\"name\"}}!' data-bind='text:content'></div>"
     applyBindings({ title: 'the title', id: 'test id', content: 'content' }, testNode)
-    expect(testNode).toContainText('content')
+    expectContainText(testNode, 'content')
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('the title')
-    expect(node.id).toEqual('test id')
-    expect(node.className).toEqual('test class')
-    expect(node.getAttribute('data-test')).toEqual('hello name!')
+    expect(node.title).to.equal('the title')
+    expect(node.id).to.equal('test id')
+    expect(node.className).to.equal('test class')
+    expect(node.getAttribute('data-test')).to.equal('hello name!')
   })
 
   it('Should update when observable changes', function () {
@@ -295,18 +295,18 @@ describe('Attribute Interpolation Markup bindings', function () {
     const observable = Observable('time')
     applyBindings({ what: observable }, testNode)
     const node = testNode.childNodes[0] as HTMLDivElement
-    expect(node.title).toEqual('The best time.')
+    expect(node.title).to.equal('The best time.')
     observable('fun')
-    expect(node.title).toEqual('The best fun.')
+    expect(node.title).to.equal('The best fun.')
   })
 
   it('Should update when observable changes (quotation marks and backspaces)', function () {
     testNode.innerHTML = '<div title=\'The "best" {{what}}.\'></div>'
     const observable = Observable('time "test"')
     applyBindings({ what: observable }, testNode)
-    expect((testNode.childNodes[0] as HTMLDivElement).title).toEqual('The \"best\" time "test".')
+    expect((testNode.childNodes[0] as HTMLDivElement).title).to.equal('The \"best\" time "test".')
     observable('fun \\ test')
-    expect((testNode.childNodes[0] as HTMLDivElement).title).toEqual('The \"best\" fun \\ test.')
+    expect((testNode.childNodes[0] as HTMLDivElement).title).to.equal('The \"best\" fun \\ test.')
   })
 
   it('Should convert value attribute to two-way binding', function () {
@@ -315,11 +315,11 @@ describe('Attribute Interpolation Markup bindings', function () {
     applyBindings({ value: observable }, testNode)
     const node = testNode.childNodes[0] as HTMLInputElement
 
-    expect(node.value).toEqual('default value')
+    expect(node.value).to.equal('default value')
 
     node.value = 'user-enterd value'
     triggerEvent(testNode.children[0], 'change')
-    expect(observable()).toEqual('user-enterd value')
+    expect(observable()).to.equal('user-enterd value')
   })
 
   it('Should convert checked attribute to two-way binding', function () {
@@ -328,9 +328,9 @@ describe('Attribute Interpolation Markup bindings', function () {
     applyBindings({ isChecked: observable }, testNode)
     const node = testNode.childNodes[0] as HTMLInputElement
 
-    expect(node.checked).toBe(true)
+    assert.isTrue(node.checked)
 
     node.click()
-    expect(observable()).toBe(false)
+    assert.isFalse(observable())
   })
 })
