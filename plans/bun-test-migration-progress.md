@@ -53,6 +53,16 @@
   - Verified with `bun test ./packages/provider.virtual/spec/*.ts` from `/Users/brianhunt/repos/tko`.
   - Status: 6 pass, 0 fail.
 
+- `@tko/provider.component`
+  - Verified with `bun test ./packages/provider.component/spec/*.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 26 pass, 0 fail.
+  - Notes: migrated both provider and custom-element specs to `bun:test`, native fake timers, shared Bun DOM helpers, and direct `DisposableStack` cleanup. Cross-checked against a clean `origin/main` Karma run: `26 SUCCESS`. Also replaced the old string-based unknown-element check in `ComponentProvider` with `instanceof HTMLUnknownElement`, which preserves browser behavior and fixes the Bun/happy-dom mismatch.
+
+- `@tko/provider.mustache`
+  - Verified with `bun test ./packages/provider.mustache/spec/*.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 63 pass, 3 existing skip, 0 fail.
+  - Notes: migrated the interpolation specs to `bun:test`, shared Bun DOM helpers, and explicit `it.skip(...)` for the existing legacy skipped coverage. Cross-checked against a clean `origin/main` Karma run: `63 SUCCESS`.
+
 - `@tko/utils.jsx`
   - Verified with `bun test ./packages/utils.jsx/spec/*.ts` from `/Users/brianhunt/repos/tko`.
   - Status: 121 pass, 0 fail.

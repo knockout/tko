@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'bun:test'
+
 import { options } from '@tko/utils'
 
 import { observable, isObservable } from '@tko/observable'
@@ -14,15 +16,16 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import components from '@tko/utils.component'
 
 import { ComponentProvider } from '../dist'
-
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
 describe('Components: Provider', function () {
   let bindingHandlers
+  let testNode: HTMLElement
 
   describe('custom elements', function () {
     // Note: knockout/spec/components
     beforeEach(function () {
+      testNode = prepareTestNode()
       const provider = new MultiProvider({ providers: [new DataBindProvider(), new ComponentProvider()] })
       options.bindingProviderInstance = provider
       bindingHandlers = provider.bindingHandlers
@@ -38,13 +41,11 @@ describe('Components: Provider', function () {
         ignoreCustomElementWarning: true
       })
       const initialMarkup = 'He: <helium></helium>'
-      const root = document.createElement('div')
-      root.innerHTML = initialMarkup
+      testNode.innerHTML = initialMarkup
 
       // Since components are loaded asynchronously, it doesn't show up synchronously
-      applyBindings(null, root)
-      // expect(root.innerHTML).toEqual(initialMarkup);
-      expect(root.innerHTML).toEqual('He: <helium>X<i data-bind="text: 123">123</i></helium>')
+      applyBindings(null, testNode)
+      expect(testNode.innerHTML).toEqual('He: <helium>X<i data-bind="text: 123">123</i></helium>')
     })
 
     it('interprets the params of custom elements', function () {
@@ -60,6 +61,7 @@ describe('Components: Provider', function () {
       })
       const ce = document.createElement('argon')
       ce.setAttribute('params', 'alpha: 1, beta: [2], charlie: {x: 3}, delta: delta')
+      testNode.appendChild(ce)
       applyBindings({ delta: 'QxE' }, ce)
       expect(ce.innerHTML).toEqual('<b>sXZ <u data-bind="text: delta">G2k</u></b>')
       expect(called).toEqual(true)

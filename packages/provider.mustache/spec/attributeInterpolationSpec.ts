@@ -1,5 +1,7 @@
 /* eslint semi: 0 */
 
+import { beforeEach, describe, expect, it } from 'bun:test'
+
 import { triggerEvent, options } from '@tko/utils'
 
 import { applyBindings } from '@tko/bind'
@@ -12,8 +14,8 @@ import { MultiProvider } from '@tko/provider.multi'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import '@tko/utils/helpers/jasmine-13-helper'
 import { AttributeMustacheProvider } from '../src'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
 function ctxStub(obj = {}) {
   return {
@@ -230,7 +232,7 @@ describe('Attribute Interpolation Markup Provider', function () {
 describe('Attribute Interpolation Markup bindings', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   let bindingHandlers

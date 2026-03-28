@@ -59,7 +59,7 @@ export default class ComponentProvider extends Provider {
     const tagName = tagNameLower(node)
     if (registry.isRegistered(tagName)) {
       const hasDash = tagName.includes('-')
-      const isUnknownEntity = '' + node === '[object HTMLUnknownElement]'
+      const isUnknownEntity = typeof HTMLUnknownElement !== 'undefined' && node instanceof HTMLUnknownElement
       if (hasDash || isUnknownEntity) {
         return tagName
       }

@@ -1,5 +1,7 @@
 /* eslint semi: 0 */
 
+import { beforeEach, describe, expect, it } from 'bun:test'
+
 import { options } from '@tko/utils'
 
 import { applyBindings } from '@tko/bind'
@@ -17,8 +19,15 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
 import { TextMustacheProvider } from '../src'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+function setNodeText(node: Node, text: string) {
+  if ('textContent' in node) {
+    node.textContent = text
+  } else {
+    ;(node as any).innerText = text
+  }
+}
 
 describe('Interpolation Markup preprocessor', function () {
   function testPreprocess(node): any {
@@ -168,7 +177,7 @@ describe('Interpolation Markup bindings', function () {
 
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -183,33 +192,33 @@ describe('Interpolation Markup bindings', function () {
   })
 
   it('Should replace {{...}} expression with virtual text binding', function () {
-    jasmine.setNodeText(testNode, "hello {{'name'}}!")
+    setNodeText(testNode, "hello {{'name'}}!")
     applyBindings(null, testNode)
     expect(testNode).toContainText('hello name!')
     expect(testNode).toContainHtml("hello <!--ko text:'name'-->name<!--/ko-->!")
   })
 
   it('Should replace multiple expressions', function () {
-    jasmine.setNodeText(testNode, "hello {{'name'}}{{'!'}}")
+    setNodeText(testNode, "hello {{'name'}}{{'!'}}")
     applyBindings(null, testNode)
     expect(testNode).toContainText('hello name!')
   })
 
-  xit('Should support lambdas (=>) and {{}}', function () {
+  it.skip('Should support lambdas (=>) and {{}}', function () {
     // See NOTE on lambda support in the HTML binding, below
-    jasmine.setNodeText(testNode, "hello {{ => '{{name}}' }}!")
+    setNodeText(testNode, "hello {{ => '{{name}}' }}!")
     applyBindings(null, testNode)
     expect(testNode).toContainText('hello {{name}}!')
   })
 
   it('Should ignore unmatched }} and {{', function () {
-    jasmine.setNodeText(testNode, "hello }}'name'{{'!'}}{{")
+    setNodeText(testNode, "hello }}'name'{{'!'}}{{")
     applyBindings(null, testNode)
     expect(testNode).toContainText("hello }}'name'!{{")
   })
 
   it('Should update when observable changes', function () {
-    jasmine.setNodeText(testNode, 'The best {{what}}.')
+    setNodeText(testNode, 'The best {{what}}.')
     const observable = Observable('time')
     applyBindings({ what: observable }, testNode)
     expect(testNode).toContainText('The best time.')
@@ -217,7 +226,7 @@ describe('Interpolation Markup bindings', function () {
     expect(testNode).toContainText('The best fun.')
   })
 
-  xit('Should be able to override wrapExpression to define a different set of elements', function () {
+  it.skip('Should be able to override wrapExpression to define a different set of elements', function () {
     // Skipping this because it's neither documented nor does it appear
     // essential to the desired functionality.
     //
@@ -233,7 +242,7 @@ describe('Interpolation Markup bindings', function () {
       return originalWrapExpresssion('"--" + ' + expressionText + ' + "--"', node);
     }
 
-    jasmine.setNodeText(testNode, "hello {{'name'}}!");
+    setNodeText(testNode, "hello {{'name'}}!");
     applyBindings(null, testNode);
     expect(testNode).toContainText('hello --name--!'); */
   })
@@ -264,14 +273,8 @@ describe('Interpolation Markup bindings', function () {
   })
 
   describe('Using unescaped HTML syntax', function () {
-    //jQuery-Templates (jquery.html(..)) doesn't works with mustache-templates
-    if (!options.useTemplateTag && options.jQuery) {
-      console.log('Skip some mustache-tests in combination with jquery-template')
-      return
-    }
-
     it('Should replace {{{...}}} expression with virtual html binding', function () {
-      jasmine.setNodeText(testNode, "hello {{{'<b>name</b>'}}}!")
+      setNodeText(testNode, "hello {{{'<b>name</b>'}}}!")
       applyBindings(null, testNode)
       expect(testNode).toContainText('hello name!')
       expect(testNode).toContainHtml("hello <!--ko html:'<b>name</b>'--><b>name</b><!--/ko-->!")
@@ -279,7 +282,7 @@ describe('Interpolation Markup bindings', function () {
     })
 
     it('Should support mix of escaped and unescape expressions', function () {
-      jasmine.setNodeText(testNode, "hello {{{'<b>name</b>'}}}{{'!'}}")
+      setNodeText(testNode, "hello {{{'<b>name</b>'}}}{{'!'}}")
       applyBindings(null, testNode)
       expect(testNode).toContainText('hello name!')
       expect(testNode).toContainHtml(
@@ -288,27 +291,27 @@ describe('Interpolation Markup bindings', function () {
       expect(testNode.childNodes[2].nodeName.toLowerCase()).toEqual('b')
     })
 
-    xit('Should support backticks and {{{}}}', function () {
+    it.skip('Should support backticks and {{{}}}', function () {
       // NOTE This was from ko.punches tests, namely when including
       // anonymous function(){}'s, but it's not clear what might be
       // analogous in tko.
       //
       // Two dynamics similar to anonymous functions would be backtick
       // interpolation, and lambdas.
-      jasmine.setNodeText(testNode, "hello {{{ `<b>${'{{{name}}}'}</b>` }}}!")
+      setNodeText(testNode, "hello {{{ `<b>${'{{{name}}}'}</b>` }}}!")
       applyBindings({ name: 'nAmE' }, testNode)
       expect(testNode).toContainText('hello {{{name}}}!')
       expect(testNode.childNodes[2].nodeName.toLowerCase()).toEqual('b')
     })
 
     it('Should ignore unmatched }}} and {{{', function () {
-      jasmine.setNodeText(testNode, "hello }}}'name'{{{'!'}}}{{{")
+      setNodeText(testNode, "hello }}}'name'{{{'!'}}}{{{")
       applyBindings(null, testNode)
       expect(testNode).toContainText("hello }}}'name'!{{{")
     })
 
     it('Should update when observable changes', function () {
-      jasmine.setNodeText(testNode, 'The best {{{what}}}.')
+      setNodeText(testNode, 'The best {{{what}}}.')
       const observable = Observable('<b>time</b>')
       applyBindings({ what: observable }, testNode)
       expect(testNode).toContainText('The best time.')
@@ -321,12 +324,6 @@ describe('Interpolation Markup bindings', function () {
 
   describe('Using block syntax', function () {
     it('Should support "with"', function () {
-      //jQuery-Templates (jquery.html(..)) doesn't works with mustache-templates
-      if (!options.useTemplateTag && options.jQuery) {
-        console.log('Skip some mustache-tests in combination with jquery-template')
-        return
-      }
-
       testNode.innerHTML =
         '<div><h1>{{title}}</h1>{{#with: story}}<div>{{{intro}}}</div><div>{{{body}}}</div>{{/with}}</div>'
       applyBindings({ title: 'First Post', story: { intro: 'Before the jump', body: 'After the jump' } }, testNode)
@@ -360,7 +357,7 @@ describe('Interpolation Markup bindings', function () {
     })
 
     it('Should support self-closing blocks', function () {
-      jasmine.setNodeText(testNode, "hello {{#text 'name'/}}")
+      setNodeText(testNode, "hello {{#text 'name'/}}")
       applyBindings(null, testNode)
       expect(testNode).toContainText('hello name')
     })

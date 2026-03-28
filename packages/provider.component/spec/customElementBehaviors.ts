@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, jest } from 'bun:test'
+
 import { options, tasks, objectForEach, cleanNode, triggerEvent } from '@tko/utils'
 
 import { observable, isWritableObservable, isObservable, Observable } from '@tko/observable'
@@ -20,16 +22,30 @@ import components from '@tko/utils.component'
 import { bindings as componentBindings } from '@tko/binding.component'
 
 import { ComponentProvider } from '../dist'
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
-import { useMockForTasks } from '@tko/utils/helpers/jasmine-13-helper'
+function restoreAfter<T extends object, K extends keyof T>(cleanup: DisposableStack, object: T, propertyName: K) {
+  const originalValue = object[propertyName]
+  cleanup.defer(() => {
+    object[propertyName] = originalValue
+  })
+}
+
+function useFakeTaskScheduler(cleanup: DisposableStack) {
+  restoreAfter(cleanup, options, 'taskScheduler')
+  options.taskScheduler = callback => setTimeout(callback, 0)
+}
 
 describe('Components: Custom elements', function () {
   let bindingHandlers
   let testNode: HTMLElement
+  let cleanup: DisposableStack
 
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
-    useMockForTasks(options)
+    cleanup = new DisposableStack()
+    jest.useFakeTimers()
+    testNode = prepareTestNode()
+    useFakeTaskScheduler(cleanup)
     const provider = new MultiProvider({ providers: [new DataBindProvider(), new ComponentProvider()] })
     options.bindingProviderInstance = provider
 
@@ -42,7 +58,10 @@ describe('Components: Custom elements', function () {
 
   afterEach(function () {
     expect(tasks.resetForTesting()).toEqual(0)
-    jasmine.Clock.reset()
+    cleanup.dispose()
+    jest.clearAllTimers()
+    jest.clearAllMocks()
+    jest.useRealTimers()
     components.unregister('test-component')
   })
 
@@ -56,16 +75,14 @@ describe('Components: Custom elements', function () {
     expect(testNode).toContainHtml(initialMarkup)
 
     // ... but when the component is loaded, it does show up
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainHtml(
       '<div>hello <test-component>custom element <span data-bind="text: 123">123</span></test-component></div>'
     )
   })
 
   it('Inserts components into custom elements with matching non-dashed names', function () {
-    this.after(function () {
-      components.unregister('somefaroutname')
-    })
+    cleanup.defer(() => components.unregister('somefaroutname'))
     components.register('somefaroutname', {
       template: 'custom element <span data-bind="text: 123"></span>',
       ignoreCustomElementWarning: true
@@ -78,16 +95,14 @@ describe('Components: Custom elements', function () {
     expect(testNode).toContainHtml(initialMarkup)
 
     // ... but when the component is loaded, it does show up
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainHtml(
       '<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>'
     )
   })
 
   it('Does not insert components into standard elements with matching names', function () {
-    this.after(function () {
-      components.unregister('em')
-    })
+    cleanup.defer(() => components.unregister('em'))
     components.register('em', {
       template: 'custom element <span data-bind="text: 123"></span>',
       ignoreCustomElementWarning: true
@@ -96,7 +111,7 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = initialMarkup
 
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainHtml(initialMarkup)
   })
 
@@ -115,7 +130,7 @@ describe('Components: Custom elements', function () {
 
     // See the component show up.
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainHtml('<div>hello <a>custom element</a> <b>ignored</b></div>')
   })
 
@@ -126,7 +141,7 @@ describe('Components: Custom elements', function () {
     // Bind with a viewmodel that controls visibility
     const viewModel = { shouldshow: observable(true) }
     applyBindings(viewModel, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainHtml('<test-component data-bind="visible: shouldshow">custom element</test-component>')
     const node = testNode.childNodes[0] as HTMLElement
     expect(node.style.display).not.toBe('none')
@@ -148,7 +163,7 @@ describe('Components: Custom elements', function () {
     )
 
     // Even though applyBindings threw an exception, the component still gets bound (asynchronously)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
   })
 
   it('Is possible to call applyBindings directly on a custom element', function () {
@@ -158,7 +173,7 @@ describe('Components: Custom elements', function () {
     expect(customElem.tagName.toLowerCase()).toBe('test-component')
 
     applyBindings(null, customElem)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(customElem.innerHTML).toBe('custom element')
   })
 
@@ -191,7 +206,7 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML =
       '<test-component params="nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: \'mystr\'"></test-component>'
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
 
     delete suppliedParams[0].$raw // Don't include '$raw' in the following assertion, as we only want to compare supplied values
     expect(suppliedParams).toEqual([{ nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: 'mystr' }])
@@ -208,7 +223,7 @@ describe('Components: Custom elements', function () {
 
     testNode.innerHTML = '<test-component></test-component>'
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(suppliedParams).toEqual([{ $raw: {} }])
   })
 
@@ -223,7 +238,7 @@ describe('Components: Custom elements', function () {
 
     testNode.innerHTML = '<test-component params=" "></test-component>'
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(suppliedParams).toEqual([{ $raw: {} }])
   })
 
@@ -249,11 +264,11 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = '<test-component params="textToShow: value"></test-component>'
     const vm = observable({ value: 'A' })
     applyBindings(vm, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainText('the value: A')
 
     vm({ value: 'Z' })
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainText('the value: Z')
   })
 
@@ -282,7 +297,7 @@ describe('Components: Custom elements', function () {
     myobservable.subprop = 'subprop'
     testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>'
     applyBindings({ myobservable: myobservable }, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     const node = testNode.childNodes[0].childNodes[0] as HTMLElement
     const viewModelInstance = dataFor(node)
     expect(testNode.firstChild).toContainText('the observable: 1')
@@ -324,7 +339,7 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML =
       '<test-component params=\'suppliedobservable: myobservable().split("").reverse().join("")\'></test-component>'
     applyBindings(rootViewModel, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode.firstChild).toContainText('the string reversed: ahplA')
     const node = testNode.childNodes[0].childNodes[0] as HTMLElement
     const componentViewModelInstance = dataFor(node)
@@ -380,7 +395,7 @@ describe('Components: Custom elements', function () {
       outerObservable = observable({ inner: innerObservable })
     testNode.innerHTML = '<test-component params="somevalue: outer().inner"></test-component>'
     applyBindings({ outer: outerObservable }, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     const node = testNode.childNodes[0].childNodes[0] as HTMLInputElement
     expect(node.value).toEqual('inner1')
     expect(outerObservable.getSubscriptionsCount()).toBe(1)
@@ -434,7 +449,7 @@ describe('Components: Custom elements', function () {
 
     testNode.innerHTML = '<test-component params="$raw: suppliedValue"></test-component>'
     applyBindings({ suppliedValue: suppliedValue }, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(constructorCallCount).toBe(1)
   })
 
@@ -459,7 +474,7 @@ describe('Components: Custom elements', function () {
 
     // See it binds properly
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode.firstChild).toContainHtml('custom element')
 
     // See the viewmodel is disposed when the corresponding DOM element is
@@ -489,10 +504,8 @@ describe('Components: Custom elements', function () {
     // amend simpleHtmlParse to use a document fragment, but it seems unlikely that
     // anyone targetting IE < 9 would not be using jQuery.
 
-    this.after(function () {
-      components.unregister('outer-component')
-      components.unregister('inner-component')
-    })
+    cleanup.defer(() => components.unregister('outer-component'))
+    cleanup.defer(() => components.unregister('inner-component'))
 
     components.register('inner-component', {
       template: 'the inner component with value [<span data-bind="text: innerval"></span>]'
@@ -504,30 +517,14 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = initialMarkup
 
     applyBindings({ outerval: { innerval: 'my value' } }, testNode)
-    try {
-      jasmine.Clock.tick(1)
-      expect(testNode).toContainText(
-        'hello [the outer component [the inner component with value [my value]] goodbye] world'
-      )
-    } catch (ex: any) {
-      if (ex.message.indexOf('Unexpected call to method or property access.') >= 0) {
-        // On IE < 9, this scenario is only supported if you have referenced jQuery.
-        // So don't consider this to be a failure if jQuery isn't referenced.
-        if (!window.jQuery) {
-          return
-        }
-      }
-
-      throw ex
-    }
+    jest.advanceTimersByTime(1)
+    expect(testNode).toContainText('hello [the outer component [the inner component with value [my value]] goodbye] world')
   })
 
   it('Is possible to set up components that receive, inject, and bind templates supplied by the user of the component (sometimes called "templated components" or "transclusion")', function () {
     // This spec repeats assertions made in other specs elsewhere, but is useful to prove the end-to-end technique
 
-    this.after(function () {
-      components.unregister('special-list')
-    })
+    cleanup.defer(() => components.unregister('special-list'))
 
     // First define a reusable 'special-list' component that produces a <ul> in which the <li>s are filled with the supplied template
     // Note: It would be even simpler to write "template: { nodes: $componentTemplateNodes }", which would also work.
@@ -565,7 +562,7 @@ describe('Components: Custom elements', function () {
       testNode
     )
 
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode.childNodes[0]).toContainText('Cheeses')
     const node = testNode.childNodes[1].childNodes[0] as HTMLElement
     expect(node.tagName.toLowerCase()).toEqual('ul')
@@ -599,7 +596,7 @@ describe('Components: Custom elements', function () {
     applyBindings(viewModel, testNode)
     expect(callbacks).toEqual(0)
 
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
     expect(testNode).toContainHtml('<test-component data-bind="afterrender: callback">custom element</test-component>')
   })
 })
