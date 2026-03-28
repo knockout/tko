@@ -1,4 +1,6 @@
-import { domData, cleanNode, options, virtualElements } from '@tko/utils'
+import { expect } from 'chai'
+
+import { cleanNode, options } from '@tko/utils'
 
 import { observable as koObservable } from '@tko/observable'
 
@@ -16,14 +18,14 @@ import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('BindingHandler behaviors', function () {
   let bindingHandlers
 
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -57,14 +59,14 @@ describe('BindingHandler behaviors', function () {
           this.x = this.computed(() => {
             xCalls++
             v() // Add a dependency.
-            expect(this).toEqual(instance)
+            expect(this).to.equal(instance)
             return 'x'
           })
           this.y = this.computed({
             read: () => {
               yCalls++
               v()
-              expect(this).toEqual(instance)
+              expect(this).to.equal(instance)
               return 'y'
             }
           })
@@ -72,21 +74,21 @@ describe('BindingHandler behaviors', function () {
       }
       testNode.innerHTML = '<i data-bind="fnHandler"></i>'
       applyBindings({}, testNode)
-      expect(xCalls).toEqual(1)
-      expect(yCalls).toEqual(1)
-      expect(instance.x()).toEqual('x')
-      expect(instance.y()).toEqual('y')
-      expect(xCalls).toEqual(1)
-      expect(yCalls).toEqual(1)
+      expect(xCalls).to.equal(1)
+      expect(yCalls).to.equal(1)
+      expect(instance.x()).to.equal('x')
+      expect(instance.y()).to.equal('y')
+      expect(xCalls).to.equal(1)
+      expect(yCalls).to.equal(1)
       instance.v(1)
-      expect(xCalls).toEqual(2)
-      expect(yCalls).toEqual(2)
+      expect(xCalls).to.equal(2)
+      expect(yCalls).to.equal(2)
 
       cleanNode(testNode)
       instance.v(2)
       // Re-computations have stopped.
-      expect(xCalls).toEqual(2)
-      expect(yCalls).toEqual(2)
+      expect(xCalls).to.equal(2)
+      expect(yCalls).to.equal(2)
     })
 
     it("has a .subscribe property with the node's lifecycle", function () {
@@ -100,21 +102,21 @@ describe('BindingHandler behaviors', function () {
           this.subscribe(obs, this.cb)
         }
         cb() {
-          expect(this).toEqual(handlerInstance)
+        expect(this).to.equal(handlerInstance)
         }
       }
       testNode.innerHTML = "<i data-bind='fnHandler'></i>"
       applyBindings({}, testNode)
-      expect(obs.getSubscriptionsCount()).toEqual(1)
+      expect(obs.getSubscriptionsCount()).to.equal(1)
       cleanNode(testNode)
-      expect(obs.getSubscriptionsCount()).toEqual(0)
+      expect(obs.getSubscriptionsCount()).to.equal(0)
     })
 
     it('registers a kind with HandlerClass.register', function () {
       class HC extends BindingHandler {}
 
       BindingHandler.registerBindingHandler(HC, 'testHCregistration')
-      expect(bindingHandlers.testHCregistration).toEqual(HC)
+      expect(bindingHandlers.testHCregistration).to.equal(HC)
     })
   })
 
@@ -123,12 +125,12 @@ describe('BindingHandler behaviors', function () {
       const obj = { canary: 42 },
         viewModel = { param: obj }
       bindingHandlers.fnHandler = function (element, valueAccessor, allBindings, $data, $context) {
-        expect(valueAccessor()).toEqual(obj)
-        expect(element).toEqual(testNode.children[0])
-        expect($data).toEqual(viewModel)
-        expect($context).toEqual(contextFor(testNode.children[0]))
-        expect(allBindings()['bx']).toEqual(43)
-        expect(allBindings.get('bx')).toEqual(43)
+        expect(valueAccessor()).to.equal(obj)
+        expect(element).to.equal(testNode.children[0])
+        expect($data).to.equal(viewModel)
+        expect($context).to.equal(contextFor(testNode.children[0]))
+        expect(allBindings()['bx']).to.equal(43)
+        expect(allBindings.get('bx')).to.equal(43)
       }
       testNode.innerHTML = "<p data-bind='fnHandler: param, bx: 43'>"
       applyBindings(viewModel, testNode)
@@ -143,13 +145,13 @@ describe('BindingHandler behaviors', function () {
       }
       bindingHandlers.fnHandler.dispose = function () {
         disposeCalled++
-        expect(this).toEqual(instance)
+        expect(this).to.equal(instance)
       }
       testNode.innerHTML = '<b data-bind="if: x"><i data-bind="fnHandler"></i></b>'
       applyBindings(viewModel, testNode)
-      expect(disposeCalled).toEqual(0)
+      expect(disposeCalled).to.equal(0)
       viewModel.x(false)
-      expect(disposeCalled).toEqual(1)
+      expect(disposeCalled).to.equal(1)
     })
 
     it('does not error without a `dispose` property', function () {
@@ -168,7 +170,7 @@ describe('BindingHandler behaviors', function () {
       bindingHandlers.fnHandler.allowVirtualElements = true
       testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>'
       applyBindings({}, testNode)
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
 
     it('virtual elements via fn.allowVirtualElements', function () {
@@ -179,7 +181,7 @@ describe('BindingHandler behaviors', function () {
       bindingHandlers.fnHandler.allowVirtualElements = true
       testNode.innerHTML = '<b><!-- ko fnHandler --><!-- /ko --></b>'
       applyBindings({}, testNode)
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
 
     it('errors when allowVirtualElements is not set', function () {
@@ -191,8 +193,8 @@ describe('BindingHandler behaviors', function () {
 
       expect(function () {
         applyBindings({}, testNode)
-      }).toThrowContaining("The binding 'fnHandler' cannot be used with virtual elements")
-      expect(called).toEqual(0)
+      }).to.throw("The binding 'fnHandler' cannot be used with virtual elements")
+      expect(called).to.equal(0)
     })
   })
 })
