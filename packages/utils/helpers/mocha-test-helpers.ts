@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import { options } from '../dist'
 
 export function prepareTestNode(): HTMLElement {
   const existingNode = document.getElementById('testNode')
@@ -59,4 +60,12 @@ export function expectContainHtml(node: Element, expectedHtml: string, postProce
 
 export function expectContainHtmlElementsAndText(node: Element, expectedHtml: string) {
   assert.equal(cleanedHtml(node).replace(/<!--.+?-->/g, ''), expectedHtml)
+}
+
+export function useMockForTasks(cleanups: Array<() => void>) {
+  const originalTaskScheduler = options.taskScheduler
+  cleanups.push(() => {
+    options.taskScheduler = originalTaskScheduler
+  })
+  options.taskScheduler = callback => setTimeout(callback, 0)
 }
