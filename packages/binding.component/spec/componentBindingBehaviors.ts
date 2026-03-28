@@ -24,7 +24,9 @@ import { bindings as componentBindings } from '../dist'
 
 import components from '@tko/utils.component'
 
-import { useMockForTasks } from '@tko/utils/helpers/jasmine-13-helper'
+import { expect } from 'chai'
+import sinon from 'sinon'
+import { expectContainHtml, expectContainText, prepareTestNode, restoreAfter, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Components: Component binding', function () {
   let testComponentName = 'test-component',
@@ -32,9 +34,13 @@ describe('Components: Component binding', function () {
     testComponentParams,
     outerViewModel
   let testNode: HTMLElement
+  let clock: sinon.SinonFakeTimers
+  let cleanups: Array<() => void>
   beforeEach(function () {
-    useMockForTasks(options)
-    testNode = jasmine.prepareTestNode()
+    cleanups = []
+    clock = sinon.useFakeTimers()
+    useMockForTasks(cleanups)
+    testNode = prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
@@ -52,8 +58,11 @@ describe('Components: Component binding', function () {
   })
 
   afterEach(function () {
-    expect(tasks.resetForTesting()).toEqual(0)
-    jasmine.Clock.reset()
+    expect(tasks.resetForTesting()).to.equal(0)
+    while (cleanups.length) {
+      cleanups.pop()!()
+    }
+    clock.restore()
     components.unregister(testComponentName)
   })
 
@@ -61,29 +70,29 @@ describe('Components: Component binding', function () {
     testNode.innerHTML = '<div data-bind="component: \'\'"></div>'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrowContaining('No component name specified')
+    }).to.throw('No component name specified')
   })
 
   it('Throws if no name is specified (using options object)', function () {
     delete testComponentBindingValue.name
     expect(function () {
       applyBindings(outerViewModel, testNode)
-    }).toThrowContaining('No component name specified')
+    }).to.throw('No component name specified')
   })
 
   it('Throws if the component name is unknown', function () {
     expect(function () {
       applyBindings(outerViewModel, testNode)
-      jasmine.Clock.tick(1)
-    }).toThrow("Unknown component 'test-component'")
+      clock.tick(1)
+    }).to.throw("Unknown component 'test-component'")
   })
 
   it('Throws if the component definition has no template', function () {
     components.register(testComponentName, {})
     expect(function () {
       applyBindings(outerViewModel, testNode)
-      jasmine.Clock.tick(1)
-    }).toThrow("Component 'test-component' has no template")
+      clock.tick(1)
+    }).to.throw("Component 'test-component' has no template")
   })
 
   it('Controls descendant bindings', function () {
@@ -91,12 +100,12 @@ describe('Components: Component binding', function () {
     testNode.innerHTML = '<div data-bind="if: true, component: $data"></div>'
     expect(function () {
       applyBindings(testComponentName, testNode)
-    }).toThrowContaining(
+    }).to.throw(
       'Multiple bindings (if and component) are trying to control descendant bindings of the same element.'
     )
 
     // Even though applyBindings threw an exception, the component still gets bound (asynchronously)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
   })
 
   it("Replaces the element's contents with a clone of the template", function () {
@@ -104,7 +113,7 @@ describe('Components: Component binding', function () {
     testTemplate.appendChild(document.createElement('div'))
     testTemplate.appendChild(document.createTextNode(' '))
     testTemplate.appendChild(document.createElement('span')) //TODO good example for ASI..
-    expect(testTemplate.childNodes.length).toBe(3)
+    expect(testTemplate.childNodes.length).to.equal(3)
     ;(testTemplate.childNodes[0] as HTMLElement).innerHTML = 'hello'
     ;(testTemplate.childNodes[2] as HTMLElement).innerHTML = 'world'
     components.register(testComponentName, { template: testTemplate })
@@ -113,12 +122,12 @@ describe('Components: Component binding', function () {
     applyBindings({ testComponentBindingValue: testComponentName }, testNode)
 
     // See the template asynchronously shows up
-    jasmine.Clock.tick(1)
-    expect(testNode.children[0]).toContainHtml('<div>hello</div> <span>world</span>')
-    expect(testTemplate.children[0].childNodes.length).toBe(1)
+    clock.tick(1)
+    expectContainHtml(testNode.children[0], '<div>hello</div> <span>world</span>')
+    expect(testTemplate.children[0].childNodes.length).to.equal(1)
 
     // Also be sure it's a clone
-    expect(testNode.children[0].children[0]).not.toBe(testTemplate[0])
+    expect(testNode.children[0].children[0]).to.not.equal(testTemplate[0])
   })
 
   it("Passes params and componentInfo (with prepopulated element and templateNodes) to the component's viewmodel factory", function () {
@@ -126,17 +135,17 @@ describe('Components: Component binding', function () {
       template: '<div data-bind="text: 123">I have been prepopulated and not bound yet</div>',
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          expect(componentInfo.element).toContainText('I have been prepopulated and not bound yet')
-          expect(params).toBe(testComponentParams)
-          expect(componentInfo.templateNodes.length).toEqual(3)
-          expect(componentInfo.templateNodes[0]).toContainText('Here are some ')
-          expect(componentInfo.templateNodes[1]).toContainText('template')
-          expect(componentInfo.templateNodes[2]).toContainText(' nodes')
-          expect(componentInfo.templateNodes[1].tagName.toLowerCase()).toEqual('em')
+          expectContainText(componentInfo.element, 'I have been prepopulated and not bound yet')
+          expect(params).to.equal(testComponentParams)
+          expect(componentInfo.templateNodes.length).to.deep.equal(3)
+          expectContainText(componentInfo.templateNodes[0], 'Here are some ')
+          expectContainText(componentInfo.templateNodes[1], 'template')
+          expectContainText(componentInfo.templateNodes[2], ' nodes')
+          expect(componentInfo.templateNodes[1].tagName.toLowerCase()).to.deep.equal('em')
 
           // verify that createViewModel is the same function and was called with the component definition as the context
-          expect(this.createViewModel).toBe(componentConfig.viewModel.createViewModel)
-          expect(this.template).toBeDefined()
+          expect(this.createViewModel).to.equal(componentConfig.viewModel.createViewModel)
+          expect(this.template).to.not.equal(undefined)
 
           componentInfo.element.children[0].setAttribute('data-bind', 'text: someValue')
           return { someValue: 'From the viewmodel' }
@@ -148,18 +157,18 @@ describe('Components: Component binding', function () {
 
     components.register(testComponentName, componentConfig)
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode).toContainText('From the viewmodel')
+    expectContainText(testNode, 'From the viewmodel')
   })
 
   it('Handles absence of viewmodel by using the params', function () {
     components.register(testComponentName, { template: '<div data-bind="text: myvalue"></div>' })
     testComponentParams.myvalue = 'some parameter value'
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.children[0]).toContainHtml('<div data-bind="text: myvalue">some parameter value</div>')
+    expectContainHtml(testNode.children[0], '<div data-bind="text: myvalue">some parameter value</div>')
   })
 
   it('Injects and binds the component synchronously if it is flagged as synchronous and loads synchronously', function () {
@@ -173,15 +182,15 @@ describe('Components: Component binding', function () {
 
     // Notice the absence of any 'jasmine.Clock.tick' call here. This is synchronous.
     applyBindings(outerViewModel, testNode)
-    expect(testNode.children[0]).toContainHtml('<div data-bind="text: myvalue">123</div>')
+    expectContainHtml(testNode.children[0], '<div data-bind="text: myvalue">123</div>')
   })
 
   it('Injects and binds the component synchronously if it is flagged as synchronous and already cached, even if it previously loaded asynchronously', function () {
     // Set up a component that loads asynchronously, but is flagged as being injectable synchronously
-    this.restoreAfter(window, 'require')
+    restoreAfter(cleanups, window as any, 'require')
     // var requireCallbacks = {};
     window.require = function (moduleNames, callback) {
-      expect(moduleNames[0]).toBe('testViewModelModule')
+      expect(moduleNames[0]).to.equal('testViewModelModule')
       setTimeout(function () {
         const constructor = function (params) {
           this.viewModelProperty = params
@@ -204,14 +213,14 @@ describe('Components: Component binding', function () {
 
     // First injection is async, because the loader completes asynchronously
     applyBindings({ testList: testList }, testNode)
-    expect(testNode.children[0]).toContainText('')
-    jasmine.Clock.tick(0)
-    expect(testNode.children[0]).toContainText('first')
+    expectContainText(testNode.children[0], '')
+    clock.tick(0)
+    expectContainText(testNode.children[0], 'first')
 
     // Second (cached) injection is synchronous, because the component config says so.
     // Notice the absence of any 'jasmine.Clock.tick' call here. This is synchronous.
     testList.push('second')
-    expect(testNode.children[0]).toContainText('firstsecond', /* ignoreSpaces */ true) // Ignore spaces because old-IE is inconsistent
+    expectContainText(testNode.children[0], 'firstsecond', /* ignoreSpaces */ true) // Ignore spaces because old-IE is inconsistent
   })
 
   it('Creates a binding context with the correct parent', function () {
@@ -219,9 +228,9 @@ describe('Components: Component binding', function () {
       template: 'Parent is outer view model: <span data-bind="text: $parent.isOuterViewModel"></span>'
     })
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.children[0]).toContainText('Parent is outer view model: true')
+    expectContainText(testNode.children[0], 'Parent is outer view model: true')
   })
 
   it('Creates a binding context with $componentTemplateNodes giving the original child nodes', function () {
@@ -230,15 +239,15 @@ describe('Components: Component binding', function () {
     })
     testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"><em>original</em> child nodes</div>'
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.children[0]).toContainHtml(
+    expectContainHtml(testNode.children[0], 
       'start<span data-bind="template: { nodes: $componenttemplatenodes }"><em>original</em> child nodes</span>end'
     )
   })
 
   it('Creates a binding context with $component to reference the closest component viewmodel', function () {
-    this.after(function () {
+    cleanups.push(() => {
       components.unregister('sub-component')
     })
 
@@ -263,9 +272,9 @@ describe('Components: Component binding', function () {
     })
 
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.children[0]).toContainText(
+    expectContainText(testNode.children[0], 
       'In child context 123, inside component with property 456. Now in sub-component with property 789.',
       /* ignoreSpaces */ true
     ) // Ignore spaces because old-IE is inconsistent
@@ -284,11 +293,11 @@ describe('Components: Component binding', function () {
 
     // Instantiate it
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
     // See the params arrived as expected
-    expect(receivedParams).toEqual([testComponentParams])
-    expect(testComponentParams.someValue).toBe(123) // Just to be sure it doesn't get mutated
+    expect(receivedParams).to.deep.equal([testComponentParams])
+    expect(testComponentParams.someValue).to.equal(123) // Just to be sure it doesn't get mutated
   })
 
   it('Passes through observable params without unwrapping them (so a given component instance can observe them changing)', function () {
@@ -305,20 +314,20 @@ describe('Components: Component binding', function () {
 
     // Instantiate it
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
     // See the params arrived as expected
-    expect(receivedParams).toEqual([testComponentParams])
-    expect(testNode).toContainText('The value is 123.')
+    expect(receivedParams).to.deep.equal([testComponentParams])
+    expectContainText(testNode, 'The value is 123.')
 
     // Mutating the observable doesn't trigger creation of a new component
     testComponentParams.someValue(456)
-    expect(receivedParams.length).toBe(1) // i.e., no additional constructor call occurred
-    expect(testNode).toContainText('The value is 456.')
+    expect(receivedParams.length).to.equal(1) // i.e., no additional constructor call occurred
+    expectContainText(testNode, 'The value is 456.')
   })
 
   it('Supports observable component names, rebuilding the component if the name changes, disposing the old viewmodel and nodes', function () {
-    this.after(function () {
+    cleanups.push(() => {
       components.unregister('component-alpha')
       components.unregister('component-beta')
     })
@@ -331,14 +340,14 @@ describe('Components: Component binding', function () {
     }
 
     alphaViewModel.prototype.dispose = function () {
-      expect(arguments.length).toBe(0)
+      expect(arguments.length).to.equal(0)
       this.alphaWasDisposed = true
 
       // Disposal happens *before* the DOM is torn down, in case some custom cleanup is required
       // Note that you'd have to have captured the element via createViewModel, so this is only
       // for extensibility scenarios - we don't generally recommend that component viewmodels
       // should interact directly with their DOM, as that breaks MVVM encapsulation.
-      expect(testNode).toContainText('Alpha value is 234.')
+      expectContainText(testNode, 'Alpha value is 234.')
     }
 
     components.register('component-alpha', {
@@ -355,47 +364,47 @@ describe('Components: Component binding', function () {
     testComponentBindingValue.name = observable('component-alpha')
     testComponentParams.suppliedValue = observable(123)
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
     // See it appeared, and the expected subscriptions were registered
-    expect(testNode.firstChild).not.toBeNull()
+    expect(testNode.firstChild).to.not.equal(null)
     const firstAlphaTemplateNode = testNode.firstChild?.firstChild as HTMLElement,
       alphaViewModelInstance = dataFor(firstAlphaTemplateNode)
-    expect(firstAlphaTemplateNode.className).toBe('alpha')
-    expect(testNode).toContainText('Alpha value is 123.')
-    expect(testComponentBindingValue.name.getSubscriptionsCount()).toBe(1)
-    expect(testComponentParams.suppliedValue.getSubscriptionsCount()).toBe(1)
-    expect(alphaViewModelInstance.alphaWasDisposed).not.toBe(true)
+    expect(firstAlphaTemplateNode.className).to.equal('alpha')
+    expectContainText(testNode, 'Alpha value is 123.')
+    expect(testComponentBindingValue.name.getSubscriptionsCount()).to.equal(1)
+    expect(testComponentParams.suppliedValue.getSubscriptionsCount()).to.equal(1)
+    expect(alphaViewModelInstance.alphaWasDisposed).to.not.equal(true)
 
     // Store some data on a DOM node so we can check it was cleaned later
     domData.set(firstAlphaTemplateNode, 'TestValue', 'Hello')
 
     // Mutating an observable param doesn't change the set of subscriptions or replace the DOM nodes
     testComponentParams.suppliedValue(234)
-    expect(testNode).toContainText('Alpha value is 234.')
-    expect(testComponentBindingValue.name.getSubscriptionsCount()).toBe(1)
-    expect(testComponentParams.suppliedValue.getSubscriptionsCount()).toBe(1)
-    expect(testNode.firstChild).not.toBeNull()
-    expect(testNode.firstChild?.firstChild).toBe(firstAlphaTemplateNode) // Same node
-    expect(domData.get(firstAlphaTemplateNode, 'TestValue')).toBe('Hello') // Not cleaned
-    expect(alphaViewModelInstance.alphaWasDisposed).not.toBe(true)
+    expectContainText(testNode, 'Alpha value is 234.')
+    expect(testComponentBindingValue.name.getSubscriptionsCount()).to.equal(1)
+    expect(testComponentParams.suppliedValue.getSubscriptionsCount()).to.equal(1)
+    expect(testNode.firstChild).to.not.equal(null)
+    expect(testNode.firstChild?.firstChild).to.equal(firstAlphaTemplateNode) // Same node
+    expect(domData.get(firstAlphaTemplateNode, 'TestValue')).to.equal('Hello') // Not cleaned
+    expect(alphaViewModelInstance.alphaWasDisposed).to.not.equal(true)
 
     // Can switch to the other component by observably changing the component name,
     // but it happens asynchronously (because the component has to be loaded)
     testComponentBindingValue.name('component-beta')
-    expect(testNode).toContainText('Alpha value is 234.')
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainText('Beta value is 234.')
+    expectContainText(testNode, 'Alpha value is 234.')
+    clock.tick(1)
+    expectContainText(testNode, 'Beta value is 234.')
 
     // Cleans up by disposing obsolete subscriptions, viewmodels, and cleans DOM nodes
-    expect(testComponentBindingValue.name.getSubscriptionsCount()).toBe(1)
-    expect(testComponentParams.suppliedValue.getSubscriptionsCount()).toBe(1)
-    expect(domData.get(firstAlphaTemplateNode, 'TestValue')).toBe(undefined) // Got cleaned
-    expect(alphaViewModelInstance.alphaWasDisposed).toBe(true)
+    expect(testComponentBindingValue.name.getSubscriptionsCount()).to.equal(1)
+    expect(testComponentParams.suppliedValue.getSubscriptionsCount()).to.equal(1)
+    expect(domData.get(firstAlphaTemplateNode, 'TestValue')).to.equal(undefined) // Got cleaned
+    expect(alphaViewModelInstance.alphaWasDisposed).to.equal(true)
   })
 
   it('Supports binding to an observable that contains name/params, rebuilding the component if that observable changes, disposing the old viewmodel and nodes', function () {
-    this.after(function () {
+    cleanups.push(() => {
       components.unregister('component-alpha')
       components.unregister('component-beta')
     })
@@ -408,14 +417,14 @@ describe('Components: Component binding', function () {
     }
 
     alphaViewModel.prototype.dispose = function () {
-      expect(arguments.length).toBe(0)
+      expect(arguments.length).to.equal(0)
       this.alphaWasDisposed = true
 
       // Disposal happens *before* the DOM is torn down, in case some custom cleanup is required
       // Note that you'd have to have captured the element via createViewModel, so this is only
       // for extensibility scenarios - we don't generally recommend that component viewmodels
       // should interact directly with their DOM, as that breaks MVVM encapsulation.
-      expect(testNode).toContainText('Alpha value is 123.')
+      expectContainText(testNode, 'Alpha value is 123.')
     }
 
     components.register('component-alpha', {
@@ -432,16 +441,16 @@ describe('Components: Component binding', function () {
 
     // Instantiate the first component
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
     // See it appeared, and the expected subscriptions were registered
-    expect(testNode.firstChild).not.toBeNull()
+    expect(testNode.firstChild).to.not.equal(null)
     const firstAlphaTemplateNode = testNode.firstChild?.firstChild as HTMLElement,
       alphaViewModelInstance = dataFor(firstAlphaTemplateNode)
-    expect(firstAlphaTemplateNode.className).toBe('alpha')
-    expect(testNode).toContainText('Alpha value is 123.')
-    expect(outerViewModel.testComponentBindingValue.getSubscriptionsCount()).toBe(1)
-    expect(alphaViewModelInstance.alphaWasDisposed).not.toBe(true)
+    expect(firstAlphaTemplateNode.className).to.equal('alpha')
+    expectContainText(testNode, 'Alpha value is 123.')
+    expect(outerViewModel.testComponentBindingValue.getSubscriptionsCount()).to.equal(1)
+    expect(alphaViewModelInstance.alphaWasDisposed).to.not.equal(true)
 
     // Store some data on a DOM node so we can check it was cleaned later
     domData.set(firstAlphaTemplateNode, 'TestValue', 'Hello')
@@ -450,14 +459,14 @@ describe('Components: Component binding', function () {
     // but it happens asynchronously (because the component has to be loaded)
     outerViewModel.testComponentBindingValue({ name: 'component-beta', params: { suppliedValue: 456 } })
 
-    expect(testNode).toContainText('Alpha value is 123.')
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainText('Beta value is 456.')
+    expectContainText(testNode, 'Alpha value is 123.')
+    clock.tick(1)
+    expectContainText(testNode, 'Beta value is 456.')
 
     // Cleans up by disposing obsolete subscriptions, viewmodels, and cleans DOM nodes
-    expect(outerViewModel.testComponentBindingValue.getSubscriptionsCount()).toBe(1)
-    expect(domData.get(firstAlphaTemplateNode, 'TestValue')).toBe(undefined) // Got cleaned
-    expect(alphaViewModelInstance.alphaWasDisposed).toBe(true)
+    expect(outerViewModel.testComponentBindingValue.getSubscriptionsCount()).to.equal(1)
+    expect(domData.get(firstAlphaTemplateNode, 'TestValue')).to.equal(undefined) // Got cleaned
+    expect(alphaViewModelInstance.alphaWasDisposed).to.equal(true)
   })
 
   it('Rebuilds the component if params change in a way that is forced to unwrap inside the binding, disposing the old viewmodel and nodes', function () {
@@ -480,30 +489,30 @@ describe('Components: Component binding', function () {
       + testComponentName
       + '\', params: { someData: someObservable() } }"></div>'
     applyBindings({ someObservable: someObservable }, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.firstChild).not.toBeNull()
+    expect(testNode.firstChild).to.not.equal(null)
     const firstTemplateNode = testNode.firstChild?.firstChild as HTMLElement,
       firstViewModelInstance = dataFor(firstTemplateNode)
-    expect(firstViewModelInstance instanceof testViewModel).toBe(true)
-    expect(testNode).toContainText('Value is First.')
-    expect(firstViewModelInstance.wasDisposed).not.toBe(true)
+    expect(firstViewModelInstance instanceof testViewModel).to.equal(true)
+    expectContainText(testNode, 'Value is First.')
+    expect(firstViewModelInstance.wasDisposed).to.not.equal(true)
     domData.set(firstTemplateNode, 'TestValue', 'Hello')
 
     // Make an observable change that forces the component to rebuild (asynchronously, for consistency)
     someObservable('Second')
-    expect(testNode).toContainText('Value is First.')
-    expect(firstViewModelInstance.wasDisposed).not.toBe(true)
-    expect(domData.get(firstTemplateNode, 'TestValue')).toBe('Hello')
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainText('Value is Second.')
-    expect(firstViewModelInstance.wasDisposed).toBe(true)
-    expect(domData.get(firstTemplateNode, 'TestValue')).toBe(undefined)
+    expectContainText(testNode, 'Value is First.')
+    expect(firstViewModelInstance.wasDisposed).to.not.equal(true)
+    expect(domData.get(firstTemplateNode, 'TestValue')).to.equal('Hello')
+    clock.tick(1)
+    expectContainText(testNode, 'Value is Second.')
+    expect(firstViewModelInstance.wasDisposed).to.equal(true)
+    expect(domData.get(firstTemplateNode, 'TestValue')).to.equal(undefined)
 
     // New viewmodel is a new instance
     const secondViewModelInstance = dataFor(testNode.firstChild?.firstChild as HTMLElement)
-    expect(secondViewModelInstance instanceof testViewModel).toBe(true)
-    expect(secondViewModelInstance).not.toBe(firstViewModelInstance)
+    expect(secondViewModelInstance instanceof testViewModel).to.equal(true)
+    expect(secondViewModelInstance).to.not.equal(firstViewModelInstance)
   })
 
   it('Is possible to pass expressions that can vary observably and evaluate as writable observable instances', function () {
@@ -517,7 +526,7 @@ describe('Components: Component binding', function () {
         this.myval = params.somevalue
 
         // See we received a writable observable
-        expect(isWritableObservable(this.myval)).toBe(true)
+        expect(isWritableObservable(this.myval)).to.equal(true)
       }
     })
 
@@ -530,46 +539,46 @@ describe('Components: Component binding', function () {
     testNode.innerHTML =
       '<div data-bind="component: { name: \'' + testComponentName + '\', params: { somevalue: outer().inner } }"></div>'
     applyBindings({ outer: outerObservable }, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect((testNode.children[0].children[0] as HTMLInputElement).value).toEqual('inner1')
-    expect(outerObservable.getSubscriptionsCount()).toBe(1)
-    expect(innerObservable.getSubscriptionsCount()).toBe(1)
-    expect(constructorCallCount).toBe(1)
+    expect((testNode.children[0].children[0] as HTMLInputElement).value).to.deep.equal('inner1')
+    expect(outerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(constructorCallCount).to.equal(1)
 
     // See we can mutate the inner value and see the result show up
     innerObservable('inner2')
-    expect((testNode.children[0].children[0] as HTMLInputElement).value).toEqual('inner2')
-    expect(outerObservable.getSubscriptionsCount()).toBe(1)
-    expect(innerObservable.getSubscriptionsCount()).toBe(1)
-    expect(constructorCallCount).toBe(1)
+    expect((testNode.children[0].children[0] as HTMLInputElement).value).to.deep.equal('inner2')
+    expect(outerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(constructorCallCount).to.equal(1)
 
     // See that we can mutate the observable from within the component
     ;(testNode.children[0].children[0] as HTMLInputElement).value = 'inner3'
     triggerEvent(testNode.children[0].children[0], 'change')
-    expect(innerObservable()).toEqual('inner3')
+    expect(innerObservable()).to.deep.equal('inner3')
 
     // See we can mutate the outer value and see the result show up (cleaning subscriptions to the old inner value)
     const newInnerObservable = observable('newinner')
     outerObservable({ inner: newInnerObservable })
-    jasmine.Clock.tick(1) // modifying the outer observable causes the component to reload, which happens asynchronously
-    expect((testNode.children[0].children[0] as HTMLInputElement).value).toEqual('newinner')
-    expect(outerObservable.getSubscriptionsCount()).toBe(1)
-    expect(innerObservable.getSubscriptionsCount()).toBe(0)
-    expect(newInnerObservable.getSubscriptionsCount()).toBe(1)
-    expect(constructorCallCount).toBe(2)
+    clock.tick(1) // modifying the outer observable causes the component to reload, which happens asynchronously
+    expect((testNode.children[0].children[0] as HTMLInputElement).value).to.deep.equal('newinner')
+    expect(outerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(0)
+    expect(newInnerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(constructorCallCount).to.equal(2)
 
     // See that we can mutate the new observable from within the component
     ;(testNode.children[0].children[0] as HTMLInputElement).value = 'newinner2'
     triggerEvent(testNode.children[0].children[0], 'change')
-    expect(newInnerObservable()).toEqual('newinner2')
-    expect(innerObservable()).toEqual('inner3') // original one hasn't changed
+    expect(newInnerObservable()).to.deep.equal('newinner2')
+    expect(innerObservable()).to.deep.equal('inner3') // original one hasn't changed
 
     // See that subscriptions are disposed when the component is
     cleanNode(testNode)
-    expect(outerObservable.getSubscriptionsCount()).toBe(0)
-    expect(innerObservable.getSubscriptionsCount()).toBe(0)
-    expect(newInnerObservable.getSubscriptionsCount()).toBe(0)
+    expect(outerObservable.getSubscriptionsCount()).to.equal(0)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(0)
+    expect(newInnerObservable.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Disposes the viewmodel if the element is cleaned', function () {
@@ -584,16 +593,16 @@ describe('Components: Component binding', function () {
 
     // Bind an instance of the component; grab its viewmodel
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode.firstChild).not.toBeNull()
+    clock.tick(1)
+    expect(testNode.firstChild).to.not.equal(null)
     const firstTemplateNode = testNode.firstChild?.firstChild as HTMLElement,
       viewModelInstance = dataFor(firstTemplateNode)
-    expect(viewModelInstance instanceof TestViewModel).toBe(true)
-    expect(viewModelInstance.wasDisposed).not.toBe(true)
+    expect(viewModelInstance instanceof TestViewModel).to.equal(true)
+    expect(viewModelInstance.wasDisposed).to.not.equal(true)
 
     // See that cleaning the associated element automatically disposes the viewmodel
     cleanNode(testNode.firstChild!)
-    expect(viewModelInstance.wasDisposed).toBe(true)
+    expect(viewModelInstance.wasDisposed).to.equal(true)
   })
 
   it('Does not inject the template or instantiate the viewmodel if the element was cleaned before component loading completed', function () {
@@ -612,9 +621,9 @@ describe('Components: Component binding', function () {
     cleanNode(testNode.firstChild!)
 
     // Now wait and see that, after loading finishes, the component wasn't used
-    jasmine.Clock.tick(1)
-    expect(numConstructorCalls).toBe(0)
-    expect(testNode.firstChild).toContainHtml('')
+    clock.tick(1)
+    expect(numConstructorCalls).to.equal(0)
+    expectContainHtml(testNode.firstChild, '')
   })
 
   it('Disregards component load completions that are no longer relevant', function () {
@@ -625,11 +634,11 @@ describe('Components: Component binding', function () {
     // binding), and broken if they complete out of order (wrong final result).
 
     // Set up a mock module loader, so we can control asynchronous load completion
-    this.restoreAfter(window, 'require')
+    restoreAfter(cleanups, window as any, 'require')
     const requireCallbacks = {}
     window.require = function (moduleNames, callback) {
-      expect(moduleNames.length).toBe(1) // In this scenario, it always will be
-      expect(moduleNames[0] in requireCallbacks).toBe(false) // In this scenario, we only require each module once
+      expect(moduleNames.length).to.equal(1) // In this scenario, it always will be
+      expect(moduleNames[0] in requireCallbacks).to.equal(false) // In this scenario, we only require each module once
       requireCallbacks[moduleNames[0]] = callback
     }
 
@@ -666,7 +675,7 @@ describe('Components: Component binding', function () {
       viewModel: { require: 'module-4' },
       template: '<div>Component 4 template</div>'
     })
-    this.after(function () {
+    cleanups.push(() => {
       for (let i = 0; i < 4; i++) {
         components.unregister('component-' + i)
       }
@@ -677,57 +686,57 @@ describe('Components: Component binding', function () {
     applyBindings(outerViewModel, testNode)
 
     // Even if we wait a while, it's not yet loaded, because we're still waiting for the module
-    jasmine.Clock.tick(10)
-    expect(constructorCallLog.length).toBe(0)
-    expect(testNode.firstChild).not.toBeNull()
-    expect(testNode.firstChild?.childNodes.length).toBe(0)
+    clock.tick(10)
+    expect(constructorCallLog.length).to.equal(0)
+    expect(testNode.firstChild).to.not.equal(null)
+    expect(testNode.firstChild?.childNodes.length).to.equal(0)
 
     // In the meantime, switch to requesting component 2 and then 3
     testComponentBindingValue.name('component-2')
-    jasmine.Clock.tick(1)
+    clock.tick(1)
     testComponentBindingValue.name('component-3')
-    expect(constructorCallLog.length).toBe(0)
+    expect(constructorCallLog.length).to.equal(0)
 
     // Now if component 1 finishes loading, it's irrelevant, so nothing happens
     requireCallbacks['module-1'](testViewModel1)
-    jasmine.Clock.tick(1) // ... even if we wait a bit longer
-    expect(constructorCallLog.length).toBe(0)
-    expect(testNode.firstChild?.childNodes.length).toBe(0)
+    clock.tick(1) // ... even if we wait a bit longer
+    expect(constructorCallLog.length).to.equal(0)
+    expect(testNode.firstChild?.childNodes.length).to.equal(0)
 
     // Now if component 3 finishes loading, it's the current one, so we instantiate and bind to it.
     // Notice this happens synchronously (at least, relative to the time now), because the completion
     // is already asynchronous relative to when it began.
     requireCallbacks['module-3'](testViewModel3)
-    expect(constructorCallLog).toEqual([[3, testComponentParams]])
-    expect(testNode).toContainText('Component 3 template')
+    expect(constructorCallLog).to.deep.equal([[3, testComponentParams]])
+    expectContainText(testNode, 'Component 3 template')
     const viewModelInstance = dataFor(testNode.firstChild?.firstChild as HTMLElement)
-    expect(viewModelInstance instanceof testViewModel3).toBe(true)
-    expect(viewModelInstance.wasDisposed).not.toBe(true)
+    expect(viewModelInstance instanceof testViewModel3).to.equal(true)
+    expect(viewModelInstance.wasDisposed).to.not.equal(true)
 
     // Now if component 2 finishes loading, it's irrelevant, so nothing happens.
     // In particular, the viewmodel isn't disposed.
     requireCallbacks['module-2'](testViewModel2)
-    jasmine.Clock.tick(1) // ... even if we wait a bit longer
-    expect(constructorCallLog.length).toBe(1)
-    expect(testNode).toContainText('Component 3 template')
-    expect(viewModelInstance.wasDisposed).not.toBe(true)
+    clock.tick(1) // ... even if we wait a bit longer
+    expect(constructorCallLog.length).to.equal(1)
+    expectContainText(testNode, 'Component 3 template')
+    expect(viewModelInstance.wasDisposed).to.not.equal(true)
 
     // However, if we now switch to component 2, the old viewmodel is disposed,
     // and the new component is used without any further module load calls.
     testComponentBindingValue.name('component-2')
-    jasmine.Clock.tick(1)
-    expect(constructorCallLog.length).toBe(2)
-    expect(testNode).toContainText('Component 2 template')
-    expect(viewModelInstance.wasDisposed).toBe(true)
+    clock.tick(1)
+    expect(constructorCallLog.length).to.equal(2)
+    expectContainText(testNode, 'Component 2 template')
+    expect(viewModelInstance.wasDisposed).to.equal(true)
 
     // Show also that we won't leak memory by applying bindings to nodes
     // after they were disposed (e.g., because they were removed from the document)
     testComponentBindingValue.name('component-4')
-    jasmine.Clock.tick(1)
+    clock.tick(1)
     cleanNode(testNode.firstChild!) // Dispose the node before the module loading completes
     requireCallbacks['module-4'](testViewModel4)
-    expect(constructorCallLog.length).toBe(2) // No extra constructor calls
-    expect(testNode).toContainText('Component 2 template') // No attempt to modify the DOM
+    expect(constructorCallLog.length).to.equal(2) // No extra constructor calls
+    expectContainText(testNode, 'Component 2 template') // No attempt to modify the DOM
   })
 
   it('Supports virtual elements', function () {
@@ -736,11 +745,11 @@ describe('Components: Component binding', function () {
     testComponentParams.someData = observable(123)
 
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainText('Hello! Your param is 123 Goodbye.')
+    clock.tick(1)
+    expectContainText(testNode, 'Hello! Your param is 123 Goodbye.')
 
     testComponentParams.someData(456)
-    expect(testNode).toContainText('Hello! Your param is 456 Goodbye.')
+    expectContainText(testNode, 'Hello! Your param is 456 Goodbye.')
   })
 
   it('Should call a childrenComplete callback function', function () {
@@ -750,18 +759,18 @@ describe('Components: Component binding', function () {
 
     let callbacks = 0
     outerViewModel.callback = function (nodes, data) {
-      expect(nodes.length).toEqual(1)
-      expect(nodes[0]).toEqual(testNode.children[0].children[0])
-      expect(data).toEqual(testComponentParams)
+      expect(nodes.length).to.deep.equal(1)
+      expect(nodes[0]).to.deep.equal(testNode.children[0].children[0])
+      expect(data).to.deep.equal(testComponentParams)
       callbacks++
     }
 
     applyBindings(outerViewModel, testNode)
-    expect(callbacks).toEqual(0)
+    expect(callbacks).to.deep.equal(0)
 
-    jasmine.Clock.tick(1)
-    expect(testNode.children[0]).toContainHtml('<div data-bind="text: myvalue">some parameter value</div>')
-    expect(callbacks).toEqual(1)
+    clock.tick(1)
+    expectContainHtml(testNode.children[0], '<div data-bind="text: myvalue">some parameter value</div>')
+    expect(callbacks).to.deep.equal(1)
   })
 
   describe('Component `bindingHandlers`', function () {
@@ -781,7 +790,7 @@ describe('Components: Component binding', function () {
 
       components.register('with-my-bindings', { viewModel: ViewModel, template, synchronous: true })
       applyBindings({}, testNode)
-      expect(calls).toEqual(['text', 'text2'])
+      expect(calls).to.deep.equal(['text', 'text2'])
     })
   })
 
@@ -805,14 +814,14 @@ describe('Components: Component binding', function () {
       // Bind an instance
       testComponentParams.someData = observable('First')
       applyBindings(outerViewModel, testNode)
-      jasmine.Clock.tick(1)
-      expect(testNode).toContainText('First')
-      expect(testComponentParams.someData.getSubscriptionsCount()).toBe(0)
+      clock.tick(1)
+      expectContainText(testNode, 'First')
+      expect(testComponentParams.someData.getSubscriptionsCount()).to.equal(0)
 
       // See that changing the observable will have no effect
       testComponentParams.someData('Second')
-      jasmine.Clock.tick(1)
-      expect(testNode).toContainText('First')
+      clock.tick(1)
+      expectContainText(testNode, 'First')
     })
 
     it('when loaded synchronously', function () {
@@ -829,12 +838,12 @@ describe('Components: Component binding', function () {
       // Bind an instance
       testComponentParams.someData = observable('First')
       applyBindings(outerViewModel, testNode)
-      expect(testNode).toContainText('First')
-      expect(testComponentParams.someData.getSubscriptionsCount()).toBe(0)
+      expectContainText(testNode, 'First')
+      expect(testComponentParams.someData.getSubscriptionsCount()).to.equal(0)
 
       // See that changing the observable will have no effect
       testComponentParams.someData('Second')
-      expect(testNode).toContainText('First')
+      expectContainText(testNode, 'First')
     })
 
     it('when cached component is loaded synchronously', function () {
@@ -854,12 +863,12 @@ describe('Components: Component binding', function () {
       // Bind an instance
       testComponentParams.someData = observable('First')
       applyBindings(outerViewModel, testNode)
-      expect(testNode).toContainText('First')
-      expect(testComponentParams.someData.getSubscriptionsCount()).toBe(0)
+      expectContainText(testNode, 'First')
+      expect(testComponentParams.someData.getSubscriptionsCount()).to.equal(0)
 
       // See that changing the observable will have no effect
       testComponentParams.someData('Second')
-      expect(testNode).toContainText('First')
+      expectContainText(testNode, 'First')
     })
   })
 
@@ -872,7 +881,7 @@ describe('Components: Component binding', function () {
 
     ViewModel.register('test-component')
     applyBindings(outerViewModel, testNode)
-    expect(testNode.innerHTML).toContain('<inner-bits></inner-bits>')
+    expect(testNode.innerHTML).to.contain('<inner-bits></inner-bits>')
   })
 
   describe('jsx', function () {
@@ -886,7 +895,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="123">téxt</div>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<div attr="123">téxt</div>')
     })
 
     it('updates jsx on changes', function () {
@@ -903,19 +912,19 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="v0">text<!--O--></div>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<div attr="v0">text<!--O--></div>')
 
       obs('v1')
-      expect(testNode.children[0].innerHTML).toEqual('<div attr="v1">text<!--O--></div>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<div attr="v1">text<!--O--></div>')
 
       obs(undefined)
-      expect(testNode.children[0].innerHTML).toEqual('<div>text<!--O--></div>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<div>text<!--O--></div>')
 
       o2({ elementName: 'i', children: ['g'], attributes: {} })
-      expect(testNode.children[0].innerHTML).toEqual('<div><i>g</i><!--O--></div>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<div><i>g</i><!--O--></div>')
 
       o2(undefined)
-      expect(testNode.children[0].innerHTML).toEqual('<div><!--O--></div>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<div><!--O--></div>')
     })
 
     it('inserts a partial when the `template` is an array', function () {
@@ -930,10 +939,10 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.childNodes[0]['innerHTML']).toEqual('<b>x</b><i>y</i><em>z</em>')
-      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.childNodes[0].childNodes[1] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.childNodes[0]['innerHTML']).to.deep.equal('<b>x</b><i>y</i><em>z</em>')
+      expect(testNode.childNodes[0] instanceof HTMLElement).to.equal(true)
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).to.equal(true)
+      expect(testNode.childNodes[0].childNodes[1] instanceof HTMLElement).to.equal(true)
     })
 
     it('inserts partials from `children`', function () {
@@ -945,7 +954,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c></b>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<b>xabc<c>C</c></b>')
     })
 
     it('inserts & updates observable partials from `children`', function () {
@@ -957,13 +966,13 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<c>C</c><!--O--></b>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<b>xabc<c>C</c><!--O--></b>')
 
       children.pop()
-      expect(testNode.children[0].innerHTML).toEqual('<b>xabc<!--O--></b>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<b>xabc<!--O--></b>')
 
       children.unshift('rrr')
-      expect(testNode.children[0].innerHTML).toEqual('<b>xrrrabc<!--O--></b>')
+      expect(testNode.children[0].innerHTML).to.deep.equal('<b>xrrrabc<!--O--></b>')
     })
 
     it('inserts and updates observable template', function () {
@@ -975,10 +984,10 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(testNode.children[0].innerHTML).toEqual('abc<!--O-->')
+      expect(testNode.children[0].innerHTML).to.deep.equal('abc<!--O-->')
 
       t(['rr', 'vv'])
-      expect(testNode.children[0].innerHTML).toEqual('rrvv<!--O-->')
+      expect(testNode.children[0].innerHTML).to.deep.equal('rrvv<!--O-->')
     })
 
     it('gets params from the node', function () {
@@ -998,10 +1007,10 @@ describe('Components: Component binding', function () {
       NativeProvider.addValueToNode(testNode.children[0], 'x', x)
       NativeProvider.addValueToNode(testNode.children[0], 'y', () => x)
       applyBindings(outerViewModel, testNode)
-      expect(seen.x).toEqual(x)
-      expect(seen.y()).toEqual(x)
-      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(seen.x).to.deep.equal(x)
+      expect(seen.y()).to.deep.equal(x)
+      expect(testNode.childNodes[0] instanceof HTMLElement).to.equal(true)
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).to.equal(true)
     })
 
     it('binds context for ViewModel::template', () => {
@@ -1012,7 +1021,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(dataFor(testNode.childNodes[0])).toEqual(outerViewModel)
+      expect(dataFor(testNode.childNodes[0])).to.deep.equal(outerViewModel)
     })
 
     it('binds context for ViewModel.template', () => {
@@ -1023,7 +1032,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
       applyBindings(outerViewModel, testNode)
-      expect(dataFor(testNode.childNodes[0])).toEqual(outerViewModel)
+      expect(dataFor(testNode.childNodes[0])).to.deep.equal(outerViewModel)
     })
   }) // /jsx
 
@@ -1046,7 +1055,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).toEqual(`beep`)
+      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).to.deep.equal(`beep`)
     })
 
     it('inserts into virtual element slot with the slot template', function () {
@@ -1067,7 +1076,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).toEqual(`beep`)
+      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).to.deep.equal(`beep`)
     })
 
     it('inserts multiple times into virtual element slot with the slot template', function () {
@@ -1089,7 +1098,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).toEqual(`beep / beep`)
+      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).to.deep.equal(`beep / beep`)
     })
 
     it('inserts into nested elements', function () {
@@ -1110,7 +1119,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).toEqual(`beep`)
+      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`beep`)
     })
 
     it('inserts the node with the slot name', function () {
@@ -1131,10 +1140,10 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).toEqual(`beep`)
+      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`beep`)
       const em = testNode.children[0].children[0].children[0]
-      expect(em.tagName).toEqual('EM')
-      expect(em.getAttribute('slot')).toEqual('alpha')
+      expect(em.tagName).to.deep.equal('EM')
+      expect(em.getAttribute('slot')).to.deep.equal('alpha')
     })
 
     it('ignores missing slots', function () {
@@ -1155,7 +1164,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).toEqual(``)
+      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(``)
     })
 
     it('preprocesses <slot> nodes', function () {
@@ -1176,7 +1185,7 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).toEqual(`beep`)
+      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`beep`)
     })
 
     it('processes default and named slots', function () {
@@ -1200,7 +1209,7 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       const innerText = (testNode.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
-      expect(innerText).toEqual(`X beep Y Gamma Zeta Q`)
+      expect(innerText).to.deep.equal(`X beep Y Gamma Zeta Q`)
     })
 
     it('inserts all component template nodes in an unnamed (default) slot', function () {
@@ -1223,9 +1232,9 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).toEqual(`A. B. C.`)
+      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`A. B. C.`)
       const em = testNode.children[0].children[0].children[0]
-      expect(em.tagName).toEqual('EM')
+      expect(em.tagName).to.deep.equal('EM')
     })
 
     it('inserts multiple nodes from a <template>', function () {
@@ -1244,9 +1253,9 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).toEqual(`B. C. E.`)
+      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`B. C. E.`)
       const em = testNode.children[0].children[0].children[0]
-      expect(em.tagName).toEqual('EM')
+      expect(em.tagName).to.deep.equal('EM')
     })
 
     it('preserves JSX-based slots', function () {
@@ -1278,7 +1287,7 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       const text = (testNode.children[0] as HTMLElement).innerText.trim().replace(/\s+/, ' ')
-      expect(text).toEqual('AtoB')
+      expect(text).to.deep.equal('AtoB')
     })
 
     it('preserves native attributes on child nodes', function () {
@@ -1312,9 +1321,9 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
       const em = testNode.querySelector('em')
-      expect(NativeProvider.getNodeValues(em!).attry).toEqual('y')
-      expect(NativeProvider.getNodeValues(em!).attrz()).toEqual('z')
-      expect(NativeProvider.getNodeValues(em!).attrx).toEqual(attrx)
+      expect(NativeProvider.getNodeValues(em!).attry).to.deep.equal('y')
+      expect(NativeProvider.getNodeValues(em!).attrz()).to.deep.equal('z')
+      expect(NativeProvider.getNodeValues(em!).attrx).to.deep.equal(attrx)
     })
 
     it('updates observable nodes', function () {
@@ -1330,12 +1339,12 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect(testNode.innerText).toEqual('text')
-      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.innerText).to.deep.equal('text')
+      expect(testNode.childNodes[0] instanceof HTMLElement).to.equal(true)
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).to.equal(true)
 
       obs('téx†')
-      expect(testNode.innerText).toEqual('téx†')
+      expect(testNode.innerText).to.deep.equal('téx†')
     })
 
     it('respects observable array changes with text', function () {
@@ -1364,17 +1373,17 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
 
-      expect(testNode.innerText).toEqual('')
-      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.innerText).to.deep.equal('')
+      expect(testNode.childNodes[0] instanceof HTMLElement).to.equal(true)
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).to.equal(true)
 
       arr(['abcdef'])
-      expect(testNode.innerHTML).toEqual(
+      expect(testNode.innerHTML).to.deep.equal(
         '<test-component><div><!--ko slot: "X"-->abcdef<!--/ko--></div></test-component>'
       )
 
       arr([])
-      expect(testNode.innerHTML).toEqual(`<test-component><div><!--ko slot: "X"--><!--/ko--></div></test-component>`)
+      expect(testNode.innerHTML).to.deep.equal(`<test-component><div><!--ko slot: "X"--><!--/ko--></div></test-component>`)
     })
 
     it('respects observable array changes with JSX', function () {
@@ -1407,13 +1416,13 @@ describe('Components: Component binding', function () {
 
       applyBindings(outerViewModel, testNode)
 
-      expect(testNode.innerText).toEqual('')
-      expect(testNode.childNodes[0] instanceof HTMLElement).toBeTruthy()
-      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).toBeTruthy()
+      expect(testNode.innerText).to.deep.equal('')
+      expect(testNode.childNodes[0] instanceof HTMLElement).to.equal(true)
+      expect(testNode.childNodes[0].childNodes[0] instanceof HTMLElement).to.equal(true)
 
       // <div x="1">r</div>
       arr([{ elementName: 'div', children: ['r'], attributes: { x: 1 } }, 'text'])
-      expect(testNode.innerHTML).toEqual(
+      expect(testNode.innerHTML).to.deep.equal(
         '<test-component><div><!--ko slot: "X"--><div x="1">r</div>text<!--/ko--></div></test-component>'
       )
       jo.dispose()
