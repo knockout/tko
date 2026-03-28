@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import { subscribable as Subscribable, extenders } from '../dist'
 
 describe('Extenders', function () {
@@ -7,10 +9,10 @@ describe('Extenders', function () {
     }
 
     const subscribable = new Subscribable()
-    expect(subscribable.dummyProperty).toEqual(undefined)
+    expect(subscribable.dummyProperty).to.equal(undefined)
 
     subscribable.extend({ setDummyProperty: 123 })
-    expect(subscribable.dummyProperty).toEqual(123)
+    expect(subscribable.dummyProperty).to.equal(123)
   })
 
   it('Should be able to chain extenders', function () {
@@ -19,6 +21,6 @@ describe('Extenders', function () {
     }
     const underlyingSubscribable = new Subscribable()
     const result = underlyingSubscribable.extend({ wrapInParentObject: true }).extend({ wrapInParentObject: true })
-    expect(result.inner.inner).toEqual(underlyingSubscribable)
+    expect(result.inner.inner).to.equal(underlyingSubscribable)
   })
 })
