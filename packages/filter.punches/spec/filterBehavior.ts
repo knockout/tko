@@ -3,6 +3,7 @@ import { observable } from '@tko/observable'
 import type { KnockoutInstance } from '@tko/builder'
 
 import { filters } from '../dist'
+import { assert } from 'chai'
 
 declare let ko: KnockoutInstance
 /* can be remove https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array.isarray
@@ -20,41 +21,44 @@ describe('Text filters preprocessor', function () {
 
   /* Skipping the following five since they are tests that apply to the
        filter-runner moreso than any specific filter exported here. */
-  xit('Should convert basic input|filter syntax into function calls', function () {
-    expect(filterPreprocessor('input|filter1|filter2:arg|filter3:arg1:arg2')).toEqual(
+  it.skip('Should convert basic input|filter syntax into function calls', function () {
+    assert.equal(
+      filterPreprocessor('input|filter1|filter2:arg|filter3:arg1:arg2'),
       "ko.filters['filter3'](ko.filters['filter2'](ko.filters['filter1'](input),arg),arg1,arg2)"
     )
   })
 
-  xit('Should not be confused by | in quotes, or : or || in input', function () {
-    expect(filterPreprocessor('input1||(input2?a:b)||"A|B"|filter')).toEqual(
+  it.skip('Should not be confused by | in quotes, or : or || in input', function () {
+    assert.equal(
+      filterPreprocessor('input1||(input2?a:b)||"A|B"|filter'),
       'ko.filters[\'filter\'](input1||(input2?a:b)||"A|B")'
     )
   })
 
-  xit('Should tolerate spaces or newlines in the input', function () {
-    expect(filterPreprocessor('input \n| filter\n | filter2')).toEqual(
+  it.skip('Should tolerate spaces or newlines in the input', function () {
+    assert.equal(
+      filterPreprocessor('input \n| filter\n | filter2'),
       "ko.filters['filter2'](ko.filters['filter'](input))"
     )
   })
 
-  xit('Should be able to run filter output and apply filters to input', function () {
+  it.skip('Should be able to run filter output and apply filters to input', function () {
     try {
       ko.filters.test = function (input) {
         return input.toUpperCase()
       }
-      expect(eval(filterPreprocessor('"someText" | test'))).toEqual('SOMETEXT')
+      assert.equal(eval(filterPreprocessor('"someText" | test')), 'SOMETEXT')
     } finally {
       delete ko.filters.test
     }
   })
 
-  xit('Should pass arguments when applying filter', function () {
+  it.skip('Should pass arguments when applying filter', function () {
     try {
       ko.filters.test = function (input, length) {
         return input.slice(0, length)
       }
-      expect(eval(filterPreprocessor('"someText" | test:5'))).toEqual('someT')
+      assert.equal(eval(filterPreprocessor('"someText" | test:5')), 'someT')
     } finally {
       delete ko.filters.test
     }
@@ -63,7 +67,7 @@ describe('Text filters preprocessor', function () {
   /* ~~~ Filters ~~~ */
 
   function attempt(filter, args, expected) {
-    expect(filters[filter].apply(null, Array.isArray(args) ? args : [args])).toEqual(expected)
+    assert.deepEqual(filters[filter].apply(null, Array.isArray(args) ? args : [args]), expected)
   }
 
   it('Should convert text to uppercase using uppercase filter', function () {
@@ -133,15 +137,25 @@ describe('Text filters preprocessor', function () {
 })
 
 /* Skip this since */
-xdescribe('Text filter bindings', function () {
+describe.skip('Text filter bindings', function () {
   let testNode: HTMLElement
+
+  function prepareTestNode(): HTMLElement {
+    const existingNode = document.getElementById('testNode')
+    if (existingNode !== null && existingNode.parentNode) existingNode.parentNode.removeChild(existingNode)
+    const node = document.createElement('div')
+    node.id = 'testNode'
+    document.body.appendChild(node)
+    return node
+  }
+
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   it('Should convert input into appropriate output', function () {
     testNode.innerHTML = "<div data-bind='text: input | lowercase | fit:10 | json'></div>"
     ko.applyBindings({ input: 'Some string of data' }, testNode)
-    expect(testNode).toContainText('"some st..."')
+    assert.equal(testNode.textContent, '"some st..."')
   })
 })
