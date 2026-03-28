@@ -28,7 +28,9 @@
   "homepage": "https://tko.io",
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha",
+      "chai",
+      "sinon"
     ]
   },
   "licenses": [
