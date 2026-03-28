@@ -52,6 +52,8 @@ These ideas or findings are still useful:
 - keep useful runtime modernizations that are independent of the test runner
 - keep the lesson that shared specs must continue to run in real browsers until
   Playwright replaces that role
+- simplify task scheduling to a modern default: `queueMicrotask`, while
+  keeping `options.taskScheduler` as the public override surface
 
 ## Drop Or Redo
 
