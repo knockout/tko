@@ -33,6 +33,8 @@ default mental model.
   computed docs.
 - Add repo-level guardrails that catch stale docs, dead links, and contract
   drift earlier.
+- Simplify shared runtime infrastructure when modern platform guarantees make
+  legacy fallback matrices unnecessary.
 
 ## Non-Goals
 
@@ -145,6 +147,29 @@ Candidate systems:
 - `tko.io/scripts/`
 - CI workflow integration if the checks prove stable
 
+### 5. Modern Runtime Defaults
+
+Use modern platform guarantees to simplify core infrastructure without changing
+the public TKO API surface.
+
+Key changes:
+
+- Prefer modern JavaScript defaults such as `queueMicrotask` where the old
+  browser fallback logic no longer adds value.
+- Keep public override surfaces such as `options.taskScheduler`, but treat them
+  as explicit hooks rather than compatibility engines.
+- Use specialized primitives such as `requestAnimationFrame` only at call sites
+  that actually need frame-aligned work, not as generic queue substitutes.
+- Remove dead legacy scheduling and environment-detection branches once tests
+  prove the modern default contract.
+
+Candidate systems:
+
+- `packages/utils/src/tasks.ts`
+- `packages/utils/spec/taskBehaviors.ts`
+- downstream tests that currently override task scheduling only to preserve old
+  timer assumptions
+
 ## Execution Plan
 
 ### Phase 1. Establish the repo-level narrative
@@ -194,6 +219,20 @@ Success criteria:
 - obvious docs regressions fail early
 - generated behavior docs cannot silently drift
 
+### Phase 5. Simplify shared runtime defaults
+
+- Modernize core queueing and scheduling defaults where the platform baseline
+  now supports simpler behavior.
+- Validate those changes first against the owning package tests, then against
+  downstream package behavior that depends on them.
+- Remove test-only scheduler workarounds once the modern default is stable.
+
+Success criteria:
+
+- shared infrastructure uses modern primitives by default
+- the public override hooks remain available
+- downstream code no longer carries timer-era compatibility complexity by inertia
+
 ## Verification
 
 Use a mix of build, browser, and audit checks:
@@ -223,3 +262,5 @@ After this plan:
 - Docs and examples become more trustworthy and easier to learn from.
 - Agents and humans can both find the contract surface faster.
 - Drift between docs, tests, and implementation becomes harder to miss.
+- Shared infrastructure reflects modern platform assumptions instead of
+  preserving outdated scheduler and browser workarounds.

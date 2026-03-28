@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, jest } from 'bun:test'
+
 import { options, tasks, cleanNode } from '@tko/utils'
 
 import { MultiProvider } from '@tko/provider.multi'
@@ -14,8 +16,19 @@ import { bindings as componentBindings } from '@tko/binding.component'
 
 import components from '../dist'
 const { ComponentABC } = components
+import { prepareTestNode } from '../../../tools/testing/bun-dom'
 
-import { useMockForTasks } from '@tko/utils/helpers/jasmine-13-helper'
+function restoreAfter<T extends object, K extends keyof T>(cleanup: DisposableStack, object: T, propertyName: K) {
+  const originalValue = object[propertyName]
+  cleanup.defer(() => {
+    object[propertyName] = originalValue
+  })
+}
+
+function useFakeTaskScheduler(cleanup: DisposableStack) {
+  restoreAfter(cleanup, options, 'taskScheduler')
+  options.taskScheduler = callback => setTimeout(callback, 0)
+}
 
 describe('ComponentABC', function () {
   let testComponentName = 'test-component',
@@ -23,10 +36,13 @@ describe('ComponentABC', function () {
     testComponentParams,
     outerViewModel
   let testNode: HTMLElement
+  let cleanup: DisposableStack
 
   beforeEach(function () {
-    useMockForTasks(options)
-    testNode = jasmine.prepareTestNode()
+    cleanup = new DisposableStack()
+    jest.useFakeTimers()
+    useFakeTaskScheduler(cleanup)
+    testNode = prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
@@ -45,7 +61,10 @@ describe('ComponentABC', function () {
 
   afterEach(function () {
     expect(tasks.resetForTesting()).toEqual(0)
-    jasmine.Clock.reset()
+    cleanup.dispose()
+    jest.clearAllTimers()
+    jest.clearAllMocks()
+    jest.useRealTimers()
     components.unregister(testComponentName)
   })
 
@@ -89,7 +108,7 @@ describe('ComponentABC', function () {
     }
     ;(CX as any).register()
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
 
     expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: myvalue">some parameter value</div>')
   })
@@ -125,7 +144,7 @@ describe('ComponentABC', function () {
     }
     ;(CX as any).register()
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    jest.advanceTimersByTime(1)
 
     expect(testNode.childNodes[0]).toContainHtml('<i>vid</i>')
   })

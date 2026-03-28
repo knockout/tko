@@ -27,6 +27,7 @@ The target testing model should be:
 - SauceLabs only if a clearly justified coverage gap remains after Playwright
 - Karma retained only as a temporary compatibility harness during migration
 - Bun-migrated tests should target modern JavaScript directly, including native `DisposableStack` and removal of dead legacy compatibility branches
+- Shared runtime infrastructure should target modern JavaScript directly too; for example, the task queue should default to `queueMicrotask` and keep `options.taskScheduler` only as an override surface, not as a compatibility matrix
 
 ## Goals
 
@@ -136,6 +137,7 @@ Success criteria:
 - Establish only the minimal shared Bun test support needed for DOM globals or similar runtime setup.
 - Prefer native Bun APIs and modern language features over compatibility shims in migrated specs.
 - Remove dead compatibility branches and stale browser-era guards when Bun migration shows they no longer matter.
+- Simplify cross-cutting infrastructure when legacy support is the only reason it remains complex; the task queue is a good example, where a modern default (`queueMicrotask`) is preferable to browser-era fallback logic.
 - Add coverage/reporting guidance for the Bun-based suite.
 
 Success criteria:

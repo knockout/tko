@@ -1,8 +1,24 @@
+import { afterEach, beforeEach, describe, expect, it, jest } from 'bun:test'
+
+import { options, tasks } from '@tko/utils'
+
 import { observable } from '@tko/observable'
 
 import { computed } from '@tko/computed'
 
 import components from '../dist'
+
+function restoreAfter<T extends object, K extends keyof T>(cleanup: DisposableStack, object: T, propertyName: K) {
+  const originalValue = object[propertyName]
+  cleanup.defer(() => {
+    object[propertyName] = originalValue
+  })
+}
+
+function useFakeTaskScheduler(cleanup: DisposableStack) {
+  restoreAfter(cleanup, options, 'taskScheduler')
+  options.taskScheduler = callback => setTimeout(callback, 0)
+}
 
 describe('Components: Loader registry', function () {
   const testAsyncDelay = 20,
@@ -58,9 +74,17 @@ describe('Components: Loader registry', function () {
         expect(config).toBe(testComponentConfig)
         callback(testComponentDefinition)
       }
-    },
-    testLoaderChain = function (spec, chain, options) {
-      spec.restoreAfter(components, 'loaders')
+    }
+  let cleanup: DisposableStack
+
+  beforeEach(function () {
+    cleanup = new DisposableStack()
+    jest.useFakeTimers()
+    useFakeTaskScheduler(cleanup)
+  })
+
+  const beginLoaderChain = function (chain) {
+      restoreAfter(cleanup, components, 'loaders')
 
       // Set up a chain of loaders, then query it
       components.loaders = chain
@@ -70,33 +94,19 @@ describe('Components: Loader registry', function () {
         loadedDefinition = definition
       })
 
-      const onLoaded = function () {
-        if ('expectedDefinition' in options) {
-          expect(loadedDefinition).toBe(options.expectedDefinition)
+      return {
+        get loadedDefinition() {
+          return loadedDefinition
         }
-        if ('done' in options) {
-          options.done(loadedDefinition)
-        }
-      }
-
-      // Wait for and verify result
-      if (loadedDefinition !== 'Not yet loaded') {
-        // Completed synchronously
-        onLoaded()
-      } else {
-        // Will complete asynchronously
-        window.waitsFor(
-          function () {
-            return loadedDefinition !== 'Not yet loaded'
-          },
-          'timeout',
-          300
-        )
-        runs(onLoaded)
       }
     }
 
   afterEach(function () {
+    expect(tasks.resetForTesting()).toEqual(0)
+    cleanup.dispose()
+    jest.clearAllTimers()
+    jest.clearAllMocks()
+    jest.useRealTimers()
     components.unregister(testComponentName)
   })
 
@@ -106,26 +116,24 @@ describe('Components: Loader registry', function () {
 
   it('issues a PEBKAC when a component name does not have a dash', function () {
     const logs = new Array()
-    const orlog = console.log
+    restoreAfter(cleanup, console, 'log')
     console.log = v => logs.push(v)
 
     components.register('testname', { template: {} })
     expect(logs.length).toEqual(1)
     expect(logs[0]).toContain('Knockout warning')
 
-    console.log = orlog
     components.unregister('testname')
   })
 
   it('does not issue a PEBCAK when `ignoreCustomElementWarning` is true', function () {
     const logs = new Array()
-    const orlog = console.log
+    restoreAfter(cleanup, console, 'log')
     console.log = v => logs.push(v)
 
     components.register('testname', { template: {}, ignoreCustomElementWarning: true })
     expect(logs.length).toEqual(0)
 
-    console.log = orlog
     components.unregister('testname')
   })
 
@@ -139,7 +147,9 @@ describe('Components: Loader registry', function () {
       loaderThatShouldNeverBeCalled
     ]
 
-    testLoaderChain(this, loaders, { expectedDefinition: testComponentDefinition })
+    const request = beginLoaderChain(loaders)
+    jest.runAllTimers()
+    expect(request.loadedDefinition).toBe(testComponentDefinition)
   })
 
   it('Supplies null if no registered loader returns a config object', function () {
@@ -150,7 +160,9 @@ describe('Components: Loader registry', function () {
       loaderThatDoesNotReturnAnything
     ]
 
-    testLoaderChain(this, loaders, { expectedDefinition: null })
+    const request = beginLoaderChain(loaders)
+    jest.runAllTimers()
+    expect(request.loadedDefinition).toBe(null)
   })
 
   it('Supplies null if no registered loader returns a component for a given config object', function () {
@@ -161,7 +173,9 @@ describe('Components: Loader registry', function () {
       loaderThatDoesNotReturnAnything
     ]
 
-    testLoaderChain(this, loaders, { expectedDefinition: null })
+    const request = beginLoaderChain(loaders)
+    jest.runAllTimers()
+    expect(request.loadedDefinition).toBe(null)
   })
 
   it('Aborts if a getConfig call returns a value other than undefined', function () {
@@ -187,7 +201,9 @@ describe('Components: Loader registry', function () {
       loaderThatReturnsConfig
     ]
 
-    testLoaderChain(this, loaders, { expectedDefinition: null })
+    const request = beginLoaderChain(loaders)
+    jest.runAllTimers()
+    expect(request.loadedDefinition).toBe(null)
   })
 
   it('Aborts if a loadComponent call returns a value other than undefined', function () {
@@ -213,7 +229,9 @@ describe('Components: Loader registry', function () {
       loaderThatReturnsDefinition
     ]
 
-    testLoaderChain(this, loaders, { expectedDefinition: null })
+    const request = beginLoaderChain(loaders)
+    jest.runAllTimers()
+    expect(request.loadedDefinition).toBe(null)
   })
 
   it('Ensures that the loading process completes asynchronously, even if the loader completed synchronously', function () {
@@ -222,19 +240,16 @@ describe('Components: Loader registry', function () {
 
     let wasAsync = false
 
-    testLoaderChain(this, [loaderThatCompletesSynchronously], {
-      expectedDefinition: testComponentDefinition,
-      done: function () {
-        expect(wasAsync).toBe(true)
-      }
-    })
-
+    const request = beginLoaderChain([loaderThatCompletesSynchronously])
     wasAsync = true
+    jest.runAllTimers()
+    expect(request.loadedDefinition).toBe(testComponentDefinition)
+    expect(wasAsync).toBe(true)
   })
 
   it('Supplies component definition synchronously if the "synchronous" flag is provided and the loader completes synchronously', function () {
     // Set up a synchronous loader that returns a component marked as synchronous
-    this.restoreAfter(components, 'loaders')
+    restoreAfter(cleanup, components, 'loaders')
     let testSyncComponentConfig = { synchronous: true },
       testSyncComponentDefinition = {},
       syncComponentName = 'my-sync-component',
@@ -295,8 +310,8 @@ describe('Components: Loader registry', function () {
 
   it('Supplies component definition synchronously if the "synchronous" flag is provided and definition is already cached', function () {
     // Set up an asynchronous loader chain that returns a component marked as synchronous
-    this.restoreAfter(components, 'loaders')
-    this.after(function () {
+    restoreAfter(cleanup, components, 'loaders')
+    cleanup.defer(() => {
       delete testComponentConfig.synchronous
     })
     testComponentConfig.synchronous = 'trueish value'
@@ -304,7 +319,9 @@ describe('Components: Loader registry', function () {
 
     // Perform an initial load to prime the cache. Also verify it's set up to be async.
     let initialLoadWasAsync = false
-    getComponentDefinition(testComponentName, function (initialDefinition) {
+    const request = beginGetComponentDefinition(testComponentName)
+    initialLoadWasAsync = true // We verify that this line runs *before* the definition load completes above
+    const initialDefinition = finishGetComponentDefinition(request)
       expect(initialLoadWasAsync).toBe(true)
       expect(initialDefinition).toBe(testComponentDefinition)
 
@@ -316,8 +333,6 @@ describe('Components: Loader registry', function () {
         expect(cachedDefinition).toBe(testComponentDefinition)
       })
       expect(cachedLoadWasSynchronous).toBe(true)
-    })
-    initialLoadWasAsync = true // We verify that this line runs *before* the definition load completes above
   })
 
   it('By default, contains only the default loader', function () {
@@ -327,10 +342,8 @@ describe('Components: Loader registry', function () {
 
   it('Caches and reuses loaded component definitions', function () {
     // Ensure we leave clean state after the test
-    this.after(function () {
-      components.unregister('some-component')
-      components.unregister('other-component')
-    })
+    cleanup.defer(() => components.unregister('some-component'))
+    cleanup.defer(() => components.unregister('other-component'))
 
     components.register('some-component', {
       viewModel: function () {
@@ -345,37 +358,31 @@ describe('Components: Loader registry', function () {
 
     // Fetch the component definition, and see it's the right thing
     let definition1
-    getComponentDefinition('some-component', function (definition) {
-      definition1 = definition
-      expect(definition1.createViewModel().isTheTestComponent).toBe(true)
-    })
+    definition1 = finishGetComponentDefinition(beginGetComponentDefinition('some-component'))
+    expect(definition1.createViewModel().isTheTestComponent).toBe(true)
 
     // Fetch it again, and see the definition was reused
-    getComponentDefinition('some-component', function (definition2) {
+    finishGetComponentDefinition(beginGetComponentDefinition('some-component'), function (definition2) {
       expect(definition2).toBe(definition1)
     })
 
     // See that requests for other component names don't reuse the same cache entry
-    getComponentDefinition('other-component', function (otherDefinition) {
+    finishGetComponentDefinition(beginGetComponentDefinition('other-component'), function (otherDefinition) {
       expect(otherDefinition).not.toBe(definition1)
       expect(otherDefinition.createViewModel().isTheOtherComponent).toBe(true)
     })
 
     // See we can choose to force a refresh by clearing a cache entry before fetching a definition.
     // This facility probably won't be used by most applications, but it is helpful for tests.
-    runs(function () {
-      components.clearCachedDefinition('some-component')
-    })
-    getComponentDefinition('some-component', function (definition3) {
+    components.clearCachedDefinition('some-component')
+    finishGetComponentDefinition(beginGetComponentDefinition('some-component'), function (definition3) {
       expect(definition3).not.toBe(definition1)
       expect(definition3.createViewModel().isTheTestComponent).toBe(true)
     })
 
     // See that unregistering a component implicitly clears the cache entry too
-    runs(function () {
-      components.unregister('some-component')
-    })
-    getComponentDefinition('some-component', function (definition4) {
+    components.unregister('some-component')
+    finishGetComponentDefinition(beginGetComponentDefinition('some-component'), function (definition4) {
       expect(definition4).toBe(null)
     })
   })
@@ -385,7 +392,7 @@ describe('Components: Loader registry', function () {
     const someModuleTemplate = new Array(),
       someComponentModule = { template: someModuleTemplate },
       requireCallLog = new Array()
-    this.restoreAfter(window, 'require')
+    restoreAfter(cleanup, window, 'require')
     window.require = function (modules, callback) {
       requireCallLog.push(modules.slice(0))
       setTimeout(function () {
@@ -404,54 +411,59 @@ describe('Components: Loader registry', function () {
 
     // Even a little while later, the module hasn't yet loaded
     let definition2
-    waits(20)
-    runs(function () {
-      expect(definition1).toBe(undefined)
+    jest.advanceTimersByTime(20)
+    expect(definition1).toBe(undefined)
 
-      // ... but let's make a second request for the same module
-      components.get(testComponentName, function (loadedDefinition) {
-        definition2 = loadedDefinition
-      })
-
-      // This time there was no further request to the module loader
-      expect(requireCallLog.length).toBe(1)
+    // ... but let's make a second request for the same module
+    components.get(testComponentName, function (loadedDefinition) {
+      definition2 = loadedDefinition
     })
+    expect(definition2).toBe(undefined)
+
+    // This time there was no further request to the module loader
+    expect(requireCallLog.length).toBe(1)
+
+    // Another partial tick still should not complete either request.
+    jest.advanceTimersByTime(20)
+    expect(definition1).toBe(undefined)
+    expect(definition2).toBe(undefined)
 
     // And when the loading eventually completes, both requests are satisfied with the same definition
-    window.waitsFor(
-      function () {
-        return definition1
-      },
-      'timeout',
-      300
-    )
-    runs(function () {
-      expect(definition1.template).toBe(someModuleTemplate)
-      expect(definition2).toBe(definition1)
-    })
+    jest.runAllTimers()
+    expect(definition1.template).toBe(someModuleTemplate)
+    expect(definition2).toBe(definition1)
 
     // Subsequent requests also don't involve calls to the module loader
-    getComponentDefinition(testComponentName, function (definition3) {
+    finishGetComponentDefinition(beginGetComponentDefinition(testComponentName), function (definition3) {
       expect(definition3).toBe(definition1)
       expect(requireCallLog.length).toBe(1)
     })
   })
 
-  function getComponentDefinition(componentName, assertionCallback) {
+  function beginGetComponentDefinition(componentName) {
     let loadedDefinition,
       hasCompleted = false
-    runs(function () {
-      components.get(componentName, function (definition) {
-        loadedDefinition = definition
-        hasCompleted = true
-      })
-      expect(hasCompleted).toBe(false) // Should always complete asynchronously
+    components.get(componentName, function (definition) {
+      loadedDefinition = definition
+      hasCompleted = true
     })
-    window.waitsFor(function () {
-      return hasCompleted
-    })
-    runs(function () {
-      assertionCallback(loadedDefinition)
-    })
+    expect(hasCompleted).toBe(false) // Should always complete asynchronously
+    return {
+      get loadedDefinition() {
+        return loadedDefinition
+      },
+      get hasCompleted() {
+        return hasCompleted
+      }
+    }
+  }
+
+  function finishGetComponentDefinition(request, assertionCallback?) {
+    jest.runAllTimers()
+    expect(request.hasCompleted).toBe(true)
+    if (assertionCallback) {
+      assertionCallback(request.loadedDefinition)
+    }
+    return request.loadedDefinition
   }
 })

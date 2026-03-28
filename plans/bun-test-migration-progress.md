@@ -67,6 +67,11 @@
   - Verified with `bun test ./packages/utils.jsx/spec/*.ts` from `/Users/brianhunt/repos/tko`.
   - Status: 121 pass, 0 fail.
 
+- `@tko/utils.component`
+  - Verified with `bun test ./packages/utils.component/spec/*.ts` from `/Users/brianhunt/repos/tko`.
+  - Status: 54 pass, 0 fail.
+  - Notes: migrated component ABC, default loader, and loader registry specs to `bun:test`, Bun fake timers, shared Bun DOM helpers, and direct `DisposableStack` cleanup. Cross-checked against a clean `origin/main` Karma run: `54 SUCCESS`. The textarea template-source tests now seed `.value` directly so Bun/happy-dom exercises the same loader contract as browsers: `<textarea>` templates are parsed from `elem.value`, not DOM child elements.
+
 - `@tko/builder`
   - Verified with `bun test ./packages/builder/spec/*.ts` from `/Users/brianhunt/repos/tko`.
   - Status: 1 pass, 0 fail.
