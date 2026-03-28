@@ -1,6 +1,17 @@
 import { assert } from 'chai'
 import { options } from '../dist'
 
+export function restoreAfter<T extends object, K extends keyof T>(
+  cleanups: Array<() => void>,
+  object: T,
+  propertyName: K
+) {
+  const originalValue = object[propertyName]
+  cleanups.push(() => {
+    object[propertyName] = originalValue
+  })
+}
+
 export function prepareTestNode(): HTMLElement {
   const existingNode = document.getElementById('testNode')
   if (existingNode !== null && existingNode.parentNode) {
@@ -63,9 +74,6 @@ export function expectContainHtmlElementsAndText(node: Element, expectedHtml: st
 }
 
 export function useMockForTasks(cleanups: Array<() => void>) {
-  const originalTaskScheduler = options.taskScheduler
-  cleanups.push(() => {
-    options.taskScheduler = originalTaskScheduler
-  })
+  restoreAfter(cleanups, options, 'taskScheduler')
   options.taskScheduler = callback => setTimeout(callback, 0)
 }
