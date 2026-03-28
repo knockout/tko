@@ -1,13 +1,14 @@
-import { arrayForEach, parseHtmlFragment, options, setHtml } from '../dist'
+import { expect } from 'chai'
 
-import '../helpers/jasmine-13-helper'
+import { arrayForEach, parseHtmlFragment, options, setHtml } from '../dist'
+import { expectContainHtml, prepareTestNode } from '../helpers/mocha-test-helpers'
 
 describe('Parse HTML fragment', function () {
   const supportsTemplateTag = options.useTemplateTag && 'content' in document.createElement('template')
 
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   // See: https://github.com/knockout/knockout/issues/1880
@@ -75,11 +76,11 @@ describe('Parse HTML fragment', function () {
         const parsedNodes = parseHtmlFragment(data.html, document)
 
         // Assert that we have the expected collection of elements (not just the correct .innerHTML string)
-        expect(parsedNodes.length).toEqual(data.parsed.length)
+        expect(parsedNodes.length).to.equal(data.parsed.length)
         for (let i = 0; i < parsedNodes.length; i++) {
           testNode.innerHTML = ''
           testNode.appendChild(parsedNodes[i])
-          expect(testNode).toContainHtml(data.parsed[i], function (htmlToClean) {
+          expectContainHtml(testNode, data.parsed[i], function (htmlToClean) {
             // Old IE strips quotes from certain attributes. The easiest way of normalising this across
             // browsers is to forcibly strip the equivalent quotes in all browsers for the test.
             return htmlToClean.replace(/"x"/g, 'x')
@@ -93,10 +94,10 @@ describe('Parse HTML fragment', function () {
     const html = '<div><i></i></div>'
     const parsedNodes1 = parseHtmlFragment(html, document)
     const parsedNodes2 = parseHtmlFragment(html, document)
-    expect(parsedNodes1).not.toEqual(parsedNodes2)
-    expect(parsedNodes1[0]).not.toEqual(parsedNodes2[0])
+    expect(parsedNodes1).to.not.equal(parsedNodes2)
+    expect(parsedNodes1[0]).to.not.equal(parsedNodes2[0])
     // We need to test for deep inequality
-    expect(parsedNodes1[0].childNodes[0]).not.toEqual(parsedNodes2[0].childNodes[0])
+    expect(parsedNodes1[0].childNodes[0]).to.not.equal(parsedNodes2[0].childNodes[0])
   })
 
   it('template is to long', function () {
@@ -113,17 +114,10 @@ describe('Parse HTML fragment', function () {
       }
       return result
     }
-    let isfired = false
-
-    try {
-      const html = '<div><i>' + makeString(options.templateSizeLimit) + '</i></div>'
+    const html = '<div><i>' + makeString(options.templateSizeLimit) + '</i></div>'
+    expect(function () {
       parseHtmlFragment(html, document)
-    } catch (e: any) {
-      expect(e.message).toContain('Template is too long')
-      isfired = true
-    }
-
-    expect(isfired).toBe(true)
+    }).to.throw('Template is too long')
   })
 
   it('template contains script-tag', function () {
@@ -140,32 +134,17 @@ describe('Parse HTML fragment', function () {
     )
 
     htmlArray.forEach(html => {
-      let isfired = false
-
-      try {
-        const ret = parseHtmlFragment(html, document)
-        console.log(ret)
-      } catch (e: any) {
-        expect(e.message).toContain('detected')
-        isfired = true
-      }
-
-      expect(isfired).toBe(true)
+      expect(function () {
+        parseHtmlFragment(html, document)
+      }).to.throw('detected')
     })
 
     htmlArray.forEach(html => {
-      let isfired = false
       const node = document.createElement('div')
 
-      try {
-        const ret = setHtml(node, html)
-        console.log(ret)
-      } catch (e: any) {
-        expect(e.message).toContain('detected')
-        isfired = true
-      }
-
-      expect(isfired).toBe(true)
+      expect(function () {
+        setHtml(node, html)
+      }).to.throw('detected')
     })
   })
 })
