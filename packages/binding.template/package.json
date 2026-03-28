@@ -31,7 +31,9 @@
   },
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha",
+      "chai",
+      "sinon"
     ]
   },
   "peerDependencies": {
