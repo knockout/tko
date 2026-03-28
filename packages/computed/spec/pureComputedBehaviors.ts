@@ -1,3 +1,6 @@
+import { expect } from 'chai'
+import sinon from 'sinon'
+
 import { isWriteableObservable, observable, dependencyDetection } from '@tko/observable'
 
 import { isPureComputed, isComputed, computed, pureComputed } from '../dist'
@@ -5,28 +8,28 @@ import { isPureComputed, isComputed, computed, pureComputed } from '../dist'
 describe('Pure Computed', function () {
   it('Observables should advertise that instances are not pure computed', function () {
     const instance = observable()
-    expect(isPureComputed(instance)).toEqual(false)
+    expect(isPureComputed(instance)).to.eql(false)
   })
 
   it('Should advertise that instances are computed', function () {
     const computedInstance = pureComputed(function () {})
-    expect(isComputed(computedInstance)).toEqual(true)
+    expect(isComputed(computedInstance)).to.eql(true)
   })
 
   it('Should advertise that instances are pure computed', function () {
     const instance = pureComputed(function () {})
-    expect(isPureComputed(instance)).toEqual(true)
+    expect(isPureComputed(instance)).to.eql(true)
   })
 
   it('Should advertise that instances are not computed', function () {
     const instance = observable()
-    expect(isComputed(instance)).toEqual(false)
+    expect(isComputed(instance)).to.eql(false)
   })
 
   it('Should require an evaluator function as constructor param', function () {
     expect(function () {
       pureComputed()
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should be able to pass evaluator function using "options" parameter called "read"', function () {
@@ -35,17 +38,17 @@ describe('Pure Computed', function () {
         return 123
       }
     })
-    expect(computedInstance()).toEqual(123)
+    expect(computedInstance()).to.eql(123)
   })
 
   it('Should not be able to write a value to it if there is no "write" callback', function () {
     const computedInstance = pureComputed(function () {
       return 123
     })
-    expect(isWriteableObservable(computedInstance)).toEqual(false)
+    expect(isWriteableObservable(computedInstance)).to.eql(false)
     expect(function () {
       computedInstance(456)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should invoke the "write" callback, where present, if you attempt to write a value to it', function () {
@@ -56,27 +59,27 @@ describe('Pure Computed', function () {
         invokedWriteWithValue = value
       }
     })
-    expect(isWriteableObservable(computedInstance)).toEqual(true)
+    expect(isWriteableObservable(computedInstance)).to.eql(true)
     computedInstance('some value')
-    expect(invokedWriteWithValue).toEqual('some value')
+    expect(invokedWriteWithValue).to.eql('some value')
   })
 
   it('Should describe itself as active initially', function () {
     const computedInstance = pureComputed(function () {})
-    expect(computedInstance.isActive()).toEqual(true)
+    expect(computedInstance.isActive()).to.eql(true)
   })
 
   it('Should describe itself as inactive if the evaluator has no dependencies on its first run', function () {
     const computedInstance = pureComputed(function () {})
     computedInstance() // access the computed to evaluate it
-    expect(computedInstance.isActive()).toEqual(false)
+    expect(computedInstance.isActive()).to.eql(false)
   })
 
   it('Should describe itself as active if the evaluator has dependencies on its first run', function () {
     const observableInstance = observable('initial'),
       computedInstance = computed(observableInstance)
     computedInstance() // access the computed to evaluate it
-    expect(computedInstance.isActive()).toEqual(true)
+    expect(computedInstance.isActive()).to.eql(true)
   })
 
   it('Should evaluate on each access while sleeping when dependencies have changed', function () {
@@ -87,24 +90,24 @@ describe('Pure Computed', function () {
         return data()
       })
 
-    expect(timesEvaluated).toEqual(0)
+    expect(timesEvaluated).to.eql(0)
 
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
 
     // Access after changing dependency causes re-evaluation
     data('B')
-    expect(computedInstance()).toEqual('B')
-    expect(timesEvaluated).toEqual(2)
+    expect(computedInstance()).to.eql('B')
+    expect(timesEvaluated).to.eql(2)
 
     // Test a second time using peek
     data('C')
-    expect(computedInstance.peek()).toEqual('C')
-    expect(timesEvaluated).toEqual(3)
+    expect(computedInstance.peek()).to.eql('C')
+    expect(timesEvaluated).to.eql(3)
 
     // Access without changing dependency does not cause evaluation
-    expect(computedInstance()).toEqual('C')
-    expect(timesEvaluated).toEqual(3)
+    expect(computedInstance()).to.eql('C')
+    expect(timesEvaluated).to.eql(3)
   })
 
   it('Should notify "spectator" subscribers whenever the value changes', function () {
@@ -116,30 +119,30 @@ describe('Pure Computed', function () {
     computed.subscribe(
       function (value) {
         notifiedValues.push(value)
-        expect(computed()).toBe(value)
-        expect(computed2()).toBe(value)
+        expect(computed()).to.equal(value)
+        expect(computed2()).to.equal(value)
       },
       null,
       'spectate'
     )
 
-    expect(notifiedValues).toEqual([])
+    expect(notifiedValues).to.eql([])
 
     // Reading the computed for the first time causes a notification
-    expect(computed()).toEqual('A')
-    expect(computed2()).toEqual('A')
-    expect(notifiedValues).toEqual(['A'])
+    expect(computed()).to.eql('A')
+    expect(computed2()).to.eql('A')
+    expect(notifiedValues).to.eql(['A'])
 
     // Reading it a second time doesn't
-    expect(computed()).toEqual('A')
-    expect(computed2()).toEqual('A')
-    expect(notifiedValues).toEqual(['A'])
+    expect(computed()).to.eql('A')
+    expect(computed2()).to.eql('A')
+    expect(notifiedValues).to.eql(['A'])
 
     // Changing the dependency doesn't, but reading the computed again does
     obs('B')
-    expect(notifiedValues).toEqual(['A'])
-    expect(computed()).toEqual('B')
-    expect(notifiedValues).toEqual(['A', 'B'])
+    expect(notifiedValues).to.eql(['A'])
+    expect(computed()).to.eql('B')
+    expect(notifiedValues).to.eql(['A', 'B'])
   })
 
   it('Should not subscribe to dependencies while sleeping', function () {
@@ -147,14 +150,14 @@ describe('Pure Computed', function () {
       computedInstance = pureComputed(data)
 
     // Accessing the computed evaluates it
-    expect(computedInstance()).toEqual('A')
+    expect(computedInstance()).to.eql('A')
 
     // No subscription is registered on the dependent observable
-    expect(data.getSubscriptionsCount()).toEqual(0)
+    expect(data.getSubscriptionsCount()).to.eql(0)
 
     // getDependenciesCount returns the correct number
-    expect(computedInstance.getDependenciesCount()).toEqual(1)
-    expect(computedInstance.getDependencies()).toEqual([data])
+    expect(computedInstance.getDependenciesCount()).to.eql(1)
+    expect(computedInstance.getDependencies()).to.eql([data])
   })
 
   it('Should not evaluate after it has been disposed', function () {
@@ -165,16 +168,16 @@ describe('Pure Computed', function () {
         return data()
       })
 
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
 
     computedInstance.dispose()
-    expect(computedInstance.isActive()).toEqual(false)
+    expect(computedInstance.isActive()).to.eql(false)
 
     // These should not cause a new evaluation
     data('B')
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
   })
 
   it('Should awaken and perform dependency detection when subscribed to', function () {
@@ -186,16 +189,16 @@ describe('Pure Computed', function () {
     computedInstance.subscribe(function (value) {
       notifiedValues.push(value)
     })
-    expect(data.getSubscriptionsCount()).toEqual(1)
-    expect(computedInstance.getDependenciesCount()).toEqual(1)
-    expect(computedInstance.getDependencies()).toEqual([data])
+    expect(data.getSubscriptionsCount()).to.eql(1)
+    expect(computedInstance.getDependenciesCount()).to.eql(1)
+    expect(computedInstance.getDependencies()).to.eql([data])
 
     // The subscription should not have sent down the initial value
-    expect(notifiedValues).toEqual([])
+    expect(notifiedValues).to.eql([])
 
     // Updating data should trigger the subscription
     data('B')
-    expect(notifiedValues).toEqual(['B'])
+    expect(notifiedValues).to.eql(['B'])
   })
 
   it('Should go back to sleep when all subscriptions are disposed', function () {
@@ -203,41 +206,41 @@ describe('Pure Computed', function () {
       computedInstance = pureComputed(data),
       subscription = computedInstance.subscribe(function () {})
 
-    expect(data.getSubscriptionsCount()).toEqual(1)
-    expect(computedInstance.getDependenciesCount()).toEqual(1)
-    expect(computedInstance.getDependencies()).toEqual([data])
+    expect(data.getSubscriptionsCount()).to.eql(1)
+    expect(computedInstance.getDependenciesCount()).to.eql(1)
+    expect(computedInstance.getDependencies()).to.eql([data])
 
     // Dispose the subscription to the computed
     subscription.dispose()
     // It goes to sleep, disposing its subscription to the observable
-    expect(data.getSubscriptionsCount()).toEqual(0)
-    expect(computedInstance.getDependenciesCount()).toEqual(1) // dependency count of computed doesn't change
-    expect(computedInstance.getDependencies()).toEqual([data])
+    expect(data.getSubscriptionsCount()).to.eql(0)
+    expect(computedInstance.getDependenciesCount()).to.eql(1) // dependency count of computed doesn't change
+    expect(computedInstance.getDependencies()).to.eql([data])
   })
 
   it('Should fire "awake" and "asleep" events when changing state', function () {
     const data = observable('A'),
       computedInstance = pureComputed(data)
 
-    const notifySpy = jasmine.createSpy('notifySpy')
+    const notifySpy = sinon.spy()
     computedInstance.subscribe(notifySpy.bind(null, 'awake'), null, 'awake')
     computedInstance.subscribe(notifySpy.bind(null, 'asleep'), null, 'asleep')
 
     // Subscribing to non-change events doesn't awaken computed
-    expect(data.getSubscriptionsCount()).toEqual(0)
+    expect(data.getSubscriptionsCount()).to.eql(0)
 
     // Subscribe to computed; notifies with value
     const subscription = computedInstance.subscribe(function () {})
-    expect(notifySpy.argsForCall).toEqual([['awake', 'A']])
-    expect(data.getSubscriptionsCount()).toEqual(1)
+    expect(notifySpy.getCalls().map(call => call.args)).to.eql([['awake', 'A']])
+    expect(data.getSubscriptionsCount()).to.eql(1)
 
-    notifySpy.reset()
+    notifySpy.resetHistory()
     data('B')
-    expect(notifySpy).not.toHaveBeenCalled()
+    expect(notifySpy.called).to.equal(false)
 
     subscription.dispose()
-    expect(notifySpy.argsForCall).toEqual([['asleep', undefined]])
-    expect(data.getSubscriptionsCount()).toEqual(0)
+    expect(notifySpy.getCalls().map(call => call.args)).to.eql([['asleep', undefined]])
+    expect(data.getSubscriptionsCount()).to.eql(0)
   })
 
   it('Should subscribe to dependencies when awakened while minimizing evaluations', function () {
@@ -253,36 +256,36 @@ describe('Pure Computed', function () {
       },
       subscription
 
-    expect(timesEvaluated).toEqual(0)
+    expect(timesEvaluated).to.eql(0)
 
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
-    expect(computedInstance.getDependenciesCount()).toEqual(1)
-    expect(computedInstance.getDependencies()).toEqual([data])
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
+    expect(computedInstance.getDependenciesCount()).to.eql(1)
+    expect(computedInstance.getDependencies()).to.eql([data])
 
     // Subscribing to the computed adds a subscription to the dependency without re-evaluating
     subscription = computedInstance.subscribe(subscribeFunc)
-    expect(data.getSubscriptionsCount()).toEqual(1)
-    expect(timesEvaluated).toEqual(1)
+    expect(data.getSubscriptionsCount()).to.eql(1)
+    expect(timesEvaluated).to.eql(1)
 
     // Dispose the subscription; reading the sleeping computed doesn't cause re-evaluation
     subscription.dispose()
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
 
     // Updating data doesn't trigger re-evaluation (computed is sleeping)
     data('B')
-    expect(timesEvaluated).toEqual(1)
+    expect(timesEvaluated).to.eql(1)
 
     // Subscribing to the computed now does cause a re-evaluation because the dependency was changed
     subscription = computedInstance.subscribe(subscribeFunc)
-    expect(timesEvaluated).toEqual(2)
-    expect(notifiedValues).toEqual([]) // But nothing notified
+    expect(timesEvaluated).to.eql(2)
+    expect(notifiedValues).to.eql([]) // But nothing notified
 
     // Updating data should re-evaluate and trigger the subscription
     data('C')
-    expect(timesEvaluated).toEqual(3)
-    expect(notifiedValues).toEqual(['C'])
+    expect(timesEvaluated).to.eql(3)
+    expect(notifiedValues).to.eql(['C'])
   })
 
   it('Should minimize evaluations when accessed from a computed', function () {
@@ -295,17 +298,17 @@ describe('Pure Computed', function () {
       computedInstance = computed(pureComputedInstance)
 
     // Should only have evaluated the pure computed once
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
 
     // Updating the dependency evaluates it again
     data('B')
-    expect(computedInstance()).toEqual('B')
-    expect(timesEvaluated).toEqual(2)
+    expect(computedInstance()).to.eql('B')
+    expect(timesEvaluated).to.eql(2)
 
     // Double check that disposing subscriptions puts the pure computed to sleep
     computedInstance.dispose()
-    expect(data.getSubscriptionsCount()).toEqual(0)
+    expect(data.getSubscriptionsCount()).to.eql(0)
   })
 
   it('Should evaluate latest value when chaining pure computeds', function () {
@@ -313,10 +316,10 @@ describe('Pure Computed', function () {
       computed1 = pureComputed(data),
       computed2 = pureComputed(computed1)
 
-    expect(computed2()).toEqual('A')
+    expect(computed2()).to.eql('A')
 
     data('B')
-    expect(computed2()).toEqual('B')
+    expect(computed2()).to.eql('B')
   })
 
   it('Should minimize evaluations when chaining pure computeds', function () {
@@ -330,16 +333,16 @@ describe('Pure Computed', function () {
         return computed1()
       }) // This computed should only be re-evaluated when computed1 actually changes
 
-    expect(computed2()).toEqual(true)
-    expect(timesEvaluated).toEqual(1)
+    expect(computed2()).to.eql(true)
+    expect(timesEvaluated).to.eql(1)
 
     data('B')
-    expect(computed2()).toEqual(true)
-    expect(timesEvaluated).toEqual(1)
+    expect(computed2()).to.eql(true)
+    expect(timesEvaluated).to.eql(1)
 
     data('Z')
-    expect(computed2()).toEqual(false)
-    expect(timesEvaluated).toEqual(2)
+    expect(computed2()).to.eql(false)
+    expect(timesEvaluated).to.eql(2)
   })
 
   it('Should be able to re-evaluate a sleeping computed that previously threw an exception', function () {
@@ -353,14 +356,14 @@ describe('Pure Computed', function () {
         }
       })
 
-    expect(computedInstance()).toEqual(1)
+    expect(computedInstance()).to.eql(1)
 
     observableValue(2)
     shouldThrow(true)
-    expect(computedInstance).toThrow('Error during computed evaluation')
+    expect(computedInstance).to.throw('Error during computed evaluation')
 
     shouldThrow(false)
-    expect(computedInstance()).toEqual(2)
+    expect(computedInstance()).to.eql(2)
   })
 
   it('Should prevent recursive calling of read function', function () {
@@ -373,13 +376,13 @@ describe('Pure Computed', function () {
       })
 
     // While sleeping
-    expect(computedInstance).toThrow()
+    expect(computedInstance).to.throw()
 
     // While awake
     observableInstance('B') // to ensure re-evaluation
     expect(function () {
       computedInstance(computedInstance)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should not add dependencies if disposed during evaluation while sleeping', function () {
@@ -397,17 +400,17 @@ describe('Pure Computed', function () {
     })
 
     // Check initial state
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(1)
-    expect(computedInstance.getDependenciesCount()).toEqual(2)
-    expect(computedInstance.getDependencies()).toEqual([observableToTriggerDisposal, observableGivingValue])
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(1)
+    expect(computedInstance.getDependenciesCount()).to.eql(2)
+    expect(computedInstance.getDependencies()).to.eql([observableToTriggerDisposal, observableGivingValue])
 
     // Now cause a disposal during evaluation
     observableToTriggerDisposal(true)
-    expect(computedInstance()).toEqual('A')
-    expect(timesEvaluated).toEqual(2)
-    expect(computedInstance.getDependenciesCount()).toEqual(0)
-    expect(computedInstance.getDependencies()).toEqual([])
+    expect(computedInstance()).to.eql('A')
+    expect(timesEvaluated).to.eql(2)
+    expect(computedInstance.getDependenciesCount()).to.eql(0)
+    expect(computedInstance.getDependencies()).to.eql([])
   })
 
   it('Should support array tracking using extender', function () {
@@ -417,9 +420,9 @@ describe('Pure Computed', function () {
       }).extend({ trackArrayChanges: true }),
       changelist
 
-    expect(myComputed()).toEqual(['Beta', 'Gamma'])
+    expect(myComputed()).to.eql(['Beta', 'Gamma'])
     // The pure computed doesn't yet subscribe to the observable (it's still sleeping)
-    expect(myArray.getSubscriptionsCount()).toBe(0)
+    expect(myArray.getSubscriptionsCount()).to.equal(0)
 
     const arrayChange = myComputed.subscribe(
       function (changes) {
@@ -428,18 +431,18 @@ describe('Pure Computed', function () {
       null,
       'arrayChange'
     )
-    expect(myArray.getSubscriptionsCount()).toBe(1)
+    expect(myArray.getSubscriptionsCount()).to.equal(1)
 
     myArray(['Alpha', 'Beta', 'Gamma', 'Delta'])
-    expect(myComputed()).toEqual(['Gamma', 'Delta'])
-    expect(changelist).toEqual([
+    expect(myComputed()).to.eql(['Gamma', 'Delta'])
+    expect(changelist).to.eql([
       { status: 'deleted', value: 'Beta', index: 0 },
       { status: 'added', value: 'Delta', index: 1 }
     ])
 
     // It releases subscriptions when the arrayChange subscription is disposed
     arrayChange.dispose()
-    expect(myArray.getSubscriptionsCount()).toBe(0)
+    expect(myArray.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Should reevaluate if dependency was changed during awakening, but not otherwise', function () {
@@ -455,19 +458,19 @@ describe('Pure Computed', function () {
       }),
       subscription
 
-    expect(pureComputedInstance()).toEqual(true)
-    expect(timesEvaluated).toEqual(1)
+    expect(pureComputedInstance()).to.eql(true)
+    expect(timesEvaluated).to.eql(1)
 
     data(1)
     subscription = isEven.subscribe(function () {})
-    expect(pureComputedInstance()).toEqual(false)
-    expect(timesEvaluated).toEqual(2)
+    expect(pureComputedInstance()).to.eql(false)
+    expect(timesEvaluated).to.eql(2)
     subscription.dispose()
 
     data(3)
     subscription = isEven.subscribe(function () {})
-    expect(pureComputedInstance()).toEqual(false)
-    expect(timesEvaluated).toEqual(2)
+    expect(pureComputedInstance()).to.eql(false)
+    expect(timesEvaluated).to.eql(2)
   })
 
   it('Should wake with the correct value when a chained pure computed has side effects for its awake event', function () {
@@ -480,7 +483,7 @@ describe('Pure Computed', function () {
     // ignore side-effects from the awake callback of chained pure computeds
     computed2()
     computed2.subscribe(() => {})
-    expect(computed2()).toEqual('foo')
+    expect(computed2()).to.eql('foo')
   })
 
   describe('Should maintain order of subscriptions', function () {
@@ -493,7 +496,7 @@ describe('Pure Computed', function () {
       })
 
       data(newDataValue)
-      expect(notifiedValues).toEqual(expectedNotifiedValues)
+      expect(notifiedValues).to.eql(expectedNotifiedValues)
     }
 
     beforeEach(function () {
@@ -534,12 +537,12 @@ describe('Pure Computed', function () {
         })
 
       // Access the pure computed while it is sleeping to evaluate it and record the dependencies
-      expect(computedInstance()).toEqual('AA')
-      expect(timesEvaluated).toEqual(1)
+      expect(computedInstance()).to.eql('AA')
+      expect(timesEvaluated).to.eql(1)
 
       // If the subscriptions happen in the wrong order, we'll get two notifications: 'AB', 'BB'
       subscribeAndUpdate(computedInstance, 'B', ['BB'])
-      expect(timesEvaluated).toEqual(3)
+      expect(timesEvaluated).to.eql(3)
     })
   })
 
@@ -553,14 +556,14 @@ describe('Pure Computed', function () {
           return dependencyDetection.isInitial()
         })
 
-      expect(evaluationCount).toEqual(0) // no evaluation yet
-      expect(computedInstance()).toEqual(undefined) // isInitial is always undefined for a pure computed
-      expect(evaluationCount).toEqual(1) // single evaluation
+      expect(evaluationCount).to.eql(0) // no evaluation yet
+      expect(computedInstance()).to.eql(undefined) // isInitial is always undefined for a pure computed
+      expect(evaluationCount).to.eql(1) // single evaluation
 
       observableInstance(2)
       computed(computedInstance) // wake up computed by subscribing to it
-      expect(evaluationCount).toEqual(2) // which causes a second evaluation
-      expect(computedInstance()).toEqual(undefined) // isInitial is still undefined
+      expect(evaluationCount).to.eql(2) // which causes a second evaluation
+      expect(computedInstance()).to.eql(undefined) // isInitial is still undefined
     })
 
     it('Should accurately report the number of dependencies', function () {
@@ -569,32 +572,32 @@ describe('Pure Computed', function () {
         evaluationCount = 0,
         computedInstance = pureComputed(function () {
           // no dependencies at first
-          expect(dependencyDetection.getDependenciesCount()).toEqual(0)
-          expect(dependencyDetection.getDependencies()).toEqual([])
+          expect(dependencyDetection.getDependenciesCount()).to.eql(0)
+          expect(dependencyDetection.getDependencies()).to.eql([])
           // add a single dependency
           observable1()
-          expect(dependencyDetection.getDependenciesCount()).toEqual(1)
-          expect(dependencyDetection.getDependencies()).toEqual([observable1])
+          expect(dependencyDetection.getDependenciesCount()).to.eql(1)
+          expect(dependencyDetection.getDependencies()).to.eql([observable1])
           // add a second one
           observable2()
-          expect(dependencyDetection.getDependenciesCount()).toEqual(2)
-          expect(dependencyDetection.getDependencies()).toEqual([observable1, observable2])
+          expect(dependencyDetection.getDependenciesCount()).to.eql(2)
+          expect(dependencyDetection.getDependencies()).to.eql([observable1, observable2])
           // accessing observable again doesn't affect count
           observable1()
-          expect(dependencyDetection.getDependenciesCount()).toEqual(2)
-          expect(dependencyDetection.getDependencies()).toEqual([observable1, observable2])
+          expect(dependencyDetection.getDependenciesCount()).to.eql(2)
+          expect(dependencyDetection.getDependencies()).to.eql([observable1, observable2])
 
           return ++evaluationCount
         })
 
-      expect(computedInstance()).toEqual(1) // single evaluation
-      expect(computedInstance.getDependenciesCount()).toEqual(2) // matches value from context
-      expect(computedInstance.getDependencies()).toEqual([observable1, observable2])
+      expect(computedInstance()).to.eql(1) // single evaluation
+      expect(computedInstance.getDependenciesCount()).to.eql(2) // matches value from context
+      expect(computedInstance.getDependencies()).to.eql([observable1, observable2])
 
       observable1(2)
-      expect(computedInstance()).toEqual(2) // second evaluation
-      expect(computedInstance.getDependenciesCount()).toEqual(2) // matches value from context
-      expect(computedInstance.getDependencies()).toEqual([observable1, observable2])
+      expect(computedInstance()).to.eql(2) // second evaluation
+      expect(computedInstance.getDependenciesCount()).to.eql(2) // matches value from context
+      expect(computedInstance.getDependencies()).to.eql([observable1, observable2])
     })
   })
 })
