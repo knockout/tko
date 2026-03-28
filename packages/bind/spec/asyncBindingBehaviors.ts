@@ -16,7 +16,13 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 import { applyBindings } from '@tko/bind'
 
-import { prepareTestNode, restoreAfter, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter,
+  useMockForTasks
+} from '../../utils/helpers/mocha-test-helpers'
 
 function spyArgs(spy: sinon.SinonSpy) {
   return spy.getCalls().map(call => call.args)
@@ -166,7 +172,8 @@ describe('Deferred bindings', function () {
       { childProp: 'moving child' }
     ])
     applyBindings({ someItems: someItems }, testNode)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span><span data-bind="text: childprop">moving child</span>'
     )
 
@@ -182,7 +189,8 @@ describe('Deferred bindings', function () {
     someItems.splice(targetIndex, 0, item)
 
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">moving child</span><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
     )
     expect(testNode.childNodes[0].childNodes[targetIndex]).to.not.equal(itemNode) // node was create anew so it's not the same
@@ -203,19 +211,19 @@ describe('Deferred bindings', function () {
       })
 
     applyBindings({ status: status, show: show }, testNode)
-    expect(testNode.childNodes[0]).toContainHtml('')
+    expectContainHtml(testNode.childNodes[0], '')
 
     value(1)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>')
+    expectContainHtml(testNode.childNodes[0], '<div data-bind="text: status">ok</div>')
 
     value(0)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml('')
+    expectContainHtml(testNode.childNodes[0], '')
 
     value(1)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>')
+    expectContainHtml(testNode.childNodes[0], '<div data-bind="text: status">ok</div>')
   })
 
   it('Should update "if" binding before descendant bindings', function () {
@@ -230,17 +238,17 @@ describe('Deferred bindings', function () {
 
     applyBindings(vm, testNode)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
 
     vm.street('my street')
     vm.streetNumber('123')
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('123 my street')
+    expectContainText(testNode.childNodes[0], '123 my street')
 
     vm.street(null)
     vm.streetNumber(null)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
   })
 
   it('Should update "with" binding before descendant bindings', function () {
@@ -254,17 +262,17 @@ describe('Deferred bindings', function () {
 
     applyBindings(vm, testNode)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
 
     vm.street('my street')
     vm.streetNumber('123')
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('123 my street')
+    expectContainText(testNode.childNodes[0], '123 my street')
 
     vm.street(null)
     vm.streetNumber(null)
     clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
   })
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {
@@ -277,7 +285,7 @@ describe('Deferred bindings', function () {
 
     expect(testNode.childNodes[0].childNodes[0]['tagName']['toLowerCase']()).to.equal('span')
     expect(testNode.childNodes[0].childNodes[0]).to.equal(originalNode)
-    expect(testNode).toContainText('1')
+    expectContainText(testNode, '1')
 
     // Change the value to a different truthy value; see the previous SPAN remains
     someItem('different truthy value')
@@ -285,6 +293,6 @@ describe('Deferred bindings', function () {
 
     expect(testNode.childNodes[0].childNodes[0]['tagName']['toLowerCase']()).to.equal('span')
     expect(testNode.childNodes[0].childNodes[0]).to.equal(originalNode)
-    expect(testNode).toContainText('1')
+    expectContainText(testNode, '1')
   })
 })
