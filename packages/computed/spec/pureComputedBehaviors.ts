@@ -236,7 +236,7 @@ describe('Pure Computed', function () {
 
     notifySpy.resetHistory()
     data('B')
-    expect(notifySpy.called).to.equal(false)
+    sinon.assert.notCalled(notifySpy)
 
     subscription.dispose()
     expect(notifySpy.getCalls().map(call => call.args)).to.eql([['asleep', undefined]])

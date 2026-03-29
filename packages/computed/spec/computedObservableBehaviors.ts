@@ -582,18 +582,18 @@ describe('Dependent Observable', function () {
     const notifySpy = sinon.spy()
     computedInstance.subscribe(notifySpy, null, 'awake')
 
-    expect(notifySpy.called).to.equal(false)
+    sinon.assert.notCalled(notifySpy)
 
     expect(computedInstance()).to.equal('A')
-    expect(notifySpy.calledWithExactly('A')).to.equal(true)
-    expect(notifySpy.callCount).to.equal(1)
+    sinon.assert.calledWithExactly(notifySpy, 'A')
+    sinon.assert.callCount(notifySpy, 1)
 
     // Subscribing or updating data shouldn't trigger any more notifications
     notifySpy.resetHistory()
     computedInstance.subscribe(function () {})
     data('B')
     computedInstance()
-    expect(notifySpy.called).to.equal(false)
+    sinon.assert.notCalled(notifySpy)
   })
 
   it('Should prevent recursive calling of read function', function () {

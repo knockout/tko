@@ -161,7 +161,7 @@ describe('Rate-limited', function () {
       }
 
       // Notification happens every 50 ms, so every other number is notified
-      expect(notifySpy.callCount).to.equal(5)
+      sinon.assert.callCount(notifySpy, 5)
       expect(notifySpy.args).to.deep.equal([[2], [4], [6], [8], [10]])
 
       // No more notifications happen
@@ -186,7 +186,7 @@ describe('Rate-limited', function () {
 
       // Notification happens after the timeout period
       clock.tick(50)
-      expect(notifySpy.callCount).to.equal(1)
+      sinon.assert.callCount(notifySpy, 1)
       sinon.assert.calledWith(notifySpy, 10)
     })
 
@@ -251,7 +251,7 @@ describe('Rate-limited', function () {
       // Advance clock; Change notification happens now using the latest value notified
       clock.tick(500)
       sinon.assert.calledWith(notifySpy, 'b')
-      expect(beforeChangeSpy.callCount).to.equal(1) // Only one beforeChange notification
+      sinon.assert.callCount(beforeChangeSpy, 1) // Only one beforeChange notification
     })
 
     it('Should notify "spectator" subscribers whenever the value changes', function () {
@@ -530,7 +530,7 @@ describe('Rate-limited', function () {
       clock.tick(500)
       sinon.assert.calledWith(evalSpy, 'b')
       sinon.assert.calledWith(notifySpy, 'b')
-      expect(beforeChangeSpy.callCount).to.equal(1) // Only one beforeChange notification
+      sinon.assert.callCount(beforeChangeSpy, 1) // Only one beforeChange notification
     })
 
     it('Should run initial evaluation at first subscribe when using deferEvaluation', function () {
@@ -608,7 +608,7 @@ describe('Rate-limited', function () {
       }).extend({ rateLimit: 500 })
 
       expect(computed()).to.deep.equal('a')
-      expect(evalSpy.callCount).to.equal(1)
+      sinon.assert.callCount(evalSpy, 1)
       sinon.assert.calledWith(evalSpy, 'a')
 
       evalSpy.resetHistory()
@@ -953,7 +953,7 @@ describe('Deferred', function () {
       sinon.assert.notCalled(notifySpy)
 
       clock.tick(1)
-      expect(notifySpy.callCount).to.deep.equal(1)
+      sinon.assert.callCount(notifySpy, 1)
       expect(notifySpy.args).to.deep.equal([['B']])
     })
 
@@ -971,7 +971,7 @@ describe('Deferred', function () {
       sinon.assert.notCalled(notifySpy)
 
       clock.tick(1)
-      expect(notifySpy.callCount).to.deep.equal(1)
+      sinon.assert.callCount(notifySpy, 1)
       expect(notifySpy.args).to.deep.equal([[undefined]])
     })
 
@@ -1246,8 +1246,8 @@ describe('Deferred', function () {
       sinon.assert.notCalled(dSpy)
 
       a('something')
-      expect(bSpy.callCount).to.equal(2) // 1 for a, and 1 for d
-      expect(dSpy.callCount).to.equal(2) // 1 for a, and 1 for b
+      sinon.assert.callCount(bSpy, 2) // 1 for a, and 1 for d
+      sinon.assert.callCount(dSpy, 2) // 1 for a, and 1 for b
 
       clock.tick(1)
     })

@@ -83,11 +83,11 @@ describe('Deferred bindings', function () {
     // When changing the observable, the update is deferred
     bindingSpy.resetHistory()
     observable('B')
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
 
     // Update is still deferred
     observable('C')
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
 
     clock.tick(1)
     // Only the latest value is notified
@@ -107,11 +107,11 @@ describe('Deferred bindings', function () {
     // mutate; template should not be updated yet
     bindingSpy.resetHistory()
     observable('B')
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
 
     // mutate again; template should not be updated yet
     observable('C')
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
 
     clock.tick(1)
     // only the latest value should be used
@@ -134,11 +134,11 @@ describe('Deferred bindings', function () {
     // mutate; template should not be updated yet
     bindingSpy.resetHistory()
     observable(['A', 'B'])
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
 
     // mutate again; template should not be updated yet
     observable(['A', 'C'])
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
 
     clock.tick(1)
     // only the latest value should be used ("C" added but not "B")
@@ -156,7 +156,7 @@ describe('Deferred bindings', function () {
     const nodeA = testNode.childNodes[0].childNodes[0],
       nodeB = testNode.childNodes[0].childNodes[1]
     clock.tick(1)
-    expect(bindingSpy.called).to.equal(false)
+    sinon.assert.notCalled(bindingSpy)
     expect(testNode.childNodes[0].childNodes[0]).to.equal(nodeB)
     expect(testNode.childNodes[0].childNodes[1]).to.equal(nodeA)
   })
