@@ -1,8 +1,13 @@
 describe('Binding: Value', function() {
+    var clock;
+
     beforeEach(prepareTestNode);
 
     afterEach(function() {
-        Clock.reset();
+        if (clock) {
+            clock.restore();
+            clock = null;
+        }
     });
 
     it('Should assign the value to the node', function () {
@@ -212,7 +217,7 @@ describe('Binding: Value', function() {
     });
 
     it('Should delay reading value and updating observable when prefixing an event with "after"', function () {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
 
         var myobservable = new ko.observable("123");
         testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />";
@@ -221,12 +226,12 @@ describe('Binding: Value', function() {
         testNode.childNodes[0].value = "some user-entered value";
         expect(myobservable()).to.deep.equal("123");  // observable is not changed yet
 
-        Clock.tick(20);
+        clock.tick(20);
         expect(myobservable()).to.deep.equal("some user-entered value");  // it's changed after a delay
     });
 
     it('Should ignore "unchanged" notifications from observable during delayed event processing', function () {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
 
         var myobservable = new ko.observable("123");
         testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />";
@@ -239,12 +244,12 @@ describe('Binding: Value', function() {
         expect(testNode.childNodes[0].value).to.deep.equal("some user-entered value");
 
         // Observable is updated to new element value
-        Clock.tick(20);
+        clock.tick(20);
         expect(myobservable()).to.deep.equal("some user-entered value");
     });
 
     it('Should not ignore actual change notifications from observable during delayed event processing', function () {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
 
         var myobservable = new ko.observable("123");
         testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />";
@@ -257,7 +262,7 @@ describe('Binding: Value', function() {
         expect(testNode.childNodes[0].value).to.deep.equal("some value from the server");
 
         // New value remains when event is processed
-        Clock.tick(20);
+        clock.tick(20);
         expect(myobservable()).to.deep.equal("some value from the server");
     });
 
@@ -365,8 +370,8 @@ describe('Binding: Value', function() {
             expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0);
 
             // Also check that the selection doesn't change later (see https://github.com/knockout/knockout/issues/2218)
-            Clock.useMock();
-            Clock.tick(10);
+            clock = sinon.useFakeTimers();
+            clock.tick(10);
             expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0);
         });
 

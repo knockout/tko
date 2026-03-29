@@ -1,23 +1,3 @@
-function createSpy() {
-    var spy = sinon.stub();
-    Object.defineProperties(spy, {
-        calls: {
-            get: function() {
-                return spy.getCalls();
-            }
-        },
-        argsForCall: {
-            get: function() {
-                return spy.getCalls().map(function(call) { return call.args; });
-            }
-        }
-    });
-    spy.reset = spy.resetHistory.bind(spy);
-    spy.andCallFake = spy.callsFake.bind(spy);
-    spy.andReturn = spy.returns.bind(spy);
-    return spy;
-}
-
 describe('Binding dependencies', function() {
     beforeEach(prepareTestNode);
 
@@ -321,8 +301,8 @@ describe('Binding dependencies', function() {
             }
         };
 
-        var callbackSpy1 = createSpy('callbackSpy1'),
-            callbackSpy2 = createSpy('callbackSpy2'),
+        var callbackSpy1 = sinon.stub(),
+            callbackSpy2 = sinon.stub(),
             vm = {
                 observable: ko.observable('value'),
                 callback: callbackSpy1
@@ -332,7 +312,7 @@ describe('Binding dependencies', function() {
         ko.applyBindings(vm, testNode);
         expect(callbackSpy1.called).to.equal(true);
 
-        callbackSpy1.reset();
+        callbackSpy1.resetHistory();
         vm.callback = callbackSpy2;
 
         vm.observable('new value');

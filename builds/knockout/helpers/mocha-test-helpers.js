@@ -1,7 +1,5 @@
 ;(function (global) {
   const Assertion = chai.Assertion
-  let activeClock = null
-  let currentContext = null
 
   function restoreAfter(cleanups, object, propertyName) {
     const originalValue = object[propertyName]
@@ -51,67 +49,6 @@
 
     while ((div.innerHTML = '<!--[if gt IE ' + ++version + ']><i></i><![endif]-->'), iElems[0]) {}
     return version > 4 ? version : undefined
-  }
-
-  function createSpy(name) {
-    const spy = sinon.stub()
-
-    Object.defineProperties(spy, {
-      calls: {
-        get: function () {
-          return spy.getCalls()
-        }
-      },
-      argsForCall: {
-        get: function () {
-          return spy.getCalls().map(function (call) { return call.args })
-        }
-      }
-    })
-
-    if (name) {
-      spy.displayName = name
-    }
-
-    spy.reset = spy.resetHistory.bind(spy)
-    spy.andCallFake = spy.callsFake.bind(spy)
-    spy.andReturn = spy.returns.bind(spy)
-    return spy
-  }
-
-  const Clock = {
-    mockScheduler: function (callback) {
-      setTimeout(callback, 0)
-    },
-    useMock: function () {
-      if (activeClock) {
-        activeClock.restore()
-      }
-      activeClock = sinon.useFakeTimers()
-      return activeClock
-    },
-    useMockForTasks: function () {
-      this.useMock()
-      if (!currentContext) {
-        throw new Error('Clock.useMockForTasks must run inside a test')
-      }
-      if (ko.options.taskScheduler !== this.mockScheduler) {
-        currentContext.restoreAfter(ko.options, 'taskScheduler')
-        ko.options.taskScheduler = function (callback) { setTimeout(callback, 0) }
-      }
-    },
-    tick: function (millis) {
-      if (!activeClock) {
-        throw new Error('Clock.tick called without an active fake clock')
-      }
-      activeClock.tick(millis)
-    },
-    reset: function () {
-      if (activeClock) {
-        activeClock.restore()
-        activeClock = null
-      }
-    }
   }
 
   function expectEqualOneOf(actual, expectedPossibilities) {
@@ -203,8 +140,6 @@
   global.expectSpyNotCalled = expectSpyNotCalled
   global.expectSpyCalledWith = expectSpyCalledWith
   global.expectSpyNotCalledWith = expectSpyNotCalledWith
-  global.createSpy = createSpy
-  global.Clock = Clock
   global.ieVersion = detectIEVersion()
   global.browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'function'
 
@@ -222,7 +157,6 @@
   beforeEach(function () {
     const ctx = this
     const cleanups = []
-    currentContext = ctx
     ctx.__tkoCleanups = cleanups
     function after(cleanup) {
       cleanups.push(cleanup)
@@ -235,12 +169,6 @@
     switchJQueryState()
     ctx.after(function () {
       expect(disableJQueryUsage).to.equal(ko.options.disableJQueryUsage)
-    })
-    ctx.after(function () {
-      if (activeClock) {
-        activeClock.restore()
-        activeClock = null
-      }
     })
   })
 
@@ -256,6 +184,5 @@
       delete ctx.after
       delete ctx.restoreAfter
     }
-    currentContext = null
   })
 })(window)

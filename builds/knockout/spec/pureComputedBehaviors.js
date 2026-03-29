@@ -183,7 +183,7 @@ describe('Pure Computed', function() {
         var data = ko.observable('A'),
             computed = ko.pureComputed(data);
 
-        var notifySpy = createSpy();
+        var notifySpy = sinon.stub();
         computed.subscribe(notifySpy.bind(null, 'awake'), null, 'awake');
         computed.subscribe(notifySpy.bind(null, 'asleep'), null, 'asleep');
 
@@ -192,7 +192,7 @@ describe('Pure Computed', function() {
 
         // Subscribe to computed; notifies with value
         var subscription = computed.subscribe(function () {});
-        expect(notifySpy.argsForCall).to.deep.equal([ ['awake', 'A'] ]);
+        expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['awake', 'A'] ]);
         expect(data.getSubscriptionsCount()).to.deep.equal(1);
 
         notifySpy.resetHistory();
@@ -200,7 +200,7 @@ describe('Pure Computed', function() {
         expect(notifySpy.called).to.equal(false);
 
         subscription.dispose();
-        expect(notifySpy.argsForCall).to.deep.equal([ ['asleep', undefined] ]);
+        expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['asleep', undefined] ]);
         expect(data.getSubscriptionsCount()).to.deep.equal(0);
     });
 

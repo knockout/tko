@@ -1,33 +1,19 @@
-function createSpy() {
-    var spy = sinon.stub();
-    Object.defineProperties(spy, {
-        calls: {
-            get: function() {
-                return spy.getCalls();
-            }
-        },
-        argsForCall: {
-            get: function() {
-                return spy.getCalls().map(function(call) { return call.args; });
-            }
-        }
-    });
-    spy.reset = spy.resetHistory.bind(spy);
-    spy.andCallFake = spy.callsFake.bind(spy);
-    spy.andReturn = spy.returns.bind(spy);
-    return spy;
-}
-
 describe("Deferred bindings", function() {
-    var bindingSpy;
+    var clock,
+        originalTaskScheduler,
+        bindingSpy;
 
     beforeEach(function() {
         prepareTestNode();
-        Clock.useMockForTasks();
+        clock = sinon.useFakeTimers();
+        originalTaskScheduler = ko.options.taskScheduler;
+        ko.options.taskScheduler = function(callback) {
+            setTimeout(callback, 0);
+        };
 
         ko.options.deferUpdates = true;
 
-        bindingSpy = createSpy('bindingSpy');
+        bindingSpy = sinon.stub();
         ko.bindingHandlers.test = {
             init: function (element, valueAccessor) { bindingSpy('init', ko.unwrap(valueAccessor())); },
             update: function (element, valueAccessor) { bindingSpy('update', ko.unwrap(valueAccessor())); }
@@ -35,7 +21,9 @@ describe("Deferred bindings", function() {
     });
     afterEach(function() {
         expect(ko.tasks.resetForTesting()).to.deep.equal(0);
-        Clock.reset();
+        ko.options.taskScheduler = originalTaskScheduler;
+        clock.restore();
+        clock = null;
         ko.options.deferUpdates = false;
         bindingSpy = ko.bindingHandlers.test = null;
     });
@@ -46,10 +34,10 @@ describe("Deferred bindings", function() {
         // The initial "applyBindings" is synchronous
         testNode.innerHTML = "<div data-bind='test: myObservable'></div>";
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(bindingSpy.argsForCall).to.deep.equal([ ['init', 'A'], ['update', 'A'] ]);
+        expect(bindingSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['init', 'A'], ['update', 'A'] ]);
 
         // When changing the observable, the update is deferred
-        bindingSpy.reset();
+        bindingSpy.resetHistory();
         observable('B');
         expect(bindingSpy.called).to.equal(false);
 
@@ -57,9 +45,9 @@ describe("Deferred bindings", function() {
         observable('C');
         expect(bindingSpy.called).to.equal(false);
 
-        Clock.tick(1);
+        clock.tick(1);
         // Only the latest value is notified
-        expect(bindingSpy.argsForCall).to.deep.equal([ ['update', 'C'] ]);
+        expect(bindingSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['update', 'C'] ]);
     });
 
     it("Should update templates asynchronously", function() {
@@ -67,10 +55,10 @@ describe("Deferred bindings", function() {
 
         testNode.innerHTML = "<div data-bind='template: {data: myObservable}'><div data-bind='test: $data'></div></div>";
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(bindingSpy.argsForCall).to.deep.equal([ ['init', 'A'], ['update', 'A'] ]);
+        expect(bindingSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['init', 'A'], ['update', 'A'] ]);
 
         // mutate; template should not be updated yet
-        bindingSpy.reset();
+        bindingSpy.resetHistory();
         observable('B');
         expect(bindingSpy.called).to.equal(false);
 
@@ -78,9 +66,9 @@ describe("Deferred bindings", function() {
         observable('C');
         expect(bindingSpy.called).to.equal(false);
 
-        Clock.tick(1);
+        clock.tick(1);
         // only the latest value should be used
-        expect(bindingSpy.argsForCall).to.deep.equal([ ['init', 'C'], ['update', 'C'] ]);
+        expect(bindingSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['init', 'C'], ['update', 'C'] ]);
     });
 
     it("Should update 'foreach' items asynchronously", function() {
@@ -88,10 +76,10 @@ describe("Deferred bindings", function() {
 
         testNode.innerHTML = "<div data-bind='foreach: {data: myObservables}'><div data-bind='test: $data'></div></div>";
         ko.applyBindings({ myObservables: observable }, testNode);
-        expect(bindingSpy.argsForCall).to.deep.equal([ ['init', 'A'], ['update', 'A'] ]);
+        expect(bindingSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['init', 'A'], ['update', 'A'] ]);
 
         // mutate; template should not be updated yet
-        bindingSpy.reset();
+        bindingSpy.resetHistory();
         observable(["A", "B"]);
         expect(bindingSpy.called).to.equal(false);
 
@@ -99,19 +87,19 @@ describe("Deferred bindings", function() {
         observable(["A", "C"]);
         expect(bindingSpy.called).to.equal(false);
 
-        Clock.tick(1);
+        clock.tick(1);
         // only the latest value should be used ("C" added but not "B")
-        expect(bindingSpy.argsForCall).to.deep.equal([ ['init', 'C'], ['update', 'C'] ]);
+        expect(bindingSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['init', 'C'], ['update', 'C'] ]);
 
         // When an element is deleted and then added in a new place, it should register as a move and
         // not create new DOM elements or update any child bindings
-        bindingSpy.reset();
+        bindingSpy.resetHistory();
         observable.remove("A");
         observable.push("A");
 
         var nodeA = testNode.childNodes[0].childNodes[0],
             nodeB = testNode.childNodes[0].childNodes[1];
-        Clock.tick(1);
+        clock.tick(1);
         expect(bindingSpy.called).to.equal(false);
         expect(testNode.childNodes[0].childNodes[0]).to.equal(nodeB);
         expect(testNode.childNodes[0].childNodes[1]).to.equal(nodeA);
@@ -141,7 +129,7 @@ describe("Deferred bindings", function() {
         ko.tasks.runEarly();
         someItems.splice(targetIndex, 0, item);
 
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode.childNodes[0], '<span data-bind="text: childprop">moving child</span><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>');
         expect(testNode.childNodes[0].childNodes[targetIndex]).not.to.equal(itemNode);    // node was created anew so it's not the same
     });
@@ -159,15 +147,15 @@ describe("Deferred bindings", function() {
         expectContainText(testNode.childNodes[0], '');
 
         value(1);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode.childNodes[0], '<div data-bind="text: status">ok</div>');
 
         value(0);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode.childNodes[0], '');
 
         value(1);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode.childNodes[0], '<div data-bind="text: status">ok</div>');
     });
 
@@ -181,17 +169,17 @@ describe("Deferred bindings", function() {
         };
 
         ko.applyBindings(vm, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], '');
 
         vm.street('my street');
         vm.streetNumber('123');
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], '123my street');
 
         vm.street(null);
         vm.streetNumber(null);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], '');
     });
 
@@ -205,17 +193,17 @@ describe("Deferred bindings", function() {
         };
 
         ko.applyBindings(vm, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], '');
 
         vm.street('my street');
         vm.streetNumber('123');
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], '123my street');
 
         vm.street(null);
         vm.streetNumber(null);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], '');
     });
 
@@ -232,7 +220,7 @@ describe("Deferred bindings", function() {
 
         // Change the value to a different truthy value; see the previous SPAN remains
         someItem('different truthy value');
-        Clock.tick(1);
+        clock.tick(1);
         expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).to.deep.equal("span");
         expect(testNode.childNodes[0].childNodes[0]).to.deep.equal(originalNode);
         expectContainText(testNode, "1");

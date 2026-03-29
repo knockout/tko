@@ -31,18 +31,18 @@ describe('unwrapObservable', function() {
 
 describe('arrayForEach', function () {
   it('Should go call the callback for each element of the array, in order', function () {
-      var callback = createSpy();
+      var callback = sinon.stub();
 
       ko.utils.arrayForEach(["a", "b", "c"], callback);
 
-      expect(callback.calls.length).to.equal(3);
-      expect(callback.calls[0].args).to.deep.equal(["a", 0, ["a", "b", "c"]]);
-      expect(callback.calls[1].args).to.deep.equal(["b", 1, ["a", "b", "c"]]);
-      expect(callback.calls[2].args).to.deep.equal(["c", 2, ["a", "b", "c"]]);
+      expect(callback.callCount).to.equal(3);
+      expect(callback.getCalls()[0].args).to.deep.equal(["a", 0, ["a", "b", "c"]]);
+      expect(callback.getCalls()[1].args).to.deep.equal(["b", 1, ["a", "b", "c"]]);
+      expect(callback.getCalls()[2].args).to.deep.equal(["c", 2, ["a", "b", "c"]]);
   });
 
   it('Should do nothing with empty arrays', function () {
-      var callback = createSpy();
+      var callback = sinon.stub();
 
       ko.utils.arrayForEach([], callback);
 
@@ -129,11 +129,11 @@ describe('arrayFirst', function () {
   var matchB, matchD;
 
   beforeEach(function () {
-      matchB = createSpy().andCallFake(function (x) {
+      matchB = sinon.stub().callsFake(function (x) {
           return x.charAt(0) === "b";
       });
 
-      matchD = createSpy().andCallFake(function (x) {
+      matchD = sinon.stub().callsFake(function (x) {
           return x.charAt(0) === "d";
       });
   });
@@ -145,7 +145,7 @@ describe('arrayFirst', function () {
   });
 
   it('Should return undefined with empty arrays, and not call the predicate', function () {
-      var predicate = createSpy();
+      var predicate = sinon.stub();
 
       var result = ko.utils.arrayFirst([], predicate);
 
@@ -156,9 +156,9 @@ describe('arrayFirst', function () {
   it('Should test the predicate on every element before the first matching element', function () {
       ko.utils.arrayFirst(["a", "b", "c"], matchB);
 
-      expect(matchB.calls.length).to.equal(2);
-      expect(matchB.calls[0].args).to.deep.equal(["a", 0, ["a", "b", "c"]]);
-      expect(matchB.calls[1].args).to.deep.equal(["b", 1, ["a", "b", "c"]]);
+      expect(matchB.callCount).to.equal(2);
+      expect(matchB.getCalls()[0].args).to.deep.equal(["a", 0, ["a", "b", "c"]]);
+      expect(matchB.getCalls()[1].args).to.deep.equal(["b", 1, ["a", "b", "c"]]);
   });
 
   it('Should return undefined if no element matches', function () {
@@ -170,10 +170,10 @@ describe('arrayFirst', function () {
   it('Should test every element if no element matches', function () {
       ko.utils.arrayFirst(["a", "b", "c"], matchD);
 
-      expect(matchD.calls.length).to.equal(3);
-      expect(matchD.calls[0].args).to.deep.equal(["a", 0, ["a", "b", "c"]]);
-      expect(matchD.calls[1].args).to.deep.equal(["b", 1, ["a", "b", "c"]]);
-      expect(matchD.calls[2].args).to.deep.equal(["c", 2, ["a", "b", "c"]]);
+      expect(matchD.callCount).to.equal(3);
+      expect(matchD.getCalls()[0].args).to.deep.equal(["a", 0, ["a", "b", "c"]]);
+      expect(matchD.getCalls()[1].args).to.deep.equal(["b", 1, ["a", "b", "c"]]);
+      expect(matchD.getCalls()[2].args).to.deep.equal(["c", 2, ["a", "b", "c"]]);
   });
 
   it('Should throw an error for a null array', function () {
@@ -230,7 +230,7 @@ describe('arrayMap', function () {
   });
 
   it('Should return empty arrays for empty arrays, and not call the map function', function () {
-      var mapFunction = createSpy();
+      var mapFunction = sinon.stub();
 
       var result = ko.utils.arrayMap([], mapFunction);
 
@@ -281,7 +281,7 @@ describe('arrayFilter', function () {
   });
 
   it('Should return empty arrays for empty arrays, and not call the filter function', function () {
-      var filterFunction = createSpy();
+      var filterFunction = sinon.stub();
 
       var result = ko.utils.arrayFilter([], filterFunction);
 
