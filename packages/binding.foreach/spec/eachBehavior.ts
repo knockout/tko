@@ -1025,8 +1025,12 @@ describe('focus', function () {
     $target.find(':input').focus()
     applyBindings(list, $target[0])
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, document.body)
-      done()
+      try {
+        assert.strictEqual(document.activeElement, document.body)
+        done()
+      } catch (error) {
+        done(error)
+      }
     }, 1000)
   })
 
@@ -1039,8 +1043,12 @@ describe('focus', function () {
     list.remove('a')
     list.push('a')
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, document.body)
-      done()
+      try {
+        assert.strictEqual(document.activeElement, document.body)
+        done()
+      } catch (error) {
+        done(error)
+      }
     }, 1000)
   })
 
@@ -1054,8 +1062,12 @@ describe('focus', function () {
     list.remove(o0)
     list.push(o0)
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
-      done()
+      try {
+        assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
+        done()
+      } catch (error) {
+        done(error)
+      }
     }, 1000)
   })
 
@@ -1072,8 +1084,12 @@ describe('focus', function () {
     list.push('y')
 
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
-      done()
+      try {
+        assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
+        done()
+      } catch (error) {
+        done(error)
+      }
     }, 1000)
   })
 
@@ -1089,8 +1105,12 @@ describe('focus', function () {
     list.push(o0)
 
     setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
-      done()
+      try {
+        assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
+        done()
+      } catch (error) {
+        done(error)
+      }
     }, 1000)
   })
 })

@@ -386,8 +386,12 @@ describe('Binding: Value', function () {
 
       // Also check that the selection doesn't change later (see https://github.com/knockout/knockout/issues/2218)
       setTimeout(function () {
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
-        done()
+        try {
+          expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+          done()
+        } catch (error) {
+          done(error)
+        }
       }, 10)
     })
 
