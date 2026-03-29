@@ -548,7 +548,7 @@ describe('Binding attribute syntax', function() {
     });
 
     describe('Should not bind against text content inside restricted elements', function() {
-        this.beforeEach(function() {
+        beforeEach(function() {
             this.restoreAfter(ko.bindingProvider, 'instance');
 
             // Developers won't expect or want binding to mutate the contents of <script> or <textarea>
