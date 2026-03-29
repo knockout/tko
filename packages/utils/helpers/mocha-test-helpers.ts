@@ -36,7 +36,18 @@ export function nodeText(node: Node) {
   return node.nodeType === Node.TEXT_NODE ? node.nodeValue : 'textContent' in node ? node.textContent : (node as HTMLElement).innerText
 }
 
-function cleanedHtml(node: Element) {
+type HtmlNode = Node & { innerHTML: string }
+
+function assertHtmlNode(node: Node | null): asserts node is HtmlNode {
+  assert.isNotNull(node, 'expected node to exist')
+  if (node === null) {
+    throw new Error('expected node to exist')
+  }
+  assert('innerHTML' in node, 'expected node to support innerHTML')
+}
+
+function cleanedHtml(node: Node | null) {
+  assertHtmlNode(node)
   let html = node.innerHTML.toLowerCase().replace(/\r\n/g, '')
   html = html.replace(/(<!--.*?-->)\s*/g, '$1')
   html = html.replace(/ __ko__\d+=\"(ko\d+|null)\"/g, '')
@@ -60,7 +71,7 @@ export function expectContainText(node: Node, expectedText: string, ignoreSpaces
   assert.equal(actualText, expectedText)
 }
 
-export function expectContainHtml(node: Element, expectedHtml: string, postProcessCleanedHtml?: (html: string) => string) {
+export function expectContainHtml(node: Node | null, expectedHtml: string, postProcessCleanedHtml?: (html: string) => string) {
   let html = cleanedHtml(node)
   expectedHtml = expectedHtml.replace(/(<!--.*?-->)\s*/g, '$1')
   if (postProcessCleanedHtml) {
@@ -69,7 +80,7 @@ export function expectContainHtml(node: Element, expectedHtml: string, postProce
   assert.equal(html, expectedHtml)
 }
 
-export function expectContainHtmlElementsAndText(node: Element, expectedHtml: string) {
+export function expectContainHtmlElementsAndText(node: Node | null, expectedHtml: string) {
   assert.equal(cleanedHtml(node).replace(/<!--.+?-->/g, ''), expectedHtml)
 }
 

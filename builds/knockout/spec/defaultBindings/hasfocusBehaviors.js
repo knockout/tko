@@ -12,11 +12,11 @@ ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
 
             // When the value becomes true, we focus
             model.myVal(true);
-            expect(currentState).toEqual(true);
+            expect(currentState).to.deep.equal(true);
 
             // When the value becomes false, we blur
             model.myVal(false);
-            expect(currentState).toEqual(false);
+            expect(currentState).to.deep.equal(false);
         });
 
         it('Should set an observable value to be true on focus and false on blur', function() {
@@ -29,19 +29,19 @@ ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
 
             testNode.childNodes[0].focus();
             ko.utils.triggerEvent(testNode.childNodes[0], "focusin");
-            expect(model.myVal()).toEqual(true);
+            expect(model.myVal()).to.deep.equal(true);
 
             // Move the focus elsewhere
             testNode.childNodes[1].focus();
             ko.utils.triggerEvent(testNode.childNodes[0], "focusout");
-            expect(model.myVal()).toEqual(false);
+            expect(model.myVal()).to.deep.equal(false);
 
             // If the model value becomes true after a blur, we re-focus the element
             // (Represents issue #672, where this wasn't working)
             var didFocusExpectedElement = false;
             ko.utils.registerEventHandler(testNode.childNodes[0], "focusin", function() { didFocusExpectedElement = true });
             model.myVal(true);
-            expect(didFocusExpectedElement).toEqual(true);
+            expect(didFocusExpectedElement).to.deep.equal(true);
         });
 
         it('Should set a non-observable value to be true on focus and false on blur', function() {
@@ -51,12 +51,12 @@ ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
 
             testNode.childNodes[0].focus();
             ko.utils.triggerEvent(testNode.childNodes[0], "focusin");
-            expect(model.myVal).toEqual(true);
+            expect(model.myVal).to.deep.equal(true);
 
             // Move the focus elsewhere
             testNode.childNodes[1].focus();
             ko.utils.triggerEvent(testNode.childNodes[0], "focusout");
-            expect(model.myVal).toEqual(false);
+            expect(model.myVal).to.deep.equal(false);
         });
 
         it('Should not unnecessarily focus or blur an element that is already focused/blurred', function() {
@@ -70,7 +70,7 @@ ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
             var didFocusAgain = false;
             ko.utils.registerEventHandler(testNode.childNodes[0], "focusin", function() { didFocusAgain = true });
             model.isFocused.valueHasMutated();
-            expect(didFocusAgain).toEqual(false);
+            expect(didFocusAgain).to.deep.equal(false);
 
             // Similarly, when the elem is already blurred, changing the model value to a different
             // falsy value shouldn't cause any additional blur events
@@ -78,7 +78,7 @@ ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
             var didBlurAgain = false;
             ko.utils.registerEventHandler(testNode.childNodes[0], "focusout", function() { didBlurAgain = true });
             model.isFocused(null);
-            expect(didBlurAgain).toEqual(false);
+            expect(didBlurAgain).to.deep.equal(false);
         });
 
         it('Should not cause unrelated items to lose focus when initialized with false', function () {
@@ -88,7 +88,7 @@ ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
 
             // Can only test for focus in browsers that support it
             if ("activeElement" in document) {
-                expect(document.activeElement).toBe(testNode.childNodes[0]);
+                expect(document.activeElement).to.equal(testNode.childNodes[0]);
             }
         });
     });

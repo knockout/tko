@@ -25,9 +25,9 @@ describe('DOM node disposal', function() {
         var didRun = false;
         ko.utils.domNodeDisposal.addDisposeCallback(testNode, function() { didRun = true });
 
-        expect(didRun).toEqual(false);
+        expect(didRun).to.deep.equal(false);
         ko.cleanNode(testNode);
-        expect(didRun).toEqual(true);
+        expect(didRun).to.deep.equal(true);
     });
 
     it('Should run registered disposal callbacks on descendants when a node is cleaned', function () {
@@ -38,9 +38,9 @@ describe('DOM node disposal', function() {
         childNode.appendChild(grandChildNode);
         ko.utils.domNodeDisposal.addDisposeCallback(grandChildNode, function() { didRun = true });
 
-        expect(didRun).toEqual(false);
+        expect(didRun).to.deep.equal(false);
         ko.cleanNode(testNode);
-        expect(didRun).toEqual(true);
+        expect(didRun).to.deep.equal(true);
     });
 
     it('Should run registered disposal callbacks and detach from DOM when a node is removed', function () {
@@ -49,11 +49,11 @@ describe('DOM node disposal', function() {
         testNode.appendChild(childNode);
         ko.utils.domNodeDisposal.addDisposeCallback(childNode, function() { didRun = true });
 
-        expect(didRun).toEqual(false);
-        expect(testNode.childNodes.length).toEqual(1);
+        expect(didRun).to.deep.equal(false);
+        expect(testNode.childNodes.length).to.deep.equal(1);
         ko.removeNode(childNode);
-        expect(didRun).toEqual(true);
-        expect(testNode.childNodes.length).toEqual(0);
+        expect(didRun).to.deep.equal(true);
+        expect(testNode.childNodes.length).to.deep.equal(0);
     });
 
     it('Should be able to remove previously-registered disposal callbacks', function() {
@@ -61,10 +61,10 @@ describe('DOM node disposal', function() {
         var callback = function() { didRun = true };
         ko.utils.domNodeDisposal.addDisposeCallback(testNode, callback);
 
-        expect(didRun).toEqual(false);
+        expect(didRun).to.deep.equal(false);
         ko.utils.domNodeDisposal.removeDisposeCallback(testNode, callback);
         ko.cleanNode(testNode);
-        expect(didRun).toEqual(false); // Didn't run only because we removed it
+        expect(didRun).to.deep.equal(false); // Didn't run only because we removed it
     });
 
     it('Should not clean descendant nodes that are removed by a parent dispose handler', function() {
@@ -82,8 +82,8 @@ describe('DOM node disposal', function() {
         ko.utils.domNodeDisposal.addDisposeCallback(grandChildNode, grandChildSpy);
 
         ko.cleanNode(testNode);
-        expect(childSpy).toHaveBeenCalledWith(childNode);
-        expect(grandChildSpy).not.toHaveBeenCalled();
+        expect(childSpy.calledWith(childNode)).to.equal(true);
+        expect(grandChildSpy.called).to.equal(false);
     });
 
     it('Should not clean nodes that are removed by a comment dispose handler', function() {
@@ -105,9 +105,9 @@ describe('DOM node disposal', function() {
         ko.utils.domNodeDisposal.addDisposeCallback(childNode2, child2Spy);
 
         ko.cleanNode(testNode);
-        expect(childSpy).toHaveBeenCalledWith(childNode);
-        expect(grandChildSpy).not.toHaveBeenCalled();
-        expect(child2Spy).toHaveBeenCalledWith(childNode2);
+        expect(childSpy.calledWith(childNode)).to.equal(true);
+        expect(grandChildSpy.called).to.equal(false);
+        expect(child2Spy.calledWith(childNode2)).to.equal(true);
     });
 
     it('Should continue cleaning if a cleaned node is removed in a handler', function() {
@@ -126,8 +126,8 @@ describe('DOM node disposal', function() {
         ko.utils.domNodeDisposal.addDisposeCallback(childNode2, childSpy);
 
         ko.cleanNode(testNode);
-        expect(removeChildSpy).toHaveBeenCalledWith(childNode);
-        expect(childSpy).toHaveBeenCalledWith(childNode2);
+        expect(removeChildSpy.calledWith(childNode)).to.equal(true);
+        expect(childSpy.calledWith(childNode2)).to.equal(true);
 
         removeChildSpy.reset();
         childSpy.reset();
@@ -141,8 +141,8 @@ describe('DOM node disposal', function() {
         ko.utils.domNodeDisposal.addDisposeCallback(childNode3, childSpy);
 
         ko.cleanNode(testNode);
-        expect(removeChildSpy).toHaveBeenCalledWith(childNode2);
-        expect(childSpy).toHaveBeenCalledWith(childNode3);
+        expect(removeChildSpy.calledWith(childNode2)).to.equal(true);
+        expect(childSpy.calledWith(childNode3)).to.equal(true);
 
         removeChildSpy.reset();
         childSpy.reset();
@@ -155,8 +155,8 @@ describe('DOM node disposal', function() {
         ko.utils.domNodeDisposal.addDisposeCallback(childNode2, childSpy);
 
         ko.cleanNode(testNode);
-        expect(removeChildSpy).toHaveBeenCalledWith(childNode);
-        expect(childSpy).toHaveBeenCalledWith(childNode2);
+        expect(removeChildSpy.calledWith(childNode)).to.equal(true);
+        expect(childSpy.calledWith(childNode2)).to.equal(true);
     });
 
     it('Should be able to attach disposal callback to a node that has been cloned', function() {
@@ -186,10 +186,10 @@ describe('DOM node disposal', function() {
         };
 
         testNode['ko_test'] = "mydata";
-        expect(testNode['ko_test']).toEqual("mydata");
+        expect(testNode['ko_test']).to.deep.equal("mydata");
 
         ko.cleanNode(testNode);
-        expect(testNode['ko_test']).toBeUndefined();
+        expect(testNode['ko_test']).to.equal(undefined);
     });
 
     it('If jQuery is referenced, should clear jQuery data when a node is cleaned', function() {
@@ -199,10 +199,10 @@ describe('DOM node disposal', function() {
 
         var obj = {};
         jQuery.data(testNode, 'ko_test', obj);
-        expect(jQuery.data(testNode, 'ko_test')).toBe(obj);
+        expect(jQuery.data(testNode, 'ko_test')).to.equal(obj);
 
         ko.cleanNode(testNode);
-        expect(jQuery.data(testNode, 'ko_test')).toBeUndefined();
+        expect(jQuery.data(testNode, 'ko_test')).to.equal(undefined);
     });
 
     it('If jQuery is referenced, should be able to prevent jQuery data from being cleared by overwriting "cleanExternalData"', function() {
@@ -216,9 +216,9 @@ describe('DOM node disposal', function() {
 
         var obj = {};
         jQuery.data(testNode, 'ko_test', obj);
-        expect(jQuery.data(testNode, 'ko_test')).toBe(obj);
+        expect(jQuery.data(testNode, 'ko_test')).to.equal(obj);
 
         ko.cleanNode(testNode);
-        expect(jQuery.data(testNode, 'ko_test')).toBe(obj);
+        expect(jQuery.data(testNode, 'ko_test')).to.equal(obj);
     });
 });

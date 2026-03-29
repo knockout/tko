@@ -93,10 +93,10 @@ describe('onError handler', function () {
             syncError = true;
         }
 
-        expect(syncError).toBe(true);
+        expect(syncError).to.equal(true);
 
-        expect(koOnErrorCount).toBe(0);
-        expect(windowOnErrorCount).toBe(0);
+        expect(koOnErrorCount).to.equal(0);
+        expect(windowOnErrorCount).to.equal(0);
     });
 
     it('fires on async component errors', async function () {
@@ -121,8 +121,8 @@ describe('onError handler', function () {
         await waitFor(function () {
             return koOnErrorCount > 0 && windowOnErrorCount > 0;
         });
-        expect(koOnErrorCount).toBe(1);
-        expect(windowOnErrorCount).toBe(1);
+        expect(koOnErrorCount).to.equal(1);
+        expect(windowOnErrorCount).to.equal(1);
     });
 
     it('passes through the error instance', async function() {
@@ -135,8 +135,8 @@ describe('onError handler', function () {
         await waitFor(function () {
             return koOnErrorCount > 0;
         });
-        expect(koOnErrorCount).toBe(1);
-        expect(windowOnErrorCount).toBe(1);
-        expect(lastSeenError).toBe(expectedInstance);
+        expect(koOnErrorCount).to.equal(1);
+        expect(windowOnErrorCount).to.equal(1);
+        expect(lastSeenError).to.equal(expectedInstance);
     });
 });

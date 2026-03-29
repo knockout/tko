@@ -5,31 +5,31 @@ describe('Binding: Event', function() {
         var model = {
             firstWasCalled: false,
             firstHandler: function (passedModel, evt) {
-                expect(evt.type).toEqual("click");
-                expect(this).toEqual(model);
-                expect(passedModel).toEqual(model);
+                expect(evt.type).to.deep.equal("click");
+                expect(this).to.deep.equal(model);
+                expect(passedModel).to.deep.equal(model);
 
-                expect(model.firstWasCalled).toEqual(false);
+                expect(model.firstWasCalled).to.deep.equal(false);
                 model.firstWasCalled = true;
             },
 
             secondWasCalled: false,
             secondHandler: function (passedModel, evt) {
-                expect(evt.type).toEqual("mouseover");
-                expect(this).toEqual(model);
-                expect(passedModel).toEqual(model);
+                expect(evt.type).to.deep.equal("mouseover");
+                expect(this).to.deep.equal(model);
+                expect(passedModel).to.deep.equal(model);
 
-                expect(model.secondWasCalled).toEqual(false);
+                expect(model.secondWasCalled).to.deep.equal(false);
                 model.secondWasCalled = true;
             }
         };
         testNode.innerHTML = "<button data-bind='event:{click:firstHandler, mouseover:secondHandler, mouseout:null}'>hey</button>";
         ko.applyBindings(model, testNode);
         ko.utils.triggerEvent(testNode.childNodes[0], "click");
-        expect(model.firstWasCalled).toEqual(true);
-        expect(model.secondWasCalled).toEqual(false);
+        expect(model.firstWasCalled).to.deep.equal(true);
+        expect(model.secondWasCalled).to.deep.equal(false);
         ko.utils.triggerEvent(testNode.childNodes[0], "mouseover");
-        expect(model.secondWasCalled).toEqual(true);
+        expect(model.secondWasCalled).to.deep.equal(true);
         ko.utils.triggerEvent(testNode.childNodes[0], "mouseout"); // Shouldn't do anything (specifically, shouldn't throw)
     });
 
@@ -48,8 +48,8 @@ describe('Binding: Event', function() {
         testNode.innerHTML = "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}'>hey</button></div>";
         ko.applyBindings(model, testNode);
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "click");
-        expect(model.innerWasCalled).toEqual(true);
-        expect(model.outerWasCalled).toEqual(true);
+        expect(model.innerWasCalled).to.deep.equal(true);
+        expect(model.outerWasCalled).to.deep.equal(true);
     });
 
     it('Should be able to prevent bubbling of bubblable events using the (eventname)Bubble:false option', function() {
@@ -60,25 +60,25 @@ describe('Binding: Event', function() {
         testNode.innerHTML = "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}, clickBubble:false'>hey</button></div>";
         ko.applyBindings(model, testNode);
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "click");
-        expect(model.innerWasCalled).toEqual(true);
-        expect(model.outerWasCalled).toEqual(false);
+        expect(model.innerWasCalled).to.deep.equal(true);
+        expect(model.outerWasCalled).to.deep.equal(false);
     });
 
     it('Should be able to supply handler params using "bind" helper', function() {
         // Using "bind" like this just eliminates the function literal wrapper - it's purely stylistic
         var didCallHandler = false, someObj = {};
         var myHandler = function() {
-            expect(this).toEqual(someObj);
-            expect(arguments.length).toEqual(5);
+            expect(this).to.deep.equal(someObj);
+            expect(arguments.length).to.deep.equal(5);
 
             // First x args will be the ones you bound
-            expect(arguments[0]).toEqual(123);
-            expect(arguments[1]).toEqual("another");
-            expect(arguments[2].something).toEqual(true);
+            expect(arguments[0]).to.deep.equal(123);
+            expect(arguments[1]).to.deep.equal("another");
+            expect(arguments[2].something).to.deep.equal(true);
 
             // Then you get the args we normally pass to handlers, i.e., the model then the event
-            expect(arguments[3]).toEqual(viewModel);
-            expect(arguments[4].type).toEqual("mouseover");
+            expect(arguments[3]).to.deep.equal(viewModel);
+            expect(arguments[4].type).to.deep.equal("mouseover");
 
             didCallHandler = true;
         };
@@ -86,6 +86,6 @@ describe('Binding: Event', function() {
         var viewModel = { myHandler: myHandler, someObj: someObj };
         ko.applyBindings(viewModel, testNode);
         ko.utils.triggerEvent(testNode.childNodes[0], "mouseover");
-        expect(didCallHandler).toEqual(true);
+        expect(didCallHandler).to.deep.equal(true);
     });
 });

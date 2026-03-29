@@ -213,7 +213,7 @@ describe('Binding: Event', function () {
     triggerEvent(testNode.children[0].children[0], 'click')
   })
 
-  xit('respects the `passive` param', function () {
+  it.skip('respects the `passive` param', function () {
     /**
      * This does not appear to be testable.  The evt.preventDefault below
      * throws an uncatchable error in Chrome 63.

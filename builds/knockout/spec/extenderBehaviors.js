@@ -6,10 +6,10 @@ describe('Extenders', function() {
         };
 
         var subscribable = new ko.subscribable();
-        expect(subscribable.dummyProperty).toEqual(undefined);
+        expect(subscribable.dummyProperty).to.deep.equal(undefined);
 
         subscribable.extend({ setDummyProperty : 123 });
-        expect(subscribable.dummyProperty).toEqual(123);
+        expect(subscribable.dummyProperty).to.deep.equal(123);
     });
 
     it('Should be able to chain extenders', function() {
@@ -18,6 +18,6 @@ describe('Extenders', function() {
         };
         var underlyingSubscribable = new ko.subscribable();
         var result = underlyingSubscribable.extend({ wrapInParentObject:true }).extend({ wrapInParentObject:true });
-        expect(result.inner.inner).toEqual(underlyingSubscribable);
+        expect(result.inner.inner).to.deep.equal(underlyingSubscribable);
     });
 });

@@ -19,8 +19,8 @@ describe('Cross-window support', function() {
             // renderTemplate
             ko.setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: text'></div>" }));
             ko.renderTemplate("someTemplate", { text: 'abc' }, null, body2);
-            expect(body2.childNodes.length).toEqual(1);
-            expect(body2).toContainHtml('<div data-bind="text: text">abc</div>');
+            expect(body2.childNodes.length).to.deep.equal(1);
+            expectContainHtml(body2, '<div data-bind="text: text">abc</div>');
             ko.cleanNode(body2);
 
             // template/foreach binding
@@ -31,7 +31,7 @@ describe('Cross-window support', function() {
                 { childProp: 'second child' }
             ];
             ko.applyBindings({ someItems: someItems }, body2.childNodes[1]);
-            expect(body2.childNodes[1]).toContainHtml('<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>');
+            expectContainHtml(body2.childNodes[1], '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>');
             ko.cleanNode(body2);
 
             // foreach binding
@@ -41,7 +41,7 @@ describe('Cross-window support', function() {
                 { childProp: 'second child' }
             ];
             ko.applyBindings({ someItems: someItems }, body2);
-            expect(body2.childNodes[0]).toContainHtml('<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>');
+            expectContainHtml(body2.childNodes[0], '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>');
             ko.cleanNode(body2);
 
             // with binding
@@ -50,16 +50,16 @@ describe('Cross-window support', function() {
             ko.applyBindings({ someItem: someItem }, body2);
 
             // First it's not there
-            expect(body2.childNodes[0].childNodes.length).toEqual(0);
+            expect(body2.childNodes[0].childNodes.length).to.deep.equal(0);
 
             // Then it's there
             someItem({ occasionallyExistentChildProp: 'Child prop value' });
-            expect(body2.childNodes[0].childNodes.length).toEqual(1);
-            expect(body2.childNodes[0].childNodes[0]).toContainText("Child prop value");
+            expect(body2.childNodes[0].childNodes.length).to.deep.equal(1);
+            expectContainText(body2.childNodes[0].childNodes[0], "Child prop value");
 
             // Then it's gone again
             someItem(null);
-            expect(body2.childNodes[0].childNodes.length).toEqual(0);
+            expect(body2.childNodes[0].childNodes.length).to.deep.equal(0);
             ko.cleanNode(body2);
         } finally {
             ko.setTemplateEngine(previousTemplateEngine);

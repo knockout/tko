@@ -19,23 +19,23 @@ describe('Native template engine', function() {
             templateElem[templateElementProp] = "name: <div data-bind='text: name'></div>";
 
             ko.renderTemplate(templateElemId, { name: 'bert' }, null, testNode);
-            expect(testNode).toContainHtml("name: <div data-bind=\"text: name\">bert</div>");
+            expectContainHtml(testNode, "name: <div data-bind=\"text: name\">bert</div>");
 
             // A second render also works
             ko.renderTemplate(templateElemId, { name: 'tom' }, null, testNode);
-            expect(testNode).toContainHtml("name: <div data-bind=\"text: name\">tom</div>");
+            expectContainHtml(testNode, "name: <div data-bind=\"text: name\">tom</div>");
 
             // A change to the element contents is picked up
             templateElem[templateElementProp] = "welcome <div data-bind='text: name'></div>";
             ko.renderTemplate(templateElemId, { name: 'dave' }, null, testNode);
-            expect(testNode).toContainHtml("welcome <div data-bind=\"text: name\">dave</div>");
+            expectContainHtml(testNode, "welcome <div data-bind=\"text: name\">dave</div>");
         }
 
         it('can display static content from regular DOM element', function () {
             var testDivTemplate = ensureNodeExistsAndIsEmpty("testDivTemplate");
             testDivTemplate.innerHTML = "this is some static content";
             ko.renderTemplate("testDivTemplate", null, null, testNode);
-            expect(testNode).toContainHtml("this is some static content");
+            expectContainHtml(testNode, "this is some static content");
         });
 
         it('can fetch template from regular DOM element and data-bind on results', function () {
@@ -65,14 +65,14 @@ describe('Native template engine', function() {
             new ko.templateSources.anonymousTemplate(testNode).text("this is some static content");
             testNode.innerHTML = "irrelevant initial content";
             ko.renderTemplate(testNode, null, null, testNode);
-            expect(testNode).toContainHtml("this is some static content");
+            expectContainHtml(testNode, "this is some static content");
         });
 
         it('can data-bind on results', function () {
             new ko.templateSources.anonymousTemplate(testNode).text("name: <div data-bind='text: name'></div>");
             testNode.innerHTML = "irrelevant initial content";
             ko.renderTemplate(testNode, { name: 'bert' }, null, testNode);
-            expect(testNode).toContainHtml("name: <div data-bind=\"text: name\">bert</div>");
+            expectContainHtml(testNode, "name: <div data-bind=\"text: name\">bert</div>");
         });
 
         it('can be supplied by not giving a template name', function() {
@@ -83,7 +83,7 @@ describe('Native template engine', function() {
             };
             ko.applyBindings(viewModel, testNode);
 
-            expect(testNode.childNodes[0]).toContainText("Value: abc");
+            expectContainText(testNode.childNodes[0], "Value: abc");
         });
 
         it('with no content should be rejected', function () {
@@ -94,7 +94,7 @@ describe('Native template engine', function() {
             };
             expect(function () {
                 ko.applyBindings(viewModel, testNode);
-            }).toThrowContaining("no template content");
+            }).to.throw("no template content");
         });
 
         it('work in conjunction with foreach', function() {
@@ -102,21 +102,21 @@ describe('Native template engine', function() {
             var myItems = ko.observableArray([{ itemProp: 'Alpha' }, { itemProp: 'Beta' }, { itemProp: 'Gamma' }]);
             ko.applyBindings({ myItems: myItems }, testNode);
 
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("Item: Alpha");
-            expect(testNode.childNodes[0].childNodes[1]).toContainText("Item: Beta");
-            expect(testNode.childNodes[0].childNodes[2]).toContainText("Item: Gamma");
+            expectContainText(testNode.childNodes[0].childNodes[0], "Item: Alpha");
+            expectContainText(testNode.childNodes[0].childNodes[1], "Item: Beta");
+            expectContainText(testNode.childNodes[0].childNodes[2], "Item: Gamma");
 
             // Can cause re-rendering
             myItems.push({ itemProp: 'Pushed' });
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("Item: Alpha");
-            expect(testNode.childNodes[0].childNodes[1]).toContainText("Item: Beta");
-            expect(testNode.childNodes[0].childNodes[2]).toContainText("Item: Gamma");
-            expect(testNode.childNodes[0].childNodes[3]).toContainText("Item: Pushed");
+            expectContainText(testNode.childNodes[0].childNodes[0], "Item: Alpha");
+            expectContainText(testNode.childNodes[0].childNodes[1], "Item: Beta");
+            expectContainText(testNode.childNodes[0].childNodes[2], "Item: Gamma");
+            expectContainText(testNode.childNodes[0].childNodes[3], "Item: Pushed");
 
             myItems.splice(1, 1);
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("Item: Alpha");
-            expect(testNode.childNodes[0].childNodes[1]).toContainText("Item: Gamma");
-            expect(testNode.childNodes[0].childNodes[2]).toContainText("Item: Pushed");
+            expectContainText(testNode.childNodes[0].childNodes[0], "Item: Alpha");
+            expectContainText(testNode.childNodes[0].childNodes[1], "Item: Gamma");
+            expectContainText(testNode.childNodes[0].childNodes[2], "Item: Pushed");
         });
 
         it('may be nested', function() {
@@ -135,13 +135,13 @@ describe('Native template engine', function() {
             viewModel.invocationCount = function() { return ++this.invocations }.bind(viewModel);
             ko.applyBindings(viewModel, testNode);
 
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)");
-            expect(testNode.childNodes[0].childNodes[1]).toContainText("(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)");
+            expectContainText(testNode.childNodes[0].childNodes[0], "(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)");
+            expectContainText(testNode.childNodes[0].childNodes[1], "(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)");
 
             // Check we can insert without causing anything else to rerender
             viewModel.items()[1].children.unshift('ANew');
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)");
-            expect(testNode.childNodes[0].childNodes[1]).toContainText("(Val: ANew, Invocations: 6, Parents: 2)(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)");
+            expectContainText(testNode.childNodes[0].childNodes[0], "(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)");
+            expectContainText(testNode.childNodes[0].childNodes[1], "(Val: ANew, Invocations: 6, Parents: 2)(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)");
         });
     });
 
@@ -151,7 +151,7 @@ describe('Native template engine', function() {
                                           + "ValueBound: <span data-bind='text: $parent.parentProp'></span>"
                                       + "</div>";
             ko.applyBindings({ someItem: {}, parentProp: 'Hello' }, testNode);
-            expect(testNode.childNodes[0]).toContainText("ValueBound: Hello");
+            expectContainText(testNode.childNodes[0], "ValueBound: Hello");
         });
 
         it('should expose all ancestor binding contexts as $parents, with top frame also given as $root', function() {
@@ -178,7 +178,7 @@ describe('Native template engine', function() {
                     }
                 }
             }, testNode);
-            expect(testNode.childNodes[0].childNodes[0].childNodes[0]).toContainText("(data: INNER, parent: MIDDLE, parents[0]: MIDDLE, parents[1]: OUTER, parents.length: 3, root: ROOT)");
+            expectContainText(testNode.childNodes[0].childNodes[0].childNodes[0], "(data: INNER, parent: MIDDLE, parents[0]: MIDDLE, parents[1]: OUTER, parents.length: 3, root: ROOT)");
         });
     });
 });

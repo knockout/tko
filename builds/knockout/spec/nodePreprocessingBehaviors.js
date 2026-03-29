@@ -13,7 +13,7 @@ describe('Node preprocessing', function() {
         ko.options.bindingProviderInstance.preprocessNode = function(node) { return null; };
         testNode.innerHTML = "<p data-bind='text: someValue'></p>";
         ko.applyBindings({ someValue: 'hello' }, testNode);
-        expect(testNode).toContainText('hello');
+        expectContainText(testNode, 'hello');
     });
 
     it('Can replace a node with some other node', function() {
@@ -31,11 +31,11 @@ describe('Node preprocessing', function() {
         testNode.innerHTML = "<span>a</span><mySpecialNode></mySpecialNode><span>b</span>";
         var someValue = ko.observable('hello');
         ko.applyBindings({ someValue: someValue }, testNode);
-        expect(testNode).toContainText('ahellob');
+        expectContainText(testNode, 'ahellob');
 
         // Check that updating the observable has the expected effect
         someValue('goodbye');
-        expect(testNode).toContainText('agoodbyeb');
+        expectContainText(testNode, 'agoodbyeb');
     });
 
     it('Can replace a node with multiple new nodes', function() {
@@ -62,11 +62,11 @@ describe('Node preprocessing', function() {
         testNode.innerHTML = "the value is {{ someValue }}.";
         var someValue = ko.observable('hello');
         ko.applyBindings({ someValue: someValue }, testNode);
-        expect(testNode).toContainText('the value is hello.');
+        expectContainText(testNode, 'the value is hello.');
 
         // Check that updating the observable has the expected effect
         someValue('goodbye');
-        expect(testNode).toContainText('the value is goodbye.');
+        expectContainText(testNode, 'the value is goodbye.');
     });
 
     it('Can modify the set of top-level nodes in a foreach loop', function() {
@@ -95,13 +95,13 @@ describe('Node preprocessing', function() {
         var items = ko.observableArray(["Alpha", "Beta"]);
 
         ko.applyBindings({ items: items }, testNode);
-        expect(testNode).toContainText('AlphaAlphaBetaBeta');
+        expectContainText(testNode, 'AlphaAlphaBetaBeta');
 
         // Check that modifying the observable array has the expected effect
         items.splice(0, 1);
-        expect(testNode).toContainText('BetaBeta');
+        expectContainText(testNode, 'BetaBeta');
         items.push('Gamma');
-        expect(testNode).toContainText('BetaBetaGammaGamma');
+        expectContainText(testNode, 'BetaBetaGammaGamma');
     });
 
     it('Should call a childrenComplete callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function () {
@@ -125,20 +125,20 @@ describe('Node preprocessing', function() {
             vm = {
                 childprop: 'child property',
                 callback: function (nodes, data) {
-                    expect(nodes.length).toBe(5);
-                    expect(nodes[0]).toContainText('[');    // <span>[</span>
-                    expect(nodes[1].nodeType).toBe(8);      // <!-- ko text: $data.childprop -->
-                    expect(nodes[2].nodeType).toBe(3);      // text node inserted by text binding
-                    expect(nodes[3].nodeType).toBe(8);      // <!-- /ko -->
-                    expect(nodes[4]).toContainText(']');    // <span>]</span>
-                    expect(data).toBe(vm);
+                    expect(nodes.length).to.equal(5);
+                    expectContainText(nodes[0], '[');    // <span>[</span>
+                    expect(nodes[1].nodeType).to.equal(8);      // <!-- ko text: $data.childprop -->
+                    expect(nodes[2].nodeType).to.equal(3);      // text node inserted by text binding
+                    expect(nodes[3].nodeType).to.equal(8);      // <!-- /ko -->
+                    expectContainText(nodes[4], ']');    // <span>]</span>
+                    expect(data).to.equal(vm);
                     callbacks++;
                 }
             };
 
         testNode.innerHTML = "<div data-bind='childrenComplete: callback'><span>[</span>$data.childprop<span>]</span></div>";
         ko.applyBindings(vm, testNode);
-        expect(testNode.childNodes[0]).toContainText('[child property]');
-        expect(callbacks).toBe(1);
+        expectContainText(testNode.childNodes[0], '[child property]');
+        expect(callbacks).to.equal(1);
     });
 });
