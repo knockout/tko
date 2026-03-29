@@ -16,7 +16,7 @@ if (!Array.isArray) {
 
 describe('Text filters preprocessor', function () {
   const filterPreprocessor = function (string) {
-    return 'todo deactivated, see xit'
+    return 'todo deactivated, see skipped preprocessor tests'
   } //var filterPreprocessor = ko.punches.textFilter.preprocessor;
 
   /* Skipping the following five since they are tests that apply to the
