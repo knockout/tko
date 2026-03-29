@@ -13,22 +13,17 @@ import { computed as koComputed, pureComputed as koPureComputed, when } from '..
 
 import { restoreAfter, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
 
-let cleanups: Array<() => void>
-let clock: sinon.SinonFakeTimers
-
-beforeEach(function () {
-  cleanups = []
-  clock = sinon.useFakeTimers()
-})
-
-afterEach(function () {
-  while (cleanups.length) {
-    cleanups.pop()?.()
-  }
-  clock.restore()
-})
-
 describe('Throttled observables', function () {
+  let clock: sinon.SinonFakeTimers
+
+  beforeEach(function () {
+    clock = sinon.useFakeTimers()
+  })
+
+  afterEach(function () {
+    clock.restore()
+  })
+
   it('Should notify subscribers asynchronously after writes stop for the specified timeout duration', function () {
     const observable = koObservable('A').extend({ throttle: 100 })
     const notifiedValues = new Array()
@@ -54,6 +49,16 @@ describe('Throttled observables', function () {
 })
 
 describe('Throttled dependent observables', function () {
+  let clock: sinon.SinonFakeTimers
+
+  beforeEach(function () {
+    clock = sinon.useFakeTimers()
+  })
+
+  afterEach(function () {
+    clock.restore()
+  })
+
   it('Should notify subscribers asynchronously after dependencies stop updating for the specified timeout duration', function () {
     const underlying = koObservable()
     const asyncDepObs = koComputed(function () {
@@ -109,6 +114,16 @@ describe('Throttled dependent observables', function () {
 })
 
 describe('Rate-limited', function () {
+  let clock: sinon.SinonFakeTimers
+
+  beforeEach(function () {
+    clock = sinon.useFakeTimers()
+  })
+
+  afterEach(function () {
+    clock.restore()
+  })
+
   describe('Subscribable', function () {
     it('Should delay change notifications', function () {
       const subscribable = new koSubscribable().extend({ rateLimit: 500 })
@@ -722,12 +737,21 @@ describe('Rate-limited', function () {
 })
 
 describe('Deferred', function () {
+  let cleanups: Array<() => void>
+  let clock: sinon.SinonFakeTimers
+
   beforeEach(function () {
+    cleanups = []
+    clock = sinon.useFakeTimers()
     useMockForTasks(cleanups)
   })
 
   afterEach(function () {
     expect(tasks.resetForTesting()).to.equal(0)
+    while (cleanups.length) {
+      cleanups.pop()?.()
+    }
+    clock.restore()
   })
 
   describe('Observable', function () {
