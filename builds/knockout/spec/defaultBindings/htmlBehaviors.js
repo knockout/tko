@@ -1,5 +1,5 @@
 describe('Binding: HTML', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should assign the value to the node without HTML-encoding the value', function () {
         var model = { textProp: "My <span>HTML-containing</span> value" };

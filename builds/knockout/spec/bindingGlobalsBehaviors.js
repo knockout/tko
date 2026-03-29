@@ -1,5 +1,5 @@
 describe('options.bindingGlobals', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('references the global window by default', function() {
         this.after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs

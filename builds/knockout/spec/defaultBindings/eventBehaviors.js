@@ -1,5 +1,5 @@
 describe('Binding: Event', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should invoke the supplied function when the event occurs, using model as \'this\' param and first arg, and event as second arg', function () {
         var model = {

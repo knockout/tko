@@ -1,7 +1,6 @@
 ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
     describe('Binding: ' + binding, function() {
-        beforeEach(jasmine.prepareTestNode);
-        beforeEach(function() { waits(1); }); // Workaround for spurious focus-timing-related failures on IE8 (issue #736)
+        beforeEach(prepareTestNode);
 
         it('Should respond to changes on an observable value by blurring or focusing the element', function() {
             var currentState;

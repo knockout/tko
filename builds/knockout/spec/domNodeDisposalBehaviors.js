@@ -1,6 +1,25 @@
+function createSpy() {
+    var spy = sinon.stub();
+    Object.defineProperties(spy, {
+        calls: {
+            get: function() {
+                return spy.getCalls();
+            }
+        },
+        argsForCall: {
+            get: function() {
+                return spy.getCalls().map(function(call) { return call.args; });
+            }
+        }
+    });
+    spy.reset = spy.resetHistory.bind(spy);
+    spy.andCallFake = spy.callsFake.bind(spy);
+    spy.andReturn = spy.returns.bind(spy);
+    return spy;
+}
 
 describe('DOM node disposal', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should run registered disposal callbacks when a node is cleaned', function () {
         var didRun = false;
@@ -51,11 +70,11 @@ describe('DOM node disposal', function() {
     it('Should not clean descendant nodes that are removed by a parent dispose handler', function() {
         var childNode = document.createElement("DIV");
         var grandChildNode = document.createElement("DIV");
-        var childSpy = jasmine.createSpy('childSpy')
+        var childSpy = createSpy('childSpy')
             .andCallFake(function() {
                 childNode.removeChild(grandChildNode);
             });
-        var grandChildSpy = jasmine.createSpy('grandChildSpy');
+        var grandChildSpy = createSpy('grandChildSpy');
 
         testNode.appendChild(childNode);
         childNode.appendChild(grandChildNode);
@@ -71,12 +90,12 @@ describe('DOM node disposal', function() {
         var childNode = document.createComment("ko comment");
         var grandChildNode = document.createElement("DIV");
         var childNode2 = document.createComment("ko comment");
-        var childSpy = jasmine.createSpy('childSpy')
+        var childSpy = createSpy('childSpy')
             .andCallFake(function() {
                 testNode.removeChild(grandChildNode);
             });
-        var grandChildSpy = jasmine.createSpy('grandChildSpy');
-        var child2Spy = jasmine.createSpy('child2Spy');
+        var grandChildSpy = createSpy('grandChildSpy');
+        var child2Spy = createSpy('child2Spy');
 
         testNode.appendChild(childNode);
         testNode.appendChild(grandChildNode);
@@ -94,11 +113,11 @@ describe('DOM node disposal', function() {
     it('Should continue cleaning if a cleaned node is removed in a handler', function() {
         var childNode = document.createElement("DIV");
         var childNode2 = document.createElement("DIV");
-        var removeChildSpy = jasmine.createSpy('removeChildSpy')
+        var removeChildSpy = createSpy('removeChildSpy')
             .andCallFake(function() {
                 testNode.removeChild(childNode);
             });
-        var childSpy = jasmine.createSpy('childSpy');
+        var childSpy = createSpy('childSpy');
 
         // Test by removing the node itself
         testNode.appendChild(childNode);

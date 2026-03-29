@@ -1,5 +1,5 @@
 describe('Binding: If', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsy', function() {
         testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem.nonExistentChildProp'></span></div>";

@@ -31,7 +31,7 @@ describe('unwrapObservable', function() {
 
 describe('arrayForEach', function () {
   it('Should go call the callback for each element of the array, in order', function () {
-      var callback = jasmine.createSpy('callback');
+      var callback = createSpy();
 
       ko.utils.arrayForEach(["a", "b", "c"], callback);
 
@@ -42,7 +42,7 @@ describe('arrayForEach', function () {
   });
 
   it('Should do nothing with empty arrays', function () {
-      var callback = jasmine.createSpy('callback');
+      var callback = createSpy();
 
       ko.utils.arrayForEach([], callback);
 
@@ -129,11 +129,11 @@ describe('arrayFirst', function () {
   var matchB, matchD;
 
   beforeEach(function () {
-      matchB = jasmine.createSpy('matchB').andCallFake(function (x) {
+      matchB = createSpy().andCallFake(function (x) {
           return x.charAt(0) === "b";
       });
 
-      matchD = jasmine.createSpy('matchD').andCallFake(function (x) {
+      matchD = createSpy().andCallFake(function (x) {
           return x.charAt(0) === "d";
       });
   });
@@ -145,7 +145,7 @@ describe('arrayFirst', function () {
   });
 
   it('Should return undefined with empty arrays, and not call the predicate', function () {
-      var predicate = jasmine.createSpy('predicate');
+      var predicate = createSpy();
 
       var result = ko.utils.arrayFirst([], predicate);
 
@@ -230,7 +230,7 @@ describe('arrayMap', function () {
   });
 
   it('Should return empty arrays for empty arrays, and not call the map function', function () {
-      var mapFunction = jasmine.createSpy('mapFunction');
+      var mapFunction = createSpy();
 
       var result = ko.utils.arrayMap([], mapFunction);
 
@@ -281,7 +281,7 @@ describe('arrayFilter', function () {
   });
 
   it('Should return empty arrays for empty arrays, and not call the filter function', function () {
-      var filterFunction = jasmine.createSpy('filterFunction');
+      var filterFunction = createSpy();
 
       var result = ko.utils.arrayFilter([], filterFunction);
 
@@ -375,7 +375,7 @@ describe('Function.bind', function() {
   it('should bind a function to `null` or `undefined`', function () {
       var bound = fn.bind(null),
           actual = bound('a'),
-          global = jasmine.getGlobal();
+          global = window;
 
       expect(actual[0]).toEqualOneOf([null, global]);
       expect(actual[1]).toEqual('a');

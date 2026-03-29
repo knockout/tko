@@ -1,5 +1,5 @@
 describe('Binding: CSS style', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should give the element the specified CSS style value', function () {
         var myObservable = new ko.observable("red");

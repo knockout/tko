@@ -1,5 +1,5 @@
 describe('Binding: Enable/Disable', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Enable means the node is enabled only when the value is true', function () {
         var observable = new ko.observable();

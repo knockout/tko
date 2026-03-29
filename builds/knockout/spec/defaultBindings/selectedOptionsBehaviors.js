@@ -1,5 +1,5 @@
 describe('Binding: Selected Options', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should only be applicable to SELECT nodes', function () {
         var threw = false;
