@@ -47,10 +47,10 @@ describe('Binding: If', function () {
     // this.after(function () { setTemplateEngine(new nativeTemplateEngine()) })
     // setTemplateEngine(new nativeTemplateEngine()) // This template engine will just throw errors if you try to use it
     // testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem.existentChildProp'></span></div>"
-    // expect(testNode.childNodes.length).toEqual(1)
+    // expect(testNode.childNodes.length).to.equal(1)
     // applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode)
-    // expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-    // expect(testNode.childNodes[0].childNodes[0]).toContainText('Child prop value')
+    // expect(testNode.childNodes[0].childNodes.length).to.equal(1)
+    // expectContainText(testNode.childNodes[0].childNodes[0], 'Child prop value')
   })
 
   it('Should leave descendant nodes unchanged if the value is truthy and remains truthy when changed', function () {

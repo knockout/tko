@@ -16,7 +16,7 @@ describe('arrayForEach', function () {
 
     ko.utils.arrayForEach(['a', 'b', 'c'], callback)
 
-    expect(callback.callCount).to.equal(3)
+    sinon.assert.callCount(callback, 3)
     expect(callback.getCall(0).args).to.deep.equal(['a', 0, ['a', 'b', 'c']])
     expect(callback.getCall(1).args).to.deep.equal(['b', 1, ['a', 'b', 'c']])
     expect(callback.getCall(2).args).to.deep.equal(['c', 2, ['a', 'b', 'c']])
@@ -27,7 +27,7 @@ describe('arrayForEach', function () {
 
     ko.utils.arrayForEach([], callback)
 
-    expect(callback.called).to.equal(false)
+    sinon.assert.notCalled(callback)
   })
 
   it('Should alter "this" context when defined as an argument', function () {
@@ -138,13 +138,13 @@ describe('arrayFirst', function () {
     const result = ko.utils.arrayFirst([], predicate)
 
     expect(result).to.equal(undefined)
-    expect(predicate.called).to.equal(false)
+    sinon.assert.notCalled(predicate)
   })
 
   it('Should test the predicate on every element before the first matching element', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchB)
 
-    expect(matchB.callCount).to.equal(2)
+    sinon.assert.callCount(matchB, 2)
     expect(matchB.getCall(0).args).to.deep.equal(['a', 0, ['a', 'b', 'c']])
     expect(matchB.getCall(1).args).to.deep.equal(['b', 1, ['a', 'b', 'c']])
   })
@@ -157,7 +157,7 @@ describe('arrayFirst', function () {
   it('Should test every element if no element matches', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
 
-    expect(matchD.callCount).to.equal(3)
+    sinon.assert.callCount(matchD, 3)
     expect(matchD.getCall(0).args).to.deep.equal(['a', 0, ['a', 'b', 'c']])
     expect(matchD.getCall(1).args).to.deep.equal(['b', 1, ['a', 'b', 'c']])
     expect(matchD.getCall(2).args).to.deep.equal(['c', 2, ['a', 'b', 'c']])
@@ -226,7 +226,7 @@ describe('arrayMap', function () {
     const result = ko.utils.arrayMap([], mapFunction)
 
     expect(result).to.deep.equal([])
-    expect(mapFunction.called).to.equal(false)
+    sinon.assert.notCalled(mapFunction)
   })
 
   it('Should copy the array before returning it', function () {
@@ -278,7 +278,7 @@ describe('arrayFilter', function () {
     const result = ko.utils.arrayFilter([], filterFunction)
 
     expect(result).to.deep.equal([])
-    expect(filterFunction.called).to.equal(false)
+    sinon.assert.notCalled(filterFunction)
   })
 
   it('Should copy the array before returning it', function () {

@@ -42,7 +42,7 @@ describe('Components: Provider', function () {
 
       // Since components are loaded asynchronously, it doesn't show up synchronously
       applyBindings(null, root)
-      // expect(root.innerHTML).toEqual(initialMarkup);
+      // expect(root.innerHTML).to.equal(initialMarkup)
       expect(root.innerHTML).to.equal('He: <helium>X<i data-bind="text: 123">123</i></helium>')
     })
 
