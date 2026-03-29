@@ -1,23 +1,3 @@
-function createSpy() {
-    var spy = sinon.stub();
-    Object.defineProperties(spy, {
-        calls: {
-            get: function() {
-                return spy.getCalls();
-            }
-        },
-        argsForCall: {
-            get: function() {
-                return spy.getCalls().map(function(call) { return call.args; });
-            }
-        }
-    });
-    spy.reset = spy.resetHistory.bind(spy);
-    spy.andCallFake = spy.callsFake.bind(spy);
-    spy.andReturn = spy.returns.bind(spy);
-    return spy;
-}
-
 describe('DOM node disposal', function() {
     beforeEach(prepareTestNode);
 
@@ -70,11 +50,11 @@ describe('DOM node disposal', function() {
     it('Should not clean descendant nodes that are removed by a parent dispose handler', function() {
         var childNode = document.createElement("DIV");
         var grandChildNode = document.createElement("DIV");
-        var childSpy = createSpy('childSpy')
-            .andCallFake(function() {
+        var childSpy = sinon.stub()
+            .callsFake(function() {
                 childNode.removeChild(grandChildNode);
             });
-        var grandChildSpy = createSpy('grandChildSpy');
+        var grandChildSpy = sinon.stub();
 
         testNode.appendChild(childNode);
         childNode.appendChild(grandChildNode);
@@ -90,12 +70,12 @@ describe('DOM node disposal', function() {
         var childNode = document.createComment("ko comment");
         var grandChildNode = document.createElement("DIV");
         var childNode2 = document.createComment("ko comment");
-        var childSpy = createSpy('childSpy')
-            .andCallFake(function() {
+        var childSpy = sinon.stub()
+            .callsFake(function() {
                 testNode.removeChild(grandChildNode);
             });
-        var grandChildSpy = createSpy('grandChildSpy');
-        var child2Spy = createSpy('child2Spy');
+        var grandChildSpy = sinon.stub();
+        var child2Spy = sinon.stub();
 
         testNode.appendChild(childNode);
         testNode.appendChild(grandChildNode);
@@ -113,11 +93,11 @@ describe('DOM node disposal', function() {
     it('Should continue cleaning if a cleaned node is removed in a handler', function() {
         var childNode = document.createElement("DIV");
         var childNode2 = document.createElement("DIV");
-        var removeChildSpy = createSpy('removeChildSpy')
-            .andCallFake(function() {
+        var removeChildSpy = sinon.stub()
+            .callsFake(function() {
                 testNode.removeChild(childNode);
             });
-        var childSpy = createSpy('childSpy');
+        var childSpy = sinon.stub();
 
         // Test by removing the node itself
         testNode.appendChild(childNode);
@@ -129,8 +109,8 @@ describe('DOM node disposal', function() {
         expect(removeChildSpy.calledWith(childNode)).to.equal(true);
         expect(childSpy.calledWith(childNode2)).to.equal(true);
 
-        removeChildSpy.reset();
-        childSpy.reset();
+        removeChildSpy.resetHistory();
+        childSpy.resetHistory();
 
         // Test by removing a previous node
         var childNode3 = document.createElement("DIV");
@@ -144,8 +124,8 @@ describe('DOM node disposal', function() {
         expect(removeChildSpy.calledWith(childNode2)).to.equal(true);
         expect(childSpy.calledWith(childNode3)).to.equal(true);
 
-        removeChildSpy.reset();
-        childSpy.reset();
+        removeChildSpy.resetHistory();
+        childSpy.resetHistory();
 
         // Test by removing a comment node
         var childNode = document.createComment("ko comment");

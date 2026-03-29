@@ -1,12 +1,21 @@
 describe('Tasks', function() {
+    var clock,
+        originalTaskScheduler;
+
     beforeEach(function() {
-        Clock.useMockForTasks();
+        clock = sinon.useFakeTimers();
+        originalTaskScheduler = ko.options.taskScheduler;
+        ko.options.taskScheduler = function(callback) {
+            setTimeout(callback, 0);
+        };
     });
 
     afterEach(function() {
         // Check that task schedule is clear after each test
         expect(ko.tasks.resetForTesting()).to.deep.equal(0);
-        Clock.reset();
+        ko.options.taskScheduler = originalTaskScheduler;
+        clock.restore();
+        clock = null;
     });
 
     it('Should run in next execution cycle', function() {
@@ -16,7 +25,7 @@ describe('Tasks', function() {
         });
         expect(runCount).to.deep.equal(0);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runCount).to.deep.equal(1);
     });
 
@@ -29,7 +38,7 @@ describe('Tasks', function() {
         ko.tasks.schedule(func);
         expect(runCount).to.deep.equal(0);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runCount).to.deep.equal(2);
     });
 
@@ -42,7 +51,7 @@ describe('Tasks', function() {
         ko.tasks.schedule(func.bind(null, 1));
         ko.tasks.schedule(func.bind(null, 2));
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runValues).to.deep.equal([1,2]);
     });
 
@@ -54,13 +63,13 @@ describe('Tasks', function() {
         ko.tasks.schedule(func);
         expect(runCount).to.deep.equal(0);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runCount).to.deep.equal(1);
 
         ko.tasks.schedule(func);
         expect(runCount).to.deep.equal(1);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runCount).to.deep.equal(2);
     });
 
@@ -76,7 +85,7 @@ describe('Tasks', function() {
         ko.tasks.schedule(func.bind(null, 'i'));
         expect(runValues).to.deep.equal([]);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runValues).to.deep.equal(['i','x']);
     });
 
@@ -94,7 +103,7 @@ describe('Tasks', function() {
 
         // When running tasks, it will throw an exception after completing all tasks
         expect(function() {
-            Clock.tick(1);
+            clock.tick(1);
         }).to.throw();
         expect(runValues).to.deep.equal([1,2]);
     });
@@ -111,7 +120,7 @@ describe('Tasks', function() {
         expect(runValues).to.deep.equal([]);
 
         expect(function() {
-            Clock.tick(1);
+            clock.tick(1);
         }).to.throw('Too much recursion');
 
         // 5000 is the current limit in the code, but it could change if needed.
@@ -129,7 +138,7 @@ describe('Tasks', function() {
         }
         expect(runValues).to.deep.equal([]);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(runValues.length).to.deep.equal(10000);
     });
 
@@ -141,7 +150,7 @@ describe('Tasks', function() {
             });
             ko.tasks.cancel(handle);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(runCount).to.deep.equal(0);
         });
 
@@ -154,7 +163,7 @@ describe('Tasks', function() {
             var handle2 = ko.tasks.schedule(func);
             ko.tasks.cancel(handle2);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(runCount).to.deep.equal(1);
         });
 
@@ -166,7 +175,7 @@ describe('Tasks', function() {
             var handle1 = ko.tasks.schedule(func.bind(null, 1));
             expect(runValues).to.deep.equal([]);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(runValues).to.deep.equal([1]);
 
             var handle2 = ko.tasks.schedule(func.bind(null, 2));
@@ -175,7 +184,7 @@ describe('Tasks', function() {
             ko.tasks.cancel(handle1);
 
             // But nothing should happen; the second task will run in the next iteration
-            Clock.tick(1);
+            clock.tick(1);
             expect(runValues).to.deep.equal([1,2]);
         });
 
@@ -198,7 +207,7 @@ describe('Tasks', function() {
 
             // When running tasks, it will throw an exception after completing the tasks
             expect(function() {
-                Clock.tick(1);
+                clock.tick(1);
             }).to.throw();
             expect(runValues).to.deep.equal([1, 3]);  // The canceled task will be skipped
         });
@@ -217,7 +226,7 @@ describe('Tasks', function() {
             ko.tasks.runEarly();
             expect(runValues).to.deep.equal([1]);
 
-            // Skip calling Clock.tick to show that the queue is clear
+            // The queue is clear, so there is nothing to advance.
         });
 
         it('Should run tasks early during task processing', function() {
@@ -239,7 +248,7 @@ describe('Tasks', function() {
             });
             ko.tasks.schedule(func.bind(null, 1));
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(runValues).to.deep.equal([1,2,3]);
         });
 
@@ -259,7 +268,7 @@ describe('Tasks', function() {
             expect(runValues.length).to.deep.equal(5000);
 
             expect(function() {
-                Clock.tick(1);
+                clock.tick(1);
             }).to.throw('Too much recursion');
 
             // No additional iterations should happen
@@ -287,7 +296,7 @@ describe('Tasks', function() {
 
             // It will throw an exception after completing all tasks
             expect(function() {
-                Clock.tick(1);
+                clock.tick(1);
             }).to.throw();
             expect(runValues).to.deep.equal([1, 2, 3]);
         });
@@ -297,7 +306,6 @@ describe('Tasks', function() {
 describe('Tasks scheduler', function() {
     afterEach(function() {
         expect(ko.tasks.resetForTesting()).to.deep.equal(0);
-        Clock.reset();
     });
 
     function waitForNextTaskCycle() {
@@ -327,44 +335,48 @@ describe('Tasks scheduler', function() {
 
     it('Should run only once for a set of tasks', function() {
         var counts = [0, 0];    // scheduler, tasks
+        var clock = sinon.useFakeTimers();
 
-        Clock.useMock();
-        this.restoreAfter(ko.options, 'taskScheduler');
-        ko.options.taskScheduler = function (callback) {
-            ++counts[0];
-            setTimeout(callback, 0);
-        };
-        function func() {
-            ++counts[1];
-        };
+        try {
+            this.restoreAfter(ko.options, 'taskScheduler');
+            ko.options.taskScheduler = function (callback) {
+                ++counts[0];
+                setTimeout(callback, 0);
+            };
+            function func() {
+                ++counts[1];
+            };
 
-        // First batch = one scheduler call
-        ko.tasks.schedule(func);
-        expect(counts).to.deep.equal([1, 0]);
-        ko.tasks.schedule(func);
-        expect(counts).to.deep.equal([1, 0]);
-        Clock.tick(1);
-        expect(counts).to.deep.equal([1, 2]);
+            // First batch = one scheduler call
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 0]);
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 0]);
+            clock.tick(1);
+            expect(counts).to.deep.equal([1, 2]);
 
-        // Second batch = one scheduler call
-        counts = [0, 0];
-        ko.tasks.schedule(func);
-        ko.tasks.schedule(func);
-        Clock.tick(1);
-        expect(counts).to.deep.equal([1, 2]);
+            // Second batch = one scheduler call
+            counts = [0, 0];
+            ko.tasks.schedule(func);
+            ko.tasks.schedule(func);
+            clock.tick(1);
+            expect(counts).to.deep.equal([1, 2]);
 
-        // runEarly doesn't cause any extra scheduler call
-        counts = [0, 0];
-        ko.tasks.schedule(func);
-        expect(counts).to.deep.equal([1, 0]);
+            // runEarly doesn't cause any extra scheduler call
+            counts = [0, 0];
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 0]);
 
-        ko.tasks.runEarly();
-        expect(counts).to.deep.equal([1, 1]);
+            ko.tasks.runEarly();
+            expect(counts).to.deep.equal([1, 1]);
 
-        ko.tasks.schedule(func);
-        expect(counts).to.deep.equal([1, 1]);
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 1]);
 
-        Clock.tick(1);
-        expect(counts).to.deep.equal([1, 2]);
+            clock.tick(1);
+            expect(counts).to.deep.equal([1, 2]);
+        } finally {
+            clock.restore();
+        }
     });
 });

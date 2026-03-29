@@ -271,10 +271,17 @@ describe('Binding: TextInput', function() {
         // But the DEBUG version allows us to force it to bind to specific events for testing purposes.
 
         describe('Event processing', function () {
+            var clock;
+
             beforeEach(function() {
                 this.restoreAfter(ko.bindingHandlers.textInput, '_forceUpdateOn');
                 ko.bindingHandlers.textInput._forceUpdateOn = ['afterkeydown'];
-                Clock.useMock();
+                clock = sinon.useFakeTimers();
+            });
+
+            afterEach(function() {
+                clock.restore();
+                clock = null;
             });
 
             it('Should update observable asynchronously', function () {
@@ -285,7 +292,7 @@ describe('Binding: TextInput', function() {
                 testNode.childNodes[0].value = "some user-entered value";
                 expect(myobservable()).to.deep.equal("123");  // observable is not changed yet
 
-                Clock.tick(20);
+                clock.tick(20);
                 expect(myobservable()).to.deep.equal("some user-entered value");  // it's changed after a delay
             });
 
@@ -301,7 +308,7 @@ describe('Binding: TextInput', function() {
                 expect(testNode.childNodes[0].value).to.deep.equal("some user-entered value");
 
                 // Observable is updated to new element value
-                Clock.tick(20);
+                clock.tick(20);
                 expect(myobservable()).to.deep.equal("some user-entered value");
             });
 
@@ -317,7 +324,7 @@ describe('Binding: TextInput', function() {
                 expect(testNode.childNodes[0].value).to.deep.equal("some value from the server");
 
                 // New value remains when event is processed
-                Clock.tick(20);
+                clock.tick(20);
                 expect(myobservable()).to.deep.equal("some value from the server");
             });
 
@@ -334,7 +341,7 @@ describe('Binding: TextInput', function() {
 
                 // even after a delay, the keydown event isn't processed
                 model.someProp = undefined;
-                Clock.tick(20);
+                clock.tick(20);
                 expect(model.someProp).to.equal(undefined);
                 expect(testNode.childNodes[0]._ko_textInputProcessedEvent).to.deep.equal("change");
             });

@@ -423,7 +423,7 @@ describe('Dependent Observable', function() {
         var data = ko.observable('A'),
             computed = ko.computed({ read: data, deferEvaluation: true });
 
-        var notifySpy = createSpy();
+        var notifySpy = sinon.stub();
         computed.subscribe(notifySpy, null, 'awake');
 
         expect(notifySpy.called).to.equal(false);

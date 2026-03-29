@@ -23,10 +23,16 @@ describe('Components: Component binding', function() {
     var testComponentName = 'test-component',
         testComponentBindingValue,
         testComponentParams,
-        outerViewModel;
+        outerViewModel,
+        clock,
+        originalTaskScheduler;
 
     beforeEach(function() {
-        Clock.useMockForTasks();
+        clock = sinon.useFakeTimers();
+        originalTaskScheduler = ko.options.taskScheduler;
+        ko.options.taskScheduler = function(callback) {
+            setTimeout(callback, 0);
+        };
         prepareTestNode();
         testComponentParams = {};
         testComponentBindingValue = { name: testComponentName, params: testComponentParams };
@@ -36,7 +42,9 @@ describe('Components: Component binding', function() {
 
     afterEach(function() {
         expect(ko.tasks.resetForTesting()).to.equal(0);
-        Clock.reset();
+        ko.options.taskScheduler = originalTaskScheduler;
+        clock.restore();
+        clock = null;
         ko.components.unregister(testComponentName);
     });
 
@@ -55,7 +63,7 @@ describe('Components: Component binding', function() {
     it('Throws if the component name is unknown', function() {
         expect(function() {
             ko.applyBindings(outerViewModel, testNode);
-            Clock.tick(1);
+            clock.tick(1);
         }).to.throw("Unknown component 'test-component'");
     });
 
@@ -63,7 +71,7 @@ describe('Components: Component binding', function() {
         ko.components.register(testComponentName, {});
         expect(function() {
             ko.applyBindings(outerViewModel, testNode);
-            Clock.tick(1);
+            clock.tick(1);
         }).to.throw("Component 'test-component' has no template");
     });
 
@@ -74,7 +82,7 @@ describe('Components: Component binding', function() {
             .to.throw('Multiple bindings (if and component) are trying to control descendant bindings of the same element.');
 
         // Even though ko.applyBindings threw an exception, the component still gets bound (asynchronously)
-        Clock.tick(1);
+        clock.tick(1);
     });
 
     it('Replaces the element\'s contents with a clone of the template', function() {
@@ -90,7 +98,7 @@ describe('Components: Component binding', function() {
         ko.applyBindings({ testComponentBindingValue: testComponentName }, testNode);
 
         // See the template asynchronously shows up
-        Clock.tick(1);
+        clock.tick(1);
         expectHtml(testNode.childNodes[0], '<div>hello</div> <span>world</span>');
 
         // Also be sure it's a clone
@@ -123,7 +131,7 @@ describe('Components: Component binding', function() {
 
         ko.components.register(testComponentName, componentConfig);
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         expectText(testNode, 'From the viewmodel');
     });
@@ -132,7 +140,7 @@ describe('Components: Component binding', function() {
         ko.components.register(testComponentName, { template: '<div data-bind="text: myvalue"></div>' });
         testComponentParams.myvalue = 'some parameter value';
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         expectHtml(testNode.childNodes[0], '<div data-bind="text: myvalue">some parameter value</div>');
     });
@@ -144,7 +152,7 @@ describe('Components: Component binding', function() {
             viewModel: function() { this.myvalue = 123; }
         });
 
-        // Notice the absence of any 'Clock.tick' call here. This is synchronous.
+        // This is synchronous.
         ko.applyBindings(outerViewModel, testNode);
         expectHtml(testNode.childNodes[0], '<div data-bind="text: myvalue">123</div>');
     });
@@ -177,11 +185,11 @@ describe('Components: Component binding', function() {
         // First injection is async, because the loader completes asynchronously
         ko.applyBindings({ testList: testList }, testNode);
         expectContainText(testNode.childNodes[0], '');
-        Clock.tick(0);
+        clock.tick(0);
         expectContainText(testNode.childNodes[0], 'first');
 
         // Second (cached) injection is synchronous, because the component config says so.
-        // Notice the absence of any 'Clock.tick' call here. This is synchronous.
+        // This is synchronous.
         testList.push('second');
         expectContainText(testNode.childNodes[0], 'firstsecond', /* ignoreSpaces */ true); // Ignore spaces because old-IE is inconsistent
     });
@@ -191,7 +199,7 @@ describe('Components: Component binding', function() {
             template: 'Parent is outer view model: <span data-bind="text: $parent.isOuterViewModel"></span>'
         });
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         expectContainText(testNode.childNodes[0], 'Parent is outer view model: true');
     });
@@ -202,7 +210,7 @@ describe('Components: Component binding', function() {
         });
         testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"><em>original</em> child nodes</div>';
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         expectContainHtml(testNode.childNodes[0], 'start<span data-bind="template: { nodes: $componenttemplatenodes }"><em>original</em> child nodes</span>end');
     });
@@ -228,7 +236,7 @@ describe('Components: Component binding', function() {
         });
 
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         expectContainText(testNode.childNodes[0], 'In child context 123, inside component with property 456. Now in sub-component with property 789.', /* ignoreSpaces */ true); // Ignore spaces because old-IE is inconsistent
     });
@@ -250,7 +258,7 @@ describe('Components: Component binding', function() {
         ko.applyBindings(outerViewModel, testNode);
         expect(renderedCount).to.equal(0);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedCount).to.equal(1);
     });
 
@@ -283,7 +291,7 @@ describe('Components: Component binding', function() {
         ko.applyBindings(outerViewModel, testNode);
         expect(renderedComponents).to.deep.equal([]);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ 'sub-component1', 'sub-component2', 'test-component' ]);
     });
 
@@ -317,7 +325,7 @@ describe('Components: Component binding', function() {
         expect(renderedComponents).to.deep.equal([]);
         expectContainText(testNode.childNodes[0], 'xx', /* ignoreSpaces */ true); // Ignore spaces because old-IE is inconsistent
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ 'sub-component1', 'sub-component2', 'test-component' ]);
         expectContainText(testNode.childNodes[0], 'x12x', /* ignoreSpaces */ true); // Ignore spaces because old-IE is inconsistent
     });
@@ -366,7 +374,7 @@ describe('Components: Component binding', function() {
         });
 
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ 'sub-component1', 'test-component' ]);
     });
 
@@ -402,11 +410,11 @@ describe('Components: Component binding', function() {
         ko.applyBindings(outerViewModel, testNode);
         expect(renderedComponents).to.deep.equal([]);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ ]);
 
         templateProviderCallback('<span></span>');
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ 'sub-component1', 'sub-component2', 'test-component' ]);
     });
 
@@ -421,7 +429,7 @@ describe('Components: Component binding', function() {
 
         // Instantiate it
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         // See the params arrived as expected
         expect(receivedParams).to.deep.equal([testComponentParams]);
@@ -442,7 +450,7 @@ describe('Components: Component binding', function() {
 
         // Instantiate it
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         // See the params arrived as expected
         expect(receivedParams).to.deep.equal([testComponentParams]);
@@ -489,7 +497,7 @@ describe('Components: Component binding', function() {
         testComponentBindingValue.name = ko.observable('component-alpha');
         testComponentParams.suppliedValue = ko.observable(123);
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         // See it appeared, and the expected subscriptions were registered
         var firstAlphaTemplateNode = testNode.firstChild.firstChild,
@@ -519,7 +527,7 @@ describe('Components: Component binding', function() {
         testComponentBindingValue.name('component-beta');
         expectContainText(testNode, 'Alpha value is 234.');
         expect(renderedComponents).to.deep.equal(['alpha']);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode, 'Beta value is 234.');
         expect(renderedComponents).to.deep.equal(['alpha', 'beta']);
 
@@ -570,7 +578,7 @@ describe('Components: Component binding', function() {
 
         // Instantiate the first component
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         // See it appeared, and the expected subscriptions were registered
         var firstAlphaTemplateNode = testNode.firstChild.firstChild,
@@ -593,7 +601,7 @@ describe('Components: Component binding', function() {
         });
 
         expectContainText(testNode, 'Alpha value is 123.');
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode, 'Beta value is 456.');
 
         // Cleans up by disposing obsolete subscriptions, viewmodels, and cleans DOM nodes
@@ -623,7 +631,7 @@ describe('Components: Component binding', function() {
         var someObservable = ko.observable('First');
         testNode.innerHTML = '<div data-bind="component: { name: \'' + testComponentName + '\', params: { someData: someObservable() } }"></div>';
         ko.applyBindings({ someObservable: someObservable }, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         var firstTemplateNode = testNode.firstChild.firstChild,
             firstViewModelInstance = ko.dataFor(firstTemplateNode);
@@ -638,7 +646,7 @@ describe('Components: Component binding', function() {
         expectContainText(testNode, 'Value is First.');
         expect(firstViewModelInstance.wasDisposed).not.to.equal(true);
         expect(ko.utils.domData.get(firstTemplateNode, 'TestValue')).to.equal('Hello');
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode, 'Value is Second.');
         expect(renderedCount).to.equal(2);
         expect(firstViewModelInstance.wasDisposed).to.equal(true);
@@ -673,7 +681,7 @@ describe('Components: Component binding', function() {
             outerObservable = ko.observable({ inner: innerObservable });
         testNode.innerHTML = '<div data-bind="component: { name: \'' + testComponentName + '\', params: { somevalue: outer().inner } }"></div>';
         ko.applyBindings({ outer: outerObservable }, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('inner1');
         expect(outerObservable.getSubscriptionsCount()).to.equal(1);
         expect(innerObservable.getSubscriptionsCount()).to.equal(1);
@@ -694,7 +702,7 @@ describe('Components: Component binding', function() {
         // See we can mutate the outer value and see the result show up (cleaning subscriptions to the old inner value)
         var newInnerObservable = ko.observable('newinner');
         outerObservable({ inner: newInnerObservable });
-        Clock.tick(1);              // modifying the outer observable causes the component to reload, which happens asynchronously
+        clock.tick(1);              // modifying the outer observable causes the component to reload, which happens asynchronously
         expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('newinner');
         expect(outerObservable.getSubscriptionsCount()).to.equal(1);
         expect(innerObservable.getSubscriptionsCount()).to.equal(0);
@@ -725,7 +733,7 @@ describe('Components: Component binding', function() {
 
         // Bind an instance of the component; grab its viewmodel
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         var firstTemplateNode = testNode.firstChild.firstChild,
             viewModelInstance = ko.dataFor(firstTemplateNode);
         expect(viewModelInstance instanceof testViewModel).to.equal(true);
@@ -750,7 +758,7 @@ describe('Components: Component binding', function() {
         ko.cleanNode(testNode.firstChild);
 
         // Now wait and see that, after loading finishes, the component wasn't used
-        Clock.tick(1);
+        clock.tick(1);
         expect(numConstructorCalls).to.equal(0);
         expectContainHtml(testNode.firstChild, '');
     });
@@ -793,19 +801,19 @@ describe('Components: Component binding', function() {
         ko.applyBindings(outerViewModel, testNode);
 
         // Even if we wait a while, it's not yet loaded, because we're still waiting for the module
-        Clock.tick(10);
+        clock.tick(10);
         expect(constructorCallLog.length).to.equal(0);
         expect(testNode.firstChild.childNodes.length).to.equal(0);
 
         // In the meantime, switch to requesting component 2 and then 3
         testComponentBindingValue.name('component-2');
-        Clock.tick(1);
+        clock.tick(1);
         testComponentBindingValue.name('component-3');
         expect(constructorCallLog.length).to.equal(0);
 
         // Now if component 1 finishes loading, it's irrelevant, so nothing happens
         requireCallbacks['module-1'](testViewModel1);
-        Clock.tick(1); // ... even if we wait a bit longer
+        clock.tick(1); // ... even if we wait a bit longer
         expect(constructorCallLog.length).to.equal(0);
         expect(testNode.firstChild.childNodes.length).to.equal(0);
 
@@ -822,7 +830,7 @@ describe('Components: Component binding', function() {
         // Now if component 2 finishes loading, it's irrelevant, so nothing happens.
         // In particular, the viewmodel isn't disposed.
         requireCallbacks['module-2'](testViewModel2);
-        Clock.tick(1); // ... even if we wait a bit longer
+        clock.tick(1); // ... even if we wait a bit longer
         expect(constructorCallLog.length).to.equal(1);
         expectContainText(testNode, 'Component 3 template');
         expect(viewModelInstance.wasDisposed).not.to.equal(true);
@@ -830,7 +838,7 @@ describe('Components: Component binding', function() {
         // However, if we now switch to component 2, the old viewmodel is disposed,
         // and the new component is used without any further module load calls.
         testComponentBindingValue.name('component-2');
-        Clock.tick(1);
+        clock.tick(1);
         expect(constructorCallLog.length).to.equal(2);
         expectContainText(testNode, 'Component 2 template');
         expect(viewModelInstance.wasDisposed).to.equal(true);
@@ -838,7 +846,7 @@ describe('Components: Component binding', function() {
         // Show also that we won't leak memory by applying bindings to nodes
         // after they were disposed (e.g., because they were removed from the document)
         testComponentBindingValue.name('component-4');
-        Clock.tick(1);
+        clock.tick(1);
         ko.cleanNode(testNode.firstChild); // Dispose the node before the module loading completes
         requireCallbacks['module-4'](testViewModel4);
         expect(constructorCallLog.length).to.equal(2); // No extra constructor calls
@@ -853,7 +861,7 @@ describe('Components: Component binding', function() {
         testComponentParams.someData = ko.observable(123);
 
         ko.applyBindings(outerViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode, 'Hello! Your param is 123 Goodbye.');
 
         testComponentParams.someData(456);
@@ -876,7 +884,7 @@ describe('Components: Component binding', function() {
         ko.applyBindings(outerViewModel, testNode);
         expect(callbacks).to.deep.equal(0);
 
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode.childNodes[0], '<div data-bind="text: myvalue">some parameter value</div>');
         expect(callbacks).to.deep.equal(1);
     });
@@ -902,11 +910,11 @@ describe('Components: Component binding', function() {
         ko.applyBindings(outerViewModel, testNode);
         expect(renderedComponents).to.deep.equal([]);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ 'sub-component1', 'test-component' ]);
 
         observable(2);
-        Clock.tick(1);
+        clock.tick(1);
         expect(renderedComponents).to.deep.equal([ 'sub-component1', 'test-component', 'sub-component2' ]);
     });
 
@@ -916,7 +924,7 @@ describe('Components: Component binding', function() {
         });
         testNode.innerHTML = "<div></div>";
         ko.applyBindingsToNode(testNode.childNodes[0], {component: {name: testComponentName}}, outerViewModel);
-        Clock.tick(1);
+        clock.tick(1);
 
         expectContainText(testNode.childNodes[0], 'Parent is outer view model: true');
     });
@@ -941,13 +949,13 @@ describe('Components: Component binding', function() {
             // Bind an instance
             testComponentParams.someData = ko.observable('First');
             ko.applyBindings(outerViewModel, testNode);
-            Clock.tick(1);
+            clock.tick(1);
             expectContainText(testNode, 'First');
             expect(testComponentParams.someData.getSubscriptionsCount()).to.equal(0);
 
             // See that changing the observable will have no effect
             testComponentParams.someData('Second');
-            Clock.tick(1);
+            clock.tick(1);
             expectContainText(testNode, 'First');
         });
 

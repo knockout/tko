@@ -1,27 +1,14 @@
-function createSpy() {
-    var spy = sinon.stub();
-    Object.defineProperties(spy, {
-        calls: {
-            get: function() {
-                return spy.getCalls();
-            }
-        },
-        argsForCall: {
-            get: function() {
-                return spy.getCalls().map(function(call) { return call.args; });
-            }
-        }
-    });
-    spy.reset = spy.resetHistory.bind(spy);
-    spy.andCallFake = spy.callsFake.bind(spy);
-    spy.andReturn = spy.returns.bind(spy);
-    return spy;
-}
+var clock;
 
 describe("Throttled observables", function() {
     beforeEach(function() {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
     }); // Workaround for spurious timing-related failures on IE8 (issue #736)
+
+    afterEach(function() {
+        clock.restore();
+        clock = null;
+    });
 
     it("Should notify subscribers asynchronously after writes stop for the specified timeout duration", function() {
         var observable = ko.observable('A').extend({ throttle: 100 });
@@ -36,14 +23,14 @@ describe("Throttled observables", function() {
         observable('D');
         expect(notifiedValues.length).to.deep.equal(0); // Should not notify synchronously
 
-        Clock.tick(10);
+        clock.tick(10);
 
         // Mutate more
         observable('E');
         observable('F');
         expect(notifiedValues.length).to.deep.equal(0); // Should not notify until end of throttle timeout
 
-        Clock.tick(100);
+        clock.tick(100);
         expect(notifiedValues.length).to.deep.equal(1);
         expect(notifiedValues[0]).to.deep.equal("F");
     });
@@ -51,8 +38,13 @@ describe("Throttled observables", function() {
 
 describe("Throttled dependent observables", function() {
     beforeEach(function() {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
     }); // Workaround for spurious timing-related failures on IE8 (issue #736)
+
+    afterEach(function() {
+        clock.restore();
+        clock = null;
+    });
 
     it("Should notify subscribers asynchronously after dependencies stop updating for the specified timeout duration", function() {
         var underlying = ko.observable();
@@ -72,12 +64,12 @@ describe("Throttled dependent observables", function() {
         expect(notifiedValues.length).to.deep.equal(0);
 
         // Still shouldn't have evaluated
-        Clock.tick(10);
+        clock.tick(10);
         expect(asyncDepObs()).to.equal(undefined); // Should not update until throttle timeout
         expect(notifiedValues.length).to.deep.equal(0);
 
         // Now wait for throttle timeout
-        Clock.tick(100);
+        clock.tick(100);
         expect(asyncDepObs()).to.deep.equal('New value');
         expect(notifiedValues.length).to.deep.equal(1);
         expect(notifiedValues[0]).to.deep.equal('New value');
@@ -99,12 +91,12 @@ describe("Throttled dependent observables", function() {
         expect(evaluationCount).to.deep.equal(1); // Should not re-evaluate synchronously when dependencies update
 
         // Also mutate async
-        Clock.tick(10);
+        clock.tick(10);
         someDependency("D");
         expect(evaluationCount).to.deep.equal(1);
 
         // Now wait for throttle timeout
-        Clock.tick(100);
+        clock.tick(100);
         expect(evaluationCount).to.deep.equal(2); // Finally, it's evaluated
         expect(asyncDepObs()).to.deep.equal("D");
     });
@@ -112,13 +104,18 @@ describe("Throttled dependent observables", function() {
 
 describe('Rate-limited', function() {
     beforeEach(function() {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
+    });
+
+    afterEach(function() {
+        clock.restore();
+        clock = null;
     });
 
     describe('Subscribable', function() {
         it('Should delay change notifications', function() {
             var subscribable = new ko.subscribable().extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             subscribable.subscribe(notifySpy);
             subscribable.subscribe(notifySpy, null, 'custom');
 
@@ -135,63 +132,63 @@ describe('Rate-limited', function() {
             expect(notifySpy.calledWith('c')).to.equal(true);
 
             // Advance clock; Change notification happens now using the latest value notified
-            notifySpy.reset();
-            Clock.tick(500);
+            notifySpy.resetHistory();
+            clock.tick(500);
             expect(notifySpy.calledWith('b')).to.equal(true);
         });
 
         it('Should notify every timeout interval using notifyAtFixedRate method ', function() {
             var subscribable = new ko.subscribable().extend({rateLimit:{method:'notifyAtFixedRate', timeout:50}});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             subscribable.subscribe(notifySpy);
 
             // Push 10 changes every 25 ms
             for (var i = 0; i < 10; ++i) {
                 subscribable.notifySubscribers(i+1);
-                Clock.tick(25);
+                clock.tick(25);
             }
 
             // Notification happens every 50 ms, so every other number is notified
-            expect(notifySpy.calls.length).to.equal(5);
-            expect(notifySpy.argsForCall).to.deep.equal([ [2], [4], [6], [8], [10] ]);
+            expect(notifySpy.callCount).to.equal(5);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ [2], [4], [6], [8], [10] ]);
 
             // No more notifications happen
-            notifySpy.reset();
-            Clock.tick(50);
+            notifySpy.resetHistory();
+            clock.tick(50);
             expect(notifySpy.called).to.equal(false);
         });
 
         it('Should notify after nothing happens for the timeout period using notifyWhenChangesStop method', function() {
             var subscribable = new ko.subscribable().extend({rateLimit:{method:'notifyWhenChangesStop', timeout:50}});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             subscribable.subscribe(notifySpy);
 
             // Push 10 changes every 25 ms
             for (var i = 0; i < 10; ++i) {
                 subscribable.notifySubscribers(i+1);
-                Clock.tick(25);
+                clock.tick(25);
             }
 
             // No notifications happen yet
             expect(notifySpy.called).to.equal(false);
 
             // Notification happens after the timeout period
-            Clock.tick(50);
-            expect(notifySpy.calls.length).to.equal(1);
+            clock.tick(50);
+            expect(notifySpy.callCount).to.equal(1);
             expect(notifySpy.calledWith(10)).to.equal(true);
         });
 
         it('Should use latest settings when applied multiple times', function() {
             var subscribable = new ko.subscribable().extend({rateLimit:250}).extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             subscribable.subscribe(notifySpy);
 
             subscribable.notifySubscribers('a');
 
-            Clock.tick(250);
+            clock.tick(250);
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(250);
+            clock.tick(250);
             expect(notifySpy.calledWith('a')).to.equal(true);
         });
 
@@ -199,7 +196,7 @@ describe('Rate-limited', function() {
             // This test describes the current behavior for the given scenario but is not a contract for that
             // behavior, which could change in the future if convenient.
             var subscribable = new ko.subscribable().extend({rateLimit:250});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             subscribable.subscribe(notifySpy);
 
             subscribable.notifySubscribers('a');  // Pending notification
@@ -209,12 +206,12 @@ describe('Rate-limited', function() {
             subscribable.notifySubscribers('b');
 
             // First notification happens using original settings
-            Clock.tick(250);
+            clock.tick(250);
             expect(notifySpy.calledWith('a')).to.equal(true);
 
             // Second notification happends using later settings
-            notifySpy.reset();
-            Clock.tick(250);
+            notifySpy.resetHistory();
+            clock.tick(250);
             expect(notifySpy.calledWith('b')).to.equal(true);
         });
 
@@ -227,10 +224,10 @@ describe('Rate-limited', function() {
     describe('Observable', function() {
         it('Should delay change notifications', function() {
             var observable = ko.observable().extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
-            var beforeChangeSpy = createSpy('beforeChangeSpy')
-                .andCallFake(function(value) {expect(observable()).to.equal(value); });
+            var beforeChangeSpy = sinon.stub()
+                .callsFake(function(value) {expect(observable()).to.equal(value); });
             observable.subscribe(beforeChangeSpy, null, 'beforeChange');
 
             // Observable is changed, but notification is delayed
@@ -244,15 +241,15 @@ describe('Rate-limited', function() {
             expect(notifySpy.called).to.equal(false);
 
             // Advance clock; Change notification happens now using the latest value notified
-            Clock.tick(500);
+            clock.tick(500);
             expect(notifySpy.calledWith('b')).to.equal(true);
-            expect(beforeChangeSpy.calls.length).to.equal(1);   // Only one beforeChange notification
+            expect(beforeChangeSpy.callCount).to.equal(1);   // Only one beforeChange notification
         });
 
         it('Should notify "spectator" subscribers whenever the value changes', function () {
             var observable = new ko.observable('A').extend({rateLimit:500}),
-                spectateSpy = createSpy('notifySpy'),
-                notifySpy = createSpy('notifySpy');
+                spectateSpy = sinon.stub(),
+                notifySpy = sinon.stub();
 
             observable.subscribe(spectateSpy, null, "spectate");
             observable.subscribe(notifySpy);
@@ -266,26 +263,26 @@ describe('Rate-limited', function() {
             expect(spectateSpy.calledWith('C')).to.equal(true);
 
             expect(notifySpy.called).to.equal(false);
-            Clock.tick(500);
+            clock.tick(500);
 
             // "spectate" was called for each new value
-            expect(spectateSpy.argsForCall).to.deep.equal([ ['B'], ['C'] ]);
+            expect(spectateSpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'], ['C'] ]);
             // whereas "change" was only called for the final value
-            expect(notifySpy.argsForCall).to.deep.equal([ ['C'] ]);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['C'] ]);
         });
 
         it('Should suppress change notification when value is changed/reverted', function() {
             var observable = ko.observable('original').extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
-            var beforeChangeSpy = createSpy('beforeChangeSpy');
+            var beforeChangeSpy = sinon.stub();
             observable.subscribe(beforeChangeSpy, null, 'beforeChange');
 
             observable('new');                      // change value
             expect(observable()).to.deep.equal('new');    // access observable to make sure it really has the changed value
             observable('original');                 // but then change it back
             expect(notifySpy.called).to.equal(false);
-            Clock.tick(500);
+            clock.tick(500);
             expect(notifySpy.called).to.equal(false);
 
             // Check that value is correct and notification hasn't happened
@@ -294,7 +291,7 @@ describe('Rate-limited', function() {
 
             // Changing observable to a new value still works as expected
             observable('new');
-            Clock.tick(500);
+            clock.tick(500);
             expect(notifySpy.calledWith('new')).to.equal(true);
             expect(beforeChangeSpy.calledWith('original')).to.equal(true);
             expect(beforeChangeSpy.calledWith('new')).to.equal(false);
@@ -302,7 +299,7 @@ describe('Rate-limited', function() {
 
         it('Should support notifications from nested update', function() {
             var observable = ko.observable('a').extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
 
             // Create a one-time subscription that will modify the observable
@@ -315,19 +312,19 @@ describe('Rate-limited', function() {
             expect(notifySpy.called).to.equal(false);
             expect(observable()).to.deep.equal('b');
 
-            notifySpy.reset();
-            Clock.tick(500);
+            notifySpy.resetHistory();
+            clock.tick(500);
             expect(notifySpy.calledWith('b')).to.equal(true);
             expect(observable()).to.deep.equal('z');
 
-            notifySpy.reset();
-            Clock.tick(500);
+            notifySpy.resetHistory();
+            clock.tick(500);
             expect(notifySpy.calledWith('z')).to.equal(true);
         });
 
         it('Should suppress notifications when value is changed/reverted from nested update', function() {
             var observable = ko.observable('a').extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
 
             // Create a one-time subscription that will modify the observable and then revert the change
@@ -341,21 +338,21 @@ describe('Rate-limited', function() {
             expect(notifySpy.called).to.equal(false);
             expect(observable()).to.deep.equal('b');
 
-            notifySpy.reset();
-            Clock.tick(500);
+            notifySpy.resetHistory();
+            clock.tick(500);
             expect(notifySpy.calledWith('b')).to.equal(true);
             expect(observable()).to.deep.equal('b');
 
-            notifySpy.reset();
-            Clock.tick(500);
+            notifySpy.resetHistory();
+            clock.tick(500);
             expect(notifySpy.called).to.equal(false);
         });
 
         it('Should not notify future subscribers', function() {
             var observable = ko.observable('a').extend({rateLimit:500}),
-                notifySpy1 = createSpy('notifySpy1'),
-                notifySpy2 = createSpy('notifySpy2'),
-                notifySpy3 = createSpy('notifySpy3');
+                notifySpy1 = sinon.stub(),
+                notifySpy2 = sinon.stub(),
+                notifySpy3 = sinon.stub();
 
             observable.subscribe(notifySpy1);
             observable('b');
@@ -367,7 +364,7 @@ describe('Rate-limited', function() {
             expect(notifySpy2.called).to.equal(false);
             expect(notifySpy3.called).to.equal(false);
 
-            Clock.tick(500);
+            clock.tick(500);
             expect(notifySpy1.calledWith('c')).to.equal(true);
             expect(notifySpy2.calledWith('c')).to.equal(true);
             expect(notifySpy3.called).to.equal(false);
@@ -390,7 +387,7 @@ describe('Rate-limited', function() {
             expect(computed()).to.equal(undefined);
 
             // Advance clock; Change notification happens now using the latest value notified
-            Clock.tick(500);
+            clock.tick(500);
             expect(computed()).to.deep.equal('b');
         });
 
@@ -411,7 +408,7 @@ describe('Rate-limited', function() {
             expect(computed()).to.equal(undefined);
 
             // Advance clock; Change notification happens now using the latest value notified
-            Clock.tick(500);
+            clock.tick(500);
             expect(computed()).to.deep.equal('b');
         });
 
@@ -419,14 +416,14 @@ describe('Rate-limited', function() {
             var observable = ko.observable('a').extend({rateLimit:500});
             observable('b');
 
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed(function () {
                 return evalSpy(observable());
             });
             expect(evalSpy.calledWith('b')).to.equal(true);
-            evalSpy.reset();
+            evalSpy.resetHistory();
 
-            Clock.tick(500);
+            clock.tick(500);
             expect(evalSpy.called).to.equal(false);
         });
 
@@ -456,7 +453,7 @@ describe('Rate-limited', function() {
                 one(false);
                 expect(threeNotifications).to.deep.equal([true]);
 
-                Clock.tick(100);
+                clock.tick(100);
                 expect(threeNotifications).to.deep.equal([true, false]);
             }
         });
@@ -473,7 +470,7 @@ describe('Rate-limited', function() {
 
             myArray.push('Gamma');
             myArray.push('Delta');
-            Clock.tick(10);
+            clock.tick(10);
             expect(changelist).to.deep.equal([
                 { status : 'added', value : 'Gamma', index : 2 },
                 { status : 'added', value : 'Delta', index : 3 }
@@ -482,7 +479,7 @@ describe('Rate-limited', function() {
             changelist = undefined;
             myArray.shift();
             myArray.shift();
-            Clock.tick(10);
+            clock.tick(10);
             expect(changelist).to.deep.equal([
                 { status : 'deleted', value : 'Alpha', index : 0 },
                 { status : 'deleted', value : 'Beta', index : 1 }
@@ -491,7 +488,7 @@ describe('Rate-limited', function() {
             changelist = undefined;
             myArray.push('Epsilon');
             myArray.pop();
-            Clock.tick(10);
+            clock.tick(10);
             expect(changelist).to.deep.equal(undefined);
         });
     });
@@ -499,33 +496,33 @@ describe('Rate-limited', function() {
     describe('Computed Observable', function() {
         it('Should delay running evaluator where there are no subscribers', function() {
             var observable = ko.observable();
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed(function () { evalSpy(observable()); return observable(); }).extend({rateLimit:500});
 
             // Observable is changed, but evaluation is delayed
-            evalSpy.reset();
+            evalSpy.resetHistory();
             observable('a');
             observable('b');
             expect(evalSpy.called).to.equal(false);
 
             // Advance clock; Change notification happens now using the latest value notified
-            evalSpy.reset();
-            Clock.tick(500);
+            evalSpy.resetHistory();
+            clock.tick(500);
             expect(evalSpy.calledWith('b')).to.equal(true);
         });
 
         it('Should delay change notifications and evaluation', function() {
             var observable = ko.observable();
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed(function () { evalSpy(observable()); return observable(); }).extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             computed.subscribe(notifySpy);
-            var beforeChangeSpy = createSpy('beforeChangeSpy')
-                .andCallFake(function(value) {expect(computed()).to.equal(value); });
+            var beforeChangeSpy = sinon.stub()
+                .callsFake(function(value) {expect(computed()).to.equal(value); });
             computed.subscribe(beforeChangeSpy, null, 'beforeChange');
 
             // Observable is changed, but notification is delayed
-            evalSpy.reset();
+            evalSpy.resetHistory();
             observable('a');
             expect(evalSpy.called).to.equal(false);
             expect(computed()).to.deep.equal('a');
@@ -534,18 +531,18 @@ describe('Rate-limited', function() {
             expect(beforeChangeSpy.calledWith(undefined)).to.equal(true);    // beforeChange notification happens right away
 
             // Second change notification is also delayed
-            evalSpy.reset();
+            evalSpy.resetHistory();
             observable('b');
             expect(computed.peek()).to.deep.equal('a');           // peek returns previously evaluated value
             expect(evalSpy.called).to.equal(false);
             expect(notifySpy.called).to.equal(false);
 
             // Advance clock; Change notification happens now using the latest value notified
-            evalSpy.reset();
-            Clock.tick(500);
+            evalSpy.resetHistory();
+            clock.tick(500);
             expect(evalSpy.calledWith('b')).to.equal(true);
             expect(notifySpy.calledWith('b')).to.equal(true);
-            expect(beforeChangeSpy.calls.length).to.equal(1);   // Only one beforeChange notification
+            expect(beforeChangeSpy.callCount).to.equal(1);   // Only one beforeChange notification
         });
 
         it('Should run initial evaluation at first subscribe when using deferEvaluation', function() {
@@ -553,7 +550,7 @@ describe('Rate-limited', function() {
             // computed also has deferEvaluation. For example, the preceding test ('Should delay change
             // notifications and evaluation') will pass just as well if using deferEvaluation.
             var observable = ko.observable('a');
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed({
                 read: function () {
                     evalSpy(observable());
@@ -563,7 +560,7 @@ describe('Rate-limited', function() {
             }).extend({rateLimit:500});
             expect(evalSpy.called).to.equal(false);
 
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             computed.subscribe(notifySpy);
             expect(evalSpy.calledWith('a')).to.equal(true);
             expect(notifySpy.called).to.equal(false);
@@ -571,7 +568,7 @@ describe('Rate-limited', function() {
 
         it('Should run initial evaluation when observable is accessed when using deferEvaluation', function() {
             var observable = ko.observable('a');
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed({
                 read: function () {
                     evalSpy(observable());
@@ -588,16 +585,16 @@ describe('Rate-limited', function() {
         it('Should suppress change notifications when value is changed/reverted', function() {
             var observable = ko.observable('original');
             var computed = ko.computed(function () { return observable(); }).extend({rateLimit:500});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             computed.subscribe(notifySpy);
-            var beforeChangeSpy = createSpy('beforeChangeSpy');
+            var beforeChangeSpy = sinon.stub();
             computed.subscribe(beforeChangeSpy, null, 'beforeChange');
 
             observable('new');                      // change value
             expect(computed()).to.deep.equal('new');      // access computed to make sure it really has the changed value
             observable('original');                 // and then change the value back
             expect(notifySpy.called).to.equal(false);
-            Clock.tick(500);
+            clock.tick(500);
             expect(notifySpy.called).to.equal(false);
 
             // Check that value is correct and notification hasn't happened
@@ -606,7 +603,7 @@ describe('Rate-limited', function() {
 
             // Changing observable to a new value still works as expected
             observable('new');
-            Clock.tick(500);
+            clock.tick(500);
             expect(notifySpy.calledWith('new')).to.equal(true);
             expect(beforeChangeSpy.calledWith('original')).to.equal(true);
             expect(beforeChangeSpy.calledWith('new')).to.equal(false);
@@ -614,18 +611,18 @@ describe('Rate-limited', function() {
 
         it('Should not re-evaluate if computed is disposed before timeout', function() {
             var observable = ko.observable('a');
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed(function () { evalSpy(observable()); return observable(); }).extend({rateLimit:500});
 
             expect(computed()).to.deep.equal('a');
-            expect(evalSpy.calls.length).to.equal(1);
+            expect(evalSpy.callCount).to.equal(1);
             expect(evalSpy.calledWith('a')).to.equal(true);
 
-            evalSpy.reset();
+            evalSpy.resetHistory();
             observable('b');
             computed.dispose();
 
-            Clock.tick(500);
+            clock.tick(500);
             expect(computed()).to.deep.equal('a');
             expect(evalSpy.called).to.equal(false);
         });
@@ -683,7 +680,7 @@ describe('Rate-limited', function() {
             expect(dependentComputed()).to.equal(undefined);
 
             // Advance clock; Change notification happens now using the latest value notified
-            Clock.tick(500);
+            clock.tick(500);
             expect(dependentComputed()).to.deep.equal('b');
         });
 
@@ -705,7 +702,7 @@ describe('Rate-limited', function() {
             expect(dependentComputed()).to.equal(undefined);
 
             // Advance clock; Change notification happens now using the latest value notified
-            Clock.tick(500);
+            clock.tick(500);
             expect(dependentComputed()).to.deep.equal('b');
         });
 
@@ -735,7 +732,7 @@ describe('Rate-limited', function() {
                 one(false);
                 expect(threeNotifications).to.deep.equal([true]);
 
-                Clock.tick(100);
+                clock.tick(100);
                 expect(threeNotifications).to.deep.equal([true, false]);
             }
         });
@@ -744,7 +741,7 @@ describe('Rate-limited', function() {
 
 describe('Deferred', function() {
     beforeEach(function() {
-        Clock.useMock();
+        clock = sinon.useFakeTimers();
         this.restoreAfter(ko.options, 'taskScheduler');
         this.restoreAfter(ko.tasks, 'scheduler');
         ko.options.taskScheduler = function(callback) {
@@ -757,20 +754,21 @@ describe('Deferred', function() {
 
     afterEach(function() {
         expect(ko.tasks.resetForTesting()).to.deep.equal(0);
-        Clock.reset();
+        clock.restore();
+        clock = null;
     });
 
     describe('Observable', function() {
         it('Should delay notifications', function() {
             var observable = ko.observable().extend({deferred:true});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
 
             observable('A');
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['A'] ]);
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['A'] ]);
         });
 
         it('Should throw if you attempt to turn off deferred', function() {
@@ -786,35 +784,35 @@ describe('Deferred', function() {
 
         it('Should notify subscribers about only latest value', function() {
             var observable = ko.observable().extend({notify:'always', deferred:true});  // include notify:'always' to ensure notifications weren't suppressed by some other means
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
 
             observable('A');
             observable('B');
 
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'] ]);
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'] ]);
         });
 
         it('Should suppress notification when value is changed/reverted', function() {
             var observable = ko.observable('original').extend({deferred:true});
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
 
             observable('new');
             expect(observable()).to.deep.equal('new');
             observable('original');
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy.called).to.equal(false);
             expect(observable()).to.deep.equal('original');
         });
 
         it('Should not notify future subscribers', function() {
             var observable = ko.observable('a').extend({deferred:true}),
-                notifySpy1 = createSpy('notifySpy1'),
-                notifySpy2 = createSpy('notifySpy2'),
-                notifySpy3 = createSpy('notifySpy3');
+                notifySpy1 = sinon.stub(),
+                notifySpy2 = sinon.stub(),
+                notifySpy3 = sinon.stub();
 
             observable.subscribe(notifySpy1);
             observable('b');
@@ -826,7 +824,7 @@ describe('Deferred', function() {
             expect(notifySpy2.called).to.equal(false);
             expect(notifySpy3.called).to.equal(false);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy1.calledWith('c')).to.equal(true);
             expect(notifySpy2.calledWith('c')).to.equal(true);
             expect(notifySpy3.called).to.equal(false);
@@ -836,14 +834,14 @@ describe('Deferred', function() {
             var observable = ko.observable('a').extend({deferred:true});
             observable('b');
 
-            var evalSpy = createSpy('evalSpy');
+            var evalSpy = sinon.stub();
             var computed = ko.computed(function () {
                 return evalSpy(observable());
             });
             expect(evalSpy.calledWith('b')).to.equal(true);
-            evalSpy.reset();
+            evalSpy.resetHistory();
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(evalSpy.called).to.equal(false);
         });
 
@@ -852,14 +850,14 @@ describe('Deferred', function() {
             ko.options.deferUpdates = true;
 
             var observable = ko.observable();
-            var notifySpy = createSpy('notifySpy');
+            var notifySpy = sinon.stub();
             observable.subscribe(notifySpy);
 
             observable('A');
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['A'] ]);
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['A'] ]);
         });
     });
 
@@ -874,7 +872,7 @@ describe('Deferred', function() {
 
             myArray.push('Gamma');
             myArray.push('Delta');
-            Clock.tick(1);
+            clock.tick(1);
             expect(changelist).to.deep.equal([
                 { status : 'added', value : 'Gamma', index : 2 },
                 { status : 'added', value : 'Delta', index : 3 }
@@ -883,7 +881,7 @@ describe('Deferred', function() {
             changelist = undefined;
             myArray.shift();
             myArray.shift();
-            Clock.tick(1);
+            clock.tick(1);
             expect(changelist).to.deep.equal([
                 { status : 'deleted', value : 'Alpha', index : 0 },
                 { status : 'deleted', value : 'Beta', index : 1 }
@@ -892,7 +890,7 @@ describe('Deferred', function() {
             changelist = undefined;
             myArray.push('Epsilon');
             myArray.pop();
-            Clock.tick(1);
+            clock.tick(1);
             expect(changelist).to.deep.equal(undefined);
         });
     });
@@ -902,12 +900,12 @@ describe('Deferred', function() {
             var timesEvaluated = 0,
                 data = ko.observable('A'),
                 computed = ko.computed(function () { ++timesEvaluated; return data(); }).extend({deferred:true}),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription = computed.subscribe(notifySpy);
 
             expect(computed()).to.deep.equal('A');
             expect(timesEvaluated).to.deep.equal(1);
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy.called).to.equal(false);
 
             data('B');
@@ -916,15 +914,15 @@ describe('Deferred', function() {
             expect(timesEvaluated).to.deep.equal(2);
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(1);
-            expect(notifySpy.calls.length).to.deep.equal(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'] ]);
+            clock.tick(1);
+            expect(notifySpy.callCount).to.deep.equal(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'] ]);
         });
 
         it('Should notify first change of computed with deferEvaluation if value is changed to undefined', function () {
             var data = ko.observable('A'),
                 computed = ko.computed(data, null, {deferEvaluation: true}).extend({deferred:true}),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription = computed.subscribe(notifySpy);
 
             expect(computed()).to.deep.equal('A');
@@ -933,36 +931,36 @@ describe('Deferred', function() {
             expect(computed()).to.deep.equal(undefined);
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(1);
-            expect(notifySpy.calls.length).to.deep.equal(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ [undefined] ]);
+            clock.tick(1);
+            expect(notifySpy.callCount).to.deep.equal(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ [undefined] ]);
         });
 
         it('Should notify first change to pure computed after awakening if value changed to last notified value', function() {
             var data = ko.observable('A'),
                 computed = ko.pureComputed(data).extend({deferred:true}),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription = computed.subscribe(notifySpy);
 
             data('B');
             expect(computed()).to.deep.equal('B');
             expect(notifySpy.called).to.equal(false);
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'] ]);
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'] ]);
 
             subscription.dispose();
-            notifySpy.reset();
+            notifySpy.resetHistory();
             data('C');
             expect(computed()).to.deep.equal('C');
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy.called).to.equal(false);
 
             subscription = computed.subscribe(notifySpy);
             data('B');
             expect(computed()).to.deep.equal('B');
             expect(notifySpy.called).to.equal(false);
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'] ]);
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'] ]);
         });
 
         it('Should delay update of dependent computed observable', function() {
@@ -979,7 +977,7 @@ describe('Deferred', function() {
             data('C');
             expect(dependentComputed()).to.deep.equal('A');
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(dependentComputed()).to.deep.equal('C');
         });
 
@@ -997,7 +995,7 @@ describe('Deferred', function() {
             data('C');
             expect(dependentComputed()).to.deep.equal('A');
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(dependentComputed()).to.deep.equal('C');
         });
 
@@ -1006,7 +1004,7 @@ describe('Deferred', function() {
                 timesEvaluated = 0,
                 computed1 = ko.computed(function () { return data() + 'X'; }).extend({deferred:true}),
                 computed2 = ko.computed(function () { timesEvaluated++; return computed1() + 'Y'; }).extend({deferred:true}),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription = computed2.subscribe(notifySpy);
 
             expect(computed2()).to.deep.equal('AXY');
@@ -1017,10 +1015,10 @@ describe('Deferred', function() {
             expect(timesEvaluated).to.deep.equal(2);
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(computed2()).to.deep.equal('BXY');
             expect(timesEvaluated).to.deep.equal(2);      // Verify that the computed wasn't evaluated again unnecessarily
-            expect(notifySpy.argsForCall).to.deep.equal([ ['BXY'] ]);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['BXY'] ]);
         });
 
         it('Should *not* delay update of dependent deferred pure computed observable', function () {
@@ -1036,7 +1034,7 @@ describe('Deferred', function() {
             expect(computed2()).to.deep.equal('BXY');
             expect(timesEvaluated).to.deep.equal(2);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(computed2()).to.deep.equal('BXY');
             expect(timesEvaluated).to.deep.equal(2);      // Verify that the computed wasn't evaluated again unnecessarily
         });
@@ -1045,7 +1043,7 @@ describe('Deferred', function() {
             var data = ko.observable('A'),
                 deferredComputed = ko.computed(data).extend({deferred:true}),
                 dependentComputed = ko.computed(deferredComputed).extend({rateLimit: 500}),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription = dependentComputed.subscribe(notifySpy);
 
             expect(dependentComputed()).to.deep.equal('A');
@@ -1058,9 +1056,9 @@ describe('Deferred', function() {
             expect(dependentComputed()).to.deep.equal('C');
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(500);
+            clock.tick(500);
             expect(dependentComputed()).to.deep.equal('C');
-            expect(notifySpy.argsForCall).to.deep.equal([ ['C'] ]);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['C'] ]);
         });
 
         it('Is default behavior when "ko.options.deferUpdates" is "true"', function() {
@@ -1069,15 +1067,15 @@ describe('Deferred', function() {
 
             var data = ko.observable('A'),
                 computed = ko.computed(data),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription = computed.subscribe(notifySpy);
 
             // Notification is deferred
             data('B');
             expect(notifySpy.called).to.equal(false);
 
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'] ]);
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'] ]);
         });
 
         it('Is superseded by rate-limit', function() {
@@ -1087,7 +1085,7 @@ describe('Deferred', function() {
             var data = ko.observable('A'),
                 deferredComputed = ko.computed(data),
                 dependentComputed = ko.computed(function() { return 'R' + deferredComputed(); }).extend({rateLimit: 500}),
-                notifySpy = createSpy('notifySpy'),
+                notifySpy = sinon.stub(),
                 subscription1 = deferredComputed.subscribe(notifySpy),
                 subscription2 = dependentComputed.subscribe(notifySpy);
 
@@ -1098,11 +1096,11 @@ describe('Deferred', function() {
             expect(dependentComputed()).to.deep.equal('RB');
             expect(notifySpy.called).to.equal(false);       // no notifications yet
 
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'] ]);   // only the deferred computed notifies initially
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'] ]);   // only the deferred computed notifies initially
 
-            Clock.tick(499);
-            expect(notifySpy.argsForCall).to.deep.equal([ ['B'], [ 'RB' ] ]); // the rate-limited computed notifies after the specified timeout
+            clock.tick(499);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['B'], [ 'RB' ] ]); // the rate-limited computed notifies after the specified timeout
         });
 
         it('Should minimize evaluation at the end of a complex graph', function() {
@@ -1134,12 +1132,12 @@ describe('Deferred', function() {
                 i = ko.pureComputed(function i() {
                     return 'i(' + a() + ',' + h() + ',' + b() + ',' + f() + ')';
                 }).extend({notify:"always"}),   // ensure we get a notification for each evaluation
-                notifySpy = createSpy('callback'),
+                notifySpy = sinon.stub(),
                 subscription = i.subscribe(notifySpy);
 
             a('x');
-            Clock.tick(1);
-            expect(notifySpy.argsForCall).to.deep.equal([['i(x,h(cx,g(ex,fx),d(bx,cx)),bx,fx)']]);    // only one evaluation and notification
+            clock.tick(1);
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([['i(x,h(cx,g(ex,fx),d(bx,cx)),bx,fx)']]);    // only one evaluation and notification
         });
 
         it('Should minimize evaluation when dependent computed doesn\'t actually change', function() {
@@ -1158,7 +1156,7 @@ describe('Deferred', function() {
                 });
 
             source({ key: 'value' });
-            Clock.tick(1);
+            clock.tick(1);
             expect(countEval).to.deep.equal(1);
 
             // Reading it again shouldn't cause an update
@@ -1174,8 +1172,8 @@ describe('Deferred', function() {
             var a = ko.observable(),
                 b = ko.computed({ read : function() { a(); return d(); }, deferEvaluation : true }),
                 d = ko.computed({ read : function() { a(); return b(); }, deferEvaluation : true }),
-                bSpy = createSpy('bSpy'),
-                dSpy = createSpy('dSpy');
+                bSpy = sinon.stub(),
+                dSpy = sinon.stub();
 
             b.subscribe(bSpy, null, "dirty");
             d.subscribe(dSpy, null, "dirty");
@@ -1185,10 +1183,10 @@ describe('Deferred', function() {
             expect(dSpy.called).to.equal(false);
 
             a('something');
-            expect(bSpy.calls.length).to.equal(2);  // 1 for a, and 1 for d
-            expect(dSpy.calls.length).to.equal(2);  // 1 for a, and 1 for b
+            expect(bSpy.callCount).to.equal(2);  // 1 for a, and 1 for d
+            expect(dSpy.callCount).to.equal(2);  // 1 for a, and 1 for b
 
-            Clock.tick(1);
+            clock.tick(1);
         });
 
         it('Should not cause loss of updates when an intermediate value is read by a dependent computed observable', function() {
@@ -1217,7 +1215,7 @@ describe('Deferred', function() {
                 one(false);
                 expect(threeNotifications).to.deep.equal([true]);
 
-                Clock.tick(1);
+                clock.tick(1);
                 expect(threeNotifications).to.deep.equal([true, false]);
             }
         });
@@ -1232,21 +1230,21 @@ describe('Deferred', function() {
             var obs = ko.observable('somevalue'),
                 isTruthy = ko.pureComputed(function() { return !!obs(); }),
                 objIfTruthy = ko.pureComputed(function() { return isTruthy(); }).extend({ notify: 'always' }),
-                notifySpy = createSpy('callback'),
+                notifySpy = sinon.stub(),
                 subscription = objIfTruthy.subscribe(notifySpy);
 
             obs('someothervalue');
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy.called).to.equal(false);
 
             obs('');
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy.called).to.equal(true);
-            expect(notifySpy.argsForCall).to.deep.equal([[false]]);
-            notifySpy.reset();
+            expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([[false]]);
+            notifySpy.resetHistory();
 
             obs(undefined);
-            Clock.tick(1);
+            clock.tick(1);
             expect(notifySpy.called).to.equal(false);
         });
 
@@ -1264,7 +1262,7 @@ describe('Deferred', function() {
                     timesEvaluated++;
                     return data() + '2';
                 }),
-                notifySpy = createSpy('callback'),
+                notifySpy = sinon.stub(),
                 subscription = computed2.subscribe(notifySpy);
 
             // The computed is evaluated when awakened
@@ -1273,7 +1271,7 @@ describe('Deferred', function() {
             // When we update the observable, both computeds will be marked dirty and scheduled for notification
             // But the first one will dispose the subscription to the second, putting it to sleep
             data('B');
-            Clock.tick(1);
+            clock.tick(1);
             expect(timesEvaluated).to.deep.equal(1);
 
             // When we read the computed it should be evaluated again because its dependencies have changed
@@ -1301,13 +1299,13 @@ describe('Deferred', function() {
             x(4);
             expect(called).to.equal(0);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(called).to.equal(1);
             expect(x.getSubscriptionsCount()).to.equal(0);
 
             x(3);
             x(4);
-            Clock.tick(1);
+            clock.tick(1);
             expect(called).to.equal(1);
             expect(x.getSubscriptionsCount()).to.equal(0);
         });
@@ -1324,13 +1322,13 @@ describe('Deferred', function() {
             expect(called).to.equal(0);
             expect(x.getSubscriptionsCount()).to.equal(1);
 
-            Clock.tick(1);
+            clock.tick(1);
             expect(called).to.equal(1);
             expect(x.getSubscriptionsCount()).to.equal(0);
 
             x(3);
             x(4);
-            Clock.tick(1);
+            clock.tick(1);
             expect(called).to.equal(1);
             expect(x.getSubscriptionsCount()).to.equal(0);
         });

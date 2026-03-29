@@ -19,14 +19,23 @@ function expectText(node, expectedText, ignoreSpaces) {
 }
 
 describe('Components: Custom elements', function() {
+    var clock,
+        originalTaskScheduler;
+
     beforeEach(function() {
+        clock = sinon.useFakeTimers();
+        originalTaskScheduler = ko.options.taskScheduler;
+        ko.options.taskScheduler = function(callback) {
+            setTimeout(callback, 0);
+        };
         prepareTestNode();
-        Clock.useMockForTasks();
     });
 
     afterEach(function() {
         expect(ko.tasks.resetForTesting()).to.equal(0);
-        Clock.reset();
+        ko.options.taskScheduler = originalTaskScheduler;
+        clock.restore();
+        clock = null;
         ko.components.unregister('test-component');
     });
 
@@ -42,7 +51,7 @@ describe('Components: Custom elements', function() {
         expectHtml(testNode, initialMarkup);
 
         // ... but when the component is loaded, it does show up
-        Clock.tick(1);
+        clock.tick(1);
         expectHtml(testNode, '<div>hello <test-component>custom element <span data-bind="text: 123">123</span></test-component></div>');
     });
 
@@ -60,7 +69,7 @@ describe('Components: Custom elements', function() {
             expectContainHtml(testNode, initialMarkup);
 
             // ... but when the component is loaded, it does show up
-            Clock.tick(1);
+            clock.tick(1);
             expectContainHtml(testNode, '<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>');
         }
     });
@@ -74,7 +83,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = initialMarkup;
 
         ko.applyBindings(null, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode, initialMarkup);
     });
 
@@ -95,7 +104,7 @@ describe('Components: Custom elements', function() {
 
         // See the component show up
         ko.applyBindings(null, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode, '<div>hello <a>custom element</a> <b>ignored</b></div>');
     });
 
@@ -106,7 +115,7 @@ describe('Components: Custom elements', function() {
         // Bind with a viewmodel that controls visibility
         var viewModel = { shouldshow: ko.observable(true) };
         ko.applyBindings(viewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode, '<test-component data-bind="visible: shouldshow">custom element</test-component>');
         expect(testNode.childNodes[0].style.display).not.to.equal('none');
 
@@ -124,7 +133,7 @@ describe('Components: Custom elements', function() {
             .to.throw('Unable to process binding "if"');
 
         // Even though ko.applyBindings threw an exception, the component still gets bound (asynchronously)
-        Clock.tick(1);
+        clock.tick(1);
     });
 
     it('Is possible to call applyBindings directly on a custom element', function() {
@@ -134,7 +143,7 @@ describe('Components: Custom elements', function() {
         expect(customElem.tagName.toLowerCase()).to.equal('test-component');
 
         ko.applyBindings(null, customElem);
-        Clock.tick(1);
+        clock.tick(1);
         expect(customElem.innerHTML).to.equal('custom element');
     });
 
@@ -165,7 +174,7 @@ describe('Components: Custom elements', function() {
 
         testNode.innerHTML = '<test-component params="nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: \'mystr\'"></test-component>';
         ko.applyBindings(null, testNode);
-        Clock.tick(1);
+        clock.tick(1);
 
         delete suppliedParams[0].$raw; // Don't include '$raw' in the following assertion, as we only want to compare supplied values
         expect(suppliedParams).to.deep.equal([{ nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: 'mystr' }]);
@@ -180,7 +189,7 @@ describe('Components: Custom elements', function() {
 
         testNode.innerHTML = '<test-component></test-component>';
         ko.applyBindings(null, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expect(suppliedParams).to.deep.equal([{ $raw: {} }]);
     });
 
@@ -193,7 +202,7 @@ describe('Components: Custom elements', function() {
 
         testNode.innerHTML = '<test-component params=" "></test-component>';
         ko.applyBindings(null, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expect(suppliedParams).to.deep.equal([{ $raw: {} }]);
     });
 
@@ -208,7 +217,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component params="value: value"></test-component>';
         ko.applyBindings({value: 123}, testNode);
 
-        Clock.tick(1);
+        clock.tick(1);
         // The only binding it should look up is "component"
         expect(bindings).to.deep.equal(['component']);
     });
@@ -221,7 +230,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component params="textToShow: value"></test-component>';
         var vm = ko.observable({ value: 'A' });
         ko.applyBindings(vm, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode, "the component value: A, the root value: A");
 
         vm({ value: 'Z' });
@@ -229,7 +238,7 @@ describe('Components: Custom elements', function() {
         // This is the way it has always worked, but maybe this isn't the best experience
         expectContainText(testNode, "the component value: A, the root value: Z");
 
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode, "the component value: Z, the root value: Z");
     });
 
@@ -252,7 +261,7 @@ describe('Components: Custom elements', function() {
         myobservable.subprop = 'subprop';
         testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>';
         ko.applyBindings({ myobservable: myobservable }, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         var viewModelInstance = ko.dataFor(testNode.firstChild.firstChild);
         expectContainText(testNode.firstChild, 'the observable: 1');
 
@@ -292,7 +301,7 @@ describe('Components: Custom elements', function() {
         // Bind, using an expression that evaluates the observable during binding
         testNode.innerHTML = '<test-component params=\'suppliedobservable: myobservable().split("").reverse().join("")\'></test-component>';
         ko.applyBindings(rootViewModel, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.firstChild, 'the string reversed: ahplA');
         var componentViewModelInstance = ko.dataFor(testNode.firstChild.firstChild);
         expect(constructorCallCount).to.equal(1);
@@ -347,7 +356,7 @@ describe('Components: Custom elements', function() {
             outerObservable = ko.observable({ inner: innerObservable });
         testNode.innerHTML = '<test-component params="somevalue: outer().inner"></test-component>';
         ko.applyBindings({ outer: outerObservable }, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('inner1');
         expect(outerObservable.getSubscriptionsCount()).to.equal(1);
         expect(innerObservable.getSubscriptionsCount()).to.equal(1);
@@ -400,7 +409,7 @@ describe('Components: Custom elements', function() {
 
         testNode.innerHTML = '<test-component params="$raw: suppliedValue"></test-component>';
         ko.applyBindings({ suppliedValue: suppliedValue }, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expect(constructorCallCount).to.equal(1);
     });
 
@@ -420,7 +429,7 @@ describe('Components: Custom elements', function() {
 
         // See it binds properly
         ko.applyBindings(null, testNode);
-        Clock.tick(1);
+        clock.tick(1);
         expectContainHtml(testNode.firstChild, 'custom element');
 
         // See the viewmodel is disposed when the corresponding DOM element is
@@ -466,7 +475,7 @@ describe('Components: Custom elements', function() {
 
         ko.applyBindings({ outerval: { innerval: 'my value' } }, testNode);
         try {
-            Clock.tick(1);
+            clock.tick(1);
             expectContainText(testNode, 'hello [the outer component [the inner component with value [my value]] goodbye] world');
         } catch(ex) {
             if (ex.message.indexOf('Unexpected call to method or property access.') >= 0) {
@@ -522,7 +531,7 @@ describe('Components: Custom elements', function() {
             ]
         }, testNode);
 
-        Clock.tick(1);
+        clock.tick(1);
         expectContainText(testNode.childNodes[0], 'Cheeses');
         expect(testNode.childNodes[1].childNodes[0].tagName.toLowerCase()).to.deep.equal('ul');
         expect(testNode.childNodes[1].childNodes[0].className).to.deep.equal('my-special-list');
@@ -555,7 +564,7 @@ describe('Components: Custom elements', function() {
         ko.applyBindings(viewModel, testNode);
         expect(callbacks).to.deep.equal(0);
 
-        Clock.tick(1);
+        clock.tick(1);
         expect(callbacks).to.deep.equal(1);
         expectContainHtml(testNode, '<test-component data-bind="childrencomplete: callback">custom element</test-component>');
     });
