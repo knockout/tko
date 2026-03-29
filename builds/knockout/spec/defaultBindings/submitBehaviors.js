@@ -8,7 +8,7 @@ describe('Binding: Submit', function() {
         var formNode = testNode.childNodes[0];
         ko.applyBindings(model, testNode);
         ko.utils.triggerEvent(testNode.childNodes[0], "submit");
-        expect(model.wasCalled).toEqual(true);
-        expect(firstParamStored).toEqual(formNode);
+        expect(model.wasCalled).to.deep.equal(true);
+        expect(firstParamStored).to.deep.equal(formNode);
     });
 });

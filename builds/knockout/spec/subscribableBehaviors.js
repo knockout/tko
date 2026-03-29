@@ -2,15 +2,15 @@
 describe('Subscribable', function() {
     it('Should declare that it is subscribable', function () {
         var instance = new ko.subscribable();
-        expect(ko.isSubscribable(instance)).toEqual(true);
+        expect(ko.isSubscribable(instance)).to.deep.equal(true);
     });
 
     it('isSubscribable should return false for undefined', function () {
-        expect(ko.isSubscribable(undefined)).toEqual(false);
+        expect(ko.isSubscribable(undefined)).to.deep.equal(false);
     });
 
     it('isSubscribable should return false for null', function () {
-        expect(ko.isSubscribable(null)).toEqual(false);
+        expect(ko.isSubscribable(null)).to.deep.equal(false);
     });
 
     it('Should be able to notify subscribers', function () {
@@ -18,7 +18,7 @@ describe('Subscribable', function() {
         var notifiedValue;
         instance.subscribe(function (value) { notifiedValue = value; });
         instance.notifySubscribers(123);
-        expect(notifiedValue).toEqual(123);
+        expect(notifiedValue).to.deep.equal(123);
     });
 
     it('Should be able to unsubscribe', function () {
@@ -27,13 +27,13 @@ describe('Subscribable', function() {
         var subscription = instance.subscribe(function (value) { notifiedValue = value; });
         subscription.dispose();
         instance.notifySubscribers(123);
-        expect(notifiedValue).toEqual(undefined);
+        expect(notifiedValue).to.deep.equal(undefined);
     });
 
     it('Should be able to specify a \'this\' pointer for the callback', function () {
         var model = {
             someProperty: 123,
-            myCallback: function (arg) { expect(arg).toEqual('notifiedValue'); expect(this.someProperty).toEqual(123); }
+            myCallback: function (arg) { expect(arg).to.deep.equal('notifiedValue'); expect(this.someProperty).to.deep.equal(123); }
         };
         var instance = new ko.subscribable();
         instance.subscribe(model.myCallback, model);
@@ -54,7 +54,7 @@ describe('Subscribable', function() {
         });
 
         instance.notifySubscribers('ignored');
-        expect(subscription2wasNotified).toEqual(false);
+        expect(subscription2wasNotified).to.deep.equal(false);
     });
 
     it('Should be able to notify subscribers for a specific \'event\'', function () {
@@ -63,10 +63,10 @@ describe('Subscribable', function() {
         instance.subscribe(function (value) { notifiedValue = value; }, null, "myEvent");
 
         instance.notifySubscribers(123, "unrelatedEvent");
-        expect(notifiedValue).toEqual(undefined);
+        expect(notifiedValue).to.deep.equal(undefined);
 
         instance.notifySubscribers(456, "myEvent");
-        expect(notifiedValue).toEqual(456);
+        expect(notifiedValue).to.deep.equal(456);
     });
 
     it('Should be able to unsubscribe for a specific \'event\'', function () {
@@ -75,7 +75,7 @@ describe('Subscribable', function() {
         var subscription = instance.subscribe(function (value) { notifiedValue = value; }, null, "myEvent");
         subscription.dispose();
         instance.notifySubscribers(123, "myEvent");
-        expect(notifiedValue).toEqual(undefined);
+        expect(notifiedValue).to.deep.equal(undefined);
     });
 
     it('Should be able to subscribe for a specific \'event\' without being notified for the default event', function () {
@@ -83,7 +83,7 @@ describe('Subscribable', function() {
         var notifiedValue;
         var subscription = instance.subscribe(function (value) { notifiedValue = value; }, null, "myEvent");
         instance.notifySubscribers(123);
-        expect(notifiedValue).toEqual(undefined);
+        expect(notifiedValue).to.deep.equal(undefined);
     });
 
     it('Should be able to retrieve the number of active subscribers', function() {
@@ -91,20 +91,20 @@ describe('Subscribable', function() {
         var sub1 = instance.subscribe(function() { });
         var sub2 = instance.subscribe(function() { }, null, "someSpecificEvent");
 
-        expect(instance.getSubscriptionsCount()).toEqual(2);
-        expect(instance.getSubscriptionsCount("change")).toEqual(1);
-        expect(instance.getSubscriptionsCount("someSpecificEvent")).toEqual(1);
-        expect(instance.getSubscriptionsCount("nonexistentEvent")).toEqual(0);
+        expect(instance.getSubscriptionsCount()).to.deep.equal(2);
+        expect(instance.getSubscriptionsCount("change")).to.deep.equal(1);
+        expect(instance.getSubscriptionsCount("someSpecificEvent")).to.deep.equal(1);
+        expect(instance.getSubscriptionsCount("nonexistentEvent")).to.deep.equal(0);
 
         sub1.dispose();
-        expect(instance.getSubscriptionsCount()).toEqual(1);
-        expect(instance.getSubscriptionsCount("change")).toEqual(0);
-        expect(instance.getSubscriptionsCount("someSpecificEvent")).toEqual(1);
+        expect(instance.getSubscriptionsCount()).to.deep.equal(1);
+        expect(instance.getSubscriptionsCount("change")).to.deep.equal(0);
+        expect(instance.getSubscriptionsCount("someSpecificEvent")).to.deep.equal(1);
 
         sub2.dispose();
-        expect(instance.getSubscriptionsCount()).toEqual(0);
-        expect(instance.getSubscriptionsCount("change")).toEqual(0);
-        expect(instance.getSubscriptionsCount("someSpecificEvent")).toEqual(0);
+        expect(instance.getSubscriptionsCount()).to.deep.equal(0);
+        expect(instance.getSubscriptionsCount("change")).to.deep.equal(0);
+        expect(instance.getSubscriptionsCount("someSpecificEvent")).to.deep.equal(0);
     });
 
     it('Should be possible to replace notifySubscribers with a custom handler', function() {
@@ -116,9 +116,9 @@ describe('Subscribable', function() {
         };
         instance.notifySubscribers(123, "myEvent");
 
-        expect(interceptedNotifications.length).toEqual(1);
-        expect(interceptedNotifications[0].eventName).toEqual("myEvent");
-        expect(interceptedNotifications[0].value).toEqual(123);
+        expect(interceptedNotifications.length).to.deep.equal(1);
+        expect(interceptedNotifications[0].eventName).to.deep.equal("myEvent");
+        expect(interceptedNotifications[0].value).to.deep.equal(123);
     });
 
     it('Should inherit any properties defined on ko.subscribable.fn', function() {
@@ -131,8 +131,8 @@ describe('Subscribable', function() {
         ko.subscribable.fn.customFunc = function() { return this; };
 
         var instance = new ko.subscribable();
-        expect(instance.customProp).toEqual('some value');
-        expect(instance.customFunc()).toEqual(instance);
+        expect(instance.customProp).to.deep.equal('some value');
+        expect(instance.customFunc()).to.deep.equal(instance);
     });
 
     it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
@@ -151,6 +151,6 @@ describe('Subscribable', function() {
 
         ko.subscribable.fn.customFunction = customFunction;
 
-        expect(subscribable.customFunction).toBe(customFunction);
+        expect(subscribable.customFunction).to.equal(customFunction);
     });
 });

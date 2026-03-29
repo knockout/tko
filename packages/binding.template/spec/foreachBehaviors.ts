@@ -20,7 +20,8 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { expectContainHtml, expectContainText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
-function expectHaveValues(node: ParentNode, expectedValues: string[]) {
+function expectHaveValues(node: Node | null, expectedValues: string[]) {
+  expect(node).to.not.equal(null)
   const actualValues = Array.from((node as Element).children).map(child => (child as HTMLInputElement).value)
   expect(actualValues).to.deep.equal(expectedValues)
 }

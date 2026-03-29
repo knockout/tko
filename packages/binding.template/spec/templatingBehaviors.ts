@@ -375,7 +375,7 @@ describe('Templating', function () {
     expect((testNode.childNodes[0] as HTMLInputElement).value).to.equal('Hi')
   })
 
-  xit('Data binding syntax should be able to reference variables put into scope by the template engine', function () {
+  it.skip('Data binding syntax should be able to reference variables put into scope by the template engine', function () {
     // Disabling this because the only place where
     // templateRenderingVariablesInScope appears is with the
     // dummy template engine.  The Provider/Parser is never made
@@ -531,7 +531,7 @@ describe('Templating', function () {
     )
   })
 
-  xit('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function () {
+  it.skip('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function () {
     // SKIP because we have deprecated getBindings in favour of
     // getBindingAccessors.
 
@@ -698,7 +698,7 @@ describe('Templating', function () {
   /**
    * Update the templating engine to handle JSX nodes.
    */
-  xit('Should accept `jsx:...`', function () {
+  it.skip('Should accept `jsx:...`', function () {
     testNode.innerHTML = "<div data-bind='template: { jsx: testJsx }'></div>"
     const obs = observable('alpha')
     const model = {
@@ -1223,7 +1223,7 @@ describe('Templating', function () {
     )
   })
 
-  xit('Should not be allowed to rewrite templates that embed anonymous templates', function () {
+  it.skip('Should not be allowed to rewrite templates that embed anonymous templates', function () {
     // SKIP because we have removed template rewriting.
     //
     // ----
@@ -1250,7 +1250,7 @@ describe('Templating', function () {
     }).to.throw(/This template engine does not support anonymous templates nested within its templates/)
   })
 
-  xit('Should not be allowed to rewrite templates that embed control flow bindings', function () {
+  it.skip('Should not be allowed to rewrite templates that embed control flow bindings', function () {
     // SKIP because we have removed template rewriting.
     // ----
     // Same reason as above (also include binding names with quotes and spaces to show that formatting doesn't matter)

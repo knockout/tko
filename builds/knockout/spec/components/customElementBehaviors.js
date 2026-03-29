@@ -1,3 +1,23 @@
+function cleanedHtml(node) {
+    var html = node.innerHTML.toLowerCase().replace(/\r\n/g, '');
+    html = html.replace(/(<!--.*?-->)\s*/g, '$1');
+    return html.replace(/ __ko__\d+=\"(ko\d+|null)\"/g, '');
+}
+
+function expectHtml(node, expectedHtml) {
+    expect(cleanedHtml(node)).to.equal(expectedHtml.replace(/(<!--.*?-->)\s*/g, '$1'));
+}
+
+function expectText(node, expectedText, ignoreSpaces) {
+    var actualText = (nodeText(node) || '').replace(/\r\n/g, '\n');
+    var normalizedExpectedText = expectedText;
+    if (ignoreSpaces) {
+        actualText = actualText.replace(/\s/g, '');
+        normalizedExpectedText = expectedText.replace(/\s/g, '');
+    }
+    expect(actualText).to.equal(normalizedExpectedText);
+}
+
 describe('Components: Custom elements', function() {
     beforeEach(function() {
         prepareTestNode();
@@ -5,7 +25,7 @@ describe('Components: Custom elements', function() {
     });
 
     afterEach(function() {
-        expect(ko.tasks.resetForTesting()).toEqual(0);
+        expect(ko.tasks.resetForTesting()).to.equal(0);
         Clock.reset();
         ko.components.unregister('test-component');
     });
@@ -19,11 +39,11 @@ describe('Components: Custom elements', function() {
 
         // Since components are loaded asynchronously, it doesn't show up synchronously
         ko.applyBindings(null, testNode);
-        expect(testNode).toContainHtml(initialMarkup);
+        expectHtml(testNode, initialMarkup);
 
         // ... but when the component is loaded, it does show up
         Clock.tick(1);
-        expect(testNode).toContainHtml('<div>hello <test-component>custom element <span data-bind="text: 123">123</span></test-component></div>');
+        expectHtml(testNode, '<div>hello <test-component>custom element <span data-bind="text: 123">123</span></test-component></div>');
     });
 
     it('Inserts components into custom elements with matching non-dashed names', function() {
@@ -37,11 +57,11 @@ describe('Components: Custom elements', function() {
 
             // Since components are loaded asynchronously, it doesn't show up synchronously
             ko.applyBindings(null, testNode);
-            expect(testNode).toContainHtml(initialMarkup);
+            expectContainHtml(testNode, initialMarkup);
 
             // ... but when the component is loaded, it does show up
             Clock.tick(1);
-            expect(testNode).toContainHtml('<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>');
+            expectContainHtml(testNode, '<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>');
         }
     });
 
@@ -55,7 +75,7 @@ describe('Components: Custom elements', function() {
 
         ko.applyBindings(null, testNode);
         Clock.tick(1);
-        expect(testNode).toContainHtml(initialMarkup);
+        expectContainHtml(testNode, initialMarkup);
     });
 
     it('Is possible to override getComponentNameForNode to determine which component goes into which element', function() {
@@ -76,7 +96,7 @@ describe('Components: Custom elements', function() {
         // See the component show up
         ko.applyBindings(null, testNode);
         Clock.tick(1);
-        expect(testNode).toContainHtml('<div>hello <a>custom element</a> <b>ignored</b></div>');
+        expectContainHtml(testNode, '<div>hello <a>custom element</a> <b>ignored</b></div>');
     });
 
     it('Is possible to have regular data-bind bindings on a custom element, as long as they don\'t attempt to control descendants', function() {
@@ -87,13 +107,13 @@ describe('Components: Custom elements', function() {
         var viewModel = { shouldshow: ko.observable(true) };
         ko.applyBindings(viewModel, testNode);
         Clock.tick(1);
-        expect(testNode).toContainHtml('<test-component data-bind="visible: shouldshow">custom element</test-component>');
-        expect(testNode.childNodes[0].style.display).not.toBe('none');
+        expectContainHtml(testNode, '<test-component data-bind="visible: shouldshow">custom element</test-component>');
+        expect(testNode.childNodes[0].style.display).not.to.equal('none');
 
         // See that the 'visible' binding still works
         viewModel.shouldshow(false);
-        expect(testNode.childNodes[0].style.display).toBe('none');
-        expect(testNode.childNodes[0].innerHTML).toBe('custom element');
+        expect(testNode.childNodes[0].style.display).to.equal('none');
+        expect(testNode.childNodes[0].innerHTML).to.equal('custom element');
     });
 
     it('Is not possible to have regular data-bind bindings on a custom element if they also attempt to control descendants', function() {
@@ -101,7 +121,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component data-bind="if: true"></test-component>';
 
         expect(function() { ko.applyBindings(null, testNode); })
-            .toThrowContaining('Unable to process binding "if"');
+            .to.throw('Unable to process binding "if"');
 
         // Even though ko.applyBindings threw an exception, the component still gets bound (asynchronously)
         Clock.tick(1);
@@ -111,11 +131,11 @@ describe('Components: Custom elements', function() {
         ko.components.register('test-component', { template: 'custom element'});
         testNode.innerHTML = '<test-component></test-component>';
         var customElem = testNode.childNodes[0];
-        expect(customElem.tagName.toLowerCase()).toBe('test-component');
+        expect(customElem.tagName.toLowerCase()).to.equal('test-component');
 
         ko.applyBindings(null, customElem);
         Clock.tick(1);
-        expect(customElem.innerHTML).toBe('custom element');
+        expect(customElem.innerHTML).to.equal('custom element');
     });
 
     it('Throws if you try to duplicate the \'component\' binding on a custom element that matches a component', function() {
@@ -123,7 +143,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component data-bind="component: {}"></test-component>';
 
         expect(function() { ko.applyBindings(null, testNode); })
-            .toThrowContaining('The binding "component" is duplicated by multiple providers');
+            .to.throw('The binding "component" is duplicated by multiple providers');
     });
 
     it('Is possible to pass literal values', function() {
@@ -136,8 +156,8 @@ describe('Components: Custom elements', function() {
                 // The raw value for each param is a computed giving the literal value
                 ko.utils.objectForEach(params, function(key, value) {
                     if (key !== '$raw') {
-                        expect(ko.isComputed(params.$raw[key])).toBe(true);
-                        expect(params.$raw[key]()).toBe(value);
+                        expect(ko.isComputed(params.$raw[key])).to.equal(true);
+                        expect(params.$raw[key]()).to.equal(value);
                     }
                 });
             }
@@ -148,7 +168,7 @@ describe('Components: Custom elements', function() {
         Clock.tick(1);
 
         delete suppliedParams[0].$raw; // Don't include '$raw' in the following assertion, as we only want to compare supplied values
-        expect(suppliedParams).toEqual([{ nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: 'mystr' }]);
+        expect(suppliedParams).to.deep.equal([{ nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: 'mystr' }]);
     });
 
     it('Supplies an empty params object (with empty $raw) if a custom element has no params attribute', function() {
@@ -161,7 +181,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component></test-component>';
         ko.applyBindings(null, testNode);
         Clock.tick(1);
-        expect(suppliedParams).toEqual([{ $raw: {} }]);
+        expect(suppliedParams).to.deep.equal([{ $raw: {} }]);
     });
 
     it('Supplies an empty params object (with empty $raw) if a custom element has an empty whitespace params attribute', function() {
@@ -174,7 +194,7 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component params=" "></test-component>';
         ko.applyBindings(null, testNode);
         Clock.tick(1);
-        expect(suppliedParams).toEqual([{ $raw: {} }]);
+        expect(suppliedParams).to.deep.equal([{ $raw: {} }]);
     });
 
     it('Should not confuse parameters with bindings', function() {
@@ -190,7 +210,7 @@ describe('Components: Custom elements', function() {
 
         Clock.tick(1);
         // The only binding it should look up is "component"
-        expect(bindings).toEqual(['component']);
+        expect(bindings).to.deep.equal(['component']);
     });
 
     it('Should update component when observable view model changes', function() {
@@ -202,15 +222,15 @@ describe('Components: Custom elements', function() {
         var vm = ko.observable({ value: 'A' });
         ko.applyBindings(vm, testNode);
         Clock.tick(1);
-        expect(testNode).toContainText("the component value: A, the root value: A");
+        expectContainText(testNode, "the component value: A, the root value: A");
 
         vm({ value: 'Z' });
         // The view-model change updates the old component contents before the new contents get rendered.
         // This is the way it has always worked, but maybe this isn't the best experience
-        expect(testNode).toContainText("the component value: A, the root value: Z");
+        expectContainText(testNode, "the component value: A, the root value: Z");
 
         Clock.tick(1);
-        expect(testNode).toContainText("the component value: Z, the root value: Z");
+        expectContainText(testNode, "the component value: Z, the root value: Z");
     });
 
     it('Is possible to pass observable instances', function() {
@@ -218,12 +238,12 @@ describe('Components: Custom elements', function() {
             template: '<p>the observable: <span data-bind="text: receivedobservable"></span></p>',
             viewModel: function(params) {
                 this.receivedobservable = params.suppliedobservable;
-                expect(this.receivedobservable.subprop).toBe('subprop');
+                expect(this.receivedobservable.subprop).to.equal('subprop');
                 this.dispose = function() { this.wasDisposed = true; };
 
                 // The $raw value for this param is a computed giving the observable instance
-                expect(ko.isComputed(params.$raw.suppliedobservable)).toBe(true);
-                expect(params.$raw.suppliedobservable()).toBe(params.suppliedobservable);
+                expect(ko.isComputed(params.$raw.suppliedobservable)).to.equal(true);
+                expect(params.$raw.suppliedobservable()).to.equal(params.suppliedobservable);
             }
         });
 
@@ -234,13 +254,13 @@ describe('Components: Custom elements', function() {
         ko.applyBindings({ myobservable: myobservable }, testNode);
         Clock.tick(1);
         var viewModelInstance = ko.dataFor(testNode.firstChild.firstChild);
-        expect(testNode.firstChild).toContainText('the observable: 1');
+        expectContainText(testNode.firstChild, 'the observable: 1');
 
         // See the observable instance can mutate, without causing the component to tear down
         myobservable(2);
-        expect(testNode.firstChild).toContainText('the observable: 2');
-        expect(ko.dataFor(testNode.firstChild.firstChild)).toBe(viewModelInstance); // Didn't create a new instance
-        expect(viewModelInstance.wasDisposed).not.toBe(true);
+        expectContainText(testNode.firstChild, 'the observable: 2');
+        expect(ko.dataFor(testNode.firstChild.firstChild)).to.equal(viewModelInstance); // Didn't create a new instance
+        expect(viewModelInstance.wasDisposed).not.to.equal(true);
     });
 
     it('Is possible to pass expressions that can vary observably', function() {
@@ -257,15 +277,15 @@ describe('Components: Custom elements', function() {
                 this.dispose = function() { this.wasDisposed = true; };
 
                 // See we didn't get the original observable instance. Instead we got a read-only computed property.
-                expect(this.receivedobservable).not.toBe(rootViewModel.myobservable);
-                expect(ko.isComputed(this.receivedobservable)).toBe(true);
-                expect(ko.isWritableObservable(this.receivedobservable)).toBe(false);
+                expect(this.receivedobservable).not.to.equal(rootViewModel.myobservable);
+                expect(ko.isComputed(this.receivedobservable)).to.equal(true);
+                expect(ko.isWritableObservable(this.receivedobservable)).to.equal(false);
 
                 // The $raw value for this param is a computed property whose value is raw result
                 // of evaluating the binding value. Since the raw result in this case is itself not
                 // observable, it's the same value as the regular (non-$raw) supplied parameter.
-                expect(ko.isComputed(params.$raw.suppliedobservable)).toBe(true);
-                expect(params.$raw.suppliedobservable()).toBe(params.suppliedobservable());
+                expect(ko.isComputed(params.$raw.suppliedobservable)).to.equal(true);
+                expect(params.$raw.suppliedobservable()).to.equal(params.suppliedobservable());
             }
         });
 
@@ -273,25 +293,25 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component params=\'suppliedobservable: myobservable().split("").reverse().join("")\'></test-component>';
         ko.applyBindings(rootViewModel, testNode);
         Clock.tick(1);
-        expect(testNode.firstChild).toContainText('the string reversed: ahplA');
+        expectContainText(testNode.firstChild, 'the string reversed: ahplA');
         var componentViewModelInstance = ko.dataFor(testNode.firstChild.firstChild);
-        expect(constructorCallCount).toBe(1);
-        expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1);
+        expect(constructorCallCount).to.equal(1);
+        expect(rootViewModel.myobservable.getSubscriptionsCount()).to.equal(1);
 
         // See that mutating the underlying observable modifies the supplied computed property,
         // but doesn't cause the component to tear down
         rootViewModel.myobservable('Beta');
-        expect(testNode.firstChild).toContainText('the string reversed: ateB');
-        expect(constructorCallCount).toBe(1);
-        expect(ko.dataFor(testNode.firstChild.firstChild)).toBe(componentViewModelInstance); // No new viewmodel needed
-        expect(componentViewModelInstance.wasDisposed).not.toBe(true);
-        expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1); // No extra subscription needed
+        expectContainText(testNode.firstChild, 'the string reversed: ateB');
+        expect(constructorCallCount).to.equal(1);
+        expect(ko.dataFor(testNode.firstChild.firstChild)).to.equal(componentViewModelInstance); // No new viewmodel needed
+        expect(componentViewModelInstance.wasDisposed).not.to.equal(true);
+        expect(rootViewModel.myobservable.getSubscriptionsCount()).to.equal(1); // No extra subscription needed
 
         // See also that subscriptions to the evaluated observables are disposed
         // when the custom element is cleaned
         ko.cleanNode(testNode);
-        expect(componentViewModelInstance.wasDisposed).toBe(true);
-        expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(0);
+        expect(componentViewModelInstance.wasDisposed).to.equal(true);
+        expect(rootViewModel.myobservable.getSubscriptionsCount()).to.equal(0);
     });
 
     it('Is possible to pass expressions that can vary observably and evaluate as writable observable instances', function() {
@@ -303,18 +323,18 @@ describe('Components: Custom elements', function() {
                 this.myval = params.somevalue;
 
                 // See we received a writable observable
-                expect(ko.isWritableObservable(this.myval)).toBe(true);
+                expect(ko.isWritableObservable(this.myval)).to.equal(true);
 
                 // See we received a computed, not either of the original observables
-                expect(ko.isComputed(this.myval)).toBe(true);
+                expect(ko.isComputed(this.myval)).to.equal(true);
 
                 // See we can reach the original inner observable directly if needed via $raw
                 // (e.g., because it has subobservables or similar)
                 var originalObservable = params.$raw.somevalue();
-                expect(ko.isObservable(originalObservable)).toBe(true);
-                expect(ko.isComputed(originalObservable)).toBe(false);
+                expect(ko.isObservable(originalObservable)).to.equal(true);
+                expect(ko.isComputed(originalObservable)).to.equal(false);
                 if (originalObservable() === 'inner1') {
-                    expect(originalObservable).toBe(innerObservable); // See there's no wrapper
+                    expect(originalObservable).to.equal(innerObservable); // See there's no wrapper
                 }
             }
         });
@@ -328,43 +348,43 @@ describe('Components: Custom elements', function() {
         testNode.innerHTML = '<test-component params="somevalue: outer().inner"></test-component>';
         ko.applyBindings({ outer: outerObservable }, testNode);
         Clock.tick(1);
-        expect(testNode.childNodes[0].childNodes[0].value).toEqual('inner1');
-        expect(outerObservable.getSubscriptionsCount()).toBe(1);
-        expect(innerObservable.getSubscriptionsCount()).toBe(1);
-        expect(constructorCallCount).toBe(1);
+        expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('inner1');
+        expect(outerObservable.getSubscriptionsCount()).to.equal(1);
+        expect(innerObservable.getSubscriptionsCount()).to.equal(1);
+        expect(constructorCallCount).to.equal(1);
 
         // See we can mutate the inner value and see the result show up
         innerObservable('inner2');
-        expect(testNode.childNodes[0].childNodes[0].value).toEqual('inner2');
-        expect(outerObservable.getSubscriptionsCount()).toBe(1);
-        expect(innerObservable.getSubscriptionsCount()).toBe(1);
-        expect(constructorCallCount).toBe(1);
+        expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('inner2');
+        expect(outerObservable.getSubscriptionsCount()).to.equal(1);
+        expect(innerObservable.getSubscriptionsCount()).to.equal(1);
+        expect(constructorCallCount).to.equal(1);
 
         // See that we can mutate the observable from within the component
         testNode.childNodes[0].childNodes[0].value = 'inner3';
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], 'change');
-        expect(innerObservable()).toEqual('inner3');
+        expect(innerObservable()).to.deep.equal('inner3');
 
         // See we can mutate the outer value and see the result show up (cleaning subscriptions to the old inner value)
         var newInnerObservable = ko.observable('newinner');
         outerObservable({ inner: newInnerObservable });
-        expect(testNode.childNodes[0].childNodes[0].value).toEqual('newinner');
-        expect(outerObservable.getSubscriptionsCount()).toBe(1);
-        expect(innerObservable.getSubscriptionsCount()).toBe(0);
-        expect(newInnerObservable.getSubscriptionsCount()).toBe(1);
-        expect(constructorCallCount).toBe(1);
+        expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('newinner');
+        expect(outerObservable.getSubscriptionsCount()).to.equal(1);
+        expect(innerObservable.getSubscriptionsCount()).to.equal(0);
+        expect(newInnerObservable.getSubscriptionsCount()).to.equal(1);
+        expect(constructorCallCount).to.equal(1);
 
         // See that we can mutate the new observable from within the component
         testNode.childNodes[0].childNodes[0].value = 'newinner2';
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], 'change');
-        expect(newInnerObservable()).toEqual('newinner2');
-        expect(innerObservable()).toEqual('inner3');    // original one hasn't changed
+        expect(newInnerObservable()).to.deep.equal('newinner2');
+        expect(innerObservable()).to.deep.equal('inner3');    // original one hasn't changed
 
         // See that subscriptions are disposed when the component is
         ko.cleanNode(testNode);
-        expect(outerObservable.getSubscriptionsCount()).toBe(0);
-        expect(innerObservable.getSubscriptionsCount()).toBe(0);
-        expect(newInnerObservable.getSubscriptionsCount()).toBe(0);
+        expect(outerObservable.getSubscriptionsCount()).to.equal(0);
+        expect(innerObservable.getSubscriptionsCount()).to.equal(0);
+        expect(newInnerObservable.getSubscriptionsCount()).to.equal(0);
     });
 
     it('Supplies any custom parameter called "$raw" in preference to the function that yields raw parameter values', function() {
@@ -374,14 +394,14 @@ describe('Components: Custom elements', function() {
             template: 'Ignored',
             viewModel: function(params) {
                 constructorCallCount++;
-                expect(params.$raw).toBe(suppliedValue);
+                expect(params.$raw).to.equal(suppliedValue);
             }
         });
 
         testNode.innerHTML = '<test-component params="$raw: suppliedValue"></test-component>';
         ko.applyBindings({ suppliedValue: suppliedValue }, testNode);
         Clock.tick(1);
-        expect(constructorCallCount).toBe(1);
+        expect(constructorCallCount).to.equal(1);
     });
 
     it('Disposes the component when the custom element is cleaned', function() {
@@ -401,12 +421,12 @@ describe('Components: Custom elements', function() {
         // See it binds properly
         ko.applyBindings(null, testNode);
         Clock.tick(1);
-        expect(testNode.firstChild).toContainHtml('custom element');
+        expectContainHtml(testNode.firstChild, 'custom element');
 
         // See the viewmodel is disposed when the corresponding DOM element is
-        expect(componentViewModel.wasDisposed).not.toBe(true);
+        expect(componentViewModel.wasDisposed).not.to.equal(true);
         ko.cleanNode(testNode.firstChild);
-        expect(componentViewModel.wasDisposed).toBe(true);
+        expect(componentViewModel.wasDisposed).to.equal(true);
     });
 
     it('Can nest custom elements', function() {
@@ -447,7 +467,7 @@ describe('Components: Custom elements', function() {
         ko.applyBindings({ outerval: { innerval: 'my value' } }, testNode);
         try {
             Clock.tick(1);
-            expect(testNode).toContainText('hello [the outer component [the inner component with value [my value]] goodbye] world');
+            expectContainText(testNode, 'hello [the outer component [the inner component with value [my value]] goodbye] world');
         } catch(ex) {
             if (ex.message.indexOf('Unexpected call to method or property access.') >= 0) {
                 // On IE < 9, this scenario is only supported if you have referenced jQuery.
@@ -503,10 +523,10 @@ describe('Components: Custom elements', function() {
         }, testNode);
 
         Clock.tick(1);
-        expect(testNode.childNodes[0]).toContainText('Cheeses');
-        expect(testNode.childNodes[1].childNodes[0].tagName.toLowerCase()).toEqual('ul');
-        expect(testNode.childNodes[1].childNodes[0].className).toEqual('my-special-list');
-        expect(testNode.childNodes[1].childNodes[0]).toContainHtml(
+        expectContainText(testNode.childNodes[0], 'Cheeses');
+        expect(testNode.childNodes[1].childNodes[0].tagName.toLowerCase()).to.deep.equal('ul');
+        expect(testNode.childNodes[1].childNodes[0].className).to.deep.equal('my-special-list');
+        expectContainHtml(testNode.childNodes[1].childNodes[0], 
             '<li data-bind="template: { nodes: $component.supplieditemtemplate }">'
           +     '<em data-bind="text: name">brie</em> has quality <em data-bind="text: quality">7</em>'
           + '</li>'
@@ -526,17 +546,17 @@ describe('Components: Custom elements', function() {
         var callbacks = 0,
             viewModel = {
                 callback: function (nodes, data) {
-                    expect(nodes.length).toEqual(1);
-                    expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0]);
-                    expect(data).toEqual(undefined);
+                    expect(nodes.length).to.deep.equal(1);
+                    expect(nodes[0]).to.deep.equal(testNode.childNodes[0].childNodes[0]);
+                    expect(data).to.deep.equal(undefined);
                     callbacks++;
                 }
             };
         ko.applyBindings(viewModel, testNode);
-        expect(callbacks).toEqual(0);
+        expect(callbacks).to.deep.equal(0);
 
         Clock.tick(1);
-        expect(callbacks).toEqual(1);
-        expect(testNode).toContainHtml('<test-component data-bind="childrencomplete: callback">custom element</test-component>');
+        expect(callbacks).to.deep.equal(1);
+        expectContainHtml(testNode, '<test-component data-bind="childrencomplete: callback">custom element</test-component>');
     });
 });

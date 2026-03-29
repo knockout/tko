@@ -30,7 +30,6 @@
     "karma-coverage": "^2.2.1",
     "karma-esbuild": "^2.3.0",
     "karma-firefox-launcher": "^2.1.2",
-    "karma-jasmine": "^0.1.6",
     "karma-mocha": "^2.0.1",
     "karma-sauce-launcher": "^4.3.6",
     "knip": "^6.3.1",

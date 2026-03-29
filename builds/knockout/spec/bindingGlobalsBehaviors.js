@@ -7,14 +7,14 @@ describe('options.bindingGlobals', function() {
         window.testFoo = "bar";
         testNode.innerHTML = "<div id='testFoo' data-bind='text: testFoo'></div>";
         ko.applyBindings();
-        expect(document.getElementById("testFoo").innerText).toEqual("bar");
+        expect(document.getElementById("testFoo").innerText).to.deep.equal("bar");
     });
 
-    xit('is reassignable (https://github.com/knockout/tko/issues/166)', function() {
+    it.skip('is reassignable (https://github.com/knockout/tko/issues/166)', function() {
         this.skip();
         ko.options.bindingGlobals = {foo: "bar"};
         testNode.innerHTML = "<div id='testFoo' data-bind='text: foo'></div>";
         ko.applyBindings();
-        expect(document.getElementById("testFoo").innerText).toEqual("bar");
+        expect(document.getElementById("testFoo").innerText).to.deep.equal("bar");
     });
 });

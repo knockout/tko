@@ -74,11 +74,11 @@ describe('Parse HTML fragment', function() {
             }
 
             // Assert that we have the expected collection of elements (not just the correct .innerHTML string)
-            expect(parsedNodes.length).toEqual(data.parsed.length);
+            expect(parsedNodes.length).to.deep.equal(data.parsed.length);
             for (var i = 0; i < parsedNodes.length; i++) {
                 testNode.innerHTML = '';
                 testNode.appendChild(parsedNodes[i]);
-                expect(testNode).toContainHtml(data.parsed[i], function(htmlToClean) {
+                expectContainHtml(testNode, data.parsed[i], function(htmlToClean) {
                     // Old IE strips quotes from certain attributes. The easiest way of normalising this across
                     // browsers is to forcibly strip the equivalent quotes in all browsers for the test.
                     return htmlToClean.replace(/"x"/g, 'x');

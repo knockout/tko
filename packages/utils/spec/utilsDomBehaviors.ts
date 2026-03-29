@@ -62,7 +62,7 @@ describe('registerEventHandler', function () {
     }
   })
   //TODO it looks like jquery3.7+ and trigger doesn't works with tko, useOnlyNativeEvents should be always true if jquery is used.
-  xit('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
+  it.skip('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
     const jQuery = options.jQuery
 
     if (!options.jQuery) console.log('------- JQUERY is disabled -------')
