@@ -180,7 +180,7 @@ describe('Components: Component binding', function () {
       }
     })
 
-    // Notice the absence of any 'jasmine.Clock.tick' call here. This is synchronous.
+    // Notice the absence of any fake-clock tick here. This is synchronous.
     applyBindings(outerViewModel, testNode)
     expectContainHtml(testNode.children[0], '<div data-bind="text: myvalue">123</div>')
   })
@@ -218,7 +218,7 @@ describe('Components: Component binding', function () {
     expectContainText(testNode.children[0], 'first')
 
     // Second (cached) injection is synchronous, because the component config says so.
-    // Notice the absence of any 'jasmine.Clock.tick' call here. This is synchronous.
+    // Notice the absence of any fake-clock tick here. This is synchronous.
     testList.push('second')
     expectContainText(testNode.children[0], 'firstsecond', /* ignoreSpaces */ true) // Ignore spaces because old-IE is inconsistent
   })
