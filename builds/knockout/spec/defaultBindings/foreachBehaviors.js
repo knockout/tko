@@ -1,5 +1,5 @@
 describe('Binding: Foreach', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsy', function() {
         testNode.innerHTML = "<div data-bind='foreach: someItem'><span data-bind='text: someItem.nonExistentChildProp'></span></div>";
@@ -586,7 +586,7 @@ describe('Binding: Foreach', function() {
     });
 
     it('Should be able to output HTML5 elements (even on IE<9, as long as you reference either innershiv.js or jQuery1.7+Modernizr)', function() {
-        var isSupported = jasmine.ieVersion >= 9 || window.innerShiv || window.jQuery;
+        var isSupported = ieVersion >= 9 || window.innerShiv || window.jQuery;
         if (isSupported) {
             // Represents https://github.com/SteveSanderson/knockout/issues/194
             ko.utils.setHtml(testNode, "<div data-bind='foreach:someitems'><section data-bind='text: $data'></section></div>");
@@ -599,7 +599,7 @@ describe('Binding: Foreach', function() {
     });
 
     it('Should be able to output HTML5 elements within container-less templates (same as above)', function() {
-        var isSupported = jasmine.ieVersion >= 9 || window.innerShiv || window.jQuery;
+        var isSupported = ieVersion >= 9 || window.innerShiv || window.jQuery;
         if (isSupported) {
             // Represents https://github.com/SteveSanderson/knockout/issues/194
             ko.utils.setHtml(testNode, "xxx<!-- ko foreach:someitems --><div><section data-bind='text: $data'></section></div><!-- /ko -->");
@@ -646,7 +646,7 @@ describe('Binding: Foreach', function() {
     it('Should not clean unrelated nodes when beforeRemove callback removes some nodes before others', function() {
         // In this scenario, a beforeRemove callback removes non-element nodes (such as text nodes)
         // immediately, but delays removing element nodes (for a fade effect, for example). See #1903.
-        jasmine.Clock.useMock();
+        Clock.useMock();
         testNode.innerHTML = "<div data-bind='foreach: {data: planets, beforeRemove: beforeRemove}'>--<span data-bind='text: name'></span>++</div>";
         var planets = ko.observableArray([
             { name: ko.observable('Mercury') },
@@ -684,7 +684,7 @@ describe('Binding: Foreach', function() {
         expect(testNode).toContainText('--Mercury++--Venus++--Earth++Moon--Mars++--Jupiter++--Saturn++');
 
         // After the delay, the deleted item's node is removed
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode).toContainText('--Mercury++--Venus++--Earth++--Mars++--Jupiter++--Saturn++');
 
     });

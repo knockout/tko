@@ -1,5 +1,5 @@
 describe('Binding: Visible/Hidden', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Visible means the node is only visible when the value is true', function () {
         var observable = new ko.observable(false);

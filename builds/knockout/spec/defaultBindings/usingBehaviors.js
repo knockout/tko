@@ -1,5 +1,5 @@
 describe('Binding: Using', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should leave descendant nodes in the document (and bind them in the context of the supplied value) if the value is truthy', function() {
         testNode.innerHTML = "<div data-bind='using: someItem'><span data-bind='text: existentChildProp'></span></div>";

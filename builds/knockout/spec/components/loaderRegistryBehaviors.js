@@ -45,29 +45,18 @@ describe('Components: Loader registry', function() {
             // Set up a chain of loaders, then query it
             ko.components.loaders = chain;
 
-            var loadedDefinition = "Not yet loaded";
-            ko.components.get(testComponentName, function(definition) {
-                loadedDefinition = definition;
+            return new Promise(function(resolve, reject) {
+                ko.components.get(testComponentName, function(definition) {
+                    try {
+                        if ('expectedDefinition' in options) {
+                            expect(definition).toBe(options.expectedDefinition);
+                        }
+                        resolve(definition);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
             });
-
-            var onLoaded = function() {
-                if ('expectedDefinition' in options) {
-                    expect(loadedDefinition).toBe(options.expectedDefinition);
-                }
-                if ('done' in options) {
-                    options.done(loadedDefinition);
-                }
-            };
-
-            // Wait for and verify result
-            if (loadedDefinition !== "Not yet loaded") {
-                // Completed synchronously
-                onLoaded();
-            } else {
-                // Will complete asynchronously
-                waitsFor(function() { return loadedDefinition !== "Not yet loaded"; }, 300);
-                runs(onLoaded);
-            }
         };
 
     afterEach(function() {
@@ -88,7 +77,7 @@ describe('Components: Loader registry', function() {
             loaderThatShouldNeverBeCalled
         ];
 
-        testLoaderChain(this, loaders, { expectedDefinition: testComponentDefinition });
+        return testLoaderChain(this, loaders, { expectedDefinition: testComponentDefinition });
     });
 
     it('Supplies null if no registered loader returns a config object', function() {
@@ -99,7 +88,7 @@ describe('Components: Loader registry', function() {
             loaderThatDoesNotReturnAnything
         ];
 
-        testLoaderChain(this, loaders, { expectedDefinition: null });
+        return testLoaderChain(this, loaders, { expectedDefinition: null });
     });
 
     it('Supplies null if no registered loader returns a component for a given config object', function() {
@@ -110,7 +99,7 @@ describe('Components: Loader registry', function() {
             loaderThatDoesNotReturnAnything
         ];
 
-        testLoaderChain(this, loaders, { expectedDefinition: null });
+        return testLoaderChain(this, loaders, { expectedDefinition: null });
     });
 
     it('Aborts if a getConfig call returns a value other than undefined', function() {
@@ -134,7 +123,7 @@ describe('Components: Loader registry', function() {
             loaderThatReturnsConfig
         ];
 
-        testLoaderChain(this, loaders, { expectedDefinition: null });
+        return testLoaderChain(this, loaders, { expectedDefinition: null });
     });
 
     it('Aborts if a loadComponent call returns a value other than undefined', function() {
@@ -158,7 +147,7 @@ describe('Components: Loader registry', function() {
             loaderThatReturnsDefinition
         ];
 
-        testLoaderChain(this, loaders, { expectedDefinition: null });
+        return testLoaderChain(this, loaders, { expectedDefinition: null });
     });
 
     it('Ensures that the loading process completes asynchronously, even if the loader completed synchronously', function() {
@@ -167,14 +156,14 @@ describe('Components: Loader registry', function() {
 
         var wasAsync = false;
 
-        testLoaderChain(this, [loaderThatCompletesSynchronously], {
+        var loaderPromise = testLoaderChain(this, [loaderThatCompletesSynchronously], {
             expectedDefinition: testComponentDefinition,
-            done: function() {
-                expect(wasAsync).toBe(true);
-            }
         });
 
         wasAsync = true;
+        return loaderPromise.then(function() {
+            expect(wasAsync).toBe(true);
+        });
     });
 
     it('Supplies component definition synchronously if the "synchronous" flag is provided and the loader completes synchronously', function() {
@@ -245,7 +234,7 @@ describe('Components: Loader registry', function() {
 
         // Perform an initial load to prime the cache. Also verify it's set up to be async.
         var initialLoadWasAsync = false;
-        getComponentDefinition(testComponentName, function(initialDefinition) {
+        var initialDefinitionPromise = getComponentDefinition(testComponentName, function(initialDefinition) {
             expect(initialLoadWasAsync).toBe(true);
             expect(initialDefinition).toBe(testComponentDefinition);
 
@@ -259,6 +248,7 @@ describe('Components: Loader registry', function() {
             expect(cachedLoadWasSynchronous).toBe(true);
         });
         initialLoadWasAsync = true; // We verify that this line runs *before* the definition load completes above
+        return initialDefinitionPromise;
     });
 
     it('By default, contains only the default loader', function() {
@@ -282,35 +272,43 @@ describe('Components: Loader registry', function() {
 
         // Fetch the component definition, and see it's the right thing
         var definition1;
-        getComponentDefinition('some-component', function(definition) {
+        var cachePromise = getComponentDefinition('some-component', function(definition) {
             definition1 = definition;
             expect(definition1.createViewModel().isTheTestComponent).toBe(true);
         });
 
-        // Fetch it again, and see the definition was reused
-        getComponentDefinition('some-component', function(definition2) {
-            expect(definition2).toBe(definition1);
-        });
+        return cachePromise
+            .then(function(definition1Result) {
+                definition1 = definition1Result;
 
-        // See that requests for other component names don't reuse the same cache entry
-        getComponentDefinition('other-component', function(otherDefinition) {
-            expect(otherDefinition).not.toBe(definition1);
-            expect(otherDefinition.createViewModel().isTheOtherComponent).toBe(true);
-        });
-
-        // See we can choose to force a refresh by clearing a cache entry before fetching a definition.
-        // This facility probably won't be used by most applications, but it is helpful for tests.
-        runs(function() { ko.components.clearCachedDefinition('some-component'); });
-        getComponentDefinition('some-component', function(definition3) {
-            expect(definition3).not.toBe(definition1);
-            expect(definition3.createViewModel().isTheTestComponent).toBe(true);
-        });
-
-        // See that unregistering a component implicitly clears the cache entry too
-        runs(function() { ko.components.unregister('some-component'); });
-        getComponentDefinition('some-component', function(definition4) {
-            expect(definition4).toBe(null);
-        });
+                // Fetch it again, and see the definition was reused
+                return getComponentDefinition('some-component', function(definition2) {
+                    expect(definition2).toBe(definition1);
+                });
+            })
+            .then(function() {
+                // See that requests for other component names don't reuse the same cache entry
+                return getComponentDefinition('other-component', function(otherDefinition) {
+                    expect(otherDefinition).not.toBe(definition1);
+                    expect(otherDefinition.createViewModel().isTheOtherComponent).toBe(true);
+                });
+            })
+            .then(function() {
+                // See we can choose to force a refresh by clearing a cache entry before fetching a definition.
+                // This facility probably won't be used by most applications, but it is helpful for tests.
+                ko.components.clearCachedDefinition('some-component');
+                return getComponentDefinition('some-component', function(definition3) {
+                    expect(definition3).not.toBe(definition1);
+                    expect(definition3.createViewModel().isTheTestComponent).toBe(true);
+                });
+            })
+            .then(function() {
+                // See that unregistering a component implicitly clears the cache entry too
+                ko.components.unregister('some-component');
+                return getComponentDefinition('some-component', function(definition4) {
+                    expect(definition4).toBe(null);
+                });
+            });
     });
 
     it('Only commences a single loading process, even if multiple requests arrive before loading has completed', function() {
@@ -335,44 +333,52 @@ describe('Components: Loader registry', function() {
 
         // Even a little while later, the module hasn't yet loaded
         var definition2 = undefined;
-        waits(20);
-        runs(function() {
-            expect(definition1).toBe(undefined);
+        expect(definition1).toBe(undefined);
 
-            // ... but let's make a second request for the same module
-            ko.components.get(testComponentName, function(loadedDefinition) {
-                definition2 = loadedDefinition;
-            });
-
-            // This time there was no further request to the module loader
-            expect(requireCallLog.length).toBe(1);
+        // ... but let's make a second request for the same module
+        ko.components.get(testComponentName, function(loadedDefinition) {
+            definition2 = loadedDefinition;
         });
+
+        // This time there was no further request to the module loader
+        expect(requireCallLog.length).toBe(1);
 
         // And when the loading eventually completes, both requests are satisfied with the same definition
-        waitsFor(function() { return definition1 }, 300);
-        runs(function() {
-            expect(definition1.template).toBe(someModuleTemplate);
-            expect(definition2).toBe(definition1);
-        });
+        return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                try {
+                    expect(definition1).toBeDefined();
+                    expect(definition1.template).toBe(someModuleTemplate);
+                    expect(definition2).toBe(definition1);
 
-        // Subsequent requests also don't involve calls to the module loader
-        getComponentDefinition(testComponentName, function(definition3) {
-            expect(definition3).toBe(definition1);
-            expect(requireCallLog.length).toBe(1);
+                    // Subsequent requests also don't involve calls to the module loader
+                    getComponentDefinition(testComponentName, function(definition3) {
+                        expect(definition3).toBe(definition1);
+                        expect(requireCallLog.length).toBe(1);
+                    }).then(resolve, reject);
+                } catch (error) {
+                    reject(error);
+                }
+            }, 100);
         });
     });
 
     function getComponentDefinition(componentName, assertionCallback) {
-        var loadedDefinition,
-            hasCompleted = false;
-        runs(function() {
+        var hasCompleted = false;
+
+        return new Promise(function(resolve, reject) {
             ko.components.get(componentName, function(definition) {
-                loadedDefinition = definition;
                 hasCompleted = true;
+                try {
+                    if (assertionCallback) {
+                        assertionCallback(definition);
+                    }
+                    resolve(definition);
+                } catch (error) {
+                    reject(error);
+                }
             });
             expect(hasCompleted).toBe(false); // Should always complete asynchronously
         });
-        waitsFor(function() { return hasCompleted; });
-        runs(function() { assertionCallback(loadedDefinition); });
     }
 });

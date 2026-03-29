@@ -1,5 +1,5 @@
 describe('Binding: Text', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should assign the value to the node, HTML-encoding the value', function () {
         var model = { textProp: "'Val <with> \"special\" <i>characters</i>'" };

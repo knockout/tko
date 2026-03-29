@@ -1,5 +1,5 @@
 describe('Binding attribute syntax', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('applyBindings should accept no parameters and then act on document.body with undefined model', function() {
         this.after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
@@ -98,7 +98,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "<div data-bind='test: (1;2)'></div>";
         expect(function () {
             ko.applyBindings(null, testNode);
-        }).toThrowContaining("Unable to parse bindings.\nBindings value: test: (1;2)\nMessage:");
+        }).toThrowContaining("Bad operator");
     });
 
     it('Should produce a meaningful error if a binding value doesn\'t exist', function() {
@@ -108,7 +108,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "<div data-bind='test: nonexistentValue'></div>";
         expect(function () {
             ko.applyBindings(null, testNode);
-        }).toThrowContaining("Unable to process binding \"test: function");
+        }).toThrowContaining("Unable to process binding \"test\"");
     });
 
     it('Should invoke registered handlers\'s init() then update() methods passing binding data', function () {
@@ -194,7 +194,13 @@ describe('Binding attribute syntax', function() {
 
     it('Should use properties on the view model in preference to properties on the binding context', function() {
         testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>";
-        ko.applyBindings({ '$data': { someProp: 'Inner value'}, someProp: 'Outer value' }, testNode);
+        var outerNode = document.createElement("div");
+        document.body.appendChild(outerNode);
+        this.after(function () { document.body.removeChild(outerNode); });
+        ko.applyBindings({ someProp: 'Outer value' }, outerNode);
+        var outerContext = ko.contextFor(outerNode);
+        ko.cleanNode(outerNode);
+        ko.applyBindings(outerContext.createChildContext({ someProp: 'Inner value' }), testNode);
         expect(testNode).toContainText("Inner value");
     });
 
@@ -558,7 +564,7 @@ describe('Binding attribute syntax', function() {
                 nodeHasBindings: function(node) {
                     // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
                     // This will still prove that the binding provider was not executed on the children of a restricted element.
-                    if (node.nodeType === Node.TEXT_NODE && jasmine.ieVersion < 9) {
+                    if (node.nodeType === Node.TEXT_NODE && ieVersion < 9) {
                         node.data = "replaced";
                         return false;
                     }

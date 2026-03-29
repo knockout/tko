@@ -62,16 +62,8 @@ Make targets (they include `tools/build.mk`).
 Use Mocha/Chai/Sinon for repository tests.
 
 Do not:
-- add `bun:test` imports to repository specs
 - split shared specs into runner-specific versions while they still need to run
   in the browser harness
-
-When modernizing older tests:
-- replace helper patterns like `runs`, `waitsFor`, `this.after`,
-  `this.restoreAfter`, and `jasmine.prepareTestNode` with explicit
-  Mocha/Sinon-based setup
-- preserve browser execution for converted specs until Playwright replaces that
-  coverage
 
 ## Code Style
 

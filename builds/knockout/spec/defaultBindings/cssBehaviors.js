@@ -1,6 +1,6 @@
 
 describe('Binding: CSS classes', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should give the element the specific CSS class only when the specified value is true', function () {
         var observable1 = new ko.observable();

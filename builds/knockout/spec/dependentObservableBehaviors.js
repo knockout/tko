@@ -423,17 +423,17 @@ describe('Dependent Observable', function() {
         var data = ko.observable('A'),
             computed = ko.computed({ read: data, deferEvaluation: true });
 
-        var notifySpy = jasmine.createSpy('notifySpy');
+        var notifySpy = createSpy();
         computed.subscribe(notifySpy, null, 'awake');
 
         expect(notifySpy).not.toHaveBeenCalled();
 
         expect(computed()).toEqual('A');
         expect(notifySpy).toHaveBeenCalledWith('A');
-        expect(notifySpy.calls.length).toBe(1);
+        expect(notifySpy.callCount).toEqual(1);
 
         // Subscribing or updating data shouldn't trigger any more notifications
-        notifySpy.reset();
+        notifySpy.resetHistory();
         computed.subscribe(function() {});
         data('B');
         computed();
@@ -590,7 +590,7 @@ describe('Dependent Observable', function() {
 
     it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
         // On unsupported browsers, there's nothing to test
-        if (!jasmine.browserSupportsProtoAssignment) {
+        if (!browserSupportsProtoAssignment) {
             return;
         }
 

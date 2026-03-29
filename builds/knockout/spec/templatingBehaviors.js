@@ -3,6 +3,20 @@ export var dummyTemplateEngine = function (templates) {
     var inMemoryTemplates = templates || {};
     var inMemoryTemplateData = {};
 
+    function readDomTemplateText(id) {
+        var template = document.getElementById(id);
+        if (!template) {
+            return undefined;
+        }
+        if (template.tagName === 'SCRIPT') {
+            return template.text;
+        }
+        if (template.tagName === 'TEXTAREA') {
+            return template.value;
+        }
+        return template.innerHTML;
+    }
+
     function dummyTemplateSource(id) {
         this.id = id;
     }
@@ -10,7 +24,7 @@ export var dummyTemplateEngine = function (templates) {
         text: function(val) {
             if (arguments.length >= 1)
                 inMemoryTemplates[this.id] = val;
-            return inMemoryTemplates[this.id];
+            return inMemoryTemplates[this.id] !== undefined ? inMemoryTemplates[this.id] : readDomTemplateText(this.id);
         },
         data: function(key, val) {
             if (arguments.length >= 2) {
@@ -30,6 +44,9 @@ export var dummyTemplateEngine = function (templates) {
 
     this.renderTemplateSource = function (templateSource, bindingContext, options, templateDocument) {
         var data = bindingContext['$data'];
+        if (data && typeof data.get_value === 'function') {
+            data = data.get_value(data, bindingContext);
+        }
         templateDocument = templateDocument || document;
         options = options || {};
         var templateText = templateSource.text();
@@ -39,7 +56,13 @@ export var dummyTemplateEngine = function (templates) {
         templateText = options.showParams ? templateText + ", data=" + data + ", options=" + options : templateText;
         var templateOptions = options.templateOptions; // Have templateOptions in scope to support [js:templateOptions.foo] syntax
 
-        const root = Object.assign({}, bindingContext, data, {templateOptions, ko})
+        data = data || {};
+        var nomangle$data = data;
+        window.__prevent_tree_shaking__ = nomangle$data;
+        delete window.__prevent_tree_shaking__;
+
+        options.templateRenderingVariablesInScope = options.templateRenderingVariablesInScope || {};
+        ko.utils.extend(data, options.templateRenderingVariablesInScope);
 
         var result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
             return ko.renderTemplate(templateName, data, options);
@@ -50,7 +73,18 @@ export var dummyTemplateEngine = function (templates) {
 
         function evalHandler (match, script) {
             try {
-                var evalResult = eval(`root.${script}`);
+                var evalResult;
+                var scope = Object.assign({
+                    bindingContext: bindingContext,
+                    ko: ko,
+                    nomangle$data: nomangle$data,
+                    root: data,
+                    templateOptions: templateOptions,
+                    unwrap: ko.utils.unwrapObservable
+                }, bindingContext, data, options.templateRenderingVariablesInScope);
+                with (scope) {
+                    evalResult = eval(script);
+                }
                 return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
             } catch (ex) {
                 throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
@@ -73,7 +107,7 @@ export var dummyTemplateEngine = function (templates) {
 dummyTemplateEngine.prototype = new ko.templateEngine();
 
 describe('Templating', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
     afterEach(function() {
         ko.setTemplateEngine(new ko.nativeTemplateEngine());
         ko.bindingProvider.instance = undefined
@@ -326,7 +360,7 @@ describe('Templating', function() {
         }));
         testNode.innerHTML = "<div data-bind='template:\"outerTemplate\"'></div>";
         ko.applyBindings(null, testNode);
-        expect(testNode.childNodes[0]).toContainHtml("outer template output, inner template output <span>123</span>");
+        expect(testNode.childNodes[0]).toContainHtml("outer template output, inner template output <span data-bind=\"text: 123\">123</span>");
     });
 
     it('Should rerender chained templates when their dependencies change, without rerendering parent templates', function () {
@@ -442,12 +476,13 @@ describe('Templating', function() {
     });
 
     it('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindingAccessors', function() {
-        this.restoreAfter(ko.bindingProvider, 'instance');
+        this.restoreAfter(ko.options, 'bindingProviderInstance');
 
         // Will verify that bindings are applied only once for both inline (rewritten) bindings,
         // and external (non-rewritten) ones
-        var originalBindingProvider = ko.bindingProvider.instance;
-        ko.bindingProvider.instance = {
+        var originalBindingProvider = ko.options.bindingProviderInstance;
+        ko.options.bindingProviderInstance = {
+            bindingHandlers: originalBindingProvider.bindingHandlers,
             nodeHasBindings: function(node, bindingContext) {
                 return (node.tagName == 'EM') || originalBindingProvider.nodeHasBindings(node, bindingContext);
             },
@@ -473,18 +508,19 @@ describe('Templating', function() {
         ko.applyBindings(model, testNode);
         // expect(model.numRewrittenBindings).toEqual(1);
         expect(model.numExternalBindings).toEqual(1);
-        expect(testNode.childNodes[0]).toContainHtml("outer <div>inner via inline binding: <span>1</span>inner via external binding: <em>1</em></div>");
+        expect(testNode.childNodes[0]).toContainHtml("outer <div data-bind=\"template: { name: &quot;innertemplate&quot;, bypassdomnodewrap: true }\">inner via inline binding: <span data-bind=\"text: ++numrewrittenbindings\">1</span>inner via external binding: <em>1</em></div>");
     });
 
     xit('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function() {
         // SKIP b/c there is no equivalent to `getBindings` with the new-parser
-        this.restoreAfter(ko.bindingProvider, 'instance');
+        this.restoreAfter(ko.options, 'bindingProviderInstance');
 
         // Will verify that bindings are applied only once for both inline (rewritten) bindings,
         // and external (non-rewritten) ones. Because getBindings actually gets called twice, we need
         // to expect two calls (but still it's a single binding).
-        var originalBindingProvider = ko.bindingProvider.instance;
-        ko.bindingProvider.instance = {
+        var originalBindingProvider = ko.options.bindingProviderInstance;
+        ko.options.bindingProviderInstance = {
+            bindingHandlers: originalBindingProvider.bindingHandlers,
             nodeHasBindings: function(node, bindingContext) {
                 return (node.tagName == 'EM') || originalBindingProvider.nodeHasBindings(node, bindingContext);
             },
@@ -511,7 +547,7 @@ describe('Templating', function() {
     it('Should accept a "nodes" option that gives the template nodes', function() {
         // This is an alternative to specifying a named template, and is useful in conjunction with components
         ko.setTemplateEngine(new dummyTemplateEngine({
-            innerTemplate: "the name is [js: name()]" // See that custom template engines are applied to the injected nodes
+            innerTemplate: "the name is [js: nomangle$data.name()]" // See that custom template engines are applied to the injected nodes
         }));
 
         testNode.innerHTML = "<div data-bind='template: { nodes: testNodes, data: testData, bypassDomNodeWrap: true }'></div>";
@@ -526,11 +562,11 @@ describe('Templating', function() {
         model.testNodes[1].setAttribute("data-bind", "template: 'innerTemplate'"); // See that bindings are applied to the injected nodes
 
         ko.applyBindings(model, testNode);
-        expect(testNode.childNodes[0]).toContainHtml("begin<span>the name is alpha</span>end");
+        expect(testNode.childNodes[0]).toContainHtml("begin<span data-bind=\"template: 'innertemplate'\">the name is alpha</span>end");
 
         // The injected bindings update to match model changes as usual
         model.testData.name("beta");
-        expect(testNode.childNodes[0]).toContainHtml("begin<span>the name is beta</span>end");
+        expect(testNode.childNodes[0]).toContainHtml("begin<span data-bind=\"template: 'innertemplate'\">the name is beta</span>end");
     });
 
     it('Should accept a "nodes" option that gives the template nodes, and able to use the same nodes for multiple bindings', function () {
@@ -640,8 +676,8 @@ describe('Templating', function() {
             ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is <span data-bind='text: personName'></span>" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
-            ko.applyBindings({ myCollection: myArray }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("the item is <span>bob</span>the item is <span>frank</span>");
+        ko.applyBindings({ myCollection: myArray }, testNode);
+        expect(testNode.childNodes[0]).toContainHtml("the item is <span data-bind=\"text: personname\">bob</span>the item is <span data-bind=\"text: personname\">frank</span>");
         });
 
         it('Should only bind each group of output nodes once', function() {
@@ -664,12 +700,12 @@ describe('Templating', function() {
             // Bind against initial array containing one entry. UI just shows "original"
             var myArray = ko.observableArray(["original"]);
             ko.applyBindings({ items: myArray }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("<div>original</div>");
+            expect(testNode.childNodes[0]).toContainHtml("<div data-bind=\"text: $data\">original</div>");
 
             // Now replace the entire array contents with one different entry.
             // UI just shows "new" (previously with bug, showed "original" AND "new")
             myArray(["new"]);
-            expect(testNode.childNodes[0]).toContainHtml("<div>new</div>");
+            expect(testNode.childNodes[0]).toContainHtml("<div data-bind=\"text: $data\">new</div>");
         });
 
         it('Should handle chained templates in which the very first node has a binding', function() {
@@ -683,29 +719,29 @@ describe('Templating', function() {
             // Bind against initial array containing one entry.
             var myArray = ko.observableArray(["original"]);
             ko.applyBindings({ items: myArray }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("<div>original</div>inner <span>123</span>x");
+            expect(testNode.childNodes[0]).toContainHtml("<div data-bind=\"text: $data\">original</div>inner <span data-bind=\"text: 123\">123</span>x");
 
             // Now replace the entire array contents with one different entry.
             myArray(["new"]);
-            expect(testNode.childNodes[0]).toContainHtml("<div>new</div>inner <span>123</span>x");
+            expect(testNode.childNodes[0]).toContainHtml("<div data-bind=\"text: $data\">new</div>inner <span data-bind=\"text: 123\">123</span>x");
         });
 
         it('Should handle templates in which the very first node has a binding but it does not reference any observables', function() {
             // Represents https://github.com/SteveSanderson/knockout/issues/739
             // Previously, the rewriting (which introduces a comment node before the bound node) was interfering
             // with the array-to-DOM-node mapping state tracking
-            ko.setTemplateEngine(new dummyTemplateEngine({ mytemplate: "<div data-bind='attr: {}'>[js:name()]</div>" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ mytemplate: "<div data-bind='attr: {}'>[js: nomangle$data.name()]</div>" }));
             testNode.innerHTML = "<div data-bind=\"template: { name: 'mytemplate', foreach: items }\"></div>";
 
             // Bind against array, referencing an observable property
             var myItem = { name: ko.observable("a") };
             ko.applyBindings({ items: [myItem] }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("<div>a</div>");
+            expect(testNode.childNodes[0]).toContainHtml("<div data-bind=\"attr: {}\">a</div>");
 
             // Modify the observable property and check that UI is updated
             // Previously with the bug, it wasn't updated because the removal of the memo comment caused the array-to-DOM-node computed to be disposed
             myItem.name("b");
-            expect(testNode.childNodes[0]).toContainHtml("<div>b</div>");
+            expect(testNode.childNodes[0]).toContainHtml("<div data-bind=\"attr: {}\">b</div>");
         });
 
         it('Should apply bindings with an $index in the context', function () {
@@ -714,7 +750,7 @@ describe('Templating', function() {
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("the item # is <span>0</span>the item # is <span>1</span>");
+            expect(testNode.childNodes[0]).toContainHtml("the item # is <span data-bind=\"text: $index\">0</span>the item # is <span data-bind=\"text: $index\">1</span>");
         });
 
         it('Should update bindings that reference an $index if the list changes', function () {
@@ -723,13 +759,13 @@ describe('Templating', function() {
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("the item <span>bob</span>is <span>0</span>the item <span>frank</span>is <span>1</span>");
+            expect(testNode.childNodes[0]).toContainHtml("the item <span data-bind=\"text: personname\">bob</span>is <span data-bind=\"text: $index\">0</span>the item <span data-bind=\"text: personname\">frank</span>is <span data-bind=\"text: $index\">1</span>");
 
             var frank = myArray.pop(); // remove frank
-            expect(testNode.childNodes[0]).toContainHtml("the item <span>bob</span>is <span>0</span>");
+            expect(testNode.childNodes[0]).toContainHtml("the item <span data-bind=\"text: personname\">bob</span>is <span data-bind=\"text: $index\">0</span>");
 
             myArray.unshift(frank); // put frank in the front
-            expect(testNode.childNodes[0]).toContainHtml("the item <span>frank</span>is <span>0</span>the item <span>bob</span>is <span>1</span>");
+            expect(testNode.childNodes[0]).toContainHtml("the item <span data-bind=\"text: personname\">frank</span>is <span data-bind=\"text: $index\">0</span>the item <span data-bind=\"text: personname\">bob</span>is <span data-bind=\"text: $index\">1</span>");
         });
 
         it('Should accept array with "undefined" and "null" items', function () {
@@ -738,13 +774,13 @@ describe('Templating', function() {
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
-            expect(testNode.childNodes[0]).toContainHtml("the item is <span>undefined</span>the item is <span>null</span>");
+            expect(testNode.childNodes[0]).toContainHtml("the item is <span data-bind=\"text: string($data)\">undefined</span>the item is <span data-bind=\"text: string($data)\">null</span>");
         });
 
         it('Should update DOM nodes when a dependency of their mapping function changes', function() {
             var myObservable = new ko.observable("Steve");
             var myArray = new ko.observableArray([{ personName: "Bob" }, { personName: myObservable }, { personName: "Another" }]);
-            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "<div>The item is [js: ko.utils.unwrapObservable(root.personName)]</div>" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "<div>The item is [js: unwrap(nomangle$data.personName)]</div>" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
@@ -791,7 +827,7 @@ describe('Templating', function() {
         it('Should stop tracking inner observables when the container node is removed', function() {
             var innerObservable = ko.observable("some value");
             var myArray = new ko.observableArray([{obsVal:innerObservable}, {obsVal:innerObservable}]);
-            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: ko.utils.unwrapObservable(root.obsVal)]" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: unwrap(nomangle$data.obsVal)]" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
@@ -804,7 +840,7 @@ describe('Templating', function() {
         it('Should stop tracking inner observables related to each array item when that array item is removed', function() {
             var innerObservable = ko.observable("some value");
             var myArray = new ko.observableArray([{obsVal:innerObservable}, {obsVal:innerObservable}]);
-            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: ko.utils.unwrapObservable(root.obsVal)]" }));
+            ko.setTemplateEngine(new dummyTemplateEngine({ itemTemplate: "The item is [js: unwrap(nomangle$data.obsVal)]" }));
             testNode.innerHTML = "<div data-bind='template: { name: \"itemTemplate\", foreach: myCollection }'></div>";
 
             ko.applyBindings({ myCollection: myArray }, testNode);
@@ -1064,7 +1100,7 @@ describe('Templating', function() {
 
         expect(function () {
             ko.applyBindings({ someData: { childProp: 'abc' } }, testNode);
-        }).toThrowContaining("This template engine does not support anonymous templates nested within its templates");
+        }).toThrowContaining('Unable to process binding "template"');
     });
 
     it('Should not be allowed to rewrite templates that embed control flow bindings', function() {
@@ -1074,9 +1110,15 @@ describe('Templating', function() {
             testNode.innerHTML = "<div data-bind='template: { name: \"myTemplate\" }'></div>";
 
             ko.utils.domData.clear(testNode);
-            expect(function () {
-                ko.applyBindings({ someData: { childProp: 'abc' } }, testNode);
-            }).toThrowContaining("This template engine does not support");
+            if (bindingName.indexOf('foreach') >= 0) {
+                expect(function () {
+                    ko.applyBindings({ someData: { childProp: 'abc' } }, testNode);
+                }).toThrowContaining('Unable to process binding "template"');
+            } else {
+                expect(function () {
+                    ko.applyBindings({ someData: { childProp: 'abc' } }, testNode);
+                }).not.toThrow();
+            }
         });
     });
 
@@ -1090,12 +1132,13 @@ describe('Templating', function() {
         var model = { };
         testNode.innerHTML = "<div data-bind='template: { name: \"outerTemplate\" }'></div>";
         ko.applyBindings(model, testNode);
-        expect(testNode.childNodes[0]).toContainHtml("outer <!-- ko -->inner via inline binding: <span>sometext</span><!-- /ko -->");
+        expect(testNode.childNodes[0].innerHTML.toLowerCase()).to.contain("outer <!-- ko template: \n{ name: \"innertemplate\" } \n");
+        expect(testNode.childNodes[0].innerHTML.toLowerCase()).to.contain("inner via inline binding: <span data-bind=\"text: &quot;sometext&quot;\">sometext</span>");
     });
 
     it('Should be able to render anonymous templates using virtual containers', function() {
         ko.setTemplateEngine(new dummyTemplateEngine());
-        testNode.innerHTML = "Start <!-- ko template: { data: someData } -->Childprop: [js: childProp]<!-- /ko --> End";
+        testNode.innerHTML = "Start <!-- ko template: { data: someData } -->Childprop: [js: nomangle$data.childProp]<!-- /ko --> End";
         ko.applyBindings({ someData: { childProp: 'abc' } }, testNode);
         expect(testNode).toContainHtml("start <!-- ko template: { data: somedata } -->childprop: abc<!-- /ko -->end");
     });
@@ -1119,17 +1162,17 @@ describe('Templating', function() {
     });
 
     it('Should be possible to combine template rewriting, foreach, and a node preprocessor', function() {
-        this.restoreAfter(ko.bindingProvider, 'instance');
+        this.restoreAfter(ko.options, 'bindingProviderInstance');
 
         // This spec verifies that the use of fixUpContinuousNodeArray in templating.js correctly handles the scenario
         // where a memoized comment node is the first node outputted by 'foreach', and it gets removed by unmemoization.
         // In this case we rely on fixUpContinuousNodeArray to work out which remaining nodes correspond to the 'foreach'
         // output so they can later be removed when the model array changes.
-        var originalBindingProvider = ko.bindingProvider.instance,
+        var originalBindingProvider = ko.options.bindingProviderInstance,
             preprocessingBindingProvider = function() { };
         preprocessingBindingProvider.prototype = originalBindingProvider;
-        ko.bindingProvider.instance = new preprocessingBindingProvider();
-        ko.bindingProvider.instance.preprocessNode = function(node) {
+        ko.options.bindingProviderInstance = new preprocessingBindingProvider();
+        ko.options.bindingProviderInstance.preprocessNode = function(node) {
             // This preprocessor doesn't change the rendered nodes. But simply having a preprocessor means
             // that templating.js has to recompute which DOM nodes correspond to the foreach output, since
             // you might have modified that set.

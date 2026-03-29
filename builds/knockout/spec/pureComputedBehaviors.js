@@ -183,7 +183,7 @@ describe('Pure Computed', function() {
         var data = ko.observable('A'),
             computed = ko.pureComputed(data);
 
-        var notifySpy = jasmine.createSpy('notifySpy');
+        var notifySpy = createSpy();
         computed.subscribe(notifySpy.bind(null, 'awake'), null, 'awake');
         computed.subscribe(notifySpy.bind(null, 'asleep'), null, 'asleep');
 
@@ -195,7 +195,7 @@ describe('Pure Computed', function() {
         expect(notifySpy.argsForCall).toEqual([ ['awake', 'A'] ]);
         expect(data.getSubscriptionsCount()).toEqual(1);
 
-        notifySpy.reset();
+        notifySpy.resetHistory();
         data('B');
         expect(notifySpy).not.toHaveBeenCalled();
 

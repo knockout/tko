@@ -1,13 +1,33 @@
+function createSpy() {
+    var spy = sinon.stub();
+    Object.defineProperties(spy, {
+        calls: {
+            get: function() {
+                return spy.getCalls();
+            }
+        },
+        argsForCall: {
+            get: function() {
+                return spy.getCalls().map(function(call) { return call.args; });
+            }
+        }
+    });
+    spy.reset = spy.resetHistory.bind(spy);
+    spy.andCallFake = spy.callsFake.bind(spy);
+    spy.andReturn = spy.returns.bind(spy);
+    return spy;
+}
+
 describe("Deferred bindings", function() {
     var bindingSpy;
 
     beforeEach(function() {
-        jasmine.prepareTestNode();
-        jasmine.Clock.useMockForTasks();
+        prepareTestNode();
+        Clock.useMockForTasks();
 
         ko.options.deferUpdates = true;
 
-        bindingSpy = jasmine.createSpy('bindingSpy');
+        bindingSpy = createSpy('bindingSpy');
         ko.bindingHandlers.test = {
             init: function (element, valueAccessor) { bindingSpy('init', ko.unwrap(valueAccessor())); },
             update: function (element, valueAccessor) { bindingSpy('update', ko.unwrap(valueAccessor())); }
@@ -15,7 +35,7 @@ describe("Deferred bindings", function() {
     });
     afterEach(function() {
         expect(ko.tasks.resetForTesting()).toEqual(0);
-        jasmine.Clock.reset();
+        Clock.reset();
         ko.options.deferUpdates = false;
         bindingSpy = ko.bindingHandlers.test = null;
     });
@@ -37,7 +57,7 @@ describe("Deferred bindings", function() {
         observable('C');
         expect(bindingSpy).not.toHaveBeenCalled();
 
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         // Only the latest value is notified
         expect(bindingSpy.argsForCall).toEqual([ ['update', 'C'] ]);
     });
@@ -58,7 +78,7 @@ describe("Deferred bindings", function() {
         observable('C');
         expect(bindingSpy).not.toHaveBeenCalled();
 
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         // only the latest value should be used
         expect(bindingSpy.argsForCall).toEqual([ ['init', 'C'], ['update', 'C'] ]);
     });
@@ -79,7 +99,7 @@ describe("Deferred bindings", function() {
         observable(["A", "C"]);
         expect(bindingSpy).not.toHaveBeenCalled();
 
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         // only the latest value should be used ("C" added but not "B")
         expect(bindingSpy.argsForCall).toEqual([ ['init', 'C'], ['update', 'C'] ]);
 
@@ -91,7 +111,7 @@ describe("Deferred bindings", function() {
 
         var nodeA = testNode.childNodes[0].childNodes[0],
             nodeB = testNode.childNodes[0].childNodes[1];
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(bindingSpy).not.toHaveBeenCalled();
         expect(testNode.childNodes[0].childNodes[0]).toBe(nodeB);
         expect(testNode.childNodes[0].childNodes[1]).toBe(nodeA);
@@ -121,7 +141,7 @@ describe("Deferred bindings", function() {
         ko.tasks.runEarly();
         someItems.splice(targetIndex, 0, item);
 
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainHtml('<span data-bind="text: childprop">moving child</span><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>');
         expect(testNode.childNodes[0].childNodes[targetIndex]).not.toBe(itemNode);    // node was created anew so it's not the same
     });
@@ -139,15 +159,15 @@ describe("Deferred bindings", function() {
         expect(testNode.childNodes[0]).toContainHtml('');
 
         value(1);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>');
 
         value(0);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainHtml('');
 
         value(1);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: status">ok</div>');
     });
 
@@ -161,17 +181,17 @@ describe("Deferred bindings", function() {
         };
 
         ko.applyBindings(vm, testNode);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainText('');
 
         vm.street('my street');
         vm.streetNumber('123');
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainText('123my street');
 
         vm.street(null);
         vm.streetNumber(null);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainText('');
     });
 
@@ -185,17 +205,17 @@ describe("Deferred bindings", function() {
         };
 
         ko.applyBindings(vm, testNode);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainText('');
 
         vm.street('my street');
         vm.streetNumber('123');
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainText('123my street');
 
         vm.street(null);
         vm.streetNumber(null);
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0]).toContainText('');
     });
 
@@ -212,7 +232,7 @@ describe("Deferred bindings", function() {
 
         // Change the value to a different truthy value; see the previous SPAN remains
         someItem('different truthy value');
-        jasmine.Clock.tick(1);
+        Clock.tick(1);
         expect(testNode.childNodes[0].childNodes[0].tagName.toLowerCase()).toEqual("span");
         expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode);
         expect(testNode).toContainText("1");

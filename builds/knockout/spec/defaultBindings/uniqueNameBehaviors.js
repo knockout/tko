@@ -1,5 +1,5 @@
 describe('Binding: Unique Name', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should apply a different name to each element', function () {
         testNode.innerHTML = "<div data-bind='uniqueName: true'></div><div data-bind='uniqueName: true'></div>";

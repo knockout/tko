@@ -1,5 +1,25 @@
+function createSpy() {
+    var spy = sinon.stub();
+    Object.defineProperties(spy, {
+        calls: {
+            get: function() {
+                return spy.getCalls();
+            }
+        },
+        argsForCall: {
+            get: function() {
+                return spy.getCalls().map(function(call) { return call.args; });
+            }
+        }
+    });
+    spy.reset = spy.resetHistory.bind(spy);
+    spy.andCallFake = spy.callsFake.bind(spy);
+    spy.andReturn = spy.returns.bind(spy);
+    return spy;
+}
+
 describe('Binding dependencies', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('If the binding handler depends on an observable, invokes the init handler once and the update handler whenever a new value is available', function () {
         var observable = new ko.observable();
@@ -301,8 +321,8 @@ describe('Binding dependencies', function() {
             }
         };
 
-        var callbackSpy1 = jasmine.createSpy('callbackSpy1'),
-            callbackSpy2 = jasmine.createSpy('callbackSpy2'),
+        var callbackSpy1 = createSpy('callbackSpy1'),
+            callbackSpy2 = createSpy('callbackSpy2'),
             vm = {
                 observable: ko.observable('value'),
                 callback: callbackSpy1

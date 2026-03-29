@@ -11,7 +11,7 @@ describe('Native template engine', function() {
         return resultNode;
     }
 
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     describe('Named templates', function () {
         function testRenderTemplate(templateElem, templateElemId, templateElementProp) {

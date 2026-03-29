@@ -1,6 +1,6 @@
 
 describe('Dependent Observable DOM', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should register DOM node disposal callback only if active after the initial evaluation', function() {
         // Set up an active one

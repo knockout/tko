@@ -1,5 +1,5 @@
 describe('Binding: TextInput', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should assign the value to the node', function () {
         testNode.innerHTML = "<input data-bind='textInput:123' />";
@@ -187,23 +187,29 @@ describe('Binding: TextInput', function() {
         expect(originalSubproperty()).toEqual("original value");
     });
 
-    it('Should update observable on input event (on supported browsers) or propertychange event (on old IE)', function () {
+    it('Should update observable on input event (on supported browsers) or propertychange event (on old IE)', function (done) {
         var myobservable = new ko.observable(123);
         testNode.innerHTML = "<input data-bind='textInput: someProp' />";
         ko.applyBindings({ someProp: myobservable }, testNode);
         expect(testNode.childNodes[0].value).toEqual("123");
 
         testNode.childNodes[0].value = "some user-entered value";   // setting the value triggers the propertychange event on IE
-        if (!jasmine.ieVersion || jasmine.ieVersion >= 9) {
+        if (!ieVersion || ieVersion >= 9) {
             ko.utils.triggerEvent(testNode.childNodes[0], "input");
         }
-        if (jasmine.ieVersion === 9) {
+        if (ieVersion === 9) {
             // IE 9 responds to the event asynchronously (see #1788)
-            waitsFor(function () {
-                return myobservable() === "some user-entered value";
+            setTimeout(function () {
+                try {
+                    expect(myobservable()).toEqual("some user-entered value");
+                    done();
+                } catch (error) {
+                    done(error);
+                }
             }, 50);
         } else {
             expect(myobservable()).toEqual("some user-entered value");
+            done();
         }
     });
 
@@ -268,7 +274,7 @@ describe('Binding: TextInput', function() {
             beforeEach(function() {
                 this.restoreAfter(ko.bindingHandlers.textInput, '_forceUpdateOn');
                 ko.bindingHandlers.textInput._forceUpdateOn = ['afterkeydown'];
-                jasmine.Clock.useMock();
+                Clock.useMock();
             });
 
             it('Should update observable asynchronously', function () {
@@ -279,7 +285,7 @@ describe('Binding: TextInput', function() {
                 testNode.childNodes[0].value = "some user-entered value";
                 expect(myobservable()).toEqual("123");  // observable is not changed yet
 
-                jasmine.Clock.tick(20);
+                Clock.tick(20);
                 expect(myobservable()).toEqual("some user-entered value");  // it's changed after a delay
             });
 
@@ -295,7 +301,7 @@ describe('Binding: TextInput', function() {
                 expect(testNode.childNodes[0].value).toEqual("some user-entered value");
 
                 // Observable is updated to new element value
-                jasmine.Clock.tick(20);
+                Clock.tick(20);
                 expect(myobservable()).toEqual("some user-entered value");
             });
 
@@ -311,7 +317,7 @@ describe('Binding: TextInput', function() {
                 expect(testNode.childNodes[0].value).toEqual("some value from the server");
 
                 // New value remains when event is processed
-                jasmine.Clock.tick(20);
+                Clock.tick(20);
                 expect(myobservable()).toEqual("some value from the server");
             });
 
@@ -328,7 +334,7 @@ describe('Binding: TextInput', function() {
 
                 // even after a delay, the keydown event isn't processed
                 model.someProp = undefined;
-                jasmine.Clock.tick(20);
+                Clock.tick(20);
                 expect(model.someProp).toBeUndefined();
                 expect(testNode.childNodes[0]._ko_textInputProcessedEvent).toEqual("change");
             });

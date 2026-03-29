@@ -1,5 +1,5 @@
 describe('Binding: Attr', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should be able to set arbitrary attribute values', function() {
         var model = { myValue: "first value" };
@@ -39,7 +39,7 @@ describe('Binding: Attr', function() {
         ko.applyBindings({ myValue: myValue }, testNode);
         expect(testNode.childNodes[0].name).toEqual("myName");
         if (testNode.childNodes[0].outerHTML) { // Old Firefox doesn't support outerHTML
-            expect(testNode.childNodes[0].outerHTML).toMatch('name="?myName"?');
+            expect(testNode.childNodes[0].outerHTML).to.match(/name="?myName"?/)
         }
         expect(testNode.childNodes[0].getAttribute("name")).toEqual("myName");
 
@@ -47,7 +47,7 @@ describe('Binding: Attr', function() {
         myValue(false);
         expect(testNode.childNodes[0].name).toEqual("");
         if (testNode.childNodes[0].outerHTML) { // Old Firefox doesn't support outerHTML
-            expect(testNode.childNodes[0].outerHTML).toNotMatch('name="?([^">]+)');
+            expect(testNode.childNodes[0].outerHTML).to.not.match(/name="?([^">]+)/)
         }
         expect(testNode.childNodes[0].getAttribute("name")).toEqual("");
 
@@ -55,7 +55,7 @@ describe('Binding: Attr', function() {
         myValue("<A name with special &'\" chars>");
         expect(testNode.childNodes[0].name).toEqual("<A name with special &'\" chars>");
         if (testNode.childNodes[0].outerHTML) { // Old Firefox doesn't support outerHTML
-            expect(testNode.childNodes[0].outerHTML).toMatch('name="?(<|&lt;)A name with special &amp;\'&quot; chars(>|&gt;)"?');
+            expect(testNode.childNodes[0].outerHTML).to.match(/name="?(<|&lt;)A name with special &amp;'&quot; chars(>|&gt;)"?/)
         }
         expect(testNode.childNodes[0].getAttribute("name")).toEqual("<A name with special &'\" chars>");
     });

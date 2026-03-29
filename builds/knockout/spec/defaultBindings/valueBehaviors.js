@@ -1,5 +1,9 @@
 describe('Binding: Value', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
+
+    afterEach(function() {
+        Clock.reset();
+    });
 
     it('Should assign the value to the node', function () {
         testNode.innerHTML = "<input data-bind='value:123' />";
@@ -208,7 +212,7 @@ describe('Binding: Value', function() {
     });
 
     it('Should delay reading value and updating observable when prefixing an event with "after"', function () {
-        jasmine.Clock.useMock();
+        Clock.useMock();
 
         var myobservable = new ko.observable("123");
         testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />";
@@ -217,12 +221,12 @@ describe('Binding: Value', function() {
         testNode.childNodes[0].value = "some user-entered value";
         expect(myobservable()).toEqual("123");  // observable is not changed yet
 
-        jasmine.Clock.tick(20);
+        Clock.tick(20);
         expect(myobservable()).toEqual("some user-entered value");  // it's changed after a delay
     });
 
     it('Should ignore "unchanged" notifications from observable during delayed event processing', function () {
-        jasmine.Clock.useMock();
+        Clock.useMock();
 
         var myobservable = new ko.observable("123");
         testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />";
@@ -235,12 +239,12 @@ describe('Binding: Value', function() {
         expect(testNode.childNodes[0].value).toEqual("some user-entered value");
 
         // Observable is updated to new element value
-        jasmine.Clock.tick(20);
+        Clock.tick(20);
         expect(myobservable()).toEqual("some user-entered value");
     });
 
     it('Should not ignore actual change notifications from observable during delayed event processing', function () {
-        jasmine.Clock.useMock();
+        Clock.useMock();
 
         var myobservable = new ko.observable("123");
         testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"afterkeyup\"' />";
@@ -253,7 +257,7 @@ describe('Binding: Value', function() {
         expect(testNode.childNodes[0].value).toEqual("some value from the server");
 
         // New value remains when event is processed
-        jasmine.Clock.tick(20);
+        Clock.tick(20);
         expect(myobservable()).toEqual("some value from the server");
     });
 
@@ -261,7 +265,7 @@ describe('Binding: Value', function() {
         // This spec describes the awkward choreography of events needed to detect changes to text boxes on IE < 10,
         // because it doesn't fire regular "change" events when the user selects an autofill entry. It isn't applicable
         // on IE 10+ or other browsers, because they don't have that problem with autofill.
-        var isOldIE = jasmine.ieVersion && jasmine.ieVersion < 10;
+        var isOldIE = ieVersion && ieVersion < 10;
 
         if (isOldIE) {
             var myobservable = new ko.observable(123).extend({ notify: 'always' });
@@ -361,10 +365,9 @@ describe('Binding: Value', function() {
             expect(testNode.childNodes[0].selectedIndex).toEqual(0);
 
             // Also check that the selection doesn't change later (see https://github.com/knockout/knockout/issues/2218)
-            waits(10);
-            runs(function() {
-                expect(testNode.childNodes[0].selectedIndex).toEqual(0);
-            });
+            Clock.useMock();
+            Clock.tick(10);
+            expect(testNode.childNodes[0].selectedIndex).toEqual(0);
         });
 
         it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function() {
@@ -668,7 +671,7 @@ describe('Binding: Value', function() {
                 ko.applyBindings({ myObservable: observable, options: options }, testNode);
 
                 expect(testNode.childNodes[0].selectedIndex).toEqual(-1);
-                expect(observable()).toEqual(undefined);
+                expect(observable()).toEqual(null);
             });
         });
     });
