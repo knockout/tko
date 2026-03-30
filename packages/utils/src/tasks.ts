@@ -11,7 +11,34 @@ let taskQueue = new Array(),
   nextHandle = 1,
   nextIndexToProcess = 0
 
-options.taskScheduler = callback => queueMicrotask(callback)
+const schedulerGlobal = options.global
+
+if (schedulerGlobal && typeof schedulerGlobal.queueMicrotask === 'function') {
+  options.taskScheduler = callback => schedulerGlobal.queueMicrotask(callback)
+} else if (
+  schedulerGlobal &&
+  schedulerGlobal.MutationObserver &&
+  schedulerGlobal.document &&
+  !(schedulerGlobal.navigator && schedulerGlobal.navigator.standalone)
+) {
+  options.taskScheduler = (function () {
+    let scheduledCallback: null | (() => void) = null
+    let toggle = false
+    const div = schedulerGlobal.document.createElement('div')
+
+    new schedulerGlobal.MutationObserver(function () {
+      const callback = scheduledCallback
+      scheduledCallback = null
+      callback?.()
+    }).observe(div, { attributes: true })
+
+    return function (callback: () => void) {
+      scheduledCallback = callback
+      toggle = !toggle
+      div.setAttribute('data-task-scheduler', toggle ? '1' : '0')
+    }
+  })()
+}
 
 function processTasks() {
   if (taskQueueLength) {
