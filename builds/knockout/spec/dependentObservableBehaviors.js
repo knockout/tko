@@ -70,7 +70,7 @@ describe('Dependent Observable', function() {
         var someContainer = { depObs: instance };
         someContainer.depObs("some value");
         expect(invokedWriteWithValue).to.deep.equal("some value");
-        expect(invokedWriteWithThis).to.deep.equal(function(){return this;}.call()); // Since no owner was specified
+        expect(invokedWriteWithThis).to.equal(function(){return this;}.call()); // Since no owner was specified
     });
 
     it('Should be able to write to multiple computed properties on a model object using chaining syntax', function() {
@@ -112,7 +112,7 @@ describe('Dependent Observable', function() {
         expect(invokedWriteWithArgs[0]).to.deep.equal("first");
         expect(invokedWriteWithArgs[1]).to.deep.equal(2);
         expect(invokedWriteWithArgs[2]).to.deep.equal(["third1", "third2"]);
-        expect(invokedWriteWithThis).to.deep.equal(someOwner);
+        expect(invokedWriteWithThis).to.equal(someOwner);
     });
 
     it('Should use the second arg (evaluatorFunctionTarget) for "this" when calling read/write if no options.owner was given', function() {
@@ -124,8 +124,8 @@ describe('Dependent Observable', function() {
 
         instance("force invocation of write");
 
-        expect(actualReadThis).to.deep.equal(expectedThis);
-        expect(actualWriteThis).to.deep.equal(expectedThis);
+        expect(actualReadThis).to.equal(expectedThis);
+        expect(actualWriteThis).to.equal(expectedThis);
     });
 
     it('Should be able to pass evaluator function using "options" parameter called "read"', function() {

@@ -100,7 +100,7 @@ describe('BindingHandler behaviors', function () {
           this.subscribe(obs, this.cb)
         }
         cb() {
-        expect(this).to.equal(handlerInstance)
+          expect(this).to.equal(handlerInstance)
         }
       }
       testNode.innerHTML = "<i data-bind='fnHandler'></i>"

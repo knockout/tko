@@ -25,7 +25,12 @@ import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import { expectContainHtml, expectContainText, prepareTestNode, restoreAfter } from '../../utils/helpers/mocha-test-helpers'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter
+} from '../../utils/helpers/mocha-test-helpers'
 import { Provider } from '@tko/provider'
 
 describe('Binding attribute syntax', function () {
@@ -392,9 +397,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='test1: true, test2: true'></div>"
     expect(function () {
       applyBindings(null, testNode)
-    }).to.throw(
-      'Multiple bindings (test1 and test2) are trying to control descendant bindings of the same element.'
-    )
+    }).to.throw('Multiple bindings (test1 and test2) are trying to control descendant bindings of the same element.')
   })
 
   it('Should use properties on the view model in preference to properties on the binding context', function () {

@@ -55,17 +55,20 @@ export var dummyTemplateEngine = function (templates) {
 
         templateText = options.showParams ? templateText + ", data=" + data + ", options=" + options : templateText;
         var templateOptions = options.templateOptions; // Have templateOptions in scope to support [js:templateOptions.foo] syntax
-
-        data = data || {};
-        var nomangle$data = data;
+        var renderData = data == null ? {} : data;
+        var nomangle$data = renderData;
         window.__prevent_tree_shaking__ = nomangle$data;
         delete window.__prevent_tree_shaking__;
 
-        options.templateRenderingVariablesInScope = options.templateRenderingVariablesInScope || {};
-        ko.utils.extend(data, options.templateRenderingVariablesInScope);
+        var templateRenderingVariablesInScope = options.templateRenderingVariablesInScope || {};
+        var scopeData = {};
+        if (renderData && (typeof renderData === 'object' || typeof renderData === 'function')) {
+            ko.utils.extend(scopeData, renderData);
+        }
+        ko.utils.extend(scopeData, templateRenderingVariablesInScope);
 
         var result = templateText.replace(/\[renderTemplate\:(.*?)\]/g, function (match, templateName) {
-            return ko.renderTemplate(templateName, data, options);
+            return ko.renderTemplate(templateName, renderData, options);
         });
 
         result = result.replace(/\[\[js\:([\s\S]*?)\]\]/g, evalHandler);
@@ -78,10 +81,10 @@ export var dummyTemplateEngine = function (templates) {
                     bindingContext: bindingContext,
                     ko: ko,
                     nomangle$data: nomangle$data,
-                    root: data,
+                    root: renderData,
                     templateOptions: templateOptions,
                     unwrap: ko.utils.unwrapObservable
-                }, bindingContext, data, options.templateRenderingVariablesInScope);
+                }, bindingContext, scopeData);
                 with (scope) {
                     evalResult = eval(script);
                 }
