@@ -151,8 +151,8 @@ describe('Binding: Value', function() {
         expect(mySetter.set).to.deep.equal('668');
 
         // ['property']
-        testNode.childNodes[0].value = 669;
-        ko.utils.triggerEvent(testNode.childNodes[0], "change");
+        testNode.childNodes[2].value = 669;
+        ko.utils.triggerEvent(testNode.childNodes[2], "change");
         expect(mySetter.set).to.deep.equal('669');
     });
 

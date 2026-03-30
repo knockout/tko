@@ -61,12 +61,16 @@ describe('Deferred bindings', function () {
     }
   })
   afterEach(function () {
-    expect(tasks.resetForTesting()).to.equal(0)
-    while (cleanups.length) {
-      cleanups.pop()!()
+    const pendingTasks = tasks.resetForTesting()
+    try {
+      while (cleanups.length) {
+        cleanups.pop()!()
+      }
+    } finally {
+      clock.restore()
+      bindingSpy = bindingHandlers.test = null
     }
-    clock.restore()
-    bindingSpy = bindingHandlers.test = null
+    expect(pendingTasks).to.equal(0)
   })
 
   it('Should update bindings asynchronously', function () {
