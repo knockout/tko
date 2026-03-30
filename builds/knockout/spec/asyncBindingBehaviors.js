@@ -144,7 +144,7 @@ describe("Deferred bindings", function() {
             show = ko.pureComputed(function () { return value() > 0 && is1(); });
 
         ko.applyBindings({ status: status, show: show }, testNode);
-        expectContainText(testNode.childNodes[0], '');
+        expectContainHtml(testNode.childNodes[0], '');
 
         value(1);
         clock.tick(1);
