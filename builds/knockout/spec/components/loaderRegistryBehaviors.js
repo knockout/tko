@@ -57,6 +57,28 @@ describe('Components: Loader registry', function() {
                     }
                 });
             });
+        },
+        waitFor = function(condition, timeoutMs) {
+            timeoutMs = timeoutMs || 1000;
+            return new Promise(function(resolve, reject) {
+                var deadline = Date.now() + timeoutMs;
+
+                function poll() {
+                    if (condition()) {
+                        resolve();
+                        return;
+                    }
+
+                    if (Date.now() >= deadline) {
+                        reject(new Error('Timed out waiting for loader completion'));
+                        return;
+                    }
+
+                    setTimeout(poll, 1);
+                }
+
+                poll();
+            });
         };
 
     afterEach(function() {
@@ -344,22 +366,18 @@ describe('Components: Loader registry', function() {
         expect(requireCallLog.length).to.equal(1);
 
         // And when the loading eventually completes, both requests are satisfied with the same definition
-        return new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                try {
-                    expect(definition1).to.not.equal(undefined);
-                    expect(definition1.template).to.equal(someModuleTemplate);
-                    expect(definition2).to.equal(definition1);
+        return waitFor(function() {
+            return definition1 !== undefined && definition2 !== undefined;
+        }).then(function() {
+            expect(definition1).to.not.equal(undefined);
+            expect(definition1.template).to.equal(someModuleTemplate);
+            expect(definition2).to.equal(definition1);
 
-                    // Subsequent requests also don't involve calls to the module loader
-                    getComponentDefinition(testComponentName, function(definition3) {
-                        expect(definition3).to.equal(definition1);
-                        expect(requireCallLog.length).to.equal(1);
-                    }).then(resolve, reject);
-                } catch (error) {
-                    reject(error);
-                }
-            }, 100);
+            // Subsequent requests also don't involve calls to the module loader
+            return getComponentDefinition(testComponentName, function(definition3) {
+                expect(definition3).to.equal(definition1);
+                expect(requireCallLog.length).to.equal(1);
+            });
         });
     });
 
