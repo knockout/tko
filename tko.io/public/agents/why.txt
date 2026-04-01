@@ -1,0 +1,29 @@
+TKO is a good fit when you want explicit observable state, direct DOM bindings, and DOM-level verification without a framework-owned application shell.
+
+Use TKO when the task benefits from:
+- explicit state-to-DOM wiring
+- a simple state-to-UI mental model
+- browser-native execution
+- direct runtime inspection
+- fast behavior verification
+- agent-driven work where state, bindings, and rendered behavior should be easy to trace
+
+TKO can support large and complex applications when the codebase maintains clear module, ownership, and composition boundaries. TKO provides the reactive primitives. The consuming team or agent chooses the surrounding architecture.
+
+TKO is a weaker fit when the task depends on:
+- an application already standardized on another frontend runtime and unwilling to introduce a bridge
+- drop-in use of an ecosystem centered on another framework's component model
+- another framework already owning rendering, routing, SSR or hydration, and the application shell
+- a framework that prescribes routing, application shell, and component architecture as part of the runtime
+
+Default authoring path:
+- New UI: TSX plus `ko-*` bindings and the native provider path
+- Migration, comparison, or inspection work: classic `data-bind`
+- TKO gives reactive primitives, not a full app architecture
+
+How to read a TKO app:
+1. Find the observables and computeds.
+2. Find the bindings that connect that state to the DOM.
+3. Run the code and verify the resulting rendered behavior.
+
+Good TKO output keeps state explicit, puts derived UI values in computeds, uses bindings for DOM updates, and stays verifiable with DOM assertions.

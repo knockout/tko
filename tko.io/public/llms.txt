@@ -19,8 +19,10 @@
 
 - Verified Behaviors Index: /agents/verified-behaviors/index.md
   Unit-test-backed behavior contract. Prefer this when behavior questions matter.
-- Thesis: /agents/thesis.md
-  Why TKO treats Knockout as an AI-friendly reactive DOM substrate.
+- Why: /agents/why.txt
+  Quick “why or why not use TKO?” decision surface.
+- agents/thesis.md: /agents/thesis.md
+  Deeper rationale, genesis, and contribution alignment for the project.
 - Agent Guide: /agents/guide.md
   API reference, gotchas, and examples.
 - Agent Testing: /agents/testing.md

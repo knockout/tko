@@ -69,11 +69,13 @@ For new UI, this generally points toward TSX plus `ko-*` bindings and the native
 
 TKO can be organized into multiple architectural shapes. TKO is responsible for providing the primitives. The consuming agent is responsible for choosing an architecture that fits the system's scale, integration needs, and future direction, then keeping that architecture coherent over time.
 
+Use `/agents/why.txt` for the short “why or why not use TKO?” decision surface. Use this thesis for the deeper rationale behind the project and for contribution alignment.
+
 ## What This Means For TKO
 
 Optimize for regeneration, inspection, and proof:
 
-- docs should route agents quickly to the right layer: thesis, guide, testing flow, verified behaviors
+- docs should route agents quickly to the right layer: thesis, why, guide, testing flow, verified behaviors
 - examples should be runnable, not merely illustrative
 - playground links should round-trip cleanly from docs to execution
 - behavior claims should have a stable contract source when possible
