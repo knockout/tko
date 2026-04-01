@@ -26,6 +26,8 @@ roadmap for future automation work.
 - Public packages are still on `4.0.0-beta1.x`
 - There are currently no pending `.changeset/*.md` files to drive a stable bump
 - The docs site still describes TKO as a prerelease in `tko.io/src/content/docs/index.md`
+- Current preferred next step: run one more beta rehearsal release to validate
+  trusted publishing and provenance before the final stable `4.0.0` cut
 
 ---
 
@@ -166,6 +168,51 @@ Package-scope note:
   the main public entry points and confirm there is no package in the release
   set that was omitted from trusted publishing coverage
 
+### Recommended TKO path: beta provenance rehearsal
+
+For TKO specifically, the safest rehearsal path is:
+
+1. Cut one more beta release such as `4.0.0-beta1.8`
+2. Do the prerelease work from a dedicated release branch, not `main`
+3. Use Changesets prerelease mode with the `beta` tag
+4. Publish from GitHub Actions without `NPM_TOKEN` so OIDC is the only publish
+   path
+
+This follows the Changesets prerelease guidance more closely than trying to run
+prerelease mode directly from `main`. Changesets explicitly warns that doing
+prereleases from the default branch can complicate the repository state and
+block other changes until prerelease mode is exited.
+
+### Concrete beta rehearsal flow
+
+On a dedicated prerelease branch:
+
+1. Add the release changeset set for the intended beta release
+2. Enter prerelease mode with `npx changeset pre enter beta`
+3. Run `npx changeset version`
+4. Commit the resulting version and changelog changes, including
+   `.changeset/pre.json`
+5. Trigger a dedicated GitHub Actions publish workflow from that branch that:
+   - runs on a GitHub-hosted runner
+   - has `id-token: write`
+   - uses a recent enough Node/npm toolchain for trusted publishing
+   - does not pass `NPM_TOKEN` / `NODE_AUTH_TOKEN` to the publish command
+   - runs `npx changeset publish`
+
+Important note:
+
+- In Changesets prerelease mode, the prerelease tag is used both in the version
+  string and as the npm dist-tag, so the beta publish should land under the
+  `beta` tag rather than replacing `latest`
+
+After the rehearsal succeeds:
+
+1. Verify the beta package versions and provenance on npm
+2. Install the beta in a fresh test project and run smoke tests
+3. Exit prerelease mode with `npx changeset pre exit` when ready to prepare the
+   stable cut, or discard the prerelease branch if it was only used as a
+   rehearsal branch
+
 ### Rehearsal verification
 
 After the canary publish:
@@ -260,6 +307,7 @@ Optional hardening after the first successful trusted publish:
 ## Working Checklist
 
 - [ ] Decide whether the next cut is the final stable `4.0.0` or a rehearsal
+- [ ] Preferred path: run a `beta` provenance rehearsal before the final stable cut
 - [ ] Create the release changeset set for the intended packages
 - [ ] Remove or rewrite prerelease wording in the docs
 - [ ] Update agent-facing docs if public guidance changed
