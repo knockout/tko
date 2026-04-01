@@ -1,0 +1,16 @@
+# @tko/utils.component
+
+## 4.0.0
+
+### Patch Changes
+
+- Stabilize the full public TKO package set for the 4.0.0 release.
+- Updated dependencies
+  - @tko/bind@4.0.0
+  - @tko/binding.core@4.0.0
+  - @tko/computed@4.0.0
+  - @tko/lifecycle@4.0.0
+  - @tko/observable@4.0.0
+  - @tko/provider.multi@4.0.0
+  - @tko/provider.virtual@4.0.0
+  - @tko/utils@4.0.0
