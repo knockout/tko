@@ -126,15 +126,11 @@ This creates a changeset file in `.changeset/` that gets committed with your PR.
 1. Push to main triggers `.github/workflows/release.yml`
 2. If unreleased changesets exist, the action opens a "Version Packages" PR
 3. Review the PR (it bumps versions and updates changelogs)
-4. Merge it to publish to npm
+4. Merge it to publish to npm via GitHub Actions OIDC trusted publishing
 
-**Manual release** (fallback):
-```bash
-make repackage       # Sync package.json metadata across packages
-lerna version        # Bump versions (interactive)
-make                 # Rebuild everything
-lerna publish from-package  # Publish to npm
-```
+Avoid manual workstation publishes. If release CI is unavailable, fix the
+workflow or npm trusted publisher configuration rather than bypassing it with a
+long-lived publish token.
 
 ## Plans
 

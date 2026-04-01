@@ -54,7 +54,8 @@ It's available as `@tko/build.knockout`, and over CDN:
 | $ `make` | **Currently TKO use a make file** / no scripts at package.json |
 | $ `make test` | Run all tests with electron. See below. |
 | $ `make test-headless` | Run all tests with chromium. See below. |
-| $ `lerna publish` | Bump versions and publish to npm registry |
+| $ `npx changeset add` | Add a changeset for package behavior changes in your PR |
+| Release workflow | On merge to `main`, CI opens or updates a version PR; when that version PR is merged and there are no remaining changesets, CI publishes from GitHub Actions via npm trusted publishing |
 | $ `make test-coverage` | Run all tests and create a code coverage report |
 
 Checkout the `Makefile` for more commands that can be executed with `make {command}`.
