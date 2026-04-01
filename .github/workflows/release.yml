@@ -1,7 +1,7 @@
 # Automated release via Changesets.
 #
 # On push to main:
-#   - If there are unreleased changesets, opens/updates a "Version Packages"
+#   - If there are unreleased changesets, opens/updates a release version
 #     PR that bumps versions and updates changelogs.
 #   - If there are no unreleased changesets, builds, tests, and publishes
 #     to npm from a separate least-privilege job.
@@ -30,9 +30,11 @@ jobs:
 
     steps:
       - name: Checkout code
+        # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Node.js
+        # actions/setup-node v6.3.0
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           # npm trusted publishing requires npm CLI 11.5.1+, which is available
@@ -46,6 +48,7 @@ jobs:
 
       - name: Create or update version PR
         id: changesets
+        # changesets/action v1.5.3
         uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba
         with:
           version: npx changeset version
@@ -69,9 +72,11 @@ jobs:
 
     steps:
       - name: Checkout code
+        # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Node.js
+        # actions/setup-node v6.3.0
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           # npm trusted publishing requires npm CLI 11.5.1+, which is available
