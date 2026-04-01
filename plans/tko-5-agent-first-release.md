@@ -108,6 +108,7 @@ The migration posture should be documentation-first:
 - use before-and-after examples to show modern equivalents for legacy build choices and authoring patterns
 - keep migration help focused on guides, examples, and explicit support boundaries rather than on a long-lived compatibility layer
 - align the docs with that posture by treating `/4/` as the preserved TKO 4 reference and `/` as the v5 canonical path
+- clean up the npm package surface so deprecated or legacy package names clearly point users toward the canonical 5.0 path
 
 This keeps the release honest. The break is real, but the path forward is well lit.
 

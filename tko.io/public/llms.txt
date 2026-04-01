@@ -4,6 +4,9 @@
 > reactive data binding and UI templating with zero runtime dependencies. TKO
 > uniquely enables building complex UIs directly in the browser using TSX and
 > esbuild-wasm, with no local toolchain required.
+>
+> TKO treats Knockout as a reactive DOM substrate that is particularly well-suited
+> to AI-assisted authoring, verification, and rapid iteration.
 
 ## Quick Start
 
@@ -16,6 +19,8 @@
 
 - Verified Behaviors Index: /agents/verified-behaviors/index.md
   Unit-test-backed behavior contract. Prefer this when behavior questions matter.
+- Thesis: /agents/thesis.md
+  Why TKO treats Knockout as an AI-friendly reactive DOM substrate.
 - Agent Guide: /agents/guide.md
   API reference, gotchas, and examples.
 - Agent Testing: /agents/testing.md
