@@ -9,6 +9,8 @@
   Quick “why or why not use TKO?” decision surface.
 - Thesis: /agents/thesis.md
   Deeper rationale, genesis, and contribution alignment for the project.
+- Concepts: /agents/concepts.md
+  Architectural concepts, boundaries, and composition model.
 - Verified Behaviors Index: /agents/verified-behaviors/index.md
   Unit-test-backed behavior contract. Prefer this when behavior questions matter.
 - Agent Guide: /agents/guide.md
