@@ -1,52 +1,32 @@
 # TKO Thesis
 
-TKO treats Knockout as a reactive DOM substrate that is particularly well-suited to AI-assisted authoring, verification, and rapid iteration.
+Use `/agents/why.txt` for the short “why or why not use TKO?” decision surface. This file explains why TKO exists, what direction it follows, and what kinds of contributions align with that direction.
 
-This thesis starts from a simple observation: Knockout emerged very early in the evolution of frontend frameworks. Many later frameworks evolved toward the needs of human operators and human-scaled organizations: larger abstraction layers, heavier build assumptions, stronger framework ownership of application structure, and patterns optimized for large teams writing and reviewing code by hand.
+## Core Thesis
 
-TKO treats the Knockout observable and binding model as a foundational design principle for high-velocity abstraction of complex interactions:
+TKO treats the Knockout observable and binding model as a foundational design principle for building complex interactions at high velocity:
 
 - observables and computeds are explicit state primitives
 - bindings are an explicit bridge between state and the DOM
 - the runtime surface is comparatively small and inspectable
 - behavior can be verified directly at the DOM and contract level
 
-These traits make TKO unusually compatible with AI-first workflows. Agents do better when systems are:
-
-- explicit rather than magical
-- local rather than framework-global
-- composable rather than heavily prescriptive
-- easy to inspect at runtime
-- easy to verify from behavior
-
 TKO builds from that substrate for a modern environment: modern JavaScript, CSP-safe parsing, native browser APIs, TSX authoring, verified behavior contracts, and fast browser-level feedback loops.
 
-## Why TKO Fits AI-First Work
+## Why This Matters Now
 
-TKO fits best when the task benefits from:
+Frontend frameworks after Knockout often specialized around the needs of human-operated organizations: stronger framework ownership of structure, deeper build pipelines, and abstractions designed around handwritten code at team scale.
 
-- explicit reactive state
-- direct DOM binding
-- simple state-to-UI mental model that scales well
-- browser-native execution
-- easy runtime inspection
-- fast behavior verification
+TKO is not a rejection of those systems. It is a different bet.
 
-## Weaker Fit
-
-TKO is a weaker fit when the task depends on:
-
-- a project already deeply committed to another frontend runtime and unwilling to introduce a bridge layer
-- drop-in use of an ecosystem centered on another framework's component model
-- a development model that assumes a framework-managed application shell rather than an explicit state-to-DOM binding model
-- avoiding the cost of introducing a second UI paradigm into an existing framework-dominant codebase
+TKO is designed to enable AI to OODA faster: observe, orient, decide, and act by keeping state, DOM wiring, and runtime behavior explicit and verifiable.
 
 ## Design Principles
 
 - prefer explicit contracts over hidden machinery
 - prefer browser-native flows over mandatory toolchain complexity
 - prefer verifiable examples over illustrative but fragile snippets
-- prefer modular primitives over organization-shaped abstractions
+- prefer modular primitives over abstractions shaped mainly by organizational overhead
 - prefer machine-readable behavior contracts alongside human docs
 
 ## What This Means For Agents
@@ -57,37 +37,32 @@ Agents should be able to understand a TKO program by following a short chain:
 2. find the bindings that connect that state to the DOM
 3. run the code and verify the resulting behavior
 
-That favors authoring patterns with strong locality and low ambiguity:
+This favors explicit contracts, local reasoning, and examples that can be executed and verified with minimal hidden scaffolding.
 
-- keep state explicit and near the bindings that consume it
-- put derived UI values in computeds instead of burying logic in ad hoc expressions
-- prefer small DOM islands over framework-wide hidden coordination
-- prefer bindings and providers that make the DOM contract easy to read back from the rendered output
-- prefer examples that an agent can execute with minimal setup and no missing scaffolding
+## Contribution Alignment
 
-For new UI, this generally points toward TSX plus `ko-*` bindings and the native provider path. For migration and comparison work, classic `data-bind` remains useful because it expresses the same state-to-DOM contract in a runtime-readable form.
+Contributions that align with the thesis usually:
 
-TKO can be organized into multiple architectural shapes. TKO is responsible for providing the primitives. The consuming agent is responsible for choosing an architecture that fits the system's scale, integration needs, and future direction, then keeping that architecture coherent over time.
+- make reactive contracts clearer
+- improve runtime inspectability
+- strengthen verified behavior coverage
+- make examples more runnable and easier to prove
+- reduce unnecessary dependency or toolchain burden
+- improve migration clarity or interop with surrounding systems
 
-Use `/agents/why.txt` for the short “why or why not use TKO?” decision surface. Use this thesis for the deeper rationale behind the project and for contribution alignment.
+Contributions that move away from the thesis usually:
 
-## What This Means For TKO
+- hide reactive behavior behind opaque abstractions
+- add framework-owned architecture by default
+- increase toolchain burden without improving verification or clarity
+- multiply package, version, or docs ambiguity
 
-Optimize for regeneration, inspection, and proof:
+TKO should continue optimizing for regeneration, inspection, and proof: runnable examples, stable behavior contracts, clear docs routing, and lower ambiguity around packages, versions, and migration paths.
 
-- docs should route agents quickly to the right layer: thesis, why, guide, testing flow, verified behaviors
-- examples should be runnable, not merely illustrative
-- playground links should round-trip cleanly from docs to execution
-- behavior claims should have a stable contract source when possible
-- package and docs versioning should reduce ambiguity about what guidance applies to which release line
-- legacy package names and migration lanes should point clearly to the modern canonical path
+## Evolutionary Analogy
 
-## What Good Agent Output Looks Like
+In biology, early ancestors are often more general and later descendants become more specialized for a particular environment. A classic example is feathers: early feathers appear to have evolved before bird flight, likely serving functions such as insulation, communication, or water repellency, and only later became aerodynamic structures for flight. The earlier substrate was not obsolete. It became newly valuable when the environment and use case changed.
 
-In TKO, useful AI-generated output is not just syntactically valid code. It should be:
+TKO treats Knockout in that way. Knockout appeared early in the evolution of frontend frameworks, before the ecosystem specialized around virtual DOMs, framework-owned application shells, and large convention-heavy toolchains. Its observable and binding model remained closer to a general reactive DOM substrate: explicit state, explicit DOM wiring, and direct behavioral verification.
 
-- easy for a human to inspect and extend later
-- easy to verify from DOM behavior
-- explicit about reactive dependencies
-- light on framework ceremony
-- aligned with the documented contract and versioned docs surface
+Later frontend frameworks specialized for different environmental pressures: larger human organizations, heavier build systems, framework-managed application structure, and ecosystem-scale coordination. The thesis of TKO is that AI-assisted development changes the environment. Agents need systems they can inspect, regenerate, verify, and evolve directly. In that environment, Knockout's earlier observable-and-binding substrate becomes newly fit for the same reason early feathers did: a general structure developed under one set of pressures becomes newly fit under another.

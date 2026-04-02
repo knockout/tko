@@ -8,18 +8,16 @@ Use TKO when the task benefits from:
 - fast behavior verification
 - agent-driven work where state, bindings, and rendered behavior should be easy to trace
 
-TKO can support large and complex applications when the codebase maintains clear module, ownership, and composition boundaries. TKO provides the reactive primitives. The consuming team or agent chooses the surrounding architecture.
+TKO can support large and complex applications when the codebase maintains clear module boundaries, ownership, and composition rules. TKO gives reactive primitives rather than a full application architecture.
 
 TKO is a weaker fit when the task depends on:
 - an application already standardized on another frontend runtime and unwilling to introduce a bridge
 - drop-in use of an ecosystem centered on another framework's component model
-- another framework already owning rendering, routing, SSR or hydration, and the application shell
-- a framework that prescribes routing, application shell, and component architecture as part of the runtime
+- another framework already owning rendering, routing, SSR or hydration, and the application shell, so adding TKO would introduce a second mental model and explicit bridges for state, events, styling, or lifecycle
 
 Default authoring path:
 - New UI: TSX plus `ko-*` bindings and the native provider path
 - Migration, comparison, or inspection work: classic `data-bind`
-- TKO gives reactive primitives, not a full app architecture
 
 How to read a TKO app:
 1. Find the observables and computeds.
