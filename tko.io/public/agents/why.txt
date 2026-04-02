@@ -1,3 +1,5 @@
+Use `/llms.txt` as the index for the full agent docs set.
+
 TKO is a good fit when you want explicit observable state, direct DOM bindings, and DOM-level verification without a framework-owned application shell.
 
 Use TKO when the task benefits from:

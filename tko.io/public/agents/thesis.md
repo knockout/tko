@@ -1,6 +1,6 @@
 # TKO Thesis
 
-Use `/agents/why.txt` for the short “why or why not use TKO?” decision surface. Use `/agents/concepts.md` for architectural concepts and boundaries. This file explains why TKO exists, what direction it follows, and what kinds of contributions align with that direction.
+Use `/llms.txt` as the index for the full agent docs set. This file explains why TKO exists, what direction it follows, and what kinds of contributions align with that direction.
 
 ## Core Thesis
 
