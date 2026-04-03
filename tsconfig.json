@@ -2,15 +2,14 @@
   "compileOnSave": false,  
   "compilerOptions": {
     "declaration": true,
-    "downlevelIteration": true,
-    "target": "ES6",
-    "module": "ES2015",
-    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "node10", //Deprecated in ts7.0
     "allowJs": false,
     "importHelpers": true,
     "allowSyntheticDefaultImports":  true,
     "strict": true,
-    "baseUrl": ".",
     "noEmit": true,
     /*Disable some typing feature from ts*/
     "noImplicitAny": false,
@@ -23,18 +22,18 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    
+    "lib": ["es2022", "dom"],
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [
-        "packages/utils/helpers/jasmine-13-helper.ts"
+        "./packages/utils/helpers/jasmine-13-helper.ts"
       ],
       "@tko/binding.template/helpers/dummyTemplateEngine": [
-        "packages/binding.template/helpers/dummyTemplateEngine.ts"
+        "./packages/binding.template/helpers/dummyTemplateEngine.ts"
       ],
       "*": [
-        "*",
-        "packages/*",
-        "builds/*"
+        "./*",
+        "./packages/*",
+        "./builds/*"
       ]
     }
   },

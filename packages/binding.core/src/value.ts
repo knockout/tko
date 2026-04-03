@@ -11,7 +11,7 @@ export class value extends BindingHandler {
     return ['options', 'foreach', 'template']
   }
 
-  override $element: HTMLInputElement
+  declare $element: HTMLInputElement
   elementValueBeforeEvent: any
   propertyChangeFired: any
   propertyChangedFired: boolean

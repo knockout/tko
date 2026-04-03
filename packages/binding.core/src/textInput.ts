@@ -17,7 +17,7 @@ class TextInput extends BindingHandler {
     return 'textinput'
   }
 
-  override $element: HTMLInputElement
+  declare $element: HTMLInputElement
   previousElementValue: any
   elementValueBeforeEvent?: ReturnType<typeof setTimeout>
   timeoutHandle?: ReturnType<typeof setTimeout>

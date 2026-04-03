@@ -22,7 +22,7 @@
     "@types/mocha": "^10.0.10",
     "chai": "^4.5.0",
     "electron": "^33.2.1",
-    "esbuild": "^0.27.0",
+    "esbuild": "^0.28.0",
     "eslint": "^10.0.3",
     "fs-extra": "^11.3.2",
     "globals": "^17.4.0",
@@ -41,10 +41,10 @@
     "lerna": "^9.0.3",
     "mocha": "^11.0.1",
     "nyc": "^18.0.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "sinon": "^19.0.2",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.56.1"
+    "typescript-eslint": "^8.58.0"
   },
   "workspaces": [
     "packages/*",
