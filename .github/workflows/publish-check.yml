@@ -1,0 +1,60 @@
+# Verify that all packages can be published successfully.
+# Catches packaging issues (missing dist files, bad exports, etc.) before merge.
+name: Publish Check
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  publish-dry-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build all packages
+        run: make
+
+      - name: Check package contents
+        run: |
+          # Verify each public package has dist files and valid package.json
+          for pkg in packages/*/; do
+            if [ -f "$pkg/package.json" ]; then
+              name=$(node -e "const p=require('./$pkg/package.json'); if(!p.private) console.log(p.name)")
+              if [ -n "$name" ]; then
+                echo "Checking $name..."
+                # Verify dist directory exists and has files
+                if [ ! -d "$pkg/dist" ] || [ -z "$(ls -A "$pkg/dist" 2>/dev/null)" ]; then
+                  echo "ERROR: $name has no dist output"
+                  exit 1
+                fi
+                # Run npm pack dry-run to verify publishable
+                (cd "$pkg" && npm pack --dry-run 2>&1) || exit 1
+              fi
+            fi
+          done
+          for pkg in builds/*/; do
+            if [ -f "$pkg/package.json" ]; then
+              name=$(node -e "const p=require('./$pkg/package.json'); if(!p.private) console.log(p.name)")
+              if [ -n "$name" ]; then
+                echo "Checking $name..."
+                if [ ! -d "$pkg/dist" ] || [ -z "$(ls -A "$pkg/dist" 2>/dev/null)" ]; then
+                  echo "ERROR: $name has no dist output"
+                  exit 1
+                fi
+                (cd "$pkg" && npm pack --dry-run 2>&1) || exit 1
+              fi
+            fi
+          done
+          echo "All packages pass publish check."

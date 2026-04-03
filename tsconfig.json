@@ -42,6 +42,7 @@
     "node_modules",
     "builds",
     "docs",
-    "tools"
+    "tools",
+    "tko.io"
   ]
 }

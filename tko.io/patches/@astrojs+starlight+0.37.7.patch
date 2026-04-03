@@ -1,0 +1,16 @@
+diff --git a/node_modules/@astrojs/starlight/utils/head.ts b/node_modules/@astrojs/starlight/utils/head.ts
+index 46d2efd..a56803b 100644
+--- a/node_modules/@astrojs/starlight/utils/head.ts
++++ b/node_modules/@astrojs/starlight/utils/head.ts
+@@ -121,9 +121,9 @@ export function getHead(
+ 
+ /** Create a fully parsed, merged, and sorted head entry array from multiple sources. */
+ function createHead(defaults: HeadUserConfig, ...heads: HeadConfig[]) {
+-	let head = HeadSchema.parse(defaults);
++	let head = Array.isArray(defaults) ? [...defaults] : [];
+ 	for (const next of heads) {
+-		head = mergeHead(head, next);
++		head = mergeHead(head, next || []);
+ 	}
+ 	return sortHead(head);
+ }

@@ -1,1 +1,6 @@
-build
+node_modules/
+_site/
+.astro/
+dist/
+package-lock.json
+public/lib/

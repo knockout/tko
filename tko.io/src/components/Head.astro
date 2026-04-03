@@ -1,0 +1,121 @@
+---
+import DefaultHead from '@astrojs/starlight/components/Head.astro';
+---
+
+<DefaultHead />
+<link rel="llms" type="text/plain" href="/llms.txt" />
+<script type="module" src="/js/examples.js"></script>
+
+<!-- StarlightTabsRestore: runs before body parsing to prevent tab flash -->
+<script is:inline>
+class StarlightTabsRestore extends HTMLElement {
+  connectedCallback() {
+    var tabs = this.closest('starlight-tabs');
+    if (!tabs || typeof localStorage === 'undefined') return;
+    var syncKey = tabs.dataset.syncKey;
+    if (!syncKey) return;
+    var label = localStorage.getItem('starlight-synced-tabs__' + syncKey);
+    if (!label) return;
+    var allTabs = [].slice.call(tabs.querySelectorAll('[role="tab"]'));
+    var idx = -1;
+    for (var i = 0; i < allTabs.length; i++) {
+      if (allTabs[i].textContent && allTabs[i].textContent.trim() === label) { idx = i; break; }
+    }
+    var panels = tabs.querySelectorAll(':scope > [role="tabpanel"]');
+    var newTab = allTabs[idx];
+    var newPanel = panels[idx];
+    if (idx < 1 || !newTab || !newPanel) return;
+    if (allTabs[0]) { allTabs[0].setAttribute('aria-selected', 'false'); allTabs[0].setAttribute('tabindex', '-1'); }
+    if (panels[0]) panels[0].setAttribute('hidden', 'true');
+    newTab.removeAttribute('tabindex');
+    newTab.setAttribute('aria-selected', 'true');
+    newPanel.removeAttribute('hidden');
+  }
+}
+customElements.define('starlight-tabs-restore', StarlightTabsRestore);
+</script>
+
+<!-- StarlightTabs: module script, deferred until after DOM parsing -->
+<script>
+class StarlightTabs extends HTMLElement {
+  static #syncedTabs = new Map();
+  tabs;
+  panels;
+  #syncKey;
+
+  constructor() {
+    super();
+    const tablist = this.querySelector('[role="tablist"]');
+    if (!tablist) return;
+    this.tabs = [...tablist.querySelectorAll('[role="tab"]')];
+    this.panels = [...this.querySelectorAll(':scope > [role="tabpanel"]')];
+    this.#syncKey = this.dataset.syncKey;
+
+    if (this.#syncKey) {
+      const synced = StarlightTabs.#syncedTabs.get(this.#syncKey) ?? [];
+      synced.push(this);
+      StarlightTabs.#syncedTabs.set(this.#syncKey, synced);
+    }
+
+    this.tabs.forEach((tab, i) => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const current = tablist.querySelector('[aria-selected="true"]');
+        if (e.currentTarget !== current) this.switchTab(e.currentTarget, i);
+      });
+      tab.addEventListener('keydown', (e) => {
+        const index = this.tabs.indexOf(e.currentTarget);
+        const next =
+          e.key === 'ArrowLeft' ? index - 1
+          : e.key === 'ArrowRight' ? index + 1
+          : e.key === 'Home' ? 0
+          : e.key === 'End' ? this.tabs.length - 1
+          : null;
+        if (next !== null && this.tabs[next]) {
+          e.preventDefault();
+          this.switchTab(this.tabs[next], next);
+        }
+      });
+    });
+  }
+
+  switchTab(newTab, index, shouldSync = true) {
+    if (!newTab) return;
+    const prevOffset = shouldSync ? this.getBoundingClientRect().top : 0;
+    this.tabs.forEach((t) => {
+      t.setAttribute('aria-selected', 'false');
+      t.setAttribute('tabindex', '-1');
+    });
+    this.panels.forEach((p) => { p.hidden = true; });
+    const panel = this.panels[index];
+    if (panel) panel.hidden = false;
+    newTab.removeAttribute('tabindex');
+    newTab.setAttribute('aria-selected', 'true');
+    if (shouldSync) {
+      newTab.focus();
+      StarlightTabs.#syncTabs(this, newTab);
+      window.scrollTo({
+        top: window.scrollY + (this.getBoundingClientRect().top - prevOffset),
+        behavior: 'instant'
+      });
+    }
+  }
+
+  static #syncTabs(emitter, newTab) {
+    const syncKey = emitter.#syncKey;
+    const label = newTab.textContent?.trim();
+    if (!syncKey || !label) return;
+    const synced = StarlightTabs.#syncedTabs.get(syncKey);
+    if (!synced) return;
+    for (const receiver of synced) {
+      if (receiver === emitter) continue;
+      const idx = receiver.tabs.findIndex((t) => t.textContent?.trim() === label);
+      if (idx !== -1) receiver.switchTab(receiver.tabs[idx], idx, false);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('starlight-synced-tabs__' + syncKey, label);
+    }
+  }
+}
+customElements.define('starlight-tabs', StarlightTabs);
+</script>
