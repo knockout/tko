@@ -2,14 +2,39 @@
  * Config for karma.
  */
 const fs = require('fs')
+const { Buffer } = require('buffer')
+const { createInstrumenter } = require('istanbul-lib-instrument')
 
 const {argv} = process
 const {SAUCE_USERNAME, SAUCE_ACCESS_KEY} = process.env
+const coverage = argv.includes('--coverage')
 
 const pkg = JSON.parse(fs.readFileSync('package.json'))
 
+const coveragePlugin = {
+  name: 'code-coverage',
+  setup(build) {
+    if(!coverage)
+      return
+
+    const coverageInstrumenter = createInstrumenter({ esModules: true })
+
+    build.onEnd((result) => {
+      const js = result.outputFiles.find(f => f.path.match(/\.js$/))
+      const sourceMap = result.outputFiles.find(f => f.path.match(/\.js\.map$/))
+      const sourceMapObject = JSON.parse(sourceMap.text)
+      sourceMapObject.sourceRoot = '/'
+
+      const instrumented = coverageInstrumenter.instrumentSync(js.text, null, sourceMapObject)
+      js.contents = Buffer.from(instrumented)
+    })
+  }
+}
+
+const basePath = process.cwd()
+
 const CommonConfig = {
-  basePath: process.cwd(),
+  basePath: basePath,
   frameworks: pkg.karma.frameworks,
   files: pkg.karma.files || [
     { pattern: 'spec/**/*.js', watched: false },
@@ -22,13 +47,29 @@ const CommonConfig = {
   esbuild: {
     // See: https://esbuild.github.io/api/
     format: 'iife',
-    sourcemap: "inline",
+    sourcemap: coverage ? "external" : "inline",
     bundle: false,
+    plugins: [coveragePlugin],
     define: {
       BUILD_VERSION: '"test"',
-    } 
+    }
   }
 }
+
+const coverageConfig = {
+  reporters: ['progress', 'coverage'],
+  // configure the reporter
+  coverageReporter: {
+      // specify a central output directory
+      dir: '../../coverage-temp/',
+      reporters: [        
+        { type: 'json', subdir: '.', file: basePath.substring(basePath.lastIndexOf('/')+1) + '_report.json' }
+      ]
+  }
+}
+
+if(coverage)
+  Object.assign(CommonConfig, coverageConfig)
 
 
 /**

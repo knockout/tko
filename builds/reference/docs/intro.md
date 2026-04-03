@@ -24,11 +24,6 @@ TKO has a comprehensive suite of tests that ensure its correct functioning and a
 
 ## Sponsors
 
-Support Knockout:
-
-<a class='btn btn-primary btn-lg btn-block' href='https://patreon.com/brianmhunt'>
-	via Patreon to Brian M Hunt
-</a>
 
 
 ## First Example

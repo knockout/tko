@@ -1,85 +1,23 @@
 //
 // HTML-based manipulation
 //
-import { stringTrim } from '../string'
 import { makeArray } from '../array'
 import { emptyDomNode, moveCleanedNodesToContainerElement } from './manipulation'
-import { forceRefresh } from './fixes'
 import * as virtualElements from './virtualElements'
 import options from '../options'
 
-const none = [0, '', ''],
-  table = [1, '<table>', '</table>'],
-  tbody = [2, '<table><tbody>', '</tbody></table>'],
-  colgroup = [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
-  tr = [3, '<table><tbody><tr>', '</tr></tbody></table>'],
-  select = [1, "<select multiple='multiple'>", '</select>'],
-  fieldset = [1, '<fieldset>', '</fieldset>'],
-  map = [1, '<map>', '</map>'],
-  object = [1, '<object>', '</object>'],
-  lookup = {
-    area: map,
-    col: colgroup,
-    colgroup: table,
-    caption: table,
-    legend: fieldset,
-    thead: table,
-    tbody: table,
-    tfoot: table,
-    tr: tbody,
-    td: tr,
-    th: tr,
-    option: select,
-    optgroup: select,
-    param: object
-  },
-  // The canonical way to test that the HTML5 <template> tag is supported
-  supportsTemplateTag =
-    options.useTemplateTag && options.document && 'content' in options.document.createElement('template')
+// The canonical way to test that the HTML5 <template> tag is supported
+const supportsTemplateTag =
+  options.useTemplateTag && options.document && 'content' in options.document.createElement('template')
 
-function getWrap(tags) {
-  const m = tags.match(/^(?:<!--[^]*?-->\s*?)*?<([a-z]+)[\s>]/)
-  return (m && lookup[m[1]]) || none
-}
-
+/** @deprecated HTMLTemplateTag or the jquery-template-function as fallback are enough */
 function simpleHtmlParse(html: string, documentContext?: Document): Node[] {
   if (!documentContext) {
     documentContext = document
   }
-  const windowContext = documentContext['parentWindow'] || documentContext['defaultView'] || window
-
-  // Based on jQuery's "clean" function, but only accounting for table-related elements.
-  // If you have referenced jQuery, this won't be used anyway - KO will use jQuery's "clean" function directly
-
-  // Note that there's still an issue in IE < 9 whereby it will discard comment nodes that are the first child of
-  // a descendant node. For example: "<div><!-- mycomment -->abc</div>" will get parsed as "<div>abc</div>"
-  // This won't affect anyone who has referenced jQuery, and there's always the workaround of inserting a dummy node
-  // (possibly a text node) in front of the comment. So, KO does not attempt to workaround this IE issue automatically at present.
-
-  // Trim whitespace, otherwise indexOf won't work as expected
-  const div: Element = documentContext.createElement('div')
-  let tags = stringTrim(html).toLowerCase(),
-    wrap = getWrap(tags),
-    depth = wrap[0]
-
-  // Go to html and back, then peel off extra wrappers
-  // Note that we always prefix with some dummy text, because otherwise, IE<9 will strip out leading comment nodes in descendants. Total madness.
-  const markup = 'ignored<div>' + wrap[1] + html + wrap[2] + '</div>'
-  if (typeof windowContext['innerShiv'] === 'function') {
-    // Note that innerShiv is deprecated in favour of html5shiv. We should consider adding
-    // support for html5shiv (except if no explicit support is needed, e.g., if html5shiv
-    // somehow shims the native APIs so it just works anyway)
-    div.appendChild(windowContext['innerShiv'](markup))
-  } else {
-    div.innerHTML = markup
-  }
-  let n: ChildNode = div
-  // Move to the right depth
-  while (depth--) {
-    n = n.lastChild!
-  }
-
-  return makeArray(n.lastChild!.childNodes)
+  const div = documentContext.createElement('div')
+  div.innerHTML = html
+  return makeArray(div.childNodes)
 }
 
 function templateHtmlParse(html: string, documentContext?: Document): Node[] {
@@ -222,6 +160,4 @@ export function setTextContent(element: Node, textContent?: TextContent): void {
   } else {
     ;(innerTextNode as Text).data = value
   }
-
-  forceRefresh(element)
 }

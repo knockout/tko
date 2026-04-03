@@ -1,0 +1,35 @@
+{
+  "description": "Virtual comment-node bindings and `<ko>` preprocessing.",
+  "behaviors": [
+    {
+      "statement": "The provider reads bindings from `<!-- ko ... -->` comment nodes and evaluates them against the supplied context.",
+      "specs": [
+        "packages/provider.virtual/spec/virtualProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Virtual comment bindings support multiple bindings in the same opening comment.",
+      "specs": [
+        "packages/provider.virtual/spec/virtualProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`preprocessNode` converts a `<ko>` element into opening and closing virtual comment nodes.",
+      "specs": [
+        "packages/provider.virtual/spec/virtualProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`<ko>` attribute names prefixed with `ko-` are normalized to plain binding names in the generated virtual binding.",
+      "specs": [
+        "packages/provider.virtual/spec/virtualProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Child nodes inside `<ko>` are preserved between the generated opening and closing virtual comments.",
+      "specs": [
+        "packages/provider.virtual/spec/virtualProviderBehaviors.ts"
+      ]
+    }
+  ]
+}

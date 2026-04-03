@@ -6,10 +6,6 @@
 import options from './options'
 import { deferError } from './error'
 
-interface HTMLScriptElementOld extends HTMLScriptElement {
-  onreadystatechange: any
-}
-
 let taskQueue = new Array(),
   taskQueueLength = 0,
   nextHandle = 1,
@@ -26,21 +22,6 @@ if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
       div.classList.toggle('foo')
     }
   })(scheduledProcess)
-} else if (w && w.document && 'onreadystatechange' in w.document.createElement('script')) {
-  // IE 6-10
-  // From https://github.com/YuzuJS/setImmediate * Copyright (c) 2012 Barnesandnoble.com, llc, Donavon West, and Domenic Denicola * License: MIT
-  options.taskScheduler = function (callback) {
-    let script: HTMLScriptElementOld | null = document.createElement('script') as HTMLScriptElementOld
-    script.onreadystatechange = function () {
-      if (script) {
-        script.onreadystatechange = null
-        document.documentElement.removeChild(script)
-        script = null
-      }
-      callback()
-    }
-    document.documentElement.appendChild(script)
-  }
 } else {
   options.taskScheduler = function (callback) {
     setTimeout(callback, 0)

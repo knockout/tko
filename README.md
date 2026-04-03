@@ -54,7 +54,9 @@ It's available as `@tko/build.knockout`, and over CDN:
 | $ `make` | **Currently TKO use a make file** / no scripts at package.json |
 | $ `make test` | Run all tests with electron. See below. |
 | $ `make test-headless` | Run all tests with chromium. See below. |
-| $ `lerna publish` | Bump versions and publish to npm registry |
+| $ `npx changeset add` | Add a changeset for package behavior changes in your PR |
+| Release workflow | On merge to `main`, CI opens or updates a version PR; when that version PR is merged and there are no remaining changesets, CI publishes from GitHub Actions via npm trusted publishing |
+| $ `make test-coverage` | Run all tests and create a code coverage report |
 
 Checkout the `Makefile` for more commands that can be executed with `make {command}`.
 
@@ -77,10 +79,6 @@ Other options:
 
 - `make ci` — use Sauce Labs to test a variety of platforms; requires an account at Sauce Labs and `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` to be set in the environment.
 
-#### `visual.html` (possibly outdated)
-
-Note that running `karma` will create a `visual.html` file that shows the proportional size of imports into each package.
-
 ## Objectives
 
 TKO aims to become a base for future versions of Knockout.  The objectives include:
@@ -99,6 +97,11 @@ TKO aims to become a base for future versions of Knockout.  The objectives inclu
 - Type-safe with Typescript
 - CSP compliant
 - JSX/TSX support
+
+## Zero-dependency and small sized - with all plugins, bundled only ~125KB
+
+Created with https://esbuild.github.io/analyze/
+![Bundled only 125KB](assets/esbuild_analyzer.png)
 
 ## JQUERY and TKO
 

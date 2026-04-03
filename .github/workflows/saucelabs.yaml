@@ -22,7 +22,7 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 22
-    - uses: actions/checkout@v4    
+    - uses: actions/checkout@v6    
     - uses: saucelabs/sauce-connect-action@v2
       with:
         username: ${{ secrets.SAUCE_USERNAME }}

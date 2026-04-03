@@ -16,12 +16,12 @@ import { bindings as templateBindings } from '@tko/binding.template'
 
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import { TextMustacheProvider } from '../dist'
+import { TextMustacheProvider } from '../src'
 
 import '@tko/utils/helpers/jasmine-13-helper'
 
 describe('Interpolation Markup preprocessor', function () {
-  function testPreprocess(node) {
+  function testPreprocess(node): any {
     const provider = new TextMustacheProvider()
     return provider.preprocessNode(node)
   }

@@ -5,6 +5,12 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 - #194 fix userAgent typo in IE check @phillipc
 - #196 fix `**` operator precedence @mcselle
 - #195 add docker container for headless tests, upgrade packages, README fixes @Auge19
+- #222 & #255 enable noImplicitOverride, noImplicitReturns, strictBindCallApply and strictFunctionTypes for stricter typescript validation @phillipc
+- #219 Make some security fixes and add an HTML sanitization hook to `options` @phillipc
+- #216 & #217 adds eslint and prettier @phillipc
+- #214 convert several classes to typescript @phillipc
+- #215 make jquery disablable and fix the loader mechanism @phillipc
+- #233 remove IE9 switches from TKO @phillipc
 
 ## Beta 1.7
 

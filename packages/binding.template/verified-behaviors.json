@@ -1,0 +1,52 @@
+{
+  "description": "Template and foreach rendering, including `nodes`, callbacks, and destroyed-item handling.",
+  "behaviors": [
+    {
+      "statement": "`foreach` duplicates template content for each array entry and keeps the DOM in sync with array mutations.",
+      "notes": [
+        "Add, insert, splice, shift, and pop flows are covered in the specs."
+      ],
+      "specs": [
+        "packages/binding.template/spec/foreachBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`foreach` and `template: { foreach: ... }` support destroyed-item filtering through `includeDestroyed` and `options.includeDestroyed`.",
+      "notes": [
+        "`includeDestroyed: false` omits entries whose `_destroy` flag unwraps truthy.",
+        "`includeDestroyed: true` keeps destroyed entries in the rendered output."
+      ],
+      "specs": [
+        "packages/binding.template/spec/foreachBehaviors.ts",
+        "packages/binding.template/spec/templatingBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`template` supports a `nodes` option that supplies template nodes directly.",
+      "notes": [
+        "The nodes source may be a plain array or a `childNodes` collection.",
+        "The same nodes can be reused across multiple bindings because the template engine clones them.",
+        "Falsy `nodes` values behave like an empty node list.",
+        "Observable arrays are rejected for `nodes`."
+      ],
+      "specs": [
+        "packages/binding.template/spec/templatingBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`foreach` supports `afterAdd`, `beforeRemove`, and `afterRender` callbacks.",
+      "notes": [
+        "`beforeRemove` leaves node removal to the callback."
+      ],
+      "specs": [
+        "packages/binding.template/spec/foreachBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`childrenComplete` also fires when rendering through `template`.",
+      "specs": [
+        "packages/binding.template/spec/templatingBehaviors.ts"
+      ]
+    }
+  ]
+}

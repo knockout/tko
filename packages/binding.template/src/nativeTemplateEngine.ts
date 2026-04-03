@@ -1,4 +1,4 @@
-import { ieVersion, makeArray, parseHtmlFragment } from '@tko/utils'
+import { makeArray, parseHtmlFragment } from '@tko/utils'
 import { templateEngine, TemplateOptions } from './templateEngine'
 import { setTemplateEngine } from './templating'
 import type { TemplateSource } from './templateSources'
@@ -14,15 +14,7 @@ nativeTemplateEngine.prototype.renderTemplateSource = function (
   options: TemplateOptions<any>,
   templateDocument?: Document
 ): Node[] {
-  let version: number
-  if (ieVersion instanceof Array) {
-    version = parseInt(ieVersion[1], 10)
-  } else {
-    version = ieVersion ?? 0
-  }
-  const useNodesIfAvailable = !(version < 9), // IE<9 cloneNode doesn't work properly
-    templateNodesFunc = useNodesIfAvailable ? templateSource.nodes : null,
-    templateNodes = templateNodesFunc ? templateSource.nodes?.() : null
+  const templateNodes = templateSource.nodes ? templateSource.nodes() : null
 
   if (templateNodes) {
     return makeArray(templateNodes.cloneNode(true).childNodes)

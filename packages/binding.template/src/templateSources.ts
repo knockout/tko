@@ -30,19 +30,21 @@ import { tagNameLower as tagNameLowerFn, setHtml, domData, parseHtmlForTemplateN
 const templateScript = 1,
   templateTextArea = 2,
   templateTemplate = 3,
-  templateElement = 4
+  templateElement = 4,
+  templateAnonymous = 5
 
 export interface TemplateSource {
-  //constructor(element: Node);
-
   text(): string
   text(valueToWrite: string): void
+  text(valueToWrite?: string): string | void
 
   data(key: string): any
   data<T>(key: string): T
   data<T>(key: string, valueToWrite: T): void
 
-  nodes?: { (): Node; (valueToWrite: Node): void }
+  nodes(): Node
+  nodes(valueToWrite: Node): undefined
+  nodes(valueToWrite?: any): Node | undefined
 }
 
 const dataDomDataPrefix = domData.nextKey() + '_'
@@ -55,8 +57,8 @@ function setTemplateDomData(element, data) {
 }
 
 export class domElement implements TemplateSource {
-  domElement: Element | Comment
-  templateType: number
+  protected domElement: Element | Comment
+  protected templateType: number
 
   constructor(element: Element | Comment) {
     this.domElement = element
@@ -143,11 +145,14 @@ export class domElement implements TemplateSource {
 export class anonymousTemplate extends domElement {
   constructor(element: Element | Comment) {
     super(element)
+    //The old prototype construct uses an empty-constructor from domElement, so templateType and element was 'undefined'.
+    //With the new templateType = templateAnonymous (5) we achieve the same behavior in the "nodes" Method
+    this.templateType = templateAnonymous
   }
 
   override text(): string
-  override text(valueToWrite: string): undefined
-  override text(/* valueToWrite */): string | undefined {
+  override text(valueToWrite: string): void
+  override text(valueToWrite?: string): string | void {
     if (arguments.length == 0) {
       const templateData = getTemplateDomData(this.domElement)
       if (templateData.textData === undefined && templateData.containerData) {
@@ -155,9 +160,7 @@ export class anonymousTemplate extends domElement {
       }
       return templateData.textData
     } else {
-      const valueToWrite = arguments[0]
       setTemplateDomData(this.domElement, { textData: valueToWrite })
     }
-    return undefined
   }
 }

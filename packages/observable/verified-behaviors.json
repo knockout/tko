@@ -1,0 +1,41 @@
+{
+  "description": "Core observable and observableArray notification and mutation behavior.",
+  "behaviors": [
+    {
+      "statement": "Observables ignore duplicate writes for identical primitives, `null`, and `undefined` by default.",
+      "notes": [
+        "Writing the same object reference still notifies because object equality is treated as changed by default."
+      ],
+      "specs": [
+        "packages/observable/spec/observableBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Setting `equalityComparer = null` or using `extend({ notify: \"always\" })` forces notifications for unchanged primitive values.",
+      "specs": [
+        "packages/observable/spec/observableBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`observableArray.destroy(item)` and `destroyAll(...)` mark `_destroy = true` without removing items from the array.",
+      "specs": [
+        "packages/observable/spec/observableArrayBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`observableArray.remove(...)` and `removeAll(...)` remove matching items, return the removed values, and mutate the original array.",
+      "notes": [
+        "No change notification is sent when nothing matches."
+      ],
+      "specs": [
+        "packages/observable/spec/observableArrayBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`observableArray` is iterable and reports as both an observable and an observable array.",
+      "specs": [
+        "packages/observable/spec/observableArrayBehaviors.ts"
+      ]
+    }
+  ]
+}

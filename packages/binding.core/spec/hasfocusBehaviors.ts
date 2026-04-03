@@ -1,4 +1,4 @@
-import { triggerEvent, registerEventHandler, ieVersion } from '@tko/utils'
+import { triggerEvent, registerEventHandler } from '@tko/utils'
 
 import { applyBindings, applyBindingsToNode } from '@tko/bind'
 
@@ -93,14 +93,6 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       bindingHandlers.set(coreBindings.bindings)
       bindingHandlers.focusKnockout351 = legacyCustomBinding
     })
-
-    if (ieVersion) {
-      // Workaround for spurious focus-timing-related failures on IE8
-      // (issue knockout/knockout#736)
-      beforeEach(function () {
-        waits(100)
-      })
-    }
 
     it('Should set an observable value to be true on focus and false on blur even if the binding is applied through another binding', function () {
       const createElementWithHasFocusBinding = {
