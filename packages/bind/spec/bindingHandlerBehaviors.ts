@@ -48,7 +48,6 @@ describe('BindingHandler behaviors', function () {
         v: Observable
         x: Observable
         y: Observable
-        computed
 
         constructor(...args) {
           super(...args)
@@ -93,7 +92,6 @@ describe('BindingHandler behaviors', function () {
       let obs = koObservable(),
         handlerInstance
       bindingHandlers.fnHandler = class extends BindingHandler {
-        subscribe
         constructor(...args) {
           super(...args)
           handlerInstance = this
