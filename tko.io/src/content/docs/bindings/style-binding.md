@@ -11,20 +11,38 @@ The `style` binding adds or removes one or more style values to the associated D
 
 ### Example
 
-```example
-name: Control Text & Appearance
-html: |-
-  <div data-bind="style: { color: currentProfit() < 0 ? 'red' : 'black' }">
-     Profit Information
+```tsx
+const currentProfit = ko.observable(150000)
+const textColor = ko.pureComputed(() => (currentProfit() < 0 ? 'red' : 'black'))
+
+<>
+  <p>Current profit: $<span ko-text={currentProfit}></span></p>
+  <p>
+    <button ko-click={() => currentProfit(-50)}>Show loss</button>
+    <button ko-click={() => currentProfit(150000)}>Restore profit</button>
+  </p>
+  <div ko-style={{ color: textColor }}>
+    Profit Information
   </div>
-javascript: |-
-  var viewModel = {
-      currentProfit: ko.observable(150000) // Positive value, so initially black
-  };
-  viewModel.currentProfit(-50); // Causes the DIV's contents to go red
+</>
+```
+
+```html
+<div data-bind="style: { color: currentProfit() < 0 ? 'red' : 'black' }">
+  Profit Information
+</div>
+```
+
+```javascript
+var viewModel = {
+    currentProfit: ko.observable(150000) // Positive value, so initially black
+};
+viewModel.currentProfit(-50); // Causes the DIV's contents to go red
 ```
 
 This will set the element's `style.color` property to `red` whenever the `currentProfit` value dips below zero, and to `black` whenever it goes above zero.
+
+In TSX, `ko-style={...}` keeps the style object on the element, but any derived style values should come from observables or computeds declared above the JSX. The playground button adds the standard render/setup wrapper automatically.
 
 ### Parameters
 
@@ -53,4 +71,4 @@ If you want to apply a `font-weight` or `text-decoration` style, or any other st
 * Don't write `{ font-weight: someValue }`; do write `{ fontWeight: someValue }`
 * Don't write `{ text-decoration: someValue }`; do write `{ textDecoration: someValue }`
 
-See also: [a longer list of style names and their JavaScript equivalents](http://www.comptechdoc.org/independent/web/cgi/javamanual/javastyle.html)
+See also: [MDN's CSS property reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)

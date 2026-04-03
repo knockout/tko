@@ -14,6 +14,12 @@ Note: For text boxes, drop-down lists, and all non-checkable form controls, use 
 
 ### Example with checkbox
 
+```tsx
+const wantsSpam = ko.observable(true)
+
+<p>Send me spam: <input type="checkbox" ko-checked={wantsSpam} /></p>
+```
+
 ```html
 <p>Send me spam: <input type="checkbox" data-bind="checked: wantsSpam" /></p>
 ```
@@ -28,6 +34,21 @@ Note: For text boxes, drop-down lists, and all non-checkable form controls, use 
 ```
 
 ### Example adding checkboxes bound to an array
+```tsx
+const wantsSpam = ko.observable(true)
+const spamFlavors = ko.observableArray(['cherry', 'almond'])
+
+<>
+  <p>Send me spam: <input type="checkbox" ko-checked={wantsSpam} /></p>
+  <div ko-visible={wantsSpam}>
+    Preferred flavors of spam:
+    <div><input type="checkbox" value="cherry" ko-checked={spamFlavors} /> Cherry</div>
+    <div><input type="checkbox" value="almond" ko-checked={spamFlavors} /> Almond</div>
+    <div><input type="checkbox" value="msg" ko-checked={spamFlavors} /> Monosodium Glutamate</div>
+  </div>
+</>
+```
+
 ```html
 <p>Send me spam: <input type="checkbox" data-bind="checked: wantsSpam" /></p>
 <div data-bind="visible: wantsSpam">
@@ -49,6 +70,21 @@ viewModel.spamFlavors.push("msg"); // Now additionally checks the Monosodium Glu
 ```
 
 ### Example adding radio buttons
+```tsx
+const wantsSpam = ko.observable(true)
+const spamFlavor = ko.observable('almond')
+
+<>
+  <p>Send me spam: <input type="checkbox" ko-checked={wantsSpam} /></p>
+  <div ko-visible={wantsSpam}>
+    Preferred flavor of spam:
+    <div><input type="radio" name="flavorGroup" value="cherry" ko-checked={spamFlavor} /> Cherry</div>
+    <div><input type="radio" name="flavorGroup" value="almond" ko-checked={spamFlavor} /> Almond</div>
+    <div><input type="radio" name="flavorGroup" value="msg" ko-checked={spamFlavor} /> Monosodium Glutamate</div>
+  </div>
+</>
+```
+
 ```html
 <p>Send me spam: <input type="checkbox" data-bind="checked: wantsSpam" /></p>
 <div data-bind="visible: wantsSpam">
@@ -98,6 +134,21 @@ viewModel.spamFlavors.push("msg"); // Now additionally checks the Monosodium Glu
      If your binding also includes `checkedValue`, this defines the value used by the `checked` binding instead of the element's `value` attribute. This is useful if you want the value to be something other than a string (such as an integer or object), or you want the value set dynamically.
 
      In the following example, the item objects themselves (not their `itemName` strings) will be included in the `chosenItems` array when their corresponding checkboxes are checked:
+
+    ```tsx
+    const items = ko.observableArray([
+        { itemName: 'Choice 1' },
+        { itemName: 'Choice 2' }
+    ])
+    const chosenItems = ko.observableArray()
+
+    <ul ko-foreach={items}>
+        <li>
+            <input type="checkbox" ko-checkedValue="$data" ko-checked={chosenItems} />
+            <span ko-text="itemName" />
+        </li>
+    </ul>
+    ```
 
     ```html
     <!-- ko foreach: items -->

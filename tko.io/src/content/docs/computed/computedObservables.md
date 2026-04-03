@@ -1,10 +1,10 @@
 ---
-title: ComputedObservables
+title: Computed Observables
 ---
 
 # Computed Observables Overview
 
-What if you've got an [observable](../../observables/observables/) for `firstName`, and another for `lastName`, and you want to display the full name? That's where *computed observables* come in - these are functions that are dependent on one or more other observables, and will automatically update whenever any of these dependencies change.
+What if you've got an [observable](/observables/) for `firstName`, and another for `lastName`, and you want to display the full name? That's where *computed observables* come in - these are functions that are dependent on one or more other observables, and will automatically update whenever any of these dependencies change.
 
 For example, given the following view model class,
 
@@ -58,7 +58,7 @@ function AppViewModel() {
 }
 ```
 
-Because `self` is captured in the function's closure, it remains available and consistent in any nested functions, such as the `ko.computed` evaluator. This convention is even more useful when it comes to event handlers, as you'll see in many of the [live examples](../examples/).
+Because `self` is captured in the function's closure, it remains available and consistent in any nested functions, such as the `ko.computed` evaluator. This convention is even more useful when it comes to event handlers, as you'll see throughout the docs.
 
 ### Dependency chains just work
 
@@ -73,7 +73,7 @@ Then, changes to `items` or `selectedIndexes` will ripple through the chain of c
 
 ### Forcing computed observables to always notify subscribers
 
-When a computed observable returns a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](../../observables/extenders/) to ensure that a computed observable's subscribers are always notified on an update, even if the value is the same. You would apply the extender like this:
+When a computed observable returns a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](/observables/extenders/) to ensure that a computed observable's subscribers are always notified on an update, even if the value is the same. You would apply the extender like this:
 
 ```javascript
 myViewModel.fullName = ko.computed(function() {
@@ -83,24 +83,24 @@ myViewModel.fullName = ko.computed(function() {
 
 ### Delaying and/or suppressing change notifications
 
-Normally, a computed observable updates and notifies its subscribers immediately, as soon as its dependencies change. But if a computed observable has many dependencies or involves expensive updates, you may get better performance by limiting or delaying the computed observable's updates and notifications. This is accomplished using the [`rateLimit` extender](../../observables/rateLimit-observable/) like this:
+Normally, a computed observable updates and notifies its subscribers immediately, as soon as its dependencies change. But if a computed observable has many dependencies or involves expensive updates, you may get better performance by limiting or delaying the computed observable's updates and notifications. This is accomplished using the [`rateLimit` extender](/observables/rateLimit-observable/) like this:
 
 ```javascript
 // Ensure updates no more than once per 50-millisecond period
 myViewModel.fullName.extend({ rateLimit: 50 });
 ```
 
-# Writeable computed observables
+# Writable computed observables
 
-*Beginners may wish to skip this section - writeable computed observables are fairly advanced and are not necessary in most situations*
+*Beginners may wish to skip this section - writable computed observables are fairly advanced and are not necessary in most situations*
 
-As you've learned, computed observables have a value that is computed from other observables. In that sense, computed observables are normally *read-only*. What may seem surprising, then, is that it is possible to make computed observables *writeable*. You just need to supply your own callback function that does something sensible with written values.
+As you've learned, computed observables have a value that is computed from other observables. In that sense, computed observables are normally *read-only*. What may seem surprising, then, is that it is possible to make computed observables *writable*. You just need to supply your own callback function that does something sensible with written values.
 
-You can then use your writeable computed observable exactly like a regular observable, with your own custom logic intercepting all reads and writes. This is a powerful feature with a wide range of possible uses. Just like observables, you can write values to multiple observable or computed observable properties on a model object using *chaining syntax*. For example, `myViewModel.fullName('Joe Smith').age(50)`.
+You can then use your writable computed observable exactly like a regular observable, with your own custom logic intercepting all reads and writes. This is a powerful feature with a wide range of possible uses. Just like observables, you can write values to multiple observable or computed observable properties on a model object using *chaining syntax*. For example, `myViewModel.fullName('Joe Smith').age(50)`.
 
 ### Example 1: Decomposing user input
 
-Going back to the classic "first name + last name = full name" example, you can turn things back-to-front: make the `fullName` computed observable writeable, so that the user can directly edit the full name, and their supplied value will be parsed and mapped back to the underlying `firstName` and `lastName` observables:
+Going back to the classic "first name + last name = full name" example, you can turn things back-to-front: make the `fullName` computed observable writable, so that the user can directly edit the full name, and their supplied value will be parsed and mapped back to the underlying `firstName` and `lastName` observables:
 
 ```javascript
 function MyViewModel() {
@@ -135,11 +135,11 @@ In this example, the `write` callback handles incoming values by splitting the i
 
 This is the exact opposite of the classic "Hello World" example, in that here the first and last names are not editable, but the combined full name is editable.
 
-The preceding view model code demonstrates the *single parameter syntax* for initializing computed observables. See the [computed observable reference](#computed_observable_reference) below for the full list of available options.
+The preceding view model code demonstrates the *single parameter syntax* for initializing computed observables. See the computed observable reference below for the full list of available options.
 
 ### Example 2: A value converter
 
-Sometimes you might want to represent a data point on the screen in a different format from its underlying storage. For example, you might want to store a price as a raw float value, but let the user edit it with a currency symbol and fixed number of decimal places. You can use a writeable computed observable to represent the formatted price, mapping incoming values back to the underlying float value:
+Sometimes you might want to represent a data point on the screen in a different format from its underlying storage. For example, you might want to store a price as a raw float value, but let the user edit it with a currency symbol and fixed number of decimal places. You can use a writable computed observable to represent the formatted price, mapping incoming values back to the underlying float value:
 
 ```javascript
 function MyViewModel() {
@@ -171,7 +171,7 @@ Now, whenever the user enters a new price, the text box immediately updates to s
 
 ### Example 3: Filtering and validating user input
 
-Example 1 showed how a writeable computed observable can effectively *filter* its incoming data by choosing not to write certain values back to the underlying observables if they don't meet some criteria. It ignored full name values that didn't include a space.
+Example 1 showed how a writable computed observable can effectively *filter* its incoming data by choosing not to write certain values back to the underlying observables if they don't meet some criteria. It ignored full name values that didn't include a space.
 
 Taking this a step further, you could also toggle an `isValid` flag depending on whether the latest input was satisfactory, and display a message in the UI accordingly. There's an easier way of doing validation (explained below), but first consider the following view model, which demonstrates the mechanism:
 
@@ -206,7 +206,7 @@ ko.applyBindings(new MyViewModel());
 
 Now, `acceptedNumericValue` will only ever contain numeric values, and any other values entered will trigger the appearance of a validation message instead of updating `acceptedNumericValue`.
 
-**Note:** For such trivial requirements as validating that an input is numeric, this technique is overkill. It would be far easier just to use jQuery Validation and its `number` class on the `<input>` element. Knockout and jQuery Validation work together nicely in a grid-editor-style UI. However, the preceding example demonstrates a more general mechanism for filtering and validating with custom logic to control what kind of user feedback appears, which may be of use if your scenario is more complex than jQuery Validation handles natively.
+**Note:** For such trivial requirements as validating that an input is numeric, this technique is overkill. A native `type="number"` input or a dedicated validation layer is usually simpler. The preceding example demonstrates a more general mechanism for filtering and validating with custom logic to control what kind of user feedback appears, which may be of use if your scenario is more complex than that.
 
 # How dependency tracking works
 
@@ -223,11 +223,29 @@ So, KO doesn't just detect your dependencies the first time your evaluator runs 
 
 The other neat trick is that declarative bindings are simply implemented as computed observables. So, if a binding reads the value of an observable, that binding becomes dependent on that observable, which causes that binding to be re-evaluated if the observable changes.
 
+### Waiting for a condition with `ko.when`
+
+If you want to run code once a predicate becomes truthy, `ko.when` gives you a small helper around computed dependency tracking. Pass either an observable or a predicate function.
+
+```javascript
+ko.when(function () {
+    return viewModel.isReady() && viewModel.hasData();
+}, function () {
+    console.log('Ready');
+});
+
+ko.when(function () {
+    return viewModel.isReady();
+}).then(function () {
+    console.log('Ready');
+});
+```
+
 ### Controlling dependencies using peek
 
-Knockout's automatic dependency tracking normally does exactly what you want. But you might sometimes need to control which observables will update your computed observable, especially if the computed observable performs some sort of action, such as making an Ajax request. The `peek` function lets you access an observable or computed observable without creating a dependency.
+Knockout's automatic dependency tracking normally does exactly what you want. But you might sometimes need to control which observables will update your computed observable, especially if the computed observable performs some sort of action, such as making a network request. The `peek` function lets you access an observable or computed observable without creating a dependency.
 
-In the example below, a computed observable is used to reload an observable named `currentPageData` using Ajax with data from two other observable properties. The computed observable will update whenever `pageIndex` changes, but it ignores changes to `selectedItem` because it is accessed using `peek`. In this case, the user might want to use the current value of `selectedItem` only for tracking purposes when a new set of data is loaded.
+In the example below, a computed observable is used to reload an observable named `currentPageData` using a network request with data from two other observable properties. The computed observable will update whenever `pageIndex` changes, but it ignores changes to `selectedItem` because it is accessed using `peek`. In this case, the user might want to use the current value of `selectedItem` only for tracking purposes when a new set of data is loaded.
 
 ```javascript
 ko.computed(function() {
@@ -235,11 +253,14 @@ ko.computed(function() {
         page: this.pageIndex(),
         selected: this.selectedItem.peek()
     };
-    $.getJSON('/Some/Json/Service', params, this.currentPageData);
+
+    fetch('/Some/Json/Service?' + new URLSearchParams(params))
+        .then(function(response) { return response.json(); })
+        .then(function(data) { this.currentPageData(data); }.bind(this));
 }, this);
 ```
 
-Note: If you just want to prevent a computed observable from updating too often, see the [`rateLimit` extender](../../observables/rateLimit-observable/).
+Note: If you just want to prevent a computed observable from updating too often, see the [`rateLimit` extender](/observables/rateLimit-observable/).
 
 ### Note: Why circular dependencies aren't meaningful
 
@@ -262,7 +283,7 @@ for (var prop in myObject) {
 Additionally, Knockout provides similar functions that can operate on observables and computed observables:
 
 * `ko.isObservable` - returns true for observables, observable arrays, and all computed observables.
-* `ko.isWriteableObservable` - returns true for observable, observable arrays, and writeable computed observables.
+* `ko.isWriteableObservable` - returns true for observable, observable arrays, and writable computed observables.
 
 # Computed Observable Reference
 
@@ -279,7 +300,7 @@ A computed observable can be constructed using one of the following forms:
 
 1. `ko.computed( options )` --- This single parameter form for creating a computed observable accepts a JavaScript object with any of the following properties.
   * `read` --- Required. A function that is used to evaluate the computed observable's current value.
-  * `write` --- Optional. If given, makes the computed observable writeable. This is a function that receives values that other code is trying to write to your computed observable. It's up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
+  * `write` --- Optional. If given, makes the computed observable writable. This is a function that receives values that other code is trying to write to your computed observable. It's up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
   * `owner` --- Optional. If given, defines the value of `this` whenever KO invokes your `read` or `write` callbacks.
   * `deferEvaluation` --- Optional. If this option is true, then the value of the computed observable will not be evaluated until something actually attempts to access its value or manually subscribes to it. By default, a computed observable has its value determined immediately during creation.
   * `disposeWhen` --- Optional. If given, this function is executed on each re-evaluation to determine if the computed observable should be disposed. A `true`-ish result will trigger disposal of the computed observable.
@@ -290,12 +311,12 @@ A computed observable can be constructed using one of the following forms:
 A computed observable provides the following functions:
 
 * `dispose()` --- Manually disposes the computed observable, clearing all subscriptions to dependencies. This function is useful if you want to stop a computed observable from being updated or want to clean up memory for a computed observable that has dependencies on observables that won't be cleaned.
-* `extend(extenders)` --- Applies the given [extenders](../../observables/extenders/) to the computed observable.
+* `extend(extenders)` --- Applies the given [extenders](/observables/extenders/) to the computed observable.
 * `getDependenciesCount()` --- Returns the current number of dependencies of the computed observable.
 * `getSubscriptionsCount()` --- Returns the current number of subscriptions (either from other computed observables or manual subscriptions) of the computed observable.
 * `isActive()` --- Returns whether the computed observable may be updated in the future. A computed observable is inactive if it has no dependencies.
-* `peek()` --- Returns the current value of the computed observable without creating a dependency (see the section above on [`peek`](#controlling_dependencies_using_peek)).
-* `subscribe( callback [,callbackTarget, event] )` --- Registers a [manual subscription](observables.html#explicitly_subscribing_to_observables) to be notified of changes to the computed observable.
+* `peek()` --- Returns the current value of the computed observable without creating a dependency (see the section above on [`peek`](#controlling-dependencies-using-peek)).
+* `subscribe( callback [,callbackTarget, event] )` --- Registers a [manual subscription](/observables/#explicitly-subscribing-to-observables) to be notified of changes to the computed observable.
 
 ## Using the computed context
 
@@ -314,7 +335,7 @@ var myComputed = ko.computed(function() {
 
     // Now let's inspect ko.computedContext
     var isFirstEvaluation = ko.computedContext.isInitial(),
-        dependencyCount = ko.computedContext.getDependenciesCount(),
+        dependencyCount = ko.computedContext.getDependenciesCount();
     console.log("Evaluating " + (isFirstEvaluation ? "for the first time" : "again"));
     console.log("By now, this computed has " + dependencyCount + " dependencies");
 

@@ -1,0 +1,43 @@
+{
+  "description": "Mustache-style text and attribute interpolation providers.",
+  "behaviors": [
+    {
+      "statement": "Text interpolation rewrites `{{expr}}` into virtual `text` bindings, `{{{expr}}}` into virtual `html` bindings, and `{{#binding:value}}{{/binding}}` into virtual block bindings.",
+      "specs": [
+        "packages/provider.mustache/spec/textInterpolationSpec.ts"
+      ]
+    },
+    {
+      "statement": "Unclosed or unopened delimiters are ignored in both text and attribute interpolation; unmatched trailing delimiters are treated as literal text.",
+      "specs": [
+        "packages/provider.mustache/spec/textInterpolationSpec.ts",
+        "packages/provider.mustache/spec/attributeInterpolationSpec.ts"
+      ]
+    },
+    {
+      "statement": "Attribute interpolation supports multiple expressions per attribute, multiple interpolated attributes on the same element, and backtick expressions.",
+      "specs": [
+        "packages/provider.mustache/spec/attributeInterpolationSpec.ts"
+      ]
+    },
+    {
+      "statement": "Interpolated text and attributes update when their source observables change.",
+      "specs": [
+        "packages/provider.mustache/spec/textInterpolationSpec.ts",
+        "packages/provider.mustache/spec/attributeInterpolationSpec.ts"
+      ]
+    },
+    {
+      "statement": "Interpolated `value` and `checked` attributes become two-way bindings.",
+      "specs": [
+        "packages/provider.mustache/spec/attributeInterpolationSpec.ts"
+      ]
+    },
+    {
+      "statement": "Text interpolation does not rewrite contents inside `<textarea>` or `<script>`, but it does work inside templates declared with `<script>` and `<textarea>`.",
+      "specs": [
+        "packages/provider.mustache/spec/textInterpolationSpec.ts"
+      ]
+    }
+  ]
+}

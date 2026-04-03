@@ -10,18 +10,29 @@ The `visible` binding causes the associated DOM element to become hidden or visi
 
 ### Example
 
-```example
-html: |-
-  <div data-bind="visible: shouldShowMessage">
+```tsx
+const shouldShowMessage = ko.observable(true)
+
+<>
+  <p><label><input type="checkbox" ko-checked={shouldShowMessage} /> Show message</label></p>
+  <div ko-visible={shouldShowMessage}>
     You will see this message only when "shouldShowMessage" holds a true value.
   </div>
+</>
+```
 
-javascript: |-
-  var viewModel = {
-	shouldShowMessage: ko.observable(true) // Message initially visible
-  };
-  viewModel.shouldShowMessage(false); // ... now it's hidden
-  viewModel.shouldShowMessage(true); // ... now it's visible again
+```html
+<div data-bind="visible: shouldShowMessage">
+  You will see this message only when "shouldShowMessage" holds a true value.
+</div>
+```
+
+```javascript
+var viewModel = {
+  shouldShowMessage: ko.observable(true) // Message initially visible
+};
+viewModel.shouldShowMessage(false); // ... now it's hidden
+viewModel.shouldShowMessage(true); // ... now it's visible again
 ```
 
 ### Parameters
@@ -44,16 +55,32 @@ javascript: |-
 
 You can also use a JavaScript function or arbitrary JavaScript expression as the parameter value. If you do, KO will run your function/evaluate your expression, and use the result to determine whether to hide the element.
 
-For example,
+For example, in TSX you would typically put the derived condition in a computed:
 
-```example
-html: |-
-  <div data-bind="visible: myValues().length > 0">
+```tsx
+const myValues = ko.observableArray([])
+const hasValues = ko.pureComputed(() => myValues().length > 0)
+
+<>
+  <p>
+    <button ko-click={() => myValues.push(`Item ${myValues().length + 1}`)}>Add value</button>
+    <button ko-click={() => myValues.removeAll()}>Clear values</button>
+  </p>
+  <div ko-visible={hasValues}>
     You will see this message only when 'myValues' has at least one member.
   </div>
-javascript: |-
-  var viewModel = {
-	myValues: ko.observableArray([]) // Initially empty, so message hidden
-  };
-  viewModel.myValues.push("some value"); // Now visible
+</>
+```
+
+```html
+<div data-bind="visible: myValues().length > 0">
+  You will see this message only when 'myValues' has at least one member.
+</div>
+```
+
+```javascript
+var viewModel = {
+  myValues: ko.observableArray([]) // Initially empty, so message hidden
+};
+viewModel.myValues.push("some value"); // Now visible
 ```

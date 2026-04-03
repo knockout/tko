@@ -126,15 +126,11 @@ This creates a changeset file in `.changeset/` that gets committed with your PR.
 1. Push to main triggers `.github/workflows/release.yml`
 2. If unreleased changesets exist, the action opens a "Version Packages" PR
 3. Review the PR (it bumps versions and updates changelogs)
-4. Merge it to publish to npm
+4. Merge it to publish to npm via GitHub Actions OIDC trusted publishing
 
-**Manual release** (fallback):
-```bash
-make repackage       # Sync package.json metadata across packages
-lerna version        # Bump versions (interactive)
-make                 # Rebuild everything
-lerna publish from-package  # Publish to npm
-```
+Avoid manual workstation publishes. If release CI is unavailable, fix the
+workflow or npm trusted publisher configuration rather than bypassing it with a
+long-lived publish token.
 
 ## Plans
 
@@ -156,6 +152,17 @@ When documentation changes — new APIs, new bindings, new patterns, behavioral
 changes — update **both** the Starlight docs (for humans) and the agent guide
 (for agents). The agent guide should be token-efficient: dense, code-first,
 minimal prose.
+
+## Docs Verification
+
+When validating `tko.io` documentation changes with the local docs site:
+
+- Use `playwright-cli` in headless mode by default. Do not use headed/browser-stealing runs unless the user explicitly asks for them.
+- Prefer a live Astro dev server on `127.0.0.1` so markdown/plugin edits reload while you work.
+- For docs pages with runnable examples, verify the live page and each `Open in Playground` button after edits.
+- Standard headless flow: `playwright-cli close-all`, `playwright-cli open http://127.0.0.1:4321/...`, inspect the snapshot for playground refs, click each button, switch to the playground tab, and confirm `#esbuild-status`, `#compile-time`, and `#error-bar`.
+- Treat docs example work as incomplete until the emitted playground payload compiles cleanly on the live site.
+- If a page has multiple TSX examples, check every TSX playground button, not just the first one.
 
 ## Important Guidelines
 

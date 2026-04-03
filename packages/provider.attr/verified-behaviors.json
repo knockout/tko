@@ -1,0 +1,23 @@
+{
+  "description": "Attribute-based `ko-*` binding discovery on elements.",
+  "behaviors": [
+    {
+      "statement": "`nodeHasBindings` returns `false` when an element has no `ko-*` attributes and `true` when any `ko-*` attribute is present.",
+      "specs": [
+        "packages/provider.attr/spec/AttributeProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`getBindingAccessors` strips the `ko-` prefix and exposes the binding under its plain name.",
+      "specs": [
+        "packages/provider.attr/spec/AttributeProviderBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "Attribute expressions are evaluated against the supplied binding context.",
+      "specs": [
+        "packages/provider.attr/spec/AttributeProviderBehaviors.ts"
+      ]
+    }
+  ]
+}

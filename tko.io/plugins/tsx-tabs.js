@@ -1,75 +1,45 @@
 /**
- * Remark plugin: wraps HTML code blocks containing data-bind attributes
- * in synced TSX/HTML tab pairs using Starlight's tab markup.
+ * Remark plugin: wraps adjacent handwritten TSX + HTML code blocks
+ * in synced Starlight tab groups.
  *
- * Generates a TSX equivalent by converting data-bind="..." to ko-* attributes,
- * then wraps both versions in <starlight-tabs> for a tabbed display.
+ * TSX examples are authored as real standalone `.tsx` files. When a matching
+ * HTML example has a following JS block, that JS is rendered inside the HTML
+ * tab panel so it does not appear as a separate block below the tab group.
  */
-
-/**
- * Parse a KO binding string into individual {name, value} pairs.
- * Respects nested braces, parens, brackets, and quoted strings so that
- * object/array values and string literals are not split on internal commas.
- */
-function parseBindingString(str) {
-  const bindings = []
-  let depth = 0
-  let start = 0
-  let quote = null
-
-  for (let i = 0; i <= str.length; i++) {
-    const ch = i < str.length ? str[i] : null
-
-    if (quote) {
-      if (ch === '\\') { i++; continue }
-      if (ch === quote) quote = null
-      continue
-    }
-
-    if (ch === "'" || ch === '"' || ch === '`') { quote = ch; continue }
-    if (ch === '{' || ch === '(' || ch === '[') depth++
-    else if (ch === '}' || ch === ')' || ch === ']') depth--
-    else if ((ch === ',' || i === str.length) && depth === 0) {
-      const part = str.slice(start, i).trim()
-      if (part) {
-        const colon = part.indexOf(':')
-        if (colon > 0) {
-          bindings.push({
-            name: part.slice(0, colon).trim(),
-            value: part.slice(colon + 1).trim()
-          })
-        }
-      }
-      start = i + 1
-    }
-  }
-
-  return bindings
+function isJavaScriptLike(node) {
+  return node?.type === 'code' && (node.lang === 'javascript' || node.lang === 'js')
 }
 
-/**
- * Convert HTML with data-bind attributes to TSX with ko-* attributes.
- */
-function convertDataBindToTsx(html) {
-  return html.replace(/data-bind=(["'])([\s\S]*?)\1/g, (_match, _quote, bindingStr) => {
-    const bindings = parseBindingString(bindingStr)
-    if (bindings.length === 0) return _match
-    return bindings.map(({ name, value }) => `ko-${name}={${value}}`).join(' ')
-  })
+function encodePlaygroundJs(value) {
+  return Buffer.from(value, 'utf8').toString('base64url')
 }
 
-/**
- * Build the array of AST nodes that replace a single HTML code block:
- *   html(open tabs + tablist + open TSX panel)
- *   code(tsx)
- *   html(close TSX panel + open HTML panel)
- *   code(html)
- *   html(close HTML panel + restore + close tabs)
- */
-function createTabGroup(node, id) {
-  const tsxCode = convertDataBindToTsx(node.value)
+function appendPlaygroundJsMeta(meta, jsCode) {
+  if (!jsCode) return meta
+  const parts = [meta, `playground-js=${encodePlaygroundJs(jsCode)}`].filter(Boolean)
+  return parts.join(' ')
+}
+
+function createTabGroup(tsxNode, htmlNode, jsNode, id) {
   const tsxId = `${id}t`
   const htmlId = `${id}h`
+  const htmlPanelChildren = [
+    {
+      type: 'code',
+      lang: 'html',
+      value: htmlNode.value,
+      meta: appendPlaygroundJsMeta(htmlNode.meta, jsNode?.value)
+    }
+  ]
+
+  if (jsNode) {
+    htmlPanelChildren.push({
+      type: 'code',
+      lang: jsNode.lang,
+      value: jsNode.value,
+      meta: jsNode.meta
+    })
+  }
 
   return [
     {
@@ -87,19 +57,14 @@ function createTabGroup(node, id) {
     {
       type: 'code',
       lang: 'tsx',
-      value: tsxCode,
-      meta: node.meta
+      value: tsxNode.value,
+      meta: tsxNode.meta
     },
     {
       type: 'html',
       value: `</div><div role="tabpanel" id="tab-panel-${htmlId}" aria-labelledby="tab-${htmlId}" hidden>`
     },
-    {
-      type: 'code',
-      lang: 'html',
-      value: node.value,
-      meta: node.meta
-    },
+    ...htmlPanelChildren,
     {
       type: 'html',
       value: `</div><starlight-tabs-restore></starlight-tabs-restore></starlight-tabs>`
@@ -111,18 +76,38 @@ function walkAndTransform(node, counter) {
   if (!Array.isArray(node.children)) return
 
   const newChildren = []
-  for (const child of node.children) {
+  let i = 0
+
+  while (i < node.children.length) {
+    const child = node.children[i]
+    const next = node.children[i + 1]
+    const third = node.children[i + 2]
+
     if (
       child.type === 'code' &&
-      child.lang === 'html' &&
-      /data-bind=/.test(child.value)
+      child.lang === 'tsx' &&
+      next?.type === 'code' &&
+      next.lang === 'html'
     ) {
-      newChildren.push(...createTabGroup(child, ++counter.value))
+      newChildren.push(...createTabGroup(child, next, isJavaScriptLike(third) ? third : null, ++counter.value))
+      i += isJavaScriptLike(third) ? 3 : 2
+    } else if (
+      child.type === 'code' &&
+      child.lang === 'html' &&
+      isJavaScriptLike(next)
+    ) {
+      newChildren.push({
+        ...child,
+        meta: appendPlaygroundJsMeta(child.meta, next.value)
+      })
+      i++
     } else {
       walkAndTransform(child, counter)
       newChildren.push(child)
+      i++
     }
   }
+
   node.children = newChildren
 }
 

@@ -14,6 +14,15 @@ The `if` binding causes a section of markup to appear in your document (and to h
 
 This example shows that the `if` binding can dynamically add and remove sections of markup as observable values change.
 
+```tsx
+const displayMessage = ko.observable(false)
+
+<>
+  <label><input type="checkbox" ko-checked={displayMessage} /> Display message</label>
+  <div ko-if={displayMessage}>Here is a message. Astonishing.</div>
+</>
+```
+
 ```html
 <label><input type="checkbox" data-bind="checked: displayMessage" /> Display message</label>
 
@@ -29,6 +38,20 @@ ko.applyBindings({
 ### Example 2
 
 In the following example, the `<div>` element will be empty for "Mercury", but populated for "Earth". That's because Earth has a non-null `capital` property, whereas "Mercury" has `null` for that property.
+
+```tsx
+const planets = [
+  { name: 'Mercury', capital: null },
+  { name: 'Earth', capital: { cityName: 'Barnsley' } }
+]
+
+<ul ko-foreach={planets}>
+  <li>
+    Planet: <b ko-text="name"> </b>
+    <div ko-if="capital">Capital: <b ko-text="capital.cityName"> </b></div>
+  </li>
+</ul>
+```
 
 ```html
 <ul data-bind="foreach: planets">

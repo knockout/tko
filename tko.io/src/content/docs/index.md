@@ -20,6 +20,8 @@ TKO is the monorepo and documentation home for the modern Knockout builds.
 
 It keeps the familiar Knockout model of observables, computed values, and declarative bindings, while publishing the runtime as modular packages instead of a single legacy distribution.
 
+New examples in this docs set show both classic HTML `data-bind` and modern TSX `ko-*` authoring. Use the TSX examples when you are writing new UI with `@tko/build.reference`, and use the HTML examples when you need to mirror existing markup or compare against older code with `@tko/build.knockout`.
+
 ## Choose a build
 
 Use this rule of thumb:
@@ -33,7 +35,7 @@ Use this rule of thumb:
   <a class="landing-card" href="/advanced/provider/">
     <span class="landing-card__eyebrow">Recommended for modular setups</span>
     <h3><code>@tko/build.reference</code></h3>
-    <p>Use this if you want the leaner reference build and are comfortable composing a more modular setup yourself.</p>
+    <p>Use this if you want the TSX and `ko-*` path shown in this docs set, plus a more modular setup with JSX, native bindings, and provider composition.</p>
   </a>
   <div class="landing-card landing-card--status">
     <span class="landing-card__eyebrow">Project status</span>
@@ -43,6 +45,8 @@ Use this rule of thumb:
 </div>
 
 If you are upgrading an existing Knockout 3.x application, start with the [Knockout 3 to 4 Guide](/3to4/).
+
+If you are following the TSX examples in this docs set, install `@tko/build.reference`.
 
 ## Current status
 
@@ -60,7 +64,7 @@ yarn add @tko/build.knockout
 bun add @tko/build.knockout
 ```
 
-If you want the modular reference build instead:
+If you want the TSX / `ko-*` path instead:
 
 ```bash
 npm install @tko/build.reference

@@ -11,6 +11,15 @@ The `text` binding causes the associated DOM element to display the text value o
 Typically this is useful with elements like `<span>` or `<em>` that traditionally display text, but technically you can use it with any element.
 
 ### Example
+```tsx
+const myMessage = ko.observable('Hello, world!')
+
+<>
+  <p>Type a message: <input ko-textInput={myMessage} /></p>
+  <p>Today's message is: <span ko-text={myMessage}></span></p>
+</>
+```
+
 ```html
 Today's message is: <span data-bind="text: myMessage"></span>
 ```
@@ -23,6 +32,8 @@ viewModel.myMessage("Hello, world!"); // Text appears
 
 ko.applyBindings(viewModel);
 ```
+
+In TSX, `ko-text={...}` takes normal JavaScript expressions. Define the values you need before the JSX, then bind them directly.
 
 
 ### Parameters
@@ -39,11 +50,25 @@ ko.applyBindings(viewModel);
 
    * None
 
-### Note 1: Using functions and expressions to detemine text values
+### Note 1: Using functions and expressions to determine text values
 
-If you want to detemine text programmatically, one option is to create a [computed observable](../../computed/computedObservables/), and use its evaluator function as a place for your code that works out what text to display.
+If you want to determine text programmatically, one option is to create a [computed observable](/computed/computedobservables/), and use its evaluator function as a place for your code that works out what text to display.
 
 For example,
+
+```tsx
+const price = ko.observable(24.95)
+const priceRating = ko.pureComputed(() => (price() > 50 ? 'expensive' : 'affordable'))
+
+<>
+  <p>Price: $<span ko-text={price}></span></p>
+  <p>The item is <span ko-text={priceRating}></span> today.</p>
+  <p>
+    <button ko-click={() => price(Math.max(0, price() - 30))}>Lower price</button>
+    <button ko-click={() => price(price() + 30)}>Raise price</button>
+  </p>
+</>
+```
 
 ```html
 The item is <span data-bind="text: priceRating"></span> today.
@@ -62,7 +87,18 @@ ko.applyBindings(viewModel);
 
 Now, the text will switch between "expensive" and "affordable" as needed whenever `price` changes.
 
-Alternatively, you don't need to create a computed observable if you're doing something simple like this. You can pass an arbitrary JavaScript expression to the `text` binding. For example,
+In HTML, you don't need to create a computed observable if you're doing something simple like this. You can pass an arbitrary JavaScript expression to the `text` binding. In TSX, make that derived value a computed so it stays reactive. For example,
+
+```tsx
+const price = ko.observable(24.95)
+const priceDescription = ko.pureComputed(() => (price() > 50 ? 'expensive' : 'affordable'))
+
+<>
+  <p>Price: $<span ko-text={price}></span></p>
+  <p>The item is <span ko-text={priceDescription}></span> today.</p>
+  <p><button ko-click={() => price(price() > 50 ? 24.95 : 74.95)}>Toggle price range</button></p>
+</>
+```
 
 ```html
 The item is
@@ -70,7 +106,7 @@ The item is
 today.
 ```
 
-This has exactly the same result, without requiring the `priceRating` computed observable.
+This has exactly the same result. In the HTML version the binding expression stays reactive on its own; in TSX the computed keeps the derived text reactive.
 
 ### Note 2: About HTML encoding
 
@@ -103,19 +139,3 @@ To handle this, you can use the *containerless syntax*, which is based on commen
 ```
 
 The `<!--ko-->` and `<!--/ko-->` comments act as start/end markers, defining a "virtual element" that contains the markup inside. Knockout understands this virtual element syntax and binds as if you had a real container element.
-
-### Note 4: About an IE 6 whitespace quirk
-
-IE 6 has a strange quirk whereby it sometimes ignores whitespace that immediately follows an empty span. This has nothing directly to do with Knockout, but in case you do want to write:
-
-```html
-Welcome, `<span data-bind="text: userName"></span>` to our web site.
-```
-
-... and IE 6 renders no whitespace before the words `to our web site`, you can avoid the problem by putting any text into the `<span>`, e.g.:
-
-```html
-Welcome, <span data-bind="text: userName">&nbsp;</span> to our web site.
-```
-
-Other browsers, and newer versions of IE, don't have this quirk.

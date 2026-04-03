@@ -21,7 +21,7 @@ On this page, you'll learn about the first of these three. But before that, let'
 
 *Model-View-View Model (MVVM)* is a design pattern for building user interfaces. It describes how you can keep a potentially sophisticated UI simple by splitting it into three parts:
 
-* A *model*: your application's stored data. This data represents objects and operations in your business domain (e.g., bank accounts that can perform money transfers) and is independent of any UI. When using KO, you will usually make Ajax calls to some server-side code to read and write this stored model data.
+* A *model*: your application's stored data. This data represents objects and operations in your business domain (e.g., bank accounts that can perform money transfers) and is independent of any UI. When using KO, you will usually make network requests to some server-side code to read and write this stored model data.
 
 * A *view model*: a pure-code representation of the data and operations on a UI. For example, if you're implementing a list editor, your view model would be an object holding a list of items, and exposing methods to add and remove items.
 
@@ -56,7 +56,7 @@ To activate Knockout, add the following line to a `<script>` block:
 ko.applyBindings(myViewModel);
 ```
 
-You can either put the script block at the bottom of your HTML document, or you can put it at the top and wrap the contents in a DOM-ready handler such as [jQuery's `$` function](http://api.jquery.com/jQuery/#jQuery3).
+You can either put the script block at the bottom of your HTML document, or you can put it at the top and wrap the contents in a `DOMContentLoaded` handler.
 
 That does it! Now, your view will display as if you'd written the following HTML:
 
@@ -89,7 +89,7 @@ You don't have to change the view at all - the same `data-bind` syntax will keep
 
 ## Reading and writing observables
 
-Not all browsers support JavaScript getters and setters (\* cough \* IE \* cough \*), so for compatibility, `ko.observable` objects are actually *functions*.
+For compatibility and consistency, `ko.observable` objects are actually *functions* rather than property accessors.
 
 * To **read** the observable's current value, just call the observable with no parameters. In this example, `myViewModel.personName()` will return `'Bob'`, and `myViewModel.personAge()` will return `123`.
 
@@ -150,7 +150,7 @@ Observables implement a variety of functions useful for working in an asynchrono
 
 ## Forcing observables to always notify subscribers
 
-When writing to an observable that contains a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](../../observables/extenders/) to ensure that an observable's subscribers are always notified on a write, even if the value is the same. You would apply the extender to an observable like this:
+When writing to an observable that contains a primitive value (a number, string, boolean, or null), the dependencies of the observable are normally only notified if the value actually changed. However, it is possible to use the built-in `notify` [extender](/observables/extenders/) to ensure that an observable's subscribers are always notified on a write, even if the value is the same. You would apply the extender to an observable like this:
 
 ```javascript
 myViewModel.personName.extend({ notify: 'always' });
@@ -158,7 +158,7 @@ myViewModel.personName.extend({ notify: 'always' });
 
 ## Delaying and/or suppressing change notifications
 
-Normally, an observable notifies its subscribers immediately, as soon as it's changed. But if an observable is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying the observable's change notifications. This is accomplished using the [`rateLimit` extender](../../observables/rateLimit-observable/) like this:
+Normally, an observable notifies its subscribers immediately, as soon as it's changed. But if an observable is changed repeatedly or triggers expensive updates, you may get better performance by limiting or delaying the observable's change notifications. This is accomplished using the [`rateLimit` extender](./rateLimit-observable/) like this:
 
 ```javascript
 // Ensure it notifies about changes no more than once per 50-millisecond period

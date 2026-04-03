@@ -1,0 +1,35 @@
+{
+  "description": "Built-in string, defaulting, fitting, and JSON filters.",
+  "behaviors": [
+    {
+      "statement": "`filters.uppercase` uppercases plain strings and unwrapped observables, and `filters.lowercase` lowercases them.",
+      "specs": [
+        "packages/filter.punches/spec/filterBehavior.ts"
+      ]
+    },
+    {
+      "statement": "`filters.default` replaces empty string, whitespace-only string, empty array, `null`, and `undefined`, but leaves nonblank strings, `0`, and functions unchanged.",
+      "specs": [
+        "packages/filter.punches/spec/filterBehavior.ts"
+      ]
+    },
+    {
+      "statement": "`filters.replace` performs string replacement and unwraps observable input.",
+      "specs": [
+        "packages/filter.punches/spec/filterBehavior.ts"
+      ]
+    },
+    {
+      "statement": "`filters.fit` truncates with default ellipsis, supports custom suffix text, and supports left or middle truncation modes.",
+      "specs": [
+        "packages/filter.punches/spec/filterBehavior.ts"
+      ]
+    },
+    {
+      "statement": "`filters.json` stringifies strings, arrays, and objects, and accepts a spacing argument.",
+      "specs": [
+        "packages/filter.punches/spec/filterBehavior.ts"
+      ]
+    }
+  ]
+}

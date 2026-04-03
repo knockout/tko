@@ -1,0 +1,44 @@
+{
+  "description": "`computed`, `when`, `throttle`, and `rateLimit` behavior covered by the async/unit specs.",
+  "behaviors": [
+    {
+      "statement": "`extend({ throttle: timeout })` delays observable change notifications until writes stop, then emits the latest value.",
+      "specs": [
+        "packages/computed/spec/asyncBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`extend({ throttle: timeout })` on a computed delays reevaluation and notification until dependencies stop changing.",
+      "notes": [
+        "The evaluator still runs once synchronously on initial creation."
+      ],
+      "specs": [
+        "packages/computed/spec/asyncBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`extend({ rateLimit: timeout })` delays default change notifications, while `beforeChange` stays immediate and `spectate` sees each write.",
+      "specs": [
+        "packages/computed/spec/asyncBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`rateLimit` supports both `notifyAtFixedRate` and `notifyWhenChangesStop`, and later `rateLimit` settings are used for future notifications.",
+      "specs": [
+        "packages/computed/spec/asyncBehaviors.ts"
+      ]
+    },
+    {
+      "statement": "`when(predicate, callback)` runs the callback once, then disposes its subscription.",
+      "notes": [
+        "The predicate may be either a function or an observable.",
+        "The return value exposes `dispose()` to cancel the pending notification.",
+        "With deferred updates enabled, the callback runs in a later task."
+      ],
+      "specs": [
+        "packages/computed/spec/observableUtilsBehaviors.ts",
+        "packages/computed/spec/asyncBehaviors.ts"
+      ]
+    }
+  ]
+}

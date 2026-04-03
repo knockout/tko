@@ -10,6 +10,16 @@ The `enable` binding causes the associated DOM element to be enabled only when t
 
 ### Example
 
+```tsx
+const hasCellphone = ko.observable(false)
+const cellphoneNumber = ko.observable('')
+
+<>
+  <p><input type="checkbox" ko-checked={hasCellphone} /> I have a cellphone</p>
+  <p>Your cellphone number: <input type="text" ko-value={cellphoneNumber} ko-enable={hasCellphone} /></p>
+</>
+```
+
 ```html
 <p>
     <input type="checkbox" data-bind="checked: hasCellphone" />
@@ -31,6 +41,8 @@ ko.applyBindings(viewModel);
 ```
 
 In this example, the "Your cellphone number" text box will initially be disabled. It will be enabled only when the user checks the box labelled "I have a cellphone".
+
+In TSX, the same example becomes compile-time checked `ko-checked`, `ko-value`, and `ko-enable` bindings with the observables declared up front.
 
 ### Parameters
 

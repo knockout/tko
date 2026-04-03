@@ -19,6 +19,16 @@
  */
 
 const MASK_SVG = `url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.75'%3E%3Cpath%20d%3D'M15%203h6v6'%2F%3E%3Cpath%20d%3D'M10%2014%2021%203'%2F%3E%3Cpath%20d%3D'M18%2013v6a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2V8a2%202%200%200%201%202-2h6'%2F%3E%3C%2Fsvg%3E")`
+const DEFAULT_PLAYGROUND_HTML = '<div id="root"></div>'
+const DIRECT_MOUNT_PATTERNS = [
+  /document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\.\s*(?:appendChild|append|replaceChildren)\s*\(/,
+  /(?:ko|tko)\.applyBindings\s*\([\s\S]*?,\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)/,
+  /tko\.jsx\.render\s*\([\s\S]*?,\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)/,
+  /(?:ReactDOM\.)?createRoot\s*\(\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)\s*\.render\s*\(/,
+  /ReactDOM\.render\s*\([\s\S]*?,\s*document\.getElementById\(\s*(['"`])([^'"`]+)\1\s*\)\s*\)/
+]
+const ELEMENT_REF_RE =
+  /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*document\.getElementById\(\s*(['"`])([^'"`]+)\2\s*\)/g
 
 function h(tag, props, children = []) {
   return {
@@ -64,13 +74,81 @@ function autoApplyBindings(js) {
   return js + `\nko.applyBindings(${vmName});`
 }
 
-function addPlaygroundButton(renderData, html, js) {
-  const runnableJs = autoApplyBindings(js)
-  if (!runnableJs) return
-  const hash = encodePlaygroundHash(html, runnableJs)
-  const ast = renderData.blockAst
+function looksLikeJsxExpression(code) {
+  const trimmed = code.trim()
+  return trimmed.startsWith('<') || trimmed.startsWith('(')
+}
 
-  const copyDiv = findNode(ast, n =>
+function indentBlock(code, spaces) {
+  const indent = ' '.repeat(spaces)
+  return code
+    .split('\n')
+    .map(line => (line ? `${indent}${line}` : line))
+    .join('\n')
+}
+
+function findExplicitMountId(code) {
+  for (const pattern of DIRECT_MOUNT_PATTERNS) {
+    const match = code.match(pattern)
+    if (match) return match[2]
+  }
+
+  for (const match of code.matchAll(ELEMENT_REF_RE)) {
+    const [, refName, , id] = match
+    const refPattern = new RegExp(
+      String.raw`\b${refName}\b\s*\.\s*(?:appendChild|append|replaceChildren)\s*\(|` +
+      String.raw`(?:^|\W)(?:ko|tko)\.applyBindings\s*\([\s\S]*?,\s*${refName}\b|` +
+      String.raw`tko\.jsx\.render\s*\([\s\S]*?,\s*${refName}\b|` +
+      String.raw`(?:ReactDOM\.)?createRoot\s*\(\s*${refName}\b\s*\)\s*\.render\s*\(|` +
+      String.raw`ReactDOM\.render\s*\([\s\S]*?,\s*${refName}\b`,
+      'm'
+    )
+    if (refPattern.test(code)) return id
+  }
+
+  return null
+}
+
+function inferPlaygroundHtml(tsx) {
+  const mountId = findExplicitMountId(tsx)
+  return mountId ? `<div id="${mountId}"></div>` : DEFAULT_PLAYGROUND_HTML
+}
+
+function wrapTsxForPlayground(tsx) {
+  const code = tsx.trim()
+  if (!code) return code
+
+  // Hand-authored full examples should keep their explicit setup only when
+  // they already include a concrete mount target.
+  if (findExplicitMountId(code)) return code
+
+  const blocks = code.split(/\n\s*\n/)
+  const jsxIndex = blocks.findIndex(block => looksLikeJsxExpression(block.trim()))
+  if (jsxIndex < 0) return code
+
+  const jsxBlock = blocks.slice(jsxIndex).join('\n\n').trim()
+  if (!jsxBlock) return code
+
+  const prelude = blocks.slice(0, jsxIndex).join('\n\n').trim()
+
+  let wrapped = ''
+  if (prelude) wrapped += `${prelude}\n\n`
+  wrapped += '{\n'
+  wrapped += '  // boilerplate added by the docs playground\n'
+  wrapped += "  const __docsPlaygroundRoot = document.getElementById('root')\n"
+  wrapped += '  const __docsPlaygroundRendered = tko.jsx.render(\n'
+  wrapped += `${indentBlock(jsxBlock, 4)}\n`
+  wrapped += '  )\n'
+  wrapped += '  __docsPlaygroundRoot.appendChild(__docsPlaygroundRendered.node)\n'
+  wrapped += '  tko.applyBindings({}, __docsPlaygroundRoot)\n'
+  wrapped += '}'
+  return wrapped
+}
+
+function insertPlaygroundButton(blockAst, html, js) {
+  const hash = encodePlaygroundHash(html, js)
+
+  const copyDiv = findNode(blockAst, n =>
     n.type === 'element' &&
     n.tagName === 'div' &&
     Array.isArray(n.properties?.className) &&
@@ -89,11 +167,17 @@ function addPlaygroundButton(renderData, html, js) {
   copyDiv.children.unshift(link)
 }
 
-export function pluginPlaygroundButton() {
-  // Track pending blocks for pairing with a following JS block
-  let pendingHtml = null
-  let pendingTsx = null
+function addHtmlPlaygroundButton(blockAst, html, js) {
+  const runnableJs = autoApplyBindings(js)
+  if (!runnableJs) return
+  insertPlaygroundButton(blockAst, html, runnableJs)
+}
 
+function addTsxButton(blockAst, tsx) {
+  insertPlaygroundButton(blockAst, inferPlaygroundHtml(tsx), wrapTsxForPlayground(tsx))
+}
+
+export function pluginPlaygroundButton() {
   return {
     name: 'playground-button',
 
@@ -177,38 +261,25 @@ export function pluginPlaygroundButton() {
     hooks: {
       postprocessRenderedBlock: ({ codeBlock, renderData }) => {
         if (codeBlock.language === 'tsx') {
-          // TSX block (from tsx-tabs) — store for pairing with following JS block
-          pendingTsx = { html: codeBlock.code.trim(), renderData }
-        } else if (codeBlock.language === 'html') {
-          const code = codeBlock.code
-          const { html, js } = splitHtmlAndScript(code)
+          addTsxButton(renderData.blockAst, codeBlock.code.trim())
+          return
+        }
 
-          if (js) {
-            // Self-contained HTML block with inline <script> — add button now
-            pendingHtml = null
-            pendingTsx = null
-            addPlaygroundButton(renderData, html, js)
-          } else {
-            // HTML-only block — store for potential pairing with next JS block
-            pendingHtml = { html: code.trim(), renderData }
-          }
-        } else if (codeBlock.language === 'javascript' && (pendingHtml || pendingTsx)) {
-          // JS block after an HTML/TSX block — pair them
-          const js = codeBlock.code.trim()
-          if (js) {
-            if (pendingHtml) {
-              addPlaygroundButton(pendingHtml.renderData, pendingHtml.html, js)
-            }
-            if (pendingTsx) {
-              addPlaygroundButton(pendingTsx.renderData, pendingTsx.html, js)
-            }
-          }
-          pendingHtml = null
-          pendingTsx = null
-        } else {
-          // Any other block type breaks the pairing
-          pendingHtml = null
-          pendingTsx = null
+        if (codeBlock.language !== 'html') return
+
+        const { html, js } = splitHtmlAndScript(codeBlock.code)
+        if (js) {
+          addHtmlPlaygroundButton(renderData.blockAst, html, js)
+          return
+        }
+
+        const pairedJs = codeBlock.metaOptions.getString('playground-js')
+        if (pairedJs) {
+          addHtmlPlaygroundButton(
+            renderData.blockAst,
+            html,
+            Buffer.from(pairedJs, 'base64url').toString('utf8')
+          )
         }
       }
     }

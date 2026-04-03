@@ -9,22 +9,31 @@ The `attr` binding provides a generic way to set the value of any attribute for 
 
 ### Example
 
+```tsx
+const url = ko.observable('/llms.txt')
+const details = ko.observable('TKO agent docs and playground links')
+
+<a ko-attr={{ href: url, title: details }}>LLMs.txt</a>
+```
+
 ```html
 <a data-bind="attr: { href: url, title: details }">
-    Report
+    LLMs.txt
 </a>
 ```
 
 ```javascript
 var viewModel = {
-    url: ko.observable("year-end.html"),
-    details: ko.observable("Report including final year-end statistics")
+    url: ko.observable("/llms.txt"),
+    details: ko.observable("TKO agent docs and playground links")
 };
 
 ko.applyBindings(viewModel);
 ```
 
-This will set the element's `href` attribute to `year-end.html` and the element's `title` attribute to `Report including final year-end statistics`.
+This will set the element's `href` attribute to `/llms.txt` and the element's `title` attribute to `TKO agent docs and playground links`.
+
+In TSX, `ko-attr={...}` takes normal JavaScript expressions. Define any observables you want to bind before the JSX, then use them directly in the binding expression. The playground button adds the standard render/setup wrapper automatically.
 
 ### Parameters
 
