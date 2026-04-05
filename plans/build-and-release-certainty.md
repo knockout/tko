@@ -71,6 +71,7 @@ to npm.
 - Builds all packages and runs tests
 - If unreleased changesets exist, opens/updates a version PR
 - If version PR is merged, publishes to npm
+- After a successful publish, creates the matching GitHub Release and tag
 - Uses npm trusted publishing via GitHub Actions OIDC
 - Requires trusted publisher configuration for the public `@tko/*` packages on npm
 

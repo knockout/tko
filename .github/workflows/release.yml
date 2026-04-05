@@ -98,3 +98,38 @@ jobs:
         # npm generates provenance attestations automatically during trusted
         # publishing from GitHub Actions.
         run: npx changeset publish
+
+  github-release:
+    name: Create GitHub Release
+    needs: [prepare-release, publish]
+    if: needs.prepare-release.outputs.has_changesets == 'false' && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        # actions/checkout v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Determine release version
+        id: version
+        run: echo "version=$(node -p 'require(\"./lerna.json\").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release if missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          tag="v${VERSION}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "GitHub release $tag already exists; skipping."
+            exit 0
+          fi
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "TKO ${VERSION}" \
+            --generate-notes
