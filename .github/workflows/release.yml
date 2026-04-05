@@ -112,10 +112,12 @@ jobs:
       - name: Checkout code
         # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Determine release version
         id: version
-        run: echo "version=$(node -p 'require(\"./lerna.json\").version')" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node -p 'require(\"./builds/reference/package.json\").version')" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release if missing
         env:
