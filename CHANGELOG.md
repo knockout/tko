@@ -1,7 +1,3 @@
-## 💪 Next
-
-- coming soon
-
 ## 4.0.0
 
 - #202 Make TKO more type-safe @mcselle, @Auge19, @phillipc, @M-Kirchhoff, @brianmhunt 
