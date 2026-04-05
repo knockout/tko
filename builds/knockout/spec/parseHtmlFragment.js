@@ -1,7 +1,7 @@
 var temporarilyRegisteredComponents = [];
 
 describe('Parse HTML fragment', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
     afterEach(function() {
         ko.utils.arrayForEach(temporarilyRegisteredComponents, function(componentName) {
             ko.components.unregister(componentName);
@@ -50,7 +50,7 @@ describe('Parse HTML fragment', function() {
             //     modified version of innerShiv that supports a 'reset' method. In production code, people
             //     should not use 'reset' like this - instead ensure that all custom elements are preregistered.
             // None of this mess affects other browsers.
-            if (jasmine.ieVersion <= 8) {
+            if (ieVersion <= 8) {
                 data.html.replace(/\<([a-z0-9\-]+)/g, function(ignored, foundTagName) {
                     if (!ko.components.isRegistered(foundTagName)) {
                         temporarilyRegisteredComponents.push(foundTagName);
@@ -66,7 +66,7 @@ describe('Parse HTML fragment', function() {
             var parsedNodes = ko.utils.parseHtmlFragment(data.html, document);
 
             // Normalise the output
-            if (jasmine.ieVersion <= 8 && data.ignoreRedundantTBody) {
+            if (ieVersion <= 8 && data.ignoreRedundantTBody) {
                 if (parsedNodes[parsedNodes.length - 1].tagName === 'TBODY') {
                     // IE 7 adds a tbody tag; ignore it for the purpose of the test
                     parsedNodes.pop();
@@ -74,11 +74,11 @@ describe('Parse HTML fragment', function() {
             }
 
             // Assert that we have the expected collection of elements (not just the correct .innerHTML string)
-            expect(parsedNodes.length).toEqual(data.parsed.length);
+            expect(parsedNodes.length).to.deep.equal(data.parsed.length);
             for (var i = 0; i < parsedNodes.length; i++) {
                 testNode.innerHTML = '';
                 testNode.appendChild(parsedNodes[i]);
-                expect(testNode).toContainHtml(data.parsed[i], function(htmlToClean) {
+                expectContainHtml(testNode, data.parsed[i], function(htmlToClean) {
                     // Old IE strips quotes from certain attributes. The easiest way of normalising this across
                     // browsers is to forcibly strip the equivalent quotes in all browsers for the test.
                     return htmlToClean.replace(/"x"/g, 'x');

@@ -1,4 +1,5 @@
 import { applyBindings } from '@tko/bind'
+import { expect } from 'chai'
 
 import { triggerEvent } from '@tko/utils'
 
@@ -8,12 +9,12 @@ import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: Submit', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -35,7 +36,7 @@ describe('Binding: Submit', function () {
     const formNode = testNode.childNodes[0]
     applyBindings(model, testNode)
     triggerEvent(testNode.children[0], 'submit')
-    expect(model.wasCalled).toEqual(true)
-    expect(firstParamStored).toEqual(formNode)
+    expect(model.wasCalled).to.equal(true)
+    expect(firstParamStored).to.equal(formNode)
   })
 })

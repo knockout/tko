@@ -2,26 +2,26 @@
 describe('Observable', function() {
     it('Should be subscribable', function () {
         var instance = new ko.observable();
-        expect(ko.isSubscribable(instance)).toEqual(true);
+        expect(ko.isSubscribable(instance)).to.deep.equal(true);
     });
 
     it('Should advertise that instances are observable', function () {
         var instance = new ko.observable();
-        expect(ko.isObservable(instance)).toEqual(true);
+        expect(ko.isObservable(instance)).to.deep.equal(true);
     });
 
     it('Should not advertise that ko.observable is observable', function () {
-        expect(ko.isObservable(ko.observable)).toEqual(false);
+        expect(ko.isObservable(ko.observable)).to.deep.equal(false);
     });
 
     it('Should advertise that instances are not computed', function () {
         var instance = ko.observable();
-        expect(ko.isComputed(instance)).toEqual(false);
+        expect(ko.isComputed(instance)).to.deep.equal(false);
     });
 
     it('Should advertise that instances are not pure computed', function () {
         var instance = ko.observable();
-        expect(ko.isPureComputed(instance)).toEqual(false);
+        expect(ko.isPureComputed(instance)).to.deep.equal(false);
     });
 
     it('ko.isObservable should return false for non-observable values', function () {
@@ -33,14 +33,14 @@ describe('Observable', function() {
             function() {},
             new ko.subscribable()
         ], function (value) {
-            expect(ko.isObservable(value)).toEqual(false);
+            expect(ko.isObservable(value)).to.deep.equal(false);
         });
     });
 
     it('ko.isObservable should throw exception for value that has fake observable pointer', function () {
         var x = ko.observable();
         x.__ko_proto__= {};
-        expect(function () { ko.isObservable(x); }).toThrow();
+        expect(function () { ko.isObservable(x); }).to.throw();
     });
 
     it('Should be able to write values to it', function () {
@@ -55,40 +55,40 @@ describe('Observable', function() {
         };
         model.prop1('A').prop2('B');
 
-        expect(model.prop1()).toEqual('A');
-        expect(model.prop2()).toEqual('B');
+        expect(model.prop1()).to.deep.equal('A');
+        expect(model.prop2()).to.deep.equal('B');
     });
 
     it('Should be able to use Function.prototype methods to access/update', function() {
         var instance = ko.observable('A');
         var obj = {};
 
-        expect(instance.call(null)).toEqual('A');
-        expect(instance.call(obj, 'B')).toBe(obj);
-        expect(instance.apply(null, [])).toBe('B');
+        expect(instance.call(null)).to.deep.equal('A');
+        expect(instance.call(obj, 'B')).to.equal(obj);
+        expect(instance.apply(null, [])).to.equal('B');
     });
 
     it('Should advertise that instances can have values written to them', function () {
         var instance = new ko.observable(function () { });
-        expect(ko.isWriteableObservable(instance)).toEqual(true);
-        expect(ko.isWritableObservable(instance)).toEqual(true);
+        expect(ko.isWriteableObservable(instance)).to.deep.equal(true);
+        expect(ko.isWritableObservable(instance)).to.deep.equal(true);
     });
 
     it('Should be able to read back most recent value', function () {
         var instance = new ko.observable();
         instance(123);
         instance(234);
-        expect(instance()).toEqual(234);
+        expect(instance()).to.deep.equal(234);
     });
 
     it('Should initially have undefined value', function () {
         var instance = new ko.observable();
-        expect(instance()).toEqual(undefined);
+        expect(instance()).to.deep.equal(undefined);
     });
 
     it('Should be able to set initial value as constructor param', function () {
         var instance = new ko.observable('Hi!');
-        expect(instance()).toEqual('Hi!');
+        expect(instance()).to.deep.equal('Hi!');
     });
 
     it('Should notify subscribers about each new value', function () {
@@ -100,7 +100,7 @@ describe('Observable', function() {
 
         instance('A');
         instance('B');
-        expect(notifiedValues).toEqual([ 'A', 'B' ]);
+        expect(notifiedValues).to.deep.equal([ 'A', 'B' ]);
     });
 
     it('Should notify "spectator" subscribers about each new value', function () {
@@ -112,7 +112,7 @@ describe('Observable', function() {
 
         instance('A');
         instance('B');
-        expect(notifiedValues).toEqual([ 'A', 'B' ]);
+        expect(notifiedValues).to.deep.equal([ 'A', 'B' ]);
     });
 
     it('Should be able to tell it that its value has mutated, at which point it notifies subscribers', function () {
@@ -124,13 +124,13 @@ describe('Observable', function() {
 
         var someUnderlyingObject = { childProperty : "A" };
         instance(someUnderlyingObject);
-        expect(notifiedValues.length).toEqual(1);
-        expect(notifiedValues[0]).toEqual("A");
+        expect(notifiedValues.length).to.deep.equal(1);
+        expect(notifiedValues[0]).to.deep.equal("A");
 
         someUnderlyingObject.childProperty = "B";
         instance.valueHasMutated();
-        expect(notifiedValues.length).toEqual(2);
-        expect(notifiedValues[1]).toEqual("B");
+        expect(notifiedValues.length).to.deep.equal(2);
+        expect(notifiedValues[1]).to.deep.equal("B");
     });
 
     it('Should notify "beforeChange" subscribers before each new value', function () {
@@ -143,9 +143,9 @@ describe('Observable', function() {
         instance('A');
         instance('B');
 
-        expect(notifiedValues.length).toEqual(2);
-        expect(notifiedValues[0]).toEqual(undefined);
-        expect(notifiedValues[1]).toEqual('A');
+        expect(notifiedValues.length).to.deep.equal(2);
+        expect(notifiedValues[0]).to.deep.equal(undefined);
+        expect(notifiedValues[1]).to.deep.equal('A');
     });
 
     it('Should be able to tell it that its value will mutate, at which point it notifies "beforeChange" subscribers', function () {
@@ -157,17 +157,17 @@ describe('Observable', function() {
 
         var someUnderlyingObject = { childProperty : "A" };
         instance(someUnderlyingObject);
-        expect(notifiedValues.length).toEqual(1);
-        expect(notifiedValues[0]).toEqual(undefined);
+        expect(notifiedValues.length).to.deep.equal(1);
+        expect(notifiedValues[0]).to.deep.equal(undefined);
 
         instance.valueWillMutate();
-        expect(notifiedValues.length).toEqual(2);
-        expect(notifiedValues[1]).toEqual("A");
+        expect(notifiedValues.length).to.deep.equal(2);
+        expect(notifiedValues[1]).to.deep.equal("A");
 
         someUnderlyingObject.childProperty = "B";
         instance.valueHasMutated();
-        expect(notifiedValues.length).toEqual(2);
-        expect(notifiedValues[1]).toEqual("A");
+        expect(notifiedValues.length).to.deep.equal(2);
+        expect(notifiedValues[1]).to.deep.equal("A");
     });
 
     it('Should ignore writes when the new value is primitive and strictly equals the old value', function() {
@@ -177,13 +177,13 @@ describe('Observable', function() {
 
         for (var i = 0; i < 3; i++) {
             instance("A");
-            expect(instance()).toEqual("A");
-            expect(notifiedValues).toEqual(["A"]);
+            expect(instance()).to.deep.equal("A");
+            expect(notifiedValues).to.deep.equal(["A"]);
         }
 
         instance("B");
-        expect(instance()).toEqual("B");
-        expect(notifiedValues).toEqual(["A", "B"]);
+        expect(instance()).to.deep.equal("B");
+        expect(notifiedValues).to.deep.equal(["A", "B"]);
     });
 
     it('Should ignore writes when both the old and new values are strictly null', function() {
@@ -191,7 +191,7 @@ describe('Observable', function() {
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
         instance(null);
-        expect(notifiedValues).toEqual([]);
+        expect(notifiedValues).to.deep.equal([]);
     });
 
     it('Should ignore writes when both the old and new values are strictly undefined', function() {
@@ -199,7 +199,7 @@ describe('Observable', function() {
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
         instance(undefined);
-        expect(notifiedValues).toEqual([]);
+        expect(notifiedValues).to.deep.equal([]);
     });
 
     it('Should notify subscribers of a change when an object value is written, even if it is identical to the old value', function() {
@@ -210,7 +210,7 @@ describe('Observable', function() {
         var notifiedValues = [];
         instance.subscribe(notifiedValues.push, notifiedValues);
         instance(constantObject);
-        expect(notifiedValues).toEqual([constantObject]);
+        expect(notifiedValues).to.deep.equal([constantObject]);
     });
 
     it('Should notify subscribers of a change even when an identical primitive is written if you\'ve set the equality comparer to null', function() {
@@ -220,12 +220,12 @@ describe('Observable', function() {
 
         // No notification by default
         instance("A");
-        expect(notifiedValues).toEqual([]);
+        expect(notifiedValues).to.deep.equal([]);
 
         // But there is a notification if we null out the equality comparer
         instance.equalityComparer = null;
         instance("A");
-        expect(notifiedValues).toEqual(["A"]);
+        expect(notifiedValues).to.deep.equal(["A"]);
     });
 
     it('Should ignore writes when the equalityComparer callback states that the values are equal', function() {
@@ -238,31 +238,31 @@ describe('Observable', function() {
         instance.subscribe(notifiedValues.push, notifiedValues);
 
         instance({ id: 1 });
-        expect(notifiedValues.length).toEqual(1);
+        expect(notifiedValues.length).to.deep.equal(1);
 
         // Same key - no change
         instance({ id: 1, ignoredProp: 'abc' });
-        expect(notifiedValues.length).toEqual(1);
+        expect(notifiedValues.length).to.deep.equal(1);
 
         // Different key - change
         instance({ id: 2, ignoredProp: 'abc' });
-        expect(notifiedValues.length).toEqual(2);
+        expect(notifiedValues.length).to.deep.equal(2);
 
         // Null vs not-null - change
         instance(null);
-        expect(notifiedValues.length).toEqual(3);
+        expect(notifiedValues.length).to.deep.equal(3);
 
         // Null vs null - no change
         instance(null);
-        expect(notifiedValues.length).toEqual(3);
+        expect(notifiedValues.length).to.deep.equal(3);
 
         // Null vs undefined - change
         instance(undefined);
-        expect(notifiedValues.length).toEqual(4);
+        expect(notifiedValues.length).to.deep.equal(4);
 
         // undefined vs object - change
         instance({ id: 1 });
-        expect(notifiedValues.length).toEqual(5);
+        expect(notifiedValues.length).to.deep.equal(5);
     });
 
     it('Should expose a "notify" extender that can configure the observable to notify on all writes, even if the value is unchanged', function() {
@@ -271,21 +271,21 @@ describe('Observable', function() {
         instance.subscribe(notifiedValues.push, notifiedValues);
 
         instance(123);
-        expect(notifiedValues.length).toEqual(1);
+        expect(notifiedValues.length).to.deep.equal(1);
 
         // Typically, unchanged values don't trigger a notification
         instance(123);
-        expect(notifiedValues.length).toEqual(1);
+        expect(notifiedValues.length).to.deep.equal(1);
 
         // ... but you can enable notifications regardless of change
         instance.extend({ notify: 'always' });
         instance(123);
-        expect(notifiedValues.length).toEqual(2);
+        expect(notifiedValues.length).to.deep.equal(2);
 
         // ... or later disable that
         instance.extend({ notify: null });
         instance(123);
-        expect(notifiedValues.length).toEqual(2);
+        expect(notifiedValues.length).to.deep.equal(2);
     });
 
     it('Should be possible to replace notifySubscribers with a custom handler', function() {
@@ -299,7 +299,7 @@ describe('Observable', function() {
 
         // This represents the current set of events that are generated for an observable. This set might
         // expand in the future.
-        expect(interceptedNotifications).toEqual([
+        expect(interceptedNotifications).to.deep.equal([
             { eventName: 'beforeChange', value: 123 },
             { eventName: 'spectate', value: 456 },
             { eventName: 'None', value: 456 }
@@ -318,13 +318,13 @@ describe('Observable', function() {
         ko.observable.fn.customFunc = function() { return this(); };
 
         var instance = ko.observable(123);
-        expect(instance.customProp).toEqual('subscribable value');
-        expect(instance.customFunc()).toEqual(123);
+        expect(instance.customProp).to.deep.equal('subscribable value');
+        expect(instance.customFunc()).to.deep.equal(123);
     });
 
     it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
         // On unsupported browsers, there's nothing to test
-        if (!jasmine.browserSupportsProtoAssignment) {
+        if (!browserSupportsProtoAssignment) {
             return;
         }
 
@@ -341,7 +341,7 @@ describe('Observable', function() {
         ko.subscribable.fn.customFunction1 = customFunction1;
         ko.observable.fn.customFunction2 = customFunction2;
 
-        expect(observable.customFunction1).toBe(customFunction1);
-        expect(observable.customFunction2).toBe(customFunction2);
+        expect(observable.customFunction1).to.equal(customFunction1);
+        expect(observable.customFunction2).to.equal(customFunction2);
     });
 });

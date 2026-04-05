@@ -2,29 +2,29 @@
 describe('Pure Computed', function() {
     it('Should advertise that instances are computed', function () {
         var computed = ko.pureComputed(function () { });
-        expect(ko.isComputed(computed)).toEqual(true);
+        expect(ko.isComputed(computed)).to.deep.equal(true);
     });
 
     it('Should advertise that instances are pure computed', function () {
         var instance = ko.pureComputed(function () { });
-        expect(ko.isPureComputed(instance)).toEqual(true);
+        expect(ko.isPureComputed(instance)).to.deep.equal(true);
     });
 
     it('Should require an evaluator function as constructor param', function () {
-        expect(function () { ko.pureComputed(); }).toThrow();
+        expect(function () { ko.pureComputed(); }).to.throw();
     });
 
     it('Should be able to pass evaluator function using "options" parameter called "read"', function() {
         var computed = ko.pureComputed({
             read: function () { return 123; }
         });
-        expect(computed()).toEqual(123);
+        expect(computed()).to.deep.equal(123);
     });
 
     it('Should not be able to write a value to it if there is no "write" callback', function () {
         var computed = ko.pureComputed(function () { return 123; });
-        expect(ko.isWriteableObservable(computed)).toEqual(false);
-        expect(function () { computed(456); }).toThrow();
+        expect(ko.isWriteableObservable(computed)).to.deep.equal(false);
+        expect(function () { computed(456); }).to.throw();
     });
 
     it('Should invoke the "write" callback, where present, if you attempt to write a value to it', function() {
@@ -33,27 +33,27 @@ describe('Pure Computed', function() {
             read: function() {},
             write: function(value) { invokedWriteWithValue = value; }
         });
-        expect(ko.isWriteableObservable(computed)).toEqual(true);
+        expect(ko.isWriteableObservable(computed)).to.deep.equal(true);
         computed("some value");
-        expect(invokedWriteWithValue).toEqual("some value");
+        expect(invokedWriteWithValue).to.deep.equal("some value");
     });
 
     it('Should describe itself as active initially', function() {
         var computed = ko.pureComputed(function () { });
-        expect(computed.isActive()).toEqual(true);
+        expect(computed.isActive()).to.deep.equal(true);
     });
 
     it('Should describe itself as inactive if the evaluator has no dependencies on its first run', function() {
         var computed = ko.pureComputed(function () { });
         computed(); // access the computed to evaluate it
-        expect(computed.isActive()).toEqual(false);
+        expect(computed.isActive()).to.deep.equal(false);
     });
 
     it('Should describe itself as active if the evaluator has dependencies on its first run', function() {
         var observable = ko.observable('initial'),
             computed = ko.computed(observable);
         computed(); // access the computed to evaluate it
-        expect(computed.isActive()).toEqual(true);
+        expect(computed.isActive()).to.deep.equal(true);
     });
 
     it('Should evaluate on each access while sleeping when dependencies have changed', function () {
@@ -61,24 +61,24 @@ describe('Pure Computed', function() {
             data = ko.observable('A'),
             computed = ko.pureComputed(function () { ++timesEvaluated; return data(); });
 
-        expect(timesEvaluated).toEqual(0);
+        expect(timesEvaluated).to.deep.equal(0);
 
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
 
         // Access after changing dependency causes re-evaluation
         data('B');
-        expect(computed()).toEqual('B');
-        expect(timesEvaluated).toEqual(2);
+        expect(computed()).to.deep.equal('B');
+        expect(timesEvaluated).to.deep.equal(2);
 
         // Test a second time using peek
         data('C');
-        expect(computed.peek()).toEqual('C');
-        expect(timesEvaluated).toEqual(3);
+        expect(computed.peek()).to.deep.equal('C');
+        expect(timesEvaluated).to.deep.equal(3);
 
         // Access without changing dependency does not cause evaluation
-        expect(computed()).toEqual('C');
-        expect(timesEvaluated).toEqual(3);
+        expect(computed()).to.deep.equal('C');
+        expect(timesEvaluated).to.deep.equal(3);
     });
 
     it('Should notify "spectator" subscribers whenever the value changes', function () {
@@ -88,27 +88,27 @@ describe('Pure Computed', function() {
         var notifiedValues = [];
         computed.subscribe(function (value) {
             notifiedValues.push(value);
-            expect(computed()).toBe(value);
-            expect(computed2()).toBe(value);
+            expect(computed()).to.equal(value);
+            expect(computed2()).to.equal(value);
         }, null, "spectate");
 
-        expect(notifiedValues).toEqual([]);
+        expect(notifiedValues).to.deep.equal([]);
 
         // Reading the computed for the first time causes a notification
-        expect(computed()).toEqual('A');
-        expect(computed2()).toEqual('A');
-        expect(notifiedValues).toEqual(['A']);
+        expect(computed()).to.deep.equal('A');
+        expect(computed2()).to.deep.equal('A');
+        expect(notifiedValues).to.deep.equal(['A']);
 
         // Reading it a second time doesn't
-        expect(computed()).toEqual('A');
-        expect(computed2()).toEqual('A');
-        expect(notifiedValues).toEqual(['A']);
+        expect(computed()).to.deep.equal('A');
+        expect(computed2()).to.deep.equal('A');
+        expect(notifiedValues).to.deep.equal(['A']);
 
         // Changing the dependency doesn't, but reading the computed again does
         observable('B');
-        expect(notifiedValues).toEqual(['A']);
-        expect(computed()).toEqual('B');
-        expect(notifiedValues).toEqual(['A', 'B']);
+        expect(notifiedValues).to.deep.equal(['A']);
+        expect(computed()).to.deep.equal('B');
+        expect(notifiedValues).to.deep.equal(['A', 'B']);
     });
 
     it('Should not subscribe to dependencies while sleeping', function() {
@@ -116,14 +116,14 @@ describe('Pure Computed', function() {
             computed = ko.pureComputed(data);
 
         // Accessing the computed evaluates it
-        expect(computed()).toEqual('A');
+        expect(computed()).to.deep.equal('A');
 
         // No subscription is registered on the dependent observable
-        expect(data.getSubscriptionsCount()).toEqual(0);
+        expect(data.getSubscriptionsCount()).to.deep.equal(0);
 
         // getDependenciesCount returns the correct number
-        expect(computed.getDependenciesCount()).toEqual(1);
-        expect(computed.getDependencies()).toEqual([data]);
+        expect(computed.getDependenciesCount()).to.deep.equal(1);
+        expect(computed.getDependencies()).to.deep.equal([data]);
     });
 
     it('Should not evaluate after it has been disposed', function () {
@@ -131,16 +131,16 @@ describe('Pure Computed', function() {
             data = ko.observable('A'),
             computed = ko.pureComputed(function () { ++timesEvaluated; return data(); });
 
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
 
         computed.dispose();
-        expect(computed.isActive()).toEqual(false);
+        expect(computed.isActive()).to.deep.equal(false);
 
         // These should not cause a new evaluation
         data('B');
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
     });
 
     it('Should awaken and perform dependency detection when subscribed to', function() {
@@ -150,16 +150,16 @@ describe('Pure Computed', function() {
 
         // Subscribe to computed; the dependency should now be tracked
         computed.subscribe(function (value) { notifiedValues.push(value); });
-        expect(data.getSubscriptionsCount()).toEqual(1);
-        expect(computed.getDependenciesCount()).toEqual(1);
-        expect(computed.getDependencies()).toEqual([data]);
+        expect(data.getSubscriptionsCount()).to.deep.equal(1);
+        expect(computed.getDependenciesCount()).to.deep.equal(1);
+        expect(computed.getDependencies()).to.deep.equal([data]);
 
         // The subscription should not have sent down the initial value
-        expect(notifiedValues).toEqual([]);
+        expect(notifiedValues).to.deep.equal([]);
 
         // Updating data should trigger the subscription
         data('B');
-        expect(notifiedValues).toEqual(['B']);
+        expect(notifiedValues).to.deep.equal(['B']);
     });
 
     it('Should go back to sleep when all subscriptions are disposed', function() {
@@ -167,41 +167,41 @@ describe('Pure Computed', function() {
             computed = ko.pureComputed(data),
             subscription = computed.subscribe(function () {});
 
-        expect(data.getSubscriptionsCount()).toEqual(1);
-        expect(computed.getDependenciesCount()).toEqual(1);
-        expect(computed.getDependencies()).toEqual([data]);
+        expect(data.getSubscriptionsCount()).to.deep.equal(1);
+        expect(computed.getDependenciesCount()).to.deep.equal(1);
+        expect(computed.getDependencies()).to.deep.equal([data]);
 
         // Dispose the subscription to the computed
         subscription.dispose();
         // It goes to sleep, disposing its subscription to the observable
-        expect(data.getSubscriptionsCount()).toEqual(0);
-        expect(computed.getDependenciesCount()).toEqual(1);     // dependency count of computed doesn't change
-        expect(computed.getDependencies()).toEqual([data]);
+        expect(data.getSubscriptionsCount()).to.deep.equal(0);
+        expect(computed.getDependenciesCount()).to.deep.equal(1);     // dependency count of computed doesn't change
+        expect(computed.getDependencies()).to.deep.equal([data]);
     });
 
     it('Should fire "awake" and "asleep" events when changing state', function() {
         var data = ko.observable('A'),
             computed = ko.pureComputed(data);
 
-        var notifySpy = jasmine.createSpy('notifySpy');
+        var notifySpy = sinon.stub();
         computed.subscribe(notifySpy.bind(null, 'awake'), null, 'awake');
         computed.subscribe(notifySpy.bind(null, 'asleep'), null, 'asleep');
 
         // Subscribing to non-change events doesn't awaken computed
-        expect(data.getSubscriptionsCount()).toEqual(0);
+        expect(data.getSubscriptionsCount()).to.deep.equal(0);
 
         // Subscribe to computed; notifies with value
         var subscription = computed.subscribe(function () {});
-        expect(notifySpy.argsForCall).toEqual([ ['awake', 'A'] ]);
-        expect(data.getSubscriptionsCount()).toEqual(1);
+        expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['awake', 'A'] ]);
+        expect(data.getSubscriptionsCount()).to.deep.equal(1);
 
-        notifySpy.reset();
+        notifySpy.resetHistory();
         data('B');
-        expect(notifySpy).not.toHaveBeenCalled();
+        expect(notifySpy.called).to.equal(false);
 
         subscription.dispose();
-        expect(notifySpy.argsForCall).toEqual([ ['asleep', undefined] ]);
-        expect(data.getSubscriptionsCount()).toEqual(0);
+        expect(notifySpy.getCalls().map(function(call) { return call.args; })).to.deep.equal([ ['asleep', undefined] ]);
+        expect(data.getSubscriptionsCount()).to.deep.equal(0);
     });
 
     it('Should subscribe to dependencies when awakened while minimizing evaluations', function() {
@@ -212,36 +212,36 @@ describe('Pure Computed', function() {
             subscribeFunc = function (value) { notifiedValues.push(value); },
             subscription;
 
-        expect(timesEvaluated).toEqual(0);
+        expect(timesEvaluated).to.deep.equal(0);
 
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
-        expect(computed.getDependenciesCount()).toEqual(1);
-        expect(computed.getDependencies()).toEqual([data]);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
+        expect(computed.getDependenciesCount()).to.deep.equal(1);
+        expect(computed.getDependencies()).to.deep.equal([data]);
 
         // Subscribing to the computed adds a subscription to the dependency without re-evaluating
         subscription = computed.subscribe(subscribeFunc);
-        expect(data.getSubscriptionsCount()).toEqual(1);
-        expect(timesEvaluated).toEqual(1);
+        expect(data.getSubscriptionsCount()).to.deep.equal(1);
+        expect(timesEvaluated).to.deep.equal(1);
 
         // Dispose the subscription; reading the sleeping computed doesn't cause re-evaluation
         subscription.dispose();
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
 
         // Updating data doesn't trigger re-evaluation (computed is sleeping)
         data('B');
-        expect(timesEvaluated).toEqual(1);
+        expect(timesEvaluated).to.deep.equal(1);
 
         // Subscribing to the computed now does cause a re-evaluation because the dependency was changed
         subscription = computed.subscribe(subscribeFunc);
-        expect(timesEvaluated).toEqual(2);
-        expect(notifiedValues).toEqual([]); // But nothing notified
+        expect(timesEvaluated).to.deep.equal(2);
+        expect(notifiedValues).to.deep.equal([]); // But nothing notified
 
         // Updating data should re-evaluate and trigger the subscription
         data('C');
-        expect(timesEvaluated).toEqual(3);
-        expect(notifiedValues).toEqual(['C']);
+        expect(timesEvaluated).to.deep.equal(3);
+        expect(notifiedValues).to.deep.equal(['C']);
     });
 
     it('Should minimize evaluations when accessed from a computed', function() {
@@ -251,17 +251,17 @@ describe('Pure Computed', function() {
             computed = ko.computed(pureComputed);
 
         // Should only have evaluated the pure computed once
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
 
         // Updating the dependency evaluates it again
         data('B');
-        expect(computed()).toEqual('B');
-        expect(timesEvaluated).toEqual(2);
+        expect(computed()).to.deep.equal('B');
+        expect(timesEvaluated).to.deep.equal(2);
 
         // Double check that disposing subscriptions puts the pure computed to sleep
         computed.dispose();
-        expect(data.getSubscriptionsCount()).toEqual(0);
+        expect(data.getSubscriptionsCount()).to.deep.equal(0);
     });
 
     it('Should evaluate latest value when chaining pure computeds', function() {
@@ -269,10 +269,10 @@ describe('Pure Computed', function() {
             computed1 = ko.pureComputed(data),
             computed2 = ko.pureComputed(computed1);
 
-        expect(computed2()).toEqual('A');
+        expect(computed2()).to.deep.equal('A');
 
         data('B');
-        expect(computed2()).toEqual('B');
+        expect(computed2()).to.deep.equal('B');
     });
 
     it('Should minimize evaluations when chaining pure computeds', function() {
@@ -281,16 +281,16 @@ describe('Pure Computed', function() {
             computed1 = ko.pureComputed(function () { return data() <= 'M'; } ),  // This computed will return the same value for many values of data
             computed2 = ko.pureComputed(function () { ++timesEvaluated; return computed1(); });     // This computed should only be re-evaluated when computed1 actually changes
 
-        expect(computed2()).toEqual(true);
-        expect(timesEvaluated).toEqual(1);
+        expect(computed2()).to.deep.equal(true);
+        expect(timesEvaluated).to.deep.equal(1);
 
         data('B');
-        expect(computed2()).toEqual(true);
-        expect(timesEvaluated).toEqual(1);
+        expect(computed2()).to.deep.equal(true);
+        expect(timesEvaluated).to.deep.equal(1);
 
         data('Z');
-        expect(computed2()).toEqual(false);
-        expect(timesEvaluated).toEqual(2);
+        expect(computed2()).to.deep.equal(false);
+        expect(timesEvaluated).to.deep.equal(2);
     });
 
     it('Should be able to re-evaluate a sleeping computed that previously threw an exception', function() {
@@ -303,14 +303,14 @@ describe('Pure Computed', function() {
                 }
             });
 
-        expect(computed()).toEqual(1);
+        expect(computed()).to.deep.equal(1);
 
         observableValue(2);
         shouldThrow(true);
-        expect(computed).toThrow("Error during computed evaluation");
+        expect(computed).to.throw("Error during computed evaluation");
 
         shouldThrow(false);
-        expect(computed()).toEqual(2);
+        expect(computed()).to.deep.equal(2);
     });
 
     it('Should prevent recursive calling of read function', function() {
@@ -323,13 +323,13 @@ describe('Pure Computed', function() {
             });
 
         // While sleeping
-        expect(computed).toThrow();
+        expect(computed).to.throw();
 
         // While awake
         observable('B');    // to ensure re-evaluation
         expect(function() {
             ko.computed(computed);
-        }).toThrow();
+        }).to.throw();
     });
 
     it('Should not add dependencies if disposed during evaluation while sleeping', function () {
@@ -346,17 +346,17 @@ describe('Pure Computed', function() {
             });
 
         // Check initial state
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(1);
-        expect(computed.getDependenciesCount()).toEqual(2);
-        expect(computed.getDependencies()).toEqual([observableToTriggerDisposal, observableGivingValue]);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(1);
+        expect(computed.getDependenciesCount()).to.deep.equal(2);
+        expect(computed.getDependencies()).to.deep.equal([observableToTriggerDisposal, observableGivingValue]);
 
         // Now cause a disposal during evaluation
         observableToTriggerDisposal(true);
-        expect(computed()).toEqual('A');
-        expect(timesEvaluated).toEqual(2);
-        expect(computed.getDependenciesCount()).toEqual(0);
-        expect(computed.getDependencies()).toEqual([]);
+        expect(computed()).to.deep.equal('A');
+        expect(timesEvaluated).to.deep.equal(2);
+        expect(computed.getDependenciesCount()).to.deep.equal(0);
+        expect(computed.getDependencies()).to.deep.equal([]);
     });
 
     it('Should reevaluate if dependency was changed during awakening, but not otherwise', function() {
@@ -367,19 +367,19 @@ describe('Pure Computed', function() {
             pureComputed = ko.pureComputed(function () { ++timesEvaluated; return isEven(); }),
             subscription;
 
-        expect(pureComputed()).toEqual(true);
-        expect(timesEvaluated).toEqual(1);
+        expect(pureComputed()).to.deep.equal(true);
+        expect(timesEvaluated).to.deep.equal(1);
 
         data(1);
         subscription = isEven.subscribe(function() {});
-        expect(pureComputed()).toEqual(false);
-        expect(timesEvaluated).toEqual(2);
+        expect(pureComputed()).to.deep.equal(false);
+        expect(timesEvaluated).to.deep.equal(2);
         subscription.dispose();
 
         data(3);
         subscription = isEven.subscribe(function() {});
-        expect(pureComputed()).toEqual(false);
-        expect(timesEvaluated).toEqual(2);
+        expect(pureComputed()).to.deep.equal(false);
+        expect(timesEvaluated).to.deep.equal(2);
     });
 
     it('Should wake with the correct value when a chained pure computed has side effects for its awake event', function () {
@@ -396,7 +396,7 @@ describe('Pure Computed', function() {
         computed2();
 
         computed2.subscribe(function () {});
-        expect(computed2()).toEqual('foo');
+        expect(computed2()).to.deep.equal('foo');
     });
 
     describe('Should maintain order of subscriptions', function () {
@@ -407,7 +407,7 @@ describe('Pure Computed', function() {
             computed.subscribe(function (value) { notifiedValues.push(value); });
 
             data(newDataValue);
-            expect(notifiedValues).toEqual(expectedNotifiedValues);
+            expect(notifiedValues).to.deep.equal(expectedNotifiedValues);
         }
 
         beforeEach(function() {
@@ -441,12 +441,12 @@ describe('Pure Computed', function() {
                 computed = ko.pureComputed(function () { ++timesEvaluated; return dataPureComputed() + data(); });
 
             // Access the pure computed while it is sleeping to evaluate it and record the dependencies
-            expect(computed()).toEqual('AA');
-            expect(timesEvaluated).toEqual(1);
+            expect(computed()).to.deep.equal('AA');
+            expect(timesEvaluated).to.deep.equal(1);
 
             // If the subscriptions happen in the wrong order, we'll get two notifications: 'AB', 'BB'
             subscribeAndUpdate(computed, 'B', ['BB']);
-            expect(timesEvaluated).toEqual(3);
+            expect(timesEvaluated).to.deep.equal(3);
         });
     });
 
@@ -460,14 +460,14 @@ describe('Pure Computed', function() {
                     return ko.computedContext.isInitial();
                 });
 
-            expect(evaluationCount).toEqual(0);     // no evaluation yet
-            expect(computed()).toEqual(undefined);  // isInitial is always undefined for a pure computed
-            expect(evaluationCount).toEqual(1);     // single evaluation
+            expect(evaluationCount).to.deep.equal(0);     // no evaluation yet
+            expect(computed()).to.deep.equal(undefined);  // isInitial is always undefined for a pure computed
+            expect(evaluationCount).to.deep.equal(1);     // single evaluation
 
             observable(2);
             ko.computed(computed);                  // wake up computed by subscribing to it
-            expect(evaluationCount).toEqual(2);     // which causes a second evaluation
-            expect(computed()).toEqual(undefined);  // isInitial is still undefined
+            expect(evaluationCount).to.deep.equal(2);     // which causes a second evaluation
+            expect(computed()).to.deep.equal(undefined);  // isInitial is still undefined
         });
 
         it('Should accurately report the number of dependencies', function() {
@@ -476,32 +476,32 @@ describe('Pure Computed', function() {
                 evaluationCount = 0,
                 computed = ko.pureComputed(function() {
                     // no dependencies at first
-                    expect(ko.computedContext.getDependenciesCount()).toEqual(0);
-                    expect(ko.computedContext.getDependencies()).toEqual([]);
+                    expect(ko.computedContext.getDependenciesCount()).to.deep.equal(0);
+                    expect(ko.computedContext.getDependencies()).to.deep.equal([]);
                     // add a single dependency
                     observable1();
-                    expect(ko.computedContext.getDependenciesCount()).toEqual(1);
-                    expect(ko.computedContext.getDependencies()).toEqual([observable1]);
+                    expect(ko.computedContext.getDependenciesCount()).to.deep.equal(1);
+                    expect(ko.computedContext.getDependencies()).to.deep.equal([observable1]);
                     // add a second one
                     observable2();
-                    expect(ko.computedContext.getDependenciesCount()).toEqual(2);
-                    expect(ko.computedContext.getDependencies()).toEqual([observable1, observable2]);
+                    expect(ko.computedContext.getDependenciesCount()).to.deep.equal(2);
+                    expect(ko.computedContext.getDependencies()).to.deep.equal([observable1, observable2]);
                     // accessing observable again doesn't affect count
                     observable1();
-                    expect(ko.computedContext.getDependenciesCount()).toEqual(2);
-                    expect(ko.computedContext.getDependencies()).toEqual([observable1, observable2]);
+                    expect(ko.computedContext.getDependenciesCount()).to.deep.equal(2);
+                    expect(ko.computedContext.getDependencies()).to.deep.equal([observable1, observable2]);
 
                     return ++evaluationCount;
                 });
 
-            expect(computed()).toEqual(1);     // single evaluation
-            expect(computed.getDependenciesCount()).toEqual(2); // matches value from context
-            expect(computed.getDependencies()).toEqual([observable1, observable2]);
+            expect(computed()).to.deep.equal(1);     // single evaluation
+            expect(computed.getDependenciesCount()).to.deep.equal(2); // matches value from context
+            expect(computed.getDependencies()).to.deep.equal([observable1, observable2]);
 
             observable1(2);
-            expect(computed()).toEqual(2);     // second evaluation
-            expect(computed.getDependenciesCount()).toEqual(2); // matches value from context
-            expect(computed.getDependencies()).toEqual([observable1, observable2]);
+            expect(computed()).to.deep.equal(2);     // second evaluation
+            expect(computed.getDependenciesCount()).to.deep.equal(2); // matches value from context
+            expect(computed.getDependencies()).to.deep.equal([observable1, observable2]);
         });
     });
 });

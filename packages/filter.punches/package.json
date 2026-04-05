@@ -28,7 +28,8 @@
   },
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha",
+      "chai"
     ]
   },
   "licenses": [

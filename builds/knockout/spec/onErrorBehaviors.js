@@ -5,7 +5,35 @@ describe('onError handler', function () {
     var lastSeenError = null;
     const originalOnError = ko.options.onError
 
+    function waitFor(condition, timeoutMs) {
+        timeoutMs = timeoutMs || 100;
+        return new Promise(function (resolve, reject) {
+            var deadline = Date.now() + timeoutMs;
+
+            function poll() {
+                if (condition()) {
+                    resolve();
+                    return;
+                }
+
+                if (Date.now() >= deadline) {
+                    reject(new Error('Timed out waiting for async error handling'));
+                    return;
+                }
+
+                setTimeout(poll, 1);
+            }
+
+            poll();
+        });
+    }
+
     beforeEach(function () {
+        this.restoreAfter(ko.options, 'taskScheduler');
+        ko.options.taskScheduler = function (callback) {
+            setTimeout(callback, 0);
+        };
+
         ko.options.onError = function (error) {
             lastSeenError = error;
             koOnErrorCount++;
@@ -65,58 +93,50 @@ describe('onError handler', function () {
             syncError = true;
         }
 
-        expect(syncError).toBe(true);
+        expect(syncError).to.equal(true);
 
-        expect(koOnErrorCount).toBe(0);
-        expect(windowOnErrorCount).toBe(0);
+        expect(koOnErrorCount).to.equal(0);
+        expect(windowOnErrorCount).to.equal(0);
     });
 
-    it('fires on async component errors', function () {
-        runs(function () {
-            var component = {
-                tagName: 'test-onerror',
-                template: "<div data-bind='text: name'></div>",
-                viewModel: function () {
-                    this.name = ko.computed(function () {
-                        return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
-                    });
-                }
-            };
-
-            if (!ko.components.isRegistered(component.tagName)) {
-                ko.components.register(component.tagName, component);
+    it('fires on async component errors', async function () {
+        var component = {
+            tagName: 'test-onerror',
+            template: "<div data-bind='text: name'></div>",
+            viewModel: function () {
+                this.name = ko.computed(function () {
+                    return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
+                });
             }
+        };
 
-            window.testDivTemplate.innerHTML = "<test-onerror></test-onerror>";
-            ko.renderTemplate("testDivTemplate", {
-            }, null, window.templateOutput);
-        });
+        if (!ko.components.isRegistered(component.tagName)) {
+            ko.components.register(component.tagName, component);
+        }
 
-        waitsFor(function () {
+        window.testDivTemplate.innerHTML = "<test-onerror></test-onerror>";
+        ko.renderTemplate("testDivTemplate", {
+        }, null, window.templateOutput);
+
+        await waitFor(function () {
             return koOnErrorCount > 0 && windowOnErrorCount > 0;
-        }, 'Error counts were not updated', 500);
-
-        runs(function () {
-            expect(koOnErrorCount).toBe(1);
-            expect(windowOnErrorCount).toBe(1);
         });
+        expect(koOnErrorCount).to.equal(1);
+        expect(windowOnErrorCount).to.equal(1);
     });
 
-    it('passes through the error instance', function() {
+    it('passes through the error instance', async function() {
         var expectedInstance;
         ko.tasks.schedule(function() {
             expectedInstance = new Error('Some error');
             throw expectedInstance;
         });
 
-        waitsFor(function () {
+        await waitFor(function () {
             return koOnErrorCount > 0;
         });
-
-        runs(function () {
-            expect(koOnErrorCount).toBe(1);
-            expect(windowOnErrorCount).toBe(1);
-            expect(lastSeenError).toBe(expectedInstance);
-        })
+        expect(koOnErrorCount).to.equal(1);
+        expect(windowOnErrorCount).to.equal(1);
+        expect(lastSeenError).to.equal(expectedInstance);
     });
 });

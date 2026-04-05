@@ -20,16 +20,21 @@ import components from '@tko/utils.component'
 import { bindings as componentBindings } from '@tko/binding.component'
 
 import { ComponentProvider } from '../dist'
-
-import { useMockForTasks } from '@tko/utils/helpers/jasmine-13-helper'
+import { expect } from 'chai'
+import sinon from 'sinon'
+import { expectContainHtml, expectContainText, prepareTestNode, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Components: Custom elements', function () {
   let bindingHandlers
   let testNode: HTMLElement
+  let clock: sinon.SinonFakeTimers
+  let cleanups: Array<() => void>
 
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
-    useMockForTasks(options)
+    cleanups = []
+    testNode = prepareTestNode()
+    clock = sinon.useFakeTimers()
+    useMockForTasks(cleanups)
     const provider = new MultiProvider({ providers: [new DataBindProvider(), new ComponentProvider()] })
     options.bindingProviderInstance = provider
 
@@ -41,8 +46,11 @@ describe('Components: Custom elements', function () {
   })
 
   afterEach(function () {
-    expect(tasks.resetForTesting()).toEqual(0)
-    jasmine.Clock.reset()
+    expect(tasks.resetForTesting()).to.equal(0)
+    while (cleanups.length) {
+      cleanups.pop()!()
+    }
+    clock.restore()
     components.unregister('test-component')
   })
 
@@ -53,19 +61,18 @@ describe('Components: Custom elements', function () {
 
     // Since components are loaded asynchronously, it doesn't show up synchronously
     applyBindings(null, testNode)
-    expect(testNode).toContainHtml(initialMarkup)
+    expectContainHtml(testNode, initialMarkup)
 
     // ... but when the component is loaded, it does show up
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainHtml(
+    clock.tick(1)
+    expectContainHtml(
+      testNode,
       '<div>hello <test-component>custom element <span data-bind="text: 123">123</span></test-component></div>'
     )
   })
 
   it('Inserts components into custom elements with matching non-dashed names', function () {
-    this.after(function () {
-      components.unregister('somefaroutname')
-    })
+    cleanups.push(() => components.unregister('somefaroutname'))
     components.register('somefaroutname', {
       template: 'custom element <span data-bind="text: 123"></span>',
       ignoreCustomElementWarning: true
@@ -75,19 +82,18 @@ describe('Components: Custom elements', function () {
 
     // Since components are loaded asynchronously, it doesn't show up synchronously
     applyBindings(null, testNode)
-    expect(testNode).toContainHtml(initialMarkup)
+    expectContainHtml(testNode, initialMarkup)
 
     // ... but when the component is loaded, it does show up
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainHtml(
+    clock.tick(1)
+    expectContainHtml(
+      testNode,
       '<div>hello <somefaroutname>custom element <span data-bind="text: 123">123</span></somefaroutname></div>'
     )
   })
 
   it('Does not insert components into standard elements with matching names', function () {
-    this.after(function () {
-      components.unregister('em')
-    })
+    cleanups.push(() => components.unregister('em'))
     components.register('em', {
       template: 'custom element <span data-bind="text: 123"></span>',
       ignoreCustomElementWarning: true
@@ -96,8 +102,8 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = initialMarkup
 
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainHtml(initialMarkup)
+    clock.tick(1)
+    expectContainHtml(testNode, initialMarkup)
   })
 
   it('Is possible to override getComponentNameForNode to determine which component goes into which element', function () {
@@ -115,8 +121,8 @@ describe('Components: Custom elements', function () {
 
     // See the component show up.
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainHtml('<div>hello <a>custom element</a> <b>ignored</b></div>')
+    clock.tick(1)
+    expectContainHtml(testNode, '<div>hello <a>custom element</a> <b>ignored</b></div>')
   })
 
   it("Is possible to have regular data-bind bindings on a custom element, as long as they don't attempt to control descendants", function () {
@@ -126,15 +132,15 @@ describe('Components: Custom elements', function () {
     // Bind with a viewmodel that controls visibility
     const viewModel = { shouldshow: observable(true) }
     applyBindings(viewModel, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainHtml('<test-component data-bind="visible: shouldshow">custom element</test-component>')
+    clock.tick(1)
+    expectContainHtml(testNode, '<test-component data-bind="visible: shouldshow">custom element</test-component>')
     const node = testNode.childNodes[0] as HTMLElement
-    expect(node.style.display).not.toBe('none')
+    expect(node.style.display).to.not.equal('none')
 
     // See that the 'visible' binding still works
     viewModel.shouldshow(false)
-    expect(node.style.display).toBe('none')
-    expect(node.innerHTML).toBe('custom element')
+    expect(node.style.display).to.equal('none')
+    expect(node.innerHTML).to.equal('custom element')
   })
 
   it('Is not possible to have regular data-bind bindings on a custom element if they also attempt to control descendants', function () {
@@ -143,23 +149,23 @@ describe('Components: Custom elements', function () {
 
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrowContaining(
+    }).to.throw(
       'Multiple bindings (if and component) are trying to control descendant bindings of the same element.'
     )
 
     // Even though applyBindings threw an exception, the component still gets bound (asynchronously)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
   })
 
   it('Is possible to call applyBindings directly on a custom element', function () {
     components.register('test-component', { template: 'custom element' })
     testNode.innerHTML = '<test-component></test-component>'
     const customElem = testNode.childNodes[0] as HTMLElement
-    expect(customElem.tagName.toLowerCase()).toBe('test-component')
+    expect(customElem.tagName.toLowerCase()).to.equal('test-component')
 
     applyBindings(null, customElem)
-    jasmine.Clock.tick(1)
-    expect(customElem.innerHTML).toBe('custom element')
+    clock.tick(1)
+    expect(customElem.innerHTML).to.equal('custom element')
   })
 
   it("Throws if you try to duplicate the 'component' binding on a custom element that matches a component", function () {
@@ -168,7 +174,7 @@ describe('Components: Custom elements', function () {
 
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrowContaining('The binding "component" is duplicated by multiple providers')
+    }).to.throw('The binding "component" is duplicated by multiple providers')
   })
 
   it('Is possible to pass literal values', function () {
@@ -181,8 +187,8 @@ describe('Components: Custom elements', function () {
         // The raw value for each param is a computed giving the literal value
         objectForEach(params, function (key, value) {
           if (key !== '$raw') {
-            expect(isComputed(params.$raw[key])).toBe(true)
-            expect(params.$raw[key]()).toBe(value)
+            expect(isComputed(params.$raw[key])).to.equal(true)
+            expect(params.$raw[key]()).to.equal(value)
           }
         })
       }
@@ -191,10 +197,10 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML =
       '<test-component params="nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: \'mystr\'"></test-component>'
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
     delete suppliedParams[0].$raw // Don't include '$raw' in the following assertion, as we only want to compare supplied values
-    expect(suppliedParams).toEqual([{ nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: 'mystr' }])
+    expect(suppliedParams).to.deep.equal([{ nothing: null, num: 123, bool: true, obj: { abc: 123 }, str: 'mystr' }])
   })
 
   it('Supplies an empty params object (with empty $raw) if a custom element has no params attribute', function () {
@@ -208,8 +214,8 @@ describe('Components: Custom elements', function () {
 
     testNode.innerHTML = '<test-component></test-component>'
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
-    expect(suppliedParams).toEqual([{ $raw: {} }])
+    clock.tick(1)
+    expect(suppliedParams).to.deep.equal([{ $raw: {} }])
   })
 
   it('Supplies an empty params object (with empty $raw) if a custom element has an empty whitespace params attribute', function () {
@@ -223,8 +229,8 @@ describe('Components: Custom elements', function () {
 
     testNode.innerHTML = '<test-component params=" "></test-component>'
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
-    expect(suppliedParams).toEqual([{ $raw: {} }])
+    clock.tick(1)
+    expect(suppliedParams).to.deep.equal([{ $raw: {} }])
   })
 
   it('Should not confuse parameters with bindings', function () {
@@ -240,7 +246,7 @@ describe('Components: Custom elements', function () {
     applyBindings({ value: 123 }, testNode)
 
     // The only binding it should look up is "component"
-    expect(called).toBe(false)
+    expect(called).to.equal(false)
   })
 
   it('Should update component when observable view model changes', function () {
@@ -249,12 +255,12 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = '<test-component params="textToShow: value"></test-component>'
     const vm = observable({ value: 'A' })
     applyBindings(vm, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainText('the value: A')
+    clock.tick(1)
+    expectContainText(testNode, 'the value: A')
 
     vm({ value: 'Z' })
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainText('the value: Z')
+    clock.tick(1)
+    expectContainText(testNode, 'the value: Z')
   })
 
   it('Is possible to pass observable instances', function () {
@@ -262,14 +268,14 @@ describe('Components: Custom elements', function () {
       template: '<p>the observable: <span data-bind="text: receivedobservable"></span></p>',
       viewModel: function (params) {
         this.receivedobservable = params.suppliedobservable
-        expect(this.receivedobservable.subprop).toBe('subprop')
+        expect(this.receivedobservable.subprop).to.equal('subprop')
         this.dispose = function () {
           this.wasDisposed = true
         }
 
         // The $raw value for this param is a computed giving the observable instance
-        expect(isComputed(params.$raw.suppliedobservable)).toBe(true)
-        expect(params.$raw.suppliedobservable()).toBe(params.suppliedobservable)
+        expect(isComputed(params.$raw.suppliedobservable)).to.equal(true)
+        expect(params.$raw.suppliedobservable()).to.equal(params.suppliedobservable)
       }
     })
 
@@ -282,16 +288,16 @@ describe('Components: Custom elements', function () {
     myobservable.subprop = 'subprop'
     testNode.innerHTML = '<test-component params="suppliedobservable: myobservable"></test-component>'
     applyBindings({ myobservable: myobservable }, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
     const node = testNode.childNodes[0].childNodes[0] as HTMLElement
     const viewModelInstance = dataFor(node)
-    expect(testNode.firstChild).toContainText('the observable: 1')
+    expectContainText(testNode.firstChild as Node, 'the observable: 1')
 
     // See the observable instance can mutate, without causing the component to tear down
     myobservable(2)
-    expect(testNode.firstChild).toContainText('the observable: 2')
-    expect(dataFor(node)).toBe(viewModelInstance) // Didn't create a new instance
-    expect(viewModelInstance.wasDisposed).not.toBe(true)
+    expectContainText(testNode.firstChild as Node, 'the observable: 2')
+    expect(dataFor(node)).to.equal(viewModelInstance)
+    expect(viewModelInstance.wasDisposed).to.not.equal(true)
   })
 
   it('Is possible to pass expressions that can vary observably', function () {
@@ -308,15 +314,15 @@ describe('Components: Custom elements', function () {
         }
 
         // See we didn't get the original observable instance. Instead we got a read-only computed property.
-        expect(this.receivedobservable).not.toBe(rootViewModel.myobservable)
-        expect(isComputed(this.receivedobservable)).toBe(true)
-        expect(isWritableObservable(this.receivedobservable)).toBe(false)
+        expect(this.receivedobservable).to.not.equal(rootViewModel.myobservable)
+        expect(isComputed(this.receivedobservable)).to.equal(true)
+        expect(isWritableObservable(this.receivedobservable)).to.equal(false)
 
         // The $raw value for this param is a computed property whose value is raw result
         // of evaluating the binding value. Since the raw result in this case is itself not
         // observable, it's the same value as the regular (non-$raw) supplied parameter.
-        expect(isComputed(params.$raw.suppliedobservable)).toBe(true)
-        expect(params.$raw.suppliedobservable()).toBe(params.suppliedobservable())
+        expect(isComputed(params.$raw.suppliedobservable)).to.equal(true)
+        expect(params.$raw.suppliedobservable()).to.equal(params.suppliedobservable())
       }
     })
 
@@ -324,27 +330,27 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML =
       '<test-component params=\'suppliedobservable: myobservable().split("").reverse().join("")\'></test-component>'
     applyBindings(rootViewModel, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode.firstChild).toContainText('the string reversed: ahplA')
+    clock.tick(1)
+    expectContainText(testNode.firstChild as Node, 'the string reversed: ahplA')
     const node = testNode.childNodes[0].childNodes[0] as HTMLElement
     const componentViewModelInstance = dataFor(node)
-    expect(constructorCallCount).toBe(1)
-    expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1)
+    expect(constructorCallCount).to.equal(1)
+    expect(rootViewModel.myobservable.getSubscriptionsCount()).to.equal(1)
 
     // See that mutating the underlying observable modifies the supplied computed property,
     // but doesn't cause the component to tear down
     rootViewModel.myobservable('Beta')
-    expect(testNode.firstChild).toContainText('the string reversed: ateB')
-    expect(constructorCallCount).toBe(1)
-    expect(dataFor(node)).toBe(componentViewModelInstance) // No new viewmodel needed
-    expect(componentViewModelInstance.wasDisposed).not.toBe(true)
-    expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(1) // No extra subscription needed
+    expectContainText(testNode.firstChild as Node, 'the string reversed: ateB')
+    expect(constructorCallCount).to.equal(1)
+    expect(dataFor(node)).to.equal(componentViewModelInstance)
+    expect(componentViewModelInstance.wasDisposed).to.not.equal(true)
+    expect(rootViewModel.myobservable.getSubscriptionsCount()).to.equal(1)
 
     // See also that subscriptions to the evaluated observables are disposed
     // when the custom element is cleaned
     cleanNode(testNode)
-    expect(componentViewModelInstance.wasDisposed).toBe(true)
-    expect(rootViewModel.myobservable.getSubscriptionsCount()).toBe(0)
+    expect(componentViewModelInstance.wasDisposed).to.equal(true)
+    expect(rootViewModel.myobservable.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Is possible to pass expressions that can vary observably and evaluate as writable observable instances', function () {
@@ -356,18 +362,18 @@ describe('Components: Custom elements', function () {
         this.myval = params.somevalue
 
         // See we received a writable observable
-        expect(isWritableObservable(this.myval)).toBe(true)
+        expect(isWritableObservable(this.myval)).to.equal(true)
 
         // See we received a computed, not either of the original observables
-        expect(isComputed(this.myval)).toBe(true)
+        expect(isComputed(this.myval)).to.equal(true)
 
         // See we can reach the original inner observable directly if needed via $raw
         // (e.g., because it has subobservables or similar)
         const originalObservable = params.$raw.somevalue()
-        expect(isObservable(originalObservable)).toBe(true)
-        expect(isComputed(originalObservable)).toBe(false)
+        expect(isObservable(originalObservable)).to.equal(true)
+        expect(isComputed(originalObservable)).to.equal(false)
         if (originalObservable() === 'inner1') {
-          expect(originalObservable).toBe(innerObservable) // See there's no wrapper
+          expect(originalObservable).to.equal(innerObservable)
         }
       }
     })
@@ -380,45 +386,45 @@ describe('Components: Custom elements', function () {
       outerObservable = observable({ inner: innerObservable })
     testNode.innerHTML = '<test-component params="somevalue: outer().inner"></test-component>'
     applyBindings({ outer: outerObservable }, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
     const node = testNode.childNodes[0].childNodes[0] as HTMLInputElement
-    expect(node.value).toEqual('inner1')
-    expect(outerObservable.getSubscriptionsCount()).toBe(1)
-    expect(innerObservable.getSubscriptionsCount()).toBe(1)
-    expect(constructorCallCount).toBe(1)
+    expect(node.value).to.equal('inner1')
+    expect(outerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(constructorCallCount).to.equal(1)
 
     // See we can mutate the inner value and see the result show up
     innerObservable('inner2')
-    expect(node.value).toEqual('inner2')
-    expect(outerObservable.getSubscriptionsCount()).toBe(1)
-    expect(innerObservable.getSubscriptionsCount()).toBe(1)
-    expect(constructorCallCount).toBe(1)
+    expect(node.value).to.equal('inner2')
+    expect(outerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(constructorCallCount).to.equal(1)
 
     // See that we can mutate the observable from within the component
     node.value = 'inner3'
     triggerEvent(node, 'change')
-    expect(innerObservable()).toEqual('inner3')
+    expect(innerObservable()).to.equal('inner3')
 
     // See we can mutate the outer value and see the result show up (cleaning subscriptions to the old inner value)
     const newInnerObservable = observable('newinner')
     outerObservable({ inner: newInnerObservable })
-    expect(node.value).toEqual('newinner')
-    expect(outerObservable.getSubscriptionsCount()).toBe(1)
-    expect(innerObservable.getSubscriptionsCount()).toBe(0)
-    expect(newInnerObservable.getSubscriptionsCount()).toBe(1)
-    expect(constructorCallCount).toBe(1)
+    expect(node.value).to.equal('newinner')
+    expect(outerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(0)
+    expect(newInnerObservable.getSubscriptionsCount()).to.equal(1)
+    expect(constructorCallCount).to.equal(1)
 
     // See that we can mutate the new observable from within the component
     node.value = 'newinner2'
     triggerEvent(node, 'change')
-    expect(newInnerObservable()).toEqual('newinner2')
-    expect(innerObservable()).toEqual('inner3') // original one hasn't changed
+    expect(newInnerObservable()).to.equal('newinner2')
+    expect(innerObservable()).to.equal('inner3')
 
     // See that subscriptions are disposed when the component is
     cleanNode(testNode)
-    expect(outerObservable.getSubscriptionsCount()).toBe(0)
-    expect(innerObservable.getSubscriptionsCount()).toBe(0)
-    expect(newInnerObservable.getSubscriptionsCount()).toBe(0)
+    expect(outerObservable.getSubscriptionsCount()).to.equal(0)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(0)
+    expect(newInnerObservable.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Supplies any custom parameter called "$raw" in preference to the function that yields raw parameter values', function () {
@@ -428,14 +434,14 @@ describe('Components: Custom elements', function () {
       template: 'Ignored',
       viewModel: function (params) {
         constructorCallCount++
-        expect(params.$raw).toBe(suppliedValue)
+        expect(params.$raw).to.equal(suppliedValue)
       }
     })
 
     testNode.innerHTML = '<test-component params="$raw: suppliedValue"></test-component>'
     applyBindings({ suppliedValue: suppliedValue }, testNode)
-    jasmine.Clock.tick(1)
-    expect(constructorCallCount).toBe(1)
+    clock.tick(1)
+    expect(constructorCallCount).to.equal(1)
   })
 
   it('Disposes the component when the custom element is cleaned', function () {
@@ -459,40 +465,18 @@ describe('Components: Custom elements', function () {
 
     // See it binds properly
     applyBindings(null, testNode)
-    jasmine.Clock.tick(1)
-    expect(testNode.firstChild).toContainHtml('custom element')
+    clock.tick(1)
+    expectContainHtml(testNode.firstChild as HTMLElement, 'custom element')
 
     // See the viewmodel is disposed when the corresponding DOM element is
-    expect(componentViewModel.wasDisposed).not.toBe(true)
+    expect(componentViewModel.wasDisposed).to.not.equal(true)
     cleanNode(testNode.firstChild!)
-    expect(componentViewModel.wasDisposed).toBe(true)
+    expect(componentViewModel.wasDisposed).to.equal(true)
   })
 
   it('Can nest custom elements', function () {
-    // Note that, for custom elements to work properly on IE < 9, you *must*:
-    // (1) Reference jQuery
-    // (2) Register any component that will be used as a custom element
-    //     (e.g., components.register(...)) *before* the browser parses any
-    //     markup containing that custom element
-    //
-    // The reason for (2) is the same as the well-known issue that IE < 9 cannot
-    // parse markup containing HTML5 elements unless you've already called
-    // document.createElement(thatElementName) first. Our old-IE compatibility
-    // code causes this to happen automatically for all registered components.
-    //
-    // The reason for (1) is that KO's built-in simpleHtmlParse logic uses .innerHTML
-    // on a <div> that is not attached to any document, which means the trick from
-    // (1) does not work. Referencing jQuery overrides the HTML parsing logic to
-    // uses jQuery's, which uses a temporary document fragment, and our old-IE compatibility
-    // code has patched createDocumentFragment to enable preregistered components
-    // to act as custom elements in that document fragment. If we wanted, we could
-    // amend simpleHtmlParse to use a document fragment, but it seems unlikely that
-    // anyone targetting IE < 9 would not be using jQuery.
-
-    this.after(function () {
-      components.unregister('outer-component')
-      components.unregister('inner-component')
-    })
+    cleanups.push(() => components.unregister('outer-component'))
+    cleanups.push(() => components.unregister('inner-component'))
 
     components.register('inner-component', {
       template: 'the inner component with value [<span data-bind="text: innerval"></span>]'
@@ -504,30 +488,14 @@ describe('Components: Custom elements', function () {
     testNode.innerHTML = initialMarkup
 
     applyBindings({ outerval: { innerval: 'my value' } }, testNode)
-    try {
-      jasmine.Clock.tick(1)
-      expect(testNode).toContainText(
-        'hello [the outer component [the inner component with value [my value]] goodbye] world'
-      )
-    } catch (ex: any) {
-      if (ex.message.indexOf('Unexpected call to method or property access.') >= 0) {
-        // On IE < 9, this scenario is only supported if you have referenced jQuery.
-        // So don't consider this to be a failure if jQuery isn't referenced.
-        if (!window.jQuery) {
-          return
-        }
-      }
-
-      throw ex
-    }
+    clock.tick(1)
+    expectContainText(testNode, 'hello [the outer component [the inner component with value [my value]] goodbye] world')
   })
 
   it('Is possible to set up components that receive, inject, and bind templates supplied by the user of the component (sometimes called "templated components" or "transclusion")', function () {
     // This spec repeats assertions made in other specs elsewhere, but is useful to prove the end-to-end technique
 
-    this.after(function () {
-      components.unregister('special-list')
-    })
+    cleanups.push(() => components.unregister('special-list'))
 
     // First define a reusable 'special-list' component that produces a <ul> in which the <li>s are filled with the supplied template
     // Note: It would be even simpler to write "template: { nodes: $componentTemplateNodes }", which would also work.
@@ -565,12 +533,13 @@ describe('Components: Custom elements', function () {
       testNode
     )
 
-    jasmine.Clock.tick(1)
-    expect(testNode.childNodes[0]).toContainText('Cheeses')
+    clock.tick(1)
+    expectContainText(testNode.childNodes[0] as Node, 'Cheeses')
     const node = testNode.childNodes[1].childNodes[0] as HTMLElement
-    expect(node.tagName.toLowerCase()).toEqual('ul')
-    expect(node.className).toEqual('my-special-list')
-    expect(node).toContainHtml(
+    expect(node.tagName.toLowerCase()).to.equal('ul')
+    expect(node.className).to.equal('my-special-list')
+    expectContainHtml(
+      node,
       '<li data-bind="template: { nodes: $component.supplieditemtemplate }">'
         + '<em data-bind="text: name">brie</em> has quality <em data-bind="text: quality">7</em>'
         + '</li>'
@@ -590,16 +559,16 @@ describe('Components: Custom elements', function () {
     let callbacks = 0,
       viewModel = {
         callback: function (nodes, data) {
-          expect(nodes.length).toEqual(1)
-          expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0])
-          expect(data).toEqual(undefined)
+          expect(nodes.length).to.equal(1)
+          expect(nodes[0]).to.equal(testNode.childNodes[0].childNodes[0])
+          expect(data).to.equal(undefined)
           callbacks++
         }
       }
     applyBindings(viewModel, testNode)
-    expect(callbacks).toEqual(0)
+    expect(callbacks).to.equal(0)
 
-    jasmine.Clock.tick(1)
-    expect(testNode).toContainHtml('<test-component data-bind="afterrender: callback">custom element</test-component>')
+    clock.tick(1)
+    expectContainHtml(testNode, '<test-component data-bind="afterrender: callback">custom element</test-component>')
   })
 })

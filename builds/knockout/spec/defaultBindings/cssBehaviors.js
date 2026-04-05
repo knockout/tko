@@ -1,6 +1,6 @@
 
 describe('Binding: CSS classes', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should give the element the specific CSS class only when the specified value is true', function () {
         var observable1 = new ko.observable();
@@ -8,11 +8,11 @@ describe('Binding: CSS classes', function() {
         testNode.innerHTML = "<div class='unrelatedClass1 unrelatedClass2' data-bind='css: { myRule: someModelProperty, anotherRule: anotherModelProperty }'>Hallo</div>";
         ko.applyBindings({ someModelProperty: observable1, anotherModelProperty: observable2 }, testNode);
 
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 unrelatedClass2 anotherRule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 unrelatedClass2 anotherRule");
         observable1(true);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 unrelatedClass2 anotherRule myRule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 unrelatedClass2 anotherRule myRule");
         observable2(false);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 unrelatedClass2 myRule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 unrelatedClass2 myRule");
     });
 
     it('Should give the element a single CSS class without a leading space when the specified value is true', function() {
@@ -20,9 +20,9 @@ describe('Binding: CSS classes', function() {
         testNode.innerHTML = "<div data-bind='css: { myRule: someModelProperty }'>Hallo</div>";
         ko.applyBindings({ someModelProperty: observable1 }, testNode);
 
-        expect(testNode.childNodes[0].className).toEqual("");
+        expect(testNode.childNodes[0].className).to.deep.equal("");
         observable1(true);
-        expect(testNode.childNodes[0].className).toEqual("myRule");
+        expect(testNode.childNodes[0].className).to.deep.equal("myRule");
     });
 
     it('Should toggle multiple CSS classes if specified as a single string separated by spaces', function() {
@@ -30,11 +30,11 @@ describe('Binding: CSS classes', function() {
         testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: { \"myRule _another-Rule123\": someModelProperty }'>Hallo</div>";
         ko.applyBindings({ someModelProperty: observable1 }, testNode);
 
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
         observable1(true);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 myRule _another-Rule123");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 myRule _another-Rule123");
         observable1(false);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
     });
 
     it('Should set/change dynamic CSS class(es) if string is specified', function() {
@@ -42,15 +42,15 @@ describe('Binding: CSS classes', function() {
         testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>";
         ko.applyBindings({ someModelProperty: observable1 }, testNode);
 
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
         observable1("my-Rule");
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 my-Rule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 my-Rule");
         observable1("another_Rule  my-Rule");
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 another_Rule my-Rule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 another_Rule my-Rule");
         observable1(undefined);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
         observable1(" ");
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
     });
 
     it('Should work with any arbitrary class names', function() {
@@ -59,9 +59,9 @@ describe('Binding: CSS classes', function() {
         testNode.innerHTML = "<div data-bind='css: { \"complex/className complex.className\" : someModelProperty }'>Something</div>";
         ko.applyBindings({ someModelProperty: observable1 }, testNode);
 
-        expect(testNode.childNodes[0].className).toEqual("");
+        expect(testNode.childNodes[0].className).to.deep.equal("");
         observable1(true);
-        expect(testNode.childNodes[0].className).toEqual("complex/className complex.className");
+        expect(testNode.childNodes[0].className).to.deep.equal("complex/className complex.className");
     });
 
     // Ensure CSS binding supports SVG, where applicable.
@@ -83,9 +83,9 @@ describe('Binding: CSS classes', function() {
             var observable = ko.observable();
             testNode.innerHTML = "<svg class='Y' data-bind='css: {x: someModelProperty}'></svg>";
             ko.applyBindings({someModelProperty: observable}, testNode);
-            expect(testNode.childNodes[0].getAttribute('class')).toEqual("Y");
+            expect(testNode.childNodes[0].getAttribute('class')).to.deep.equal("Y");
             observable(true);
-            expect(testNode.childNodes[0].getAttribute('class')).toEqual("Y x");
+            expect(testNode.childNodes[0].getAttribute('class')).to.deep.equal("Y x");
         }
     });
 
@@ -94,13 +94,13 @@ describe('Binding: CSS classes', function() {
         var observable1 = new ko.observable({});
         testNode.innerHTML = "<div class='unrelatedClass1' data-bind='css: someModelProperty'>Hallo</div>";
         ko.applyBindings({ someModelProperty: observable1 }, testNode);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
         observable1("my-Rule");
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 my-Rule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 my-Rule");
         observable1(null);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1");
         observable1("my-Rule");
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass1 my-Rule");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass1 my-Rule");
     });
 
     it('Should be able to combine "class" and "css" bindings with dynamic and static classes', function () {
@@ -112,17 +112,17 @@ describe('Binding: CSS classes', function() {
         testNode.innerHTML = "<div class='unrelatedClass' data-bind='css: { staticClass: booleanProp }, class: stringProp'></div>";
 
         ko.applyBindings({ booleanProp: booleanProp, stringProp: stringProp }, testNode);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass");
 
         booleanProp(true);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass staticClass");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass staticClass");
 
         stringProp("dynamicClass");
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass staticClass dynamicClass");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass staticClass dynamicClass");
 
         booleanProp(false);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass dynamicClass");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass dynamicClass");
         stringProp(null);
-        expect(testNode.childNodes[0].className).toEqual("unrelatedClass");
+        expect(testNode.childNodes[0].className).to.deep.equal("unrelatedClass");
     });
 });

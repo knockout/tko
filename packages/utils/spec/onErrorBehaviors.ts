@@ -1,4 +1,28 @@
+import { expect } from 'chai'
+
 import { options, tasks } from '../dist'
+
+function waitFor(condition: () => boolean, timeoutMs = 100) {
+  return new Promise<void>((resolve, reject) => {
+    const deadline = Date.now() + timeoutMs
+
+    function poll() {
+      if (condition()) {
+        resolve()
+        return
+      }
+
+      if (Date.now() >= deadline) {
+        reject(new Error('Timed out waiting for async error handling'))
+        return
+      }
+
+      setTimeout(poll, 1)
+    }
+
+    poll()
+  })
+}
 
 describe('onError handler', function () {
   let koOnErrorCount = 0
@@ -45,80 +69,25 @@ describe('onError handler', function () {
   })
 
   afterEach(function () {
+    expect(tasks.resetForTesting()).to.equal(0)
     window.onerror = windowOnErrorOriginal
     options.onError = optionsOnErrorOriginal
     lastSeenError = null
   })
 
-  // FIXME
-  // it('does not fire on sync errors', function () {
-  //     window.testDivTemplate.innerHTML = "name: <div data-bind='text: name'></div>";
-  //
-  //     var syncError = false;
-  //
-  //     try {
-  //         ko.renderTemplate("testDivTemplate", {
-  //             name: ko.computed(function () {
-  //                 return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
-  //             })
-  //         }, null, window.templateOutput);
-  //     }
-  //     catch (e) {
-  //         syncError = true;
-  //     }
-  //
-  //     expect(syncError).toBe(true);
-  //
-  //     expect(koOnErrorCount).toBe(0);
-  //     expect(windowOnErrorCount).toBe(0);
-  // });
-  //
-  // it('fires on async component errors', function () {
-  //     runs(function () {
-  //         var component = {
-  //             tagName: 'test-onerror',
-  //             template: "<div data-bind='text: name'></div>",
-  //             viewModel: function () {
-  //                 this.name = ko.computed(function () {
-  //                     return ERRORS_ON_PURPOSE = ERRORS_ON_PURPOSE2;
-  //                 });
-  //             }
-  //         };
-  //
-  //         if (!ko.components.isRegistered(component.tagName)) {
-  //             ko.components.register(component.tagName, component);
-  //         }
-  //
-  //         window.testDivTemplate.innerHTML = "<test-onerror></test-onerror>";
-  //         ko.renderTemplate("testDivTemplate", {
-  //         }, null, window.templateOutput);
-  //     });
-  //
-  //     waitsFor(function () {
-  //         return koOnErrorCount > 0 && windowOnErrorCount > 0;
-  //     }, 'Error counts were not updated', 500);
-  //
-  //     runs(function () {
-  //         expect(koOnErrorCount).toBe(1);
-  //         expect(windowOnErrorCount).toBe(1);
-  //     });
-  // });
-
-  it('does not re-throw the error', function () {
+  it('does not re-throw the error', async function () {
     let expectedInstance
     tasks.schedule(function () {
       expectedInstance = new Error('Some error')
       throw expectedInstance
     })
 
-    waitsFor(function () {
+    await waitFor(function () {
       return koOnErrorCount > 0
     })
 
-    runs(function () {
-      expect(koOnErrorCount).toBe(1)
-      expect(windowOnErrorCount).toBe(0)
-      expect(lastSeenError).toBe(expectedInstance)
-    })
+    expect(koOnErrorCount).to.equal(1)
+    expect(windowOnErrorCount).to.equal(0)
+    expect(lastSeenError).to.equal(expectedInstance)
   })
 })

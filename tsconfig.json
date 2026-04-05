@@ -25,9 +25,6 @@
     "skipLibCheck": true,
     
     "paths": {
-      "@tko/utils/helpers/jasmine-13-helper": [
-        "packages/utils/helpers/jasmine-13-helper.ts"
-      ],
       "@tko/binding.template/helpers/dummyTemplateEngine": [
         "packages/binding.template/helpers/dummyTemplateEngine.ts"
       ],

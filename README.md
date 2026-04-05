@@ -73,7 +73,7 @@ Start tests with electron: `make test`
 
 Start tests with headless-chrome: `make test-headless`
 
-The test setup has naturally grown and been ported from knockout.js. Some tests use Jasmine 1.3, newer ones use Mocha, Chai and Sinon. Karma is used as test runner rather as test pipeline
+The test setup has been ported from knockout.js and standardized on Mocha, Chai and Sinon. Karma is used as the test runner.
 
 Other options:
 
@@ -129,10 +129,7 @@ Additionally, implement a well-configured [Content Security Policy (CSP)](https:
 - Test-Environment -> electron and headless-chrome
 - Linting -> Eslint
 - Formatting -> Prettier (configured like StandardJS)
-- TDD/BDD-Frameworks -> 
-    - Jasmine 1.3
-    - Mocha + Chai
-    - sinon (Mocks)
+- TDD/BDD-Frameworks -> Mocha + Chai + Sinon
 - Testing-Cloud-Service -> sauce
 - standard -> Code-Style (outdated for typescript)
 

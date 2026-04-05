@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import { observable } from '@tko/observable'
 
 import { when } from '../dist'
@@ -17,17 +18,17 @@ describe('when', function () {
     )
 
     x(5)
-    expect(called).toBe(0)
-    expect(x.getSubscriptionsCount()).toBe(1)
+    expect(called).to.equal(0)
+    expect(x.getSubscriptionsCount()).to.equal(1)
 
     x(4)
-    expect(called).toBe(1)
-    expect(x.getSubscriptionsCount()).toBe(0)
+    expect(called).to.equal(1)
+    expect(x.getSubscriptionsCount()).to.equal(0)
 
     x(3)
     x(4)
-    expect(called).toBe(1)
-    expect(x.getSubscriptionsCount()).toBe(0)
+    expect(called).to.equal(1)
+    expect(x.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Runs callback if predicate function is already true', function () {
@@ -43,13 +44,13 @@ describe('when', function () {
       }
     )
 
-    expect(called).toBe(1)
-    expect(x.getSubscriptionsCount()).toBe(0)
+    expect(called).to.equal(1)
+    expect(x.getSubscriptionsCount()).to.equal(0)
 
     x(3)
     x(4)
-    expect(called).toBe(1)
-    expect(x.getSubscriptionsCount()).toBe(0)
+    expect(called).to.equal(1)
+    expect(x.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Accepts an observable as the predicate', function () {
@@ -60,12 +61,12 @@ describe('when', function () {
       called++
     })
 
-    expect(called).toBe(0)
-    expect(x.getSubscriptionsCount()).toBe(1)
+    expect(called).to.equal(0)
+    expect(x.getSubscriptionsCount()).to.equal(1)
 
     x(true)
-    expect(called).toBe(1)
-    expect(x.getSubscriptionsCount()).toBe(0)
+    expect(called).to.equal(1)
+    expect(x.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Returns an object with a dispose function that cancels the notification', function () {
@@ -76,14 +77,14 @@ describe('when', function () {
       called++
     })
 
-    expect(called).toBe(0)
-    expect(x.getSubscriptionsCount()).toBe(1)
+    expect(called).to.equal(0)
+    expect(x.getSubscriptionsCount()).to.equal(1)
 
     handle.dispose()
-    expect(x.getSubscriptionsCount()).toBe(0)
+    expect(x.getSubscriptionsCount()).to.equal(0)
 
     x(true)
-    expect(called).toBe(0)
+    expect(called).to.equal(0)
   })
 
   it('Will call callback function only once even if value is updated during callback', function () {
@@ -96,18 +97,18 @@ describe('when', function () {
       x(true)
     })
 
-    expect(called).toBe(0)
-    expect(x.getSubscriptionsCount()).toBe(1)
+    expect(called).to.equal(0)
+    expect(x.getSubscriptionsCount()).to.equal(1)
 
     x(true)
-    expect(called).toBe(1)
+    expect(called).to.equal(1)
   })
 
   it("Should be able to specify a 'this' pointer for the callback", function () {
     const model = {
       someProperty: 123,
       myCallback: function () {
-        expect(this.someProperty).toEqual(123)
+        expect(this.someProperty).to.equal(123)
       }
     }
     when(observable(true), model.myCallback, model)
