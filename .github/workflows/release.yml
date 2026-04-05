@@ -32,6 +32,8 @@ jobs:
       - name: Checkout code
         # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         # actions/setup-node v6.3.0
@@ -66,6 +68,9 @@ jobs:
     if: needs.prepare-release.outputs.has_changesets == 'false'
     runs-on: ubuntu-latest
 
+    outputs:
+      release_version: ${{ steps.version.outputs.version }}
+
     permissions:
       contents: read
       id-token: write
@@ -74,6 +79,8 @@ jobs:
       - name: Checkout code
         # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         # actions/setup-node v6.3.0
@@ -88,6 +95,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Determine release version
+        id: version
+        run: |
+          version="$(node tools/release-version.cjs)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Build all packages
         run: make
 
@@ -98,3 +111,54 @@ jobs:
         # npm generates provenance attestations automatically during trusted
         # publishing from GitHub Actions.
         run: npx changeset publish
+
+  github-release:
+    name: Create GitHub Release
+    needs: [prepare-release, publish]
+    if: needs.prepare-release.outputs.has_changesets == 'false' && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.publish.outputs.release_version }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          tag="v${VERSION}"
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            object_type="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.type')"
+            object_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+
+            if [ "$object_type" = "tag" ]; then
+              existing_target="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha" --jq '.object.sha')"
+            else
+              existing_target="$object_sha"
+            fi
+
+            if [ "$existing_target" = "$TARGET_SHA" ]; then
+              echo "GitHub release $tag already exists on $TARGET_SHA; skipping."
+              exit 0
+            fi
+
+            echo "GitHub release $tag already exists on $existing_target, expected $TARGET_SHA." >&2
+            exit 1
+          fi
+
+          prerelease_flag=""
+          case "$VERSION" in
+            *-alpha*|*-beta*|*-rc*)
+              prerelease_flag="--prerelease"
+              ;;
+          esac
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$TARGET_SHA" \
+            --title "TKO ${VERSION}" \
+            --generate-notes \
+            $prerelease_flag
