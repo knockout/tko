@@ -3,6 +3,7 @@
 import { addDisposeCallback, createSymbolOrString } from '@tko/utils'
 
 import { computed } from '@tko/computed'
+import { Observable } from 'packages/observable'
 
 const SUBSCRIPTIONS = createSymbolOrString('LifeCycle Subscriptions List')
 const ANCHOR_NODE = createSymbolOrString('LifeCycle Anchor Node')
@@ -24,7 +25,7 @@ export default class LifeCycle {
     }
   }
 
-  subscribe(observable, action, subscriptionType) {
+  subscribe(observable: Observable, action, subscriptionType?: string) {
     if (typeof action === 'string') {
       action = this[action]
     }

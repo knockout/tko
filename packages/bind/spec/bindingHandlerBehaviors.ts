@@ -10,7 +10,7 @@ import { VirtualProvider } from '@tko/provider.virtual'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import { applyBindings, BindingHandler, contextFor } from '../dist'
+import { applyBindings, BindingHandler, contextFor } from '../src'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
@@ -48,9 +48,9 @@ describe('BindingHandler behaviors', function () {
         v: Observable
         x: Observable
         y: Observable
-        declare computed: any
-        constructor(...args) {
-          super(...args)
+
+        constructor(params) {
+          super(params)
           const v = (this.v = koObservable(0))
           instance = this
           this.x = this.computed(() => {
@@ -92,9 +92,8 @@ describe('BindingHandler behaviors', function () {
       let obs = koObservable(),
         handlerInstance
       bindingHandlers.fnHandler = class extends BindingHandler {
-        declare subscribe: any
-        constructor(...args) {
-          super(...args)
+        constructor(params) {
+          super(params)
           handlerInstance = this
           this.subscribe(obs, this.cb)
         }
@@ -110,7 +109,7 @@ describe('BindingHandler behaviors', function () {
     })
 
     it('registers a kind with HandlerClass.register', function () {
-      class HC extends BindingHandler {}
+      class HC extends BindingHandler<any> {}
 
       BindingHandler.registerBindingHandler(HC, 'testHCregistration')
       expect(bindingHandlers.testHCregistration).toEqual(HC)
