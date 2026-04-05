@@ -17,14 +17,18 @@ class TextInput extends BindingHandler {
     return 'textinput'
   }
 
-  override $element: HTMLInputElement
+  get $inputElement(): HTMLInputElement {
+    return this.$element as HTMLInputElement
+  }
+
   previousElementValue: any
   elementValueBeforeEvent?: ReturnType<typeof setTimeout>
   timeoutHandle?: ReturnType<typeof setTimeout>
 
   constructor(...args: [any]) {
     super(...args)
-    this.previousElementValue = this.$element.value
+
+    this.previousElementValue = this.$inputElement.value
 
     if (options.debug && (this.constructor as any)._forceUpdateOn) {
       // Provide a way for tests to specify exactly which events are bound
@@ -58,7 +62,7 @@ class TextInput extends BindingHandler {
   }
 
   updateModel(event) {
-    const element = this.$element
+    const element = this.$inputElement
     clearTimeout(this.timeoutHandle)
     this.elementValueBeforeEvent = this.timeoutHandle = undefined
     const elementValue = element.value
@@ -73,7 +77,7 @@ class TextInput extends BindingHandler {
   }
 
   deferUpdateModel(event: any) {
-    const element = this.$element
+    const element = this.$inputElement
     if (!this.timeoutHandle) {
       // The elementValueBeforeEvent variable is set *only* during the brief gap between an
       // event firing and the updateModel function running. This allows us to ignore model
@@ -92,12 +96,12 @@ class TextInput extends BindingHandler {
     }
     if (this.elementValueBeforeEvent !== undefined && modelValue === this.elementValueBeforeEvent) {
       setTimeout(this.updateView.bind(this), 4)
-    } else if (this.$element.value !== modelValue) {
+    } else if (this.$inputElement.value !== modelValue) {
       // Update the element only if the element and model are different. On some browsers, updating the value
       // will move the cursor to the end of the input, which would be bad while the user is typing.
       this.previousElementValue = modelValue // Make sure we ignore events (propertychange) that result from updating the value
-      this.$element.value = modelValue
-      this.previousElementValue = this.$element.value // In case the browser changes the value (see #2281)
+      this.$inputElement.value = modelValue
+      this.previousElementValue = this.$inputElement.value // In case the browser changes the value (see #2281)
     }
   }
 }
