@@ -1,6 +1,9 @@
-For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
-
 ## 💪 Next
+
+- coming soon
+
+## 4.0.0
+
 - #202 Make TKO more type-safe @mcselle, @Auge19, @phillipc, @M-Kirchhoff, @brianmhunt 
 - #194 fix userAgent typo in IE check @phillipc
 - #196 fix `**` operator precedence @mcselle
@@ -11,9 +14,6 @@ For TODO between alpha and release, see https://github.com/knockout/tko/issues/1
 - #214 convert several classes to typescript @phillipc
 - #215 make jquery disablable and fix the loader mechanism @phillipc
 - #233 remove IE9 switches from TKO @phillipc
-
-## 4.0.0
-
 - Stabilize the full public `@tko/*` package set on the 4.x line.
 - Publish stable `4.0.0` entry points for `@tko/build.knockout` and `@tko/build.reference`.
 - Validate GitHub Actions trusted publishing and npm provenance for public packages.
