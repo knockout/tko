@@ -117,6 +117,10 @@ All PR checks must pass before merge.
 
 Releases are managed with [Changesets](https://github.com/changesets/changesets).
 
+TKO uses a repo-wide fixed release line for all public `@tko/*` packages. A
+release that bumps any public package bumps the full public package set to the
+same version.
+
 **For contributors** — when your PR changes package behavior:
 ```bash
 npx changeset add    # Select affected packages, bump type, describe change

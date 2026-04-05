@@ -62,8 +62,9 @@ New workflow `.github/workflows/publish-check.yml` that runs on PRs:
 Installed `@changesets/cli`. Configuration in `.changeset/config.json`.
 Contributors add a changeset file with their PR: `npx changeset add`.
 On merge to main, the release workflow opens a "Version Packages" PR
-that bumps versions and updates changelogs. Merging that PR publishes
-to npm.
+that bumps versions and updates changelogs. TKO now uses a repo-wide
+fixed version group for all public `@tko/*` packages, so public releases
+move together on one version line. Merging that PR publishes to npm.
 
 ### 2.2 Add a release workflow ✅ DONE
 
