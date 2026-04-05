@@ -63,6 +63,12 @@ jobs:
           )"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      - name: Verify published npm version exists
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          npm view "@tko/build.reference@$VERSION" version --registry=https://registry.npmjs.org >/dev/null
+
       - name: Backfill GitHub release if missing
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
