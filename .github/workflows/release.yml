@@ -32,6 +32,8 @@ jobs:
       - name: Checkout code
         # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         # actions/setup-node v6.3.0
@@ -77,6 +79,8 @@ jobs:
       - name: Checkout code
         # actions/checkout v6.0.2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         # actions/setup-node v6.3.0
@@ -93,7 +97,33 @@ jobs:
 
       - name: Determine release version
         id: version
-        run: echo "version=$(node -p 'require(\"./builds/reference/package.json\").version')" >> "$GITHUB_OUTPUT"
+        run: |
+          version="$(node <<'NODE'
+          const fs = require('fs')
+          const path = require('path')
+
+          const roots = ['builds', 'packages']
+          const versions = new Set()
+
+          for (const root of roots) {
+            for (const name of fs.readdirSync(root)) {
+              const packageJson = path.join(root, name, 'package.json')
+              if (!fs.existsSync(packageJson)) continue
+              const pkg = JSON.parse(fs.readFileSync(packageJson, 'utf8'))
+              if (pkg.private) continue
+              versions.add(pkg.version)
+            }
+          }
+
+          if (versions.size !== 1) {
+            console.error(`Expected one public package version, found: ${[...versions].sort().join(', ')}`)
+            process.exit(1)
+          }
+
+          process.stdout.write([...versions][0])
+          NODE
+          )"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build all packages
         run: make
@@ -106,23 +136,53 @@ jobs:
         # publishing from GitHub Actions.
         run: npx changeset publish
 
-  dispatch-github-release:
-    name: Dispatch GitHub Release Workflow
+  github-release:
+    name: Create GitHub Release
     needs: [prepare-release, publish]
     if: needs.prepare-release.outputs.has_changesets == 'false' && needs.publish.result == 'success'
     runs-on: ubuntu-latest
 
     permissions:
-      actions: write
+      contents: write
 
     steps:
-      - name: Dispatch GitHub release workflow
+      - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.publish.outputs.release_version }}
+          TARGET_SHA: ${{ github.sha }}
         run: |
-          gh workflow run github-release.yml \
+          tag="v${VERSION}"
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            object_type="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.type')"
+            object_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+
+            if [ "$object_type" = "tag" ]; then
+              existing_target="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha" --jq '.object.sha')"
+            else
+              existing_target="$object_sha"
+            fi
+
+            if [ "$existing_target" = "$TARGET_SHA" ]; then
+              echo "GitHub release $tag already exists on $TARGET_SHA; skipping."
+              exit 0
+            fi
+
+            echo "GitHub release $tag already exists on $existing_target, expected $TARGET_SHA." >&2
+            exit 1
+          fi
+
+          prerelease_flag=""
+          case "$VERSION" in
+            *-alpha*|*-beta*|*-rc*)
+              prerelease_flag="--prerelease"
+              ;;
+          esac
+
+          gh release create "$tag" \
             --repo "$GITHUB_REPOSITORY" \
-            --ref "$GITHUB_REF_NAME" \
-            -f version="$VERSION" \
-            -f target_sha="$GITHUB_SHA"
+            --target "$TARGET_SHA" \
+            --title "TKO ${VERSION}" \
+            --generate-notes \
+            $prerelease_flag

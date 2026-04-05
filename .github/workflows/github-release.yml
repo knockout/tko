@@ -1,35 +1,93 @@
-name: Create GitHub Release
+name: Backfill GitHub Release
 
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: Release version without the leading v (for example 4.0.1)
-        required: true
-        type: string
       target_sha:
-        description: Commit SHA to tag and release
+        description: Published main commit SHA to tag and release
         required: true
         type: string
 
 jobs:
-  create-github-release:
+  backfill-github-release:
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
     steps:
-      - name: Create GitHub release if missing
+      - name: Checkout published commit
+        # actions/checkout v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.target_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate target commit and determine release version
+        id: version
+        env:
+          TARGET_SHA: ${{ inputs.target_sha }}
+        run: |
+          git fetch origin main --depth=1
+
+          if ! git merge-base --is-ancestor "$TARGET_SHA" "origin/main"; then
+            echo "Target SHA $TARGET_SHA is not reachable from origin/main." >&2
+            exit 1
+          fi
+
+          version="$(node <<'NODE'
+          const fs = require('fs')
+          const path = require('path')
+
+          const roots = ['builds', 'packages']
+          const versions = new Set()
+
+          for (const root of roots) {
+            for (const name of fs.readdirSync(root)) {
+              const packageJson = path.join(root, name, 'package.json')
+              if (!fs.existsSync(packageJson)) continue
+              const pkg = JSON.parse(fs.readFileSync(packageJson, 'utf8'))
+              if (pkg.private) continue
+              versions.add(pkg.version)
+            }
+          }
+
+          if (versions.size !== 1) {
+            console.error(`Expected one public package version, found: ${[...versions].sort().join(', ')}`)
+            process.exit(1)
+          }
+
+          process.stdout.write([...versions][0])
+          NODE
+          )"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Backfill GitHub release if missing
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
           TARGET_SHA: ${{ inputs.target_sha }}
         run: |
           tag="v${VERSION}"
+
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "GitHub release $tag already exists; skipping."
-            exit 0
+            object_type="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.type')"
+            object_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+
+            if [ "$object_type" = "tag" ]; then
+              existing_target="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha" --jq '.object.sha')"
+            else
+              existing_target="$object_sha"
+            fi
+
+            if [ "$existing_target" = "$TARGET_SHA" ]; then
+              echo "GitHub release $tag already exists on $TARGET_SHA; nothing to do."
+              exit 0
+            fi
+
+            echo "GitHub release $tag already exists on $existing_target, expected $TARGET_SHA." >&2
+            exit 1
           fi
 
           prerelease_flag=""

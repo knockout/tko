@@ -71,10 +71,10 @@ to npm.
 - Builds all packages and runs tests
 - If unreleased changesets exist, opens/updates a version PR
 - If version PR is merged, publishes to npm
-- After a successful publish, dispatches `github-release.yml` to create the matching GitHub Release and tag
+- After a successful publish, creates the matching GitHub Release and tag in the same workflow
 - Uses npm trusted publishing via GitHub Actions OIDC
 - Requires trusted publisher configuration for the public `@tko/*` packages on npm
-- Includes a manual `github-release.yml` workflow for rerunnable release/tag repair if GitHub release creation ever needs a retry after publish
+- Includes a manual `github-release.yml` workflow to backfill a missing release/tag for a published `main` commit if GitHub release creation ever needs a retry after publish
 
 ---
 
