@@ -1,6 +1,6 @@
 # Automated release via Changesets.
 #
-# On push to main:
+# On tagging:
 #   - If there are unreleased changesets, opens/updates a release version
 #     PR that bumps versions and updates changelogs.
 #   - If there are no unreleased changesets, builds, tests, and publishes
@@ -12,7 +12,8 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
