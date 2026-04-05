@@ -70,7 +70,7 @@ export function dummyTemplateEngine(templates?) {
         const evalResult = eval(script)
         return evalResult === null || evalResult === undefined ? '' : evalResult.toString()
       } catch (ex: any) {
-        throw new Error('Error evaluating script: [js: ' + script + ']\n\nException: ' + ex.toString())
+        throw new Error('Error evaluating script: [js: ' + script + ']\n\nException: ' + ex.toString(), { cause: ex })
       }
     }
 
