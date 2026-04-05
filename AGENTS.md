@@ -106,8 +106,8 @@ GitHub Actions workflows (`.github/workflows/`):
 | `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
 | `lint-and-typecheck.yml` | PRs | Prettier + ESLint + tsc (combined) |
 | `publish-check.yml` | PRs | Verify packages are publishable |
-| `release.yml` | Push to main | Changeset version PRs + npm publish + GitHub release |
-| `github-release-repair.yml` | Manual | Recreate or repair a GitHub release/tag boundary after publish |
+| `release.yml` | Push to main | Changeset version PRs + npm publish + dispatch GitHub release workflow |
+| `github-release.yml` | Manual + post-publish dispatch | Create or repair a GitHub release/tag boundary after publish |
 | `deploy-docs.yml` | Push to main | Deploy tko.io to GitHub Pages |
 | `codeql-analysis.yml` | Weekly + main push | Security scanning |
 
@@ -128,8 +128,8 @@ This creates a changeset file in `.changeset/` that gets committed with your PR.
 2. If unreleased changesets exist, the action opens a "Version Packages" PR
 3. Review the PR (it bumps versions and updates changelogs)
 4. Merge it to publish to npm via GitHub Actions OIDC trusted publishing
-5. After a successful publish, CI creates the matching GitHub Release and tag
-6. If release creation ever needs repair after publish, run `github-release-repair.yml` with the version and merged commit SHA
+5. After a successful publish, CI dispatches `github-release.yml` to create the matching GitHub Release and tag
+6. If release creation ever needs repair after publish, run `github-release.yml` manually with the version and merged commit SHA
 
 Avoid manual workstation publishes. If release CI is unavailable, fix the
 workflow or npm trusted publisher configuration rather than bypassing it with a

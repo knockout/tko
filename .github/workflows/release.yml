@@ -66,6 +66,9 @@ jobs:
     if: needs.prepare-release.outputs.has_changesets == 'false'
     runs-on: ubuntu-latest
 
+    outputs:
+      release_version: ${{ steps.version.outputs.version }}
+
     permissions:
       contents: read
       id-token: write
@@ -88,6 +91,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Determine release version
+        id: version
+        run: echo "version=$(node -p 'require(\"./builds/reference/package.json\").version')" >> "$GITHUB_OUTPUT"
+
       - name: Build all packages
         run: make
 
@@ -99,39 +106,23 @@ jobs:
         # publishing from GitHub Actions.
         run: npx changeset publish
 
-  github-release:
-    name: Create GitHub Release
+  dispatch-github-release:
+    name: Dispatch GitHub Release Workflow
     needs: [prepare-release, publish]
     if: needs.prepare-release.outputs.has_changesets == 'false' && needs.publish.result == 'success'
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      actions: write
 
     steps:
-      - name: Checkout code
-        # actions/checkout v6.0.2
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-
-      - name: Determine release version
-        id: version
-        run: echo "version=$(node -p 'require(\"./builds/reference/package.json\").version')" >> "$GITHUB_OUTPUT"
-
-      - name: Create GitHub release if missing
+      - name: Dispatch GitHub release workflow
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.publish.outputs.release_version }}
         run: |
-          tag="v${VERSION}"
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "GitHub release $tag already exists; skipping."
-            exit 0
-          fi
-
-          gh release create "$tag" \
+          gh workflow run github-release.yml \
             --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "TKO ${VERSION}" \
-            --generate-notes
+            --ref "$GITHUB_REF_NAME" \
+            -f version="$VERSION" \
+            -f target_sha="$GITHUB_SHA"
