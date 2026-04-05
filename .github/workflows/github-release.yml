@@ -32,8 +32,16 @@ jobs:
             exit 0
           fi
 
+          prerelease_flag=""
+          case "$VERSION" in
+            *-alpha*|*-beta*|*-rc*)
+              prerelease_flag="--prerelease"
+              ;;
+          esac
+
           gh release create "$tag" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$TARGET_SHA" \
             --title "TKO ${VERSION}" \
-            --generate-notes
+            --generate-notes \
+            $prerelease_flag
