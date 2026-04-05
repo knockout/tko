@@ -5,7 +5,7 @@
 [![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 
-[![Check 'Main' (build+tsc)](https://github.com/knockout/tko/actions/workflows/run-tsc.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/run-tsc.yml)
+[![Check 'Main-build'](https://github.com/knockout/tko/actions/workflows/main-build.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/main-build.yml)
 [![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
 [![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
 <!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/tko.svg)](https://saucelabs.com/u/tko) -->
