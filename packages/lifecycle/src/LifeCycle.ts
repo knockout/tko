@@ -25,7 +25,7 @@ export default class LifeCycle {
     }
   }
 
-  subscribe(observable: Observable, action, subscriptionType?: string) {
+  subscribe(observable: Observable, action: any, subscriptionType?: string) {
     if (typeof action === 'string') {
       action = this[action]
     }

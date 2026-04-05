@@ -109,7 +109,7 @@ describe('BindingHandler behaviors', function () {
     })
 
     it('registers a kind with HandlerClass.register', function () {
-      class HC extends BindingHandler<any> {}
+      class HC extends BindingHandler {}
 
       BindingHandler.registerBindingHandler(HC, 'testHCregistration')
       expect(bindingHandlers.testHCregistration).toEqual(HC)
