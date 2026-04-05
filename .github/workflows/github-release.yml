@@ -1,0 +1,87 @@
+name: Backfill GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: Published main commit SHA to tag and release
+        required: true
+        type: string
+
+jobs:
+  backfill-github-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout published commit
+        # actions/checkout v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.target_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate target commit and determine release version
+        id: version
+        env:
+          TARGET_SHA: ${{ inputs.target_sha }}
+        run: |
+          git fetch origin main --depth=1
+
+          if ! git merge-base --is-ancestor "$TARGET_SHA" "origin/main"; then
+            echo "Target SHA $TARGET_SHA is not reachable from origin/main." >&2
+            exit 1
+          fi
+
+          version="$(node tools/release-version.cjs)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify published npm version exists
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          npm view "@tko/build.reference@$VERSION" version --registry=https://registry.npmjs.org >/dev/null
+
+      - name: Backfill GitHub release if missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TARGET_SHA: ${{ inputs.target_sha }}
+        run: |
+          tag="v${VERSION}"
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            object_type="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.type')"
+            object_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+
+            if [ "$object_type" = "tag" ]; then
+              existing_target="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha" --jq '.object.sha')"
+            else
+              existing_target="$object_sha"
+            fi
+
+            if [ "$existing_target" = "$TARGET_SHA" ]; then
+              echo "GitHub release $tag already exists on $TARGET_SHA; nothing to do."
+              exit 0
+            fi
+
+            echo "GitHub release $tag already exists on $existing_target, expected $TARGET_SHA." >&2
+            exit 1
+          fi
+
+          prerelease_flag=""
+          case "$VERSION" in
+            *-alpha*|*-beta*|*-rc*)
+              prerelease_flag="--prerelease"
+              ;;
+          esac
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$TARGET_SHA" \
+            --title "TKO ${VERSION}" \
+            --generate-notes \
+            $prerelease_flag
