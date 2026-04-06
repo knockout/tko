@@ -32,5 +32,6 @@ builds/**/meta
 .vscode/extensions.json
 !.vscode/launch.json
 .vscode/settings.json
+.claude/worktrees/
 .playwright-mcp
 .playwright-cli
