@@ -169,10 +169,7 @@ describe('Binding: Using', function () {
     expectContainHtml(container, '<div data-bind="foreach: childprop"></div>')
 
     childprop.push('me')
-    expectContainHtml(
-      container,
-      '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span></div>'
-    )
+    expectContainHtml(container, '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span></div>')
 
     childprop.push('me2')
     expectContainHtml(
@@ -201,7 +198,10 @@ describe('Binding: Using', function () {
     expectContainHtml(container, 'text<!-- ko foreach: childprop --><!-- /ko -->')
 
     childprop.push('me')
-    expectContainHtml(container, 'text<!-- ko foreach: childprop --><span data-bind="text: $data">me</span><!-- /ko -->')
+    expectContainHtml(
+      container,
+      'text<!-- ko foreach: childprop --><span data-bind="text: $data">me</span><!-- /ko -->'
+    )
 
     childprop.push('me2')
     expectContainHtml(

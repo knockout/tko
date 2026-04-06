@@ -26,7 +26,13 @@ import components from '@tko/utils.component'
 
 import { expect } from 'chai'
 import sinon from 'sinon'
-import { expectContainHtml, expectContainText, prepareTestNode, restoreAfter, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter,
+  useMockForTasks
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Components: Component binding', function () {
   let testComponentName = 'test-component',
@@ -100,9 +106,7 @@ describe('Components: Component binding', function () {
     testNode.innerHTML = '<div data-bind="if: true, component: $data"></div>'
     expect(function () {
       applyBindings(testComponentName, testNode)
-    }).to.throw(
-      'Multiple bindings (if and component) are trying to control descendant bindings of the same element.'
-    )
+    }).to.throw('Multiple bindings (if and component) are trying to control descendant bindings of the same element.')
 
     // Even though applyBindings threw an exception, the component still gets bound (asynchronously)
     clock.tick(1)
@@ -241,7 +245,8 @@ describe('Components: Component binding', function () {
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
 
-    expectContainHtml(testNode.children[0], 
+    expectContainHtml(
+      testNode.children[0],
       'start<span data-bind="template: { nodes: $componenttemplatenodes }"><em>original</em> child nodes</span>end'
     )
   })
@@ -274,7 +279,8 @@ describe('Components: Component binding', function () {
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
 
-    expectContainText(testNode.children[0], 
+    expectContainText(
+      testNode.children[0],
       'In child context 123, inside component with property 456. Now in sub-component with property 789.',
       /* ignoreSpaces */ true
     ) // Ignore spaces because old-IE is inconsistent
@@ -1383,7 +1389,9 @@ describe('Components: Component binding', function () {
       )
 
       arr([])
-      expect(testNode.innerHTML).to.deep.equal(`<test-component><div><!--ko slot: "X"--><!--/ko--></div></test-component>`)
+      expect(testNode.innerHTML).to.deep.equal(
+        `<test-component><div><!--ko slot: "X"--><!--/ko--></div></test-component>`
+      )
     })
 
     it('respects observable array changes with JSX', function () {

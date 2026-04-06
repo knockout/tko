@@ -126,6 +126,11 @@ describe('Compare Arrays', function () {
     expect(compareResult[compareResult.length - 1]).to.deep.equal({ status: 'deleted', value: 'T', index: 19 })
 
     compareResult = compareArrays(oldArray, newArray, { dontLimitMoves: true })
-    expect(compareResult[compareResult.length - 1]).to.deep.equal({ status: 'deleted', value: 'T', index: 19, moved: 4 })
+    expect(compareResult[compareResult.length - 1]).to.deep.equal({
+      status: 'deleted',
+      value: 'T',
+      index: 19,
+      moved: 4
+    })
   })
 })

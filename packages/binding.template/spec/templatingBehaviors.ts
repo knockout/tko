@@ -19,7 +19,12 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { dummyTemplateEngine } from '../helpers/dummyTemplateEngine'
 import { Provider } from '@tko/provider'
-import { expectContainHtml, expectContainText, prepareTestNode, restoreAfter } from '../../utils/helpers/mocha-test-helpers'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Templating', function () {
   let bindingHandlers
@@ -314,7 +319,8 @@ describe('Templating', function () {
     )
     testNode.innerHTML = '<div data-bind=\'template:"outerTemplate"\'></div>'
     applyBindings(null, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer template output, inner template output <span data-bind="text: 123">123</span>'
     )
   })
@@ -526,7 +532,8 @@ describe('Templating', function () {
     // below.
     // expect(model.numRewrittenBindings).to.equal(1);
     expect(model.numExternalBindings).to.equal(1)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer <div data-bind="template: { name: &quot;innertemplate&quot;, bypassdomnodewrap: true }">inner via inline binding: <span data-bind="text: ++numrewrittenbindings">1</span>inner via external binding: <em>1</em></div>'
     )
   })
@@ -583,7 +590,8 @@ describe('Templating', function () {
     applyBindings(model, testNode)
     expect(model.numRewrittenBindings).to.equal(1)
     expect(model.numExternalBindings).to.equal(2)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer <div>inner via inline binding: <span>1</span>inner via external binding: <em>2</em></div>'
     )
   })
@@ -605,13 +613,15 @@ describe('Templating', function () {
     ;(model.testNodes[1] as HTMLSpanElement).setAttribute('data-bind', "template: 'innerTemplate'") // See that bindings are applied to the injected nodes
 
     applyBindings(model, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       'begin<span data-bind="template: \'innertemplate\'">the name is alpha</span>end'
     )
 
     // The injected bindings update to match model changes as usual
     model.testData.name('beta')
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       'begin<span data-bind="template: \'innertemplate\'">the name is beta</span>end'
     )
   })
@@ -742,7 +752,8 @@ describe('Templating', function () {
       const originalFrankNode = testNode.childNodes[0].childNodes[1]
 
       myArray.push({ personName: 'Steve' })
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>the item is bob</div><div>the item is frank</div><div>the item is steve</div>'
       )
       expect(testNode.childNodes[0].childNodes[0]).to.equal(originalBobNode)
@@ -757,7 +768,8 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item is <span data-bind="text: personname">bob</span>the item is <span data-bind="text: personname">frank</span>'
       )
     })
@@ -807,13 +819,15 @@ describe('Templating', function () {
       // Bind against initial array containing one entry.
       const myArray = observableArray(['original'])
       applyBindings({ items: myArray }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div data-bind="text: $data">original</div>inner <span data-bind="text: 123">123</span>x'
       )
 
       // Now replace the entire array contents with one different entry.
       myArray(['new'])
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div data-bind="text: $data">new</div>inner <span data-bind="text: 123">123</span>x'
       )
     })
@@ -846,7 +860,8 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item # is <span data-bind="text: $index">0</span>the item # is <span data-bind="text: $index">1</span>'
       )
     })
@@ -861,17 +876,20 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item <span data-bind="text: personname">bob</span>is <span data-bind="text: $index">0</span>the item <span data-bind="text: personname">frank</span>is <span data-bind="text: $index">1</span>'
       )
 
       const frank = myArray.pop() // remove frank
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item <span data-bind="text: personname">bob</span>is <span data-bind="text: $index">0</span>'
       )
 
       myArray.unshift(frank) // put frank in the front
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item <span data-bind="text: personname">frank</span>is <span data-bind="text: $index">0</span>the item <span data-bind="text: personname">bob</span>is <span data-bind="text: $index">1</span>'
       )
     })
@@ -885,7 +903,8 @@ describe('Templating', function () {
 
       options.bindingGlobals.String = String
       applyBindings({ myCollection: myArray }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item is <span data-bind="text: string($data)">undefined</span>the item is <span data-bind="text: string($data)">null</span>'
       )
     })
@@ -899,13 +918,15 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>the item is bob</div><div>the item is steve</div><div>the item is another</div>'
       )
       const originalBobNode = testNode.childNodes[0].childNodes[0]
 
       myObservable('Steve2')
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>the item is bob</div><div>the item is steve2</div><div>the item is another</div>'
       )
       expect(testNode.childNodes[0].childNodes[0]).to.equal(originalBobNode)
@@ -1018,7 +1039,8 @@ describe('Templating', function () {
         return dataItem.preferredTemplate == 1 ? 'firstTemplate' : 'secondTemplate'
       }
       applyBindings({ myCollection: myArray, getTemplateModelProperty: getTemplate, anotherProperty: 123 }, testNode)
-      expectContainHtml(testNode.childNodes[0], 
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>template1output, firstitemvalue</div><div>template2output, seconditemvalue</div>'
       )
     })
@@ -1038,12 +1060,14 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: items }\'></div>'
 
       applyBindings(myVm, testNode)
-      expectContainText(testNode.childNodes[0], 
+      expectContainText(
+        testNode.childNodes[0],
         'The 0 item A has 0.1,1.2,2.3, The 1 item B has 0.4,1.5,2.6, The 2 item C has 0.7,1.8,2.9, '
       )
 
       myVm({ items: ['C', 'B', 'A'], itemValues: { A: [1, 2, 30], B: [4, 5, 60], C: [7, 8, 90] } })
-      expectContainText(testNode.childNodes[0], 
+      expectContainText(
+        testNode.childNodes[0],
         'The 0 item C has 0.7,1.8,2.90, The 1 item B has 0.4,1.5,2.60, The 2 item A has 0.1,1.2,2.30, '
       )
     })
@@ -1142,7 +1166,8 @@ describe('Templating', function () {
       '<div data-bind=\'template: {name: "myTemplate", foreach: people, templateOptions: someAdditionalData }\'></div>'
 
     applyBindings(myModel, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<div>person alpha has additional property someadditionalvalue</div><div>person beta has additional property someadditionalvalue</div>'
     )
   })
@@ -1218,7 +1243,8 @@ describe('Templating', function () {
       { val: 'ROOT', outerItem: { val: 'OUTER', middleItem: { val: 'MIDDLE', innerItem: { val: 'INNER' } } } },
       testNode
     )
-    expectContainText(testNode.childNodes[0].childNodes[0], 
+    expectContainText(
+      testNode.childNodes[0].childNodes[0],
       '(Data:INNER, Parent:MIDDLE, Grandparent:OUTER, Root:ROOT, Depth:3)'
     )
   })
@@ -1277,7 +1303,8 @@ describe('Templating', function () {
     const model = {}
     testNode.innerHTML = '<div data-bind=\'template: { name: "outerTemplate" }\'></div>'
     applyBindings(model, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer <!-- ko template: { name: "innertemplate" } -->inner via inline binding: <span data-bind="text: &quot;sometext&quot;">sometext</span><!-- /ko -->'
     )
   })
@@ -1293,9 +1320,7 @@ describe('Templating', function () {
   it('Should render sub-context with {data: }', function () {
     testNode.innerHTML = "<div data-bind='template: {data: outer}'><span data-bind='text: inner'></span></div>"
     applyBindings({ outer: { inner: 'x' } }, testNode)
-    expectContainHtml(testNode, 
-      '<div data-bind="template: {data: outer}"><span data-bind="text: inner">x</span></div>'
-    )
+    expectContainHtml(testNode, '<div data-bind="template: {data: outer}"><span data-bind="text: inner">x</span></div>')
   })
 
   it('Should be able to use anonymous templates that contain first-child comment nodes', function () {
@@ -1304,7 +1329,8 @@ describe('Templating', function () {
     setTemplateEngine(new dummyTemplateEngine({}))
     testNode.innerHTML = "start <div data-bind='foreach: [1,2]'><span><!-- leading comment -->hello</span></div>"
     applyBindings(null, testNode)
-    expectContainHtml(testNode, 
+    expectContainHtml(
+      testNode,
       'start <div data-bind="foreach: [1,2]"><span><!-- leading comment -->hello</span><span><!-- leading comment -->hello</span></div>'
     )
   })
