@@ -1,6 +1,6 @@
 # Automated release via Changesets.
 #
-# On push to main:
+# On tagging:
 #   - If there are unreleased changesets, opens/updates a release version
 #     PR that bumps versions and updates changelogs.
 #   - If there are no unreleased changesets, builds, tests, and publishes
@@ -12,7 +12,8 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -100,6 +101,18 @@ jobs:
         run: |
           version="$(node tools/release-version.cjs)"
           echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate tag matches release version
+        env:
+          TAG_VERSION: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          tag_version="${TAG_VERSION#v}"
+
+          if [ "$tag_version" != "$RELEASE_VERSION" ]; then
+            echo "Tag version $tag_version does not match release version $RELEASE_VERSION." >&2
+            exit 1
+          fi
 
       - name: Build all packages
         run: make
