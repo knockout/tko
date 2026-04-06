@@ -24,9 +24,7 @@
   "homepage": "https://tko.io",
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai",
-      "sinon"
+      "mocha"
     ]
   },
   "dependencies": {
