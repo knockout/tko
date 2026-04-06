@@ -16,8 +16,7 @@
   },
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai"
+      "mocha"
     ]
   },
   "homepage": "https://tko.io",

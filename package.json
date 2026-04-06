@@ -34,7 +34,6 @@
     "karma-jasmine": "^0.1.6",
     "karma-mocha": "^2.0.1",
     "karma-sauce-launcher": "^4.3.6",
-    "karma-sinon": "^1.0.5",
     "lerna": "^9.0.3",
     "mocha": "^11.7.5",
     "nyc": "^18.0.0",
