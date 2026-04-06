@@ -22,7 +22,12 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import { ComponentProvider } from '../dist'
 import { expect } from 'chai'
 import sinon from 'sinon'
-import { expectContainHtml, expectContainText, prepareTestNode, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  useMockForTasks
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Components: Custom elements', function () {
   let bindingHandlers
@@ -149,9 +154,7 @@ describe('Components: Custom elements', function () {
 
     expect(function () {
       applyBindings(null, testNode)
-    }).to.throw(
-      'Multiple bindings (if and component) are trying to control descendant bindings of the same element.'
-    )
+    }).to.throw('Multiple bindings (if and component) are trying to control descendant bindings of the same element.')
 
     // Even though applyBindings threw an exception, the component still gets bound (asynchronously)
     clock.tick(1)

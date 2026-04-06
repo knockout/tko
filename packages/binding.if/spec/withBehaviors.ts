@@ -218,7 +218,6 @@ describe('Binding: With', function () {
     expect((testNode.childNodes[0].childNodes[0] as HTMLInputElement).value).to.equal('Hello')
 
     expect(dataFor(testNode.childNodes[0].childNodes[0])).to.equal(dataFor(testNode))
-
     ;(testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'Goodbye'
     triggerEvent(testNode.children[0].children[0], 'change')
     expect(someItem()).to.equal('Goodbye')
@@ -320,7 +319,6 @@ describe('Binding: With', function () {
     expect(item.getSubscriptionsCount('change')).to.equal(3)
     expectValues(testNode.childNodes[0], ['one'])
     expectContainText(testNode.childNodes[0], 'one')
-
     ;(testNode.childNodes[0].childNodes[0] as HTMLInputElement).value = 'two'
     triggerEvent(testNode.children[0].children[0], 'change')
     expect(item()).to.equal('two')

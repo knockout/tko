@@ -97,10 +97,7 @@ describe('Components: Default loader', function () {
     const createViewModelFunction = function () {}
     const domNodeArray = new Array()
     let didResolveDefinition = false
-    const config = {
-      template: { require: 'path/templateModule' },
-      viewModel: { require: 'path/viewModelModule' }
-    }
+    const config = { template: { require: 'path/templateModule' }, viewModel: { require: 'path/viewModelModule' } }
 
     restoreAfter(cleanups, window as any, 'require')
     ;(window as any).require = function (modules, callback) {
@@ -198,10 +195,7 @@ describe('Components: Default loader', function () {
     restoreAfter(cleanups, components, 'loaders')
     components.loaders = [testLoader as any, components.defaultLoader]
 
-    const config = {
-      template: { customThing: 123 },
-      viewModel: { instance: {} }
-    }
+    const config = { template: { customThing: 123 }, viewModel: { instance: {} } }
     testConfigObject(config, function (definition) {
       expect(definition.template.length).to.equal(1)
       expectContainText(definition.template[0], 'Hello world')
@@ -233,10 +227,7 @@ describe('Components: Default loader', function () {
     restoreAfter(cleanups, components, 'loaders')
     components.loaders = [testLoader as any, components.defaultLoader]
 
-    const config = {
-      template: '<div>Hello world</div>',
-      viewModel: { customThing: 456 }
-    }
+    const config = { template: '<div>Hello world</div>', viewModel: { customThing: 456 } }
     testConfigObject(config, function (definition) {
       expect(definition.template.length).to.equal(1)
       expectContainText(definition.template[0], 'Hello world')
@@ -275,9 +266,13 @@ describe('Components: Default loader', function () {
       })
 
       it('Can be configured as an element ID', function () {
-        testTemplateFromElement('<div id="my-container-elem">{0}</div>', 'my-container-elem', function (templateSourceElem) {
-          expect(templateSourceElem.childNodes.length).to.equal(2)
-        })
+        testTemplateFromElement(
+          '<div id="my-container-elem">{0}</div>',
+          'my-container-elem',
+          function (templateSourceElem) {
+            expect(templateSourceElem.childNodes.length).to.equal(2)
+          }
+        )
       })
 
       it('Can be configured as the ID of a <script> element', function () {

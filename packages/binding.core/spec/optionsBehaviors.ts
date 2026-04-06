@@ -234,13 +234,11 @@ describe('Binding: Options', function () {
     })
     applyBindings({ myValues: myObservable }, testNode)
     expect(changeHandlerFireCount).to.equal(0)
-
     ;(testNode.childNodes[0] as HTMLSelectElement).options[0].selected = true
     expectHaveSelectedValues(testNode.childNodes[0], ['A'])
     myObservable(['B', 'C', 'A'])
     expectHaveSelectedValues(testNode.childNodes[0], ['A'])
     expect(changeHandlerFireCount).to.equal(0)
-
     ;(testNode.childNodes[0] as HTMLSelectElement).options[0].selected = true
     expectHaveSelectedValues(testNode.childNodes[0], ['B', 'A'])
     myObservable(['C', 'A'])
@@ -319,7 +317,7 @@ describe('Binding: Options', function () {
       { name: observable('Bert'), id: 'B' }
     ]
     testNode.innerHTML =
-      '<select data-bind="options: people, optionsText: \'name\', optionsValue: \'id\', optionsCaption: \'-\'"></select>'
+      "<select data-bind=\"options: people, optionsText: 'name', optionsValue: 'id', optionsCaption: '-'\"></select>"
     applyBindings({ people: people }, testNode)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[2].selected = true
 
