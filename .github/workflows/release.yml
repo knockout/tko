@@ -52,7 +52,7 @@ jobs:
       - name: Create or update version PR
         id: changesets
         # changesets/action v1.5.3
-        uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf
         with:
           version: npx changeset version
           title: 'chore: version packages'
