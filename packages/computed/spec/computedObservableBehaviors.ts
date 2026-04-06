@@ -918,7 +918,7 @@ describe('Dependent Observable', function () {
       expect(computedInstance()).to.equal(false) // value of isInitial was false
 
       // value outside of computed is undefined
-      expect(dependencyDetection.isInitial()).to.be.undefined
+      expect(dependencyDetection.isInitial()).to.equal(undefined)
     })
 
     it('Should accurately report initial evaluation when deferEvaluation is true', function () {
@@ -976,8 +976,8 @@ describe('Dependent Observable', function () {
       expect(computedInstance.getDependencies()).to.deep.equal([observable1, observable2])
 
       // value outside of computed is undefined
-      expect(dependencyDetection.getDependenciesCount()).to.be.undefined
-      expect(dependencyDetection.getDependencies()).to.be.undefined
+      expect(dependencyDetection.getDependenciesCount()).to.equal(undefined)
+      expect(dependencyDetection.getDependencies()).to.equal(undefined)
     })
   })
 
