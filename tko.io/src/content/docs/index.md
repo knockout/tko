@@ -39,8 +39,8 @@ Use this rule of thumb:
   </a>
   <div class="landing-card landing-card--status">
     <span class="landing-card__eyebrow">Project status</span>
-    <h3>4.x prerelease line</h3>
-    <p>Pin the exact version you test with. The packages are usable, but the docs and example system are still being tightened up.</p>
+    <h3>4.0 stable line</h3>
+    <p>Start from the latest 4.x release. The packages are stable, and the docs and example system will keep improving alongside them.</p>
   </div>
 </div>
 
@@ -50,7 +50,7 @@ If you are following the TSX examples in this docs set, install `@tko/build.refe
 
 ## Current status
 
-> TKO packages are still published as 4.x prereleases. Pin the exact version you test with, and expect some docs and examples to keep evolving.
+> TKO 4.x packages are now on the stable line. If you are validating a migration or debugging a regression, record the exact version you tested with.
 
 ## Quick start
 
