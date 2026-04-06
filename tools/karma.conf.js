@@ -39,7 +39,7 @@ const CommonConfig = {
   files: pkg.karma.files || [
     { pattern: 'spec/**/*.js', watched: false },
     { pattern: 'spec/**/*.ts', watched: false }
-  ],
+  ],  
   preprocessors: {
     'spec/**/*.js': ['esbuild'],
     'spec/**/*.ts': ['esbuild']

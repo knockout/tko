@@ -20,9 +20,7 @@
   },
   "karma": {
     "frameworks": [
-      "mocha",
-      "sinon",
-      "chai"
+      "mocha"
     ]
   },
   "homepage": "https://tko.io",

@@ -4,6 +4,8 @@
 
 import tkoRoot from '..'
 
+import { assert } from 'chai'
+
 describe('tko/build.reference', () => {
   describe('root import', () => {
     it('exports a ko object', () => {

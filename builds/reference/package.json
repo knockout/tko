@@ -9,8 +9,7 @@
   "author": "The Knockout Team",
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai"
+      "mocha"
     ]
   },
   "license": "MIT",
