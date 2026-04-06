@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 let testObservableArray
 let notifiedValues

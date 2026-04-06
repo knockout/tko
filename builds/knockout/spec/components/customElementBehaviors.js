@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 function cleanedHtml(node) {
     var html = node.innerHTML.toLowerCase().replace(/\r\n/g, '');
     html = html.replace(/(<!--.*?-->)\s*/g, '$1');

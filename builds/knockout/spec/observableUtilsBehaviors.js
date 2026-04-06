@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('ko.when', function() {
     it('Runs callback when predicate function becomes true, but only once', function() {
         var x = ko.observable(3),

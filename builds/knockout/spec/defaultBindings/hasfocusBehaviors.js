@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 ko.utils.arrayForEach(['hasfocus', 'hasFocus'], function(binding) {
     describe('Binding: ' + binding, function() {
         beforeEach(prepareTestNode);

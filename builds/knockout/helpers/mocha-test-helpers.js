@@ -1,3 +1,11 @@
+import * as chai from 'chai'
+import sinon from 'sinon'
+
+window.sinon = sinon
+window.chai = chai
+window.expect = chai.expect
+window.assert = chai.assert
+
 ;(function (global) {
   const Assertion = chai.Assertion
 

@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Components: Loader registry', function() {
     var testAsyncDelay = 20,
         testComponentName = 'test-component',

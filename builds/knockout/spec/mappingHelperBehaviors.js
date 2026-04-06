@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 describe('Mapping helpers', function() {
     it('ko.toJS should require a parameter', function() {

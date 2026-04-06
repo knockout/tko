@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 describe('Extenders', function() {
     it('Should be able to extend any subscribable', function () {

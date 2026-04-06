@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('Observable Array change tracking', function() {
 
     it('Supplies changelists to subscribers', function() {

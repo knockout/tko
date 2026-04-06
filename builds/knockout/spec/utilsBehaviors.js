@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('unwrapObservable', function() {
   it('Should return the underlying value of observables', function() {
       var someObject = { abc: 123 },

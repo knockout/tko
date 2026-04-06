@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 describe('Pure Computed', function() {
     it('Should advertise that instances are computed', function () {

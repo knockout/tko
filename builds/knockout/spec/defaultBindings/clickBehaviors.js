@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Binding: Click', function() {
     // This is just a special case of the "event" binding, so not necessary to respecify all its behaviors
     beforeEach(prepareTestNode);

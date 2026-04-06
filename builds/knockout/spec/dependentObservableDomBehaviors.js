@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 describe('Dependent Observable DOM', function() {
     beforeEach(prepareTestNode);

@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('DOM node disposal', function() {
     beforeEach(prepareTestNode);
 

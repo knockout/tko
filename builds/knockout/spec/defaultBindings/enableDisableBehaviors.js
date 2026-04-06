@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Binding: Enable/Disable', function() {
     beforeEach(prepareTestNode);
 
