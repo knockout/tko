@@ -32,9 +32,7 @@
   ],
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai",
-      "sinon"
+      "mocha"
     ],
     "files": [
       "dist/browser.min.js",

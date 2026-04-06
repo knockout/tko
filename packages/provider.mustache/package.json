@@ -30,8 +30,7 @@
   },
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai"
+      "mocha"
     ]
   },
   "licenses": [
