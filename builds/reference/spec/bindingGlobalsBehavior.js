@@ -1,4 +1,5 @@
 import tko from '..'
+import { expect } from 'chai';
 
 describe('options.bindingGlobals', () => {
   it('is not globalThis by default', () => {

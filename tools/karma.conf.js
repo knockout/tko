@@ -40,6 +40,17 @@ const CommonConfig = {
     { pattern: 'spec/**/*.js', watched: false },
     { pattern: 'spec/**/*.ts', watched: false }
   ],
+  plugins: [
+    require('./chai-setup.js'),
+    require('karma-chrome-launcher'),
+    require('karma-firefox-launcher'),
+    require('karma-jasmine'),
+    require('karma-esbuild'),
+    require('karma-sinon'),
+    require('karma-coverage'),
+    require('karma-sauce-launcher'),
+    require('karma-mocha')
+  ],
   preprocessors: {
     'spec/**/*.js': ['esbuild'],
     'spec/**/*.ts': ['esbuild']
