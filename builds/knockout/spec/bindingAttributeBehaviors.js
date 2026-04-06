@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('Binding attribute syntax', function() {
     beforeEach(prepareTestNode);
 

@@ -1,3 +1,4 @@
+import '../../helpers/mocha-test-helpers.js'
 
 describe('Binding: CSS classes', function() {
     beforeEach(prepareTestNode);

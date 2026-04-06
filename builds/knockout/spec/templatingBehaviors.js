@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 export var dummyTemplateEngine = function (templates) {
     var inMemoryTemplates = templates || {};

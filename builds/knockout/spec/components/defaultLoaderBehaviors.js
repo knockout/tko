@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Components: Default loader', function() {
     var testComponentName = 'test-component';
 

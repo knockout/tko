@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('onError handler', function () {
     var koOnErrorCount = 0;
     var windowOnErrorCount = 0;

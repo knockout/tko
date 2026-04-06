@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 var clock;
 
 describe("Throttled observables", function() {

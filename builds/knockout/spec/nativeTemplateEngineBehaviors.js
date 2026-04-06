@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('Native template engine', function() {
     function ensureNodeExistsAndIsEmpty(id, tagName, type) {
         var existingNode = document.getElementById(id);

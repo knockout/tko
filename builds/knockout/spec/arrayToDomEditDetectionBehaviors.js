@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 function copyDomNodeChildren(domNode) {
     var copy = [];

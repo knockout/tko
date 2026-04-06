@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 
 describe('Dependent Observable', function() {
     it('Should be subscribable', function () {

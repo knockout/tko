@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 var temporarilyRegisteredComponents = [];
 
 describe('Parse HTML fragment', function() {

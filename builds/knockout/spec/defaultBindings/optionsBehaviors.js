@@ -1,3 +1,5 @@
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Binding: Options', function() {
     beforeEach(prepareTestNode);
 

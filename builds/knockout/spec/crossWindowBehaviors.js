@@ -1,3 +1,4 @@
+import '../helpers/mocha-test-helpers.js'
 import { dummyTemplateEngine } from "./templatingBehaviors";
 
 describe('Cross-window support', function() {

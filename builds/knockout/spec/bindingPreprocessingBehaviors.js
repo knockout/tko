@@ -1,3 +1,5 @@
+import '../helpers/mocha-test-helpers.js'
+
 describe('Binding preprocessing', function() {
     it('Should allow binding to modify value through "preprocess" method', function() {
         delete ko.bindingHandlers.a;
