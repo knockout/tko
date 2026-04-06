@@ -1,4 +1,5 @@
 /// <reference types="jquery" />
+/// <reference types="mocha" />
 
 //export {} allows redefining window module
 export {}
