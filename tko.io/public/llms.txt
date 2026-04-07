@@ -22,6 +22,8 @@
   How to run and verify TKO code.
 - Agent TSX Scaffold: /agents/sample-tsx.html
   Minimal in-browser TSX + esbuild scaffold for rapid prototype work.
+- Examples: /examples/
+  Interactive examples that show update locality and TKO's observable model.
 
 ## Use This First
 
@@ -29,6 +31,7 @@
 - API usage or authoring pattern: /agents/guide.md
 - Verification or test flow: /agents/testing.md
 - Rapid prototype in-browser: /agents/sample-tsx.html
+- Conceptual interactive examples: /examples/
 
 ## Build Choice
 
@@ -54,6 +57,7 @@
 - Agent Guide: /agents/guide.md (API reference, gotchas, examples)
 - Agent Testing: /agents/testing.md (how to run and verify TKO code)
 - Agent TSX Scaffold: /agents/sample-tsx.html (minimal browser TSX + esbuild scaffold for rapid prototype work)
+- Examples: /examples/ (interactive examples showing update locality and reactive behavior)
 - Playground: /playground
 - GitHub: https://github.com/knockout/tko
 
