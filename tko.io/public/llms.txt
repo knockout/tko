@@ -25,7 +25,7 @@
 - Agent TSX Scaffold: /agents/sample-tsx.html
   Minimal in-browser TSX + esbuild scaffold for rapid prototype work.
 - Examples: /examples/
-  Interactive examples that show update locality and TKO's observable model.
+  Interactive self-contained HTML examples that show update locality and TKO's observable model.
 
 ## Use This First
 
@@ -35,6 +35,7 @@
 - Verification or test flow: /agents/testing.md
 - Rapid prototype in-browser: /agents/sample-tsx.html
 - Conceptual interactive examples: /examples/
+  The examples are self-contained HTML files.
 
 ## Build Choice
 
@@ -62,7 +63,7 @@
 - Agent Contract: /agents/contract.md (preferred state/binding/DOM split for examples and prototypes)
 - Agent Testing: /agents/testing.md (how to run and verify TKO code)
 - Agent TSX Scaffold: /agents/sample-tsx.html (minimal browser TSX + esbuild scaffold for rapid prototype work)
-- Examples: /examples/ (interactive examples showing update locality and reactive behavior)
+- Examples: /examples/ (interactive self-contained HTML examples showing update locality and reactive behavior)
 - Playground: /playground
 - GitHub: https://github.com/knockout/tko
 

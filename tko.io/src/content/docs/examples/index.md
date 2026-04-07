@@ -10,6 +10,7 @@ These examples are meant to make TKO's model visible.
 
 - They focus on observables, bindings, and update locality.
 - They are intentionally interactive.
+- They are self-contained HTML files you can inspect, copy, or adapt directly.
 - They are designed to show what work is happening, not just what UI appears.
 
 ## Available examples
