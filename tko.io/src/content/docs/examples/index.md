@@ -18,7 +18,6 @@ These examples are meant to make TKO's model visible.
 - [odoom](/examples/odoom.html?view=example)
 - [Spreadsheet](/examples/spreadsheet.html?view=example)
 - [Signal Graph](/examples/signal-graph.html?view=example)
-- [Reactive Audio Mixer](/examples/audio-mixer.html?view=example)
 - [Form Engine](/examples/form-engine.html?view=example)
 
 ## Why this section exists

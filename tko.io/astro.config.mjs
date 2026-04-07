@@ -37,7 +37,6 @@ export default defineConfig({
             { label: 'odoom ↗', link: '/examples/odoom.html?view=example' },
             { label: 'Spreadsheet ↗', link: '/examples/spreadsheet.html?view=example' },
             { label: 'Signal Graph ↗', link: '/examples/signal-graph.html?view=example' },
-            { label: 'Reactive Audio Mixer ↗', link: '/examples/audio-mixer.html?view=example' },
             { label: 'Form Engine ↗', link: '/examples/form-engine.html?view=example' }
           ]
         },
