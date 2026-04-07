@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Honeycomb Locality</title>
+    <style>
+      :root {
+        --bg: #09111a;
+        --panel: rgba(14, 22, 34, 0.92);
+        --border: #243346;
+        --text: #eef4fb;
+        --muted: #91a5bd;
+        --warm: #ff9b59;
+        --cool: #49d7a6;
+        --hex: #b8792f;
+        --hex-core: #c98a39;
+        --hex-edge: #6e4517;
+        --source: #fff1cf;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, #081019, #0b1420);
+        color: var(--text);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+
+      .app {
+        position: relative;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .topbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 8px;
+        align-items: center;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 0 0 18px 18px;
+        background: rgba(10, 16, 25, 0.78);
+        backdrop-filter: blur(10px);
+      }
+
+      .title {
+        min-width: 0;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.3rem, 2.35vw, 2rem);
+        line-height: 0.94;
+        letter-spacing: -0.05em;
+      }
+
+      .subtitle {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .chip {
+        display: grid;
+        gap: 3px;
+        min-width: 150px;
+        padding: 7px 10px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(19, 29, 43, 0.92);
+      }
+
+      .chip-context .chip-label,
+      .chip-context .chip-value {
+        color: var(--text);
+      }
+
+      .chip-label {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .chip-left .chip-label,
+      .chip-left .chip-value {
+        color: var(--warm);
+      }
+
+      .chip-right .chip-label,
+      .chip-right .chip-value {
+        color: var(--cool);
+      }
+
+      .chip-value {
+        font-size: 1.65rem;
+        line-height: 0.88;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+      }
+
+      .chip-note {
+        color: var(--muted);
+        font-size: 0.7rem;
+        line-height: 1.15;
+      }
+
+      .stage {
+        position: relative;
+        height: 100vh;
+        background:
+          radial-gradient(circle at 50% 36%, rgba(255, 206, 102, 0.14), transparent 38%),
+          linear-gradient(180deg, #100d08, #1f1609 45%, #120d07 100%);
+        overflow: hidden;
+      }
+
+      .board-wrap {
+        position: absolute;
+        inset: 0;
+      }
+
+      .board {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
+
+      .board svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+      }
+
+      .hex-shape {
+        fill: url(#honey-fill);
+        stroke: rgba(102, 60, 12, 0.96);
+        stroke-width: 1.35;
+        transform-box: fill-box;
+        transform-origin: center;
+        will-change: transform, filter;
+        --touch-brightness: 1;
+        --touch-saturate: 1;
+        filter: brightness(var(--touch-brightness)) saturate(var(--touch-saturate));
+        transition:
+          fill 100ms ease,
+          stroke 100ms ease,
+          transform 100ms ease;
+      }
+
+      .hex-cell.edge .hex-shape {
+        fill: rgba(144, 88, 28, 0.98);
+        stroke: rgba(93, 56, 15, 1);
+      }
+
+      .hex-cell.interactive {
+        cursor: pointer;
+      }
+
+      .hex-cell.interactive:hover .hex-shape {
+        transform: translateY(-1px);
+      }
+
+      .hex-cell.source .hex-shape {
+        fill: #fff1c5;
+        stroke: #fff2aa;
+      }
+
+      .hex-cell.neighbor .hex-shape {
+        fill: #ffd66c;
+        stroke: #ffdf95;
+      }
+
+      @media (max-width: 1100px) {
+        .topbar {
+          grid-template-columns: 1fr;
+        }
+
+        .chip {
+          min-width: 0;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .topbar {
+          padding: 7px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app" id="appRoot">
+      <section class="stage">
+        <section class="topbar">
+          <div class="title">
+            <h1>Hover one hex. Compare all work vs local work.</h1>
+            <div class="subtitle">
+              Same visible result. Left compares every visible hex. Right notifies 6 neighbors.
+            </div>
+          </div>
+
+          <article class="chip chip-context">
+            <div class="chip-label">Board Size</div>
+            <div class="chip-value" data-bind="text: totalVisibleLabel"></div>
+            <div class="chip-note">visible hexes on screen</div>
+          </article>
+
+          <article class="chip chip-left">
+            <div class="chip-label">Conceptual Virtual DOM Pass · O(n)</div>
+            <div class="chip-value" data-bind="text: vdomCountLabel"></div>
+            <div class="chip-note">+ board size on each hover</div>
+          </article>
+
+          <article class="chip chip-right">
+            <div class="chip-label">Observable Local Update · O(1)</div>
+            <div class="chip-value" data-bind="text: obsCountLabel"></div>
+            <div class="chip-note">+ 6 neighbors on each hover</div>
+          </article>
+        </section>
+        <div class="board-wrap">
+          <svg
+            class="board"
+            aria-label="Honeycomb board"
+            xmlns="http://www.w3.org/2000/svg"
+            data-bind="attr: { viewBox: viewBox }"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id="honey-fill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#d79a44" />
+                <stop offset="55%" stop-color="#bf7f31" />
+                <stop offset="100%" stop-color="#a66924" />
+              </linearGradient>
+            </defs>
+            <!-- ko foreach: cells -->
+            <g
+              class="hex-cell"
+              data-bind="
+                attr: { transform: transform },
+                css: {
+                  interactive: interactive,
+                  edge: edge,
+                  source: source,
+                  neighbor: neighbor
+                },
+                event: {
+                  mouseenter: $parent.hoverCell,
+                  click: $parent.clickCell
+                }
+              "
+            >
+              <polygon
+                class="hex-shape"
+                data-bind="attr: { points: points }, hexTone: touchedLevel, hexPulse: pulse"
+              ></polygon>
+            </g>
+            <!-- /ko -->
+          </svg>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://www.tko.io/lib/tko.js"></script>
+    <script>
+      ;(() => {
+        const ko = globalThis.tko
+        const numberFormatter = new Intl.NumberFormat()
+        const size = 18
+        const cols = 64
+        const rows = 38
+        const overscan = 2
+        const hexWidth = Math.sqrt(3) * size
+        const hexHeight = 2 * size
+        const yStep = (3 / 4) * hexHeight
+        const visibleWidth = (cols - overscan * 2 - 0.5) * hexWidth
+        const visibleHeight = (rows - overscan * 2 - 0.25) * yStep + size
+        const axialDirs = [
+          [1, 0],
+          [1, -1],
+          [0, -1],
+          [-1, 0],
+          [-1, 1],
+          [0, 1]
+        ]
+
+        ko.bindingHandlers.hexPulse = {
+          init(element) {
+            element.__pulseSeen = 0
+            element.__pulseAnimation = null
+          },
+          update(element, valueAccessor) {
+            const pulse = ko.unwrap(valueAccessor()) || {}
+            const tick = pulse.tick || 0
+            const last = element.__pulseSeen || 0
+            if (tick <= last) return
+
+            element.__pulseSeen = tick
+            if (element.__pulseAnimation) {
+              element.__pulseAnimation.cancel()
+            }
+
+            const source = !!pulse.source
+            const peakScale = source ? 1.08 : 1.03
+            const peakBrightness = source ? 1.42 : 1.22
+            const baseBrightness = parseFloat(getComputedStyle(element).getPropertyValue('--touch-brightness')) || 1
+            const baseSaturate = parseFloat(getComputedStyle(element).getPropertyValue('--touch-saturate')) || 1
+
+            element.__pulseAnimation = element.animate(
+              [
+                { transform: 'scale(1)', filter: `brightness(${baseBrightness}) saturate(${baseSaturate})` },
+                {
+                  transform: `scale(${peakScale})`,
+                  filter: `brightness(${baseBrightness * peakBrightness}) saturate(${baseSaturate * 1.18})`,
+                  offset: 0.32
+                },
+                {
+                  transform: 'scale(1.01)',
+                  filter: `brightness(${baseBrightness * 1.04}) saturate(${baseSaturate * 1.04})`,
+                  offset: 0.68
+                },
+                { transform: 'scale(1)', filter: `brightness(${baseBrightness}) saturate(${baseSaturate})` }
+              ],
+              { duration: source ? 180 : 140, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'none' }
+            )
+          }
+        }
+
+        ko.bindingHandlers.hexTone = {
+          update(element, valueAccessor) {
+            const level = ko.unwrap(valueAccessor()) || 0
+            const capped = Math.min(level, 12)
+            const brightness = Math.max(0.46, 1 - capped * 0.05)
+            const saturate = Math.max(0.7, 1 - capped * 0.02)
+            element.style.setProperty('--touch-brightness', String(brightness))
+            element.style.setProperty('--touch-saturate', String(saturate))
+          }
+        }
+
+        function keyFor(q, r) {
+          return `${q},${r}`
+        }
+
+        function gridKey(col, row) {
+          return `${col},${row}`
+        }
+
+        function oddRToAxial(col, row) {
+          return { q: col - ((row - (row & 1)) >> 1), r: row }
+        }
+
+        function polygonPoints(cx, cy) {
+          const points = []
+          for (let i = 0; i < 6; i += 1) {
+            const angle = ((60 * i - 30) * Math.PI) / 180
+            const x = cx + size * Math.cos(angle)
+            const y = cy + size * Math.sin(angle)
+            points.push(`${x},${y}`)
+          }
+          return points.join(' ')
+        }
+
+        function buildCells() {
+          const cells = []
+          const cellsByKey = new Map()
+
+          for (let row = 0; row < rows; row += 1) {
+            for (let col = 0; col < cols; col += 1) {
+              const { q, r } = oddRToAxial(col, row)
+              const x = col * hexWidth + ((row & 1) * hexWidth) / 2 - overscan * hexWidth
+              const y = row * yStep - overscan * yStep
+              const isVisible = x + size > 0 && x - size < visibleWidth && y + size > 0 && y - size < visibleHeight
+
+              const cell = {
+                q,
+                r,
+                x,
+                y,
+                key: keyFor(q, r),
+                gridKey: gridKey(col, row),
+                transform: `translate(${x}, ${y})`,
+                points: polygonPoints(0, 0),
+                source: ko.observable(false),
+                neighbor: ko.observable(false),
+                touchedLevel: ko.observable(0),
+                pulse: ko.observable({ tick: 0, dx: 0, dy: 0, source: false }),
+                interactive: false,
+                edge: true,
+                isVisible,
+                neighbors: []
+              }
+
+              cells.push(cell)
+              cellsByKey.set(cell.key, cell)
+            }
+          }
+
+          cells.forEach(cell => {
+            cell.neighbors = axialDirs
+              .map(([dq, dr]) => cellsByKey.get(keyFor(cell.q + dq, cell.r + dr)))
+              .filter(Boolean)
+
+            const [col, row] = cell.gridKey.split(',').map(Number)
+            const isGridEdge = col === 0 || row === 0 || col === cols - 1 || row === rows - 1
+            cell.edge = isGridEdge || cell.neighbors.length !== 6
+            cell.interactive = !cell.edge && cell.isVisible
+          })
+
+          return cells
+        }
+
+        function buildWaterfallQueue(startCell, cells) {
+          const remaining = new Map(cells.filter(cell => cell.isVisible).map(cell => [cell.key, cell]))
+          const ordered = []
+          let frontier = [startCell]
+
+          while (remaining.size > 0 && frontier.length > 0) {
+            const currentStep = frontier.filter(cell => remaining.has(cell.key))
+            if (currentStep.length === 0) break
+
+            currentStep.forEach(cell => {
+              remaining.delete(cell.key)
+              ordered.push(cell)
+            })
+
+            const nextFrontier = new Map()
+            currentStep.forEach(cell => {
+              cell.neighbors.forEach(neighbor => {
+                if (neighbor.isVisible && remaining.has(neighbor.key)) {
+                  nextFrontier.set(neighbor.key, neighbor)
+                }
+              })
+            })
+            frontier = [...nextFrontier.values()]
+          }
+
+          remaining.forEach(cell => ordered.push(cell))
+          return ordered
+        }
+
+        const cells = buildCells()
+        const totalVisible = cells.filter(cell => cell.isVisible).length
+        const viewModel = {
+          cells,
+          viewBox: `0 0 ${visibleWidth} ${visibleHeight}`,
+          totalVisible: ko.observable(totalVisible),
+          vdomCount: ko.observable(0),
+          obsCount: ko.observable(0),
+          totalVisibleLabel: ko.pureComputed(() => numberFormatter.format(viewModel.totalVisible())),
+          vdomCountLabel: ko.pureComputed(() => numberFormatter.format(viewModel.vdomCount())),
+          obsCountLabel: ko.pureComputed(() => numberFormatter.format(viewModel.obsCount())),
+          lastKey: ko.observable(null),
+          activeSource: null,
+          activeNeighbors: [],
+          hoverCell(cell) {
+            if (!cell.interactive || cell.key === viewModel.lastKey()) return true
+
+            if (viewModel.activeSource) {
+              viewModel.activeSource.source(false)
+            }
+            viewModel.activeNeighbors.forEach(neighbor => neighbor.neighbor(false))
+
+            viewModel.lastKey(cell.key)
+            viewModel.activeSource = cell
+            viewModel.activeNeighbors = cell.neighbors
+
+            cell.source(true)
+            cell.neighbors.forEach(neighbor => neighbor.neighbor(true))
+
+            viewModel.vdomCount(viewModel.vdomCount() + viewModel.totalVisible())
+            viewModel.obsCount(viewModel.obsCount() + cell.neighbors.length)
+            return true
+          },
+          clickCell(cell) {
+            if (!cell.interactive) return true
+
+            const queue = buildWaterfallQueue(cell, cells)
+            let index = 0
+            const batchSize = 24
+
+            function advanceBurst() {
+              if (index >= queue.length) return
+
+              let touched = 0
+              while (index < queue.length && touched < batchSize) {
+                const target = queue[index]
+                index += 1
+                touched += 1
+
+                const pulse = target.pulse()
+                target.touchedLevel(target.touchedLevel() + 1)
+                target.pulse({
+                  tick: (pulse.tick || 0) + 1,
+                  dx: target.x - cell.x,
+                  dy: target.y - cell.y,
+                  source: target === cell
+                })
+              }
+
+              viewModel.vdomCount(viewModel.vdomCount() + touched * viewModel.totalVisible())
+              viewModel.obsCount(viewModel.obsCount() + touched)
+              requestAnimationFrame(advanceBurst)
+            }
+
+            requestAnimationFrame(advanceBurst)
+            return true
+          }
+        }
+
+        ko.applyBindings(viewModel, appRoot)
+      })()
+    </script>
+  </body>
+</html>

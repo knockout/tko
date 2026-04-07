@@ -6,7 +6,7 @@ Test-backed behavior summaries live under `/agents/verified-behaviors/`. Treat t
 
 ```html
 <script src="https://tko.io/lib/tko.js"></script>
-<script>window.ko = window.tko</script>
+<script>const ko = globalThis.tko</script>
 ```
 
 ## Observables
@@ -48,6 +48,15 @@ Binding notes:
 <input data-bind="textInput: query">
 <textarea data-bind="textInput: notes"></textarea>
 ```
+
+## Example Discipline
+
+When the goal is to demonstrate TKO itself, keep the state flow inside observables, computeds, and bindings.
+
+- Prefer `text`, `css`, `attr`, `event`, `foreach`, and `pureComputed` over manual DOM writes.
+- Avoid driving visible state with `textContent`, `innerHTML`, `classList`, or ad-hoc `addEventListener` when bindings can express the same behavior.
+- Use custom `bindingHandlers` only for DOM-specific effects that do not belong in the state layer, such as animation, focus, canvas, SVG, or third-party widget integration.
+- If an example contrasts reactive models, the counters and highlighted state should also be observable-driven so the example demonstrates the pattern instead of bypassing it.
 
 ## Classic data-bind parsing and CSP
 
@@ -210,6 +219,8 @@ tko.applyBindings({ removeTodo: t => todos.remove(t) }, root)
 ## Testing
 
 Observable writes update DOM synchronously — assert immediately after setting:
+
+Direct DOM reads are appropriate here because this is verification code, not the UI update path itself.
 
 ```js
 const vm = { msg: ko.observable('Hello') }
