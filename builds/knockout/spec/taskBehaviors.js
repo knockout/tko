@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+import sinon from 'sinon'
 import '../helpers/mocha-test-helpers.js'
 
 describe('Tasks', function() {

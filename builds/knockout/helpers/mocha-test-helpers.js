@@ -1,13 +1,6 @@
-import * as chai from 'chai'
-import sinon from 'sinon'
-
-window.sinon = sinon
-window.chai = chai
-window.expect = chai.expect
-window.assert = chai.assert
+import {expect, Assertion, util} from 'chai'
 
 ;(function (global) {
-  const Assertion = chai.Assertion
 
   function restoreAfter(cleanups, object, propertyName) {
     const originalValue = object[propertyName]
@@ -60,7 +53,7 @@ window.assert = chai.assert
   }
 
   function expectEqualOneOf(actual, expectedPossibilities) {
-    const matches = expectedPossibilities.some(function (expected) { return chai.util.eql(actual, expected) })
+    const matches = expectedPossibilities.some(function (expected) { return util.eql(actual, expected) })
     new Assertion(matches, 'expected value to deeply equal one of the provided possibilities').to.equal(true)
   }
 

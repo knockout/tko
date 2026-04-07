@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import '../helpers/mocha-test-helpers.js'
 
 describe('Observable Array change tracking', function() {
