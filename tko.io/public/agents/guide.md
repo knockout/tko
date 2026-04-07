@@ -2,6 +2,8 @@
 
 Test-backed behavior summaries live under `/agents/verified-behaviors/`. Treat those files as the contract layer when prose docs and implementation need reconciliation.
 
+For preferred state/binding/DOM architecture in examples and prototypes, read `/agents/contract.md`.
+
 ## Setup
 
 ```html
@@ -53,6 +55,7 @@ Binding notes:
 
 When the goal is to demonstrate TKO itself, keep the state flow inside observables, computeds, and bindings.
 
+- If you want a replacement-oriented checklist for DOM/state decisions, use `/agents/contract.md`.
 - It is normal to look up a mount element with `document.getElementById(...)`, `querySelector(...)`, or another host-framework reference so you can call `ko.applyBindings(viewModel, element)`.
 - Prefer `text`, `css`, `attr`, `event`, `foreach`, and `pureComputed` over manual DOM writes.
 - Avoid driving visible state with `textContent`, `innerHTML`, `classList`, or ad-hoc `addEventListener` when bindings can express the same behavior.

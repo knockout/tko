@@ -16,6 +16,8 @@
 
 - Verified Behaviors Index: /agents/verified-behaviors/index.md
   Unit-test-backed behavior contract. Prefer this when behavior questions matter.
+- Agent Contract: /agents/contract.md
+  Preferred state/binding/DOM split for TKO examples and prototypes.
 - Agent Guide: /agents/guide.md
   API reference, gotchas, and examples.
 - Agent Testing: /agents/testing.md
@@ -28,6 +30,7 @@
 ## Use This First
 
 - Behavior question or edge case: /agents/verified-behaviors/index.md
+- State vs DOM architecture choice: /agents/contract.md
 - API usage or authoring pattern: /agents/guide.md
 - Verification or test flow: /agents/testing.md
 - Rapid prototype in-browser: /agents/sample-tsx.html
@@ -56,6 +59,7 @@
 
 - Verified Behaviors: /agents/verified-behaviors/index.md (package-scoped index)
 - Agent Guide: /agents/guide.md (API reference, gotchas, examples)
+- Agent Contract: /agents/contract.md (preferred state/binding/DOM split for examples and prototypes)
 - Agent Testing: /agents/testing.md (how to run and verify TKO code)
 - Agent TSX Scaffold: /agents/sample-tsx.html (minimal browser TSX + esbuild scaffold for rapid prototype work)
 - Examples: /examples/ (interactive examples showing update locality and reactive behavior)
@@ -80,6 +84,7 @@ TSX: `ko-text={msg}` — compile-time JSX expressions, needs esbuild + `tko.jsx.
 Inside `ko-foreach` children, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
 
 See /agents/guide.md for usage patterns.
+See /agents/contract.md for preferred state vs DOM architecture.
 Use /agents/verified-behaviors/index.md for test-backed behavior contracts.
 
 ## Docs

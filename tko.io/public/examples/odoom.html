@@ -356,7 +356,12 @@
         </a>
       </nav>
     </header>
-    <main class="odoom" id="appRoot" tabindex="0" data-bind="odoomController: $data">
+    <main
+      class="odoom"
+      id="appRoot"
+      tabindex="0"
+      data-bind="hasFocus: viewportFocused, event: { keydown: handleKeyDown, keyup: handleKeyUp, pointerdown: focusViewport }"
+    >
       <div class="viewport">
         <canvas data-bind="odoomScene: $data"></canvas>
       </div>
@@ -366,7 +371,7 @@
         <div class="stack">
           <article class="title-card">
             <h1>odoom</h1>
-            <div class="subtitle">One-shot by AI: a tiny WebGL corridor crawler with an observable HUD.</div>
+          <div class="subtitle">A tiny WebGL corridor crawler with an observable HUD.</div>
           </article>
 
           <section class="metrics">
@@ -631,212 +636,230 @@
           return program
         }
 
-        function createViewModel() {
-          const runtime = {
-            map: baseMap.slice(),
-            input: Object.create(null),
-            renderTime: 0,
-            raf: 0,
-            gl: null,
-            wallTexture: null,
-            resizeObserver: null,
-            minimapDraw: null,
-            playerX: 1.5,
-            playerY: 1.5,
-            angle: 0.15
-          }
-
-          const vm = {
-            runtime,
-            health: ko.observable(88),
-            ammo: ko.observable(24),
-            cells: ko.observable(0),
-            fps: ko.observable(0),
-            message: ko.observable('Click the viewport, then move with WASD. Use Space to fire.'),
-            minimapVisible: ko.observable(true),
-            fov: ko.observable(68),
-            pixelScale: ko.observable(2),
-            muzzleFlash: ko.observable(0),
-            playerX: ko.observable(runtime.playerX),
-            playerY: ko.observable(runtime.playerY),
-            angle: ko.observable(runtime.angle),
-            healthLabel: ko.pureComputed(() => numberFormatter.format(vm.health())),
-            ammoLabel: ko.pureComputed(() => numberFormatter.format(vm.ammo())),
-            cellsLabel: ko.pureComputed(() => numberFormatter.format(vm.cells())),
-            fpsLabel: ko.pureComputed(() => numberFormatter.format(Math.round(vm.fps()))),
-            headingLabel: ko.pureComputed(() => `${Math.round(((vm.angle() * 180) / Math.PI + 360) % 360)}°`),
-            fovLabel: ko.pureComputed(() => `${vm.fov()}°`),
-            pixelScaleLabel: ko.pureComputed(() => `${vm.pixelScale()}x`),
-            muzzleOpacity: ko.pureComputed(() => vm.muzzleFlash().toFixed(3)),
-            minimapLabel: ko.pureComputed(() => (vm.minimapVisible() ? 'Hide minimap' : 'Show minimap')),
-            fovInput: ko.pureComputed({
-              read: () => String(vm.fov()),
-              write: value => vm.fov(Number(value))
-            }),
-            pixelScaleInput: ko.pureComputed({
-              read: () => String(vm.pixelScale()),
-              write: value => vm.pixelScale(Number(value))
-            }),
-            toggleMinimap() {
-              vm.minimapVisible(!vm.minimapVisible())
-            },
-            resetRun() {
-              runtime.map = baseMap.slice()
-              runtime.playerX = 1.5
-              runtime.playerY = 1.5
-              runtime.angle = 0.15
-              vm.playerX(runtime.playerX)
-              vm.playerY(runtime.playerY)
-              vm.angle(runtime.angle)
-              vm.health(88)
-              vm.ammo(24)
-              vm.cells(0)
-              vm.muzzleFlash(0)
-              vm.message('Run reset. Click the viewport and move.')
-              if (runtime.gl && runtime.wallTexture) {
-                updateWallTexture(runtime.gl, runtime.wallTexture, runtime.map)
-              }
-              if (runtime.minimapDraw) runtime.minimapDraw()
-            }
-          }
-
-          return vm
+        const inputBindings = {
+          KeyW: 'forward',
+          KeyS: 'back',
+          KeyA: 'turnLeft',
+          ArrowLeft: 'turnLeft',
+          KeyD: 'turnRight',
+          ArrowRight: 'turnRight',
+          ShiftLeft: 'sprint',
+          ShiftRight: 'sprint'
         }
 
-        function handlePickup(vm) {
-          const { runtime } = vm
-          const cx = Math.floor(runtime.playerX)
-          const cy = Math.floor(runtime.playerY)
-          const index = cy * MAP_W + cx
-          const cell = runtime.map[index]
+        class ODoomState {
+          #renderer = null
 
-          if (cell === AMMO) {
-            runtime.map[index] = 0
-            vm.ammo(vm.ammo() + 12)
-            vm.message('Picked up shells. Observable ammo updated immediately.')
-          } else if (cell === MEDKIT) {
-            runtime.map[index] = 0
-            vm.health(Math.min(100, vm.health() + 18))
-            vm.message('Medkit grabbed. HUD updated through observables.')
-          } else if (cell === CELL) {
-            runtime.map[index] = 0
-            vm.cells(vm.cells() + 1)
-            vm.message('Energy cell secured. WebGL view unchanged, HUD reacts instantly.')
-          } else {
-            return
-          }
+          constructor() {
+            this.mapData = ko.observable(baseMap.slice())
+            this.health = ko.observable(88)
+            this.ammo = ko.observable(24)
+            this.cells = ko.observable(0)
+            this.fps = ko.observable(0)
+            this.message = ko.observable('Click the viewport, then move with WASD. Use Space to fire.')
+            this.minimapVisible = ko.observable(true)
+            this.fov = ko.observable(68)
+            this.pixelScale = ko.observable(2)
+            this.muzzleFlash = ko.observable(0)
+            this.playerX = ko.observable(1.5)
+            this.playerY = ko.observable(1.5)
+            this.angle = ko.observable(0.15)
+            this.forward = ko.observable(false)
+            this.back = ko.observable(false)
+            this.turnLeft = ko.observable(false)
+            this.turnRight = ko.observable(false)
+            this.sprint = ko.observable(false)
+            this.viewportFocused = ko.observable(false)
 
-          if (runtime.gl && runtime.wallTexture) {
-            updateWallTexture(runtime.gl, runtime.wallTexture, runtime.map)
-          }
-          if (runtime.minimapDraw) runtime.minimapDraw()
-        }
-
-        function updatePlayer(vm, dt) {
-          const { runtime } = vm
-          const input = runtime.input
-          const sprint = input.ShiftLeft || input.ShiftRight
-          const moveSpeed = (sprint ? 3.4 : 2.2) * dt
-          const turnSpeed = 1.9 * dt
-
-          if (input.KeyA || input.ArrowLeft) runtime.angle -= turnSpeed
-          if (input.KeyD || input.ArrowRight) runtime.angle += turnSpeed
-
-          let moveX = 0
-          let moveY = 0
-          const dirX = Math.cos(runtime.angle)
-          const dirY = Math.sin(runtime.angle)
-          const strafeX = Math.cos(runtime.angle + Math.PI / 2)
-          const strafeY = Math.sin(runtime.angle + Math.PI / 2)
-
-          if (input.KeyW) {
-            moveX += dirX * moveSpeed
-            moveY += dirY * moveSpeed
-          }
-          if (input.KeyS) {
-            moveX -= dirX * moveSpeed
-            moveY -= dirY * moveSpeed
-          }
-          const nextX = runtime.playerX + moveX
-          const nextY = runtime.playerY + moveY
-
-          if (!wallAt(runtime.map, Math.floor(nextX), Math.floor(runtime.playerY))) {
-            runtime.playerX = nextX
-          }
-          if (!wallAt(runtime.map, Math.floor(runtime.playerX), Math.floor(nextY))) {
-            runtime.playerY = nextY
-          }
-
-          vm.playerX(runtime.playerX)
-          vm.playerY(runtime.playerY)
-          vm.angle(runtime.angle)
-          vm.muzzleFlash(Math.max(0, vm.muzzleFlash() - dt * 2.7))
-          handlePickup(vm)
-        }
-
-        function fireWeapon(vm) {
-          if (vm.ammo() <= 0) {
-            vm.message('Click. Empty.')
-            return
-          }
-
-          vm.ammo(vm.ammo() - 1)
-          vm.muzzleFlash(1)
-          vm.message('Fired a round. Ammo observable changed, WebGL flash reacted.')
-        }
-
-        ko.bindingHandlers.odoomController = {
-          init(element, valueAccessor) {
-            const vm = valueAccessor()
-
-            function onKeyDown(event) {
-              vm.runtime.input[event.code] = true
-              if (event.code === 'Space') {
-                event.preventDefault()
-                fireWeapon(vm)
-              }
-            }
-
-            function onKeyUp(event) {
-              vm.runtime.input[event.code] = false
-            }
-
-            function onPointerDown() {
-              element.focus()
-            }
-
-            element.addEventListener('keydown', onKeyDown)
-            element.addEventListener('keyup', onKeyUp)
-            element.addEventListener('pointerdown', onPointerDown)
-
-            ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-              element.removeEventListener('keydown', onKeyDown)
-              element.removeEventListener('keyup', onKeyUp)
-              element.removeEventListener('pointerdown', onPointerDown)
+            this.healthLabel = ko.pureComputed(() => numberFormatter.format(this.health()))
+            this.ammoLabel = ko.pureComputed(() => numberFormatter.format(this.ammo()))
+            this.cellsLabel = ko.pureComputed(() => numberFormatter.format(this.cells()))
+            this.fpsLabel = ko.pureComputed(() => numberFormatter.format(Math.round(this.fps())))
+            this.headingLabel = ko.pureComputed(() => `${Math.round(((this.angle() * 180) / Math.PI + 360) % 360)}°`)
+            this.fovLabel = ko.pureComputed(() => `${this.fov()}°`)
+            this.pixelScaleLabel = ko.pureComputed(() => `${this.pixelScale()}x`)
+            this.muzzleOpacity = ko.pureComputed(() => this.muzzleFlash().toFixed(3))
+            this.minimapLabel = ko.pureComputed(() => (this.minimapVisible() ? 'Hide minimap' : 'Show minimap'))
+            this.fovInput = ko.pureComputed({
+              read: () => String(this.fov()),
+              write: value => this.fov(Number(value))
+            })
+            this.pixelScaleInput = ko.pureComputed({
+              read: () => String(this.pixelScale()),
+              write: value => this.pixelScale(Number(value))
             })
           }
+
+          setRenderer(renderer) {
+            this.#renderer = renderer
+          }
+
+          get renderer() {
+            return this.#renderer
+          }
+
+          setInputFlag = (code, value) => {
+            const intent = inputBindings[code]
+            if (intent) {
+              this[intent](value)
+            }
+          }
+
+          toggleMinimap = () => {
+            this.minimapVisible(!this.minimapVisible())
+          }
+
+          resetRun = () => {
+            this.mapData(baseMap.slice())
+            this.playerX(1.5)
+            this.playerY(1.5)
+            this.angle(0.15)
+            this.health(88)
+            this.ammo(24)
+            this.cells(0)
+            this.muzzleFlash(0)
+            this.message('Run reset. Click the viewport and move.')
+            this.forward(false)
+            this.back(false)
+            this.turnLeft(false)
+            this.turnRight(false)
+            this.sprint(false)
+            this.#renderer?.resetTiming()
+          }
+
+          handlePickup = () => {
+            const map = this.mapData()
+            const cx = Math.floor(this.playerX())
+            const cy = Math.floor(this.playerY())
+            const index = cy * MAP_W + cx
+            const cell = map[index]
+            let nextMap = null
+
+            if (cell === AMMO) {
+              nextMap = map.slice()
+              nextMap[index] = 0
+              this.ammo(this.ammo() + 12)
+              this.message('Picked up shells. Observable ammo updated immediately.')
+            } else if (cell === MEDKIT) {
+              nextMap = map.slice()
+              nextMap[index] = 0
+              this.health(Math.min(100, this.health() + 18))
+              this.message('Medkit grabbed. HUD updated through observables.')
+            } else if (cell === CELL) {
+              nextMap = map.slice()
+              nextMap[index] = 0
+              this.cells(this.cells() + 1)
+              this.message('Energy cell secured. WebGL view unchanged, HUD reacts instantly.')
+            } else {
+              return
+            }
+
+            this.mapData(nextMap)
+          }
+
+          updatePlayer = dt => {
+            const map = this.mapData()
+            const moveSpeed = (this.sprint() ? 3.4 : 2.2) * dt
+            const turnSpeed = 1.9 * dt
+            let angle = this.angle()
+
+            if (this.turnLeft()) angle -= turnSpeed
+            if (this.turnRight()) angle += turnSpeed
+
+            let moveX = 0
+            let moveY = 0
+            const dirX = Math.cos(angle)
+            const dirY = Math.sin(angle)
+
+            if (this.forward()) {
+              moveX += dirX * moveSpeed
+              moveY += dirY * moveSpeed
+            }
+            if (this.back()) {
+              moveX -= dirX * moveSpeed
+              moveY -= dirY * moveSpeed
+            }
+
+            let playerX = this.playerX()
+            let playerY = this.playerY()
+            const nextX = playerX + moveX
+            const nextY = playerY + moveY
+
+            if (!wallAt(map, Math.floor(nextX), Math.floor(playerY))) {
+              playerX = nextX
+            }
+            if (!wallAt(map, Math.floor(playerX), Math.floor(nextY))) {
+              playerY = nextY
+            }
+
+            this.playerX(playerX)
+            this.playerY(playerY)
+            this.angle(angle)
+            this.muzzleFlash(Math.max(0, this.muzzleFlash() - dt * 2.7))
+            this.handlePickup()
+          }
+
+          fireWeapon = () => {
+            if (this.ammo() <= 0) {
+              this.message('Click. Empty.')
+              return
+            }
+
+            this.ammo(this.ammo() - 1)
+            this.muzzleFlash(1)
+            this.message('Fired a round. Ammo observable changed, WebGL flash reacted.')
+          }
+
+          handleKeyDown = (_, event) => {
+            this.setInputFlag(event.code, true)
+            if (event.code === 'Space') {
+              event.preventDefault()
+              this.fireWeapon()
+            }
+          }
+
+          handleKeyUp = (_, event) => {
+            this.setInputFlag(event.code, false)
+          }
+
+          focusViewport = () => {
+            this.viewportFocused(true)
+          }
         }
 
-        ko.bindingHandlers.odoomMinimap = {
-          init(canvas, valueAccessor) {
-            const vm = valueAccessor()
+        class ODoomRenderer {
+          #state
+          #renderTime = 0
+          #raf = 0
+          #resizeObserver = null
+
+          constructor(state) {
+            this.#state = state
+          }
+
+          resetTiming() {
+            this.#renderTime = 0
+          }
+
+          bindMinimap(canvas) {
             const ctx = canvas.getContext('2d')
             const size = canvas.width / MAP_W
 
-            function draw() {
+            const draw = () => {
+              const map = this.#state.mapData()
               ctx.clearRect(0, 0, canvas.width, canvas.height)
 
               for (let y = 0; y < MAP_H; y += 1) {
                 for (let x = 0; x < MAP_W; x += 1) {
-                  const cell = vm.runtime.map[y * MAP_W + x]
+                  const cell = map[y * MAP_W + x]
                   ctx.fillStyle =
                     cell === WALL ? '#172131' : cell === AMMO || cell === MEDKIT || cell === CELL ? '#63efbe' : '#0b1017'
                   ctx.fillRect(x * size, y * size, size - 1, size - 1)
                 }
               }
 
-              const px = vm.playerX() * size
-              const py = vm.playerY() * size
+              const px = this.#state.playerX() * size
+              const py = this.#state.playerY() * size
               ctx.fillStyle = '#ffffff'
               ctx.beginPath()
               ctx.arc(px, py, 5, 0, Math.PI * 2)
@@ -846,29 +869,26 @@
               ctx.lineWidth = 2
               ctx.beginPath()
               ctx.moveTo(px, py)
-              ctx.lineTo(px + Math.cos(vm.angle()) * 16, py + Math.sin(vm.angle()) * 16)
+              ctx.lineTo(px + Math.cos(this.#state.angle()) * 16, py + Math.sin(this.#state.angle()) * 16)
               ctx.stroke()
             }
 
-            vm.runtime.minimapDraw = draw
             const redraw = ko.computed(() => {
-              vm.playerX()
-              vm.playerY()
-              vm.angle()
-              vm.minimapVisible()
-              vm.cells()
-              vm.ammo()
-              vm.health()
+              this.#state.mapData()
+              this.#state.playerX()
+              this.#state.playerY()
+              this.#state.angle()
+              this.#state.minimapVisible()
+              this.#state.cells()
+              this.#state.ammo()
+              this.#state.health()
               draw()
             })
 
             ko.utils.domNodeDisposal.addDisposeCallback(canvas, () => redraw.dispose())
           }
-        }
 
-        ko.bindingHandlers.odoomScene = {
-          init(canvas, valueAccessor) {
-            const vm = valueAccessor()
+          bindScene(canvas) {
             const gl = canvas.getContext('webgl', { antialias: false, alpha: false })
             if (!gl) throw new Error('WebGL unavailable')
 
@@ -877,9 +897,7 @@
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
 
-            const wallTexture = createWallTexture(gl, vm.runtime.map)
-            vm.runtime.gl = gl
-            vm.runtime.wallTexture = wallTexture
+            const wallTexture = createWallTexture(gl, this.#state.mapData())
 
             const positionLocation = gl.getAttribLocation(program, 'aPosition')
             const resolutionLocation = gl.getUniformLocation(program, 'uResolution')
@@ -890,8 +908,8 @@
             const timeLocation = gl.getUniformLocation(program, 'uTime')
             const flashLocation = gl.getUniformLocation(program, 'uFlash')
 
-            function resize() {
-              const scale = vm.pixelScale()
+            const resize = () => {
+              const scale = this.#state.pixelScale()
               const width = Math.max(320, Math.floor(canvas.clientWidth / scale))
               const height = Math.max(180, Math.floor(canvas.clientHeight / scale))
               if (canvas.width !== width || canvas.height !== height) {
@@ -902,28 +920,31 @@
             }
 
             const resizeComputed = ko.computed(() => {
-              vm.pixelScale()
+              this.#state.pixelScale()
               resize()
             })
 
-            const observer = new ResizeObserver(() => resize())
-            observer.observe(canvas)
-            vm.runtime.resizeObserver = observer
+            this.#resizeObserver = new ResizeObserver(() => resize())
+            this.#resizeObserver.observe(canvas)
 
-            function renderFrame(now) {
-              if (!vm.runtime.renderTime) vm.runtime.renderTime = now
-              const dt = Math.min(0.05, (now - vm.runtime.renderTime) / 1000)
-              vm.runtime.renderTime = now
+            const textureComputed = ko.computed(() => {
+              updateWallTexture(gl, wallTexture, this.#state.mapData())
+            })
 
-              updatePlayer(vm, dt)
-              vm.fps(1 / Math.max(dt, 0.001))
+            const renderFrame = now => {
+              if (!this.#renderTime) this.#renderTime = now
+              const dt = Math.min(0.05, (now - this.#renderTime) / 1000)
+              this.#renderTime = now
+
+              this.#state.updatePlayer(dt)
+              this.#state.fps(1 / Math.max(dt, 0.001))
 
               resize()
 
-              const angle = vm.angle()
+              const angle = this.#state.angle()
               const dirX = Math.cos(angle)
               const dirY = Math.sin(angle)
-              const planeScale = Math.tan((vm.fov() * Math.PI) / 360)
+              const planeScale = Math.tan((this.#state.fov() * Math.PI) / 360)
               const planeX = -dirY * planeScale
               const planeY = dirX * planeScale
 
@@ -936,31 +957,41 @@
               gl.bindTexture(gl.TEXTURE_2D, wallTexture)
               gl.uniform1i(wallMapLocation, 0)
               gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
-              gl.uniform2f(playerLocation, vm.playerX(), vm.playerY())
+              gl.uniform2f(playerLocation, this.#state.playerX(), this.#state.playerY())
               gl.uniform2f(directionLocation, dirX, dirY)
               gl.uniform2f(planeLocation, planeX, planeY)
               gl.uniform1f(timeLocation, now * 0.001)
-              gl.uniform1f(flashLocation, vm.muzzleFlash())
+              gl.uniform1f(flashLocation, this.#state.muzzleFlash())
               gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
-              if (vm.runtime.minimapDraw && vm.minimapVisible()) {
-                vm.runtime.minimapDraw()
-              }
-
-              vm.runtime.raf = requestAnimationFrame(renderFrame)
+              this.#raf = requestAnimationFrame(renderFrame)
             }
 
-            vm.runtime.raf = requestAnimationFrame(renderFrame)
+            this.#raf = requestAnimationFrame(renderFrame)
 
             ko.utils.domNodeDisposal.addDisposeCallback(canvas, () => {
-              cancelAnimationFrame(vm.runtime.raf)
+              cancelAnimationFrame(this.#raf)
               resizeComputed.dispose()
-              observer.disconnect()
+              textureComputed.dispose()
+              this.#resizeObserver.disconnect()
             })
           }
         }
 
-        const viewModel = createViewModel()
+        ko.bindingHandlers.odoomMinimap = {
+          init(canvas, valueAccessor) {
+            valueAccessor().renderer.bindMinimap(canvas)
+          }
+        }
+
+        ko.bindingHandlers.odoomScene = {
+          init(canvas, valueAccessor) {
+            valueAccessor().renderer.bindScene(canvas)
+          }
+        }
+
+        const viewModel = new ODoomState()
+        viewModel.setRenderer(new ODoomRenderer(viewModel))
         ko.applyBindings(viewModel, appRoot)
       })()
     </script>

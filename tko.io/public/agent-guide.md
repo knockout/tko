@@ -1,5 +1,7 @@
 # TKO Agent Guide
 
+For preferred state/binding/DOM architecture in examples and prototypes, read `/agents/contract.md`.
+
 ## Setup
 
 ```html

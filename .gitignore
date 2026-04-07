@@ -34,3 +34,4 @@ builds/**/meta
 .vscode/settings.json
 .playwright-mcp
 .playwright-cli
+test-results/
