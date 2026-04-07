@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Engine</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+      :root {
+        color-scheme: dark;
+        --bg: #07111d;
+        --panel: rgba(12, 20, 34, 0.9);
+        --panel-2: rgba(15, 25, 41, 0.94);
+        --border: rgba(131, 164, 214, 0.18);
+        --border-strong: rgba(137, 186, 252, 0.24);
+        --text: #ecf2ff;
+        --muted: #97a7c7;
+        --accent: #70f0c4;
+        --accent-2: #79b8ff;
+        --warn: #ffd27a;
+        --danger: #ff7f87;
+        --ok: #77e1a3;
+        --site-header-h: 54px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(121, 184, 255, 0.15), transparent 30%),
+          radial-gradient(circle at 90% 18%, rgba(112, 240, 196, 0.08), transparent 22%),
+          linear-gradient(180deg, #050d18, #07111d 30%, #060b15);
+        color: var(--text);
+        display: grid;
+        grid-template-rows: var(--site-header-h) minmax(0, 1fr);
+        font-family:
+          'Avenir Next',
+          'Segoe UI',
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-width: 0;
+        height: var(--site-header-h);
+        padding: 0 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(7, 12, 20, 0.9);
+        backdrop-filter: blur(12px);
+      }
+
+      .site-header__brandlink {
+        color: var(--text);
+        font-family: 'Lobster', cursive;
+        font-size: 1.6rem;
+        font-weight: 400;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .site-header__nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        white-space: nowrap;
+      }
+
+      .site-header__nav a {
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-decoration: none;
+      }
+
+      .site-header__nav a:hover {
+        color: var(--text);
+      }
+
+      .site-header__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+
+      .site-header__icon svg {
+        width: 1rem;
+        height: 1rem;
+        fill: currentColor;
+      }
+
+      .site-header__icon:hover {
+        color: var(--text);
+      }
+
+      .app {
+        height: 100%;
+        min-height: 0;
+        padding: 0 18px 18px;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: 14px;
+        min-height: calc(100% - 18px);
+      }
+
+      .hero,
+      .strip,
+      .panel,
+      .controls {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        backdrop-filter: blur(16px);
+      }
+
+      .hero {
+        padding: 20px 22px;
+        display: grid;
+        gap: 8px;
+        box-shadow:
+          0 24px 64px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.1rem, 4vw, 3.6rem);
+        line-height: 0.92;
+        letter-spacing: -0.07em;
+      }
+
+      .lede {
+        max-width: 60rem;
+        color: var(--muted);
+        font-size: 0.96rem;
+        line-height: 1.5;
+      }
+
+      .strip {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .chip {
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px 14px 11px;
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .chip-label {
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .chip-value {
+        font-size: 1.8rem;
+        line-height: 0.88;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+      }
+
+      .chip-value--accent {
+        color: var(--accent);
+      }
+
+      .chip-value--warn {
+        color: var(--warn);
+      }
+
+      .chip-value--danger {
+        color: var(--danger);
+      }
+
+      .chip-note {
+        color: var(--muted);
+        font-size: 0.74rem;
+        line-height: 1.25;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(290px, 0.8fr);
+        gap: 14px;
+        min-height: 0;
+      }
+
+      .form-panel {
+        padding: 18px;
+        min-height: 0;
+        display: grid;
+        gap: 14px;
+      }
+
+      .sections {
+        display: grid;
+        gap: 14px;
+      }
+
+      .section {
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 16px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: -0.03em;
+      }
+
+      .section-hint {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .subsections {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .subsection {
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(9, 16, 29, 0.65);
+      }
+
+      .subsection h3 {
+        margin: 0 0 10px;
+        font-size: 0.9rem;
+        color: #dce7ff;
+        letter-spacing: -0.02em;
+      }
+
+      .fields {
+        display: grid;
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field--inline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: #dbe5ff;
+        font-size: 0.8rem;
+      }
+
+      .field label strong {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: rgba(6, 11, 19, 0.95);
+        color: var(--text);
+        padding: 0.82rem 0.92rem;
+        font: inherit;
+        outline: none;
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease,
+          transform 120ms ease;
+      }
+
+      .field textarea {
+        min-height: 126px;
+        resize: vertical;
+      }
+
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: rgba(121, 184, 255, 0.45);
+        box-shadow: 0 0 0 4px rgba(121, 184, 255, 0.08);
+      }
+
+      .field.is-dirty input,
+      .field.is-dirty select,
+      .field.is-dirty textarea {
+        border-color: rgba(112, 240, 196, 0.3);
+      }
+
+      .field.is-invalid input,
+      .field.is-invalid select,
+      .field.is-invalid textarea {
+        border-color: rgba(255, 127, 135, 0.5);
+      }
+
+      .field-help,
+      .field-error {
+        font-size: 0.75rem;
+        line-height: 1.3;
+      }
+
+      .field-help {
+        color: var(--muted);
+      }
+
+      .field-error {
+        color: var(--danger);
+      }
+
+      .switches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.62rem 0.8rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(7, 12, 21, 0.75);
+        color: var(--text);
+      }
+
+      .switch input {
+        margin: 0;
+        accent-color: var(--accent);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 4px;
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.7rem 1rem;
+        font: inherit;
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          background 120ms ease,
+          border-color 120ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      button:disabled {
+        opacity: 0.52;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .save-track {
+        flex: 1 1 260px;
+        min-width: 220px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .save-track__label {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .bar {
+        height: 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #7cf7c6, #79b8ff);
+        border-radius: inherit;
+        transition: width 100ms linear;
+      }
+
+      .sidebar {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+        min-height: 0;
+      }
+
+      .summary,
+      .issues,
+      .save-status {
+        padding: 16px;
+      }
+
+      .summary h2,
+      .issues h2,
+      .save-status h2 {
+        margin: 0 0 12px;
+        font-size: 0.95rem;
+        letter-spacing: -0.03em;
+      }
+
+      .summary-label {
+        color: var(--muted);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+      }
+
+      .summary-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .summary-item {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .summary-value {
+        margin-top: 6px;
+        color: var(--text);
+        font-size: 0.88rem;
+        line-height: 1.35;
+      }
+
+      .validation-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }
+
+      .validation-list li {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font-size: 0.84rem;
+        line-height: 1.35;
+      }
+
+      .validation-empty {
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.35;
+      }
+
+      .save-status__copy {
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.5;
+      }
+
+      .save-state {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .save-state strong {
+        color: var(--accent);
+      }
+
+      .dirty-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .pill {
+        padding: 0.4rem 0.62rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 0.74rem;
+      }
+
+      @media (max-width: 1200px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .app {
+          padding: 10px;
+        }
+
+        .strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .subsections {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          grid-template-columns: 1fr;
+        }
+
+        .field--inline {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-header__brandlink" href="/" aria-label="TKO home">TKO</a>
+      <nav class="site-header__nav" aria-label="Example navigation">
+        <a href="/">Docs</a>
+        <a href="/examples/">Examples</a>
+        <a class="site-header__icon" href="https://github.com/knockout/tko" aria-label="GitHub">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.71 5.47 7.8.4.08.55-.18.55-.39 0-.19-.01-.82-.01-1.48-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.97-.82-1.16-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.54.28-.89.5-1.1-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.05.08-2.19 0 0 .67-.22 2.2.84A7.45 7.45 0 0 1 8 4.8c.68 0 1.37.09 2.01.27 1.53-1.06 2.2-.84 2.2-.84.44 1.14.16 1.98.08 2.19.51.57.82 1.29.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.47.55.39A8.18 8.18 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"
+            />
+          </svg>
+        </a>
+      </nav>
+    </header>
+    <main class="app" id="appRoot">
+      <div class="shell">
+        <section class="hero">
+          <h1>Form Engine</h1>
+          <div class="lede">
+            A product-style form that keeps validation, dirty state, derived summaries, and async save flow in observables.
+            The visible UI is reactive, but the state remains simple.
+          </div>
+        </section>
+
+        <section class="strip">
+          <article class="chip">
+            <div class="chip-label">Dirty fields</div>
+            <div class="chip-value chip-value--accent" data-bind="text: dirtyCountLabel"></div>
+            <div class="chip-note">changes since the last save</div>
+          </article>
+          <article class="chip">
+            <div class="chip-label">Validation errors</div>
+            <div class="chip-value chip-value--danger" data-bind="text: errorCountLabel"></div>
+            <div class="chip-note">blocking save right now</div>
+          </article>
+          <article class="chip">
+            <div class="chip-label">Estimated monthly</div>
+            <div class="chip-value chip-value--warn" data-bind="text: monthlyLabel"></div>
+            <div class="chip-note">derived from plan, seats, and add-ons</div>
+          </article>
+          <article class="chip">
+            <div class="chip-label">Completion</div>
+            <div class="chip-value" data-bind="text: completionLabel"></div>
+            <div class="chip-note">required fields in good shape</div>
+          </article>
+          <article class="chip">
+            <div class="chip-label">Save state</div>
+            <div class="chip-value chip-value--accent" data-bind="text: saveStateLabel"></div>
+            <div class="chip-note" data-bind="text: savedAtLabel"></div>
+          </article>
+        </section>
+
+        <section class="workspace">
+          <section class="panel form-panel">
+            <div class="sections">
+              <section class="section">
+                <div class="section-head">
+                  <h2>Account</h2>
+                  <div class="section-hint">Primary identity and contact details.</div>
+                </div>
+                <div class="subsections">
+                  <div class="subsection">
+                    <h3>Organization</h3>
+                    <div class="fields">
+                      <div class="field" data-bind="css: { 'is-dirty': companyDirty(), 'is-invalid': !!companyError() }">
+                        <label for="company">
+                          <span>Company name</span>
+                          <strong data-bind="visible: companyDirty">changed</strong>
+                        </label>
+                        <input id="company" type="text" data-bind="textInput: company.value" placeholder="Northstar Labs" />
+                        <div class="field-help">Shown on invoices and the internal summary cards.</div>
+                        <div class="field-error" data-bind="visible: companyError, text: companyError"></div>
+                      </div>
+                      <div class="field" data-bind="css: { 'is-dirty': ownerDirty(), 'is-invalid': !!ownerError() }">
+                        <label for="owner">
+                          <span>Owner name</span>
+                          <strong data-bind="visible: ownerDirty">changed</strong>
+                        </label>
+                        <input id="owner" type="text" data-bind="textInput: owner.value" placeholder="Avery Stone" />
+                        <div class="field-help">The person responsible for the draft.</div>
+                        <div class="field-error" data-bind="visible: ownerError, text: ownerError"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="subsection">
+                    <h3>Contact</h3>
+                    <div class="fields">
+                      <div class="field" data-bind="css: { 'is-dirty': contactEmailDirty(), 'is-invalid': !!contactEmailError() }">
+                        <label for="contactEmail">
+                          <span>Primary email</span>
+                          <strong data-bind="visible: contactEmailDirty">changed</strong>
+                        </label>
+                        <input id="contactEmail" type="email" data-bind="textInput: contactEmail.value" placeholder="avery@northstar.example" />
+                        <div class="field-help">Used for save confirmations and review notes.</div>
+                        <div class="field-error" data-bind="visible: contactEmailError, text: contactEmailError"></div>
+                      </div>
+                      <div class="field" data-bind="css: { 'is-dirty': billingEmailDirty(), 'is-invalid': !!billingEmailError() }">
+                        <label for="billingEmail">
+                          <span>Billing email</span>
+                          <strong data-bind="visible: billingEmailDirty">changed</strong>
+                        </label>
+                        <input id="billingEmail" type="email" data-bind="textInput: billingEmail.value" placeholder="billing@northstar.example" />
+                        <div class="field-help">Separate from the primary contact if needed.</div>
+                        <div class="field-error" data-bind="visible: billingEmailError, text: billingEmailError"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="section-head">
+                  <h2>Project</h2>
+                  <div class="section-hint">Timeline, scope, and delivery pressure.</div>
+                </div>
+                <div class="subsections">
+                  <div class="subsection">
+                    <h3>Timeline</h3>
+                    <div class="fields">
+                      <div class="field" data-bind="css: { 'is-dirty': projectDirty(), 'is-invalid': !!projectError() }">
+                        <label for="project">
+                          <span>Project title</span>
+                          <strong data-bind="visible: projectDirty">changed</strong>
+                        </label>
+                        <input id="project" type="text" data-bind="textInput: project.value" placeholder="Launch Control Center" />
+                        <div class="field-help">Used as the main label in the summary.</div>
+                        <div class="field-error" data-bind="visible: projectError, text: projectError"></div>
+                      </div>
+                      <div class="field field--inline">
+                        <div class="field" data-bind="css: { 'is-dirty': launchDateDirty(), 'is-invalid': !!launchDateError() }">
+                          <label for="launchDate">
+                            <span>Launch date</span>
+                            <strong data-bind="visible: launchDateDirty">changed</strong>
+                          </label>
+                          <input id="launchDate" type="date" data-bind="value: launchDate.value, valueUpdate: 'input'" />
+                          <div class="field-error" data-bind="visible: launchDateError, text: launchDateError"></div>
+                        </div>
+                        <div class="field" data-bind="css: { 'is-dirty': priorityDirty(), 'is-invalid': !!priorityError() }">
+                          <label for="priority">
+                            <span>Priority</span>
+                            <strong data-bind="visible: priorityDirty">changed</strong>
+                          </label>
+                          <select id="priority" data-bind="value: priority.value">
+                            <option value="low">Low</option>
+                            <option value="normal">Normal</option>
+                            <option value="urgent">Urgent</option>
+                          </select>
+                          <div class="field-help">Raises the derived monthly estimate when urgent.</div>
+                          <div class="field-error" data-bind="visible: priorityError, text: priorityError"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="subsection">
+                    <h3>Scope</h3>
+                    <div class="fields">
+                      <div class="field" data-bind="css: { 'is-dirty': planDirty(), 'is-invalid': !!planError() }">
+                        <label for="plan">
+                          <span>Plan</span>
+                          <strong data-bind="visible: planDirty">changed</strong>
+                        </label>
+                        <select id="plan" data-bind="value: plan.value">
+                          <option value="starter">Starter</option>
+                          <option value="pro">Pro</option>
+                          <option value="scale">Scale</option>
+                        </select>
+                        <div class="field-help">Feeds the derived pricing summary.</div>
+                        <div class="field-error" data-bind="visible: planError, text: planError"></div>
+                      </div>
+
+                      <div class="field" data-bind="css: { 'is-dirty': seatsDirty(), 'is-invalid': !!seatsError() }">
+                        <label for="seats">
+                          <span>Seats</span>
+                          <strong data-bind="visible: seatsDirty">changed</strong>
+                        </label>
+                        <input id="seats" type="number" min="1" max="200" data-bind="textInput: seats.value" />
+                        <div class="field-help">Affects the per-seat estimate.</div>
+                        <div class="field-error" data-bind="visible: seatsError, text: seatsError"></div>
+                      </div>
+
+                      <div class="switches">
+                        <label class="switch" data-bind="css: { 'is-dirty': supportDirty() }">
+                          <input type="checkbox" data-bind="checked: supportPack.value" />
+                          <span>Support pack</span>
+                        </label>
+                        <label class="switch" data-bind="css: { 'is-dirty': auditDirty() }">
+                          <input type="checkbox" data-bind="checked: auditLogs.value" />
+                          <span>Audit logs</span>
+                        </label>
+                        <label class="switch" data-bind="css: { 'is-dirty': exportDirty() }">
+                          <input type="checkbox" data-bind="checked: csvExport.value" />
+                          <span>CSV export</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="section-head">
+                  <h2>Notes</h2>
+                  <div class="section-hint">Freeform context for reviewers and implementers.</div>
+                </div>
+                <div class="fields">
+                  <div class="field" data-bind="css: { 'is-dirty': notesDirty(), 'is-invalid': !!notesError() }">
+                    <label for="notes">
+                      <span>Implementation notes</span>
+                      <strong data-bind="visible: notesDirty">changed</strong>
+                    </label>
+                    <textarea id="notes" data-bind="textInput: notes.value" placeholder="Call out integrations, edge cases, or launch blockers."></textarea>
+                    <div class="field-help">Optional, but useful when the form becomes a real intake flow.</div>
+                    <div class="field-error" data-bind="visible: notesError, text: notesError"></div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="actions">
+              <div class="buttons">
+                <button type="button" data-bind="click: saveDraft, enable: canSave, text: saveButtonLabel"></button>
+                <button type="button" data-bind="click: restoreSample">Restore sample</button>
+              </div>
+
+              <div class="save-track">
+                <div class="save-track__label">
+                  <span data-bind="text: saveStatusLabel"></span>
+                  <span data-bind="text: saveProgressLabel"></span>
+                </div>
+                <div class="bar" aria-hidden="true">
+                  <span data-bind="style: { width: saveProgressWidth }"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="sidebar">
+            <section class="panel summary">
+              <h2>What updates</h2>
+              <div class="save-status__copy">
+                This example keeps field values, the clean baseline, and async save progress in the same observable model.
+              </div>
+              <div class="summary-grid">
+                <div class="summary-item">
+                  <div class="summary-label">Derived totals</div>
+                  <div class="summary-value">Monthly price, completion, and save state all react to the same form state.</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Dirty tracking</div>
+                  <div class="summary-value">Each field compares its live value to the last committed baseline.</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Async save</div>
+                  <div class="summary-value">Saving animates progress while the form stays interactive, then commits every baseline together.</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel issues">
+              <h2>Validation</h2>
+              <div data-bind="visible: validationIssues().length === 0" class="validation-empty">
+                Everything required is in good shape.
+              </div>
+              <ul class="validation-list" data-bind="foreach: validationIssues, visible: validationIssues().length > 0">
+                <li>
+                  <strong data-bind="text: field"></strong>
+                  <span data-bind="text: message"></span>
+                </li>
+              </ul>
+            </section>
+
+            <section class="panel save-status">
+              <h2>Save flow</h2>
+              <div class="save-status__copy" data-bind="text: message"></div>
+              <div class="save-state">
+                <div data-bind="text: saveNarrative"></div>
+                <div style="margin-top: 10px; color: var(--muted); font-size: 0.78rem" data-bind="text: savedAtLabel"></div>
+              </div>
+              <div class="dirty-pills" data-bind="foreach: dirtyFieldLabels">
+                <span class="pill" data-bind="text: $data"></span>
+              </div>
+              <div class="validation-empty" data-bind="visible: dirtyFieldLabels().length === 0">
+                Nothing is unsaved right now.
+              </div>
+            </section>
+          </aside>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://www.tko.io/lib/tko.js"></script>
+    <script>
+      ;(() => {
+        const ko = globalThis.tko
+        const numberFormatter = new Intl.NumberFormat()
+
+        function isEmail(value) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim())
+        }
+
+        function trackedField(initial, validator, markDirty) {
+          const value = ko.observable(initial)
+          const baseline = ko.observable(initial)
+          const error = ko.pureComputed(() => (validator ? validator(value()) : ''))
+          const dirty = ko.pureComputed(() => value() !== baseline())
+
+          value.subscribe(() => {
+            if (markDirty) markDirty()
+          })
+
+          return {
+            value,
+            baseline,
+            error,
+            dirty,
+            commit() {
+              baseline(value())
+            },
+            reset(next) {
+              value(next)
+              baseline(next)
+            }
+          }
+        }
+
+        const vm = {
+          saveState: ko.observable('ready'),
+          saveProgress: ko.observable(0),
+          savedAt: ko.observable('Not saved yet'),
+          message: ko.observable('Fill the fields, watch the summary update, then save the draft.'),
+          isSaving: ko.observable(false),
+          markDirty() {
+            if (vm.saveState() !== 'saving') vm.saveState('dirty')
+          }
+        }
+
+        vm.company = trackedField('Northstar Labs', value => {
+          const text = String(value).trim()
+          if (!text) return 'Company name is required.'
+          if (text.length < 3) return 'Company name needs at least 3 characters.'
+          return ''
+        }, vm.markDirty)
+        vm.owner = trackedField('Avery Stone', value => {
+          const text = String(value).trim()
+          return text.length < 2 ? 'Owner name is required.' : ''
+        }, vm.markDirty)
+        vm.contactEmail = trackedField('avery@northstar.example', value => {
+          const text = String(value).trim()
+          if (!text) return 'Primary email is required.'
+          return isEmail(text) ? '' : 'Primary email needs a valid address.'
+        }, vm.markDirty)
+        vm.billingEmail = trackedField('billing@northstar.example', value => {
+          const text = String(value).trim()
+          if (!text) return 'Billing email is required.'
+          return isEmail(text) ? '' : 'Billing email needs a valid address.'
+        }, vm.markDirty)
+        vm.project = trackedField('Launch Control Center', value => {
+          const text = String(value).trim()
+          if (!text) return 'Project title is required.'
+          if (text.length < 4) return 'Project title should be a little longer.'
+          return ''
+        }, vm.markDirty)
+        vm.launchDate = trackedField('2026-05-12', value => {
+          return String(value).trim() ? '' : 'Launch date is required.'
+        }, vm.markDirty)
+        vm.priority = trackedField('normal', value => {
+          return ['low', 'normal', 'urgent'].includes(String(value)) ? '' : 'Choose a priority.'
+        }, vm.markDirty)
+        vm.plan = trackedField('pro', value => {
+          return ['starter', 'pro', 'scale'].includes(String(value)) ? '' : 'Choose a plan.'
+        }, vm.markDirty)
+        vm.seats = trackedField('18', value => {
+          const count = Number(value)
+          if (!Number.isFinite(count)) return 'Seat count must be a number.'
+          if (count < 1) return 'Seat count must be at least 1.'
+          if (count > 200) return 'Seat count should stay under 200.'
+          return ''
+        }, vm.markDirty)
+        vm.supportPack = trackedField(true, null, vm.markDirty)
+        vm.auditLogs = trackedField(true, null, vm.markDirty)
+        vm.csvExport = trackedField(false, null, vm.markDirty)
+        vm.notes = trackedField(
+          'Call out the migration plan, rollout window, and who signs off.',
+          value => {
+            const text = String(value)
+            return text.length > 500 ? 'Notes should stay under 500 characters.' : ''
+          },
+          vm.markDirty
+        )
+
+        vm.fields = [
+          { field: 'Company', value: vm.company },
+          { field: 'Owner', value: vm.owner },
+          { field: 'Primary email', value: vm.contactEmail },
+          { field: 'Billing email', value: vm.billingEmail },
+          { field: 'Project title', value: vm.project },
+          { field: 'Launch date', value: vm.launchDate },
+          { field: 'Priority', value: vm.priority },
+          { field: 'Plan', value: vm.plan },
+          { field: 'Seats', value: vm.seats },
+          { field: 'Support pack', value: vm.supportPack },
+          { field: 'Audit logs', value: vm.auditLogs },
+          { field: 'CSV export', value: vm.csvExport },
+          { field: 'Notes', value: vm.notes }
+        ]
+
+        ;[
+          ['company', vm.company],
+          ['owner', vm.owner],
+          ['contactEmail', vm.contactEmail],
+          ['billingEmail', vm.billingEmail],
+          ['project', vm.project],
+          ['launchDate', vm.launchDate],
+          ['priority', vm.priority],
+          ['plan', vm.plan],
+          ['seats', vm.seats],
+          ['support', vm.supportPack],
+          ['audit', vm.auditLogs],
+          ['export', vm.csvExport],
+          ['notes', vm.notes]
+        ].forEach(([name, field]) => {
+          vm[`${name}Dirty`] = field.dirty
+          vm[`${name}Error`] = field.error
+        })
+
+        vm.fieldDirtyCount = ko.pureComputed(() => vm.fields.filter(item => item.value.dirty()).length)
+        vm.validationIssues = ko.pureComputed(() => {
+          const issues = []
+          const push = (field, message) => issues.push({ field, message })
+
+          if (vm.company.error()) push('Company', vm.company.error())
+          if (vm.owner.error()) push('Owner', vm.owner.error())
+          if (vm.contactEmail.error()) push('Primary email', vm.contactEmail.error())
+          if (vm.billingEmail.error()) push('Billing email', vm.billingEmail.error())
+          if (vm.project.error()) push('Project title', vm.project.error())
+          if (vm.launchDate.error()) push('Launch date', vm.launchDate.error())
+          if (vm.priority.error()) push('Priority', vm.priority.error())
+          if (vm.plan.error()) push('Plan', vm.plan.error())
+          if (vm.seats.error()) push('Seats', vm.seats.error())
+          if (vm.notes.error()) push('Notes', vm.notes.error())
+
+          return issues
+        })
+
+        vm.requiredValidCount = ko.pureComputed(() => {
+          let count = 0
+          if (!vm.company.error()) count += 1
+          if (!vm.owner.error()) count += 1
+          if (!vm.contactEmail.error()) count += 1
+          if (!vm.billingEmail.error()) count += 1
+          if (!vm.project.error()) count += 1
+          if (!vm.launchDate.error()) count += 1
+          if (!vm.priority.error()) count += 1
+          if (!vm.plan.error()) count += 1
+          if (!vm.seats.error()) count += 1
+          return count
+        })
+
+        vm.requiredTotal = 9
+        vm.completion = ko.pureComputed(() => Math.round((vm.requiredValidCount() / vm.requiredTotal) * 100))
+        vm.canSave = ko.pureComputed(
+          () => !vm.isSaving() && vm.fieldDirtyCount() > 0 && vm.validationIssues().length === 0
+        )
+
+        vm.dirtyFieldLabels = ko.pureComputed(() =>
+          vm.fields.filter(item => item.value.dirty()).map(item => item.field)
+        )
+
+        vm.estimatedMonthly = ko.pureComputed(() => {
+          const planRates = {
+            starter: 29,
+            pro: 59,
+            scale: 109
+          }
+          const seatRates = {
+            starter: 3,
+            pro: 5,
+            scale: 8
+          }
+          const priorityFee = vm.priority.value() === 'urgent' ? 18 : vm.priority.value() === 'low' ? -6 : 0
+          const addonFee = (vm.supportPack.value() ? 24 : 0) + (vm.auditLogs.value() ? 16 : 0) + (vm.csvExport.value() ? 10 : 0)
+          const monthly = planRates[vm.plan.value()] + Number(vm.seats.value()) * seatRates[vm.plan.value()] + priorityFee + addonFee
+          return Math.max(0, monthly)
+        })
+
+        vm.monthlyLabel = ko.pureComputed(() => `$${numberFormatter.format(vm.estimatedMonthly())}`)
+        vm.dirtyCountLabel = ko.pureComputed(() => numberFormatter.format(vm.fieldDirtyCount()))
+        vm.errorCountLabel = ko.pureComputed(() => numberFormatter.format(vm.validationIssues().length))
+        vm.completionLabel = ko.pureComputed(() => `${vm.completion()}%`)
+        vm.saveStateLabel = ko.pureComputed(() => {
+          if (vm.isSaving()) return `Saving ${Math.round(vm.saveProgress() * 100)}%`
+          if (vm.fieldDirtyCount() === 0) return vm.savedAt() === 'Not saved yet' ? 'Clean' : 'Saved'
+          if (vm.validationIssues().length > 0) return 'Blocked'
+          return 'Ready'
+        })
+        vm.saveProgressLabel = ko.pureComputed(() =>
+          vm.isSaving() ? `${Math.round(vm.saveProgress() * 100)}%` : vm.saveState() === 'saved' ? 'done' : 'idle'
+        )
+        vm.saveProgressWidth = ko.pureComputed(() => `${Math.round(vm.saveProgress() * 100)}%`)
+        vm.savedAtLabel = ko.pureComputed(() => {
+          if (vm.isSaving()) return 'Saving draft to the server...'
+          return vm.savedAt()
+        })
+        vm.saveNarrative = ko.pureComputed(() => {
+          if (vm.isSaving()) return 'Saving in progress. The form stays responsive while the observable state updates.'
+          if (vm.saveState() === 'saved') return 'Saved successfully. Baselines were committed back into the observables.'
+          if (vm.canSave()) return 'The draft is valid and ready to commit.'
+          if (vm.validationIssues().length > 0) return 'Fix the highlighted validation issues, then save.'
+          return 'The save flow is idle until you make a change.'
+        })
+        vm.saveButtonLabel = ko.pureComputed(() => {
+          if (vm.isSaving()) return 'Saving...'
+          if (vm.saveState() === 'saved' && vm.fieldDirtyCount() === 0) return 'Saved'
+          return 'Save draft'
+        })
+
+        vm.commitAll = function () {
+          vm.fields.forEach(item => item.value.commit())
+        }
+
+        vm.restoreSample = function () {
+          vm.company.reset('Northstar Labs')
+          vm.owner.reset('Avery Stone')
+          vm.contactEmail.reset('avery@northstar.example')
+          vm.billingEmail.reset('billing@northstar.example')
+          vm.project.reset('Launch Control Center')
+          vm.launchDate.reset('2026-05-12')
+          vm.priority.reset('normal')
+          vm.plan.reset('pro')
+          vm.seats.reset('18')
+          vm.supportPack.reset(true)
+          vm.auditLogs.reset(true)
+          vm.csvExport.reset(false)
+          vm.notes.reset('Call out the migration plan, rollout window, and who signs off.')
+          vm.isSaving(false)
+          vm.saveProgress(0)
+          vm.saveState('ready')
+          vm.savedAt('Not saved yet')
+          vm.message('Sample data restored. Dirty state and validation reset together.')
+        }
+
+        let saveFrame = 0
+        let savedResetTimer = 0
+
+        vm.saveDraft = function () {
+          if (!vm.canSave() || vm.isSaving()) return false
+
+          vm.isSaving(true)
+          vm.saveState('saving')
+          vm.saveProgress(0)
+          vm.message('Saving draft. The form stays live while the async simulation runs.')
+
+          const started = performance.now()
+
+          function tick(now) {
+            const progress = Math.min(1, (now - started) / 900)
+            vm.saveProgress(progress)
+
+            if (progress < 1) {
+              saveFrame = requestAnimationFrame(tick)
+              return
+            }
+
+            vm.commitAll()
+            vm.isSaving(false)
+            vm.saveState('saved')
+            vm.savedAt(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))
+            vm.saveProgress(0)
+            vm.message('Saved. Dirty counts dropped back to zero because the baseline was committed.')
+
+            clearTimeout(savedResetTimer)
+            savedResetTimer = setTimeout(() => {
+              if (!vm.isSaving() && vm.fieldDirtyCount() === 0) {
+                vm.saveState('ready')
+              }
+            }, 1800)
+          }
+
+          saveFrame = requestAnimationFrame(tick)
+          return false
+        }
+
+        vm.fieldDirtyCount.subscribe(value => {
+          if (!vm.isSaving()) {
+            vm.saveState(value > 0 ? 'dirty' : 'ready')
+          }
+        })
+
+        const root = document.getElementById('appRoot')
+        ko.applyBindings(vm, root)
+      })()
+    </script>
+  </body>
+</html>

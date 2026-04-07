@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signal Graph</title>
+    <script src="https://www.tko.io/lib/tko.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+      :root {
+        --bg: #071017;
+        --panel: rgba(12, 19, 30, 0.9);
+        --panel-2: rgba(16, 25, 38, 0.96);
+        --line: rgba(111, 136, 169, 0.22);
+        --line-hot: rgba(108, 231, 214, 0.9);
+        --line-soft: rgba(96, 130, 161, 0.45);
+        --text: #eff5fb;
+        --muted: #8da2bc;
+        --warm: #ffbf6d;
+        --cool: #62e6d0;
+        --violet: #af9cff;
+        --danger: #ff7d8c;
+        --node-fill: #152131;
+        --node-border: rgba(143, 167, 196, 0.4);
+        --node-border-hot: rgba(255, 255, 255, 0.92);
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+        --site-header-h: 54px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(90, 128, 255, 0.14), transparent 32%),
+          radial-gradient(circle at 82% 18%, rgba(98, 230, 208, 0.14), transparent 26%),
+          linear-gradient(180deg, #050b12, #081018 46%, #05080d);
+        color: var(--text);
+        display: grid;
+        grid-template-rows: var(--site-header-h) minmax(0, 1fr);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        overflow: hidden;
+      }
+
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-width: 0;
+        height: var(--site-header-h);
+        padding: 0 16px;
+        border-bottom: 1px solid rgba(114, 139, 171, 0.18);
+        background: rgba(7, 12, 18, 0.9);
+        backdrop-filter: blur(12px);
+      }
+
+      .site-header__brandlink {
+        color: var(--text);
+        font-family: 'Lobster', cursive;
+        font-size: 1.6rem;
+        font-weight: 400;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .site-header__nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        white-space: nowrap;
+      }
+
+      .site-header__nav a {
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-decoration: none;
+      }
+
+      .site-header__nav a:hover {
+        color: var(--text);
+      }
+
+      .site-header__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+
+      .site-header__icon svg {
+        width: 1rem;
+        height: 1rem;
+        fill: currentColor;
+      }
+
+      .site-header__icon:hover {
+        color: var(--text);
+      }
+
+      .app {
+        height: 100%;
+        min-height: 0;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 12px;
+        padding: 0 16px 16px;
+      }
+
+      .masthead {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .title h1 {
+        margin: 0;
+        font-size: clamp(1.55rem, 3vw, 2.5rem);
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+      }
+
+      .subtitle {
+        max-width: 70ch;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.45;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .control-button {
+        appearance: none;
+        border: 1px solid rgba(255, 191, 109, 0.36);
+        border-radius: 999px;
+        background: rgba(36, 24, 11, 0.9);
+        color: #ffe2b3;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 0.72rem 1rem;
+        transition:
+          background 120ms ease,
+          border-color 120ms ease,
+          color 120ms ease,
+          transform 120ms ease,
+          box-shadow 120ms ease;
+      }
+
+      .control-button:hover,
+      .control-button:focus-visible {
+        border-color: rgba(255, 224, 170, 0.8);
+        background: rgba(68, 42, 13, 0.96);
+        color: #fff2d8;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(255, 191, 109, 0.16);
+      }
+
+      .control-button.active {
+        border-color: rgba(255, 239, 204, 0.92);
+        background: rgba(89, 54, 14, 0.98);
+        color: #fff6e4;
+        box-shadow: 0 10px 28px rgba(255, 191, 109, 0.22);
+      }
+
+      .stat {
+        min-width: 0;
+        padding: 12px 14px;
+        border: 1px solid rgba(129, 154, 186, 0.26);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(15, 23, 35, 0.96), rgba(10, 15, 24, 0.88));
+        box-shadow: var(--shadow);
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .stat-value {
+        margin-top: 4px;
+        font-size: 1.6rem;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: -0.06em;
+      }
+
+      .stat-note {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        line-height: 1.25;
+      }
+
+      .workspace {
+        position: relative;
+        min-height: 0;
+        border: 1px solid rgba(114, 139, 171, 0.18);
+        border-radius: 28px;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(9, 15, 23, 0.72), rgba(5, 8, 13, 0.92)),
+          radial-gradient(circle at 50% 15%, rgba(98, 230, 208, 0.08), transparent 34%),
+          radial-gradient(circle at 50% 88%, rgba(175, 156, 255, 0.08), transparent 24%);
+        box-shadow: var(--shadow);
+      }
+
+      .workspace::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(122, 149, 181, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(122, 149, 181, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 92%);
+        pointer-events: none;
+      }
+
+      svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+      }
+
+      .edge {
+        fill: none;
+        stroke: var(--line-soft);
+        stroke-width: 2.1;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0.36;
+        transition:
+          stroke 120ms ease,
+          opacity 120ms ease,
+          stroke-width 120ms ease,
+          filter 120ms ease;
+      }
+
+      .edge.hot {
+        stroke: var(--line-hot);
+        stroke-width: 3.4;
+        opacity: 0.95;
+        filter: drop-shadow(0 0 8px rgba(108, 231, 214, 0.5));
+      }
+
+      .node {
+        cursor: default;
+      }
+
+      .node rect.shell {
+        fill: var(--node-fill);
+        stroke: var(--node-border);
+        stroke-width: 1.6;
+        rx: 18;
+        ry: 18;
+        transition:
+          fill 120ms ease,
+          stroke 120ms ease,
+          transform 120ms ease,
+          filter 120ms ease;
+      }
+
+      .node text {
+        fill: var(--text);
+        pointer-events: none;
+      }
+
+      .node .name {
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .node .role {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        fill: var(--muted);
+      }
+
+      .node .formula,
+      .node .value,
+      .node .runs {
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Monaco,
+          Consolas,
+          'Liberation Mono',
+          monospace;
+      }
+
+      .node .formula {
+        font-size: 11px;
+        fill: rgba(226, 236, 247, 0.76);
+      }
+
+      .node .value {
+        font-size: 18px;
+        font-weight: 800;
+        fill: #ffffff;
+      }
+
+      .node .runs {
+        font-size: 10px;
+        fill: var(--muted);
+      }
+
+      .node.source rect.shell {
+        fill: #24180b;
+        stroke: rgba(255, 191, 109, 0.78);
+        stroke-width: 2.2;
+      }
+
+      .node.source .role {
+        fill: var(--warm);
+      }
+
+      .node.computed rect.shell {
+        fill: #102126;
+        stroke: rgba(98, 230, 208, 0.28);
+      }
+
+      .node.computed .role {
+        fill: var(--cool);
+      }
+
+      .node.output rect.shell {
+        fill: #181026;
+        stroke: rgba(175, 156, 255, 0.3);
+      }
+
+      .node.output .role {
+        fill: var(--violet);
+      }
+
+      .node.idle {
+        opacity: 0.58;
+      }
+
+      .node.hot rect.shell {
+        stroke: var(--node-border-hot);
+        filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.15));
+      }
+
+      .node.focused rect.shell {
+        stroke: rgba(255, 255, 255, 1);
+        filter: drop-shadow(0 0 20px rgba(255, 191, 109, 0.2));
+      }
+
+      .node .formula,
+      .node .runs {
+        opacity: 0.82;
+      }
+
+      .node.flash rect.shell {
+        animation: flash-pop 420ms ease-out;
+      }
+
+      @keyframes flash-pop {
+        0% {
+          transform: scale(1)
+        }
+        20% {
+          transform: scale(1.03)
+        }
+        100% {
+          transform: scale(1)
+        }
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.35;
+      }
+
+      .hint {
+        max-width: 72ch;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid rgba(129, 154, 186, 0.22);
+        border-radius: 999px;
+        background: rgba(14, 21, 32, 0.9);
+        color: var(--text);
+      }
+
+      .chip b {
+        color: var(--cool);
+      }
+
+      @media (max-width: 1100px) {
+        .masthead {
+          grid-template-columns: 1fr;
+        }
+
+        .stats {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 820px) {
+        .app {
+          padding: 12px;
+          gap: 10px;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-header__brandlink" href="/" aria-label="TKO home">TKO</a>
+      <nav class="site-header__nav" aria-label="Example navigation">
+        <a href="/">Docs</a>
+        <a href="/examples/">Examples</a>
+        <a class="site-header__icon" href="https://github.com/knockout/tko" aria-label="GitHub">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.71 5.47 7.8.4.08.55-.18.55-.39 0-.19-.01-.82-.01-1.48-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.97-.82-1.16-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.54.28-.89.5-1.1-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.05.08-2.19 0 0 .67-.22 2.2.84A7.45 7.45 0 0 1 8 4.8c.68 0 1.37.09 2.01.27 1.53-1.06 2.2-.84 2.2-.84.44 1.14.16 1.98.08 2.19.51.57.82 1.29.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.47.55.39A8.18 8.18 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"
+            />
+          </svg>
+        </a>
+      </nav>
+    </header>
+    <main class="app" id="app">
+      <header class="masthead">
+        <div class="title">
+          <h1>Signal Graph</h1>
+          <div class="subtitle">
+            A computed dependency map: mutate one input and only the downstream branch lights up.
+            The graph shows actual observable changes and computed recomputes, not generic UI noise.
+          </div>
+          <section class="controls" aria-label="Mutation controls">
+            <!-- ko foreach: sourceControls -->
+            <button
+              class="control-button"
+              type="button"
+              data-bind="
+                text: buttonLabel,
+                click: bump,
+                css: { active: isFocused },
+                attr: { 'aria-pressed': isFocused() ? 'true' : 'false' }
+              "
+            ></button>
+            <!-- /ko -->
+          </section>
+        </div>
+
+        <section class="stats" aria-label="Graph metrics">
+          <article class="stat">
+            <div class="stat-label">Focused input</div>
+            <div class="stat-value" data-bind="text: focusLabel"></div>
+            <div class="stat-note">the input observable you just changed</div>
+          </article>
+
+          <article class="stat">
+            <div class="stat-label">Downstream nodes</div>
+            <div class="stat-value" data-bind="text: downstreamLabel"></div>
+            <div class="stat-note">only nodes reachable from the focused input</div>
+          </article>
+
+          <article class="stat">
+            <div class="stat-label">Propagation hits</div>
+            <div class="stat-value" data-bind="text: propagationLabel"></div>
+            <div class="stat-note">writes plus computed recomputes observed so far</div>
+          </article>
+        </section>
+      </header>
+
+      <section class="workspace" aria-label="Signal graph">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          data-bind="attr: { viewBox: viewBox }"
+          preserveAspectRatio="xMidYMid meet"
+          aria-label="Signal dependency graph"
+        >
+          <defs>
+            <linearGradient id="sourceFill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2f2212" />
+              <stop offset="100%" stop-color="#161009" />
+            </linearGradient>
+            <linearGradient id="computedFill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#13272b" />
+              <stop offset="100%" stop-color="#0d1a1d" />
+            </linearGradient>
+            <linearGradient id="outputFill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#201634" />
+              <stop offset="100%" stop-color="#120d22" />
+            </linearGradient>
+            <marker
+              id="arrowHot"
+              markerWidth="10"
+              markerHeight="10"
+              refX="9"
+              refY="5"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <path d="M0,0 L10,5 L0,10 z" fill="#6ce7d6" />
+            </marker>
+            <marker
+              id="arrowSoft"
+              markerWidth="10"
+              markerHeight="10"
+              refX="9"
+              refY="5"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <path d="M0,0 L10,5 L0,10 z" fill="#5f86a6" />
+            </marker>
+          </defs>
+
+          <!-- ko foreach: edges -->
+          <path
+            class="edge"
+            data-bind="
+              attr: {
+                d: path,
+                marker-end: hot() ? 'url(#arrowHot)' : 'url(#arrowSoft)'
+              },
+              css: { hot: hot }
+            "
+          />
+          <!-- /ko -->
+
+          <!-- ko foreach: nodes -->
+          <g
+            class="node"
+            data-bind="
+              attr: {
+                transform: transform,
+                'data-kind': kind,
+                role: 'img'
+              },
+              css: {
+                source: isSource,
+                computed: isComputed,
+                output: isOutput,
+                hot: isHot,
+                focused: isFocused,
+                idle: !isHot(),
+                flash: isFlashing
+              }
+            "
+          >
+            <rect class="shell" width="216" height="98" rx="18" ry="18" />
+            <rect
+              x="1"
+              y="1"
+              width="214"
+              height="96"
+              rx="17"
+              ry="17"
+              data-bind="attr: { fill: fillGradient }"
+              opacity="0.96"
+            />
+            <text class="role" x="16" y="22" data-bind="text: kindLabel"></text>
+            <text class="name" x="16" y="45" data-bind="text: label"></text>
+            <text class="formula" x="16" y="63" data-bind="text: formula"></text>
+            <text class="value" x="16" y="85" data-bind="text: valueLabel"></text>
+            <text class="runs" x="128" y="85" data-bind="text: runLabel"></text>
+          </g>
+          <!-- /ko -->
+        </svg>
+      </section>
+
+      <footer class="footer">
+        <div class="hint">
+          Use the mutation buttons above the graph. The amber input lane is the only place state originates;
+          everything else is downstream computation.
+        </div>
+        <div class="chip">
+          <span>One source →</span>
+          <b>downstream only</b>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      const ko = globalThis.tko
+      globalThis.ko = ko
+
+      const numberFmt = new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+      const intFmt = new Intl.NumberFormat()
+
+      const formatNumber = value => numberFmt.format(value)
+      const round = value => Math.round(value * 100) / 100
+      const clampWrap = (value, wrap) => {
+        const next = value % wrap
+        return next < 0 ? next + wrap : next
+      }
+
+      const sourceDefs = [
+        {
+          id: 'seed',
+          label: 'input A',
+          formula: 'observable',
+          kindLabel: 'source',
+          x: 110,
+          y: 122,
+          start: 0.82,
+          step: 0.17,
+          wrap: 2.08,
+          fillGradient: 'url(#sourceFill)'
+        },
+        {
+          id: 'bias',
+          label: 'input B',
+          formula: 'observable',
+          kindLabel: 'source',
+          x: 110,
+          y: 284,
+          start: 0.46,
+          step: 0.13,
+          wrap: 1.84,
+          fillGradient: 'url(#sourceFill)'
+        },
+        {
+          id: 'gate',
+          label: 'input C',
+          formula: 'observable',
+          kindLabel: 'source',
+          x: 110,
+          y: 446,
+          start: 0.68,
+          step: 0.21,
+          wrap: 1.96,
+          fillGradient: 'url(#sourceFill)'
+        }
+      ]
+
+      const computedDefs = [
+        {
+          id: 'mix',
+          label: 'mix',
+          kindLabel: 'computed',
+          x: 395,
+          y: 120,
+          deps: ['seed', 'bias'],
+          formula: 'seed × 0.75 + bias × 1.25',
+          fillGradient: 'url(#computedFill)',
+          compute: (seed, bias) => round(seed * 0.75 + bias * 1.25)
+        },
+        {
+          id: 'drift',
+          label: 'drift',
+          kindLabel: 'computed',
+          x: 395,
+          y: 290,
+          deps: ['bias'],
+          formula: 'bias × 0.85',
+          fillGradient: 'url(#computedFill)',
+          compute: bias => round(bias * 0.85)
+        },
+        {
+          id: 'mask',
+          label: 'mask',
+          kindLabel: 'computed',
+          x: 670,
+          y: 360,
+          deps: ['gate'],
+          formula: 'gate > 0.55 ? 1 : 0',
+          fillGradient: 'url(#computedFill)',
+          compute: gate => (gate > 0.55 ? 1 : 0)
+        },
+        {
+          id: 'blend',
+          label: 'blend',
+          kindLabel: 'computed',
+          x: 670,
+          y: 150,
+          deps: ['mix', 'drift'],
+          formula: 'mix × 0.60 + drift × 0.40',
+          fillGradient: 'url(#computedFill)',
+          compute: (mix, drift) => round(mix * 0.6 + drift * 0.4)
+        },
+        {
+          id: 'score',
+          label: 'score',
+          kindLabel: 'computed',
+          x: 670,
+          y: 570,
+          deps: ['mask', 'mix'],
+          formula: 'mask ? mix + 0.15 : mix - 0.15',
+          fillGradient: 'url(#computedFill)',
+          compute: (mask, mix) => round(mask ? mix + 0.15 : mix - 0.15)
+        },
+        {
+          id: 'signal',
+          label: 'signal',
+          kindLabel: 'computed',
+          x: 955,
+          y: 130,
+          deps: ['mix', 'gate'],
+          formula: 'mix + gate × 0.40',
+          fillGradient: 'url(#computedFill)',
+          compute: (mix, gate) => round(mix + gate * 0.4)
+        },
+        {
+          id: 'render',
+          label: 'render',
+          kindLabel: 'output',
+          x: 955,
+          y: 300,
+          deps: ['signal'],
+          formula: 'signal × 1.10',
+          fillGradient: 'url(#outputFill)',
+          compute: signal => round(signal * 1.1)
+        },
+        {
+          id: 'alert',
+          label: 'alert',
+          kindLabel: 'output',
+          x: 955,
+          y: 470,
+          deps: ['mask', 'drift'],
+          formula: 'mask ? drift + 0.20 : drift - 0.20',
+          fillGradient: 'url(#outputFill)',
+          compute: (mask, drift) => round(mask ? drift + 0.2 : drift - 0.2)
+        },
+        {
+          id: 'trace',
+          label: 'trace',
+          kindLabel: 'output',
+          x: 955,
+          y: 640,
+          deps: ['mix', 'drift'],
+          formula: 'mix + drift × 0.30',
+          fillGradient: 'url(#outputFill)',
+          compute: (mix, drift) => round(mix + drift * 0.3)
+        },
+        {
+          id: 'beam',
+          label: 'beam',
+          kindLabel: 'output',
+          x: 1240,
+          y: 210,
+          deps: ['signal', 'blend'],
+          formula: 'signal + blend × 0.25',
+          fillGradient: 'url(#outputFill)',
+          compute: (signal, blend) => round(signal + blend * 0.25)
+        },
+        {
+          id: 'archive',
+          label: 'archive',
+          kindLabel: 'output',
+          x: 1240,
+          y: 520,
+          deps: ['trace', 'score'],
+          formula: 'trace + score × 0.20',
+          fillGradient: 'url(#outputFill)',
+          compute: (trace, score) => round(trace + score * 0.2)
+        }
+      ]
+
+      const edgeDefs = [
+        ['seed', 'mix'],
+        ['bias', 'mix'],
+        ['bias', 'drift'],
+        ['gate', 'mask'],
+        ['mix', 'blend'],
+        ['drift', 'blend'],
+        ['mask', 'score'],
+        ['mix', 'score'],
+        ['mix', 'signal'],
+        ['gate', 'signal'],
+        ['signal', 'render'],
+        ['mask', 'alert'],
+        ['drift', 'alert'],
+        ['mix', 'trace'],
+        ['drift', 'trace'],
+        ['signal', 'beam'],
+        ['blend', 'beam'],
+        ['trace', 'archive'],
+        ['score', 'archive']
+      ]
+
+      const sourceNodes = new Map()
+      const computedNodes = new Map()
+      const nodeOrder = []
+      const graphNodes = []
+      const edges = []
+
+      const initialFocus = (() => {
+        const hash = globalThis.location?.hash?.replace(/^#/, '')
+        return sourceDefs.some(def => def.id === hash) ? hash : 'seed'
+      })()
+
+      const focusSource = ko.observable(initialFocus)
+      const propagationHits = ko.observable(0)
+
+      function flashState() {
+        const isFlashing = ko.observable(false)
+        let timer = 0
+
+        const pulse = () => {
+          isFlashing(true)
+          clearTimeout(timer)
+          timer = setTimeout(() => {
+            isFlashing(false)
+          }, 360)
+        }
+
+        return { isFlashing, pulse }
+      }
+
+      function sourceNode(def) {
+        const value = ko.observable(def.start)
+        const writes = ko.observable(0)
+        const flash = flashState()
+
+        const node = {
+          id: def.id,
+          kind: 'source',
+          kindLabel: def.kindLabel,
+          label: def.label,
+          buttonLabel: `Mutate ${def.label}`,
+          formula: def.formula,
+          x: def.x,
+          y: def.y,
+          transform: `translate(${def.x}, ${def.y})`,
+          value,
+          valueLabel: ko.pureComputed(() => formatNumber(value())),
+          runLabel: ko.pureComputed(() => `${intFmt.format(writes())} writes`),
+          fillGradient: def.fillGradient,
+          isSource: true,
+          isComputed: false,
+          isOutput: false,
+          isFocused: ko.pureComputed(() => focusSource() === def.id),
+          isHot: ko.pureComputed(() => activeSet().has(def.id)),
+          isFlashing: flash.isFlashing,
+          bump() {
+            const next = round(clampWrap(value() + def.step, def.wrap))
+            value(next)
+            writes(writes() + 1)
+            flash.pulse()
+            focusSource(def.id)
+            propagationHits(propagationHits() + 1)
+          }
+        }
+
+        sourceNodes.set(def.id, node)
+        nodeOrder.push(def.id)
+        return node
+      }
+
+      function computedNode(def) {
+        const flash = flashState()
+        const runs = ko.observable(0)
+        const sources = def.deps.map(dep => dependencyValue(dep))
+
+        const value = ko.pureComputed(() => def.compute(...sources.map(source => source())))
+        const node = {
+          id: def.id,
+          kind: def.kindLabel,
+          kindLabel: def.kindLabel,
+          label: def.label,
+          formula: def.formula,
+          x: def.x,
+          y: def.y,
+          transform: `translate(${def.x}, ${def.y})`,
+          value,
+          valueLabel: ko.pureComputed(() => formatNumber(value())),
+          runLabel: ko.pureComputed(() => `${intFmt.format(runs())} recomputes`),
+          fillGradient: def.fillGradient,
+          isSource: false,
+          isComputed: true,
+          isOutput: def.kindLabel === 'output',
+          isFocused: ko.pureComputed(() => focusSource() === def.id),
+          isHot: ko.pureComputed(() => activeSet().has(def.id)),
+          isFlashing: flash.isFlashing
+        }
+
+        value.subscribe(() => {
+          runs(runs() + 1)
+          flash.pulse()
+          propagationHits(propagationHits() + 1)
+        })
+
+        computedNodes.set(def.id, node)
+        nodeOrder.push(def.id)
+        return node
+      }
+
+      function dependencyValue(id) {
+        return sourceNodes.has(id) ? sourceNodes.get(id).value : computedNodes.get(id).value
+      }
+
+      const nodeById = new Map()
+      sourceDefs.forEach(def => {
+        const node = sourceNode(def)
+        nodeById.set(node.id, node)
+        graphNodes.push(node)
+      })
+      computedDefs.forEach(def => {
+        const node = computedNode(def)
+        nodeById.set(node.id, node)
+        graphNodes.push(node)
+      })
+
+      const outgoing = new Map()
+      const incoming = new Map()
+
+      edgeDefs.forEach(([from, to]) => {
+        if (!outgoing.has(from)) {
+          outgoing.set(from, new Set())
+        }
+        if (!incoming.has(to)) {
+          incoming.set(to, new Set())
+        }
+
+        outgoing.get(from).add(to)
+        incoming.get(to).add(from)
+      })
+
+      const downstreamCache = new Map()
+
+      function downstreamFrom(id) {
+        if (downstreamCache.has(id)) {
+          return downstreamCache.get(id)
+        }
+
+        const visited = new Set([id])
+        const queue = [id]
+
+        while (queue.length > 0) {
+          const current = queue.shift()
+          const nextNodes = outgoing.get(current)
+          if (!nextNodes) {
+            continue
+          }
+
+          nextNodes.forEach(next => {
+            if (!visited.has(next)) {
+              visited.add(next)
+              queue.push(next)
+            }
+          })
+        }
+
+        downstreamCache.set(id, visited)
+        return visited
+      }
+
+      const activeSet = ko.pureComputed(() => downstreamFrom(focusSource()))
+
+      const edgeNodes = edgeDefs.map(([from, to]) => {
+        const source = nodeById.get(from)
+        const target = nodeById.get(to)
+        const hot = ko.pureComputed(() => activeSet().has(from) && activeSet().has(to))
+        const x1 = source.x + 216
+        const y1 = source.y + 49
+        const x2 = target.x
+        const y2 = target.y + 49
+        const mid = x1 + (x2 - x1) * 0.5
+        const path = `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`
+
+        return {
+          from,
+          to,
+          path,
+          hot
+        }
+      })
+
+      const viewModel = {
+        focusSource,
+        propagationHits,
+        activeSet,
+        sourceControls: sourceDefs.map(def => sourceNodes.get(def.id)),
+        nodes: graphNodes,
+        edges: edgeNodes,
+        viewBox: '0 0 1460 760',
+        focusLabel: ko.pureComputed(() => focusSource()),
+        downstreamLabel: ko.pureComputed(() => intFmt.format(activeSet().size)),
+        propagationLabel: ko.pureComputed(() => intFmt.format(propagationHits()))
+      }
+
+      ko.applyBindings(viewModel, globalThis.document.getElementById('app'))
+    </script>
+  </body>
+</html>

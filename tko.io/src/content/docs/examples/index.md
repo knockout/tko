@@ -6,8 +6,6 @@ sidebar:
   order: 0
 ---
 
-# Examples
-
 These examples are meant to make TKO's model visible.
 
 - They focus on observables, bindings, and update locality.
@@ -16,8 +14,12 @@ These examples are meant to make TKO's model visible.
 
 ## Available examples
 
-- [Honeycomb](/examples/honeycomb/)
-- [odoom](/examples/odoom/)
+- [Honeycomb](/examples/honeycomb.html?view=example)
+- [odoom](/examples/odoom.html?view=example)
+- [Spreadsheet](/examples/spreadsheet.html?view=example)
+- [Signal Graph](/examples/signal-graph.html?view=example)
+- [Reactive Audio Mixer](/examples/audio-mixer.html?view=example)
+- [Form Engine](/examples/form-engine.html?view=example)
 
 ## Why this section exists
 

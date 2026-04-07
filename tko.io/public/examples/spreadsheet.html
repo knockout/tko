@@ -1,0 +1,1290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spreadsheet</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+      :root {
+        color-scheme: dark;
+        --bg: #07101a;
+        --panel: rgba(11, 18, 30, 0.9);
+        --panel-strong: rgba(8, 13, 22, 0.96);
+        --border: rgba(140, 164, 204, 0.16);
+        --border-strong: rgba(131, 176, 255, 0.22);
+        --text: #eef4ff;
+        --muted: #91a6c8;
+        --accent: #8ef0d6;
+        --formula: #ffd87a;
+        --selected: #7ab6ff;
+        --precedent: #f3aa57;
+        --dependent: #71e0b1;
+        --danger: #ff8f8f;
+        --site-header-h: 54px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        display: grid;
+        grid-template-rows: var(--site-header-h) minmax(0, 1fr);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background:
+          radial-gradient(circle at 14% 12%, rgba(122, 182, 255, 0.16), transparent 26%),
+          radial-gradient(circle at 84% 14%, rgba(110, 224, 177, 0.12), transparent 24%),
+          linear-gradient(180deg, #060b12, #07111a 44%, #05080d);
+      }
+
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-width: 0;
+        height: var(--site-header-h);
+        padding: 0 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(7, 13, 22, 0.9);
+        backdrop-filter: blur(12px);
+      }
+
+      .site-header__brandlink {
+        color: var(--text);
+        font-family: 'Lobster', cursive;
+        font-size: 1.6rem;
+        font-weight: 400;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .site-header__nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        white-space: nowrap;
+      }
+
+      .site-header__nav a {
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-decoration: none;
+      }
+
+      .site-header__nav a:hover {
+        color: var(--text);
+      }
+
+      .site-header__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+
+      .site-header__icon svg {
+        width: 1rem;
+        height: 1rem;
+        fill: currentColor;
+      }
+
+      .site-header__icon:hover {
+        color: var(--text);
+      }
+
+      .app {
+        height: 100%;
+        min-height: 0;
+        padding: 0 12px 12px;
+      }
+
+      .shell {
+        min-height: calc(100% - 12px);
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 0.7fr);
+        gap: 12px;
+      }
+
+      .main,
+      .side {
+        min-width: 0;
+      }
+
+      .main {
+        display: grid;
+        grid-template-rows: auto auto auto minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: var(--panel);
+        backdrop-filter: blur(16px);
+        box-shadow:
+          0 18px 70px rgba(0, 0, 0, 0.25),
+          inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
+
+      .hero {
+        padding: 14px 16px 12px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.85rem, 3.2vw, 3rem);
+        line-height: 0.9;
+        letter-spacing: -0.08em;
+      }
+
+      .lede {
+        margin-top: 6px;
+        max-width: 64rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+
+      .hero-badge {
+        flex: 0 0 auto;
+        align-self: stretch;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.55rem 0.8rem;
+        border-radius: 999px;
+        border: 1px solid rgba(142, 240, 214, 0.22);
+        background: rgba(142, 240, 214, 0.08);
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .metric {
+        padding: 7px 10px 6px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.025);
+        min-width: 0;
+      }
+
+      .metric-label {
+        color: var(--muted);
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .metric-value {
+        margin-top: 3px;
+        font-size: 1.28rem;
+        line-height: 0.9;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .metric-value--accent {
+        color: var(--accent);
+      }
+
+      .metric-value--formula {
+        color: var(--formula);
+      }
+
+      .metric-value--selected {
+        color: var(--selected);
+      }
+
+      .metric-value--danger {
+        color: var(--danger);
+      }
+
+      .formula-card {
+        padding: 10px 12px 10px;
+      }
+
+      .formula-card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+
+      .eyebrow {
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .formula-address {
+        margin-top: 3px;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: var(--accent);
+      }
+
+      .formula-meta {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        text-align: right;
+      }
+
+      .formula-input {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        background: rgba(4, 8, 14, 0.95);
+        color: var(--text);
+        padding: 0.7rem 0.86rem;
+        font:
+          600 0.96rem/1.25 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        outline: none;
+      }
+
+      .formula-input:focus {
+        border-color: rgba(122, 182, 255, 0.72);
+        box-shadow: 0 0 0 3px rgba(122, 182, 255, 0.14);
+      }
+
+      .formula-input:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .formula-status {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 0.68rem;
+        line-height: 1.25;
+      }
+
+      .formula-hint {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 0.64rem;
+        line-height: 1.25;
+      }
+
+      .sheet-card {
+        padding: 9px 11px 9px;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 6px;
+      }
+
+      .sheet-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .toolbar-copy {
+        color: var(--muted);
+        font-size: 0.66rem;
+        line-height: 1.24;
+        max-width: 42rem;
+      }
+
+      .preset-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.6rem 0.9rem;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .sheet-grid {
+        min-height: 0;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 18px;
+        overflow: hidden;
+        background: var(--panel-strong);
+      }
+
+      .grid-row {
+        display: grid;
+        grid-template-columns: 3.2rem repeat(6, minmax(0, 1fr));
+      }
+
+      .grid-head {
+        border-bottom: 1px solid rgba(140, 164, 204, 0.14);
+        background: rgba(10, 15, 24, 0.98);
+      }
+
+      .corner,
+      .grid-head-cell,
+      .row-head,
+      .grid-cell {
+        min-width: 0;
+      }
+
+      .corner {
+        border-right: 1px solid rgba(140, 164, 204, 0.14);
+      }
+
+      .grid-head-cell {
+        padding: 0.44rem 0.26rem;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.6rem;
+        font-weight: 800;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        border-right: 1px solid rgba(140, 164, 204, 0.14);
+      }
+
+      .grid-head-cell:last-child {
+        border-right: 0;
+      }
+
+      .grid-body {
+        display: grid;
+      }
+
+      .grid-body .grid-row {
+        border-bottom: 1px solid rgba(140, 164, 204, 0.12);
+      }
+
+      .grid-body .grid-row:last-child {
+        border-bottom: 0;
+      }
+
+      .row-head {
+        display: grid;
+        place-items: center;
+        border-right: 1px solid rgba(140, 164, 204, 0.12);
+        background: rgba(10, 15, 24, 0.96);
+        color: var(--muted);
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      .grid-cell {
+        height: clamp(2.2rem, 4.2vh, 2.95rem);
+        border: 0;
+        border-right: 1px solid rgba(140, 164, 204, 0.12);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0.01)),
+          rgba(8, 13, 21, 0.98);
+        text-align: left;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 0.03rem;
+        align-content: start;
+        padding: 0.24rem 0.38rem 0.18rem;
+        border-radius: 0;
+        transition:
+          background 120ms ease,
+          box-shadow 120ms ease,
+          transform 120ms ease,
+          border-color 120ms ease;
+      }
+
+      .grid-cell:last-child {
+        border-right: 0;
+      }
+
+      .grid-cell:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-1px);
+      }
+
+      .grid-cell:focus-visible {
+        outline: 2px solid rgba(122, 182, 255, 0.9);
+        outline-offset: -2px;
+      }
+
+      .grid-cell--literal {
+        background:
+          linear-gradient(180deg, rgba(122, 182, 255, 0.03), rgba(255, 255, 255, 0.01)),
+          rgba(8, 13, 21, 0.98);
+      }
+
+      .grid-cell--formula {
+        background:
+          linear-gradient(180deg, rgba(255, 216, 122, 0.05), rgba(255, 255, 255, 0.01)),
+          rgba(8, 13, 21, 0.98);
+      }
+
+      .grid-cell--selected {
+        background:
+          linear-gradient(180deg, rgba(122, 182, 255, 0.14), rgba(122, 182, 255, 0.06)),
+          rgba(8, 13, 21, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(122, 182, 255, 0.85);
+      }
+
+      .grid-cell--precedent {
+        background:
+          linear-gradient(180deg, rgba(243, 170, 87, 0.12), rgba(243, 170, 87, 0.05)),
+          rgba(8, 13, 21, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(243, 170, 87, 0.45);
+      }
+
+      .grid-cell--dependent {
+        background:
+          linear-gradient(180deg, rgba(113, 224, 177, 0.12), rgba(113, 224, 177, 0.05)),
+          rgba(8, 13, 21, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(113, 224, 177, 0.42);
+      }
+
+      .grid-cell--error {
+        background:
+          linear-gradient(180deg, rgba(255, 143, 143, 0.12), rgba(255, 143, 143, 0.05)),
+          rgba(8, 13, 21, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(255, 143, 143, 0.44);
+      }
+
+      .cell-address {
+        color: var(--muted);
+        font-size: 0.5rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .cell-value {
+        font-size: 0.8rem;
+        line-height: 1.04;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .grid-cell--formula .cell-value {
+        color: #fff2c7;
+      }
+
+      .grid-cell--literal .cell-value {
+        color: #dff0ff;
+      }
+
+      .grid-cell--error .cell-value {
+        color: var(--danger);
+      }
+
+      .cell-formula {
+        color: var(--muted);
+        font:
+          600 0.48rem/1.15 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        letter-spacing: 0.02em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .side {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+
+      .side-card {
+        padding: 14px;
+      }
+
+      .side-card h2 {
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+      }
+
+      .inspector {
+        display: grid;
+        gap: 12px;
+      }
+
+      .inspector-row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .inspector-label {
+        color: var(--muted);
+        font-size: 0.67rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .inspector-value {
+        font-size: 0.84rem;
+        line-height: 1.4;
+      }
+
+      .inspector-code {
+        font:
+          600 0.84rem/1.4 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        color: #edf3ff;
+        word-break: break-word;
+      }
+
+      .pill-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.42rem;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.36rem 0.58rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        font-size: 0.7rem;
+        white-space: nowrap;
+      }
+
+      .pill--precedent {
+        border-color: rgba(243, 170, 87, 0.24);
+        background: rgba(243, 170, 87, 0.08);
+      }
+
+      .pill--dependent {
+        border-color: rgba(113, 224, 177, 0.26);
+        background: rgba(113, 224, 177, 0.08);
+      }
+
+      .pill--overflow {
+        border-color: rgba(122, 182, 255, 0.22);
+        background: rgba(122, 182, 255, 0.08);
+        color: var(--selected);
+      }
+
+      .note {
+        color: var(--muted);
+        font-size: 0.75rem;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 1180px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+
+        .metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .side {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .app {
+          padding: 8px;
+        }
+
+        .shell {
+          min-height: calc(100vh - 16px);
+        }
+
+        .hero {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .side {
+          grid-template-columns: 1fr;
+        }
+
+        .grid-row {
+          grid-template-columns: 2.4rem repeat(6, minmax(0, 1fr));
+        }
+
+        .grid-cell {
+          height: 3rem;
+          padding: 0.22rem 0.34rem 0.16rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-header__brandlink" href="/" aria-label="TKO home">TKO</a>
+      <nav class="site-header__nav" aria-label="Example navigation">
+        <a href="/">Docs</a>
+        <a href="/examples/">Examples</a>
+        <a class="site-header__icon" href="https://github.com/knockout/tko" aria-label="GitHub">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.71 5.47 7.8.4.08.55-.18.55-.39 0-.19-.01-.82-.01-1.48-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.97-.82-1.16-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.83.72 1.24 1.87.89 2.33.68.07-.54.28-.89.5-1.1-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.19-.08-.21-.36-1.05.08-2.19 0 0 .67-.22 2.2.84A7.45 7.45 0 0 1 8 4.8c.68 0 1.37.09 2.01.27 1.53-1.06 2.2-.84 2.2-.84.44 1.14.16 1.98.08 2.19.51.57.82 1.29.82 2.19 0 3.14-1.87 3.83-3.65 4.04.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.47.55.39A8.18 8.18 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"
+            />
+          </svg>
+        </a>
+      </nav>
+    </header>
+    <main class="app" id="spreadsheetRoot">
+      <div class="shell">
+        <section class="main">
+          <article class="hero card">
+            <div>
+              <h1>Spreadsheet</h1>
+              <div class="lede">
+                One-shot by AI: cells are observables, formula cells are computeds, and one edit ripples through
+                the sheet.
+              </div>
+            </div>
+            <div class="hero-badge">TKO dependency engine</div>
+          </article>
+
+          <section class="metrics">
+            <article class="metric">
+              <div class="metric-label">Selected</div>
+              <div class="metric-value metric-value--selected" data-bind="text: selectedAddressLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">Type</div>
+              <div class="metric-value" data-bind="text: selectedKindLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">Value</div>
+              <div class="metric-value metric-value--formula" data-bind="text: selectedValueLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">Direct inputs</div>
+              <div class="metric-value metric-value--accent" data-bind="text: selectedDependencyCountLabel"></div>
+            </article>
+          </section>
+
+          <article class="formula-card card">
+            <div class="formula-card-head">
+              <div>
+                <div class="eyebrow">Formula Bar</div>
+                <div class="formula-address" data-bind="text: selectedAddressLabel"></div>
+              </div>
+              <div class="formula-meta" data-bind="text: selectedFormulaMeta"></div>
+            </div>
+            <input
+              class="formula-input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              data-bind="textInput: activeRaw, enable: hasSelection"
+              placeholder="Select a cell"
+            />
+            <div class="formula-status" data-bind="text: message"></div>
+            <div class="formula-hint">Literal cells are observables. Formula cells are computeds that read other cells through the same reactive graph.</div>
+          </article>
+
+          <article class="sheet-card card">
+            <div class="sheet-toolbar">
+              <div class="toolbar-copy" data-bind="text: toolbarCopy"></div>
+              <div class="preset-buttons">
+                <button type="button" data-bind="click: loadBudget">Budget</button>
+                <button type="button" data-bind="click: loadCascade">Cascade</button>
+              </div>
+            </div>
+
+            <div class="sheet-grid" aria-label="Spreadsheet grid">
+              <div class="grid-row grid-head">
+                <div class="corner"></div>
+                <!-- ko foreach: columnHeaders -->
+                <div class="grid-head-cell" data-bind="text: $data"></div>
+                <!-- /ko -->
+              </div>
+
+              <div class="grid-body" data-bind="foreach: rows">
+                <div class="grid-row">
+                  <div class="row-head" data-bind="text: label"></div>
+                  <!-- ko foreach: cells -->
+                  <button
+                    type="button"
+                    class="grid-cell"
+                    data-bind="
+                      click: $root.selectCell,
+                      css: {
+                        'grid-cell--formula': kind() === 'formula',
+                        'grid-cell--literal': kind() === 'literal',
+                        'grid-cell--selected': isSelected(),
+                        'grid-cell--precedent': isPrecedent(),
+                        'grid-cell--dependent': isDependent(),
+                        'grid-cell--error': isError()
+                      },
+                      attr: { 'aria-label': ariaLabel }
+                    "
+                  >
+                    <span class="cell-address" data-bind="text: address"></span>
+                    <strong class="cell-value" data-bind="text: display"></strong>
+                    <span class="cell-formula" data-bind="visible: isFormula(), text: formulaPreview"></span>
+                  </button>
+                  <!-- /ko -->
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <aside class="side">
+          <article class="side-card card">
+            <h2>Inspector</h2>
+            <div class="inspector">
+              <div class="inspector-row">
+                <div class="inspector-label">Raw</div>
+                <div class="inspector-value inspector-code" data-bind="text: selectedRawLabel"></div>
+              </div>
+
+              <div class="inspector-row">
+                <div class="inspector-label">Depends on</div>
+                <div class="pill-list">
+                  <!-- ko foreach: selectedPrecedentsPreview -->
+                  <span class="pill pill--precedent" data-bind="text: $data"></span>
+                  <!-- /ko -->
+                  <span class="pill pill--overflow" data-bind="visible: selectedPrecedentsOverflow, text: selectedPrecedentsOverflowLabel"></span>
+                </div>
+                <div class="note" data-bind="visible: selectedPrecedentsPreview().length === 0">none</div>
+              </div>
+
+              <div class="inspector-row">
+                <div class="inspector-label">Feeds</div>
+                <div class="pill-list">
+                  <!-- ko foreach: selectedDependentsPreview -->
+                  <span class="pill pill--dependent" data-bind="text: $data"></span>
+                  <!-- /ko -->
+                  <span class="pill pill--overflow" data-bind="visible: selectedDependentsOverflow, text: selectedDependentsOverflowLabel"></span>
+                </div>
+                <div class="note" data-bind="visible: selectedDependentsPreview().length === 0">none</div>
+              </div>
+
+              <div class="inspector-row">
+                <div class="inspector-label">How to read it</div>
+                <div class="note">Orange pills are precedents. Green pills are dependents. Blue is the active cell.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="side-card card">
+            <h2>Mechanics</h2>
+            <div class="note">Budget turns literal inputs into line totals and rollups. Cascade turns one edited literal into a long computed chain so you can watch dependency propagation instead of a rerender loop.</div>
+          </article>
+        </aside>
+      </div>
+    </main>
+
+    <script src="https://www.tko.io/lib/tko.js"></script>
+    <script>
+      ;(() => {
+        const ko = globalThis.tko
+        const numberFormatter = new Intl.NumberFormat('en-US', {
+          maximumFractionDigits: 2
+        })
+        const columns = ['A', 'B', 'C', 'D', 'E', 'F']
+        const rowNumbers = [1, 2, 3, 4, 5, 6]
+        const rowLabels = ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5', 'Totals']
+        const allowedWords = new Set(['SUM', 'AVG', 'AVERAGE', 'MIN', 'MAX', 'ABS', 'ROUND', 'PI'])
+        const previewLimit = 6
+
+        function addressFor(columnIndex, rowIndex) {
+          return `${columns[columnIndex]}${rowNumbers[rowIndex]}`
+        }
+
+        function isCellRef(value) {
+          return /^[A-F][1-6]$/.test(String(value ?? '').trim().toUpperCase())
+        }
+
+        function parseLiteral(raw) {
+          const text = String(raw ?? '').trim()
+          if (text === '') return 0
+          const number = Number(text)
+          return Number.isFinite(number) ? number : text
+        }
+
+        function expandRange(startRef, endRef) {
+          const startCol = columns.indexOf(startRef[0])
+          const endCol = columns.indexOf(endRef[0])
+          const startRow = Number(startRef.slice(1)) - 1
+          const endRow = Number(endRef.slice(1)) - 1
+          const refs = []
+          const colMin = Math.min(startCol, endCol)
+          const colMax = Math.max(startCol, endCol)
+          const rowMin = Math.min(startRow, endRow)
+          const rowMax = Math.max(startRow, endRow)
+
+          for (let row = rowMin; row <= rowMax; row += 1) {
+            for (let col = colMin; col <= colMax; col += 1) {
+              refs.push(addressFor(col, row))
+            }
+          }
+
+          return refs
+        }
+
+        function extractDependencies(raw) {
+          const text = String(raw ?? '').trim()
+          if (!text.startsWith('=')) return []
+
+          const refs = new Set()
+          const body = text.slice(1)
+
+          for (const match of body.matchAll(/\b([A-F][1-6])\s*:\s*([A-F][1-6])\b/g)) {
+            expandRange(match[1], match[2]).forEach(ref => refs.add(ref))
+          }
+
+          for (const match of body.matchAll(/\b([A-F][1-6])\b/g)) {
+            refs.add(match[1])
+          }
+
+          return [...refs]
+        }
+
+        function flattenValues(values) {
+          const flat = []
+          values.forEach(value => {
+            if (Array.isArray(value)) {
+              flat.push(...flattenValues(value))
+            } else {
+              flat.push(value)
+            }
+          })
+          return flat
+        }
+
+        function numericValues(values) {
+          return flattenValues(values).map(value => Number(value ?? 0))
+        }
+
+        function compileFormula(body, readCell, readRange) {
+          const words = body.match(/[A-Za-z_][A-Za-z0-9_]*/g) || []
+          for (const word of words) {
+            const upper = word.toUpperCase()
+            if (!allowedWords.has(upper) && !isCellRef(upper)) {
+              throw new Error(`Unsupported token ${word}`)
+            }
+          }
+
+          const rangeTokens = []
+          let normalized = body
+
+          function registerRangeFunction(source, alias) {
+            normalized = normalized.replace(
+              new RegExp(`\\b${source}\\s*\\(\\s*([A-F][1-6]\\s*:\\s*[A-F][1-6])\\s*\\)`, 'gi'),
+              (_, range) => {
+                const token = `__RANGE_${rangeTokens.length}__`
+                rangeTokens.push({ token, range: range.replace(/\s+/g, '') })
+                return `${alias}(${token})`
+              }
+            )
+          }
+
+          registerRangeFunction('AVERAGE', 'AVG')
+          registerRangeFunction('SUM', 'SUM')
+          registerRangeFunction('AVG', 'AVG')
+          registerRangeFunction('MIN', 'MIN')
+          registerRangeFunction('MAX', 'MAX')
+
+          normalized = normalized.replace(/\b([A-F][1-6])\b/g, (_, ref) => `C("${ref}")`)
+
+          for (const { token, range } of rangeTokens) {
+            normalized = normalized.replace(token, `R("${range}")`)
+          }
+
+          const fn = new Function(
+            'C',
+            'R',
+            'SUM',
+            'AVG',
+            'MIN',
+            'MAX',
+            'ABS',
+            'ROUND',
+            'PI',
+            `return (${normalized})`
+          )
+
+          const sum = (...values) => numericValues(values).reduce((acc, value) => acc + value, 0)
+          const avg = (...values) => {
+            const nums = numericValues(values)
+            return nums.length ? nums.reduce((acc, value) => acc + value, 0) / nums.length : 0
+          }
+          const min = (...values) => {
+            const nums = numericValues(values)
+            return nums.length ? Math.min(...nums) : 0
+          }
+          const max = (...values) => {
+            const nums = numericValues(values)
+            return nums.length ? Math.max(...nums) : 0
+          }
+          const round = (value, places = 0) => {
+            const factor = 10 ** Number(places || 0)
+            return Math.round(Number(value || 0) * factor) / factor
+          }
+
+          return fn(readCell, readRange, sum, avg, min, max, Math.abs, round, Math.PI)
+        }
+
+        function createScenarioMaps() {
+          const budget = {
+            A1: '12',
+            B1: '24',
+            C1: '0.05',
+            D1: '=A1*B1',
+            E1: '=D1*C1',
+            F1: '=D1-E1',
+            A2: '9',
+            B2: '38',
+            C2: '0.08',
+            D2: '=A2*B2',
+            E2: '=D2*C2',
+            F2: '=D2-E2',
+            A3: '16',
+            B3: '27',
+            C3: '0.06',
+            D3: '=A3*B3',
+            E3: '=D3*C3',
+            F3: '=D3-E3',
+            A4: '21',
+            B4: '15',
+            C4: '0.04',
+            D4: '=A4*B4',
+            E4: '=D4*C4',
+            F4: '=D4-E4',
+            A5: '11',
+            B5: '30',
+            C5: '0.03',
+            D5: '=A5*B5',
+            E5: '=D5*C5',
+            F5: '=D5-E5',
+            A6: '=SUM(A1:A5)',
+            B6: '=SUM(B1:B5)',
+            C6: '=AVERAGE(C1:C5)',
+            D6: '=SUM(D1:D5)',
+            E6: '=SUM(E1:E5)',
+            F6: '=SUM(F1:F5)'
+          }
+
+          const cascade = {}
+          const chain = []
+
+          rowNumbers.forEach((rowNumber, rowIndex) => {
+            const sequence = rowIndex % 2 === 0 ? columns : [...columns].reverse()
+            sequence.forEach(columnLabel => {
+              chain.push(`${columnLabel}${rowNumber}`)
+            })
+          })
+
+          chain.forEach((address, index) => {
+            if (index === 0) {
+              cascade[address] = '1'
+            } else {
+              const previous = chain[index - 1]
+              const delta = (index % 4) + 1
+              cascade[address] = `=${previous}+${delta}`
+            }
+          })
+
+          return { budget, cascade }
+        }
+
+        const vm = {
+          activeCell: ko.observable(null),
+          scenario: ko.observable('Budget'),
+          message: ko.observable('Budget preset loaded. Select a cell to inspect its precedents and dependents.'),
+          rows: ko.observableArray([]),
+          allCells: [],
+          cellsByAddress: Object.create(null),
+          columnHeaders: columns
+        }
+
+        const evaluationStack = new Set()
+
+        function createCell(address, rowLabel, columnLabel) {
+          const cell = {
+            address,
+            rowLabel,
+            columnLabel,
+            raw: ko.observable('')
+          }
+
+          vm.cellsByAddress[address] = cell
+          vm.allCells.push(cell)
+
+          cell.kind = ko.pureComputed(() => (String(cell.raw() ?? '').trim().startsWith('=') ? 'formula' : 'literal'))
+          cell.isFormula = ko.pureComputed(() => cell.kind() === 'formula')
+          cell.isLiteral = ko.pureComputed(() => cell.kind() === 'literal')
+          cell.dependencies = ko.pureComputed(() => extractDependencies(cell.raw()))
+          cell.formulaPreview = ko.pureComputed(() => {
+            const raw = String(cell.raw() ?? '').trim()
+            return raw.startsWith('=') ? raw.slice(1) : ''
+          })
+          cell.value = ko.pureComputed(() => {
+            const raw = String(cell.raw() ?? '').trim()
+            if (raw === '') return 0
+            if (!raw.startsWith('=')) return parseLiteral(raw)
+            if (evaluationStack.has(address)) {
+              throw new Error('CYCLE')
+            }
+
+            evaluationStack.add(address)
+            try {
+              const result = compileFormula(
+                raw.slice(1),
+                ref => {
+                  const target = vm.cellsByAddress[ref]
+                  if (!target) {
+                    throw new Error('REF')
+                  }
+                  return target.value()
+                },
+                range => {
+                  const [start, end] = range.split(':')
+                  return expandRange(start, end).map(ref => {
+                    const target = vm.cellsByAddress[ref]
+                    if (!target) {
+                      throw new Error('REF')
+                    }
+                    return target.value()
+                  })
+                }
+              )
+
+              if (typeof result === 'number') {
+                return Number.isFinite(result) ? result : '#ERR'
+              }
+
+              return result
+            } catch (error) {
+              return error && error.message === 'CYCLE' ? '#CYCLE' : '#ERR'
+            } finally {
+              evaluationStack.delete(address)
+            }
+          })
+          cell.isError = ko.pureComputed(() => {
+            const value = cell.value()
+            return typeof value === 'string' && value.startsWith('#')
+          })
+          cell.display = ko.pureComputed(() => {
+            const value = cell.value()
+            if (typeof value === 'number') {
+              return numberFormatter.format(value)
+            }
+            return String(value)
+          })
+          cell.isSelected = ko.pureComputed(() => vm.activeCell() === cell)
+          cell.isPrecedent = ko.pureComputed(() => vm.selectedPrecedents().includes(address))
+          cell.isDependent = ko.pureComputed(() => vm.selectedDependents().includes(address))
+          cell.ariaLabel = ko.pureComputed(() => {
+            const parts = [address, cell.kind(), `value ${cell.display()}`]
+            const raw = String(cell.raw() ?? '').trim()
+            if (raw) {
+              parts.push(raw.startsWith('=') ? `formula ${raw.slice(1)}` : `literal ${raw}`)
+            }
+            return `${parts.join(', ')}. Click to inspect.`
+          })
+
+          return cell
+        }
+
+        function buildGrid() {
+          const rows = rowNumbers.map((rowNumber, rowIndex) => {
+            const row = {
+              label: rowLabels[rowIndex],
+              cells: ko.observableArray([])
+            }
+
+            const cells = columns.map((columnLabel, columnIndex) => {
+              const address = addressFor(columnIndex, rowIndex)
+              return createCell(address, row.label, columnLabel)
+            })
+
+            row.cells(cells)
+            return row
+          })
+
+          vm.rows(rows)
+        }
+
+        function previewList(items) {
+          return items.slice(0, previewLimit)
+        }
+
+        vm.hasSelection = ko.pureComputed(() => !!vm.activeCell())
+        vm.selectedAddressLabel = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          return cell ? cell.address : 'none'
+        })
+        vm.selectedKindLabel = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          return cell ? cell.kind() : 'none'
+        })
+        vm.selectedValueLabel = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          return cell ? cell.display() : '—'
+        })
+        vm.selectedRawLabel = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          return cell ? cell.raw() : '—'
+        })
+        vm.selectedDependencyCountLabel = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          const count = cell ? cell.dependencies().length : 0
+          return String(count)
+        })
+        vm.selectedFormulaMeta = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          if (!cell) return '0 direct inputs'
+          const precedentCount = cell.dependencies().length
+          return cell.isFormula() ? `${precedentCount} precedent${precedentCount === 1 ? '' : 's'}` : 'literal source'
+        })
+        vm.selectedPrecedents = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          return cell ? cell.dependencies() : []
+        })
+        vm.selectedDependents = ko.pureComputed(() => {
+          const cell = vm.activeCell()
+          if (!cell) return []
+          const address = cell.address
+          return vm.allCells.filter(other => other.dependencies().includes(address)).map(other => other.address)
+        })
+        vm.selectedPrecedentsPreview = ko.pureComputed(() => previewList(vm.selectedPrecedents()))
+        vm.selectedDependentsPreview = ko.pureComputed(() => previewList(vm.selectedDependents()))
+        vm.selectedPrecedentsOverflow = ko.pureComputed(() => Math.max(0, vm.selectedPrecedents().length - previewLimit))
+        vm.selectedDependentsOverflow = ko.pureComputed(() => Math.max(0, vm.selectedDependents().length - previewLimit))
+        vm.selectedPrecedentsOverflowLabel = ko.pureComputed(() => {
+          const extra = vm.selectedPrecedentsOverflow()
+          return extra > 0 ? `+${extra} more` : ''
+        })
+        vm.selectedDependentsOverflowLabel = ko.pureComputed(() => {
+          const extra = vm.selectedDependentsOverflow()
+          return extra > 0 ? `+${extra} more` : ''
+        })
+        vm.toolbarCopy = ko.pureComputed(() => {
+          return vm.scenario() === 'Cascade'
+            ? 'Cascade turns one edited literal into a long computed chain. Select a source cell and watch the downstream cells recalculate.'
+            : 'Budget links literal inputs into per-line formulas and a totals row, so you can see computed dependency propagation instead of a copied result.'
+        })
+        vm.activeRaw = ko.pureComputed({
+          read: () => {
+            const cell = vm.activeCell()
+            return cell ? cell.raw() : ''
+          },
+          write: value => {
+            const cell = vm.activeCell()
+            if (cell) {
+              cell.raw(String(value))
+            }
+          }
+        })
+
+        function selectCell(cell) {
+          vm.activeCell(cell)
+          vm.message(
+            cell.isFormula()
+              ? `${cell.address} is a computed cell. Editing one of its precedents will re-run it automatically.`
+              : `${cell.address} is a literal cell. This observable value feeds any formula that depends on it.`
+          )
+          return true
+        }
+
+        function loadScenario(name) {
+          const scenarios = createScenarioMaps()
+          const preset = scenarios[name]
+          if (!preset) return
+
+          vm.allCells.forEach(cell => {
+            cell.raw('')
+          })
+
+          Object.entries(preset).forEach(([address, raw]) => {
+            const cell = vm.cellsByAddress[address]
+            if (cell) {
+              cell.raw(raw)
+            }
+          })
+
+          vm.scenario(name === 'cascade' ? 'Cascade' : 'Budget')
+
+          const focusAddress = name === 'cascade' ? 'A1' : 'D6'
+          const focusCell = vm.cellsByAddress[focusAddress] || vm.cellsByAddress.A1
+          selectCell(focusCell)
+        }
+
+        vm.selectCell = selectCell
+        vm.loadBudget = () => loadScenario('budget')
+        vm.loadCascade = () => loadScenario('cascade')
+
+        buildGrid()
+        loadScenario('budget')
+
+        ko.applyBindings(vm, document.getElementById('spreadsheetRoot'))
+      })()
+    </script>
+  </body>
+</html>
