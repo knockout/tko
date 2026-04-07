@@ -14,11 +14,11 @@ These examples are meant to make TKO's model visible.
 
 ## Available examples
 
-- [Honeycomb](/examples/honeycomb.html?view=example)
-- [odoom](/examples/odoom.html?view=example)
-- [Spreadsheet](/examples/spreadsheet.html?view=example)
-- [Signal Graph](/examples/signal-graph.html?view=example)
-- [Form Engine](/examples/form-engine.html?view=example)
+- [Honeycomb](/examples/honeycomb.html?view=example): Count naive virtual DOM comparisons against observable updates in a dense interactive field.
+- [odoom](/examples/odoom.html?view=example): A tiny WebGL corridor crawler where the HUD, controls, and simulation state stay observable-driven.
+- [Spreadsheet](/examples/spreadsheet.html?view=example): Cells as observables, formulas as computeds, and dependency propagation you can edit live.
+- [Signal Graph](/examples/signal-graph.html?view=example): Mutate one input and watch only the downstream computed branch recompute.
+- [Form Engine](/examples/form-engine.html?view=example): A realistic product form showing dirty state, validation, summaries, and save flow as reactive state.
 
 ## Why this section exists
 
