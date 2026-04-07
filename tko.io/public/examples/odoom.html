@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>odoom</title>
+    <style>
+      :root {
+        --bg: #05070d;
+        --panel: rgba(10, 14, 24, 0.82);
+        --panel-strong: rgba(9, 12, 20, 0.92);
+        --line: rgba(119, 150, 197, 0.2);
+        --text: #eef3ff;
+        --muted: #9cabcb;
+        --accent: #7cf7c6;
+        --danger: #ff7a73;
+        --ammo: #ffd166;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: #05070d;
+        color: var(--text);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+
+      .odoom {
+        position: relative;
+        height: 100vh;
+        overflow: hidden;
+        outline: none;
+        background:
+          radial-gradient(circle at 50% 22%, rgba(72, 105, 180, 0.12), transparent 36%),
+          linear-gradient(180deg, #05070d, #080b13);
+      }
+
+      .viewport {
+        position: absolute;
+        inset: 0;
+      }
+
+      .viewport canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .muzzle {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 50% 62%, rgba(255, 244, 181, 0.48), transparent 18%),
+          radial-gradient(circle at 50% 62%, rgba(255, 189, 81, 0.22), transparent 34%);
+        mix-blend-mode: screen;
+      }
+
+      .hud {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 1rem;
+        padding: 1rem;
+        pointer-events: none;
+      }
+
+      .stack {
+        display: grid;
+        gap: 0.9rem;
+        align-content: start;
+        min-width: 0;
+      }
+
+      .title-card,
+      .metrics,
+      .message,
+      .controls,
+      .minimap-shell {
+        pointer-events: auto;
+        user-select: none;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        backdrop-filter: blur(14px);
+        border-radius: 1.1rem;
+      }
+
+      .title-card {
+        padding: 1rem 1.1rem;
+        max-width: 44rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 3.2rem);
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+      }
+
+      .subtitle {
+        margin-top: 0.45rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.7rem;
+        padding: 0.9rem;
+        max-width: 58rem;
+      }
+
+      .metric {
+        display: grid;
+        gap: 0.2rem;
+        padding: 0.75rem 0.8rem;
+        border-radius: 0.9rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .metric-label {
+        font-size: 0.66rem;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--muted);
+      }
+
+      .metric-value {
+        font-size: 1.65rem;
+        line-height: 0.88;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+      }
+
+      .metric-value--health {
+        color: var(--danger);
+      }
+
+      .metric-value--ammo {
+        color: var(--ammo);
+      }
+
+      .metric-value--accent {
+        color: var(--accent);
+      }
+
+      .message {
+        max-width: 36rem;
+        padding: 0.8rem 1rem;
+        color: var(--text);
+        font-size: 0.92rem;
+      }
+
+      .right-rail {
+        display: grid;
+        gap: 0.9rem;
+        width: min(22rem, 28vw);
+        align-content: start;
+      }
+
+      .controls {
+        padding: 0.9rem 1rem;
+      }
+
+      .controls h2,
+      .minimap-shell h2 {
+        margin: 0 0 0.7rem;
+        font-size: 0.95rem;
+        letter-spacing: -0.03em;
+      }
+
+      .controls-grid {
+        display: grid;
+        gap: 0.8rem;
+      }
+
+      .control {
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .control label {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      input[type='range'] {
+        width: 100%;
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 0.55rem 0.85rem;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .minimap-shell {
+        padding: 0.9rem 1rem 1rem;
+      }
+
+      .minimap-shell canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 0.85rem;
+        background: rgba(4, 7, 11, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .minimap-note {
+        margin-top: 0.55rem;
+        color: var(--muted);
+        font-size: 0.74rem;
+        line-height: 1.35;
+      }
+
+      @media (max-width: 1080px) {
+        .hud {
+          grid-template-columns: 1fr;
+        }
+
+        .right-rail {
+          width: min(32rem, 100%);
+        }
+
+        .metrics {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .title-card,
+        .message,
+        .controls,
+        .minimap-shell {
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="odoom" id="appRoot" tabindex="0" data-bind="odoomController: $data">
+      <div class="viewport">
+        <canvas data-bind="odoomScene: $data"></canvas>
+      </div>
+      <div class="muzzle" data-bind="style: { opacity: muzzleOpacity }"></div>
+
+      <section class="hud">
+        <div class="stack">
+          <article class="title-card">
+            <h1>odoom</h1>
+            <div class="subtitle">One-shot by AI: a tiny WebGL corridor crawler with an observable HUD.</div>
+          </article>
+
+          <section class="metrics">
+            <article class="metric">
+              <div class="metric-label">Health</div>
+              <div class="metric-value metric-value--health" data-bind="text: healthLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">Ammo</div>
+              <div class="metric-value metric-value--ammo" data-bind="text: ammoLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">Cells</div>
+              <div class="metric-value metric-value--accent" data-bind="text: cellsLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">Heading</div>
+              <div class="metric-value" data-bind="text: headingLabel"></div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">FPS</div>
+              <div class="metric-value" data-bind="text: fpsLabel"></div>
+            </article>
+          </section>
+
+          <article class="message" data-bind="text: message"></article>
+        </div>
+
+        <div class="right-rail">
+          <section class="controls">
+            <h2>Controls</h2>
+            <div class="controls-grid">
+              <div class="control">
+                <label><span>Field of view</span><strong data-bind="text: fovLabel"></strong></label>
+                <input type="range" min="52" max="96" step="1" data-bind="value: fovInput, valueUpdate: 'input'" />
+              </div>
+              <div class="control">
+                <label><span>Pixel scale</span><strong data-bind="text: pixelScaleLabel"></strong></label>
+                <input type="range" min="1" max="4" step="1" data-bind="value: pixelScaleInput, valueUpdate: 'input'" />
+              </div>
+              <div class="buttons">
+                <button data-bind="click: toggleMinimap, text: minimapLabel"></button>
+                <button data-bind="click: resetRun">Reset run</button>
+              </div>
+              <div class="minimap-note">W/S move. A/D turn. Shift sprint. Space fires.</div>
+            </div>
+          </section>
+
+          <section class="minimap-shell" data-bind="visible: minimapVisible">
+            <h2>Minimap</h2>
+            <canvas width="240" height="240" data-bind="odoomMinimap: $data"></canvas>
+            <div class="minimap-note">Green cells are pickups. White shows the current facing direction.</div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://www.tko.io/lib/tko.js"></script>
+    <script>
+      ;(() => {
+        const ko = globalThis.tko
+        const numberFormatter = new Intl.NumberFormat()
+
+        const MAP_W = 16
+        const MAP_H = 16
+        const WALL = 1
+        const AMMO = 2
+        const MEDKIT = 3
+        const CELL = 4
+
+        const baseMap = [
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+          1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+          1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1,
+          1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1,
+          1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1,
+          1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
+          1, 0, 1, 0, 1, 1, 1, 3, 0, 1, 1, 1, 0, 1, 0, 1,
+          1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
+          1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1,
+          1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1,
+          1, 0, 1, 1, 1, 0, 1, 0, 4, 1, 0, 1, 1, 1, 0, 1,
+          1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
+          1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1,
+          1, 2, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+          1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
+          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        ]
+
+        function wallAt(map, x, y) {
+          if (x < 0 || y < 0 || x >= MAP_W || y >= MAP_H) return WALL
+          return map[y * MAP_W + x] === WALL ? WALL : 0
+        }
+
+        function createWallTexture(gl, map) {
+          const data = new Uint8Array(MAP_W * MAP_H)
+          for (let i = 0; i < map.length; i += 1) {
+            data[i] = map[i] === WALL ? 255 : 0
+          }
+
+          const texture = gl.createTexture()
+          gl.bindTexture(gl.TEXTURE_2D, texture)
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, MAP_W, MAP_H, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, data)
+          return texture
+        }
+
+        function updateWallTexture(gl, texture, map) {
+          const data = new Uint8Array(MAP_W * MAP_H)
+          for (let i = 0; i < map.length; i += 1) {
+            data[i] = map[i] === WALL ? 255 : 0
+          }
+          gl.bindTexture(gl.TEXTURE_2D, texture)
+          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, MAP_W, MAP_H, gl.LUMINANCE, gl.UNSIGNED_BYTE, data)
+        }
+
+        function compileShader(gl, type, source) {
+          const shader = gl.createShader(type)
+          gl.shaderSource(shader, source)
+          gl.compileShader(shader)
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            throw new Error(gl.getShaderInfoLog(shader) || 'Shader compile failed')
+          }
+          return shader
+        }
+
+        function createProgram(gl) {
+          const vertexShader = compileShader(
+            gl,
+            gl.VERTEX_SHADER,
+            `
+              attribute vec2 aPosition;
+              varying vec2 vUv;
+
+              void main() {
+                vUv = aPosition * 0.5 + 0.5;
+                gl_Position = vec4(aPosition, 0.0, 1.0);
+              }
+            `
+          )
+
+          const fragmentShader = compileShader(
+            gl,
+            gl.FRAGMENT_SHADER,
+            `
+              precision mediump float;
+
+              varying vec2 vUv;
+              uniform vec2 uResolution;
+              uniform sampler2D uWallMap;
+              uniform vec2 uPlayer;
+              uniform vec2 uDirection;
+              uniform vec2 uPlane;
+              uniform float uTime;
+              uniform float uFlash;
+
+              float wallAt(vec2 cell) {
+                vec2 uv = (cell + 0.5) / 16.0;
+                return texture2D(uWallMap, uv).r;
+              }
+
+              void main() {
+                float cameraX = vUv.x * 2.0 - 1.0;
+                vec2 rayDir = normalize(uDirection + uPlane * cameraX);
+                vec2 mapPos = floor(uPlayer);
+
+                vec2 deltaDist = abs(vec2(
+                  rayDir.x == 0.0 ? 1e6 : 1.0 / rayDir.x,
+                  rayDir.y == 0.0 ? 1e6 : 1.0 / rayDir.y
+                ));
+
+                vec2 stepDir;
+                vec2 sideDist;
+
+                if (rayDir.x < 0.0) {
+                  stepDir.x = -1.0;
+                  sideDist.x = (uPlayer.x - mapPos.x) * deltaDist.x;
+                } else {
+                  stepDir.x = 1.0;
+                  sideDist.x = (mapPos.x + 1.0 - uPlayer.x) * deltaDist.x;
+                }
+
+                if (rayDir.y < 0.0) {
+                  stepDir.y = -1.0;
+                  sideDist.y = (uPlayer.y - mapPos.y) * deltaDist.y;
+                } else {
+                  stepDir.y = 1.0;
+                  sideDist.y = (mapPos.y + 1.0 - uPlayer.y) * deltaDist.y;
+                }
+
+                float side = 0.0;
+                float hit = 0.0;
+
+                for (int i = 0; i < 48; i += 1) {
+                  if (sideDist.x < sideDist.y) {
+                    sideDist.x += deltaDist.x;
+                    mapPos.x += stepDir.x;
+                    side = 0.0;
+                  } else {
+                    sideDist.y += deltaDist.y;
+                    mapPos.y += stepDir.y;
+                    side = 1.0;
+                  }
+
+                  if (wallAt(mapPos) > 0.5) {
+                    hit = 1.0;
+                    break;
+                  }
+                }
+
+                float dist;
+                if (side < 0.5) {
+                  dist = (mapPos.x - uPlayer.x + (1.0 - stepDir.x) * 0.5) / rayDir.x;
+                } else {
+                  dist = (mapPos.y - uPlayer.y + (1.0 - stepDir.y) * 0.5) / rayDir.y;
+                }
+
+                dist = max(dist, 0.001);
+
+                float lineHeight = uResolution.y / dist;
+                float drawStart = (uResolution.y - lineHeight) * 0.5;
+                float drawEnd = drawStart + lineHeight;
+                float fragY = vUv.y * uResolution.y;
+
+                vec3 sky = mix(vec3(0.03, 0.05, 0.11), vec3(0.18, 0.26, 0.43), pow(1.0 - vUv.y, 1.5));
+                vec3 floorColor = mix(vec3(0.02, 0.02, 0.025), vec3(0.15, 0.08, 0.04), pow(vUv.y, 1.4));
+                vec3 color;
+
+                if (fragY < drawStart) {
+                  color = sky;
+                } else if (fragY > drawEnd) {
+                  float stripe = sin((vUv.x * 45.0 + uTime * 1.4) * 0.8) * 0.015;
+                  color = floorColor + stripe;
+                } else {
+                  float texMix = fract((side < 0.5 ? uPlayer.y + dist * rayDir.y : uPlayer.x + dist * rayDir.x) * 0.5);
+                  vec3 wall = mix(vec3(0.91, 0.39, 0.2), vec3(0.97, 0.78, 0.33), texMix);
+                  if (side > 0.5) {
+                    wall *= 0.72;
+                  }
+                  float fog = clamp(1.0 - dist / 13.0, 0.18, 1.0);
+                  color = wall * fog;
+                }
+
+                color += vec3(uFlash * 0.18, uFlash * 0.11, uFlash * 0.05);
+                gl_FragColor = vec4(color, 1.0);
+              }
+            `
+          )
+
+          const program = gl.createProgram()
+          gl.attachShader(program, vertexShader)
+          gl.attachShader(program, fragmentShader)
+          gl.linkProgram(program)
+
+          if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            throw new Error(gl.getProgramInfoLog(program) || 'Program link failed')
+          }
+
+          return program
+        }
+
+        function createViewModel() {
+          const runtime = {
+            map: baseMap.slice(),
+            input: Object.create(null),
+            renderTime: 0,
+            raf: 0,
+            gl: null,
+            wallTexture: null,
+            resizeObserver: null,
+            minimapDraw: null,
+            playerX: 1.5,
+            playerY: 1.5,
+            angle: 0.15
+          }
+
+          const vm = {
+            runtime,
+            health: ko.observable(88),
+            ammo: ko.observable(24),
+            cells: ko.observable(0),
+            fps: ko.observable(0),
+            message: ko.observable('Click the viewport, then move with WASD. Use Space to fire.'),
+            minimapVisible: ko.observable(true),
+            fov: ko.observable(68),
+            pixelScale: ko.observable(2),
+            muzzleFlash: ko.observable(0),
+            playerX: ko.observable(runtime.playerX),
+            playerY: ko.observable(runtime.playerY),
+            angle: ko.observable(runtime.angle),
+            healthLabel: ko.pureComputed(() => numberFormatter.format(vm.health())),
+            ammoLabel: ko.pureComputed(() => numberFormatter.format(vm.ammo())),
+            cellsLabel: ko.pureComputed(() => numberFormatter.format(vm.cells())),
+            fpsLabel: ko.pureComputed(() => numberFormatter.format(Math.round(vm.fps()))),
+            headingLabel: ko.pureComputed(() => `${Math.round(((vm.angle() * 180) / Math.PI + 360) % 360)}°`),
+            fovLabel: ko.pureComputed(() => `${vm.fov()}°`),
+            pixelScaleLabel: ko.pureComputed(() => `${vm.pixelScale()}x`),
+            muzzleOpacity: ko.pureComputed(() => vm.muzzleFlash().toFixed(3)),
+            minimapLabel: ko.pureComputed(() => (vm.minimapVisible() ? 'Hide minimap' : 'Show minimap')),
+            fovInput: ko.pureComputed({
+              read: () => String(vm.fov()),
+              write: value => vm.fov(Number(value))
+            }),
+            pixelScaleInput: ko.pureComputed({
+              read: () => String(vm.pixelScale()),
+              write: value => vm.pixelScale(Number(value))
+            }),
+            toggleMinimap() {
+              vm.minimapVisible(!vm.minimapVisible())
+            },
+            resetRun() {
+              runtime.map = baseMap.slice()
+              runtime.playerX = 1.5
+              runtime.playerY = 1.5
+              runtime.angle = 0.15
+              vm.playerX(runtime.playerX)
+              vm.playerY(runtime.playerY)
+              vm.angle(runtime.angle)
+              vm.health(88)
+              vm.ammo(24)
+              vm.cells(0)
+              vm.muzzleFlash(0)
+              vm.message('Run reset. Click the viewport and move.')
+              if (runtime.gl && runtime.wallTexture) {
+                updateWallTexture(runtime.gl, runtime.wallTexture, runtime.map)
+              }
+              if (runtime.minimapDraw) runtime.minimapDraw()
+            }
+          }
+
+          return vm
+        }
+
+        function handlePickup(vm) {
+          const { runtime } = vm
+          const cx = Math.floor(runtime.playerX)
+          const cy = Math.floor(runtime.playerY)
+          const index = cy * MAP_W + cx
+          const cell = runtime.map[index]
+
+          if (cell === AMMO) {
+            runtime.map[index] = 0
+            vm.ammo(vm.ammo() + 12)
+            vm.message('Picked up shells. Observable ammo updated immediately.')
+          } else if (cell === MEDKIT) {
+            runtime.map[index] = 0
+            vm.health(Math.min(100, vm.health() + 18))
+            vm.message('Medkit grabbed. HUD updated through observables.')
+          } else if (cell === CELL) {
+            runtime.map[index] = 0
+            vm.cells(vm.cells() + 1)
+            vm.message('Energy cell secured. WebGL view unchanged, HUD reacts instantly.')
+          } else {
+            return
+          }
+
+          if (runtime.gl && runtime.wallTexture) {
+            updateWallTexture(runtime.gl, runtime.wallTexture, runtime.map)
+          }
+          if (runtime.minimapDraw) runtime.minimapDraw()
+        }
+
+        function updatePlayer(vm, dt) {
+          const { runtime } = vm
+          const input = runtime.input
+          const sprint = input.ShiftLeft || input.ShiftRight
+          const moveSpeed = (sprint ? 3.4 : 2.2) * dt
+          const turnSpeed = 1.9 * dt
+
+          if (input.KeyA || input.ArrowLeft) runtime.angle -= turnSpeed
+          if (input.KeyD || input.ArrowRight) runtime.angle += turnSpeed
+
+          let moveX = 0
+          let moveY = 0
+          const dirX = Math.cos(runtime.angle)
+          const dirY = Math.sin(runtime.angle)
+          const strafeX = Math.cos(runtime.angle + Math.PI / 2)
+          const strafeY = Math.sin(runtime.angle + Math.PI / 2)
+
+          if (input.KeyW) {
+            moveX += dirX * moveSpeed
+            moveY += dirY * moveSpeed
+          }
+          if (input.KeyS) {
+            moveX -= dirX * moveSpeed
+            moveY -= dirY * moveSpeed
+          }
+          const nextX = runtime.playerX + moveX
+          const nextY = runtime.playerY + moveY
+
+          if (!wallAt(runtime.map, Math.floor(nextX), Math.floor(runtime.playerY))) {
+            runtime.playerX = nextX
+          }
+          if (!wallAt(runtime.map, Math.floor(runtime.playerX), Math.floor(nextY))) {
+            runtime.playerY = nextY
+          }
+
+          vm.playerX(runtime.playerX)
+          vm.playerY(runtime.playerY)
+          vm.angle(runtime.angle)
+          vm.muzzleFlash(Math.max(0, vm.muzzleFlash() - dt * 2.7))
+          handlePickup(vm)
+        }
+
+        function fireWeapon(vm) {
+          if (vm.ammo() <= 0) {
+            vm.message('Click. Empty.')
+            return
+          }
+
+          vm.ammo(vm.ammo() - 1)
+          vm.muzzleFlash(1)
+          vm.message('Fired a round. Ammo observable changed, WebGL flash reacted.')
+        }
+
+        ko.bindingHandlers.odoomController = {
+          init(element, valueAccessor) {
+            const vm = valueAccessor()
+
+            function onKeyDown(event) {
+              vm.runtime.input[event.code] = true
+              if (event.code === 'Space') {
+                event.preventDefault()
+                fireWeapon(vm)
+              }
+            }
+
+            function onKeyUp(event) {
+              vm.runtime.input[event.code] = false
+            }
+
+            function onPointerDown() {
+              element.focus()
+            }
+
+            element.addEventListener('keydown', onKeyDown)
+            element.addEventListener('keyup', onKeyUp)
+            element.addEventListener('pointerdown', onPointerDown)
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+              element.removeEventListener('keydown', onKeyDown)
+              element.removeEventListener('keyup', onKeyUp)
+              element.removeEventListener('pointerdown', onPointerDown)
+            })
+          }
+        }
+
+        ko.bindingHandlers.odoomMinimap = {
+          init(canvas, valueAccessor) {
+            const vm = valueAccessor()
+            const ctx = canvas.getContext('2d')
+            const size = canvas.width / MAP_W
+
+            function draw() {
+              ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+              for (let y = 0; y < MAP_H; y += 1) {
+                for (let x = 0; x < MAP_W; x += 1) {
+                  const cell = vm.runtime.map[y * MAP_W + x]
+                  ctx.fillStyle =
+                    cell === WALL ? '#172131' : cell === AMMO || cell === MEDKIT || cell === CELL ? '#63efbe' : '#0b1017'
+                  ctx.fillRect(x * size, y * size, size - 1, size - 1)
+                }
+              }
+
+              const px = vm.playerX() * size
+              const py = vm.playerY() * size
+              ctx.fillStyle = '#ffffff'
+              ctx.beginPath()
+              ctx.arc(px, py, 5, 0, Math.PI * 2)
+              ctx.fill()
+
+              ctx.strokeStyle = '#ffffff'
+              ctx.lineWidth = 2
+              ctx.beginPath()
+              ctx.moveTo(px, py)
+              ctx.lineTo(px + Math.cos(vm.angle()) * 16, py + Math.sin(vm.angle()) * 16)
+              ctx.stroke()
+            }
+
+            vm.runtime.minimapDraw = draw
+            const redraw = ko.computed(() => {
+              vm.playerX()
+              vm.playerY()
+              vm.angle()
+              vm.minimapVisible()
+              vm.cells()
+              vm.ammo()
+              vm.health()
+              draw()
+            })
+
+            ko.utils.domNodeDisposal.addDisposeCallback(canvas, () => redraw.dispose())
+          }
+        }
+
+        ko.bindingHandlers.odoomScene = {
+          init(canvas, valueAccessor) {
+            const vm = valueAccessor()
+            const gl = canvas.getContext('webgl', { antialias: false, alpha: false })
+            if (!gl) throw new Error('WebGL unavailable')
+
+            const program = createProgram(gl)
+            const positionBuffer = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
+
+            const wallTexture = createWallTexture(gl, vm.runtime.map)
+            vm.runtime.gl = gl
+            vm.runtime.wallTexture = wallTexture
+
+            const positionLocation = gl.getAttribLocation(program, 'aPosition')
+            const resolutionLocation = gl.getUniformLocation(program, 'uResolution')
+            const wallMapLocation = gl.getUniformLocation(program, 'uWallMap')
+            const playerLocation = gl.getUniformLocation(program, 'uPlayer')
+            const directionLocation = gl.getUniformLocation(program, 'uDirection')
+            const planeLocation = gl.getUniformLocation(program, 'uPlane')
+            const timeLocation = gl.getUniformLocation(program, 'uTime')
+            const flashLocation = gl.getUniformLocation(program, 'uFlash')
+
+            function resize() {
+              const scale = vm.pixelScale()
+              const width = Math.max(320, Math.floor(canvas.clientWidth / scale))
+              const height = Math.max(180, Math.floor(canvas.clientHeight / scale))
+              if (canvas.width !== width || canvas.height !== height) {
+                canvas.width = width
+                canvas.height = height
+              }
+              gl.viewport(0, 0, canvas.width, canvas.height)
+            }
+
+            const resizeComputed = ko.computed(() => {
+              vm.pixelScale()
+              resize()
+            })
+
+            const observer = new ResizeObserver(() => resize())
+            observer.observe(canvas)
+            vm.runtime.resizeObserver = observer
+
+            function renderFrame(now) {
+              if (!vm.runtime.renderTime) vm.runtime.renderTime = now
+              const dt = Math.min(0.05, (now - vm.runtime.renderTime) / 1000)
+              vm.runtime.renderTime = now
+
+              updatePlayer(vm, dt)
+              vm.fps(1 / Math.max(dt, 0.001))
+
+              resize()
+
+              const angle = vm.angle()
+              const dirX = Math.cos(angle)
+              const dirY = Math.sin(angle)
+              const planeScale = Math.tan((vm.fov() * Math.PI) / 360)
+              const planeX = -dirY * planeScale
+              const planeY = dirX * planeScale
+
+              gl.useProgram(program)
+              gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+              gl.enableVertexAttribArray(positionLocation)
+              gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
+
+              gl.activeTexture(gl.TEXTURE0)
+              gl.bindTexture(gl.TEXTURE_2D, wallTexture)
+              gl.uniform1i(wallMapLocation, 0)
+              gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
+              gl.uniform2f(playerLocation, vm.playerX(), vm.playerY())
+              gl.uniform2f(directionLocation, dirX, dirY)
+              gl.uniform2f(planeLocation, planeX, planeY)
+              gl.uniform1f(timeLocation, now * 0.001)
+              gl.uniform1f(flashLocation, vm.muzzleFlash())
+              gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+
+              if (vm.runtime.minimapDraw && vm.minimapVisible()) {
+                vm.runtime.minimapDraw()
+              }
+
+              vm.runtime.raf = requestAnimationFrame(renderFrame)
+            }
+
+            vm.runtime.raf = requestAnimationFrame(renderFrame)
+
+            ko.utils.domNodeDisposal.addDisposeCallback(canvas, () => {
+              cancelAnimationFrame(vm.runtime.raf)
+              resizeComputed.dispose()
+              observer.disconnect()
+            })
+          }
+        }
+
+        const viewModel = createViewModel()
+        ko.applyBindings(viewModel, appRoot)
+      })()
+    </script>
+  </body>
+</html>

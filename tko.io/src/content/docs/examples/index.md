@@ -17,6 +17,7 @@ These examples are meant to make TKO's model visible.
 ## Available examples
 
 - [Honeycomb](/examples/honeycomb/)
+- [odoom](/examples/odoom/)
 
 ## Why this section exists
 
