@@ -53,10 +53,12 @@ Binding notes:
 
 When the goal is to demonstrate TKO itself, keep the state flow inside observables, computeds, and bindings.
 
+- It is normal to look up a mount element with `document.getElementById(...)`, `querySelector(...)`, or another host-framework reference so you can call `ko.applyBindings(viewModel, element)`.
 - Prefer `text`, `css`, `attr`, `event`, `foreach`, and `pureComputed` over manual DOM writes.
 - Avoid driving visible state with `textContent`, `innerHTML`, `classList`, or ad-hoc `addEventListener` when bindings can express the same behavior.
 - Use custom `bindingHandlers` only for DOM-specific effects that do not belong in the state layer, such as animation, focus, canvas, SVG, or third-party widget integration.
 - If an example contrasts reactive models, the counters and highlighted state should also be observable-driven so the example demonstrates the pattern instead of bypassing it.
+- The line to avoid is using the DOM itself as the mutable source of truth after bindings are active.
 
 ## Classic data-bind parsing and CSP
 

@@ -31,6 +31,8 @@ ko.when(() => viewModel.isReady() && viewModel.hasData()).then(() => console.log
 
 Activate with `ko.applyBindings(viewModel, element)`.
 
+Looking up that mount element with `document.getElementById(...)`, `querySelector(...)`, or another host reference is normal. The important rule is that once bindings are active, observable state should remain the source of truth instead of ad-hoc DOM mutation.
+
 Syntax: `data-bind="bindingName: expression"` on HTML elements.
 
 text, html, visible, hidden, css:{class:bool}, style:{prop:val}, attr:{name:val},

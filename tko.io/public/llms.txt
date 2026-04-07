@@ -43,6 +43,7 @@
 - Derived `ko-*` values must stay observable or computed. `ko-text={price() > 50 ? 'expensive' : 'cheap'}` freezes; use a computed.
 - `ko.applyBindings(...)` returns a `Promise`.
 - TKO connects observable state to the DOM; `bindingHandlers` are the DOM/state bridge.
+- Looking up a mount element with `document.getElementById(...)` (or similar) in order to call `ko.applyBindings(viewModel, element)` is normal and expected. What to avoid is driving reactive UI state through ad-hoc DOM mutation once bindings are active.
 
 ## Package Routing
 
@@ -68,6 +69,7 @@
 - Bindings are the DOM integration layer: they read state, update DOM, and write user-driven changes back to state.
 - `bindingHandlers` are the bridge between the DOM and the observable state layer.
 - `ko.applyBindings(viewModel, element)` activates that bridge on an existing DOM subtree.
+- It is acceptable to locate that mount subtree with `document.getElementById(...)`, `querySelector(...)`, or a framework-provided element reference before calling `ko.applyBindings(...)`.
 - In TSX, `tko.jsx.render()` creates DOM nodes and `ko.applyBindings({}, root)` then activates the `ko-*` bindings on that rendered DOM.
 
 ## Two Binding Syntaxes
