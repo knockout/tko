@@ -5,8 +5,6 @@
     "target": "es2022",
     "module": "es2022",
     "moduleResolution": "bundler",
-    "resolvePackageJsonExports": false,
-    "resolvePackageJsonImports": false,
     "allowJs": false,
     "importHelpers": true,
     "allowSyntheticDefaultImports":  true,

@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {   
     "noEmit": false,
+    "rootDir": ".",
     "emitDeclarationOnly": true,
+    "ignoreDeprecations": "6.0",
     "outFile": "builds/dts/dist/tko.d.ts",
   },
   "exclude": [
@@ -10,6 +12,7 @@
     "builds",
     "docs",
     "tools",
-    "**/spec/**"
+    "**/spec/**",
+    "tko.io"
   ]
 }
