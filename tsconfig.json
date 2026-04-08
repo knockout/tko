@@ -2,10 +2,11 @@
   "compileOnSave": false,  
   "compilerOptions": {
     "declaration": true,
-    "ignoreDeprecations": "6.0",
     "target": "es2022",
     "module": "es2022",
-    "moduleResolution": "node10", //Deprecated in ts7.0
+    "moduleResolution": "bundler",
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false,
     "allowJs": false,
     "importHelpers": true,
     "allowSyntheticDefaultImports":  true,
