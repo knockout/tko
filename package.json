@@ -24,7 +24,6 @@
     "esbuild": "^0.28.0",
     "eslint": "^10.2.0",
     "fs-extra": "^11.3.2",
-    "globals": "^17.4.0",
     "jquery": "^4.0.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
