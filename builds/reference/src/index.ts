@@ -29,8 +29,8 @@ import { overloadOperator } from '@tko/utils.parser'
 declare const BUILD_VERSION: string
 
 /** Overload "evil twins" with strict equivalents */
-overloadOperator('==', (a, b) => a === b)
-overloadOperator('!=', (a, b) => a !== b)
+overloadOperator('==', (a, b) => a === b, 10)
+overloadOperator('!=', (a, b) => a !== b, 10)
 
 const builder = new Builder({
   filters,

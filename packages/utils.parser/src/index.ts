@@ -8,9 +8,11 @@ export { default as Node } from './Node'
 
 export { default as parseObjectLiteral } from './preparse'
 
-export function overloadOperator(op: string, fn: (a, b) => any, precedence?: number) {
+export function overloadOperator(op: string, fn: (a, b) => any, precedence: number) {
   operators[op] = fn
   if (Number.isInteger(precedence)) {
     operators[op].precedence = precedence
+  } else {
+    throw new Error('Precedence must be an integer')
   }
 }
