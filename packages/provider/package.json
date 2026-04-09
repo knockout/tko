@@ -5,7 +5,8 @@
   "module": "dist/provider.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

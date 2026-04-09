@@ -5,7 +5,8 @@
   "module": "dist/provider.virtual.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

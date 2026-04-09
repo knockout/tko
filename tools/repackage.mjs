@@ -22,7 +22,8 @@ const packageData = (pkg, version) => ({
   },
   files: [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   homepage: "https://tko.io",
   licenses: [

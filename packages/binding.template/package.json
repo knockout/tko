@@ -5,7 +5,8 @@
   "module": "dist/binding.template.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",

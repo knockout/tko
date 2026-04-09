@@ -5,7 +5,8 @@
   "module": "dist/provider.databind.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {

@@ -16,7 +16,8 @@
   },
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "karma": {
     "frameworks": [

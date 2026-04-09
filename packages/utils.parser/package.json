@@ -5,7 +5,8 @@
   "module": "dist/utils.parser.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {

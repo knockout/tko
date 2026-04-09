@@ -5,7 +5,8 @@
   "module": "dist/utils.jsx.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",

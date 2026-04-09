@@ -5,7 +5,8 @@
   "module": "dist/binding.core.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",
