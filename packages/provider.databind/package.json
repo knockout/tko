@@ -10,7 +10,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider.bindingstring": "^4.0.0"
+    "@tko/provider.bindingstring": "^4.0.0",
+    "@tko/bind": "^4.0.0"
   },
   "karma": {
     "frameworks": [

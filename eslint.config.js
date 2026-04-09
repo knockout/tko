@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  { ignores: ['**/*.{js,mjs,cjs}', 'builds/**/*'] },
+  { ignores: ['**/*.{js,mjs,cjs}', 'builds/**/*', '**/*.d.ts'] },
   {
     rules: {
       "no-empty": "off",
