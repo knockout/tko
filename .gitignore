@@ -25,6 +25,7 @@ builds/**/meta
 .nyc_output
 **/dist/*
 packages/**/types
+builds/reference/types
 !packages/tko/dist/*
 
 *-debug.log
@@ -35,3 +36,4 @@ packages/**/types
 .vscode/settings.json
 .playwright-mcp
 .playwright-cli
+.codex

@@ -18,7 +18,7 @@ package.json:
 node_modules: package-lock.json
 
 all:: node_modules package-lock.json
-	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
+	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE) && \
 	$(MAKE) dts
 
 test:
@@ -61,7 +61,7 @@ eslint-fix:
 dts:
 	rm -rf .dts-tmp
 	$(NPX) tsc --project tsconfig.dts.json --outDir .dts-tmp
-	$(NODE) tools/sync-dts.mjs .dts-tmp
+	$(NODE) tools/sync-dts.mjs .dts-tmp packages,builds/reference
 	rm -rf .dts-tmp
 
 docker-build:
