@@ -1,15 +1,16 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0",
   "name": "@tko/computed",
   "description": "TKO Computed Observables",
   "module": "dist/computed.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "dependencies": {
-    "@tko/observable": "^4.0.0-beta1.3",
-    "@tko/utils": "^4.0.0-beta1.3"
+    "@tko/observable": "^4.0.0",
+    "@tko/utils": "^4.0.0"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

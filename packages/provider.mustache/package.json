@@ -1,11 +1,12 @@
 {
-  "version": "4.0.0-beta1.6",
+  "version": "4.0.0",
   "name": "@tko/provider.mustache",
   "description": "Interpolate text/node attributes {{ }}",
   "module": "dist/provider.mustache.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -23,9 +24,9 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/observable": "^4.0.0-beta1.3",
-    "@tko/provider": "^4.0.0-beta1.3",
-    "@tko/utils.parser": "^4.0.0-beta1.6"
+    "@tko/observable": "^4.0.0",
+    "@tko/provider": "^4.0.0",
+    "@tko/utils.parser": "^4.0.0"
   },
   "karma": {
     "frameworks": [
@@ -40,6 +41,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

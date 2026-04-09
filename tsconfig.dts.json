@@ -2,15 +2,19 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {   
     "noEmit": false,
+    "rootDir": ".",
     "emitDeclarationOnly": true,
     "verbatimModuleSyntax": null,
-    "outFile": "builds/dts/dist/tko.d.ts",
+    "outDir": "dist",
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false
   },
   "exclude": [
     "node_modules",
-    "builds",
+    "builds/knockout",
     "docs",
     "tools",
-    "**/spec/**"
+    "**/spec/**",
+    "tko.io"
   ]
 }
