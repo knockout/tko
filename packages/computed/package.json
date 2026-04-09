@@ -5,7 +5,8 @@
   "module": "dist/computed.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "dependencies": {
     "@tko/observable": "^4.0.0",
@@ -39,6 +40,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

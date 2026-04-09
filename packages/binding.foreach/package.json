@@ -5,7 +5,8 @@
   "module": "dist/binding.foreach.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -42,6 +43,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

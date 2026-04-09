@@ -5,7 +5,8 @@
   "module": "dist/provider.databind.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -26,6 +27,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

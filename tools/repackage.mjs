@@ -14,6 +14,7 @@ const packageData = (pkg, version) => ({
   standard: undefined,
   exports: {
     ".": {
+      types: "./types/index.d.ts",
       require: "./dist/index.cjs",
       import: "./dist/index.js"
     },
@@ -21,7 +22,8 @@ const packageData = (pkg, version) => ({
   },
   files: [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   homepage: "https://tko.io",
   licenses: [

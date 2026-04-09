@@ -14,7 +14,7 @@ export { deferUpdates } from './defer'
 export type { ObservableArray } from './observableArray'
 export type { Observable } from './observable'
 export type { MaybeSubscribable, Subscribable, SubscriptionCallback } from './subscribable'
-
+export type { Subscription } from './Subscription'
 export { valuesArePrimitiveAndEqual, applyExtenders, extenders } from './extenders'
 
 import * as dependencyDetection from './dependencyDetection'
