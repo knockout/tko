@@ -1,16 +1,17 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0",
   "module": "dist/lifecycle.js",
   "dependencies": {
-    "@tko/computed": "^4.0.0-beta1.3",
-    "@tko/utils": "^4.0.0-beta1.3"
+    "@tko/computed": "^4.0.0",
+    "@tko/utils": "^4.0.0"
   },
   "peerDependencies": {
-    "@tko/observable": "^4.0.0-alpha8.0"
+    "@tko/observable": "^4.0.0"
   },
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "name": "@tko/lifecycle",
   "description": "Knockout LifeCycle for object instances",
@@ -22,8 +23,7 @@
   "license": "MIT",
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai"
+      "mocha"
     ]
   },
   "homepage": "https://tko.io",
@@ -35,6 +35,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },
