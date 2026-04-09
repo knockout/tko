@@ -1,11 +1,12 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0",
   "name": "@tko/binding.if",
   "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
   "module": "dist/binding.if.js",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -23,10 +24,10 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/bind": "^4.0.0-beta1.3",
-    "@tko/computed": "^4.0.0-beta1.3",
-    "@tko/observable": "^4.0.0-beta1.3",
-    "@tko/utils": "^4.0.0-beta1.3",
+    "@tko/bind": "^4.0.0",
+    "@tko/computed": "^4.0.0",
+    "@tko/observable": "^4.0.0",
+    "@tko/utils": "^4.0.0",
     "tslib": "^2.2.0"
   },
   "karma": {
@@ -42,6 +43,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

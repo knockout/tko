@@ -7,6 +7,9 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    ignore:
+      # package will be removed
+      - dependency-name: "*jasmine*"
     groups:
       # Group minor/patch devDependency updates into a single PR
       dev-dependencies:

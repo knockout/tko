@@ -1,11 +1,12 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0",
   "name": "@tko/utils",
   "description": "TKO Utilities",
   "type": "module",
   "files": [
     "dist/",
-    "helpers/"
+    "helpers/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

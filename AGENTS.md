@@ -106,7 +106,8 @@ GitHub Actions workflows (`.github/workflows/`):
 | `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
 | `lint-and-typecheck.yml` | PRs | Prettier + ESLint + tsc (combined) |
 | `publish-check.yml` | PRs | Verify packages are publishable |
-| `release.yml` | Push to main | Changeset version PRs + npm publish |
+| `release.yml` | Push to main | Changeset version PRs + npm publish + GitHub release creation |
+| `github-release.yml` | Manual fallback | Backfill a GitHub release/tag for a published `main` commit if automatic release creation needs a retry |
 | `deploy-docs.yml` | Push to main | Deploy tko.io to GitHub Pages |
 | `codeql-analysis.yml` | Weekly + main push | Security scanning |
 
@@ -115,6 +116,10 @@ All PR checks must pass before merge.
 ## Release Process
 
 Releases are managed with [Changesets](https://github.com/changesets/changesets).
+
+TKO uses a repo-wide fixed release line for all public `@tko/*` packages. A
+release that bumps any public package bumps the full public package set to the
+same version.
 
 **For contributors** — when your PR changes package behavior:
 ```bash
@@ -127,6 +132,8 @@ This creates a changeset file in `.changeset/` that gets committed with your PR.
 2. If unreleased changesets exist, the action opens a "Version Packages" PR
 3. Review the PR (it bumps versions and updates changelogs)
 4. Merge it to publish to npm via GitHub Actions OIDC trusted publishing
+5. The same release workflow creates the matching GitHub Release and tag after a successful publish
+6. If GitHub release creation ever needs a retry after publish, run `github-release.yml` manually with the merged commit SHA
 
 Avoid manual workstation publishes. If release CI is unavailable, fix the
 workflow or npm trusted publisher configuration rather than bypassing it with a

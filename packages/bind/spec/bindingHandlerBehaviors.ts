@@ -10,7 +10,7 @@ import { VirtualProvider } from '@tko/provider.virtual'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import { applyBindings, BindingHandler, contextFor } from '../dist'
+import { applyBindings, BindingHandler, contextFor } from '../src'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
@@ -48,10 +48,9 @@ describe('BindingHandler behaviors', function () {
         v: Observable
         x: Observable
         y: Observable
-        computed
 
-        constructor(...args) {
-          super(...args)
+        constructor(params) {
+          super(params)
           const v = (this.v = koObservable(0))
           instance = this
           this.x = this.computed(() => {
@@ -93,9 +92,8 @@ describe('BindingHandler behaviors', function () {
       let obs = koObservable(),
         handlerInstance
       bindingHandlers.fnHandler = class extends BindingHandler {
-        subscribe
-        constructor(...args) {
-          super(...args)
+        constructor(params) {
+          super(params)
           handlerInstance = this
           this.subscribe(obs, this.cb)
         }
