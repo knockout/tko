@@ -24,6 +24,7 @@ coverage-temp
 builds/**/meta
 .nyc_output
 **/dist/*
+packages/**/types
 !packages/tko/dist/*
 
 *-debug.log

@@ -14,7 +14,7 @@ const packageData = (pkg, version) => ({
   standard: undefined,
   exports: {
     ".": {
-      types: "./index.ts",
+      types: "./types/index.d.ts",
       require: "./dist/index.cjs",
       import: "./dist/index.js"
     },

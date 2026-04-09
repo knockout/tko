@@ -4,8 +4,9 @@
     "noEmit": false,
     "rootDir": ".",
     "emitDeclarationOnly": true,
-    "ignoreDeprecations": "6.0",
-    "outFile": "builds/dts/dist/tko.d.ts",
+    "outDir": "dist",
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false
   },
   "exclude": [
     "node_modules",
