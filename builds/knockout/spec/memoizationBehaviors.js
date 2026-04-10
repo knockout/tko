@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+import '../helpers/mocha-test-helpers.js'
 
 function parseMemoCommentHtml(commentHtml) {
     commentHtml = commentHtml.replace("<!--", "").replace("-->", "");
@@ -9,20 +11,20 @@ describe('Memoization', function() {
         var threw = false;
         try { ko.memoization.memoize({}) }
         catch (ex) { threw = true; }
-        expect(threw).toEqual(true);
+        expect(threw).to.deep.equal(true);
     });
 
     it("Should return an HTML comment", function () {
         var result = ko.memoization.memoize(function () { });
-        expect(typeof result).toEqual("string");
-        expect(result.substring(0, 4)).toEqual("<!--");
+        expect(typeof result).to.deep.equal("string");
+        expect(result.substring(0, 4)).to.deep.equal("<!--");
     });
 
     it("Should call the function when unmemoizing", function () {
         var didCall = false;
         var memo = ko.memoization.memoize(function () { didCall = true });
         ko.memoization.unmemoize(parseMemoCommentHtml(memo));
-        expect(didCall).toEqual(true);
+        expect(didCall).to.deep.equal(true);
     });
 
     it("Should not be able to unmemoize more than once", function () {
@@ -32,26 +34,26 @@ describe('Memoization', function() {
         var threw = false;
         try { ko.memoization.unmemoize(parseMemoCommentHtml(memo)) }
         catch (ex) { threw = true; }
-        expect(threw).toEqual(true);
+        expect(threw).to.deep.equal(true);
     });
 
     it("Should be able to find memos in a DOM tree and unmemoize them, passing the memo node as a param", function () {
         var containerNode = document.createElement("DIV");
         var didCall = false;
         containerNode.innerHTML = "Hello " + ko.memoization.memoize(function (domNode) {
-            expect(domNode.parentNode).toEqual(containerNode);
+            expect(domNode.parentNode).to.deep.equal(containerNode);
             didCall = true;
         });
         ko.memoization.unmemoizeDomNodeAndDescendants(containerNode);
-        expect(didCall).toEqual(true);
+        expect(didCall).to.deep.equal(true);
     });
 
     it("After unmemoizing a DOM tree, removes the memo nodes", function () {
         var containerNode = document.createElement("DIV");
         containerNode.innerHTML = "Hello " + ko.memoization.memoize(function () { });
 
-        expect(containerNode.childNodes.length).toEqual(2);
+        expect(containerNode.childNodes.length).to.deep.equal(2);
         ko.memoization.unmemoizeDomNodeAndDescendants(containerNode);
-        expect(containerNode.childNodes.length).toEqual(1);
+        expect(containerNode.childNodes.length).to.deep.equal(1);
     });
 });

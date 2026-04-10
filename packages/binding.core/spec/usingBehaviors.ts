@@ -1,4 +1,4 @@
-import { triggerEvent, options } from '@tko/utils'
+import { expect } from 'chai'
 
 import { applyBindings, contextFor } from '@tko/bind'
 
@@ -13,12 +13,27 @@ import { MultiProvider } from '@tko/provider.multi'
 import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as coreBindings } from '@tko/binding.core'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { options, triggerEvent } from '@tko/utils'
+
+import { expectContainHtml, expectContainText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
+
+function expectArrayEqual(actual: Array<unknown>, expected: Array<unknown>) {
+  expect(actual.length).to.equal(expected.length)
+  actual.forEach((value, index) => expect(value).to.equal(expected[index]))
+}
+
+function expectHaveValues(node: Node, expectedValues: Array<unknown>) {
+  expectArrayEqual(
+    Array.from(node.childNodes, child => (child as any).value).filter(value => value !== undefined),
+    expectedValues
+  )
+}
 
 describe('Binding: Using', function () {
   let testNode: HTMLElement
+
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -30,17 +45,17 @@ describe('Binding: Using', function () {
 
   it('Should leave descendant nodes in the document (and bind them in the context of the supplied value) if the value is truthy', function () {
     testNode.innerHTML = "<div data-bind='using: someItem'><span data-bind='text: existentChildProp'></span></div>"
-    expect(testNode.childNodes.length).toEqual(1)
+    expect(testNode.childNodes.length).to.equal(1)
     applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode)
-    expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('Child prop value')
+    expect(testNode.childNodes[0].childNodes.length).to.equal(1)
+    expectContainText(testNode.childNodes[0].childNodes[0], 'Child prop value')
   })
 
   it('Should leave descendant nodes in the document (and bind them) if the value is falsy', function () {
     testNode.innerHTML = "<div data-bind='using: someItem'><span data-bind='text: $data'></span></div>"
     applyBindings({ someItem: null }, testNode)
-    expect(testNode.childNodes[0].childNodes.length).toEqual(1)
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('')
+    expect(testNode.childNodes[0].childNodes.length).to.equal(1)
+    expectContainText(testNode.childNodes[0].childNodes[0], '')
   })
 
   it('Should leave descendant nodes unchanged and not bind them more than once if the supplied value notifies a change', function () {
@@ -57,31 +72,27 @@ describe('Binding: Using', function () {
     const originalNode = testNode.children[0].children[0]
 
     applyBindings({ someItem: someItem }, testNode)
-    expect(testNode.children[0].children[0]).toEqual(originalNode)
+    expect(testNode.children[0].children[0]).to.equal(originalNode)
 
-    // Initial state is one subscriber, one click handler
-    expect(testNode.children[0].children[0]).toContainText('Hello')
-    expect(someItem().childProp.getSubscriptionsCount()).toEqual(1)
+    expectContainText(testNode.children[0].children[0], 'Hello')
+    expect(someItem().childProp.getSubscriptionsCount()).to.equal(1)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(countedClicks).toEqual(1)
+    expect(countedClicks).to.equal(1)
 
-    // Force "update" binding handler to fire, then check we still have one subscriber...
     someItem.valueHasMutated()
-    expect(someItem().childProp.getSubscriptionsCount()).toEqual(1)
+    expect(someItem().childProp.getSubscriptionsCount()).to.equal(1)
 
-    // ... and one click handler
     countedClicks = 0
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(countedClicks).toEqual(1)
+    expect(countedClicks).to.equal(1)
 
-    // and the node is still the same
-    expect(testNode.children[0].children[0]).toEqual(originalNode)
+    expect(testNode.children[0].children[0]).to.equal(originalNode)
   })
 
   it('Should be able to access parent binding context via $parent', function () {
     testNode.innerHTML = "<div data-bind='using: someItem'><span data-bind='text: $parent.parentProp'></span></div>"
     applyBindings({ someItem: {}, parentProp: 'Parent prop value' }, testNode)
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('Parent prop value')
+    expectContainText(testNode.childNodes[0].childNodes[0], 'Parent prop value')
   })
 
   it('Should be able to access all parent binding contexts via $parents, and root context via $root', function () {
@@ -102,50 +113,49 @@ describe('Binding: Using', function () {
       testNode
     )
     const finalContainer = testNode.childNodes[0].childNodes[0].childNodes[0]
-    expect(finalContainer.childNodes[0]).toContainText('bottom')
-    expect(finalContainer.childNodes[1]).toContainText('middle')
-    expect(finalContainer.childNodes[2]).toContainText('top')
-    expect(finalContainer.childNodes[3]).toContainText('outer')
-    expect(finalContainer.childNodes[4]).toContainText('outer')
+    expectContainText(finalContainer.childNodes[0], 'bottom')
+    expectContainText(finalContainer.childNodes[1], 'middle')
+    expectContainText(finalContainer.childNodes[2], 'top')
+    expectContainText(finalContainer.childNodes[3], 'outer')
+    expectContainText(finalContainer.childNodes[4], 'outer')
 
-    // Also check that, when we later retrieve the binding contexts, we get consistent results
-    expect(contextFor(testNode).$data.name).toEqual('outer')
-    expect(contextFor(testNode.childNodes[0] as HTMLElement).$data.name).toEqual('outer')
-    expect(contextFor(testNode.childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('top')
-    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name).toEqual('middle')
+    expect(contextFor(testNode).$data.name).to.equal('outer')
+    expect(contextFor(testNode.childNodes[0] as HTMLElement).$data.name).to.equal('outer')
+    expect(contextFor(testNode.childNodes[0].childNodes[0] as HTMLElement).$data.name).to.equal('top')
+    expect(contextFor(testNode.childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name).to.equal('middle')
     expect(
       contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement).$data.name
-    ).toEqual('bottom')
+    ).to.equal('bottom')
     const firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0] as HTMLElement
-    expect(firstSpan.tagName).toEqual('SPAN')
-    expect(contextFor(firstSpan as HTMLElement).$data.name).toEqual('bottom')
-    expect(contextFor(firstSpan as HTMLElement).$root.name).toEqual('outer')
-    expect(contextFor(firstSpan as HTMLElement).$parents[1].name).toEqual('top')
+    expect(firstSpan.tagName).to.equal('SPAN')
+    expect(contextFor(firstSpan as HTMLElement).$data.name).to.equal('bottom')
+    expect(contextFor(firstSpan as HTMLElement).$root.name).to.equal('outer')
+    expect(contextFor(firstSpan as HTMLElement).$parents[1].name).to.equal('top')
   })
 
-  it('Should be able to define a \"using\" region using a containerless binding', function () {
+  it('Should be able to define a "using" region using a containerless binding', function () {
     const someitem = observable({ someItem: 'first value' })
     testNode.innerHTML = 'xxx <!-- ko using: someitem --><span data-bind="text: someItem"></span><!-- /ko -->'
     applyBindings({ someitem: someitem }, testNode)
 
-    expect(testNode).toContainText('xxx first value')
+    expectContainText(testNode, 'xxx first value')
 
     someitem({ someItem: 'second value' })
-    expect(testNode).toContainText('xxx second value')
+    expectContainText(testNode, 'xxx second value')
   })
 
-  it('Should be able to use \"using\" within an observable top-level view model', function () {
+  it('Should be able to use "using" within an observable top-level view model', function () {
     const vm = observable({ someitem: observable({ someItem: 'first value' }) })
     testNode.innerHTML = 'xxx <!-- ko using: someitem --><span data-bind="text: someItem"></span><!-- /ko -->'
     applyBindings(vm, testNode)
 
-    expect(testNode).toContainText('xxx first value')
+    expectContainText(testNode, 'xxx first value')
 
     vm({ someitem: observable({ someItem: 'second value' }) })
-    expect(testNode).toContainText('xxx second value')
+    expectContainText(testNode, 'xxx second value')
   })
 
-  it('Should be able to nest a template within \"using\"', function () {
+  it('Should be able to nest a template within "using"', function () {
     testNode.innerHTML =
       "<div data-bind='using: someitem'>"
       + "<div data-bind='foreach: childprop'><span data-bind='text: $data'></span></div></div>"
@@ -155,30 +165,26 @@ describe('Binding: Using', function () {
     const viewModel = { someitem: someitem }
     applyBindings(viewModel, testNode)
 
-    // First it's not there (by template)
-    const container = testNode.childNodes[0]
-    expect(container).toContainHtml('<div data-bind="foreach: childprop"></div>')
+    const container = testNode.childNodes[0] as Element
+    expectContainHtml(container, '<div data-bind="foreach: childprop"></div>')
 
-    // Then it's there
     childprop.push('me')
-    expect(container).toContainHtml(
-      '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span></div>'
-    )
+    expectContainHtml(container, '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span></div>')
 
-    // Then there's a second one
     childprop.push('me2')
-    expect(container).toContainHtml(
+    expectContainHtml(
+      container,
       '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span><span data-bind=\"text: $data\">me2</span></div>'
     )
 
-    // Then it changes
     someitem({ childprop: ['notme'] })
-    expect(container).toContainHtml(
+    expectContainHtml(
+      container,
       '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">notme</span></div>'
     )
   })
 
-  it('Should be able to nest a containerless template within \"using\"', function () {
+  it('Should be able to nest a containerless template within "using"', function () {
     testNode.innerHTML =
       "<div data-bind='using: someitem'>text"
       + "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
@@ -188,26 +194,25 @@ describe('Binding: Using', function () {
     const viewModel = { someitem: someitem }
     applyBindings(viewModel, testNode)
 
-    // First it's not there (by template)
-    let container = testNode.childNodes[0]
-    expect(container).toContainHtml('text<!-- ko foreach: childprop --><!-- /ko -->')
+    let container = testNode.childNodes[0] as Element
+    expectContainHtml(container, 'text<!-- ko foreach: childprop --><!-- /ko -->')
 
-    // Then it's there
     childprop.push('me')
-    expect(container).toContainHtml(
+    expectContainHtml(
+      container,
       'text<!-- ko foreach: childprop --><span data-bind="text: $data">me</span><!-- /ko -->'
     )
 
-    // Then there's a second one
     childprop.push('me2')
-    expect(container).toContainHtml(
+    expectContainHtml(
+      container,
       'text<!-- ko foreach: childprop --><span data-bind="text: $data">me</span><span data-bind="text: $data">me2</span><!-- /ko -->'
     )
 
-    // Then it changes
     someitem({ childprop: ['notme'] })
-    container = testNode.childNodes[0]
-    expect(container).toContainHtml(
+    container = testNode.childNodes[0] as Element
+    expectContainHtml(
+      container,
       'text<!-- ko foreach: childprop --><span data-bind="text: $data">notme</span><!-- /ko -->'
     )
   })
@@ -216,17 +221,15 @@ describe('Binding: Using', function () {
     testNode.innerHTML = "<div data-bind='using: item'><input data-bind='value: $rawData'/></div>"
     const item = observable('one')
     applyBindings({ item: item }, testNode)
-    expect(item.getSubscriptionsCount('change')).toEqual(2) // only subscriptions are the using and value bindings
-    expect(testNode.childNodes[0]).toHaveValues(['one'])
+    expect(item.getSubscriptionsCount('change')).to.equal(2)
+    expectHaveValues(testNode.childNodes[0], ['one'])
 
-    // Should update observable when input is changed
     const inputElement = testNode?.childNodes[0]?.childNodes[0] as HTMLInputElement
     inputElement.value = 'two'
     triggerEvent(inputElement, 'change')
-    expect(item()).toEqual('two')
+    expect(item()).to.equal('two')
 
-    // Should update the input when the observable changes
     item('three')
-    expect(testNode.childNodes[0]).toHaveValues(['three'])
+    expectHaveValues(testNode.childNodes[0], ['three'])
   })
 })

@@ -30,7 +30,7 @@
   },
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha"
     ]
   },
   "licenses": [

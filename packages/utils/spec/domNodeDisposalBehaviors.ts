@@ -1,4 +1,7 @@
 /* global testNode */
+import { expect } from 'chai'
+import sinon from 'sinon'
+
 import {
   addDisposeCallback,
   removeDisposeCallback,
@@ -8,13 +11,12 @@ import {
   otherNodeCleanerFunctions,
   cleanjQueryData
 } from '../dist'
-
-import '../helpers/jasmine-13-helper'
+import { prepareTestNode } from '../helpers/mocha-test-helpers'
 
 describe('DOM node disposal', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
   afterEach(function () {
     otherNodeCleanerFunctions.length = 0
@@ -27,9 +29,9 @@ describe('DOM node disposal', function () {
       didRun = true
     })
 
-    expect(didRun).toEqual(false)
+    expect(didRun).to.equal(false)
     cleanNode(testNode)
-    expect(didRun).toEqual(true)
+    expect(didRun).to.equal(true)
   })
 
   it('Should run registered disposal callbacks on descendants when a node is cleaned', function () {
@@ -42,9 +44,9 @@ describe('DOM node disposal', function () {
       didRun = true
     })
 
-    expect(didRun).toEqual(false)
+    expect(didRun).to.equal(false)
     cleanNode(testNode)
-    expect(didRun).toEqual(true)
+    expect(didRun).to.equal(true)
   })
 
   it('Should run registered disposal callbacks and detach from DOM when a node is removed', function () {
@@ -55,11 +57,11 @@ describe('DOM node disposal', function () {
       didRun = true
     })
 
-    expect(didRun).toEqual(false)
-    expect(testNode.childNodes.length).toEqual(1)
+    expect(didRun).to.equal(false)
+    expect(testNode.childNodes.length).to.equal(1)
     removeNode(childNode)
-    expect(didRun).toEqual(true)
-    expect(testNode.childNodes.length).toEqual(0)
+    expect(didRun).to.equal(true)
+    expect(testNode.childNodes.length).to.equal(0)
   })
 
   it('Should be able to remove previously-registered disposal callbacks', function () {
@@ -69,19 +71,19 @@ describe('DOM node disposal', function () {
     }
     addDisposeCallback(testNode, callback)
 
-    expect(didRun).toEqual(false)
+    expect(didRun).to.equal(false)
     removeDisposeCallback(testNode, callback)
     cleanNode(testNode)
-    expect(didRun).toEqual(false) // Didn't run only because we removed it
+    expect(didRun).to.equal(false) // Didn't run only because we removed it
   })
 
   it('Should not clean descendant nodes that are removed by a parent dispose handler', function () {
     const childNode = document.createElement('DIV')
     const grandChildNode = document.createElement('DIV')
-    const childSpy = jasmine.createSpy('childSpy').andCallFake(function () {
+    const childSpy = sinon.spy(function () {
       childNode.removeChild(grandChildNode)
     })
-    const grandChildSpy = jasmine.createSpy('grandChildSpy')
+    const grandChildSpy = sinon.spy()
 
     testNode.appendChild(childNode)
     childNode.appendChild(grandChildNode)
@@ -89,19 +91,19 @@ describe('DOM node disposal', function () {
     addDisposeCallback(grandChildNode, grandChildSpy)
 
     cleanNode(testNode)
-    expect(childSpy).toHaveBeenCalledWith(childNode)
-    expect(grandChildSpy).not.toHaveBeenCalled()
+    sinon.assert.calledWith(childSpy, childNode)
+    sinon.assert.notCalled(grandChildSpy)
   })
 
   it('Should not clean nodes that are removed by a comment dispose handler', function () {
     const childNode = document.createComment('ko comment')
     const grandChildNode = document.createElement('DIV')
     const childNode2 = document.createComment('ko comment')
-    const childSpy = jasmine.createSpy('childSpy').andCallFake(function () {
+    const childSpy = sinon.spy(function () {
       testNode.removeChild(grandChildNode)
     })
-    const grandChildSpy = jasmine.createSpy('grandChildSpy')
-    const child2Spy = jasmine.createSpy('child2Spy')
+    const grandChildSpy = sinon.spy()
+    const child2Spy = sinon.spy()
 
     testNode.appendChild(childNode)
     testNode.appendChild(grandChildNode)
@@ -111,18 +113,18 @@ describe('DOM node disposal', function () {
     addDisposeCallback(childNode2, child2Spy)
 
     cleanNode(testNode)
-    expect(childSpy).toHaveBeenCalledWith(childNode)
-    expect(grandChildSpy).not.toHaveBeenCalled()
-    expect(child2Spy).toHaveBeenCalledWith(childNode2)
+    sinon.assert.calledWith(childSpy, childNode)
+    sinon.assert.notCalled(grandChildSpy)
+    sinon.assert.calledWith(child2Spy, childNode2)
   })
 
   it('Should continue cleaning if a cleaned node is removed in a handler', function () {
     let childNode: Node = document.createElement('DIV')
     const childNode2: Node = document.createElement('DIV')
-    const removeChildSpy = jasmine.createSpy('removeChildSpy').andCallFake(function () {
+    const removeChildSpy = sinon.spy(function () {
       testNode.removeChild(childNode)
     })
-    const childSpy = jasmine.createSpy('childSpy')
+    const childSpy = sinon.spy()
 
     // Test by removing the node itself
     testNode.appendChild(childNode)
@@ -131,11 +133,11 @@ describe('DOM node disposal', function () {
     addDisposeCallback(childNode2, childSpy)
 
     cleanNode(testNode)
-    expect(removeChildSpy).toHaveBeenCalledWith(childNode)
-    expect(childSpy).toHaveBeenCalledWith(childNode2)
+    sinon.assert.calledWith(removeChildSpy, childNode)
+    sinon.assert.calledWith(childSpy, childNode2)
 
-    removeChildSpy.reset()
-    childSpy.reset()
+    removeChildSpy.resetHistory()
+    childSpy.resetHistory()
 
     // Test by removing a previous node
     const childNode3 = document.createElement('DIV')
@@ -146,11 +148,11 @@ describe('DOM node disposal', function () {
     addDisposeCallback(childNode3, childSpy)
 
     cleanNode(testNode)
-    expect(removeChildSpy).toHaveBeenCalledWith(childNode2)
-    expect(childSpy).toHaveBeenCalledWith(childNode3)
+    sinon.assert.calledWith(removeChildSpy, childNode2)
+    sinon.assert.calledWith(childSpy, childNode3)
 
-    removeChildSpy.reset()
-    childSpy.reset()
+    removeChildSpy.resetHistory()
+    childSpy.resetHistory()
 
     // Test by removing a comment node
     childNode = document.createComment('ko comment') as Node
@@ -160,8 +162,8 @@ describe('DOM node disposal', function () {
     addDisposeCallback(childNode2, childSpy)
 
     cleanNode(testNode)
-    expect(removeChildSpy).toHaveBeenCalledWith(childNode)
-    expect(childSpy).toHaveBeenCalledWith(childNode2)
+    sinon.assert.calledWith(removeChildSpy, childNode)
+    sinon.assert.calledWith(childSpy, childNode2)
   })
 
   it('Should be able to attach disposal callback to a node that has been cloned', function () {
@@ -192,10 +194,10 @@ describe('DOM node disposal', function () {
     })
 
     testNode['ko_test'] = 'mydata'
-    expect(testNode['ko_test']).toEqual('mydata')
+    expect(testNode['ko_test']).to.equal('mydata')
 
     cleanNode(testNode)
-    expect(testNode['ko_test']).toBeUndefined()
+    expect(testNode['ko_test']).to.equal(undefined)
   })
 
   it('If jQuery is referenced, should clear jQuery data when a node is cleaned', function () {
@@ -208,10 +210,10 @@ describe('DOM node disposal', function () {
 
     const obj = {}
     jQuery.data(testNode, 'ko_test', obj)
-    expect(jQuery.data(testNode, 'ko_test')).toBe(obj)
+    expect(jQuery.data(testNode, 'ko_test')).to.equal(obj)
 
     cleanNode(testNode)
-    expect(jQuery.data(testNode, 'ko_test')).toBeUndefined()
+    expect(jQuery.data(testNode, 'ko_test')).to.equal(undefined)
   })
 
   it('If jQuery is referenced, should be able to prevent jQuery data from being cleared by overwriting "cleanExternalData"', function () {
@@ -225,9 +227,9 @@ describe('DOM node disposal', function () {
 
     const obj = {}
     jQuery.data(testNode, 'ko_test', obj)
-    expect(jQuery.data(testNode, 'ko_test')).toBe(obj)
+    expect(jQuery.data(testNode, 'ko_test')).to.equal(obj)
 
     cleanNode(testNode)
-    expect(jQuery.data(testNode, 'ko_test')).toBe(obj)
+    expect(jQuery.data(testNode, 'ko_test')).to.equal(obj)
   })
 })

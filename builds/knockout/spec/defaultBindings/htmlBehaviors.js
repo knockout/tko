@@ -1,24 +1,27 @@
+import { expect } from 'chai'
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Binding: HTML', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should assign the value to the node without HTML-encoding the value', function () {
         var model = { textProp: "My <span>HTML-containing</span> value" };
         testNode.innerHTML = "<span data-bind='html:textProp'></span>";
         ko.applyBindings(model, testNode);
-        expect(testNode.childNodes[0].innerHTML.toLowerCase()).toEqual(model.textProp.toLowerCase());
-        expect(testNode.childNodes[0].childNodes[1].innerHTML).toEqual("HTML-containing");
+        expect(testNode.childNodes[0].innerHTML.toLowerCase()).to.deep.equal(model.textProp.toLowerCase());
+        expect(testNode.childNodes[0].childNodes[1].innerHTML).to.deep.equal("HTML-containing");
     });
 
     it('Should assign an empty string as value if the model value is null', function () {
         testNode.innerHTML = "<span data-bind='html:(null)' ></span>";
         ko.applyBindings(null, testNode);
-        expect(testNode.childNodes[0].innerHTML).toEqual("");
+        expect(testNode.childNodes[0].innerHTML).to.deep.equal("");
     });
 
     it('Should assign an empty string as value if the model value is undefined', function () {
         testNode.innerHTML = "<span data-bind='html:undefined' ></span>";
         ko.applyBindings(null, testNode);
-        expect(testNode.childNodes[0].innerHTML).toEqual("");
+        expect(testNode.childNodes[0].innerHTML).to.deep.equal("");
     });
 
     it('Should be able to write arbitrary HTML, even if it is not semantically correct', function() {
@@ -28,7 +31,7 @@ describe('Binding: HTML', function() {
         var model = { textProp: "<p>hello</p><p>this isn't semantically correct</p>" };
         testNode.innerHTML = "<p data-bind='html:textProp'></p>";
         ko.applyBindings(model, testNode);
-        expect(testNode.childNodes[0]).toContainHtml(model.textProp);
+        expectContainHtml(testNode.childNodes[0], model.textProp);
     });
 
     it('Should be able to write arbitrary HTML, including <tr> elements into tables', function() {
@@ -46,8 +49,8 @@ describe('Binding: HTML', function() {
 
         var td = tr.childNodes[0];
 
-        expect(tr.tagName).toEqual("TR");
-        expect(td.tagName).toEqual("TD");
-        expect('innerText' in td ? td.innerText : td.textContent).toEqual("hello");
+        expect(tr.tagName).to.deep.equal("TR");
+        expect(td.tagName).to.deep.equal("TD");
+        expect('innerText' in td ? td.innerText : td.textContent).to.deep.equal("hello");
     });
 });

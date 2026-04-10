@@ -14,8 +14,7 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import components from '@tko/utils.component'
 
 import { ComponentProvider } from '../dist'
-
-import '@tko/utils/helpers/jasmine-13-helper'
+import { expect } from 'chai'
 
 describe('Components: Provider', function () {
   let bindingHandlers
@@ -43,8 +42,8 @@ describe('Components: Provider', function () {
 
       // Since components are loaded asynchronously, it doesn't show up synchronously
       applyBindings(null, root)
-      // expect(root.innerHTML).toEqual(initialMarkup);
-      expect(root.innerHTML).toEqual('He: <helium>X<i data-bind="text: 123">123</i></helium>')
+      // expect(root.innerHTML).to.equal(initialMarkup)
+      expect(root.innerHTML).to.equal('He: <helium>X<i data-bind="text: 123">123</i></helium>')
     })
 
     it('interprets the params of custom elements', function () {
@@ -61,8 +60,8 @@ describe('Components: Provider', function () {
       const ce = document.createElement('argon')
       ce.setAttribute('params', 'alpha: 1, beta: [2], charlie: {x: 3}, delta: delta')
       applyBindings({ delta: 'QxE' }, ce)
-      expect(ce.innerHTML).toEqual('<b>sXZ <u data-bind="text: delta">G2k</u></b>')
-      expect(called).toEqual(true)
+      expect(ce.innerHTML).to.equal('<b>sXZ <u data-bind="text: delta">G2k</u></b>')
+      expect(called).to.equal(true)
     })
 
     it('does not unwrap observables (#44)', function () {
@@ -76,7 +75,7 @@ describe('Components: Provider', function () {
       }
 
       function ChildViewModel(params) {
-        expect(isObservable(params.value)).toEqual(true)
+        expect(isObservable(params.value)).to.equal(true)
         this.cvalue = params.value
       }
 
@@ -124,7 +123,7 @@ describe('Components: Provider', function () {
       // var called = false;
       components.register('lithium', {
         viewModel: function (params) {
-          expect(params).toEqual({ $raw: {} })
+          expect(params).to.deep.equal({ $raw: {} })
         },
         template: 'hello',
         synchronous: true,
@@ -140,7 +139,7 @@ describe('Components: Provider', function () {
       // re brianmhunt/knockout-secure-binding#38
       components.register('neon', {
         viewModel: function (params) {
-          expect(params.text).toEqual('Knights of Ne.')
+          expect(params.text).to.equal('Knights of Ne.')
         },
         template: 'A noble gas and less noble car.',
         synchronous: true,

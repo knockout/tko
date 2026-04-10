@@ -32,11 +32,10 @@
   ],
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha"
     ],
     "files": [
       "dist/browser.min.js",
-      "helpers/jasmine.extensions.js",
       "spec/**/*.js"
     ]
   },

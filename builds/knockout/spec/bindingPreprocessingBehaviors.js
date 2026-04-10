@@ -1,3 +1,6 @@
+import { expect } from 'chai'
+import '../helpers/mocha-test-helpers.js'
+
 describe('Binding preprocessing', function() {
     it('Should allow binding to modify value through "preprocess" method', function() {
         delete ko.bindingHandlers.a;
@@ -9,8 +12,8 @@ describe('Binding preprocessing', function() {
         };
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 1, b");
         var parsedRewritten = eval("({" + rewritten + "})");
-        expect(parsedRewritten.a).toEqual(1);
-        expect(parsedRewritten.b).toEqual(false);
+        expect(parsedRewritten.a).to.deep.equal(1);
+        expect(parsedRewritten.b).to.deep.equal(false);
     });
 
     it('Should allow binding to add/replace bindings through "preprocess" method\'s "addBinding" callback', function() {
@@ -30,11 +33,11 @@ describe('Binding preprocessing', function() {
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 1, b: 2");
         var parsedRewritten = eval("({" + rewritten + "})");
 
-        expect(parsedRewritten.a).toEqual(1);
-        expect(parsedRewritten.a2).toEqual(1);
+        expect(parsedRewritten.a).to.deep.equal(1);
+        expect(parsedRewritten.a2).to.deep.equal(1);
 
-        expect(parsedRewritten.b).toBeUndefined();
-        expect(parsedRewritten.b2).toEqual(2);
+        expect(parsedRewritten.b).to.equal(undefined);
+        expect(parsedRewritten.b2).to.deep.equal(2);
     });
 
     it('Should be able to chain "preprocess" calls when one adds a binding for another', function() {
@@ -52,12 +55,12 @@ describe('Binding preprocessing', function() {
         };
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 2");
         var parsedRewritten = eval("({" + rewritten + "})");
-        expect(parsedRewritten.a).toBeUndefined();
-        expect(parsedRewritten.b).toEqual(3);
+        expect(parsedRewritten.a).to.equal(undefined);
+        expect(parsedRewritten.b).to.deep.equal(3);
     });
 
     // See knockout/tko#67
-    xit('Should be able to get a dynamically created binding handler during preprocessing', function() {
+    it.skip('Should be able to get a dynamically created binding handler during preprocessing', function() {
         this.restoreAfter(ko, 'getBindingHandler'); // restore original function when done
 
         ko.getBindingHandler = function(bindingKey) {
@@ -70,6 +73,6 @@ describe('Binding preprocessing', function() {
         var rewritten = ko.expressionRewriting.preProcessBindings("a: 1");
 
         var parsedRewritten = eval("({" + rewritten + "})");
-        expect(parsedRewritten.a).toEqual(12);
+        expect(parsedRewritten.a).to.deep.equal(12);
     });
 });

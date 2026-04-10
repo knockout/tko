@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import { triggerEvent, registerEventHandler } from '@tko/utils'
 
 import { applyBindings, applyBindingsToNode } from '@tko/bind'
@@ -12,9 +14,9 @@ import { options, arrayForEach } from '@tko/utils'
 
 import * as coreBindings from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { MultiProvider } from '@tko/provider.multi'
+import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 const hasfocusUpdatingProperty = '__ko_hasfocusKnockoutUpdating'
 const hasfocusLastValue = '__ko_hasfocusKnockoutLastValue'
@@ -83,7 +85,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
     let testNode: HTMLElement
     beforeEach(function () {
-      testNode = jasmine.prepareTestNode()
+      testNode = prepareTestNode()
     })
 
     beforeEach(function () {
@@ -113,12 +115,12 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
       input.focus()
       triggerEvent(input, 'focusin')
-      expect($myVal()).toEqual(true)
+      expect($myVal()).to.equal(true)
 
       // Move the focus elsewhere
       ;(testNode.childNodes[1] as HTMLElement).focus()
       triggerEvent(input, 'focusout')
-      expect($myVal()).toEqual(false)
+      expect($myVal()).to.equal(false)
     })
 
     it('Should respond to changes on an observable value by blurring or focusing the element', function () {
@@ -135,11 +137,11 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
       // When the value becomes true, we focus
       model.myVal(true)
-      expect(currentState).toEqual(true)
+      expect(currentState).to.equal(true)
 
       // When the value becomes false, we blur
       model.myVal(false)
-      expect(currentState).toEqual(false)
+      expect(currentState).to.equal(false)
     })
 
     it('Should set an observable value to be true on focus and false on blur', function () {
@@ -151,12 +153,12 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       // in IE doesn't reliably trigger the "focus" and "blur" events synchronously
       ;(testNode.children[0] as HTMLInputElement).focus()
       triggerEvent(testNode.children[0], 'focusin')
-      expect(model.myVal()).toEqual(true)
+      expect(model.myVal()).to.equal(true)
 
       // Move the focus elsewhere
       ;(testNode.childNodes[1] as HTMLElement).focus()
       triggerEvent(testNode.children[0], 'focusout')
-      expect(model.myVal()).toEqual(false)
+      expect(model.myVal()).to.equal(false)
 
       // If the model value becomes true after a blur, we re-focus the element
       // (Represents issue #672, where this wasn't working)
@@ -165,7 +167,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
         didFocusExpectedElement = true
       })
       model.myVal(true)
-      expect(didFocusExpectedElement).toEqual(true)
+      expect(didFocusExpectedElement).to.equal(true)
     })
 
     it('Should set a non-observable value to be true on focus and false on blur', function () {
@@ -174,12 +176,12 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
       applyBindings(model, testNode)
       ;(testNode.childNodes[0] as HTMLElement).focus()
       triggerEvent(testNode.children[0], 'focusin')
-      expect(model.myVal).toEqual(true)
+      expect(model.myVal).to.equal(true)
 
       // Move the focus elsewhere
       ;(testNode.childNodes[1] as HTMLElement).focus()
       triggerEvent(testNode.children[0], 'focusout')
-      expect(model.myVal).toEqual(false)
+      expect(model.myVal).to.equal(false)
     })
 
     function defineSubscription<T>(
@@ -254,36 +256,36 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
         )
 
         testNode.focus()
-        expect(model.myVal()).toEqual(false)
-        expect(model.myVal2()).toEqual(false)
+        expect(model.myVal()).to.equal(false)
+        expect(model.myVal2()).to.equal(false)
 
         //console.log(binding + ': focus input 0-myVal ' + event)
         input0.focus()
         triggerEvent(input0, 'focusin')
-        expect(model.myVal()).toEqual(true)
-        expect(model.myVal2()).toEqual(false)
+        expect(model.myVal()).to.equal(true)
+        expect(model.myVal2()).to.equal(false)
 
         //console.log('focusout input 0-myVal')
         input0.blur()
         triggerEvent(input0, 'focusout')
-        expect(model.myVal()).toEqual(false)
-        expect(model.myVal2()).toEqual(false)
+        expect(model.myVal()).to.equal(false)
+        expect(model.myVal2()).to.equal(false)
 
         // Move the focus elsewhere
         //console.log('focus input 1-myVal2')
         input1.focus()
         triggerEvent(input1, 'focusout')
-        expect(model.myVal()).toEqual(false)
-        expect(model.myVal2()).toEqual(true)
+        expect(model.myVal()).to.equal(false)
+        expect(model.myVal2()).to.equal(true)
 
         //console.log('focusout input 1-myVal2')
         input1.blur()
         triggerEvent(input1, 'focusout')
-        expect(model.myVal()).toEqual(false)
-        expect(model.myVal2()).toEqual(false)
+        expect(model.myVal()).to.equal(false)
+        expect(model.myVal2()).to.equal(false)
 
-        expect(displayVal()).toEqual(false)
-        expect(changeCounter).toEqual(4)
+        expect(displayVal()).to.equal(false)
+        expect(changeCounter).to.equal(4)
       })
     })
 
@@ -301,7 +303,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
         didFocusAgain = true
       })
       model.isFocused.valueHasMutated()
-      expect(didFocusAgain).toEqual(false)
+      expect(didFocusAgain).to.equal(false)
 
       // Similarly, when the elem is already blurred, changing the model value to a different
       // falsy value shouldn't cause any additional blur events
@@ -311,7 +313,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
         didBlurAgain = true
       })
       model.isFocused(null)
-      expect(didBlurAgain).toEqual(false)
+      expect(didBlurAgain).to.equal(false)
     })
 
     it('Should not cause unrelated items to lose focus when initialized with false', function () {
@@ -321,7 +323,7 @@ arrayForEach(['hasfocus', 'hasFocus', 'focusKnockout351'], binding => {
 
       // Can only test for focus in browsers that support it
       if ('activeElement' in document) {
-        expect(document.activeElement).toBe(testNode.childNodes[0])
+        expect(document.activeElement).to.equal(testNode.childNodes[0])
       }
     })
   })

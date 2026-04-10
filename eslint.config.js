@@ -9,12 +9,12 @@ module.exports = [
   { ignores: ['**/*.{js,mjs,cjs}', 'builds/**/*', '**/*.d.ts'] },
   {
     rules: {
-      'no-empty': 'off',
-      'prefer-rest-params': 'off',
-      'prefer-spread': 'off',
-      'prefer-const': 'off',
-      'no-useless-escape': 'off',
-      'no-useless-assignment': 'off',
+      "no-empty": "off",
+      "prefer-rest-params" : "off",
+      "prefer-spread": "off",
+      "prefer-const": "off",
+      "no-useless-escape": "off",
+      "no-useless-assignment": "off",
 //    "no-var": "off",
       'no-array-constructor': 'off',
       'no-misleading-character-class': 'off',

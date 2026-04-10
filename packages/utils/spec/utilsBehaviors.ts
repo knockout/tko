@@ -1,6 +1,9 @@
+import { expect } from 'chai'
+import sinon from 'sinon'
+
 import * as utils from '../dist'
-import '../helpers/jasmine-13-helper'
 import type { KnockoutInstance } from '@tko/builder'
+import { prepareTestNode } from '../helpers/mocha-test-helpers'
 
 const ko: KnockoutInstance = globalThis.ko || {}
 
@@ -9,22 +12,22 @@ ko.tasks = utils.tasks
 
 describe('arrayForEach', function () {
   it('Should go call the callback for each element of the array, in order', function () {
-    const callback = jasmine.createSpy('callback')
+    const callback = sinon.spy()
 
     ko.utils.arrayForEach(['a', 'b', 'c'], callback)
 
-    expect(callback.calls.length).toBe(3)
-    expect(callback.calls[0].args).toEqual(['a', 0, ['a', 'b', 'c']])
-    expect(callback.calls[1].args).toEqual(['b', 1, ['a', 'b', 'c']])
-    expect(callback.calls[2].args).toEqual(['c', 2, ['a', 'b', 'c']])
+    sinon.assert.callCount(callback, 3)
+    expect(callback.getCall(0).args).to.deep.equal(['a', 0, ['a', 'b', 'c']])
+    expect(callback.getCall(1).args).to.deep.equal(['b', 1, ['a', 'b', 'c']])
+    expect(callback.getCall(2).args).to.deep.equal(['c', 2, ['a', 'b', 'c']])
   })
 
   it('Should do nothing with empty arrays', function () {
-    const callback = jasmine.createSpy('callback')
+    const callback = sinon.spy()
 
     ko.utils.arrayForEach([], callback)
 
-    expect(callback).not.toHaveBeenCalled()
+    sinon.assert.notCalled(callback)
   })
 
   it('Should alter "this" context when defined as an argument', function () {
@@ -37,43 +40,43 @@ describe('arrayForEach', function () {
       },
       expectedContext
     )
-    expect(actualContext).toBe(expectedContext)
+    expect(actualContext).to.equal(expectedContext)
   })
 
   it('Should throw an error for a null array', function () {
     expect(function () {
       const nullArray: Array<any> = null as unknown as Array<any>
       ko.utils.arrayForEach(nullArray, function () {})
-    }).toThrow()
+    }).to.throw()
   })
 })
 
 describe('arrayIndexOf', function () {
   it('Should return the index if the element is found in the input array', function () {
     const result = ko.utils.arrayIndexOf(['a', 'b', 'c'], 'b')
-    expect(result).toBe(1)
+    expect(result).to.equal(1)
   })
 
   it('Should return -1 for empty arrays', function () {
     const result = ko.utils.arrayIndexOf([], 'a')
-    expect(result).toBe(-1)
+    expect(result).to.equal(-1)
   })
 
   it('Should return -1 if the element is not found', function () {
     const result = ko.utils.arrayIndexOf(['a', 'b', 'c'], 'd')
-    expect(result).toBe(-1)
+    expect(result).to.equal(-1)
   })
 
   it('Should return the first index if the element is found twice', function () {
     const result = ko.utils.arrayIndexOf(['a', 'b', 'c', 'c'], 'c')
-    expect(result).toBe(2)
+    expect(result).to.equal(2)
   })
 
   it('Should throw an error for a null array', function () {
     expect(function () {
       const nullArray: Array<string> = null as unknown as Array<string>
       ko.utils.arrayIndexOf(nullArray, 'a')
-    }).toThrow()
+    }).to.throw()
   })
 })
 
@@ -81,32 +84,32 @@ describe('arrayRemoveItem', function () {
   it('Should remove the matching element if found', function () {
     const input = ['a', 'b', 'c']
     ko.utils.arrayRemoveItem(input, 'a')
-    expect(input).toEqual(['b', 'c'])
+    expect(input).to.deep.equal(['b', 'c'])
   })
 
   it('Should do nothing for empty arrays', function () {
     const input = new Array()
     ko.utils.arrayRemoveItem(input, 'a')
-    expect(input).toEqual([])
+    expect(input).to.deep.equal([])
   })
 
   it('Should do nothing if no matching element is found', function () {
     const input = ['a', 'b', 'c']
     ko.utils.arrayRemoveItem(input, 'd')
-    expect(input).toEqual(['a', 'b', 'c'])
+    expect(input).to.deep.equal(['a', 'b', 'c'])
   })
 
   it('Should remove only the first matching element', function () {
     const input = ['a', 'b', 'b', 'c']
     ko.utils.arrayRemoveItem(input, 'b')
-    expect(input).toEqual(['a', 'b', 'c'])
+    expect(input).to.deep.equal(['a', 'b', 'c'])
   })
 
   it('Should throw an error for a null array', function () {
     expect(function () {
       const nullArray: Array<string> = null as unknown as Array<string>
       ko.utils.arrayRemoveItem(nullArray, 'a')
-    }).toThrow()
+    }).to.throw()
   })
 })
 
@@ -114,11 +117,11 @@ describe('arrayFirst', function () {
   let matchB, matchD
 
   beforeEach(function () {
-    matchB = jasmine.createSpy('matchB').andCallFake(function (x) {
+    matchB = sinon.spy(function (x: string) {
       return x.charAt(0) === 'b'
     })
 
-    matchD = jasmine.createSpy('matchD').andCallFake(function (x) {
+    matchD = sinon.spy(function (x: string) {
       return x.charAt(0) === 'd'
     })
   })
@@ -126,38 +129,38 @@ describe('arrayFirst', function () {
   it('Should return the first matching element from the input array', function () {
     const result = ko.utils.arrayFirst(['a', 'b', 'c', 'b2'], matchB)
 
-    expect(result).toBe('b')
+    expect(result).to.equal('b')
   })
 
   it('Should return undefined with empty arrays, and not call the predicate', function () {
-    const predicate = jasmine.createSpy('predicate')
+    const predicate = sinon.spy()
 
     const result = ko.utils.arrayFirst([], predicate)
 
-    expect(result).toBe(undefined)
-    expect(predicate).not.toHaveBeenCalled()
+    expect(result).to.equal(undefined)
+    sinon.assert.notCalled(predicate)
   })
 
   it('Should test the predicate on every element before the first matching element', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchB)
 
-    expect(matchB.calls.length).toBe(2)
-    expect(matchB.calls[0].args).toEqual(['a', 0, ['a', 'b', 'c']])
-    expect(matchB.calls[1].args).toEqual(['b', 1, ['a', 'b', 'c']])
+    sinon.assert.callCount(matchB, 2)
+    expect(matchB.getCall(0).args).to.deep.equal(['a', 0, ['a', 'b', 'c']])
+    expect(matchB.getCall(1).args).to.deep.equal(['b', 1, ['a', 'b', 'c']])
   })
 
   it('Should return undefined if no element matches', function () {
     const result = ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
-    expect(result).toBe(undefined)
+    expect(result).to.equal(undefined)
   })
 
   it('Should test every element if no element matches', function () {
     ko.utils.arrayFirst(['a', 'b', 'c'], matchD)
 
-    expect(matchD.calls.length).toBe(3)
-    expect(matchD.calls[0].args).toEqual(['a', 0, ['a', 'b', 'c']])
-    expect(matchD.calls[1].args).toEqual(['b', 1, ['a', 'b', 'c']])
-    expect(matchD.calls[2].args).toEqual(['c', 2, ['a', 'b', 'c']])
+    sinon.assert.callCount(matchD, 3)
+    expect(matchD.getCall(0).args).to.deep.equal(['a', 0, ['a', 'b', 'c']])
+    expect(matchD.getCall(1).args).to.deep.equal(['b', 1, ['a', 'b', 'c']])
+    expect(matchD.getCall(2).args).to.deep.equal(['c', 2, ['a', 'b', 'c']])
   })
 
   it('Should throw an error for a null array', function () {
@@ -166,43 +169,43 @@ describe('arrayFirst', function () {
       ko.utils.arrayFirst(nullArray, function () {
         return false
       })
-    }).toThrow()
+    }).to.throw()
   })
 })
 
 describe('arrayGetDistinctValues', function () {
   it('Should remove duplicates from an array of non-unique values', function () {
     const result = ko.utils.arrayGetDistinctValues(['a', 'b', 'b', 'c', 'c'])
-    expect(result).toEqual(['a', 'b', 'c'])
+    expect(result).to.deep.equal(['a', 'b', 'c'])
   })
 
   it('Should do nothing with an empty array', function () {
     const result = ko.utils.arrayGetDistinctValues([])
-    expect(result).toEqual([])
+    expect(result).to.deep.equal([])
   })
 
   it('Should do nothing with an array of unique values', function () {
     const result = ko.utils.arrayGetDistinctValues(['a', 'b', 'c'])
-    expect(result).toEqual(['a', 'b', 'c'])
+    expect(result).to.deep.equal(['a', 'b', 'c'])
   })
 
   it('Should copy the input array', function () {
     const input = ['a', 'b', 'c', 'c']
     const result = ko.utils.arrayGetDistinctValues(input)
-    expect(result).not.toBe(input)
+    expect(result).to.not.equal(input)
   })
 
   it("Should copy the input array, even if it's unchanged", function () {
     const input = ['a', 'b', 'c']
     const result = ko.utils.arrayGetDistinctValues(input)
-    expect(result).toEqual(input)
-    expect(result).not.toBe(input)
+    expect(result).to.deep.equal(input)
+    expect(result).to.not.equal(input)
   })
 
   it('Should return an empty array when called with a null array', function () {
     const nullArray: Array<any> = null as unknown as Array<any>
     const result = ko.utils.arrayGetDistinctValues(nullArray)
-    expect(result).toEqual([])
+    expect(result).to.deep.equal([])
   })
 })
 
@@ -214,16 +217,16 @@ describe('arrayMap', function () {
 
     const result = ko.utils.arrayMap(['a', 'b', 'c'], appendIndex)
 
-    expect(result).toEqual(['a0', 'b1', 'c2'])
+    expect(result).to.deep.equal(['a0', 'b1', 'c2'])
   })
 
   it('Should return empty arrays for empty arrays, and not call the map function', function () {
-    const mapFunction = jasmine.createSpy('mapFunction')
+    const mapFunction = sinon.spy()
 
     const result = ko.utils.arrayMap([], mapFunction)
 
-    expect(result).toEqual([])
-    expect(mapFunction).not.toHaveBeenCalled()
+    expect(result).to.deep.equal([])
+    sinon.assert.notCalled(mapFunction)
   })
 
   it('Should copy the array before returning it', function () {
@@ -234,8 +237,8 @@ describe('arrayMap', function () {
     const input = ['a', 'b', 'c']
     const result = ko.utils.arrayMap(input, identityFunction)
 
-    expect(result).toEqual(input)
-    expect(result).not.toBe(input)
+    expect(result).to.deep.equal(input)
+    expect(result).to.not.equal(input)
   })
 
   it('Should alter "this" context when defined as an argument', function () {
@@ -248,13 +251,13 @@ describe('arrayMap', function () {
 
     utils.arrayMap(['a'], identityFunction, expectedContext)
 
-    expect(actualContext).toBe(expectedContext)
+    expect(actualContext).to.equal(expectedContext)
   })
 
   it('Should return an empty array when called with a null array', function () {
     const nullArray: Array<any> = null as unknown as Array<any>
     const result = ko.utils.arrayMap(nullArray, function () {})
-    expect(result).toEqual([])
+    expect(result).to.deep.equal([])
   })
 })
 
@@ -266,16 +269,16 @@ describe('arrayFilter', function () {
 
     const result = ko.utils.arrayFilter(['a', 'b', 'c', 'd'], evenOnly)
 
-    expect(result).toEqual(['a', 'c'])
+    expect(result).to.deep.equal(['a', 'c'])
   })
 
   it('Should return empty arrays for empty arrays, and not call the filter function', function () {
-    const filterFunction = jasmine.createSpy('filterFunction')
+    const filterFunction = sinon.spy()
 
     const result = ko.utils.arrayFilter([], filterFunction)
 
-    expect(result).toEqual([])
-    expect(filterFunction).not.toHaveBeenCalled()
+    expect(result).to.deep.equal([])
+    sinon.assert.notCalled(filterFunction)
   })
 
   it('Should copy the array before returning it', function () {
@@ -286,8 +289,8 @@ describe('arrayFilter', function () {
     const input = ['a', 'b', 'c']
     const result = ko.utils.arrayFilter(input, alwaysTrue)
 
-    expect(result).toEqual(input)
-    expect(result).not.toBe(input)
+    expect(result).to.deep.equal(input)
+    expect(result).to.not.equal(input)
   })
 
   it('Should alter "this" context when defined as an argument', function () {
@@ -300,7 +303,7 @@ describe('arrayFilter', function () {
 
     const result = utils.arrayFilter(['a'], identityFunction, expectedContext)
 
-    expect(expectedContext).toEqual(actualContext)
+    expect(actualContext).to.equal(expectedContext)
   })
 
   it('Should return an empty array when called with a null array', function () {
@@ -308,7 +311,7 @@ describe('arrayFilter', function () {
     const result = ko.utils.arrayFilter(nullArray, function () {
       return true
     })
-    expect(result).toEqual([])
+    expect(result).to.deep.equal([])
   })
 })
 
@@ -320,27 +323,27 @@ describe('arrayPushAll', function () {
 
     ko.utils.arrayPushAll(targetArray, extraArray)
 
-    expect(targetArray).toEqual([1, 2, 3, 4, 5, 6])
+    expect(targetArray).to.deep.equal([1, 2, 3, 4, 5, 6])
   })
 
   it('does nothing if the second array is empty', function () {
     const targetArray = [1, 2, 3]
     ko.utils.arrayPushAll(targetArray, [])
-    expect(targetArray).toEqual([1, 2, 3])
+    expect(targetArray).to.deep.equal([1, 2, 3])
   })
 
   it('Should throw an error for a null first array', function () {
     expect(function () {
       const nullArray: Array<never> = null as unknown as Array<never>
       ko.utils.arrayPushAll(nullArray, [])
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should throw an error for a null second array', function () {
     expect(function () {
       const nullArray: Array<never> = null as unknown as Array<never>
       ko.utils.arrayPushAll([], nullArray)
-    }).toThrow()
+    }).to.throw()
   })
 })
 
@@ -357,56 +360,56 @@ describe('Function.bind', function () {
     const object = {},
       bound = fn.bind(object) as any
 
-    expect(bound('a')).toEqual([object, 'a'])
+    expect(bound('a')).to.deep.equal([object, 'a'])
   })
 
   it('should accept a falsy `thisArg` argument', function () {
     ko.utils.arrayForEach(['', 0, false, NaN], function (value) {
       const bound = fn.bind(value)
-      expect(bound()[0].constructor).toEqual(Object(value).constructor)
+      expect(bound()[0].constructor).to.equal(Object(value).constructor)
     })
   })
 
   it('should bind a function to `null` or `undefined`', function () {
     let bound = fn.bind(null) as any,
       actual = bound('a'),
-      global = jasmine.getGlobal()
+      global = globalThis
 
-    expect(actual[0]).toEqualOneOf([null, global])
-    expect(actual[1]).toEqual('a')
+    expect([null, global]).to.contain(actual[0])
+    expect(actual[1]).to.equal('a')
 
     bound = fn.bind(undefined)
     actual = bound('b')
 
-    expect(actual[0]).toEqualOneOf([undefined, global])
-    expect(actual[1]).toEqual('b')
+    expect([undefined, global]).to.contain(actual[0])
+    expect(actual[1]).to.equal('b')
 
     bound = fn.bind(null)
     actual = bound('b')
 
-    expect(actual[0]).toEqualOneOf([undefined, global])
-    expect(actual[1]).toEqual('b')
+    expect([undefined, global]).to.contain(actual[0])
+    expect(actual[1]).to.equal('b')
   })
 
   it('should partially apply arguments', function () {
     let object = {}
     let bound = fn.bind(object, 'a') as any
 
-    expect(bound()).toEqual([object, 'a'])
+    expect(bound()).to.deep.equal([object, 'a'])
 
     bound = fn.bind(object, 'a')
-    expect(bound('b')).toEqual([object, 'a', 'b'])
+    expect(bound('b')).to.deep.equal([object, 'a', 'b'])
 
     bound = fn.bind(object, 'a', 'b')
-    expect(bound()).toEqual([object, 'a', 'b'])
-    expect(bound('c', 'd')).toEqual([object, 'a', 'b', 'c', 'd'])
+    expect(bound()).to.deep.equal([object, 'a', 'b'])
+    expect(bound('c', 'd')).to.deep.equal([object, 'a', 'b', 'c', 'd'])
   })
 
   it('should append array arguments to partially applied arguments', function () {
     const object = {},
       bound = fn.bind(object, 'a') as any
 
-    expect(bound(['b'], 'c')).toEqual([object, 'a', ['b'], 'c'])
+    expect(bound(['b'], 'c')).to.deep.equal([object, 'a', ['b'], 'c'])
   })
 
   it('should rebind functions correctly', function () {
@@ -418,9 +421,9 @@ describe('Function.bind', function () {
       bound2 = bound1.bind(object2, 'a'),
       bound3 = bound1.bind(object3, 'b')
 
-    expect(bound1()).toEqual([object1])
-    expect(bound2()).toEqual([object1, 'a'])
-    expect(bound3()).toEqual([object1, 'b'])
+    expect(bound1()).to.deep.equal([object1])
+    expect(bound2()).to.deep.equal([object1, 'a'])
+    expect(bound3()).to.deep.equal([object1, 'b'])
   })
 })
 
@@ -435,20 +438,20 @@ describe('objectMap', function () {
 
     ko.utils.objectMap({ x: 1 }, identityFunction, expectedContext)
 
-    expect(expectedContext).toEqual(actualContext)
+    expect(actualContext).to.equal(expectedContext)
   })
 })
 
 describe('cloneNodes', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   it('should return clones', function () {
     const newNodes = ko.utils.cloneNodes([testNode])
     const isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
-    expect(isClone).toBe(true)
+    expect(isClone).to.equal(true)
   })
 
   it('should clone deeply', function () {
@@ -460,14 +463,14 @@ describe('cloneNodes', function () {
 
     const childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
 
-    expect(childIsClone).toBe(true)
+    expect(childIsClone).to.equal(true)
   })
 
   describe('safeStringfy', () => {
     const { safeStringify } = utils
 
     it('stringifies plain objects', () => {
-      expect(safeStringify({})).toEqual('{}')
+      expect(safeStringify({})).to.equal('{}')
     })
 
     it('stringifies recursive objects', () => {
@@ -476,7 +479,7 @@ describe('cloneNodes', function () {
       recursive.a = recursive
 
       const expectObj = { b: 1, c: 1, a: '...' }
-      expect(JSON.parse(safeStringify(recursive))).toEqual(expectObj)
+      expect(JSON.parse(safeStringify(recursive))).to.deep.equal(expectObj)
     })
   })
 })

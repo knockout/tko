@@ -1,19 +1,22 @@
+import { expect } from 'chai'
+import '../../helpers/mocha-test-helpers.js'
+
 describe('Binding: With', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is falsy', function() {
         testNode.innerHTML = "<div data-bind='with: someItem'><span data-bind='text: someItem.nonExistentChildProp'></span></div>";
-        expect(testNode.childNodes[0].childNodes.length).toEqual(1);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
         ko.applyBindings({ someItem: null }, testNode);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
     });
 
     it('Should leave descendant nodes in the document (and bind them in the context of the supplied value) if the value is truthy', function() {
         testNode.innerHTML = "<div data-bind='with: someItem'><span data-bind='text: existentChildProp'></span></div>";
-        expect(testNode.childNodes.length).toEqual(1);
+        expect(testNode.childNodes.length).to.deep.equal(1);
         ko.applyBindings({ someItem: { existentChildProp: 'Child prop value' } }, testNode);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(1);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
+        expectContainText(testNode.childNodes[0].childNodes[0], "Child prop value");
     });
 
     it('Should leave descendant nodes unchanged if the value is truthy', function() {
@@ -23,8 +26,8 @@ describe('Binding: With', function() {
 
         // Value is initially true, so nodes are retained
         ko.applyBindings({ someItem: someItem }, testNode);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("child prop value");
-        expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode);
+        expectContainText(testNode.childNodes[0].childNodes[0], "child prop value");
+        expect(testNode.childNodes[0].childNodes[0]).to.deep.equal(originalNode);
     });
 
     it('Should toggle the presence and bindedness of descendant nodes according to the truthiness of the value, performing binding in the context of the value', function() {
@@ -33,16 +36,16 @@ describe('Binding: With', function() {
         ko.applyBindings({ someItem: someItem }, testNode);
 
         // First it's not there
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
 
         // Then it's there
         someItem({ occasionallyExistentChildProp: 'Child prop value' });
-        expect(testNode.childNodes[0].childNodes.length).toEqual(1);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
+        expectContainText(testNode.childNodes[0].childNodes[0], "Child prop value");
 
         // Then it's gone again
         someItem(null);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
     });
 
     it('Should reconstruct and bind descendants when the data item notifies about mutation', function() {
@@ -50,12 +53,12 @@ describe('Binding: With', function() {
 
         testNode.innerHTML = "<div data-bind='with: someItem'><span data-bind='text: childProp'></span></div>";
         ko.applyBindings({ someItem: someItem }, testNode);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Hello");
+        expectContainText(testNode.childNodes[0].childNodes[0], "Hello");
 
         // Force "update" binding handler to fire, then check the DOM changed
         someItem().childProp = 'Goodbye';
         someItem.valueHasMutated();
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Goodbye");
+        expectContainText(testNode.childNodes[0].childNodes[0], "Goodbye");
     });
 
     it('Should not bind the same elements more than once even if the supplied value notifies a change', function() {
@@ -69,25 +72,25 @@ describe('Binding: With', function() {
         ko.applyBindings({ someItem: someItem }, testNode);
 
         // Initial state is one subscriber, one click handler
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Hello");
-        expect(someItem().childProp.getSubscriptionsCount()).toEqual(1);
+        expectContainText(testNode.childNodes[0].childNodes[0], "Hello");
+        expect(someItem().childProp.getSubscriptionsCount()).to.deep.equal(1);
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "click");
-        expect(countedClicks).toEqual(1);
+        expect(countedClicks).to.deep.equal(1);
 
         // Force "update" binding handler to fire, then check we still have one subscriber...
         someItem.valueHasMutated();
-        expect(someItem().childProp.getSubscriptionsCount()).toEqual(1);
+        expect(someItem().childProp.getSubscriptionsCount()).to.deep.equal(1);
 
         // ... and one click handler
         countedClicks = 0;
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "click");
-        expect(countedClicks).toEqual(1);
+        expect(countedClicks).to.deep.equal(1);
     });
 
     it('Should be able to access parent binding context via $parent', function() {
         testNode.innerHTML = "<div data-bind='with: someItem'><span data-bind='text: $parent.parentProp'></span></div>";
         ko.applyBindings({ someItem: { }, parentProp: 'Parent prop value' }, testNode);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Parent prop value");
+        expectContainText(testNode.childNodes[0].childNodes[0], "Parent prop value");
     });
 
     it('Should be able to access all parent binding contexts via $parents, and root context via $root', function() {
@@ -115,23 +118,23 @@ describe('Binding: With', function() {
             }
         }, testNode);
         var finalContainer = testNode.childNodes[0].childNodes[0].childNodes[0];
-        expect(finalContainer.childNodes[0]).toContainText("bottom");
-        expect(finalContainer.childNodes[1]).toContainText("middle");
-        expect(finalContainer.childNodes[2]).toContainText("top");
-        expect(finalContainer.childNodes[3]).toContainText("outer");
-        expect(finalContainer.childNodes[4]).toContainText("outer");
+        expectContainText(finalContainer.childNodes[0], "bottom");
+        expectContainText(finalContainer.childNodes[1], "middle");
+        expectContainText(finalContainer.childNodes[2], "top");
+        expectContainText(finalContainer.childNodes[3], "outer");
+        expectContainText(finalContainer.childNodes[4], "outer");
 
         // Also check that, when we later retrieve the binding contexts, we get consistent results
-        expect(ko.contextFor(testNode).$data.name).toEqual("outer");
-        expect(ko.contextFor(testNode.childNodes[0]).$data.name).toEqual("outer");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual("top");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual("middle");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).$data.name).toEqual("bottom");
+        expect(ko.contextFor(testNode).$data.name).to.deep.equal("outer");
+        expect(ko.contextFor(testNode.childNodes[0]).$data.name).to.deep.equal("outer");
+        expect(ko.contextFor(testNode.childNodes[0].childNodes[0]).$data.name).to.deep.equal("top");
+        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0]).$data.name).to.deep.equal("middle");
+        expect(ko.contextFor(testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).$data.name).to.deep.equal("bottom");
         var firstSpan = testNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0];
-        expect(firstSpan.tagName).toEqual("SPAN");
-        expect(ko.contextFor(firstSpan).$data.name).toEqual("bottom");
-        expect(ko.contextFor(firstSpan).$root.name).toEqual("outer");
-        expect(ko.contextFor(firstSpan).$parents[1].name).toEqual("top");
+        expect(firstSpan.tagName).to.deep.equal("SPAN");
+        expect(ko.contextFor(firstSpan).$data.name).to.deep.equal("bottom");
+        expect(ko.contextFor(firstSpan).$root.name).to.deep.equal("outer");
+        expect(ko.contextFor(firstSpan).$parents[1].name).to.deep.equal("top");
     });
 
     it('Should be able to access all parent bindings when using "as" when "createChildContextWithAs" is set', function() {
@@ -163,12 +166,12 @@ describe('Binding: With', function() {
             }
         }, testNode);
         var finalContainer = testNode.childNodes[0].childNodes[0].childNodes[0];
-        expect(finalContainer.childNodes[0]).toContainText("bottom");
-        expect(finalContainer.childNodes[1]).toContainText("middle");
-        expect(finalContainer.childNodes[2]).toContainText("middle");
-        expect(finalContainer.childNodes[3]).toContainText("top");
-        expect(finalContainer.childNodes[4]).toContainText("outer");
-        expect(finalContainer.childNodes[5]).toContainText("outer");
+        expectContainText(finalContainer.childNodes[0], "bottom");
+        expectContainText(finalContainer.childNodes[1], "middle");
+        expectContainText(finalContainer.childNodes[2], "middle");
+        expectContainText(finalContainer.childNodes[3], "top");
+        expectContainText(finalContainer.childNodes[4], "outer");
+        expectContainText(finalContainer.childNodes[5], "outer");
     });
 
     it('Should be able to define an \"with\" region using a containerless template', function() {
@@ -177,15 +180,15 @@ describe('Binding: With', function() {
         ko.applyBindings({ someitem: someitem }, testNode);
 
         // First it's not there
-        expect(testNode).toContainHtml("hello <!-- ko with: someitem --><!-- /ko --> goodbye");
+        expectContainHtml(testNode, "hello <!-- ko with: someitem --><!-- /ko --> goodbye");
 
         // Then it's there
         someitem({ occasionallyexistentchildprop: 'child prop value' });
-        expect(testNode).toContainHtml("hello <!-- ko with: someitem --><span data-bind=\"text: occasionallyexistentchildprop\">child prop value</span><!-- /ko --> goodbye");
+        expectContainHtml(testNode, "hello <!-- ko with: someitem --><span data-bind=\"text: occasionallyexistentchildprop\">child prop value</span><!-- /ko --> goodbye");
 
         // Then it's gone again
         someitem(null);
-        expect(testNode).toContainHtml("hello <!-- ko with: someitem --><!-- /ko --> goodbye");
+        expectContainHtml(testNode, "hello <!-- ko with: someitem --><!-- /ko --> goodbye");
     });
 
     it('Should be able to nest \"with\" regions defined by containerless templates', function() {
@@ -199,42 +202,42 @@ describe('Binding: With', function() {
         ko.applyBindings(viewModel, testNode);
 
         // First neither are there
-        expect(testNode).toContainHtml("hello <!-- ko with: topitem --><!-- /ko -->");
+        expectContainHtml(testNode, "hello <!-- ko with: topitem --><!-- /ko -->");
 
         // Make top appear
         viewModel.topitem({ topprop: 'property of top', childitem: ko.observable() });
-        expect(testNode).toContainHtml("hello <!-- ko with: topitem -->got top: <span data-bind=\"text: topprop\">property of top</span><!-- ko with: childitem --><!-- /ko --><!-- /ko -->");
+        expectContainHtml(testNode, "hello <!-- ko with: topitem -->got top: <span data-bind=\"text: topprop\">property of top</span><!-- ko with: childitem --><!-- /ko --><!-- /ko -->");
 
         // Make child appear
         viewModel.topitem().childitem({ childprop: 'property of child' });
-        expect(testNode).toContainHtml("hello <!-- ko with: topitem -->got top: <span data-bind=\"text: topprop\">property of top</span><!-- ko with: childitem -->got child: <span data-bind=\"text: childprop\">property of child</span><!-- /ko --><!-- /ko -->");
+        expectContainHtml(testNode, "hello <!-- ko with: topitem -->got top: <span data-bind=\"text: topprop\">property of top</span><!-- ko with: childitem -->got child: <span data-bind=\"text: childprop\">property of child</span><!-- /ko --><!-- /ko -->");
 
         // Make top disappear
         viewModel.topitem(null);
-        expect(testNode).toContainHtml("hello <!-- ko with: topitem --><!-- /ko -->");
+        expectContainHtml(testNode, "hello <!-- ko with: topitem --><!-- /ko -->");
     });
 
     it('Should provide access to an observable viewModel through $rawData', function() {
         testNode.innerHTML = "<div data-bind='with: item'><input data-bind='value: $rawData'/><div data-bind='text: $data'></div></div>";
         var item = ko.observable('one');
         ko.applyBindings({ item: item }, testNode);
-        expect(item.getSubscriptionsCount('change')).toEqual(3);    // subscriptions are the with and value bindings, and the binding context
-        expect(testNode.childNodes[0]).toHaveValues(['one']);
-        expect(testNode.childNodes[0].childNodes[1]).toContainText('one');
+        expect(item.getSubscriptionsCount('change')).to.deep.equal(3);    // subscriptions are the with and value bindings, and the binding context
+        expectHaveValues(testNode.childNodes[0], ['one']);
+        expectContainText(testNode.childNodes[0].childNodes[1], 'one');
 
         // Should update observable when input is changed
         testNode.childNodes[0].childNodes[0].value = 'two';
         ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "change");
-        expect(item()).toEqual('two');
-        expect(testNode.childNodes[0].childNodes[1]).toContainText('two');
+        expect(item()).to.deep.equal('two');
+        expectContainText(testNode.childNodes[0].childNodes[1], 'two');
 
         // Should update the input when the observable changes
         item('three');
-        expect(testNode.childNodes[0]).toHaveValues(['three']);
-        expect(testNode.childNodes[0].childNodes[1]).toContainText('three');
+        expectHaveValues(testNode.childNodes[0], ['three']);
+        expectContainText(testNode.childNodes[0].childNodes[1], 'three');
 
         // subscription count is stable
-        expect(item.getSubscriptionsCount('change')).toEqual(3);
+        expect(item.getSubscriptionsCount('change')).to.deep.equal(3);
     });
 
     it('Should update if given a function', function () {
@@ -253,13 +256,13 @@ describe('Binding: With', function() {
 
         var model = new ViewModel();
         ko.applyBindings(model, testNode);
-        expect(testNode).toContainText("4");
+        expectContainText(testNode, "4");
 
         model.items.push({ x: ko.observable(15) });
-        expect(testNode).toContainText("19");
+        expectContainText(testNode, "19");
 
         model.items()[0].x(10);
-        expect(testNode).toContainText("25");
+        expectContainText(testNode, "25");
     });
 
     it('Should call a childrenComplete callback function', function () {
@@ -267,16 +270,16 @@ describe('Binding: With', function() {
         var someItem = ko.observable({ childprop: 'child' }),
             callbacks = 0;
         ko.applyBindings({ someItem: someItem, callback: function () { callbacks++; } }, testNode);
-        expect(callbacks).toEqual(1);
-        expect(testNode.childNodes[0]).toContainText('child');
+        expect(callbacks).to.deep.equal(1);
+        expectContainText(testNode.childNodes[0], 'child');
 
         someItem(null);
-        expect(callbacks).toEqual(1);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(callbacks).to.deep.equal(1);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
 
         someItem({ childprop: "new child" });
-        expect(callbacks).toEqual(2);
-        expect(testNode.childNodes[0]).toContainText('new child');
+        expect(callbacks).to.deep.equal(2);
+        expectContainText(testNode.childNodes[0], 'new child');
     });
 
     describe('With "createChildContextWithAs = false" and "as"', function () {
@@ -290,38 +293,38 @@ describe('Binding: With', function() {
             var someItem = { childProp: 'Hello' };
             ko.applyBindings({ someItem: someItem }, testNode);
 
-            expect(testNode.childNodes[0].childNodes[0]).toContainText('Hello');
-            expect(ko.dataFor(testNode.childNodes[0].childNodes[0])).toEqual(ko.dataFor(testNode));
+            expectContainText(testNode.childNodes[0].childNodes[0], 'Hello');
+            expect(ko.dataFor(testNode.childNodes[0].childNodes[0])).to.deep.equal(ko.dataFor(testNode));
         });
 
         it('Should provide access to observable value', function() {
             testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><input data-bind='value: item'/></div>";
             var someItem = ko.observable('Hello');
             ko.applyBindings({ someItem: someItem }, testNode);
-            expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello');
+            expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('Hello');
 
-            expect(ko.dataFor(testNode.childNodes[0].childNodes[0])).toEqual(ko.dataFor(testNode));
+            expect(ko.dataFor(testNode.childNodes[0].childNodes[0])).to.deep.equal(ko.dataFor(testNode));
 
             // Should update observable when input is changed
             testNode.childNodes[0].childNodes[0].value = 'Goodbye';
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "change");
-            expect(someItem()).toEqual('Goodbye');
+            expect(someItem()).to.deep.equal('Goodbye');
 
             // Should update the input when the observable changes
             someItem('Hello again');
-            expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello again');
+            expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('Hello again');
         });
 
         it('Should not re-render the nodes when an observable value changes', function() {
             testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item'></span></div>";
             var someItem = ko.observable('first');
             ko.applyBindings({ someItem: someItem }, testNode);
-            expect(testNode.childNodes[0]).toContainText('first');
+            expectContainText(testNode.childNodes[0], 'first');
 
             var saveNode = testNode.childNodes[0].childNodes[0];
             someItem('second');
-            expect(testNode.childNodes[0]).toContainText('second');
-            expect(testNode.childNodes[0].childNodes[0]).toEqual(saveNode);
+            expectContainText(testNode.childNodes[0], 'second');
+            expect(testNode.childNodes[0].childNodes[0]).to.deep.equal(saveNode);
         });
 
         it('Should remove nodes when an observable value become falsy', function() {
@@ -330,16 +333,16 @@ describe('Binding: With', function() {
             ko.applyBindings({ someItem: someItem }, testNode);
 
             // First it's not there
-            expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+            expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
 
             // Then it's there
             someItem({ occasionallyExistentChildProp: 'Child prop value' });
-            expect(testNode.childNodes[0].childNodes.length).toEqual(1);
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
+            expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
+            expectContainText(testNode.childNodes[0].childNodes[0], "Child prop value");
 
             // Then it's gone again
             someItem(null);
-            expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+            expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
         });
     });
 
@@ -354,41 +357,41 @@ describe('Binding: With', function() {
             var someItem = { childProp: 'Hello' };
             ko.applyBindings({ someItem: someItem }, testNode);
 
-            expect(testNode.childNodes[0].childNodes[0]).toContainText('Hello');
-            expect(ko.dataFor(testNode.childNodes[0].childNodes[0])).toEqual(someItem);
+            expectContainText(testNode.childNodes[0].childNodes[0], 'Hello');
+            expect(ko.dataFor(testNode.childNodes[0].childNodes[0])).to.deep.equal(someItem);
         });
 
         it('Should unwrap observable value', function() {
             testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><input data-bind='value: item'/><input data-bind='value: $rawData'/></div>";
             var someItem = ko.observable('Hello');
             ko.applyBindings({ someItem: someItem }, testNode);
-            expect(testNode.childNodes[0]).toHaveValues(['Hello', 'Hello']);
+            expectHaveValues(testNode.childNodes[0], ['Hello', 'Hello']);
 
             // Should not update observable when input bound to named item is changed
             testNode.childNodes[0].childNodes[0].value = 'Goodbye';
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "change");
-            expect(someItem()).toEqual('Hello');
+            expect(someItem()).to.deep.equal('Hello');
 
             // Should update observable when input bound to $rawData is changed
             testNode.childNodes[0].childNodes[1].value = 'Goodbye';
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[1], "change");
-            expect(someItem()).toEqual('Goodbye');
+            expect(someItem()).to.deep.equal('Goodbye');
 
             // Should update the input when the observable changes
             someItem('Hello again');
-            expect(testNode.childNodes[0].childNodes[0].value).toEqual('Hello again');
+            expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal('Hello again');
         });
 
         it('Should re-render the nodes when an observable value changes', function() {
             testNode.innerHTML = "<div data-bind='with: someItem, as: \"item\"'><span data-bind='text: item'></span></div>";
             var someItem = ko.observable('first');
             ko.applyBindings({ someItem: someItem }, testNode);
-            expect(testNode.childNodes[0]).toContainText('first');
+            expectContainText(testNode.childNodes[0], 'first');
 
             var saveNode = testNode.childNodes[0].childNodes[0];
             someItem('second');
-            expect(testNode.childNodes[0]).toContainText('second');
-            expect(testNode.childNodes[0].childNodes[0]).not.toEqual(saveNode);
+            expectContainText(testNode.childNodes[0], 'second');
+            expect(testNode.childNodes[0].childNodes[0]).not.to.deep.equal(saveNode);
         });
 
         it('Should remove nodes when an observable value become falsy', function() {
@@ -397,16 +400,16 @@ describe('Binding: With', function() {
             ko.applyBindings({ someItem: someItem }, testNode);
 
             // First it's not there
-            expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+            expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
 
             // Then it's there
             someItem({ occasionallyExistentChildProp: 'Child prop value' });
-            expect(testNode.childNodes[0].childNodes.length).toEqual(1);
-            expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
+            expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
+            expectContainText(testNode.childNodes[0].childNodes[0], "Child prop value");
 
             // Then it's gone again
             someItem(null);
-            expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+            expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
         });
     });
 });

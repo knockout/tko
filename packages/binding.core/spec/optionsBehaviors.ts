@@ -1,4 +1,4 @@
-import { registerEventHandler } from '@tko/utils'
+import { expect } from 'chai'
 
 import { applyBindings } from '@tko/bind'
 
@@ -6,18 +6,44 @@ import { observable, observableArray } from '@tko/observable'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
-import { options } from '@tko/utils'
+import { registerEventHandler, options, selectExtensions } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
 import type { ObservableArray } from '@tko/observable'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { expectContainText, nodeText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
+
+function expectArrayEqual(actual: Array<unknown>, expected: Array<unknown>) {
+  expect(actual.length).to.equal(expected.length)
+  actual.forEach((value, index) => expect(value).to.equal(expected[index]))
+}
+
+function expectHaveTexts(node: Node, expectedTexts: Array<unknown>) {
+  expectArrayEqual(Array.from(node.childNodes, nodeText), expectedTexts)
+}
+
+function expectHaveValues(node: Node, expectedValues: Array<unknown>) {
+  expectArrayEqual(
+    Array.from(node.childNodes, child => (child as any).value).filter(value => value !== undefined),
+    expectedValues
+  )
+}
+
+function expectHaveSelectedValues(node: Node, expectedValues: Array<unknown>) {
+  expectArrayEqual(
+    Array.from(node.childNodes)
+      .filter(child => (child as HTMLOptionElement).selected)
+      .map(child => selectExtensions.readValue(child as HTMLElement)),
+    expectedValues
+  )
+}
 
 describe('Binding: Options', function () {
   let testNode: HTMLElement
+
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -34,26 +60,26 @@ describe('Binding: Options', function () {
     } catch (ex) {
       threw = true
     }
-    expect(threw).toEqual(true)
+    expect(threw).to.equal(true)
   })
 
   it("Should set the SELECT node's options set to match the model value", function () {
     const observable = observableArray(['A', 'B', 'C'])
     testNode.innerHTML = "<select data-bind='options:myValues'><option>should be deleted</option></select>"
     applyBindings({ myValues: observable }, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['A', 'B', 'C'])
+    expectHaveTexts(testNode.childNodes[0], ['A', 'B', 'C'])
   })
 
   it('Should accept optionsText and optionsValue params to display subproperties of the model values', function () {
     const modelValues = observableArray([
-      { name: 'bob', id: observable(6) }, // Note that subproperties can be observable
+      { name: 'bob', id: observable(6) },
       { name: observable('frank'), id: 13 }
     ])
     testNode.innerHTML =
       '<select data-bind=\'options:myValues, optionsText: "name", optionsValue: "id"\'><option>should be deleted</option></select>'
     applyBindings({ myValues: modelValues }, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['bob', 'frank'])
-    expect(testNode.childNodes[0]).toHaveValues(['6', '13'])
+    expectHaveTexts(testNode.childNodes[0], ['bob', 'frank'])
+    expectHaveValues(testNode.childNodes[0], ['6', '13'])
   })
 
   it('Should accept function in optionsText param to display subproperties of the model values', function () {
@@ -72,7 +98,7 @@ describe('Binding: Options', function () {
       },
       testNode
     )
-    expect(testNode.childNodes[0]).toHaveTexts(['bob (manager)', 'frank (coder & tester)'])
+    expectHaveTexts(testNode.childNodes[0], ['bob (manager)', 'frank (coder & tester)'])
   })
 
   it('Should accept lambda in optionsText param to compute text from model values', function () {
@@ -80,7 +106,7 @@ describe('Binding: Options', function () {
     testNode.innerHTML =
       "<select data-bind='options: myValues, optionsText: val => val.name.toUpperCase()'><option>should be deleted</option></select>"
     applyBindings({ myValues: modelValues }, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['BOB', 'FRANK'])
+    expectHaveTexts(testNode.childNodes[0], ['BOB', 'FRANK'])
   })
 
   it('Should accept a function in optionsValue param to select subproperties of the model values (and use that for the option text)', function () {
@@ -99,15 +125,15 @@ describe('Binding: Options', function () {
       },
       testNode
     )
-    expect(testNode.childNodes[0]).toHaveValues(['bob (manager)', 'frank (coder & tester)'])
-    expect(testNode.childNodes[0]).toHaveTexts(['bob (manager)', 'frank (coder & tester)'])
+    expectHaveValues(testNode.childNodes[0], ['bob (manager)', 'frank (coder & tester)'])
+    expectHaveTexts(testNode.childNodes[0], ['bob (manager)', 'frank (coder & tester)'])
   })
 
   it('Should exclude any items marked as destroyed', function () {
     const modelValues = observableArray([{ name: 'bob', _destroy: true }, { name: 'frank' }])
     testNode.innerHTML = '<select data-bind=\'options: myValues, optionsValue: "name"\'></select>'
     applyBindings({ myValues: modelValues }, testNode)
-    expect(testNode.childNodes[0]).toHaveValues(['frank'])
+    expectHaveValues(testNode.childNodes[0], ['frank'])
   })
 
   it('Should include items marked as destroyed if optionsIncludeDestroyed is set', function () {
@@ -115,7 +141,7 @@ describe('Binding: Options', function () {
     testNode.innerHTML =
       '<select data-bind=\'options: myValues, optionsValue: "name", optionsIncludeDestroyed: true\'></select>'
     applyBindings({ myValues: modelValues }, testNode)
-    expect(testNode.childNodes[0]).toHaveValues(['bob', 'frank'])
+    expectHaveValues(testNode.childNodes[0], ['bob', 'frank'])
   })
 
   it("Should update the SELECT node's options if the model changes", function () {
@@ -123,7 +149,7 @@ describe('Binding: Options', function () {
     testNode.innerHTML = "<select data-bind='options:myValues'><option>should be deleted</option></select>"
     applyBindings({ myValues: observable }, testNode)
     observable.splice(1, 1)
-    expect(testNode.childNodes[0]).toHaveTexts(['A', 'C'])
+    expectHaveTexts(testNode.childNodes[0], ['A', 'C'])
   })
 
   it("Should retain as much selection as possible when changing the SELECT node's options", function () {
@@ -131,9 +157,9 @@ describe('Binding: Options', function () {
     testNode.innerHTML = "<select data-bind='options:myValues' multiple='multiple'></select>"
     applyBindings({ myValues: observable }, testNode)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[1].selected = true
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['B'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['B'])
     observable(['B', 'C', 'A'])
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['B'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['B'])
   })
 
   it('Should retain selection when replacing the options data with new objects that have the same "value"', function () {
@@ -141,37 +167,34 @@ describe('Binding: Options', function () {
     testNode.innerHTML = "<select data-bind='options:myValues, optionsValue:\"x\"' multiple='multiple'></select>"
     applyBindings({ myValues: observable }, testNode)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[1].selected = true
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['B'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['B'])
     observable([{ x: 'A' }, { x: 'C' }, { x: 'B' }])
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['B'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['B'])
   })
 
   it('Should select first option when removing the selected option and the original first option', function () {
-    // This test failed in IE<=8 and Firefox without changes made in #1208
     testNode.innerHTML = "<select data-bind=\"options: filterValues, optionsText: 'x', optionsValue: 'x'\">"
     const viewModel = { filterValues: observableArray([{ x: 1 }, { x: 2 }, { x: 3 }]) }
     applyBindings(viewModel, testNode)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[1].selected = true
-    expect(testNode.childNodes[0]).toHaveSelectedValues([2])
+    expectHaveSelectedValues(testNode.childNodes[0], [2])
 
     viewModel.filterValues.splice(0, 2, { x: 4 })
-    expect(testNode.childNodes[0]).toHaveSelectedValues([4])
+    expectHaveSelectedValues(testNode.childNodes[0], [4])
   })
 
   it('Should select caption by default and retain selection when adding multiple items', function () {
-    // This test failed in IE<=8 without changes made in #1208
     testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
     const viewModel = { filterValues: observableArray(undefined) }
     applyBindings(viewModel, testNode)
-    expect(testNode.childNodes[0]).toHaveSelectedValues([undefined])
+    expectHaveSelectedValues(testNode.childNodes[0], [undefined])
     const captionElement = (testNode.childNodes[0] as HTMLSelectElement).options[0]
 
     viewModel.filterValues.push('1')
     viewModel.filterValues.push('2')
-    expect(testNode.childNodes[0]).toHaveSelectedValues([undefined])
+    expectHaveSelectedValues(testNode.childNodes[0], [undefined])
 
-    // The option element for the caption is retained
-    expect((testNode.childNodes[0] as HTMLSelectElement).options[0]).toBe(captionElement)
+    expect((testNode.childNodes[0] as HTMLSelectElement).options[0]).to.equal(captionElement)
   })
 
   it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
@@ -182,28 +205,24 @@ describe('Binding: Options', function () {
       changeHandlerFireCount++
     })
     applyBindings({ myValues: myObservable }, testNode)
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(0)
-    expect(changeHandlerFireCount).toEqual(1)
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
+    expect(changeHandlerFireCount).to.equal(1)
 
-    // Change the order of options; since selection is not changed, should not trigger change event
     myObservable(['B', 'C', 'A'])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(2)
-    expect(changeHandlerFireCount).toEqual(1)
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+    expect(changeHandlerFireCount).to.equal(1)
 
-    // Change to a new set of options; since selection is changed, should trigger change event
     myObservable(['D', 'E'])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(0)
-    expect(changeHandlerFireCount).toEqual(2)
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
+    expect(changeHandlerFireCount).to.equal(2)
 
-    // Delete all options; selection is changed (to nothing), so should trigger event
     myObservable([])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(-1)
-    expect(changeHandlerFireCount).toEqual(3)
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(-1)
+    expect(changeHandlerFireCount).to.equal(3)
 
-    // Re-add options; should trigger change event
     myObservable([1, 2, 3])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(0)
-    expect(changeHandlerFireCount).toEqual(4)
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
+    expect(changeHandlerFireCount).to.equal(4)
   })
 
   it('Should trigger a change event when the options selection is changed by modifying the options data (multiple select)', function () {
@@ -214,73 +233,65 @@ describe('Binding: Options', function () {
       changeHandlerFireCount++
     })
     applyBindings({ myValues: myObservable }, testNode)
-    expect(changeHandlerFireCount).toEqual(0) // Selection wasn't changed
-
-    // Select the first item and change the order of options; since selection is not changed, should not trigger change event
+    expect(changeHandlerFireCount).to.equal(0)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[0].selected = true
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['A'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['A'])
     myObservable(['B', 'C', 'A'])
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['A'])
-    expect(changeHandlerFireCount).toEqual(0)
-
-    // Select another item and then remove it from options; since selection is changed, should trigger change event
+    expectHaveSelectedValues(testNode.childNodes[0], ['A'])
+    expect(changeHandlerFireCount).to.equal(0)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[0].selected = true
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['B', 'A'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['B', 'A'])
     myObservable(['C', 'A'])
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['A'])
-    expect(changeHandlerFireCount).toEqual(1)
+    expectHaveSelectedValues(testNode.childNodes[0], ['A'])
+    expect(changeHandlerFireCount).to.equal(1)
 
-    // Change to a new set of options; since selection is changed (to nothing), should trigger change event
     myObservable(['D', 'E'])
-    expect(testNode.childNodes[0]).toHaveSelectedValues([])
-    expect(changeHandlerFireCount).toEqual(2)
+    expectHaveSelectedValues(testNode.childNodes[0], [])
+    expect(changeHandlerFireCount).to.equal(2)
 
-    // Delete all options; selection is not changed, so shouldn't trigger event
     myObservable([])
-    expect(changeHandlerFireCount).toEqual(2)
+    expect(changeHandlerFireCount).to.equal(2)
 
-    // Set observable options and select them
     myObservable([observable('X'), observable('Y')])
-    expect(changeHandlerFireCount).toEqual(2)
+    expect(changeHandlerFireCount).to.equal(2)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[0].selected = (
       testNode.childNodes[0] as HTMLSelectElement
     ).options[1].selected = true
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['X', 'Y'])
+    expectHaveSelectedValues(testNode.childNodes[0], ['X', 'Y'])
 
-    // Change the value of a selected item, which should deselect it and trigger a change event
     myObservable()[1]('Z')
-    expect(testNode.childNodes[0]).toHaveSelectedValues(['X'])
-    expect(changeHandlerFireCount).toEqual(3)
+    expectHaveSelectedValues(testNode.childNodes[0], ['X'])
+    expect(changeHandlerFireCount).to.equal(3)
   })
 
   it('Should place a caption at the top of the options list and display it when the model value is undefined', function () {
     testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: "Select one..."\'></select>'
     applyBindings({}, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['Select one...', 'A', 'B'])
+    expectHaveTexts(testNode.childNodes[0], ['Select one...', 'A', 'B'])
   })
 
   it('Should not include the caption if the options value is null', function () {
     testNode.innerHTML = '<select data-bind=\'options: null, optionsCaption: "Select one..."\'></select>'
     applyBindings({}, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts([])
+    expectHaveTexts(testNode.childNodes[0], [])
   })
 
   it('Should not include the caption if the optionsCaption value is null', function () {
     testNode.innerHTML = '<select data-bind=\'options: ["A", "B"], optionsCaption: null\'></select>'
     applyBindings({}, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['A', 'B'])
+    expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
   })
 
   it('Should not include the caption if the optionsCaption value is undefined', function () {
     testNode.innerHTML = '<select data-bind=\'options: ["A", "B"], optionsCaption: test\'></select>'
     applyBindings({ test: observable() }, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['A', 'B'])
+    expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
   })
 
   it("Should include a caption even if it's blank", function () {
     testNode.innerHTML = '<select data-bind=\'options: ["A","B"], optionsCaption: ""\'></select>'
     applyBindings({}, testNode)
-    expect(testNode.childNodes[0]).toHaveTexts(['', 'A', 'B'])
+    expectHaveTexts(testNode.childNodes[0], ['', 'A', 'B'])
   })
 
   it('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function () {
@@ -288,18 +299,16 @@ describe('Binding: Options', function () {
     testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
     applyBindings({ myCaption: myCaption }, testNode)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[2].selected = true
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(2)
-    expect(testNode.childNodes[0]).toHaveTexts(['Initial caption', 'A', 'B'])
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+    expectHaveTexts(testNode.childNodes[0], ['Initial caption', 'A', 'B'])
 
-    // Show we can update the caption without affecting selection
     myCaption('New caption')
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(2)
-    expect(testNode.childNodes[0]).toHaveTexts(['New caption', 'A', 'B'])
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+    expectHaveTexts(testNode.childNodes[0], ['New caption', 'A', 'B'])
 
-    // Show that caption will be removed if value is null
     myCaption(null)
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(1)
-    expect(testNode.childNodes[0]).toHaveTexts(['A', 'B'])
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(1)
+    expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
   })
 
   it('Should allow the option text to be given by an observable and update it when the model changes without affecting selection', function () {
@@ -312,13 +321,12 @@ describe('Binding: Options', function () {
     applyBindings({ people: people }, testNode)
     ;(testNode.childNodes[0] as HTMLSelectElement).options[2].selected = true
 
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(2)
-    expect(testNode.childNodes[0]).toHaveTexts(['-', 'Annie', 'Bert'])
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+    expectHaveTexts(testNode.childNodes[0], ['-', 'Annie', 'Bert'])
 
-    // Also show we can update the text without affecting selection
     people[1].name('Bob')
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).toEqual(2)
-    expect(testNode.childNodes[0]).toHaveTexts(['-', 'Annie', 'Bob'])
+    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+    expectHaveTexts(testNode.childNodes[0], ['-', 'Annie', 'Bob'])
   })
 
   it('Should call an optionsAfterRender callback function and not cause updates if an observable accessed in the callback is changed', function () {
@@ -337,18 +345,15 @@ describe('Binding: Options', function () {
       },
       testNode
     )
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
 
-    // Change the array, but don't update the observableArray so that the options binding isn't updated
     someItems().push({ childprop: 'hidden child' })
-    expect(testNode.childNodes[0]).toContainText('first child')
-    // Update callback observable and check that the binding wasn't updated
+    expectContainText(testNode.childNodes[0], 'first child')
     callbackObservable(2)
-    expect(testNode.childNodes[0]).toContainText('first child')
-    // Update the observableArray and verify that the binding is now updated
+    expectContainText(testNode.childNodes[0], 'first child')
     someItems.valueHasMutated()
-    expect(testNode.childNodes[0]).toContainText('first childhidden child')
-    expect(callbacks).toEqual(2)
+    expectContainText(testNode.childNodes[0], 'first childhidden child')
+    expect(callbacks).to.equal(2)
   })
 
   it('Should ignore the optionsAfterRender binding if the callback was not provided or not a function', function () {
@@ -357,7 +362,6 @@ describe('Binding: Options', function () {
     const someItems = observableArray([{ childprop: 'first child' }])
 
     applyBindings({ someItems: someItems, callback: null }, testNode)
-    // Ensure bindings were applied normally
-    expect(testNode.childNodes[0]).toContainText('first child')
+    expectContainText(testNode.childNodes[0], 'first child')
   })
 })

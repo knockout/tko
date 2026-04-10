@@ -1,4 +1,5 @@
 import { applyBindings } from '@tko/bind'
+import { expect } from 'chai'
 
 import { observable } from '@tko/observable'
 
@@ -8,12 +9,12 @@ import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: CSS style', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -27,11 +28,11 @@ describe('Binding: CSS style', function () {
     testNode.innerHTML = '<div data-bind=\'style: { "background-color": colorValue }\'>Hallo</div>'
     applyBindings({ colorValue: myObservable }, testNode)
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.backgroundColor).toEqualOneOf(['red', '#ff0000']) // Opera returns style color values in #rrggbb notation, unlike other browsers
+    expect(divEl.style.backgroundColor).to.be.oneOf(['red', '#ff0000']) // Opera returns style color values in #rrggbb notation, unlike other browsers
     myObservable('green')
-    expect(divEl.style.backgroundColor).toEqualOneOf(['green', '#008000'])
+    expect(divEl.style.backgroundColor).to.be.oneOf(['green', '#008000'])
     myObservable(undefined)
-    expect(divEl.style.backgroundColor).toEqual('')
+    expect(divEl.style.backgroundColor).to.equal('')
   })
 
   it('Should be able to apply the numeric value to a style and have it converted to px', function () {
@@ -39,7 +40,7 @@ describe('Binding: CSS style', function () {
     testNode.innerHTML = "<div data-bind='style: { width: 10 }'></div>"
     applyBindings(null, testNode)
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.width).toBe('10px')
+    expect(divEl.style.width).to.equal('10px')
   })
 
   it('Should give the element the specified CSS style value', function () {
@@ -47,18 +48,18 @@ describe('Binding: CSS style', function () {
     testNode.innerHTML = "<div data-bind='style: { backgroundColor: colorValue }'>Hallo</div>"
     applyBindings({ colorValue: myObservable }, testNode)
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.backgroundColor).toEqualOneOf(['red', '#ff0000']) // Opera returns style color values in #rrggbb notation, unlike other browsers
+    expect(divEl.style.backgroundColor).to.be.oneOf(['red', '#ff0000']) // Opera returns style color values in #rrggbb notation, unlike other browsers
     myObservable('green')
-    expect(divEl.style.backgroundColor).toEqualOneOf(['green', '#008000'])
+    expect(divEl.style.backgroundColor).to.be.oneOf(['green', '#008000'])
     myObservable(undefined)
-    expect(divEl.style.backgroundColor).toEqual('')
+    expect(divEl.style.backgroundColor).to.equal('')
   })
 
   it("Should be able to apply the numeric value to a style that doesn't accept pixels", function () {
     testNode.innerHTML = "<div data-bind='style: { zIndex: 10 }'></div>"
     applyBindings(null, testNode)
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.zIndex).toEqualOneOf(['10', 10])
+    expect(divEl.style.zIndex).to.be.oneOf(['10', 10])
   })
 
   it('Should be able to apply the numeric value zero to a style', function () {
@@ -66,7 +67,7 @@ describe('Binding: CSS style', function () {
     testNode.innerHTML = "<div data-bind='style: { width: 0 }'></div>"
     applyBindings(null, testNode)
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.width).toBe('0px')
+    expect(divEl.style.width).to.equal('0px')
   })
 
   it('Should be able to use "false" to remove a style', function () {
@@ -74,7 +75,7 @@ describe('Binding: CSS style', function () {
     testNode.innerHTML = "<div style='width: 100px' data-bind='style: { width: false }'></div>"
     applyBindings(null, testNode)
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.width).toBe('')
+    expect(divEl.style.width).to.equal('')
   })
 
   it('Should properly respond to changes in the observable, adding px when appropriate', function () {
@@ -84,15 +85,15 @@ describe('Binding: CSS style', function () {
     applyBindings({ width: width }, testNode)
 
     const divEl = testNode.children[0] as HTMLDivElement
-    expect(divEl.style.width).toBe('')
+    expect(divEl.style.width).to.equal('')
 
     width(10)
-    expect(divEl.style.width).toBe('10px')
+    expect(divEl.style.width).to.equal('10px')
 
     width(20)
-    expect(divEl.style.width).toBe('20px')
+    expect(divEl.style.width).to.equal('20px')
 
     width(false)
-    expect(divEl.style.width).toBe('')
+    expect(divEl.style.width).to.equal('')
   })
 })
