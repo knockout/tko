@@ -360,9 +360,9 @@
       class="odoom"
       id="appRoot"
       tabindex="0"
-      data-bind="hasFocus: viewportFocused, event: { keydown: handleKeyDown, keyup: handleKeyUp, pointerdown: focusViewport }"
+      data-bind="hasFocus: viewportFocused, event: { keydown: handleKeyDown, keyup: handleKeyUp }"
     >
-      <div class="viewport">
+      <div class="viewport" data-bind="event: { pointerdown: focusViewport }">
         <canvas data-bind="odoomScene: $data"></canvas>
       </div>
       <div class="muzzle" data-bind="style: { opacity: muzzleOpacity }"></div>

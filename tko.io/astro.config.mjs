@@ -29,17 +29,7 @@ export default defineConfig({
       sidebar: [
         { label: 'Introduction', slug: 'index' },
         { label: 'Knockout 3 to 4 Guide', slug: '3to4' },
-        {
-          label: 'Examples',
-          items: [
-            { label: 'Overview', slug: 'examples' },
-            { label: 'Honeycomb ↗', link: '/examples/honeycomb.html?view=example' },
-            { label: 'odoom ↗', link: '/examples/odoom.html?view=example' },
-            { label: 'Spreadsheet ↗', link: '/examples/spreadsheet.html?view=example' },
-            { label: 'Signal Graph ↗', link: '/examples/signal-graph.html?view=example' },
-            { label: 'Form Engine ↗', link: '/examples/form-engine.html?view=example' }
-          ]
-        },
+        { label: 'Examples', slug: 'examples' },
         { label: 'Bindings', autogenerate: { directory: 'bindings' } },
         { label: 'Observables', autogenerate: { directory: 'observables' } },
         { label: 'Computed', autogenerate: { directory: 'computed' } },

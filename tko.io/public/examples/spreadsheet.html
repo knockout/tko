@@ -894,12 +894,12 @@
           const refs = new Set()
           const body = text.slice(1)
 
-          for (const match of body.matchAll(/\b([A-F][1-6])\s*:\s*([A-F][1-6])\b/g)) {
-            expandRange(match[1], match[2]).forEach(ref => refs.add(ref))
+          for (const match of body.matchAll(/\b([A-F][1-6])\s*:\s*([A-F][1-6])\b/gi)) {
+            expandRange(match[1].toUpperCase(), match[2].toUpperCase()).forEach(ref => refs.add(ref))
           }
 
-          for (const match of body.matchAll(/\b([A-F][1-6])\b/g)) {
-            refs.add(match[1])
+          for (const match of body.matchAll(/\b([A-F][1-6])\b/gi)) {
+            refs.add(match[1].toUpperCase())
           }
 
           return [...refs]
@@ -938,7 +938,7 @@
               new RegExp(`\\b${source}\\s*\\(\\s*([A-F][1-6]\\s*:\\s*[A-F][1-6])\\s*\\)`, 'gi'),
               (_, range) => {
                 const token = `__RANGE_${rangeTokens.length}__`
-                rangeTokens.push({ token, range: range.replace(/\s+/g, '') })
+                rangeTokens.push({ token, range: range.replace(/\s+/g, '').toUpperCase() })
                 return `${alias}(${token})`
               }
             )
@@ -950,7 +950,7 @@
           registerRangeFunction('MIN', 'MIN')
           registerRangeFunction('MAX', 'MAX')
 
-          normalized = normalized.replace(/\b([A-F][1-6])\b/g, (_, ref) => `C("${ref}")`)
+          normalized = normalized.replace(/\b([A-F][1-6])\b/gi, (_, ref) => `C("${ref.toUpperCase()}")`)
 
           for (const { token, range } of rangeTokens) {
             normalized = normalized.replace(token, `R("${range}")`)

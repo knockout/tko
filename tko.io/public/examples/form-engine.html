@@ -1109,6 +1109,15 @@
         }
 
         vm.restoreSample = function () {
+          if (saveFrame) {
+            cancelAnimationFrame(saveFrame)
+            saveFrame = 0
+          }
+          if (savedResetTimer) {
+            clearTimeout(savedResetTimer)
+            savedResetTimer = 0
+          }
+
           vm.company.reset('Northstar Labs')
           vm.owner.reset('Avery Stone')
           vm.contactEmail.reset('avery@northstar.example')
