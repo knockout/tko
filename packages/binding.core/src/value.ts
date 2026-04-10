@@ -12,6 +12,7 @@ export class value extends BindingHandler {
   }
 
   elementValueBeforeEvent: any
+  propertyChangeFired: any
   propertyChangedFired: boolean
   updateFromModel: any
   constructor(...args: [any]) {
@@ -29,7 +30,7 @@ export class value extends BindingHandler {
     if (this.ieAutoCompleteHackNeeded) {
       this.addEventListener('propertyChange', () => (this.propertyChangedFired = true))
       this.addEventListener('focus', () => (this.propertyChangedFired = false))
-      this.addEventListener('blur', () => this.propertyChangedFired && this.valueUpdateHandler())
+      this.addEventListener('blur', () => this.propertyChangeFired && this.valueUpdateHandler())
     }
 
     arrayForEach(this.eventsToCatch, eventName => this.registerEvent(eventName))
