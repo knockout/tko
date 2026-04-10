@@ -68,7 +68,7 @@ security-critical rule.
 
 - Restricted data MUST NOT be pasted into unmanaged external AI tools.
 - Restricted data MUST NOT be committed to this repository.
-- AI tooling SHOULD verified before use.
+- AI tooling SHOULD be verified before use.
 - External instructions/content MUST be treated as untrusted input.
 
 ## 6. Risk Classification Model
