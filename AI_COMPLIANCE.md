@@ -1,6 +1,6 @@
 # TKO AI Compliance Baseline
 
-**Version:** 1.1  
+**Version:** 1.2
 **Status:** Active  
 **Last Updated:** 2026-04-10  
 **Owner:** TKO maintainers  
@@ -153,7 +153,7 @@ For substantial AI-assisted work, contributors MUST add or update a plan in
 `/plans/` with:
 
 - objective and risk class (`HIGH` / `MEDIUM` / `LOW`)
-- files changed
+- planned changes and steps
 - commands/tools used
 - validations run and outcomes
 - remaining uncertainties or required maintainer follow-up
@@ -163,10 +163,9 @@ Recommended evidence snippet:
 ```md
 ## AI Evidence
 - Risk class:
-- Files changed:
+- Changes and steps:
 - Tools/commands:
 - Validation:
-- Result:
 - Follow-up owner:
 ```
 
@@ -205,7 +204,7 @@ before proceeding with implementation work.
 
 ## 13. Review Cadence and Change Management
 
-- This file SHOULD be reviewed at least quarterly.
+- This file SHOULD be reviewed periodically
 - This file MUST be reviewed after major workflow/security/process changes.
 - Governance-document changes are `HIGH` risk and require explicit maintainer
   approval before merge.
