@@ -1,6 +1,6 @@
 # TKO Agent Guide
 
-Test-backed behavior summaries live under `/agents/verified-behaviors/`. Treat those files as the contract layer when prose docs and implementation need reconciliation.
+Use `/llms.txt` as the index for the full agent docs set. Treat the verified behaviors docs as the contract layer when prose docs and implementation need reconciliation.
 
 ## Setup
 

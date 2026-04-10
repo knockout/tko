@@ -1,6 +1,6 @@
 # TKO Agent Testing Guide
 
-How to run and verify TKO code without human interaction.
+Use `/llms.txt` as the index for the full agent docs set. This file explains how to run and verify TKO code without human interaction.
 
 ## Option 1: Static HTML file (data-bind, no JSX)
 

@@ -1,5 +1,7 @@
 # Verified Behaviors Index
 
+Use `/llms.txt` as the index for the full agent docs set.
+
 > Generated from package discovery plus package-local curated unit-test-backed JSON.
 > If a behavior is not covered by unit tests, it does not belong in this directory.
 
