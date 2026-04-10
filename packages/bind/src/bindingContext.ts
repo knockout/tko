@@ -1,5 +1,4 @@
-import { extend, options, domData, isObjectLike } from '@tko/utils'
-import type { KnockoutInstance } from '@tko/builder'
+import { extend, options, domData, isObjectLike, type KnockoutUtils } from '@tko/utils'
 
 import { pureComputed } from '@tko/computed'
 
@@ -9,7 +8,7 @@ import type { Observable } from '@tko/observable'
 
 import { contextAncestorBindingInfo } from './bindingEvent'
 
-import { BindingContextExtendCallback } from './applyBindings'
+import type { BindingContextExtendCallback } from './applyBindings'
 
 export const boundElementDomDataKey = domData.nextKey()
 
@@ -23,7 +22,7 @@ export interface BindingContextSetting {
 }
 
 export interface BindingContext<T = any> {
-  ko: KnockoutInstance
+  ko: KnockoutUtils
 
   [symbol: symbol]: any
   $parent?: any
