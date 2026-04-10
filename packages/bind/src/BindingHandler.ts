@@ -97,7 +97,11 @@ export class BindingHandler<T = any> extends LifeCycle {
     provider.bindingHandlers.set(name, this) //todo dangerous javascript: this in static function = this is calling object
   }
 
-  static registerBindingHandler(handler: BindingHandler, name: string, provider = options.bindingProviderInstance) {
+  static registerBindingHandler(
+    handler: typeof BindingHandler,
+    name: string,
+    provider = options.bindingProviderInstance
+  ) {
     provider.bindingHandlers.set(name, handler)
   }
 }

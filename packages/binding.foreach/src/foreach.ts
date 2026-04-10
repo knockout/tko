@@ -97,7 +97,6 @@ export class ForEachBinding extends AsyncBindingHandler {
   //    computed
   //    {data: array, name: string, as: string}
   afterAdd
-  override allBindings: AllBindings
   static animateFrame
   as
   beforeRemove

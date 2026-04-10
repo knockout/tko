@@ -6,7 +6,7 @@ releases without manual verification of every detail.
 
 ---
 
-## Current State
+## Original State
 
 - 25-package Lerna monorepo, fully TypeScript, built with esbuild + Make
 - ~89% test coverage across 143 test files with Karma
@@ -14,7 +14,7 @@ releases without manual verification of every detail.
 - ESLint + Prettier enforced on PRs
 - Manual release via `lerna version` + `lerna publish`
 
-## Gaps
+## Original Gaps
 
 | Area | Risk |
 |------|------|
@@ -62,8 +62,9 @@ New workflow `.github/workflows/publish-check.yml` that runs on PRs:
 Installed `@changesets/cli`. Configuration in `.changeset/config.json`.
 Contributors add a changeset file with their PR: `npx changeset add`.
 On merge to main, the release workflow opens a "Version Packages" PR
-that bumps versions and updates changelogs. Merging that PR publishes
-to npm.
+that bumps versions and updates changelogs. TKO now uses a repo-wide
+fixed version group for all public `@tko/*` packages, so public releases
+move together on one version line. Merging that PR publishes to npm.
 
 ### 2.2 Add a release workflow ✅ DONE
 
@@ -71,7 +72,10 @@ to npm.
 - Builds all packages and runs tests
 - If unreleased changesets exist, opens/updates a version PR
 - If version PR is merged, publishes to npm
-- Requires `NPM_TOKEN` secret in GitHub repo settings
+- After a successful publish, creates the matching GitHub Release and tag in the same workflow
+- Uses npm trusted publishing via GitHub Actions OIDC
+- Requires trusted publisher configuration for the public `@tko/*` packages on npm
+- Includes a manual `github-release.yml` workflow to backfill a missing release/tag for a published `main` commit if GitHub release creation ever needs a retry after publish
 
 ---
 
@@ -86,8 +90,8 @@ to npm.
 
 ### 3.2 Add npm provenance to publishing ✅ DONE
 
-Release workflow publishes with `--provenance` flag so users can verify
-packages were built in CI.
+When publishing through npm trusted publishing from GitHub Actions, npm
+automatically emits provenance attestations for public packages.
 
 ### 3.3 Add `npm audit` to CI ✅ DONE
 

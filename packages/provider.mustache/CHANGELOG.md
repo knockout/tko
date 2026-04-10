@@ -1,0 +1,13 @@
+# @tko/provider.mustache
+
+## 4.0.0
+
+### Patch Changes
+
+- Stabilize the full public TKO package set for the 4.0.0 release.
+- Updated dependencies
+  - @tko/binding.template@4.0.0
+  - @tko/observable@4.0.0
+  - @tko/provider@4.0.0
+  - @tko/utils@4.0.0
+  - @tko/utils.parser@4.0.0
