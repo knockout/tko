@@ -24,13 +24,7 @@ import components from '@tko/utils.component'
 import { createElement, Fragment } from '@tko/utils.jsx'
 import { JsxObserver } from '@tko/utils.jsx'
 
-import { overloadOperator } from '@tko/utils.parser'
-
 declare const BUILD_VERSION: string
-
-/** Overload "evil twins" with strict equivalents */
-overloadOperator('==', (a, b) => a === b, 10)
-overloadOperator('!=', (a, b) => a !== b, 10)
 
 const builder = new Builder({
   filters,

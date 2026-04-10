@@ -31,6 +31,9 @@ export class Options {
   // Modify the default attribute from `data-bind`.
   defaultBindingAttribute: string = 'data-bind'
 
+  // If true, TKO will overload "evil twins" with strict equivalents in all bindings.
+  overloadEvilTwins: boolean = false
+
   // Enable/disable <!-- ko binding: ... -> style bindings
   allowVirtualElements: boolean = true
 
