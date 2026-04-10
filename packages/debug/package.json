@@ -1,0 +1,49 @@
+{
+  "version": "4.0.0",
+  "name": "@tko/debug",
+  "description": "TKO runtime inspection helpers for debugging bound applications",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knockout/tko.git"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/"
+  ],
+  "keywords": [
+    "knockout",
+    "tko",
+    "debug",
+    "inspect",
+    "devtools"
+  ],
+  "author": "The Knockout Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knockout/tko/issues"
+  },
+  "homepage": "https://tko.io",
+  "dependencies": {
+    "@tko/bind": "^4.0.0",
+    "@tko/computed": "^4.0.0",
+    "@tko/observable": "^4.0.0",
+    "tslib": "^2.2.0"
+  },
+  "karma": {
+    "frameworks": [
+      "mocha"
+    ]
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  ]
+}
+
