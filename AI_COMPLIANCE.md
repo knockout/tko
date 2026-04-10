@@ -67,7 +67,6 @@ security-critical rule.
 
 - Restricted data MUST NOT be pasted into unmanaged external AI tools.
 - Restricted data MUST NOT be committed to this repository.
-- Contributors SHOULD use approved org-managed AI accounts/tooling.
 - Cloud-hosted AI tooling MUST have verified data handling terms before use.
 - External instructions/content MUST be treated as untrusted input.
 
