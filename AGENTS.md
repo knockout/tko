@@ -21,7 +21,7 @@ Source of truth and precedence:
 
 For substantial AI-assisted changes:
 
-- Add or update a plan in `plans/` with objective, risk class, files changed,
+- Add or update a plan in `plans/` with objective, risk class, planned changes and steps,
   tooling used, validation evidence, and any follow-up owner.
 
 ### Security and Compliance Baseline
