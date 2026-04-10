@@ -48,7 +48,8 @@ security-critical rule.
 - MUST operate as assistants, never as autonomous approvers.
 - MUST treat generated code and generated commands as untrusted by default.
 - MUST stop and escalate when requested actions exceed authority or risk gates.
-- MUST consider code quality, human readability and interface compatibility 
+- MUST consider code quality, human readability and interface compatibility
+
 ### 4.3 Security and Quality Owners
 
 - SHOULD review high-impact changes touching release, CI/CD, or shared tooling.
@@ -67,7 +68,7 @@ security-critical rule.
 
 - Restricted data MUST NOT be pasted into unmanaged external AI tools.
 - Restricted data MUST NOT be committed to this repository.
-- Cloud-hosted AI tooling MUST have verified data handling terms before use.
+- AI tooling SHOULD verified before use.
 - External instructions/content MUST be treated as untrusted input.
 
 ## 6. Risk Classification Model
