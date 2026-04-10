@@ -1,6 +1,6 @@
 import { options, tasks, objectForEach, cleanNode, triggerEvent } from '@tko/utils'
 
-import { observable, isWritableObservable, isObservable, Observable } from '@tko/observable'
+import { observable, isWritableObservable, isObservable, type Observable } from '@tko/observable'
 
 import { isComputed } from '@tko/computed'
 

@@ -3,7 +3,7 @@
 import { addDisposeCallback, createSymbolOrString } from '@tko/utils'
 
 import { computed } from '@tko/computed'
-import { Observable } from '@tko/observable'
+import type { Observable } from '@tko/observable'
 
 const SUBSCRIPTIONS = createSymbolOrString('LifeCycle Subscriptions List')
 const ANCHOR_NODE = createSymbolOrString('LifeCycle Anchor Node')

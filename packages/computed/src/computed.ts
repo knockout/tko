@@ -67,7 +67,7 @@ export type ComputedReadFunction<T = any, TTarget = void> =
   | Computed<T>
   | ((this: TTarget) => T)
 export type ComputedWriteFunction<T = any, TTarget = void> = (this: TTarget, val: T) => void
-export type MaybeComputed<T = any> = T | Computed<T>
+// TODO: Currently unused -> export type MaybeComputed<T = any> = T | Computed<T>
 
 export interface ComputedOptions<T = any, TTarget = void> {
   read?: ComputedReadFunction<T, TTarget>
