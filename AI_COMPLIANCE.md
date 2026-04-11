@@ -199,7 +199,7 @@ At session start, read in this order:
 1. `AGENTS.md`
 2. `AI_COMPLIANCE.md`
 
-If required governance files are missing, stop and escalate to maintainers before proceeding with implementation 
+If required governance files are missing, stop work and escalate to maintainers. 
 
 ## 13. Review Cadence and Change Management
 
