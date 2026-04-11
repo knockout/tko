@@ -6,7 +6,7 @@
     "module": "es2022",
     "moduleResolution": "bundler",
     "allowJs": false,
-    "importHelpers": true,
+    "importHelpers": false,
     "allowSyntheticDefaultImports":  true,
     "strict": true,
     "noEmit": true,
@@ -21,6 +21,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
     "lib": ["es2022", "dom"],
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [

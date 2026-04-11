@@ -22,7 +22,7 @@ export default class BindingHandlerObject {
    * The handler may have a `.` in it, e.g. `attr.title`, in which case the
    * handler is `attr`.  Otherwise it's the name given
    */
-  get(nameOrDotted) {
+  get(nameOrDotted: string) {
     const [name] = nameOrDotted.split('.')
     return this[name]
   }

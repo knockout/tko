@@ -4,6 +4,7 @@
     "noEmit": false,
     "rootDir": ".",
     "emitDeclarationOnly": true,
+    "verbatimModuleSyntax": null,
     "outDir": "dist",
     "resolvePackageJsonExports": false,
     "resolvePackageJsonImports": false
