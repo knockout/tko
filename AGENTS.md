@@ -184,6 +184,10 @@ Agent-facing files in `tko.io/public/`:
 - `agent-guide.md` — API reference, gotchas, examples, playground URL format
 - `agent-testing.md` — how to run and verify TKO code without human interaction
 
+Repo-level agent reference:
+- `AI_GLOSSARY.md` — domain-specific terms, concepts, and package cross-references
+  for the full TKO monorepo; read this for terminology before working on any package.
+
 When documentation changes — new APIs, new bindings, new patterns, behavioral
 changes — update **both** the Starlight docs (for humans) and the agent guide
 (for agents). The agent guide should be token-efficient: dense, code-first,
