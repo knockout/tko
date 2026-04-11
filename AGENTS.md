@@ -4,9 +4,10 @@ TKO ("Technical Knockout") is the monorepo for the next generation of
 [Knockout.js](https://knockoutjs.com). It is a TypeScript MVVM framework for
 data binding and templating with zero runtime dependencies.
 
-Repository: https://github.com/knockout/tko
-Docs: https://tko.io
-License: MIT
+- Repository: https://github.com/knockout/tko
+- Docs: https://tko.io
+- License: MIT
+- Documentation: `tko.io/src/content/**`
 
 ## AI Governance (Mandatory)
 
@@ -19,10 +20,16 @@ Source of truth and precedence:
 - `AGENTS.md` provides operational context and repository-specific workflows.
 - When guidance conflicts, follow the precedence model defined in `AI_COMPLIANCE.md`.
 
-For substantial AI-assisted changes:
+For substantial AI-assisted changes (important notice):
 
 - Add or update a plan in `plans/` with objective, risk class, planned changes and steps,
   tooling used, validation evidence, and any follow-up owner.
+
+Verified Behaviors:
+
+- Package-scoped, unit-test-backed behaviour contracts documenting exactly what TKO
+  guarantees for each feature. A canonical reference for AI agents and contributors.
+- File-Pattern: [packages/*/verified-behaviors.json](packages/)  
 
 ### Security and Compliance Baseline
 
@@ -60,22 +67,22 @@ Builds: `@tko/build.knockout` (backwards-compatible) and
 All builds use Make + esbuild. Run from the repo root:
 
 ```bash
-npm install           # Install all dependencies (uses npm workspaces)
-make                  # Build all packages (ESM, CommonJS, MJS)
-make test             # Run all tests with Electron
-make test-headless    # Run all tests with headless Chrome
-make test-headless-ff # Run all tests with headless Firefox
-make test-headless-jquery  # Run tests with jQuery enabled
-make test-coverage    # Run tests and generate coverage report
-make eslint           # Run ESLint
-make eslint-fix       # Run ESLint with auto-fix
-make format           # Check Prettier formatting
-make format-fix       # Fix Prettier formatting
-make tsc              # TypeScript type-check (no emit)
-make dts              # Generate TypeScript declaration files
-make knip             # Run Knip for Linting imports and exports
-make sweep            # Clean dist/ and coverage/ dirs
-make clean            # Full clean (node_modules, lockfiles, dist)
+npm install               # Install all dependencies (uses npm workspaces)
+make                      # Build all packages (ESM, CommonJS, MJS)
+make test                 # Run all tests with Electron
+make test-headless        # Run all tests with headless Chrome
+make test-headless-ff     # Run all tests with headless Firefox
+make test-headless-jquery # Run tests with jQuery enabled
+make test-coverage        # Run tests and generate coverage report
+make eslint               # Run ESLint
+make eslint-fix           # Run ESLint with auto-fix
+make format               # Check Prettier formatting
+make format-fix           # Fix Prettier formatting
+make tsc                  # TypeScript type-check (no emit)
+make dts                  # Generate TypeScript declaration files
+make knip                 # Run Knip for Linting imports and exports
+make sweep                # Clean dist/ and coverage/ dirs
+make clean                # Full clean (node_modules, lockfiles, dist)
 ```
 
 Individual packages can be built/tested from their directory with the same
@@ -115,6 +122,7 @@ Each package under `packages/` follows this layout:
 ```
 packages/example/
   src/           # TypeScript source
+  types/         # Typescript typings
   spec/          # Tests
   dist/          # Build output (gitignored)
   helpers/       # Test helpers (if any)
@@ -171,7 +179,7 @@ long-lived publish token.
 ## Plans
 
 Significant changes should have a plan file in `plans/` before implementation
-begins. Plans document the context, approach, and verification steps. Review
+begins. Plans document the context, approach, risk class, and verification steps. Review
 existing plans in that directory for format examples.
 
 ## Agent-First Documentation

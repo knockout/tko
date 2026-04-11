@@ -54,7 +54,6 @@ name('Mary')    // write → notifies all subscribers
 ```
 
 - Internally stores the value under `observable[LATEST_VALUE]`.
-- Write returns `this`, enabling chaining: `name('Mary').age(50)`.
 - Duplicate primitive writes are silently ignored (via `equalityComparer`).
 - Object writes always notify (object equality is never assumed).
 
@@ -1138,13 +1137,6 @@ Type-check utilities. `isSubscribable` tests for the `SUBSCRIBABLE_SYM` symbol.
 
 ---
 
-### AMD / RequireJS
-Legacy module loading format. TKO components can be registered with AMD-style
-`{ require: 'module/path' }` template and viewmodel configs, resolved by the
-component loader registry.
-
----
-
 ### CSP (Content Security Policy)
 TKO's `data-bind` parser (`@tko/utils.parser`) does not use `eval` or
 `new Function`, making it compatible with strict CSP headers that block
@@ -1172,35 +1164,6 @@ deferred during template rewriting.
 **Package:** `@tko/filter.punches`  
 Binding string preprocessing filters. Transforms shorthand filter syntax in
 binding strings before the `@tko/utils.parser` processes them.
-
----
-
-## Governance & Process Terms
-
-### Verified Behaviors
-**File:** [packages/*/verified-behaviors.json](packages/)  
-Package-scoped, unit-test-backed behaviour contracts documenting exactly what TKO
-guarantees for each feature. A canonical reference for AI agents and contributors.
-
----
-
-### `plans/`
-Directory of design plan documents for significant changes. Each plan documents:
-objective, risk class, planned changes and steps, tooling used, validation
-evidence, and follow-up owner. Plans should be created before implementation
-begins for any substantial change.
-
----
-
-### AI_COMPLIANCE.md
-Normative policy baseline for all AI-assisted work in this repository. Takes
-precedence over `AGENTS.md` when guidance conflicts.
-
----
-
-### AGENTS.md
-Operational context and repository-specific workflows for AI coding agents.
-Should be read at the start of every AI agent session.
 
 ---
 
