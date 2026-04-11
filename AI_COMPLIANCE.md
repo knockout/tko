@@ -48,7 +48,7 @@ security-critical rule.
 - MUST operate as assistants, never as autonomous approvers.
 - MUST treat generated code and generated commands as untrusted by default.
 - MUST stop and escalate when requested actions exceed authority or risk gates.
-- MUST consider code quality, human readability and interface compatibility
+- MUST consider code quality, human readability, and interface compatibility when generating or proposing changes
 
 ### 4.3 Security and Quality Owners
 
