@@ -600,7 +600,7 @@ export default class Parser {
 
   /**
    * Use this method to parse expressions that can be followed by additional markup
-   * seperated by a comma, such as in bindings strings.
+   * separated by a comma, such as in bindings strings.
    *
    * @returns an expression that cannot contain multiple values separated by commas.
    * @see {@link Parser.expression}
