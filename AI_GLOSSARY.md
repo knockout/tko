@@ -34,7 +34,6 @@ AI agents and contributors.
 17. [Tasks / Microtask Scheduler](#tasks--microtask-scheduler)
 18. [MVVM Pattern Terms](#mvvm-pattern-terms)
 19. [Build & Architecture Terms](#build--architecture-terms)
-20. [Governance & Process Terms](#governance--process-terms)
 
 ---
 
