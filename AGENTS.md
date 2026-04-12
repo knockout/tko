@@ -52,6 +52,7 @@ Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
 packages/          # 25 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
 tools/             # Shared build config (build.mk, karma.conf.js, repackage.mjs)
+skills/            # AI agent skills (on-demand workflow instructions)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
 Makefile           # Top-level build orchestrator
 ```
@@ -181,6 +182,18 @@ long-lived publish token.
 Significant changes should have a plan file in `plans/` before implementation
 begins. Plans document the context, approach, risk class, and verification steps. Review
 existing plans in that directory for format examples.
+
+## AI Skills
+
+Reusable workflow instructions for AI agents live in `skills/`. Each skill is a
+self-contained folder with a `SKILL.md` and optional supporting assets
+(templates, scripts, references).
+
+| Skill | Purpose |
+|-------|---------|
+| `plan-creation` | Scaffold a `plans/` file with the correct template, classify risk per `AI_COMPLIANCE.md`, and enforce approval gates |
+
+Skills are loaded on-demand when the agent detects a matching task.
 
 ## Agent-First Documentation
 
