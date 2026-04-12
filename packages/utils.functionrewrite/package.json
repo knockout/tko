@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/utils.functionrewrite",
   "description": "Rewrite `function {}` as lambdas (=>)",
-  "module": "dist/utils.functionrewrite.js",
+  "module": "dist/index.js",
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "license": "MIT",
@@ -27,8 +26,7 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

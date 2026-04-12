@@ -11,12 +11,10 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "keywords": [

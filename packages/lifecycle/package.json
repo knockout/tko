@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "module": "dist/lifecycle.js",
+  "module": "dist/index.js",
   "dependencies": {
     "@tko/computed": "^4.0.0",
     "@tko/utils": "^4.0.0"
@@ -10,7 +10,6 @@
   },
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "name": "@tko/lifecycle",
@@ -38,8 +37,7 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

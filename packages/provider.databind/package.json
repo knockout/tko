@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/provider.databind",
   "description": "Link HTML attributes based on a `data-bind` HTML attribute",
-  "module": "dist/provider.databind.js",
+  "module": "dist/index.js",
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "license": "MIT",
@@ -30,8 +29,7 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
