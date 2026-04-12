@@ -122,7 +122,7 @@ Each package under `packages/` follows this layout:
 ```
 packages/example/
   src/           # TypeScript source
-  types/         # Typescript typings
+  types/         # TypeScript typings
   spec/          # Tests
   dist/          # Build output (gitignored)
   helpers/       # Test helpers (if any)
