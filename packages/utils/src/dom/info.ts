@@ -3,18 +3,27 @@
 //
 import { arrayFirst } from '../array'
 
-export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
+export function domNodeIsContainedBy(node: Node | null, containedByNode?: Node | null): boolean {
+  // If there is no contained node, then the node is not attached to it
+  // This case also happens when the shadow DOM from a HTMLTemplateElement is involved
+  if (!node || !containedByNode) {
+    return false
+  }
   if (node === containedByNode) {
     return true
   }
   if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
     return false
-  } // Fixes issue #1162 - can't use node.contains for document fragments on IE8
+  }
+  // Fixes issue #1162 - can't use node.contains for document fragments on IE8
   if (containedByNode.contains) {
     return containedByNode.contains(node.nodeType !== Node.ELEMENT_NODE ? node.parentNode : node)
   }
   if (containedByNode.compareDocumentPosition) {
-    return (containedByNode.compareDocumentPosition(node) & 16) == 16
+    return (
+      (containedByNode.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_CONTAINED_BY)
+      === Node.DOCUMENT_POSITION_CONTAINED_BY
+    )
   }
 
   let parentNode: Node | null = node
@@ -24,8 +33,8 @@ export function domNodeIsContainedBy(node: Node, containedByNode: Node) {
   return !!parentNode
 }
 
-export function domNodeIsAttachedToDocument(node) {
-  return domNodeIsContainedBy(node, node.ownerDocument.documentElement)
+export function domNodeIsAttachedToDocument(node: Node): boolean {
+  return domNodeIsContainedBy(node, node.ownerDocument?.documentElement)
 }
 
 export function anyDomNodeIsAttachedToDocument(nodes) {
@@ -39,7 +48,11 @@ export function tagNameLower(element: Element) {
   return element && element.tagName && element.tagName.toLowerCase()
 }
 
-export function isDomElement(obj) {
+export function isTemplateTag(node): node is HTMLTemplateElement {
+  return node && node.nodeType === Node.ELEMENT_NODE && tagNameLower(node) === 'template'
+}
+
+export function isDomElement(obj): obj is HTMLElement {
   if (window.HTMLElement) {
     return obj instanceof HTMLElement
   } else {
@@ -47,7 +60,7 @@ export function isDomElement(obj) {
   }
 }
 
-export function isDocumentFragment(obj) {
+export function isDocumentFragment(obj): obj is DocumentFragment {
   if (window.DocumentFragment) {
     return obj instanceof DocumentFragment
   } else {
