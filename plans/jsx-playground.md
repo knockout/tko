@@ -1,5 +1,7 @@
 # Plan: TKO JSX Playground at /playground
 
+**Risk class:** LOW
+
 ## Context
 
 TKO users need an interactive playground to experiment with JSX + TKO without
@@ -120,3 +122,10 @@ No other files need modification. The page is self-contained.
 6. Switch between HTML and TSX tabs — content preserved
 7. Test responsive: resize browser narrow — panels stack vertically
 8. `bun run build && bun run preview` — verify production build works
+
+## AI Evidence
+- Risk class: LOW
+- Changes and steps: create `playground.astro` standalone page, inline editor/compiler logic via CodeMirror 6 + esbuild-wasm, no new npm dependencies
+- Tools/commands: `bun run dev`, `bun run build`, `bun run preview`, `playwright-cli` headless
+- Validation: steps 1–8 above; verify playground page loads and live-compiles TSX without errors
+- Follow-up owner: TKO maintainers
