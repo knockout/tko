@@ -1,4 +1,5 @@
 import { unwrap } from '@tko/observable'
+import { options } from '@tko/utils'
 
 export function LAMBDA() {}
 
@@ -84,10 +85,18 @@ const operators: Operators = {
   //    TODO: 'typeof': function (a, b) { return typeof b; },
   // equality
   '==': function equal(a, b) {
-    return a == b
+    if (options.overloadEvilTwins) {
+      return a === b
+    } else {
+      return a == b
+    }
   },
   '!=': function ne(a, b) {
-    return a != b
+    if (options.overloadEvilTwins) {
+      return a !== b
+    } else {
+      return a != b
+    }
   },
   '===': function sequal(a, b) {
     return a === b
