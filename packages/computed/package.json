@@ -5,7 +5,6 @@
   "module": "dist/computed.js",
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "dependencies": {
@@ -42,7 +41,6 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   }
 }

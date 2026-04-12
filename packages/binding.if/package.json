@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/binding.if",
   "description": "TKO conditional (if/ifnot/unless/with/else) bindings",
-  "module": "dist/binding.if.js",
+  "module": "dist/index.js",
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "repository": {
@@ -44,7 +43,6 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   }
 }

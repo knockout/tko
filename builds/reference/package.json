@@ -34,7 +34,6 @@
   },
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "homepage": "https://tko.io",
@@ -49,8 +48,7 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

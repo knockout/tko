@@ -7,7 +7,10 @@ import fs from 'fs/promises'
 
 const LERNA_CONF = '../../lerna.json'
 
-const packageData = (pkg, version) => ({
+const hasDir = (name) =>
+  fs.access(name).then(() => true, () => false)
+
+const packageData = (pkg, version, hasHelpers) => ({
   version: version,
   ...pkg,
   // Common
@@ -18,11 +21,11 @@ const packageData = (pkg, version) => ({
       require: "./dist/index.cjs",
       import: "./dist/index.js"
     },
-    "./helpers/*": "./helpers/*"
+    ...(hasHelpers && { "./helpers/*": "./helpers/*" })
   },
   files: [
     "dist/",
-    "helpers/",
+    ...(hasHelpers ? ["helpers/"] : []),
     "types/"
   ],
   homepage: "https://tko.io",
@@ -46,7 +49,8 @@ const parse = async n => JSON.parse(await fs.readFile(n, 'utf8'))
 
 const version = (await parse(LERNA_CONF)).version
 const pkg = await parse('package.json')
+const hasHelpers = await hasDir('helpers')
 console.info(`Rewriting package.json: ${pkg.name}.`)
-const data = packageData(pkg, version)
+const data = packageData(pkg, version, hasHelpers)
 fs.writeFile('package.json', JSON.stringify(data, null, 2), 'utf8')
   .catch(console.error)

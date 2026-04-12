@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/binding.foreach",
   "description": "Knockout Foreach Binding",
-  "module": "dist/binding.foreach.js",
+  "module": "dist/index.js",
   "files": [
     "dist/",
-    "helpers/",
     "types/"
   ],
   "repository": {
@@ -44,7 +43,6 @@
       "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   }
 }
