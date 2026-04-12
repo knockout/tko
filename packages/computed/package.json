@@ -2,7 +2,7 @@
   "version": "4.0.0",
   "name": "@tko/computed",
   "description": "TKO Computed Observables",
-  "module": "dist/computed.js",
+  "module": "dist/index.js",
   "files": [
     "dist/",
     "types/"
