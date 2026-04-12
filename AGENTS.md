@@ -14,11 +14,11 @@ data binding and templating with zero runtime dependencies.
 TKO uses explicit AI governance documents. Every AI assistant and contributor
 must follow them.
 
-Source of truth and precedence:
+Policy baseline and conflict precedence:
 
 - `AI_COMPLIANCE.md` is the normative policy baseline for AI-assisted work.
 - `AGENTS.md` provides operational context and repository-specific workflows.
-- When guidance conflicts, follow the precedence model defined in `AI_COMPLIANCE.md`.
+- When guidance conflicts, apply the explicit order in `AI_COMPLIANCE.md` section 3.
 
 For substantial AI-assisted changes (important notice):
 
