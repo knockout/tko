@@ -36,9 +36,7 @@
   },
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai",
-      "sinon"
+      "mocha"
     ]
   },
   "licenses": [

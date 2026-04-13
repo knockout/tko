@@ -33,7 +33,11 @@ export function setNodeText(node: Node, text: string) {
 }
 
 export function nodeText(node: Node) {
-  return node.nodeType === Node.TEXT_NODE ? node.nodeValue : 'textContent' in node ? node.textContent : (node as HTMLElement).innerText
+  return node.nodeType === Node.TEXT_NODE
+    ? node.nodeValue
+    : 'textContent' in node
+      ? node.textContent
+      : (node as HTMLElement).innerText
 }
 
 type HtmlNode = Node & { innerHTML: string }
@@ -70,7 +74,11 @@ export function expectContainText(node: Node, expectedText: string, ignoreSpaces
   assert.equal(actualText, expectedText)
 }
 
-export function expectContainHtml(node: Node | null, expectedHtml: string, postProcessCleanedHtml?: (html: string) => string) {
+export function expectContainHtml(
+  node: Node | null,
+  expectedHtml: string,
+  postProcessCleanedHtml?: (html: string) => string
+) {
   let html = cleanedHtml(node)
   expectedHtml = expectedHtml.replace(/(<!--.*?-->)\s*/g, '$1')
   if (postProcessCleanedHtml) {

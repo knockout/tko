@@ -100,7 +100,10 @@ describe('ComponentABC', function () {
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
 
-    expectContainHtml(testNode.childNodes[0] as HTMLElement, '<div data-bind="text: myvalue">some parameter value</div>')
+    expectContainHtml(
+      testNode.childNodes[0] as HTMLElement,
+      '<div data-bind="text: myvalue">some parameter value</div>'
+    )
   })
 
   it('registers on the components', function () {

@@ -1,4 +1,12 @@
+import * as chai from 'chai'
+import sinon from 'sinon'
+
 ;(function (global) {
+  const { expect } = chai
+  global.chai = chai
+  global.sinon = sinon
+  global.expect = expect
+
   function restoreAfter(cleanups, object, propertyName) {
     const originalValue = object[propertyName]
     cleanups.push(function () {

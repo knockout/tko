@@ -12,7 +12,12 @@ import { options } from '@tko/utils'
 import * as coreBindings from '../dist'
 
 import { Provider } from '@tko/provider'
-import { expectContainHtml, expectContainText, prepareTestNode, restoreAfter } from '../../utils/helpers/mocha-test-helpers'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: Text', function () {
   let bindingHandlers

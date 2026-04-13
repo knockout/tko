@@ -63,7 +63,8 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: childProp'></span></div>"
     const someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
     applyBindings({ someItems: someItems }, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
     )
   })
@@ -99,7 +100,8 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: $data'></span></div>"
     const someItems = ['alpha', 'beta']
     applyBindings({ someItems: someItems }, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: $data">alpha</span><span data-bind="text: $data">beta</span>'
     )
   })
@@ -108,43 +110,50 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: childProp'></span></div>"
     const someItems = observableArray([{ childProp: 'first child' }, { childProp: 'second child' }])
     applyBindings({ someItems: someItems }, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
     )
 
     // Add items at the beginning...
     someItems.unshift({ childProp: 'zeroth child' })
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">zeroth child</span><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
     )
 
     // ... middle
     someItems.splice(2, 0, { childProp: 'middle child' })
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">zeroth child</span><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">middle child</span><span data-bind="text: childprop">second child</span>'
     )
 
     // ... and end
     someItems.push({ childProp: 'last child' })
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">zeroth child</span><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">middle child</span><span data-bind="text: childprop">second child</span><span data-bind="text: childprop">last child</span>'
     )
 
     // Also remove from beginning...
     someItems.shift()
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">middle child</span><span data-bind="text: childprop">second child</span><span data-bind="text: childprop">last child</span>'
     )
 
     // ... and middle
     someItems.splice(1, 1)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span><span data-bind="text: childprop">last child</span>'
     )
 
     // ... and end
     someItems.pop()
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
     )
 
@@ -160,7 +169,8 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "<div data-bind='foreach: someitems'>a<!-- ko if:true -->b<!-- /ko --></div>"
     const someitems = observableArray([1, 2])
     applyBindings({ someitems: someitems }, testNode)
-    expectContainHtml(testNode, 
+    expectContainHtml(
+      testNode,
       '<div data-bind="foreach: someitems">a<!-- ko if:true -->b<!-- /ko -->a<!-- ko if:true -->b<!-- /ko --></div>'
     )
 
@@ -205,7 +215,8 @@ describe('Binding: Foreach', function () {
       "<div data-bind='foreach: { data: someItems, includeDestroyed: true }'><span data-bind='text: childProp'></span></div>"
     const someItems = observableArray([{ childProp: 'first child' }, { childProp: 'second child', _destroy: true }])
     applyBindings({ someItems: someItems }, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
     )
   })
@@ -237,13 +248,15 @@ describe('Binding: Foreach', function () {
 
     // Try adding
     someItems.push('added child')
-    expectContainHtml(divNode, 
+    expectContainHtml(
+      divNode,
       '<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>'
     )
     expect(afterAddCallbackData.length).to.equal(1)
     expect(afterAddCallbackData[0].elem).to.equal(divNode.childNodes[1])
     expect(afterAddCallbackData[0].value).to.equal('added child')
-    expectContainHtml(afterAddCallbackData[0].currentParentClone, 
+    expectContainHtml(
+      afterAddCallbackData[0].currentParentClone,
       '<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>'
     )
 
@@ -253,10 +266,12 @@ describe('Binding: Foreach', function () {
     expectContainText(beforeRemoveCallbackData[0].elem, 'first child')
     expect(beforeRemoveCallbackData[0].value).to.equal('first child')
     // Note that when using "beforeRemove", we *don't* remove the node from the doc - it's up to the beforeRemove callback to do it. So, check it's still there.
-    expectContainHtml(beforeRemoveCallbackData[0].currentParentClone, 
+    expectContainHtml(
+      beforeRemoveCallbackData[0].currentParentClone,
       '<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>'
     )
-    expectContainHtml(divNode, 
+    expectContainHtml(
+      divNode,
       '<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>'
     )
 
@@ -267,10 +282,12 @@ describe('Binding: Foreach', function () {
     expectContainText(beforeRemoveCallbackData[0].elem, 'added child')
     expect(beforeRemoveCallbackData[0].value).to.equal('added child')
     // Neither item has yet been removed and both are still in their original locations
-    expectContainHtml(beforeRemoveCallbackData[0].currentParentClone, 
+    expectContainHtml(
+      beforeRemoveCallbackData[0].currentParentClone,
       '<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>'
     )
-    expectContainHtml(divNode, 
+    expectContainHtml(
+      divNode,
       '<span data-bind="text: $data">first child</span><span data-bind="text: $data">added child</span>'
     )
 
@@ -543,10 +560,12 @@ describe('Binding: Foreach', function () {
     applyBindings(viewModel, testNode)
 
     // Verify we can access binding contexts during binding
-    expectContainText(testNode.childNodes[0].childNodes[0], 
+    expectContainText(
+      testNode.childNodes[0].childNodes[0],
       '(Val: A1, Parents: 2, Rootval: ROOTVAL)(Val: A2, Parents: 2, Rootval: ROOTVAL)(Val: A3, Parents: 2, Rootval: ROOTVAL)'
     )
-    expectContainText(testNode.childNodes[0].childNodes[1], 
+    expectContainText(
+      testNode.childNodes[0].childNodes[1],
       '(Val: B1, Parents: 2, Rootval: ROOTVAL)(Val: B2, Parents: 2, Rootval: ROOTVAL)'
     )
 
@@ -563,7 +582,8 @@ describe('Binding: Foreach', function () {
     testNode.innerHTML = "hi <!-- ko foreach: someitems --><span data-bind='text: childprop'></span><!-- /ko -->"
     const someitems = [{ childprop: 'first child' }, { childprop: 'second child' }]
     applyBindings({ someitems: someitems }, testNode)
-    expectContainHtml(testNode, 
+    expectContainHtml(
+      testNode,
       'hi <!-- ko foreach: someitems --><span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span><!-- /ko -->'
     )
 
@@ -595,7 +615,8 @@ describe('Binding: Foreach', function () {
     applyBindings(viewModel, testNode)
 
     // Verify we can access binding contexts during binding
-    expectContainText(testNode, 
+    expectContainText(
+      testNode,
       '(Val: A1, Parents: 2, Rootval: ROOTVAL)(Val: A2, Parents: 2, Rootval: ROOTVAL)(Val: A3, Parents: 2, Rootval: ROOTVAL)(Val: B1, Parents: 2, Rootval: ROOTVAL)(Val: B2, Parents: 2, Rootval: ROOTVAL)'
     )
 
@@ -627,7 +648,8 @@ describe('Binding: Foreach', function () {
     }
     applyBindings(viewModel, testNode)
 
-    expectContainHtml(testNode, 
+    expectContainHtml(
+      testNode,
       '<ul>'
         + '<!--ko foreach: items-->'
         + '<li>'
@@ -665,17 +687,20 @@ describe('Binding: Foreach', function () {
     // Any of the following results are acceptable.
     if (!match) {
       // Opera 11.5 doesn't add any closing </li> tags
-      expectContainHtml(testNode, 
+      expectContainHtml(
+        testNode,
         '<ul><li>header item<!-- ko foreach: someitems --><li data-bind="text: $data">alpha<li data-bind="text: $data">beta<!-- /ko --></ul>'
       )
     } else if (match.length == 3) {
       // Modern browsers implicitly re-add the closing </li> tags
-      expectContainHtml(testNode, 
+      expectContainHtml(
+        testNode,
         '<ul><li>header item</li><!-- ko foreach: someitems --><li data-bind="text: $data">alpha</li><li data-bind="text: $data">beta</li><!-- /ko --></ul>'
       )
     } else {
       // ... but IE < 8 doesn't add ones that immediately precede a <li>
-      expectContainHtml(testNode, 
+      expectContainHtml(
+        testNode,
         '<ul><li>header item</li><!-- ko foreach: someitems --><li data-bind="text: $data">alpha<li data-bind="text: $data">beta</li><!-- /ko --></ul>'
       )
     }
@@ -717,7 +742,8 @@ describe('Binding: Foreach', function () {
       "<div data-bind='foreach: { data: someItems, as: \"item\" }'><span data-bind='text: item'></span></div>"
     const someItems = ['alpha', 'beta']
     applyBindings({ someItems: someItems }, testNode)
-    expectContainHtml(testNode.childNodes[0], 
+    expectContainHtml(
+      testNode.childNodes[0],
       '<span data-bind="text: item">alpha</span><span data-bind="text: item">beta</span>'
     )
   })
@@ -773,7 +799,8 @@ describe('Binding: Foreach', function () {
     setHtml(testNode, "<div data-bind='foreach:someitems'><section data-bind='text: $data'></section></div>")
     const viewModel = { someitems: ['Alpha', 'Beta'] }
     applyBindings(viewModel, testNode)
-    expectContainHtml(testNode, 
+    expectContainHtml(
+      testNode,
       '<div data-bind="foreach:someitems"><section data-bind="text: $data">alpha</section><section data-bind="text: $data">beta</section></div>'
     )
   })
@@ -786,7 +813,8 @@ describe('Binding: Foreach', function () {
     )
     const viewModel = { someitems: ['Alpha', 'Beta'] }
     applyBindings(viewModel, testNode)
-    expectContainHtml(testNode, 
+    expectContainHtml(
+      testNode,
       'xxx<!-- ko foreach:someitems --><div><section data-bind="text: $data">alpha</section></div><div><section data-bind="text: $data">beta</section></div><!-- /ko -->'
     )
   })
