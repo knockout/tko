@@ -5,8 +5,7 @@
   "module": "dist/binding.template.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "repository": {
     "type": "git",
@@ -46,7 +45,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

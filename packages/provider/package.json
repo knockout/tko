@@ -5,8 +5,7 @@
   "module": "dist/provider.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -28,7 +27,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

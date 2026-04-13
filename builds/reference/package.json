@@ -35,8 +35,7 @@
   },
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "homepage": "https://tko.io",
   "licenses": [
@@ -47,7 +46,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     },

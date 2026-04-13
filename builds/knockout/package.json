@@ -27,8 +27,7 @@
   },
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "karma": {
     "frameworks": [
@@ -66,7 +65,6 @@
   },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     },

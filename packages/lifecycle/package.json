@@ -11,8 +11,7 @@
   },
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "name": "@tko/lifecycle",
   "description": "Knockout LifeCycle for object instances",
@@ -36,7 +35,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

@@ -5,8 +5,7 @@
   "module": "dist/utils.parser.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -33,7 +32,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

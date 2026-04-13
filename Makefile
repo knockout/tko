@@ -18,8 +18,7 @@ package.json:
 node_modules: package-lock.json
 
 all:: node_modules package-lock.json
-	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE) && \
-	$(MAKE) dts
+	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test:
 	$(LERNA) exec --stream -- $(MAKE) test
@@ -59,10 +58,7 @@ eslint-fix:
 	$(NPX) eslint . --fix
 	
 dts:
-	rm -rf .dts-tmp
-	$(NPX) tsc --project tsconfig.dts.json --outDir .dts-tmp
-	$(NODE) tools/sync-dts.mjs .dts-tmp packages,builds/reference
-	rm -rf .dts-tmp
+	$(NPX) tsc --build tsconfig.dts.json
 
 docker-build:
 	$(DOCKER) build . --tag tko
@@ -101,7 +97,6 @@ sweep:
 	rm -rf builds/*/dist/*
 	rm -rf coverage/
 	rm -rf coverage-temp/
-	rm -rf packages/*/types/*
 	
 clean: sweep
 	rm -rf node_modules/
