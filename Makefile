@@ -1,7 +1,4 @@
-NPX		:= npx
-NODE  	:= node
-NPM		:= npm
-LERNA	:= npx lerna
+LERNA	:= bunx lerna
 DOCKER	:= docker
 
 # Some make settings
@@ -24,22 +21,22 @@ test test-headless test-headless-ff test-headless-jquery:
 	bunx vitest run
 
 format:
-	$(NPX) prettier . --check
+	bunx prettier . --check
 
 format-fix:
-	$(NPX) prettier . --write
+	bunx prettier . --write
 
 tsc:
-	$(NPX) tsc
+	bunx tsc
 
 eslint:
-	$(NPX) eslint .
+	bunx eslint .
 
 eslint-fix:
-	$(NPX) eslint . --fix
+	bunx eslint . --fix
 	
 dts:
-	$(NPX) tsc --build tsconfig.dts.json
+	bunx tsc --build tsconfig.dts.json
 
 docker-build:
 	$(DOCKER) build . --tag tko
@@ -66,12 +63,12 @@ package.json:
 install: node_modules
 
 outdated-list:
-	$(NPM) outdated
+	bun outdated
 
 outdated-upgrade:
-	$(NPM) upgrade-interactive --latest
+	bun upgrade-interactive --latest
 
-install: package-lock.json
+install: bun.lock
 
 sweep:
 	rm -rf packages/*/dist/*
@@ -87,4 +84,4 @@ clean: sweep
 # Local linking of these packages, so they
 # are available for local testing/dev.
 link:
-	$(LERNA) exec --stream -- npm link
+	$(LERNA) exec --stream -- bun link

@@ -9,12 +9,7 @@ export default defineConfig({
   test: {
     include: ['packages/*/spec/**/*.ts', 'builds/reference/spec/**/*.js', 'builds/knockout/spec/**/*.js'],
     setupFiles: ['builds/knockout/helpers/vitest-setup.js'],
-    browser: {
-      enabled: true,
-      provider: playwright(),
-      headless: true,
-      instances: browsers
-    },
+    browser: { enabled: true, provider: playwright(), headless: true, instances: browsers },
     globals: true,
     testTimeout: 10000
   }
