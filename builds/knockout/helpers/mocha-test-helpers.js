@@ -3,10 +3,6 @@ import sinon from 'sinon'
 
 const { expect } = chai
 
-globalThis.chai = chai
-globalThis.sinon = sinon
-globalThis.expect = expect
-
 function restoreAfter(cleanups, object, propertyName) {
   const originalValue = object[propertyName]
   cleanups.push(function () {
