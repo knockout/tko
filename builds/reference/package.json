@@ -30,12 +30,12 @@
     "@tko/provider.native": "^4.0.0",
     "@tko/provider.virtual": "^4.0.0",
     "@tko/utils.component": "^4.0.0",
-    "@tko/utils.jsx": "^4.0.0"
+    "@tko/utils.jsx": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "homepage": "https://tko.io",
   "licenses": [
@@ -46,7 +46,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     },

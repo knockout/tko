@@ -2,11 +2,12 @@
   "compileOnSave": false,  
   "compilerOptions": {
     "declaration": true,
+    "ignoreDeprecations": "6.0",
     "target": "es2022",
     "module": "es2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node10", //Deprecated in ts7.0
     "allowJs": false,
-    "importHelpers": false,
+    "importHelpers": true,
     "allowSyntheticDefaultImports":  true,
     "strict": true,
     "noEmit": true,
@@ -21,7 +22,6 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true,
     "lib": ["es2022", "dom"],
     "paths": {
       "@tko/utils/helpers/jasmine-13-helper": [

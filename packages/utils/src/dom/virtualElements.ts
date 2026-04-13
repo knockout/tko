@@ -15,6 +15,7 @@ import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from '.
 import { removeNode } from './disposal'
 import { tagNameLower } from './info'
 import * as domData from './data'
+import options from '../options'
 
 export const startCommentRegex = /^\s*ko(?:\s+([\s\S]+))?\s*$/
 export const endCommentRegex = /^\s*\/ko\s*$/
@@ -110,6 +111,7 @@ export interface VirtualElementsAllowedBindings {
 }
 
 export const allowedBindings: VirtualElementsAllowedBindings = Object.create(null)
+export const hasBindingValue = isStartComment
 
 export function childNodes(node: Node): any {
   return isStartComment(node) ? getVirtualChildren(node) : node.childNodes

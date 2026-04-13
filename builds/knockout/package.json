@@ -27,8 +27,7 @@
   },
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "karma": {
     "frameworks": [
@@ -61,11 +60,11 @@
     "@tko/provider.multi": "^4.0.0",
     "@tko/provider.virtual": "^4.0.0",
     "@tko/utils.component": "^4.0.0",
-    "@tko/utils.functionrewrite": "^4.0.0"
+    "@tko/utils.functionrewrite": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     },

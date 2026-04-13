@@ -5,13 +5,13 @@
   "module": "dist/provider.bindingString.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "license": "MIT",
   "dependencies": {
     "@tko/provider": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0"
+    "@tko/utils.parser": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [
@@ -27,7 +27,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

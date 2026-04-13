@@ -1,6 +1,7 @@
 import { domData } from '@tko/utils'
 import { subscribable } from '@tko/observable'
-import type { Subscribable, SubscriptionCallback, Subscription } from '@tko/observable'
+import type { Subscribable, SubscriptionCallback } from '@tko/observable'
+import type Subscription from '@tko/observable/src/Subscription'
 
 export const contextAncestorBindingInfo = Symbol('_ancestorBindingInfo')
 const boundElementDomDataKey = domData.nextKey()

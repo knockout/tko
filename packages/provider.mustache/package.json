@@ -5,8 +5,7 @@
   "module": "dist/provider.mustache.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "repository": {
     "type": "git",
@@ -24,9 +23,12 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
+    "@tko/binding.template": "^4.0.0",
     "@tko/observable": "^4.0.0",
     "@tko/provider": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0"
+    "@tko/utils": "^4.0.0",
+    "@tko/utils.parser": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [
@@ -41,7 +43,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

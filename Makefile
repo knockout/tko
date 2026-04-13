@@ -18,8 +18,7 @@ package.json:
 node_modules: package-lock.json
 
 all:: node_modules package-lock.json
-	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE) && \
-	$(MAKE) dts
+	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test:
 	$(LERNA) exec --stream -- $(MAKE) test
@@ -52,9 +51,6 @@ format-fix:
 tsc:
 	$(NPX) tsc
 
-knip:
-	$(NPX) knip --no-config-hints
-
 eslint:
 	$(NPX) eslint .
 
@@ -62,16 +58,10 @@ eslint-fix:
 	$(NPX) eslint . --fix
 	
 dts:
-	rm -rf .dts-tmp
-	$(NPX) tsc --project tsconfig.dts.json --outDir .dts-tmp
-	$(NODE) tools/sync-dts.mjs .dts-tmp packages,builds/reference
-	rm -rf .dts-tmp
+	$(NPX) tsc --build tsconfig.dts.json
 
 docker-build:
 	$(DOCKER) build . --tag tko
-
-lerna-check:
-	$(LERNA) exec --stream -- true
 
 # Run the `repackage` target in every directory.  Essentially
 # homogenizes the `package.json`.
@@ -107,7 +97,6 @@ sweep:
 	rm -rf builds/*/dist/*
 	rm -rf coverage/
 	rm -rf coverage-temp/
-	rm -rf packages/*/types/*
 	
 clean: sweep
 	rm -rf node_modules/

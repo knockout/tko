@@ -5,15 +5,13 @@
   "module": "dist/provider.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
   "dependencies": {
     "@tko/utils": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/bind": "^4.0.0"
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [
@@ -29,7 +27,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

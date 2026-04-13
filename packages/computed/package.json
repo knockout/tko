@@ -5,12 +5,12 @@
   "module": "dist/computed.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "dependencies": {
     "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/utils": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "repository": {
     "type": "git",
@@ -39,7 +39,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

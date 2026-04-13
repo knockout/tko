@@ -5,11 +5,12 @@
   "module": "dist/utils.functionrewrite.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "tslib": "^2.2.0"
+  },
   "karma": {
     "frameworks": [
       "mocha"
@@ -24,7 +25,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

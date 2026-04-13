@@ -5,8 +5,7 @@
   "module": "dist/binding.core.js",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "repository": {
     "type": "git",
@@ -27,7 +26,8 @@
     "@tko/bind": "^4.0.0",
     "@tko/computed": "^4.0.0",
     "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/utils": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "karma": {
     "frameworks": [
@@ -42,7 +42,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },

@@ -5,8 +5,7 @@
   "type": "module",
   "files": [
     "dist/",
-    "helpers/",
-    "types/"
+    "helpers/"
   ],
   "repository": {
     "type": "git",
@@ -28,7 +27,9 @@
       "jasmine"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "tslib": "^2.2.0"
+  },
   "licenses": [
     {
       "type": "MIT",
@@ -37,7 +38,6 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     },
