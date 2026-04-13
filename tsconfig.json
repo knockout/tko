@@ -22,7 +22,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    "types": ["jquery"],
+    "types": ["mocha", "jquery"],
     "lib": ["es2022", "dom"],
     "paths": {
       "@tko/binding.template/helpers/dummyTemplateEngine": [
