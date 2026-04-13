@@ -36,11 +36,6 @@
     },
     "./helpers/*": "./helpers/*"
   },
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
   }

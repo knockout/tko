@@ -18,11 +18,6 @@
     "dist/",
     "helpers/"
   ],
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {

@@ -18,11 +18,6 @@
   ],
   "author": "The Knockout Team",
   "license": "MIT",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "dependencies": {
     "@tko/bind": "^4.0.0",
     "@tko/computed": "^4.0.0",

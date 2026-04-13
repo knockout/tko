@@ -13,11 +13,6 @@
     "@tko/utils.parser": "^4.0.0",
     "tslib": "^2.2.0"
   },
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {

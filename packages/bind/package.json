@@ -28,11 +28,6 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "__about__": "These are copied into all packages/*/package.json",
   "licenses": [
     {

@@ -21,11 +21,6 @@
   },
   "author": "The Knockout Team",
   "license": "MIT",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {

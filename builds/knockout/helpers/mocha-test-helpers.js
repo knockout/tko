@@ -152,11 +152,7 @@ globalThis.browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'fu
 let disableJQueryUsage = true
 
 function switchJQueryState() {
-  if (globalThis.__karma__ && globalThis.__karma__.config.args.includes('--noJQuery')) {
-    ko.options.disableJQueryUsage = disableJQueryUsage = true
-  } else {
-    ko.options.disableJQueryUsage = disableJQueryUsage = false
-  }
+  ko.options.disableJQueryUsage = disableJQueryUsage = false
 }
 
 // Per-test cleanup array, reset each test via beforeEach/afterEach.

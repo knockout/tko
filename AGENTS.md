@@ -96,17 +96,14 @@ Make targets (they include `tools/build.mk`).
 
 ## Testing
 
-- **Runner**: Karma
-- **Frameworks**: Mocha + Chai + Sinon
-- **Browsers**: Electron (default), Chrome Headless, Firefox Headless
-- **Coverage**: nyc/Istanbul (~89% statements, ~83% branches)
-- **Test files**: `packages/*/spec/` directories
+- **Runner**: Vitest browser mode (Playwright, headless Chromium)
+- **Assertions**: Chai (expect) + Sinon (spies/stubs/timers)
+- **Config**: `vitest.config.ts` at repo root
+- **Test files**: `packages/*/spec/**/*.ts`, `builds/*/spec/**/*.js`
+- **Run**: `bunx vitest run` (all tests) or `bunx vitest run <path>` (single file)
 
-Use Mocha/Chai/Sinon for repository tests.
-
-Do not:
-- split shared specs into runner-specific versions while they still need to run
-  in the browser harness
+Tests run in a real browser via Playwright — not jsdom. This is required
+because TKO does low-level DOM manipulation, MutationObserver, and event handling.
 
 ## Code Style
 
@@ -236,7 +233,7 @@ When validating `tko.io` documentation changes with the local docs site:
 
 ## Important Guidelines
 
-- Do not modify `tools/build.mk` or `tools/karma.conf.js` without understanding
+- Do not modify `tools/build.mk` or `vitest.config.ts` without understanding
   the full impact — they are shared across all 25+ packages.
 - Do not add runtime dependencies to core packages. TKO is zero-dependency.
 - The `builds/` packages bundle everything into a single distributable.

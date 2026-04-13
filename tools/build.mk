@@ -11,7 +11,7 @@ version := $(shell node -e "console.log(require('./package.json').version)")
 banner := // ${package} 🥊 ${version}
 iife-global-name := tko
 
-KARMA 	:= npx karma
+VITEST	:= bunx vitest
 ESBUILD := npx esbuild
 .SUFFIXES:
 .SUFFIXES: .ts .js
@@ -114,25 +114,13 @@ clean:
 	rm -rf dist/*
 
 test: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --noJQuery
+	$(VITEST) run
 
 test-headless: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery
-
-test-coverage: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery --coverage
+	$(VITEST) run
 
 test-headless-ff: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-firefox --noJQuery
+	$(VITEST) run
 
 test-headless-jquery: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome 
-
-test-debug: esm
-	$(KARMA) start $(tools_dir)/karma.conf --headless-chrome --debug
-
-watch: esm
-	$(KARMA) start $(tools_dir)/karma.conf
-
-test-ci:
-	$(KARMA) start $(tools_dir)/karma.conf --once --sauce
+	$(VITEST) run

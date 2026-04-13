@@ -26,11 +26,6 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "licenses": [
     {
       "type": "MIT",

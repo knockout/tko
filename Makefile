@@ -21,26 +21,16 @@ all:: node_modules package-lock.json
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test:
-	$(LERNA) exec --stream -- $(MAKE) test
+	bunx vitest run
 
 test-headless:
-	$(LERNA) exec --stream -- $(MAKE) test-headless
-
-# Instrumentalization via CLI: $(LERNA) exec --stream -- $(NPX) instrument dist --in-place
-# We have done it with a Esbuild-Plugin in the karma.conf.js-file
-# To manually merge coverage files: $(NPX) nyc merge coverage ../../coverage-temp/coverage-final.json
-test-coverage:
-	$(LERNA) exec --stream -- $(MAKE) test-coverage   
-	$(NPX) nyc report --reporter=html --reporter=text --reporter=cobertura --report-dir=coverage --temp-dir=coverage-temp --exclude="**/browser.min.js" --exclude="**/spec/*" > COVERAGE.md
-
-test-headless-jquery:
-	$(LERNA) exec --stream -- $(MAKE) test-headless-jquery
+	bunx vitest run
 
 test-headless-ff:
-	$(LERNA) exec --stream -- $(MAKE) test-headless-ff
+	bunx vitest run
 
-ci:
-	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
+test-headless-jquery:
+	bunx vitest run
 
 format:
 	$(NPX) prettier . --check
