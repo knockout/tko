@@ -473,7 +473,7 @@ describe('Components: Default loader', function() {
     }
 
     function mockAmdEnvironment(spec, definedModules) {
-        spec.restoreAfter(window, 'require');
+        restoreAfter(window, 'require');
         window.require = function(modules, callback) {
             expect(modules.length).to.equal(1);
             if (modules[0] in definedModules) {

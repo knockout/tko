@@ -40,7 +40,7 @@ describe('Components: Loader registry', function() {
             }
         },
         testLoaderChain = function(spec, chain, options) {
-            spec.restoreAfter(ko.components, 'loaders');
+            restoreAfter(ko.components, 'loaders');
 
             // Set up a chain of loaders, then query it
             ko.components.loaders = chain;

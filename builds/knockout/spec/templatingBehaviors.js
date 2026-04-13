@@ -85,9 +85,10 @@ export var dummyTemplateEngine = function (templates) {
                     templateOptions: templateOptions,
                     unwrap: ko.utils.unwrapObservable
                 }, bindingContext, scopeData);
-                with (scope) {
-                    evalResult = eval(script);
-                }
+                var keys = Object.keys(scope);
+                var values = keys.map(function(k) { return scope[k]; });
+                var fn = new Function(keys.join(','), 'return (' + script + ')');
+                evalResult = fn.apply(null, values);
                 return (evalResult === null) || (evalResult === undefined) ? "" : evalResult.toString();
             } catch (ex) {
                 throw new Error("Error evaluating script: [js: " + script + "]\n\nException: " + ex.toString());
