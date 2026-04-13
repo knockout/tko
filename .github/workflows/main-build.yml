@@ -2,32 +2,31 @@
 name: Build
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [24.x]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          node-version: 24.x
 
       - name: Install dependencies
-        run: npm install
+        run: bun install
+
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium
 
       - name: Audit for vulnerabilities (prod-mode)
         run: npm audit --audit-level=high --production
@@ -36,7 +35,7 @@ jobs:
         run: make
 
       - name: Run tests
-        run: make test-headless
+        run: bunx vitest run
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7

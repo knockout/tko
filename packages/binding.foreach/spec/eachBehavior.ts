@@ -445,7 +445,6 @@ describe('observable array changes', function () {
   })
 
   describe('DOM move capabilities', function () {
-
     it('sorting complex data moves 1 DOM node', function () {
       div = $("<div data-bind='foreach: obs'><div data-bind='html: testHtml'></div></div>")
       applyBindings(view, div[0])

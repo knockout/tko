@@ -2,35 +2,28 @@
 name: Check Tests
 
 on:
-  # Runs for every pull-requests created
   pull_request:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  testheadless:
+  test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [24]
-        run: ['test-headless','test-headless-jquery', 'test-headless-ff']
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm install
+        run: bun install
+
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium
 
       - name: Run Build
         run: make
 
-      - name: Run ${{ matrix.run }}
-        run: make ${{ matrix.run }}
+      - name: Run Tests
+        run: bunx vitest run
