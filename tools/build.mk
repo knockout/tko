@@ -11,7 +11,7 @@ version := $(shell node -e "console.log(require('./package.json').version)")
 banner := // ${package} 🥊 ${version}
 iife-global-name := tko
 
-ESBUILD := npx esbuild
+ESBUILD := bunx esbuild
 .SUFFIXES:
 .SUFFIXES: .ts .js
 
