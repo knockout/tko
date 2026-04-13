@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitest/config'
 import { playwright } from '@vitest/browser-playwright'
 
-const browsers = (process.env.VITEST_BROWSERS || 'chromium').split(',').map((b) => ({ browser: b.trim() }))
+const browsers = ((globalThis as any).process?.env?.VITEST_BROWSERS || 'chromium')
+  .split(',')
+  .map((b: string) => ({ browser: b.trim() }))
 
 export default defineConfig({
   test: {

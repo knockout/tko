@@ -11,5 +11,4 @@ import '../dist/browser.min.js'
 
 // Now import the helper — it needs chai, expect, ko, and beforeEach/afterEach as globals.
 // beforeEach/afterEach come from vitest globals (globals: true in config).
-// The helper is an IIFE that reads these from the global scope.
 import './mocha-test-helpers.js'

@@ -15,9 +15,9 @@ default: all
 
 package.json:
 
-node_modules: package-lock.json
+node_modules: bun.lock
 
-all:: node_modules package-lock.json
+all:: node_modules bun.lock
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test test-headless test-headless-ff test-headless-jquery:
@@ -58,8 +58,8 @@ bump:
 publish-unpublished: all link
 	$(LERNA) publish from-package
 
-package-lock.json: package.json packages/*/package.json
-	$(NPM) i
+bun.lock: package.json packages/*/package.json
+	bun install
 
 package.json:
 
@@ -81,9 +81,7 @@ sweep:
 	
 clean: sweep
 	rm -rf node_modules/
-	rm -f package-lock.json
-	rm -rf packages/*/package-lock.json
-	rm -rf builds/*/package-lock.json
+	rm -f bun.lock
 
 
 # Local linking of these packages, so they
