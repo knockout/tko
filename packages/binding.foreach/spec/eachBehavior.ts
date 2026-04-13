@@ -1021,7 +1021,7 @@ describe('focus', function () {
     const list = ['a', 'b', 'c']
     $target.find(':input').focus()
     applyBindings(list, $target[0])
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     assert.strictEqual(document.activeElement, document.body)
   })
 
@@ -1033,7 +1033,7 @@ describe('focus', function () {
 
     list.remove('a')
     list.push('a')
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     assert.strictEqual(document.activeElement, document.body)
   })
 
@@ -1046,7 +1046,7 @@ describe('focus', function () {
 
     list.remove(o0)
     list.push(o0)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
   })
 
@@ -1062,7 +1062,7 @@ describe('focus', function () {
     list.push(o0)
     list.push('y')
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
   })
 
@@ -1077,7 +1077,7 @@ describe('focus', function () {
     list.push(o0) // focused
     list.push(o0)
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
   })
 })
