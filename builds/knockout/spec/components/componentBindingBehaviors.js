@@ -791,7 +791,7 @@ describe('Components: Component binding', function() {
         ko.components.register('component-3', { viewModel: { require: 'module-3' }, template: '<div>Component 3 template</div>' });
         ko.components.register('component-4', { viewModel: { require: 'module-4' }, template: '<div>Component 4 template</div>' });
         after(function() {
-            for (var i = 0; i < 4; i++) {
+            for (var i = 1; i <= 4; i++) {
                 ko.components.unregister('component-' + i);
             }
         });

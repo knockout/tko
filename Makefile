@@ -17,8 +17,14 @@ node_modules: bun.lock
 all:: node_modules bun.lock
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
-test test-headless test-headless-ff test-headless-jquery:
+test test-headless:
 	bunx vitest run
+
+test-headless-ff:
+	VITEST_BROWSERS=firefox bunx vitest run
+
+test-headless-jquery:
+	VITEST_BROWSERS=chromium bunx vitest run
 
 format:
 	bunx prettier . --check

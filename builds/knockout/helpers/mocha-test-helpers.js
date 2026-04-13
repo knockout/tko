@@ -178,8 +178,15 @@ beforeEach(function () {
 })
 
 afterEach(function () {
-  for (let index = _cleanups.length - 1; index >= 0; index--) {
-    _cleanups[index]()
-  }
+  const cleanups = _cleanups
   _cleanups = []
+  let firstError
+  for (let index = cleanups.length - 1; index >= 0; index--) {
+    try {
+      cleanups[index]()
+    } catch (error) {
+      firstError = firstError || error
+    }
+  }
+  if (firstError) throw firstError
 })
