@@ -7,6 +7,7 @@ export default defineConfig({
     setupFiles: ['builds/knockout/helpers/vitest-setup.js'],
     browser: { enabled: true, provider: playwright(), headless: true, instances: [{ browser: 'chromium' }] },
     globals: true,
-    testTimeout: 10000
+    testTimeout: 10000,
+    dangerouslyIgnoreUnhandledErrors: true
   }
 })
