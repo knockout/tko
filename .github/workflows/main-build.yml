@@ -21,7 +21,7 @@ jobs:
         run: bun install
 
       - name: Install Playwright browsers
-        run: bunx playwright install chromium firefox webkit
+        run: bunx playwright install --with-deps chromium firefox webkit
 
       - name: Audit for vulnerabilities (prod-mode)
         run: npm audit --audit-level=high --production
