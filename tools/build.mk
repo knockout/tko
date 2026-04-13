@@ -11,7 +11,6 @@ version := $(shell node -e "console.log(require('./package.json').version)")
 banner := // ${package} 🥊 ${version}
 iife-global-name := tko
 
-VITEST	:= bunx vitest
 ESBUILD := npx esbuild
 .SUFFIXES:
 .SUFFIXES: .ts .js
@@ -113,14 +112,4 @@ repackage: $(tools_dir)/repackage.mjs ../../lerna.json
 clean:
 	rm -rf dist/*
 
-test: esm
-	$(VITEST) run
-
-test-headless: esm
-	$(VITEST) run
-
-test-headless-ff: esm
-	$(VITEST) run
-
-test-headless-jquery: esm
-	$(VITEST) run
+# Tests run from repo root via `bunx vitest run` (see root Makefile)

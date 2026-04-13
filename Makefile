@@ -20,16 +20,7 @@ node_modules: package-lock.json
 all:: node_modules package-lock.json
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
-test:
-	bunx vitest run
-
-test-headless:
-	bunx vitest run
-
-test-headless-ff:
-	bunx vitest run
-
-test-headless-jquery:
+test test-headless test-headless-ff test-headless-jquery:
 	bunx vitest run
 
 format:

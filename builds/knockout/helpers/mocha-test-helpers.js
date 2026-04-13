@@ -152,7 +152,7 @@ globalThis.browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'fu
 let disableJQueryUsage = true
 
 function switchJQueryState() {
-  ko.options.disableJQueryUsage = disableJQueryUsage = false
+  ko.options.disableJQueryUsage = disableJQueryUsage = true
 }
 
 // Per-test cleanup array, reset each test via beforeEach/afterEach.
