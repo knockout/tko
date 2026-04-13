@@ -39,7 +39,6 @@ export function nodeText(node: Node) {
 type HtmlNode = Node & { innerHTML: string }
 
 function assertHtmlNode(node: Node | null): asserts node is HtmlNode {
-  assert.isNotNull(node, 'expected node to exist')
   if (node === null) {
     throw new Error('expected node to exist')
   }

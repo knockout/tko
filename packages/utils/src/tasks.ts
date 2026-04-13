@@ -38,6 +38,8 @@ if (schedulerGlobal && typeof schedulerGlobal.queueMicrotask === 'function') {
       div.setAttribute('data-task-scheduler', toggle ? '1' : '0')
     }
   })()
+} else {
+  options.taskScheduler = callback => setTimeout(callback, 0)
 }
 
 function processTasks() {

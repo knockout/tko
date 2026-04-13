@@ -1,6 +1,4 @@
 ;(function (global) {
-  const Assertion = chai.Assertion
-
   function restoreAfter(cleanups, object, propertyName) {
     const originalValue = object[propertyName]
     cleanups.push(function () {
@@ -53,7 +51,7 @@
 
   function expectEqualOneOf(actual, expectedPossibilities) {
     const matches = expectedPossibilities.some(function (expected) { return chai.util.eql(actual, expected) })
-    new Assertion(matches, 'expected value to deeply equal one of the provided possibilities').to.equal(true)
+    expect(matches, 'expected value to deeply equal one of the provided possibilities').to.equal(true)
   }
 
   function expectContainHtml(actual, expectedHtml, postProcessCleanedHtml) {
