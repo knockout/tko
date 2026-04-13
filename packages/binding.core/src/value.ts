@@ -11,9 +11,7 @@ export class value extends BindingHandler {
     return ['options', 'foreach', 'template']
   }
 
-  override $element: HTMLInputElement
   elementValueBeforeEvent: any
-  propertyChangeFired: any
   propertyChangedFired: boolean
   updateFromModel: any
   constructor(...args: [any]) {
@@ -31,12 +29,12 @@ export class value extends BindingHandler {
     if (this.ieAutoCompleteHackNeeded) {
       this.addEventListener('propertyChange', () => (this.propertyChangedFired = true))
       this.addEventListener('focus', () => (this.propertyChangedFired = false))
-      this.addEventListener('blur', () => this.propertyChangeFired && this.valueUpdateHandler())
+      this.addEventListener('blur', () => this.propertyChangedFired && this.valueUpdateHandler())
     }
 
     arrayForEach(this.eventsToCatch, eventName => this.registerEvent(eventName))
 
-    if (this.isInput && this.$element.type === 'file') {
+    if (this.isInput(this.$element) && this.$element.type === 'file') {
       this.updateFromModel = this.updateFromModelForFile
     } else {
       this.updateFromModel = this.updateFromModelForValue
@@ -52,20 +50,20 @@ export class value extends BindingHandler {
     return [...new Set(['change', ...requestedEventsArray])]
   }
 
-  get isInput() {
+  isInput(element: HTMLElement): element is HTMLInputElement {
     return tagNameLower(this.$element) === 'input'
   }
 
   get isCheckboxOrRadio() {
     const e = this.$element
-    return this.isInput && (e.type == 'checkbox' || e.type == 'radio')
+    return this.isInput(e) && (e.type == 'checkbox' || e.type == 'radio')
   }
 
   // Workaround for https://github.com/SteveSanderson/knockout/issues/122
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded() {
     return (
-      this.isInput
+      this.isInput(this.$element)
       && this.$element.type == 'text'
       && this.$element.autocomplete != 'off'
       && (!this.$element.form || this.$element.form.autocomplete != 'off')
@@ -105,7 +103,7 @@ export class value extends BindingHandler {
     // For file input elements, can only write the empty string
     const newValue = unwrap(this.value)
     if (newValue === null || newValue === undefined || newValue === '') {
-      this.$element.value = ''
+      ;(this.$element as HTMLInputElement).value = ''
     } else {
       dependencyDetection.ignore(this.valueUpdateHandler, this) // reset the model to match the element
     }

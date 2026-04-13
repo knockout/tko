@@ -1,43 +1,118 @@
 # Automated release via Changesets.
 #
-# On push to main:
-#   - If there are unreleased changesets, opens/updates a "Version Packages"
+# On tagging:
+#   - If there are unreleased changesets, opens/updates a release version
 #     PR that bumps versions and updates changelogs.
-#   - If that PR is merged (no remaining changesets), builds and publishes
-#     to npm.
+#   - If there are no unreleased changesets, builds, tests, and publishes
+#     to npm from a separate least-privilege job.
 #
-# Requires an NPM_TOKEN secret with publish access to the @tko scope.
+# Requires npm trusted publisher configuration for the @tko packages.
+# Publish auth comes from GitHub Actions OIDC, not a long-lived npm token.
 name: Release
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
+  prepare-release:
+    name: Prepare Release
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
       pull-requests: write
-      id-token: write
+
+    outputs:
+      has_changesets: ${{ steps.changesets.outputs.hasChangesets }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        # actions/checkout v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        # actions/setup-node v6.3.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version: 22.x
+          # npm trusted publishing requires npm CLI 11.5.1+, which is available
+          # on the current Node 24 line.
+          node-version: 24.x
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Create or update version PR
+        id: changesets
+        # changesets/action v1.5.3
+        uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba
+        with:
+          version: npx changeset version
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
+          # Signed GitHub API commits are preferable to git-cli pushes for the
+          # automated version PR branch.
+          commitMode: github-api
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish to npm
+    needs: prepare-release
+    if: needs.prepare-release.outputs.has_changesets == 'false'
+    runs-on: ubuntu-latest
+
+    outputs:
+      release_version: ${{ steps.version.outputs.version }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        # actions/checkout v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        # actions/setup-node v6.3.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          # npm trusted publishing requires npm CLI 11.5.1+, which is available
+          # on the current Node 24 line.
+          node-version: 24.x
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine release version
+        id: version
+        run: |
+          version="$(node tools/release-version.cjs)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate tag matches release version
+        env:
+          TAG_VERSION: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          tag_version="${TAG_VERSION#v}"
+
+          if [ "$tag_version" != "$RELEASE_VERSION" ]; then
+            echo "Tag version $tag_version does not match release version $RELEASE_VERSION." >&2
+            exit 1
+          fi
 
       - name: Build all packages
         run: make
@@ -45,14 +120,58 @@ jobs:
       - name: Run tests
         run: make test-headless
 
-      - name: Create release PR or publish
-        uses: changesets/action@v1
-        with:
-          version: npx changeset version
-          publish: npx changeset publish --provenance
-          title: 'chore: version packages'
-          commit: 'chore: version packages'
+      - name: Publish packages
+        # npm generates provenance attestations automatically during trusted
+        # publishing from GitHub Actions.
+        run: npx changeset publish
+
+  github-release:
+    name: Create GitHub Release
+    needs: [prepare-release, publish]
+    if: needs.prepare-release.outputs.has_changesets == 'false' && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.publish.outputs.release_version }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          tag="v${VERSION}"
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            object_type="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.type')"
+            object_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+
+            if [ "$object_type" = "tag" ]; then
+              existing_target="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha" --jq '.object.sha')"
+            else
+              existing_target="$object_sha"
+            fi
+
+            if [ "$existing_target" = "$TARGET_SHA" ]; then
+              echo "GitHub release $tag already exists on $TARGET_SHA; skipping."
+              exit 0
+            fi
+
+            echo "GitHub release $tag already exists on $existing_target, expected $TARGET_SHA." >&2
+            exit 1
+          fi
+
+          prerelease_flag=""
+          case "$VERSION" in
+            *-alpha*|*-beta*|*-rc*)
+              prerelease_flag="--prerelease"
+              ;;
+          esac
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$TARGET_SHA" \
+            --title "TKO ${VERSION}" \
+            --generate-notes \
+            $prerelease_flag

@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta1.3",
+  "version": "4.0.0",
   "name": "@tko/utils.functionrewrite",
   "description": "Rewrite `function {}` as lambdas (=>)",
   "module": "dist/utils.functionrewrite.js",
@@ -13,8 +13,7 @@
   },
   "karma": {
     "frameworks": [
-      "mocha",
-      "chai"
+      "mocha"
     ]
   },
   "homepage": "https://tko.io",

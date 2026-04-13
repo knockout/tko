@@ -81,7 +81,7 @@ describe('Identifier', function () {
 
   describe('the dereference function', function () {
     it('does nothing with no references', function () {
-      let refs,
+      let refs = Array(),
         ident = new Identifier({}, 'x', refs)
       assert.equal(ident.dereference('1', {}), 1)
     })
