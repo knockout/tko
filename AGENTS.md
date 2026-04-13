@@ -51,7 +51,7 @@ Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
 ```
 packages/          # 25 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
-tools/             # Shared build config (build.mk, karma.conf.js, repackage.mjs)
+tools/             # Shared build config (build.mk, repackage.mjs)
 skills/            # AI agent skills (on-demand workflow instructions)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
 Makefile           # Top-level build orchestrator
@@ -75,18 +75,14 @@ All builds use Make + esbuild. Run from the repo root:
 ```bash
 bun install               # Install all dependencies (uses Bun workspaces)
 make                      # Build all packages (ESM, CommonJS, MJS)
-make test                 # Run all tests with Electron
-make test-headless        # Run all tests with headless Chrome
-make test-headless-ff     # Run all tests with headless Firefox
-make test-headless-jquery # Run tests with jQuery enabled
-make test-coverage        # Run tests and generate coverage report
+make test                 # Run all tests (Vitest, headless Chromium via Playwright)
+bunx vitest run           # Same as make test, directly
 make eslint               # Run ESLint
 make eslint-fix           # Run ESLint with auto-fix
 make format               # Check Prettier formatting
 make format-fix           # Fix Prettier formatting
 make tsc                  # TypeScript type-check (no emit)
 make dts                  # Generate TypeScript declaration files
-make knip                 # Run Knip for Linting imports and exports
 make sweep                # Clean dist/ and coverage/ dirs
 make clean                # Full clean (node_modules, lockfiles, dist)
 ```

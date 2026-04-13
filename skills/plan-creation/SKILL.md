@@ -1,6 +1,6 @@
 ---
 name: plan-creation
-description: "Create or update a TKO plan file in plans/. USE WHEN: planning substantial AI-assisted changes, classifying risk, reviewing existing plans for format, documenting verification, or handling HIGH-risk path changes (.github/workflows/, tools/build.mk, tools/karma.conf.js, release/publish controls), new runtime dependencies, CI/CD modifications, or multi-package behavior changes. Scaffolds the plan, applies AI_COMPLIANCE.md risk classes, and enforces approval/evidence expectations."
+description: "Create or update a TKO plan file in plans/. USE WHEN: planning substantial AI-assisted changes, classifying risk, reviewing existing plans for format, documenting verification, or handling HIGH-risk path changes (.github/workflows/, tools/build.mk, vitest.config.ts, release/publish controls), new runtime dependencies, CI/CD modifications, or multi-package behavior changes. Scaffolds the plan, applies AI_COMPLIANCE.md risk classes, and enforces approval/evidence expectations."
 argument-hint: "Describe the change you are planning"
 ---
 
@@ -21,7 +21,7 @@ Create a plan **before implementation** when any of these apply:
 - A new dependency is introduced
 - CI/CD, release, or publish logic is modified
 - Files in a HIGH-risk path are changed (`.github/workflows/`, `tools/build.mk`,
-  `tools/karma.conf.js`, `.changeset/`, release scripts)
+  `vitest.config.ts`, `.changeset/`, release scripts)
 - The AI_COMPLIANCE.md risk class is HIGH or MEDIUM with broad blast radius
 - You are unsure whether a plan is needed (it is always safe to have one)
 
@@ -54,7 +54,7 @@ Per `AI_COMPLIANCE.md` §6:
 
 - `.github/workflows/`
 - `tools/build.mk`
-- `tools/karma.conf.js`
+- `vitest.config.ts`
 - `.changeset/` and release scripts/workflows
 - Authentication/publishing and CI secret configurations
 
