@@ -30,7 +30,8 @@
     "@tko/lifecycle": "^4.0.0",
     "@tko/observable": "^4.0.0",
     "@tko/provider.native": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/utils": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "homepage": "https://tko.io",
   "licenses": [

@@ -28,7 +28,9 @@
       "jasmine"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "tslib": "^2.2.0"
+  },
   "licenses": [
     {
       "type": "MIT",

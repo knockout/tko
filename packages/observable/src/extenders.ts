@@ -36,14 +36,14 @@ export function applyExtenders(requestedExtenders?) {
  */
 
 // Change when notifications are published.
-function notify(target: any, notifyWhen: string) {
+export function notify(target: any, notifyWhen: string) {
   target.equalityComparer =
     notifyWhen == 'always'
       ? null // null equalityComparer means to always notify
       : valuesArePrimitiveAndEqual
 }
 
-function deferred(target: any, option: boolean) {
+export function deferred(target: any, option: boolean) {
   if (option !== true) {
     throw new Error(
       "The 'deferred' extender only accepts the value 'true', because it is not supported to turn deferral off once enabled."
@@ -52,7 +52,7 @@ function deferred(target: any, option: boolean) {
   deferUpdates(target)
 }
 
-function rateLimit(target: any, options: string | any) {
+export function rateLimit(target: any, options: string | any) {
   let timeout, method, limitFunction
 
   if (typeof options === 'number') {

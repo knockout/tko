@@ -9,7 +9,9 @@
     "types/"
   ],
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "tslib": "^2.2.0"
+  },
   "karma": {
     "frameworks": [
       "mocha"

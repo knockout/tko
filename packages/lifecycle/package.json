@@ -3,7 +3,8 @@
   "module": "dist/lifecycle.js",
   "dependencies": {
     "@tko/computed": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/utils": "^4.0.0",
+    "tslib": "^2.2.0"
   },
   "peerDependencies": {
     "@tko/observable": "^4.0.0"

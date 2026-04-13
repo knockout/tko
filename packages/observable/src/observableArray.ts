@@ -12,7 +12,7 @@ import { trackArrayChanges } from './observableArray.changeTracking'
 
 import type { Observable, ObservableFunctions } from './observable'
 
-//TODO Currently unused --> export type MaybeObservableArray<T = any> = T[] | ObservableArray<T>
+export type MaybeObservableArray<T = any> = T[] | ObservableArray<T>
 
 export interface ObservableArrayFunctions<T = any> extends ObservableFunctions<T[]> {
   /**

@@ -88,15 +88,12 @@ export function proxy(object) {
   return proxy
 }
 
-/** @internal */
 export function getObservable(proxied, prop) {
   return proxied[MIRROR_SYM][prop]
 }
-/** @internal */
 export function peek(proxied, prop) {
   return getObservable(proxied, prop).peek()
 }
-/** @internal */
 export function isProxied(proxied) {
   return PROXY_SYM in proxied
 }
