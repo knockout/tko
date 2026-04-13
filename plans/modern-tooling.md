@@ -20,7 +20,7 @@ reverted PRs.
 | Build orchestrator | Make + esbuild | Bun scripts + esbuild | Standard package.json scripts, no Make knowledge needed |
 | Linter + formatter | ESLint + Prettier | Biome | Single tool, Rust-native, 10-100x faster |
 | Linter (unused exports) | none | knip | Catches dead code, unused deps |
-| Test runner | Karma + browser | Karma (unchanged for now) | Works, not worth migrating yet |
+| Test runner | Karma + Mocha + browser | @web/test-runner | Mocha-compatible, modern, Playwright browsers |
 | Version pinning | none | mise/asdf via `.tool-versions` | Reproducible environments |
 
 ## Phases
@@ -29,7 +29,7 @@ reverted PRs.
 
 **One PR. Low risk.**
 
-- Add `.tool-versions` with `bun latest` (and `node 24` for compatibility)
+- Add `.tool-versions` with `bun latest`
 - Add `bun.lock` alongside `package-lock.json` (transitional)
 - Verify `bun install` works, `make test-headless` still passes
 - Update CI to use `bun install` instead of `npm install`
@@ -102,7 +102,43 @@ Changes:
 
 Verify: `biome ci` passes, all tests pass, diff is formatting-only.
 
-### Phase 5: knip
+### Phase 5: @web/test-runner (replaces Karma)
+
+**One PR per sub-step. High value — eliminates Karma and its plugin ecosystem.**
+
+@web/test-runner is built for testing web libraries in real browsers. It's
+Mocha-compatible, so the 150 spec files we just migrated keep their syntax.
+Uses Playwright under the hood for Chrome, Firefox, and WebKit.
+
+Eliminates: `karma`, `karma-esbuild`, `karma-mocha`, `karma-chrome-launcher`,
+`karma-firefox-launcher`, `karma-coverage`, `karma-sauce-launcher` (7 deps).
+
+Changes:
+- Add `@web/test-runner`, `@web/test-runner-playwright` as devDependencies
+- Create `web-test-runner.config.mjs` replacing `tools/karma.conf.js`:
+  - esbuild plugin for TS/bundling (or use `@web/dev-server-esbuild`)
+  - Playwright browsers: chromium, firefox, webkit
+  - Coverage via built-in istanbul support
+  - Files: `packages/*/spec/**/*.ts`, `builds/knockout/spec/**/*.js`
+- Update per-package `package.json`: remove `karma` config blocks
+- Update Makefile/Bun scripts: `test` → `web-test-runner`
+- Update CI: replace `test-headless`, `test-headless-ff`, `test-headless-jquery`
+  with single `web-test-runner --browsers chromium firefox webkit`
+- The `builds/knockout` plain-JS specs need special handling — either:
+  - Bundle them through esbuild (like we did for the helper), or
+  - Migrate them to import from `@tko/build.knockout` as ESM
+- Remove `tools/karma.conf.js` and all `karma-*` devDependencies
+- Update AGENTS.md testing section
+
+Sub-PRs:
+1. Add @web/test-runner config alongside karma (both work)
+2. Migrate `packages/` specs to @web/test-runner
+3. Migrate `builds/knockout` specs
+4. Remove karma
+
+Verify: all specs pass in chromium, firefox, webkit. Coverage numbers match.
+
+### Phase 6: knip
 
 **One PR. Low risk — linter only, no source changes.**
 
@@ -115,7 +151,7 @@ This was the main issue with the reverted PR #234 — it bundled the linter setu
 with `verbatimModuleSyntax`, type refactoring, and export cleanup all in one
 56-file PR. This time: just the linter. Findings get fixed in focused follow-ups.
 
-### Phase 6 (future): knip findings
+### Phase 7 (future): knip findings
 
 **One PR per category of finding.**
 
@@ -128,7 +164,6 @@ Each is a small, reviewable PR. None bundles concerns.
 
 ## Future considerations
 
-- **Karma → Vitest** — if Karma becomes painful. Not urgent.
 - **esbuild → Bun bundler** — evaluate during Phase 3. Bun's bundler is esbuild-compatible and eliminates a dependency. Test with `bun build` on a few packages to compare output.
 - **Lerna → Bun workspaces** — evaluate during Phase 3. `bun --filter` replaces `lerna exec`, `bun install` already handles workspace resolution. Lerna may become unnecessary once Makefiles are gone.
 
