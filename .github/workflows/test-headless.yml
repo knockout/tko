@@ -20,10 +20,12 @@ jobs:
         run: bun install
 
       - name: Install Playwright browsers
-        run: bunx playwright install chromium
+        run: bunx playwright install chromium firefox
 
       - name: Run Build
         run: make
 
       - name: Run Tests
         run: bunx vitest run
+        env:
+          VITEST_BROWSERS: chromium,firefox

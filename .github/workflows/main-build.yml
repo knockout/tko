@@ -26,7 +26,7 @@ jobs:
         run: bun install
 
       - name: Install Playwright browsers
-        run: bunx playwright install chromium
+        run: bunx playwright install chromium firefox
 
       - name: Audit for vulnerabilities (prod-mode)
         run: npm audit --audit-level=high --production
@@ -36,6 +36,8 @@ jobs:
 
       - name: Run tests
         run: bunx vitest run
+        env:
+          VITEST_BROWSERS: chromium,firefox
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
