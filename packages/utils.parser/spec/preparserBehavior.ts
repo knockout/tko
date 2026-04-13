@@ -150,7 +150,7 @@ describe('Expression Rewriting', function () {
     expect(parsedRewritten.b).to.be.undefined // eslint-disable-line
   })
 
-  xit('Should return accessor functions for each value when called with the valueAccessors option', function () {
+  it.skip('Should return accessor functions for each value when called with the valueAccessors option', function () {
     // Deprecated
     const rewritten = preProcessBindings('a: 1', { valueAccessors: true })
     expect(rewritten).to.equal("'a':function(){return 1 }")

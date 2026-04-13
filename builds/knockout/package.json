@@ -31,11 +31,11 @@
   ],
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha"
     ],
     "files": [
       "dist/browser.min.js",
-      "helpers/jasmine.extensions.js",
+      "helpers/mocha-test-helpers.js",
       "spec/**/*.js"
     ]
   },

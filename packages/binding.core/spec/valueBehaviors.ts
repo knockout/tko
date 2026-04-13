@@ -1,3 +1,6 @@
+import { expect } from 'chai'
+import sinon from 'sinon'
+
 import { triggerEvent, domData } from '@tko/utils'
 
 import { computed } from '@tko/computed'
@@ -12,12 +15,21 @@ import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { nodeText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
+
+function expectArrayEqual(actual: Array<unknown>, expected: Array<unknown>) {
+  expect(actual.length).to.equal(expected.length)
+  actual.forEach((value, index) => expect(value).to.equal(expected[index]))
+}
+
+function expectHaveTexts(node: Node, expectedTexts: Array<unknown>) {
+  expectArrayEqual(Array.from(node.childNodes, nodeText), expectedTexts)
+}
 
 describe('Binding: Value', function () {
   let testNode: any //TODO HTMLElement will be better
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -29,43 +41,43 @@ describe('Binding: Value', function () {
   it('Should assign the value to the node', function () {
     testNode.innerHTML = "<input data-bind='value:123' />"
     applyBindings(null, testNode)
-    expect(testNode.childNodes[0].value).toEqual('123')
+    expect(testNode.childNodes[0].value).to.deep.equal('123')
   })
 
   it('Should treat null values as empty strings', function () {
     testNode.innerHTML = "<input data-bind='value:myProp' />"
     applyBindings({ myProp: observable(0) }, testNode)
-    expect(testNode.childNodes[0].value).toEqual('0')
+    expect(testNode.childNodes[0].value).to.deep.equal('0')
   })
 
   it('Should assign an empty string as value if the model value is null', function () {
     testNode.innerHTML = "<input data-bind='value:(null)' />"
     applyBindings(null, testNode)
-    expect(testNode.childNodes[0].value).toEqual('')
+    expect(testNode.childNodes[0].value).to.deep.equal('')
   })
 
   it('Should assign an empty string as value if the model value is undefined', function () {
     testNode.innerHTML = "<input data-bind='value:undefined' />"
     applyBindings(null, testNode)
-    expect(testNode.childNodes[0].value).toEqual('')
+    expect(testNode.childNodes[0].value).to.deep.equal('')
   })
 
   it('For observable values, should unwrap the value and update on change', function () {
     const myObservable = observable(123)
     testNode.innerHTML = "<input data-bind='value:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
-    expect(testNode.childNodes[0].value).toEqual('123')
+    expect(testNode.childNodes[0].value).to.deep.equal('123')
     myObservable(456)
-    expect(testNode.childNodes[0].value).toEqual('456')
+    expect(testNode.childNodes[0].value).to.deep.equal('456')
   })
 
   it("For observable values, should update on change if new value is 'strictly' different from previous value", function () {
     const myObservable = observable('+123')
     testNode.innerHTML = "<input data-bind='value:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
-    expect(testNode.childNodes[0].value).toEqual('+123')
+    expect(testNode.childNodes[0].value).to.deep.equal('+123')
     myObservable(123)
-    expect(testNode.childNodes[0].value).toEqual('123')
+    expect(testNode.childNodes[0].value).to.deep.equal('123')
   })
 
   it("For writeable observable values, should catch the node's onchange and write values back to the observable", function () {
@@ -74,7 +86,7 @@ describe('Binding: Value', function () {
     applyBindings({ someProp: myObservable }, testNode)
     testNode.childNodes[0].value = 'some user-entered value'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(myObservable()).toEqual('some user-entered value')
+    expect(myObservable()).to.deep.equal('some user-entered value')
   })
 
   it('For writeable observable values, should always write when triggered, even when value is the same', function () {
@@ -98,20 +110,20 @@ describe('Binding: Value', function () {
     // set initial valid value
     testNode.childNodes[0].value = '1234'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(validValue()).toEqual('1234')
-    expect(isValid()).toEqual(true)
+    expect(validValue()).to.deep.equal('1234')
+    expect(isValid()).to.deep.equal(true)
 
     // set to an invalid value
     testNode.childNodes[0].value = '1234a'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(validValue()).toEqual('1234')
-    expect(isValid()).toEqual(false)
+    expect(validValue()).to.deep.equal('1234')
+    expect(isValid()).to.deep.equal(false)
 
     // set to a valid value where the current value of the writeable computed is the same as the written value
     testNode.childNodes[0].value = '1234'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(validValue()).toEqual('1234')
-    expect(isValid()).toEqual(true)
+    expect(validValue()).to.deep.equal('1234')
+    expect(isValid()).to.deep.equal(true)
   })
 
   it('Should ignore node changes when bound to a read-only observable', function () {
@@ -122,24 +134,24 @@ describe('Binding: Value', function () {
 
     testNode.innerHTML = "<input data-bind='value: prop' />"
     applyBindings(vm, testNode)
-    expect(testNode.childNodes[0].value).toEqual('zzz')
+    expect(testNode.childNodes[0].value).to.deep.equal('zzz')
 
     // Change the input value and trigger change event; verify that the view model wasn't changed
     testNode.childNodes[0].value = 'yyy'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(vm.prop).toEqual(computedValue)
-    expect(computedValue()).toEqual('zzz')
+    expect(vm.prop).to.deep.equal(computedValue)
+    expect(computedValue()).to.deep.equal('zzz')
   })
 
   it("For non-observable property values, should catch the node's onchange and write values back to the property", function () {
     const model = { modelProperty123: 456 }
     testNode.innerHTML = "<input data-bind='value: modelProperty123' />"
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0].value).toEqual('456')
+    expect(testNode.childNodes[0].value).to.deep.equal('456')
 
     testNode.childNodes[0].value = 789
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(model.modelProperty123).toEqual('789')
+    expect(model.modelProperty123).to.deep.equal('789')
   })
 
   it('Should be able to read and write to a property of an object returned by a function', function () {
@@ -154,24 +166,24 @@ describe('Binding: Value', function () {
       + '<input data-bind=\'value: getSetter()["set"]\' />'
       + '<input data-bind="value: getSetter()[\'set\']" />'
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0].value).toEqual('666')
-    expect(testNode.childNodes[1].value).toEqual('666')
-    expect(testNode.childNodes[2].value).toEqual('666')
+    expect(testNode.childNodes[0].value).to.deep.equal('666')
+    expect(testNode.childNodes[1].value).to.deep.equal('666')
+    expect(testNode.childNodes[2].value).to.deep.equal('666')
 
     // .property
     testNode.childNodes[0].value = 667
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(mySetter.set).toEqual('667')
+    expect(mySetter.set).to.deep.equal('667')
 
     // ["property"]
     testNode.childNodes[1].value = 668
     triggerEvent(testNode.childNodes[1], 'change')
-    expect(mySetter.set).toEqual('668')
+    expect(mySetter.set).to.deep.equal('668')
 
     // ['property']
     testNode.childNodes[0].value = 669
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(mySetter.set).toEqual('669')
+    expect(mySetter.set).to.deep.equal('669')
   })
 
   it('Should be able to write to observable subproperties of an observable, even after the parent observable has changed', function () {
@@ -183,15 +195,15 @@ describe('Binding: Value', function () {
     // Set up a text box whose value is linked to the subproperty of the observable's current value
     testNode.innerHTML = "<input data-bind='value: myprop().subproperty' />"
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0].value).toEqual('original value')
+    expect(testNode.childNodes[0].value).to.deep.equal('original value')
 
     model.myprop({ subproperty: newSubproperty }) // Note that myprop (and hence its subproperty) is changed *after* the bindings are applied
     testNode.childNodes[0].value = 'Some new value'
     triggerEvent(testNode.childNodes[0], 'change')
 
     // Verify that the change was written to the *new* subproperty, not the one referenced when the bindings were first established
-    expect(newSubproperty()).toEqual('Some new value')
-    expect(originalSubproperty()).toEqual('original value')
+    expect(newSubproperty()).to.deep.equal('Some new value')
+    expect(originalSubproperty()).to.deep.equal('original value')
   })
 
   it('Should only register one single onchange handler', function () {
@@ -200,7 +212,7 @@ describe('Binding: Value', function () {
     myObservable.subscribe(function (value) {
       notifiedValues.push(value)
     })
-    expect(notifiedValues.length).toEqual(0)
+    expect(notifiedValues.length).to.deep.equal(0)
 
     testNode.innerHTML = "<input data-bind='value:someProp' />"
     applyBindings({ someProp: myObservable }, testNode)
@@ -210,11 +222,11 @@ describe('Binding: Value', function () {
     // we'll see one new value per onchange event. More handlers cause more notifications.
     testNode.childNodes[0].value = 'ABC'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(notifiedValues.length).toEqual(1)
+    expect(notifiedValues.length).to.deep.equal(1)
 
     testNode.childNodes[0].value = 'DEF'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(notifiedValues.length).toEqual(2)
+    expect(notifiedValues.length).to.deep.equal(2)
   })
 
   it('Should be able to catch updates after specific events (e.g., keyup) instead of onchange', function () {
@@ -223,7 +235,7 @@ describe('Binding: Value', function () {
     applyBindings({ someProp: myObservable }, testNode)
     testNode.childNodes[0].value = 'some user-entered value'
     triggerEvent(testNode.childNodes[0], 'keyup')
-    expect(myObservable()).toEqual('some user-entered value')
+    expect(myObservable()).to.deep.equal('some user-entered value')
   })
 
   it('Should catch updates on change as well as the nominated valueUpdate event', function () {
@@ -233,57 +245,66 @@ describe('Binding: Value', function () {
     applyBindings({ someProp: myObservable }, testNode)
     testNode.childNodes[0].value = 'some user-entered value'
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(myObservable()).toEqual('some user-entered value')
+    expect(myObservable()).to.deep.equal('some user-entered value')
   })
 
   it('Should delay reading value and updating observable when prefixing an event with "after"', function () {
-    jasmine.Clock.useMock()
+    const clock = sinon.useFakeTimers()
+    try {
+      const myObservable = observable('123')
+      testNode.innerHTML = '<input data-bind=\'value:someProp, valueUpdate: "afterkeyup"\' />'
+      applyBindings({ someProp: myObservable }, testNode)
+      triggerEvent(testNode.childNodes[0], 'keyup')
+      testNode.childNodes[0].value = 'some user-entered value'
+      expect(myObservable()).to.deep.equal('123') // observable is not changed yet
 
-    const myObservable = observable('123')
-    testNode.innerHTML = '<input data-bind=\'value:someProp, valueUpdate: "afterkeyup"\' />'
-    applyBindings({ someProp: myObservable }, testNode)
-    triggerEvent(testNode.childNodes[0], 'keyup')
-    testNode.childNodes[0].value = 'some user-entered value'
-    expect(myObservable()).toEqual('123') // observable is not changed yet
-
-    jasmine.Clock.tick(20)
-    expect(myObservable()).toEqual('some user-entered value') // it's changed after a delay
+      clock.tick(20)
+      expect(myObservable()).to.deep.equal('some user-entered value') // it's changed after a delay
+    } finally {
+      clock.restore()
+    }
   })
 
   it('Should ignore "unchanged" notifications from observable during delayed event processing', function () {
-    jasmine.Clock.useMock()
+    const clock = sinon.useFakeTimers()
+    try {
+      const myObservable = observable('123')
+      testNode.innerHTML = '<input data-bind=\'value:someProp, valueUpdate: "afterkeyup"\' />'
+      applyBindings({ someProp: myObservable }, testNode)
+      triggerEvent(testNode.childNodes[0], 'keyup')
+      testNode.childNodes[0].value = 'some user-entered value'
 
-    const myObservable = observable('123')
-    testNode.innerHTML = '<input data-bind=\'value:someProp, valueUpdate: "afterkeyup"\' />'
-    applyBindings({ someProp: myObservable }, testNode)
-    triggerEvent(testNode.childNodes[0], 'keyup')
-    testNode.childNodes[0].value = 'some user-entered value'
+      // Notification of previous value (unchanged) is ignored
+      myObservable.valueHasMutated()
+      expect(testNode.childNodes[0].value).to.deep.equal('some user-entered value')
 
-    // Notification of previous value (unchanged) is ignored
-    myObservable.valueHasMutated()
-    expect(testNode.childNodes[0].value).toEqual('some user-entered value')
-
-    // Observable is updated to new element value
-    jasmine.Clock.tick(20)
-    expect(myObservable()).toEqual('some user-entered value')
+      // Observable is updated to new element value
+      clock.tick(20)
+      expect(myObservable()).to.deep.equal('some user-entered value')
+    } finally {
+      clock.restore()
+    }
   })
 
   it('Should not ignore actual change notifications from observable during delayed event processing', function () {
-    jasmine.Clock.useMock()
+    const clock = sinon.useFakeTimers()
+    try {
+      const myObservable = observable('123')
+      testNode.innerHTML = '<input data-bind=\'value:someProp, valueUpdate: "afterkeyup"\' />'
+      applyBindings({ someProp: myObservable }, testNode)
+      triggerEvent(testNode.childNodes[0], 'keyup')
+      testNode.childNodes[0].value = 'some user-entered value'
 
-    const myObservable = observable('123')
-    testNode.innerHTML = '<input data-bind=\'value:someProp, valueUpdate: "afterkeyup"\' />'
-    applyBindings({ someProp: myObservable }, testNode)
-    triggerEvent(testNode.childNodes[0], 'keyup')
-    testNode.childNodes[0].value = 'some user-entered value'
+      // New value is written to input element
+      myObservable('some value from the server')
+      expect(testNode.childNodes[0].value).to.deep.equal('some value from the server')
 
-    // New value is written to input element
-    myObservable('some value from the server')
-    expect(testNode.childNodes[0].value).toEqual('some value from the server')
-
-    // New value remains when event is processed
-    jasmine.Clock.tick(20)
-    expect(myObservable()).toEqual('some value from the server')
+      // New value remains when event is processed
+      clock.tick(20)
+      expect(myObservable()).to.deep.equal('some value from the server')
+    } finally {
+      clock.restore()
+    }
   })
 
   it('Should handle autofill selection by treating "focus", "blur" and "change" event', function () {
@@ -302,7 +323,7 @@ describe('Binding: Value', function () {
     // See that no 'update' event fires.
     triggerEvent(testNode.childNodes[0], 'focus')
     triggerEvent(testNode.childNodes[0], 'blur')
-    expect(numUpdates).toEqual(0)
+    expect(numUpdates).to.deep.equal(0)
 
     // Simulate:
     // 1. Select from autofill
@@ -311,10 +332,10 @@ describe('Binding: Value', function () {
     testNode.childNodes[0].value = 'some user-entered value'
     //IE: triggerEvent(testNode.childNodes[0], 'propertychange')
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(myObservable()).toEqual('some user-entered value')
-    expect(numUpdates).toEqual(1)
+    expect(myObservable()).to.deep.equal('some user-entered value')
+    expect(numUpdates).to.deep.equal(1)
     triggerEvent(testNode.childNodes[0], 'blur')
-    expect(numUpdates).toEqual(1)
+    expect(numUpdates).to.deep.equal(1)
 
     // Simulate:
     // 1. Select from autofill
@@ -323,11 +344,11 @@ describe('Binding: Value', function () {
     testNode.childNodes[0].value = 'different user-entered value'
     //IE: triggerEvent(testNode.childNodes[0], 'propertychange')
     triggerEvent(testNode.childNodes[0], 'blur')
-    expect(myObservable()).toEqual('some user-entered value')
-    expect(numUpdates).toEqual(1)
+    expect(myObservable()).to.deep.equal('some user-entered value')
+    expect(numUpdates).to.deep.equal(1)
     triggerEvent(testNode.childNodes[0], 'change')
-    expect(numUpdates).toEqual(2)
-    expect(myObservable()).toEqual('different user-entered value')
+    expect(numUpdates).to.deep.equal(2)
+    expect(myObservable()).to.deep.equal('different user-entered value')
   })
 
   it('Should bind to file inputs but not allow setting an non-empty value', function () {
@@ -336,7 +357,7 @@ describe('Binding: Value', function () {
 
     testNode.innerHTML = "<input type='file' data-bind='value: prop' />"
     applyBindings(vm, testNode)
-    expect(testNode.childNodes[0].value).toEqual('')
+    expect(testNode.childNodes[0].value).to.deep.equal('')
   })
 
   describe('For select boxes', function () {
@@ -344,30 +365,34 @@ describe('Binding: Value', function () {
       const myObservable = observable('B')
       testNode.innerHTML = '<select data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(1)
-      expect(myObservable()).toEqual('B')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      expect(myObservable()).to.deep.equal('B')
 
       myObservable('A')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
-      expect(myObservable()).toEqual('A')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+      expect(myObservable()).to.deep.equal('A')
     })
 
-    it('Should update selectedIndex when the model changes (value specified before options)', function () {
+    it('Should update selectedIndex when the model changes (value specified before options)', function (done) {
       const myObservable = observable('B')
       testNode.innerHTML = '<select data-bind=\'value:myObservable, options:["A", "B"]\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(1)
-      expect(myObservable()).toEqual('B')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      expect(myObservable()).to.deep.equal('B')
 
       myObservable('A')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
-      expect(myObservable()).toEqual('A')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+      expect(myObservable()).to.deep.equal('A')
 
       // Also check that the selection doesn't change later (see https://github.com/knockout/knockout/issues/2218)
-      waits(10)
-      runs(function () {
-        expect(testNode.childNodes[0].selectedIndex).toEqual(0)
-      })
+      setTimeout(function () {
+        try {
+          expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+          done()
+        } catch (error) {
+          done(error)
+        }
+      }, 10)
     })
 
     it('Should display the caption when the model value changes to undefined, null, or \"\" when using \'options\' binding', function () {
@@ -377,21 +402,21 @@ describe('Binding: Value', function () {
       applyBindings({ myObservable: myObservable }, testNode)
 
       // Caption is selected when observable changed to undefined
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
       myObservable(undefined)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
 
       // Caption is selected when observable changed to null
       myObservable('B')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
       myObservable(null)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
 
       // Caption is selected when observable changed to ""
       myObservable('B')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
       myObservable('')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
     it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function () {
@@ -401,21 +426,21 @@ describe('Binding: Value', function () {
       applyBindings({ myObservable: myObservable }, testNode)
 
       // Caption is selected when observable changed to undefined
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
       myObservable(undefined)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
 
       // Caption is selected when observable changed to null
       myObservable('B')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
       myObservable(null)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
 
       // Caption is selected when observable changed to ""
       myObservable('B')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
       myObservable('')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(0)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
     it('When size > 1, should unselect all options when value is undefined, null, or \"\"', function () {
@@ -424,21 +449,21 @@ describe('Binding: Value', function () {
       applyBindings({ myObservable: myObservable }, testNode)
 
       // Nothing is selected when observable changed to undefined
-      expect(testNode.childNodes[0].selectedIndex).toEqual(1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
       myObservable(undefined)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
 
       // Nothing is selected when observable changed to null
       myObservable('B')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
       myObservable(null)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
 
       // Nothing is selected when observable changed to ""
       myObservable('B')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
       myObservable('')
-      expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
     })
 
     it('Should update the model value when the UI is changed (setting it to undefined when the caption is selected)', function () {
@@ -450,11 +475,11 @@ describe('Binding: Value', function () {
 
       dropdown.selectedIndex = 1
       triggerEvent(dropdown, 'change')
-      expect(myObservable()).toEqual('A')
+      expect(myObservable()).to.deep.equal('A')
 
       dropdown.selectedIndex = 0
       triggerEvent(dropdown, 'change')
-      expect(myObservable()).toEqual(undefined)
+      expect(myObservable()).to.deep.equal(undefined)
     })
 
     it('Should be able to associate option values with arbitrary objects (not just strings)', function () {
@@ -466,16 +491,16 @@ describe('Binding: Value', function () {
       applyBindings({ myOptions: [x, y], selectedValue: selectedValue }, testNode)
 
       // Check the UI displays the entry corresponding to the chosen value
-      expect(dropdown.selectedIndex).toEqual(1)
+      expect(dropdown.selectedIndex).to.deep.equal(1)
 
       // Check that when we change the model value, the UI is updated
       selectedValue(x)
-      expect(dropdown.selectedIndex).toEqual(0)
+      expect(dropdown.selectedIndex).to.deep.equal(0)
 
       // Check that when we change the UI, this changes the model value
       dropdown.selectedIndex = 1
       triggerEvent(dropdown, 'change')
-      expect(selectedValue()).toEqual(y)
+      expect(selectedValue()).to.deep.equal(y)
     })
 
     it('Should automatically initialize the model property to match the first option value if no option value matches the current model property value', function () {
@@ -488,28 +513,28 @@ describe('Binding: Value', function () {
       // Should work with options specified before value
       testNode.innerHTML = '<select data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)
-      expect(myObservable()).toEqual('A')
+      expect(myObservable()).to.deep.equal('A')
 
       // ... and with value specified before options
       domData.clear(testNode)
       testNode.innerHTML = '<select data-bind=\'value:myObservable, options:["A", "B"]\'></select>'
       myObservable(undefined)
-      expect(myObservable()).toEqual(undefined)
+      expect(myObservable()).to.deep.equal(undefined)
       applyBindings({ myObservable: myObservable }, testNode)
-      expect(myObservable()).toEqual('A')
+      expect(myObservable()).to.deep.equal('A')
     })
 
     it("When non-empty, should reject model values that don't match any option value, resetting the model value to whatever is visibly selected in the UI", function () {
       const myObservable = observable('B')
       testNode.innerHTML = '<select data-bind=\'options:["A", "B", "C"], value:myObservable\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)
-      expect(testNode.childNodes[0].selectedIndex).toEqual(1)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
 
       myObservable('D') // This change should be rejected, as there's no corresponding option in the UI
-      expect(myObservable()).toEqual('B')
+      expect(myObservable()).to.deep.equal('B')
 
       myObservable(null) // This change should also be rejected
-      expect(myObservable()).toEqual('B')
+      expect(myObservable()).to.deep.equal('B')
     })
 
     it('Should support numerical option values, which are not implicitly converted to strings', function () {
@@ -518,13 +543,13 @@ describe('Binding: Value', function () {
       applyBindings({ myObservable: myObservable }, testNode)
 
       // First check that numerical model values will match a dropdown option
-      expect(testNode.childNodes[0].selectedIndex).toEqual(2) // 3rd element, zero-indexed
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2) // 3rd element, zero-indexed
 
       // Then check that dropdown options map back to numerical model values
       testNode.childNodes[0].selectedIndex = 1
       triggerEvent(testNode.childNodes[0], 'change')
-      expect(typeof myObservable()).toEqual('number')
-      expect(myObservable()).toEqual(20)
+      expect(typeof myObservable()).to.deep.equal('number')
+      expect(myObservable()).to.deep.equal(20)
     })
 
     it('Should always use value (and not text) when options have value attributes', function () {
@@ -533,11 +558,11 @@ describe('Binding: Value', function () {
         "<select data-bind='value:myObservable'><option value=''>A</option><option value='A'>B</option></select>"
       applyBindings({ myObservable: myObservable }, testNode)
       const dropdown = testNode.childNodes[0]
-      expect(dropdown.selectedIndex).toEqual(1)
+      expect(dropdown.selectedIndex).to.deep.equal(1)
 
       dropdown.selectedIndex = 0
       triggerEvent(dropdown, 'change')
-      expect(myObservable()).toEqual('')
+      expect(myObservable()).to.deep.equal('')
     })
 
     it('Should use text value when options have text values but no value attribute', function () {
@@ -546,14 +571,14 @@ describe('Binding: Value', function () {
         "<select data-bind='value:myObservable'><option>A</option><option>B</option><option>C</option></select>"
       applyBindings({ myObservable: myObservable }, testNode)
       const dropdown = testNode.childNodes[0]
-      expect(dropdown.selectedIndex).toEqual(1)
+      expect(dropdown.selectedIndex).to.deep.equal(1)
 
       dropdown.selectedIndex = 0
       triggerEvent(dropdown, 'change')
-      expect(myObservable()).toEqual('A')
+      expect(myObservable()).to.deep.equal('A')
 
       myObservable('C')
-      expect(dropdown.selectedIndex).toEqual(2)
+      expect(dropdown.selectedIndex).to.deep.equal(2)
     })
 
     it('Should not throw an exception for value binding on multiple select boxes', function () {
@@ -562,8 +587,8 @@ describe('Binding: Value', function () {
       const myObservable = observable()
       expect(function () {
         applyBindings({ x: myObservable }, testNode)
-      }).not.toThrow()
-      expect(myObservable()).not.toBeUndefined() // The spec doesn't specify which of the two possible values is actually set
+      }).not.to.throw()
+      expect(myObservable()).to.not.equal(undefined) // The spec doesn't specify which of the two possible values is actually set
     })
 
     describe('Using valueAllowUnset option', function () {
@@ -576,15 +601,15 @@ describe('Binding: Value', function () {
 
         select.selectedIndex = 2
         myObservable(undefined)
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
 
         select.selectedIndex = 2
         myObservable(null)
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
 
         select.selectedIndex = 2
         myObservable('')
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
       })
 
       it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function () {
@@ -596,15 +621,15 @@ describe('Binding: Value', function () {
 
         select.selectedIndex = 2
         myObservable(undefined)
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
 
         select.selectedIndex = 2
         myObservable(null)
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
 
         select.selectedIndex = 2
         myObservable('')
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
       })
 
       it('Should display the caption when the model value changes to undefined after having no selection', function () {
@@ -616,7 +641,7 @@ describe('Binding: Value', function () {
 
         select.selectedIndex = -1
         myObservable(undefined)
-        expect(select.selectedIndex).toEqual(0)
+        expect(select.selectedIndex).to.deep.equal(0)
       })
 
       it('Should select no option value if no option value matches the current model property value', function () {
@@ -625,8 +650,8 @@ describe('Binding: Value', function () {
           '<select data-bind=\'options:["A", "B"], value:myObservable, valueAllowUnset:true\'></select>'
         applyBindings({ myObservable: myObservable }, testNode)
 
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(myObservable()).toEqual(undefined)
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(myObservable()).to.deep.equal(undefined)
       })
 
       it("Should select no option value if model value does't match any option value", function () {
@@ -634,10 +659,10 @@ describe('Binding: Value', function () {
         testNode.innerHTML =
           '<select data-bind=\'options:["A", "B", "C"], value:myObservable, valueAllowUnset:true\'></select>'
         applyBindings({ myObservable: myObservable }, testNode)
-        expect(testNode.childNodes[0].selectedIndex).toEqual(1)
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
 
         myObservable('D')
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
       })
 
       it('Should maintain model value and update selection when options change', function () {
@@ -647,23 +672,23 @@ describe('Binding: Value', function () {
         applyBindings({ myObservable: myObservable, myOptions: options }, testNode)
 
         // Initially nothing is selected because the value isn't in the options list
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(myObservable()).toEqual('D')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(myObservable()).to.deep.equal('D')
 
         // Replace with new options that still don't contain the value
         options(['B', 'C'])
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(myObservable()).toEqual('D')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(myObservable()).to.deep.equal('D')
 
         // Now update with options that do contain the value
         options(['C', 'D'])
-        expect(testNode.childNodes[0].selectedIndex).toEqual(1)
-        expect(myObservable()).toEqual('D')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+        expect(myObservable()).to.deep.equal('D')
 
         // Update back to options that don't contain the value
         options(['E', 'F'])
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(myObservable()).toEqual('D')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(myObservable()).to.deep.equal('D')
       })
 
       it('Should maintain model value and update selection when changing observable option text or value', function () {
@@ -676,25 +701,25 @@ describe('Binding: Value', function () {
           "<select data-bind=\"options:people, optionsText:'name', optionsValue:'id', value:selected, valueAllowUnset:true\"></select>"
 
         applyBindings({ people: people, selected: selected }, testNode)
-        expect(testNode.childNodes[0].selectedIndex).toEqual(1)
-        expect(testNode.childNodes[0]).toHaveTexts(['Annie', 'Bert'])
-        expect(selected()).toEqual('B')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+        expectHaveTexts(testNode.childNodes[0], ['Annie', 'Bert'])
+        expect(selected()).to.deep.equal('B')
 
         // Changing an option name shouldn't change selection
         people[1].name('Charles')
-        expect(testNode.childNodes[0].selectedIndex).toEqual(1)
-        expect(testNode.childNodes[0]).toHaveTexts(['Annie', 'Charles'])
-        expect(selected()).toEqual('B')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+        expectHaveTexts(testNode.childNodes[0], ['Annie', 'Charles'])
+        expect(selected()).to.deep.equal('B')
 
         // Changing the selected option value should clear selection
         people[1].id('C')
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(selected()).toEqual('B')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(selected()).to.deep.equal('B')
 
         // Changing an option name while nothing is selected won't select anything
         people[0].name('Amelia')
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(selected()).toEqual('B')
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(selected()).to.deep.equal('B')
       })
 
       it('Should select no options if model value is null and option value is 0', function () {
@@ -707,8 +732,8 @@ describe('Binding: Value', function () {
           '<select data-bind=\'options:options, optionsValue:"id", optionsText:"name", value:myObservable, valueAllowUnset:true\'></select>'
         applyBindings({ myObservable, options }, testNode)
 
-        expect(testNode.childNodes[0].selectedIndex).toEqual(-1)
-        expect(myObservable()).toEqual(undefined)
+        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+        expect(myObservable()).to.equal(null)
       })
     })
   })
@@ -720,16 +745,16 @@ describe('Binding: Value', function () {
       applyBindings({ myObservable: myObservable }, testNode)
 
       const checkbox = testNode.childNodes[0]
-      expect(checkbox.value).toEqual('B')
+      expect(checkbox.value).to.deep.equal('B')
 
       myObservable('C')
-      expect(checkbox.value).toEqual('C')
+      expect(checkbox.value).to.deep.equal('C')
 
       checkbox.value = 'D'
       triggerEvent(checkbox, 'change')
 
       // observable does not update, as we are not handling events when on a checkbox/radio
-      expect(myObservable()).toEqual('C')
+      expect(myObservable()).to.deep.equal('C')
     })
 
     it('Should update value, but not respond to events when on a radio', function () {
@@ -738,16 +763,16 @@ describe('Binding: Value', function () {
       applyBindings({ myObservable: myObservable }, testNode)
 
       const radio = testNode.childNodes[0]
-      expect(radio.value).toEqual('B')
+      expect(radio.value).to.deep.equal('B')
 
       myObservable('C')
-      expect(radio.value).toEqual('C')
+      expect(radio.value).to.deep.equal('C')
 
       radio.value = 'D'
       triggerEvent(radio, 'change')
 
       // observable does not update, as we are not handling events when on a checkbox/radio
-      expect(myObservable()).toEqual('C')
+      expect(myObservable()).to.deep.equal('C')
     })
   })
 })

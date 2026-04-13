@@ -30,7 +30,7 @@
   "homepage": "https://tko.io",
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha"
     ]
   },
   "__about__": "These are copied into all packages/*/package.json",

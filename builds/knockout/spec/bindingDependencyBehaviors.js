@@ -1,5 +1,5 @@
 describe('Binding dependencies', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('If the binding handler depends on an observable, invokes the init handler once and the update handler whenever a new value is available', function () {
         var observable = new ko.observable();
@@ -11,15 +11,15 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='test: myObservable'></div>";
 
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(initPassedValues.length).toEqual(1);
-        expect(updatePassedValues.length).toEqual(1);
-        expect(initPassedValues[0]).toBeUndefined();
-        expect(updatePassedValues[0]).toBeUndefined();
+        expect(initPassedValues.length).to.deep.equal(1);
+        expect(updatePassedValues.length).to.deep.equal(1);
+        expect(initPassedValues[0]).to.equal(undefined);
+        expect(updatePassedValues[0]).to.equal(undefined);
 
         observable("A");
-        expect(initPassedValues.length).toEqual(1);
-        expect(updatePassedValues.length).toEqual(2);
-        expect(updatePassedValues[1]).toEqual("A");
+        expect(initPassedValues.length).to.deep.equal(1);
+        expect(updatePassedValues.length).to.deep.equal(2);
+        expect(updatePassedValues[1]).to.deep.equal("A");
     });
 
     it('If the associated DOM element was removed by KO, handler subscriptions are disposed immediately', function () {
@@ -30,11 +30,11 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='anyHandler: myObservable()'></div>";
         ko.applyBindings({ myObservable: observable }, testNode);
 
-        expect(observable.getSubscriptionsCount()).toEqual(1);
+        expect(observable.getSubscriptionsCount()).to.deep.equal(1);
 
         ko.removeNode(testNode);
 
-        expect(observable.getSubscriptionsCount()).toEqual(0);
+        expect(observable.getSubscriptionsCount()).to.deep.equal(0);
     });
 
     it('If the associated DOM element was removed independently of KO, handler subscriptions are disposed on the next evaluation', function () {
@@ -45,12 +45,12 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='anyHandler: myObservable()'></div>";
         ko.applyBindings({ myObservable: observable }, testNode);
 
-        expect(observable.getSubscriptionsCount()).toEqual(1);
+        expect(observable.getSubscriptionsCount()).to.deep.equal(1);
 
         testNode.parentNode.removeChild(testNode);
         observable("B"); // Force re-evaluation
 
-        expect(observable.getSubscriptionsCount()).toEqual(0);
+        expect(observable.getSubscriptionsCount()).to.deep.equal(0);
     });
 
     it('If the binding attribute involves an observable, re-invokes the bindings if the observable notifies a change', function () {
@@ -60,12 +60,12 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='test: myObservable().message'></div>";
 
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(passedValues.length).toEqual(1);
-        expect(passedValues[0]).toEqual("hello");
+        expect(passedValues.length).to.deep.equal(1);
+        expect(passedValues[0]).to.deep.equal("hello");
 
         observable({ message: "goodbye" });
-        expect(passedValues.length).toEqual(2);
-        expect(passedValues[1]).toEqual("goodbye");
+        expect(passedValues.length).to.deep.equal(2);
+        expect(passedValues[1]).to.deep.equal("goodbye");
     });
 
     it('Should not reinvoke init for notifications triggered during first evaluation', function () {
@@ -86,7 +86,7 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='test: myObservable'></div>";
 
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(initCalls).toEqual(1);
+        expect(initCalls).to.deep.equal(1);
     });
 
     it('Should not run update before init, even if an associated observable is updated by a different binding before init', function() {
@@ -115,7 +115,7 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='test1: myObservable, test2: true'></div>";
 
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(hasUpdatedSecondBinding).toEqual(true);
+        expect(hasUpdatedSecondBinding).to.deep.equal(true);
     });
 
     it('Should be able to get all updates to observables in both init and update', function() {
@@ -135,23 +135,23 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='testInit: myProp()'></div><div data-bind='testUpdate: myProp()'></div>";
         var vm = ko.observable({ myProp: ko.observable("initial value") });
         ko.applyBindings(vm, testNode);
-        expect(lastBoundValueInit).toEqual("initial value");
-        expect(lastBoundValueUpdate).toEqual("initial value");
+        expect(lastBoundValueInit).to.deep.equal("initial value");
+        expect(lastBoundValueUpdate).to.deep.equal("initial value");
 
         // update value of observable
         vm().myProp("second value");
-        expect(lastBoundValueInit).toEqual("second value");
-        expect(lastBoundValueUpdate).toEqual("second value");
+        expect(lastBoundValueInit).to.deep.equal("second value");
+        expect(lastBoundValueUpdate).to.deep.equal("second value");
 
         // update value of observable to another observable
         vm().myProp(ko.observable("third value"));
-        expect(lastBoundValueInit).toEqual("third value");
-        expect(lastBoundValueUpdate).toEqual("third value");
+        expect(lastBoundValueInit).to.deep.equal("third value");
+        expect(lastBoundValueUpdate).to.deep.equal("third value");
 
         // update view model with brand-new property
         vm({ myProp: function() {return "fourth value"; }});
-        expect(lastBoundValueInit).toEqual("fourth value");
-        expect(lastBoundValueUpdate).toEqual("fourth value");
+        expect(lastBoundValueInit).to.deep.equal("fourth value");
+        expect(lastBoundValueUpdate).to.deep.equal("fourth value");
     });
 
     it('Should not update sibling bindings if a binding is updated', function() {
@@ -165,9 +165,9 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='countingHandler: true, unwrappingHandler: myObservable()'></div>";
 
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(countUpdates).toEqual(1);
+        expect(countUpdates).to.deep.equal(1);
         observable(3);
-        expect(countUpdates).toEqual(1);
+        expect(countUpdates).to.deep.equal(1);
     });
 
     it('Should not subscribe to observables accessed in init function', function() {
@@ -181,7 +181,7 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='if: true'><div data-bind='test: myObservable'></div></div>";
 
         ko.applyBindings({ myObservable: observable }, testNode);
-        expect(observable.getSubscriptionsCount()).toEqual(0);
+        expect(observable.getSubscriptionsCount()).to.deep.equal(0);
     });
 
     it('Should access latest value from extra binding when normal binding is updated', function() {
@@ -197,10 +197,10 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='existentHandler: myObservable, nonexistentHandler: myNonObservable'></div>";
 
         ko.applyBindings(vm, testNode);
-        expect(updateValue).toEqual("first value");
+        expect(updateValue).to.deep.equal("first value");
         vm.myNonObservable = "second value";
         observable.notifySubscribers();
-        expect(updateValue).toEqual("second value");
+        expect(updateValue).to.deep.equal("second value");
     });
 
     it('Should update a binding when its observable is modified in a sibling binding', function() {
@@ -216,9 +216,9 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='updatedHandler: true, modifyingHandler: true'></div>";
 
         ko.applyBindings({}, testNode);
-        expect(latestValue).toEqual(1);
+        expect(latestValue).to.deep.equal(1);
         observable1(2);
-        expect(latestValue).toEqual(2);
+        expect(latestValue).to.deep.equal(2);
     });
 
     it('Should track observables accessed within the binding provider\'s "getBindingAccessor" function', function() {
@@ -242,12 +242,12 @@ describe('Binding dependencies', function() {
         testNode.innerHTML = "<div data-bind='text: \"hello\"'></div>";
         ko.applyBindings({}, testNode);
 
-        expect(testNode).toContainText('substitute');
-        expect(observable.getSubscriptionsCount()).toEqual(1);
+        expectContainText(testNode, 'substitute');
+        expect(observable.getSubscriptionsCount()).to.deep.equal(1);
 
         // update observable to update binding
         observable('new value');
-        expect(testNode).toContainText('new value');
+        expectContainText(testNode, 'new value');
     });
 
     it('Should not cause updates if an observable accessed in a childrenComplete callback is changed', function () {
@@ -273,20 +273,20 @@ describe('Binding dependencies', function() {
 
         testNode.innerHTML = "<div data-bind='test: bindingObservable, childrenComplete: callback'></div>";
         ko.applyBindings(vm, testNode);
-        expect(callbacks).toEqual(1);
+        expect(callbacks).to.deep.equal(1);
 
         // Change the childprop which is not an observable so should not change the bound element
         vm.childprop = 'new child';
-        expect(testNode.childNodes[0]).toContainText('child');
+        expectContainText(testNode.childNodes[0], 'child');
 
         // Update callback observable and check that the binding wasn't updated
         callbackObservable(2);
-        expect(testNode.childNodes[0]).toContainText('child');
+        expectContainText(testNode.childNodes[0], 'child');
 
         // Update the bound observable and verify that the binding is now updated
         bindingObservable(2);
-        expect(testNode.childNodes[0]).toContainText('new child');
-        expect(callbacks).toEqual(2);
+        expectContainText(testNode.childNodes[0], 'new child');
+        expect(callbacks).to.deep.equal(2);
     });
 
     it('Should always use the latest value of a childrenComplete callback', function () {
@@ -301,8 +301,8 @@ describe('Binding dependencies', function() {
             }
         };
 
-        var callbackSpy1 = jasmine.createSpy('callbackSpy1'),
-            callbackSpy2 = jasmine.createSpy('callbackSpy2'),
+        var callbackSpy1 = sinon.stub(),
+            callbackSpy2 = sinon.stub(),
             vm = {
                 observable: ko.observable('value'),
                 callback: callbackSpy1
@@ -310,15 +310,15 @@ describe('Binding dependencies', function() {
 
         testNode.innerHTML = "<div data-bind='test: observable, childrenComplete: callback'></div>";
         ko.applyBindings(vm, testNode);
-        expect(callbackSpy1).toHaveBeenCalled();
+        expect(callbackSpy1.called).to.equal(true);
 
-        callbackSpy1.reset();
+        callbackSpy1.resetHistory();
         vm.callback = callbackSpy2;
 
         vm.observable('new value');
-        expect(testNode.childNodes[0]).toContainText('new value');
-        expect(callbackSpy1).not.toHaveBeenCalled();
-        expect(callbackSpy2).toHaveBeenCalled();
+        expectContainText(testNode.childNodes[0], 'new value');
+        expect(callbackSpy1.called).to.equal(false);
+        expect(callbackSpy2.called).to.equal(true);
     });
 
     describe('Observable view models', function() {
@@ -330,85 +330,85 @@ describe('Binding dependencies', function() {
             testNode.innerHTML = "<div><input data-bind='value:someProp' /><input type='button' data-bind='click: checkVM' /></div>";
             vm({ someProp: 'My prop value', checkVM: checkVM });
             ko.applyBindings(vm, testNode);
-            expect(vm.getSubscriptionsCount()).toEqual(1);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(1);
 
-            expect(testNode.childNodes[0].childNodes[0].value).toEqual("My prop value");
+            expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal("My prop value");
 
             // a change to the input value should be written to the model
             testNode.childNodes[0].childNodes[0].value = "some user-entered value";
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "change");
-            expect(vm().someProp).toEqual("some user-entered value");
+            expect(vm().someProp).to.deep.equal("some user-entered value");
             // a click should use correct view model
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[1], "click");
-            expect(clickedVM).toEqual(vm());
+            expect(clickedVM).to.deep.equal(vm());
 
             // set the view-model to a new object
             vm({ someProp: ko.observable('My new prop value'), checkVM: checkVM });
-            expect(testNode.childNodes[0].childNodes[0].value).toEqual("My new prop value");
+            expect(testNode.childNodes[0].childNodes[0].value).to.deep.equal("My new prop value");
 
             // a change to the input value should be written to the new model
             testNode.childNodes[0].childNodes[0].value = "some new user-entered value";
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[0], "change");
-            expect(vm().someProp()).toEqual("some new user-entered value");
+            expect(vm().someProp()).to.deep.equal("some new user-entered value");
             // a click should use correct view model
             ko.utils.triggerEvent(testNode.childNodes[0].childNodes[1], "click");
-            expect(clickedVM).toEqual(vm());
+            expect(clickedVM).to.deep.equal(vm());
 
             // clear the element and the view-model (shouldn't be any errors) and the subscription should be cleared
             ko.removeNode(testNode);
             vm(null);
-            expect(vm.getSubscriptionsCount()).toEqual(0);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(0);
         });
 
         it('Should provide access to the view model\'s observable through $rawData', function() {
             var vm = ko.observable('text');
             testNode.innerHTML = "<div data-bind='text:$data'></div>";
             ko.applyBindings(vm, testNode);
-            expect(testNode).toContainText("text");
+            expectContainText(testNode, "text");
 
             var context = ko.contextFor(testNode);
-            expect(context.$data).toEqual('text');
-            expect(context.$rawData).toBe(vm);
+            expect(context.$data).to.deep.equal('text');
+            expect(context.$rawData).to.equal(vm);
         });
 
         it('Should set $rawData to the observable returned from a function', function() {
             var vm = ko.observable('text');
             testNode.innerHTML = "<div data-bind='text:$data'></div>";
             ko.applyBindings(function() { return vm; }, testNode);
-            expect(testNode).toContainText("text");
+            expectContainText(testNode, "text");
 
             var context = ko.contextFor(testNode);
-            expect(context.$data).toEqual('text');
-            expect(context.$rawData).toBe(vm);
+            expect(context.$data).to.deep.equal('text');
+            expect(context.$rawData).to.equal(vm);
         });
 
         it('Should set $rawData to the view model if a function unwraps the observable view model', function() {
             var vm = ko.observable('text');
             testNode.innerHTML = "<div data-bind='text:$data'></div>";
             ko.applyBindings(function() { return vm(); }, testNode);
-            expect(testNode).toContainText("text");
+            expectContainText(testNode, "text");
 
             var context = ko.contextFor(testNode);
-            expect(context.$data).toEqual('text');
-            expect(context.$rawData).toBe('text');
+            expect(context.$data).to.deep.equal('text');
+            expect(context.$rawData).to.equal('text');
 
             // Updating view model updates bindings and context
             vm('new text');
-            expect(testNode).toContainText("new text");
-            expect(context.$data).toEqual('new text');
-            expect(context.$rawData).toBe('new text');
+            expectContainText(testNode, "new text");
+            expect(context.$data).to.deep.equal('new text');
+            expect(context.$rawData).to.equal('new text');
         });
 
         it('Should dispose view model subscription on next update when bound node is removed outside of KO', function() {
             var vm = ko.observable('text');
             testNode.innerHTML = "<div data-bind='text:$data'></div>";
             ko.applyBindings(vm, testNode);
-            expect(vm.getSubscriptionsCount()).toEqual(1);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(1);
 
             // remove the element and re-set the view-model; the subscription should be cleared
             testNode.parentNode.removeChild(testNode);
             vm(null);
-            expect(vm.getSubscriptionsCount()).toEqual(0);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(0);
         });
 
         it('Should update all child contexts (including values copied from the parent)', function() {
@@ -424,20 +424,20 @@ describe('Binding dependencies', function() {
             testNode.innerHTML = "<div data-bind='setChildContext:obj1'><span data-bind='text:prop1'></span><span data-bind='text:$root.prop2'></span></div>";
             var vm = ko.observable({obj1: {prop1: "First "}, prop2: "view model"});
             ko.applyBindings(vm, testNode);
-            expect(testNode).toContainText("First view model");
+            expectContainText(testNode, "First view model");
 
             // change view model to new object
             vm({obj1: {prop1: "Second view "}, prop2: "model"});
-            expect(testNode).toContainText("Second view model");
+            expectContainText(testNode, "Second view model");
 
             // change it again
             vm({obj1: {prop1: "Third view model"}, prop2: ""});
-            expect(testNode).toContainText("Third view model");
+            expectContainText(testNode, "Third view model");
 
             // clear the element and the view-model (shouldn't be any errors) and the subscription should be cleared
             ko.removeNode(testNode);
             vm(null);
-            expect(vm.getSubscriptionsCount()).toEqual(0);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(0);
         });
 
         it('Should update all extended contexts (including values copied from the parent)', function() {
@@ -452,20 +452,20 @@ describe('Binding dependencies', function() {
             testNode.innerHTML = "<div data-bind='withProperties: obj1'><span data-bind='text:prop1'></span><span data-bind='text:prop2'></span><span data-bind='text:$rawData().prop3'></span></div>";
             var vm = ko.observable({obj1: {prop1: "First "}, prop2: "view ", prop3: "model"});
             ko.applyBindings(vm, testNode);
-            expect(testNode).toContainText("First view model");
+            expectContainText(testNode, "First view model");
 
             // change view model to new object
             vm({obj1: {prop1: "Second view "}, prop2: "model", prop3: ""});
-            expect(testNode).toContainText("Second view model");
+            expectContainText(testNode, "Second view model");
 
             // change it again
             vm({obj1: {prop1: ""}, prop2: "", prop3: "Third view model"});
-            expect(testNode).toContainText("Third view model");
+            expectContainText(testNode, "Third view model");
 
             // clear the element and the view-model (shouldn't be any errors) and the subscription should be cleared
             ko.removeNode(testNode);
             vm(null);
-            expect(vm.getSubscriptionsCount()).toEqual(0);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(0);
         });
 
         it('Should maintain correct $rawData in extended context when parent is bound to a function that returns an observable view model', function() {
@@ -481,23 +481,23 @@ describe('Binding dependencies', function() {
                 whichVm = ko.observable(vm1);
             testNode.innerHTML = "<div data-bind='extended: {}'><div data-bind='text: $data'></div></div>";
             ko.applyBindings(function() { return whichVm(); }, testNode);
-            expect(testNode).toContainText('vm1');
+            expectContainText(testNode, 'vm1');
 
             var parentContext = ko.contextFor(testNode),
                 childContext = ko.contextFor(testNode.childNodes[0].childNodes[0]);
 
-            expect(parentContext.$data).toEqual('vm1');
-            expect(parentContext.$rawData).toBe(vm1);
+            expect(parentContext.$data).to.deep.equal('vm1');
+            expect(parentContext.$rawData).to.equal(vm1);
 
-            expect(childContext).not.toBe(parentContext);
-            expect(childContext.$data).toEqual('vm1');
-            expect(childContext.$rawData).toBe(vm1);
+            expect(childContext).not.to.equal(parentContext);
+            expect(childContext.$data).to.deep.equal('vm1');
+            expect(childContext.$rawData).to.equal(vm1);
 
             // Updating view model updates bindings and context
             whichVm(vm2);
-            expect(testNode).toContainText('vm2');
-            expect(childContext.$data).toEqual('vm2');
-            expect(childContext.$rawData).toBe(vm2);
+            expectContainText(testNode, 'vm2');
+            expect(childContext.$data).to.deep.equal('vm2');
+            expect(childContext.$rawData).to.equal(vm2);
         });
 
         it('Should update an extended child context', function() {
@@ -514,20 +514,20 @@ describe('Binding dependencies', function() {
             testNode.innerHTML = "<div data-bind='withProperties: obj1'><span data-bind='text:prop1'></span><span data-bind='text:$parent.prop2'></span></div>";
             var vm = ko.observable({obj1: {prop1: "First "}, prop2: "view model"});
             ko.applyBindings(vm, testNode);
-            expect(testNode).toContainText("First view model");
+            expectContainText(testNode, "First view model");
 
             // ch ange view model to new object
             vm({obj1: {prop1: "Second view "}, prop2: "model"});
-            expect(testNode).toContainText("Second view model");
+            expectContainText(testNode, "Second view model");
 
             // change it again
             vm({obj1: {prop1: "Third view model"}, prop2: ""});
-            expect(testNode).toContainText("Third view model");
+            expectContainText(testNode, "Third view model");
 
             // clear the element and the view-model (shouldn't be any errors) and the subscription should be cleared
             ko.removeNode(testNode);
             vm(null);
-            expect(vm.getSubscriptionsCount()).toEqual(0);
+            expect(vm.getSubscriptionsCount()).to.deep.equal(0);
         });
     });
 
@@ -548,7 +548,7 @@ describe('Binding dependencies', function() {
         it('Should default to the order in the binding', function() {
             testNode.innerHTML = "<div data-bind='test1, test2, test3'></div>";
             ko.applyBindings(null, testNode);
-            expect(bindingOrder).toEqual([1,2,3]);
+            expect(bindingOrder).to.deep.equal([1,2,3]);
         });
 
         it('Should be based on binding\'s "after" values, which override the default binding order', function() {
@@ -556,7 +556,7 @@ describe('Binding dependencies', function() {
             ko.bindingHandlers.test3.after = ['test2'];
             testNode.innerHTML = "<div data-bind='test3, test2, test1'></div>";
             ko.applyBindings(null, testNode);
-            expect(bindingOrder).toEqual([1,2,3]);
+            expect(bindingOrder).to.deep.equal([1,2,3]);
         });
 
         it('Should leave bindings without an "after" value where they are', function() {
@@ -565,7 +565,7 @@ describe('Binding dependencies', function() {
             ko.bindingHandlers.test2.after = ['test1'];
             testNode.innerHTML = "<div data-bind='test2, test1, test3'></div>";
             ko.applyBindings(null, testNode);
-            expect(bindingOrder).toEqual([1,2,3]);
+            expect(bindingOrder).to.deep.equal([1,2,3]);
         });
 
         it('Should leave bindings without an "after" value where they are (extended)', function() {
@@ -574,7 +574,7 @@ describe('Binding dependencies', function() {
             ko.bindingHandlers.test2.after = ['test1'];
             testNode.innerHTML = "<div data-bind='test2, test3, test1'></div>";
             ko.applyBindings(null, testNode);
-            expect(bindingOrder).toEqualOneOf([[1,2,3], [3,1,2]]);
+            expectEqualOneOf(bindingOrder, [[1,2,3], [3,1,2]]);
         });
 
         it('Should throw an error if bindings have a cyclic dependency', function() {
@@ -587,7 +587,7 @@ describe('Binding dependencies', function() {
 
             expect(function () {
                 ko.applyBindings(null, testNode);
-            }).toThrow("Cannot combine the following bindings, because they have a cyclic dependency: test1, test3, test2");
+            }).to.throw("Cannot combine the following bindings, because they have a cyclic dependency: test1, test3, test2");
         })
     });
 });

@@ -1,4 +1,5 @@
 import { observable } from '@tko/observable'
+import { expect } from 'chai'
 
 import { applyBindings } from '@tko/bind'
 
@@ -10,15 +11,22 @@ import { options } from '@tko/utils'
 
 import * as coreBindings from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
 import { Provider } from '@tko/provider'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: Text', function () {
   let bindingHandlers
+  let cleanups: Array<() => void>
 
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    cleanups = []
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -28,11 +36,17 @@ describe('Binding: Text', function () {
     bindingHandlers.set(coreBindings.bindings)
   })
 
+  afterEach(function () {
+    while (cleanups.length > 0) {
+      cleanups.pop()?.()
+    }
+  })
+
   it('Should assign the value to the node, HTML-encoding the value', function () {
     const model = { textProp: '\'Val <with> "special" <i>characters</i>\'' }
     testNode.innerHTML = "<span data-bind='text:textProp'></span>"
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0].textContent || (testNode.childNodes[0] as HTMLElement).innerText).toEqual(
+    expect(testNode.childNodes[0].textContent || (testNode.childNodes[0] as HTMLElement).innerText).to.equal(
       model.textProp
     )
   })
@@ -44,7 +58,7 @@ describe('Binding: Text', function () {
       'textContent' in testNode.childNodes[0]
         ? testNode.childNodes[0].textContent
         : (testNode.childNodes[0] as HTMLElement).innerText
-    expect(actualText).toEqual('')
+    expect(actualText).to.equal('')
   })
 
   it('Should assign an empty string as value if the model value is undefined', function () {
@@ -54,37 +68,37 @@ describe('Binding: Text', function () {
       'textContent' in testNode.childNodes[0]
         ? testNode.childNodes[0].textContent
         : (testNode.childNodes[0] as HTMLElement).innerText
-    expect(actualText).toEqual('')
+    expect(actualText).to.equal('')
   })
 
   it('Should work with virtual elements, adding a text node between the comments', function () {
     const myObservable = observable('Some text')
     testNode.innerHTML = 'xxx <!-- ko text: textProp --><!-- /ko -->'
     applyBindings({ textProp: myObservable }, testNode)
-    expect(testNode).toContainText('xxx Some text')
-    expect(testNode).toContainHtml('xxx <!-- ko text: textprop -->some text<!-- /ko -->')
+    expectContainText(testNode, 'xxx Some text')
+    expectContainHtml(testNode, 'xxx <!-- ko text: textprop -->some text<!-- /ko -->')
 
     // update observable; should update text
     myObservable('New text')
-    expect(testNode).toContainText('xxx New text')
-    expect(testNode).toContainHtml('xxx <!-- ko text: textprop -->new text<!-- /ko -->')
+    expectContainText(testNode, 'xxx New text')
+    expectContainHtml(testNode, 'xxx <!-- ko text: textprop -->new text<!-- /ko -->')
 
     // clear observable; should remove text
     myObservable(undefined)
-    expect(testNode).toContainText('xxx ')
-    expect(testNode).toContainHtml('xxx <!-- ko text: textprop --><!-- /ko -->')
+    expectContainText(testNode, 'xxx ')
+    expectContainHtml(testNode, 'xxx <!-- ko text: textprop --><!-- /ko -->')
   })
 
   it('Should work with virtual elements, removing any existing stuff between the comments', function () {
     testNode.innerHTML =
       "xxx <!--ko text: undefined-->some random thing<span> that won't be here later</span><!--/ko-->"
     applyBindings(null, testNode)
-    expect(testNode).toContainText('xxx ')
-    expect(testNode).toContainHtml('xxx <!--ko text: undefined--><!--/ko-->')
+    expectContainText(testNode, 'xxx ')
+    expectContainHtml(testNode, 'xxx <!--ko text: undefined--><!--/ko-->')
   })
   // TODO: NEED HELP
   it('Should not attempt data binding on the generated text node', function () {
-    this.restoreAfter(options, 'bindingProviderInstance')
+    restoreAfter(cleanups, options, 'bindingProviderInstance')
 
     // Since custom binding providers can regard text nodes as bindable, it would be a
     // security risk to bind against user-supplied text (XSS).
@@ -98,13 +112,6 @@ describe('Binding: Text', function () {
         return [Node.ELEMENT_NODE]
       }
       override nodeHasBindings(/* node, bindingContext */) {
-        /* // IE < 9 can't bind text nodes, as expando properties are not allowed on them.
-                // This will still prove that the binding provider was not executed on the children of a restricted element.
-                if (node.nodeType === Node.TEXT_NODE && jasmine.ieVersion < 9) {
-                    node.data = "replaced";
-                    return false;
-                } */
-
         return true
       }
       override getBindingAccessors(node, bindingContext) {
@@ -135,6 +142,6 @@ describe('Binding: Text', function () {
     // get replaced by the special message.
     testNode.innerHTML = "<span data-bind='text: sometext'></span>"
     applyBindings({ sometext: 'hello' }, testNode)
-    expect('textContent' in testNode ? testNode.textContent : (testNode as HTMLElement).innerText).toEqual('hello')
+    expect('textContent' in testNode ? testNode.textContent : (testNode as HTMLElement).innerText).to.equal('hello')
   })
 })

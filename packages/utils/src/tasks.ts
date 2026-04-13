@@ -9,23 +9,37 @@ import { deferError } from './error'
 let taskQueue = new Array(),
   taskQueueLength = 0,
   nextHandle = 1,
-  nextIndexToProcess = 0,
-  w = options.global
+  nextIndexToProcess = 0
 
-if (w && w.MutationObserver && !(w.navigator && w.navigator.standalone)) {
-  // Chrome 27+, Firefox 14+, IE 11+, Opera 15+, Safari 6.1+, node
-  // From https://github.com/petkaantonov/bluebird * Copyright (c) 2014 Petka Antonov * License: MIT
-  options.taskScheduler = (function (callback) {
-    const div = w.document.createElement('div')
-    new w.MutationObserver(callback).observe(div, { attributes: true })
-    return function () {
-      div.classList.toggle('foo')
+const schedulerGlobal = options.global
+
+if (schedulerGlobal && typeof schedulerGlobal.queueMicrotask === 'function') {
+  options.taskScheduler = callback => schedulerGlobal.queueMicrotask(callback)
+} else if (
+  schedulerGlobal
+  && schedulerGlobal.MutationObserver
+  && schedulerGlobal.document
+  && !(schedulerGlobal.navigator && schedulerGlobal.navigator.standalone)
+) {
+  options.taskScheduler = (function () {
+    let scheduledCallback: null | (() => void) = null
+    let toggle = false
+    const div = schedulerGlobal.document.createElement('div')
+
+    new schedulerGlobal.MutationObserver(function () {
+      const callback = scheduledCallback
+      scheduledCallback = null
+      callback?.()
+    }).observe(div, { attributes: true })
+
+    return function (callback: () => void) {
+      scheduledCallback = callback
+      toggle = !toggle
+      div.setAttribute('data-task-scheduler', toggle ? '1' : '0')
     }
-  })(scheduledProcess)
+  })()
 } else {
-  options.taskScheduler = function (callback) {
-    setTimeout(callback, 0)
-  }
+  options.taskScheduler = callback => setTimeout(callback, 0)
 }
 
 function processTasks() {

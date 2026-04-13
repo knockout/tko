@@ -41,6 +41,7 @@ const CommonConfig = {
     { pattern: 'spec/**/*.ts', watched: false }
   ],  
   preprocessors: {
+    'helpers/**/*.js': ['esbuild'],
     'spec/**/*.js': ['esbuild'],
     'spec/**/*.ts': ['esbuild']
   },
@@ -48,7 +49,7 @@ const CommonConfig = {
     // See: https://esbuild.github.io/api/
     format: 'iife',
     sourcemap: coverage ? "external" : "inline",
-    bundle: false,
+    bundle: true,
     plugins: [coveragePlugin],
     define: {
       BUILD_VERSION: '"test"',

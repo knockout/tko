@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import { options } from '@tko/utils'
 
 import { applyBindings, bindingEvent } from '@tko/bind'
@@ -10,8 +12,8 @@ import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import '@tko/utils/helpers/jasmine-13-helper'
 import { observable } from '@tko/observable'
+import { expectContainText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: DescendantsComplete', function () {
   // This is just a special case of the "event" binding, so not necessary to respecify all its behaviors
@@ -19,7 +21,7 @@ describe('Binding: DescendantsComplete', function () {
   let bindingHandlers
 
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -35,7 +37,7 @@ describe('Binding: DescendantsComplete', function () {
   it('Should call a descendantsComplete callback function after descendant elements are bound', function () {
     let callbacks = 0,
       callback = function (node) {
-        expect(node).toEqual(testNode.childNodes[0])
+        expect(node).to.equal(testNode.childNodes[0])
         callbacks++
       },
       vm = { callback: callback }
@@ -43,13 +45,13 @@ describe('Binding: DescendantsComplete', function () {
     testNode.innerHTML =
       "<div data-bind='descendantsComplete: callback'><span data-bind='text: \"Some Text\"'></span></div>"
     applyBindings(vm, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 
   it('Should call a descendantsComplete callback function when bound to a virtual element', function () {
     let callbacks = 0,
       callback = function (node) {
-        expect(node).toEqual(testNode.childNodes[1])
+        expect(node).to.equal(testNode.childNodes[1])
         callbacks++
       },
       vm = { callback: callback }
@@ -57,7 +59,7 @@ describe('Binding: DescendantsComplete', function () {
     testNode.innerHTML =
       'begin <!-- ko descendantsComplete: callback --><span data-bind=\'text: "Some Text"\'></span><!-- /ko --> end'
     applyBindings(vm, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 
   it('Should not call a descendantsComplete callback function when there are no descendant nodes', function () {
@@ -72,7 +74,7 @@ describe('Binding: DescendantsComplete', function () {
       },
       testNode
     )
-    expect(callbacks).toEqual(0)
+    expect(callbacks).to.equal(0)
   })
 
   it('Should ignore (and not throw an error) for a null descendantsComplete callback', function () {
@@ -90,19 +92,19 @@ describe('Binding: DescendantsComplete', function () {
       bindingEvent.descendantsComplete,
       function (node) {
         callbacks++
-        expect(node).toEqual(testNode.childNodes[0])
+        expect(node).to.equal(testNode.childNodes[0])
       },
       null
     )
 
     applyBindings({}, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 
   it("Should call a descendantsComplete callback function even if descendant element doesn't generate event", function () {
     let callbacks = 0,
       callback = function (node) {
-        expect(node).toEqual(testNode.childNodes[0])
+        expect(node).to.equal(testNode.childNodes[0])
         callbacks++
       },
       vm = { callback: callback }
@@ -110,7 +112,7 @@ describe('Binding: DescendantsComplete', function () {
     testNode.innerHTML =
       "<div data-bind='descendantsComplete: callback'><span data-bind='text: \"Some Text\"'></span><div data-bind='descendantsComplete'></div></div>"
     applyBindings(vm, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 
   it('TKO-Change: descendantsComplete callback function is not called after nested \"if\" binding', function () {
@@ -131,19 +133,19 @@ describe('Binding: DescendantsComplete', function () {
     }
 
     applyBindings(viewModel, testNode)
-    expect(callbacks).toEqual(0)
-    expect(render).toEqual(0)
-    expect(testNode).toContainText('')
+    expect(callbacks).to.equal(0)
+    expect(render).to.equal(0)
+    expectContainText(testNode, '')
 
     // Complete the outer condition first and then the inner one
     viewModel.outerCondition(true)
-    expect(callbacks).toEqual(0)
-    expect(render).toEqual(0)
-    expect(testNode).toContainText('')
+    expect(callbacks).to.equal(0)
+    expect(render).to.equal(0)
+    expectContainText(testNode, '')
 
     viewModel.innerCondition(true)
-    expect(callbacks).toEqual(0) //Breaking Changing to KO = there was completeOn: 'render' possible
-    expect(render).toEqual(1) //The workaround with children is complete. It is also asynchronously usable in TKO.
-    expect(testNode).toContainText('hello')
+    expect(callbacks).to.equal(0) //Breaking Changing to KO = there was completeOn: 'render' possible
+    expect(render).to.equal(1) //The workaround with children is complete. It is also asynchronously usable in TKO.
+    expectContainText(testNode, 'hello')
   })
 })

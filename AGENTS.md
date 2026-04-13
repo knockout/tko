@@ -92,12 +92,16 @@ Make targets (they include `tools/build.mk`).
 ## Testing
 
 - **Runner**: Karma
-- **Frameworks**: Mocha + Chai + Sinon (preferred for new tests), Jasmine 1.3 (legacy)
+- **Frameworks**: Mocha + Chai + Sinon
 - **Browsers**: Electron (default), Chrome Headless, Firefox Headless
 - **Coverage**: nyc/Istanbul (~89% statements, ~83% branches)
 - **Test files**: `packages/*/spec/` directories
 
-When writing new tests, use Mocha/Chai/Sinon (not Jasmine).
+Use Mocha/Chai/Sinon for repository tests.
+
+Do not:
+- split shared specs into runner-specific versions while they still need to run
+  in the browser harness
 
 ## Code Style
 

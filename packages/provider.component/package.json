@@ -19,7 +19,7 @@
   },
   "karma": {
     "frameworks": [
-      "jasmine"
+      "mocha"
     ]
   },
   "homepage": "https://tko.io",
