@@ -1,15 +1,27 @@
 # Plan: Modern Tooling Migration
 
+**Risk class:** MEDIUM — phased approach, each phase is independently shippable
+**Owner:** brianmhunt
+
+## Progress
+
+| Phase | Status | PR | Notes |
+|-------|--------|-----|-------|
+| 1. Bun + Vitest | CI green | #303 | Bun replaces npm. Vitest replaces Karma. 2679 tests, 143 files, ~4s. Chromium+Firefox+WebKit in CI. |
+| 2. tsgo | Blocked on Karma removal | — | Needs `moduleResolution: "bundler"` which requires `@tko/*` paths fix in tsconfig. Ready to implement once #303 merges. |
+| 3. Makefiles → Bun | Not started | — | |
+| 4. Biome | Not started | — | |
+| 5. knip | Not started | — | |
+| 6. knip findings | Not started | — | |
+
 ## Context
 
-TKO's build tooling is dated: Makefiles orchestrate esbuild, npm is the package
-manager, TypeScript 6 is the checker, and karma runs browser tests. Recent
+TKO's build tooling was dated: Makefiles orchestrated esbuild, npm was the
+package manager, TypeScript 6 the checker, and Karma ran browser tests. Recent
 attempts to modernize (knip, moduleResolution changes) were reverted because
 they were merged without review and broke the mocha migration.
 
-This plan lays out a phased migration to a modern stack: Bun, tsgo (TypeScript 7),
-and knip — in an order that delivers value early and avoids the mistakes of the
-reverted PRs.
+This plan lays out a phased migration to a modern stack.
 
 ## Target stack
 
@@ -20,53 +32,61 @@ reverted PRs.
 | Build orchestrator | Make + esbuild | Bun scripts + esbuild | Standard package.json scripts, no Make knowledge needed |
 | Linter + formatter | ESLint + Prettier | Biome | Single tool, Rust-native, 10-100x faster |
 | Linter (unused exports) | none | knip | Catches dead code, unused deps |
-| Test runner | Karma + Mocha + browser | @web/test-runner | Mocha-compatible, modern, Playwright browsers |
+| Test runner | ~~Karma~~ Vitest | Vitest browser mode | Playwright (Chromium, Firefox, WebKit), ~4s for full suite |
 | Version pinning | none | mise/asdf via `.tool-versions` | Reproducible environments |
+
+## Security policy
+
+- **minimumReleaseAge**: Do not install any package version less than 48 hours
+  old. This applies to all dependencies — devDependencies and production.
+  Protects against supply-chain attacks via compromised fresh releases.
+- Pin exact versions in `.tool-versions` (currently `bun 1.3.12`).
+- Use `bun.lock` (committed) for deterministic installs.
 
 ## Phases
 
-### Phase 1: `.tool-versions` + Bun
+### Phase 1: Bun + Vitest (PR #303 — done)
 
-**One PR. Low risk.**
+Replaced npm with Bun and Karma with Vitest in a single PR:
 
-- Add `.tool-versions` with `bun latest`
-- Add `bun.lock` alongside `package-lock.json` (transitional)
-- Verify `bun install` works, `make test-headless` still passes
-- Update CI to use `bun install` instead of `npm install`
-- Update AGENTS.md to mention Bun
-
-No Makefile changes yet — Bun just replaces npm as the package manager.
+- `.tool-versions` pins `bun 1.3.12`
+- `bun.lock` replaces `package-lock.json`
+- `vitest.config.ts` with Playwright browser mode (headless)
+- CI runs Chromium + Firefox + WebKit via `VITEST_BROWSERS` env var
+- Makefile and CI workflows updated to use `bunx` everywhere
+- `tools/karma.conf.js` deleted, 7 karma deps removed
+- `builds/knockout/helpers/mocha-test-helpers.js` converted to ESM
+- `builds/knockout/helpers/vitest-setup.js` loads ko build + globals
+- All 143 files, 2679 tests pass, 42 skipped, 0 failures
 
 ### Phase 2: tsgo (TypeScript 7)
 
-**One PR. Low risk — additive, not replacing.**
+**Blocked on Phase 1 merge.** Karma-esbuild read tsconfig, so changing
+`moduleResolution` broke test builds. With Karma gone, this is unblocked.
 
-Verified locally: tsgo passes with zero errors on TKO source using:
-```json
-{
-  "module": "es2022",
-  "moduleResolution": "bundler",
-  "typeRoots": ["node_modules/@types"]
-}
-```
+tsgo requires `moduleResolution: "bundler"` (it removed `"node10"`). Under
+`"bundler"`, TypeScript strictly follows `package.json` `exports` fields. TKO's
+inter-package `@tko/*` imports resolve to `dist/index.js` (no types) instead of
+`index.ts` (full types), causing 257 type errors.
 
-Changes:
-- Add `@typescript/native-preview` as devDependency
-- Update `tsconfig.json`:
-  - `moduleResolution`: `"node10"` → `"bundler"` (required — tsgo removed `node10`)
-  - Add `typeRoots: ["node_modules/@types"]` (tsgo doesn't support `types` field yet — [microsoft/typescript-go#3023](https://github.com/microsoft/typescript-go/issues/3023))
-  - Remove `types: ["mocha", "jquery"]` (redundant with `typeRoots`)
-- Add `make tsgo` target (or `bun run tsgo` script) for fast local checks
-- Keep `tsc` (TS 6) in CI until tsgo reaches stable — both coexist
-- Verify: `npx tsgo` passes, `npx tsc` still passes, all tests pass
+**Root cause**: The `exports` field in each package.json points to `dist/` JS
+files but has no `"types"` condition. Under `"node10"` this works because TS
+ignores `exports` and finds `index.ts` directly.
 
-Speed: tsc 1.17s → tsgo 0.41s (3x on TKO, likely more on larger projects).
+**Fix** (verified — reduces 257 errors to 0):
+- Add `"@tko/*": ["./packages/*/index.ts", "./builds/*/index.ts"]` to tsconfig
+  `paths` so TS resolves to source during development
+- Add `"types": "./index.ts"` to `exports` in each package.json (belt and suspenders)
+- Export `Subscription` type from `@tko/observable` (fixes one deep import)
+- Add type annotation to `bindings` const in `binding.core` (fixes inference issue)
+
+Speed: tsc 0.96s → tsgo 0.35s (2.7x).
 
 ### Phase 3: Replace Makefiles with Bun scripts
 
 **One PR per concern. Medium risk — touches shared infra.**
 
-The Makefile currently does: build (esbuild), test (karma), lint (eslint),
+The Makefile currently does: build (esbuild), test (vitest), lint (eslint),
 format (prettier), typecheck (tsc), dts generation, sweep/clean.
 
 Migration:
@@ -77,11 +97,6 @@ Migration:
 - Update CI workflows to use `bun run build`, `bun run test`, etc.
 - Update AGENTS.md build commands section
 
-This is the biggest phase. Can be split into sub-PRs:
-1. Add `bun run` scripts alongside Make targets (both work)
-2. Migrate CI to use `bun run`
-3. Remove Makefiles
-
 ### Phase 4: Biome (replaces ESLint + Prettier)
 
 **One PR. Medium risk — touches all linted files, but output should be identical.**
@@ -91,85 +106,46 @@ Biome is a single Rust-native tool that replaces both ESLint and Prettier.
 
 Changes:
 - Add `@biomejs/biome` as devDependency
-- Create `biome.json` matching current ESLint + Prettier rules:
-  - No semicolons, single quotes, trailing commas: none, 120 char width
-  - typescript-eslint equivalent rules
+- Create `biome.json` matching current ESLint + Prettier rules
 - Run `biome check --write` to migrate all files
 - Remove `eslint.config.js`, `.prettierrc`, eslint/prettier devDependencies
-- Update Make targets (or Bun scripts if Phase 3 is done): `make lint` → `biome check`
-- Update CI workflow: single `biome ci` command replaces separate prettier + eslint steps
-- Update AGENTS.md
+- Update CI: single `biome ci` command
 
-Verify: `biome ci` passes, all tests pass, diff is formatting-only.
-
-### Phase 5: @web/test-runner (replaces Karma)
-
-**One PR per sub-step. High value — eliminates Karma and its plugin ecosystem.**
-
-@web/test-runner is built for testing web libraries in real browsers. It's
-Mocha-compatible, so the 150 spec files we just migrated keep their syntax.
-Uses Playwright under the hood for Chrome, Firefox, and WebKit.
-
-Eliminates: `karma`, `karma-esbuild`, `karma-mocha`, `karma-chrome-launcher`,
-`karma-firefox-launcher`, `karma-coverage`, `karma-sauce-launcher` (7 deps).
-
-Changes:
-- Add `@web/test-runner`, `@web/test-runner-playwright` as devDependencies
-- Create `web-test-runner.config.mjs` replacing `tools/karma.conf.js`:
-  - esbuild plugin for TS/bundling (or use `@web/dev-server-esbuild`)
-  - Playwright browsers: chromium, firefox, webkit
-  - Coverage via built-in istanbul support
-  - Files: `packages/*/spec/**/*.ts`, `builds/knockout/spec/**/*.js`
-- Update per-package `package.json`: remove `karma` config blocks
-- Update Makefile/Bun scripts: `test` → `web-test-runner`
-- Update CI: replace `test-headless`, `test-headless-ff`, `test-headless-jquery`
-  with single `web-test-runner --browsers chromium firefox webkit`
-- The `builds/knockout` plain-JS specs need special handling — either:
-  - Bundle them through esbuild (like we did for the helper), or
-  - Migrate them to import from `@tko/build.knockout` as ESM
-- Remove `tools/karma.conf.js` and all `karma-*` devDependencies
-- Update AGENTS.md testing section
-
-Sub-PRs:
-1. Add @web/test-runner config alongside karma (both work)
-2. Migrate `packages/` specs to @web/test-runner
-3. Migrate `builds/knockout` specs
-4. Remove karma
-
-Verify: all specs pass in chromium, firefox, webkit. Coverage numbers match.
-
-### Phase 6: knip
+### Phase 5: knip
 
 **One PR. Low risk — linter only, no source changes.**
 
 - Add `knip.json` config
 - Add CI workflow for knip checks
-- Add `bun run knip` script
-- Fix any findings in a follow-up PR (separate from the linter setup)
+- Fix any findings in follow-up PRs (separate from the linter setup)
 
-This was the main issue with the reverted PR #234 — it bundled the linter setup
-with `verbatimModuleSyntax`, type refactoring, and export cleanup all in one
-56-file PR. This time: just the linter. Findings get fixed in focused follow-ups.
-
-### Phase 7 (future): knip findings
+### Phase 6 (future): knip findings
 
 **One PR per category of finding.**
 
 - Unused export cleanup
 - Unused dependency removal
 - `verbatimModuleSyntax` + import type fixes
-- New shared type interfaces (if needed)
+- Dead IE code removal (detectIEVersion, browserSupportsProtoAssignment, etc.)
 
-Each is a small, reviewable PR. None bundles concerns.
+## Known follow-ups from Phase 1
+
+- **`globalThis.after` shadows Vitest's `afterAll`** — rename to `addCleanup` across 25 spec files
+- **setupFiles loads knockout build for all specs** — split into Vitest projects config
+- **Helper duplication** (JS vs TS mocha-test-helpers) — extract shared module
+- **CI workflow duplication** (test-headless.yml vs main-build.yml) — reusable workflow
+- **jQuery test toggle** — need env var mechanism to enable jQuery path
+- **Coverage** — add `@vitest/coverage-v8` when needed
+- **Governance files** (AI_COMPLIANCE.md, AI_GLOSSARY.md, skills/) — review and likely remove
 
 ## Future considerations
 
-- **esbuild → Bun bundler** — evaluate during Phase 3. Bun's bundler is esbuild-compatible and eliminates a dependency. Test with `bun build` on a few packages to compare output.
-- **Lerna → Bun workspaces** — evaluate during Phase 3. `bun --filter` replaces `lerna exec`, `bun install` already handles workspace resolution. Lerna may become unnecessary once Makefiles are gone.
+- **esbuild → Bun bundler** — evaluate during Phase 3
+- **Lerna → Bun workspaces** — evaluate during Phase 3
 
 ## Verification
 
 Each phase must:
-1. Pass all CI checks (lint, typecheck, test-headless x3, publish-dry-run)
-2. Be verified in a clean worktree before pushing
+1. Pass all CI checks
+2. Be verified locally before pushing
 3. Be reviewed and approved before merge
