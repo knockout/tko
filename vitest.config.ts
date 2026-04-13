@@ -5,11 +5,12 @@ export default defineConfig({
   test: {
     include: [
       'packages/*/spec/**/*.ts',
-      'builds/reference/spec/**/*.js'
+      'builds/reference/spec/**/*.js',
+      'builds/knockout/spec/**/*.js'
     ],
-    // builds/knockout excluded — its helper registers beforeEach/afterEach
-    // at module scope which requires Karma's global loading model.
-    // TODO: refactor helper to work with Vitest, then add builds/knockout/spec/**/*.js
+    setupFiles: [
+      'builds/knockout/helpers/vitest-setup.js'
+    ],
     browser: {
       enabled: true,
       provider: playwright(),

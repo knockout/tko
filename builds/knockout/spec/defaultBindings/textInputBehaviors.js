@@ -274,7 +274,7 @@ describe('Binding: TextInput', function() {
             var clock;
 
             beforeEach(function() {
-                this.restoreAfter(ko.bindingHandlers.textInput, '_forceUpdateOn');
+                restoreAfter(ko.bindingHandlers.textInput, '_forceUpdateOn');
                 ko.bindingHandlers.textInput._forceUpdateOn = ['afterkeydown'];
                 clock = sinon.useFakeTimers();
             });

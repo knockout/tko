@@ -338,7 +338,7 @@ describe('Tasks scheduler', function() {
         var clock = sinon.useFakeTimers();
 
         try {
-            this.restoreAfter(ko.options, 'taskScheduler');
+            restoreAfter(ko.options, 'taskScheduler');
             ko.options.taskScheduler = function (callback) {
                 ++counts[0];
                 setTimeout(callback, 0);

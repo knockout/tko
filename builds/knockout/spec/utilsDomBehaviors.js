@@ -38,7 +38,7 @@ describe('registerEventHandler', function() {
             return; // Nothing to test. Run the specs with jQuery referenced for this to do anything.
         }
 
-        this.restoreAfter(ko.options, 'useOnlyNativeEvents');
+        restoreAfter(ko.options, 'useOnlyNativeEvents');
 
         var element = document.createElement('button');
         var eventFired = false;
@@ -66,7 +66,7 @@ describe('registerEventHandler', function() {
     });
 
     it ('should not use jQuery eventing with useOnlyNativeEvents option set to true', function() {
-        this.restoreAfter(ko.options, 'useOnlyNativeEvents');
+        restoreAfter(ko.options, 'useOnlyNativeEvents');
 
         var element = document.createElement('button');
         var eventFired = false;

@@ -135,7 +135,7 @@ describe('Binding: With', function() {
     });
 
     it('Should be able to access all parent bindings when using "as" when "createChildContextWithAs" is set', function() {
-        this.restoreAfter(ko.options, 'createChildContextWithAs');
+        restoreAfter(ko.options, 'createChildContextWithAs');
         ko.options.createChildContextWithAs = true;
 
         testNode.innerHTML = "<div data-bind='with: topItem'>" +
@@ -281,7 +281,7 @@ describe('Binding: With', function() {
 
     describe('With "createChildContextWithAs = false" and "as"', function () {
         beforeEach(function() {
-            this.restoreAfter(ko.options, 'createChildContextWithAs');
+            restoreAfter(ko.options, 'createChildContextWithAs');
             ko.options.createChildContextWithAs = false;
         });
 
@@ -345,7 +345,7 @@ describe('Binding: With', function() {
 
     describe('With "createChildContextWithAs = true" and "as"', function () {
         beforeEach(function() {
-            this.restoreAfter(ko.options, 'createChildContextWithAs');
+            restoreAfter(ko.options, 'createChildContextWithAs');
             ko.options.createChildContextWithAs = true;
         });
 

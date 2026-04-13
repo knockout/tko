@@ -225,7 +225,7 @@ describe('Binding: Foreach', function() {
 
     // @mbest/note this is not passing.
     it.skip('Should call an afterRender callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function() {
-        this.restoreAfter(ko.bindingProvider, 'instance');
+        restoreAfter(ko.bindingProvider, 'instance');
         // Set up a binding provider that converts text nodes to expressions
         var originalBindingProvider = ko.bindingProvider.instance,
             preprocessingBindingProvider = function() { };
@@ -695,7 +695,7 @@ describe('Binding: Foreach', function() {
 
     describe('With "createChildContextWithAs = false" and "as"', function () {
         beforeEach(function() {
-            this.restoreAfter(ko.options, 'createChildContextWithAs');
+            restoreAfter(ko.options, 'createChildContextWithAs');
             ko.options.createChildContextWithAs = false;
         });
 
@@ -749,7 +749,7 @@ describe('Binding: Foreach', function() {
 
     describe('With "createChildContextWithAs = true" and "as"', function () {
         beforeEach(function() {
-            this.restoreAfter(ko.options, 'createChildContextWithAs');
+            restoreAfter(ko.options, 'createChildContextWithAs');
             ko.options.createChildContextWithAs = true;
         });
 

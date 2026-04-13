@@ -58,7 +58,7 @@ describe('Binding preprocessing', function() {
 
     // See knockout/tko#67
     it.skip('Should be able to get a dynamically created binding handler during preprocessing', function() {
-        this.restoreAfter(ko, 'getBindingHandler'); // restore original function when done
+        restoreAfter(ko, 'getBindingHandler'); // restore original function when done
 
         ko.getBindingHandler = function(bindingKey) {
             return {

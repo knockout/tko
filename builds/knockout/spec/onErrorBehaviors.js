@@ -29,7 +29,7 @@ describe('onError handler', function () {
     }
 
     beforeEach(function () {
-        this.restoreAfter(ko.options, 'taskScheduler');
+        restoreAfter(ko.options, 'taskScheduler');
         ko.options.taskScheduler = function (callback) {
             setTimeout(callback, 0);
         };

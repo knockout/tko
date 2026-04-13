@@ -479,7 +479,7 @@ describe('Templating', function() {
     });
 
     it('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindingAccessors', function() {
-        this.restoreAfter(ko.options, 'bindingProviderInstance');
+        restoreAfter(ko.options, 'bindingProviderInstance');
 
         // Will verify that bindings are applied only once for both inline (rewritten) bindings,
         // and external (non-rewritten) ones
@@ -516,7 +516,7 @@ describe('Templating', function() {
 
     it.skip('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function() {
         // SKIP b/c there is no equivalent to `getBindings` with the new-parser
-        this.restoreAfter(ko.options, 'bindingProviderInstance');
+        restoreAfter(ko.options, 'bindingProviderInstance');
 
         // Will verify that bindings are applied only once for both inline (rewritten) bindings,
         // and external (non-rewritten) ones. Because getBindings actually gets called twice, we need
@@ -874,7 +874,7 @@ describe('Templating', function() {
         });
 
         it('Should omit any items whose \'_destroy\' flag is set if foreachHidesDestroyed is set', function() {
-            this.restoreAfter(ko.options, 'foreachHidesDestroyed');
+            restoreAfter(ko.options, 'foreachHidesDestroyed');
             ko.options.foreachHidesDestroyed = true;
 
             var myArray = new ko.observableArray([{ someProp: 1 }, { someProp: 2, _destroy: 'evals to true' }, { someProp : 3 }, { someProp: 4, _destroy: false }]);
@@ -1165,7 +1165,7 @@ describe('Templating', function() {
     });
 
     it('Should be possible to combine template rewriting, foreach, and a node preprocessor', function() {
-        this.restoreAfter(ko.options, 'bindingProviderInstance');
+        restoreAfter(ko.options, 'bindingProviderInstance');
 
         // This spec verifies that the use of fixUpContinuousNodeArray in templating.js correctly handles the scenario
         // where a memoized comment node is the first node outputted by 'foreach', and it gets removed by unmemoization.

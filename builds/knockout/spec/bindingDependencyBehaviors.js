@@ -222,7 +222,7 @@ describe('Binding dependencies', function() {
     });
 
     it('Should track observables accessed within the binding provider\'s "getBindingAccessor" function', function() {
-        this.restoreAfter(ko.bindingProvider, 'instance');
+        restoreAfter(ko.bindingProvider, 'instance');
 
         var observable = ko.observable('substitute'),
             originalBindingProvider = ko.bindingProvider.instance;

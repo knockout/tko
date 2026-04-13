@@ -79,7 +79,7 @@ describe('Components: Default loader', function() {
                 viewModel: { require: 'path/viewModelModule' }
             };
 
-        this.restoreAfter(window, 'require');
+        restoreAfter(window, 'require');
         window.require = function(modules, callback) {
             expect(modules.length).to.equal(1);
             switch (modules[0]) {
@@ -184,7 +184,7 @@ describe('Components: Default loader', function() {
             }
         };
 
-        this.restoreAfter(ko.components, 'loaders');
+        restoreAfter(ko.components, 'loaders');
         ko.components.loaders = [testLoader, ko.components.defaultLoader];
 
         var config = {
@@ -218,7 +218,7 @@ describe('Components: Default loader', function() {
             }
         };
 
-        this.restoreAfter(ko.components, 'loaders');
+        restoreAfter(ko.components, 'loaders');
         ko.components.loaders = [testLoader, ko.components.defaultLoader];
 
         var config = {

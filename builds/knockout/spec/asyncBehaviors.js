@@ -742,8 +742,8 @@ describe('Rate-limited', function() {
 describe('Deferred', function() {
     beforeEach(function() {
         clock = sinon.useFakeTimers();
-        this.restoreAfter(ko.options, 'taskScheduler');
-        this.restoreAfter(ko.tasks, 'scheduler');
+        restoreAfter(ko.options, 'taskScheduler');
+        restoreAfter(ko.tasks, 'scheduler');
         ko.options.taskScheduler = function(callback) {
             setTimeout(callback, 0);
         };
@@ -846,7 +846,7 @@ describe('Deferred', function() {
         });
 
         it('Is default behavior when "ko.options.deferUpdates" is "true"', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var observable = ko.observable();
@@ -1062,7 +1062,7 @@ describe('Deferred', function() {
         });
 
         it('Is default behavior when "ko.options.deferUpdates" is "true"', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var data = ko.observable('A'),
@@ -1079,7 +1079,7 @@ describe('Deferred', function() {
         });
 
         it('Is superseded by rate-limit', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var data = ko.observable('A'),
@@ -1104,7 +1104,7 @@ describe('Deferred', function() {
         });
 
         it('Should minimize evaluation at the end of a complex graph', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var a = ko.observable('a'),
@@ -1142,7 +1142,7 @@ describe('Deferred', function() {
 
         it('Should minimize evaluation when dependent computed doesn\'t actually change', function() {
             // From https://github.com/knockout/knockout/issues/2174
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var source = ko.observable({ key: 'value' }),
@@ -1166,7 +1166,7 @@ describe('Deferred', function() {
 
         it('Should ignore recursive dirty events', function() {
             // From https://github.com/knockout/knockout/issues/1943
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var a = ko.observable(),
@@ -1224,7 +1224,7 @@ describe('Deferred', function() {
             // See https://github.com/knockout/knockout/issues/2240
             // Set up a scenario where a computed will be marked as dirty but won't get marked as
             // stale and so won't be re-evaluated
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var obs = ko.observable('somevalue'),
@@ -1249,7 +1249,7 @@ describe('Deferred', function() {
         });
 
         it('Should not re-evaluate if pure computed becomes asleep while a notification is pending', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var data = ko.observable('A'),
@@ -1284,7 +1284,7 @@ describe('Deferred', function() {
 
     describe('ko.when', function() {
         it('Runs callback in a sepearate task when predicate function becomes true, but only once', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var x = ko.observable(3),
@@ -1311,7 +1311,7 @@ describe('Deferred', function() {
         });
 
         it('Runs callback in a sepearate task if predicate function is already true', function() {
-            this.restoreAfter(ko.options, 'deferUpdates');
+            restoreAfter(ko.options, 'deferUpdates');
             ko.options.deferUpdates = true;
 
             var x = ko.observable(4),

@@ -2,7 +2,7 @@ describe('Binding attribute syntax', function() {
     beforeEach(prepareTestNode);
 
     it('applyBindings should accept no parameters and then act on document.body with undefined model', function() {
-        this.after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
+        after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
 
         var didInit = false;
         ko.bindingHandlers.test = {
@@ -18,7 +18,7 @@ describe('Binding attribute syntax', function() {
     });
 
     it('applyBindings should accept one parameter and then act on document.body with parameter as model', function() {
-        this.after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
+        after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
 
         var didInit = false;
         var suppliedViewModel = {};
@@ -49,7 +49,7 @@ describe('Binding attribute syntax', function() {
         var shouldNotMatchNode = document.createElement("DIV");
         shouldNotMatchNode.innerHTML = "<div id='shouldNotMatchThisElement' data-bind='test'></div>";
         document.body.appendChild(shouldNotMatchNode);
-        this.after(function () { document.body.removeChild(shouldNotMatchNode); });
+        after(function () { document.body.removeChild(shouldNotMatchNode); });
 
         ko.applyBindings(suppliedViewModel, testNode);
         expect(didInit).to.deep.equal(true);
@@ -196,7 +196,7 @@ describe('Binding attribute syntax', function() {
         testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>";
         var outerNode = document.createElement("div");
         document.body.appendChild(outerNode);
-        this.after(function () { document.body.removeChild(outerNode); });
+        after(function () { document.body.removeChild(outerNode); });
         ko.applyBindings({ someProp: 'Outer value' }, outerNode);
         var outerContext = ko.contextFor(outerNode);
         ko.cleanNode(outerNode);
@@ -549,7 +549,7 @@ describe('Binding attribute syntax', function() {
 
     describe('Should not bind against text content inside restricted elements', function() {
         beforeEach(function() {
-            this.restoreAfter(ko.bindingProvider, 'instance');
+            restoreAfter(ko.bindingProvider, 'instance');
 
             // Developers won't expect or want binding to mutate the contents of <script> or <textarea>
             // elements. Historically this wasn't a problem because the default binding provider only

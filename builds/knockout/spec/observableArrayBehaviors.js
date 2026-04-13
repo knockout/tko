@@ -355,7 +355,7 @@ describe('Observable Array', function() {
     });
 
     it('Should inherit any properties defined on ko.subscribable.fn, ko.observable.fn, or ko.observableArray.fn', function() {
-        this.after(function() {
+        after(function() {
             delete ko.subscribable.fn.subscribableProp; // Will be able to reach this
             delete ko.subscribable.fn.customProp;       // Overridden on ko.observable.fn
             delete ko.subscribable.fn.customFunc;       // Overridden on ko.observableArray.fn
@@ -383,7 +383,7 @@ describe('Observable Array', function() {
             return;
         }
 
-        this.after(function() {
+        after(function() {
             delete ko.observable.fn.customFunction1;
             delete ko.observableArray.fn.customFunction2;
         });
