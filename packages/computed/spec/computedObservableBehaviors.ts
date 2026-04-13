@@ -137,11 +137,8 @@ describe('Dependent Observable', function () {
     const someContainer = { depObs: instance }
     someContainer.depObs('some value')
     expect(invokedWriteWithValue).to.equal('some value')
-    expect(invokedWriteWithThis).to.equal(
-      function () {
-        return this
-      }.call(null)
-    ) // Since no owner was specified
+    // No owner specified — `this` is null, undefined, or globalThis depending on strict mode
+    expect([null, undefined, globalThis]).to.contain(invokedWriteWithThis)
   })
 
   it('Should be able to write to multiple computed properties on a model object using chaining syntax', function () {

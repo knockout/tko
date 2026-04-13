@@ -63,12 +63,17 @@ Key packages: `@tko/observable`, `@tko/computed`, `@tko/bind`,
 Builds: `@tko/build.knockout` (backwards-compatible) and
 `@tko/build.reference` (modern/recommended).
 
+## Prerequisites
+
+- **Bun** — package manager and script runner. Install via [mise](https://mise.jdx.dev/): `mise install` (reads `.tool-versions`), or [bun.sh](https://bun.sh).
+- Use `bun install` instead of `npm install`.
+
 ## Build Commands
 
 All builds use Make + esbuild. Run from the repo root:
 
 ```bash
-npm install               # Install all dependencies (uses npm workspaces)
+bun install               # Install all dependencies (uses Bun workspaces)
 make                      # Build all packages (ESM, CommonJS, MJS)
 make test                 # Run all tests with Electron
 make test-headless        # Run all tests with headless Chrome
