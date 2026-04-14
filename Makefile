@@ -67,8 +67,6 @@ bun.lock: package.json packages/*/package.json
 
 package.json:
 
-install: node_modules
-
 outdated-list:
 	bun outdated
 
