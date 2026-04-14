@@ -28,11 +28,6 @@
       "@tko/*": [
         "./packages/*/index.ts",
         "./builds/*/index.ts"
-      ],
-      "*": [
-        "./*",
-        "./packages/*",
-        "./builds/*"
       ]
     }
   },
