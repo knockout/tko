@@ -10,12 +10,10 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "keywords": [
     "knockout",

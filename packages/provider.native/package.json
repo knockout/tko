@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/provider.native",
   "description": "Link binding handlers whose value is already attached to the node",
-  "module": "dist/provider.native.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -24,8 +23,7 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/binding.core",
   "description": "TKO Core bindings",
-  "module": "dist/binding.core.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -39,7 +38,6 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   }
 }
