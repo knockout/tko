@@ -1,7 +1,5 @@
 # Plan: TSX Docs Example Rollout
 
-**Risk class:** LOW
-
 ## Goal
 
 Make the TSX side of the docs easier to read than the legacy HTML + viewmodel
@@ -214,10 +212,3 @@ After this rollout:
 - setup ceremony stops dominating simple binding pages
 - HTML examples remain fully available for legacy readers
 - both tabs remain runnable through the playground
-
-## AI Evidence
-- Risk class: LOW
-- Changes and steps: update `plugins/tsx-tabs.js` and `plugins/playground-button.js`, migrate binding example pages to reader-first TSX shape
-- Tools/commands: `bun run build`, `bun x astro dev`, `playwright-cli` headless
-- Validation: per-page verification — TSX tab, HTML tab, both playground buttons compile without errors
-- Follow-up owner: TKO maintainers

@@ -1,7 +1,5 @@
 # Agent Verified Behaviors
 
-**Risk class:** LOW
-
 ## Summary
 Add a generated, package-scoped agent reference under `tko.io/public/agents/verified-behaviors/` whose claims are backed by unit tests. The source of truth is the test suite, not prose docs. The generated output should be compact enough for LLM consumption and rebuilt automatically whenever docs are built or published.
 
@@ -77,10 +75,3 @@ Update agent-facing entry points to link to the generated index:
 - Expand the manifest as more APIs are audited against tests.
 - If the manifest grows large, consider validation that referenced spec files still exist.
 - Consider replacing the compatibility root agent files with redirects or short pointers once the `/agents/` paths are fully established.
-
-## AI Evidence
-- Risk class: LOW
-- Changes and steps: add generator script, curated JSON files per package, build integration, docs site entry-point updates
-- Tools/commands: `bun run build`, `playwright-cli` headless, `make test-headless`
-- Validation: run generator, confirm emitted markdown, spot-check at least one package file via live docs site
-- Follow-up owner: TKO maintainers

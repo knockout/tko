@@ -1,7 +1,5 @@
 # Plan: Trusted Publishing for npm Releases
 
-**Risk class:** HIGH
-
 **Goal**: Move TKO npm publishing from long-lived `NPM_TOKEN` authentication to
 npm trusted publishing via GitHub Actions OIDC.
 
@@ -75,10 +73,3 @@ Changesets pattern.
 - Confirm no remaining repo docs require `NPM_TOKEN` for publishing
 - Confirm the workflow now targets a Node/npm version that meets npm trusted
   publishing requirements
-
-## AI Evidence
-- Risk class: HIGH
-- Changes and steps: update `release.yml` to use OIDC trusted publishing, upgrade Node to 24.x, remove `NPM_TOKEN` references from docs and workflow
-- Tools/commands: review workflow YAML, `make test-headless`, manual dry-run via `npm publish --dry-run`
-- Validation: `release.yml` grants only `id-token: write`, no `NPM_TOKEN` secret referenced, workflow runs `npm publish` via OIDC on tag push
-- Follow-up owner: TKO maintainers (npm trusted publisher configuration on npmjs.com)
