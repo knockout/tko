@@ -18,7 +18,7 @@ const packageData = (pkg, version, hasHelpers) => ({
   exports: {
     ".": {
       require: "./dist/index.cjs",
-      import: "./dist/index.js"
+      import: pkg.exports?.["."]?.import || "./dist/index.js"
     },
     ...(hasHelpers && { "./helpers/*": "./helpers/*" })
   },

@@ -38,5 +38,6 @@
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
-  }
+  },
+  "module": "dist/index.js"
 }
