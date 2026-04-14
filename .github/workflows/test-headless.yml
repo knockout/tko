@@ -30,4 +30,5 @@ jobs:
       - name: Run Tests
         run: bunx vitest run
         env:
+          HOME: /root
           VITEST_BROWSERS: chromium,firefox,webkit
