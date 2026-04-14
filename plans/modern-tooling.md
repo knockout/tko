@@ -37,11 +37,13 @@ This plan lays out a phased migration to a modern stack.
 
 ## Security policy
 
-- **minimumReleaseAge**: Do not install any package version less than 48 hours
-  old. This applies to all dependencies — devDependencies and production.
+- **minimumReleaseAge**: Enforced via `bunfig.toml` (`minimumReleaseAge = 172800`).
+  Rejects package versions published less than 48 hours ago.
   Protects against supply-chain attacks via compromised fresh releases.
 - Pin exact versions in `.tool-versions` (currently `bun 1.3.12`).
+- Pin dev preview packages to exact versions (no `^`).
 - Use `bun.lock` (committed) for deterministic installs.
+- Use `bun install --frozen-lockfile` in CI.
 
 ## Phases
 
