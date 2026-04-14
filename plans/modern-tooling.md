@@ -8,7 +8,7 @@
 | Phase | Status | PR | Notes |
 |-------|--------|-----|-------|
 | 1. Bun + Vitest | Merged | #303 | Bun replaces npm. Vitest replaces Karma. 2679 tests, 143 files, ~4s. Chromium+Firefox+WebKit in CI. |
-| 2. tsgo | PR open | #305 | tsgo 0.17s vs tsc 1.0s (6x). moduleResolution: bundler. 0 errors on both checkers. |
+| 2. moduleResolution: bundler | PR open | #305 | Switch to bundler resolution (required for future tsgo). tsgo removed from deps per phillipc feedback — install locally if needed. |
 | 3. Makefiles → Bun | Not started | — | |
 | 4. Biome | Not started | — | |
 | 5. knip | Not started | — | |
