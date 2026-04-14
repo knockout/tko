@@ -45,6 +45,7 @@ make eslint-fix           # Run ESLint with auto-fix
 make format               # Check Prettier formatting
 make format-fix           # Fix Prettier formatting
 make tsc                  # TypeScript type-check (no emit)
+bunx tsgo                 # TypeScript 7 type-check (6x faster)
 make dts                  # Generate TypeScript declaration files
 make sweep                # Clean dist/ and coverage/ dirs
 make clean                # Full clean (node_modules, lockfiles, dist)
@@ -76,10 +77,10 @@ Run `make format-fix && make eslint-fix` before committing.
 ## TypeScript
 
 - All source is in TypeScript (`packages/*/src/`)
-- Target: ES6, Module: ES2015
+- Target: ES2022, Module: ES2022, moduleResolution: bundler
 - Strict mode enabled (with `noImplicitAny: false`)
-- Types checked with `make tsc` (noEmit — esbuild handles compilation)
-- Path aliases: `@tko/*` maps to `packages/*` and `builds/*`
+- Types checked with `bunx tsc` or `bunx tsgo` (TypeScript 7, 6x faster)
+- Path aliases: `@tko/*` resolves to `packages/*/index.ts` and `builds/*/index.ts`
 
 ## Package Conventions
 
