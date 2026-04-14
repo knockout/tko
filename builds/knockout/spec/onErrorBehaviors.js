@@ -66,9 +66,13 @@ describe('onError handler', function () {
             return true; // suppress
         };
 
-        // Capture errors at the event level to prevent Vitest from seeing
-        // deliberate throws as unhandled errors
-        errorCapture = function (event) { event.preventDefault(); };
+        // Suppress only the deliberate test errors so Vitest doesn't count them
+        errorCapture = function (event) {
+            var msg = event?.error?.message || event?.reason?.message || event?.message || '';
+            if (msg.includes('ERRORS_ON_PURPOSE') || msg === 'Some error') {
+                event.preventDefault();
+            }
+        };
         window.addEventListener('error', errorCapture, true);
         window.addEventListener('unhandledrejection', errorCapture, true);
     });
