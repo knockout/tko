@@ -13,7 +13,7 @@ License: MIT
 Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
 
 ```
-packages/          # 25 modular @tko/* packages (all TypeScript)
+packages/          # 26 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
 tools/             # Shared build config (build.mk, repackage.mjs)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
@@ -127,7 +127,7 @@ same version.
 
 **For contributors** — when your PR changes package behavior:
 ```bash
-npx changeset add    # Select affected packages, bump type, describe change
+bunx changeset add   # Select affected packages, bump type, describe change
 ```
 This creates a changeset file in `.changeset/` that gets committed with your PR.
 
