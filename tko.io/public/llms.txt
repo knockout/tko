@@ -24,6 +24,8 @@
   How to run and verify TKO code.
 - Agent TSX Scaffold: /agents/sample-tsx.html
   Minimal in-browser TSX + esbuild scaffold for rapid prototype work.
+- Glossary: /agents/glossary.md
+  Domain-specific terms, concepts, and package reference.
 - Examples: /examples/
   Interactive self-contained HTML examples that show update locality and TKO's observable model.
 

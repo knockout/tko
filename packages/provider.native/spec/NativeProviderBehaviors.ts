@@ -14,7 +14,7 @@ describe('Native Provider Behavior', function () {
     const div = document.createElement('div')
     const attr = { 'ko-thing': {} }
     div[NATIVE_BINDINGS] = attr
-    assert.ok(p.nodeHasBindings(div), true)
+    assert.ok(p.nodeHasBindings(div))
     const accessors = p.getBindingAccessors(div)
     assert.equal(Object.keys(accessors).length, 1)
     assert.strictEqual(accessors['thing'](), attr['ko-thing'])
@@ -25,14 +25,14 @@ describe('Native Provider Behavior', function () {
     const div = document.createElement('div')
     const attr = { thing: {} }
     div[NATIVE_BINDINGS] = attr
-    assert.notOk(p.nodeHasBindings(div), false)
+    assert.notOk(p.nodeHasBindings(div))
     assert.equal(p.getBindingAccessors(div), null)
   })
 
   it('ignores nodes w/o the symbol', function () {
     const p = new NativeProvider()
     const div = document.createElement('div')
-    assert.notOk(p.nodeHasBindings(div), false)
+    assert.notOk(p.nodeHasBindings(div))
     assert.equal(p.getBindingAccessors(div), null)
   })
 

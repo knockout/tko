@@ -65,8 +65,7 @@ In each individual `packages/*/` directory, you can also run:
 
 | Command | Effect |
 | --- | --- |
-| $ `karma COMMAND ../../karma.conf.js [--once]`  | Test the local package, where COMMAND is e.g. `start` or `run` |
-| $ `make test-debug` | Runs all tests in the current package in debug- and watch-mode: Attach vscode, set a breakpoint, press save and debug |
+| $ `bunx vitest run`  | Run all tests (headless Chromium via Playwright) |
 
 ### Testing
 
@@ -74,7 +73,7 @@ Start tests with electron: `make test`
 
 Start tests with headless-chrome: `make test-headless`
 
-The test setup has naturally grown and been ported from knockout.js. Some tests use Jasmine 1.3, newer ones use Mocha, Chai and Sinon. Karma is used as test runner rather as test pipeline
+Tests use Vitest browser mode with Playwright (headless Chromium). Assertions use Chai and Sinon.
 
 Other options:
 
@@ -126,14 +125,11 @@ Additionally, implement a well-configured [Content Security Policy (CSP)](https:
  
 ---
 
-- Test-Runner -> Karma
-- Test-Environment -> electron and headless-chrome
+- Test-Runner -> Vitest (browser mode, Playwright)
+- Test-Environment -> headless Chromium
 - Linting -> Eslint
 - Formatting -> Prettier (configured like StandardJS)
-- TDD/BDD-Frameworks -> 
-    - Jasmine 1.3
-    - Mocha + Chai
-    - sinon (Mocks)
+- TDD/BDD-Frameworks -> Mocha + Chai + Sinon
 - Testing-Cloud-Service -> sauce
 - standard -> Code-Style (outdated for typescript)
 

@@ -29,16 +29,6 @@
     "dist/",
     "helpers/"
   ],
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ],
-    "files": [
-      "dist/browser.min.js",
-      "helpers/jasmine.extensions.js",
-      "spec/**/*.js"
-    ]
-  },
   "licenses": [
     {
       "type": "MIT",

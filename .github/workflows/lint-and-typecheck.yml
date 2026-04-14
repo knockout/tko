@@ -1,6 +1,4 @@
 # Combined lint, format, and typecheck workflow.
-# Replaces separate eslint.yml, prettier.yml, and run-tsc.yml to avoid
-# running npm install three times.
 name: Lint & Typecheck
 
 on:
@@ -15,14 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22.x
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm install
+        run: bun install --frozen-lockfile
 
       - name: Check Prettier
         run: make format
@@ -34,4 +29,4 @@ jobs:
         run: make
 
       - name: Typecheck
-        run: npx tsc
+        run: bunx tsc

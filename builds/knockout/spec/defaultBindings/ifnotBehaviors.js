@@ -1,22 +1,22 @@
 describe('Binding: Ifnot', function() {
-    beforeEach(jasmine.prepareTestNode);
+    beforeEach(prepareTestNode);
 
     it('Should remove descendant nodes from the document (and not bind them) if the value is truey', function() {
         testNode.innerHTML = "<div data-bind='ifnot: condition'><span data-bind='text: someItem.nonExistentChildProp'></span></div>";
-        expect(testNode.childNodes[0].childNodes.length).toEqual(1);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
         ko.applyBindings({ someItem: null, condition: true }, testNode);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
     });
 
     it('Should leave descendant nodes in the document (and bind them) if the value is falsy, independently of the active template engine', function() {
-        this.after(function() { ko.setTemplateEngine(new ko.nativeTemplateEngine()); });
+        after(function() { ko.setTemplateEngine(new ko.nativeTemplateEngine()); });
 
         ko.setTemplateEngine(new ko.templateEngine()); // This template engine will just throw errors if you try to use it
         testNode.innerHTML = "<div data-bind='ifnot: condition'><span data-bind='text: someItem.existentChildProp'></span></div>";
-        expect(testNode.childNodes.length).toEqual(1);
+        expect(testNode.childNodes.length).to.deep.equal(1);
         ko.applyBindings({ someItem: { existentChildProp: 'Child prop value' }, condition: false }, testNode);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(1);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
+        expectContainText(testNode.childNodes[0].childNodes[0], "Child prop value");
     });
 
     it('Should leave descendant nodes unchanged if the value is falsy and remains falsy when changed', function() {
@@ -26,13 +26,13 @@ describe('Binding: Ifnot', function() {
 
         // Value is initially true, so nodes are retained
         ko.applyBindings({ someItem: someItem }, testNode);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("false");
-        expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode);
+        expectContainText(testNode.childNodes[0].childNodes[0], "false");
+        expect(testNode.childNodes[0].childNodes[0]).to.deep.equal(originalNode);
 
         // Change the value to a different falsy value
         someItem(0);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("0");
-        expect(testNode.childNodes[0].childNodes[0]).toEqual(originalNode);
+        expectContainText(testNode.childNodes[0].childNodes[0], "0");
+        expect(testNode.childNodes[0].childNodes[0]).to.deep.equal(originalNode);
     });
 
     it('Should toggle the presence and bindedness of descendant nodes according to the falsiness of the value', function() {
@@ -42,25 +42,25 @@ describe('Binding: Ifnot', function() {
         ko.applyBindings({ someItem: someItem, condition: condition }, testNode);
 
         // First it's not there
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
 
         // Then it's there
         someItem({ occasionallyExistentChildProp: 'Child prop value' });
         condition(false);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(1);
-        expect(testNode.childNodes[0].childNodes[0]).toContainText("Child prop value");
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1);
+        expectContainText(testNode.childNodes[0].childNodes[0], "Child prop value");
 
         // Then it's gone again
         condition(true);
         someItem(null);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
     });
 
     it('Should not interfere with binding context', function() {
         testNode.innerHTML = "<div data-bind='ifnot: false'>Parents: <span data-bind='text: $parents.length'></span></div>";
         ko.applyBindings({ }, testNode);
-        expect(testNode.childNodes[0]).toContainText("Parents: 0");
-        expect(ko.contextFor(testNode.childNodes[0].childNodes[1]).$parents.length).toEqual(0);
+        expectContainText(testNode.childNodes[0], "Parents: 0");
+        expect(ko.contextFor(testNode.childNodes[0].childNodes[1]).$parents.length).to.deep.equal(0);
     });
 
     it('Should call a childrenComplete callback function', function () {
@@ -69,15 +69,15 @@ describe('Binding: Ifnot', function() {
             callbacks = 0;
         var viewModel = { condition: ko.observable(false), someText: "hello", callback: function () { callbacks++; } };
         ko.applyBindings(viewModel, testNode);
-        expect(callbacks).toEqual(1);
-        expect(testNode.childNodes[0]).toContainText('hello');
+        expect(callbacks).to.deep.equal(1);
+        expectContainText(testNode.childNodes[0], 'hello');
 
         viewModel.condition(true);
-        expect(callbacks).toEqual(1);
-        expect(testNode.childNodes[0].childNodes.length).toEqual(0);
+        expect(callbacks).to.deep.equal(1);
+        expect(testNode.childNodes[0].childNodes.length).to.deep.equal(0);
 
         viewModel.condition(false);
-        expect(callbacks).toEqual(2);
-        expect(testNode.childNodes[0]).toContainText('hello');
+        expect(callbacks).to.deep.equal(2);
+        expectContainText(testNode.childNodes[0], 'hello');
     });
 });

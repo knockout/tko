@@ -1,9 +1,10 @@
-import '../helpers/jasmine-13-helper'
+import { expect } from 'chai'
 
 import * as utils from '../dist'
 import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
 import type { KnockoutInstance } from '@tko/builder'
+import { prepareTestNode, restoreAfter } from '../helpers/mocha-test-helpers'
 
 const ko: KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
@@ -12,7 +13,7 @@ ko.options = options
 describe('startCommentRegex', function () {
   it('only ie8 has a text property at comment nodes', function () {
     const reg: RegExp = virtualElements.startCommentRegex
-    expect(reg.source).not.toContain('<!..')
+    expect(reg.source).to.not.contain('<!..')
   })
 })
 
@@ -26,35 +27,42 @@ describe('setTextContent', function () {
   // NOTE: will test innerHTML because <IE8 doesn't have textContent
   it('defaults to empty string', function () {
     ko.utils.setTextContent(element)
-    expect(element.innerHTML).toEqual('')
+    expect(element.innerHTML).to.equal('')
   })
 
   it('sets text from plain values or observables', function () {
     ko.utils.setTextContent(element, 'test')
-    expect(element.innerHTML).toEqual('test')
+    expect(element.innerHTML).to.equal('test')
 
     // We use a function as a proxy for an obsevrable
     ko.utils.setTextContent(element, function () {
       return 'change'
     })
-    expect(element.innerHTML).toEqual('change')
+    expect(element.innerHTML).to.equal('change')
   })
 
   it('overwrites existing text', function () {
     element.innerHTML = 'existing'
 
     ko.utils.setTextContent(element, 'changed')
-    expect(element.innerHTML).toEqual('changed')
+    expect(element.innerHTML).to.equal('changed')
   })
 })
 
 describe('registerEventHandler', function () {
   let testNode: HTMLElement
+  let cleanups: Array<() => void>
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    cleanups = []
+    testNode = prepareTestNode()
+  })
+  afterEach(function () {
+    while (cleanups.length) {
+      cleanups.pop()!()
+    }
   })
   //TODO it looks like jquery3.7+ and trigger doesn't works with tko, useOnlyNativeEvents should be always true if jquery is used.
-  xit('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
+  it.skip('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
     const jQuery = options.jQuery
 
     if (!options.jQuery) console.log('------- JQUERY is disabled -------')
@@ -63,7 +71,7 @@ describe('registerEventHandler', function () {
       return // Nothing to test. Run the specs with jQuery referenced for this to do anything.
     }
 
-    this.restoreAfter(ko.options, 'useOnlyNativeEvents')
+    restoreAfter(cleanups, ko.options, 'useOnlyNativeEvents')
 
     const element = document.createElement('button')
     let eventFired = false
@@ -82,12 +90,12 @@ describe('registerEventHandler', function () {
 
     // Trigger the event natively (jQuery intercepts and creates new event object, which we can test)
     element.click()
-    expect(eventFired && jQueryModified).toBe(true)
+    expect(eventFired && jQueryModified).to.equal(true)
 
     // Also trigger an event through ko.utils.triggerEvent to show that it creates a jQuery event directly
     eventFired = jQueryModified = false
     ko.utils.triggerEvent(element, 'click')
-    expect(eventFired && !jQueryModified).toBe(true)
+    expect(eventFired && !jQueryModified).to.equal(true)
   })
 
   it('if jQuery is referenced, useOnlyNativeEvents option set to true', function () {
@@ -98,11 +106,11 @@ describe('registerEventHandler', function () {
       return // Nothing to test. Run the specs with jQuery referenced for this to do anything.
     }
     //see upper test-case, the JQUERY 3.7 trigger-function currently doesn't work with tko..
-    expect(ko.options.useOnlyNativeEvents).toBe(true)
+    expect(ko.options.useOnlyNativeEvents).to.equal(true)
   })
 
   it('should not use jQuery eventing with useOnlyNativeEvents option set to true', function () {
-    this.restoreAfter(ko.options, 'useOnlyNativeEvents')
+    restoreAfter(cleanups, ko.options, 'useOnlyNativeEvents')
 
     const element = document.createElement('button')
     let eventFired = false
@@ -121,25 +129,25 @@ describe('registerEventHandler', function () {
 
     // Trigger the event natively
     element.click()
-    expect(eventFired && !jQueryModified).toBe(true)
+    expect(eventFired && !jQueryModified).to.equal(true)
 
     // Also trigger an event through ko.utils.triggerEvent to show that it triggers a native event
     eventFired = jQueryModified = false
     ko.utils.triggerEvent(element, 'click')
-    expect(eventFired && !jQueryModified).toBe(true)
+    expect(eventFired && !jQueryModified).to.equal(true)
   })
 })
 
 describe('cloneNodes', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   it('should return clones', function () {
     const newNodes = ko.utils.cloneNodes([testNode])
     const isClone = !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
-    expect(isClone).toBe(true)
+    expect(isClone).to.equal(true)
   })
 
   it('should clone deeply', function () {
@@ -151,14 +159,14 @@ describe('cloneNodes', function () {
 
     const childIsClone = !child.isSameNode(newChild) && child.isEqualNode(newChild)
 
-    expect(childIsClone).toBe(true)
+    expect(childIsClone).to.equal(true)
   })
 })
 
 describe('selectExtensions', () => {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   it('should use loose equality for select value', () => {
@@ -169,9 +177,9 @@ describe('selectExtensions', () => {
     `
     testNode.appendChild(select)
 
-    expect(select.selectedIndex).toBe(0)
-    expect(utils.selectExtensions.readValue(select)).toBe('42')
+    expect(select.selectedIndex).to.equal(0)
+    expect(utils.selectExtensions.readValue(select)).to.equal('42')
     utils.selectExtensions.writeValue(select, 84, true)
-    expect(select.selectedIndex).toBe(1)
+    expect(select.selectedIndex).to.equal(1)
   })
 })

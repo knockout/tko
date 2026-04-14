@@ -1,4 +1,4 @@
-/* globals it, jasmine, describe, afterEach, beforeEach, expect */
+import { expect } from 'chai'
 
 import { options, tasks } from '@tko/utils'
 import { observable } from '@tko/observable'
@@ -12,9 +12,11 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 import { bindings as eachBindings } from '@tko/binding.foreach'
 import { BindingHandlerObject } from '@tko/provider'
+import { restoreAfter } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding Application Promise', function () {
   let bindingHandlers: BindingHandlerObject
+  let cleanups: Array<() => void>
 
   class SyncBinding extends BindingHandler {
     override get bindingCompleted() {
@@ -51,8 +53,11 @@ describe('Binding Application Promise', function () {
   }
 
   beforeEach(function () {
+    cleanups = []
     // Set up the default binding handlers.
     const provider = new MultiProvider({ providers: [new VirtualProvider(), new DataBindProvider()] })
+    restoreAfter(cleanups, options, 'bindingProviderInstance')
+    restoreAfter(cleanups, options, 'onError')
     options.bindingProviderInstance = provider
     bindingHandlers = provider.bindingHandlers
     bindingHandlers.set(coreBindings)
@@ -66,135 +71,127 @@ describe('Binding Application Promise', function () {
   })
 
   afterEach(function () {
-    expect(tasks.resetForTesting()).toEqual(0)
+    expect(tasks.resetForTesting()).to.equal(0)
+    while (cleanups.length) {
+      cleanups.pop()!()
+    }
   })
 
   it('returns a promise', function () {
     const div = document.createElement('div')
     const abr = applyBindings({}, div)
-    expect(abr.constructor).toEqual(options.Promise)
+    expect(abr.constructor).to.equal(options.Promise)
   })
 
-  it('completes immediately when there are no bindings', function () {
+  it('completes immediately when there are no bindings', async function () {
     const div = document.createElement('div')
     const abr = applyBindings({}, div)
-    jasmine.resolve(abr.then(() => expect(div.outerHTML).toEqual('<div></div>')))
+    await abr
+    expect(div.outerHTML).to.equal('<div></div>')
   })
 
-  it('completes immediately with synchronous bindings and no descendants', function () {
+  it('completes immediately with synchronous bindings and no descendants', async function () {
     const div = document.createElement('div')
     div.setAttribute('data-bind', 'css: "abc"')
     const abr = applyBindings({}, div)
-    jasmine.resolve(
-      abr.then(() => expect(div.outerHTML).toEqual('<div data-bind="css: &quot;abc&quot;" class="abc"></div>'))
-    )
+    await abr
+    expect(div.outerHTML).to.equal('<div data-bind="css: &quot;abc&quot;" class="abc"></div>')
   })
 
-  it('completes immediately with synchronous bindings and synchronous descendants', function () {
+  it('completes immediately with synchronous bindings and synchronous descendants', async function () {
     const div = document.createElement('div')
     div.innerHTML = '<span data-bind="template: { foreach: y }"><i data-bind="css: $data"></i></span>'
     const abr = applyBindings({ y: ['a', 'b'] }, div)
-    jasmine.resolve(
-      abr.then(() =>
-        expect(div.outerHTML).toEqual(
-          '<div><span data-bind="template: { foreach: y }"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
-        )
-      )
+    await abr
+    expect(div.outerHTML).to.equal(
+      '<div><span data-bind="template: { foreach: y }"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
     )
   })
 
-  it('calls bindingCompleted synchronously/element', function () {
+  it('calls bindingCompleted synchronously/element', async function () {
     const div = document.createElement('div')
     div.setAttribute('data-bind', 'sync: x')
     const x = observable(false)
     const abr = applyBindings({ x }, div)
-    expect(x()).toEqual(true)
-    jasmine.resolve(abr.then(() => expect(x()).toEqual(true)))
+    expect(x()).to.equal(true)
+    await abr
+    expect(x()).to.equal(true)
   })
 
-  it('resolves asynchronously/element', function () {
+  it('resolves asynchronously/element', async function () {
     const div = document.createElement('div')
     div.setAttribute('data-bind', 'async: x')
     const x = observable(false)
     const abr = applyBindings({ x }, div)
-    expect(x()).toEqual(false)
-    jasmine.resolve(abr.then(() => expect(x()).toEqual(true)))
+    expect(x()).to.equal(false)
+    await abr
+    expect(x()).to.equal(true)
   })
 
-  it('calls bindingCompleted synchronously/virtual-element', function () {
+  it('calls bindingCompleted synchronously/virtual-element', async function () {
     const div = document.createElement('div')
     div.innerHTML = '<!-- ko sync: x --><!-- /ko -->'
     const x = observable(false)
     const abr = applyBindings({ x }, div)
-    expect(x()).toEqual(true)
-    jasmine.resolve(abr.then(() => expect(x()).toEqual(true)))
+    expect(x()).to.equal(true)
+    await abr
+    expect(x()).to.equal(true)
   })
 
-  it('resolves asynchronously/virtual-element', function () {
+  it('resolves asynchronously/virtual-element', async function () {
     const div = document.createElement('div')
     div.innerHTML = '<!-- ko async: x --><!-- /ko -->'
     const x = observable(false)
     const abr = applyBindings({ x }, div)
-    expect(x()).toEqual(false)
-    jasmine.resolve(abr.then(() => expect(x()).toEqual(true)))
+    expect(x()).to.equal(false)
+    await abr
+    expect(x()).to.equal(true)
   })
 
-  it('completes with multiple nested async (synthetic) bindings', function () {
+  it('completes with multiple nested async (synthetic) bindings', async function () {
     const div = document.createElement('div')
     div.innerHTML = '<i data-bind="asynccb: a"><i data-bind="asynccb: b"><i data-bind="asynccb: c"></i></i></i>'
     const [a, b, c] = [observable(false), observable(false), observable(false)]
     const abr = applyBindings({ a, b, c }, div)
-    expect(a()).toEqual(false)
-    expect(b()).toEqual(false)
-    expect(c()).toEqual(false)
-    jasmine.resolve(
-      abr.then(() => {
-        expect(a()).toEqual(true)
-        expect(b()).toEqual(true)
-        expect(c()).toEqual(true)
-      })
-    )
+    expect(a()).to.equal(false)
+    expect(b()).to.equal(false)
+    expect(c()).to.equal(false)
+    await abr
+    expect(a()).to.equal(true)
+    expect(b()).to.equal(true)
+    expect(c()).to.equal(true)
   })
 
-  it('completes with asynchronous (foreach) bindings and synchronous descendants', function () {
+  it('completes with asynchronous (foreach) bindings and synchronous descendants', async function () {
     const div = document.createElement('div')
     div.innerHTML = '<span data-bind="foreach: y"><i data-bind="css: $data"></i></span>'
     const abr = applyBindings({ y: ['a', 'b'] }, div)
-    jasmine.resolve(
-      abr.then(() =>
-        expect(div.outerHTML).toEqual(
-          '<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
-        )
-      )
+    await abr
+    expect(div.outerHTML).to.equal(
+      '<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
     )
   })
 
-  it('completes with asynchronous (foreach) bindings and asynchronous descendants', function () {
+  it('completes with asynchronous (foreach) bindings and asynchronous descendants', async function () {
     const div = document.createElement('div')
     div.innerHTML = '<span data-bind="foreach: y"><i data-bind="css: $data"></i></span>'
     eachBindings.foreach.setSync(false)
     const abr = applyBindings({ y: ['a', 'b'] }, div)
-    jasmine.resolve(
-      abr.then(() =>
-        expect(div.outerHTML).toEqual(
-          '<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
-        )
-      )
+    await abr
+    expect(div.outerHTML).to.equal(
+      '<div><span data-bind="foreach: y"><i data-bind="css: $data" class="a"></i><i data-bind="css: $data" class="b"></i></span></div>'
     )
   })
 
-  it('completes with synchronous bindings and asynchronous (foreach) descendants', function () {
+  it('completes with synchronous bindings and asynchronous (foreach) descendants', async function () {
     const div = document.createElement('div')
     div.innerHTML =
       '<span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data"></i></i></span>'
     eachBindings.foreach.setSync(false)
     const abr = applyBindings({ y: [{ z: ['a', 'b'] }] }, div)
-    jasmine.resolve(
-      abr.then(() =>
-        expect(div.outerHTML).toEqual(
-          '<div><span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data">a</i><i data-bind="text: $data">b</i></i></span></div>'
-        )
-      )
+    await abr
+    expect(div.outerHTML).to.equal(
+      '<div><span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data">a</i><i data-bind="text: $data">b</i></i></span></div>'
     )
   })
 })

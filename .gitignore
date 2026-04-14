@@ -36,3 +36,4 @@ builds/**/meta
 .playwright-cli
 test-results/
 .claude/worktrees/
+__screenshots__

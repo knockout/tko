@@ -1,12 +1,21 @@
 describe('Tasks', function() {
+    var clock,
+        originalTaskScheduler;
+
     beforeEach(function() {
-        jasmine.Clock.useMockForTasks();
+        clock = sinon.useFakeTimers();
+        originalTaskScheduler = ko.options.taskScheduler;
+        ko.options.taskScheduler = function(callback) {
+            setTimeout(callback, 0);
+        };
     });
 
     afterEach(function() {
         // Check that task schedule is clear after each test
-        expect(ko.tasks.resetForTesting()).toEqual(0);
-        jasmine.Clock.reset();
+        expect(ko.tasks.resetForTesting()).to.deep.equal(0);
+        ko.options.taskScheduler = originalTaskScheduler;
+        clock.restore();
+        clock = null;
     });
 
     it('Should run in next execution cycle', function() {
@@ -14,10 +23,10 @@ describe('Tasks', function() {
         ko.tasks.schedule(function() {
             runCount++;
         });
-        expect(runCount).toEqual(0);
+        expect(runCount).to.deep.equal(0);
 
-        jasmine.Clock.tick(1);
-        expect(runCount).toEqual(1);
+        clock.tick(1);
+        expect(runCount).to.deep.equal(1);
     });
 
     it('Should run multiple times if added more than once', function() {
@@ -27,10 +36,10 @@ describe('Tasks', function() {
         };
         ko.tasks.schedule(func);
         ko.tasks.schedule(func);
-        expect(runCount).toEqual(0);
+        expect(runCount).to.deep.equal(0);
 
-        jasmine.Clock.tick(1);
-        expect(runCount).toEqual(2);
+        clock.tick(1);
+        expect(runCount).to.deep.equal(2);
     });
 
     it('Should run scheduled tasks in the order they were scheduled', function() {
@@ -42,8 +51,8 @@ describe('Tasks', function() {
         ko.tasks.schedule(func.bind(null, 1));
         ko.tasks.schedule(func.bind(null, 2));
 
-        jasmine.Clock.tick(1);
-        expect(runValues).toEqual([1,2]);
+        clock.tick(1);
+        expect(runValues).to.deep.equal([1,2]);
     });
 
     it('Should run tasks again if scheduled after a previous run', function() {
@@ -52,16 +61,16 @@ describe('Tasks', function() {
             runCount++;
         };
         ko.tasks.schedule(func);
-        expect(runCount).toEqual(0);
+        expect(runCount).to.deep.equal(0);
 
-        jasmine.Clock.tick(1);
-        expect(runCount).toEqual(1);
+        clock.tick(1);
+        expect(runCount).to.deep.equal(1);
 
         ko.tasks.schedule(func);
-        expect(runCount).toEqual(1);
+        expect(runCount).to.deep.equal(1);
 
-        jasmine.Clock.tick(1);
-        expect(runCount).toEqual(2);
+        clock.tick(1);
+        expect(runCount).to.deep.equal(2);
     });
 
     it('Should process newly scheduled tasks during task processing', function() {
@@ -74,10 +83,10 @@ describe('Tasks', function() {
         };
 
         ko.tasks.schedule(func.bind(null, 'i'));
-        expect(runValues).toEqual([]);
+        expect(runValues).to.deep.equal([]);
 
-        jasmine.Clock.tick(1);
-        expect(runValues).toEqual(['i','x']);
+        clock.tick(1);
+        expect(runValues).to.deep.equal(['i','x']);
     });
 
     it('Should keep correct state if a task throws an exception', function() {
@@ -90,13 +99,13 @@ describe('Tasks', function() {
             throw Error("test");
         });
         ko.tasks.schedule(func.bind(null, 2));
-        expect(runValues).toEqual([]);
+        expect(runValues).to.deep.equal([]);
 
         // When running tasks, it will throw an exception after completing all tasks
         expect(function() {
-            jasmine.Clock.tick(1);
-        }).toThrow();
-        expect(runValues).toEqual([1,2]);
+            clock.tick(1);
+        }).to.throw();
+        expect(runValues).to.deep.equal([1,2]);
     });
 
     it('Should stop recursive task processing after a fixed number of iterations', function() {
@@ -108,14 +117,14 @@ describe('Tasks', function() {
         };
 
         ko.tasks.schedule(func);
-        expect(runValues).toEqual([]);
+        expect(runValues).to.deep.equal([]);
 
         expect(function() {
-            jasmine.Clock.tick(1);
-        }).toThrowContaining('Too much recursion');
+            clock.tick(1);
+        }).to.throw('Too much recursion');
 
         // 5000 is the current limit in the code, but it could change if needed.
-        expect(runValues.length).toEqual(5000);
+        expect(runValues.length).to.deep.equal(5000);
     });
 
     it('Should not stop non-recursive task processing', function() {
@@ -127,10 +136,10 @@ describe('Tasks', function() {
         for (var i = 0; i < 10000; ++i) {
             ko.tasks.schedule(func);
         }
-        expect(runValues).toEqual([]);
+        expect(runValues).to.deep.equal([]);
 
-        jasmine.Clock.tick(1);
-        expect(runValues.length).toEqual(10000);
+        clock.tick(1);
+        expect(runValues.length).to.deep.equal(10000);
     });
 
     describe('Cancel', function() {
@@ -141,8 +150,8 @@ describe('Tasks', function() {
             });
             ko.tasks.cancel(handle);
 
-            jasmine.Clock.tick(1);
-            expect(runCount).toEqual(0);
+            clock.tick(1);
+            expect(runCount).to.deep.equal(0);
         });
 
         it('Should prevent only the canceled task', function() {
@@ -154,8 +163,8 @@ describe('Tasks', function() {
             var handle2 = ko.tasks.schedule(func);
             ko.tasks.cancel(handle2);
 
-            jasmine.Clock.tick(1);
-            expect(runCount).toEqual(1);
+            clock.tick(1);
+            expect(runCount).to.deep.equal(1);
         });
 
         it('Should do nothing if task has already run', function() {
@@ -164,10 +173,10 @@ describe('Tasks', function() {
                 runValues.push(value);
             };
             var handle1 = ko.tasks.schedule(func.bind(null, 1));
-            expect(runValues).toEqual([]);
+            expect(runValues).to.deep.equal([]);
 
-            jasmine.Clock.tick(1);
-            expect(runValues).toEqual([1]);
+            clock.tick(1);
+            expect(runValues).to.deep.equal([1]);
 
             var handle2 = ko.tasks.schedule(func.bind(null, 2));
 
@@ -175,8 +184,8 @@ describe('Tasks', function() {
             ko.tasks.cancel(handle1);
 
             // But nothing should happen; the second task will run in the next iteration
-            jasmine.Clock.tick(1);
-            expect(runValues).toEqual([1,2]);
+            clock.tick(1);
+            expect(runValues).to.deep.equal([1,2]);
         });
 
         it('Should work correctly after a task throws an exception', function() {
@@ -194,13 +203,13 @@ describe('Tasks', function() {
             });
             handle = ko.tasks.schedule(func.bind(null, 2));
             ko.tasks.schedule(func.bind(null, 3));
-            expect(runValues).toEqual([]);
+            expect(runValues).to.deep.equal([]);
 
             // When running tasks, it will throw an exception after completing the tasks
             expect(function() {
-                jasmine.Clock.tick(1);
-            }).toThrow();
-            expect(runValues).toEqual([1, 3]);  // The canceled task will be skipped
+                clock.tick(1);
+            }).to.throw();
+            expect(runValues).to.deep.equal([1, 3]);  // The canceled task will be skipped
         });
     });
 
@@ -211,13 +220,13 @@ describe('Tasks', function() {
                 runValues.push(value);
             };
             ko.tasks.schedule(func.bind(null, 1));
-            expect(runValues).toEqual([]);
+            expect(runValues).to.deep.equal([]);
 
             // Immediately runs any scheduled tasks
             ko.tasks.runEarly();
-            expect(runValues).toEqual([1]);
+            expect(runValues).to.deep.equal([1]);
 
-            // Skip calling jasmine.Clock.tick to show that the queue is clear
+            // The queue is clear, so there is nothing to advance.
         });
 
         it('Should run tasks early during task processing', function() {
@@ -229,18 +238,18 @@ describe('Tasks', function() {
             // Schedule two tasks; the first one schedules other tasks and calls runEarly
             ko.tasks.schedule(function() {
                 ko.tasks.schedule(func.bind(null, 2));
-                expect(runValues).toEqual([]);
+                expect(runValues).to.deep.equal([]);
 
                 ko.tasks.runEarly();
-                expect(runValues).toEqual([1,2]);
+                expect(runValues).to.deep.equal([1,2]);
 
                 // Schedule another task; it will be run after this one completes
                 ko.tasks.schedule(func.bind(null, 3));
             });
             ko.tasks.schedule(func.bind(null, 1));
 
-            jasmine.Clock.tick(1);
-            expect(runValues).toEqual([1,2,3]);
+            clock.tick(1);
+            expect(runValues).to.deep.equal([1,2,3]);
         });
 
         it('Should stop recursive task processing after a fixed number of iterations', function() {
@@ -252,18 +261,18 @@ describe('Tasks', function() {
             };
 
             ko.tasks.schedule(func);
-            expect(runValues).toEqual([]);
+            expect(runValues).to.deep.equal([]);
 
             ko.tasks.runEarly();    // No exception thrown yet, but the recursion was ended
             // 5000 is the current limit in the code, but it could change if needed.
-            expect(runValues.length).toEqual(5000);
+            expect(runValues.length).to.deep.equal(5000);
 
             expect(function() {
-                jasmine.Clock.tick(1);
-            }).toThrowContaining('Too much recursion');
+                clock.tick(1);
+            }).to.throw('Too much recursion');
 
             // No additional iterations should happen
-            expect(runValues.length).toEqual(5000);
+            expect(runValues.length).to.deep.equal(5000);
         });
 
 
@@ -274,92 +283,100 @@ describe('Tasks', function() {
             };
             ko.tasks.schedule(func.bind(null, 1));
             ko.tasks.schedule(function() {
-                expect(runValues).toEqual([1]);
+                expect(runValues).to.deep.equal([1]);
                 ko.tasks.runEarly();        // The error will be thrown asynchronously after all tasks are complete
-                expect(runValues).toEqual([1, 2]);
+                expect(runValues).to.deep.equal([1, 2]);
                 ko.tasks.schedule(func.bind(null, 3));
             });
             ko.tasks.schedule(function() {
                 throw Error("test");
             });
             ko.tasks.schedule(func.bind(null, 2));
-            expect(runValues).toEqual([]);
+            expect(runValues).to.deep.equal([]);
 
             // It will throw an exception after completing all tasks
             expect(function() {
-                jasmine.Clock.tick(1);
-            }).toThrow();
-            expect(runValues).toEqual([1, 2, 3]);
+                clock.tick(1);
+            }).to.throw();
+            expect(runValues).to.deep.equal([1, 2, 3]);
         });
     });
 });
 
 describe('Tasks scheduler', function() {
-    beforeEach(function() { waits(1); }); // Workaround for timing-related issues in IE8
+    afterEach(function() {
+        expect(ko.tasks.resetForTesting()).to.deep.equal(0);
+    });
 
-    it('Should process tasks asynchronously', function() {
+    function waitForNextTaskCycle() {
+        return new Promise(function(resolve) {
+            setTimeout(resolve, 0);
+        });
+    }
+
+    it('Should process tasks asynchronously', async function() {
         var runCount = 0;
         function func() {
             runCount++;
         }
         ko.tasks.schedule(func);
-        expect(runCount).toEqual(0);
+        expect(runCount).to.deep.equal(0);
 
-        waits(1);
-        runs(function() {
-            expect(runCount).toEqual(1);
+        await waitForNextTaskCycle();
+        expect(runCount).to.deep.equal(1);
 
-            // Run a second time
-            ko.tasks.schedule(func);
-            expect(runCount).toEqual(1);
-        });
+        // Run a second time
+        ko.tasks.schedule(func);
+        expect(runCount).to.deep.equal(1);
 
-        waits(1);
-        runs(function() {
-            expect(runCount).toEqual(2);
-        });
+        await waitForNextTaskCycle();
+        expect(runCount).to.deep.equal(2);
     });
 
     it('Should run only once for a set of tasks', function() {
         var counts = [0, 0];    // scheduler, tasks
+        var clock = sinon.useFakeTimers();
 
-        jasmine.Clock.useMock();
-        this.restoreAfter(ko.tasks, 'scheduler');
-        ko.options.taskScheduler = function (callback) {
-            ++counts[0];
-            setTimeout(callback, 0);
-        };
-        function func() {
-            ++counts[1];
-        };
+        try {
+            restoreAfter(ko.options, 'taskScheduler');
+            ko.options.taskScheduler = function (callback) {
+                ++counts[0];
+                setTimeout(callback, 0);
+            };
+            function func() {
+                ++counts[1];
+            };
 
-        // First batch = one scheduler call
-        ko.tasks.schedule(func);
-        expect(counts).toEqual([1, 0]);
-        ko.tasks.schedule(func);
-        expect(counts).toEqual([1, 0]);
-        jasmine.Clock.tick(1);
-        expect(counts).toEqual([1, 2]);
+            // First batch = one scheduler call
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 0]);
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 0]);
+            clock.tick(1);
+            expect(counts).to.deep.equal([1, 2]);
 
-        // Second batch = one scheduler call
-        counts = [0, 0];
-        ko.tasks.schedule(func);
-        ko.tasks.schedule(func);
-        jasmine.Clock.tick(1);
-        expect(counts).toEqual([1, 2]);
+            // Second batch = one scheduler call
+            counts = [0, 0];
+            ko.tasks.schedule(func);
+            ko.tasks.schedule(func);
+            clock.tick(1);
+            expect(counts).to.deep.equal([1, 2]);
 
-        // runEarly doesn't cause any extra scheduler call
-        counts = [0, 0];
-        ko.tasks.schedule(func);
-        expect(counts).toEqual([1, 0]);
+            // runEarly doesn't cause any extra scheduler call
+            counts = [0, 0];
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 0]);
 
-        ko.tasks.runEarly();
-        expect(counts).toEqual([1, 1]);
+            ko.tasks.runEarly();
+            expect(counts).to.deep.equal([1, 1]);
 
-        ko.tasks.schedule(func);
-        expect(counts).toEqual([1, 1]);
+            ko.tasks.schedule(func);
+            expect(counts).to.deep.equal([1, 1]);
 
-        jasmine.Clock.tick(1);
-        expect(counts).toEqual([1, 2]);
+            clock.tick(1);
+            expect(counts).to.deep.equal([1, 2]);
+        } finally {
+            clock.restore();
+        }
     });
 });
