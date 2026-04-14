@@ -19,7 +19,7 @@ import { value } from './value'
 import { visible, hidden } from './visible'
 import { using } from './using'
 
-export const bindings = {
+export const bindings: Record<string, unknown> = {
   attr,
   checked,
   checkedValue,

@@ -1,22 +1,19 @@
 {
-  "compileOnSave": false,  
+  "compileOnSave": false,
   "compilerOptions": {
     "declaration": true,
-    "ignoreDeprecations": "6.0",
     "target": "es2022",
     "module": "es2022",
-    "moduleResolution": "node10", //Deprecated in ts7.0
+    "moduleResolution": "bundler",
     "allowJs": false,
     "importHelpers": true,
-    "allowSyntheticDefaultImports":  true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noEmit": true,
-    /*Disable some typing feature from ts*/
     "noImplicitAny": false,
     "noImplicitThis": false,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
-    /* END Disabling */
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "strictBindCallApply": true,
@@ -27,6 +24,10 @@
     "paths": {
       "@tko/binding.template/helpers/dummyTemplateEngine": [
         "./packages/binding.template/helpers/dummyTemplateEngine.ts"
+      ],
+      "@tko/*": [
+        "./packages/*/index.ts",
+        "./builds/*/index.ts"
       ],
       "*": [
         "./*",
