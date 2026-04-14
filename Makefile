@@ -13,9 +13,10 @@ default: all
 
 package.json:
 
-node_modules: bun.lock
+node_modules: package.json bun.lock packages/*/package.json
+	bun install
 
-all:: node_modules bun.lock
+all:: node_modules
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test test-headless:
@@ -83,7 +84,6 @@ sweep:
 	
 clean: sweep
 	rm -rf node_modules/
-	rm -f bun.lock
 
 
 # Local linking of these packages, so they
