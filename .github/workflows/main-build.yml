@@ -16,8 +16,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install unzip (needed by setup-bun)
-        run: apt-get update && apt-get install -y unzip
+      - name: Install system dependencies
+        run: apt-get update && apt-get install -y unzip make
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
