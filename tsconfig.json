@@ -22,9 +22,6 @@
     "types": ["mocha", "jquery"],
     "lib": ["es2022", "dom"],
     "paths": {
-      "@tko/binding.template/helpers/dummyTemplateEngine": [
-        "./packages/binding.template/helpers/dummyTemplateEngine.ts"
-      ],
       "@tko/*": [
         "./packages/*/index.ts",
         "./builds/*/index.ts"
