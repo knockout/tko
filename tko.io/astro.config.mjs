@@ -29,6 +29,7 @@ export default defineConfig({
       sidebar: [
         { label: 'Introduction', slug: 'index' },
         { label: 'Knockout 3 to 4 Guide', slug: '3to4' },
+        { label: 'Examples', slug: 'examples' },
         { label: 'Bindings', autogenerate: { directory: 'bindings' } },
         { label: 'Observables', autogenerate: { directory: 'observables' } },
         { label: 'Computed', autogenerate: { directory: 'computed' } },

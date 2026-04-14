@@ -2,11 +2,13 @@
 
 Test-backed behavior summaries live under `/agents/verified-behaviors/`. Treat those files as the contract layer when prose docs and implementation need reconciliation.
 
+For preferred state/binding/DOM architecture in examples and prototypes, read `/agents/contract.md`.
+
 ## Setup
 
 ```html
 <script src="https://tko.io/lib/tko.js"></script>
-<script>window.ko = window.tko</script>
+<script>const ko = globalThis.tko</script>
 ```
 
 ## Observables
@@ -48,6 +50,18 @@ Binding notes:
 <input data-bind="textInput: query">
 <textarea data-bind="textInput: notes"></textarea>
 ```
+
+## Example Discipline
+
+When the goal is to demonstrate TKO itself, keep the state flow inside observables, computeds, and bindings.
+
+- If you want a replacement-oriented checklist for DOM/state decisions, use `/agents/contract.md`.
+- It is normal to look up a mount element with `document.getElementById(...)`, `querySelector(...)`, or another host-framework reference so you can call `ko.applyBindings(viewModel, element)`.
+- Prefer `text`, `css`, `attr`, `event`, `foreach`, and `pureComputed` over manual DOM writes.
+- Avoid driving visible state with `textContent`, `innerHTML`, `classList`, or ad-hoc `addEventListener` when bindings can express the same behavior.
+- Use custom `bindingHandlers` only for DOM-specific effects that do not belong in the state layer, such as animation, focus, canvas, SVG, or third-party widget integration.
+- If an example contrasts reactive models, the counters and highlighted state should also be observable-driven so the example demonstrates the pattern instead of bypassing it.
+- The line to avoid is using the DOM itself as the mutable source of truth after bindings are active.
 
 ## Classic data-bind parsing and CSP
 
@@ -210,6 +224,8 @@ tko.applyBindings({ removeTodo: t => todos.remove(t) }, root)
 ## Testing
 
 Observable writes update DOM synchronously — assert immediately after setting:
+
+Direct DOM reads are appropriate here because this is verification code, not the UI update path itself.
 
 ```js
 const vm = { msg: ko.observable('Hello') }

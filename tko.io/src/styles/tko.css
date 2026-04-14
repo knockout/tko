@@ -106,6 +106,8 @@ h1,
 .content-panel h1 {
   font-size: clamp(1.85rem, 4vw, 2.75rem);
   font-weight: 700;
+  margin: 0;
+  line-height: 1;
 }
 
 .content-panel h2 {
@@ -190,6 +192,9 @@ header {
 
 .content-panel .sl-markdown-content > .sl-heading-wrapper:first-child {
   margin-top: 0;
+  display: flex;
+  align-items: center;
+  min-height: 100%;
 }
 
 .content-panel a {
