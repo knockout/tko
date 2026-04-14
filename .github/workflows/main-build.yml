@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
 
     steps:
       - name: Checkout code
@@ -19,9 +21,6 @@ jobs:
 
       - name: Install dependencies
         run: bun install
-
-      - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium firefox webkit
 
       - name: Run Build
         run: make
