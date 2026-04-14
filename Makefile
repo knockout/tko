@@ -1,4 +1,5 @@
-LERNA	:= bunx lerna
+BUNX	:= bunx
+LERNA	:= $(BUNX) lerna
 DOCKER	:= docker
 
 # Some make settings
@@ -18,31 +19,31 @@ all:: node_modules bun.lock
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
 test test-headless:
-	bunx vitest run
+	$(BUNX) vitest run
 
 test-headless-ff:
-	VITEST_BROWSERS=firefox bunx vitest run
+	VITEST_BROWSERS=firefox $(BUNX) vitest run
 
 test-headless-jquery:
-	VITEST_BROWSERS=chromium bunx vitest run
+	VITEST_BROWSERS=chromium $(BUNX) vitest run
 
 format:
-	bunx prettier . --check
+	$(BUNX) prettier . --check
 
 format-fix:
-	bunx prettier . --write
+	$(BUNX) prettier . --write
 
 tsc:
-	bunx tsc
+	$(BUNX) tsc
 
 eslint:
-	bunx eslint .
+	$(BUNX) eslint .
 
 eslint-fix:
-	bunx eslint . --fix
+	$(BUNX) eslint . --fix
 	
 dts:
-	bunx tsc --build tsconfig.dts.json
+	$(BUNX) tsc --build tsconfig.dts.json
 
 docker-build:
 	$(DOCKER) build . --tag tko
