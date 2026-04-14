@@ -57,7 +57,7 @@ describe('Components: Custom elements', function() {
 
     it('Inserts components into custom elements with matching non-dashed names', function() {
         if (ieVersion || window.HTMLUnknownElement) {   // Phantomjs 1.x doesn't include HTMLUnknownElement and will fail this test
-            this.after(function () { ko.components.unregister('somefaroutname'); });
+            after(function () { ko.components.unregister('somefaroutname'); });
             ko.components.register('somefaroutname', {
                 template: 'custom element <span data-bind="text: 123"></span>'
             });
@@ -75,7 +75,7 @@ describe('Components: Custom elements', function() {
     });
 
     it('Does not insert components into standard elements with matching names', function() {
-        this.after(function () { ko.components.unregister('em'); });
+        after(function () { ko.components.unregister('em'); });
         ko.components.register('em', {
             template: 'custom element <span data-bind="text: 123"></span>'
         });
@@ -94,7 +94,7 @@ describe('Components: Custom elements', function() {
             : ko.options.bindingProviderInstance.provider && ko.options.bindingProviderInstance.provider.providers
                 ? ko.options.bindingProviderInstance.provider.providers[0]
             : ko.options.bindingProviderInstance;
-        this.restoreAfter(componentProvider, 'getComponentNameForNode');
+        restoreAfter(componentProvider, 'getComponentNameForNode');
 
         // Set up a getComponentNameForNode function that maps "A" tags to test-component
         testNode.innerHTML = '<div>hello <a>&nbsp;</a> <b>ignored</b></div>';
@@ -207,7 +207,7 @@ describe('Components: Custom elements', function() {
     });
 
     it('Should not confuse parameters with bindings', function() {
-        this.restoreAfter(ko, 'getBindingHandler');
+        restoreAfter(ko, 'getBindingHandler');
         var bindings = [];
         ko.getBindingHandler = function(bindingKey) {
             bindings.push(bindingKey);
@@ -459,7 +459,7 @@ describe('Components: Custom elements', function() {
         // amend simpleHtmlParse to use a document fragment, but it seems unlikely that
         // anyone targetting IE < 9 would not be using jQuery.
 
-        this.after(function() {
+        after(function() {
             ko.components.unregister('outer-component');
             ko.components.unregister('inner-component');
         });
@@ -493,7 +493,7 @@ describe('Components: Custom elements', function() {
     it('Is possible to set up components that receive, inject, and bind templates supplied by the user of the component (sometimes called "templated components" or "transclusion")', function() {
         // This spec repeats assertions made in other specs elsewhere, but is useful to prove the end-to-end technique
 
-        this.after(function() {
+        after(function() {
             ko.components.unregister('special-list');
         });
 

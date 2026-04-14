@@ -22,11 +22,6 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "dependencies": {
     "tslib": "^2.2.0"
   },

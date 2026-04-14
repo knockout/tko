@@ -573,7 +573,7 @@ describe('Dependent Observable', function() {
     });
 
     it('Should inherit any properties defined on ko.subscribable.fn or ko.computed.fn', function() {
-        this.after(function() {
+        after(function() {
             delete ko.subscribable.fn.customProp;       // Will be able to reach this
             delete ko.subscribable.fn.customFunc;       // Overridden on ko.computed.fn
             delete ko.computed.fn.customFunc;         // Will be able to reach this
@@ -594,7 +594,7 @@ describe('Dependent Observable', function() {
             return;
         }
 
-        this.after(function() {
+        after(function() {
             delete ko.subscribable.fn.customFunction1;
             delete ko.computed.fn.customFunction2;
         });

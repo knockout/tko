@@ -7,11 +7,6 @@
     "url": "git+https://github.com/knockout/tko.git"
   },
   "author": "The Knockout Team",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "license": "MIT",
   "dependencies": {
     "@tko/binding.component": "^4.0.0",

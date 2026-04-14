@@ -373,7 +373,7 @@ describe('Binding: Value', function () {
       expect(myObservable()).to.deep.equal('A')
     })
 
-    it('Should update selectedIndex when the model changes (value specified before options)', function (done) {
+    it('Should update selectedIndex when the model changes (value specified before options)', async function () {
       const myObservable = observable('B')
       testNode.innerHTML = '<select data-bind=\'value:myObservable, options:["A", "B"]\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)
@@ -385,14 +385,8 @@ describe('Binding: Value', function () {
       expect(myObservable()).to.deep.equal('A')
 
       // Also check that the selection doesn't change later (see https://github.com/knockout/knockout/issues/2218)
-      setTimeout(function () {
-        try {
-          expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
-          done()
-        } catch (error) {
-          done(error)
-        }
-      }, 10)
+      await new Promise(resolve => setTimeout(resolve, 10))
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
     it('Should display the caption when the model value changes to undefined, null, or \"\" when using \'options\' binding', function () {

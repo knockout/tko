@@ -159,7 +159,7 @@ describe('Components: Component binding', function() {
 
     it('Injects and binds the component synchronously if it is flagged as synchronous and already cached, even if it previously loaded asynchronously', function() {
         // Set up a component that loads asynchronously, but is flagged as being injectable synchronously
-        this.restoreAfter(window, 'require');
+        restoreAfter(window, 'require');
         var requireCallbacks = {};
         window.require = function(moduleNames, callback) {
             expect(moduleNames[0]).to.equal('testViewModelModule');
@@ -216,7 +216,7 @@ describe('Components: Component binding', function() {
     });
 
     it('Creates a binding context with $component to reference the closest component viewmodel', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('sub-component');
         });
 
@@ -265,7 +265,7 @@ describe('Components: Component binding', function() {
     // @mbest - This fails b/c `test-component`'s koDescendantsComplete is called
     // after the test function completes.  Otherwise the result is correct.
     it.skip('Inner components\' koDescendantsComplete occurs before the outer component\'s', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('sub-component');
         });
 
@@ -296,7 +296,7 @@ describe('Components: Component binding', function() {
     });
 
     it.skip('koDescendantsComplete occurs after all inner components even if outer component is rendered synchronously', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('sub-component');
         });
 
@@ -331,7 +331,7 @@ describe('Components: Component binding', function() {
     });
 
     it('When all components are rendered synchronously, inner components\' koDescendantsComplete occurs before the outer component\'s', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('sub-component');
         });
 
@@ -353,7 +353,7 @@ describe('Components: Component binding', function() {
     });
 
     it.skip('koDescendantsComplete waits for inner component to complete even if it is several layers down', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('sub-component');
         });
 
@@ -379,8 +379,8 @@ describe('Components: Component binding', function() {
     });
 
     it.skip('koDescendantsComplete waits for inner components that are not yet loaded', function() {
-        this.restoreAfter(window, 'require');
-        this.after(function() {
+        restoreAfter(window, 'require');
+        after(function() {
             ko.components.unregister('sub-component');
         });
 
@@ -463,7 +463,7 @@ describe('Components: Component binding', function() {
     });
 
     it('Supports observable component names, rebuilding the component if the name changes, disposing the old viewmodel and nodes', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('component-alpha');
             ko.components.unregister('component-beta');
         });
@@ -540,7 +540,7 @@ describe('Components: Component binding', function() {
     });
 
     it('Supports binding to an observable that contains name/params, rebuilding the component if that observable changes, disposing the old viewmodel and nodes', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('component-alpha');
             ko.components.unregister('component-beta');
         });
@@ -771,7 +771,7 @@ describe('Components: Component binding', function() {
         // binding), and broken if they complete out of order (wrong final result).
 
         // Set up a mock module loader, so we can control asynchronous load completion
-        this.restoreAfter(window, 'require');
+        restoreAfter(window, 'require');
         var requireCallbacks = {};
         window.require = function(moduleNames, callback) {
             expect(moduleNames.length).to.equal(1); // In this scenario, it always will be
@@ -790,8 +790,8 @@ describe('Components: Component binding', function() {
         ko.components.register('component-2', { viewModel: { require: 'module-2' }, template: '<div>Component 2 template</div>' });
         ko.components.register('component-3', { viewModel: { require: 'module-3' }, template: '<div>Component 3 template</div>' });
         ko.components.register('component-4', { viewModel: { require: 'module-4' }, template: '<div>Component 4 template</div>' });
-        this.after(function() {
-            for (var i = 0; i < 4; i++) {
+        after(function() {
+            for (var i = 1; i <= 4; i++) {
                 ko.components.unregister('component-' + i);
             }
         });
@@ -890,7 +890,7 @@ describe('Components: Component binding', function() {
     });
 
     it.skip('Does not call outer component\'s koDescendantsComplete function if an inner component is re-rendered', function() {
-        this.after(function() {
+        after(function() {
             ko.components.unregister('sub-component');
         });
 

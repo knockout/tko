@@ -29,16 +29,6 @@
     "dist/",
     "helpers/"
   ],
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ],
-    "files": [
-      "dist/browser.min.js",
-      "helpers/mocha-test-helpers.js",
-      "spec/**/*.js"
-    ]
-  },
   "licenses": [
     {
       "type": "MIT",

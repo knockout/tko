@@ -1,7 +1,5 @@
-NPX		:= npx
-NODE  	:= node
-NPM		:= npm
-LERNA	:= npx lerna
+BUNX	:= bunx
+LERNA	:= $(BUNX) lerna
 DOCKER	:= docker
 
 # Some make settings
@@ -15,50 +13,38 @@ default: all
 
 package.json:
 
-node_modules: package-lock.json
+node_modules: package.json bun.lock packages/*/package.json
+	bun install
 
-all:: node_modules package-lock.json
+all:: node_modules
 	$(LERNA) --concurrency $(CONCURRENCY) exec --stream -- $(MAKE)
 
-test:
-	$(LERNA) exec --stream -- $(MAKE) test
-
-test-headless:
-	$(LERNA) exec --stream -- $(MAKE) test-headless
-
-# Instrumentalization via CLI: $(LERNA) exec --stream -- $(NPX) instrument dist --in-place
-# We have done it with a Esbuild-Plugin in the karma.conf.js-file
-# To manually merge coverage files: $(NPX) nyc merge coverage ../../coverage-temp/coverage-final.json
-test-coverage:
-	$(LERNA) exec --stream -- $(MAKE) test-coverage   
-	$(NPX) nyc report --reporter=html --reporter=text --reporter=cobertura --report-dir=coverage --temp-dir=coverage-temp --exclude="**/browser.min.js" --exclude="**/spec/*" > COVERAGE.md
-
-test-headless-jquery:
-	$(LERNA) exec --stream -- $(MAKE) test-headless-jquery
+test test-headless:
+	$(BUNX) vitest run
 
 test-headless-ff:
-	$(LERNA) exec --stream -- $(MAKE) test-headless-ff
+	VITEST_BROWSERS=firefox $(BUNX) vitest run
 
-ci:
-	$(LERNA) exec --stream --concurrency=1 -- $(MAKE) test-ci
+test-headless-jquery:
+	VITEST_BROWSERS=chromium $(BUNX) vitest run
 
 format:
-	$(NPX) prettier . --check
+	$(BUNX) prettier . --check
 
 format-fix:
-	$(NPX) prettier . --write
+	$(BUNX) prettier . --write
 
 tsc:
-	$(NPX) tsc
+	$(BUNX) tsc
 
 eslint:
-	$(NPX) eslint .
+	$(BUNX) eslint .
 
 eslint-fix:
-	$(NPX) eslint . --fix
+	$(BUNX) eslint . --fix
 	
 dts:
-	$(NPX) tsc --build tsconfig.dts.json
+	$(BUNX) tsc --build tsconfig.dts.json
 
 docker-build:
 	$(DOCKER) build . --tag tko
@@ -77,20 +63,18 @@ bump:
 publish-unpublished: all link
 	$(LERNA) publish from-package
 
-package-lock.json: package.json packages/*/package.json
-	$(NPM) i
+bun.lock: package.json packages/*/package.json
+	bun install
 
 package.json:
 
-install: node_modules
-
 outdated-list:
-	$(NPM) outdated
+	bun outdated
 
 outdated-upgrade:
-	$(NPM) upgrade-interactive --latest
+	bun upgrade-interactive --latest
 
-install: package-lock.json
+install: bun.lock
 
 sweep:
 	rm -rf packages/*/dist/*
@@ -100,12 +84,9 @@ sweep:
 	
 clean: sweep
 	rm -rf node_modules/
-	rm -f package-lock.json
-	rm -rf packages/*/package-lock.json
-	rm -rf builds/*/package-lock.json
 
 
 # Local linking of these packages, so they
 # are available for local testing/dev.
 link:
-	$(LERNA) exec --stream -- npm link
+	$(LERNA) exec --stream -- bun link

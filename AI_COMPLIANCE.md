@@ -84,7 +84,7 @@ security-critical rule.
 
 - `.github/workflows/`
 - `tools/build.mk`
-- `tools/karma.conf.js`
+- `vitest.config.ts`
 - release and publish controls (`.changeset/`, release scripts/workflows)
 - authentication/publishing and CI secret flow configuration
 

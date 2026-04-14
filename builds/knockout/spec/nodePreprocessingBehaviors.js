@@ -2,7 +2,7 @@ describe('Node preprocessing', function() {
     beforeEach(prepareTestNode);
 
     beforeEach(function() {
-        this.restoreAfter(ko.options, 'bindingProviderInstance');
+        restoreAfter(ko.options, 'bindingProviderInstance');
 
         var preprocessingBindingProvider = function() { };
         preprocessingBindingProvider.prototype = ko.options.bindingProviderInstance;

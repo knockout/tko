@@ -51,7 +51,7 @@ Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
 ```
 packages/          # 25 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
-tools/             # Shared build config (build.mk, karma.conf.js, repackage.mjs)
+tools/             # Shared build config (build.mk, repackage.mjs)
 skills/            # AI agent skills (on-demand workflow instructions)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
 Makefile           # Top-level build orchestrator
@@ -63,25 +63,26 @@ Key packages: `@tko/observable`, `@tko/computed`, `@tko/bind`,
 Builds: `@tko/build.knockout` (backwards-compatible) and
 `@tko/build.reference` (modern/recommended).
 
+## Prerequisites
+
+- **Bun** — package manager and script runner. Install via [mise](https://mise.jdx.dev/): `mise install` (reads `.tool-versions`), or [bun.sh](https://bun.sh).
+- Use `bun install` instead of `npm install`.
+
 ## Build Commands
 
 All builds use Make + esbuild. Run from the repo root:
 
 ```bash
-npm install               # Install all dependencies (uses npm workspaces)
+bun install               # Install all dependencies (uses Bun workspaces)
 make                      # Build all packages (ESM, CommonJS, MJS)
-make test                 # Run all tests with Electron
-make test-headless        # Run all tests with headless Chrome
-make test-headless-ff     # Run all tests with headless Firefox
-make test-headless-jquery # Run tests with jQuery enabled
-make test-coverage        # Run tests and generate coverage report
+make test                 # Run all tests (Vitest, headless Chromium via Playwright)
+bunx vitest run           # Same as make test, directly
 make eslint               # Run ESLint
 make eslint-fix           # Run ESLint with auto-fix
 make format               # Check Prettier formatting
 make format-fix           # Fix Prettier formatting
 make tsc                  # TypeScript type-check (no emit)
 make dts                  # Generate TypeScript declaration files
-make knip                 # Run Knip for Linting imports and exports
 make sweep                # Clean dist/ and coverage/ dirs
 make clean                # Full clean (node_modules, lockfiles, dist)
 ```
@@ -91,17 +92,14 @@ Make targets (they include `tools/build.mk`).
 
 ## Testing
 
-- **Runner**: Karma
-- **Frameworks**: Mocha + Chai + Sinon
-- **Browsers**: Electron (default), Chrome Headless, Firefox Headless
-- **Coverage**: nyc/Istanbul (~89% statements, ~83% branches)
-- **Test files**: `packages/*/spec/` directories
+- **Runner**: Vitest browser mode (Playwright, headless Chromium)
+- **Assertions**: Chai (expect) + Sinon (spies/stubs/timers)
+- **Config**: `vitest.config.ts` at repo root
+- **Test files**: `packages/*/spec/**/*.ts`, `builds/*/spec/**/*.js`
+- **Run**: `bunx vitest run` (all tests) or `bunx vitest run <path>` (single file)
 
-Use Mocha/Chai/Sinon for repository tests.
-
-Do not:
-- split shared specs into runner-specific versions while they still need to run
-  in the browser harness
+Tests run in a real browser via Playwright — not jsdom. This is required
+because TKO does low-level DOM manipulation, MutationObserver, and event handling.
 
 ## Code Style
 
@@ -231,7 +229,7 @@ When validating `tko.io` documentation changes with the local docs site:
 
 ## Important Guidelines
 
-- Do not modify `tools/build.mk` or `tools/karma.conf.js` without understanding
+- Do not modify `tools/build.mk` or `vitest.config.ts` without understanding
   the full impact — they are shared across all 25+ packages.
 - Do not add runtime dependencies to core packages. TKO is zero-dependency.
 - The `builds/` packages bundle everything into a single distributable.

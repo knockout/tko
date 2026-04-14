@@ -375,19 +375,19 @@ describe('Function.bind', function () {
       actual = bound('a'),
       global = globalThis
 
-    expect([null, global]).to.contain(actual[0])
+    expect([null, undefined, global]).to.contain(actual[0])
     expect(actual[1]).to.equal('a')
 
     bound = fn.bind(undefined)
     actual = bound('b')
 
-    expect([undefined, global]).to.contain(actual[0])
+    expect([null, undefined, global]).to.contain(actual[0])
     expect(actual[1]).to.equal('b')
 
     bound = fn.bind(null)
     actual = bound('b')
 
-    expect([undefined, global]).to.contain(actual[0])
+    expect([null, undefined, global]).to.contain(actual[0])
     expect(actual[1]).to.equal('b')
   })
 

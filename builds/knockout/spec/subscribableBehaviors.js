@@ -122,7 +122,7 @@ describe('Subscribable', function() {
     });
 
     it('Should inherit any properties defined on ko.subscribable.fn', function() {
-        this.after(function() {
+        after(function() {
             delete ko.subscribable.fn.customProp;
             delete ko.subscribable.fn.customFunc;
         });
@@ -141,7 +141,7 @@ describe('Subscribable', function() {
             return;
         }
 
-        this.after(function() {
+        after(function() {
             delete ko.subscribable.fn.customFunction;
         });
 

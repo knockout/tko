@@ -40,7 +40,7 @@ describe('Components: Loader registry', function() {
             }
         },
         testLoaderChain = function(spec, chain, options) {
-            spec.restoreAfter(ko.components, 'loaders');
+            restoreAfter(ko.components, 'loaders');
 
             // Set up a chain of loaders, then query it
             ko.components.loaders = chain;
@@ -190,7 +190,7 @@ describe('Components: Loader registry', function() {
 
     it('Supplies component definition synchronously if the "synchronous" flag is provided and the loader completes synchronously', function() {
         // Set up a synchronous loader that returns a component marked as synchronous
-        this.restoreAfter(ko.components, 'loaders');
+        restoreAfter(ko.components, 'loaders');
         var testSyncComponentConfig = { synchronous: true },
             testSyncComponentDefinition = { },
             syncComponentName = 'my-sync-component',
@@ -249,8 +249,8 @@ describe('Components: Loader registry', function() {
 
     it('Supplies component definition synchronously if the "synchronous" flag is provided and definition is already cached', function() {
         // Set up an asynchronous loader chain that returns a component marked as synchronous
-        this.restoreAfter(ko.components, 'loaders');
-        this.after(function() { delete testComponentConfig.synchronous; });
+        restoreAfter(ko.components, 'loaders');
+        after(function() { delete testComponentConfig.synchronous; });
         testComponentConfig.synchronous = "trueish value";
         ko.components.loaders = [loaderThatReturnsConfig, loaderThatReturnsDefinition];
 
@@ -280,7 +280,7 @@ describe('Components: Loader registry', function() {
 
     it('Caches and reuses loaded component definitions', function() {
         // Ensure we leave clean state after the test
-        this.after(function() {
+        after(function() {
             ko.components.unregister('some-component');
             ko.components.unregister('other-component');
         });
@@ -338,7 +338,7 @@ describe('Components: Loader registry', function() {
         var someModuleTemplate = [],
             someComponentModule = { template: someModuleTemplate },
             requireCallLog = [];
-        this.restoreAfter(window, 'require');
+        restoreAfter(window, 'require');
         window.require = function(modules, callback) {
             requireCallLog.push(modules.slice(0));
             setTimeout(function() { callback(someComponentModule); }, 80);

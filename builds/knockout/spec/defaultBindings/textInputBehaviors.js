@@ -187,30 +187,15 @@ describe('Binding: TextInput', function() {
         expect(originalSubproperty()).to.deep.equal("original value");
     });
 
-    it('Should update observable on input event (on supported browsers) or propertychange event (on old IE)', function (done) {
+    it('Should update observable on input event (on supported browsers) or propertychange event (on old IE)', function () {
         var myobservable = new ko.observable(123);
         testNode.innerHTML = "<input data-bind='textInput: someProp' />";
         ko.applyBindings({ someProp: myobservable }, testNode);
         expect(testNode.childNodes[0].value).to.deep.equal("123");
 
-        testNode.childNodes[0].value = "some user-entered value";   // setting the value triggers the propertychange event on IE
-        if (!ieVersion || ieVersion >= 9) {
-            ko.utils.triggerEvent(testNode.childNodes[0], "input");
-        }
-        if (ieVersion === 9) {
-            // IE 9 responds to the event asynchronously (see #1788)
-            setTimeout(function () {
-                try {
-                    expect(myobservable()).to.deep.equal("some user-entered value");
-                    done();
-                } catch (error) {
-                    done(error);
-                }
-            }, 50);
-        } else {
-            expect(myobservable()).to.deep.equal("some user-entered value");
-            done();
-        }
+        testNode.childNodes[0].value = "some user-entered value";
+        ko.utils.triggerEvent(testNode.childNodes[0], "input");
+        expect(myobservable()).to.deep.equal("some user-entered value");
     });
 
     it('Should update observable on blur event', function () {
@@ -274,7 +259,7 @@ describe('Binding: TextInput', function() {
             var clock;
 
             beforeEach(function() {
-                this.restoreAfter(ko.bindingHandlers.textInput, '_forceUpdateOn');
+                restoreAfter(ko.bindingHandlers.textInput, '_forceUpdateOn');
                 ko.bindingHandlers.textInput._forceUpdateOn = ['afterkeydown'];
                 clock = sinon.useFakeTimers();
             });

@@ -34,11 +34,6 @@
     "@tko/utils": "^4.0.0",
     "tslib": "^2.2.0"
   },
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "licenses": [
     {
       "type": "MIT",

@@ -11,8 +11,7 @@ version := $(shell node -e "console.log(require('./package.json').version)")
 banner := // ${package} 🥊 ${version}
 iife-global-name := tko
 
-KARMA 	:= npx karma
-ESBUILD := npx esbuild
+ESBUILD := bunx esbuild
 .SUFFIXES:
 .SUFFIXES: .ts .js
 
@@ -113,26 +112,4 @@ repackage: $(tools_dir)/repackage.mjs ../../lerna.json
 clean:
 	rm -rf dist/*
 
-test: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --noJQuery
-
-test-headless: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery
-
-test-coverage: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome --noJQuery --coverage
-
-test-headless-ff: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-firefox --noJQuery
-
-test-headless-jquery: esm
-	$(KARMA) start $(tools_dir)/karma.conf --once --headless-chrome 
-
-test-debug: esm
-	$(KARMA) start $(tools_dir)/karma.conf --headless-chrome --debug
-
-watch: esm
-	$(KARMA) start $(tools_dir)/karma.conf
-
-test-ci:
-	$(KARMA) start $(tools_dir)/karma.conf --once --sauce
+# Tests run from repo root via `bunx vitest run` (see root Makefile)

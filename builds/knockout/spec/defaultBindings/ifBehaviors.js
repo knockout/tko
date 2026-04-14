@@ -9,7 +9,7 @@ describe('Binding: If', function() {
     });
 
     it('Should leave descendant nodes in the document (and bind them) if the value is truthy, independently of the active template engine', function() {
-        this.after(function() { ko.setTemplateEngine(new ko.nativeTemplateEngine()); });
+        after(function() { ko.setTemplateEngine(new ko.nativeTemplateEngine()); });
 
         ko.setTemplateEngine(new ko.templateEngine()); // This template engine will just throw errors if you try to use it
         testNode.innerHTML = "<div data-bind='if: someItem'><span data-bind='text: someItem.existentChildProp'></span></div>";

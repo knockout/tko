@@ -48,7 +48,7 @@ describe('Binding: Text', function() {
     });
 
     it('Should not attempt data binding on the generated text node', function() {
-        this.restoreAfter(ko.bindingProvider, 'instance');
+        restoreAfter(ko.bindingProvider, 'instance');
 
         // Since custom binding providers can regard text nodes as bindable, it would be a
         // security risk to bind against user-supplied text (XSS).

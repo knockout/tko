@@ -2,7 +2,7 @@ describe('options.bindingGlobals', function() {
     beforeEach(prepareTestNode);
 
     it('references the global window by default', function() {
-        this.after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
+        after(function () { ko.cleanNode(document.body); });     // Just to avoid interfering with other specs
 
         window.testFoo = "bar";
         testNode.innerHTML = "<div id='testFoo' data-bind='text: testFoo'></div>";

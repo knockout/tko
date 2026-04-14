@@ -158,7 +158,7 @@ describe('DOM node disposal', function() {
     });
 
     it('Should be able to clean any user data by overwriting "cleanExternalData"', function() {
-        this.restoreAfter(ko.utils.domNodeDisposal, 'cleanExternalData'); // restore original function when done
+        restoreAfter(ko.utils.domNodeDisposal, 'cleanExternalData'); // restore original function when done
 
         ko.utils.domNodeDisposal.cleanExternalData = function (node) {
             if (node['ko_test'])
@@ -190,7 +190,7 @@ describe('DOM node disposal', function() {
             return; // Nothing to test. Run the specs with jQuery referenced for this to do anything.
         }
 
-        this.restoreAfter(ko.utils.domNodeDisposal, 'cleanExternalData'); // restore original function when done
+        restoreAfter(ko.utils.domNodeDisposal, 'cleanExternalData'); // restore original function when done
 
         ko.utils.domNodeDisposal.cleanExternalData = function () {};
 

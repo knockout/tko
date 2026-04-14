@@ -4,6 +4,7 @@ describe('onError handler', function () {
     var windowOnErrorOriginal;
     var lastSeenError = null;
     const originalOnError = ko.options.onError
+    var errorCapture = null
 
     function waitFor(condition, timeoutMs) {
         timeoutMs = timeoutMs || 100;
@@ -29,7 +30,7 @@ describe('onError handler', function () {
     }
 
     beforeEach(function () {
-        this.restoreAfter(ko.options, 'taskScheduler');
+        restoreAfter(ko.options, 'taskScheduler');
         ko.options.taskScheduler = function (callback) {
             setTimeout(callback, 0);
         };
@@ -62,16 +63,24 @@ describe('onError handler', function () {
 
         window.onerror = function () {
             windowOnErrorCount++;
-
-            // Don't spam the console, since these were triggered deliberately
-            // Annoyingly, Phantom interprets this return value backwardly, treating 'false'
-            // to mean 'suppress', when browsers all use 'true' to mean 'suppress'.
-            var isPhantom = !!window._phantom;
-            return isPhantom ? false : true;
+            return true; // suppress
         };
+
+        // Suppress only the deliberate test errors so Vitest doesn't count them
+        errorCapture = function (event) {
+            var msg = event?.error?.message || event?.reason?.message || event?.message || '';
+            if (msg.includes('ERRORS_ON_PURPOSE') || msg === 'Some error') {
+                event.preventDefault();
+            }
+        };
+        window.addEventListener('error', errorCapture, true);
+        window.addEventListener('unhandledrejection', errorCapture, true);
     });
 
     afterEach(function () {
+        window.removeEventListener('error', errorCapture, true);
+        window.removeEventListener('unhandledrejection', errorCapture, true);
+        errorCapture = null;
         window.onerror = windowOnErrorOriginal;
         ko.options.onError = originalOnError;
         lastSeenError = null;
