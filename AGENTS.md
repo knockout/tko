@@ -13,7 +13,7 @@ License: MIT
 Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
 
 ```
-packages/          # 25 modular @tko/* packages (all TypeScript)
+packages/          # 26 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
 tools/             # Shared build config (build.mk, repackage.mjs)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
@@ -76,10 +76,10 @@ Run `make format-fix && make eslint-fix` before committing.
 ## TypeScript
 
 - All source is in TypeScript (`packages/*/src/`)
-- Target: ES6, Module: ES2015
+- Target: ES2022, Module: ES2022, moduleResolution: bundler
 - Strict mode enabled (with `noImplicitAny: false`)
-- Types checked with `make tsc` (noEmit — esbuild handles compilation)
-- Path aliases: `@tko/*` maps to `packages/*` and `builds/*`
+- Types checked with `bunx tsc` (noEmit — esbuild handles compilation)
+- Path aliases: `@tko/*` resolves to `packages/*/index.ts` and `builds/*/index.ts`
 
 ## Package Conventions
 
@@ -126,7 +126,7 @@ same version.
 
 **For contributors** — when your PR changes package behavior:
 ```bash
-npx changeset add    # Select affected packages, bump type, describe change
+bunx changeset add   # Select affected packages, bump type, describe change
 ```
 This creates a changeset file in `.changeset/` that gets committed with your PR.
 

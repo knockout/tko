@@ -50,14 +50,10 @@ It's available as `@tko/build.knockout`, and over CDN:
 | Command | Effect |
 | ------- | ------ |
 | $ `git clone git@github.com:knockout/tko` | Clone the repository. |
-| $ `npm install` | Ensure that all packages available |
-| $ `make` | **Currently TKO use a make file** / no scripts at package.json |
-| $ `make test` | Run all tests with electron. See below. |
-| $ `make test-headless` | Run all tests with chromium. See below. |
-| $ `npx changeset add` | Add a changeset for package behavior changes in your PR |
-| Release workflow | On merge to `main`, CI opens or updates a version PR; when that version PR is merged and there are no remaining changesets, the same workflow publishes from GitHub Actions via npm trusted publishing and creates the matching GitHub release/tag |
-| GitHub release workflow | Manual fallback to backfill the GitHub release/tag for a published `main` commit if automatic release creation needs a retry |
-| $ `make test-coverage` | Run all tests and create a code coverage report |
+| $ `bun install` | Install all dependencies |
+| $ `make` | Build all packages (ESM, CommonJS, MJS) |
+| $ `make test` | Run all tests (Vitest, headless Chromium via Playwright) |
+| $ `bunx changeset add` | Add a changeset for package behavior changes in your PR |
 
 Checkout the `Makefile` for more commands that can be executed with `make {command}`.
 
@@ -69,11 +65,9 @@ In each individual `packages/*/` directory, you can also run:
 
 ### Testing
 
-Start tests with electron: `make test`
-
-Start tests with headless-chrome: `make test-headless`
-
 Tests use Vitest browser mode with Playwright (headless Chromium). Assertions use Chai and Sinon.
+
+Run `make test` or `bunx vitest run`.
 
 Other options:
 
@@ -118,38 +112,26 @@ Additionally, implement a well-configured [Content Security Policy (CSP)](https:
 
 ## Overview of the development stack
 
+- **bun** -> Package manager and script runner
 - **make** -> Build tasks
-- **npm** -> Node Package Manager
-- **esbuild** -> ts/js compiler and bundler
-- **lerna** -> mono-repo build-chain
- 
+- **esbuild** -> TS/JS compiler and bundler
+- **lerna** -> Monorepo build chain
+
 ---
 
-- Test-Runner -> Vitest (browser mode, Playwright)
-- Test-Environment -> headless Chromium
-- Linting -> Eslint
-- Formatting -> Prettier (configured like StandardJS)
-- TDD/BDD-Frameworks -> Mocha + Chai + Sinon
-- Testing-Cloud-Service -> sauce
-- standard -> Code-Style (outdated for typescript)
+- Test Runner -> Vitest (browser mode, Playwright)
+- Test Environment -> headless Chromium, Firefox, WebKit
+- Type Checker -> tsc (TypeScript 6) + tsgo (TypeScript 7, 6x faster)
+- Linting -> ESLint
+- Formatting -> Prettier
+- Assertions -> Chai + Sinon
 
-## Some WSL tricks
+## WSL Setup
 
-Install electron-deps for "make test":
-
-```bash
-sudo apt-get install build-essential clang libdbus-1-dev libgtk-3-dev \
-libnotify-dev libasound2-dev libcap-dev \
-libcups2-dev libxtst-dev \
-libxss1 libnss3-dev gcc-multilib g++-multilib curl \
-gperf bison python3-dbusmock openjdk-8-jre
-```
-
-Install Chrome for "make test-headless":
+Install Playwright browser dependencies:
 
 ```bash
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt -y install ./google-chrome-stable_current_amd64.deb
+bunx playwright install --with-deps chromium
 ```
 
 Install Firefox for "make test-headless-ff":

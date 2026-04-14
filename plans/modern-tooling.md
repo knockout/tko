@@ -7,8 +7,8 @@
 
 | Phase | Status | PR | Notes |
 |-------|--------|-----|-------|
-| 1. Bun + Vitest | CI green | #303 | Bun replaces npm. Vitest replaces Karma. 2679 tests, 143 files, ~4s. Chromium+Firefox+WebKit in CI. |
-| 2. tsgo | Blocked on Karma removal | — | Needs `moduleResolution: "bundler"` which requires `@tko/*` paths fix in tsconfig. Ready to implement once #303 merges. |
+| 1. Bun + Vitest | Merged | #303 | Bun replaces npm. Vitest replaces Karma. 2679 tests, 143 files, ~4s. Chromium+Firefox+WebKit in CI. |
+| 2. moduleResolution: bundler | PR open | #305 | Switch to bundler resolution (required for future tsgo). tsgo removed from deps per phillipc feedback — install locally if needed. |
 | 3. Makefiles → Bun | Not started | — | |
 | 4. Biome | Not started | — | |
 | 5. knip | Not started | — | |
@@ -37,11 +37,13 @@ This plan lays out a phased migration to a modern stack.
 
 ## Security policy
 
-- **minimumReleaseAge**: Do not install any package version less than 48 hours
-  old. This applies to all dependencies — devDependencies and production.
+- **minimumReleaseAge**: Enforced via `bunfig.toml` (`minimumReleaseAge = 172800`).
+  Rejects package versions published less than 48 hours ago.
   Protects against supply-chain attacks via compromised fresh releases.
 - Pin exact versions in `.tool-versions` (currently `bun 1.3.12`).
+- Pin dev preview packages to exact versions (no `^`).
 - Use `bun.lock` (committed) for deterministic installs.
+- Use `bun install --frozen-lockfile` in CI.
 
 ## Phases
 
