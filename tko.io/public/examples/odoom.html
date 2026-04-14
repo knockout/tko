@@ -992,7 +992,7 @@
 
         const viewModel = new ODoomState()
         viewModel.setRenderer(new ODoomRenderer(viewModel))
-        ko.applyBindings(viewModel, appRoot)
+        ko.applyBindings(viewModel, document.getElementById('appRoot'))
       })()
     </script>
   </body>

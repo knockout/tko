@@ -1069,7 +1069,9 @@
           }
           const priorityFee = vm.priority.value() === 'urgent' ? 18 : vm.priority.value() === 'low' ? -6 : 0
           const addonFee = (vm.supportPack.value() ? 24 : 0) + (vm.auditLogs.value() ? 16 : 0) + (vm.csvExport.value() ? 10 : 0)
-          const monthly = planRates[vm.plan.value()] + Number(vm.seats.value()) * seatRates[vm.plan.value()] + priorityFee + addonFee
+          const parsedSeats = Number(vm.seats.value())
+          const seatCount = Number.isFinite(parsedSeats) ? parsedSeats : 0
+          const monthly = planRates[vm.plan.value()] + seatCount * seatRates[vm.plan.value()] + priorityFee + addonFee
           return Math.max(0, monthly)
         })
 
