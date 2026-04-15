@@ -15,9 +15,8 @@ Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
 ```
 packages/          # 26 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
-tools/             # Shared build config (build.mk, repackage.mjs)
+tools/             # Shared build script (build.ts)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
-Makefile           # Top-level build orchestrator
 ```
 
 Key packages: `@tko/observable`, `@tko/computed`, `@tko/bind`,
@@ -33,25 +32,22 @@ Builds: `@tko/build.knockout` (backwards-compatible) and
 
 ## Build Commands
 
-All builds use Make + esbuild. Run from the repo root:
+All commands use Bun. Run from the repo root:
 
 ```bash
 bun install               # Install all dependencies (uses Bun workspaces)
-make                      # Build all packages (ESM, CommonJS, MJS)
-make test                 # Run all tests (Vitest, headless Chromium via Playwright)
-bunx vitest run           # Same as make test, directly
-make eslint               # Run ESLint
-make eslint-fix           # Run ESLint with auto-fix
-make format               # Check Prettier formatting
-make format-fix           # Fix Prettier formatting
-make tsc                  # TypeScript type-check (no emit)
-make dts                  # Generate TypeScript declaration files
-make sweep                # Clean dist/ and coverage/ dirs
-make clean                # Full clean (node_modules, lockfiles, dist)
+bun run build             # Build all packages (ESM, CommonJS, MJS, browser)
+bun run test              # Run all tests (Vitest, headless Chromium via Playwright)
+bun run lint              # Run ESLint
+bun run lint:fix          # Run ESLint with auto-fix
+bun run format            # Check Prettier formatting
+bun run format:fix        # Fix Prettier formatting
+bun run tsc               # TypeScript type-check (no emit)
+bun run dts               # Generate TypeScript declaration files
+bun run clean             # Clean dist/ and coverage/ dirs
 ```
 
-Individual packages can be built/tested from their directory with the same
-Make targets (they include `tools/build.mk`).
+Individual packages can be built from their directory with `bun run build`.
 
 ## Testing
 
@@ -68,7 +64,7 @@ because TKO does low-level DOM manipulation, MutationObserver, and event handlin
 
 - **Formatter**: Prettier — no semicolons, single quotes, trailing commas: none, 120 char width
 - **Linter**: ESLint with typescript-eslint (flat config)
-- **Editor**: 2-space indentation for JS/TS, tabs for Makefiles, LF line endings
+- **Editor**: 2-space indentation for JS/TS, LF line endings
 - See `.prettierrc` and `eslint.config.js` for full config
 
 Run `make format-fix && make eslint-fix` before committing.
@@ -93,7 +89,6 @@ packages/example/
   helpers/       # Test helpers (if any)
   index.ts       # Entry point
   package.json   # Package metadata
-  Makefile       # Includes ../../tools/build.mk
 ```
 
 Inter-package dependencies use `@tko/package-name` and are resolved via
@@ -176,7 +171,7 @@ When validating `tko.io` documentation changes with the local docs site:
 
 ## Important Guidelines
 
-- Do not modify `tools/build.mk` or `vitest.config.ts` without understanding
+- Do not modify `tools/build.ts` or `vitest.config.ts` without understanding
   the full impact — they are shared across all 25+ packages.
 - Do not add runtime dependencies to core packages. TKO is zero-dependency.
 - The `builds/` packages bundle everything into a single distributable.

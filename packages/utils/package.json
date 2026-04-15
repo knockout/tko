@@ -36,5 +36,8 @@
       "import": "./dist/index.js"
     }
   },
-  "module": "dist/index.js"
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  }
 }

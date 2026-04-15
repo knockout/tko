@@ -36,5 +36,8 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

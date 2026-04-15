@@ -20,13 +20,13 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Check Prettier
-        run: make format
+        run: bun run format
 
       - name: Check ESLint
-        run: make eslint
+        run: bun run lint
 
       - name: Build (required for tsc)
-        run: make
+        run: bun run build
 
       - name: Typecheck
         run: bunx tsc

@@ -6,7 +6,18 @@
     "type": "git",
     "url": "https://github.com/knockout/tko.git"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "test": "bunx vitest run",
+    "test:ff": "VITEST_BROWSERS=firefox bunx vitest run",
+    "tsc": "bunx tsc",
+    "dts": "bunx tsc --build tsconfig.dts.json",
+    "format": "bunx prettier . --check",
+    "format:fix": "bunx prettier . --write",
+    "lint": "bunx eslint .",
+    "lint:fix": "bunx eslint . --fix",
+    "clean": "rm -rf packages/*/dist builds/*/dist coverage"
+  },
   "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [
     {
@@ -27,7 +38,6 @@
     "fs-extra": "^11.3.2",
     "globals": "^17.4.0",
     "jquery": "^4.0.0",
-    "lerna": "^9.0.3",
     "playwright": "^1.59.1",
     "prettier": "^3.8.1",
     "sinon": "^21.0.3",

@@ -40,5 +40,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.git"
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

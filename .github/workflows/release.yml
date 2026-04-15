@@ -109,10 +109,10 @@ jobs:
           fi
 
       - name: Build all packages
-        run: make
+        run: bun run build
 
       - name: Run tests
-        run: make test-headless
+        run: bun run test
 
       - name: Publish packages
         # npm generates provenance attestations automatically during trusted

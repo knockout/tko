@@ -46,5 +46,11 @@
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
+  },
+  "tko": {
+    "buildMode": "browser-only"
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

@@ -57,5 +57,12 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     }
+  },
+  "tko": {
+    "iifeGlobalName": "ko",
+    "buildMode": "browser-only"
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

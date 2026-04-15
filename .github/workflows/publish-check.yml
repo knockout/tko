@@ -26,7 +26,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build all packages
-        run: make
+        run: bun run build
 
       - name: Check package contents
         run: |
