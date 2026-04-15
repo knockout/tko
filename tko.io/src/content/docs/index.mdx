@@ -17,23 +17,26 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## Quick start
 
-### Script tag (global)
+### Browser
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
-<script>
-  const ko = globalThis.ko
-</script>
-```
-
-### ES module (browser)
-
-```html
-<script type="module">
-  import ko from 'https://esm.run/@tko/build.knockout'
-  const name = ko.observable('TKO')
-</script>
-```
+<Tabs syncKey="script">
+  <TabItem label="ES module">
+    ```html
+    <script type="module">
+      import ko from 'https://esm.run/@tko/build.knockout'
+      const name = ko.observable('TKO')
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Classic script">
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
+    <script>
+      const ko = globalThis.ko
+    </script>
+    ```
+  </TabItem>
+</Tabs>
 
 ### Package manager
 
