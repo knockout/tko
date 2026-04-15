@@ -22,10 +22,11 @@ yet, which the builds/ packages need.
 
 ## What gets created
 
-### `tools/build.ts` (~60 lines)
+### `tools/build.ts` (~45 lines)
 
-Shared build script that reads the local `package.json` to get name, version,
-and optional TKO-specific config. Runs esbuild programmatically.
+Shared build script using native Bun APIs (`Bun.file`, `Bun.Glob`, `Bun.spawn`).
+Reads package.json for name, version, and optional TKO-specific config.
+Runs esbuild via `bunx esbuild`.
 
 Reads from `package.json`:
 - `name` and `version` — for banner and BUILD_VERSION define

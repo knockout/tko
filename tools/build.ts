@@ -1,70 +1,50 @@
+#!/usr/bin/env bun
 /**
  * Shared build script for all TKO packages.
- *
- * Reads package.json from cwd() for name, version, and optional tko config.
- * Runs esbuild to produce ESM, CJS, MJS, and/or browser bundles.
- *
+ * Reads package.json for name, version, and optional tko config.
  * Usage: bun ../../tools/build.ts (from a package directory)
  */
-import { execSync } from 'node:child_process'
-import { readFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { $, Glob } from 'bun'
 
-const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
-const name = pkg.name as string
-const version = pkg.version as string
+const pkg = await Bun.file('package.json').json()
+const { name, version } = pkg
 const banner = `// ${name} 🥊 ${version}`
-const tko = pkg.tko || {}
-const buildMode = tko.buildMode || 'default'
-const iifeGlobalName = tko.iifeGlobalName || 'tko'
-
-function run(cmd: string) {
-  console.log(`[build] ${name} → ${cmd.split('--outfile=')[1] || cmd.split('--outdir=')[1] || ''}`)
-  execSync(`bunx esbuild ${cmd}`, { stdio: 'inherit' })
-}
-
-function findSources(): string[] {
-  const sources: string[] = []
-  function walk(dir: string) {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      if (entry.isDirectory()) walk(join(dir, entry.name))
-      else if (entry.name.endsWith('.ts')) sources.push(join(dir, entry.name))
-    }
-  }
-  walk('src')
-  return sources
-}
-
-if (!existsSync('dist')) mkdirSync('dist', { recursive: true })
+const { buildMode = 'default', iifeGlobalName = 'tko' } = pkg.tko ?? {}
 
 const common = `--log-level=warning --define:BUILD_VERSION='"${version}"' --sourcemap=external`
 
-if (buildMode === 'default') {
-  // ESM — all source files to dist/
-  const sources = findSources().join(' ')
-  run(`${sources} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`)
+async function esbuild(args: string) {
+  console.log(`[build] ${name} → ${args.match(/--out(?:file|dir)=(\S+)/)?.[1] ?? ''}`)
+  const proc = Bun.spawn(['sh', '-c', `bunx esbuild ${args}`], { stdio: ['inherit', 'inherit', 'inherit'] })
+  const code = await proc.exited
+  if (code !== 0) process.exit(code)
+}
 
-  // MJS — single entry point
-  run(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`)
+async function sources(): Promise<string> {
+  const glob = new Glob('src/**/*.ts')
+  const files: string[] = []
+  for await (const file of glob.scan('.')) files.push(file)
+  return files.join(' ')
+}
 
-  // CJS — bundled, @tko/* external
-  run(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
-} else if (buildMode === 'browser') {
-  // ESM + CJS + MJS (same as default)
-  const sources = findSources().join(' ')
-  run(`${sources} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`)
-  run(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`)
-  run(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
+await $`mkdir -p dist`.quiet()
 
-  // Browser IIFE bundles
-  if (!existsSync('meta')) mkdirSync('meta', { recursive: true })
+if (buildMode === 'default' || buildMode === 'browser') {
+  const src = await sources()
+  await esbuild(`${src} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`)
+  await esbuild(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`)
+  await esbuild(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
+}
 
+if (buildMode === 'browser') {
+  await $`mkdir -p meta`.quiet()
   const footer = `(typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : global).${iifeGlobalName} = ${iifeGlobalName}.default`
-  const iifeCommon = `--platform=browser --target=es6 --format=iife --global-name=${iifeGlobalName} --bundle --banner:js="${banner} IIFE" --footer:js="${footer}" ${common}`
+  const iife = `--platform=browser --target=es6 --format=iife --global-name=${iifeGlobalName} --bundle --banner:js="${banner} IIFE" --footer:js="${footer}" ${common}`
+  await esbuild(`./src/index.ts ${iife} --minify --outfile=dist/browser.min.js --metafile=meta/browser_min_meta.json`)
+  await esbuild(`./src/index.ts ${iife} --outfile=dist/browser.js --metafile=meta/browser_meta.json`)
+}
 
-  run(`./src/index.ts ${iifeCommon} --minify --outfile=dist/browser.min.js --metafile=meta/browser_min_meta.json`)
-  run(`./src/index.ts ${iifeCommon} --outfile=dist/browser.js --metafile=meta/browser_meta.json`)
-} else {
+if (buildMode !== 'default' && buildMode !== 'browser') {
   console.error(`Unknown buildMode: ${buildMode}`)
   process.exit(1)
 }
