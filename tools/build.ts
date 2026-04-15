@@ -49,16 +49,20 @@ if (buildMode === 'default') {
 
   // CJS — bundled, @tko/* external
   run(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
-} else if (buildMode === 'browser-only') {
+} else if (buildMode === 'browser') {
+  // ESM + CJS + MJS (same as default)
+  const sources = findSources().join(' ')
+  run(`${sources} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`)
+  run(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`)
+  run(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
+
+  // Browser IIFE bundles
   if (!existsSync('meta')) mkdirSync('meta', { recursive: true })
 
-  const footer = `(typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : global).${iifeGlobalName} = ${iifeGlobalName}.default`
+  const footer = `(typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : global).${iifeGlobalName} = ${iifeGlobalName}.default`
   const iifeCommon = `--platform=browser --target=es6 --format=iife --global-name=${iifeGlobalName} --bundle --banner:js="${banner} IIFE" --footer:js="${footer}" ${common}`
 
-  // Minified
   run(`./src/index.ts ${iifeCommon} --minify --outfile=dist/browser.min.js --metafile=meta/browser_min_meta.json`)
-
-  // Unminified
   run(`./src/index.ts ${iifeCommon} --outfile=dist/browser.js --metafile=meta/browser_meta.json`)
 } else {
   console.error(`Unknown buildMode: ${buildMode}`)

@@ -67,7 +67,7 @@ because TKO does low-level DOM manipulation, MutationObserver, and event handlin
 - **Editor**: 2-space indentation for JS/TS, LF line endings
 - See `.prettierrc` and `eslint.config.js` for full config
 
-Run `make format-fix && make eslint-fix` before committing.
+Run `bun run format:fix && bun run lint:fix` before committing.
 
 ## TypeScript
 

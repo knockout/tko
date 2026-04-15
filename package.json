@@ -7,7 +7,7 @@
     "url": "https://github.com/knockout/tko.git"
   },
   "scripts": {
-    "build": "bun run --filter '*' build",
+    "build": "bun run --filter './packages/*' build && bun run --filter './builds/*' build",
     "test": "bunx vitest run",
     "test:ff": "VITEST_BROWSERS=firefox bunx vitest run",
     "tsc": "bunx tsc",

@@ -60,7 +60,7 @@
   },
   "tko": {
     "iifeGlobalName": "ko",
-    "buildMode": "browser-only"
+    "buildMode": "browser"
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"

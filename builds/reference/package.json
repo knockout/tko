@@ -48,7 +48,7 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "tko": {
-    "buildMode": "browser-only"
+    "buildMode": "browser"
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
