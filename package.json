@@ -17,6 +17,8 @@
     "lint": "bunx @biomejs/biome lint .",
     "lint:fix": "bunx @biomejs/biome check --fix .",
     "check": "bunx @biomejs/biome check .",
+    "verify:esm": "bun tools/verify-esm-extensions.ts",
+    "verify": "bunx @biomejs/biome check . && bunx tsc && bun run build && bun run verify:esm && bunx vitest run",
     "clean": "rm -rf packages/*/dist builds/*/dist coverage"
   },
   "bugs": "https://github.com/knockout/tko/issues",

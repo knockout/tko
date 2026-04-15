@@ -27,5 +27,8 @@ jobs:
       - name: Build (required for tsc)
         run: bun run build
 
+      - name: Verify ESM extensions
+        run: bun run verify:esm
+
       - name: Typecheck
         run: bunx tsc
