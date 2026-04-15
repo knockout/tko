@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
@@ -18,31 +18,47 @@
     "rules": {
       "recommended": true,
       "complexity": {
-        "noUselessEscapeInRegex": "off"
+        "noUselessEscapeInRegex": "off",
+        "noArguments": "off",
+        "noBannedTypes": "off",
+        "useArrowFunction": "off",
+        "noThisInStatic": "off"
       },
       "correctness": {
-        "noUnusedVariables": "off",
-        "noUnusedImports": "off"
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn",
+        "noUnusedFunctionParameters": "warn"
       },
       "style": {
         "useConst": "off",
         "useArrayLiterals": "off",
-        "noNamespace": "off"
+        "noNamespace": "off",
+        "noNonNullAssertion": "off"
       },
       "suspicious": {
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
         "noMisleadingCharacterClass": "off",
         "noDoubleEquals": "off",
-        "noRedeclare": "off",
+        "noRedeclare": "error",
         "noShadowRestrictedNames": "off",
         "noControlCharactersInRegex": "off",
         "noEmptyBlockStatements": "off",
         "noPrototypeBuiltins": "off",
-        "noFallthroughSwitchClause": "off"
+        "noFallthroughSwitchClause": "error",
+        "noImplicitAnyLet": "off",
+        "noTemplateCurlyInString": "off",
+        "useIterableCallbackReturn": "off",
+        "noGlobalIsNan": "off",
+        "noGlobalIsFinite": "off",
+        "noThenProperty": "off",
+        "useGetterReturn": "error"
       },
       "performance": {
         "noDelete": "off"
+      },
+      "security": {
+        "noGlobalEval": "off"
       }
     }
   },
@@ -55,11 +71,6 @@
     }
   },
   "assist": {
-    "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
+    "enabled": false
   }
 }

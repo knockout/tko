@@ -11,7 +11,7 @@
 | 2. moduleResolution: bundler | Merged | #305 | bundler resolution, bunfig.toml with 48h minimumReleaseAge. |
 | 2b. Package fixes | Merged | #308 | Fix broken module paths, remove helpers from published packages, delete repackage.mjs. |
 | 3. Makefiles → Bun | Merged | #309 | tools/build.ts replaces Make+lerna. 0.3s clean build. All Makefiles, build.mk, lerna.json deleted. |
-| 4. Biome | Not started | — | |
+| 4. Biome | In progress | #310 | Replaces ESLint + Prettier. 27x faster. Format parity + safe new rules. |
 | 5. knip | Not started | — | |
 | 6. knip findings | Not started | — | |
 
