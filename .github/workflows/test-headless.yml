@@ -29,6 +29,9 @@ jobs:
       - name: Run Build
         run: bun run build
 
+      - name: Verify ESM extensions
+        run: bun run verify:esm
+
       - name: Run Tests
         run: bunx vitest run
         env:
