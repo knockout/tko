@@ -59,6 +59,43 @@ describe('options.strictEquality', function () {
     expect(evaluate('x == y', { x: 0, y: '' })).to.equal(true) // loose again
   })
 
+  // Regression tests for #290: == and != must have correct precedence
+  // so they work in compound expressions (the original bug was a parser
+  // error when precedence was missing)
+  it('parses == with && (precedence)', function () {
+    // == (prec 10) binds tighter than && (prec 6)
+    expect(evaluate('x && y == z', { x: true, y: 1, z: 1 })).to.equal(true)
+    expect(evaluate('x && y == z', { x: true, y: 1, z: 2 })).to.equal(false)
+    expect(evaluate('x && y == z', { x: false, y: 1, z: 1 })).to.equal(false)
+  })
+
+  it('parses != with || (precedence)', function () {
+    // != (prec 10) binds tighter than || (prec 5)
+    expect(evaluate('x != y || z', { x: 1, y: 1, z: false })).to.equal(false)
+    expect(evaluate('x != y || z', { x: 1, y: 2, z: false })).to.equal(true)
+    expect(evaluate('x != y || z', { x: 1, y: 1, z: true })).to.equal(true)
+  })
+
+  it('parses mixed == and != with logical operators', function () {
+    expect(evaluate('x == y && z != w', { x: 1, y: 1, z: 2, w: 3 })).to.equal(true)
+    expect(evaluate('x == y && z != w', { x: 1, y: 2, z: 2, w: 3 })).to.equal(false)
+    expect(evaluate('x == y && z != w', { x: 1, y: 1, z: 3, w: 3 })).to.equal(false)
+  })
+
+  it('parses == and != in strict mode with logical operators', function () {
+    options.strictEquality = true
+    // strict: 0 == '' is false, so && short-circuits
+    expect(evaluate('x == y && z', { x: 0, y: '', z: true })).to.equal(false)
+    // strict: 0 != '' is true
+    expect(evaluate('x != y || z', { x: 0, y: '', z: false })).to.equal(true)
+  })
+
+  it('parses dvHuett reproduction: if: value != null (#290)', function () {
+    expect(evaluate('x != null', { x: 'hello' })).to.equal(true)
+    expect(evaluate('x != null', { x: null })).to.equal(false)
+    expect(evaluate('x != null', { x: 0 })).to.equal(true)
+  })
+
   it('does not affect === and !== operators', function () {
     expect(evaluate('x === y', { x: 0, y: 0 })).to.equal(true)
     expect(evaluate('x === y', { x: 0, y: '' })).to.equal(false)
