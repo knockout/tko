@@ -37,6 +37,8 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .tool-versions
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -79,6 +81,8 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .tool-versions
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
