@@ -21,7 +21,7 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import { dummyTemplateEngine } from '@tko/binding.template/helpers/dummyTemplateEngine'
+import { dummyTemplateEngine } from '../../binding.template/helpers/dummyTemplateEngine'
 
 const BLANK_HTML = `
 <!doctype html>

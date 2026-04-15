@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/provider",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
-  "module": "dist/provider.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -25,8 +24,7 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

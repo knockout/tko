@@ -2,7 +2,7 @@
   "version": "4.0.0",
   "name": "@tko/bind",
   "description": "TKO DOM-Observable Binding",
-  "module": "dist/bind.js",
+  "module": "dist/index.js",
   "dependencies": {
     "@tko/computed": "^4.0.0",
     "@tko/lifecycle": "^4.0.0",
@@ -15,8 +15,7 @@
     "@tko/binding.foreach": "^4.0.0"
   },
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -39,7 +38,6 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   }
 }

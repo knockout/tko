@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/utils.jsx",
   "description": "TKO JSX Rendering",
-  "module": "dist/utils.jsx.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -38,8 +37,7 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

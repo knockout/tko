@@ -29,8 +29,7 @@
     "tslib": "^2.2.0"
   },
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "homepage": "https://tko.io",
   "licenses": [
@@ -43,8 +42,7 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

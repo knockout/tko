@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/provider.multi",
   "description": "Combine multiple other providers into one",
-  "module": "dist/provider.multi.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -23,8 +22,7 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"

@@ -106,9 +106,6 @@ dist/browser.js: $(src) package.json
 		--metafile=meta/browser_meta.json \
 		./src/index.js
 
-repackage: $(tools_dir)/repackage.mjs ../../lerna.json
-	node $(tools_dir)/repackage.mjs
-
 clean:
 	rm -rf dist/*
 

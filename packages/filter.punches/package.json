@@ -2,10 +2,9 @@
   "version": "4.0.0",
   "name": "@tko/filter.punches",
   "description": "TKO filters from knockout punches",
-  "module": "dist/filter.punches.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -36,7 +35,6 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   }
 }

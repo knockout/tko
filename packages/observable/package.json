@@ -10,12 +10,10 @@
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "keywords": [
     "knockout",
@@ -39,5 +37,6 @@
       "type": "MIT",
       "url": "https://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "module": "dist/index.js"
 }

@@ -28,17 +28,16 @@
     }
   ],
   "files": [
-    "dist/",
-    "helpers/"
+    "dist/"
   ],
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
-  }
+  },
+  "module": "dist/index.js"
 }
