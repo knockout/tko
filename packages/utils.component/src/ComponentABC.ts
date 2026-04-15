@@ -49,7 +49,7 @@ export class ComponentABC extends LifeCycle {
    */
   static get template(): any {
     if ('template' in this.prototype) {
-      return
+      return undefined
     }
     return { element: this.element }
   }
@@ -82,6 +82,7 @@ export class ComponentABC extends LifeCycle {
   }
 
   static register(name = this.customElementName) {
+    // biome-ignore lint/complexity/noUselessThisAlias: viewModel captures the subclass for register()
     const viewModel = this
     const { template } = this
     const synchronous = this.sync

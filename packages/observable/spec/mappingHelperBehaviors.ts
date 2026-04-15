@@ -51,7 +51,7 @@ describe('Mapping helpers', function () {
   })
 
   it('toJS should treat RegExp, Date, Number, String and Boolean instances as primitives (and not walk their subproperties)', function () {
-    const regExp = new RegExp('')
+    const regExp = /(?:)/
     const date = new Date()
     const string = new String()
     const number = new Number()

@@ -131,6 +131,7 @@ export function trackArrayChanges(target: ObservableArray, options?: CompareArra
       return (diff[diff.length] = { status: status, value: value, index: index })
     }
     switch (operationName) {
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: push sets offset then falls through to unshift
       case 'push':
         offset = arrayLength
       case 'unshift':
@@ -139,6 +140,7 @@ export function trackArrayChanges(target: ObservableArray, options?: CompareArra
         }
         break
 
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: pop sets offset then falls through to shift
       case 'pop':
         offset = arrayLength - 1
       case 'shift':

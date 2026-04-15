@@ -132,8 +132,8 @@ function executeTemplate(targetNodeOrNodeArray, renderMode, template, bindingCon
 
   // Loosely check result is an array of DOM nodes
   if (
-    typeof renderedNodesArray.length !== 'number'
-    || (renderedNodesArray.length > 0 && typeof renderedNodesArray[0].nodeType !== 'number')
+    typeof renderedNodesArray.length !== 'number' ||
+    (renderedNodesArray.length > 0 && typeof renderedNodesArray[0].nodeType !== 'number')
   ) {
     throw new Error('Template engine must return an array of DOM nodes')
   }

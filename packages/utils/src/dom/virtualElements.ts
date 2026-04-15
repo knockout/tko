@@ -79,13 +79,13 @@ function getUnbalancedChildTags(node) {
     captureRemaining: any = null
   if (childNode) {
     do {
-      if (captureRemaining) // We already hit an unbalanced node and are now just scooping up all subsequent nodes
-      {
+      if (captureRemaining) {
+        // We already hit an unbalanced node and are now just scooping up all subsequent nodes
         captureRemaining.push(childNode)
       } else if (isStartComment(childNode)) {
         const matchingEndComment = getMatchingEndComment(childNode, /* allowUnbalanced: */ true)
-        if (matchingEndComment) // It's a balanced tag, so skip immediately to the end of this virtual set
-        {
+        if (matchingEndComment) {
+          // It's a balanced tag, so skip immediately to the end of this virtual set
           childNode = matchingEndComment
         } else {
           captureRemaining = [childNode]

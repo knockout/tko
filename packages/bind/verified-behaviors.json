@@ -7,43 +7,28 @@
         "The promise resolves immediately when there are no bindings or only synchronous bindings.",
         "The promise waits for async binding handlers and async descendant binding work before it resolves."
       ],
-      "specs": [
-        "packages/bind/spec/bindingCompletionPromiseBehavior.ts"
-      ]
+      "specs": ["packages/bind/spec/bindingCompletionPromiseBehavior.ts"]
     },
     {
       "statement": "`BindingHandler` instances can create lifecycle-bound computeds with `this.computed(...)` and lifecycle-bound subscriptions with `this.subscribe(...)`.",
-      "notes": [
-        "Both stop updating after the bound node is cleaned."
-      ],
-      "specs": [
-        "packages/bind/spec/bindingHandlerBehaviors.ts"
-      ]
+      "notes": ["Both stop updating after the bound node is cleaned."],
+      "specs": ["packages/bind/spec/bindingHandlerBehaviors.ts"]
     },
     {
       "statement": "`BindingHandler.registerBindingHandler(HandlerClass, name)` registers a class-based binding handler.",
-      "specs": [
-        "packages/bind/spec/bindingHandlerBehaviors.ts"
-      ]
+      "specs": ["packages/bind/spec/bindingHandlerBehaviors.ts"]
     },
     {
       "statement": "Function-style binding handlers receive `(element, valueAccessor, allBindings, $data, $context)` and may define `dispose` cleanup.",
-      "notes": [
-        "Virtual-element use requires `allowVirtualElements = true`."
-      ],
-      "specs": [
-        "packages/bind/spec/bindingHandlerBehaviors.ts"
-      ]
+      "notes": ["Virtual-element use requires `allowVirtualElements = true`."],
+      "specs": ["packages/bind/spec/bindingHandlerBehaviors.ts"]
     },
     {
       "statement": "`childrenComplete` fires after descendant bindings are applied.",
       "notes": [
         "It works on normal elements and virtual elements, and it does not fire when there are no descendants."
       ],
-      "specs": [
-        "packages/bind/spec/bindingAttributeBehaviors.ts",
-        "packages/bind/spec/nodePreprocessingBehaviors.ts"
-      ]
+      "specs": ["packages/bind/spec/bindingAttributeBehaviors.ts", "packages/bind/spec/nodePreprocessingBehaviors.ts"]
     }
   ]
 }

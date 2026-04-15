@@ -10,6 +10,6 @@ describe('tko/build.reference', () => {
     it('exports a ko object', () => {
       const tko = globalThis.tko
       assert.notEqual(tko.cleanNode, undefined)
-     })
+    })
   })
 })

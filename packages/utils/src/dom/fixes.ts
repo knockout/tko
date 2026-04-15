@@ -30,8 +30,8 @@ export function fixUpContinuousNodeArray(continuousNodeArray, parentNode) {
 
     // Rule [B]
     while (
-      continuousNodeArray.length > 1
-      && continuousNodeArray[continuousNodeArray.length - 1].parentNode !== parentNode
+      continuousNodeArray.length > 1 &&
+      continuousNodeArray[continuousNodeArray.length - 1].parentNode !== parentNode
     ) {
       continuousNodeArray.length--
     }

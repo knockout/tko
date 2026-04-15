@@ -16,7 +16,7 @@ import { dependencyDetection } from '@tko/observable'
 
 import type { Observable } from '@tko/observable'
 
-import { Computed, computed } from '@tko/computed'
+import { type Computed, computed } from '@tko/computed'
 
 import { dataFor, bindingContext, boundElementDomDataKey, contextSubscribeSymbol } from './bindingContext'
 
@@ -154,8 +154,8 @@ function applyBindingsToNodeAndDescendantsInternal(
   // (2) It might have bindings (e.g., it has a data-bind attribute, or it's a marker for a containerless template)
 
   const shouldApplyBindings =
-    isElement // Case (1)
-    || hasBindings(nodeVerified) // Case (2)
+    isElement || // Case (1)
+    hasBindings(nodeVerified) // Case (2)
 
   const { shouldBindDescendants }: any = shouldApplyBindings
     ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
@@ -193,8 +193,8 @@ function* topologicalSortBindings(bindings: Record<string, any>, $component: any
           }
           if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
             throw Error(
-              'Cannot combine the following bindings, because they have a cyclic dependency: '
-                + cyclicDependencyStack.join(', ')
+              'Cannot combine the following bindings, because they have a cyclic dependency: ' +
+                cyclicDependencyStack.join(', ')
             )
           } else {
             pushBinding(bindingDependencyKey)
@@ -369,11 +369,11 @@ function applyBindingsToNodeInternal<T>(
         if (bindingHandler.controlsDescendants) {
           if (bindingHandlerThatControlsDescendantBindings !== undefined) {
             throw new Error(
-              'Multiple bindings ('
-                + bindingHandlerThatControlsDescendantBindings
-                + ' and '
-                + key
-                + ') are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.'
+              'Multiple bindings (' +
+                bindingHandlerThatControlsDescendantBindings +
+                ' and ' +
+                key +
+                ') are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.'
             )
           }
           bindingHandlerThatControlsDescendantBindings = key
@@ -507,12 +507,12 @@ function onBindingError(spec: BindingError) {
     // During: 'init' or initial 'update'
     error = spec.errorCaptured
     spec.message =
-      'Unable to process binding "'
-      + spec.bindingKey
-      + '" in binding "'
-      + spec.bindingKey
-      + '"\nMessage: '
-      + (error.message ? error.message : error)
+      'Unable to process binding "' +
+      spec.bindingKey +
+      '" in binding "' +
+      spec.bindingKey +
+      '"\nMessage: ' +
+      (error.message ? error.message : error)
   } else {
     // During: 'apply'
     error = spec.errorCaptured

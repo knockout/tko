@@ -63,11 +63,11 @@ export class value extends BindingHandler {
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded() {
     return (
-      this.isInput(this.$element)
-      && this.$element.type == 'text'
-      && this.$element.autocomplete != 'off'
-      && (!this.$element.form || this.$element.form.autocomplete != 'off')
-      && MSIE_REGEX.test(window.navigator.userAgent) //IE detection (primarily for IE10/11)
+      this.isInput(this.$element) &&
+      this.$element.type == 'text' &&
+      this.$element.autocomplete != 'off' &&
+      (!this.$element.form || this.$element.form.autocomplete != 'off') &&
+      MSIE_REGEX.test(window.navigator.userAgent) //IE detection (primarily for IE10/11)
     )
   }
 

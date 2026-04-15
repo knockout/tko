@@ -210,8 +210,8 @@ describe('Binding: Checked', function () {
   it('When a checkbox is bound to an array, the checkbox should control whether its value is in that array', function () {
     const model = { myArray: ['Existing value', 'Unrelated value'] }
     testNode.innerHTML =
-      "<input type='checkbox' value='Existing value' data-bind='checked:myArray' />"
-      + "<input type='checkbox' value='New value'      data-bind='checked:myArray' />"
+      "<input type='checkbox' value='Existing value' data-bind='checked:myArray' />" +
+      "<input type='checkbox' value='New value'      data-bind='checked:myArray' />"
     applyBindings(model, testNode)
 
     expect(model.myArray).to.deep.equal(['Existing value', 'Unrelated value'])
@@ -297,13 +297,13 @@ describe('Binding: Checked', function () {
   it('When the bound observable is updated in a subscription in response to a radio click, view and model should stay in sync', function () {
     // This test failed when jQuery was included before the changes made in #1191
     testNode.innerHTML =
-      '<input type="radio" value="1" name="x" data-bind="checked: choice" />'
-      + '<input type="radio" value="2" name="x" data-bind="checked: choice" />'
-      + '<input type="radio" value="3" name="x" data-bind="checked: choice" />'
+      '<input type="radio" value="1" name="x" data-bind="checked: choice" />' +
+      '<input type="radio" value="2" name="x" data-bind="checked: choice" />' +
+      '<input type="radio" value="3" name="x" data-bind="checked: choice" />'
     const choice = observable('1')
     choice.subscribe(function (newValue) {
-      if (newValue == '3') // don't allow item 3 to be selected; revert to item 1
-      {
+      if (newValue == '3') {
+        // don't allow item 3 to be selected; revert to item 1
         choice('1')
       }
     })
@@ -321,7 +321,7 @@ describe('Binding: Checked', function () {
 
   arrayForEach(
     [
-      { binding: 'checkedValue', label: "With \'checkedValue\'" },
+      { binding: 'checkedValue', label: "With 'checkedValue'" },
       { binding: 'value', label: "With 'value' treated like 'checkedValue' when used with 'checked'" }
     ],
     function (data) {
@@ -331,12 +331,12 @@ describe('Binding: Checked', function () {
         it('Should use that value as the checkbox value in the array', function () {
           const model = { myArray: observableArray([1, 3]) }
           testNode.innerHTML =
-            "<input type='checkbox' data-bind='checked:myArray, "
-            + binding
-            + ":1' />"
-            + "<input value='off' type='checkbox' data-bind='checked:myArray, "
-            + binding
-            + ":2' />"
+            "<input type='checkbox' data-bind='checked:myArray, " +
+            binding +
+            ":1' />" +
+            "<input value='off' type='checkbox' data-bind='checked:myArray, " +
+            binding +
+            ":2' />"
           applyBindings(model, testNode)
 
           expect(model.myArray()).to.deep.equal([1, 3]) // initial value is unchanged
@@ -371,9 +371,9 @@ describe('Binding: Checked', function () {
             object2 = { y: 1 },
             model = { values: [object1], choices: [object1, object2] }
           testNode.innerHTML =
-            "<div data-bind='foreach: choices'><input type='checkbox' data-bind='checked:$parent.values, "
-            + binding
-            + ":$data' /></div>"
+            "<div data-bind='foreach: choices'><input type='checkbox' data-bind='checked:$parent.values, " +
+            binding +
+            ":$data' /></div>"
           applyBindings(model, testNode)
 
           // Checkbox initial state is determined by whether the value is in the array
@@ -395,9 +395,9 @@ describe('Binding: Checked', function () {
             object2 = { id: observable(2) },
             model = { values: observableArray([1]), choices: [object1, object2] }
           testNode.innerHTML =
-            "<div data-bind='foreach: choices'><input type='checkbox' data-bind='"
-            + binding
-            + ":id, checked:$parent.values' /></div>"
+            "<div data-bind='foreach: choices'><input type='checkbox' data-bind='" +
+            binding +
+            ":id, checked:$parent.values' /></div>"
           applyBindings(model, testNode)
 
           expect(model.values()).to.deep.equal([1])
@@ -446,12 +446,12 @@ describe('Binding: Checked', function () {
         it("Should use that value as the radio button's value", function () {
           const myobservable = observable(false)
           testNode.innerHTML =
-            "<input type='radio' data-bind='checked:someProp, "
-            + binding
-            + ":true' />"
-            + "<input type='radio' data-bind='checked:someProp, "
-            + binding
-            + ":false' />"
+            "<input type='radio' data-bind='checked:someProp, " +
+            binding +
+            ":true' />" +
+            "<input type='radio' data-bind='checked:someProp, " +
+            binding +
+            ":false' />"
           applyBindings({ someProp: myobservable }, testNode)
 
           expect(myobservable()).to.deep.equal(false)
@@ -474,9 +474,9 @@ describe('Binding: Checked', function () {
             object2 = { id: observable(2) },
             model = { value: observable(1), choices: [object1, object2] }
           testNode.innerHTML =
-            "<div data-bind='foreach: choices'><input type='radio' data-bind='"
-            + binding
-            + ":id, checked:$parent.value' /></div>"
+            "<div data-bind='foreach: choices'><input type='radio' data-bind='" +
+            binding +
+            ":id, checked:$parent.value' /></div>"
           applyBindings(model, testNode)
 
           expect(model.value()).to.deep.equal(1)
@@ -515,12 +515,12 @@ describe('Binding: Checked', function () {
           it("Should use that value as the checkbox's value when not bound to an array", function () {
             const myobservable = observable('random value')
             testNode.innerHTML =
-              "<input type='checkbox' data-bind='checked:someProp, "
-              + binding
-              + ":true' />"
-              + "<input type='checkbox' data-bind='checked:someProp, "
-              + binding
-              + ":false' />"
+              "<input type='checkbox' data-bind='checked:someProp, " +
+              binding +
+              ":true' />" +
+              "<input type='checkbox' data-bind='checked:someProp, " +
+              binding +
+              ":false' />"
             applyBindings({ someProp: myobservable }, testNode)
 
             expect(myobservable()).to.deep.equal('random value')
@@ -552,9 +552,9 @@ describe('Binding: Checked', function () {
               object2 = { id: observable(2) },
               model = { value: observable(1), choices: [object1, object2] }
             testNode.innerHTML =
-              "<div data-bind='foreach: choices'><input type='checkbox' data-bind='"
-              + binding
-              + ":id, checked:$parent.value' /></div>"
+              "<div data-bind='foreach: choices'><input type='checkbox' data-bind='" +
+              binding +
+              ":id, checked:$parent.value' /></div>"
             applyBindings(model, testNode)
 
             expect(model.value()).to.deep.equal(1)

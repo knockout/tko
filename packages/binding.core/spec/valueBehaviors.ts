@@ -162,9 +162,9 @@ describe('Binding: Value', function () {
       }
     }
     testNode.innerHTML =
-      "<input data-bind='value: getSetter().set' />"
-      + '<input data-bind=\'value: getSetter()["set"]\' />'
-      + '<input data-bind="value: getSetter()[\'set\']" />'
+      "<input data-bind='value: getSetter().set' />" +
+      '<input data-bind=\'value: getSetter()["set"]\' />' +
+      '<input data-bind="value: getSetter()[\'set\']" />'
     applyBindings(model, testNode)
     expect(testNode.childNodes[0].value).to.deep.equal('666')
     expect(testNode.childNodes[1].value).to.deep.equal('666')
@@ -389,7 +389,7 @@ describe('Binding: Value', function () {
       expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
-    it('Should display the caption when the model value changes to undefined, null, or \"\" when using \'options\' binding', function () {
+    it('Should display the caption when the model value changes to undefined, null, or "" when using \'options\' binding', function () {
       const myObservable = observable('B')
       testNode.innerHTML =
         '<select data-bind=\'options:["A", "B"], optionsCaption:"Select...", value:myObservable\'></select>'
@@ -413,7 +413,7 @@ describe('Binding: Value', function () {
       expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
-    it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function () {
+    it('Should display the caption when the model value changes to undefined, null, or "" when options specified directly', function () {
       const myObservable = observable('B')
       testNode.innerHTML =
         "<select data-bind='value:myObservable'><option value=''>Select...</option><option>A</option><option>B</option></select>"
@@ -437,7 +437,7 @@ describe('Binding: Value', function () {
       expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
-    it('When size > 1, should unselect all options when value is undefined, null, or \"\"', function () {
+    it('When size > 1, should unselect all options when value is undefined, null, or ""', function () {
       const myObservable = observable('B')
       testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)
@@ -586,7 +586,7 @@ describe('Binding: Value', function () {
     })
 
     describe('Using valueAllowUnset option', function () {
-      it('Should display the caption when the model value changes to undefined, null, or \"\" when using \'options\' binding', function () {
+      it('Should display the caption when the model value changes to undefined, null, or "" when using \'options\' binding', function () {
         const myObservable = observable('B')
         testNode.innerHTML =
           '<select data-bind=\'options:["A", "B"], optionsCaption:"Select...", value:myObservable, valueAllowUnset:true\'></select>'
@@ -606,7 +606,7 @@ describe('Binding: Value', function () {
         expect(select.selectedIndex).to.deep.equal(0)
       })
 
-      it('Should display the caption when the model value changes to undefined, null, or \"\" when options specified directly', function () {
+      it('Should display the caption when the model value changes to undefined, null, or "" when options specified directly', function () {
         const myObservable = observable('B')
         testNode.innerHTML =
           "<select data-bind='value:myObservable, valueAllowUnset:true'><option value=''>Select...</option><option>A</option><option>B</option></select>"

@@ -49,12 +49,14 @@ function detectIEVersion() {
   const div = document.createElement('div')
   const iElems = div.getElementsByTagName('i')
 
-  while ((div.innerHTML = '<!--[if gt IE ' + ++version + ']><i></i><![endif]-->'), iElems[0]) {}
+  while (((div.innerHTML = '<!--[if gt IE ' + ++version + ']><i></i><![endif]-->'), iElems[0])) {}
   return version > 4 ? version : undefined
 }
 
 function expectEqualOneOf(actual, expectedPossibilities) {
-  const matches = expectedPossibilities.some(function (expected) { return chai.util.eql(actual, expected) })
+  const matches = expectedPossibilities.some(function (expected) {
+    return chai.util.eql(actual, expected)
+  })
   expect(matches, 'expected value to deeply equal one of the provided possibilities').to.equal(true)
 }
 
@@ -93,18 +95,31 @@ function expectHaveTexts(actual, expectedTexts) {
 }
 
 function expectHaveValues(actual, expectedValues) {
-  const values = ko.utils.arrayFilter(ko.utils.arrayMap(actual.childNodes, function (node) { return node.value }), function (value) { return value !== undefined })
+  const values = ko.utils.arrayFilter(
+    ko.utils.arrayMap(actual.childNodes, function (node) {
+      return node.value
+    }),
+    function (value) {
+      return value !== undefined
+    }
+  )
   expect(values).to.deep.equal(expectedValues)
 }
 
 function expectHaveCheckedStates(actual, expectedValues) {
-  const values = ko.utils.arrayMap(actual.childNodes, function (node) { return node.checked })
+  const values = ko.utils.arrayMap(actual.childNodes, function (node) {
+    return node.checked
+  })
   expect(values).to.deep.equal(expectedValues)
 }
 
 function expectHaveSelectedValues(actual, expectedValues) {
-  const selectedNodes = ko.utils.arrayFilter(actual.childNodes, function (node) { return node.selected })
-  const selectedValues = ko.utils.arrayMap(selectedNodes, function (node) { return ko.selectExtensions.readValue(node) })
+  const selectedNodes = ko.utils.arrayFilter(actual.childNodes, function (node) {
+    return node.selected
+  })
+  const selectedValues = ko.utils.arrayMap(selectedNodes, function (node) {
+    return ko.selectExtensions.readValue(node)
+  })
   expect(selectedValues).to.deep.equal(expectedValues)
 }
 

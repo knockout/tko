@@ -211,9 +211,9 @@ describe('Components: Component binding', function () {
 
     const testList = observableArray(['first'])
     testNode.innerHTML =
-      '<div data-bind="foreach: testList">'
-      + '<div data-bind="component: { name: \'test-component\', params: $data }"></div>'
-      + '</div>'
+      '<div data-bind="foreach: testList">' +
+      '<div data-bind="component: { name: \'test-component\', params: $data }"></div>' +
+      '</div>'
 
     // First injection is async, because the loader completes asynchronously
     applyBindings({ testList: testList }, testNode)
@@ -258,11 +258,11 @@ describe('Components: Component binding', function () {
 
     components.register(testComponentName, {
       template:
-        '<span data-bind="with: { childContext: 123 }">'
-        + 'In child context <!-- ko text: childContext --><!-- /ko -->, '
-        + 'inside component with property <!-- ko text: $component.componentProp --><!-- /ko -->. '
-        + '<div data-bind="component: \'sub-component\'"></div>'
-        + '</span>',
+        '<span data-bind="with: { childContext: 123 }">' +
+        'In child context <!-- ko text: childContext --><!-- /ko -->, ' +
+        'inside component with property <!-- ko text: $component.componentProp --><!-- /ko -->. ' +
+        '<div data-bind="component: \'sub-component\'"></div>' +
+        '</span>',
       viewModel: function () {
         return { componentProp: 456 }
       }
@@ -491,9 +491,9 @@ describe('Components: Component binding', function () {
     // Instantiate the first component, via a binding that unwraps an observable before it reaches the component
     const someObservable = observable('First')
     testNode.innerHTML =
-      '<div data-bind="component: { name: \''
-      + testComponentName
-      + '\', params: { someData: someObservable() } }"></div>'
+      '<div data-bind="component: { name: \'' +
+      testComponentName +
+      '\', params: { someData: someObservable() } }"></div>'
     applyBindings({ someObservable: someObservable }, testNode)
     clock.tick(1)
 

@@ -63,7 +63,7 @@ export interface Observable<T = any> extends ObservableFunctions<T> {
   /**
    * The latest value of the observable.
    */
-  [LATEST_VALUE]: any;
+  [LATEST_VALUE]: any
 
   /**
    * Gets the current value of the observable.
@@ -183,7 +183,6 @@ function limitNotifySubscribers(value, event?: string) {
     this._origNotifySubscribers(value, event)
   }
 }
-
 /**
  * Adds a limit function to the subscribable prototype.
  * @param limitFunction The function to limit notifications.

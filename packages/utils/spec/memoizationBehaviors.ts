@@ -42,8 +42,8 @@ describe('Memoization', function () {
     const containerNode = document.createElement('DIV')
     let didCall = false
     containerNode.innerHTML =
-      'Hello '
-      + memoization.memoize(function (domNode) {
+      'Hello ' +
+      memoization.memoize(function (domNode) {
         expect(domNode.parentNode).to.equal(containerNode)
         didCall = true
       })

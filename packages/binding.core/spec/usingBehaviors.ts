@@ -97,17 +97,17 @@ describe('Binding: Using', function () {
 
   it('Should be able to access all parent binding contexts via $parents, and root context via $root', function () {
     testNode.innerHTML =
-      "<div data-bind='using: topItem'>"
-      + "<div data-bind='using: middleItem'>"
-      + "<div data-bind='using: bottomItem'>"
-      + "<span data-bind='text: name'></span>"
-      + "<span data-bind='text: $parent.name'></span>"
-      + "<span data-bind='text: $parents[1].name'></span>"
-      + "<span data-bind='text: $parents[2].name'></span>"
-      + "<span data-bind='text: $root.name'></span>"
-      + '</div>'
-      + '</div>'
-      + '</div>'
+      "<div data-bind='using: topItem'>" +
+      "<div data-bind='using: middleItem'>" +
+      "<div data-bind='using: bottomItem'>" +
+      "<span data-bind='text: name'></span>" +
+      "<span data-bind='text: $parent.name'></span>" +
+      "<span data-bind='text: $parents[1].name'></span>" +
+      "<span data-bind='text: $parents[2].name'></span>" +
+      "<span data-bind='text: $root.name'></span>" +
+      '</div>' +
+      '</div>' +
+      '</div>'
     applyBindings(
       { name: 'outer', topItem: { name: 'top', middleItem: { name: 'middle', bottomItem: { name: 'bottom' } } } },
       testNode
@@ -157,8 +157,8 @@ describe('Binding: Using', function () {
 
   it('Should be able to nest a template within "using"', function () {
     testNode.innerHTML =
-      "<div data-bind='using: someitem'>"
-      + "<div data-bind='foreach: childprop'><span data-bind='text: $data'></span></div></div>"
+      "<div data-bind='using: someitem'>" +
+      "<div data-bind='foreach: childprop'><span data-bind='text: $data'></span></div></div>"
 
     const childprop = observableArray(new Array())
     const someitem = observable({ childprop: childprop })
@@ -169,25 +169,22 @@ describe('Binding: Using', function () {
     expectContainHtml(container, '<div data-bind="foreach: childprop"></div>')
 
     childprop.push('me')
-    expectContainHtml(container, '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span></div>')
+    expectContainHtml(container, '<div data-bind="foreach: childprop"><span data-bind="text: $data">me</span></div>')
 
     childprop.push('me2')
     expectContainHtml(
       container,
-      '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">me</span><span data-bind=\"text: $data\">me2</span></div>'
+      '<div data-bind="foreach: childprop"><span data-bind="text: $data">me</span><span data-bind="text: $data">me2</span></div>'
     )
 
     someitem({ childprop: ['notme'] })
-    expectContainHtml(
-      container,
-      '<div data-bind="foreach: childprop"><span data-bind=\"text: $data\">notme</span></div>'
-    )
+    expectContainHtml(container, '<div data-bind="foreach: childprop"><span data-bind="text: $data">notme</span></div>')
   })
 
   it('Should be able to nest a containerless template within "using"', function () {
     testNode.innerHTML =
-      "<div data-bind='using: someitem'>text"
-      + "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
+      "<div data-bind='using: someitem'>text" +
+      "<!-- ko foreach: childprop --><span data-bind='text: $data'></span><!-- /ko --></div>"
 
     const childprop = observableArray<string>([])
     const someitem = observable({ childprop: childprop })

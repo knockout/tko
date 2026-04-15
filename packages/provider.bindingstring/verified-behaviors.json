@@ -3,21 +3,15 @@
   "behaviors": [
     {
       "statement": "A subclass can define bindings by returning a binding string from `getBindingString()`, and `getBindingAccessors` parses that string into named accessors.",
-      "specs": [
-        "packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts"]
     },
     {
       "statement": "Binding preprocessing can rewrite a missing value through a handler `preprocess` hook, so `b` can become `b:false`.",
-      "specs": [
-        "packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts"]
     },
     {
       "statement": "Binding preprocessing leaves explicit values intact, so `b: true` remains `true` instead of being replaced by the fallback.",
-      "specs": [
-        "packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts"]
     }
   ]
 }

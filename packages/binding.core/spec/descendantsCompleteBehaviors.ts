@@ -115,7 +115,7 @@ describe('Binding: DescendantsComplete', function () {
     expect(callbacks).to.equal(1)
   })
 
-  it('TKO-Change: descendantsComplete callback function is not called after nested \"if\" binding', function () {
+  it('TKO-Change: descendantsComplete callback function is not called after nested "if" binding', function () {
     testNode.innerHTML =
       "<div data-bind='if: outerCondition, descendantsComplete: callback'><div data-bind='if: innerCondition, childrenComplete: render'><span data-bind='text: someText'></span></div></div>"
     let callbacks = 0,

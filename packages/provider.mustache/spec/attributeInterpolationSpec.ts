@@ -304,9 +304,9 @@ describe('Attribute Interpolation Markup bindings', function () {
     testNode.innerHTML = '<div title=\'The "best" {{what}}.\'></div>'
     const observable = Observable('time "test"')
     applyBindings({ what: observable }, testNode)
-    expect((testNode.childNodes[0] as HTMLDivElement).title).to.equal('The \"best\" time "test".')
+    expect((testNode.childNodes[0] as HTMLDivElement).title).to.equal('The "best" time "test".')
     observable('fun \\ test')
-    expect((testNode.childNodes[0] as HTMLDivElement).title).to.equal('The \"best\" fun \\ test.')
+    expect((testNode.childNodes[0] as HTMLDivElement).title).to.equal('The "best" fun \\ test.')
   })
 
   it('Should convert value attribute to two-way binding', function () {

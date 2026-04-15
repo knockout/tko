@@ -377,10 +377,10 @@ describe('Binding attribute syntax', function () {
       }
     }
     testNode.innerHTML =
-      "<div data-bind='test: true'>"
-      + "<div data-bind='text: 123'>456</div>"
-      + '</div>'
-      + "<div data-bind='text: 123'>456</div>"
+      "<div data-bind='test: true'>" +
+      "<div data-bind='text: 123'>456</div>" +
+      '</div>' +
+      "<div data-bind='text: 123'>456</div>"
     applyBindings(null, testNode)
 
     expect(testNode.childNodes[0].childNodes[0]['innerHTML']).to.equal('456')
@@ -545,15 +545,15 @@ describe('Binding attribute syntax', function () {
 
   it('Should be allowed to express containerless bindings with arbitrary internal whitespace and newlines', function () {
     testNode.innerHTML =
-      'Hello <!-- ko\n'
-      + '    with\n'
-      + '      : \n '
-      + '        { \n'
-      + "           \tpersonName: 'Bert'\n"
-      + '        }\n'
-      + "   \t --><span data-bind='text: personName'></span><!-- \n"
-      + '     /ko \n'
-      + '-->, Goodbye'
+      'Hello <!-- ko\n' +
+      '    with\n' +
+      '      : \n ' +
+      '        { \n' +
+      "           \tpersonName: 'Bert'\n" +
+      '        }\n' +
+      "   \t --><span data-bind='text: personName'></span><!-- \n" +
+      '     /ko \n' +
+      '-->, Goodbye'
     applyBindings({ personName: 'Bert' }, testNode)
     expectContainText(testNode, 'Hello Bert, Goodbye')
   })

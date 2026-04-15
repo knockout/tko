@@ -3,39 +3,27 @@
   "behaviors": [
     {
       "statement": "`nodeHasBindings` detects elements with a `data-bind` attribute.",
-      "specs": [
-        "packages/provider.databind/spec/dataBindProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.databind/spec/dataBindProviderBehaviors.ts"]
     },
     {
       "statement": "`getBindingAccessors` parses multiple bindings, preserves escaped quotes in string literals, and returns value-accessor functions.",
-      "specs": [
-        "packages/provider.databind/spec/dataBindProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.databind/spec/dataBindProviderBehaviors.ts"]
     },
     {
       "statement": "Parsed accessors are what binding handlers receive as `valueAccessor` during `init` and `update`.",
-      "specs": [
-        "packages/provider.databind/spec/dataBindProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.databind/spec/dataBindProviderBehaviors.ts"]
     },
     {
       "statement": "The provider drives core bindings end to end for `text`, `attr`, `click`, and `value`, including reading from and writing to observables.",
-      "specs": [
-        "packages/provider.databind/spec/dataBindProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.databind/spec/dataBindProviderBehaviors.ts"]
     },
     {
       "statement": "`value` bindings work with ES5 `defineProperty` getters/setters, including nested property paths.",
-      "specs": [
-        "packages/provider.databind/spec/dataBindProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.databind/spec/dataBindProviderBehaviors.ts"]
     },
     {
       "statement": "Expression lookup resolves `$data` before `$context`, `$context` before globals, recognizes `$element`, can be denied access to `window` globals, and does not bleed one globals object into another.",
-      "specs": [
-        "packages/provider.databind/spec/dataBindProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.databind/spec/dataBindProviderBehaviors.ts"]
     }
   ]
 }

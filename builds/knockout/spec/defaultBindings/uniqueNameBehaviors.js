@@ -1,12 +1,12 @@
-describe('Binding: Unique Name', function() {
-    beforeEach(prepareTestNode);
+describe('Binding: Unique Name', function () {
+  beforeEach(prepareTestNode)
 
-    it('Should apply a different name to each element', function () {
-        testNode.innerHTML = "<div data-bind='uniqueName: true'></div><div data-bind='uniqueName: true'></div>";
-        ko.applyBindings({}, testNode);
+  it('Should apply a different name to each element', function () {
+    testNode.innerHTML = "<div data-bind='uniqueName: true'></div><div data-bind='uniqueName: true'></div>"
+    ko.applyBindings({}, testNode)
 
-        expect(testNode.childNodes[0].name.length > 0).to.deep.equal(true);
-        expect(testNode.childNodes[1].name.length > 0).to.deep.equal(true);
-        expect(testNode.childNodes[0].name == testNode.childNodes[1].name).to.deep.equal(false);
-    });
-});
+    expect(testNode.childNodes[0].name.length > 0).to.deep.equal(true)
+    expect(testNode.childNodes[1].name.length > 0).to.deep.equal(true)
+    expect(testNode.childNodes[0].name == testNode.childNodes[1].name).to.deep.equal(false)
+  })
+})

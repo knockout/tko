@@ -126,17 +126,17 @@ describe('Binding: With', function () {
 
   it('Should be able to access all parent binding contexts via $parents, and root context via $root', function () {
     testNode.innerHTML =
-      "<div data-bind='with: topItem'>"
-      + "<div data-bind='with: middleItem'>"
-      + "<div data-bind='with: bottomItem'>"
-      + "<span data-bind='text: name'></span>"
-      + "<span data-bind='text: $parent.name'></span>"
-      + "<span data-bind='text: $parents[1].name'></span>"
-      + "<span data-bind='text: $parents[2].name'></span>"
-      + "<span data-bind='text: $root.name'></span>"
-      + '</div>'
-      + '</div>'
-      + '</div>'
+      "<div data-bind='with: topItem'>" +
+      "<div data-bind='with: middleItem'>" +
+      "<div data-bind='with: bottomItem'>" +
+      "<span data-bind='text: name'></span>" +
+      "<span data-bind='text: $parent.name'></span>" +
+      "<span data-bind='text: $parents[1].name'></span>" +
+      "<span data-bind='text: $parents[2].name'></span>" +
+      "<span data-bind='text: $root.name'></span>" +
+      '</div>' +
+      '</div>' +
+      '</div>'
     applyBindings(
       { name: 'outer', topItem: { name: 'top', middleItem: { name: 'middle', bottomItem: { name: 'bottom' } } } },
       testNode
@@ -284,12 +284,12 @@ describe('Binding: With', function () {
 
   it('Should be able to nest "with" regions defined by containerless templates', function () {
     testNode.innerHTML =
-      'hello <!-- ko with: topitem -->'
-      + 'Got top: <span data-bind="text: topprop"></span>'
-      + '<!-- ko with: childitem -->'
-      + 'Got child: <span data-bind="text: childprop"></span>'
-      + '<!-- /ko -->'
-      + '<!-- /ko -->'
+      'hello <!-- ko with: topitem -->' +
+      'Got top: <span data-bind="text: topprop"></span>' +
+      '<!-- ko with: childitem -->' +
+      'Got child: <span data-bind="text: childprop"></span>' +
+      '<!-- /ko -->' +
+      '<!-- /ko -->'
     const viewModel = { topitem: observable(null) }
     applyBindings(viewModel, testNode)
 
