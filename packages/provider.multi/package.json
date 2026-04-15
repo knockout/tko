@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/provider.multi",
   "description": "Combine multiple other providers into one",
   "module": "dist/index.js",
@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0",
+    "@tko/provider": "^4.0.1",
     "tslib": "^2.2.0"
   },
   "homepage": "https://tko.io",

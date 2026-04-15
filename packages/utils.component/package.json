@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/utils.component",
   "description": "Registry and loading utilities for web components",
   "module": "dist/index.js",
@@ -8,17 +8,17 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/lifecycle": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0",
+    "@tko/lifecycle": "^4.0.1",
+    "@tko/observable": "^4.0.1",
+    "@tko/utils": "^4.0.1",
     "tslib": "^2.2.0"
   },
   "peerDependencies": {
-    "@tko/bind": "^4.0.0",
-    "@tko/binding.core": "^4.0.0",
-    "@tko/computed": "^4.0.0",
-    "@tko/provider.multi": "^4.0.0",
-    "@tko/provider.virtual": "^4.0.0"
+    "@tko/bind": "^4.0.1",
+    "@tko/binding.core": "^4.0.1",
+    "@tko/computed": "^4.0.1",
+    "@tko/provider.multi": "^4.0.1",
+    "@tko/provider.virtual": "^4.0.1"
   },
   "homepage": "https://tko.io",
   "licenses": [

@@ -1,5 +1,21 @@
 # @tko/provider.attr
 
+## 4.0.1
+
+### Patch Changes
+
+- 5598b3d: Add .js extensions to ESM dist imports for Node ESM compatibility
+
+  Relative imports in ESM dist files now include `.js` extensions, fixing `ERR_MODULE_NOT_FOUND` in Node's strict ESM resolver and tools like vitest that use it.
+
+- f5e3efc: Fix broken ESM module paths and remove test helpers from published packages
+
+  The `module` field in 22 packages pointed to non-existent files (e.g., `dist/bind.js`). Fixed to `dist/index.js`. Test helpers are no longer included in published packages.
+
+- Updated dependencies [5598b3d]
+- Updated dependencies [f5e3efc]
+  - @tko/provider@4.0.1
+
 ## 4.0.0
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/provider.mustache",
   "description": "Interpolate text/node attributes {{ }}",
   "module": "dist/index.js",
@@ -22,11 +22,11 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/binding.template": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/provider": "^4.0.0",
-    "@tko/utils": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0",
+    "@tko/binding.template": "^4.0.1",
+    "@tko/observable": "^4.0.1",
+    "@tko/provider": "^4.0.1",
+    "@tko/utils": "^4.0.1",
+    "@tko/utils.parser": "^4.0.1",
     "tslib": "^2.2.0"
   },
   "licenses": [
