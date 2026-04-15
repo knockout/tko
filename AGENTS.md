@@ -12,7 +12,7 @@ License: MIT
 
 Monorepo with Bun workspaces.
 
-```
+```text
 packages/          # 26 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
 tools/             # Shared build script (build.ts)
