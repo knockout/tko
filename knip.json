@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["vitest.config.ts", "tools/build.ts"],
+      "project": ["*.ts", "tools/**/*.ts"]
+    },
+    "packages/*": {
+      "entry": ["index.ts", "src/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "builds/*": {
+      "entry": ["index.ts", "src/index.ts"],
+      "project": ["src/**/*.ts"]
+    }
+  },
+  "ignoreDependencies": [
+    "tslib",
+    "@vitest/browser",
+    "@vitest/browser-playwright",
+    "esbuild",
+    "playwright"
+  ]
+}

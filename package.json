@@ -17,6 +17,7 @@
     "lint": "bunx @biomejs/biome lint .",
     "lint:fix": "bunx @biomejs/biome check --fix .",
     "check": "bunx @biomejs/biome check .",
+    "knip": "bunx knip",
     "verify:esm": "bun tools/verify-esm-extensions.ts",
     "verify": "bunx @biomejs/biome check . && bunx tsc && bun run build && bun run verify:esm && bunx vitest run",
     "clean": "rm -rf packages/*/dist builds/*/dist coverage"
@@ -37,7 +38,6 @@
     "@vitest/browser-playwright": "^4.1.4",
     "chai": "^6.2.2",
     "esbuild": "^0.28.0",
-    "fs-extra": "^11.3.2",
     "jquery": "^4.0.0",
     "playwright": "^1.59.1",
     "sinon": "^21.0.3",
