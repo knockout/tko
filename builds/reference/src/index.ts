@@ -20,13 +20,12 @@ import components from '@tko/utils.component'
 import { createElement, Fragment } from '@tko/utils.jsx'
 import { JsxObserver } from '@tko/utils.jsx'
 
-import { overloadOperator } from '@tko/utils.parser'
+import { options } from '@tko/utils'
 
 declare const BUILD_VERSION: string
 
-/** Overload "evil twins" with strict equivalents */
-overloadOperator('==', (a, b) => a === b)
-overloadOperator('!=', (a, b) => a !== b)
+/** Use === and !== instead of == and != in binding expressions */
+options.strictEquality = true
 
 const builder = new Builder({
   filters,

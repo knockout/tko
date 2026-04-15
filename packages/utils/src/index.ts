@@ -12,7 +12,7 @@ export * from './function'
 export * from './string'
 export * from './symbol'
 export * from './css'
-export { default as options } from './options'
+export { default as options, defineOption, Options } from './options'
 
 // DOM;
 export * from './dom/event'
