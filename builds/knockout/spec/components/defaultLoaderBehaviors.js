@@ -11,8 +11,8 @@ describe('Components: Default loader', function () {
     expect(ko.components.isRegistered(testComponentName)).to.equal(true)
     expect(ko.components.isRegistered('other-component')).to.equal(false)
 
-    ko.components.unregister(testComponentName, {})
-    ko.components.unregister('nonexistent-component', {}) // No error - it's just a no-op, since it's harmless
+    ko.components.unregister(testComponentName)
+    ko.components.unregister('nonexistent-component') // No error - it's just a no-op, since it's harmless
 
     expect(ko.components.isRegistered(testComponentName)).to.equal(false)
   })

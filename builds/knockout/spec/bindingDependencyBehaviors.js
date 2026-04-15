@@ -565,7 +565,7 @@ describe('Binding dependencies', function () {
       ko.applyBindings(vm, testNode)
       expectContainText(testNode, 'First view model')
 
-      // ch ange view model to new object
+      // change view model to new object
       vm({ obj1: { prop1: 'Second view ' }, prop2: 'model' })
       expectContainText(testNode, 'Second view model')
 

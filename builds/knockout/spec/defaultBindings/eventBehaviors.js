@@ -35,7 +35,7 @@ describe('Binding: Event', function () {
   })
 
   it('Should prevent default action', function () {
-    testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: function() { } }'>hey</button>"
+    testNode.innerHTML = "<a href='http://www.example.com/' data-bind='event: { click: function() { } }'>hey</a>"
     ko.applyBindings(null, testNode)
     ko.utils.triggerEvent(testNode.childNodes[0], 'click')
     // Assuming we haven't been redirected to http://www.example.com/, this spec has now passed

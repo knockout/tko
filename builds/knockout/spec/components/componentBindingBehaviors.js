@@ -165,7 +165,6 @@ describe('Components: Component binding', function () {
   it('Injects and binds the component synchronously if it is flagged as synchronous and already cached, even if it previously loaded asynchronously', function () {
     // Set up a component that loads asynchronously, but is flagged as being injectable synchronously
     restoreAfter(window, 'require')
-    var requireCallbacks = {}
     window.require = function (moduleNames, callback) {
       expect(moduleNames[0]).to.equal('testViewModelModule')
       setTimeout(function () {

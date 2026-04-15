@@ -1,7 +1,7 @@
 describe('Binding: Ifnot', function () {
   beforeEach(prepareTestNode)
 
-  it('Should remove descendant nodes from the document (and not bind them) if the value is truey', function () {
+  it('Should remove descendant nodes from the document (and not bind them) if the value is truthy', function () {
     testNode.innerHTML =
       "<div data-bind='ifnot: condition'><span data-bind='text: someItem.nonExistentChildProp'></span></div>"
     expect(testNode.childNodes[0].childNodes.length).to.deep.equal(1)

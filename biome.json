@@ -3,7 +3,7 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["packages/**", "builds/**", "global.d.ts"]
+    "includes": ["packages/**", "builds/**", "tools/**", "global.d.ts", "vitest.config.ts"]
   },
   "formatter": {
     "enabled": true,
