@@ -5,7 +5,7 @@
   "description": "TKO documentation site",
   "scripts": {
     "postinstall": "patch-package",
-    "prebuild": "node ./scripts/generate-verified-behaviors.mjs && mkdir -p public/lib && cd ../builds/knockout && make browser && cp dist/browser.min.js ../../tko.io/public/lib/ko.js && cd ../reference && make browser && cp dist/browser.min.js ../../tko.io/public/lib/tko.js",
+    "prebuild": "node ./scripts/generate-verified-behaviors.mjs && mkdir -p public/lib && cd ../builds/knockout && bun run build && cp dist/browser.min.js ../../tko.io/public/lib/ko.js && cd ../reference && bun run build && cp dist/browser.min.js ../../tko.io/public/lib/tko.js",
     "predev": "bun run prebuild",
     "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build --force",

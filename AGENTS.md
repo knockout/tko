@@ -10,7 +10,7 @@ License: MIT
 
 ## Project Structure
 
-Lerna monorepo with npm workspaces. Current version: see `lerna.json`.
+Monorepo with Bun workspaces.
 
 ```
 packages/          # 26 modular @tko/* packages (all TypeScript)
