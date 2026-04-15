@@ -561,11 +561,11 @@ export class ForEachBinding extends AsyncBindingHandler {
       }
     } else {
       ForEachBinding.animateFrame =
-        w.requestAnimationFrame
-        || w.webkitRequestAnimationFrame
-        || w.mozRequestAnimationFrame
-        || w.msRequestAnimationFrame
-        || function (cb) {
+        w.requestAnimationFrame ||
+        w.webkitRequestAnimationFrame ||
+        w.mozRequestAnimationFrame ||
+        w.msRequestAnimationFrame ||
+        function (cb) {
           return w.setTimeout(cb, 1000 / 60)
         }
     }

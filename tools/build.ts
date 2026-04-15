@@ -16,7 +16,9 @@ const common = `--log-level=warning --define:BUILD_VERSION='"${version}"' --sour
 function esbuild(args: string) {
   console.log(`[build] ${name} → ${args.match(/--out(?:file|dir)=(\S+)/)?.[1] ?? ''}`)
   const proc = Bun.spawn(['sh', '-c', `bunx esbuild ${args}`], { stdio: ['inherit', 'inherit', 'inherit'] })
-  return proc.exited.then(code => { if (code) process.exit(code) })
+  return proc.exited.then(code => {
+    if (code) process.exit(code)
+  })
 }
 
 async function sources(): Promise<string> {
@@ -35,7 +37,9 @@ if (buildMode === 'default' || buildMode === 'browser') {
   queued.push(
     esbuild(`${src} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`),
     esbuild(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`),
-    esbuild(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
+    esbuild(
+      `./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`
+    )
   )
 }
 

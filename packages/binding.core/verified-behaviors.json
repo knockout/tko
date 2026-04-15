@@ -3,12 +3,8 @@
   "behaviors": [
     {
       "statement": "`event` handlers receive `(model, event)` and run with `this === model`.",
-      "notes": [
-        "Null handlers are ignored without throwing."
-      ],
-      "specs": [
-        "packages/binding.core/spec/eventBehaviors.ts"
-      ]
+      "notes": ["Null handlers are ignored without throwing."],
+      "specs": ["packages/binding.core/spec/eventBehaviors.ts"]
     },
     {
       "statement": "`event` descriptor objects are verified for `preventDefault`, `bubble`, `once`, `capture`, `debounce`, and `throttle`.",
@@ -16,9 +12,7 @@
         "Default click handling prevents default navigation unless `preventDefault: false` is supplied.",
         "Bubbling is on by default and can be disabled."
       ],
-      "specs": [
-        "packages/binding.core/spec/eventBehaviors.ts"
-      ]
+      "specs": ["packages/binding.core/spec/eventBehaviors.ts"]
     },
     {
       "statement": "`descendantsComplete` fires after descendant bindings finish on both DOM and virtual elements.",
@@ -27,9 +21,7 @@
         "A `null` callback is ignored.",
         "It also works with `ko.bindingEvent.subscribe(...)`."
       ],
-      "specs": [
-        "packages/binding.core/spec/descendantsCompleteBehaviors.ts"
-      ]
+      "specs": ["packages/binding.core/spec/descendantsCompleteBehaviors.ts"]
     }
   ]
 }

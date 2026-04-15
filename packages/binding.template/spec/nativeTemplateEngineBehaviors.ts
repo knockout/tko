@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 import { applyBindings } from '@tko/bind'
 
-import { observable, ObservableArray, observableArray } from '@tko/observable'
+import { observable, type ObservableArray, observableArray } from '@tko/observable'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
@@ -137,11 +137,11 @@ describe('Native template engine', function () {
 
     it('may be nested', function () {
       testNode.innerHTML =
-        "<div data-bind='template: { foreach: items }'>"
-        + "<div data-bind='template: { foreach: children }'>"
-        + "(Val: <span data-bind='text: $data'></span>, Invocations: <span data-bind='text: $root.invocationCount()'></span>, Parents: <span data-bind='text: $parents.length'></span>)"
-        + '</div>'
-        + '</div>'
+        "<div data-bind='template: { foreach: items }'>" +
+        "<div data-bind='template: { foreach: children }'>" +
+        "(Val: <span data-bind='text: $data'></span>, Invocations: <span data-bind='text: $root.invocationCount()'></span>, Parents: <span data-bind='text: $parents.length'></span>)" +
+        '</div>' +
+        '</div>'
 
       class myViewModel {
         invocations: number = 0 // Verifying # invocations to be sure we're not rendering anything multiple times and discarding the results
@@ -223,29 +223,29 @@ describe('Native template engine', function () {
   })
 
   describe('Data-bind syntax', function () {
-    it('should expose parent binding context as $parent if binding with an explicit \"data\" value', function () {
+    it('should expose parent binding context as $parent if binding with an explicit "data" value', function () {
       testNode.innerHTML =
-        "<div data-bind='template: { data: someItem }'>"
-        + "ValueBound: <span data-bind='text: $parent.parentProp'></span>"
-        + '</div>'
+        "<div data-bind='template: { data: someItem }'>" +
+        "ValueBound: <span data-bind='text: $parent.parentProp'></span>" +
+        '</div>'
       applyBindings({ someItem: {}, parentProp: 'Hello' }, testNode)
       expectContainText(testNode.childNodes[0], 'ValueBound: Hello')
     })
 
     it('should expose all ancestor binding contexts as $parents, with top frame also given as $root', function () {
       testNode.innerHTML =
-        "<div data-bind='template: { data: outerItem }'>"
-        + "<div data-bind='template: { data: middleItem }'>"
-        + "<div data-bind='template: { data: innerItem }'>("
-        + "data: <span data-bind='text: $data.val'></span>, "
-        + "parent: <span data-bind='text: $parent.val'></span>, "
-        + "parents[0]: <span data-bind='text: $parents[0].val'></span>, "
-        + "parents[1]: <span data-bind='text: $parents[1].val'></span>, "
-        + "parents.length: <span data-bind='text: $parents.length'></span>, "
-        + "root: <span data-bind='text: $root.val'></span>"
-        + ')</div>'
-        + '</div>'
-        + '</div>'
+        "<div data-bind='template: { data: outerItem }'>" +
+        "<div data-bind='template: { data: middleItem }'>" +
+        "<div data-bind='template: { data: innerItem }'>(" +
+        "data: <span data-bind='text: $data.val'></span>, " +
+        "parent: <span data-bind='text: $parent.val'></span>, " +
+        "parents[0]: <span data-bind='text: $parents[0].val'></span>, " +
+        "parents[1]: <span data-bind='text: $parents[1].val'></span>, " +
+        "parents.length: <span data-bind='text: $parents.length'></span>, " +
+        "root: <span data-bind='text: $root.val'></span>" +
+        ')</div>' +
+        '</div>' +
+        '</div>'
 
       applyBindings(
         { val: 'ROOT', outerItem: { val: 'OUTER', middleItem: { val: 'MIDDLE', innerItem: { val: 'INNER' } } } },

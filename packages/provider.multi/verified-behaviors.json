@@ -3,33 +3,23 @@
   "behaviors": [
     {
       "statement": "`nodeHasBindings` returns `true` if any applicable provider reports bindings and `false` if none do.",
-      "specs": [
-        "packages/provider.multi/spec/MultiProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.multi/spec/MultiProviderBehaviors.ts"]
     },
     {
       "statement": "Providers whose `FOR_NODE_TYPES` do not include the current node type are skipped for binding detection and preprocessing.",
-      "specs": [
-        "packages/provider.multi/spec/MultiProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.multi/spec/MultiProviderBehaviors.ts"]
     },
     {
       "statement": "`getBindingAccessors` merges binding maps from applicable providers.",
-      "specs": [
-        "packages/provider.multi/spec/MultiProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.multi/spec/MultiProviderBehaviors.ts"]
     },
     {
       "statement": "If a provider is marked `preemptive`, only the first applicable preemptive provider contributes bindings.",
-      "specs": [
-        "packages/provider.multi/spec/MultiProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.multi/spec/MultiProviderBehaviors.ts"]
     },
     {
       "statement": "`preprocessNode` calls every applicable provider preprocessor.",
-      "specs": [
-        "packages/provider.multi/spec/MultiProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.multi/spec/MultiProviderBehaviors.ts"]
     }
   ]
 }

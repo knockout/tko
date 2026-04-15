@@ -50,7 +50,7 @@ export class Options {
   disableJQueryUsage: boolean = false
 
   get jQuery(): JQueryStatic | undefined {
-    if (this.disableJQueryUsage) return
+    if (this.disableJQueryUsage) return undefined
     return this._jQuery ?? (globalThis as any).jQuery
   }
 

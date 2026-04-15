@@ -1,0 +1,76 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["packages/**", "builds/**", "tools/**", "global.d.ts", "vitest.config.ts"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120,
+    "lineEnding": "lf"
+  },
+  "linter": {
+    "enabled": true,
+    "includes": ["**/*.ts"],
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noUselessEscapeInRegex": "off",
+        "noArguments": "off",
+        "noBannedTypes": "off",
+        "useArrowFunction": "off",
+        "noThisInStatic": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn",
+        "noUnusedFunctionParameters": "warn"
+      },
+      "style": {
+        "useConst": "off",
+        "useArrayLiterals": "off",
+        "noNamespace": "off",
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off",
+        "noMisleadingCharacterClass": "off",
+        "noDoubleEquals": "off",
+        "noRedeclare": "error",
+        "noShadowRestrictedNames": "off",
+        "noControlCharactersInRegex": "off",
+        "noEmptyBlockStatements": "off",
+        "noPrototypeBuiltins": "off",
+        "noFallthroughSwitchClause": "error",
+        "noImplicitAnyLet": "off",
+        "noTemplateCurlyInString": "off",
+        "useIterableCallbackReturn": "off",
+        "noGlobalIsNan": "off",
+        "noGlobalIsFinite": "off",
+        "noThenProperty": "off",
+        "useGetterReturn": "error"
+      },
+      "performance": {
+        "noDelete": "off"
+      },
+      "security": {
+        "noGlobalEval": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "trailingCommas": "none",
+      "quoteStyle": "single",
+      "arrowParentheses": "asNeeded"
+    }
+  },
+  "assist": {
+    "enabled": false
+  }
+}

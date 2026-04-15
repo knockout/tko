@@ -218,11 +218,11 @@ describe('Else binding', function () {
 
   it('else chaining after if condition', function () {
     testNode.innerHTML =
-      "<div data-bind='if: x'>x</div>"
-      + '<!-- ko elseif: y1 -->y1<!-- /ko -->'
-      + '<!-- ko elseif: y2 -->y2<!-- /ko -->'
-      + '<!-- ko elseif: y3 -->y3<!-- /ko -->'
-      + '<!-- ko else -->else<!-- /ko -->'
+      "<div data-bind='if: x'>x</div>" +
+      '<!-- ko elseif: y1 -->y1<!-- /ko -->' +
+      '<!-- ko elseif: y2 -->y2<!-- /ko -->' +
+      '<!-- ko elseif: y3 -->y3<!-- /ko -->' +
+      '<!-- ko else -->else<!-- /ko -->'
     const x = observable(false)
     const y1 = observable(false)
     const y2 = observable(false)

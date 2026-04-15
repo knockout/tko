@@ -52,7 +52,7 @@ describe('Binding: Attr', function () {
     expect(href?.namespaceURI).to.equal('http://www.w3.org/1999/xlink')
   })
 
-  it('Should be able to set \"name\" attribute, even on IE6-7', function () {
+  it('Should be able to set "name" attribute, even on IE6-7', function () {
     const myValue = observable('myName')
     testNode.innerHTML = "<input data-bind='attr: { name: myValue }' />"
     applyBindings({ myValue: myValue }, testNode)

@@ -38,10 +38,11 @@ All commands use Bun. Run from the repo root:
 bun install               # Install all dependencies (uses Bun workspaces)
 bun run build             # Build all packages (ESM, CommonJS, MJS, browser)
 bun run test              # Run all tests (Vitest, headless Chromium via Playwright)
-bun run lint              # Run ESLint
-bun run lint:fix          # Run ESLint with auto-fix
-bun run format            # Check Prettier formatting
-bun run format:fix        # Fix Prettier formatting
+bun run check             # Run Biome (lint + format)
+bun run lint              # Run Biome lint only
+bun run lint:fix          # Run Biome lint with auto-fix
+bun run format            # Check Biome formatting
+bun run format:fix        # Fix Biome formatting
 bun run tsc               # TypeScript type-check (no emit)
 bun run dts               # Generate TypeScript declaration files
 bun run clean             # Clean dist/ and coverage/ dirs
@@ -62,12 +63,11 @@ because TKO does low-level DOM manipulation, MutationObserver, and event handlin
 
 ## Code Style
 
-- **Formatter**: Prettier — no semicolons, single quotes, trailing commas: none, 120 char width
-- **Linter**: ESLint with typescript-eslint (flat config)
-- **Editor**: 2-space indentation for JS/TS, LF line endings
-- See `.prettierrc` and `eslint.config.js` for full config
+- **Linter + Formatter**: Biome — single Rust-native tool replacing ESLint + Prettier
+- **Style**: no semicolons, single quotes, trailing commas: none, 120 char width, 2-space indent, LF line endings
+- See `biome.json` for full config
 
-Run `bun run format:fix && bun run lint:fix` before committing.
+Run `bun run lint:fix` before committing.
 
 ## TypeScript
 
@@ -102,7 +102,7 @@ GitHub Actions workflows (`.github/workflows/`):
 |----------|---------|---------|
 | `main-build.yml` | Push to main | Build + audit + headless test |
 | `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
-| `lint-and-typecheck.yml` | PRs | Prettier + ESLint + tsc (combined) |
+| `lint-and-typecheck.yml` | PRs | Biome + tsc (lint, format, typecheck) |
 | `publish-check.yml` | PRs | Verify packages are publishable |
 | `release.yml` | Tag push (`v*`) | Changeset version PRs + npm publish + GitHub release creation |
 | `github-release.yml` | Manual fallback | Backfill a GitHub release/tag for a published `main` commit if automatic release creation needs a retry |

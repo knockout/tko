@@ -545,11 +545,11 @@ describe('Binding: Foreach', function () {
 
   it('Should be able to nest foreaches and access binding contexts both during and after binding', function () {
     testNode.innerHTML =
-      "<div data-bind='foreach: items'>"
-      + "<div data-bind='foreach: children'>"
-      + "(Val: <span data-bind='text: $data'></span>, Parents: <span data-bind='text: $parents.length'></span>, Rootval: <span data-bind='text: $root.rootVal'></span>)"
-      + '</div>'
-      + '</div>'
+      "<div data-bind='foreach: items'>" +
+      "<div data-bind='foreach: children'>" +
+      "(Val: <span data-bind='text: $data'></span>, Parents: <span data-bind='text: $parents.length'></span>, Rootval: <span data-bind='text: $root.rootVal'></span>)" +
+      '</div>' +
+      '</div>'
     const viewModel = {
       rootVal: 'ROOTVAL',
       items: observableArray([
@@ -650,24 +650,24 @@ describe('Binding: Foreach', function () {
 
     expectContainHtml(
       testNode,
-      '<ul>'
-        + '<!--ko foreach: items-->'
-        + '<li>'
-        + '<!--ko if: childval-->'
-        + '<span data-bind="text: childval.childprop">123</span>'
-        + '<!--/ko-->'
-        + '</li>'
-        + '<li>'
-        + '<!--ko if: childval-->'
-        + '<!--/ko-->'
-        + '</li>'
-        + '<li>'
-        + '<!--ko if: childval-->'
-        + '<span data-bind="text: childval.childprop">456</span>'
-        + '<!--/ko-->'
-        + '</li>'
-        + '<!--/ko-->'
-        + '</ul>'
+      '<ul>' +
+        '<!--ko foreach: items-->' +
+        '<li>' +
+        '<!--ko if: childval-->' +
+        '<span data-bind="text: childval.childprop">123</span>' +
+        '<!--/ko-->' +
+        '</li>' +
+        '<li>' +
+        '<!--ko if: childval-->' +
+        '<!--/ko-->' +
+        '</li>' +
+        '<li>' +
+        '<!--ko if: childval-->' +
+        '<span data-bind="text: childval.childprop">456</span>' +
+        '<!--/ko-->' +
+        '</li>' +
+        '<!--/ko-->' +
+        '</ul>'
     )
   })
 
@@ -737,7 +737,7 @@ describe('Binding: Foreach', function () {
     expectContainText(testNode, 'B')
   })
 
-  it('Should be able to give an alias to $data using \"as\"', function () {
+  it('Should be able to give an alias to $data using "as"', function () {
     testNode.innerHTML =
       "<div data-bind='foreach: { data: someItems, as: \"item\" }'><span data-bind='text: item'></span></div>"
     const someItems = ['alpha', 'beta']
@@ -748,13 +748,13 @@ describe('Binding: Foreach', function () {
     )
   })
 
-  it('Should be able to give an alias to $data using \"as\", and use it within a nested loop', function () {
+  it('Should be able to give an alias to $data using "as", and use it within a nested loop', function () {
     testNode.innerHTML =
-      '<div data-bind=\'foreach: { data: someItems, as: "item" }\'>'
-      + "<span data-bind='foreach: item.sub'>"
-      + '<span data-bind=\'text: item.name+":"+$data\'></span>,'
-      + '</span>'
-      + '</div>'
+      '<div data-bind=\'foreach: { data: someItems, as: "item" }\'>' +
+      "<span data-bind='foreach: item.sub'>" +
+      '<span data-bind=\'text: item.name+":"+$data\'></span>,' +
+      '</span>' +
+      '</div>'
     const someItems = [
       { name: 'alpha', sub: ['a', 'b'] },
       { name: 'beta', sub: ['c'] }
@@ -763,13 +763,13 @@ describe('Binding: Foreach', function () {
     expectContainText(testNode.childNodes[0], 'alpha:a,alpha:b,beta:c,')
   })
 
-  it('Should be able to set up multiple nested levels of aliases using \"as\"', function () {
+  it('Should be able to set up multiple nested levels of aliases using "as"', function () {
     testNode.innerHTML =
-      '<div data-bind=\'foreach: { data: someItems, as: "item" }\'>'
-      + '<span data-bind=\'foreach: { data: item.sub, as: "subvalue" }\'>'
-      + '<span data-bind=\'text: item.name+":"+subvalue\'></span>,'
-      + '</span>'
-      + '</div>'
+      '<div data-bind=\'foreach: { data: someItems, as: "item" }\'>' +
+      '<span data-bind=\'foreach: { data: item.sub, as: "subvalue" }\'>' +
+      '<span data-bind=\'text: item.name+":"+subvalue\'></span>,' +
+      '</span>' +
+      '</div>'
     const someItems = [
       { name: 'alpha', sub: ['a', 'b'] },
       { name: 'beta', sub: ['c', 'd'] }
@@ -778,7 +778,7 @@ describe('Binding: Foreach', function () {
     expectContainText(testNode.childNodes[0], 'alpha:a,alpha:b,beta:c,beta:d,')
   })
 
-  it('Should be able to give an alias to $data using \"as\", and use it within arbitrary descendant binding contexts', function () {
+  it('Should be able to give an alias to $data using "as", and use it within arbitrary descendant binding contexts', function () {
     testNode.innerHTML =
       "<div data-bind='foreach: { data: someItems, as: \"item\" }'><span data-bind='if: item.length'><span data-bind='text: item'></span>,</span></div>"
     const someItems = ['alpha', 'beta']
@@ -786,7 +786,7 @@ describe('Binding: Foreach', function () {
     expectContainText(testNode.childNodes[0], 'alpha,beta,')
   })
 
-  it('Should be able to give an alias to $data using \"as\", and use it within descendant binding contexts defined using containerless syntax', function () {
+  it('Should be able to give an alias to $data using "as", and use it within descendant binding contexts defined using containerless syntax', function () {
     testNode.innerHTML =
       "<div data-bind='foreach: { data: someItems, as: \"item\" }'>x<!-- ko if: item.length --><span data-bind='text: item'></span>x,<!-- /ko --></div>"
     const someItems = ['alpha', 'beta']
@@ -999,12 +999,12 @@ describe('Binding: Foreach', function () {
       return null
     }
     testNode.innerHTML =
-      "<div data-bind='foreach: items'>"
-      + '<button>DeleteMe</button>'
-      + '<data></data>'
-      + '<!-- ko text: $data --><!-- /ko -->'
-      + '<button>DeleteMe</button>' // Tests that we can remove the last node even when the preceding node is a virtual element rather than a single node
-      + '</div>'
+      "<div data-bind='foreach: items'>" +
+      '<button>DeleteMe</button>' +
+      '<data></data>' +
+      '<!-- ko text: $data --><!-- /ko -->' +
+      '<button>DeleteMe</button>' + // Tests that we can remove the last node even when the preceding node is a virtual element rather than a single node
+      '</div>'
     const items = observableArray(['Alpha', 'Beta'])
 
     applyBindings({ items: items }, testNode)

@@ -16,10 +16,10 @@ const schedulerGlobal = options.global
 if (schedulerGlobal && typeof schedulerGlobal.queueMicrotask === 'function') {
   options.taskScheduler = callback => schedulerGlobal.queueMicrotask(callback)
 } else if (
-  schedulerGlobal
-  && schedulerGlobal.MutationObserver
-  && schedulerGlobal.document
-  && !(schedulerGlobal.navigator && schedulerGlobal.navigator.standalone)
+  schedulerGlobal &&
+  schedulerGlobal.MutationObserver &&
+  schedulerGlobal.document &&
+  !(schedulerGlobal.navigator && schedulerGlobal.navigator.standalone)
 ) {
   options.taskScheduler = (function () {
     let scheduledCallback: null | (() => void) = null

@@ -3,39 +3,27 @@
   "behaviors": [
     {
       "statement": "JSX objects convert to DOM nodes, including nested children, arrays, generators, sparse arrays, primitives, SVG nodes, and actual DOM nodes.",
-      "specs": [
-        "packages/utils.jsx/spec/jsxBehaviors.ts"
-      ]
+      "specs": ["packages/utils.jsx/spec/jsxBehaviors.ts"]
     },
     {
       "statement": "Observable children and attributes stay live: text, nodes, arrays, numbers, attributes, and nested observable structures update in place.",
-      "specs": [
-        "packages/utils.jsx/spec/jsxBehaviors.ts"
-      ]
+      "specs": ["packages/utils.jsx/spec/jsxBehaviors.ts"]
     },
     {
       "statement": "Binding-handler attributes like `ko-x` keep observable references intact instead of being unwrapped at JSX conversion time.",
-      "specs": [
-        "packages/utils.jsx/spec/jsxBehaviors.ts"
-      ]
+      "specs": ["packages/utils.jsx/spec/jsxBehaviors.ts"]
     },
     {
       "statement": "Re-inserting original JSX nodes is supported; re-inserting non-JSX nodes that already carry bindings throws rather than applying bindings twice.",
-      "specs": [
-        "packages/utils.jsx/spec/jsxBehaviors.ts"
-      ]
+      "specs": ["packages/utils.jsx/spec/jsxBehaviors.ts"]
     },
     {
       "statement": "Promise and thenable children are supported, including resolved-node binding, removal before or after resolution, and error-to-comment behavior.",
-      "specs": [
-        "packages/utils.jsx/spec/jsxBehaviors.ts"
-      ]
+      "specs": ["packages/utils.jsx/spec/jsxBehaviors.ts"]
     },
     {
       "statement": "JSX-created nodes can carry native bindings and participate in component rendering and observable-array diff updates.",
-      "specs": [
-        "packages/utils.jsx/spec/jsxBehaviors.ts"
-      ]
+      "specs": ["packages/utils.jsx/spec/jsxBehaviors.ts"]
     }
   ]
 }

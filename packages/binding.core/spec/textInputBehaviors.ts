@@ -205,9 +205,9 @@ describe('Binding: TextInput', function () {
       }
     }
     testNode.innerHTML =
-      "<input data-bind='textInput: getSetter().set' />"
-      + '<input data-bind=\'textInput: getSetter()["set"]\' />'
-      + '<input data-bind="textInput: getSetter()[\'set\']" />'
+      "<input data-bind='textInput: getSetter().set' />" +
+      '<input data-bind=\'textInput: getSetter()["set"]\' />' +
+      '<input data-bind="textInput: getSetter()[\'set\']" />'
     applyBindings(model, testNode)
     expect((testNode.children[0] as HTMLInputElement).value).to.equal('666')
     expect((testNode.children[1] as HTMLInputElement).value).to.equal('666')

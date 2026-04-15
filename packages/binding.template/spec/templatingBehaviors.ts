@@ -518,8 +518,8 @@ describe('Templating', function () {
       new dummyTemplateEngine({
         outerTemplate: 'Outer <div data-bind=\'template: { name: "innerTemplate", bypassDomNodeWrap: true }\'></div>',
         innerTemplate:
-          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>"
-          + 'Inner via external binding: <em></em>'
+          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>" +
+          'Inner via external binding: <em></em>'
       })
     )
 
@@ -581,8 +581,8 @@ describe('Templating', function () {
       new dummyTemplateEngine({
         outerTemplate: 'Outer <div data-bind=\'template: { name: "innerTemplate", bypassDomNodeWrap: true }\'></div>',
         innerTemplate:
-          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>"
-          + 'Inner via external binding: <em></em>'
+          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>" +
+          'Inner via external binding: <em></em>'
       })
     )
     const model = { numRewrittenBindings: 0, numExternalBindings: 0 }
@@ -953,7 +953,7 @@ describe('Templating', function () {
       expect(testNode.childNodes[0].childNodes.length).to.equal(0)
     })
 
-    it('Should accept an \"as\" option to define an alias for the iteration variable', function () {
+    it('Should accept an "as" option to define an alias for the iteration variable', function () {
       // Note: There are more detailed specs (e.g., covering nesting) associated with the "foreach" binding which
       // uses this templating functionality internally.
       const myArray = observableArray(['A', 'B'])
@@ -1073,7 +1073,7 @@ describe('Templating', function () {
     })
   })
 
-  it('Data binding syntax should support \"if\" condition', function () {
+  it('Data binding syntax should support "if" condition', function () {
     setTemplateEngine(new dummyTemplateEngine({ myTemplate: 'Value: [js: nomangle$data.myProp().childProp]' }))
     testNode.innerHTML = '<div data-bind=\'template: { name: "myTemplate", "if": myProp }\'></div>'
 
@@ -1092,7 +1092,7 @@ describe('Templating', function () {
     expectContainText(testNode.childNodes[0], 'Value: def')
   })
 
-  it('Data binding syntax should support \"ifnot\" condition', function () {
+  it('Data binding syntax should support "ifnot" condition', function () {
     setTemplateEngine(new dummyTemplateEngine({ myTemplate: 'Hello' }))
     testNode.innerHTML = '<div data-bind=\'template: { name: "myTemplate", ifnot: shouldHide }\'></div>'
 
@@ -1111,7 +1111,7 @@ describe('Templating', function () {
     expectContainText(testNode.childNodes[0], '')
   })
 
-  it('Data binding syntax should support \"if\" condition in conjunction with foreach', function () {
+  it('Data binding syntax should support "if" condition in conjunction with foreach', function () {
     setTemplateEngine(new dummyTemplateEngine({ myTemplate: 'Value: [js: nomangle$data.myProp().childProp]' }))
     testNode.innerHTML =
       '<div data-bind=\'template: { name: "myTemplate", "if": myProp, foreach: [$data, $data, $data] }\'></div>'
@@ -1216,7 +1216,7 @@ describe('Templating', function () {
     expectContainText(testNode.childNodes[0], 'ValueLiteral: Hello, ValueBound: Hello')
   })
 
-  it('Data-bind syntax should expose parent binding context as $parent if binding with an explicit \"data\" value', function () {
+  it('Data-bind syntax should expose parent binding context as $parent if binding with an explicit "data" value', function () {
     setTemplateEngine(
       new dummyTemplateEngine({
         myTemplate:

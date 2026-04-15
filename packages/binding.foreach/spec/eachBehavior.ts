@@ -122,9 +122,9 @@ describe('each binding', function () {
     applyBindings(list, target[0])
     assert.equal(
       $(target).html(),
-      '<li><em data-bind="text: $data">a</em></li>'
-        + '<li><em data-bind="text: $data">b</em></li>'
-        + '<li><em data-bind="text: $data">c</em></li>'
+      '<li><em data-bind="text: $data">a</em></li>' +
+        '<li><em data-bind="text: $data">b</em></li>' +
+        '<li><em data-bind="text: $data">c</em></li>'
     )
   })
 
@@ -134,10 +134,10 @@ describe('each binding', function () {
     applyBindings(list, target[0])
     assert.equal(
       $(target).html(),
-      '<!-- ko foreach: $data -->'
-        + '<em data-bind="text: $data">A</em>'
-        + '<em data-bind="text: $data">B</em>'
-        + '<!-- /ko -->'
+      '<!-- ko foreach: $data -->' +
+        '<em data-bind="text: $data">A</em>' +
+        '<em data-bind="text: $data">B</em>' +
+        '<!-- /ko -->'
     )
   })
 

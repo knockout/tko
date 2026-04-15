@@ -5,12 +5,8 @@ import { DataBindProvider } from '@tko/provider.databind'
 import { ComponentProvider } from '@tko/provider.component'
 import { AttributeProvider } from '@tko/provider.attr'
 import { MultiProvider } from '@tko/provider.multi'
-import {
-  TextMustacheProvider, AttributeMustacheProvider
-} from '@tko/provider.mustache'
-import {
-  NativeProvider
-} from '@tko/provider.native'
+import { TextMustacheProvider, AttributeMustacheProvider } from '@tko/provider.mustache'
+import { NativeProvider } from '@tko/provider.native'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
@@ -44,7 +40,7 @@ const builder = new Builder({
       new TextMustacheProvider(),
       new DataBindProvider(),
       new VirtualProvider(),
-      new AttributeProvider(),
+      new AttributeProvider()
     ]
   }),
   bindings: [
@@ -73,9 +69,9 @@ export default builder.create({
         node,
         dispose: () => observer.dispose()
       }
-    },
+    }
   },
   components,
   version,
-  Component: components.ComponentABC,
+  Component: components.ComponentABC
 })

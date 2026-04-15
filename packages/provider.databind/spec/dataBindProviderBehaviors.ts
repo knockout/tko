@@ -62,7 +62,7 @@ describe('Data-Bind Behaviors', function () {
       const bindings = instance.getBindingAccessors(div)
       assert.equal(Object.keys(bindings).length, 2, 'len')
       assert.equal(bindings['a'](), 'a"b', 'a')
-      assert.equal(bindings['b'](), "c\'d", 'b')
+      assert.equal(bindings['b'](), "c'd", 'b')
     })
 
     it('returns a name/valueAccessor pair', function () {

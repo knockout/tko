@@ -1,5 +1,5 @@
 import { makeArray, parseHtmlFragment } from '@tko/utils'
-import { templateEngine, TemplateOptions } from './templateEngine'
+import { templateEngine, type TemplateOptions } from './templateEngine'
 import { setTemplateEngine } from './templating'
 import type { TemplateSource } from './templateSources'
 import type { BindingContext } from '@tko/bind'

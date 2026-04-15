@@ -1,6 +1,6 @@
 import { options, tasks, objectForEach, cleanNode, triggerEvent } from '@tko/utils'
 
-import { observable, isWritableObservable, isObservable, Observable } from '@tko/observable'
+import { observable, isWritableObservable, isObservable, type Observable } from '@tko/observable'
 
 import { isComputed } from '@tko/computed'
 
@@ -506,10 +506,10 @@ describe('Components: Custom elements', function () {
     //       viewmodel as well, so retaining the longer syntax for this test.
     components.register('special-list', {
       template:
-        '<ul class="my-special-list" data-bind="foreach: specialListItems">'
-        + '<li data-bind="template: { nodes: $component.suppliedItemTemplate }">'
-        + '</li>'
-        + '</ul>',
+        '<ul class="my-special-list" data-bind="foreach: specialListItems">' +
+        '<li data-bind="template: { nodes: $component.suppliedItemTemplate }">' +
+        '</li>' +
+        '</ul>',
       viewModel: {
         createViewModel: function (params, componentInfo) {
           return { specialListItems: params.items, suppliedItemTemplate: componentInfo.templateNodes }
@@ -519,10 +519,10 @@ describe('Components: Custom elements', function () {
 
     // Now make some view markup that uses <special-list> and supplies a template to be used inside each list item
     testNode.innerHTML =
-      '<h1>Cheeses</h1>'
-      + '<special-list params="items: cheeses">'
-      + '<em data-bind="text: name">x</em> has quality <em data-bind="text: quality">x</em>'
-      + '</special-list>'
+      '<h1>Cheeses</h1>' +
+      '<special-list params="items: cheeses">' +
+      '<em data-bind="text: name">x</em> has quality <em data-bind="text: quality">x</em>' +
+      '</special-list>'
 
     // Finally, bind it all to some data
     applyBindings(
@@ -543,15 +543,15 @@ describe('Components: Custom elements', function () {
     expect(node.className).to.equal('my-special-list')
     expectContainHtml(
       node,
-      '<li data-bind="template: { nodes: $component.supplieditemtemplate }">'
-        + '<em data-bind="text: name">brie</em> has quality <em data-bind="text: quality">7</em>'
-        + '</li>'
-        + '<li data-bind="template: { nodes: $component.supplieditemtemplate }">'
-        + '<em data-bind="text: name">cheddar</em> has quality <em data-bind="text: quality">9</em>'
-        + '</li>'
-        + '<li data-bind="template: { nodes: $component.supplieditemtemplate }">'
-        + '<em data-bind="text: name">roquefort</em> has quality <em data-bind="text: quality">3</em>'
-        + '</li>'
+      '<li data-bind="template: { nodes: $component.supplieditemtemplate }">' +
+        '<em data-bind="text: name">brie</em> has quality <em data-bind="text: quality">7</em>' +
+        '</li>' +
+        '<li data-bind="template: { nodes: $component.supplieditemtemplate }">' +
+        '<em data-bind="text: name">cheddar</em> has quality <em data-bind="text: quality">9</em>' +
+        '</li>' +
+        '<li data-bind="template: { nodes: $component.supplieditemtemplate }">' +
+        '<em data-bind="text: name">roquefort</em> has quality <em data-bind="text: quality">3</em>' +
+        '</li>'
     )
   })
 

@@ -11,7 +11,7 @@ import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 import { bindings as eachBindings } from '@tko/binding.foreach'
-import { BindingHandlerObject } from '@tko/provider'
+import type { BindingHandlerObject } from '@tko/provider'
 import { restoreAfter } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding Application Promise', function () {

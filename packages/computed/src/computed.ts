@@ -287,8 +287,8 @@ computed.fn = {
       if (hasOwnProperty(dependencyTracking, id)) {
         dependency = dependencyTracking[id]
         if (
-          (this._evalDelayed && dependency._target._notificationIsPending)
-          || dependency._target.hasChanged(dependency._version)
+          (this._evalDelayed && dependency._target._notificationIsPending) ||
+          dependency._target.hasChanged(dependency._version)
         ) {
           return true
         }
@@ -344,8 +344,7 @@ computed.fn = {
     }
   },
   evaluateImmediate(notifyChange) {
-    let computedObservable = this,
-      state = computedObservable[computedState],
+    let state = this[computedState],
       disposeWhen = state.disposeWhen,
       changed = false
 
@@ -363,12 +362,12 @@ computed.fn = {
     }
 
     if (
-      (state.disposeWhenNodeIsRemoved && !domNodeIsAttachedToDocument(state.disposeWhenNodeIsRemoved))
-      || (disposeWhen && disposeWhen())
+      (state.disposeWhenNodeIsRemoved && !domNodeIsAttachedToDocument(state.disposeWhenNodeIsRemoved)) ||
+      (disposeWhen && disposeWhen())
     ) {
       // See comment above about suppressDisposalUntilDisposeWhenReturnsFalse
       if (!state.suppressDisposalUntilDisposeWhenReturnsFalse) {
-        computedObservable.dispose()
+        this.dispose()
         return
       }
     } else {
@@ -390,15 +389,14 @@ computed.fn = {
     // Factoring it out into a separate function means it can be independent of the try/catch block in evaluateImmediate,
     // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
 
-    let computedObservable = this,
-      state = computedObservable[computedState],
+    let state = this[computedState],
       changed = false
 
     // Initially, we assume that none of the subscriptions are still being used (i.e., all are candidates for disposal).
     // Then, during evaluation, we cross off any that are in fact still being used.
     const isInitial = state.pure ? undefined : !state.dependenciesCount, // If we're evaluating when there are no previous dependencies, it must be the first time
       dependencyDetectionContext = {
-        computedObservable: computedObservable,
+        computedObservable: this,
         disposalCandidates: state.dependencyTracking,
         disposalCount: state.dependenciesCount
       }
@@ -406,7 +404,7 @@ computed.fn = {
     dependencyDetection.begin({
       callbackTarget: dependencyDetectionContext,
       callback: computedBeginDependencyDetectionCallback,
-      computed: computedObservable,
+      computed: this,
       isInitial: isInitial
     })
 
@@ -416,37 +414,37 @@ computed.fn = {
     const newValue = this.evaluateImmediate_CallReadThenEndDependencyDetection(state, dependencyDetectionContext)
 
     if (!state.dependenciesCount) {
-      computedObservable.dispose()
+      this.dispose()
       changed = true // When evaluation causes a disposal, make sure all dependent computeds get notified so they'll see the new state
     } else {
-      changed = computedObservable.isDifferent(state.latestValue, newValue)
+      changed = this.isDifferent(state.latestValue, newValue)
     }
 
     if (changed) {
       if (!state.isSleeping) {
-        computedObservable.notifySubscribers(state.latestValue, 'beforeChange')
+        this.notifySubscribers(state.latestValue, 'beforeChange')
       } else {
-        computedObservable.updateVersion()
+        this.updateVersion()
       }
 
       state.latestValue = newValue
       if (options.debug) {
-        computedObservable._latestValue = newValue
+        this._latestValue = newValue
       }
 
-      computedObservable.notifySubscribers(state.latestValue, 'spectate')
+      this.notifySubscribers(state.latestValue, 'spectate')
 
       if (!state.isSleeping && notifyChange) {
-        computedObservable.notifySubscribers(state.latestValue)
+        this.notifySubscribers(state.latestValue)
       }
 
-      if (computedObservable._recordUpdate) {
-        computedObservable._recordUpdate()
+      if (this._recordUpdate) {
+        this._recordUpdate()
       }
     }
 
     if (isInitial) {
-      computedObservable.notifySubscribers(state.latestValue, 'awake')
+      this.notifySubscribers(state.latestValue, 'awake')
     }
 
     return changed
@@ -476,8 +474,8 @@ computed.fn = {
     //  or to get the initial value when "deferEvaluation" is set.
     const state = this[computedState]
     if (
-      (state.isDirty && (forceEvaluate || !state.dependenciesCount))
-      || (state.isSleeping && this.haveDependenciesChanged())
+      (state.isDirty && (forceEvaluate || !state.dependenciesCount)) ||
+      (state.isSleeping && this.haveDependenciesChanged())
     ) {
       this.evaluateImmediate()
     }
