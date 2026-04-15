@@ -103,7 +103,7 @@ const operators: Operators = {
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
   //    TODO: 'typeof': function (a, b) { return typeof b; },
-  // equality — default loose comparison; use setStrictEquality(true) for === behavior
+  // equality — default loose; set options.strictEquality = true for === behavior
   '==': looseEqual,
   '!=': looseNotEqual,
   '===': strictEqual,
