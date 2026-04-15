@@ -59,3 +59,13 @@ if (buildMode !== 'default' && buildMode !== 'browser') {
 }
 
 await Promise.all(queued)
+
+// Fix ESM imports: add .js extensions to relative imports for Node ESM compat
+const distGlob = new Glob('dist/**/*.{js,mjs}')
+for await (const file of distGlob.scan('.')) {
+  const content = await Bun.file(file).text()
+  const fixed = content.replace(/(from\s+['"])(\.\.?\/[^'"]+?)(?<!\.js)(?=['"])/g, '$1$2.js')
+  if (fixed !== content) {
+    await Bun.write(file, fixed)
+  }
+}
