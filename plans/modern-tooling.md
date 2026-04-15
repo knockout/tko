@@ -10,7 +10,7 @@
 | 1. Bun + Vitest | Merged | #303 | Bun replaces npm. Vitest replaces Karma. 2679 tests, 143 files, ~4s. Chromium+Firefox+WebKit in CI. |
 | 2. moduleResolution: bundler | Merged | #305 | bundler resolution, bunfig.toml with 48h minimumReleaseAge. |
 | 2b. Package fixes | Merged | #308 | Fix broken module paths, remove helpers from published packages, delete repackage.mjs. |
-| 3. Makefiles → Bun | Next | — | |
+| 3. Makefiles → Bun | Merged | #309 | tools/build.ts replaces Make+lerna. 0.3s clean build. All Makefiles, build.mk, lerna.json deleted. |
 | 4. Biome | Not started | — | |
 | 5. knip | Not started | — | |
 | 6. knip findings | Not started | — | |
@@ -143,8 +143,7 @@ Changes:
 
 ## Future considerations
 
-- **esbuild → Bun bundler** — evaluate during Phase 3
-- **Lerna → Bun workspaces** — evaluate during Phase 3
+- **esbuild → Bun bundler** — evaluate when Bun supports IIFE `globalName`
 
 ## Verification
 
