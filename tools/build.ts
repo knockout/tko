@@ -16,8 +16,7 @@ const common = `--log-level=warning --define:BUILD_VERSION='"${version}"' --sour
 async function esbuild(args: string) {
   console.log(`[build] ${name} → ${args.match(/--out(?:file|dir)=(\S+)/)?.[1] ?? ''}`)
   const proc = Bun.spawn(['sh', '-c', `bunx esbuild ${args}`], { stdio: ['inherit', 'inherit', 'inherit'] })
-  const code = await proc.exited
-  if (code !== 0) process.exit(code)
+  if (await proc.exited) process.exit(1)
 }
 
 async function sources(): Promise<string> {
@@ -31,17 +30,21 @@ await $`mkdir -p dist`.quiet()
 
 if (buildMode === 'default' || buildMode === 'browser') {
   const src = await sources()
-  await esbuild(`${src} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`)
-  await esbuild(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`)
-  await esbuild(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
+  await Promise.all([
+    esbuild(`${src} --platform=neutral --banner:js="${banner} ESM" ${common} --outdir=dist/`),
+    esbuild(`src/index.ts --platform=neutral --banner:js="${banner} MJS" ${common} --outfile=dist/index.mjs`),
+    esbuild(`./index.ts --platform=neutral --target=es6 --format=cjs --bundle --banner:js="${banner} CommonJS" ${common} --outfile=dist/index.cjs --external:@tko/*`)
+  ])
 }
 
 if (buildMode === 'browser') {
   await $`mkdir -p meta`.quiet()
   const footer = `(typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : global).${iifeGlobalName} = ${iifeGlobalName}.default`
   const iife = `--platform=browser --target=es6 --format=iife --global-name=${iifeGlobalName} --bundle --banner:js="${banner} IIFE" --footer:js="${footer}" ${common}`
-  await esbuild(`./src/index.ts ${iife} --minify --outfile=dist/browser.min.js --metafile=meta/browser_min_meta.json`)
-  await esbuild(`./src/index.ts ${iife} --outfile=dist/browser.js --metafile=meta/browser_meta.json`)
+  await Promise.all([
+    esbuild(`./src/index.ts ${iife} --minify --outfile=dist/browser.min.js --metafile=meta/browser_min_meta.json`),
+    esbuild(`./src/index.ts ${iife} --outfile=dist/browser.js --metafile=meta/browser_meta.json`)
+  ])
 }
 
 if (buildMode !== 'default' && buildMode !== 'browser') {
