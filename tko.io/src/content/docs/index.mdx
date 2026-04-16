@@ -23,16 +23,16 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   <TabItem label="ES module">
     ```html
     <script type="module">
-      import ko from 'https://esm.run/@tko/build.knockout'
+      import ko from 'https://esm.run/@tko/build.reference'
       const name = ko.observable('TKO')
     </script>
     ```
   </TabItem>
   <TabItem label="Classic script">
     ```html
-    <script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
     <script>
-      const ko = globalThis.ko
+      const ko = globalThis.tko
     </script>
     ```
   </TabItem>
@@ -43,27 +43,27 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 <Tabs syncKey="pkg">
   <TabItem label="npm">
     ```sh
-    npm install @tko/build.knockout
+    npm install @tko/build.reference
     ```
   </TabItem>
   <TabItem label="bun">
     ```sh
-    bun add @tko/build.knockout
+    bun add @tko/build.reference
     ```
   </TabItem>
   <TabItem label="pnpm">
     ```sh
-    pnpm add @tko/build.knockout
+    pnpm add @tko/build.reference
     ```
   </TabItem>
   <TabItem label="yarn">
     ```sh
-    yarn add @tko/build.knockout
+    yarn add @tko/build.reference
     ```
   </TabItem>
 </Tabs>
 
-For the modern TSX / `ko-*` path, use `@tko/build.reference` instead.
+For Knockout 3.x compatibility, use `@tko/build.knockout` instead.
 
 ## First binding example
 
@@ -76,8 +76,9 @@ For the modern TSX / `ko-*` path, use `@tko/build.reference` instead.
   <p>Hello, <strong data-bind="text: name"></strong>.</p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
 <script>
+  const ko = globalThis.tko
   ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
 </script>
 ```
@@ -85,15 +86,15 @@ For the modern TSX / `ko-*` path, use `@tko/build.reference` instead.
 ## Choose a build
 
 <div class="landing-grid">
-  <a class="landing-card" href="/bindings/">
-    <span class="landing-card__eyebrow">Recommended for migrations</span>
-    <h3><code>@tko/build.knockout</code></h3>
-    <p>Compatibility-focused. Closest match to a traditional Knockout application. Includes `data-bind` and `foreach`.</p>
-  </a>
   <a class="landing-card" href="/advanced/provider/">
-    <span class="landing-card__eyebrow">Recommended for new projects</span>
+    <span class="landing-card__eyebrow">Recommended</span>
     <h3><code>@tko/build.reference</code></h3>
     <p>Modern path with TSX, `ko-*` attributes, native provider, and strict equality in expressions.</p>
+  </a>
+  <a class="landing-card" href="/3to4/">
+    <span class="landing-card__eyebrow">Knockout 3.x migrations</span>
+    <h3><code>@tko/build.knockout</code></h3>
+    <p>Compatibility-focused. Drop-in replacement for existing Knockout applications.</p>
   </a>
 </div>
 
