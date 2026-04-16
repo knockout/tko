@@ -11,21 +11,21 @@ Knockout applications written over a decade ago are still running in production.
 ## Quick start
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
+<script type="module">
+  import ko from 'https://esm.run/@tko/build.reference'
+</script>
 ```
 
-Or as an ES module:
+Or as a classic script:
 
 ```html
-<script type="module">
-  import ko from 'https://esm.run/@tko/build.knockout'
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
 ```
 
 Or via a package manager:
 
 ```sh
-npm install @tko/build.knockout
+npm install @tko/build.reference
 ```
 
 **[Full documentation at tko.io](https://tko.io)**
@@ -34,8 +34,8 @@ npm install @tko/build.knockout
 
 | Package | Description |
 |---------|-------------|
-| `@tko/build.knockout` | Knockout-compatible build. Start here for migrations. |
-| `@tko/build.reference` | Modern build with TSX, `ko-*` attributes, native provider, strict equality. |
+| `@tko/build.reference` | **Recommended.** Modern build with TSX, `ko-*` attributes, native provider, strict equality. |
+| `@tko/build.knockout` | Knockout 3.x compatibility. [Migrating from Knockout?](https://tko.io/3to4/) Start here. |
 
 ## Development
 

@@ -126,14 +126,16 @@ Changes:
 - Add CI workflow for knip checks
 - Fix any findings in follow-up PRs (separate from the linter setup)
 
-### Phase 6 (future): knip findings
+### Phase 6: knip findings + follow-on fixes
 
 **One PR per category of finding.**
 
-- Unused export cleanup
-- Unused dependency removal
-- `verbatimModuleSyntax` + import type fixes
-- Dead IE code removal (detectIEVersion, browserSupportsProtoAssignment, etc.)
+- 6 (core): Unused files/deps/unlisted deps — Merged #312
+- 6b: `verbatimModuleSyntax` — enables the flag, removes tslib from all packages (PR #319, open)
+- 6c: ESM extensions — adds `.js` to dist imports, `verify:esm` CI check (Merged #315)
+- 6d: `strictEquality` — `defineOption` API, `ko.options.strictEquality` setter (Merged #314, fixes #290)
+- 6e: CI speed — Python-based Bun install in containers, saves ~9 min (PR #318, open)
+- Remaining: unused export cleanup, dead IE code removal
 
 ## Known follow-ups from Phase 1
 
