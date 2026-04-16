@@ -116,7 +116,7 @@ describe('Components: Component binding', function () {
     expectContainText(testNode.children[0], 'world')
   })
 
-  it('Renders nothing (and does not throw) when neither template nor children are provided', function () {
+  it('Throws if neither a template nor children are provided', function () {
     components.register(testComponentName, {
       viewModel: function () {
         return {}
@@ -126,8 +126,7 @@ describe('Components: Component binding', function () {
     expect(function () {
       applyBindings(outerViewModel, testNode)
       clock.tick(1)
-    }).to.not.throw()
-    expect(testNode.children[0].children.length).to.equal(0)
+    }).to.throw("Component 'test-component' has no template")
   })
 
   it('Uses children as template with native ko- attribute bindings', function () {

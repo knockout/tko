@@ -68,13 +68,12 @@ describe('Components: Component binding', function () {
     }).to.throw("Unknown component 'test-component'")
   })
 
-  it('Renders nothing (and does not throw) when neither template nor children are provided', function () {
+  it('Throws if neither a template nor children are provided', function () {
     ko.components.register(testComponentName, {})
     expect(function () {
       ko.applyBindings(outerViewModel, testNode)
       clock.tick(1)
-    }).to.not.throw()
-    expect(testNode.children[0].children.length).to.equal(0)
+    }).to.throw("Component 'test-component' has no template")
   })
 
   it('Uses the element children as template when no template is configured', function () {

@@ -33,6 +33,19 @@ export default class ComponentBinding extends DescendantBindingHandler {
     this.computed('computeApplyComponent')
   }
 
+  /**
+   * True when originalChildNodes contain at least one element or a text
+   * node with non-whitespace content. Whitespace-only children are treated
+   * as "no children" so `<my-comp>   </my-comp>` still errors.
+   */
+  hasMeaningfulChildren(): boolean {
+    return this.originalChildNodes.some(
+      n =>
+        n.nodeType === Node.ELEMENT_NODE ||
+        (n.nodeType === Node.TEXT_NODE && (n.nodeValue ?? '').trim().length > 0)
+    )
+  }
+
   cloneTemplateIntoElement(componentName: string, template: any, element: Node) {
     if (!template) {
       throw new Error("Component '" + componentName + "' has no template")
@@ -150,6 +163,11 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (!componentDefinition.template) {
       if (viewTemplate) {
         this.cloneTemplateIntoElement(componentName, viewTemplate, element)
+      } else if (!this.hasMeaningfulChildren()) {
+        // No template configured, viewModel didn't supply one, and the element
+        // has no children to use as an in-place template. This is a mistake —
+        // fail loudly rather than silently rendering nothing.
+        throw new Error("Component '" + componentName + "' has no template")
       }
       // else: no template configured — the element's own children serve as
       // the template. They were captured in originalChildNodes and are still
