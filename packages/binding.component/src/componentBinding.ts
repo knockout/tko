@@ -54,9 +54,13 @@ export default class ComponentBinding extends DescendantBindingHandler {
    * as "no children" so `<my-comp>   </my-comp>` still errors.
    */
   hasMeaningfulChildren(): boolean {
-    return this.originalChildNodes.some(
-      n => n.nodeType === Node.ELEMENT_NODE || (n.nodeType === Node.TEXT_NODE && (n.nodeValue ?? '').trim().length > 0)
-    )
+    const nodes = this.originalChildNodes
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i]
+      if (n.nodeType === Node.ELEMENT_NODE) return true
+      if (n.nodeType === Node.TEXT_NODE && (n.nodeValue ?? '').trim().length > 0) return true
+    }
+    return false
   }
 
   cloneTemplateIntoElement(componentName: string, template: any, element: Node) {
