@@ -142,30 +142,29 @@ describe('ComponentABC', function () {
     expectContainHtml(testNode.childNodes[0] as HTMLElement, '<i>vid</i>')
   })
 
-  it('auto-discovers <template id="$customElementName"> when no template or element is set', function () {
+  it('uses <template id="$componentName"> as a shared fallback across instances', function () {
     const tpl = document.createElement('template')
     tpl.id = 'test-component'
-    tpl.innerHTML = '<span class="auto-tpl" data-bind="text: msg"></span>'
+    tpl.innerHTML = '<span class="shared" data-bind="text: msg"></span>'
     document.body.appendChild(tpl)
     cleanups.push(() => tpl.remove())
 
     class CX extends ComponentABC {
-      msg = 'from-auto'
+      msg = 'from-shared'
       static get customElementName() {
         return 'test-component'
       }
     }
     ;(CX as any).register()
 
-    // Two instances share one <template id>
     testNode.innerHTML = '<test-component></test-component><test-component></test-component>'
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
 
-    const spans = testNode.querySelectorAll('.auto-tpl')
+    const spans = testNode.querySelectorAll('.shared')
     expect(spans.length).to.equal(2)
-    expect(spans[0].textContent).to.equal('from-auto')
-    expect(spans[1].textContent).to.equal('from-auto')
+    expect(spans[0].textContent).to.equal('from-shared')
+    expect(spans[1].textContent).to.equal('from-shared')
   })
 
   it('falls back to children-as-template when no matching <template id> exists', function () {
@@ -184,6 +183,36 @@ describe('ComponentABC', function () {
     const rendered = testNode.querySelector('.inline')
     expect(rendered).to.not.equal(null)
     expect(rendered!.textContent).to.equal('from-children')
+  })
+
+  it('instance children win over the shared <template id> default', function () {
+    const tpl = document.createElement('template')
+    tpl.id = 'test-component'
+    tpl.innerHTML = '<span class="shared" data-bind="text: msg"></span>'
+    document.body.appendChild(tpl)
+    cleanups.push(() => tpl.remove())
+
+    class CX extends ComponentABC {
+      msg = 'vm-msg'
+      static get customElementName() {
+        return 'test-component'
+      }
+    }
+    ;(CX as any).register()
+
+    testNode.innerHTML =
+      '<test-component></test-component>' +
+      '<test-component><span class="custom" data-bind="text: msg"></span></test-component>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+
+    // First instance — no children → uses shared template
+    expect(testNode.children[0].querySelector('.shared')).to.not.equal(null)
+    expect(testNode.children[0].querySelector('.custom')).to.equal(null)
+    // Second instance — has children → uses them instead of the shared default
+    expect(testNode.children[1].querySelector('.shared')).to.equal(null)
+    expect(testNode.children[1].querySelector('.custom')).to.not.equal(null)
+    expect(testNode.children[1].querySelector('.custom')!.textContent).to.equal('vm-msg')
   })
 
   it('disposes when the node is removed', function () {

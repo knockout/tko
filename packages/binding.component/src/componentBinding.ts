@@ -34,6 +34,21 @@ export default class ComponentBinding extends DescendantBindingHandler {
   }
 
   /**
+   * Look up a <template id="$componentName"> (or any element with that id)
+   * in the document and return its child nodes as a template node array,
+   * or null if none is found. Used as a fallback when no config/viewModel
+   * template and no instance children are provided.
+   */
+  findSharedTemplate(componentName: string): Node[] | null {
+    if (typeof document === 'undefined') return null
+    const el = document.getElementById(componentName)
+    if (!el) return null
+    const source =
+      (el as any).content && (el as any).content.nodeType === 11 ? (el as any).content.childNodes : el.childNodes
+    return makeArray(source)
+  }
+
+  /**
    * True when originalChildNodes contain at least one element or a text
    * node with non-whitespace content. Whitespace-only children are treated
    * as "no children" so `<my-comp>   </my-comp>` still errors.
@@ -161,10 +176,15 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (!componentDefinition.template) {
       if (viewTemplate) {
         this.cloneTemplateIntoElement(componentName, viewTemplate, element)
-      } else if (!this.hasMeaningfulChildren()) {
-        throw new Error("Component '" + componentName + "' has no template")
-      } else {
+      } else if (this.hasMeaningfulChildren()) {
         this.cloneTemplateIntoElement(componentName, this.originalChildNodes, element)
+      } else {
+        const sharedTemplate = this.findSharedTemplate(componentName)
+        if (sharedTemplate) {
+          this.cloneTemplateIntoElement(componentName, sharedTemplate, element)
+        } else {
+          throw new Error("Component '" + componentName + "' has no template")
+        }
       }
     }
 

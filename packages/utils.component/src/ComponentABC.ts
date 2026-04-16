@@ -45,10 +45,9 @@ export class ComponentABC extends LifeCycle {
    * 2. An array of DOM nodes
    * 3. A document fragment
    * 4. An AMD module (with `{require: 'some/template'}`)
-   * If neither this nor `element` is overloaded, ComponentABC looks up a
-   * <template id="$customElementName"> in the document. If that's also
-   * absent, the component's own instance children serve as its template
-   * (children-as-template mode).
+   * If neither this nor `element` is overloaded, the component binding
+   * falls back to (in order): the instance's own children, then a
+   * <template id="$customElementName"> anywhere in the document.
    * @return {mixed} One of the accepted template types for the ComponentBinding.
    */
   static get template(): any {
@@ -56,11 +55,7 @@ export class ComponentABC extends LifeCycle {
       return undefined
     }
     const element = this.element
-    if (element) {
-      return { element }
-    }
-    const autoElement = typeof document !== 'undefined' ? document.getElementById(this.customElementName) : null
-    return autoElement ? { element: autoElement } : undefined
+    return element ? { element } : undefined
   }
 
   /**
