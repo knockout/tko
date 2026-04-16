@@ -17,12 +17,22 @@ Save this as `index.html`:
       <input data-bind="textInput: name" />
       <p>Hello, <strong data-bind="text: name"></strong>.</p>
     </div>
-    <script type="module">
-      import ko from 'https://esm.run/@tko/build.reference'
+    <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
+    <script>
+      const ko = globalThis.tko
       ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
     </script>
   </body>
 </html>
+```
+
+Or as an ES module (no IIFE needed):
+
+```html
+<script type="module">
+  import ko from 'https://esm.run/@tko/build.reference'
+  ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+</script>
 ```
 
 Upload that single file to any of the platforms below. That's it — a live, reactive web UI.
