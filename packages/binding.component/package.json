@@ -39,5 +39,12 @@
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "binding",
+    "web-components",
+    "custom-elements"
+  ]
 }

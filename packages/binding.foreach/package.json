@@ -12,8 +12,10 @@
   },
   "keywords": [
     "knockout",
+    "tko",
+    "binding",
     "foreach",
-    "javascript"
+    "iteration"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

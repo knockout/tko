@@ -1,167 +1,71 @@
-
-# TKO (“Technical Knockout”)
+# TKO ("Technical Knockout")
 
 [![npm version](https://badge.fury.io/js/@tko%2Fbuild.reference.svg)](https://badge.fury.io/js/@tko%2Fbuild.reference)
-[![Join the chat at https://gitter.im/knockout/tko](https://badges.gitter.im/knockout/tko.svg)](https://gitter.im/knockout/tko?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
+[![Check Tests](https://github.com/knockout/tko/actions/workflows/test-headless.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/test-headless.yml)
+[![Lint & Typecheck](https://github.com/knockout/tko/actions/workflows/lint-and-typecheck.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/lint-and-typecheck.yml)
 
-[![Check 'Main-build'](https://github.com/knockout/tko/actions/workflows/main-build.yml/badge.svg)](https://github.com/knockout/tko/actions/workflows/main-build.yml)
-[![Coverage Status](https://coveralls.io/repos/knockout/tko/badge.svg?branch=master&service=github)](https://coveralls.io/github/knockout/tko?branch=master)
-[![Circle CI](https://circleci.com/gh/knockout/tko.svg?style=shield)](https://circleci.com/gh/knockout/tko)
-<!-- [![Sauce Test Status](https://saucelabs.com/browser-matrix/tko.svg)](https://saucelabs.com/u/tko) -->
+Modern successor to [Knockout.js](https://knockoutjs.com). Reactive data binding and UI templating with zero runtime dependencies.
 
-**TKO** houses the monorepo of [Knockout](https://github.com/knockout/knockout).
-TKO, or Technical Knockout, is a JavaScript web framework for data binding and templating. It is a fork of the original Knockout.js, which was created to enhance and modernize the framework while maintaining its core principles. TKO and Knockout implement the [MVVM pattern](http://en.wikipedia.org/wiki/Model_View_ViewModel) (a modern variant of MVC) as a zero-dependency and small sized library. TKO makes it easy to create rich, desktop-like user interfaces with JavaScript/Typescript and HTML. It uses *observers* to automatically keep your UI in sync with an underlying data model, along with a powerful and extensible set of *declarative bindings* to enable productive development. 
+Knockout applications written over a decade ago are still running in production. TKO gives them a path forward — swap the script tag, verify your tests pass, then optionally adopt modern features like TSX, native providers, and modular packages.
 
-TKO aims to provide developers with a more robust, modular, and maintainable codebase in [Typescript](https://www.typescriptlang.org/), making it easier to build rich, responsive, and maintainable web applications.
+## Quick start
 
-
-
-## Getting Started
-
-To install use one of the usual package managers e.g.
-
-- $ `yarn add @tko/build.reference`
-- $ `npm install @tko/build.reference`
-- $ `pnpm install @tko/build.reference`
-
-
-Over CDN
-
-- Reference Build: https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/build.reference.min.js
-
-For more details, see
-
- * TKO - Documentation (https://tko.io)
- * Knockout - Documentation (http://knockoutjs.com/documentation/introduction.html)
- * Online examples at [http://knockoutjs.com/examples/](http://knockoutjs.com/examples/)
- * Stackoverflow https://stackoverflow.com/questions/tagged/knockout.js
-
-## Knockout Build
-
-The Knockout build has some backwards compatibility that is not in the reference build.  See the build differences, here: https://tko.io/3to4
-
-It's available as `@tko/build.knockout`, and over CDN:
-
-- Knockout Build https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/build.knockout.min.js
-
-### Using the Monorepo
-
-| Command | Effect |
-| ------- | ------ |
-| $ `git clone git@github.com:knockout/tko` | Clone the repository. |
-| $ `bun install` | Install all dependencies |
-| $ `make` | Build all packages (ESM, CommonJS, MJS) |
-| $ `make test` | Run all tests (Vitest, headless Chromium via Playwright) |
-| $ `bunx changeset add` | Add a changeset for package behavior changes in your PR |
-
-Checkout the `Makefile` for more commands that can be executed with `make {command}`.
-
-In each individual `packages/*/` directory, you can also run:
-
-| Command | Effect |
-| --- | --- |
-| $ `bunx vitest run`  | Run all tests (headless Chromium via Playwright) |
-
-### Testing
-
-Tests use Vitest browser mode with Playwright (headless Chromium). Assertions use Chai and Sinon.
-
-Run `make test` or `bunx vitest run`.
-
-Other options:
-
-- `make ci` — use Sauce Labs to test a variety of platforms; requires an account at Sauce Labs and `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` to be set in the environment.
-
-## Objectives
-
-TKO aims to become a base for future versions of Knockout.  The objectives include:
-
-- Modularization into ES6 and separate projects, with compilation using an ES6 compiler like [Esbuild](https://esbuild.github.io/).  This solves several problems with Knockout, including:
-  - Some folks want to roll-their-own with e.g. removing components
-  - Compilation is now with Closure compiler, which is actually transliterating – meaning the *debug* and *minified* versions have different code paths (mostly in the form of things exposed in *debug* being missing in the *minified* version)
-  - The compilation of Knockout is just concatenation, leading to difficulties with maintainance, severance, and replacement
-- Documentation inline in the source code.  This aims to make it easier to document, by making documentation adjacent to the code about-which it speaks.  Also, we aim to have examples in the documentation.
-- A more comprehensive home page.  The hope is to have something fun and fancy, and we have [a rough prototype](http://brianmhunt.github.io/knockout).
-- Better setup for plugins.  The problems with Knockout include:
-  - There's no central, searchable repository for knockout
-  - What should be simple plugins (e.g. binding handlers or providers) are complex, including:
-    - Built-ins have first-class access to quite a bit of good Knockout code, but plugins generally have second-class access and often have to duplicate Knockout internals
-    - Quality plugins have lots of boilerplate for compilation, release, documentation, and testing
-- Type-safe with Typescript
-- CSP compliant
-- JSX/TSX support
-
-## Zero-dependency and small sized - with all plugins, bundled only ~125KB
-
-Created with https://esbuild.github.io/analyze/
-![Bundled only 125KB](assets/esbuild_analyzer.png)
-
-## JQUERY and TKO
-
-Optionally TKO can use JQuery for CSS-Manipulation and HTML-Templates (only if HTML5-Template-Tag no supported). All tests are based on JQuery 3.7. 
-In the future we will probably remove the usage of JQuery in TKO, as many features have already been migrated to native APIs. Compatibility with JQuery in an application will remain.
-You can set useOnlyNativeEvents to false, so JQuery is also use for event-registration. Note: Some tests fails in this case ('change'-event doesn't fire). You can set useTemplateTag to false, so disable using HTML5-Template-Tags.
-
-## Sanitizing HTML-Templates
-
-TKO supports HTML sanitization through configurable options. To sanitize HTML templates, you can override `options.sanitizeHtmlTemplate` with a library like [DOMPurify](https://github.com/cure53/DOMPurify) or [validator.js](https://github.com/validatorjs/validator.js).
-
-Additionally, implement a well-configured [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) to provide an extra layer of protection against XSS attacks.
-
-
-## Overview of the development stack
-
-- **bun** -> Package manager and script runner
-- **make** -> Build tasks
-- **esbuild** -> TS/JS compiler and bundler
-- **lerna** -> Monorepo build chain
-
----
-
-- Test Runner -> Vitest (browser mode, Playwright)
-- Test Environment -> headless Chromium, Firefox, WebKit
-- Type Checker -> tsc (TypeScript 6) + tsgo (TypeScript 7, 6x faster)
-- Linting -> ESLint
-- Formatting -> Prettier
-- Assertions -> Chai + Sinon
-
-## WSL Setup
-
-Install Playwright browser dependencies:
-
-```bash
-bunx playwright install --with-deps chromium
+```html
+<script src="https://cdn.jsdelivr.net/npm/@tko/build.knockout/dist/browser.min.js"></script>
 ```
 
-Install Firefox for "make test-headless-ff":
-```bash
-sudo add-apt-repository ppa:mozillateam/ppa
-sudo apt install xvfb firefox-esr
-sudo ln -s /usr/lib/firefox-esr/firefox.sh /usr/bin/firefox
+Or as an ES module:
 
-or 
-export FIREFOX_BIN=/usr/bin/firefox-esr
+```html
+<script type="module">
+  import ko from 'https://esm.run/@tko/build.knockout'
+</script>
 ```
 
-## Next steps
+Or via a package manager:
 
-There's an [issue for that](https://github.com/knockout/tko/issues/1).
+```sh
+npm install @tko/build.knockout
+```
+
+**[Full documentation at tko.io](https://tko.io)**
+
+## Builds
+
+| Package | Description |
+|---------|-------------|
+| `@tko/build.knockout` | Knockout-compatible build. Start here for migrations. |
+| `@tko/build.reference` | Modern build with TSX, `ko-*` attributes, native provider, strict equality. |
+
+## Development
+
+| Command | Description |
+|---------|-------------|
+| `bun install` | Install dependencies |
+| `bun run build` | Build all packages |
+| `bun run test` | Run tests (Vitest, headless Chromium) |
+| `bun run verify` | Full check: lint + typecheck + build + test |
+| `bun run knip` | Detect unused code and dependencies |
+| `bun run check` | Biome lint + format |
+
+See [AGENTS.md](AGENTS.md) for full contributor instructions.
+
+## Architecture
+
+27 modular `@tko/*` packages, two bundled builds. TypeScript source, esbuild compilation, Bun workspaces.
+
+The core model: observables notify subscribers when they change. Bindings subscribe to observables and update the DOM. No virtual DOM, no diffing — updates are proportional to what changed, not tree size.
+
+See [agents/soul.md](https://tko.io/agents/soul.md) for the design philosophy.
+
+## Direction
+
+TKO is moving toward an AI-maintained "dark factory" model — where the tooling, tests, and documentation are robust enough that AI agents can handle routine maintenance autonomously. See [plans/dark-factory.md](plans/dark-factory.md).
 
 ## License
 
-MIT license - [http://www.opensource.org/licenses/mit-license.php.](http://www.opensource.org/licenses/mit-license.php)
+MIT — [opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)
 
 ## Credits
-- Knockout Type Definitions by: [Maxime LUCE](https://github.com/SomaticIT), [Michael Best](https://github.com/mbest)  
-    - https://github.com/knockout/knockout/blob/master/build/types/knockout.d.ts#L404
-- Team-Project: https://github.com/knockout
-- http://knockoutjs.com / [Steve Sanderson](https://github.com/SteveSanderson), [Michael Best](https://github.com/mbest)
 
-## Shout Outs
-
-<div>
-  <a href='http://browserstack.com'>
-    Browser Stack
-  </a>
-<div>
+[Steve Sanderson](https://github.com/SteveSanderson) (Knockout creator), [Michael Best](https://github.com/mbest), and [contributors](https://github.com/knockout/tko/graphs/contributors).

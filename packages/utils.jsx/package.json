@@ -13,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "jsx",
+    "tsx",
+    "reactive-rendering"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

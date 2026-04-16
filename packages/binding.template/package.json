@@ -13,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "binding",
+    "template",
+    "templating"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
