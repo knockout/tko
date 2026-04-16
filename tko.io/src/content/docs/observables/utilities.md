@@ -82,8 +82,8 @@ subscribable.fn  →  observable.fn  →  observableArray.fn
 Adding a method to `ko.observable.fn` makes it available on all observables:
 
 ```js
-ko.observable.fn.log = function (label) {
-  this.subscribe(value => console.log(label, value))
+ko.observable.fn.log = function (label) {  // note: must be function, not arrow, to preserve `this`
+  this.subscribe(v => console.log(label, v))
   return this
 }
 

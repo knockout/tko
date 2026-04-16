@@ -17,7 +17,7 @@ const vm = {
   tags: ko.observableArray(['admin', 'active'])
 }
 
-async function save() {
+const save = async () => {
   const data = ko.toJS(vm)
   // data is { firstName: 'Jane', lastName: 'Doe', tags: ['admin', 'active'] }
 
@@ -44,7 +44,7 @@ await fetch('/api/user', {
 When you receive data from a server, update each observable individually:
 
 ```js
-async function load() {
+const load = async () => {
   const response = await fetch('/api/user')
   const data = await response.json()
 
@@ -54,10 +54,10 @@ async function load() {
 }
 ```
 
-For larger models, a helper function keeps things tidy:
+For larger models, a helper keeps things tidy:
 
 ```js
-function updateFrom(viewModel, data) {
+const updateFrom = (viewModel, data) => {
   for (const [key, value] of Object.entries(data)) {
     if (ko.isWritableObservable(viewModel[key])) {
       viewModel[key](value)
@@ -66,7 +66,7 @@ function updateFrom(viewModel, data) {
 }
 
 // Usage
-async function load() {
+const load = async () => {
   const data = await fetch('/api/user').then(r => r.json())
   updateFrom(vm, data)
 }
