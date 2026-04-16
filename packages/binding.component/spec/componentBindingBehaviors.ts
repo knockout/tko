@@ -129,6 +129,40 @@ describe('Components: Component binding', function () {
     }).to.throw("Component 'test-component' has no template")
   })
 
+  it('Each instance gets an independent template clone — mutations to one do not bleed into siblings or subsequent instances', function () {
+    components.register(testComponentName, {
+      template: '<p class="pristine">hello</p>'
+    })
+
+    // First pair: two sibling instances, rendered together
+    testNode.innerHTML =
+      '<div data-bind="component: testComponentBindingValue"></div>' +
+      '<div data-bind="component: testComponentBindingValue"></div>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+
+    const [firstHost, secondHost] = Array.from(testNode.children)
+    const first = firstHost.querySelector('p')!
+    const second = secondHost.querySelector('p')!
+
+    // Sibling independence: mutating the first clone does not affect the second.
+    first.className = 'mutated'
+    first.textContent = 'MUTATED'
+    expect(second.className).to.equal('pristine')
+    expect(second.textContent).to.equal('hello')
+
+    // Subsequent instantiation: a fresh bind of a new host also renders a clean template.
+    const thirdHost = document.createElement('div')
+    thirdHost.setAttribute('data-bind', 'component: testComponentBindingValue')
+    testNode.appendChild(thirdHost)
+    applyBindings(outerViewModel, thirdHost)
+    clock.tick(1)
+
+    const third = thirdHost.querySelector('p')!
+    expect(third.className).to.equal('pristine')
+    expect(third.textContent).to.equal('hello')
+  })
+
   it('Uses children as template with native ko- attribute bindings', function () {
     const inner = observable('hello')
     components.register(testComponentName, {
