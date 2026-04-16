@@ -68,4 +68,4 @@ MIT — [opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)
 
 ## Credits
 
-[Steve Sanderson](https://github.com/SteveSanderson) (Knockout creator), [Michael Best](https://github.com/mbest), and [contributors](https://github.com/knockout/tko/graphs/contributors).
+[Steve Sanderson](https://github.com/SteveSanderson) (Knockout creator), [Michael Best](https://github.com/mbest), [Ryan Niemeyer](https://github.com/rniemeyer), and [contributors](https://github.com/knockout/tko/graphs/contributors).
