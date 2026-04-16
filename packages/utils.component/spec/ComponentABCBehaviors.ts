@@ -142,6 +142,50 @@ describe('ComponentABC', function () {
     expectContainHtml(testNode.childNodes[0] as HTMLElement, '<i>vid</i>')
   })
 
+  it('auto-discovers <template id="$customElementName"> when no template or element is set', function () {
+    const tpl = document.createElement('template')
+    tpl.id = 'test-component'
+    tpl.innerHTML = '<span class="auto-tpl" data-bind="text: msg"></span>'
+    document.body.appendChild(tpl)
+    cleanups.push(() => tpl.remove())
+
+    class CX extends ComponentABC {
+      msg = 'from-auto'
+      static get customElementName() {
+        return 'test-component'
+      }
+    }
+    ;(CX as any).register()
+
+    // Two instances share one <template id>
+    testNode.innerHTML = '<test-component></test-component><test-component></test-component>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+
+    const spans = testNode.querySelectorAll('.auto-tpl')
+    expect(spans.length).to.equal(2)
+    expect(spans[0].textContent).to.equal('from-auto')
+    expect(spans[1].textContent).to.equal('from-auto')
+  })
+
+  it('falls back to children-as-template when no matching <template id> exists', function () {
+    class CX extends ComponentABC {
+      msg = 'from-children'
+      static get customElementName() {
+        return 'test-component'
+      }
+    }
+    ;(CX as any).register()
+
+    testNode.innerHTML = '<test-component><span class="inline" data-bind="text: msg"></span></test-component>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+
+    const rendered = testNode.querySelector('.inline')
+    expect(rendered).to.not.equal(null)
+    expect(rendered!.textContent).to.equal('from-children')
+  })
+
   it('disposes when the node is removed', function () {
     let disp = false
     class CX extends ComponentABC {
