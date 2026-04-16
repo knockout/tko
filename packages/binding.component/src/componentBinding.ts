@@ -40,9 +40,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
    */
   hasMeaningfulChildren(): boolean {
     return this.originalChildNodes.some(
-      n =>
-        n.nodeType === Node.ELEMENT_NODE ||
-        (n.nodeType === Node.TEXT_NODE && (n.nodeValue ?? '').trim().length > 0)
+      n => n.nodeType === Node.ELEMENT_NODE || (n.nodeType === Node.TEXT_NODE && (n.nodeValue ?? '').trim().length > 0)
     )
   }
 
