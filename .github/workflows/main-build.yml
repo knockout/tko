@@ -17,16 +17,9 @@ jobs:
         uses: actions/checkout@v6
 
       # Install Bun directly — avoids `apt-get update` (9+ min in this
-      # container) which setup-bun needs for unzip. Bun only ships .zip;
-      # Python's zipfile module is always available in the Playwright image.
+      # container) which setup-bun needs for unzip.
       - name: Install Bun
-        run: |
-          version=$(grep '^bun ' .tool-versions | awk '{print $2}')
-          curl -fsSL -o /tmp/bun.zip "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip"
-          python3 -c "import zipfile; zipfile.ZipFile('/tmp/bun.zip').extractall('/tmp')"
-          mv /tmp/bun-linux-x64/bun /usr/local/bin/
-          chmod +x /usr/local/bin/bun
-          ln -sf /usr/local/bin/bun /usr/local/bin/bunx
+        run: bash tools/install-bun.sh
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
