@@ -43,8 +43,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
     if (typeof document === 'undefined') return null
     const el = document.getElementById(componentName)
     if (!el) return null
-    const source =
-      (el as any).content && (el as any).content.nodeType === 11 ? (el as any).content.childNodes : el.childNodes
+    const source = el instanceof HTMLTemplateElement ? el.content.childNodes : el.childNodes
     return makeArray(source)
   }
 

@@ -12,8 +12,7 @@ import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 import { bindings as componentBindings } from '@tko/binding.component'
 
-import components from '../dist'
-const { ComponentABC } = components
+import components, { ComponentABC } from '@tko/utils.component'
 
 import { expect } from 'chai'
 import sinon from 'sinon'
@@ -60,16 +59,16 @@ describe('ComponentABC', function () {
 
   it('registers without overloading (children-as-template mode)', function () {
     class CX extends ComponentABC {}
-    expect(() => (CX as any).register()).to.not.throw()
+    expect(() => CX.register()).to.not.throw()
   })
 
   it('registers when neither template nor element is overloaded (children-as-template mode)', function () {
     class CXTwo extends ComponentABC {
-      static get customElementName() {
+      static override get customElementName() {
         return 'a-b'
       }
     }
-    expect(() => (CXTwo as any).register()).to.not.throw()
+    expect(() => CXTwo.register()).to.not.throw()
   })
 
   it('uses the class name kebab-case elementName is not overloaded', function () {
@@ -78,25 +77,21 @@ describe('ComponentABC', function () {
         return 'a-b'
       }
     }
-    ;(CaaXbbb as any).register()
-    expect((CaaXbbb as any).customElementName).to.equal('caa-xbbb')
+    CaaXbbb.register()
+    expect(CaaXbbb.customElementName).to.equal('caa-xbbb')
   })
 
   it('binds when registered like a normal component', function () {
     class CX extends ComponentABC {
-      myvalue: string
-      constructor(...args) {
-        super(...args)
-        this.myvalue = 'some parameter value'
-      }
-      static get customElementName() {
+      myvalue = 'some parameter value'
+      static override get customElementName() {
         return 'test-component'
       }
-      static get template() {
+      static override get template() {
         return '<div data-bind="text: myvalue"></div>'
       }
     }
-    ;(CX as any).register()
+    CX.register()
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
 
@@ -108,34 +103,30 @@ describe('ComponentABC', function () {
 
   it('registers on the components', function () {
     class CX extends ComponentABC {
-      myvalue: string
-      constructor(...args) {
-        super(...args)
-        this.myvalue = 'some parameter value'
-      }
-      static get customElementName() {
+      myvalue = 'some parameter value'
+      static override get customElementName() {
         return 'test-component'
       }
-      static get template() {
+      static override get template() {
         return '<div data-bind="text: myvalue"></div>'
       }
     }
-    ;(CX as any).register()
+    CX.register()
     expect(components._allRegisteredComponents['test-component'].viewModel).to.equal(CX)
   })
 
   it('respects the `element` property', function () {
     class CX extends ComponentABC {
-      static get customElementName() {
+      static override get customElementName() {
         return 'test-component'
       }
-      static get element() {
+      static override get element() {
         const node = document.createElement('div')
         node.innerHTML = '<i>vid</i>'
         return node
       }
     }
-    ;(CX as any).register()
+    CX.register()
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
 
@@ -151,11 +142,11 @@ describe('ComponentABC', function () {
 
     class CX extends ComponentABC {
       msg = 'from-shared'
-      static get customElementName() {
+      static override get customElementName() {
         return 'test-component'
       }
     }
-    ;(CX as any).register()
+    CX.register()
 
     testNode.innerHTML = '<test-component></test-component><test-component></test-component>'
     applyBindings(outerViewModel, testNode)
@@ -170,11 +161,11 @@ describe('ComponentABC', function () {
   it('falls back to children-as-template when no matching <template id> exists', function () {
     class CX extends ComponentABC {
       msg = 'from-children'
-      static get customElementName() {
+      static override get customElementName() {
         return 'test-component'
       }
     }
-    ;(CX as any).register()
+    CX.register()
 
     testNode.innerHTML = '<test-component><span class="inline" data-bind="text: msg"></span></test-component>'
     applyBindings(outerViewModel, testNode)
@@ -194,11 +185,11 @@ describe('ComponentABC', function () {
 
     class CX extends ComponentABC {
       msg = 'vm-msg'
-      static get customElementName() {
+      static override get customElementName() {
         return 'test-component'
       }
     }
-    ;(CX as any).register()
+    CX.register()
 
     testNode.innerHTML =
       '<test-component></test-component>' +
@@ -218,18 +209,18 @@ describe('ComponentABC', function () {
   it('disposes when the node is removed', function () {
     let disp = false
     class CX extends ComponentABC {
-      dispose() {
+      override dispose() {
         super.dispose()
         disp = true
       }
-      static get customElementName() {
+      static override get customElementName() {
         return 'test-component'
       }
-      static get template() {
+      static override get template() {
         return '<i></i>'
       }
     }
-    ;(CX as any).register()
+    CX.register()
     applyBindings(outerViewModel, testNode)
     cleanNode(testNode)
     expect(disp).to.equal(true)
