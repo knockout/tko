@@ -12,7 +12,6 @@
     "@tko/bind": "^4.0.1",
     "@tko/binding.template": "^4.0.1",
     "@tko/computed": "^4.0.1",
-    "@tko/filter.punches": "^4.0.1",
     "@tko/lifecycle": "^4.0.1",
     "@tko/observable": "^4.0.1",
     "@tko/provider": "^4.0.1",
