@@ -25,20 +25,30 @@ Save one of these as `index.html`:
     </script>
   </head>
   <body>
-    <div id="app">
+    <template id="greeting-template">
       <input ko-textInput="name" />
       <p>Hello, <strong ko-text="name"></strong>.</p>
-    </div>
+    </template>
+
+    <ko-greeting></ko-greeting>
 
     <script type="module">
       import ko from '@tko/build.reference'
-      ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+
+      ko.components.register('ko-greeting', {
+        template: { element: 'greeting-template' },
+        viewModel: function () {
+          this.name = ko.observable('TKO')
+        },
+      })
+
+      ko.applyBindings({}, document.body)
     </script>
   </body>
 </html>
 ```
 
-Native `ko-` attribute providers. No compile step. Ship it.
+Native `ko-` bindings. Reusable component with a `<template>` for markup and a viewModel for state. Drop `<ko-greeting></ko-greeting>` anywhere, any number of times — each instance gets its own observable. No compile step. Ship it.
 
   </TabItem>
   <TabItem label="ESM + TSX">
@@ -59,24 +69,28 @@ Native `ko-` attribute providers. No compile step. Ship it.
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <template id="counter-template">
+      <h1>Count: <span ko-text="count"></span></h1>
+      <button ko-click="increment">Increment</button>
+    </template>
+
+    <ko-counter></ko-counter>
+    <ko-counter></ko-counter>
 
     <script id="app" type="text/tsx">
       import ko from '@tko/build.reference'
 
-      const count = ko.observable(0)
+      class Counter {
+        count = ko.observable(0)
+        increment = () => this.count(this.count() + 1)
+      }
 
-      const view = (
-        <div>
-          <h1>Count: {count}</h1>
-          <button ko-click={() => count(count() + 1)}>Increment</button>
-        </div>
-      )
+      ko.components.register('ko-counter', {
+        template: { element: 'counter-template' },
+        viewModel: Counter,
+      })
 
-      const root = document.getElementById('root')
-      const { node } = ko.jsx.render(view)
-      root.appendChild(node)
-      ko.applyBindings({}, root)
+      ko.applyBindings({}, document.body)
     </script>
 
     <script type="module">
@@ -103,7 +117,9 @@ Native `ko-` attribute providers. No compile step. Ship it.
 </html>
 ```
 
-JSX and TypeScript, still one file. Your TSX lives in `<script type="text/tsx">` — the browser ignores unknown script types so the source is preserved verbatim. A tiny `<script type="module">` bootstrap loads esbuild-wasm from the CDN, transforms the TSX in the browser, wraps the compiled output in a blob URL, and `import()`s it as a real ES module. Imports like `import ko from '@tko/build.reference'` resolve through the import map just like any module.
+Templates and code live apart. The `<template id="counter-template">` is reusable markup — drop `<ko-counter></ko-counter>` as many times as you like, each instance gets its own `Counter` viewModel. Template content is plain HTML with `ko-` bindings; TKO doesn't care whether it came from JSX or HTML.
+
+Your TypeScript lives in `<script type="text/tsx">` — the browser ignores unknown script types so the source survives verbatim. A tiny `<script type="module">` bootstrap loads esbuild-wasm from the CDN, transforms the source, wraps it in a blob URL, and `import()`s it as a real ES module. `import ko from '@tko/build.reference'` resolves through the import map just like any module.
 
 Trade-off: first load fetches ~3MB of esbuild-wasm (cached after). Great for demos, internal tools, and apps where time-to-compile matters less than zero-build deployment.
 

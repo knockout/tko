@@ -10,14 +10,24 @@ const DEFAULT_HTML = `<!doctype html>
     </script>
   </head>
   <body>
-    <div id="app">
+    <template id="greeting-template">
       <input ko-textInput="name" />
       <p>Hello, <strong ko-text="name"></strong>.</p>
-    </div>
+    </template>
+
+    <ko-greeting></ko-greeting>
 
     <script type="module">
       import ko from '@tko/build.reference'
-      ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+
+      ko.components.register('ko-greeting', {
+        template: { element: 'greeting-template' },
+        viewModel: function () {
+          this.name = ko.observable('TKO')
+        },
+      })
+
+      ko.applyBindings({}, document.body)
     </script>
   </body>
 </html>
