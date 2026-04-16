@@ -1,37 +1,26 @@
 import type { Runner, RunnerStatus } from './runner'
 
 const DEFAULT_HTML = `<!doctype html>
-<meta charset="utf-8" />
-<title>TKO ESM</title>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello, TKO</title>
+    <script type="importmap">
+      { "imports": { "@tko/build.reference": "https://esm.sh/@tko/build.reference" } }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <input data-bind="textInput: name" />
+      <p>Hello, <strong data-bind="text: name"></strong>.</p>
+    </div>
 
-<script type="importmap">
-{
-  "imports": {
-    "@tko/build.reference": "https://esm.sh/@tko/build.reference"
-  }
-}
-</script>
-
-<style>
-  body { font-family: system-ui, sans-serif; margin: 2rem; color: #1a1a1a; }
-  button { cursor: pointer; padding: 0.35rem 0.75rem; }
-</style>
-
-<div id="root">
-  <h1>Count: <span data-bind="text: count"></span></h1>
-  <button data-bind="click: increment">Increment</button>
-</div>
-
-<script type="module">
-  import ko from '@tko/build.reference'
-
-  const vm = {
-    count: ko.observable(0),
-    increment() { vm.count(vm.count() + 1) }
-  }
-
-  ko.applyBindings(vm, document.getElementById('root'))
-</script>
+    <script type="module">
+      import ko from '@tko/build.reference'
+      ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+    </script>
+  </body>
+</html>
 `
 
 const CONSOLE_FORWARD = `<script>

@@ -11,19 +11,26 @@ Save this as `index.html`:
 
 ```html
 <!doctype html>
-<script type="importmap">
-  { "imports": { "@tko/build.reference": "https://esm.sh/@tko/build.reference" } }
-</script>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello, TKO</title>
+    <script type="importmap">
+      { "imports": { "@tko/build.reference": "https://esm.sh/@tko/build.reference" } }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <input data-bind="textInput: name" />
+      <p>Hello, <strong data-bind="text: name"></strong>.</p>
+    </div>
 
-<div id="app">
-  <input data-bind="textInput: name" />
-  <p>Hello, <strong data-bind="text: name"></strong>.</p>
-</div>
-
-<script type="module">
-  import ko from '@tko/build.reference'
-  ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
-</script>
+    <script type="module">
+      import ko from '@tko/build.reference'
+      ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+    </script>
+  </body>
+</html>
 ```
 
 Upload that single file to any of the platforms below. That's it — a live, reactive web UI.
