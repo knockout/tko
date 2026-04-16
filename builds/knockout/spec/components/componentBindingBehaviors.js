@@ -77,7 +77,7 @@ describe('Components: Component binding', function () {
   })
 
   it('Uses the element children as template when no template is configured', function () {
-    var inner = ko.observable('hello')
+    const inner = ko.observable('hello')
     ko.components.register(testComponentName, {
       viewModel: function () {
         return { greeting: inner }
