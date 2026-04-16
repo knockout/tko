@@ -71,7 +71,7 @@ See [Loading & Saving Data](./json-data/) for practical patterns.
 Every observable inherits from a prototype chain you can extend:
 
 ```
-subscribable.fn  →  observable.fn  →  observableArray (extends observable.fn)
+subscribable.fn  →  observable.fn  →  observableArray.fn
                  →  computed.fn
 ```
 

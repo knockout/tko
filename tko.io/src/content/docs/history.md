@@ -15,15 +15,15 @@ The first release shipped in July 2010. By late that year, Scott Hanselman was i
 
 From 2011 to 2014, Knockout was one of the four dominant JavaScript frameworks alongside Backbone.js, AngularJS, and Ember.js. Every framework comparison article and conference talk of that era included all four.
 
-ThoughtWorks placed Knockout in their Technology Radar's "Trial" ring in October 2012, calling it one of the "front-runners" for building single-page applications.
+[ThoughtWorks placed Knockout in their Technology Radar's "Trial" ring](https://www.thoughtworks.com/radar/languages-and-frameworks/angularjs-and-knockout) in October 2012, calling it one of the "front-runners" for building single-page applications.
 
-Knockout peaked in Stack Overflow question volume around 2013-2014, and had the highest answer rate (69.6%) of the Big Four — a sign of a mature, well-understood library.
+Knockout [peaked in Stack Overflow question volume](https://stackoverflow.blog/2018/01/11/brutal-lifecycle-javascript-frameworks/) around 2013-2014, and had the highest answer rate (69.6%) of the Big Four — a sign of a mature, well-understood library.
 
 ## Microsoft adoption
 
 Microsoft adopted Knockout extensively:
 
-- **Azure Portal** — described at VS Live 2016 as "the largest single-page application in the world," with 500+ developers building on Knockout and TypeScript
+- **Azure Portal** — [described at VS Live 2016](https://learn.microsoft.com/en-us/shows/visual-studio-visual-studio-live-redmond-2016/t15) as "the largest single-page application in the world," with 500+ developers building on Knockout and TypeScript
 - **ASP.NET SPA template** — Visual Studio 2013 shipped with Knockout as the default JavaScript framework for new SPA projects
 - **Hot Towel** — John Papa's widely-adopted SPA template combined Knockout with Durandal, Breeze, and Bootstrap
 - **Office Add-ins** — Knockout was a supported framework for building Excel, Outlook, and Word add-ins
@@ -38,7 +38,7 @@ Beyond Microsoft, Knockout found deep roots in enterprise:
 - **Oracle JET** — Oracle built their entire enterprise JavaScript UI toolkit on top of Knockout rather than creating their own data-binding layer.
 - **Financial services and government** — banks, insurance companies, and government agencies adopted Knockout for compliance-critical applications that are still running today.
 
-Notable adopters included Stack Overflow, Ancestry.com, BMW, TD Ameritrade, Royal Mail, Transport for London, and Bandcamp. Knockout accumulated over 36 million NuGet downloads.
+Notable adopters included Stack Overflow, Ancestry.com, BMW, TD Ameritrade, Royal Mail, Transport for London, and Bandcamp. Knockout accumulated over [36 million NuGet downloads](https://www.nuget.org/packages/knockoutjs/).
 
 ## The React shift (2015-2016)
 

@@ -28,7 +28,7 @@ The recommended way to load TKO is as an ES module:
 </script>
 ```
 
-An IIFE build is also available for environments that don't support ES modules:
+An IIFE build is also available for classic `<script>` tag loading:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>

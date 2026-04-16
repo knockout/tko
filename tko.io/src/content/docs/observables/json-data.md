@@ -66,8 +66,10 @@ function updateFrom(viewModel, data) {
 }
 
 // Usage
-const data = await fetch('/api/user').then(r => r.json())
-updateFrom(vm, data)
+async function load() {
+  const data = await fetch('/api/user').then(r => r.json())
+  updateFrom(vm, data)
+}
 ```
 
 ## Debugging: showing JSON in the UI
