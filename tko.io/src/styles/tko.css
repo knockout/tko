@@ -487,6 +487,10 @@ header {
 }
 
 @media (max-width: 50rem) {
+  .sidebar-pane {
+    background: var(--sl-color-black);
+  }
+
   .content-panel .sl-container,
   .right-sidebar-panel .sl-container {
     border-radius: 1rem;
