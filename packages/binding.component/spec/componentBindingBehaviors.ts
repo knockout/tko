@@ -10,6 +10,7 @@ import { VirtualProvider } from '@tko/provider.virtual'
 import { ComponentProvider } from '@tko/provider.component'
 import { NativeProvider } from '@tko/provider.native'
 import { AttributeProvider } from '@tko/provider.attr'
+import { TextMustacheProvider, AttributeMustacheProvider } from '@tko/provider.mustache'
 
 import { applyBindings, dataFor } from '@tko/bind'
 
@@ -59,7 +60,9 @@ describe('Components: Component binding', function () {
         new DataBindProvider(),
         new VirtualProvider(),
         new NativeProvider(),
-        new AttributeProvider()
+        new AttributeProvider(),
+        new TextMustacheProvider(),
+        new AttributeMustacheProvider()
       ]
     })
     options.bindingProviderInstance = provider
@@ -161,6 +164,24 @@ describe('Components: Component binding', function () {
     const third = thirdHost.querySelector('p')!
     expect(third.className).to.equal('pristine')
     expect(third.textContent).to.equal('hello')
+  })
+
+  it('Uses children as template with mixed text and {{ }} mustache interpolation', function () {
+    const name = observable('world')
+    components.register(testComponentName, {
+      viewModel: function () {
+        return { name }
+      }
+    })
+    testNode.innerHTML =
+      '<div data-bind="component: testComponentBindingValue">' +
+      'Hello, <strong>{{ name }}</strong>!' +
+      '</div>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expectContainText(testNode.children[0], 'Hello, world!')
+    name('TKO')
+    expectContainText(testNode.children[0], 'Hello, TKO!')
   })
 
   it('Uses children as template with native ko- attribute bindings', function () {
