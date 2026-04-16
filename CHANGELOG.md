@@ -1,3 +1,15 @@
+## 4.0.1
+
+- Fix `==` and `!=` parser error in binding expressions (#290) — precedence was lost when operators were overloaded in the reference build.
+- Add `ko.options.strictEquality` setter — configures whether `==`/`!=` use strict comparison in bindings. Reference build enables by default.
+- Add `defineOption()` plugin API for extending `ko.options` with typed setters.
+- Add `.js` extensions to all ESM dist imports — fixes `ERR_MODULE_NOT_FOUND` in Node's strict ESM resolver (#313).
+- Fix broken `module` field in 22 package.json files pointing to non-existent dist paths (#308).
+- Replace ESLint + Prettier with Biome (27x faster lint + format).
+- Replace Make + lerna with Bun scripts (0.3s clean build).
+- Add README.md to all 26 npm packages.
+- Add version badge to tko.io header.
+
 ## 4.0.0
 
 - #202 Make TKO more type-safe @mcselle, @Auge19, @phillipc, @M-Kirchhoff, @brianmhunt 

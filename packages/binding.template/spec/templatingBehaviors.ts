@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import { arrayForEach, domData, removeNode } from '@tko/utils'
 
 import { applyBindings } from '@tko/bind'
@@ -15,16 +17,23 @@ import { bindings as templateBindings, renderTemplate, setTemplateEngine, native
 
 import { bindings as coreBindings } from '@tko/binding.core'
 
-import '@tko/utils/helpers/jasmine-13-helper'
 import { dummyTemplateEngine } from '../helpers/dummyTemplateEngine'
 import { Provider } from '@tko/provider'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter
+} from '../../utils/helpers/mocha-test-helpers'
 
 describe('Templating', function () {
   let bindingHandlers
+  let cleanups: Array<() => void>
 
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    cleanups = []
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -42,6 +51,9 @@ describe('Templating', function () {
   })
 
   afterEach(function () {
+    while (cleanups.length) {
+      cleanups.pop()?.()
+    }
     setTemplateEngine(new nativeTemplateEngine())
   })
 
@@ -54,34 +66,34 @@ describe('Templating', function () {
     expect(function () {
       setTemplateEngine(undefined)
       renderTemplate('someTemplate', {})
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should be able to render a template into a given DOM element', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'ABC' }))
     renderTemplate('someTemplate', null, null, testNode)
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('ABC')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('ABC')
   })
 
   it('Should be able to render an empty template', function () {
     setTemplateEngine(new dummyTemplateEngine({ emptyTemplate: '' }))
     renderTemplate('emptyTemplate', null, null, testNode)
-    expect(testNode.childNodes.length).toEqual(0)
+    expect(testNode.childNodes.length).to.equal(0)
   })
 
   it("Should be able to access newly rendered/inserted elements in 'afterRender' callback", function () {
     let passedElement, passedDataItem
     const myCallback = function (elementsArray, dataItem) {
-      expect(elementsArray.length).toEqual(1)
+      expect(elementsArray.length).to.equal(1)
       passedElement = elementsArray[0]
       passedDataItem = dataItem
     }
     const myModel = {}
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'ABC' }))
     renderTemplate('someTemplate', myModel, { afterRender: myCallback }, testNode)
-    expect(passedElement.nodeValue).toEqual('ABC')
-    expect(passedDataItem).toEqual(myModel)
+    expect(passedElement.nodeValue).to.equal('ABC')
+    expect(passedDataItem).to.equal(myModel)
   })
 
   it('Should automatically rerender into DOM element when dependencies change', function () {
@@ -95,12 +107,12 @@ describe('Templating', function () {
     )
 
     renderTemplate('someTemplate', null, null, testNode)
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('Value = A')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('Value = A')
 
     dependency('B')
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('Value = B')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('Value = B')
   })
 
   it("Should not rerender DOM element if observable accessed in 'afterRender' callback is changed", function () {
@@ -114,12 +126,12 @@ describe('Templating', function () {
     }
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: myTemplate }))
     renderTemplate('someTemplate', {}, { afterRender: myCallback }, testNode)
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('Value = 1')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('Value = 1')
 
     myObservable('B')
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('Value = 1')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('Value = 1')
   })
 
   it('If the supplied data item is observable, evaluates it and has subscription on it', function () {
@@ -132,10 +144,10 @@ describe('Templating', function () {
       })
     )
     renderTemplate('someTemplate', myObservable, null, testNode)
-    expect(testNode.innerHTML).toEqual('Value = A')
+    expect(testNode.innerHTML).to.equal('Value = A')
 
     myObservable('B')
-    expect(testNode.innerHTML).toEqual('Value = B')
+    expect(testNode.innerHTML).to.equal('Value = B')
   })
 
   it('Should stop updating DOM nodes when the dependency next changes if the DOM node has been removed from the document', function () {
@@ -148,13 +160,13 @@ describe('Templating', function () {
     setTemplateEngine(new dummyTemplateEngine(template))
 
     renderTemplate('someTemplate', null, null, testNode)
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('Value = A')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('Value = A')
 
     testNode?.parentNode?.removeChild(testNode)
     dependency('B')
-    expect(testNode.childNodes.length).toEqual(1)
-    expect(testNode.innerHTML).toEqual('Value = A')
+    expect(testNode.childNodes.length).to.equal(1)
+    expect(testNode.innerHTML).to.equal('Value = A')
   })
 
   it('Should be able to pick template via an observable', function () {
@@ -164,31 +176,31 @@ describe('Templating', function () {
 
     const chosenTemplate = observable('firstTemplate')
     renderTemplate(chosenTemplate, null, null, testNode)
-    expect(testNode.innerHTML).toEqual('First template output')
+    expect(testNode.innerHTML).to.equal('First template output')
 
     chosenTemplate('secondTemplate')
-    expect(testNode.innerHTML).toEqual('Second template output')
+    expect(testNode.innerHTML).to.equal('Second template output')
   })
 
   it('Should be able to render a template using data-bind syntax', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'template output' }))
     testNode.innerHTML = '<div data-bind=\'template:"someTemplate"\'></div>'
     applyBindings(null, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('template output')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('template output')
   })
 
   it('Should remove existing content when rendering a template using data-bind syntax', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'template output' }))
     testNode.innerHTML = '<div data-bind=\'template:"someTemplate"\'><span>existing content</span></div>'
     applyBindings(null, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('template output')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('template output')
   })
 
   it('Should be able to tell data-bind syntax which object to pass as data for the template (otherwise, uses viewModel)', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'result = [js: nomangle$data.childProp]' }))
     testNode.innerHTML = '<div data-bind=\'template: { name: "someTemplate", data: someProp }\'></div>'
     applyBindings({ someProp: { childProp: 123 } }, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('result = 123')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('result = 123')
   })
 
   it('Should re-render a named template when its data item notifies about mutation', function () {
@@ -197,12 +209,12 @@ describe('Templating', function () {
 
     const myData = observable({ childProp: 123 })
     applyBindings({ someProp: myData }, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('result = 123')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('result = 123')
 
     // Now mutate and notify
     myData().childProp = 456
     myData.valueHasMutated()
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('result = 456')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('result = 456')
   })
 
   it('Should call a generic childrenComplete callback function', function () {
@@ -220,12 +232,12 @@ describe('Templating', function () {
       },
       testNode
     )
-    expect(callbacks).toEqual(1)
-    expect(testNode.childNodes[0]).toContainText('result = child')
+    expect(callbacks).to.equal(1)
+    expectContainText(testNode.childNodes[0], 'result = child')
 
     someItem({ childProp: 'new child' })
-    expect(callbacks).toEqual(2)
-    expect(testNode.childNodes[0]).toContainText('result = new child')
+    expect(callbacks).to.equal(2)
+    expectContainText(testNode.childNodes[0], 'result = new child')
   })
 
   it('Should stop tracking inner observables immediately when the container node is removed from the document', function () {
@@ -234,9 +246,9 @@ describe('Templating', function () {
     testNode.innerHTML = '<div data-bind=\'template: { name: "someTemplate", data: someProp }\'></div>'
     applyBindings({ someProp: { childProp: innerObservable } }, testNode)
 
-    expect(innerObservable.getSubscriptionsCount()).toEqual(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(1)
     removeNode(testNode.childNodes[0])
-    expect(innerObservable.getSubscriptionsCount()).toEqual(0)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Should be able to pick template via an observable model property', function () {
@@ -247,10 +259,10 @@ describe('Templating', function () {
     const chosenTemplate = observable('firstTemplate')
     testNode.innerHTML = "<div data-bind='template: chosenTemplate'></div>"
     applyBindings({ chosenTemplate: chosenTemplate }, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('First template output')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('First template output')
 
     chosenTemplate('secondTemplate')
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('Second template output')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('Second template output')
   })
 
   it('Should be able to pick template via an observable model property when specified as "name"', function () {
@@ -261,10 +273,10 @@ describe('Templating', function () {
     const chosenTemplate = observable('firstTemplate')
     testNode.innerHTML = "<div data-bind='template: { name: chosenTemplate }'></div>"
     applyBindings({ chosenTemplate: chosenTemplate }, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('First template output')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('First template output')
 
     chosenTemplate('secondTemplate')
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('Second template output')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('Second template output')
   })
 
   it('Should be able to pick template via an observable model property when specified as "name" in conjunction with "foreach"', function () {
@@ -273,16 +285,16 @@ describe('Templating', function () {
     const chosenTemplate = observable('firstTemplate')
     testNode.innerHTML = "<div data-bind='template: { name: chosenTemplate, foreach: [1,2,3] }'></div>"
     applyBindings({ chosenTemplate: chosenTemplate }, testNode)
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('FirstFirstFirst')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('FirstFirstFirst')
 
     chosenTemplate('secondTemplate')
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('SecondSecondSecond')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('SecondSecondSecond')
   })
 
   it('Should be able to pick template as a function of the data item using data-bind syntax, with the binding context available as a second parameter', function () {
     const templatePicker = function (dataItem, bindingContext) {
       // Having the entire binding context available means you can read sibling or parent level properties
-      expect(bindingContext.$parent.anotherProperty).toEqual(456)
+      expect(bindingContext.$parent.anotherProperty).to.equal(456)
       return dataItem.myTemplate
     }
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: 'result = [js: nomangle$data.childProp]' }))
@@ -295,7 +307,7 @@ describe('Templating', function () {
       },
       testNode
     )
-    expect((testNode.childNodes[0] as HTMLElement).innerHTML).toEqual('result = 123')
+    expect((testNode.childNodes[0] as HTMLElement).innerHTML).to.equal('result = 123')
   })
 
   it('Should be able to chain templates, rendering one from inside another', function () {
@@ -307,7 +319,8 @@ describe('Templating', function () {
     )
     testNode.innerHTML = '<div data-bind=\'template:"outerTemplate"\'></div>'
     applyBindings(null, testNode)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer template output, inner template output <span data-bind="text: 123">123</span>'
     )
   })
@@ -330,14 +343,14 @@ describe('Templating', function () {
     )
     testNode.innerHTML = '<div data-bind=\'template:"outerTemplate"\'></div>'
     applyBindings(null, testNode)
-    expect(testNode.childNodes[0]).toContainHtml('outer template output, abc')
-    expect(timesRenderedOuter).toEqual(1)
-    expect(timesRenderedInner).toEqual(1)
+    expectContainHtml(testNode.childNodes[0], 'outer template output, abc')
+    expect(timesRenderedOuter).to.equal(1)
+    expect(timesRenderedInner).to.equal(1)
 
     myObservable('DEF')
-    expect(testNode.childNodes[0]).toContainHtml('outer template output, def')
-    expect(timesRenderedOuter).toEqual(1)
-    expect(timesRenderedInner).toEqual(2)
+    expectContainHtml(testNode.childNodes[0], 'outer template output, def')
+    expect(timesRenderedOuter).to.equal(1)
+    expect(timesRenderedInner).to.equal(2)
   })
 
   it('Should stop tracking inner observables referenced by a chained template as soon as the chained template output node is removed from the document', function () {
@@ -351,43 +364,43 @@ describe('Templating', function () {
     testNode.innerHTML = '<div data-bind=\'template: { name: "outerTemplate", data: someProp }\'></div>'
     applyBindings({ someProp: { childProp: innerObservable } }, testNode)
 
-    expect(innerObservable.getSubscriptionsCount()).toEqual(1)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(1)
     removeNode(document.getElementById('innerTemplateOutput'))
-    expect(innerObservable.getSubscriptionsCount()).toEqual(0)
+    expect(innerObservable.getSubscriptionsCount()).to.equal(0)
   })
 
   it('Should handle data-bind attributes from inside templates, regardless of element and attribute casing', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: '<INPUT Data-Bind=\'value:"Hi"\' />' }))
     renderTemplate('someTemplate', null, null, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).value).toEqual('Hi')
+    expect((testNode.childNodes[0] as HTMLInputElement).value).to.equal('Hi')
   })
 
   it('Should handle data-bind attributes that include newlines from inside templates', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: '<input data-bind=\'value:\n"Hi"\' />' }))
     renderTemplate('someTemplate', null, null, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).value).toEqual('Hi')
+    expect((testNode.childNodes[0] as HTMLInputElement).value).to.equal('Hi')
   })
 
-  xit('Data binding syntax should be able to reference variables put into scope by the template engine', function () {
+  it.skip('Data binding syntax should be able to reference variables put into scope by the template engine', function () {
     // Disabling this because the only place where
     // templateRenderingVariablesInScope appears is with the
     // dummy template engine.  The Provider/Parser is never made
     // aware of it.
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<input data-bind='value:message' />" }))
     renderTemplate('someTemplate', null, { templateRenderingVariablesInScope: { message: 'hello' } }, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).value).toEqual('hello')
+    expect((testNode.childNodes[0] as HTMLInputElement).value).to.equal('hello')
   })
 
   it('Should handle data-bind attributes with spaces around equals sign from inside templates and reference variables', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<input data-bind = 'value:message' />" }))
     renderTemplate('someTemplate', { message: 'hello' }, {}, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).value).toEqual('hello')
+    expect((testNode.childNodes[0] as HTMLInputElement).value).to.equal('hello')
   })
 
   it('Data binding syntax should be able to use $element in binding value', function () {
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: $element.tagName'></div>" }))
     renderTemplate('someTemplate', null, null, testNode)
-    expect(testNode.childNodes[0]).toContainText('DIV')
+    expectContainText(testNode.childNodes[0], 'DIV')
   })
 
   it('Data binding syntax should be able to use $context in binding value to refer to the context object', function () {
@@ -395,7 +408,7 @@ describe('Templating', function () {
       new dummyTemplateEngine({ someTemplate: "<div data-bind='text: $context.$data === $data'></div>" })
     )
     renderTemplate('someTemplate', {}, null, testNode)
-    expect(testNode.childNodes[0]).toContainText('true')
+    expectContainText(testNode.childNodes[0], 'true')
   })
 
   it("Data binding syntax should be able to use $rawData in binding value to refer to a top level template's view model observable", function () {
@@ -404,8 +417,8 @@ describe('Templating', function () {
 
     options.bindingGlobals.isObservable = isObservable
     renderTemplate('someTemplate', data, null, testNode)
-    expect(testNode.childNodes[0]).toContainText('true')
-    expect(data.getSubscriptionsCount('change')).toEqual(1) // only subscription is from the templating code
+    expectContainText(testNode.childNodes[0], 'true')
+    expect(data.getSubscriptionsCount('change')).to.equal(1) // only subscription is from the templating code
   })
 
   it("Data binding syntax should be able to use $rawData in binding value to refer to a data-bound template's view model observable", function () {
@@ -418,15 +431,15 @@ describe('Templating', function () {
 
     applyBindings(viewModel, testNode)
 
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('true')
-    expect(viewModel.someProp.getSubscriptionsCount('change')).toEqual(1) // only subscription is from the templating code
+    expectContainText(testNode.childNodes[0].childNodes[0], 'true')
+    expect(viewModel.someProp.getSubscriptionsCount('change')).to.equal(1) // only subscription is from the templating code
   })
 
   it("Data binding syntax should be able to use $rawData in binding value to refer to a top level template's view model observable", function () {
     options.bindingGlobals.isObservable = isObservable
     setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: isObservable($rawData)'></div>" }))
     renderTemplate('someTemplate', observable('value'), null, testNode)
-    expect(testNode.childNodes[0]).toContainText('true')
+    expectContainText(testNode.childNodes[0], 'true')
   })
 
   it("Data binding syntax should be able to use $rawData in binding value to refer to a data-bound template's view model observable", function () {
@@ -437,7 +450,7 @@ describe('Templating', function () {
     const viewModel = { someProp: observable('value') }
     applyBindings(viewModel, testNode)
 
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('true')
+    expectContainText(testNode.childNodes[0].childNodes[0], 'true')
   })
 
   it('Data binding syntax should defer evaluation of variables until the end of template rendering (so bindings can take independent subscriptions to them)', function () {
@@ -449,7 +462,7 @@ describe('Templating', function () {
     )
     const viewModel = { message: 'hello' }
     renderTemplate('someTemplate', viewModel, { templateRenderingVariablesInScope: viewModel }, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).value).toEqual('goodbye')
+    expect((testNode.childNodes[0] as HTMLInputElement).value).to.equal('goodbye')
   })
 
   it("Data binding syntax should use the template's 'data' object as the viewModel value (so 'this' is set correctly when calling click handlers etc.)", function () {
@@ -464,13 +477,13 @@ describe('Templating', function () {
     }
     renderTemplate('someTemplate', viewModel, null, testNode)
     const buttonNode = testNode.childNodes[0] as HTMLButtonElement
-    expect(buttonNode.tagName).toEqual('BUTTON') // Be sure we're clicking the right thing
+    expect(buttonNode.tagName).to.equal('BUTTON') // Be sure we're clicking the right thing
     buttonNode.click()
-    expect(viewModel.didCallMyFunction).toEqual(true)
+    expect(viewModel.didCallMyFunction).to.equal(true)
   })
 
   it('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindingAccessors', function () {
-    this.restoreAfter(options, 'bindingProviderInstance')
+    restoreAfter(cleanups, options, 'bindingProviderInstance')
 
     // Will verify that bindings are applied only once for both inline (rewritten) bindings,
     // and external (non-rewritten) ones
@@ -505,8 +518,8 @@ describe('Templating', function () {
       new dummyTemplateEngine({
         outerTemplate: 'Outer <div data-bind=\'template: { name: "innerTemplate", bypassDomNodeWrap: true }\'></div>',
         innerTemplate:
-          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>"
-          + 'Inner via external binding: <em></em>'
+          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>" +
+          'Inner via external binding: <em></em>'
       })
     )
 
@@ -517,18 +530,19 @@ describe('Templating', function () {
     // binding provider tests (i.e. prefix operator).  Unclear why
     // it fails here -- but the result is correct in the string produced
     // below.
-    // expect(model.numRewrittenBindings).toEqual(1);
-    expect(model.numExternalBindings).toEqual(1)
-    expect(testNode.childNodes[0]).toContainHtml(
+    // expect(model.numRewrittenBindings).to.equal(1);
+    expect(model.numExternalBindings).to.equal(1)
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer <div data-bind="template: { name: &quot;innertemplate&quot;, bypassdomnodewrap: true }">inner via inline binding: <span data-bind="text: ++numrewrittenbindings">1</span>inner via external binding: <em>1</em></div>'
     )
   })
 
-  xit('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function () {
+  it.skip('Data binding syntax should permit nested templates, and only bind inner templates once when using getBindings', function () {
     // SKIP because we have deprecated getBindings in favour of
     // getBindingAccessors.
 
-    this.restoreAfter(options, 'bindingProviderInstance')
+    restoreAfter(cleanups, options, 'bindingProviderInstance')
 
     // Will verify that bindings are applied only once for both inline (rewritten) bindings,
     // and external (non-rewritten) ones. Because getBindings actually gets called twice, we need
@@ -567,16 +581,17 @@ describe('Templating', function () {
       new dummyTemplateEngine({
         outerTemplate: 'Outer <div data-bind=\'template: { name: "innerTemplate", bypassDomNodeWrap: true }\'></div>',
         innerTemplate:
-          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>"
-          + 'Inner via external binding: <em></em>'
+          "Inner via inline binding: <span data-bind='text: ++numRewrittenBindings'></span>" +
+          'Inner via external binding: <em></em>'
       })
     )
     const model = { numRewrittenBindings: 0, numExternalBindings: 0 }
     testNode.innerHTML = '<div data-bind=\'template: { name: "outerTemplate", bypassDomNodeWrap: true }\'></div>'
     applyBindings(model, testNode)
-    expect(model.numRewrittenBindings).toEqual(1)
-    expect(model.numExternalBindings).toEqual(2)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expect(model.numRewrittenBindings).to.equal(1)
+    expect(model.numExternalBindings).to.equal(2)
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer <div>inner via inline binding: <span>1</span>inner via external binding: <em>2</em></div>'
     )
   })
@@ -598,13 +613,15 @@ describe('Templating', function () {
     ;(model.testNodes[1] as HTMLSpanElement).setAttribute('data-bind', "template: 'innerTemplate'") // See that bindings are applied to the injected nodes
 
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       'begin<span data-bind="template: \'innertemplate\'">the name is alpha</span>end'
     )
 
     // The injected bindings update to match model changes as usual
     model.testData.name('beta')
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       'begin<span data-bind="template: \'innertemplate\'">the name is beta</span>end'
     )
   })
@@ -620,20 +637,20 @@ describe('Templating', function () {
     ;(model.testNodes[1] as HTMLSpanElement).setAttribute('data-bind', 'text: name') // See that bindings are applied to the injected nodes
 
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0]).toContainText('beginalpha1end')
-    expect(testNode.childNodes[1]).toContainText('beginalpha2end')
+    expectContainText(testNode.childNodes[0], 'beginalpha1end')
+    expectContainText(testNode.childNodes[1], 'beginalpha2end')
 
     // The injected bindings update to match model changes as usual
     model.testData1().name('beta1')
     model.testData2().name('beta2')
-    expect(testNode.childNodes[0]).toContainText('beginbeta1end')
-    expect(testNode.childNodes[1]).toContainText('beginbeta2end')
+    expectContainText(testNode.childNodes[0], 'beginbeta1end')
+    expectContainText(testNode.childNodes[1], 'beginbeta2end')
 
     // The template binding re-renders successfully if model changes
     model.testData1({ name: observable('gamma1') })
     model.testData2({ name: observable('gamma2') })
-    expect(testNode.childNodes[0]).toContainText('begingamma1end')
-    expect(testNode.childNodes[1]).toContainText('begingamma2end')
+    expectContainText(testNode.childNodes[0], 'begingamma1end')
+    expectContainText(testNode.childNodes[1], 'begingamma2end')
   })
 
   it('Should accept a "nodes" option that gives the template nodes, and it can be used in conjunction with "foreach"', function () {
@@ -652,11 +669,11 @@ describe('Templating', function () {
     ;(model.testNodes[1] as HTMLDivElement).setAttribute('data-bind', 'text: name')
 
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0]).toContainText('[alpha][beta][gamma]')
+    expectContainText(testNode.childNodes[0], '[alpha][beta][gamma]')
 
     // The injected bindings update to match model changes as usual
     model.testData.splice(1, 1)
-    expect(testNode.childNodes[0]).toContainText('[alpha][gamma]')
+    expectContainText(testNode.childNodes[0], '[alpha][gamma]')
 
     // Changing the nodes array does *not* affect subsequent output from the template.
     // This behavior may be subject to change. I'm adding this assertion just to record what
@@ -666,7 +683,7 @@ describe('Templating', function () {
     templateContainer.innerHTML =
       '[Modified, but will not appear in template output because the nodes were already cloned]'
     model.testData.splice(1, 0, { name: 'delta' })
-    expect(testNode.childNodes[0]).toContainText('[alpha][delta][gamma]')
+    expectContainText(testNode.childNodes[0], '[alpha][delta][gamma]')
   })
 
   it('Should interpret "nodes: anyfalsyValue" as being equivalent to supplying an empty node array', function () {
@@ -676,7 +693,7 @@ describe('Templating', function () {
     testNode.innerHTML =
       "<div data-bind='template: { nodes: null, bypassDomNodeWrap: true }'>Should not use this inline template</div>"
     applyBindings(null, testNode)
-    expect(testNode.childNodes[0]).toContainHtml('')
+    expectContainHtml(testNode.childNodes[0], '')
   })
 
   it('Should not allow "nodes: someObservableArray"', function () {
@@ -685,13 +702,13 @@ describe('Templating', function () {
       "<div data-bind='template: { nodes: myNodes, bypassDomNodeWrap: true }'>Should not use this inline template</div>"
     expect(function () {
       applyBindings({ myNodes: observableArray() }, testNode)
-    }).toThrowContaining('The "nodes" option must be a plain, non-observable array')
+    }).to.throw(/The "nodes" option must be a plain, non-observable array/)
   })
 
   /**
    * Update the templating engine to handle JSX nodes.
    */
-  xit('Should accept `jsx:...`', function () {
+  it.skip('Should accept `jsx:...`', function () {
     testNode.innerHTML = "<div data-bind='template: { jsx: testJsx }'></div>"
     const obs = observable('alpha')
     const model = {
@@ -706,10 +723,10 @@ describe('Templating', function () {
     }
 
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0]).toContainHtml('<begin><span>alpha</span><end></end></begin>')
+    expectContainHtml(testNode.childNodes[0], '<begin><span>alpha</span><end></end></begin>')
 
     obs('beta')
-    expect(testNode.childNodes[0]).toContainHtml('<begin><span>beta</span><end></end></begin>')
+    expectContainHtml(testNode.childNodes[0], '<begin><span>beta</span><end></end></begin>')
   })
 
   describe("Data binding 'foreach' option", function () {
@@ -719,7 +736,7 @@ describe('Templating', function () {
         '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'><span>existing content</span></div>'
 
       applyBindings({ myCollection: [{}] }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml('<span>template content</span>')
+      expectContainHtml(testNode.childNodes[0], '<span>template content</span>')
     })
 
     it("Should render for each item in an array but doesn't rerender everything if you push or splice", function () {
@@ -730,16 +747,17 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml('<div>the item is bob</div><div>the item is frank</div>')
+      expectContainHtml(testNode.childNodes[0], '<div>the item is bob</div><div>the item is frank</div>')
       const originalBobNode = testNode.childNodes[0].childNodes[0]
       const originalFrankNode = testNode.childNodes[0].childNodes[1]
 
       myArray.push({ personName: 'Steve' })
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>the item is bob</div><div>the item is frank</div><div>the item is steve</div>'
       )
-      expect(testNode.childNodes[0].childNodes[0]).toEqual(originalBobNode)
-      expect(testNode.childNodes[0].childNodes[1]).toEqual(originalFrankNode)
+      expect(testNode.childNodes[0].childNodes[0]).to.equal(originalBobNode)
+      expect(testNode.childNodes[0].childNodes[1]).to.equal(originalFrankNode)
     })
 
     it('Should apply bindings within the context of each item in the array', function () {
@@ -750,7 +768,8 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item is <span data-bind="text: personname">bob</span>the item is <span data-bind="text: personname">frank</span>'
       )
     })
@@ -766,7 +785,7 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: [1, 2, 3] }, testNode)
-      expect(initCalls).toEqual(3) // 3 because there were 3 items in myCollection
+      expect(initCalls).to.equal(3) // 3 because there were 3 items in myCollection
     })
 
     it('Should handle templates in which the very first node has a binding', function () {
@@ -779,12 +798,12 @@ describe('Templating', function () {
       // Bind against initial array containing one entry. UI just shows "original"
       const myArray = observableArray(['original'])
       applyBindings({ items: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: $data">original</div>')
+      expectContainHtml(testNode.childNodes[0], '<div data-bind="text: $data">original</div>')
 
       // Now replace the entire array contents with one different entry.
       // UI just shows "new" (previously with bug, showed "original" AND "new")
       myArray(['new'])
-      expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: $data">new</div>')
+      expectContainHtml(testNode.childNodes[0], '<div data-bind="text: $data">new</div>')
     })
 
     it('Should handle chained templates in which the very first node has a binding', function () {
@@ -800,13 +819,15 @@ describe('Templating', function () {
       // Bind against initial array containing one entry.
       const myArray = observableArray(['original'])
       applyBindings({ items: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div data-bind="text: $data">original</div>inner <span data-bind="text: 123">123</span>x'
       )
 
       // Now replace the entire array contents with one different entry.
       myArray(['new'])
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div data-bind="text: $data">new</div>inner <span data-bind="text: 123">123</span>x'
       )
     })
@@ -823,12 +844,12 @@ describe('Templating', function () {
       // Bind against array, referencing an observable property
       const myItem = { name: observable('a') }
       applyBindings({ items: [myItem] }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml('<div data-bind="attr: {}">a</div>')
+      expectContainHtml(testNode.childNodes[0], '<div data-bind="attr: {}">a</div>')
 
       // Modify the observable property and check that UI is updated
       // Previously with the bug, it wasn't updated because the removal of the memo comment caused the array-to-DOM-node computed to be disposed
       myItem.name('b')
-      expect(testNode.childNodes[0]).toContainHtml('<div data-bind="attr: {}">b</div>')
+      expectContainHtml(testNode.childNodes[0], '<div data-bind="attr: {}">b</div>')
     })
 
     it('Should apply bindings with an $index in the context', function () {
@@ -839,7 +860,8 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item # is <span data-bind="text: $index">0</span>the item # is <span data-bind="text: $index">1</span>'
       )
     })
@@ -854,17 +876,20 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item <span data-bind="text: personname">bob</span>is <span data-bind="text: $index">0</span>the item <span data-bind="text: personname">frank</span>is <span data-bind="text: $index">1</span>'
       )
 
       const frank = myArray.pop() // remove frank
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item <span data-bind="text: personname">bob</span>is <span data-bind="text: $index">0</span>'
       )
 
       myArray.unshift(frank) // put frank in the front
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item <span data-bind="text: personname">frank</span>is <span data-bind="text: $index">0</span>the item <span data-bind="text: personname">bob</span>is <span data-bind="text: $index">1</span>'
       )
     })
@@ -878,7 +903,8 @@ describe('Templating', function () {
 
       options.bindingGlobals.String = String
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         'the item is <span data-bind="text: string($data)">undefined</span>the item is <span data-bind="text: string($data)">null</span>'
       )
     })
@@ -892,23 +918,25 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>the item is bob</div><div>the item is steve</div><div>the item is another</div>'
       )
       const originalBobNode = testNode.childNodes[0].childNodes[0]
 
       myObservable('Steve2')
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>the item is bob</div><div>the item is steve2</div><div>the item is another</div>'
       )
-      expect(testNode.childNodes[0].childNodes[0]).toEqual(originalBobNode)
+      expect(testNode.childNodes[0].childNodes[0]).to.equal(originalBobNode)
 
       // Ensure we can still remove the corresponding nodes (even though they've changed), and that doing so causes the subscription to be disposed
-      expect(myObservable.getSubscriptionsCount()).toEqual(1)
+      expect(myObservable.getSubscriptionsCount()).to.equal(1)
       myArray.splice(1, 1)
-      expect(testNode.childNodes[0]).toContainHtml('<div>the item is bob</div><div>the item is another</div>')
+      expectContainHtml(testNode.childNodes[0], '<div>the item is bob</div><div>the item is another</div>')
       myObservable('Something else') // Re-evaluating the observable causes the orphaned subscriptions to be disposed
-      expect(myObservable.getSubscriptionsCount()).toEqual(0)
+      expect(myObservable.getSubscriptionsCount()).to.equal(0)
     })
 
     it("Should treat a null parameter as meaning 'no items'", function () {
@@ -917,15 +945,15 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0].childNodes.length).toEqual(2)
+      expect(testNode.childNodes[0].childNodes.length).to.equal(2)
 
       // Now set the observable to null and check it's treated like an empty array
       // (because how else should null be interpreted?)
       myArray(null)
-      expect(testNode.childNodes[0].childNodes.length).toEqual(0)
+      expect(testNode.childNodes[0].childNodes.length).to.equal(0)
     })
 
-    it('Should accept an \"as\" option to define an alias for the iteration variable', function () {
+    it('Should accept an "as" option to define an alias for the iteration variable', function () {
       // Note: There are more detailed specs (e.g., covering nesting) associated with the "foreach" binding which
       // uses this templating functionality internally.
       const myArray = observableArray(['A', 'B'])
@@ -934,7 +962,7 @@ describe('Templating', function () {
         '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection, as: "myAliasedItem" }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainText('AB')
+      expectContainText(testNode.childNodes[0], 'AB')
     })
 
     it('Should stop tracking inner observables when the container node is removed', function () {
@@ -944,10 +972,10 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(innerObservable.getSubscriptionsCount()).toEqual(2)
+      expect(innerObservable.getSubscriptionsCount()).to.equal(2)
 
       removeNode(testNode.childNodes[0])
-      expect(innerObservable.getSubscriptionsCount()).toEqual(0)
+      expect(innerObservable.getSubscriptionsCount()).to.equal(0)
     })
 
     it('Should stop tracking inner observables related to each array item when that array item is removed', function () {
@@ -957,12 +985,12 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(innerObservable.getSubscriptionsCount()).toEqual(2)
+      expect(innerObservable.getSubscriptionsCount()).to.equal(2)
 
       myArray.splice(1, 1)
-      expect(innerObservable.getSubscriptionsCount()).toEqual(1)
+      expect(innerObservable.getSubscriptionsCount()).to.equal(1)
       myArray([])
-      expect(innerObservable.getSubscriptionsCount()).toEqual(0)
+      expect(innerObservable.getSubscriptionsCount()).to.equal(0)
     })
 
     it("Should omit any items whose '_destroy' flag is set (unwrapping the flag if it is observable)", function () {
@@ -978,7 +1006,7 @@ describe('Templating', function () {
         '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection, includeDestroyed: false }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml('<div>someprop=1</div><div>someprop=3</div><div>someprop=4</div>')
+      expectContainHtml(testNode.childNodes[0], '<div>someprop=1</div><div>someprop=3</div><div>someprop=4</div>')
     })
 
     it("Should include any items whose '_destroy' flag is set if you use includeDestroyed", function () {
@@ -988,7 +1016,7 @@ describe('Templating', function () {
         '<div data-bind=\'template: { name: "itemTemplate", foreach: myCollection, includeDestroyed: true }\'></div>'
 
       applyBindings({ myCollection: myArray }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml('<div>someprop=1</div><div>someprop=2</div><div>someprop=3</div>')
+      expectContainHtml(testNode.childNodes[0], '<div>someprop=1</div><div>someprop=2</div><div>someprop=3</div>')
     })
 
     it("Should be able to render a different template for each array entry by passing a function as template name, with the array entry's binding context available as a second parameter", function () {
@@ -1006,12 +1034,13 @@ describe('Templating', function () {
 
       const getTemplate = function (dataItem, bindingContext) {
         // Having the item's binding context available means you can read sibling or parent level properties
-        expect(bindingContext.$parent.anotherProperty).toEqual(123)
+        expect(bindingContext.$parent.anotherProperty).to.equal(123)
 
         return dataItem.preferredTemplate == 1 ? 'firstTemplate' : 'secondTemplate'
       }
       applyBindings({ myCollection: myArray, getTemplateModelProperty: getTemplate, anotherProperty: 123 }, testNode)
-      expect(testNode.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        testNode.childNodes[0],
         '<div>template1output, firstitemvalue</div><div>template2output, seconditemvalue</div>'
       )
     })
@@ -1031,18 +1060,20 @@ describe('Templating', function () {
       testNode.innerHTML = '<div data-bind=\'template: { name: "itemTemplate", foreach: items }\'></div>'
 
       applyBindings(myVm, testNode)
-      expect(testNode.childNodes[0]).toContainText(
+      expectContainText(
+        testNode.childNodes[0],
         'The 0 item A has 0.1,1.2,2.3, The 1 item B has 0.4,1.5,2.6, The 2 item C has 0.7,1.8,2.9, '
       )
 
       myVm({ items: ['C', 'B', 'A'], itemValues: { A: [1, 2, 30], B: [4, 5, 60], C: [7, 8, 90] } })
-      expect(testNode.childNodes[0]).toContainText(
+      expectContainText(
+        testNode.childNodes[0],
         'The 0 item C has 0.7,1.8,2.90, The 1 item B has 0.4,1.5,2.60, The 2 item A has 0.1,1.2,2.30, '
       )
     })
   })
 
-  it('Data binding syntax should support \"if\" condition', function () {
+  it('Data binding syntax should support "if" condition', function () {
     setTemplateEngine(new dummyTemplateEngine({ myTemplate: 'Value: [js: nomangle$data.myProp().childProp]' }))
     testNode.innerHTML = '<div data-bind=\'template: { name: "myTemplate", "if": myProp }\'></div>'
 
@@ -1050,18 +1081,18 @@ describe('Templating', function () {
     applyBindings(viewModel, testNode)
 
     // Initially there is a value
-    expect(testNode.childNodes[0]).toContainText('Value: abc')
+    expectContainText(testNode.childNodes[0], 'Value: abc')
 
     // Causing the condition to become false causes the output to be removed
     viewModel.myProp(null)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
 
     // Causing the condition to become true causes the output to reappear
     viewModel.myProp({ childProp: 'def' })
-    expect(testNode.childNodes[0]).toContainText('Value: def')
+    expectContainText(testNode.childNodes[0], 'Value: def')
   })
 
-  it('Data binding syntax should support \"ifnot\" condition', function () {
+  it('Data binding syntax should support "ifnot" condition', function () {
     setTemplateEngine(new dummyTemplateEngine({ myTemplate: 'Hello' }))
     testNode.innerHTML = '<div data-bind=\'template: { name: "myTemplate", ifnot: shouldHide }\'></div>'
 
@@ -1069,37 +1100,37 @@ describe('Templating', function () {
     applyBindings(viewModel, testNode)
 
     // Initially there is no output (shouldHide=true)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
 
     // Causing the condition to become false causes the output to be displayed
     viewModel.shouldHide(false)
-    expect(testNode.childNodes[0]).toContainText('Hello')
+    expectContainText(testNode.childNodes[0], 'Hello')
 
     // Causing the condition to become true causes the output to disappear
     viewModel.shouldHide(true)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
   })
 
-  it('Data binding syntax should support \"if\" condition in conjunction with foreach', function () {
+  it('Data binding syntax should support "if" condition in conjunction with foreach', function () {
     setTemplateEngine(new dummyTemplateEngine({ myTemplate: 'Value: [js: nomangle$data.myProp().childProp]' }))
     testNode.innerHTML =
       '<div data-bind=\'template: { name: "myTemplate", "if": myProp, foreach: [$data, $data, $data] }\'></div>'
 
     const viewModel = { myProp: observable({ childProp: 'abc' }) }
     applyBindings(viewModel, testNode)
-    expect(testNode.childNodes[0].childNodes[0].nodeValue).toEqual('Value: abc')
-    expect(testNode.childNodes[0].childNodes[1].nodeValue).toEqual('Value: abc')
-    expect(testNode.childNodes[0].childNodes[2].nodeValue).toEqual('Value: abc')
+    expect(testNode.childNodes[0].childNodes[0].nodeValue).to.equal('Value: abc')
+    expect(testNode.childNodes[0].childNodes[1].nodeValue).to.equal('Value: abc')
+    expect(testNode.childNodes[0].childNodes[2].nodeValue).to.equal('Value: abc')
 
     // Causing the condition to become false causes the output to be removed
     viewModel.myProp(null)
-    expect(testNode.childNodes[0]).toContainText('')
+    expectContainText(testNode.childNodes[0], '')
 
     // Causing the condition to become true causes the output to reappear
     viewModel.myProp({ childProp: 'def' })
-    expect(testNode.childNodes[0].childNodes[0].nodeValue).toEqual('Value: def')
-    expect(testNode.childNodes[0].childNodes[1].nodeValue).toEqual('Value: def')
-    expect(testNode.childNodes[0].childNodes[2].nodeValue).toEqual('Value: def')
+    expect(testNode.childNodes[0].childNodes[0].nodeValue).to.equal('Value: def')
+    expect(testNode.childNodes[0].childNodes[1].nodeValue).to.equal('Value: def')
+    expect(testNode.childNodes[0].childNodes[2].nodeValue).to.equal('Value: def')
   })
 
   it('Should be able to populate checkboxes from inside templates, despite IE6 limitations', function () {
@@ -1107,7 +1138,7 @@ describe('Templating', function () {
       new dummyTemplateEngine({ someTemplate: "<input type='checkbox' data-bind='checked:isChecked' />" })
     )
     renderTemplate('someTemplate', { isChecked: true }, {}, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).checked).toEqual(true)
+    expect((testNode.childNodes[0] as HTMLInputElement).checked).to.equal(true)
   })
 
   it('Should be able to populate radio buttons from inside templates, despite IE6 limitations', function () {
@@ -1117,7 +1148,7 @@ describe('Templating', function () {
       })
     )
     renderTemplate('someTemplate', { someValue: 'abc' }, {}, testNode)
-    expect((testNode.childNodes[0] as HTMLInputElement).checked).toEqual(true)
+    expect((testNode.childNodes[0] as HTMLInputElement).checked).to.equal(true)
   })
 
   it("Data binding 'templateOptions' should be passed to template", function () {
@@ -1135,7 +1166,8 @@ describe('Templating', function () {
       '<div data-bind=\'template: {name: "myTemplate", foreach: people, templateOptions: someAdditionalData }\'></div>'
 
     applyBindings(myModel, testNode)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       '<div>person alpha has additional property someadditionalvalue</div><div>person beta has additional property someadditionalvalue</div>'
     )
   })
@@ -1150,17 +1182,17 @@ describe('Templating', function () {
     applyBindings(myModel, testNode)
 
     // Right now the template references myObservable, so there should be exactly one subscription on it
-    expect(testNode.childNodes[0]).toContainText('The value is some value')
-    expect(myObservable.getSubscriptionsCount()).toEqual(1)
+    expectContainText(testNode.childNodes[0], 'The value is some value')
+    expect(myObservable.getSubscriptionsCount()).to.equal(1)
     const renderedNode1 = testNode.childNodes[0].childNodes[0]
 
     // By changing the object for subModel, we force the data-bind value to be re-evaluated and the template to be re-rendered,
     // setting up a new template subscription, so there have now existed two subscriptions on myObservable...
     myModel.subModel({ myObservable: myObservable })
-    expect(testNode.childNodes[0].childNodes[0]).not.toEqual(renderedNode1)
+    expect(testNode.childNodes[0].childNodes[0]).not.to.equal(renderedNode1)
 
     // ...but, because the old subscription should have been disposed automatically, there should only be one left
-    expect(myObservable.getSubscriptionsCount()).toEqual(1)
+    expect(myObservable.getSubscriptionsCount()).to.equal(1)
   })
 
   it('Should be able to specify a template engine instance using data-bind syntax', function () {
@@ -1170,7 +1202,7 @@ describe('Templating', function () {
     testNode.innerHTML = '<div data-bind=\'template: { name: "theTemplate", templateEngine: chosenEngine }\'></div>'
     applyBindings({ chosenEngine: alternativeTemplateEngine }, testNode)
 
-    expect(testNode.childNodes[0]).toContainText('Alternative output')
+    expectContainText(testNode.childNodes[0], 'Alternative output')
   })
 
   it("Should be able to bind $data to an alias using 'as'", function () {
@@ -1181,10 +1213,10 @@ describe('Templating', function () {
     )
     testNode.innerHTML = '<div data-bind=\'template: { name: "myTemplate", data: someItem, as: "item" }\'></div>'
     applyBindings({ someItem: { prop: 'Hello' } }, testNode)
-    expect(testNode.childNodes[0]).toContainText('ValueLiteral: Hello, ValueBound: Hello')
+    expectContainText(testNode.childNodes[0], 'ValueLiteral: Hello, ValueBound: Hello')
   })
 
-  it('Data-bind syntax should expose parent binding context as $parent if binding with an explicit \"data\" value', function () {
+  it('Data-bind syntax should expose parent binding context as $parent if binding with an explicit "data" value', function () {
     setTemplateEngine(
       new dummyTemplateEngine({
         myTemplate:
@@ -1193,7 +1225,7 @@ describe('Templating', function () {
     )
     testNode.innerHTML = '<div data-bind=\'template: { name: "myTemplate", data: someItem }\'></div>'
     applyBindings({ someItem: {}, parentProp: 'Hello' }, testNode)
-    expect(testNode.childNodes[0]).toContainText('ValueLiteral: Hello, ValueBound: Hello')
+    expectContainText(testNode.childNodes[0], 'ValueLiteral: Hello, ValueBound: Hello')
   })
 
   it('Data-bind syntax should expose all ancestor binding contexts as $parents', function () {
@@ -1211,12 +1243,13 @@ describe('Templating', function () {
       { val: 'ROOT', outerItem: { val: 'OUTER', middleItem: { val: 'MIDDLE', innerItem: { val: 'INNER' } } } },
       testNode
     )
-    expect(testNode.childNodes[0].childNodes[0]).toContainText(
+    expectContainText(
+      testNode.childNodes[0].childNodes[0],
       '(Data:INNER, Parent:MIDDLE, Grandparent:OUTER, Root:ROOT, Depth:3)'
     )
   })
 
-  xit('Should not be allowed to rewrite templates that embed anonymous templates', function () {
+  it.skip('Should not be allowed to rewrite templates that embed anonymous templates', function () {
     // SKIP because we have removed template rewriting.
     //
     // ----
@@ -1240,10 +1273,10 @@ describe('Templating', function () {
 
     expect(function () {
       applyBindings({ someData: { childProp: 'abc' } }, testNode)
-    }).toThrowContaining('This template engine does not support anonymous templates nested within its templates')
+    }).to.throw(/This template engine does not support anonymous templates nested within its templates/)
   })
 
-  xit('Should not be allowed to rewrite templates that embed control flow bindings', function () {
+  it.skip('Should not be allowed to rewrite templates that embed control flow bindings', function () {
     // SKIP because we have removed template rewriting.
     // ----
     // Same reason as above (also include binding names with quotes and spaces to show that formatting doesn't matter)
@@ -1256,7 +1289,7 @@ describe('Templating', function () {
       domData.clear(testNode)
       expect(function () {
         applyBindings({ someData: { childProp: 'abc' } }, testNode)
-      }).toThrowContaining('This template engine does not support')
+      }).to.throw(/This template engine does not support/)
     })
   })
 
@@ -1270,7 +1303,8 @@ describe('Templating', function () {
     const model = {}
     testNode.innerHTML = '<div data-bind=\'template: { name: "outerTemplate" }\'></div>'
     applyBindings(model, testNode)
-    expect(testNode.childNodes[0]).toContainHtml(
+    expectContainHtml(
+      testNode.childNodes[0],
       'outer <!-- ko template: { name: "innertemplate" } -->inner via inline binding: <span data-bind="text: &quot;sometext&quot;">sometext</span><!-- /ko -->'
     )
   })
@@ -1280,15 +1314,13 @@ describe('Templating', function () {
     testNode.innerHTML =
       'Start <!-- ko template: { data: someData } -->Childprop: [js: nomangle$data.childProp]<!-- /ko --> End'
     applyBindings({ someData: { childProp: 'abc' } }, testNode)
-    expect(testNode).toContainHtml('start <!-- ko template: { data: somedata } -->childprop: abc<!-- /ko -->end')
+    expectContainHtml(testNode, 'start <!-- ko template: { data: somedata } -->childprop: abc<!-- /ko -->end')
   })
 
   it('Should render sub-context with {data: }', function () {
     testNode.innerHTML = "<div data-bind='template: {data: outer}'><span data-bind='text: inner'></span></div>"
     applyBindings({ outer: { inner: 'x' } }, testNode)
-    expect(testNode).toContainHtml(
-      '<div data-bind="template: {data: outer}"><span data-bind="text: inner">x</span></div>'
-    )
+    expectContainHtml(testNode, '<div data-bind="template: {data: outer}"><span data-bind="text: inner">x</span></div>')
   })
 
   it('Should be able to use anonymous templates that contain first-child comment nodes', function () {
@@ -1297,7 +1329,8 @@ describe('Templating', function () {
     setTemplateEngine(new dummyTemplateEngine({}))
     testNode.innerHTML = "start <div data-bind='foreach: [1,2]'><span><!-- leading comment -->hello</span></div>"
     applyBindings(null, testNode)
-    expect(testNode).toContainHtml(
+    expectContainHtml(
+      testNode,
       'start <div data-bind="foreach: [1,2]"><span><!-- leading comment -->hello</span><span><!-- leading comment -->hello</span></div>'
     )
   })
@@ -1313,7 +1346,7 @@ describe('Templating', function () {
     testNode.innerHTML =
       "<div data-bind='template: {}'><!-- ko nonexistentHandler: true --><span data-bind='countInits: true'></span><!-- /ko --></div>"
     applyBindings(null, testNode)
-    expect(initCalls).toEqual(1)
+    expect(initCalls).to.equal(1)
   })
 
   it('Should be possible to combine template rewriting, foreach, and a node preprocessor', function () {
@@ -1339,12 +1372,12 @@ describe('Templating', function () {
       "<div data-bind='template: { foreach: items }'><button data-bind='text: $data'></button> OK. </div>"
     const items = observableArray(['Alpha', 'Beta'])
     applyBindings({ items: items }, testNode)
-    expect(testNode).toContainText('Alpha OK. Beta OK. ')
+    expectContainText(testNode, 'Alpha OK. Beta OK. ')
 
     // Check that 'foreach' knows which set of elements to remove when an item vanishes from the model array,
     // even though the original 'foreach' output's first node, the memo comment, was removed during unmemoization.
     items.shift()
-    expect(testNode).toContainText('Beta OK. ')
+    expectContainText(testNode, 'Beta OK. ')
   })
 
   it('Should not throw errors if trying to apply text to a non-rendered node', function () {
@@ -1379,9 +1412,9 @@ describe('Templating', function () {
     renderTemplate('myTemplate', { myVal: 123 }, null, testDocFrag)
 
     // Can't use .toContainHtml directly on doc frags, so check DOM structure manually
-    expect(testDocFrag.childNodes.length).toEqual(1)
-    expect((testDocFrag.childNodes[0] as HTMLTemplateElement).tagName).toEqual('P')
-    expect(testDocFrag.childNodes[0]).toContainHtml('myval: 123')
+    expect(testDocFrag.childNodes.length).to.equal(1)
+    expect((testDocFrag.childNodes[0] as HTMLTemplateElement).tagName).to.equal('P')
+    expectContainHtml(testDocFrag.childNodes[0], 'myval: 123')
   })
 
   describe('The `condition` exposed via the domData for `else` chaining', function () {
@@ -1393,10 +1426,10 @@ describe('Templating', function () {
       applyBindings({ condition: condition }, testNode)
 
       const child: HTMLElement = testNode.childNodes[0] as HTMLElement
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(true)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(true)
 
       condition(false)
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(false)
     })
 
     it('is false iff the `ifnot` is true', function () {
@@ -1407,10 +1440,10 @@ describe('Templating', function () {
       applyBindings({ condition: condition }, testNode)
 
       const child: HTMLElement = testNode.childNodes[0] as HTMLElement
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(false)
 
       condition(false)
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(true)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(true)
     })
 
     it('is false iff the `foreach` is empty', function () {
@@ -1421,15 +1454,15 @@ describe('Templating', function () {
       applyBindings({ items: items }, testNode)
 
       const child: HTMLElement = testNode.childNodes[0] as HTMLElement
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(false)
 
       items([])
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(false)
 
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(false)
 
       items([123])
-      expect(domData.get(child, 'conditional').elseChainSatisfied()).toEqual(true)
+      expect(domData.get(child, 'conditional').elseChainSatisfied()).to.equal(true)
     })
 
     it('is false iff the `if` is false, on a DOM node', function () {
@@ -1440,10 +1473,10 @@ describe('Templating', function () {
 
       applyBindings({ condition: condition }, testNode)
 
-      expect(domData.get(testNode, 'conditional').elseChainSatisfied()).toEqual(true)
+      expect(domData.get(testNode, 'conditional').elseChainSatisfied()).to.equal(true)
 
       condition(false)
-      expect(domData.get(testNode, 'conditional').elseChainSatisfied()).toEqual(false)
+      expect(domData.get(testNode, 'conditional').elseChainSatisfied()).to.equal(false)
     })
   })
 })

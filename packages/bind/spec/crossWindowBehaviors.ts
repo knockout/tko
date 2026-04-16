@@ -1,6 +1,9 @@
+import { expect } from 'chai'
+
 import { applyBindings } from '../dist'
 
 import { cleanNode, options } from '@tko/utils'
+import { expectContainHtml, expectContainText } from '../../utils/helpers/mocha-test-helpers'
 
 import { observable } from '@tko/observable'
 
@@ -18,7 +21,7 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import { dummyTemplateEngine } from '@tko/binding.template/helpers/dummyTemplateEngine'
+import { dummyTemplateEngine } from '../../binding.template/helpers/dummyTemplateEngine'
 
 const BLANK_HTML = `
 <!doctype html>
@@ -50,70 +53,58 @@ describe('Cross-window support', function () {
       return
     }
 
-    this.after(function () {
-      win2.close()
-    })
+    const previousTemplateEngine = nativeTemplateEngine.instance
+    try {
+      win2.document.write(BLANK_HTML)
+      win2.document.close()
+      const body2 = win2.document.body
 
-    win2.document.write(BLANK_HTML)
-    win2.document.close()
-    const body2 = win2.document.body
-
-    // renderTemplate
-    window.runs(function () {
+      // renderTemplate
       setTemplateEngine(new dummyTemplateEngine({ someTemplate: "<div data-bind='text: text'></div>" }))
       renderTemplate('someTemplate', { text: 'abc' }, null, body2)
-      expect(body2.childNodes.length).toEqual(1)
-      expect(body2).toContainHtml('<div data-bind="text: text">abc</div>')
+      expect(body2.childNodes.length).to.equal(1)
+      expectContainHtml(body2, '<div data-bind="text: text">abc</div>')
       cleanNode(body2)
-    })
 
-    // foreach
-    window.runs(function () {
+      // foreach
       body2.innerHTML = "<div data-bind='foreach: someItems'><span data-bind='text: childProp'></span></div>"
       const someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
       applyBindings({ someItems: someItems }, body2)
-      expect(body2.childNodes[0]).toContainHtml(
+      expectContainHtml(
+        body2.childNodes[0],
         '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
       )
       cleanNode(body2)
-    })
 
-    // template/foreach binding
-    window.runs(function () {
+      // template/foreach binding
       setTemplateEngine(new nativeTemplateEngine())
       body2.innerHTML =
         "<div id='tmpl'><span data-bind='text: childProp'></span></div><div data-bind='template: {name: \"tmpl\", foreach: someItems}'></div>"
-      const someItems = [{ childProp: 'first child' }, { childProp: 'second child' }]
       applyBindings({ someItems: someItems }, body2.childNodes[1])
-      expect(body2.childNodes[1]).toContainHtml(
+      expectContainHtml(
+        body2.childNodes[1],
         '<span data-bind="text: childprop">first child</span><span data-bind="text: childprop">second child</span>'
       )
       cleanNode(body2)
-    })
 
-    // with
-    window.runs(function () {
+      // with
       const someItem = observable(undefined)
       body2.innerHTML =
         "<div data-bind='with: someItem'><span data-bind='text: occasionallyExistentChildProp'></span></div>"
       applyBindings({ someItem: someItem }, body2)
 
-      // First it's not there
-      expect(body2.childNodes[0].childNodes.length).toEqual(0)
+      expect(body2.childNodes[0].childNodes.length).to.equal(0)
 
-      // Then it's there
       someItem({ occasionallyExistentChildProp: 'Child prop value' })
-      expect(body2.childNodes[0].childNodes.length).toEqual(1)
-      expect(body2.childNodes[0].childNodes[0]).toContainText('Child prop value')
+      expect(body2.childNodes[0].childNodes.length).to.equal(1)
+      expectContainText(body2.childNodes[0].childNodes[0], 'Child prop value')
 
-      // Then it's gone again
       someItem(null)
-      expect(body2.childNodes[0].childNodes.length).toEqual(0)
+      expect(body2.childNodes[0].childNodes.length).to.equal(0)
       cleanNode(body2)
-    })
-
-    // The `this.after` appears to not be called consistently, leaving
-    // lingering windows open.
-    window.runs(() => win2.close())
+    } finally {
+      setTemplateEngine(previousTemplateEngine)
+      win2.close()
+    }
   })
 })

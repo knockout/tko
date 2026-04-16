@@ -106,6 +106,8 @@ h1,
 .content-panel h1 {
   font-size: clamp(1.85rem, 4vw, 2.75rem);
   font-weight: 700;
+  margin: 0;
+  line-height: 1;
 }
 
 .content-panel h2 {
@@ -126,8 +128,7 @@ header {
 
 .sidebar,
 .right-sidebar-panel,
-.content-panel,
-.sidebar-pane {
+.content-panel {
   background: transparent;
 }
 
@@ -190,6 +191,9 @@ header {
 
 .content-panel .sl-markdown-content > .sl-heading-wrapper:first-child {
   margin-top: 0;
+  display: flex;
+  align-items: center;
+  min-height: 100%;
 }
 
 .content-panel a {
@@ -253,7 +257,15 @@ header {
   color: var(--sl-color-text-accent);
 }
 
-.landing-hero h2 {
+.landing-hero .landing-version {
+  margin: 0 0 0.3rem;
+  font-family: var(--tko-font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: var(--sl-color-white);
+}
+
+.landing-hero h2:not(.landing-version) {
   margin: 0;
   max-width: 11ch;
   font-size: clamp(1.55rem, 3.7vw, 2.55rem);

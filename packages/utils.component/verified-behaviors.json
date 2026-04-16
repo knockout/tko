@@ -3,30 +3,20 @@
   "behaviors": [
     {
       "statement": "`ComponentABC.register()` requires an overloaded component definition.",
-      "notes": [
-        "Registration throws when the class does not provide the required template/element contract."
-      ],
-      "specs": [
-        "packages/utils.component/spec/ComponentABCBehaviors.ts"
-      ]
+      "notes": ["Registration throws when the class does not provide the required template/element contract."],
+      "specs": ["packages/utils.component/spec/ComponentABCBehaviors.ts"]
     },
     {
       "statement": "When no custom element name is supplied, `ComponentABC.register()` infers a kebab-case custom element name from the class name.",
-      "specs": [
-        "packages/utils.component/spec/ComponentABCBehaviors.ts"
-      ]
+      "specs": ["packages/utils.component/spec/ComponentABCBehaviors.ts"]
     },
     {
       "statement": "A registered `ComponentABC` class is used as the component view model and may provide its template through either `template` or `element`.",
-      "specs": [
-        "packages/utils.component/spec/ComponentABCBehaviors.ts"
-      ]
+      "specs": ["packages/utils.component/spec/ComponentABCBehaviors.ts"]
     },
     {
       "statement": "Component instances derived from `ComponentABC` are disposed when their bound node is cleaned.",
-      "specs": [
-        "packages/utils.component/spec/ComponentABCBehaviors.ts"
-      ]
+      "specs": ["packages/utils.component/spec/ComponentABCBehaviors.ts"]
     }
   ]
 }

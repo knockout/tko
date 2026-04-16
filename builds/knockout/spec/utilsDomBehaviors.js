@@ -1,117 +1,118 @@
 describe('setTextContent', function () {
-    var element;
+  var element
 
-    beforeEach(function () {
-        element = document.createElement('DIV');
-    });
+  beforeEach(function () {
+    element = document.createElement('DIV')
+  })
 
-    // NOTE: will test innerHTML because <IE8 doesn't have textContent
-    it('defaults to empty string', function () {
+  // NOTE: will test innerHTML because <IE8 doesn't have textContent
+  it('defaults to empty string', function () {
+    ko.utils.setTextContent(element)
+    expect(element.innerHTML).to.deep.equal('')
+  })
 
-        ko.utils.setTextContent(element);
-        expect(element.innerHTML).toEqual('');
-    });
+  it('sets text from plain values or observables', function () {
+    ko.utils.setTextContent(element, 'test')
+    expect(element.innerHTML).to.deep.equal('test')
 
-    it('sets text from plain values or observables', function () {
+    ko.utils.setTextContent(element, ko.observable('change'))
+    expect(element.innerHTML).to.deep.equal('change')
+  })
 
-        ko.utils.setTextContent(element, 'test');
-        expect(element.innerHTML).toEqual('test');
+  it('overwrites existing text', function () {
+    element.innerHTML = 'existing'
 
-        ko.utils.setTextContent(element, ko.observable('change'));
-        expect(element.innerHTML).toEqual('change');
-    });
+    ko.utils.setTextContent(element, 'changed')
+    expect(element.innerHTML).to.deep.equal('changed')
+  })
+})
 
-    it('overwrites existing text', function () {
+describe('registerEventHandler', function () {
+  beforeEach(prepareTestNode)
 
-        element.innerHTML = 'existing';
+  it('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function () {
+    if (typeof jQuery === 'undefined') {
+      return // Nothing to test. Run the specs with jQuery referenced for this to do anything.
+    }
 
-        ko.utils.setTextContent(element, 'changed');
-        expect(element.innerHTML).toEqual('changed');
-    });
-});
+    restoreAfter(ko.options, 'useOnlyNativeEvents')
 
-describe('registerEventHandler', function() {
-    beforeEach(jasmine.prepareTestNode);
+    var element = document.createElement('button')
+    var eventFired = false
+    var jQueryModified = false
 
-    it ('if jQuery is referenced, should use jQuery eventing with useOnlyNativeEvents option set to false', function() {
-        if (typeof jQuery === 'undefined') {
-            return; // Nothing to test. Run the specs with jQuery referenced for this to do anything.
-        }
+    testNode.appendChild(element)
 
-        this.restoreAfter(ko.options, 'useOnlyNativeEvents');
+    // Set the option to true.
+    ko.options.useOnlyNativeEvents = false
 
-        var element = document.createElement('button');
-        var eventFired = false;
-        var jQueryModified = false;
+    // Verify jQuery is used in event binding.
+    ko.utils.registerEventHandler(element, 'click', function (eventArgs) {
+      eventFired = true
+      jQueryModified = !!eventArgs.originalEvent
+    })
 
-        testNode.appendChild(element);
+    // Trigger the event natively (jQuery intercepts and creates new event object, which we can test)
+    element.click()
+    expect(eventFired && jQueryModified).to.equal(true)
 
-        // Set the option to true.
-        ko.options.useOnlyNativeEvents = false;
+    // Also trigger an event through ko.utils.triggerEvent to show that it creates a jQuery event directly
+    eventFired = jQueryModified = false
+    ko.utils.triggerEvent(element, 'click')
+    expect(eventFired && !jQueryModified).to.equal(true)
+  })
 
-        // Verify jQuery is used in event binding.
-        ko.utils.registerEventHandler(element, 'click', function(eventArgs) {
-            eventFired = true;
-            jQueryModified = !!eventArgs.originalEvent;
-        });
+  it('should not use jQuery eventing with useOnlyNativeEvents option set to true', function () {
+    restoreAfter(ko.options, 'useOnlyNativeEvents')
 
-        // Trigger the event natively (jQuery intercepts and creates new event object, which we can test)
-        element.click();
-        expect(eventFired && jQueryModified).toBe(true);
+    var element = document.createElement('button')
+    var eventFired = false
+    var jQueryModified = false
 
-        // Also trigger an event through ko.utils.triggerEvent to show that it creates a jQuery event directly
-        eventFired = jQueryModified = false;
-        ko.utils.triggerEvent(element, 'click');
-        expect(eventFired && !jQueryModified).toBe(true);
-    });
+    testNode.appendChild(element)
 
-    it ('should not use jQuery eventing with useOnlyNativeEvents option set to true', function() {
-        this.restoreAfter(ko.options, 'useOnlyNativeEvents');
+    // Set the option to true.
+    ko.options.useOnlyNativeEvents = true
 
-        var element = document.createElement('button');
-        var eventFired = false;
-        var jQueryModified = false;
+    // Verify jQuery is not used in event binding.
+    ko.utils.registerEventHandler(element, 'click', function (eventArgs) {
+      eventFired = true
+      jQueryModified = !!eventArgs.originalEvent
+    })
 
-        testNode.appendChild(element);
+    // Trigger the event natively
+    element.click()
+    expect(eventFired && !jQueryModified).to.equal(true)
 
-        // Set the option to true.
-        ko.options.useOnlyNativeEvents = true;
-
-        // Verify jQuery is not used in event binding.
-        ko.utils.registerEventHandler(element, 'click', function(eventArgs) {
-            eventFired = true;
-            jQueryModified = !!eventArgs.originalEvent;
-        });
-
-        // Trigger the event natively
-        element.click();
-        expect(eventFired && !jQueryModified).toBe(true);
-
-        // Also trigger an event through ko.utils.triggerEvent to show that it triggers a native event
-        eventFired = jQueryModified = false;
-        ko.utils.triggerEvent(element, 'click');
-        expect(eventFired && !jQueryModified).toBe(true);
-    });
-});
+    // Also trigger an event through ko.utils.triggerEvent to show that it triggers a native event
+    eventFired = jQueryModified = false
+    ko.utils.triggerEvent(element, 'click')
+    expect(eventFired && !jQueryModified).to.equal(true)
+  })
+})
 
 describe('cloneNodes', function () {
-    beforeEach(jasmine.prepareTestNode);
+  beforeEach(prepareTestNode)
 
-    it ('should return clones', function() {
-        var newNodes = ko.utils.cloneNodes([testNode]);
-        var isClone = testNode.isSameNode ? !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0]) : testNode !== newNodes[0];
-        expect(isClone).toBe(true);
-    });
+  it('should return clones', function () {
+    var newNodes = ko.utils.cloneNodes([testNode])
+    var isClone = testNode.isSameNode
+      ? !testNode.isSameNode(newNodes[0]) && testNode.isEqualNode(newNodes[0])
+      : testNode !== newNodes[0]
+    expect(isClone).to.equal(true)
+  })
 
-    it ('should clone deeply', function() {
-        var child = document.createElement('DIV');
-        testNode.appendChild(child);
+  it('should clone deeply', function () {
+    var child = document.createElement('DIV')
+    testNode.appendChild(child)
 
-        var newNodes = ko.utils.cloneNodes([testNode]);
-        var newChild = newNodes[0].childNodes[0];
+    var newNodes = ko.utils.cloneNodes([testNode])
+    var newChild = newNodes[0].childNodes[0]
 
-        var childIsClone = child.isSameNode ? !child.isSameNode(newChild) && child.isEqualNode(newChild) : child !== newChild;
+    var childIsClone = child.isSameNode
+      ? !child.isSameNode(newChild) && child.isEqualNode(newChild)
+      : child !== newChild
 
-        expect(childIsClone).toBe(true);
-    });
-});
+    expect(childIsClone).to.equal(true)
+  })
+})

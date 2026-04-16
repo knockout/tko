@@ -1,6 +1,4 @@
 # Combined lint, format, and typecheck workflow.
-# Replaces separate eslint.yml, prettier.yml, and run-tsc.yml to avoid
-# running npm install three times.
 name: Lint & Typecheck
 
 on:
@@ -15,23 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22.x
-          cache: 'npm'
+          bun-version-file: .tool-versions
 
       - name: Install dependencies
-        run: npm install
+        run: bun install --frozen-lockfile
 
-      - name: Check Prettier
-        run: make format
-
-      - name: Check ESLint
-        run: make eslint
+      - name: Check Biome (lint + format)
+        run: bunx @biomejs/biome ci .
 
       - name: Build (required for tsc)
-        run: make
+        run: bun run build
+
+      - name: Verify ESM extensions
+        run: bun run verify:esm
 
       - name: Typecheck
-        run: npx tsc
+        run: bunx tsc

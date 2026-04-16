@@ -1,28 +1,21 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/binding.component",
   "description": "component: binding for web components",
-  "module": "dist/binding.component.js",
+  "module": "dist/index.js",
   "license": "MIT",
   "dependencies": {
-    "@tko/bind": "^4.0.0",
-    "@tko/lifecycle": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0",
-    "@tko/utils.component": "^4.0.0",
-    "@tko/utils.jsx": "^4.0.0",
-    "@tko/provider.native": "^4.0.0"
+    "@tko/bind": "^4.0.1",
+    "@tko/lifecycle": "^4.0.1",
+    "@tko/observable": "^4.0.1",
+    "@tko/provider.native": "^4.0.1",
+    "@tko/utils": "^4.0.1",
+    "@tko/utils.component": "^4.0.1",
+    "@tko/utils.jsx": "^4.0.1"
   },
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {
@@ -32,11 +25,9 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
@@ -45,5 +36,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.git"
-  }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "binding",
+    "web-components",
+    "custom-elements"
+  ]
 }

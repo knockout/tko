@@ -1,84 +1,50 @@
 # TKO (Typed Knockout)
 
-> TKO is the modern TypeScript successor to Knockout.js — an MVVM framework for
-> reactive data binding and UI templating with zero runtime dependencies. TKO
-> uniquely enables building complex UIs directly in the browser using TSX and
-> esbuild-wasm, with no local toolchain required.
+> TypeScript MVVM framework for reactive data binding and UI templating.
+> Zero runtime dependencies. Successor to Knockout.js.
 
 ## Quick Start
 
 ```html
 <script src="https://tko.io/lib/tko.js"></script>
-<script>window.ko = window.tko;</script>
+<script>const ko = globalThis.tko;</script>
 ```
 
-## Start Here
+## Agent Docs
 
-- Verified Behaviors Index: /agents/verified-behaviors/index.md
-  Unit-test-backed behavior contract. Prefer this when behavior questions matter.
-- Agent Guide: /agents/guide.md
-  API reference, gotchas, and examples.
-- Agent Testing: /agents/testing.md
-  How to run and verify TKO code.
-- Agent TSX Scaffold: /agents/sample-tsx.html
-  Minimal in-browser TSX + esbuild scaffold for rapid prototype work.
+- /agents/soul.md — why Knockout works the way it does (design philosophy)
+- /agents/guide.md — API reference, gotchas, examples
+- /agents/glossary.md — domain terms, concepts, packages
+- /agents/testing.md — how to run and verify TKO code
+- /agents/contract.md — state/binding/DOM architecture
+- /agents/verified-behaviors/index.md — test-backed behavior contracts
+- /agents/sample-tsx.html — minimal browser TSX scaffold
+- /examples/ — interactive self-contained HTML examples
 
-## Use This First
+## Builds
 
-- Behavior question or edge case: /agents/verified-behaviors/index.md
-- API usage or authoring pattern: /agents/guide.md
-- Verification or test flow: /agents/testing.md
-- Rapid prototype in-browser: /agents/sample-tsx.html
+- `@tko/build.reference` — modern TKO (TSX, ko-*, native provider)
+- `@tko/build.knockout` — Knockout.js compatibility
 
-## Build Choice
+## Key Concepts
 
-- Use `@tko/build.reference` for modern TKO, including TSX, `ko-*`, and the native provider path.
-- Use `@tko/build.knockout` for compatibility-oriented Knockout-style work.
+- Observables, observableArrays, computeds = state layer
+- Bindings (`data-bind="text: msg"`) = DOM integration layer
+- `ko.applyBindings(viewModel, element)` connects state to DOM
+- TSX: `ko-text={msg}` with esbuild + `tko.jsx.render()`
 
-## Common Gotchas
+## Packages
 
-- Derived `ko-*` values must stay observable or computed. `ko-text={price() > 50 ? 'expensive' : 'cheap'}` freezes; use a computed.
-- `ko.applyBindings(...)` returns a `Promise`.
-- TKO connects observable state to the DOM; `bindingHandlers` are the DOM/state bridge.
+- Bindings: `@tko/binding.*`
+- Observables: `@tko/observable`, `@tko/computed`
+- Providers: `@tko/provider.*`, `@tko/utils.parser`
+- TSX/JSX: `@tko/utils.jsx`, `@tko/provider.native`
 
-## Package Routing
+## Gotchas
 
-- Bindings and DOM behavior: `@tko/binding.*`
-- Observables, computed, rate limiting: `@tko/observable`, `@tko/computed`
-- Binding parsing and provider selection: `@tko/provider.*`, `@tko/utils.parser`
-- TSX and JSX rendering: `@tko/utils.jsx`, `@tko/provider.native`
-
-## URLs
-
-- Verified Behaviors: /agents/verified-behaviors/index.md (package-scoped index)
-- Agent Guide: /agents/guide.md (API reference, gotchas, examples)
-- Agent Testing: /agents/testing.md (how to run and verify TKO code)
-- Agent TSX Scaffold: /agents/sample-tsx.html (minimal browser TSX + esbuild scaffold for rapid prototype work)
-- Playground: /playground
-- GitHub: https://github.com/knockout/tko
-
-## Core Contract
-
-- TKO is responsible for connecting state to the DOM.
-- Observables, observableArrays, and computeds are the state layer.
-- Bindings are the DOM integration layer: they read state, update DOM, and write user-driven changes back to state.
-- `bindingHandlers` are the bridge between the DOM and the observable state layer.
-- `ko.applyBindings(viewModel, element)` activates that bridge on an existing DOM subtree.
-- In TSX, `tko.jsx.render()` creates DOM nodes and `ko.applyBindings({}, root)` then activates the `ko-*` bindings on that rendered DOM.
-
-## Two Binding Syntaxes
-
-HTML: `data-bind="text: msg"` — runtime strings, works with `ko.applyBindings(vm, el)`
-TSX: `ko-text={msg}` — compile-time JSX expressions, needs esbuild + `tko.jsx.render()`
-
-Inside `ko-foreach` children, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
-
-See /agents/guide.md for usage patterns.
-Use /agents/verified-behaviors/index.md for test-backed behavior contracts.
-
-## Docs
-
-/observables/ · /computed/ · /bindings/ · /components/ · /binding-context/ · /advanced/
+- Derived `ko-*` values must stay observable/computed — inline expressions freeze
+- `ko.applyBindings(...)` returns a Promise
+- Inside `ko-foreach`, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
 
 ## Browser JSX (esbuild-wasm)
 
@@ -86,8 +52,12 @@ Use /agents/verified-behaviors/index.md for test-backed behavior contracts.
 import * as esbuild from 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esm/browser.min.js'
 await esbuild.initialize({ wasmURL: 'https://cdn.jsdelivr.net/npm/esbuild-wasm@0.27.4/esbuild.wasm' })
 const result = await esbuild.transform(tsxCode, {
-  loader: 'tsx',
-  jsxFactory: 'tko.jsx.createElement',
-  jsxFragment: 'tko.jsx.Fragment'
+  loader: 'tsx', jsxFactory: 'tko.jsx.createElement', jsxFragment: 'tko.jsx.Fragment'
 })
 ```
+
+## Links
+
+- Docs: /observables/ · /computed/ · /bindings/ · /components/
+- Playground: /playground
+- GitHub: https://github.com/knockout/tko

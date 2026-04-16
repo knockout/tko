@@ -1,0 +1,137 @@
+---
+title: Introduction
+description: Modern Knockout — reactive data binding and UI templating with zero runtime dependencies.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<div class="landing-hero">
+  <h2 class="landing-version">TKO v4.0.1</h2>
+  <p class="landing-kicker">Modern Knockout, clarified</p>
+  <p class="landing-lede">Reactive data binding and UI templating with zero runtime dependencies. Start with the package you need and move from overview to working bindings.</p>
+  <div class="landing-actions">
+    <a class="landing-button landing-button--primary" href="/bindings/">Start with bindings</a>
+    <a class="landing-button landing-button--secondary" href="/playground">Try the Playground</a>
+  </div>
+</div>
+
+## Quick start
+
+### Browser
+
+<Tabs syncKey="script">
+  <TabItem label="ES module">
+    ```html
+    <script type="module">
+      import ko from 'https://esm.run/@tko/build.reference'
+      const name = ko.observable('TKO')
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Classic script">
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
+    <script>
+      const ko = globalThis.tko
+    </script>
+    ```
+  </TabItem>
+</Tabs>
+
+### Package manager
+
+<Tabs syncKey="pkg">
+  <TabItem label="npm">
+    ```sh
+    npm install @tko/build.reference
+    ```
+  </TabItem>
+  <TabItem label="bun">
+    ```sh
+    bun add @tko/build.reference
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add @tko/build.reference
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```sh
+    yarn add @tko/build.reference
+    ```
+  </TabItem>
+</Tabs>
+
+For Knockout 3.x compatibility, use `@tko/build.knockout` instead.
+
+## First binding example
+
+```html
+<div id="app">
+  <label>
+    Name
+    <input data-bind="textInput: name" />
+  </label>
+  <p>Hello, <strong data-bind="text: name"></strong>.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
+<script>
+  const ko = globalThis.tko
+  ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+</script>
+```
+
+## Choose a build
+
+<div class="landing-grid">
+  <a class="landing-card" href="/advanced/provider/">
+    <span class="landing-card__eyebrow">Recommended</span>
+    <h3><code>@tko/build.reference</code></h3>
+    <p>Modern path with TSX, `ko-*` attributes, native provider, and strict equality in expressions.</p>
+  </a>
+  <a class="landing-card" href="/3to4/">
+    <span class="landing-card__eyebrow">Knockout 3.x migrations</span>
+    <h3><code>@tko/build.knockout</code></h3>
+    <p>Compatibility-focused. Drop-in replacement for existing Knockout applications.</p>
+  </a>
+</div>
+
+## What stays familiar
+
+- **Observables and computed values** — `ko.observable`, `ko.observableArray`, `ko.computed`
+- **Declarative bindings** — `data-bind="text: msg"` and the same binding APIs
+- **Components and custom bindings** — the component system and binding extensibility
+
+## What to read next
+
+<div class="landing-grid">
+  <a class="landing-card" href="/bindings/">
+    <span class="landing-card__eyebrow">Core docs</span>
+    <h3>Bindings</h3>
+    <p>Binding syntax, common bindings, and view updates.</p>
+  </a>
+  <a class="landing-card" href="/observables/">
+    <span class="landing-card__eyebrow">State model</span>
+    <h3>Observables</h3>
+    <p>Observables, observable arrays, extenders, and rate limiting.</p>
+  </a>
+  <a class="landing-card" href="/components/">
+    <span class="landing-card__eyebrow">Composition</span>
+    <h3>Components</h3>
+    <p>Reusable UI, loading strategies, and component architecture.</p>
+  </a>
+  <a class="landing-card" href="/examples/">
+    <span class="landing-card__eyebrow">See it in action</span>
+    <h3>Examples</h3>
+    <p>Interactive demos showing observable updates, dependency graphs, and reactive state.</p>
+  </a>
+</div>
+
+## Community
+
+- [GitHub issues](https://github.com/knockout/tko/issues)
+- [Gitter knockout/tko](https://gitter.im/knockout/tko)
+- [Reddit /r/knockoutjs](https://www.reddit.com/r/knockoutjs/)
+- [StackOverflow [knockout.js]](http://stackoverflow.com/tags/knockout.js/info)

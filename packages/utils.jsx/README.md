@@ -1,0 +1,5 @@
+# @tko/utils.jsx
+
+JSX/TSX rendering for TKO (createElement, JsxObserver)
+
+Part of [TKO](https://tko.io) — modern Knockout.js. [Docs](https://tko.io) · [Source](https://github.com/knockout/tko/tree/main/packages/utils.jsx)

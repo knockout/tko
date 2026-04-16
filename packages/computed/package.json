@@ -1,16 +1,14 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/computed",
   "description": "TKO Computed Observables",
-  "module": "dist/computed.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "dependencies": {
-    "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/observable": "^4.0.1",
+    "@tko/utils": "^4.0.1"
   },
   "repository": {
     "type": "git",
@@ -18,7 +16,10 @@
   },
   "keywords": [
     "knockout",
-    "tko"
+    "tko",
+    "computed",
+    "observable",
+    "reactive"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -26,11 +27,6 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
-  },
   "licenses": [
     {
       "type": "MIT",
@@ -39,10 +35,11 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

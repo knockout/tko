@@ -1,21 +1,21 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/bind",
   "description": "TKO DOM-Observable Binding",
-  "module": "dist/bind.js",
+  "module": "dist/index.js",
   "dependencies": {
-    "@tko/computed": "^4.0.0",
-    "@tko/lifecycle": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/computed": "^4.0.1",
+    "@tko/lifecycle": "^4.0.1",
+    "@tko/observable": "^4.0.1",
+    "@tko/provider": "^4.0.1",
+    "@tko/utils": "^4.0.1",
+    "@tko/builder": "^4.0.1"
   },
   "peerDependencies": {
-    "@tko/binding.foreach": "^4.0.0"
+    "@tko/binding.foreach": "^4.0.1"
   },
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -27,11 +27,6 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
-  },
   "__about__": "These are copied into all packages/*/package.json",
   "licenses": [
     {
@@ -41,10 +36,19 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
-  }
+    }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "binding",
+    "dom",
+    "observable",
+    "data-binding"
+  ]
 }

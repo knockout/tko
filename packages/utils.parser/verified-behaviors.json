@@ -11,33 +11,23 @@
     },
     {
       "statement": "Identifier lookup and write work against parser context, plain `$data`, no-prototype `$data`, and writable observables.",
-      "specs": [
-        "packages/utils.parser/spec/identifierBehaviors.ts"
-      ]
+      "specs": ["packages/utils.parser/spec/identifierBehaviors.ts"]
     },
     {
       "statement": "Dereferenced method calls preserve `this` as the parent object; top-level calls use `$data` as `this` when appropriate.",
-      "specs": [
-        "packages/utils.parser/spec/identifierBehaviors.ts"
-      ]
+      "specs": ["packages/utils.parser/spec/identifierBehaviors.ts"]
     },
     {
       "statement": "Filter syntax `value | filter[:arg...]` composes, accepts looked-up values and expressions, unwraps observables when requested, and preserves the parser root as `this` across filter chains.",
-      "specs": [
-        "packages/utils.parser/spec/filterBehaviors.ts"
-      ]
+      "specs": ["packages/utils.parser/spec/filterBehaviors.ts"]
     },
     {
       "statement": "Namespace syntax builds nested binding objects such as `event.click`, `css.classname`, and `style.stylename`, and rejects conflicting shapes like `{ x: identifier, x.y: val }`.",
-      "specs": [
-        "packages/utils.parser/spec/namespaceBehaviors.ts"
-      ]
+      "specs": ["packages/utils.parser/spec/namespaceBehaviors.ts"]
     },
     {
       "statement": "Binding-handler `preprocess` hooks can rewrite values, add bindings, chain across added bindings, and resolve dynamically created binding handlers during preprocessing.",
-      "specs": [
-        "packages/utils.parser/spec/preprocessingBehavior.ts"
-      ]
+      "specs": ["packages/utils.parser/spec/preprocessingBehavior.ts"]
     }
   ]
 }

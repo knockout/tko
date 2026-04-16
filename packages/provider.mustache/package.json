@@ -1,12 +1,10 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/provider.mustache",
   "description": "Interpolate text/node attributes {{ }}",
-  "module": "dist/provider.mustache.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -15,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "provider",
+    "interpolation",
+    "mustache"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -24,14 +24,9 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/observable": "^4.0.0",
-    "@tko/provider": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0"
-  },
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
+    "@tko/observable": "^4.0.1",
+    "@tko/provider": "^4.0.1",
+    "@tko/utils.parser": "^4.0.1"
   },
   "licenses": [
     {
@@ -41,10 +36,11 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

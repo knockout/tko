@@ -388,16 +388,16 @@ export default class Parser {
 
     while (ch) {
       if (
-        isIdentifierChar(ch)
-        || ch <= ' '
-        || ch === ''
-        || ch === '"'
-        || ch === "'"
-        || ch === '{'
-        || ch === '('
-        || ch === '`'
-        || ch === ')'
-        || (ch <= '9' && ch >= '0')
+        isIdentifierChar(ch) ||
+        ch <= ' ' ||
+        ch === '' ||
+        ch === '"' ||
+        ch === "'" ||
+        ch === '{' ||
+        ch === '(' ||
+        ch === '`' ||
+        ch === ')' ||
+        (ch <= '9' && ch >= '0')
       ) {
         break
       }
@@ -526,14 +526,14 @@ export default class Parser {
       ch = this.white()
 
       if (
-        ch === ':'
-        || ch === '}'
-        || ch === ']'
-        || ch === ')'
-        || ch === ''
-        || ch === '`'
-        || (ch === '|' && filterable === '|')
-        || (ch === ',' && !allowMultipleValues)
+        ch === ':' ||
+        ch === '}' ||
+        ch === ']' ||
+        ch === ')' ||
+        ch === '' ||
+        ch === '`' ||
+        (ch === '|' && filterable === '|') ||
+        (ch === ',' && !allowMultipleValues)
       ) {
         break
       }

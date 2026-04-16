@@ -6,8 +6,6 @@ import BindingHandlerObject from './BindingHandlerObject'
 
 import type { BindingContext } from '@tko/bind'
 
-import type { BindingAccessors, ProviderBase } from '@tko/utils'
-
 export interface ProviderParamsInput {
   bindingHandlers?: BindingHandlerObject
   globals?: any
@@ -16,7 +14,9 @@ export interface ProviderParamsInput {
   providers?: any[]
 }
 
-export default class Provider implements ProviderBase {
+export type BindingAccessors = { [name: string]: Function }
+
+export default class Provider {
   constructor(params?: ProviderParamsInput | null) {
     if (this.constructor === Provider) {
       throw new Error('Provider is an abstract base class.')
@@ -55,8 +55,7 @@ export default class Provider implements ProviderBase {
   preprocessNode(node: Node): Node[] | null {
     return [node]
   }
-
-  //TODO unused hook? postProcess(/* node */) {}
+  postProcess(/* node */) {}
 
   bindingHandlers: BindingHandlerObject
   globals: any | undefined
@@ -90,7 +89,7 @@ export default class Provider implements ProviderBase {
 
   // Given a bindings function or object, create and return a new object that contains
   // binding value-accessors functions. This is used by ko.applyBindingsToNode.
-  makeBindingAccessors(bindings: any, context: any, node: Node): BindingAccessors {
+  makeBindingAccessors(bindings, context, node) {
     if (typeof bindings === 'function') {
       return this.makeAccessorsFromFunction(bindings.bind(null, context, node))
     } else {

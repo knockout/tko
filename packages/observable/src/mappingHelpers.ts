@@ -40,14 +40,14 @@ function mapJsObjectGraph<T = any>(
 ): any {
   rootObject = mapInputCallback(rootObject)
   const canHaveProperties =
-    typeof rootObject === 'object'
-    && rootObject !== null
-    && rootObject !== undefined
-    && !(rootObject instanceof RegExp)
-    && !(rootObject instanceof Date)
-    && !(rootObject instanceof String)
-    && !(rootObject instanceof Number)
-    && !(rootObject instanceof Boolean)
+    typeof rootObject === 'object' &&
+    rootObject !== null &&
+    rootObject !== undefined &&
+    !(rootObject instanceof RegExp) &&
+    !(rootObject instanceof Date) &&
+    !(rootObject instanceof String) &&
+    !(rootObject instanceof Number) &&
+    !(rootObject instanceof Boolean)
   if (!canHaveProperties) {
     return rootObject
   }

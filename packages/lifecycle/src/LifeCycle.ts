@@ -1,5 +1,3 @@
-'use strict'
-
 import { addDisposeCallback, createSymbolOrString } from '@tko/utils'
 
 import { computed } from '@tko/computed'

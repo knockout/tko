@@ -1,18 +1,19 @@
 import { triggerEvent, options } from '@tko/utils'
 
 import { applyBindings } from '@tko/bind'
+import { expect } from 'chai'
 
 import { DataBindProvider } from '@tko/provider.databind'
 
 import { bindings as coreBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: Click', function () {
   // This is just a special case of the "event" binding, so not necessary to respecify all its behaviors
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -26,13 +27,13 @@ describe('Binding: Click', function () {
       wasCalled: false,
       doCall: function (arg1, arg2) {
         this.wasCalled = true
-        expect(arg1).toEqual(model)
-        expect(arg2.type).toEqual('click')
+        expect(arg1).to.equal(model)
+        expect(arg2.type).to.equal('click')
       }
     }
     testNode.innerHTML = "<button data-bind='click:doCall'>hey</button>"
     applyBindings(model, testNode)
     triggerEvent(testNode.children[0], 'click')
-    expect(model.wasCalled).toEqual(true)
+    expect(model.wasCalled).to.equal(true)
   })
 })

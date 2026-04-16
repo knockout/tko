@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { Provider, BindingHandlerObject } from '../src'
+import { Provider, type BindingHandlerObject } from '../src'
 
 describe('Provider', function () {
   it('throws an error if not subclassed', function () {

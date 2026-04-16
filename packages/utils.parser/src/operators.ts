@@ -1,4 +1,5 @@
 import { unwrap } from '@tko/observable'
+import { defineOption } from '@tko/utils'
 
 export function LAMBDA() {}
 
@@ -25,6 +26,26 @@ export interface OperatorWithProperties extends OperatorFunction {
 export interface Operators {
   [key: string]: OperatorWithProperties
 }
+function looseEqual(a, b) {
+  return a == b
+}
+looseEqual.precedence = 10
+
+function looseNotEqual(a, b) {
+  return a != b
+}
+looseNotEqual.precedence = 10
+
+function strictEqual(a, b) {
+  return a === b
+}
+strictEqual.precedence = 10
+
+function strictNotEqual(a, b) {
+  return a !== b
+}
+strictNotEqual.precedence = 10
+
 const operators: Operators = {
   // unary
   '@': unwrapOrCall,
@@ -82,19 +103,11 @@ const operators: Operators = {
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
   //    TODO: 'typeof': function (a, b) { return typeof b; },
-  // equality
-  '==': function equal(a, b) {
-    return a == b
-  },
-  '!=': function ne(a, b) {
-    return a != b
-  },
-  '===': function sequal(a, b) {
-    return a === b
-  },
-  '!==': function sne(a, b) {
-    return a !== b
-  },
+  // equality — default loose; set options.strictEquality = true for === behavior
+  '==': looseEqual,
+  '!=': looseNotEqual,
+  '===': strictEqual,
+  '!==': strictNotEqual,
   // bitwise
   '&': function bitAnd(a, b) {
     return a & b
@@ -206,5 +219,21 @@ operators['call'].precedence = 1
 
 // lambda
 operators['=>'].precedence = 1
+
+// Extend the Options type so ko.options.strictEquality is strongly typed
+declare module '@tko/utils' {
+  interface Options {
+    strictEquality: boolean
+  }
+}
+
+/** Register strictEquality as a configurable option on ko.options */
+defineOption('strictEquality', {
+  default: false,
+  set(strict: boolean) {
+    operators['=='] = strict ? strictEqual : looseEqual
+    operators['!='] = strict ? strictNotEqual : looseNotEqual
+  }
+})
 
 export { operators as default }

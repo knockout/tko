@@ -3,42 +3,26 @@
   "behaviors": [
     {
       "statement": "`<!-- else -->` inside an `if` region toggles between the if-content and else-content as the condition changes.",
-      "specs": [
-        "packages/binding.if/spec/elseBehaviors.ts"
-      ]
+      "specs": ["packages/binding.if/spec/elseBehaviors.ts"]
     },
     {
       "statement": "Standalone `else` and `elseif` regions chain after `if` across DOM and virtual-element forms.",
-      "notes": [
-        "Reactive switching across `if` -> `elseif` -> `else` is covered by the specs."
-      ],
-      "specs": [
-        "packages/binding.if/spec/elseBehaviors.ts"
-      ]
+      "notes": ["Reactive switching across `if` -> `elseif` -> `else` is covered by the specs."],
+      "specs": ["packages/binding.if/spec/elseBehaviors.ts"]
     },
     {
       "statement": "`with` removes descendants for falsy values and binds descendants in the supplied value context for truthy values.",
-      "notes": [
-        "The region is reconstructed when the supplied observable changes truthiness."
-      ],
-      "specs": [
-        "packages/binding.if/spec/withBehaviors.ts"
-      ]
+      "notes": ["The region is reconstructed when the supplied observable changes truthiness."],
+      "specs": ["packages/binding.if/spec/withBehaviors.ts"]
     },
     {
       "statement": "`with` preserves `$parent`, `$parents`, and `$root` access inside nested contexts.",
-      "specs": [
-        "packages/binding.if/spec/withBehaviors.ts"
-      ]
+      "specs": ["packages/binding.if/spec/withBehaviors.ts"]
     },
     {
       "statement": "When `options.createChildContextWithAs` is disabled, `with: value, as: \"alias\"` aliases the value without creating a new child context.",
-      "notes": [
-        "Observable aliases update in place without re-rendering the region."
-      ],
-      "specs": [
-        "packages/binding.if/spec/withBehaviors.ts"
-      ]
+      "notes": ["Observable aliases update in place without re-rendering the region."],
+      "specs": ["packages/binding.if/spec/withBehaviors.ts"]
     }
   ]
 }

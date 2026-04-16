@@ -45,9 +45,9 @@ describe('Expression Rewriting', function () {
   it('Should be able to parse object literals containing child objects, arrays, function literals, and newlines', function () {
     // The parsing may or may not keep unnecessary spaces. So to avoid confusion, avoid unnecessary spaces.
     const result = parseObjectLiteral(
-      'myObject:{someChild:{},someChildArray:[1,2,3],"quotedChildProp":\'string value\'},\n'
-        + "someFn:function(a,b,c){var regex=/{/;var str='/})({';return{};},"
-        + 'myArray:[{},function(){},"my\'Str",\'my"Str\']'
+      'myObject:{someChild:{},someChildArray:[1,2,3],"quotedChildProp":\'string value\'},\n' +
+        "someFn:function(a,b,c){var regex=/{/;var str='/})({';return{};}," +
+        'myArray:[{},function(){},"my\'Str",\'my"Str\']'
     )
     expect(result.length).to.equal(3)
     expect(result[0].key).to.equal('myObject')
@@ -108,10 +108,10 @@ describe('Expression Rewriting', function () {
     // create an official public property writers API.
 
     const rewritten = preProcessBindings(
-      'a : 1, b : firstName, c : function() { return "returnValue"; }, '
-        + 'd: firstName+lastName, e: boss.firstName, f: boss . lastName, '
-        + 'g: getAssistant(), h: getAssistant().firstName, i: getAssistant("[dummy]")[ "lastName" ], '
-        + 'j: boss.firstName + boss.lastName'
+      'a : 1, b : firstName, c : function() { return "returnValue"; }, ' +
+        'd: firstName+lastName, e: boss.firstName, f: boss . lastName, ' +
+        'g: getAssistant(), h: getAssistant().firstName, i: getAssistant("[dummy]")[ "lastName" ], ' +
+        'j: boss.firstName + boss.lastName'
     )
     const assistant = { firstName: 'john', lastName: 'english' }
     const firstName = 'bob'
@@ -150,7 +150,7 @@ describe('Expression Rewriting', function () {
     expect(parsedRewritten.b).to.be.undefined // eslint-disable-line
   })
 
-  xit('Should return accessor functions for each value when called with the valueAccessors option', function () {
+  it.skip('Should return accessor functions for each value when called with the valueAccessors option', function () {
     // Deprecated
     const rewritten = preProcessBindings('a: 1', { valueAccessors: true })
     expect(rewritten).to.equal("'a':function(){return 1 }")
@@ -185,11 +185,11 @@ describe('Expression Rewriting', function () {
   it('Should be able to parse object literals containing C++ style comments', function () {
     // From https://github.com/knockout/knockout/issues/1524
     const result = parseObjectLiteral(
-      'model: router.activeItem, //wiring the router\n'
-        + 'afterCompose: router.afterCompose, //wiring the router\n'
-        + "//transition:'entrance', //use the 'entrance' transition when switching views\n"
-        + 'skipTransitionOnSameViewId: true,//Transition entrance is disabled for better perfomance\n'
-        + 'cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)\n'
+      'model: router.activeItem, //wiring the router\n' +
+        'afterCompose: router.afterCompose, //wiring the router\n' +
+        "//transition:'entrance', //use the 'entrance' transition when switching views\n" +
+        'skipTransitionOnSameViewId: true,//Transition entrance is disabled for better perfomance\n' +
+        'cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)\n'
     )
     expect(result).to.deep.equal([
       { key: 'model', value: 'router.activeItem' },
@@ -201,11 +201,11 @@ describe('Expression Rewriting', function () {
 
   it('Should be able to parse object literals containing C style comments', function () {
     const result = parseObjectLiteral(
-      'a: xxx, /* First comment */\n'
-        + 'b: yyy, /* Multi-line comment that comments-out the next whole line\n'
-        + "x: 'nothing', //this is also skipped */\n"
-        + 'c: zzz, /***Comment with extra * at various parts****/\n'
-        + "d: /**/'empty comment'"
+      'a: xxx, /* First comment */\n' +
+        'b: yyy, /* Multi-line comment that comments-out the next whole line\n' +
+        "x: 'nothing', //this is also skipped */\n" +
+        'c: zzz, /***Comment with extra * at various parts****/\n' +
+        "d: /**/'empty comment'"
     )
     expect(result).to.deep.equal([
       { key: 'a', value: 'xxx' },

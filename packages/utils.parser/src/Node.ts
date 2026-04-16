@@ -52,27 +52,25 @@ export default class Node {
    * the lambda is called.
    */
   get_value(notused, context, globals, node: Node) {
-    var node: Node = this //eslint-disable-line no-var
-
-    if (node.op === LAMBDA) {
+    if (this.op === LAMBDA) {
       return (...args) => {
         let lambdaContext = context
-        if (node.lhs) {
-          lambdaContext = node.lhs.extendContext(context, args)
+        if (this.lhs) {
+          lambdaContext = this.lhs.extendContext(context, args)
         }
-        return node.get_leaf_value(node.rhs, lambdaContext, globals, node)
+        return this.get_leaf_value(this.rhs, lambdaContext, globals, this)
       }
     }
 
-    const lhv = node.get_leaf_value(node.lhs, context, globals, node)
-    const earlyOut = node.op.earlyOut
+    const lhv = this.get_leaf_value(this.lhs, context, globals, this)
+    const earlyOut = this.op.earlyOut
 
     if (earlyOut && earlyOut(lhv)) {
       return lhv
     }
-    const rhv = node.get_leaf_value(node.rhs, context, globals, node)
+    const rhv = this.get_leaf_value(this.rhs, context, globals, this)
 
-    return node.op(lhv, rhv, context, globals)
+    return this.op(lhv, rhv, context, globals)
   }
 
   //

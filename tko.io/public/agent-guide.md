@@ -1,5 +1,7 @@
 # TKO Agent Guide
 
+For preferred state/binding/DOM architecture in examples and prototypes, read `/agents/contract.md`.
+
 ## Setup
 
 ```html
@@ -30,6 +32,8 @@ ko.when(() => viewModel.isReady() && viewModel.hasData()).then(() => console.log
 ## Bindings
 
 Activate with `ko.applyBindings(viewModel, element)`.
+
+Looking up that mount element with `document.getElementById(...)`, `querySelector(...)`, or another host reference is normal. The important rule is that once bindings are active, observable state should remain the source of truth instead of ad-hoc DOM mutation.
 
 Syntax: `data-bind="bindingName: expression"` on HTML elements.
 

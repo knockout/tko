@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import { compareArrays } from '../dist'
 
 describe('Compare Arrays', function () {
@@ -5,10 +7,10 @@ describe('Compare Arrays', function () {
     const subject = ['A', {}, function () {}]
     const compareResult = compareArrays(subject, subject.slice(0))
 
-    expect(compareResult.length).toEqual(subject.length)
+    expect(compareResult.length).to.equal(subject.length)
     for (let i = 0; i < subject.length; i++) {
-      expect(compareResult[i].status).toEqual('retained')
-      expect(compareResult[i].value).toEqual(subject[i])
+      expect(compareResult[i].status).to.equal('retained')
+      expect(compareResult[i].value).to.equal(subject[i])
     }
   })
 
@@ -16,7 +18,7 @@ describe('Compare Arrays', function () {
     const oldArray = ['A', 'B']
     const newArray = ['A', 'A2', 'A3', 'B', 'B2']
     const compareResult = compareArrays(oldArray, newArray)
-    expect(compareResult).toEqual([
+    expect(compareResult).to.deep.equal([
       { status: 'retained', value: 'A' },
       { status: 'added', value: 'A2', index: 1 },
       { status: 'added', value: 'A3', index: 2 },
@@ -29,7 +31,7 @@ describe('Compare Arrays', function () {
     const oldArray = ['A', 'B', 'C', 'D', 'E']
     const newArray = ['B', 'C', 'E']
     const compareResult = compareArrays(oldArray, newArray)
-    expect(compareResult).toEqual([
+    expect(compareResult).to.deep.equal([
       { status: 'deleted', value: 'A', index: 0 },
       { status: 'retained', value: 'B' },
       { status: 'retained', value: 'C' },
@@ -42,7 +44,7 @@ describe('Compare Arrays', function () {
     const oldArray = ['A', 'B', 'C', 'D', 'E']
     const newArray = [123, 'A', 'E', 'C', 'D']
     const compareResult = compareArrays(oldArray, newArray)
-    expect(compareResult).toEqual([
+    expect(compareResult).to.deep.equal([
       { status: 'added', value: 123, index: 0 },
       { status: 'retained', value: 'A' },
       { status: 'deleted', value: 'B', index: 1 },
@@ -62,7 +64,7 @@ describe('Compare Arrays', function () {
     compareResult.sort(function (a, b) {
       return a.index - b.index || a.status.localeCompare(b.status)
     })
-    expect(compareResult).toEqual([
+    expect(compareResult).to.deep.equal([
       { status: 'added', value: 'F', index: 0 },
       { status: 'deleted', value: 'A', index: 0 },
       { status: 'added', value: 'G', index: 1 },
@@ -84,7 +86,7 @@ describe('Compare Arrays', function () {
     const oldArray = ['A', 'B', 'C', 'D', 'E']
     const newArray = [123, 'A', 'E', 'C', 'D']
     const compareResult = compareArrays(oldArray, newArray, { sparse: true })
-    expect(compareResult).toEqual([
+    expect(compareResult).to.deep.equal([
       { status: 'added', value: 123, index: 0 },
       { status: 'deleted', value: 'B', index: 1 },
       { status: 'added', value: 'E', index: 2, moved: 4 },
@@ -121,9 +123,14 @@ describe('Compare Arrays', function () {
     const newArray = [1, 2, 3, 4, 'T', 6, 7, 8, 9, 10]
 
     let compareResult = compareArrays(oldArray, newArray)
-    expect(compareResult[compareResult.length - 1]).toEqual({ status: 'deleted', value: 'T', index: 19 })
+    expect(compareResult[compareResult.length - 1]).to.deep.equal({ status: 'deleted', value: 'T', index: 19 })
 
     compareResult = compareArrays(oldArray, newArray, { dontLimitMoves: true })
-    expect(compareResult[compareResult.length - 1]).toEqual({ status: 'deleted', value: 'T', index: 19, moved: 4 })
+    expect(compareResult[compareResult.length - 1]).to.deep.equal({
+      status: 'deleted',
+      value: 'T',
+      index: 19,
+      moved: 4
+    })
   })
 })

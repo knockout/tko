@@ -1,4 +1,5 @@
 import { extend, arrayPushAll, parseHtmlFragment } from '@tko/utils'
+import { unwrap } from '@tko/observable'
 
 import { renderTemplate, anonymousTemplate, templateEngine } from '../dist'
 
@@ -66,6 +67,7 @@ export function dummyTemplateEngine(templates?) {
     })
 
     const evalHandler = function (match, script) {
+      void unwrap // keep in scope for eval'd template expressions
       try {
         const evalResult = eval(script)
         return evalResult === null || evalResult === undefined ? '' : evalResult.toString()

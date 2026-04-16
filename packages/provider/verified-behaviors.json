@@ -3,21 +3,15 @@
   "behaviors": [
     {
       "statement": "`Provider` is abstract; instantiating it directly throws.",
-      "specs": [
-        "packages/provider/spec/providerBehaviors.ts"
-      ]
+      "specs": ["packages/provider/spec/providerBehaviors.ts"]
     },
     {
       "statement": "Subclasses must override `FOR_NODE_TYPES`; accessing it on a subclass that does not override throws.",
-      "specs": [
-        "packages/provider/spec/providerBehaviors.ts"
-      ]
+      "specs": ["packages/provider/spec/providerBehaviors.ts"]
     },
     {
       "statement": "Constructor params can inject `globals` and `bindingHandlers`, and the provider instance keeps those exact references.",
-      "specs": [
-        "packages/provider/spec/providerBehaviors.ts"
-      ]
+      "specs": ["packages/provider/spec/providerBehaviors.ts"]
     }
   ]
 }

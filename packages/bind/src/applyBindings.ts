@@ -26,7 +26,7 @@ import { BindingResult } from './BindingResult'
 
 import { LegacyBindingHandler } from './LegacyBindingHandler'
 
-import type { ProviderBase } from '@tko/utils'
+import type { Provider } from '@tko/provider'
 import type { BindingHandler, AllBindings } from './BindingHandler'
 import type { BindingContext } from './bindingContext'
 
@@ -57,11 +57,11 @@ const bindingDoesNotRecurseIntoElementTypes = {
   template: true
 }
 
-function getBindingProvider(): ProviderBase {
+function getBindingProvider(): Provider {
   return options.bindingProviderInstance.instance || options.bindingProviderInstance
 }
 
-function isProviderForNode(provider: ProviderBase, node: Node): boolean {
+function isProviderForNode(provider: Provider, node: Node): boolean {
   const nodeTypes = provider.FOR_NODE_TYPES || [Node.ELEMENT_NODE, Node.TEXT_NODE, Node.COMMENT_NODE]
   return nodeTypes.includes(node.nodeType)
 }
@@ -154,8 +154,8 @@ function applyBindingsToNodeAndDescendantsInternal(
   // (2) It might have bindings (e.g., it has a data-bind attribute, or it's a marker for a containerless template)
 
   const shouldApplyBindings =
-    isElement // Case (1)
-    || hasBindings(nodeVerified) // Case (2)
+    isElement || // Case (1)
+    hasBindings(nodeVerified) // Case (2)
 
   const { shouldBindDescendants }: any = shouldApplyBindings
     ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
@@ -193,8 +193,8 @@ function* topologicalSortBindings(bindings: Record<string, any>, $component: any
           }
           if (arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
             throw Error(
-              'Cannot combine the following bindings, because they have a cyclic dependency: '
-                + cyclicDependencyStack.join(', ')
+              'Cannot combine the following bindings, because they have a cyclic dependency: ' +
+                cyclicDependencyStack.join(', ')
             )
           } else {
             pushBinding(bindingDependencyKey)
@@ -369,11 +369,11 @@ function applyBindingsToNodeInternal<T>(
         if (bindingHandler.controlsDescendants) {
           if (bindingHandlerThatControlsDescendantBindings !== undefined) {
             throw new Error(
-              'Multiple bindings ('
-                + bindingHandlerThatControlsDescendantBindings
-                + ' and '
-                + key
-                + ') are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.'
+              'Multiple bindings (' +
+                bindingHandlerThatControlsDescendantBindings +
+                ' and ' +
+                key +
+                ') are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.'
             )
           }
           bindingHandlerThatControlsDescendantBindings = key
@@ -507,12 +507,12 @@ function onBindingError(spec: BindingError) {
     // During: 'init' or initial 'update'
     error = spec.errorCaptured
     spec.message =
-      'Unable to process binding "'
-      + spec.bindingKey
-      + '" in binding "'
-      + spec.bindingKey
-      + '"\nMessage: '
-      + (error.message ? error.message : error)
+      'Unable to process binding "' +
+      spec.bindingKey +
+      '" in binding "' +
+      spec.bindingKey +
+      '"\nMessage: ' +
+      (error.message ? error.message : error)
   } else {
     // During: 'apply'
     error = spec.errorCaptured

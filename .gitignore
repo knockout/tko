@@ -24,8 +24,6 @@ coverage-temp
 builds/**/meta
 .nyc_output
 **/dist/*
-packages/**/types
-builds/reference/types
 !packages/tko/dist/*
 
 *-debug.log
@@ -36,4 +34,9 @@ builds/reference/types
 .vscode/settings.json
 .playwright-mcp
 .playwright-cli
-.codex
+test-results/
+.claude/worktrees/
+__screenshots__
+.dts-tmp/
+.nx/
+.vitest-attachments/

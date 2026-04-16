@@ -2,35 +2,39 @@
 name: Check Tests
 
 on:
-  # Runs for every pull-requests created
   pull_request:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  testheadless:
+  test:
     runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [24]
-        run: ['test-headless','test-headless-jquery', 'test-headless-ff']
+        browser: [chromium, firefox, webkit]
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+      # Install Bun directly — avoids `apt-get update` (9+ min in this
+      # container) which setup-bun needs for unzip.
+      - name: Install Bun
+        run: python3 tools/install-bun
 
       - name: Install dependencies
-        run: npm install
+        run: bun install --frozen-lockfile
 
       - name: Run Build
-        run: make
+        run: bun run build
 
-      - name: Run ${{ matrix.run }}
-        run: make ${{ matrix.run }}
+      - name: Verify ESM extensions
+        run: bun run verify:esm
+
+      - name: Run Tests
+        run: bunx vitest run
+        env:
+          HOME: /root
+          VITEST_BROWSERS: ${{ matrix.browser }}

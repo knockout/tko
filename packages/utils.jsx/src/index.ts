@@ -1,3 +1,3 @@
 export { getOriginalJsxForNode, maybeJsx, createElement, Fragment } from './jsx'
 
-export { JsxObserver } from './JsxObserver'
+export { default as JsxObserver } from './JsxObserver'

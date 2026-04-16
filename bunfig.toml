@@ -1,0 +1,4 @@
+[install]
+# Reject package versions published less than 48 hours ago.
+# Protects against supply-chain attacks via compromised fresh releases.
+minimumReleaseAge = 172800

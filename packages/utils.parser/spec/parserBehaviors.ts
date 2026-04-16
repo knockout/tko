@@ -182,11 +182,11 @@ describe('the bindings parser', function () {
   it('parses object literals with C++ style comments', function () {
     // From https://github.com/knockout/knockout/issues/1524
     const binding =
-        'model: v, //wiring the router\n'
-        + "afterCompose: 'ac', //wiring the router\n"
-        + "//transition:'entrance', //use the 'entrance' transition when switching views\n"
-        + 'skipTransitionOnSameViewId: true,//Transition entrance is disabled for better performance\n'
-        + 'cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)',
+        'model: v, //wiring the router\n' +
+        "afterCompose: 'ac', //wiring the router\n" +
+        "//transition:'entrance', //use the 'entrance' transition when switching views\n" +
+        'skipTransitionOnSameViewId: true,//Transition entrance is disabled for better performance\n' +
+        'cacheViews:true //telling composition to keep views in the dom, and reuse them (only a good idea with singleton view models)',
       context = ctxStub({ v: observable('rx') }),
       bindings = new Parser().parse(binding, context)
 
@@ -199,11 +199,11 @@ describe('the bindings parser', function () {
 
   it('parses object literals with C style comments', function () {
     const binding =
-        'a: xxx, /* First comment */\n'
-        + "b: 'yyy', /* Comment that comments-out the next whole next line\n"
-        + "x: 'nothing', //this is also skipped */\n"
-        + "c: 'zzz', /***Comment with extra * at various parts****/\n"
-        + "d: /**/'empty comment'",
+        'a: xxx, /* First comment */\n' +
+        "b: 'yyy', /* Comment that comments-out the next whole next line\n" +
+        "x: 'nothing', //this is also skipped */\n" +
+        "c: 'zzz', /***Comment with extra * at various parts****/\n" +
+        "d: /**/'empty comment'",
       context = ctxStub({ xxx: observable('rex') }),
       bindings = new Parser().parse(binding, context)
 
@@ -962,9 +962,9 @@ describe('compound expressions', function () {
   it("gets 'air' from x . y [ 0 ] ( ) ( ) [ 0 ] . yf2a", function () {
     const expect = (x.y[0]() as any)()[0].yf2a
     expect_equal(
-      '\n\r\t x\n\r\t  .\n\r\t  y\n\r\t  [\n\r\t  0'
-        + '\n\r\t  ]\n\r\t  (\n\r\t  )\n\r\t  (\n\r\t  )\n\r\t  ['
-        + '\n\r\t  0\n\r\t  ]\n\r\t .\n\r\t yf2a',
+      '\n\r\t x\n\r\t  .\n\r\t  y\n\r\t  [\n\r\t  0' +
+        '\n\r\t  ]\n\r\t  (\n\r\t  )\n\r\t  (\n\r\t  )\n\r\t  [' +
+        '\n\r\t  0\n\r\t  ]\n\r\t .\n\r\t yf2a',
       expect
     )
   })

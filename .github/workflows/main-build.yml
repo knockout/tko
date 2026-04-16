@@ -2,41 +2,39 @@
 name: Build
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [24.x]
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+      # Install Bun directly — avoids `apt-get update` (9+ min in this
+      # container) which setup-bun needs for unzip.
+      - name: Install Bun
+        run: python3 tools/install-bun
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Audit for vulnerabilities (prod-mode)
-        run: npm audit --audit-level=high --production
+        run: bun install --frozen-lockfile
 
       - name: Run Build
-        run: make
+        run: bun run build
+
+      - name: Verify ESM extensions
+        run: bun run verify:esm
 
       - name: Run tests
-        run: make test-headless
+        run: bunx vitest run
+        env:
+          HOME: /root
+          VITEST_BROWSERS: chromium,firefox,webkit
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7

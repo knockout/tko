@@ -1,0 +1,5 @@
+# @tko/observable
+
+Observables, observable arrays, and subscriptions
+
+Part of [TKO](https://tko.io) — modern Knockout.js. [Docs](https://tko.io) · [Source](https://github.com/knockout/tko/tree/main/packages/observable)

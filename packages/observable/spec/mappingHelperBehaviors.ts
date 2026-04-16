@@ -1,6 +1,4 @@
-//
-// Test Mapping Behavior
-//
+import { expect } from 'chai'
 
 import { toJS, toJSON, isObservable, observable, observableArray } from '../dist'
 
@@ -8,7 +6,7 @@ describe('Mapping helpers', function () {
   it('toJS should require a parameter', function () {
     expect(function () {
       toJS()
-    }).toThrow()
+    }).to.throw()
   })
 
   it('toJS should unwrap observable values', function () {
@@ -16,48 +14,48 @@ describe('Mapping helpers', function () {
     for (let i = 0; i < atomicValues.length; i++) {
       const data = observable(atomicValues[i])
       const result = toJS(data)
-      expect(isObservable(result)).toEqual(false)
-      expect(result).toEqual(atomicValues[i])
+      expect(isObservable(result)).to.equal(false)
+      expect(result).to.deep.equal(atomicValues[i])
     }
   })
 
   it('toJS should recursively unwrap observables whose values are themselves observable', function () {
     const weirdlyNestedObservable = observable(observable(observable(observable('Hello'))))
     const result = toJS(weirdlyNestedObservable)
-    expect(result).toEqual('Hello')
+    expect(result).to.equal('Hello')
   })
 
   it('toJS should unwrap observable properties, including nested ones', function () {
     const data = { a: observable(123), b: { b1: observable(456), b2: [789, observable('X')] } }
     const result = toJS(data)
-    expect(result.a).toEqual(123)
-    expect(result.b.b1).toEqual(456)
-    expect(result.b.b2[0]).toEqual(789)
-    expect(result.b.b2[1]).toEqual('X')
+    expect(result.a).to.equal(123)
+    expect(result.b.b1).to.equal(456)
+    expect(result.b.b2[0]).to.equal(789)
+    expect(result.b.b2[1]).to.equal('X')
   })
 
   it('toJS should unwrap observable arrays and things inside them', function () {
     const data = observableArray(['a', 1, { someProp: observable('Hey') }])
     const result = toJS(data)
-    expect(result.length).toEqual(3)
-    expect(result[0]).toEqual('a')
-    expect(result[1]).toEqual(1)
-    expect(result[2].someProp).toEqual('Hey')
+    expect(result.length).to.equal(3)
+    expect(result[0]).to.equal('a')
+    expect(result[1]).to.equal(1)
+    expect(result[2].someProp).to.equal('Hey')
   })
 
   it('toJS should resolve reference cycles', function () {
     const obj: any = {}
     obj.someProp = { owner: observable(obj) }
     const result = toJS(obj)
-    expect(result.someProp.owner).toEqual(result)
+    expect(result.someProp.owner).to.equal(result)
   })
 
   it('toJS should treat RegExp, Date, Number, String and Boolean instances as primitives (and not walk their subproperties)', function () {
-    const regExp = new RegExp('')
+    const regExp = /(?:)/
     const date = new Date()
     const string = new String()
     const number = new Number()
-    const booleanValue = new Boolean() // 'boolean' is a resever word in Javascript
+    const booleanValue = new Boolean()
 
     const result = toJS({
       regExp: observable(regExp),
@@ -67,41 +65,40 @@ describe('Mapping helpers', function () {
       booleanValue: observable(booleanValue)
     })
 
-    expect(result.regExp instanceof RegExp).toEqual(true)
-    expect(result.regExp).toEqual(regExp)
+    expect(result.regExp instanceof RegExp).to.equal(true)
+    expect(result.regExp).to.equal(regExp)
 
-    expect(result.due instanceof Date).toEqual(true)
-    expect(result.due).toEqual(date)
+    expect(result.due instanceof Date).to.equal(true)
+    expect(result.due).to.equal(date)
 
-    expect(result.string instanceof String).toEqual(true)
-    expect(result.string).toEqual(string)
+    expect(result.string instanceof String).to.equal(true)
+    expect(result.string).to.equal(string)
 
-    expect(result.number instanceof Number).toEqual(true)
-    expect(result.number).toEqual(number)
+    expect(result.number instanceof Number).to.equal(true)
+    expect(result.number).to.equal(number)
 
-    expect(result.booleanValue instanceof Boolean).toEqual(true)
-    expect(result.booleanValue).toEqual(booleanValue)
+    expect(result.booleanValue instanceof Boolean).to.equal(true)
+    expect(result.booleanValue).to.equal(booleanValue)
   })
 
   it('toJS should serialize functions', function () {
     const obj = { include: observable('test'), exclude: function () {} }
 
     const result = toJS(obj)
-    expect(result.include).toEqual('test')
-    expect(result.exclude).toEqual(obj.exclude)
+    expect(result.include).to.equal('test')
+    expect(result.exclude).to.equal(obj.exclude)
   })
 
   it('toJSON should unwrap everything and then stringify', function () {
     const data = observableArray(['a', 1, { someProp: observable('Hey') }])
     const result = toJSON(data)
 
-    // Check via parsing so the specs are independent of browser-specific JSON string formatting
-    expect(typeof result).toEqual('string')
+    expect(typeof result).to.equal('string')
     const parsedResult = JSON.parse(result)
-    expect(parsedResult.length).toEqual(3)
-    expect(parsedResult[0]).toEqual('a')
-    expect(parsedResult[1]).toEqual(1)
-    expect(parsedResult[2].someProp).toEqual('Hey')
+    expect(parsedResult.length).to.equal(3)
+    expect(parsedResult[0]).to.equal('a')
+    expect(parsedResult[1]).to.equal(1)
+    expect(parsedResult[2].someProp).to.equal('Hey')
   })
 
   it('toJSON should respect .toJSON functions on objects', function () {
@@ -114,10 +111,9 @@ describe('Mapping helpers', function () {
     }
     const result = toJSON(data)
 
-    // Check via parsing so the specs are independent of browser-specific JSON string formatting
-    expect(typeof result).toEqual('string')
+    expect(typeof result).to.equal('string')
     const parsedResult = JSON.parse(result)
-    expect(parsedResult).toEqual({ a: 'a-mapped', b: 'b-mapped' })
+    expect(parsedResult).to.deep.equal({ a: 'a-mapped', b: 'b-mapped' })
   })
 
   it('toJSON should respect .toJSON functions on arrays', function () {
@@ -130,26 +126,22 @@ describe('Mapping helpers', function () {
     }
     const result = toJSON(data)
 
-    // Check via parsing so the specs are independent of browser-specific JSON string formatting
-    expect(typeof result).toEqual('string')
+    expect(typeof result).to.equal('string')
     const parsedResult = JSON.parse(result)
-    expect(parsedResult).toEqual({ a: 'a-mapped', b: 'b-mapped' })
+    expect(parsedResult).to.deep.equal({ a: 'a-mapped', b: 'b-mapped' })
   })
 
   it('toJSON should respect replacer/space options', function () {
     const data = { a: 1 }
 
-    // Without any options
-    expect(toJSON(data)).toEqual('{"a":1}')
+    expect(toJSON(data)).to.equal('{"a":1}')
 
-    // With a replacer
     function myReplacer(x, obj) {
-      expect(obj).toEqual(data)
+      expect(obj).to.deep.equal(data)
       return 'my replacement'
     }
-    expect(toJSON(data, myReplacer)).toEqual('"my replacement"')
+    expect(toJSON(data, myReplacer)).to.equal('"my replacement"')
 
-    // With spacer
-    expect(toJSON(data, undefined, '    ')).toEqual('{\n    "a": 1\n}')
+    expect(toJSON(data, undefined, '    ')).to.equal('{\n    "a": 1\n}')
   })
 })
