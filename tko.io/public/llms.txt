@@ -12,6 +12,7 @@
 
 ## Agent Docs
 
+- /agents/soul.md — why Knockout works the way it does (design philosophy)
 - /agents/guide.md — API reference, gotchas, examples
 - /agents/glossary.md — domain terms, concepts, packages
 - /agents/testing.md — how to run and verify TKO code
