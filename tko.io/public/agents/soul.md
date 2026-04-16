@@ -74,15 +74,23 @@ resolving what bindings apply to a given node:
 This is what makes TKO different from Knockout 3.x: the binding resolution
 is not hardcoded. You choose which providers your app needs.
 
-## Backwards Compatibility Is a Feature
+## Stability and Migration
 
-Knockout has millions of users. TKO does not break their code. The
-`@tko/build.knockout` package is API-compatible with Knockout 3.x. The
-migration path is incremental: swap the script tag, verify, then
-optionally adopt modern features.
+Knockout applications written over a decade ago are still running in
+production. TKO exists to give those applications a path forward —
+the path of least resistance from Knockout 3.x to a modern, maintained
+stack.
 
-This constraint is not technical debt. It is a responsibility to the
-ecosystem. Changes that break existing users must clear a high bar.
+`@tko/build.knockout` is designed to be a drop-in replacement. Swap the
+script tag, verify your tests pass, ship. From there, adopting modern
+features (TSX, native providers, modular packages) is incremental and
+optional.
+
+TKO aims for stability, not strict backwards compatibility at all costs.
+If a change improves correctness, security, or maintainability and the
+migration path is clear, it's worth making. But gratuitous breakage is
+not acceptable — the ecosystem depends on being able to upgrade without
+rewriting.
 
 ## What This Means for Contributors
 
