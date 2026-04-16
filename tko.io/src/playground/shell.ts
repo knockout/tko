@@ -40,9 +40,8 @@ export function mount(container: HTMLElement, deps: ShellDeps, runner: Runner): 
       <div class="panels" style="position: relative;">
         <div class="loading-overlay" data-role="loading">Initializing...</div>
 
-        <div class="editor-panel">
+        <div class="editor-panel" data-role="editor-panel">
           <div class="tabs" role="tablist" data-role="tabs"></div>
-          <div data-role="editor-mounts"></div>
         </div>
 
         <div class="preview-panel">
@@ -75,7 +74,7 @@ export function mount(container: HTMLElement, deps: ShellDeps, runner: Runner): 
   const consoleClear = $('console-clear')
   const runBtn = $('run')
   const tabsContainer = $('tabs')
-  const editorMounts = $('editor-mounts')
+  const editorPanel = $('editor-panel')
 
   // Build tabs + editor mounts
   const hashData = loadFromHash()
@@ -94,7 +93,7 @@ export function mount(container: HTMLElement, deps: ShellDeps, runner: Runner): 
     const mount = document.createElement('div')
     mount.className = 'editor-mount'
     if (i !== 0) mount.hidden = true
-    editorMounts.appendChild(mount)
+    editorPanel.appendChild(mount)
     mounts[tab.id] = mount
   })
 
