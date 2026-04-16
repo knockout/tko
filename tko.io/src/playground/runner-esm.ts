@@ -10,22 +10,27 @@ const DEFAULT_HTML = `<!doctype html>
     </script>
   </head>
   <body>
-    <template id="greeting-template">
+    <!-- Reusable markup. Native ko- bindings; no data-bind needed. -->
+    <template id="ko-greeting-template">
       <input ko-textInput="name" />
       <p>Hello, <strong ko-text="name"></strong>.</p>
     </template>
 
+    <!-- Mount one or many — each instance gets its own state. -->
     <ko-greeting></ko-greeting>
 
     <script type="module">
       import ko from '@tko/build.reference'
 
-      ko.components.register('ko-greeting', {
-        template: { element: 'greeting-template' },
-        viewModel: function () {
-          this.name = ko.observable('TKO')
-        },
-      })
+      // Component class — extends ko.Component, auto-registers as <ko-greeting>
+      // (kebab-case derived from class name).
+      class KoGreeting extends ko.Component {
+        // Where TKO finds the markup for this component.
+        static get template () { return { element: 'ko-greeting-template' } }
+
+        name = ko.observable('TKO')
+      }
+      KoGreeting.register()
 
       ko.applyBindings({}, document.body)
     </script>

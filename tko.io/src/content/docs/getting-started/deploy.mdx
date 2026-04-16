@@ -25,22 +25,27 @@ Save one of these as `index.html`:
     </script>
   </head>
   <body>
-    <template id="greeting-template">
+    <!-- Reusable markup. Native ko- bindings; no data-bind needed. -->
+    <template id="ko-greeting-template">
       <input ko-textInput="name" />
       <p>Hello, <strong ko-text="name"></strong>.</p>
     </template>
 
+    <!-- Mount one or many — each instance gets its own state. -->
     <ko-greeting></ko-greeting>
 
     <script type="module">
       import ko from '@tko/build.reference'
 
-      ko.components.register('ko-greeting', {
-        template: { element: 'greeting-template' },
-        viewModel: function () {
-          this.name = ko.observable('TKO')
-        },
-      })
+      // Component class — extends ko.Component, auto-registers as <ko-greeting>
+      // (kebab-case derived from class name).
+      class KoGreeting extends ko.Component {
+        // Where TKO finds the markup for this component.
+        static get template () { return { element: 'ko-greeting-template' } }
+
+        name = ko.observable('TKO')
+      }
+      KoGreeting.register()
 
       ko.applyBindings({}, document.body)
     </script>
@@ -69,26 +74,29 @@ Native `ko-` bindings. Reusable component with a `<template>` for markup and a v
     </script>
   </head>
   <body>
-    <template id="counter-template">
+    <!-- Reusable markup. Native ko- bindings; no data-bind needed. -->
+    <template id="ko-counter-template">
       <h1>Count: <span ko-text="count"></span></h1>
       <button ko-click="increment">Increment</button>
     </template>
 
+    <!-- Two independent counters — shared template, separate state. -->
     <ko-counter></ko-counter>
     <ko-counter></ko-counter>
 
     <script id="app" type="text/tsx">
       import ko from '@tko/build.reference'
 
-      class Counter {
+      // Component class — extends ko.Component, auto-registers as <ko-counter>
+      // (kebab-case derived from class name).
+      class KoCounter extends ko.Component {
+        // Where TKO finds the markup for this component.
+        static get template () { return { element: 'ko-counter-template' } }
+
         count = ko.observable(0)
         increment = () => this.count(this.count() + 1)
       }
-
-      ko.components.register('ko-counter', {
-        template: { element: 'counter-template' },
-        viewModel: Counter,
-      })
+      KoCounter.register()
 
       ko.applyBindings({}, document.body)
     </script>
