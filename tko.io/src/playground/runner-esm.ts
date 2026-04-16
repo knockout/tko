@@ -11,8 +11,8 @@ const DEFAULT_HTML = `<!doctype html>
   </head>
   <body>
     <div id="app">
-      <input data-bind="textInput: name" />
-      <p>Hello, <strong data-bind="text: name"></strong>.</p>
+      <input ko-textInput="name" />
+      <p>Hello, <strong ko-text="name"></strong>.</p>
     </div>
 
     <script type="module">

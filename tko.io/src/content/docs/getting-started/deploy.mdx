@@ -26,8 +26,8 @@ Save one of these as `index.html`:
   </head>
   <body>
     <div id="app">
-      <input data-bind="textInput: name" />
-      <p>Hello, <strong data-bind="text: name"></strong>.</p>
+      <input ko-textInput="name" />
+      <p>Hello, <strong ko-text="name"></strong>.</p>
     </div>
 
     <script type="module">
@@ -38,7 +38,7 @@ Save one of these as `index.html`:
 </html>
 ```
 
-Data-bind attributes. No compile step. Ship it.
+Native `ko-` attribute providers. No compile step. Ship it.
 
   </TabItem>
   <TabItem label="ESM + TSX">
