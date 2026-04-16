@@ -163,6 +163,8 @@ export default class ComponentBinding extends DescendantBindingHandler {
         this.cloneTemplateIntoElement(componentName, viewTemplate, element)
       } else if (!this.hasMeaningfulChildren()) {
         throw new Error("Component '" + componentName + "' has no template")
+      } else {
+        this.cloneTemplateIntoElement(componentName, this.originalChildNodes, element)
       }
     }
 

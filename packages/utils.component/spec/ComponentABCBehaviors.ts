@@ -65,7 +65,7 @@ describe('ComponentABC', function () {
 
   it('registers when neither template nor element is overloaded (children-as-template mode)', function () {
     class CXTwo extends ComponentABC {
-      customElementName() {
+      static get customElementName() {
         return 'a-b'
       }
     }

@@ -237,6 +237,37 @@ describe('Components: Component binding', function () {
     expect(testNode.children[0].querySelector('.inner')!.textContent).to.equal('inner')
   })
 
+  it('Rebuild via observable component name restores original children for the new component', function () {
+    class CompB {
+      msg = 'from-children'
+    }
+    components.register('comp-a', { template: '<span class="from-a">A</span>' })
+    components.register('comp-b', { viewModel: CompB })
+    cleanups.push(() => {
+      components.unregister('comp-a')
+      components.unregister('comp-b')
+    })
+
+    const compName = observable('comp-a')
+    testNode.innerHTML =
+      '<div data-bind="component: { name: compName }">' +
+      '<span class="from-children" data-bind="text: msg"></span>' +
+      '</div>'
+    applyBindings({ compName }, testNode)
+    clock.tick(1)
+
+    expect(testNode.children[0].querySelector('.from-a')).to.not.equal(null)
+    expect(testNode.children[0].querySelector('.from-children')).to.equal(null)
+
+    compName('comp-b')
+    clock.tick(1)
+
+    expect(testNode.children[0].querySelector('.from-a')).to.equal(null)
+    const rendered = testNode.children[0].querySelector('.from-children')
+    expect(rendered).to.not.equal(null)
+    expect(rendered!.textContent).to.equal('from-children')
+  })
+
   it('Controls descendant bindings', function () {
     components.register(testComponentName, { template: 'x' })
     testNode.innerHTML = '<div data-bind="if: true, component: $data"></div>'
