@@ -170,6 +170,19 @@ When validating `tko.io` documentation changes with the local docs site:
 - Treat docs example work as incomplete until the emitted playground payload compiles cleanly on the live site.
 - If a page has multiple TSX examples, check every TSX playground button, not just the first one.
 
+## Always Improve
+
+Leave the codebase a little better than you found it. When you touch a file, fix small nearby issues if they're low-risk and on-scope:
+
+- Typos in comments or docstrings
+- Dead code or unused imports
+- Stale comments referring to renamed or removed APIs
+- A missing test that would have caught the bug you're fixing
+
+When a feedback loop fails, fix the loop — not just the symptom. Examples: `bun run test` passing locally while CI fails, a confusing script error, a flaky assertion that hides real bugs. Fold the missing check into the local command so the next contributor doesn't hit the same wall.
+
+Avoid scope creep. If an improvement would balloon the PR, file a follow-up issue or spawn a separate task instead.
+
 ## Important Guidelines
 
 - Do not modify `tools/build.ts` or `vitest.config.ts` without understanding
