@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
 
@@ -33,4 +37,4 @@ jobs:
         run: bunx vitest run
         env:
           HOME: /root
-          VITEST_BROWSERS: chromium,firefox,webkit
+          VITEST_BROWSERS: ${{ matrix.browser }}

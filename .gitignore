@@ -37,3 +37,6 @@ builds/**/meta
 test-results/
 .claude/worktrees/
 __screenshots__
+.dts-tmp/
+.nx/
+.vitest-attachments/

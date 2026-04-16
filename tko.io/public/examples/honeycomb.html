@@ -557,34 +557,54 @@
           lastKey: ko.observable(null),
           activeSource: null,
           activeNeighbors: [],
+          _pendingHover: null,
+          _hoverRaf: 0,
+          _clickRaf: 0,
           hoverCell(cell) {
             if (!cell.interactive || cell.key === viewModel.lastKey()) return true
 
-            if (viewModel.activeSource) {
-              viewModel.activeSource.source(false)
+            viewModel._pendingHover = cell
+            if (!viewModel._hoverRaf) {
+              viewModel._hoverRaf = requestAnimationFrame(() => {
+                viewModel._hoverRaf = 0
+                const target = viewModel._pendingHover
+                if (!target) return
+
+                if (viewModel.activeSource) {
+                  viewModel.activeSource.source(false)
+                }
+                viewModel.activeNeighbors.forEach(neighbor => neighbor.neighbor(false))
+
+                viewModel.lastKey(target.key)
+                viewModel.activeSource = target
+                viewModel.activeNeighbors = target.neighbors
+
+                target.source(true)
+                target.neighbors.forEach(neighbor => neighbor.neighbor(true))
+
+                viewModel.vdomCount(viewModel.vdomCount() + viewModel.totalVisible())
+                viewModel.obsCount(viewModel.obsCount() + target.neighbors.length)
+              })
             }
-            viewModel.activeNeighbors.forEach(neighbor => neighbor.neighbor(false))
-
-            viewModel.lastKey(cell.key)
-            viewModel.activeSource = cell
-            viewModel.activeNeighbors = cell.neighbors
-
-            cell.source(true)
-            cell.neighbors.forEach(neighbor => neighbor.neighbor(true))
-
-            viewModel.vdomCount(viewModel.vdomCount() + viewModel.totalVisible())
-            viewModel.obsCount(viewModel.obsCount() + cell.neighbors.length)
             return true
           },
           clickCell(cell) {
             if (!cell.interactive) return true
+
+            if (viewModel._clickRaf) {
+              cancelAnimationFrame(viewModel._clickRaf)
+              viewModel._clickRaf = 0
+            }
 
             const queue = buildWaterfallQueue(cell, cells)
             let index = 0
             const batchSize = 24
 
             function advanceBurst() {
-              if (index >= queue.length) return
+              if (index >= queue.length) {
+                viewModel._clickRaf = 0
+                return
+              }
 
               let touched = 0
               while (index < queue.length && touched < batchSize) {
@@ -604,10 +624,10 @@
 
               viewModel.vdomCount(viewModel.vdomCount() + touched * viewModel.totalVisible())
               viewModel.obsCount(viewModel.obsCount() + touched)
-              requestAnimationFrame(advanceBurst)
+              viewModel._clickRaf = requestAnimationFrame(advanceBurst)
             }
 
-            requestAnimationFrame(advanceBurst)
+            viewModel._clickRaf = requestAnimationFrame(advanceBurst)
             return true
           }
         }
