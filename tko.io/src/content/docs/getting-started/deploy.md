@@ -1,9 +1,9 @@
 ---
-title: Deploy
-description: Put a TKO app online in seconds — no build step required.
+title: Static Deploy
+description: Deploy a TKO app to static hosting — no build step required.
 ---
 
-TKO apps can be as simple as a single HTML file — no bundler, no server runtime, no build step. Drop a file anywhere that serves HTML and you're live.
+A TKO app can be as simple as a single HTML file. No bundler, no server runtime, no build step — just upload to any static hosting provider and you're live.
 
 ## The simplest deploy
 
