@@ -28,6 +28,7 @@ export default defineConfig({
       },
       sidebar: [
         { label: 'Introduction', slug: 'index' },
+        { label: 'Getting Started', autogenerate: { directory: 'getting-started' } },
         { label: 'Examples', slug: 'examples' },
         { label: 'Bindings', autogenerate: { directory: 'bindings' } },
         { label: 'Observables', autogenerate: { directory: 'observables' } },
@@ -35,7 +36,9 @@ export default defineConfig({
         { label: 'Components', autogenerate: { directory: 'components' } },
         { label: 'Binding Context', autogenerate: { directory: 'binding-context' } },
         { label: 'Advanced', autogenerate: { directory: 'advanced' } },
-        { label: 'Knockout 3 → 4 Guide', slug: '3to4' }
+        { label: 'API Reference', slug: 'api' },
+        { label: 'Knockout 3 → 4 Guide', slug: '3to4' },
+        { label: 'History', slug: 'history' }
       ]
     })
   ]
