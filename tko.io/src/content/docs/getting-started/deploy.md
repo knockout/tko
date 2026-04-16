@@ -11,31 +11,24 @@ Save this as `index.html`:
 
 ```html
 <!doctype html>
-<html>
-  <body>
-    <div id="app">
-      <input data-bind="textInput: name" />
-      <p>Hello, <strong data-bind="text: name"></strong>.</p>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
-    <script>
-      const ko = globalThis.tko
-      ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
-    </script>
-  </body>
-</html>
-```
+<script type="importmap">
+  { "imports": { "@tko/build.reference": "https://esm.sh/@tko/build.reference" } }
+</script>
 
-Or as an ES module (no IIFE needed):
+<div id="app">
+  <input data-bind="textInput: name" />
+  <p>Hello, <strong data-bind="text: name"></strong>.</p>
+</div>
 
-```html
 <script type="module">
-  import ko from 'https://esm.run/@tko/build.reference'
+  import ko from '@tko/build.reference'
   ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
 </script>
 ```
 
 Upload that single file to any of the platforms below. That's it — a live, reactive web UI.
+
+Try it first in the [ESM playground](/playground/esm) — same code, live editor.
 
 ## GitHub Pages
 
@@ -106,6 +99,6 @@ npx netlify-cli deploy --dir . --prod
 
 ## Why this works
 
-TKO loads from a CDN (`esm.run` or `jsdelivr`). Your app is just HTML + the browser's ES module loader. No server-side rendering, no Node.js, no build artifacts. The entire deploy is one file.
+TKO loads over the browser's native ES module loader via an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). No server-side rendering, no Node.js, no build artifacts. The entire deploy is one file.
 
 As your app grows you can add a bundler, but you don't *have* to. Many production TKO apps are a handful of HTML files and a CSS stylesheet.
