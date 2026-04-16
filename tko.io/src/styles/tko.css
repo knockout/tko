@@ -257,7 +257,7 @@ header {
   color: var(--sl-color-text-accent);
 }
 
-.landing-version {
+.landing-hero .landing-version {
   margin: 0 0 0.3rem;
   font-family: var(--tko-font-display);
   font-size: clamp(2rem, 5vw, 3.2rem);
