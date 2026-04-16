@@ -43,6 +43,7 @@ bun run lint              # Run Biome lint only
 bun run lint:fix          # Run Biome lint with auto-fix
 bun run format            # Check Biome formatting
 bun run format:fix        # Fix Biome formatting
+bun run knip              # Detect unused files, deps, and exports
 bun run tsc               # TypeScript type-check (no emit)
 bun run dts               # Generate TypeScript declaration files
 bun run clean             # Clean dist/ and coverage/ dirs
