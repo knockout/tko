@@ -49,7 +49,6 @@
     "@tko/provider.virtual": "^4.0.1",
     "@tko/utils.component": "^4.0.1",
     "@tko/utils.functionrewrite": "^4.0.1",
-    "tslib": "^2.2.0",
     "@tko/utils": "^4.0.1"
   },
   "exports": {

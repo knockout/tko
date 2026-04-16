@@ -13,8 +13,7 @@
     "@tko/provider": "^4.0.1",
     "@tko/utils": "^4.0.1",
     "@tko/utils.component": "^4.0.1",
-    "@tko/utils.parser": "^4.0.1",
-    "tslib": "^2.2.0"
+    "@tko/utils.parser": "^4.0.1"
   },
   "homepage": "https://tko.io",
   "licenses": [

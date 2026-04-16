@@ -11,8 +11,7 @@
     "@tko/provider.native": "^4.0.1",
     "@tko/utils": "^4.0.1",
     "@tko/utils.component": "^4.0.1",
-    "@tko/utils.jsx": "^4.0.1",
-    "tslib": "^2.2.0"
+    "@tko/utils.jsx": "^4.0.1"
   },
   "files": [
     "dist/"

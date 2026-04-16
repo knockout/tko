@@ -11,7 +11,6 @@
   "dependencies": {
     "@tko/observable": "^4.0.1",
     "@tko/utils": "^4.0.1",
-    "tslib": "^2.2.0",
     "@tko/bind": "^4.0.1"
   },
   "homepage": "https://tko.io",
