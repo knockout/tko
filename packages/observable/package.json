@@ -17,10 +17,10 @@
   ],
   "keywords": [
     "knockout",
+    "tko",
     "observable",
-    "observe",
-    "object",
-    "subscribable"
+    "reactive",
+    "state-management"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

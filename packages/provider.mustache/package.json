@@ -13,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "provider",
+    "interpolation",
+    "mustache"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

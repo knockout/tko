@@ -40,5 +40,12 @@
   "module": "dist/index.js",
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "builder",
+    "framework",
+    "customizable"
+  ]
 }

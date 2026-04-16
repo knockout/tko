@@ -13,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "utilities",
+    "dom",
+    "helpers"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

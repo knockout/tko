@@ -13,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "binding",
+    "conditional",
+    "control-flow"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

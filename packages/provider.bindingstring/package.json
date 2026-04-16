@@ -34,5 +34,12 @@
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "provider",
+    "parser",
+    "binding-string"
+  ]
 }

@@ -16,7 +16,10 @@
   },
   "keywords": [
     "knockout",
-    "tko"
+    "tko",
+    "computed",
+    "observable",
+    "reactive"
   ],
   "author": "The Knockout Team",
   "license": "MIT",

@@ -42,5 +42,12 @@
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "components",
+    "registry",
+    "loader"
+  ]
 }

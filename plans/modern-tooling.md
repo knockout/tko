@@ -12,8 +12,12 @@
 | 2b. Package fixes | Merged | #308 | Fix broken module paths, remove helpers from published packages, delete repackage.mjs. |
 | 3. Makefiles → Bun | Merged | #309 | tools/build.ts replaces Make+lerna. 0.3s clean build. All Makefiles, build.mk, lerna.json deleted. |
 | 4. Biome | Merged | #310 | Replaces ESLint + Prettier. 27x faster. 5 deps removed, 6 new lint rules. |
-| 5. knip | Not started | — | |
-| 6. knip findings | Not started | — | |
+| 5. knip | Merged | #311 | Config + devDep. Baseline: 9 unused exports, 19 unused types, 2 duplicate exports. |
+| 6. knip findings | Merged | #312 | Fix unused files/deps/unlisted deps. Remaining: exports needing public API review. |
+| 6b. verbatimModuleSyntax | PR open | #319 | Enable verbatimModuleSyntax, remove tslib from all packages. |
+| 6c. ESM extensions | Merged | #315 | Add .js extensions to ESM dist imports. verify:esm CI check. |
+| 6d. strictEquality | Merged | #314 | defineOption API, ko.options.strictEquality setter. Fixes #290. |
+| 6e. CI speed | PR open | #318 | Python-based Bun install in containers, saves ~9 min. |
 
 ## Context
 
@@ -122,14 +126,16 @@ Changes:
 - Add CI workflow for knip checks
 - Fix any findings in follow-up PRs (separate from the linter setup)
 
-### Phase 6 (future): knip findings
+### Phase 6: knip findings + follow-on fixes
 
 **One PR per category of finding.**
 
-- Unused export cleanup
-- Unused dependency removal
-- `verbatimModuleSyntax` + import type fixes
-- Dead IE code removal (detectIEVersion, browserSupportsProtoAssignment, etc.)
+- 6 (core): Unused files/deps/unlisted deps — Merged #312
+- 6b: `verbatimModuleSyntax` — enables the flag, removes tslib from all packages (PR #319, open)
+- 6c: ESM extensions — adds `.js` to dist imports, `verify:esm` CI check (Merged #315)
+- 6d: `strictEquality` — `defineOption` API, `ko.options.strictEquality` setter (Merged #314, fixes #290)
+- 6e: CI speed — Python-based Bun install in containers, saves ~9 min (PR #318, open)
+- Remaining: unused export cleanup, dead IE code removal
 
 ## Known follow-ups from Phase 1
 
@@ -144,6 +150,11 @@ Changes:
 ## Future considerations
 
 - **esbuild → Bun bundler** — evaluate when Bun supports IIFE `globalName`
+- **Bundle size tracking** — CI check comparing browser.min.js size against main
+- **Renovate/Dependabot** — automated dependency PRs (48h minimumReleaseAge guards supply chain)
+- **Benchmarking** — vitest bench for observable/computed hot paths
+- **`.github/copilot-instructions.md`** — extend AGENTS.md context to Copilot/Cursor users
+- **jQuery removal** — investigate scope and impact
 
 ## Verification
 

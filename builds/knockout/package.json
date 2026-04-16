@@ -63,5 +63,13 @@
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "framework",
+    "mvvm",
+    "data-binding",
+    "compatible"
+  ]
 }
