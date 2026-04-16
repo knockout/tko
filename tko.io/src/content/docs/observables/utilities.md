@@ -11,20 +11,24 @@ TKO provides helper functions for inspecting and converting observables.
 | Function | Returns `true` when |
 |----------|-------------------|
 | `ko.isObservable(value)` | The value is an observable, observable array, or computed |
+| `ko.isObservableArray(value)` | The value is an observable array |
 | `ko.isWritableObservable(value)` | The value is a writable observable (not a read-only computed) |
 | `ko.isComputed(value)` | The value is a computed observable |
 | `ko.isSubscribable(value)` | The value is any subscribable (observable, computed, or raw subscribable) |
 
 ```js
 const name = ko.observable('TKO')
+const tags = ko.observableArray(['fast'])
 const upper = ko.computed(() => name().toUpperCase())
 
-ko.isObservable(name)          // true
-ko.isObservable(upper)         // true
-ko.isObservable('plain')       // false
-ko.isWritableObservable(name)  // true
-ko.isWritableObservable(upper) // false
-ko.isComputed(upper)           // true
+ko.isObservable(name)           // true
+ko.isObservable(upper)          // true
+ko.isObservable('plain')        // false
+ko.isObservableArray(tags)      // true
+ko.isObservableArray(name)      // false
+ko.isWritableObservable(name)   // true
+ko.isWritableObservable(upper)  // false
+ko.isComputed(upper)            // true
 ```
 
 ## Unwrapping

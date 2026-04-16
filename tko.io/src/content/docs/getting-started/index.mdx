@@ -107,9 +107,9 @@ Here's a complete, self-contained example you can save as an HTML file and open 
 TKO is written in TypeScript. Types are included — no separate `@types` package needed.
 
 ```ts
-import ko, { Observable } from '@tko/build.reference'
+import ko from '@tko/build.reference'
 
-const name: Observable<string> = ko.observable('TKO')
+const name = ko.observable('TKO')  // inferred as Observable<string>
 ```
 
 ## What to read next
