@@ -172,9 +172,9 @@ When validating `tko.io` documentation changes with the local docs site:
 
 ## Always Improve
 
-Leave the codebase a little better than you found it. When you touch a file, fix small nearby issues if they're low-risk and on-scope:
+Leave the codebase a little better than you found it. When you touch a file, fix small nearby issues if they're low-risk and in-scope:
 
-- Typos in comments or docstrings
+- Typos in comments or JSDoc
 - Dead code or unused imports
 - Stale comments referring to renamed or removed APIs
 - A missing test that would have caught the bug you're fixing
