@@ -7,9 +7,7 @@
     "dist/"
   ],
   "license": "MIT",
-  "dependencies": {
-    "tslib": "^2.2.0"
-  },
+  "dependencies": {},
   "homepage": "https://tko.io",
   "licenses": [
     {

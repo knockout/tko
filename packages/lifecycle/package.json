@@ -3,8 +3,7 @@
   "module": "dist/index.js",
   "dependencies": {
     "@tko/computed": "^4.0.1",
-    "@tko/utils": "^4.0.1",
-    "tslib": "^2.2.0"
+    "@tko/utils": "^4.0.1"
   },
   "peerDependencies": {
     "@tko/observable": "^4.0.1"
