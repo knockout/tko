@@ -63,9 +63,9 @@ npx wrangler pages deploy . --project-name my-app
 Good for projects already on GCP.
 
 ```sh
-gsutil mb gs://my-app.example.com
-gsutil web set -m index.html gs://my-app.example.com
-gsutil cp index.html gs://my-app.example.com/
+gcloud storage buckets create gs://my-app.example.com
+gcloud storage buckets update gs://my-app.example.com --web-main-page-suffix=index.html
+gcloud storage cp index.html gs://my-app.example.com/
 ```
 
 Add a load balancer or use [Firebase Hosting](https://firebase.google.com/docs/hosting) for automatic HTTPS and CDN.
