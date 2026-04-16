@@ -3,11 +3,16 @@ title: Deploy in Seconds
 description: Deploy a TKO app to static hosting — no build step required.
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 A TKO app can be as simple as a single HTML file. No bundler, no server runtime, no build step — just upload to any static hosting provider and you're live.
 
 ## The simplest deploy
 
-Save this as `index.html`:
+Save one of these as `index.html`:
+
+<Tabs>
+  <TabItem label="Plain ESM">
 
 ```html
 <!doctype html>
@@ -33,9 +38,79 @@ Save this as `index.html`:
 </html>
 ```
 
-Upload that single file to any of the platforms below. That's it — a live, reactive web UI.
+Data-bind attributes. No compile step. Ship it.
 
-Try it first in the [ESM playground](/playground/esm) — same code, live editor.
+  </TabItem>
+  <TabItem label="ESM + TSX">
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello, TKO</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@tko/build.reference": "https://esm.sh/@tko/build.reference",
+          "esbuild-wasm": "https://esm.sh/esbuild-wasm@0.27.4/esm/browser.min.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script id="app" type="text/tsx">
+      import ko from '@tko/build.reference'
+
+      const count = ko.observable(0)
+
+      const view = (
+        <div>
+          <h1>Count: {count}</h1>
+          <button ko-click={() => count(count() + 1)}>Increment</button>
+        </div>
+      )
+
+      const root = document.getElementById('root')
+      const { node } = ko.jsx.render(view)
+      root.appendChild(node)
+      ko.applyBindings({}, root)
+    </script>
+
+    <script type="module">
+      import * as esbuild from 'esbuild-wasm'
+
+      await esbuild.initialize({
+        wasmURL: 'https://esm.sh/esbuild-wasm@0.27.4/esbuild.wasm',
+      })
+
+      const { code } = await esbuild.transform(
+        document.getElementById('app').textContent,
+        {
+          loader: 'tsx',
+          jsx: 'transform',
+          jsxFactory: 'ko.jsx.createElement',
+          jsxFragment: 'ko.jsx.Fragment',
+        },
+      )
+
+      const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+      await import(url)
+    </script>
+  </body>
+</html>
+```
+
+JSX and TypeScript, still one file. Your TSX lives in `<script type="text/tsx">` — the browser ignores unknown script types so the source is preserved verbatim. A tiny `<script type="module">` bootstrap loads esbuild-wasm from the CDN, transforms the TSX in the browser, wraps the compiled output in a blob URL, and `import()`s it as a real ES module. Imports like `import ko from '@tko/build.reference'` resolve through the import map just like any module.
+
+Trade-off: first load fetches ~3MB of esbuild-wasm (cached after). Great for demos, internal tools, and apps where time-to-compile matters less than zero-build deployment.
+
+  </TabItem>
+</Tabs>
+
+Try it first in the [ESM playground](/playground/esm) — same code, live editor. Use the arrow icon on the code block to open either variant.
 
 ## GitHub Pages
 
