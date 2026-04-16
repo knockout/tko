@@ -147,12 +147,13 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     const viewTemplate = componentViewModel && componentViewModel.template
 
-    if (!viewTemplate && !componentDefinition.template) {
-      throw new Error("Component '" + componentName + "' has no template")
-    }
-
     if (!componentDefinition.template) {
-      this.cloneTemplateIntoElement(componentName, viewTemplate, element)
+      if (viewTemplate) {
+        this.cloneTemplateIntoElement(componentName, viewTemplate, element)
+      }
+      // else: no template configured — the element's own children serve as
+      // the template. They were captured in originalChildNodes and are still
+      // attached to the element, ready for descendant binding below.
     }
 
     if (componentViewModel instanceof LifeCycle) {

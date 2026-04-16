@@ -58,18 +58,18 @@ describe('ComponentABC', function () {
     components.unregister(testComponentName)
   })
 
-  it("throws when there's no overloading", function () {
+  it('registers without overloading (children-as-template mode)', function () {
     class CX extends ComponentABC {}
-    expect(() => (CX as any).register()).to.throw('overload')
+    expect(() => (CX as any).register()).to.not.throw()
   })
 
-  it('throws when template or element is not overloaded', function () {
-    class CX extends ComponentABC {
+  it('registers when neither template nor element is overloaded (children-as-template mode)', function () {
+    class CXTwo extends ComponentABC {
       customElementName() {
         return 'a-b'
       }
     }
-    expect(() => (CX as any).register()).to.throw('overload')
+    expect(() => (CXTwo as any).register()).to.not.throw()
   })
 
   it('uses the class name kebab-case elementName is not overloaded', function () {
