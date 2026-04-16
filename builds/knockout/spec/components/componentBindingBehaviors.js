@@ -68,12 +68,29 @@ describe('Components: Component binding', function () {
     }).to.throw("Unknown component 'test-component'")
   })
 
-  it('Throws if the component definition has no template', function () {
+  it('Renders nothing (and does not throw) when neither template nor children are provided', function () {
     ko.components.register(testComponentName, {})
     expect(function () {
       ko.applyBindings(outerViewModel, testNode)
       clock.tick(1)
-    }).to.throw("Component 'test-component' has no template")
+    }).to.not.throw()
+    expect(testNode.children[0].children.length).to.equal(0)
+  })
+
+  it('Uses the element children as template when no template is configured', function () {
+    var inner = ko.observable('hello')
+    ko.components.register(testComponentName, {
+      viewModel: function () {
+        return { greeting: inner }
+      }
+    })
+    testNode.innerHTML =
+      '<div data-bind="component: testComponentBindingValue">' + '<span data-bind="text: greeting"></span>' + '</div>'
+    ko.applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expectText(testNode.children[0], 'hello')
+    inner('world')
+    expectText(testNode.children[0], 'world')
   })
 
   it('Controls descendant bindings', function () {

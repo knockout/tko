@@ -108,9 +108,7 @@ describe('Components: Component binding', function () {
       }
     })
     testNode.innerHTML =
-      '<div data-bind="component: testComponentBindingValue">' +
-      '<span data-bind="text: greeting"></span>' +
-      '</div>'
+      '<div data-bind="component: testComponentBindingValue">' + '<span data-bind="text: greeting"></span>' + '</div>'
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
     expectContainText(testNode.children[0], 'hello')
@@ -119,7 +117,11 @@ describe('Components: Component binding', function () {
   })
 
   it('Renders nothing (and does not throw) when neither template nor children are provided', function () {
-    components.register(testComponentName, { viewModel: function () { return {} } })
+    components.register(testComponentName, {
+      viewModel: function () {
+        return {}
+      }
+    })
     // testNode.innerHTML already has <div data-bind="component: ..."></div> (no children)
     expect(function () {
       applyBindings(outerViewModel, testNode)
@@ -136,9 +138,7 @@ describe('Components: Component binding', function () {
       }
     })
     testNode.innerHTML =
-      '<div data-bind="component: testComponentBindingValue">' +
-      '<span ko-text="greeting"></span>' +
-      '</div>'
+      '<div data-bind="component: testComponentBindingValue">' + '<span ko-text="greeting"></span>' + '</div>'
     applyBindings(outerViewModel, testNode)
     clock.tick(1)
     expectContainText(testNode.children[0], 'hello')
