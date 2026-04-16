@@ -3,7 +3,7 @@ title: Deploy
 description: Put a TKO app online in seconds — no build step required.
 ---
 
-TKO apps are static HTML files. No bundler, no server runtime, no build step. Drop a file anywhere that serves HTML and you're live.
+TKO apps can be as simple as a single HTML file — no bundler, no server runtime, no build step. Drop a file anywhere that serves HTML and you're live.
 
 ## The simplest deploy
 
