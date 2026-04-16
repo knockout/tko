@@ -9,7 +9,8 @@
     "@tko/observable": "^4.0.1",
     "@tko/provider": "^4.0.1",
     "@tko/utils": "^4.0.1",
-    "tslib": "^2.2.0"
+    "tslib": "^2.2.0",
+    "@tko/builder": "^4.0.1"
   },
   "peerDependencies": {
     "@tko/binding.foreach": "^4.0.1"

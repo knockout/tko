@@ -22,7 +22,9 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "tslib": "^2.2.0"
+    "tslib": "^2.2.0",
+    "@tko/provider": "^4.0.1",
+    "@tko/builder": "^4.0.1"
   },
   "licenses": [
     {

@@ -22,10 +22,8 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/binding.template": "^4.0.1",
     "@tko/observable": "^4.0.1",
     "@tko/provider": "^4.0.1",
-    "@tko/utils": "^4.0.1",
     "@tko/utils.parser": "^4.0.1",
     "tslib": "^2.2.0"
   },
