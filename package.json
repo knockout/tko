@@ -9,7 +9,6 @@
   "scripts": {
     "build": "bun run --filter './packages/*' build && bun run --filter './builds/*' build",
     "test": "bun run build && bunx vitest run",
-    "test:fast": "bunx vitest run",
     "test:ff": "bun run build && VITEST_BROWSERS=firefox bunx vitest run",
     "tsc": "bunx tsc",
     "dts": "bunx tsc --build tsconfig.dts.json",
