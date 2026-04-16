@@ -15,13 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install unzip (needed by setup-bun)
-        run: apt-get update && apt-get install -y unzip
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: .tool-versions
+      # Install Bun directly — avoids `apt-get update` (9+ min in this
+      # container) which setup-bun needs for unzip.
+      - name: Install Bun
+        run: python3 tools/install-bun.py
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
