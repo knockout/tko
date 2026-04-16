@@ -1,5 +1,5 @@
 ---
-title: Static Deploy
+title: Deploy in Seconds
 description: Deploy a TKO app to static hosting — no build step required.
 ---
 
