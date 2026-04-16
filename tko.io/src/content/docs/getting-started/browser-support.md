@@ -14,9 +14,13 @@ TKO targets modern browsers — any browser that supports ES2020 and `<script ty
 
 These three engines cover effectively all modern browsers.
 
-## How TKO is tested
+## What we test
 
 Every pull request runs the full test suite (2700+ tests) across all three engines using [Vitest](https://vitest.dev) browser mode with [Playwright](https://playwright.dev). The three engines run as parallel CI jobs.
+
+CI tests against the **latest stable** version of each engine. We do not currently test against specific older browser versions, so minimum version support is not precisely known. If you discover a compatibility issue with a particular browser version, please [open an issue](https://github.com/knockout/tko/issues).
+
+The original Knockout supported browsers back to IE6. TKO's modernized codebase uses ES2020+ features (optional chaining, nullish coalescing, etc.), so IE is no longer supported. Exact minimum versions for Chrome, Safari, and Firefox have not been established.
 
 ## Loading TKO
 
