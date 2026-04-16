@@ -18,7 +18,7 @@ jobs:
       # Install Bun directly — avoids `apt-get update` (9+ min in this
       # container) which setup-bun needs for unzip.
       - name: Install Bun
-        run: bash tools/install-bun.sh
+        run: python3 tools/install-bun.py
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
