@@ -198,6 +198,20 @@ When a feedback loop fails, fix the loop — not just the symptom. Examples: `bu
 
 Avoid scope creep. If an improvement would balloon the PR, file a follow-up issue or spawn a separate task instead.
 
+## Review Your Own Change Adversarially
+
+Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises. Then ask what a motivated reviewer would flag — or spawn a subagent to find out.
+
+Common failure modes worth probing every time:
+- Trading coverage or signal for speed/convenience
+- Optimizing for the happy path and glossing over edge cases
+- Locking in the current shape of the project with presumptive rules
+- Patching the symptom, not the root cause
+- Scope creep disguised as "while I'm here"
+- Silent assumptions about environment, timing, or ordering
+
+If your change doesn't survive a ten-minute attempt to poke holes in it, it's not ready. Spawn a subagent for an independent adversarial pass on PRs that touch framework internals, test coverage, public APIs, or docs the entire team relies on.
+
 ## Important Guidelines
 
 - Do not modify `tools/build.ts` or `vitest.config.ts` without understanding
