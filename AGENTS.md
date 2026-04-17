@@ -208,7 +208,7 @@ Failure modes specific to a published low-level framework, worth probing every t
 - Trading coverage or signal for speed/convenience
 - Locking in the current shape of the project with presumptive rules
 - Patching the symptom, not the root cause
-- Scope creep disguised as "while I'm here"
+- Unrelated refactors or opportunistic redesigns that balloon the PR (the "Always Improve" bar is *small, low-risk, in-scope* fixes — anything larger belongs in its own PR)
 - Silent assumptions about environment, timing, or ordering
 
 If the change doesn't survive a ten-minute attempt to poke holes in it, it's not ready.
