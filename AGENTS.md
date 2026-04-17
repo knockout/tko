@@ -8,6 +8,20 @@ Repository: https://github.com/knockout/tko
 Docs: https://tko.io
 License: MIT
 
+## Context for every agent
+
+Three things shape every decision here, more than any specific rule:
+
+1. **Low-level framework.** Observables, computeds, binding engine — infrastructure, not an app. A regression doesn't hit one app; it hits every downstream consumer.
+2. **Unknown, broad audience.** npm-published, used in apps the maintainers will never see — including high-stakes ones (financial services, enterprise, legacy KO bases).
+3. **Dark-factory thesis.** Small teams plus AI agents maintaining what once took a big team. Tests carry the load human review used to.
+
+Implications:
+- Coverage bar is higher than typical. Don't trade it for speed.
+- New test environments or targets are **additive**, never replacements.
+- Avoid rules that foreclose future goals (new runtimes, new targets). Framing beats prescription.
+- When in doubt, more signal, not less.
+
 ## Project Structure
 
 Monorepo with Bun workspaces.
@@ -59,8 +73,9 @@ Individual packages can be built from their directory with `bun run build`.
 - **Test files**: `packages/*/spec/**/*.ts`, `builds/*/spec/**/*.js`
 - **Run**: `bunx vitest run` (all tests) or `bunx vitest run <path>` (single file)
 
-Tests run in a real browser via Playwright — not jsdom. This is required
-because TKO does low-level DOM manipulation, MutationObserver, and event handling.
+Today the suite runs in a real-browser matrix (chromium, firefox, webkit) — authoritative because the binding layer is exercised against real DOM behavior. Additional environments (happy-dom, node, bun, TUI shims, …) are welcome when they **add** coverage for runtimes TKO should work in. Additive, never replacement; a test failing in a new environment is signal (missing polyfill, real env-scoped behavior, or a test that assumed too much) — fix the signal, don't prune the test.
+
+Fast local iteration: scope the run (`bunx vitest run packages/observable`, ~1s warm).
 
 ## Code Style
 
