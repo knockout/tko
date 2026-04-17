@@ -9,6 +9,8 @@ import { DataBindProvider } from '@tko/provider.databind'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { ComponentProvider } from '@tko/provider.component'
 import { NativeProvider } from '@tko/provider.native'
+import { AttributeProvider } from '@tko/provider.attr'
+import { TextMustacheProvider, AttributeMustacheProvider } from '@tko/provider.mustache'
 
 import { applyBindings, dataFor } from '@tko/bind'
 
@@ -53,7 +55,15 @@ describe('Components: Component binding', function () {
     testNode.innerHTML = '<div data-bind="component: testComponentBindingValue"></div>'
 
     const provider = new MultiProvider({
-      providers: [new ComponentProvider(), new DataBindProvider(), new VirtualProvider(), new NativeProvider()]
+      providers: [
+        new ComponentProvider(),
+        new DataBindProvider(),
+        new VirtualProvider(),
+        new NativeProvider(),
+        new AttributeProvider(),
+        new TextMustacheProvider(),
+        new AttributeMustacheProvider()
+      ]
     })
     options.bindingProviderInstance = provider
 
@@ -93,12 +103,169 @@ describe('Components: Component binding', function () {
     }).to.throw("Unknown component 'test-component'")
   })
 
-  it('Throws if the component definition has no template', function () {
-    components.register(testComponentName, {})
+  it('Uses the element children as template when no template is configured', function () {
+    const inner = observable('hello')
+    components.register('hello-world', {
+      viewModel: function () {
+        return { greeting: inner }
+      }
+    })
+    cleanups.push(() => components.unregister('hello-world'))
+    testNode.innerHTML = '<hello-world><span ko-text="greeting"></span></hello-world>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expectContainText(testNode.children[0], 'hello')
+    inner('world')
+    expectContainText(testNode.children[0], 'world')
+  })
+
+  it('Throws if neither a template nor children are provided', function () {
+    components.register('hello-world', {
+      viewModel: function () {
+        return {}
+      }
+    })
+    cleanups.push(() => components.unregister('hello-world'))
+    testNode.innerHTML = '<hello-world></hello-world>'
     expect(function () {
       applyBindings(outerViewModel, testNode)
       clock.tick(1)
-    }).to.throw("Component 'test-component' has no template")
+    }).to.throw("Component 'hello-world' has no template")
+  })
+
+  it('Each instance gets an independent template clone — mutations to one do not bleed into siblings or subsequent instances', function () {
+    components.register('hello-world', {
+      template: '<p class="pristine">hello</p>'
+    })
+    cleanups.push(() => components.unregister('hello-world'))
+
+    testNode.innerHTML = '<hello-world></hello-world><hello-world></hello-world>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+
+    const [firstHost, secondHost] = Array.from(testNode.children)
+    const first = firstHost.querySelector('p')!
+    const second = secondHost.querySelector('p')!
+
+    first.className = 'mutated'
+    first.textContent = 'MUTATED'
+    expect(second.className).to.equal('pristine')
+    expect(second.textContent).to.equal('hello')
+
+    const thirdHost = document.createElement('hello-world')
+    testNode.appendChild(thirdHost)
+    applyBindings(outerViewModel, thirdHost)
+    clock.tick(1)
+
+    const third = thirdHost.querySelector('p')!
+    expect(third.className).to.equal('pristine')
+    expect(third.textContent).to.equal('hello')
+  })
+
+  it('Uses children as template with mixed text and {{ }} mustache interpolation', function () {
+    const name = observable('world')
+    components.register('hello-world', {
+      viewModel: function () {
+        return { name }
+      }
+    })
+    cleanups.push(() => components.unregister('hello-world'))
+    testNode.innerHTML = '<hello-world>Hello, <strong>{{ name }}</strong>!</hello-world>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expectContainText(testNode.children[0], 'Hello, world!')
+    name('TKO')
+    expectContainText(testNode.children[0], 'Hello, TKO!')
+  })
+
+  it('Configured template wins — inline children are discarded', function () {
+    components.register('hello-world', {
+      template: '<p class="from-config">from template config</p>'
+    })
+    cleanups.push(() => components.unregister('hello-world'))
+    testNode.innerHTML = '<hello-world><p class="from-children">from inline</p></hello-world>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expectContainText(testNode.children[0], 'from template config')
+    expect(testNode.children[0].querySelector('.from-children')).to.equal(null)
+  })
+
+  it('Exposes $component, $data, and $parent inside children-as-template', function () {
+    const parentFlag = observable('parent')
+    components.register('hello-world', {
+      viewModel: function () {
+        return { greeting: 'ello' }
+      }
+    })
+    cleanups.push(() => components.unregister('hello-world'))
+    testNode.innerHTML =
+      '<hello-world>' +
+      '<span class="component" data-bind="text: $component.greeting"></span>' +
+      '<span class="data" data-bind="text: $data.greeting"></span>' +
+      '<span class="parent" data-bind="text: $parent.parentFlag"></span>' +
+      '</hello-world>'
+    applyBindings({ ...outerViewModel, parentFlag }, testNode)
+    clock.tick(1)
+    expect(testNode.children[0].querySelector('.component')!.textContent).to.equal('ello')
+    expect(testNode.children[0].querySelector('.data')!.textContent).to.equal('ello')
+    expect(testNode.children[0].querySelector('.parent')!.textContent).to.equal('parent')
+  })
+
+  it('Nested components both use children-as-template', function () {
+    components.register('outer-comp', {
+      viewModel: function () {
+        return { outerMsg: 'outer' }
+      }
+    })
+    components.register('inner-comp', {
+      viewModel: function () {
+        return { innerMsg: 'inner' }
+      }
+    })
+    cleanups.push(() => {
+      components.unregister('outer-comp')
+      components.unregister('inner-comp')
+    })
+    testNode.innerHTML =
+      '<outer-comp>' +
+      '<span class="outer" ko-text="outerMsg"></span>' +
+      '<inner-comp><span class="inner" ko-text="innerMsg"></span></inner-comp>' +
+      '</outer-comp>'
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expect(testNode.children[0].querySelector('.outer')!.textContent).to.equal('outer')
+    expect(testNode.children[0].querySelector('.inner')!.textContent).to.equal('inner')
+  })
+
+  it('Rebuild via observable component name restores original children for the new component', function () {
+    class CompB {
+      msg = 'from-children'
+    }
+    components.register('comp-a', { template: '<span class="from-a">A</span>' })
+    components.register('comp-b', { viewModel: CompB })
+    cleanups.push(() => {
+      components.unregister('comp-a')
+      components.unregister('comp-b')
+    })
+
+    const compName = observable('comp-a')
+    testNode.innerHTML =
+      '<div data-bind="component: { name: compName }">' +
+      '<span class="from-children" data-bind="text: msg"></span>' +
+      '</div>'
+    applyBindings({ compName }, testNode)
+    clock.tick(1)
+
+    expect(testNode.children[0].querySelector('.from-a')).to.not.equal(null)
+    expect(testNode.children[0].querySelector('.from-children')).to.equal(null)
+
+    compName('comp-b')
+    clock.tick(1)
+
+    expect(testNode.children[0].querySelector('.from-a')).to.equal(null)
+    const rendered = testNode.children[0].querySelector('.from-children')
+    expect(rendered).to.not.equal(null)
+    expect(rendered!.textContent).to.equal('from-children')
   })
 
   it('Controls descendant bindings', function () {

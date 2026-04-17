@@ -8,8 +8,8 @@
   },
   "scripts": {
     "build": "bun run --filter './packages/*' build && bun run --filter './builds/*' build",
-    "test": "bunx vitest run",
-    "test:ff": "VITEST_BROWSERS=firefox bunx vitest run",
+    "test": "bunx @biomejs/biome ci . && bun run build && bunx vitest run",
+    "test:ff": "bunx @biomejs/biome ci . && bun run build && VITEST_BROWSERS=firefox bunx vitest run",
     "tsc": "bunx tsc",
     "dts": "bunx tsc --build tsconfig.dts.json",
     "format": "bunx @biomejs/biome format .",
