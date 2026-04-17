@@ -88,14 +88,16 @@ export function triggerEvent(element: Element, eventType: string): void {
 
   const eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'
   const view = options.global as Window | undefined
-  const init = { bubbles: true, cancelable: true, view }
   let event: Event
   if (eventCategory === 'MouseEvents' && typeof MouseEvent === 'function') {
-    event = new MouseEvent(eventType, init)
+    // Preserve the legacy initEvent(...) behavior of passing the element itself
+    // as relatedTarget — handlers for mouseover/mouseout/mouseenter/mouseleave
+    // observe event.relatedTarget.
+    event = new MouseEvent(eventType, { bubbles: true, cancelable: true, view, relatedTarget: element })
   } else if (eventCategory === 'UIEvents' && typeof KeyboardEvent === 'function') {
-    event = new KeyboardEvent(eventType, init)
+    event = new KeyboardEvent(eventType, { bubbles: true, cancelable: true, view })
   } else {
-    event = new Event(eventType, init)
+    event = new Event(eventType, { bubbles: true, cancelable: true })
   }
   element.dispatchEvent(event)
 }

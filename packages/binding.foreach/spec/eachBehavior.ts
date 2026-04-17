@@ -1008,9 +1008,7 @@ describe('observable array changes', function () {
   })
 })
 
-// happy-dom gap: focus()/document.activeElement behavior differs from real browsers,
-// particularly around focus preservation across DOM reordering.
-describe.skipIf(isHappyDom())('focus', function () {
+describe('focus', function () {
   let $target
   beforeEach(function () {
     $target = $("<div data-bind='foreach: $data'>" + '<input />' + '</div>').appendTo(document.body)
@@ -1029,7 +1027,9 @@ describe.skipIf(isHappyDom())('focus', function () {
     assert.strictEqual(document.activeElement, document.body)
   })
 
-  it('does not preserves primitive targets when re-ordering', async function () {
+  // happy-dom gap below: focus preservation across foreach re-ordering relies on
+  // focus()/activeElement semantics that diverge from real browsers.
+  it.skipIf(isHappyDom())('does not preserves primitive targets when re-ordering', async function () {
     const list = observableArray(['a', 'b', 'c'])
     applyBindings(list, $target[0])
     $target.find(':input').first().focus()
@@ -1041,7 +1041,7 @@ describe.skipIf(isHappyDom())('focus', function () {
     assert.strictEqual(document.activeElement, document.body)
   })
 
-  it('preserves objects when re-ordering', async function () {
+  it.skipIf(isHappyDom())('preserves objects when re-ordering', async function () {
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1054,7 +1054,7 @@ describe.skipIf(isHappyDom())('focus', function () {
     assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
   })
 
-  it('preserves objects when re-ordering multiple identical', async function () {
+  it.skipIf(isHappyDom())('preserves objects when re-ordering multiple identical', async function () {
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1070,7 +1070,7 @@ describe.skipIf(isHappyDom())('focus', function () {
     assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
   })
 
-  it('preserves objects when re-ordering multiple identical, alt', async function () {
+  it.skipIf(isHappyDom())('preserves objects when re-ordering multiple identical, alt', async function () {
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
