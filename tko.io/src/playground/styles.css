@@ -209,7 +209,7 @@ html, body {
   padding: 0.2rem 0.75rem;
   color: var(--pg-text-muted);
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .console-msg--error { color: var(--pg-error-text); }

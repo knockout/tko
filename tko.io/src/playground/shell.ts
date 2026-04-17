@@ -12,7 +12,12 @@ function loadFromHash(): Record<string, string> | null {
   try {
     const json = decodeURIComponent(atob(location.hash.slice(1)))
     const parsed = JSON.parse(json)
-    return typeof parsed === 'object' && parsed !== null ? parsed : null
+    if (typeof parsed !== 'object' || parsed === null) return null
+    const out: Record<string, string> = {}
+    for (const [k, v] of Object.entries(parsed)) {
+      if (typeof v === 'string') out[k] = v
+    }
+    return out
   } catch {
     return null
   }
@@ -20,7 +25,8 @@ function loadFromHash(): Record<string, string> | null {
 
 function saveToHash(files: Record<string, string>): void {
   const json = JSON.stringify(files)
-  location.hash = btoa(encodeURIComponent(json))
+  const hash = '#' + btoa(encodeURIComponent(json))
+  history.replaceState(null, '', location.pathname + location.search + hash)
 }
 
 export function mount(container: HTMLElement, deps: ShellDeps, runner: Runner): void {
@@ -150,10 +156,12 @@ export function mount(container: HTMLElement, deps: ShellDeps, runner: Runner): 
   })
 
   window.addEventListener('message', (e) => {
+    if (e.source !== preview.contentWindow) return
     const data = e.data
-    if (data?.type === 'console') {
-      addConsoleMsg(data.args.join(' '), data.method)
-    } else if (data?.type === 'error') {
+    if (data?.type === 'console' && Array.isArray(data.args)) {
+      const level = data.method === 'warn' || data.method === 'error' ? data.method : 'log'
+      addConsoleMsg(data.args.join(' '), level)
+    } else if (data?.type === 'error' && typeof data.message === 'string') {
       addConsoleMsg(data.message, 'error')
     }
   })
@@ -162,7 +170,9 @@ export function mount(container: HTMLElement, deps: ShellDeps, runner: Runner): 
   const setStatus = (status: RunnerStatus) => {
     const dotClass =
       status.state === 'ready' ? 'dot--ready' : status.state === 'error' ? 'dot--error' : 'dot--loading'
-    statusEl.innerHTML = `<span class="dot ${dotClass}"></span>${status.label}`
+    const dot = document.createElement('span')
+    dot.className = 'dot ' + dotClass
+    statusEl.replaceChildren(dot, document.createTextNode(status.label))
     if (status.state === 'ready') loading.hidden = true
     if (status.state === 'error') loading.textContent = status.label
   }

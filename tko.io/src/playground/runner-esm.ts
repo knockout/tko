@@ -1,3 +1,4 @@
+import { injectConsoleForward } from './console-forward'
 import type { Runner, RunnerStatus } from './runner'
 
 const DEFAULT_HTML = `<!doctype html>
@@ -37,33 +38,6 @@ const DEFAULT_HTML = `<!doctype html>
   </body>
 </html>
 `
-
-const CONSOLE_FORWARD = `<script>
-;['log','warn','error','info'].forEach(m => {
-  const orig = console[m];
-  console[m] = (...args) => {
-    window.parent.postMessage({ type: 'console', method: m, args: args.map(a => {
-      try { return typeof a === 'object' ? JSON.stringify(a) : String(a) } catch { return String(a) }
-    }) }, '*');
-    orig.apply(console, args);
-  };
-});
-window.onerror = (msg) => {
-  window.parent.postMessage({ type: 'error', message: String(msg) }, '*');
-};
-window.onunhandledrejection = (e) => {
-  window.parent.postMessage({ type: 'error', message: String(e.reason) }, '*');
-};
-</script>
-`
-
-function injectConsoleForward(html: string): string {
-  const headClose = /<\/head>/i
-  if (headClose.test(html)) return html.replace(headClose, `${CONSOLE_FORWARD}</head>`)
-  const bodyOpen = /<body[^>]*>/i
-  if (bodyOpen.test(html)) return html.replace(bodyOpen, (m) => `${m}${CONSOLE_FORWARD}`)
-  return CONSOLE_FORWARD + html
-}
 
 export function createEsmRunner(): Runner {
   return {

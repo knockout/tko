@@ -1,3 +1,4 @@
+import { escapeScriptBody, injectConsoleForward } from './console-forward'
 import type { Runner, RunnerStatus } from './runner'
 
 const DEFAULT_HTML = `<div id="root"></div>`
@@ -20,7 +21,7 @@ tko.applyBindings({}, root)
 `
 
 function renderSrcdoc(html: string, compiledJs: string): string {
-  return `<!DOCTYPE html>
+  const doc = `<!DOCTYPE html>
 <html>
 <head>
 <style>
@@ -34,28 +35,9 @@ ${html}
 <script src="/lib/tko.js"><\/script>
 <script>
 window.ko = window.tko;
-
-['log','warn','error','info'].forEach(m => {
-  const orig = console[m];
-  console[m] = (...args) => {
-    window.parent.postMessage({ type: 'console', method: m, args: args.map(a => {
-      try { return typeof a === 'object' ? JSON.stringify(a) : String(a) } catch { return String(a) }
-    }) }, '*');
-    orig.apply(console, args);
-  };
-});
-
-window.onerror = (msg) => {
-  window.parent.postMessage({ type: 'error', message: String(msg) }, '*');
-};
-
-window.onunhandledrejection = (e) => {
-  window.parent.postMessage({ type: 'error', message: String(e.reason) }, '*');
-};
-
 setTimeout(() => {
   try {
-    ${compiledJs}
+    ${escapeScriptBody(compiledJs)}
   } catch (e) {
     console.error(e.message || e);
   }
@@ -63,6 +45,7 @@ setTimeout(() => {
 <\/script>
 </body>
 </html>`
+  return injectConsoleForward(doc)
 }
 
 export function createIifeRunner(esbuild: any): Runner {
