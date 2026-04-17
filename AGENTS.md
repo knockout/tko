@@ -59,8 +59,7 @@ Individual packages can be built from their directory with `bun run build`.
 - **Test files**: `packages/*/spec/**/*.ts`, `builds/*/spec/**/*.js`
 - **Run**: `bunx vitest run` (all tests) or `bunx vitest run <path>` (single file)
 
-Tests run in a real browser via Playwright — not jsdom. This is required
-because TKO does low-level DOM manipulation, MutationObserver, and event handling.
+Real browsers only. No jsdom/happy-dom. TKO binds DOM; partial DOMs diverge exactly where it matters. Don't split runner, exclude specs, or shrink the matrix for speed. Fast local: scope to one package (`bunx vitest run packages/observable`). Why: [#330](https://github.com/knockout/tko/pull/330).
 
 ## Code Style
 
