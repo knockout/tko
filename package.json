@@ -9,6 +9,8 @@
   "scripts": {
     "build": "bun run --filter './packages/*' build && bun run --filter './builds/*' build",
     "test": "bunx @biomejs/biome ci . && bun run build && bunx vitest run",
+    "test:unit": "bunx vitest run --project unit",
+    "test:browser": "bun run build && bunx vitest run --project browser",
     "test:ff": "bunx @biomejs/biome ci . && bun run build && VITEST_BROWSERS=firefox bunx vitest run",
     "tsc": "bunx tsc",
     "dts": "bunx tsc --build tsconfig.dts.json",
@@ -38,6 +40,7 @@
     "@vitest/browser-playwright": "^4.1.4",
     "chai": "^6.2.2",
     "esbuild": "^0.28.0",
+    "happy-dom": "^20.9.0",
     "jquery": "^4.0.0",
     "knip": "^6.4.1",
     "playwright": "^1.59.1",
