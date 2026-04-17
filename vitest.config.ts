@@ -5,12 +5,49 @@ const browsers = ((globalThis as any).process?.env?.VITEST_BROWSERS || 'chromium
   .split(',')
   .map((b: string) => ({ browser: b.trim() }))
 
+const ALL_SPECS = ['packages/*/spec/**/*.ts', 'builds/reference/spec/**/*.js', 'builds/knockout/spec/**/*.js']
+
 export default defineConfig({
   test: {
-    include: ['packages/*/spec/**/*.ts', 'builds/reference/spec/**/*.js', 'builds/knockout/spec/**/*.js'],
-    setupFiles: ['builds/knockout/helpers/vitest-setup.js'],
-    browser: { enabled: true, provider: playwright(), headless: true, instances: browsers },
+    testTimeout: 10000,
     globals: true,
-    testTimeout: 10000
+    projects: [
+      // Authoritative real-browser matrix — UNCHANGED. Always runs every spec.
+      {
+        test: {
+          name: 'browser',
+          include: ALL_SPECS,
+          setupFiles: ['builds/knockout/helpers/vitest-setup.js'],
+          browser: { enabled: true, provider: playwright(), headless: true, instances: browsers },
+          globals: true,
+          testTimeout: 10000
+        }
+      },
+      // EXPERIMENTAL: additive CLI coverage — Bun runtime, no DOM.
+      // We run the suite via `bunx vitest`, so the runtime is already Bun.
+      // `environment: 'node'` just tells vitest "don't provide a DOM" —
+      // Bun provides the node-compatible globals natively. Intent: prove
+      // the reactive primitives run in server-side contexts (Bun CLIs,
+      // TUIs, daemons).
+      {
+        test: {
+          name: 'cli-bun',
+          include: ALL_SPECS,
+          environment: 'node',
+          globals: true
+        }
+      },
+      // EXPERIMENTAL: additive CLI coverage — happy-dom.
+      // Intent: prove the binding engine works in a JS DOM (SSR, headless, TUI adapters).
+      {
+        test: {
+          name: 'cli-happy-dom',
+          include: ALL_SPECS,
+          environment: 'happy-dom',
+          setupFiles: ['builds/knockout/helpers/vitest-setup.js'],
+          globals: true
+        }
+      }
+    ]
   }
 })

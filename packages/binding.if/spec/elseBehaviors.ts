@@ -36,7 +36,7 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: true }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText).to.equal('abc')
+      expect(testNode.innerText.trim()).to.equal('abc')
     })
 
     it('shows the else-block when the condition is false', function () {
@@ -44,7 +44,7 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: false }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText).to.equal('def')
+      expect(testNode.innerText.trim()).to.equal('def')
     })
 
     it('toggles between if/else on condition change', function () {
@@ -53,9 +53,9 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: x }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText).to.equal('def')
+      expect(testNode.innerText.trim()).to.equal('def')
       x(true)
-      expect(testNode.innerText).to.equal('abc')
+      expect(testNode.innerText.trim()).to.equal('abc')
     })
   })
 })

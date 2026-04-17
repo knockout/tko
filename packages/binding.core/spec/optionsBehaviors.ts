@@ -13,6 +13,7 @@ import { bindings as coreBindings } from '../dist'
 import type { ObservableArray } from '@tko/observable'
 
 import { expectContainText, nodeText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
+import { isHappyDom } from '../../utils/helpers/test-env'
 
 function expectArrayEqual(actual: Array<unknown>, expected: Array<unknown>) {
   expect(actual.length).to.equal(expected.length)
@@ -183,7 +184,9 @@ describe('Binding: Options', function () {
     expectHaveSelectedValues(testNode.childNodes[0], [4])
   })
 
-  it('Should select caption by default and retain selection when adding multiple items', function () {
+  // happy-dom gap: <select> auto-selection semantics diverge from real browsers
+  // when options are added after the select is in the DOM.
+  it.skipIf(isHappyDom())('Should select caption by default and retain selection when adding multiple items', function () {
     testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
     const viewModel = { filterValues: observableArray(undefined) }
     applyBindings(viewModel, testNode)
@@ -197,7 +200,9 @@ describe('Binding: Options', function () {
     expect((testNode.childNodes[0] as HTMLSelectElement).options[0]).to.equal(captionElement)
   })
 
-  it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
+  // happy-dom gap: selectedIndex does not follow the selected <option>
+  // when options are reordered via innerHTML replacement.
+  it.skipIf(isHappyDom())('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
     let myObservable: ObservableArray<string | number> = observableArray<string | number>(['A', 'B', 'C']),
       changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues'></select>"
@@ -294,7 +299,9 @@ describe('Binding: Options', function () {
     expectHaveTexts(testNode.childNodes[0], ['', 'A', 'B'])
   })
 
-  it('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function () {
+  // happy-dom gap: element.options[selectedIndex] returns undefined in cases
+  // where real browsers return the option, causing the binding to crash.
+  it.skipIf(isHappyDom())('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function () {
     const myCaption = observable('Initial caption')
     testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
     applyBindings({ myCaption: myCaption }, testNode)

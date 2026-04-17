@@ -406,7 +406,8 @@ describe('Binding: Value', function () {
       expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
     })
 
-    it('When size > 1, should unselect all options when value is undefined, null, or \"\"', function () {
+    // happy-dom gap: size>1 <select> does not honor selectedIndex = -1 the same way as real browsers.
+    it.skipIf(isHappyDom())('When size > 1, should unselect all options when value is undefined, null, or \"\"', function () {
       var observable = new ko.observable('B')
       testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       ko.applyBindings({ myObservable: observable }, testNode)

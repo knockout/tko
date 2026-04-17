@@ -1,10 +1,17 @@
 import * as chai from 'chai'
 import sinon from 'sinon'
+import { isHappyDom, isRealBrowser, isNode } from '../../../packages/utils/helpers/test-env.ts'
 
 // Set globals that builds/knockout specs and mocha-test-helpers.js expect
 globalThis.chai = chai
 globalThis.expect = chai.expect
 globalThis.sinon = sinon
+
+// Test environment detectors — used with `it.skipIf(isHappyDom())` to document
+// env-scoped divergences rather than silently excluding them.
+globalThis.isHappyDom = isHappyDom
+globalThis.isRealBrowser = isRealBrowser
+globalThis.isNode = isNode
 
 // Load the knockout build (sets globalThis.ko)
 import '../dist/browser.min.js'
