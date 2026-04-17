@@ -62,8 +62,12 @@ function splitHtmlAndScript(code) {
 }
 
 function encodePlaygroundHash(html, js) {
-  const data = JSON.stringify({ html, js })
+  const data = JSON.stringify(js === undefined ? { html } : { html, js })
   return Buffer.from(encodeURIComponent(data)).toString('base64')
+}
+
+function isEsmHtml(code) {
+  return /<script\s+type=["']module["']/i.test(code) || /<script\s+type=["']importmap["']/i.test(code)
 }
 
 function autoApplyBindings(js) {
@@ -145,7 +149,7 @@ function wrapTsxForPlayground(tsx) {
   return wrapped
 }
 
-function insertPlaygroundButton(blockAst, html, js) {
+function insertPlaygroundButton(blockAst, html, js, { target = '/playground' } = {}) {
   const hash = encodePlaygroundHash(html, js)
 
   const copyDiv = findNode(blockAst, n =>
@@ -159,7 +163,7 @@ function insertPlaygroundButton(blockAst, html, js) {
   const bgDiv = h('div', {})
   const link = h('a', {
     className: ['playground-open'],
-    href: `/playground#${hash}`,
+    href: `${target}#${hash}`,
     target: '_blank',
     title: 'Open in Playground'
   }, [bgDiv])
@@ -266,6 +270,11 @@ export function pluginPlaygroundButton() {
         }
 
         if (codeBlock.language !== 'html') return
+
+        if (isEsmHtml(codeBlock.code)) {
+          insertPlaygroundButton(renderData.blockAst, codeBlock.code, undefined, { target: '/playground/esm' })
+          return
+        }
 
         const { html, js } = splitHtmlAndScript(codeBlock.code)
         if (js) {
