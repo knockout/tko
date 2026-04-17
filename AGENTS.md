@@ -8,6 +8,15 @@ Repository: https://github.com/knockout/tko
 Docs: https://tko.io
 License: MIT
 
+## Context for every agent
+
+Two things shape the coverage/safety bar here more than any specific rule:
+
+- **Low-level framework with an unknown audience.** Observables, computeds, binding engine — infrastructure, not an app. Published to npm and used in apps the maintainers will never see, including high-stakes ones. A regression hits every downstream consumer.
+- **Dark-factory thesis.** Small teams plus AI agents maintaining what once took a big team. Tests carry the load human review used to.
+
+Together: coverage and signal are expensive to lose and cheap to keep. When a change trades either away, say so explicitly and justify the delta.
+
 ## Project Structure
 
 Monorepo with Bun workspaces.
@@ -59,8 +68,9 @@ Individual packages can be built from their directory with `bun run build`.
 - **Test files**: `packages/*/spec/**/*.ts`, `builds/*/spec/**/*.js`
 - **Run**: `bunx vitest run` (all tests) or `bunx vitest run <path>` (single file)
 
-Tests run in a real browser via Playwright — not jsdom. This is required
-because TKO does low-level DOM manipulation, MutationObserver, and event handling.
+Today the suite runs in a real-browser matrix (chromium, firefox, webkit) — authoritative because the binding layer is exercised against real DOM behavior. Additional environments (happy-dom, node, bun, TUI shims, …) should **add** coverage for runtimes TKO should work in; they are not a substitute for the authoritative matrix. If a PR replaces a runner, environment, or matrix target, say so explicitly in the PR and justify the coverage delta. A test failing in a new environment is usually signal (missing polyfill, env-scoped behavior worth documenting, or a test that assumed too much) — investigate before excluding.
+
+Fast local iteration: scope the run (`bunx vitest run packages/observable`, ~1s warm).
 
 ## Code Style
 
@@ -182,6 +192,26 @@ Leave the codebase a little better than you found it. When you touch a file, fix
 When a feedback loop fails, fix the loop — not just the symptom. Examples: `bun run test` passing locally while CI fails, a confusing script error, a flaky assertion that hides real bugs. Fold the missing check into the local command so the next contributor doesn't hit the same wall.
 
 Avoid scope creep. If an improvement would balloon the PR, file a follow-up issue or spawn a separate task instead.
+
+## Review Your Own Change Adversarially
+
+Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises. Get an independent second pass (a colleague, a subagent where available) on changes that touch framework internals, test coverage, public APIs, or docs the whole team relies on.
+
+This is the ceiling on "Always Improve": that section pushes toward *more* in a PR; this one pushes toward *scrutiny* of what's in it. Use both — improve in scope, audit the scope itself here.
+
+Failure modes specific to a published low-level framework, worth probing every time:
+- Backwards-compat breaks in `@tko/build.knockout` (the legacy surface consumers rely on)
+- Subscription / computed / DOM-listener disposal leaks
+- Perf regressions in hot paths (observable read, dependency tracking, binding apply)
+- Public `@tko/*` API changes shipped without a changeset
+- Import-time side effects that poison the module graph
+- Trading coverage or signal for speed/convenience
+- Locking in the current shape of the project with presumptive rules
+- Patching the symptom, not the root cause
+- Unrelated refactors or opportunistic redesigns that balloon the PR (the "Always Improve" bar is *small, low-risk, in-scope* fixes — anything larger belongs in its own PR)
+- Silent assumptions about environment, timing, or ordering
+
+If the change doesn't survive a ten-minute attempt to poke holes in it, it's not ready.
 
 ## Important Guidelines
 
