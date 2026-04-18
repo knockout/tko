@@ -439,7 +439,7 @@ describe('Binding: Value', function () {
     })
 
     // happy-dom gap: size>1 <select> does not honor selectedIndex = -1 the same way as real browsers.
-    it.skipIf(isHappyDom())('When size > 1, should unselect all options when value is undefined, null, or ""', function () {
+    ;(isHappyDom() ? it.skip : it)('When size > 1, should unselect all options when value is undefined, null, or ""', function () {
       const myObservable = observable('B')
       testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)

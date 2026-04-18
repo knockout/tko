@@ -282,7 +282,7 @@ describe('Components: Default loader', function () {
 
       // happy-dom gap: <textarea> content parsing/child-node handling differs,
       // producing a single text child where real browsers produce a two-node template.
-      it.skipIf(isHappyDom())('Can be configured as the ID of a <textarea> element', function () {
+      ;(isHappyDom() ? it.skip : it)('Can be configured as the ID of a <textarea> element', function () {
         testTemplateFromElement('<textarea id="my-textarea-elem">{0}</textarea>', 'my-textarea-elem')
       })
 
@@ -302,7 +302,7 @@ describe('Components: Default loader', function () {
       })
 
       // happy-dom gap: <textarea> content parsing/child-node handling differs.
-      it.skipIf(isHappyDom())('Can be configured as a <textarea> element instance', function () {
+      ;(isHappyDom() ? it.skip : it)('Can be configured as a <textarea> element instance', function () {
         testTemplateFromElement('<textarea>{0}</textarea>', null)
       })
 

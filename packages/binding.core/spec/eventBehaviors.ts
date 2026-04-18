@@ -14,7 +14,6 @@ import { options } from '@tko/utils'
 import { bindings as coreBindings } from '../dist'
 
 import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
-import { isHappyDom } from '../../utils/helpers/test-env'
 
 describe('Binding: Event', function () {
   let testNode: HTMLElement

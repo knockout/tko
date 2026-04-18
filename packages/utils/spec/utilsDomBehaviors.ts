@@ -172,7 +172,7 @@ describe('selectExtensions', () => {
 
   // happy-dom gap: `selected` attribute on an <option> parsed via innerHTML
   // does not set selectedIndex the way real browsers do.
-  it.skipIf(isHappyDom())('should use loose equality for select value', () => {
+  ;(isHappyDom() ? it.skip : it)('should use loose equality for select value', () => {
     const select = document.createElement('select')
     select.innerHTML = `
       <option value="42" selected>Forty-two</option>

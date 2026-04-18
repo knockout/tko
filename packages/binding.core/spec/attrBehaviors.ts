@@ -36,7 +36,7 @@ describe('Binding: Attr', function () {
 
   // happy-dom gap: Element.lookupNamespaceURI is not implemented, which the
   // attr binding calls to resolve "xlink:" prefixes on SVG nodes.
-  it.skipIf(isHappyDom())('Should be able to set namespaced attribute values', function () {
+  ;(isHappyDom() ? it.skip : it)('Should be able to set namespaced attribute values', function () {
     const model = { myValue: 'first value' }
     testNode.innerHTML = [
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',

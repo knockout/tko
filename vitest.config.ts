@@ -23,21 +23,7 @@ export default defineConfig({
           testTimeout: 10000
         }
       },
-      // EXPERIMENTAL: additive CLI coverage — Bun runtime, no DOM.
-      // We run the suite via `bunx vitest`, so the runtime is already Bun.
-      // `environment: 'node'` just tells vitest "don't provide a DOM" —
-      // Bun provides the node-compatible globals natively. Intent: prove
-      // the reactive primitives run in server-side contexts (Bun CLIs,
-      // TUIs, daemons).
-      {
-        test: {
-          name: 'cli-bun',
-          include: ALL_SPECS,
-          environment: 'node',
-          globals: true
-        }
-      },
-      // EXPERIMENTAL: additive CLI coverage — happy-dom.
+      // Additive CLI coverage — happy-dom.
       // Intent: prove the binding engine works in a JS DOM (SSR, headless, TUI adapters).
       {
         test: {
