@@ -1271,7 +1271,9 @@ describe('Components: Component binding', function () {
       ViewModel.register('test-component')
 
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLInputElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(`beep / beep`)
+      expect((testNode.children[0] as HTMLInputElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(
+        `beep / beep`
+      )
     })
 
     it('inserts into nested elements', function () {

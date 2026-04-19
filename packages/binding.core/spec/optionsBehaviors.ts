@@ -186,49 +186,55 @@ describe('Binding: Options', function () {
 
   // happy-dom gap: <select> auto-selection semantics diverge from real browsers
   // when options are added after the select is in the DOM.
-  ;(isHappyDom() ? it.skip : it)('Should select caption by default and retain selection when adding multiple items', function () {
-    testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
-    const viewModel = { filterValues: observableArray(undefined) }
-    applyBindings(viewModel, testNode)
-    expectHaveSelectedValues(testNode.childNodes[0], [undefined])
-    const captionElement = (testNode.childNodes[0] as HTMLSelectElement).options[0]
+  ;(isHappyDom() ? it.skip : it)(
+    'Should select caption by default and retain selection when adding multiple items',
+    function () {
+      testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
+      const viewModel = { filterValues: observableArray(undefined) }
+      applyBindings(viewModel, testNode)
+      expectHaveSelectedValues(testNode.childNodes[0], [undefined])
+      const captionElement = (testNode.childNodes[0] as HTMLSelectElement).options[0]
 
-    viewModel.filterValues.push('1')
-    viewModel.filterValues.push('2')
-    expectHaveSelectedValues(testNode.childNodes[0], [undefined])
+      viewModel.filterValues.push('1')
+      viewModel.filterValues.push('2')
+      expectHaveSelectedValues(testNode.childNodes[0], [undefined])
 
-    expect((testNode.childNodes[0] as HTMLSelectElement).options[0]).to.equal(captionElement)
-  })
+      expect((testNode.childNodes[0] as HTMLSelectElement).options[0]).to.equal(captionElement)
+    }
+  )
 
   // happy-dom gap: selectedIndex does not follow the selected <option>
   // when options are reordered via innerHTML replacement.
-  ;(isHappyDom() ? it.skip : it)('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
-    let myObservable: ObservableArray<string | number> = observableArray<string | number>(['A', 'B', 'C']),
-      changeHandlerFireCount = 0
-    testNode.innerHTML = "<select data-bind='options:myValues'></select>"
-    registerEventHandler(testNode.childNodes[0] as HTMLSelectElement, 'change', function () {
-      changeHandlerFireCount++
-    })
-    applyBindings({ myValues: myObservable }, testNode)
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
-    expect(changeHandlerFireCount).to.equal(1)
+  ;(isHappyDom() ? it.skip : it)(
+    'Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)',
+    function () {
+      let myObservable: ObservableArray<string | number> = observableArray<string | number>(['A', 'B', 'C']),
+        changeHandlerFireCount = 0
+      testNode.innerHTML = "<select data-bind='options:myValues'></select>"
+      registerEventHandler(testNode.childNodes[0] as HTMLSelectElement, 'change', function () {
+        changeHandlerFireCount++
+      })
+      applyBindings({ myValues: myObservable }, testNode)
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
+      expect(changeHandlerFireCount).to.equal(1)
 
-    myObservable(['B', 'C', 'A'])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
-    expect(changeHandlerFireCount).to.equal(1)
+      myObservable(['B', 'C', 'A'])
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+      expect(changeHandlerFireCount).to.equal(1)
 
-    myObservable(['D', 'E'])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
-    expect(changeHandlerFireCount).to.equal(2)
+      myObservable(['D', 'E'])
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
+      expect(changeHandlerFireCount).to.equal(2)
 
-    myObservable([])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(-1)
-    expect(changeHandlerFireCount).to.equal(3)
+      myObservable([])
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(-1)
+      expect(changeHandlerFireCount).to.equal(3)
 
-    myObservable([1, 2, 3])
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
-    expect(changeHandlerFireCount).to.equal(4)
-  })
+      myObservable([1, 2, 3])
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(0)
+      expect(changeHandlerFireCount).to.equal(4)
+    }
+  )
 
   it('Should trigger a change event when the options selection is changed by modifying the options data (multiple select)', function () {
     let myObservable: ObservableArray<any> = observableArray(['A', 'B', 'C']),
@@ -301,22 +307,25 @@ describe('Binding: Options', function () {
 
   // happy-dom gap: element.options[selectedIndex] returns undefined in cases
   // where real browsers return the option, causing the binding to crash.
-  ;(isHappyDom() ? it.skip : it)('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function () {
-    const myCaption = observable('Initial caption')
-    testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
-    applyBindings({ myCaption: myCaption }, testNode)
-    ;(testNode.childNodes[0] as HTMLSelectElement).options[2].selected = true
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
-    expectHaveTexts(testNode.childNodes[0], ['Initial caption', 'A', 'B'])
+  ;(isHappyDom() ? it.skip : it)(
+    'Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)',
+    function () {
+      const myCaption = observable('Initial caption')
+      testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
+      applyBindings({ myCaption: myCaption }, testNode)
+      ;(testNode.childNodes[0] as HTMLSelectElement).options[2].selected = true
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+      expectHaveTexts(testNode.childNodes[0], ['Initial caption', 'A', 'B'])
 
-    myCaption('New caption')
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
-    expectHaveTexts(testNode.childNodes[0], ['New caption', 'A', 'B'])
+      myCaption('New caption')
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(2)
+      expectHaveTexts(testNode.childNodes[0], ['New caption', 'A', 'B'])
 
-    myCaption(null)
-    expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(1)
-    expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
-  })
+      myCaption(null)
+      expect((testNode.childNodes[0] as HTMLSelectElement).selectedIndex).to.equal(1)
+      expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
+    }
+  )
 
   it('Should allow the option text to be given by an observable and update it when the model changes without affecting selection', function () {
     const people = [
