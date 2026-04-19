@@ -16,7 +16,7 @@ import { options } from '@tko/utils'
 import { bindings as coreBindings } from '../dist'
 
 import { nodeText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
-import { isHappyDom } from '../../utils/helpers/test-env'
+import { itBrowserOnly } from '../../utils/helpers/test-env'
 
 function expectArrayEqual(actual: Array<unknown>, expected: Array<unknown>) {
   expect(actual.length).to.equal(expected.length)
@@ -439,31 +439,28 @@ describe('Binding: Value', function () {
     })
 
     // happy-dom gap: size>1 <select> does not honor selectedIndex = -1 the same way as real browsers.
-    ;(isHappyDom() ? it.skip : it)(
-      'When size > 1, should unselect all options when value is undefined, null, or ""',
-      function () {
-        const myObservable = observable('B')
-        testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
-        applyBindings({ myObservable: myObservable }, testNode)
+    itBrowserOnly('When size > 1, should unselect all options when value is undefined, null, or ""', function () {
+      const myObservable = observable('B')
+      testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
+      applyBindings({ myObservable: myObservable }, testNode)
 
-        // Nothing is selected when observable changed to undefined
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-        myObservable(undefined)
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+      // Nothing is selected when observable changed to undefined
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      myObservable(undefined)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
 
-        // Nothing is selected when observable changed to null
-        myObservable('B')
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-        myObservable(null)
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+      // Nothing is selected when observable changed to null
+      myObservable('B')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      myObservable(null)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
 
-        // Nothing is selected when observable changed to ""
-        myObservable('B')
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-        myObservable('')
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
-      }
-    )
+      // Nothing is selected when observable changed to ""
+      myObservable('B')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      myObservable('')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+    })
 
     it('Should update the model value when the UI is changed (setting it to undefined when the caption is selected)', function () {
       const myObservable = observable('B')

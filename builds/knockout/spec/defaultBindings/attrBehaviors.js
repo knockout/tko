@@ -10,7 +10,7 @@ describe('Binding: Attr', function () {
   })
 
   // happy-dom gap: Element.lookupNamespaceURI not implemented.
-  it.skipIf(isHappyDom())('Should be able to set namespaced attribute values', function () {
+  itBrowserOnly('Should be able to set namespaced attribute values', function () {
     var model = { myValue: 'first value' }
     testNode.innerHTML = [
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',

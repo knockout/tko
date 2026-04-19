@@ -1,8 +1,4 @@
 // Detectors for the vitest environment a test is running under.
-// Used with `it.skipIf(isHappyDom())` / `describe.skipIf(isHappyDom())`
-// to document known-divergent behavior rather than silently excluding it.
-// Each skip should come with a short comment and (when applicable) a link
-// to the upstream tracker.
 
 export function isHappyDom(): boolean {
   return typeof navigator !== 'undefined' && /HappyDOM/i.test(navigator.userAgent ?? '')
@@ -21,3 +17,12 @@ export function isRealBrowser(): boolean {
 export function isNode(): boolean {
   return typeof document === 'undefined'
 }
+
+// Env-scoped test wrappers — semantic labels for tests that require a real
+// browser and don't survive happy-dom's DOM-implementation gaps. Using a
+// wrapper keeps call-site indent identical to an unskipped `it(...)` and
+// lets each skip carry a short `// happy-dom gap: …` comment above it.
+// Cast is needed because `@types/mocha` describes `it` as `TestFunction`
+// while vitest's `it.skip` is the same shape — we just keep the outer type.
+export const itBrowserOnly = (isHappyDom() ? it.skip : it) as typeof it
+export const describeBrowserOnly = (isHappyDom() ? describe.skip : describe) as typeof describe

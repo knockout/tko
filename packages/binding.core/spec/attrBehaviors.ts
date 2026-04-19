@@ -12,7 +12,7 @@ import { options } from '@tko/utils'
 import * as coreBindings from '../dist'
 
 import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
-import { isHappyDom } from '../../utils/helpers/test-env'
+import { itBrowserOnly } from '../../utils/helpers/test-env'
 
 describe('Binding: Attr', function () {
   let testNode: HTMLElement
@@ -36,7 +36,7 @@ describe('Binding: Attr', function () {
 
   // happy-dom gap: Element.lookupNamespaceURI is not implemented, which the
   // attr binding calls to resolve "xlink:" prefixes on SVG nodes.
-  ;(isHappyDom() ? it.skip : it)('Should be able to set namespaced attribute values', function () {
+  itBrowserOnly('Should be able to set namespaced attribute values', function () {
     const model = { myValue: 'first value' }
     testNode.innerHTML = [
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',

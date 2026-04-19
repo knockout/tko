@@ -284,7 +284,7 @@ describe('Components: Default loader', function () {
       })
 
       // happy-dom gap: <textarea> content parsing differs from real browsers.
-      it.skipIf(isHappyDom())('Can be configured as the ID of a <textarea> element', function () {
+      itBrowserOnly('Can be configured as the ID of a <textarea> element', function () {
         // Special case: the textarea's value should be interpreted as a markup string
         return testTemplateFromElement('<textarea id="my-textarea-elem">{0}</textarea>', 'my-textarea-elem')
       })
@@ -308,7 +308,7 @@ describe('Components: Default loader', function () {
       })
 
       // happy-dom gap: <textarea> content parsing differs.
-      it.skipIf(isHappyDom())('Can be configured as a <textarea> element instance', function () {
+      itBrowserOnly('Can be configured as a <textarea> element instance', function () {
         // Special case: the textarea's value should be interpreted as a markup string
         return testTemplateFromElement('<textarea>{0}</textarea>', /* elementId */ null)
       })

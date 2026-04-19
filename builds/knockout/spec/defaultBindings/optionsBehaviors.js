@@ -128,62 +128,57 @@ describe('Binding: Options', function () {
   })
 
   // happy-dom gap: <select> auto-selection semantics diverge from real browsers.
-  it.skipIf(isHappyDom())(
-    'Should select caption by default and retain selection when adding multiple items',
-    function () {
-      // This test failed in IE<=8 without changes made in #1208
-      testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
-      var viewModel = {
-        filterValues: ko.observableArray()
-      }
-      ko.applyBindings(viewModel, testNode)
-      expectHaveSelectedValues(testNode.childNodes[0], [undefined])
-      var captionElement = testNode.childNodes[0].options[0]
-
-      viewModel.filterValues.push('1')
-      viewModel.filterValues.push('2')
-      expectHaveSelectedValues(testNode.childNodes[0], [undefined])
-
-      // The option element for the caption is retained
-      expect(testNode.childNodes[0].options[0]).to.equal(captionElement)
+  itBrowserOnly('Should select caption by default and retain selection when adding multiple items', function () {
+    // This test failed in IE<=8 without changes made in #1208
+    testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
+    var viewModel = {
+      filterValues: ko.observableArray()
     }
-  )
+    ko.applyBindings(viewModel, testNode)
+    expectHaveSelectedValues(testNode.childNodes[0], [undefined])
+    var captionElement = testNode.childNodes[0].options[0]
+
+    viewModel.filterValues.push('1')
+    viewModel.filterValues.push('2')
+    expectHaveSelectedValues(testNode.childNodes[0], [undefined])
+
+    // The option element for the caption is retained
+    expect(testNode.childNodes[0].options[0]).to.equal(captionElement)
+  })
 
   // happy-dom gap: selectedIndex does not follow the selected <option> after innerHTML replacement.
-  it.skipIf(isHappyDom())(
-    'Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)',
-    function () {
-      var observable = new ko.observableArray(['A', 'B', 'C']),
-        changeHandlerFireCount = 0
-      testNode.innerHTML = "<select data-bind='options:myValues'></select>"
-      ko.utils.registerEventHandler(testNode.childNodes[0], 'change', function () {
-        changeHandlerFireCount++
-      })
-      ko.applyBindings({ myValues: observable }, testNode)
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
-      expect(changeHandlerFireCount).to.deep.equal(1)
+  // biome-ignore format: keep test-call on a single line for indent consistency
+  itBrowserOnly('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
+    var observable = new ko.observableArray(['A', 'B', 'C']),
+      changeHandlerFireCount = 0
+    testNode.innerHTML = "<select data-bind='options:myValues'></select>"
+    ko.utils.registerEventHandler(testNode.childNodes[0], 'change', function () {
+      changeHandlerFireCount++
+    })
+    ko.applyBindings({ myValues: observable }, testNode)
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+    expect(changeHandlerFireCount).to.deep.equal(1)
 
-      // Change the order of options; since selection is not changed, should not trigger change event
-      observable(['B', 'C', 'A'])
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
-      expect(changeHandlerFireCount).to.deep.equal(1)
+    // Change the order of options; since selection is not changed, should not trigger change event
+    observable(['B', 'C', 'A'])
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
+    expect(changeHandlerFireCount).to.deep.equal(1)
 
-      // Change to a new set of options; since selection is changed, should trigger change event
-      observable(['D', 'E'])
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
-      expect(changeHandlerFireCount).to.deep.equal(2)
+    // Change to a new set of options; since selection is changed, should trigger change event
+    observable(['D', 'E'])
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+    expect(changeHandlerFireCount).to.deep.equal(2)
 
-      // Delete all options; selection is changed (to nothing), so should trigger event
-      observable([])
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
-      expect(changeHandlerFireCount).to.deep.equal(3)
+    // Delete all options; selection is changed (to nothing), so should trigger event
+    observable([])
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+    expect(changeHandlerFireCount).to.deep.equal(3)
 
-      // Re-add options; should trigger change event
-      observable([1, 2, 3])
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
-      expect(changeHandlerFireCount).to.deep.equal(4)
-    }
-  )
+    // Re-add options; should trigger change event
+    observable([1, 2, 3])
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(0)
+    expect(changeHandlerFireCount).to.deep.equal(4)
+  })
 
   it('Should trigger a change event when the options selection is changed by modifying the options data (multiple select)', function () {
     var observable = new ko.observableArray(['A', 'B', 'C']),
@@ -261,28 +256,26 @@ describe('Binding: Options', function () {
   })
 
   // happy-dom gap: element.options[selectedIndex] can return undefined where real browsers return the option.
-  it.skipIf(isHappyDom())(
-    'Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)',
-    function () {
-      var myCaption = ko.observable('Initial caption')
-      testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
-      ko.applyBindings({ myCaption: myCaption }, testNode)
+  // biome-ignore format: keep test-call on a single line for indent consistency
+  itBrowserOnly('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function () {
+    var myCaption = ko.observable('Initial caption')
+    testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
+    ko.applyBindings({ myCaption: myCaption }, testNode)
 
-      testNode.childNodes[0].options[2].selected = true
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
-      expectHaveTexts(testNode.childNodes[0], ['Initial caption', 'A', 'B'])
+    testNode.childNodes[0].options[2].selected = true
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
+    expectHaveTexts(testNode.childNodes[0], ['Initial caption', 'A', 'B'])
 
-      // Show we can update the caption without affecting selection
-      myCaption('New caption')
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
-      expectHaveTexts(testNode.childNodes[0], ['New caption', 'A', 'B'])
+    // Show we can update the caption without affecting selection
+    myCaption('New caption')
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(2)
+    expectHaveTexts(testNode.childNodes[0], ['New caption', 'A', 'B'])
 
-      // Show that caption will be removed if value is null
-      myCaption(null)
-      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-      expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
-    }
-  )
+    // Show that caption will be removed if value is null
+    myCaption(null)
+    expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+    expectHaveTexts(testNode.childNodes[0], ['A', 'B'])
+  })
 
   it('Should allow the option text to be given by an observable and update it when the model changes without affecting selection', function () {
     var people = [

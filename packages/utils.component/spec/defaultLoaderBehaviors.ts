@@ -5,7 +5,7 @@ import components from '../dist'
 import { expect } from 'chai'
 import sinon from 'sinon'
 import { expectContainText, restoreAfter, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
-import { isHappyDom } from '../../utils/helpers/test-env'
+import { itBrowserOnly } from '../../utils/helpers/test-env'
 
 describe('Components: Default loader', function () {
   const testComponentName = 'test-component'
@@ -282,7 +282,7 @@ describe('Components: Default loader', function () {
 
       // happy-dom gap: <textarea> content parsing/child-node handling differs,
       // producing a single text child where real browsers produce a two-node template.
-      ;(isHappyDom() ? it.skip : it)('Can be configured as the ID of a <textarea> element', function () {
+      itBrowserOnly('Can be configured as the ID of a <textarea> element', function () {
         testTemplateFromElement('<textarea id="my-textarea-elem">{0}</textarea>', 'my-textarea-elem')
       })
 
@@ -302,7 +302,7 @@ describe('Components: Default loader', function () {
       })
 
       // happy-dom gap: <textarea> content parsing/child-node handling differs.
-      ;(isHappyDom() ? it.skip : it)('Can be configured as a <textarea> element instance', function () {
+      itBrowserOnly('Can be configured as a <textarea> element instance', function () {
         testTemplateFromElement('<textarea>{0}</textarea>', null)
       })
 

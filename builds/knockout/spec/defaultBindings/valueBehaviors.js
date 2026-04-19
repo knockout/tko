@@ -407,31 +407,28 @@ describe('Binding: Value', function () {
     })
 
     // happy-dom gap: size>1 <select> does not honor selectedIndex = -1 the same way as real browsers.
-    it.skipIf(isHappyDom())(
-      'When size > 1, should unselect all options when value is undefined, null, or \"\"',
-      function () {
-        var observable = new ko.observable('B')
-        testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
-        ko.applyBindings({ myObservable: observable }, testNode)
+    itBrowserOnly('When size > 1, should unselect all options when value is undefined, null, or \"\"', function () {
+      var observable = new ko.observable('B')
+      testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
+      ko.applyBindings({ myObservable: observable }, testNode)
 
-        // Nothing is selected when observable changed to undefined
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-        observable(undefined)
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+      // Nothing is selected when observable changed to undefined
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      observable(undefined)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
 
-        // Nothing is selected when observable changed to null
-        observable('B')
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-        observable(null)
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+      // Nothing is selected when observable changed to null
+      observable('B')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      observable(null)
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
 
-        // Nothing is selected when observable changed to ""
-        observable('B')
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
-        observable('')
-        expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
-      }
-    )
+      // Nothing is selected when observable changed to ""
+      observable('B')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(1)
+      observable('')
+      expect(testNode.childNodes[0].selectedIndex).to.deep.equal(-1)
+    })
 
     it('Should update the model value when the UI is changed (setting it to undefined when the caption is selected)', function () {
       var observable = new ko.observable('B')

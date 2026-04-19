@@ -112,7 +112,7 @@ describe('onError handler', function () {
 
   // happy-dom gap: errors thrown from setTimeout callbacks bypass window.onerror,
   // surfacing as unhandled exceptions rather than reaching ko.options.onError.
-  it.skipIf(isHappyDom())('fires on async component errors', async function () {
+  itBrowserOnly('fires on async component errors', async function () {
     var component = {
       tagName: 'test-onerror',
       template: "<div data-bind='text: name'></div>",
@@ -138,7 +138,7 @@ describe('onError handler', function () {
   })
 
   // happy-dom gap: errors thrown from setTimeout callbacks bypass window.onerror.
-  it.skipIf(isHappyDom())('passes through the error instance', async function () {
+  itBrowserOnly('passes through the error instance', async function () {
     var expectedInstance
     ko.tasks.schedule(function () {
       expectedInstance = new Error('Some error')
