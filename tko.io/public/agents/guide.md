@@ -4,6 +4,8 @@ Test-backed behavior summaries live under `/agents/verified-behaviors/`. Treat t
 
 For preferred state/binding/DOM architecture in examples and prototypes, read `/agents/contract.md`.
 
+For how to add or configure runtime options (`ko.options.*`), read `/agents/options.md`.
+
 ## Setup
 
 ```html

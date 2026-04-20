@@ -33,6 +33,13 @@ function scheduleBatch() {
 
 function flushBatch() {
   cleanNodeTimeoutID = null
+  // If the option was flipped to 0 (or below) while the timer was pending,
+  // fall through to synchronous drain. Otherwise splice(0, 0) would remove
+  // nothing and scheduleBatch would re-arm the timer every 25ms forever.
+  if (options.jsxCleanBatchSize <= 0) {
+    flushAll()
+    return
+  }
   const nodes = cleanNodeQueue.splice(0, options.jsxCleanBatchSize)
   for (const node of nodes) {
     cleanNode(node)
