@@ -28,3 +28,9 @@ Read this when you need test-backed behavior for `@tko/lifecycle`, especially li
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
 - Anchoring one lifecycle object to another with `anchorTo(...)` causes disposal of the parent lifecycle to dispose the anchored child as well.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
+
+## Usage guidance
+
+- Prefer `this.computed(...)` over standalone `ko.computed(...)` inside a `LifeCycle` subclass — the computed is added to the instance's disposal set automatically.
+- Prefer `this.subscribe(observable, callback)` over `observable.subscribe(callback)` inside a `LifeCycle` subclass for the same reason.
+- Do not create observables, computeds, or subscriptions inside a computed's evaluator — see the anti-pattern in `computed.md`.

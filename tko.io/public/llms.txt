@@ -46,6 +46,9 @@
 - Derived `ko-*` values must stay observable/computed — inline expressions freeze
 - `ko.applyBindings(...)` returns a Promise
 - Inside `ko-foreach`, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
+- Component JSX params: pass each constructor param as its own attribute (`<my-card out={x} onEdit={fn} />`), never wrap in `params={{...}}` — JSX attrs flatten into one constructor arg, so wrapping double-nests to `{ params: {...} }`
+- Never create `ko.observable()`, `ko.computed()`, or `.subscribe()` inside a computed evaluator — re-runs leak instances
+- Binary HTML attrs (`disabled`, `hidden`, …): return `|| undefined` from computed; `false` renders the string `"false"` and keeps the attribute
 
 ## Browser JSX (esbuild-wasm)
 

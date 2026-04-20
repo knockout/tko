@@ -30,3 +30,5 @@ Read this when you need test-backed behavior for `@tko/utils.jsx`, especially JS
   Specs: `packages/utils.jsx/spec/jsxBehaviors.ts`
 - JSX-created nodes can carry native bindings and participate in component rendering and observable-array diff updates.
   Specs: `packages/utils.jsx/spec/jsxBehaviors.ts`
+- Binary HTML attributes (`disabled`, `readonly`, `hidden`, `required`, `checked`, `selected`) omit the attribute when the observable/computed value is `null`, `undefined`, or `false`; any other value (including the string `"false"`) sets the attribute. Use `|| undefined` in computeds to express "no attribute" explicitly.
+  Specs: `packages/utils.jsx/spec/jsxBehaviors.ts`

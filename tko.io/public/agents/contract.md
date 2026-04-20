@@ -40,6 +40,80 @@ In those cases:
 - let the custom binding read observables and update the DOM
 - avoid making the custom binding the authoritative owner of app state
 
+## DOM Mutation Containment
+
+DOM mutation and direct DOM-API calls belong inside a `BindingHandler` (a class that extends `LifeCycle` and is registered as a binding). They do not belong in component view models, utility modules, or arbitrary class methods.
+
+Violations (do not do outside a `BindingHandler`):
+- `document.createElement`, `document.body.appendChild` — bypasses the binding pipeline
+- `element.querySelector` / `querySelectorAll` — except to find a mount root for `applyBindings`
+- `element.style.*`, `element.classList.*` — use the `style` / `css` bindings
+- `element.addEventListener` — use `click`, `event:{…}`, or a binding handler
+- `appendChild` / `insertBefore` / `replaceWith` — use `foreach`, `if`, `template`
+- `element.innerHTML = …` — use `text` or (when trusted markup is the point) `html`; also flag XSS if content is external
+- `element.focus()` / `element.select()` — use `hasFocus` or a focus-orchestration binding
+- `requestAnimationFrame` for DOM scheduling — move inside a binding that owns the frame loop
+- Storing `HTMLElement` references as component view-model fields — the element belongs to the binding
+
+Where these calls are safe:
+- inside a class that extends `BindingHandler` (its `constructor`/`init`/`update` receive the owning element)
+- reading observables whose values drive DOM updates via bindings — that is the whole point
+- direct DOM reads in tests/verification code after bindings are active
+
+Binding handlers are the prescribed escape hatch for imperative DOM work: they receive the exact element, participate in the lifecycle, and dispose cleanly. Mutating the DOM from elsewhere creates a second source of truth for DOM state and the reactive graph loses sight of it.
+
+## Component Design: Binding Handlers and Component View Models
+
+### Binding handlers — narrow scope, one DOM task
+
+Each `BindingHandler` subclass should do one thing to its element. A handler that sanitizes HTML *and* walks the DOM for citations *and* renders diagrams *and* rewrites tables should be split into separate handlers, each composable on the same element.
+
+Violations:
+- a binding handler performing multiple unrelated DOM operations — split by concern
+- using a binding handler where a component with JSX would suffice — prefer declarative JSX when the rendering can be expressed that way
+
+Not a violation:
+- a handler that is complex because its single DOM task is inherently complex (rich-text editor, canvas renderer, third-party widget bridge)
+
+### Component view models — rendering only
+
+A component view model (a class registered with `components.register(...)`, typically extending `ComponentABC`) should contain only code that produces its template output. Data transformation, parsing, business rules, and utilities belong in standalone `.ts` files the component imports.
+
+Violations:
+- template method exceeding ~80 lines of JSX without decomposition — extract nested child components
+- manipulating the DOM directly from a component method — delegate to a binding handler
+- non-rendering logic (parsing, domain rules, formatting of structured data) embedded in the component — move to utilities
+- instantiating a child component with `params={{ ... }}` wrapping every prop (see "Component Params in JSX" in `/agents/guide.md`)
+
+Not a violation:
+- a component that is large because it composes many small child components
+- simple inline computeds that only map data for the template (`const label = ko.pureComputed(() => format(value()))`)
+
+## Component Communication via `subscribable`
+
+When a component needs to trigger an imperative action inside a binding handler (for example "print this iframe", "scroll to top", "focus on demand"), pass a `ko.subscribable` owned by the component into the handler. The handler subscribes in its constructor and disposes the subscription in `dispose`.
+
+Do not model the command as an `observable` holding a function (`observable<(() => void) | null>(null)`). Function-valued observables capture closures that may retain DOM references, muddle cleanup, and do not broadcast.
+
+```js
+// Component owns the channel and fires events
+class PrintableCard extends ComponentABC {
+  printChannel = new ko.subscribable()
+  onPrintClick = () => this.printChannel.notifySubscribers(null, 'print')
+}
+
+// Binding handler subscribes and disposes with its lifecycle
+class PrintIframe extends BindingHandler {
+  constructor (params) {
+    super(params)
+    const channel = this.value
+    this.addDisposable(channel.subscribe(() => this.$element.contentWindow.print(), null, 'print'))
+  }
+}
+```
+
+The element reference stays inside the binding handler, `dispose` cleans up naturally, and multiple elements can listen on the same channel without coordination.
+
 ## Security Preference
 
 - Prefer `text` over `html`.
