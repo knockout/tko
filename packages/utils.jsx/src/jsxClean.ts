@@ -49,10 +49,9 @@ function flushAll() {
     clearTimeout(cleanNodeTimeoutID)
     cleanNodeTimeoutID = null
   }
+  // `while` covers re-enqueues from cleanNode side effects — no batching
+  // here since there's no yield to pause between.
   while (cleanNodeQueue.length) {
-    const nodes = cleanNodeQueue.splice(0, cleanNodeQueue.length)
-    for (const node of nodes) {
-      cleanNode(node)
-    }
+    cleanNode(cleanNodeQueue.shift()!)
   }
 }
