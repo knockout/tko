@@ -12,6 +12,7 @@ desktop.ini
 perf/*
 *.orig
 *.bak
+*.original.md
 .DS_Store
 npm-debug.log
 node_modules

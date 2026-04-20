@@ -1,13 +1,13 @@
 # Verified Behaviors: @tko/computed
 
 > Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> If behavior not covered by unit tests, not belong in this directory.
 
-`computed`, `when`, `throttle`, and `rateLimit` behavior covered by the async/unit specs.
+`computed`, `when`, `throttle`, and `rateLimit` behavior covered by async/unit specs.
 
 ## When to Read This
 
-Read this when you need test-backed behavior for `@tko/computed`, especially `computed`, `when`, `throttle`, and `rateLimit` behavior covered by the async/unit specs.
+Read when need test-backed behavior for `@tko/computed`, especially `computed`, `when`, `throttle`, `rateLimit` from async/unit specs.
 
 ## Status
 
@@ -18,22 +18,22 @@ Read this when you need test-backed behavior for `@tko/computed`, especially `co
 
 ## Behaviors
 
-- `extend({ throttle: timeout })` delays observable change notifications until writes stop, then emits the latest value.
+- `extend({ throttle: timeout })` delays observable change notifications until writes stop, then emits latest value.
   Specs: `packages/computed/spec/asyncBehaviors.ts`
-- `extend({ throttle: timeout })` on a computed delays reevaluation and notification until dependencies stop changing.
-  Notes: The evaluator still runs once synchronously on initial creation.
+- `extend({ throttle: timeout })` on computed delays reevaluation and notification until dependencies stop changing.
+  Notes: Evaluator still runs once synchronously on initial creation.
   Specs: `packages/computed/spec/asyncBehaviors.ts`
-- `extend({ rateLimit: timeout })` delays default change notifications, while `beforeChange` stays immediate and `spectate` sees each write.
+- `extend({ rateLimit: timeout })` delays default change notifications; `beforeChange` stays immediate, `spectate` sees each write.
   Specs: `packages/computed/spec/asyncBehaviors.ts`
-- `rateLimit` supports both `notifyAtFixedRate` and `notifyWhenChangesStop`, and later `rateLimit` settings are used for future notifications.
+- `rateLimit` supports `notifyAtFixedRate` and `notifyWhenChangesStop`; later `rateLimit` settings used for future notifications.
   Specs: `packages/computed/spec/asyncBehaviors.ts`
-- `when(predicate, callback)` runs the callback once, then disposes its subscription.
-  Notes: The predicate may be either a function or an observable. The return value exposes `dispose()` to cancel the pending notification. With deferred updates enabled, the callback runs in a later task.
+- `when(predicate, callback)` runs callback once, then disposes subscription.
+  Notes: Predicate = function or observable. Return value exposes `dispose()` to cancel. With deferred updates, callback runs in later task.
   Specs: `packages/computed/spec/observableUtilsBehaviors.ts`, `packages/computed/spec/asyncBehaviors.ts`
 
 ## Anti-patterns
 
-- Creating observables, computeds, or subscriptions **inside** a computed's evaluator leaks instances. The evaluator re-runs on every dependency change, producing a new un-disposed subscriber each time, so memory and subscriber count grow without bound.
+- Creating observables, computeds, or subscriptions **inside** computed evaluator leaks instances. Evaluator re-runs each dependency change, producing new un-disposed subscriber each time — memory and subscriber count grow unbounded.
   Test sketch:
   ```ts
   const dep = ko.observable(0)
@@ -47,5 +47,5 @@ Read this when you need test-backed behavior for `@tko/computed`, especially `co
   dep(1); expect(instances.length).toBe(2)
   dep(2); expect(instances.length).toBe(3)
   ```
-  Fix: create the observable/subscription once outside the computed, or inside a `LifeCycle` subclass constructor where `this.subscribe` / `this.computed` own disposal.
+  Fix: create observable/subscription once outside computed, or inside `LifeCycle` subclass constructor where `this.subscribe` / `this.computed` own disposal.
   Related specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts` (disposal semantics).
