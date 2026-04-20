@@ -1,9 +1,7 @@
 //
-// ES6 Symbols
+// ES Symbols
 //
 
-export const useSymbols = typeof Symbol === 'function'
-
-export function createSymbolOrString(identifier) {
-  return useSymbols ? Symbol(identifier) : identifier
+export function createSymbolOrString(identifier: string): symbol {
+  return Symbol(identifier)
 }
