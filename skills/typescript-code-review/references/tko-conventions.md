@@ -160,13 +160,10 @@ const textInput = {
 ## Testing
 
 - **New tests**: Mocha + Chai + Sinon (not Jasmine)
-- **Runner**: Karma with Electron (default), Chrome Headless, Firefox Headless
+- **Runner**: Vitest + Playwright (chromium/firefox/webkit)
 - **Test location**: `packages/*/spec/`
 - Coverage target: ~89% statements, ~83% branches
 
 ## Code Style
 
-- Prettier: no semicolons, single quotes, trailing commas: none, 120 char width
-- ESLint: typescript-eslint flat config
-- 2-space indentation for JS/TS, tabs for Makefiles
-- Run `make format-fix && make eslint-fix` before committing
+- Run `bun run format` before committing
