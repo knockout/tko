@@ -1,9 +1,5 @@
 import * as chai from 'chai'
 import sinon from 'sinon'
-// Side-effect import: utils.jsx → jsxClean.ts runs defineOption('jsxCleanBatchSize').
-// defineOption throws if the option is already assigned, so this must run before the
-// `options.jsxCleanBatchSize = 0` line below.
-import '@tko/utils.jsx'
 import { options } from '@tko/utils'
 import { isHappyDom } from '../../../packages/utils/helpers/test-env.ts'
 
@@ -19,20 +15,21 @@ globalThis.sinon = sinon
 //   })
 globalThis.isHappyDom = isHappyDom
 
-// Run JSX node cleanup synchronously in tests. The default 25ms batch
-// (packages/utils.jsx/src/jsxClean.ts) can otherwise fire a timer after a
-// vitest environment (e.g. happy-dom) tears down DOM globals, surfacing as
-// `ReferenceError: Element is not defined` from `cleanNode`. `0` runs
-// cleanup synchronously on detach (no setTimeout).
-options.jsxCleanBatchSize = 0
-
 // Load the knockout build (sets globalThis.ko)
 import '../dist/browser.min.js'
-
-// browser.min.js bundles its own Options instance. Mirror the setting so
-// specs driving bindings through the bundle share the synchronous behavior.
-globalThis.ko.options.jsxCleanBatchSize = 0
 
 // Now import the helper — it needs chai, expect, ko, and beforeEach/afterEach as globals.
 // beforeEach/afterEach come from vitest globals (globals: true in config).
 import './mocha-test-helpers.js'
+
+// Run JSX node cleanup synchronously in tests. The default 25ms batch
+// (packages/utils.jsx/src/jsxClean.ts) can otherwise fire a timer after a
+// vitest environment (e.g. happy-dom) tears down DOM globals, surfacing as
+// `ReferenceError: Element is not defined` from `cleanNode`. `0` runs
+// cleanup synchronously on detach. Using beforeAll so it runs after the
+// defining package's module-load side effects, independent of import order.
+beforeAll(() => {
+  options.jsxCleanBatchSize = 0
+  // browser.min.js bundles its own Options instance.
+  globalThis.ko.options.jsxCleanBatchSize = 0
+})

@@ -142,12 +142,6 @@ const options = new Options()
  * Must be called before applyBindings — setters run side effects at
  * configuration time, not retroactively on already-parsed bindings.
  *
- * Throws if `options[name]` has already been assigned before this call.
- * A pre-assignment usually indicates a load-order bug (writing to an
- * option before the owning package was imported) or a typo on the
- * option name — either should be caught loudly. Import the owning
- * package first, then assign.
- *
  * @example
  * defineOption('strictEquality', {
  *   default: false,
@@ -156,14 +150,7 @@ const options = new Options()
  * // Then: ko.options.strictEquality = true
  */
 export function defineOption<T>(name: string, config: { default: T; set?: (value: T) => void }) {
-  const existing = Object.getOwnPropertyDescriptor(options, name)
-  if (existing && 'value' in existing && !existing.get) {
-    throw new Error(
-      `ko.options.${name} was assigned before defineOption('${name}', ...) ran. ` +
-        `Import the owning package before assigning ko.options.${name}, or check for a typo on the option name.`
-    )
-  }
-  let _value: T = config.default
+  let _value = config.default
   Object.defineProperty(options, name, {
     get() {
       return _value
