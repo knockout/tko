@@ -5,14 +5,7 @@
 // Employing sound techniques to make a faster Knockout foreach binding.
 // --------
 
-import {
-  arrayForEach,
-  cleanNode,
-  options,
-  virtualElements,
-  domData,
-  domNodeIsContainedBy
-} from '@tko/utils'
+import { arrayForEach, cleanNode, options, virtualElements, domData, domNodeIsContainedBy } from '@tko/utils'
 
 import { isObservable, unwrap, observable } from '@tko/observable'
 
