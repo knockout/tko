@@ -13,7 +13,7 @@ leaf package. Public API surface is preserved per phase.
 | C. object.ts | Not started | — | Adopt `Object.hasOwn` (ES2022); delete `@deprecated clonePlainObjectDeep`. |
 | D. memoization.ts | Not started | — | Replace prototype-exposed `{}` store with `Map`. |
 | E. array.ts idioms | Not started | — | Kill `arguments.length > 2 ? bind(thisArg)` pattern; inline native methods; standardise `[]` over `new Array()`. Public export names preserved. |
-| F. (out-of-band) deferError bug | Spawned task | — | `deferError` routes through `safeSetTimeout`, so `options.onError` swallows errors meant to be surfaced. Fixed on a separate branch, not part of this plan. |
+| F. ~~deferError bug~~ | Investigated — **not a bug** | — | Initial read claimed `deferError` routed through `options.onError` incorrectly. Existing spec `packages/utils/spec/onErrorBehaviors.ts` codifies this as intentional: when `onError` is installed, all TKO errors (deferred ones included) flow through it and do not re-escape to `window.onerror`. False positive. |
 
 ## Context
 
