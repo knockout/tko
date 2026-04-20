@@ -1,6 +1,7 @@
 import * as chai from 'chai'
 import sinon from 'sinon'
 import { isHappyDom } from '../../../packages/utils/helpers/test-env.ts'
+import { flushJsxCleanNow } from '../../../packages/utils.jsx/src/jsxClean.ts'
 
 // Set globals that builds/knockout specs and mocha-test-helpers.js expect
 globalThis.chai = chai
@@ -13,6 +14,16 @@ globalThis.sinon = sinon
 //     // ...
 //   })
 globalThis.isHappyDom = isHappyDom
+
+// In happy-dom the global DOM is torn down between files. JsxObserver.detachAndDispose
+// defers node cleanup through a 25ms setTimeout (packages/utils.jsx/src/jsxClean.ts);
+// if that timer fires after teardown, `cleanNode` throws `ReferenceError: Element is
+// not defined`. Drain the queue synchronously after each test to close the race.
+if (isHappyDom()) {
+  afterEach(() => {
+    flushJsxCleanNow()
+  })
+}
 
 // Load the knockout build (sets globalThis.ko)
 import '../dist/browser.min.js'
