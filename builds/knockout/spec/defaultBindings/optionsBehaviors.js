@@ -127,8 +127,8 @@ describe('Binding: Options', function () {
     expectHaveSelectedValues(testNode.childNodes[0], [4])
   })
 
-  // happy-dom gap: <select> auto-selection semantics diverge from real browsers.
-  itBrowserOnly('Should select caption by default and retain selection when adding multiple items', function () {
+  it('Should select caption by default and retain selection when adding multiple items', function (ctx) {
+    if (!isRealBrowser()) return ctx.skip('happy-dom: <select> auto-selection semantics diverge')
     // This test failed in IE<=8 without changes made in #1208
     testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
     var viewModel = {
@@ -146,9 +146,8 @@ describe('Binding: Options', function () {
     expect(testNode.childNodes[0].options[0]).to.equal(captionElement)
   })
 
-  // happy-dom gap: selectedIndex does not follow the selected <option> after innerHTML replacement.
-  // biome-ignore format: keep test-call on a single line for indent consistency
-  itBrowserOnly('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function () {
+  it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function (ctx) {
+    if (!isRealBrowser()) return ctx.skip('happy-dom: selectedIndex does not follow reordered <option>')
     var observable = new ko.observableArray(['A', 'B', 'C']),
       changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues'></select>"
@@ -255,9 +254,8 @@ describe('Binding: Options', function () {
     expectHaveTexts(testNode.childNodes[0], ['', 'A', 'B'])
   })
 
-  // happy-dom gap: element.options[selectedIndex] can return undefined where real browsers return the option.
-  // biome-ignore format: keep test-call on a single line for indent consistency
-  itBrowserOnly('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function () {
+  it('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function (ctx) {
+    if (!isRealBrowser()) return ctx.skip('happy-dom: element.options[selectedIndex] can be undefined')
     var myCaption = ko.observable('Initial caption')
     testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
     ko.applyBindings({ myCaption: myCaption }, testNode)

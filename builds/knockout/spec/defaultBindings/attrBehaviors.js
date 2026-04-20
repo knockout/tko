@@ -9,8 +9,8 @@ describe('Binding: Attr', function () {
     expect(testNode.childNodes[0].getAttribute('second-attribute')).to.deep.equal('true')
   })
 
-  // happy-dom gap: Element.lookupNamespaceURI not implemented.
-  itBrowserOnly('Should be able to set namespaced attribute values', function () {
+  it('Should be able to set namespaced attribute values', function (ctx) {
+    if (!isRealBrowser()) return ctx.skip('happy-dom: Element.lookupNamespaceURI not implemented')
     var model = { myValue: 'first value' }
     testNode.innerHTML = [
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',

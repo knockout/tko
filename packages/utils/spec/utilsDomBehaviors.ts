@@ -5,7 +5,7 @@ import { registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
 import type { KnockoutInstance } from '@tko/builder'
 import { prepareTestNode, restoreAfter } from '../helpers/mocha-test-helpers'
-import { itBrowserOnly } from '../helpers/test-env'
+import { isRealBrowser } from '../helpers/test-env'
 
 const ko: KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
@@ -170,9 +170,8 @@ describe('selectExtensions', () => {
     testNode = prepareTestNode()
   })
 
-  // happy-dom gap: `selected` attribute on an <option> parsed via innerHTML
-  // does not set selectedIndex the way real browsers do.
-  itBrowserOnly('should use loose equality for select value', () => {
+  it('should use loose equality for select value', function (ctx: any) {
+    if (!isRealBrowser()) return ctx.skip('happy-dom: `selected` attribute via innerHTML does not set selectedIndex')
     const select = document.createElement('select')
     select.innerHTML = `
       <option value="42" selected>Forty-two</option>
