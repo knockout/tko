@@ -111,7 +111,7 @@ describe('onError handler', function () {
   })
 
   it('fires on async component errors', async function (ctx) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: setTimeout errors bypass window.onerror')
+    if (isHappyDom()) return ctx.skip('happy-dom: setTimeout errors bypass window.onerror')
     var component = {
       tagName: 'test-onerror',
       template: "<div data-bind='text: name'></div>",
@@ -137,7 +137,7 @@ describe('onError handler', function () {
   })
 
   it('passes through the error instance', async function (ctx) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: setTimeout errors bypass window.onerror')
+    if (isHappyDom()) return ctx.skip('happy-dom: setTimeout errors bypass window.onerror')
     var expectedInstance
     ko.tasks.schedule(function () {
       expectedInstance = new Error('Some error')

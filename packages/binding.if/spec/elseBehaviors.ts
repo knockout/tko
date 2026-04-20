@@ -15,7 +15,7 @@ import { bindings as ifBindings } from '../dist'
 import { bindings as coreBindings } from '@tko/binding.core'
 
 import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
-import { isRealBrowser } from '../../utils/helpers/test-env'
+import { isHappyDom } from '../../utils/helpers/test-env'
 
 describe('else inside an if binding', function () {
   let testNode: HTMLElement
@@ -33,7 +33,7 @@ describe('else inside an if binding', function () {
 
   describe('as <!-- else -->', function () {
     it('is ignored when the condition is true', function (ctx: any) {
-      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
+      if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def' + '</i>'
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: true }, testNode)
@@ -42,7 +42,7 @@ describe('else inside an if binding', function () {
     })
 
     it('shows the else-block when the condition is false', function (ctx: any) {
-      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
+      if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def ' + '</i>'
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: false }, testNode)
@@ -51,7 +51,7 @@ describe('else inside an if binding', function () {
     })
 
     it('toggles between if/else on condition change', function (ctx: any) {
-      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
+      if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def ' + '</i>'
       const x = observable(false)
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)

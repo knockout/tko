@@ -35,7 +35,7 @@ import {
   restoreAfter,
   useMockForTasks
 } from '../../utils/helpers/mocha-test-helpers'
-import { isRealBrowser } from '../../utils/helpers/test-env'
+import { isHappyDom } from '../../utils/helpers/test-env'
 
 describe('Components: Component binding', function () {
   let testComponentName = 'test-component',
@@ -1271,7 +1271,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
 
-      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
+      if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       applyBindings(outerViewModel, testNode)
       expect((testNode.children[0] as HTMLInputElement).innerText.trim()).to.deep.equal(`beep / beep`)
     })
@@ -1408,7 +1408,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
 
-      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
+      if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       applyBindings(outerViewModel, testNode)
       expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`A. B. C.`)
       const em = testNode.children[0].children[0].children[0]
@@ -1430,7 +1430,7 @@ describe('Components: Component binding', function () {
       }
       ViewModel.register('test-component')
 
-      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
+      if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       applyBindings(outerViewModel, testNode)
       expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`B. C. E.`)
       const em = testNode.children[0].children[0].children[0]

@@ -128,7 +128,7 @@ describe('Binding: Options', function () {
   })
 
   it('Should select caption by default and retain selection when adding multiple items', function (ctx) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: <select> auto-selection semantics diverge')
+    if (isHappyDom()) return ctx.skip('happy-dom: <select> auto-selection semantics diverge')
     // This test failed in IE<=8 without changes made in #1208
     testNode.innerHTML = '<select data-bind="options: filterValues, optionsCaption: \'foo\'">'
     var viewModel = {
@@ -147,7 +147,7 @@ describe('Binding: Options', function () {
   })
 
   it('Should trigger a change event when the options selection is populated or changed by modifying the options data (single select)', function (ctx) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: selectedIndex does not follow reordered <option>')
+    if (isHappyDom()) return ctx.skip('happy-dom: selectedIndex does not follow reordered <option>')
     var observable = new ko.observableArray(['A', 'B', 'C']),
       changeHandlerFireCount = 0
     testNode.innerHTML = "<select data-bind='options:myValues'></select>"
@@ -255,7 +255,7 @@ describe('Binding: Options', function () {
   })
 
   it('Should allow the caption to be given by an observable, and update it when the model value changes (without affecting selection)', function (ctx) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: element.options[selectedIndex] can be undefined')
+    if (isHappyDom()) return ctx.skip('happy-dom: element.options[selectedIndex] can be undefined')
     var myCaption = ko.observable('Initial caption')
     testNode.innerHTML = '<select data-bind=\'options:["A", "B"], optionsCaption: myCaption\'></select>'
     ko.applyBindings({ myCaption: myCaption }, testNode)

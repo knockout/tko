@@ -16,7 +16,7 @@ import { options } from '@tko/utils'
 import { bindings as coreBindings } from '../dist'
 
 import { nodeText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
-import { isRealBrowser } from '../../utils/helpers/test-env'
+import { isHappyDom } from '../../utils/helpers/test-env'
 
 function expectArrayEqual(actual: Array<unknown>, expected: Array<unknown>) {
   expect(actual.length).to.equal(expected.length)
@@ -439,7 +439,7 @@ describe('Binding: Value', function () {
     })
 
     it('When size > 1, should unselect all options when value is undefined, null, or ""', function (ctx: any) {
-      if (!isRealBrowser()) return ctx.skip('happy-dom: size>1 <select> does not honor selectedIndex = -1')
+      if (isHappyDom()) return ctx.skip('happy-dom: size>1 <select> does not honor selectedIndex = -1')
       const myObservable = observable('B')
       testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       applyBindings({ myObservable: myObservable }, testNode)

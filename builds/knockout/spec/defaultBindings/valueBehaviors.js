@@ -407,7 +407,7 @@ describe('Binding: Value', function () {
     })
 
     it('When size > 1, should unselect all options when value is undefined, null, or \"\"', function (ctx) {
-      if (!isRealBrowser()) return ctx.skip('happy-dom: size>1 <select> does not honor selectedIndex = -1')
+      if (isHappyDom()) return ctx.skip('happy-dom: size>1 <select> does not honor selectedIndex = -1')
       var observable = new ko.observable('B')
       testNode.innerHTML = '<select size=\'2\' data-bind=\'options:["A", "B"], value:myObservable\'></select>'
       ko.applyBindings({ myObservable: observable }, testNode)

@@ -26,7 +26,7 @@ import $ from 'jquery'
 
 import { assert } from 'chai'
 
-import { isRealBrowser } from '../../utils/helpers/test-env'
+import { isHappyDom } from '../../utils/helpers/test-env'
 
 beforeEach(function () {
   const provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
@@ -1028,7 +1028,7 @@ describe('focus', function () {
   })
 
   it('does not preserves primitive targets when re-ordering', async function (ctx: any) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const list = observableArray(['a', 'b', 'c'])
     applyBindings(list, $target[0])
     $target.find(':input').first().focus()
@@ -1041,7 +1041,7 @@ describe('focus', function () {
   })
 
   it('preserves objects when re-ordering', async function (ctx: any) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1055,7 +1055,7 @@ describe('focus', function () {
   })
 
   it('preserves objects when re-ordering multiple identical', async function (ctx: any) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1072,7 +1072,7 @@ describe('focus', function () {
   })
 
   it('preserves objects when re-ordering multiple identical, alt', async function (ctx: any) {
-    if (!isRealBrowser()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])

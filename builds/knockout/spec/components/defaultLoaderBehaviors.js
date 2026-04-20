@@ -284,7 +284,7 @@ describe('Components: Default loader', function () {
       })
 
       it('Can be configured as the ID of a <textarea> element', function (ctx) {
-        if (!isRealBrowser()) return ctx.skip('happy-dom: <textarea> content parsing differs')
+        if (isHappyDom()) return ctx.skip('happy-dom: <textarea> content parsing differs')
         // Special case: the textarea's value should be interpreted as a markup string
         return testTemplateFromElement('<textarea id="my-textarea-elem">{0}</textarea>', 'my-textarea-elem')
       })
@@ -308,7 +308,7 @@ describe('Components: Default loader', function () {
       })
 
       it('Can be configured as a <textarea> element instance', function (ctx) {
-        if (!isRealBrowser()) return ctx.skip('happy-dom: <textarea> content parsing differs')
+        if (isHappyDom()) return ctx.skip('happy-dom: <textarea> content parsing differs')
         // Special case: the textarea's value should be interpreted as a markup string
         return testTemplateFromElement('<textarea>{0}</textarea>', /* elementId */ null)
       })
