@@ -1,43 +1,42 @@
-import { cleanNode } from '@tko/utils'
+import { cleanNode, options } from '@tko/utils'
 
 const DELAY_MS = 25
-const MAX_CLEAN_AT_ONCE = 1000
 const cleanNodeQueue = new Array()
 let cleanNodeTimeoutID: ReturnType<typeof setTimeout> | null = null
 
 export function queueCleanNode(node) {
   cleanNodeQueue.push(node)
-  triggerCleanTimeout()
-}
-
-function triggerCleanTimeout() {
-  if (!cleanNodeTimeoutID && cleanNodeQueue.length) {
-    cleanNodeTimeoutID = setTimeout(flushCleanQueue, DELAY_MS)
+  if (options.jsxCleanBatchSize === 0) {
+    flushAll()
+  } else {
+    scheduleBatch()
   }
 }
 
-function drainBatch() {
-  const nodes = cleanNodeQueue.splice(0, MAX_CLEAN_AT_ONCE)
+function scheduleBatch() {
+  if (!cleanNodeTimeoutID && cleanNodeQueue.length) {
+    cleanNodeTimeoutID = setTimeout(flushBatch, DELAY_MS)
+  }
+}
+
+function flushBatch() {
+  cleanNodeTimeoutID = null
+  const nodes = cleanNodeQueue.splice(0, options.jsxCleanBatchSize)
   for (const node of nodes) {
     cleanNode(node)
   }
+  scheduleBatch()
 }
 
-function flushCleanQueue() {
-  cleanNodeTimeoutID = null
-  drainBatch()
-  triggerCleanTimeout()
-}
-
-// Drain the pending cleanup queue synchronously. Safe to call in any
-// environment; useful for test teardown where the default 25ms batch can
-// otherwise fire after the test runtime has torn down DOM globals.
-export function flushJsxCleanNow() {
+function flushAll() {
   if (cleanNodeTimeoutID !== null) {
     clearTimeout(cleanNodeTimeoutID)
     cleanNodeTimeoutID = null
   }
   while (cleanNodeQueue.length) {
-    drainBatch()
+    const nodes = cleanNodeQueue.splice(0, cleanNodeQueue.length)
+    for (const node of nodes) {
+      cleanNode(node)
+    }
   }
 }
