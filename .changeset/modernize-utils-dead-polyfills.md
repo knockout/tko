@@ -1,6 +1,7 @@
 ---
 "@tko/utils": patch
 "@tko/utils.parser": patch
+"@tko/observable": patch
 ---
 
 Drop dead polyfill probes from `@tko/utils`
@@ -8,9 +9,9 @@ Drop dead polyfill probes from `@tko/utils`
 Removes runtime feature detection for capabilities that all supported runtimes
 (modern browsers, Node, Bun, happy-dom) already expose unconditionally:
 
-- `functionSupportsLengthOverwrite` — `Object.defineProperty(fn, 'length', …)`
-  has worked since IE9. `overwriteLengthPropertyIfSupported` now calls
-  `defineProperty` directly.
+- `functionSupportsLengthOverwrite` + `overwriteLengthPropertyIfSupported` —
+  `Object.defineProperty(fn, 'length', …)` has worked since IE9. Call sites
+  in `@tko/observable` now invoke `Object.defineProperty` directly.
 - `useSymbols` — `Symbol` is always defined; `createSymbolOrString` always
   returns a `Symbol`.
 - `stringTrim` — `String.prototype.trim` is always defined; simplified to

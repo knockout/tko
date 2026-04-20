@@ -2,7 +2,7 @@
 //  Observable values
 //  ---
 //
-import { options, overwriteLengthPropertyIfSupported } from '@tko/utils'
+import { options } from '@tko/utils'
 
 import * as dependencyDetection from './dependencyDetection'
 import { deferUpdates } from './defer'
@@ -103,7 +103,7 @@ export function observable<T = any>(initialValue?: T): Observable {
     }
   }
 
-  overwriteLengthPropertyIfSupported(Observable as any, { value: undefined })
+  Object.defineProperty(Observable, 'length', { value: undefined })
 
   Observable[LATEST_VALUE] = initialValue
 
