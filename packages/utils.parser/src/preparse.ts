@@ -91,7 +91,7 @@ export default function parseObjectLiteral(objectLiteralString) {
       const match = toks[i - 1].match(divisionLookBehind)
       if (match && !keywordRegexLookBehind[match[0]]) {
         // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
-        str = str.substr(str.indexOf(tok) + 1)
+        str = str.substring(str.indexOf(tok) + 1)
         toks = str.match(bindingToken)
         i = -1
         // Continue with just the slash
