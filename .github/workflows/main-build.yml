@@ -30,11 +30,16 @@ jobs:
       - name: Verify ESM extensions
         run: bun run verify:esm
 
-      - name: Run tests
-        run: bunx vitest run
+      - name: Run tests (browser matrix)
+        run: bunx vitest run --project browser
         env:
           HOME: /root
           VITEST_BROWSERS: chromium,firefox,webkit
+
+      - name: Run tests (cli-happy-dom)
+        run: bunx vitest run --project cli-happy-dom
+        env:
+          HOME: /root
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7

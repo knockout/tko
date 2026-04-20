@@ -75,34 +75,29 @@ export function triggerEvent(element: Element, eventType: string): void {
 
   if (!options.useOnlyNativeEvents && options.jQuery && !useClickWorkaround) {
     options.jQuery(element).trigger(eventType)
-  } else if (typeof document.createEvent === 'function') {
-    if (typeof element.dispatchEvent === 'function') {
-      const eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'
-      const event = document.createEvent(eventCategory)
-      ;(event as any).initEvent(
-        eventType,
-        true,
-        true,
-        options.global,
-        0,
-        0,
-        0,
-        0,
-        0,
-        false,
-        false,
-        false,
-        false,
-        0,
-        element
-      )
-      element.dispatchEvent(event)
-    } else {
-      throw new Error("The supplied element doesn't support dispatchEvent")
-    }
-  } else if (useClickWorkaround && hasClick(element)) {
-    element.click()
-  } else {
-    throw new Error("Browser doesn't support triggering events")
+    return
   }
+
+  if (typeof element.dispatchEvent !== 'function') {
+    if (useClickWorkaround && hasClick(element)) {
+      element.click()
+      return
+    }
+    throw new Error("The supplied element doesn't support dispatchEvent")
+  }
+
+  const eventCategory = knownEventTypesByEventName[eventType] || 'HTMLEvents'
+  const view = options.global as Window | undefined
+  let event: Event
+  if (eventCategory === 'MouseEvents' && typeof MouseEvent === 'function') {
+    // Preserve the legacy initEvent(...) behavior of passing the element itself
+    // as relatedTarget — handlers for mouseover/mouseout/mouseenter/mouseleave
+    // observe event.relatedTarget.
+    event = new MouseEvent(eventType, { bubbles: true, cancelable: true, view, relatedTarget: element })
+  } else if (eventCategory === 'UIEvents' && typeof KeyboardEvent === 'function') {
+    event = new KeyboardEvent(eventType, { bubbles: true, cancelable: true, view })
+  } else {
+    event = new Event(eventType, { bubbles: true, cancelable: true })
+  }
+  element.dispatchEvent(event)
 }
