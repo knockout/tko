@@ -153,6 +153,21 @@ Significant changes should have a plan file in `plans/` before implementation
 begins. Plans document the context, approach, and verification steps. Review
 existing plans in that directory for format examples.
 
+## AI PR review
+
+TKO uses AI reviewers in layered roles — see `plans/dark-factory.md` for the
+broader context.
+
+- **CodeRabbit** — primary, auto-reviews every non-draft PR against `main`.
+  Config in `.coderabbit.yaml`. Use `@coderabbitai` commands to re-request
+  or chat.
+- **Codex (chatgpt-codex-connector)** — secondary, adversarial / validation.
+  Triggered on demand for deep reviews or second opinions. Leave the default
+  auto-review on if/when you want convergence confirmation on risky PRs.
+- **GitHub Copilot** — **disabled** at the repo level. It flagged stale and
+  misdirected findings on prior PRs and the signal-to-noise wasn't worth it.
+  Do not re-enable without a specific reason.
+
 ## Agent-First Documentation
 
 AI coding agents are first-class citizens of TKO. The docs site serves both
