@@ -46,9 +46,6 @@ describe('jsxClean queue', function () {
 
     it('does not schedule a timer', function () {
       queueCleanNode(makeNode())
-      // If a timer had been scheduled, advancing the fake clock would fire it
-      // and re-invoke the dispose callback — but the dispose callback was
-      // already consumed synchronously, and the node is no longer queued.
       clock.tick(100)
       assert.lengthOf(cleaned, 1)
     })

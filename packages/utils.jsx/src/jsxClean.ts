@@ -11,13 +11,9 @@ declare module '@tko/utils' {
   }
 }
 
-/**
- * Register jsxCleanBatchSize: the maximum number of JSX nodes to clean per
- * 25ms batch tick. Set to `0` to run cleanup synchronously on detach (no
- * setTimeout). Useful in test environments that tear down DOM globals
- * between files, where a pending 25ms timer can fire against a dead
- * global and throw.
- */
+// `0` runs cleanup synchronously on detach. Test environments that tear
+// down DOM globals between files use that to avoid a pending 25ms timer
+// firing against a dead global.
 defineOption('jsxCleanBatchSize', { default: 1000 })
 
 export function queueCleanNode(node) {
@@ -49,9 +45,10 @@ function flushAll() {
     clearTimeout(cleanNodeTimeoutID)
     cleanNodeTimeoutID = null
   }
-  // `while` covers re-enqueues from cleanNode side effects — no batching
-  // here since there's no yield to pause between.
+  // Outer `while` is for re-enqueues triggered by cleanNode side effects.
   while (cleanNodeQueue.length) {
-    cleanNode(cleanNodeQueue.shift()!)
+    for (const node of cleanNodeQueue.splice(0)) {
+      cleanNode(node)
+    }
   }
 }
