@@ -110,7 +110,8 @@ describe('onError handler', function () {
     expect(windowOnErrorCount).to.equal(0)
   })
 
-  it('fires on async component errors', async function () {
+  it('fires on async component errors', async function (ctx) {
+    if (isHappyDom()) return ctx.skip('happy-dom: setTimeout errors bypass window.onerror')
     var component = {
       tagName: 'test-onerror',
       template: "<div data-bind='text: name'></div>",
@@ -135,7 +136,8 @@ describe('onError handler', function () {
     expect(windowOnErrorCount).to.equal(1)
   })
 
-  it('passes through the error instance', async function () {
+  it('passes through the error instance', async function (ctx) {
+    if (isHappyDom()) return ctx.skip('happy-dom: setTimeout errors bypass window.onerror')
     var expectedInstance
     ko.tasks.schedule(function () {
       expectedInstance = new Error('Some error')

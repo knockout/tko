@@ -6,7 +6,6 @@
 import {
   addDisposeCallback,
   arrayForEach,
-  createSymbolOrString,
   domNodeIsAttachedToDocument,
   extend,
   options,
@@ -28,7 +27,7 @@ import {
 
 import type { Observable, Subscribable } from '@tko/observable'
 
-const computedState: symbol = createSymbolOrString('_state')
+const computedState: symbol = Symbol('_state')
 const DISPOSED_STATE = {
   dependencyTracking: null,
   dependenciesCount: 0,

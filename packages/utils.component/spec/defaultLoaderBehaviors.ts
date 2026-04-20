@@ -5,6 +5,7 @@ import components from '../dist'
 import { expect } from 'chai'
 import sinon from 'sinon'
 import { expectContainText, restoreAfter, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
+import { isHappyDom } from '../../utils/helpers/test-env'
 
 describe('Components: Default loader', function () {
   const testComponentName = 'test-component'
@@ -279,7 +280,8 @@ describe('Components: Default loader', function () {
         testTemplateFromElement('<script id="my-script-elem" type="text/html">{0}</script>', 'my-script-elem')
       })
 
-      it('Can be configured as the ID of a <textarea> element', function () {
+      it('Can be configured as the ID of a <textarea> element', function (ctx: any) {
+        if (isHappyDom()) return ctx.skip('happy-dom: <textarea> content parsing differs')
         testTemplateFromElement('<textarea id="my-textarea-elem">{0}</textarea>', 'my-textarea-elem')
       })
 
@@ -298,7 +300,8 @@ describe('Components: Default loader', function () {
         testTemplateFromElement('<script type="text/html">{0}</script>', null)
       })
 
-      it('Can be configured as a <textarea> element instance', function () {
+      it('Can be configured as a <textarea> element instance', function (ctx: any) {
+        if (isHappyDom()) return ctx.skip('happy-dom: <textarea> content parsing differs')
         testTemplateFromElement('<textarea>{0}</textarea>', null)
       })
 

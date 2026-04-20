@@ -28,14 +28,17 @@ export default defineConfig({
       },
       sidebar: [
         { label: 'Introduction', slug: 'index' },
+        { label: 'Getting Started', autogenerate: { directory: 'getting-started' } },
         { label: 'Examples', slug: 'examples' },
-        { label: 'Bindings', autogenerate: { directory: 'bindings' } },
-        { label: 'Observables', autogenerate: { directory: 'observables' } },
-        { label: 'Computed', autogenerate: { directory: 'computed' } },
-        { label: 'Components', autogenerate: { directory: 'components' } },
-        { label: 'Binding Context', autogenerate: { directory: 'binding-context' } },
-        { label: 'Advanced', autogenerate: { directory: 'advanced' } },
-        { label: 'Knockout 3 → 4 Guide', slug: '3to4' }
+        { label: 'Bindings', collapsed: true, autogenerate: { directory: 'bindings' } },
+        { label: 'Observables', collapsed: true, autogenerate: { directory: 'observables' } },
+        { label: 'Computed', collapsed: true, autogenerate: { directory: 'computed' } },
+        { label: 'Components', collapsed: true, autogenerate: { directory: 'components' } },
+        { label: 'Binding Context', collapsed: true, autogenerate: { directory: 'binding-context' } },
+        { label: 'Advanced', collapsed: true, autogenerate: { directory: 'advanced' } },
+        { label: 'API Reference', slug: 'api' },
+        { label: 'Knockout 3 → 4 Guide', slug: '3to4' },
+        { label: 'History', slug: 'history' }
       ]
     })
   ]

@@ -260,10 +260,6 @@ describe('Binding attribute syntax', function () {
     ko.applyBindings({}, testNode)
 
     var allowedProperties = ['$parents', '$root', 'ko', '$rawData', '$data', '$parentContext', '$parent']
-    if (ko.utils.createSymbolOrString('') === '') {
-      allowedProperties.push('_subscribable')
-      allowedProperties.push('_ancestorBindingInfo')
-    }
     ko.utils.objectForEach(ko.contextFor(testNode.childNodes[0].childNodes[0]), function (prop) {
       expect(allowedProperties).to.contain(prop)
     })
