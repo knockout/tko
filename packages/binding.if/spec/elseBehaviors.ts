@@ -15,6 +15,7 @@ import { bindings as ifBindings } from '../dist'
 import { bindings as coreBindings } from '@tko/binding.core'
 
 import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
+import { isRealBrowser } from '../../utils/helpers/test-env'
 
 describe('else inside an if binding', function () {
   let testNode: HTMLElement
@@ -31,31 +32,34 @@ describe('else inside an if binding', function () {
   })
 
   describe('as <!-- else -->', function () {
-    it('is ignored when the condition is true', function () {
+    it('is ignored when the condition is true', function (ctx: any) {
+      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def' + '</i>'
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: true }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText.trim()).to.equal('abc')
+      expect(testNode.innerText).to.equal('abc')
     })
 
-    it('shows the else-block when the condition is false', function () {
+    it('shows the else-block when the condition is false', function (ctx: any) {
+      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def ' + '</i>'
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: false }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText.trim()).to.equal('def')
+      expect(testNode.innerText).to.equal('def')
     })
 
-    it('toggles between if/else on condition change', function () {
+    it('toggles between if/else on condition change', function (ctx: any) {
+      if (!isRealBrowser()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def ' + '</i>'
       const x = observable(false)
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: x }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText.trim()).to.equal('def')
+      expect(testNode.innerText).to.equal('def')
       x(true)
-      expect(testNode.innerText.trim()).to.equal('abc')
+      expect(testNode.innerText).to.equal('abc')
     })
   })
 })
