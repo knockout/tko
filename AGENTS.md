@@ -105,6 +105,13 @@ packages/example/
 Inter-package dependencies use `@tko/package-name` and are resolved via
 npm workspaces.
 
+### Configurable runtime options (`ko.options.*`)
+
+Register package-owned options via `defineOption` from `@tko/utils`, not as
+fields on the core `Options` class. See
+[`tko.io/public/agents/options.md`](tko.io/public/agents/options.md) for the
+pattern and canonical example.
+
 ## CI/CD
 
 GitHub Actions workflows (`.github/workflows/`):

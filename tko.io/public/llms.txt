@@ -17,6 +17,7 @@
 - /agents/glossary.md — domain terms, concepts, packages
 - /agents/testing.md — how to run and verify TKO code
 - /agents/contract.md — state/binding/DOM architecture
+- /agents/options.md — ko.options.* — when to use defineOption vs core Options fields
 - /agents/verified-behaviors/index.md — test-backed behavior contracts
 - /agents/sample-tsx.html — minimal browser TSX scaffold
 - /examples/ — interactive self-contained HTML examples
