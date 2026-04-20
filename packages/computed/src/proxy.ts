@@ -54,7 +54,7 @@ export function proxy(object) {
       object[prop] = value
       return true
     },
-    deleteProperty(property) {
+    deleteProperty(_target, property) {
       delete mirror[property as any]
       return delete object[property as any]
     },

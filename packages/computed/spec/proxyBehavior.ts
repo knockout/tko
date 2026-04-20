@@ -106,4 +106,19 @@ describe('Proxy', function () {
     }
     expect(p.x2).to.equal(16)
   })
+
+  it('deletes properties from both the proxy and the underlying object', function () {
+    const x: { a; b? } = { a: 1, b: 2 }
+    const p = proxy(x)
+    expect('b' in p).to.equal(true)
+    expect(x.b).to.equal(2)
+
+    const result = delete p.b
+    expect(result).to.equal(true)
+    expect('b' in p).to.equal(false)
+    expect('b' in x).to.equal(false)
+    // Remaining properties are untouched.
+    expect(p.a).to.equal(1)
+    expect(x.a).to.equal(1)
+  })
 })
