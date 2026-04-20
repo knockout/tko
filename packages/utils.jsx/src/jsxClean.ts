@@ -16,28 +16,28 @@ function triggerCleanTimeout() {
   }
 }
 
-function flushCleanQueue() {
-  cleanNodeTimeoutID = null
+function drainBatch() {
   const nodes = cleanNodeQueue.splice(0, MAX_CLEAN_AT_ONCE)
   for (const node of nodes) {
     cleanNode(node)
   }
+}
+
+function flushCleanQueue() {
+  cleanNodeTimeoutID = null
+  drainBatch()
   triggerCleanTimeout()
 }
 
-// Drain the pending cleanup queue synchronously. Intended for test teardown:
-// the default 25ms batch can otherwise fire after a test environment (e.g.
-// happy-dom) has torn down DOM globals, producing spurious `Element is not
-// defined` errors after the run has finished.
+// Drain the pending cleanup queue synchronously. Safe to call in any
+// environment; useful for test teardown where the default 25ms batch can
+// otherwise fire after the test runtime has torn down DOM globals.
 export function flushJsxCleanNow() {
   if (cleanNodeTimeoutID !== null) {
     clearTimeout(cleanNodeTimeoutID)
     cleanNodeTimeoutID = null
   }
   while (cleanNodeQueue.length) {
-    const nodes = cleanNodeQueue.splice(0, MAX_CLEAN_AT_ONCE)
-    for (const node of nodes) {
-      cleanNode(node)
-    }
+    drainBatch()
   }
 }

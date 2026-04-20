@@ -15,15 +15,14 @@ globalThis.sinon = sinon
 //   })
 globalThis.isHappyDom = isHappyDom
 
-// In happy-dom the global DOM is torn down between files. JsxObserver.detachAndDispose
-// defers node cleanup through a 25ms setTimeout (packages/utils.jsx/src/jsxClean.ts);
-// if that timer fires after teardown, `cleanNode` throws `ReferenceError: Element is
-// not defined`. Drain the queue synchronously after each test to close the race.
-if (isHappyDom()) {
-  afterEach(() => {
-    flushJsxCleanNow()
-  })
-}
+// JsxObserver.detachAndDispose defers node cleanup through a 25ms setTimeout
+// (packages/utils.jsx/src/jsxClean.ts). In environments that tear down DOM globals
+// between files (e.g. happy-dom), a timer still pending at teardown fires against
+// a dead global and throws `ReferenceError: Element is not defined`. Drain after
+// each test unconditionally — no-op when the queue is empty.
+afterEach(() => {
+  flushJsxCleanNow()
+})
 
 // Load the knockout build (sets globalThis.ko)
 import '../dist/browser.min.js'
