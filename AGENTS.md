@@ -223,7 +223,35 @@ Avoid scope creep. If an improvement would balloon the PR, file a follow-up issu
 
 ## Review Your Own Change Adversarially
 
-Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises. Get an independent second pass (a colleague, a subagent where available) on changes that touch framework internals, test coverage, public APIs, or docs the whole team relies on.
+Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises.
+
+**Adversarial review is mandatory, not optional, for anything that changes package behavior, public API, test coverage, docs the team relies on, CI workflows, or build/config that affects the matrix.** A single pair of eyes (yours) is not enough in a dark factory. If small teams plus agents are going to maintain what once took a big team, the missing human reviewer has to be replaced by a second agent that was not told what "good" looks like and is asked only "where is this wrong?".
+
+In scope (always run the pass):
+- Code changes in `packages/*` or `builds/*`
+- Test additions, deletions, or env changes
+- Public `@tko/*` API surface
+- Docs in `tko.io/public/` and agent-facing files (`llms.txt`, `agents/*`)
+- CI workflows, `tools/build.ts`, `vitest.config.ts`, `biome.json`
+- Changesets and commit messages that land a PR
+
+Out of scope (proportionality):
+- Typos, whitespace, comment corrections that do not change behavior or public surface
+- The adversarial review itself — its report is not an artefact that needs its own review. One pass per change closes the loop.
+
+How to run the pass, every time it is in scope:
+
+- Spawn a fresh subagent (`Agent` tool, specialized `subagent_type` when one fits, otherwise `Explore`). Do **not** let the agent that produced the change also sign it off — that is a null check.
+- Brief the reviewer with the **artefact (diff or file) and the claim it makes** ("this PR does X"). Do **not** include your reasoning for why it works, the commit message you intend to write, or the PR title. Anchoring the reviewer to your conclusion defeats the pass.
+- Prompt it to enumerate likely failure modes *before* reviewing for correctness (e.g. "list the three most likely ways this could break, then check each"). Ask: "where is this wrong, what would break, what would mislead a future reader?" Bias toward flagging.
+- Apply the failure-modes list below *and* the domain-specific checklist for the artefact type (docs → "Never ship docs that reference things that don't exist"; tests → disposal leaks + env assumptions; public API → backwards-compat + changeset; etc.).
+- If the reviewer returns a finding, **verify the specific claim** (re-run the command, read the named file, grep for the named symbol) — do not rely on your own prior reasoning to dismiss it. Subagents produce false positives, so verification is defensive, not a licence to override. If after verification you still believe the finding is wrong, record the reasoning in the PR description or as a code comment so a future reader (or maintainer) can judge it; do not silently reject.
+- If the pass surfaces a finding that belongs in a separate PR, file a follow-up or spawn a task rather than expanding the current change — keep "Keep PRs focused" intact.
+- Record that the pass was run. A single line in the PR description is enough:
+  `Adversarial pass: <reviewer name or subagent_type>. Result: clean` or
+  `Adversarial pass: <reviewer>. Flagged <N>: <summary>. Resolved: <how>.`
+  Without an audit trail, compliance is unverifiable and the rule is trivially gamed.
+- Only after the pass returns clean (or returns findings that you have verified and addressed, deferred to a follow-up, or consciously rejected with documented reasoning) may you declare the work done.
 
 This is the ceiling on "Always Improve": that section pushes toward *more* in a PR; this one pushes toward *scrutiny* of what's in it. Use both — improve in scope, audit the scope itself here.
 
