@@ -2,32 +2,15 @@
 # Codex (chatgpt-codex-connector) is kept as a secondary, adversarial
 # reviewer for deep reviews on demand. GitHub Copilot auto-review is
 # disabled at the repo level.
-
-# See https://docs.coderabbit.ai/guides/configure-coderabbit for the
-# full schema.
-
-language: "en-US"
-early_access: false
+#
+# Schema: https://docs.coderabbit.ai/guides/configure-coderabbit
+# Anything not set here uses CodeRabbit's default.
 
 reviews:
-  profile: "chill"
-  request_changes_workflow: false
-  high_level_summary: true
   poem: false
-  review_status: true
-  collapse_walkthrough: false
 
-  auto_review:
-    enabled: true
-    drafts: false
-    base_branches:
-      - main
-
-  # TKO-specific context. The architectural carve-outs live in AGENTS.md
-  # and tko.io/public/agents/. Surface them to CodeRabbit so it doesn't
-  # flag them as anti-patterns.
   path_instructions:
-    - path: "packages/**/*.ts"
+    - path: "packages/*/src/**/*.ts"
       instructions: |
         TKO is a TypeScript MVVM framework with intentional architectural
         choices that can look like anti-patterns but are not:
@@ -44,12 +27,9 @@ reviews:
           `defineOption` from @tko/utils inside the owning package; see
           tko.io/public/agents/options.md.
 
-    - path: "packages/**/spec/**/*.ts"
+    - path: "packages/*/spec/**/*.ts"
       instructions: |
         Tests use Mocha-style describe/it with Chai assertions and Sinon
         fake timers/spies. Vitest runs them with globals enabled. Bare
         `it()` and `describe()` are expected; they come from vitest's
         global injection, not a missing import.
-
-chat:
-  auto_reply: true
