@@ -1,6 +1,10 @@
 import * as chai from 'chai'
 import sinon from 'sinon'
-import options from '../../../packages/utils/src/options.ts'
+// Side-effect import: utils.jsx → jsxClean.ts runs defineOption('jsxCleanBatchSize').
+// defineOption throws if the option is already assigned, so this must run before the
+// `options.jsxCleanBatchSize = 0` line below.
+import '@tko/utils.jsx'
+import { options } from '@tko/utils'
 import { isHappyDom } from '../../../packages/utils/helpers/test-env.ts'
 
 // Set globals that builds/knockout specs and mocha-test-helpers.js expect
@@ -19,8 +23,7 @@ globalThis.isHappyDom = isHappyDom
 // (packages/utils.jsx/src/jsxClean.ts) can otherwise fire a timer after a
 // vitest environment (e.g. happy-dom) tears down DOM globals, surfacing as
 // `ReferenceError: Element is not defined` from `cleanNode`. `0` runs
-// cleanup synchronously on detach (no setTimeout). Applied to the source
-// options singleton used by @tko/* source imports (e.g. packages/utils.jsx/spec).
+// cleanup synchronously on detach (no setTimeout).
 options.jsxCleanBatchSize = 0
 
 // Load the knockout build (sets globalThis.ko)
