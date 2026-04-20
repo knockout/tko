@@ -9,7 +9,6 @@ export * from './async'
 export * from './error'
 export * from './object'
 export * from './string'
-export * from './symbol'
 export * from './css'
 export { default as options, defineOption, Options } from './options'
 

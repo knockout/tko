@@ -1,4 +1,4 @@
-import { stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
+import { safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
 
 import { unwrap, dependencyDetection } from '@tko/observable'
 
@@ -82,7 +82,7 @@ export class value extends BindingHandler {
     // This is useful, for example, to catch "keydown" events after the browser has updated the control
     // (otherwise, selectExtensions.readValue(this) will receive the control's value *before* the key event)
     let handler = this.valueUpdateHandler.bind(this)
-    if (stringStartsWith(eventName, 'after')) {
+    if (eventName.startsWith('after')) {
       handler = () => {
         // The elementValueBeforeEvent variable is non-null *only* during the brief gap between
         // a keyX event firing and the valueUpdateHandler running, which is scheduled to happen

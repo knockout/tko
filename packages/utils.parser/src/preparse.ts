@@ -1,5 +1,3 @@
-import { stringTrim } from '@tko/utils'
-
 /* eslint no-cond-assign: 0 */
 
 // The following regular expressions will be used to split an object-literal string into tokens
@@ -42,7 +40,7 @@ const keywordRegexLookBehind = { in: 1, return: 1, typeof: 1 }
  */
 export default function parseObjectLiteral(objectLiteralString) {
   // Trim leading and trailing spaces from the string
-  let str = stringTrim(objectLiteralString)
+  let str = String(objectLiteralString ?? '').trim()
 
   // Trim braces '{' surrounding the whole object literal
   if (str.charCodeAt(0) === 123) str = str.slice(1, -1)
