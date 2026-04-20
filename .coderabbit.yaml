@@ -8,28 +8,3 @@
 
 reviews:
   poem: false
-
-  path_instructions:
-    - path: "packages/*/src/**/*.ts"
-      instructions: |
-        TKO is a TypeScript MVVM framework with intentional architectural
-        choices that can look like anti-patterns but are not:
-        - Factory-function-as-constructor (`Object.setPrototypeOf`, `.fn`
-          prototype wiring) is the core primitive pattern for observables,
-          computeds, subscribables. Do NOT flag.
-        - Module-level side effects (prototype chain wiring, Symbol
-          registration, defineOption calls) are essential, not a smell.
-        - Pervasive `any` is accepted tech debt — flag only in net-new
-          code where a better type is obvious.
-        - `prefer-const` is off in this repo; `let` for never-reassigned
-          vars is fine.
-        - For runtime options (`ko.options.*`), the pattern is
-          `defineOption` from @tko/utils inside the owning package; see
-          tko.io/public/agents/options.md.
-
-    - path: "packages/*/spec/**/*.ts"
-      instructions: |
-        Tests use Mocha-style describe/it with Chai assertions and Sinon
-        fake timers/spies. Vitest runs them with globals enabled. Bare
-        `it()` and `describe()` are expected; they come from vitest's
-        global injection, not a missing import.
