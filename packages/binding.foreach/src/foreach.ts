@@ -24,7 +24,7 @@ import { contextFor, applyBindingsToDescendants, AsyncBindingHandler } from '@tk
 import type { AllBindings } from '@tko/bind'
 
 //      Utilities
-const MAX_LIST_SIZE = 9007199254740991
+const MAX_LIST_SIZE = Number.MAX_SAFE_INTEGER
 
 // from https://github.com/jonschlinkert/is-plain-object
 function isPlainObject(o): o is Record<string, any> {
