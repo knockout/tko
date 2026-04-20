@@ -176,6 +176,27 @@ changes — update **both** the Starlight docs (for humans) and the agent guide
 (for agents). The agent guide should be token-efficient: dense, code-first,
 minimal prose.
 
+### Never ship docs that reference things that don't exist on the target branch
+
+Before including a doc file — especially any untracked/generated file you find
+in the working tree — verify every package, export, class, function, spec path,
+or URL it names actually exists on the branch you are merging into (normally
+`main`).
+
+Mandatory checks before staging a docs file:
+
+1. `git ls-files <path>` — is it tracked? If not, where did it come from?
+   - If it was emitted by a generator (e.g. `tko.io/scripts/generate-verified-behaviors.mjs`), re-run the generator on a clean checkout of the target branch and diff. If the generator does not produce it, it is stale — do not ship it.
+   - If it was hand-written on a different branch, confirm that branch has merged into the target. `git log --all -- <path>` and `git branch --contains <commit>` will show where it lives.
+2. For each package name in the doc: `ls packages/<name>` and confirm a matching `package.json`. Orphan `@tko/*` references mislead both humans and downstream agents.
+3. For each spec path in the doc: the file must exist at the named location.
+4. For each external URL in the doc: it is OK to trust user-provided URLs, but do not invent them.
+
+The failure mode is shipping a doc that promises behaviour the code does not
+deliver. That is worse than no doc at all — it poisons every future reader
+(human or agent) that trusts the docs as a contract. When in doubt, leave it
+out and open a follow-up.
+
 ## Docs Verification
 
 When validating `tko.io` documentation changes with the local docs site:
@@ -217,6 +238,7 @@ Failure modes specific to a published low-level framework, worth probing every t
 - Patching the symptom, not the root cause
 - Unrelated refactors or opportunistic redesigns that balloon the PR (the "Always Improve" bar is *small, low-risk, in-scope* fixes — anything larger belongs in its own PR)
 - Silent assumptions about environment, timing, or ordering
+- Docs that reference packages, APIs, or spec paths that do not exist on the target branch (see "Agent-First Documentation" → "Never ship docs that reference things that don't exist on the target branch")
 
 If the change doesn't survive a ten-minute attempt to poke holes in it, it's not ready.
 
