@@ -5,15 +5,7 @@
 // Employing sound techniques to make a faster Knockout foreach binding.
 // --------
 
-import {
-  arrayForEach,
-  cleanNode,
-  options,
-  virtualElements,
-  createSymbolOrString,
-  domData,
-  domNodeIsContainedBy
-} from '@tko/utils'
+import { arrayForEach, cleanNode, options, virtualElements, domData, domNodeIsContainedBy } from '@tko/utils'
 
 import { isObservable, unwrap, observable } from '@tko/observable'
 
@@ -87,7 +79,7 @@ function valueToChangeAddItem(value, index): ChangeAddItem {
 }
 
 // store a symbol for caching the pending delete info index in the data item objects
-const PENDING_DELETE_INDEX_SYM = createSymbolOrString('_ko_ffe_pending_delete_index')
+const PENDING_DELETE_INDEX_SYM = Symbol('_ko_ffe_pending_delete_index')
 
 export class ForEachBinding extends AsyncBindingHandler {
   // NOTE: valid valueAccessors include:

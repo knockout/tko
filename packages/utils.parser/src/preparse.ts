@@ -1,5 +1,3 @@
-import { stringTrim } from '@tko/utils'
-
 /* eslint no-cond-assign: 0 */
 
 // The following regular expressions will be used to split an object-literal string into tokens
@@ -42,7 +40,7 @@ const keywordRegexLookBehind = { in: 1, return: 1, typeof: 1 }
  */
 export default function parseObjectLiteral(objectLiteralString) {
   // Trim leading and trailing spaces from the string
-  let str = stringTrim(objectLiteralString)
+  let str = String(objectLiteralString ?? '').trim()
 
   // Trim braces '{' surrounding the whole object literal
   if (str.charCodeAt(0) === 123) str = str.slice(1, -1)
@@ -53,7 +51,7 @@ export default function parseObjectLiteral(objectLiteralString) {
 
   // Split into tokens
   const result = new Array()
-  let toks = str.match(bindingToken)
+  let toks = str.match(bindingToken) ?? []
   let key
   let values = new Array()
   let depth = 0
@@ -92,7 +90,7 @@ export default function parseObjectLiteral(objectLiteralString) {
       if (match && !keywordRegexLookBehind[match[0]]) {
         // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
         str = str.substring(str.indexOf(tok) + 1)
-        toks = str.match(bindingToken)
+        toks = str.match(bindingToken) ?? []
         i = -1
         // Continue with just the slash
         tok = '/'

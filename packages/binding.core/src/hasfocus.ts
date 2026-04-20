@@ -1,11 +1,11 @@
-import { createSymbolOrString, triggerEvent, registerEventHandler } from '@tko/utils'
+import { triggerEvent, registerEventHandler } from '@tko/utils'
 
 import { unwrap, dependencyDetection, isWriteableObservable } from '@tko/observable'
 
 import type { AllBindings } from '@tko/bind'
 
-const hasfocusUpdatingProperty = createSymbolOrString('__ko_hasfocusUpdating')
-const hasfocusLastValue = createSymbolOrString('__ko_hasfocusLastValue')
+const hasfocusUpdatingProperty = Symbol('__ko_hasfocusUpdating')
+const hasfocusLastValue = Symbol('__ko_hasfocusLastValue')
 
 export const hasfocus = {
   init: function (element, valueAccessor, _allBindings: AllBindings) {

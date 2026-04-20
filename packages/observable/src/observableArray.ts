@@ -2,7 +2,7 @@
 // Observable Arrays
 // ===
 //
-import { arrayIndexOf, arrayForEach, overwriteLengthPropertyIfSupported } from '@tko/utils'
+import { arrayIndexOf, arrayForEach } from '@tko/utils'
 
 import type { CompareArraysOptions } from '@tko/utils'
 
@@ -152,7 +152,7 @@ export function observableArray<T = any>(initialValues?: T[]): ObservableArray<T
   const result = Object.setPrototypeOf(observable(initialValues), observableArray.fn) as ObservableArray<T>
   trackArrayChanges(result)
   // ^== result.extend({ trackArrayChanges: true })
-  overwriteLengthPropertyIfSupported(result, { get: () => result()?.length })
+  Object.defineProperty(result, 'length', { get: () => result()?.length })
   return result
 }
 
