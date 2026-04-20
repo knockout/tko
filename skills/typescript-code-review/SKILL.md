@@ -116,7 +116,7 @@ When reviewing TKO code, apply these overrides:
 - Missing DOM disposal (`disposeWhenNodeIsRemoved`, `addDisposeCallback`, `LifeCycle.anchorTo()`)
 - Violations of centralized error handling (`options.onError` pattern)
 
-**Testing**: Mocha/Chai/Sinon (not Jasmine); Karma + Electron; tests in `packages/*/spec/`.
+**Testing**: Mocha/Chai/Sinon (not Jasmine); vitest; tests in `packages/*/spec/`.
 **Zero runtime deps**: never suggest external packages for core `@tko/*` packages.
 
 See `references/tko-conventions.md` for full details.

@@ -4,6 +4,12 @@
 
 **Status:** Draft
 
+## Status Update (2026-04-20)
+
+- Source basis: local `git log` + GitHub API (`knockout/tko`).
+- Marked as done based on code + commits: Findings/Steps 1, 2, 5, 8, 9 (including `bdac39c2`, `3e7a37ae`, `5d6603d7`, `9659cf21`).
+- Obsolete: references to `tools/repackage.mjs` (file no longer exists).
+
 ## Summary
 
 A comprehensive TypeScript code review of the full TKO monorepo — 25 packages,
@@ -15,17 +21,17 @@ zero errors, `eslint` zero errors) and has strong modular architecture.
 The most severe findings are:
 
 1. **Proxy `deleteProperty` trap receives wrong argument** — all property
-   deletions on computed proxies silently corrupt the wrong key
+   deletions on computed proxies silently corrupt the wrong key ✅ **Done**
 2. **Parser operator precedence inverts JS semantics** — bitwise operators
-   parse above relational/equality, causing incorrect expression evaluation
+   parse above relational/equality, causing incorrect expression evaluation ✅ **Done**
 3. **`??` (nullish coalescing) behaves identically to `||`** — treats `0`,
    `''`, and `false` as nullish
 4. **`TextInputLegacyFirefox` override is dead code** — Firefox
    autocomplete/drag-drop events are never registered
-5. **`style` binding references global `jQuery` instead of `options.jQuery`**
+5. **`style` binding references global `jQuery` instead of `options.jQuery`** ✅ **Done**
 
 Additional systemic issues: 17 loose-equality (`==`) comparisons, 4 deprecated
-`.substr()` calls, 39 unresolved `FIXME`/`TODO` comments, and deprecated DOM
+`.substr()` calls ✅ **Done**, 39 unresolved `FIXME`/`TODO` comments, and deprecated DOM
 APIs with extraneous arguments in production source.
 
 ## Goals
@@ -52,7 +58,8 @@ APIs with extraneous arguments in production source.
 - `make tsc` — zero errors
 - `make eslint` — zero errors
 - Loose-equality (`==`) in production source: **17 occurrences**
-- Deprecated `.substr()` in production source: **4 occurrences**
+- ~~Deprecated `.substr()` in production source: **4 occurrences**~~ ✅ **Done**
+  (Current state: 0 matches in `packages/*/src` + `builds/*/src`)
 - Unresolved `FIXME`/`TODO`/`HACK`/`XXX` in production source: **39 occurrences**
 
 ### Overlap with Existing Plan
@@ -69,7 +76,7 @@ plan's Phase 1.
 
 ### Critical Issues 🔴
 
-#### 1. Proxy `deleteProperty` trap receives wrong argument
+#### 1. Proxy `deleteProperty` trap receives wrong argument ✅ Done
 **File**: `packages/computed/src/proxy.ts:57–60`
 - **Issue**: The `deleteProperty` trap declares only one parameter `property`,
   but the Proxy spec requires `(target, property)`. The first argument is the
@@ -90,7 +97,7 @@ plan's Phase 1.
   }
   ```
 
-#### 2. Parser operator precedence inverts JS semantics for bitwise operators
+#### 2. Parser operator precedence inverts JS semantics for bitwise operators ✅ Done
 **File**: `packages/utils.parser/src/operators.ts:172–192`
 - **Issue**: Bitwise operators `|`(12), `^`(11), `&`(10) have higher precedence
   than relational (11) and equality (10) operators — the exact inverse of
@@ -137,7 +144,7 @@ plan's Phase 1.
 - **Current**: `eventsIndicatingValueChange(): string[] {`
 - **Recommended**: `override eventsIndicatingSyncValueChange(): string[] {`
 
-#### 5. `style` binding references global `jQuery` instead of `options.jQuery`
+#### 5. `style` binding references global `jQuery` instead of `options.jQuery` ✅ Done
 **File**: `packages/binding.core/src/style.ts:16–17`
 - **Issue**: Guards with `options.jQuery` but calls bare global `jQuery(element)`.
   In module environments where jQuery is not a global, this throws
@@ -170,14 +177,14 @@ plan's Phase 1.
   `this.$element`.
 - **Recommended**: `return tagNameLower(element) === 'input'`
 
-#### 9. Deprecated `createEvent`/`initEvent` with extraneous arguments
+#### 9. Deprecated `createEvent`/`initEvent` with extraneous arguments ✅ Done
 **File**: `packages/utils/src/dom/event.ts:83–96`
 - **Issue**: Uses deprecated `document.createEvent()` and `initEvent()`.
   `initEvent` accepts 3 arguments but 15 are passed (remnant from
   `initMouseEvent` signature) — the extra 12 are silently ignored.
 - **Recommended**: Replace with `new Event(eventType, { bubbles: true, cancelable: true })`.
 
-#### 10. Deprecated `.substr()` usage (4 occurrences)
+#### 10. Deprecated `.substr()` usage (4 occurrences) ✅ Done
 
 | File | Line |
 |------|------|
@@ -217,7 +224,7 @@ or numbers where `===` is both safer and idiomatic.
   returns `false` for non-Element nodes — a type-contract violation.
 - **Recommended**: Return `Object.create(null)` for consistency.
 
-#### 16. `var` re-declaration shadows parameter in Parser Node
+#### 16. `var` re-declaration shadows parameter in Parser Node ✅ Done
 **File**: `packages/utils.parser/src/Node.ts:55–56`
 - **Issue**: `var node: Node = this` re-declares the `node` parameter via `var`
   hoisting, discarding it. Confusing and fragile.
@@ -243,7 +250,7 @@ or numbers where `===` is both safer and idiomatic.
 - **Issue**: `|| {}` fallback is dead code — early return already handles falsy.
 - **Recommended**: Remove the `|| {}`.
 
-#### 20. `repackage.mjs` swallows write errors silently
+#### 20. `repackage.mjs` swallows write errors silently ⚠️ Obsolete
 **File**: `tools/repackage.mjs:48–49`
 - **Issue**: `.catch(console.error)` logs but exits 0 on failure. CI won't
   catch broken repackaging.
@@ -270,7 +277,7 @@ or numbers where `===` is both safer and idiomatic.
 #### 25. AMD require call lacks error callback
 **File**: `packages/utils.component/src/loaders.ts:277`
 
-#### 26. `repackage.mjs` relative path fragility
+#### 26. `repackage.mjs` relative path fragility ⚠️ Obsolete
 **File**: `tools/repackage.mjs:7`
 - `../../lerna.json` assumes CWD depth. Derive from `import.meta.url`.
 
@@ -296,14 +303,14 @@ or numbers where `===` is both safer and idiomatic.
 
 ### Phase 1: Critical Bug Fixes (HIGH priority, behavior-changing)
 
-1. **Fix Proxy `deleteProperty` trap** — Add missing `_target` parameter in
+1. ✅ **Fix Proxy `deleteProperty` trap** — Add missing `_target` parameter in
    `packages/computed/src/proxy.ts:57`. Verify with proxy-related tests in
-   `packages/computed/spec/`.
+   `packages/computed/spec/`. Done via commit `bdac39c2`.
 
-2. **Fix parser operator precedence** — Reorder precedence values for bitwise,
+2. ✅ **Fix parser operator precedence** — Reorder precedence values for bitwise,
    relational, and equality operators in
    `packages/utils.parser/src/operators.ts:172–192`. Must match JS semantics
-   exactly. Run full parser test suite.
+   exactly. Run full parser test suite. Done via commit `3e7a37ae`.
 
 3. **Fix `??` earlyOut semantics** — Change `a => a` to
    `a => a !== null && a !== undefined` in
@@ -314,8 +321,9 @@ or numbers where `===` is both safer and idiomatic.
    `eventsIndicatingValueChange()` to `eventsIndicatingSyncValueChange()` in
    `packages/binding.core/src/textInput.ts:132`.
 
-5. **Fix `style` binding jQuery reference** — Change `jQuery(element)` to
+5. ✅ **Fix `style` binding jQuery reference** — Change `jQuery(element)` to
    `options.jQuery(element)` in `packages/binding.core/src/style.ts:17`.
+   Done via commit `5d6603d7`.
 
 ### Phase 2: Important Fixes (MEDIUM priority, no behavior change unless noted)
 
@@ -325,10 +333,12 @@ or numbers where `===` is both safer and idiomatic.
 7. **Fix duplicate error message** — Remove duplicated `spec.bindingKey`
    segment in `packages/bind/src/applyBindings.ts:510–516`.
 
-8. **Replace deprecated `.substr()`** — 4 files (see finding #10).
+8. ✅ **Replace deprecated `.substr()`** — 4 files (see finding #10).
+   Done via commit `9659cf21`.
 
-9. **Replace deprecated `createEvent`/`initEvent`** — Use `new Event()` in
+9. ✅ **Replace deprecated `createEvent`/`initEvent`** — Use `new Event()` in
    `packages/utils/src/dom/event.ts:83–96`.
+   Done (current code uses `new MouseEvent`/`new KeyboardEvent`/`new Event`).
 
 10. **Fix loose equality** — Replace 17 `==`/`!=` with `===`/`!==` across
     6 packages (see finding #12).
@@ -343,8 +353,9 @@ or numbers where `===` is both safer and idiomatic.
 13. **Fix JsxObserver subscription callback** — Pass `attr` instead of `value`
     in `utils.jsx/src/JsxObserver.ts:369`.
 
-14. **Fix `repackage.mjs` error handling** — `await` the `writeFile` call
-    in `tools/repackage.mjs:48`.
+14. ✅ **Fix `repackage.mjs` error handling** — `await` the `writeFile` call
+    in `tools/repackage.mjs:48`. ⚠️ **Obsolete/dropped**: `tools/repackage.mjs`
+    is not present in the current repo state.
 
 ### Phase 3: Cleanup (LOW priority)
 

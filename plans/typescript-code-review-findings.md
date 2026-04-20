@@ -4,6 +4,13 @@
 
 **Status:** Draft
 
+## Status Update (2026-04-20)
+
+- Source basis: local `git log` + GitHub API (`knockout/tko`), including
+  Issue [#235](https://github.com/knockout/tko/issues/235) (still `open`).
+- Marked as done: Steps 1, 2, 3.
+- Marked as obsolete: part of Step 14 (`tools/repackage.mjs` no longer exists).
+
 ## Summary
 
 A comprehensive TypeScript code review of the full TKO monorepo (25+ packages,
@@ -36,8 +43,9 @@ untyped DOM parameters, and unresolved FIXMEs in production code.
 ### TypeScript Compiler
 
 - `tsc` passes with zero errors on production source
-- Skill example files (`skills/typescript-code-review/examples/`) cause `tsc`
-  failures — they are not excluded from tsconfig
+- ~~Skill example files (`skills/typescript-code-review/examples/`) cause `tsc`
+  failures — they are not excluded from tsconfig~~ ✅ **Done** (`skills` is now
+  excluded in `tsconfig.json`)
 
 
 ### Confirmed Bug (Github-Issue #235)
@@ -68,13 +76,16 @@ comment confirms this is a known issue.
 
 ### Phase 1: Quick Wins (LOW risk, no behavior change)
 
-1. **Replace `.substr()` with `.substring()`** in `packages/binding.core/src/attr.ts:15`.
+1. ✅ **Replace `.substr()` with `.substring()`** in `packages/binding.core/src/attr.ts:15`.
+   Done via commit `9659cf21`.
 
-2. **Replace magic number** `9007199254740991` with `Number.MAX_SAFE_INTEGER`
+2. ✅ **Replace magic number** `9007199254740991` with `Number.MAX_SAFE_INTEGER`
    in `packages/binding.foreach/src/foreach.ts:35`.
+   Done via commit `1b8a062f`.
 
-3. **Exclude skill examples from tsc** — Add `skills` to the `exclude` array
+3. ✅ **Exclude skill examples from tsc** — Add `skills` to the `exclude` array
    in `tsconfig.json` so `make tsc` stays green.
+   Done (see current `tsconfig.json`).
 
 ### Phase 2: Type Improvements (MEDIUM risk)
 
@@ -98,7 +109,8 @@ comment confirms this is a known issue.
 
 14. **Add error handling to tooling scripts** — Wrap `JSON.parse` in
     try-catch in `tools/release-version.cjs`; make `writeFile` failures
-    fatal in `tools/repackage.mjs`.
+    fatal in `tools/repackage.mjs`. ⚠️ **Partially obsolete**: `tools/repackage.mjs`
+    is no longer present in the current repo state.
 
 15. **Fix DOM mutation during iteration** — Collect attributes to remove
     in `AttributeMustacheProvider.bindingObjects` before yielding, then
