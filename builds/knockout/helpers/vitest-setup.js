@@ -18,9 +18,9 @@ globalThis.isHappyDom = isHappyDom
 // Run JSX node cleanup synchronously in tests. The default 25ms batch
 // (packages/utils.jsx/src/jsxClean.ts) can otherwise fire a timer after a
 // vitest environment (e.g. happy-dom) tears down DOM globals, surfacing as
-// `ReferenceError: Element is not defined` from `cleanNode`. `0` = disable
-// batching. Applied to the source options singleton used by @tko/*
-// source imports (e.g. packages/utils.jsx/spec).
+// `ReferenceError: Element is not defined` from `cleanNode`. `0` runs
+// cleanup synchronously on detach (no setTimeout). Applied to the source
+// options singleton used by @tko/* source imports (e.g. packages/utils.jsx/spec).
 options.jsxCleanBatchSize = 0
 
 // Load the knockout build (sets globalThis.ko)

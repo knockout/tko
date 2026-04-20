@@ -13,10 +13,10 @@ declare module '@tko/utils' {
 
 /**
  * Register jsxCleanBatchSize: the maximum number of JSX nodes to clean per
- * 25ms batch tick. Set to `0` to disable batching entirely — JSX node
- * cleanup then runs synchronously on detach. Useful in test environments
- * that tear down DOM globals between files, where a pending 25ms timer
- * can fire against a dead global and throw.
+ * 25ms batch tick. Set to `0` to run cleanup synchronously on detach (no
+ * setTimeout). Useful in test environments that tear down DOM globals
+ * between files, where a pending 25ms timer can fire against a dead
+ * global and throw.
  */
 defineOption('jsxCleanBatchSize', { default: 1000 })
 
