@@ -105,6 +105,46 @@ packages/example/
 Inter-package dependencies use `@tko/package-name` and are resolved via
 npm workspaces.
 
+### Configurable runtime options (`ko.options.*`)
+
+When a package needs a configurable option (batch sizes, feature toggles,
+plugin behavior), register it via **`defineOption`** from `@tko/utils` inside
+the owning package. Do **not** add the field to the core `Options` class in
+`packages/utils/src/options.ts` — that would force `@tko/utils` to depend on
+concepts from downstream packages.
+
+Pattern:
+
+```ts
+// packages/utils.jsx/src/jsxClean.ts
+import { defineOption, options } from '@tko/utils'
+
+// Extend the Options type so ko.options.<name> is strongly typed.
+declare module '@tko/utils' {
+  interface Options {
+    jsxCleanBatchSize: number
+  }
+}
+
+// Register at module load, with an optional side-effect setter.
+defineOption('jsxCleanBatchSize', { default: 1000 })
+
+// Read wherever the option applies.
+if (options.jsxCleanBatchSize === 0) { /* sync path */ }
+```
+
+Rules:
+
+- The `declare module '@tko/utils' { interface Options { ... } }` augmentation
+  lives in the same package that defines the option.
+- `defineOption` registers at module side-effect time; the option is
+  available as soon as the owning package is imported.
+- Core `Options` class fields (in `packages/utils/src/options.ts`) are only
+  for options that are intrinsic to `@tko/utils` itself (e.g.
+  `templateSizeLimit`, `deferUpdates`, `onError`).
+- Reference `packages/utils.parser/src/operators.ts` → `strictEquality` for
+  a canonical example that includes a side-effect setter.
+
 ## CI/CD
 
 GitHub Actions workflows (`.github/workflows/`):

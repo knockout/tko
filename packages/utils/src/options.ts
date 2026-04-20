@@ -81,17 +81,6 @@ export class Options {
   templateSizeLimit: number = 4096
 
   /**
-   * Maximum number of JSX nodes to clean per 25ms batch tick
-   * (packages/utils.jsx/src/jsxClean.ts).
-   *
-   * Set to `0` to disable batching entirely — JSX node cleanup then runs
-   * synchronously on detach. Useful in test environments that tear down
-   * DOM globals between files, where a pending 25ms timer can fire against
-   * a dead global and throw.
-   */
-  jsxCleanBatchSize: number = 1000
-
-  /**
    * Whether or not to allow script tags in templates.
    * If false, an error will be thrown if a script tag is detected in the template.
    * It is not recommended to set this to true.
