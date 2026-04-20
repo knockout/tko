@@ -33,14 +33,15 @@ function scheduleBatch() {
 
 function flushBatch() {
   cleanNodeTimeoutID = null
-  // If the option was flipped to 0 (or below) while the timer was pending,
-  // fall through to synchronous drain. Otherwise splice(0, 0) would remove
-  // nothing and scheduleBatch would re-arm the timer every 25ms forever.
-  if (options.jsxCleanBatchSize <= 0) {
+  // If the option was flipped to a non-positive / non-finite value while the
+  // timer was pending, fall through to synchronous drain — otherwise
+  // splice(0, <=0|NaN) removes nothing and scheduleBatch re-arms forever.
+  const batchSize = Math.trunc(options.jsxCleanBatchSize)
+  if (!Number.isFinite(batchSize) || batchSize <= 0) {
     flushAll()
     return
   }
-  const nodes = cleanNodeQueue.splice(0, options.jsxCleanBatchSize)
+  const nodes = cleanNodeQueue.splice(0, batchSize)
   for (const node of nodes) {
     cleanNode(node)
   }

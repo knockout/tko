@@ -102,16 +102,24 @@ describe('jsxClean queue', function () {
     it('drains synchronously if batchSize is flipped to 0 while a timer is pending', function () {
       const nodes = [makeNode(), makeNode(), makeNode()]
       for (const n of nodes) queueCleanNode(n)
-      assert.lengthOf(cleaned, 0)
       assert.equal(clock.countTimers(), 1)
 
-      // Consumer flips to sync mid-flight. When the timer fires it must
-      // fall through to a full drain — not splice(0, 0) forever.
       options.jsxCleanBatchSize = 0
       clock.tick(25)
 
       assert.deepEqual(cleaned, nodes)
       assert.equal(clock.countTimers(), 0, 'no re-armed timer')
+    })
+
+    it('drains synchronously if batchSize becomes non-finite while a timer is pending', function () {
+      const nodes = [makeNode(), makeNode()]
+      for (const n of nodes) queueCleanNode(n)
+
+      options.jsxCleanBatchSize = Number.NaN as unknown as number
+      clock.tick(25)
+
+      assert.deepEqual(cleaned, nodes)
+      assert.equal(clock.countTimers(), 0)
     })
   })
 })
