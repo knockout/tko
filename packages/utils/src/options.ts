@@ -142,6 +142,11 @@ const options = new Options()
  * Must be called before applyBindings — setters run side effects at
  * configuration time, not retroactively on already-parsed bindings.
  *
+ * If a value has already been assigned to `options[name]` before
+ * `defineOption` runs (e.g. test setup writing before the owning package
+ * is imported), that value is preserved rather than clobbered with
+ * `config.default`.
+ *
  * @example
  * defineOption('strictEquality', {
  *   default: false,
@@ -150,7 +155,9 @@ const options = new Options()
  * // Then: ko.options.strictEquality = true
  */
 export function defineOption<T>(name: string, config: { default: T; set?: (value: T) => void }) {
-  let _value = config.default
+  const existing = Object.getOwnPropertyDescriptor(options, name)
+  let _value: T =
+    existing && 'value' in existing && !existing.get ? (existing.value as T) : config.default
   Object.defineProperty(options, name, {
     get() {
       return _value
@@ -162,7 +169,7 @@ export function defineOption<T>(name: string, config: { default: T; set?: (value
     enumerable: true,
     configurable: true
   })
-  // Run the setter with the default value to initialize side effects
+  // Run the setter with the resolved initial value to initialize side effects
   config.set?.(_value)
 }
 
