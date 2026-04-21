@@ -38,6 +38,9 @@ File: `packages/utils.parser/src/operators.ts`
 
 - Native JS requires explicit grouping for these mixes.
 - Current parser accepts and evaluates such expressions.
+- **Independently verified**: `operators['??'].earlyOut = a => a` is identical to `||`'s earlyOut, making `??` short-circuit on any falsy value instead of only `null`/`undefined`. Confirmed bug.
+- PR [#345](https://github.com/knockout/tko/pull/345) (open) addresses the earlyOut fix.
+- Issue [#342](https://github.com/knockout/tko/issues/342) (parser operator-precedence, closed).
 
 3. Runtime paths use ambient `document/window` instead of configured options.
 Files:

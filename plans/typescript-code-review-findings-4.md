@@ -68,7 +68,9 @@ For historical context and previously cataloged findings, see:
 - **Impact**: `Object.keys(proxy)` returns `[]`, `JSON.stringify(proxy)` returns
   `undefined`, and `{...proxy}` produces `{}`.
 - **Verified**: Confirmed — no `getOwnPropertyDescriptor` trap exists in the
-  handler.
+  handler. The related `deleteProperty` trap bug in the same file was independently
+  confirmed and fixed in PR [#336](https://github.com/knockout/tko/pull/336),
+  validating the review's accuracy for this proxy handler.
 - **Recommended**:
   ```ts
   getOwnPropertyDescriptor(_target, prop) {
@@ -176,6 +178,15 @@ For historical context and previously cataloged findings, see:
 #### 19. Duplicate import from `@tko/utils.jsx` in reference build
 **File**: `builds/reference/src/index.ts:19–20`
 - **Recommended**: Merge into single import statement.
+
+---
+
+## PR #297 Review — Additional Notes
+
+- Brian recommended treating findings plans as separate follow-ups rather than bundling with the skill PR.
+- Each critical finding should be independently verified before locking it in as a plan item.
+- Findings #1 and #2 are confirmed as real bugs (see verification notes above).
+- Open PRs addressing findings from across all rounds: #345 (`??` earlyOut), #346 (TextInputLegacyFirefox), #347 (duplicate options import).
 
 ---
 
