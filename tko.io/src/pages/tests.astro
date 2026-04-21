@@ -13,7 +13,7 @@
 //
 // URL state (all optional, all round-trip via the Run button):
 //   ?mode=dev           (default) in-tree build + both bundles
-//   ?mode=build         load a @tko/build.* from unpkg + build bundle
+//   ?mode=build         load a @tko/build.* from jsdelivr + build bundle
 //                       only; source bundle incompatible with a
 //                       non-dev ko (would re-bundle its own source
 //                       and collide on class identity)
@@ -40,7 +40,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TKO · Browser Tests</title>
-    <link rel="stylesheet" href="https://unpkg.com/mocha@10/mocha.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha@10/mocha.css" />
     <style>
       :root {
         --bg: #0f1115;
@@ -148,7 +148,7 @@
       )
     </script>
 
-    <script is:inline src="https://unpkg.com/mocha@10/mocha.js"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/mocha@10/mocha.js"></script>
     <script is:inline>
       // 10000ms matches `testTimeout` in vitest.config.ts.
       mocha.setup({ ui: 'bdd', reporter: 'html', cleanReferencesAfterRun: false, timeout: 10000 })
@@ -232,10 +232,10 @@
           location.search = qstr ? `?${qstr}` : ''
         })
 
-        // --- load ko (dev: /lib/ko.js; build: unpkg) ---
+        // --- load ko (dev: /lib/ko.js; build: jsdelivr) ---
         const koUrl = mode === 'dev'
           ? '/lib/ko.js'
-          : `https://unpkg.com/@tko/build.${pkg}@${ver}/dist/browser.min.js`
+          : `https://cdn.jsdelivr.net/npm/@tko/build.${pkg}@${ver}/dist/browser.min.js`
         await loadScript(koUrl)
         if (!window.ko) {
           showError(`Loaded ${koUrl} but window.ko is not defined. Wrong package or version?`)
