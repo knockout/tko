@@ -51,11 +51,7 @@ async function readPackageDescription(packageDir) {
 }
 
 function renderPackage(pkg) {
-  const statusRefs = [
-    `status: ${pkg.status}`,
-    ...(pkg.hasTests ? [`specs: \`${pkg.specDirRelative}\``] : []),
-    ...(pkg.curatedRelativePath ? [`curated: \`${pkg.curatedRelativePath}\``] : [])
-  ].join(' · ')
+  const curatedPath = pkg.curatedRelativePath ?? pkg.expectedCuratedRelativePath
 
   return [
     `# Verified Behaviors: ${pkg.title}`,
@@ -64,13 +60,13 @@ function renderPackage(pkg) {
     '',
     pkg.description,
     '',
-    statusRefs,
-    '',
     ...(pkg.behaviors.length
       ? ['## Behaviors', '', ...pkg.behaviors.map(renderBehavior)]
       : pkg.hasTests
         ? [`Add curated entries backed by unit tests to \`${pkg.expectedCuratedRelativePath}\`.`]
         : ['Add tests first, then curate.']),
+    '',
+    `_Curated source: \`${curatedPath}\`_`,
     ''
   ].join('\n')
 }

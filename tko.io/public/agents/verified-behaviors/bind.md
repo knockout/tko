@@ -4,8 +4,6 @@
 
 Binding application, binding-handler lifecycle, and completion callbacks.
 
-status: curated · specs: `packages/bind/spec` · curated: `packages/bind/verified-behaviors.json`
-
 ## Behaviors
 
 - `ko.applyBindings(viewModel, element)` returns a `Promise`.
@@ -22,3 +20,5 @@ status: curated · specs: `packages/bind/spec` · curated: `packages/bind/verifi
 - `childrenComplete` fires after descendant bindings are applied.
   Notes: It works on normal elements and virtual elements, and it does not fire when there are no descendants.
   Specs: `packages/bind/spec/bindingAttributeBehaviors.ts`, `packages/bind/spec/nodePreprocessingBehaviors.ts`
+
+_Curated source: `packages/bind/verified-behaviors.json`_

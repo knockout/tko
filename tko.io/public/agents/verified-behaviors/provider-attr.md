@@ -4,8 +4,6 @@
 
 Attribute-based `ko-*` binding discovery on elements.
 
-status: curated · specs: `packages/provider.attr/spec` · curated: `packages/provider.attr/verified-behaviors.json`
-
 ## Behaviors
 
 - `nodeHasBindings` returns `false` when an element has no `ko-*` attributes and `true` when any `ko-*` attribute is present.
@@ -14,3 +12,5 @@ status: curated · specs: `packages/provider.attr/spec` · curated: `packages/pr
   Specs: `packages/provider.attr/spec/AttributeProviderBehaviors.ts`
 - Attribute expressions are evaluated against the supplied binding context.
   Specs: `packages/provider.attr/spec/AttributeProviderBehaviors.ts`
+
+_Curated source: `packages/provider.attr/verified-behaviors.json`_

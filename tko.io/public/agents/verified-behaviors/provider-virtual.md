@@ -4,8 +4,6 @@
 
 Virtual comment-node bindings and `<ko>` preprocessing.
 
-status: curated · specs: `packages/provider.virtual/spec` · curated: `packages/provider.virtual/verified-behaviors.json`
-
 ## Behaviors
 
 - The provider reads bindings from `<!-- ko ... -->` comment nodes and evaluates them against the supplied context.
@@ -18,3 +16,5 @@ status: curated · specs: `packages/provider.virtual/spec` · curated: `packages
   Specs: `packages/provider.virtual/spec/virtualProviderBehaviors.ts`
 - Child nodes inside `<ko>` are preserved between the generated opening and closing virtual comments.
   Specs: `packages/provider.virtual/spec/virtualProviderBehaviors.ts`
+
+_Curated source: `packages/provider.virtual/verified-behaviors.json`_

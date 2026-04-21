@@ -4,8 +4,6 @@
 
 Mustache-style text and attribute interpolation providers.
 
-status: curated · specs: `packages/provider.mustache/spec` · curated: `packages/provider.mustache/verified-behaviors.json`
-
 ## Behaviors
 
 - Text interpolation rewrites `{{expr}}` into virtual `text` bindings, `{{{expr}}}` into virtual `html` bindings, and `{{#binding:value}}{{/binding}}` into virtual block bindings.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/provider.mustache/spec` · curated: `package
   Specs: `packages/provider.mustache/spec/attributeInterpolationSpec.ts`
 - Text interpolation does not rewrite contents inside `<textarea>` or `<script>`, but it does work inside templates declared with `<script>` and `<textarea>`.
   Specs: `packages/provider.mustache/spec/textInterpolationSpec.ts`
+
+_Curated source: `packages/provider.mustache/verified-behaviors.json`_

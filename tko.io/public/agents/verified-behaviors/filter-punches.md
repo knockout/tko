@@ -4,8 +4,6 @@
 
 Built-in string, defaulting, fitting, and JSON filters.
 
-status: curated · specs: `packages/filter.punches/spec` · curated: `packages/filter.punches/verified-behaviors.json`
-
 ## Behaviors
 
 - `filters.uppercase` uppercases plain strings and unwrapped observables, and `filters.lowercase` lowercases them.
@@ -18,3 +16,5 @@ status: curated · specs: `packages/filter.punches/spec` · curated: `packages/f
   Specs: `packages/filter.punches/spec/filterBehavior.ts`
 - `filters.json` stringifies strings, arrays, and objects, and accepts a spacing argument.
   Specs: `packages/filter.punches/spec/filterBehavior.ts`
+
+_Curated source: `packages/filter.punches/verified-behaviors.json`_

@@ -4,8 +4,6 @@
 
 Custom-element component provider behavior and component parameter handling.
 
-status: curated · specs: `packages/provider.component/spec` · curated: `packages/provider.component/verified-behaviors.json`
-
 ## Behaviors
 
 - Registered components render into matching custom elements, including overridden name resolution via `getComponentNameForNode`, but not into standard elements with the same tag name.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/provider.component/spec` · curated: `packag
   Specs: `packages/provider.component/spec/customElementBehaviors.ts`
 - Custom elements support transclusion via `componentInfo.templateNodes`, and `afterRender` callbacks on the custom element are invoked after render.
   Specs: `packages/provider.component/spec/customElementBehaviors.ts`
+
+_Curated source: `packages/provider.component/verified-behaviors.json`_

@@ -4,8 +4,6 @@
 
 Binding-string providers that return parseable binding text.
 
-status: curated · specs: `packages/provider.bindingstring/spec` · curated: `packages/provider.bindingstring/verified-behaviors.json`
-
 ## Behaviors
 
 - A subclass can define bindings by returning a binding string from `getBindingString()`, and `getBindingAccessors` parses that string into named accessors.
@@ -14,3 +12,5 @@ status: curated · specs: `packages/provider.bindingstring/spec` · curated: `pa
   Specs: `packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts`
 - Binding preprocessing leaves explicit values intact, so `b: true` remains `true` instead of being replaced by the fallback.
   Specs: `packages/provider.bindingstring/spec/BindingStringProviderBehaviors.ts`
+
+_Curated source: `packages/provider.bindingstring/verified-behaviors.json`_

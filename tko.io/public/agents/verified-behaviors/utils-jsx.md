@@ -4,8 +4,6 @@
 
 JSX object-to-DOM conversion, reactive children and attributes, and async child handling.
 
-status: curated · specs: `packages/utils.jsx/spec` · curated: `packages/utils.jsx/verified-behaviors.json`
-
 ## Behaviors
 
 - JSX objects convert to DOM nodes, including nested children, arrays, generators, sparse arrays, primitives, SVG nodes, and actual DOM nodes.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/utils.jsx/spec` · curated: `packages/utils.
   Specs: `packages/utils.jsx/spec/jsxBehaviors.ts`
 - JSX-created nodes can carry native bindings and participate in component rendering and observable-array diff updates.
   Specs: `packages/utils.jsx/spec/jsxBehaviors.ts`
+
+_Curated source: `packages/utils.jsx/verified-behaviors.json`_

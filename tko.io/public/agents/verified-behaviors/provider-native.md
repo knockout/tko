@@ -4,8 +4,6 @@
 
 Native `ko-*` binding accessors attached directly to DOM nodes.
 
-status: curated · specs: `packages/provider.native/spec` · curated: `packages/provider.native/verified-behaviors.json`
-
 ## Behaviors
 
 - `NativeProvider` only recognizes entries stored under `NATIVE_BINDINGS` whose keys start with `ko-`.
@@ -16,3 +14,5 @@ status: curated · specs: `packages/provider.native/spec` · curated: `packages/
 - `NativeProvider` is preemptive: when native bindings are present, it outranks `data-bind` and mustache providers.
   Notes: It does not preempt those providers when the native binding bag is empty or contains no `ko-*` entries.
   Specs: `packages/provider.native/spec/NativeProviderBehaviors.ts`
+
+_Curated source: `packages/provider.native/verified-behaviors.json`_

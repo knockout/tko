@@ -4,8 +4,6 @@
 
 Task scheduling, DOM disposal, memoization, HTML parsing, and array diff utilities.
 
-status: curated · specs: `packages/utils/spec` · curated: `packages/utils/verified-behaviors.json`
-
 ## Behaviors
 
 - `tasks.schedule(...)` runs callbacks asynchronously, preserves scheduling order, processes tasks scheduled during a run, and continues running remaining tasks before surfacing an exception from a throwing task.
@@ -22,3 +20,5 @@ status: curated · specs: `packages/utils/spec` · curated: `packages/utils/veri
   Specs: `packages/utils/spec/parseHtmlFragmentBehavior.ts`
 - `compareArrays(oldArray, newArray)` reports `retained`, `added`, and `deleted` entries, annotates detected moves with `moved`, supports sparse diffs, and honors the `dontLimitMoves` option.
   Specs: `packages/utils/spec/arrayEditDetectionBehaviors.ts`
+
+_Curated source: `packages/utils/verified-behaviors.json`_

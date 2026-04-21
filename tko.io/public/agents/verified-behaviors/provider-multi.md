@@ -4,8 +4,6 @@
 
 Provider composition, preemption, and node-type filtering.
 
-status: curated · specs: `packages/provider.multi/spec` · curated: `packages/provider.multi/verified-behaviors.json`
-
 ## Behaviors
 
 - `nodeHasBindings` returns `true` if any applicable provider reports bindings and `false` if none do.
@@ -18,3 +16,5 @@ status: curated · specs: `packages/provider.multi/spec` · curated: `packages/p
   Specs: `packages/provider.multi/spec/MultiProviderBehaviors.ts`
 - `preprocessNode` calls every applicable provider preprocessor.
   Specs: `packages/provider.multi/spec/MultiProviderBehaviors.ts`
+
+_Curated source: `packages/provider.multi/verified-behaviors.json`_

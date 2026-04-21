@@ -4,8 +4,6 @@
 
 Core element bindings such as `event` and descendant-completion hooks.
 
-status: curated · specs: `packages/binding.core/spec` · curated: `packages/binding.core/verified-behaviors.json`
-
 ## Behaviors
 
 - `event` handlers receive `(model, event)` and run with `this === model`.
@@ -17,3 +15,5 @@ status: curated · specs: `packages/binding.core/spec` · curated: `packages/bin
 - `descendantsComplete` fires after descendant bindings finish on both DOM and virtual elements.
   Notes: It does not fire when there are no descendant nodes. A `null` callback is ignored. It also works with `ko.bindingEvent.subscribe(...)`.
   Specs: `packages/binding.core/spec/descendantsCompleteBehaviors.ts`
+
+_Curated source: `packages/binding.core/verified-behaviors.json`_

@@ -4,8 +4,6 @@
 
 Class-based component registration through `ComponentABC` and the default component utilities.
 
-status: curated · specs: `packages/utils.component/spec` · curated: `packages/utils.component/verified-behaviors.json`
-
 ## Behaviors
 
 - `ComponentABC.register()` requires an overloaded component definition.
@@ -17,3 +15,5 @@ status: curated · specs: `packages/utils.component/spec` · curated: `packages/
   Specs: `packages/utils.component/spec/ComponentABCBehaviors.ts`
 - Component instances derived from `ComponentABC` are disposed when their bound node is cleaned.
   Specs: `packages/utils.component/spec/ComponentABCBehaviors.ts`
+
+_Curated source: `packages/utils.component/verified-behaviors.json`_

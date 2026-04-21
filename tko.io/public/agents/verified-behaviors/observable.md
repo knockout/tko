@@ -4,8 +4,6 @@
 
 Core observable and observableArray notification and mutation behavior.
 
-status: curated · specs: `packages/observable/spec` · curated: `packages/observable/verified-behaviors.json`
-
 ## Behaviors
 
 - Observables ignore duplicate writes for identical primitives, `null`, and `undefined` by default.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/observable/spec` · curated: `packages/obser
   Specs: `packages/observable/spec/observableArrayBehaviors.ts`
 - `observableArray` is iterable and reports as both an observable and an observable array.
   Specs: `packages/observable/spec/observableArrayBehaviors.ts`
+
+_Curated source: `packages/observable/verified-behaviors.json`_

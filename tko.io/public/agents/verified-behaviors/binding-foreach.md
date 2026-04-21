@@ -4,8 +4,6 @@
 
 Standalone `foreach` binding behavior, templates, and else-chain state.
 
-status: curated · specs: `packages/binding.foreach/spec` · curated: `packages/binding.foreach/verified-behaviors.json`
-
 ## Behaviors
 
 - `foreach` accepts a plain array, `observableArray`, plain observable holding an array, or computed returning an array.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/binding.foreach/spec` · curated: `packages/
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
 - Array mutation, reordering, duplicate values, `$index`, `as`, and `noIndex` are all exercised in spec coverage.
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
+
+_Curated source: `packages/binding.foreach/verified-behaviors.json`_

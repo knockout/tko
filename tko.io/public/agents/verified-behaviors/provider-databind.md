@@ -4,8 +4,6 @@
 
 `data-bind` parsing, expression lookup, and end-to-end binding accessors.
 
-status: curated · specs: `packages/provider.databind/spec` · curated: `packages/provider.databind/verified-behaviors.json`
-
 ## Behaviors
 
 - `nodeHasBindings` detects elements with a `data-bind` attribute.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/provider.databind/spec` · curated: `package
   Specs: `packages/provider.databind/spec/dataBindProviderBehaviors.ts`
 - Expression lookup resolves `$data` before `$context`, `$context` before globals, recognizes `$element`, can be denied access to `window` globals, and does not bleed one globals object into another.
   Specs: `packages/provider.databind/spec/dataBindProviderBehaviors.ts`
+
+_Curated source: `packages/provider.databind/verified-behaviors.json`_

@@ -4,8 +4,6 @@
 
 Rewriting classic function literals in binding strings.
 
-status: curated · specs: `packages/utils.functionrewrite/spec` · curated: `packages/utils.functionrewrite/verified-behaviors.json`
-
 ## Behaviors
 
 - `functionRewrite()` rewrites classic `function (...) { ... }` binding expressions into arrow-function form.
@@ -16,3 +14,5 @@ status: curated · specs: `packages/utils.functionrewrite/spec` · curated: `pac
   Specs: `packages/utils.functionrewrite/spec/functionRewriteBehavior.ts`
 - Non-function text is left unchanged.
   Specs: `packages/utils.functionrewrite/spec/functionRewriteBehavior.ts`
+
+_Curated source: `packages/utils.functionrewrite/verified-behaviors.json`_

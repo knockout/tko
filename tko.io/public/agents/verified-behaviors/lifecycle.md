@@ -4,8 +4,6 @@
 
 Lifecycle mixins for subscriptions, computeds, DOM listeners, and anchored disposal.
 
-status: curated · specs: `packages/lifecycle/spec` · curated: `packages/lifecycle/verified-behaviors.json`
-
 ## Behaviors
 
 - `LifeCycle.mixInto(...)` adds `subscribe`, `computed`, `addEventListener`, `anchorTo`, `dispose`, and `addDisposable` to function prototypes, constructed instances, classes, and class instances.
@@ -18,3 +16,5 @@ status: curated · specs: `packages/lifecycle/spec` · curated: `packages/lifecy
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
 - Anchoring one lifecycle object to another with `anchorTo(...)` causes disposal of the parent lifecycle to dispose the anchored child as well.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
+
+_Curated source: `packages/lifecycle/verified-behaviors.json`_

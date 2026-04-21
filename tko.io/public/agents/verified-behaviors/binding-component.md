@@ -4,8 +4,6 @@
 
 Component binding runtime, slots, virtual elements, and JSX/object templates.
 
-status: curated · specs: `packages/binding.component/spec` · curated: `packages/binding.component/verified-behaviors.json`
-
 ## Behaviors
 
 - `component` works on virtual elements as well as normal elements.
@@ -18,3 +16,5 @@ status: curated · specs: `packages/binding.component/spec` · curated: `package
 - Component templates can be supplied as JSX-style object trees or arrays of JSX-style nodes.
   Notes: Reactive attribute and child updates on those object templates are covered by the specs.
   Specs: `packages/binding.component/spec/componentBindingBehaviors.ts`
+
+_Curated source: `packages/binding.component/verified-behaviors.json`_

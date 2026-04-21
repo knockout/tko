@@ -4,8 +4,6 @@
 
 Template and foreach rendering, including `nodes`, callbacks, and destroyed-item handling.
 
-status: curated · specs: `packages/binding.template/spec` · curated: `packages/binding.template/verified-behaviors.json`
-
 ## Behaviors
 
 - `foreach` duplicates template content for each array entry and keeps the DOM in sync with array mutations.
@@ -22,3 +20,5 @@ status: curated · specs: `packages/binding.template/spec` · curated: `packages
   Specs: `packages/binding.template/spec/foreachBehaviors.ts`
 - `childrenComplete` also fires when rendering through `template`.
   Specs: `packages/binding.template/spec/templatingBehaviors.ts`
+
+_Curated source: `packages/binding.template/verified-behaviors.json`_

@@ -4,8 +4,6 @@
 
 Conditional and contextual bindings: `if`, `ifnot`, `with`, `else`, and `elseif`.
 
-status: curated · specs: `packages/binding.if/spec` · curated: `packages/binding.if/verified-behaviors.json`
-
 ## Behaviors
 
 - `<!-- else -->` inside an `if` region toggles between the if-content and else-content as the condition changes.
@@ -21,3 +19,5 @@ status: curated · specs: `packages/binding.if/spec` · curated: `packages/bindi
 - When `options.createChildContextWithAs` is disabled, `with: value, as: "alias"` aliases the value without creating a new child context.
   Notes: Observable aliases update in place without re-rendering the region.
   Specs: `packages/binding.if/spec/withBehaviors.ts`
+
+_Curated source: `packages/binding.if/verified-behaviors.json`_

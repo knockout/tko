@@ -4,8 +4,6 @@
 
 Provider base-class behavior and constructor contract.
 
-status: curated · specs: `packages/provider/spec` · curated: `packages/provider/verified-behaviors.json`
-
 ## Behaviors
 
 - `Provider` is abstract; instantiating it directly throws.
@@ -14,3 +12,5 @@ status: curated · specs: `packages/provider/spec` · curated: `packages/provide
   Specs: `packages/provider/spec/providerBehaviors.ts`
 - Constructor params can inject `globals` and `bindingHandlers`, and the provider instance keeps those exact references.
   Specs: `packages/provider/spec/providerBehaviors.ts`
+
+_Curated source: `packages/provider/verified-behaviors.json`_

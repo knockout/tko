@@ -4,8 +4,6 @@
 
 `computed`, `when`, `throttle`, and `rateLimit` behavior covered by the async/unit specs.
 
-status: curated · specs: `packages/computed/spec` · curated: `packages/computed/verified-behaviors.json`
-
 ## Behaviors
 
 - `extend({ throttle: timeout })` delays observable change notifications until writes stop, then emits the latest value.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/computed/spec` · curated: `packages/compute
 - `when(predicate, callback)` runs the callback once, then disposes its subscription.
   Notes: The predicate may be either a function or an observable. The return value exposes `dispose()` to cancel the pending notification. With deferred updates enabled, the callback runs in a later task.
   Specs: `packages/computed/spec/observableUtilsBehaviors.ts`, `packages/computed/spec/asyncBehaviors.ts`
+
+_Curated source: `packages/computed/verified-behaviors.json`_

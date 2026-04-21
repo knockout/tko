@@ -4,8 +4,6 @@
 
 Binding-expression parsing, identifier lookup, filters, namespaces, and preprocess hooks.
 
-status: curated · specs: `packages/utils.parser/spec` · curated: `packages/utils.parser/verified-behaviors.json`
-
 ## Behaviors
 
 - The parser supports object-literal bindings, arrays, arithmetic, logic, ternaries, lambdas, function calls, indexing, optional chaining, nullish coalescing, template-string interpolation, and comment or virtual-element parsing.
@@ -20,3 +18,5 @@ status: curated · specs: `packages/utils.parser/spec` · curated: `packages/uti
   Specs: `packages/utils.parser/spec/namespaceBehaviors.ts`
 - Binding-handler `preprocess` hooks can rewrite values, add bindings, chain across added bindings, and resolve dynamically created binding handlers during preprocessing.
   Specs: `packages/utils.parser/spec/preprocessingBehavior.ts`
+
+_Curated source: `packages/utils.parser/verified-behaviors.json`_
