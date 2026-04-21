@@ -284,7 +284,7 @@ tko.applyBindings({ removeTodo: t => todos.remove(t) }, root)
 ## Gotchas
 
 - **Async computeds are dangerous.** Dependency tracking runs synchronously — it records which observables are read during the evaluator, then stops. An `async` evaluator returns a Promise at the first `await`, so any observable reads after that are outside the tracking window and never registered as dependencies. The computed cannot know when the async function finishes (halting problem). If you must use async computeds, read all observable dependencies *before* the first `await`.
-- **Don't create computeds/subscriptions inside computeds.** A computed re-evaluates every time a dependency changes. If the evaluator creates a new `computed()` or `subscribe()` each run, those pile up and never get disposed — memory and CPU explode. Create subscriptions once outside, or dispose the previous one before creating a new one.
+- **Never create reactive primitives inside a computed's evaluator.** Each re-evaluation allocates a new instance — for `ko.computed()` and `.subscribe()` the old instance stays alive with its subscriptions, so memory and CPU grow unbounded; for `ko.observable()` / `ko.observableArray()` the allocation itself is the only leak (no subscriptions to drag along), but it is still waste. Create reactive primitives once outside the computed, or inside a `LifeCycle`-enabled constructor. See "Observables vs computed dependency management" above for the full discussion.
 - **Duplicate primitive writes are ignored.** `obs('A'); obs('A')` sends no notification. Object writes always notify.
 - **`obs.peek()`** reads without creating a dependency (useful inside computed).
 - **`observable()` with no arg** starts as `undefined`, not null.
