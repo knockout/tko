@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/utils
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Task scheduling, DOM disposal, memoization, HTML parsing, and array diff utilities.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/utils`, especially task scheduling, DOM disposal, memoization, HTML parsing, and array diff utilities.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/utils/spec`
-- Curated source: `packages/utils/verified-behaviors.json`
+status: curated · specs: `packages/utils/spec` · curated: `packages/utils/verified-behaviors.json`
 
 ## Behaviors
 

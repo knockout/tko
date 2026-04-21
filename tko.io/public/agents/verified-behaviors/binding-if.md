@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/binding.if
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Conditional and contextual bindings: `if`, `ifnot`, `with`, `else`, and `elseif`.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/binding.if`, especially conditional and contextual bindings: `if`, `ifnot`, `with`, `else`, and `elseif`.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/binding.if/spec`
-- Curated source: `packages/binding.if/verified-behaviors.json`
+status: curated · specs: `packages/binding.if/spec` · curated: `packages/binding.if/verified-behaviors.json`
 
 ## Behaviors
 

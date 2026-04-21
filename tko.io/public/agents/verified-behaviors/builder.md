@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/builder
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Builder construction from explicit provider, binding, filter, and option inputs.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/builder`, especially builder construction from explicit provider, binding, filter, and option inputs.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/builder/spec`
-- Curated source: `packages/builder/verified-behaviors.json`
+status: curated · specs: `packages/builder/spec` · curated: `packages/builder/verified-behaviors.json`
 
 ## Behaviors
 

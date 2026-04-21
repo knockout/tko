@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/filter.punches
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Built-in string, defaulting, fitting, and JSON filters.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/filter.punches`, especially built-in string, defaulting, fitting, and JSON filters.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/filter.punches/spec`
-- Curated source: `packages/filter.punches/verified-behaviors.json`
+status: curated · specs: `packages/filter.punches/spec` · curated: `packages/filter.punches/verified-behaviors.json`
 
 ## Behaviors
 

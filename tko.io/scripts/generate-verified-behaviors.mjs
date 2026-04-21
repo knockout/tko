@@ -9,10 +9,7 @@ const packagesRoot = path.join(repoRoot, 'packages')
 const outputDir = path.join(siteRoot, 'public', 'agents', 'verified-behaviors')
 const curatedFilename = 'verified-behaviors.json'
 
-const generatedNotice = [
-  '> Generated from package discovery plus package-local curated unit-test-backed JSON.',
-  '> If a behavior is not covered by unit tests, it does not belong in this directory.'
-].join('\n')
+const generatedNotice = '> Generated from package discovery + curated JSON. Unit-test-backed only.'
 
 const STATUS = {
   CURATED: 'curated',
@@ -53,26 +50,13 @@ async function readPackageDescription(packageDir) {
   }
 }
 
-function statusSummary(status) {
-  if (status === STATUS.CURATED) return 'Curated from unit tests.'
-  if (status === STATUS.NEEDS_CURATION) return 'Tests exist, but verified behaviors have not been curated yet.'
-  return 'No tests found for this package.'
-}
-
-function lowerFirst(text) {
-  if (!text) return text
-  if (text.length > 1 && text[0] === text[0].toUpperCase() && text[1] === text[1].toUpperCase()) {
-    return text
-  }
-  return text.charAt(0).toLowerCase() + text.slice(1)
-}
-
-function deriveWhenToRead(pkg) {
-  if (pkg.whenToRead) return pkg.whenToRead
-  return `Read this when you need test-backed behavior for \`${pkg.title}\`, especially ${lowerFirst(pkg.description)}`
-}
-
 function renderPackage(pkg) {
+  const statusRefs = [
+    `status: ${pkg.status}`,
+    ...(pkg.hasTests ? [`specs: \`${pkg.specDirRelative}\``] : []),
+    ...(pkg.curatedRelativePath ? [`curated: \`${pkg.curatedRelativePath}\``] : [])
+  ].join(' · ')
+
   return [
     `# Verified Behaviors: ${pkg.title}`,
     '',
@@ -80,22 +64,13 @@ function renderPackage(pkg) {
     '',
     pkg.description,
     '',
-    '## When to Read This',
-    '',
-    deriveWhenToRead(pkg),
-    '',
-    '## Status',
-    '',
-    `- Status: ${pkg.status}`,
-    `- Summary: ${statusSummary(pkg.status)}`,
-    ...(pkg.hasTests ? [`- Spec directory: \`${pkg.specDirRelative}\``] : []),
-    ...(pkg.curatedRelativePath ? [`- Curated source: \`${pkg.curatedRelativePath}\``] : []),
+    statusRefs,
     '',
     ...(pkg.behaviors.length
       ? ['## Behaviors', '', ...pkg.behaviors.map(renderBehavior)]
       : pkg.hasTests
-        ? ['## Next Step', '', `Add curated entries backed by unit tests to \`${pkg.expectedCuratedRelativePath}\`.`]
-        : ['## Next Step', '', 'Add tests first, then publish curated verified behaviors once the behavior contract is covered.']),
+        ? [`Add curated entries backed by unit tests to \`${pkg.expectedCuratedRelativePath}\`.`]
+        : ['Add tests first, then curate.']),
     ''
   ].join('\n')
 }
@@ -106,11 +81,7 @@ function renderIndex(packages) {
     '',
     generatedNotice,
     '',
-    'Package-scoped behavior summaries for agents. Every package gets a file.',
-    '',
-    '## Packages',
-    '',
-    ...packages.map(pkg => `- [${pkg.title}](./${pkg.slug}.md) - ${pkg.indexDescription}`),
+    ...packages.map(pkg => `- [${pkg.title}](./${pkg.slug}.md) — ${pkg.indexDescription}`),
     ''
   ].join('\n')
 }

@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/provider.virtual
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Virtual comment-node bindings and `<ko>` preprocessing.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/provider.virtual`, especially virtual comment-node bindings and `<ko>` preprocessing.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/provider.virtual/spec`
-- Curated source: `packages/provider.virtual/verified-behaviors.json`
+status: curated · specs: `packages/provider.virtual/spec` · curated: `packages/provider.virtual/verified-behaviors.json`
 
 ## Behaviors
 

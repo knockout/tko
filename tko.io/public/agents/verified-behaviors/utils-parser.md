@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/utils.parser
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Binding-expression parsing, identifier lookup, filters, namespaces, and preprocess hooks.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/utils.parser`, especially binding-expression parsing, identifier lookup, filters, namespaces, and preprocess hooks.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/utils.parser/spec`
-- Curated source: `packages/utils.parser/verified-behaviors.json`
+status: curated · specs: `packages/utils.parser/spec` · curated: `packages/utils.parser/verified-behaviors.json`
 
 ## Behaviors
 

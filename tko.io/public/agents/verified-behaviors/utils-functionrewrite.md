@@ -1,20 +1,10 @@
 # Verified Behaviors: @tko/utils.functionrewrite
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Rewriting classic function literals in binding strings.
 
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/utils.functionrewrite`, especially rewriting classic function literals in binding strings.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/utils.functionrewrite/spec`
-- Curated source: `packages/utils.functionrewrite/verified-behaviors.json`
+status: curated · specs: `packages/utils.functionrewrite/spec` · curated: `packages/utils.functionrewrite/verified-behaviors.json`
 
 ## Behaviors
 
