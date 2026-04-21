@@ -35,6 +35,22 @@
     -->
     <div id="mocha"></div>
     <div id="err"></div>
+
+    <!-- Pre-module bootstrap: sets `globalThis.ko` from the prebuilt
+         knockout-compat IIFE so that specs which reference `ko.*`
+         at module-top (e.g. `ko.utils.arrayForEach(...)` template-
+         engine registrations in `builds/knockout/spec/`) find `ko`
+         already defined. ESM hoisting otherwise puts the wrapper's
+         `globalThis.ko = ko` top-level statement AFTER the spec
+         import, and spec module-top throws `ReferenceError: ko is
+         not defined`.
+
+         The wrapper still reassigns `globalThis.ko` to the source-
+         bundled build after imports finish, so test bodies run
+         against the same module graph their `@tko/*` imports do
+         (class-identity preserved). -->
+    <script src="/lib/ko.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/mocha@10/mocha.js"></script>
     <script>
       // Runner setup must happen BEFORE the spec module evaluates —

@@ -32,13 +32,19 @@ describe('else inside an if binding', function () {
   })
 
   describe('as <!-- else -->', function () {
+    // innerText preserves whitespace from the HTML source in real
+    // browsers (happy-dom normalizes it, which is why that path
+    // skips). The source here intentionally includes a space
+    // around `<!-- else -->` so the comment parses as a binding,
+    // so the selected branch keeps a trailing/leading space in its
+    // text node. Trim assertions instead of stripping the source.
     it('is ignored when the condition is true', function (ctx: any) {
       if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       testNode.innerHTML = "<i data-bind='if: x'>" + 'abc <!-- else --> def' + '</i>'
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: true }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText).to.equal('abc')
+      expect(testNode.innerText.trim()).to.equal('abc')
     })
 
     it('shows the else-block when the condition is false', function (ctx: any) {
@@ -47,7 +53,7 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: false }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText).to.equal('def')
+      expect(testNode.innerText.trim()).to.equal('def')
     })
 
     it('toggles between if/else on condition change', function (ctx: any) {
@@ -57,9 +63,9 @@ describe('else inside an if binding', function () {
       expect(testNode.childNodes[0].childNodes.length).to.equal(3)
       applyBindings({ x: x }, testNode)
       expect(testNode.childNodes[0].childNodes.length).to.equal(1)
-      expect(testNode.innerText).to.equal('def')
+      expect(testNode.innerText.trim()).to.equal('def')
       x(true)
-      expect(testNode.innerText).to.equal('abc')
+      expect(testNode.innerText.trim()).to.equal('abc')
     })
   })
 })
