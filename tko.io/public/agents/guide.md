@@ -72,18 +72,18 @@ When the goal is to demonstrate TKO itself, keep the state flow inside observabl
 - If an example contrasts reactive models, the counters and highlighted state should also be observable-driven so the example demonstrates the pattern instead of bypassing it.
 - The line to avoid is using the DOM itself as the mutable source of truth after bindings are active.
 
-### Reactive styling: two valid patterns
+### Reactive styling
 
-Reactive state that drives visual variations can be expressed two ways. Neither is universally "correct" — both produce the same runtime behaviour. **Pick one and apply it consistently across a codebase.** Mixing the two for the same kind of state is what hurts readability.
+Reactive state that drives visual variations can be expressed several ways in TKO. Two common patterns are shown below; they are examples, not an exhaustive list (CSS custom properties written from a computed, classless inline style objects, component-scoped style blocks, and CSS-in-JS tokens are all reasonable too). **What matters more than the specific pattern is that a codebase applies one consistently** for the same kind of state — mixing approaches for identical problems is what hurts readability.
 
-**Pattern A — computed class name / inline style.** The computed returns the exact class name or style string. Styling lives next to the reactive expression.
+**Example A — computed class name / inline style.** The computed returns the class name or style string directly. The rule sits next to the reactive expression.
 
 ```tsx
 const className = this.computed(() => this.isActive() ? classes.active : classes.inactive)
 return <div class={className}>...</div>
 ```
 
-**Pattern B — computed attribute, CSS selector does the switching.** The computed returns a flag value; CSS reads the attribute and applies styles.
+**Example B — computed attribute, CSS selector does the switching.** The computed returns a flag value; CSS reads the attribute and applies styles.
 
 ```tsx
 const activeAttr = this.computed(() => this.isActive() || undefined)
@@ -95,13 +95,13 @@ return <div data-active={activeAttr}>...</div>
 .my-component[data-active] { opacity: 1; }
 ```
 
-**Trade-offs.**
-- Pattern A keeps the rule ("active → this class") visible in the component file; refactors that rename classes stay local. Split visibility if the class body lives in a separate stylesheet.
-- Pattern B keeps styling in CSS and pairs naturally with the `|| undefined` pattern for binary attributes (see Gotchas); adding a new visual variant means editing CSS, not the component.
-- Pattern B sidesteps class-name string concatenation inside computeds for complex multi-state styling. Pattern A can avoid the same footgun with template literals or a class-map helper; it just doesn't get it for free.
-- Pattern A reads more directly when one class encapsulates many unrelated properties that Pattern B would need multiple attribute selectors to reach.
+**Trade-offs between these two.**
+- A keeps the rule ("active → this class") visible in the component file; refactors that rename classes stay local. Split visibility if the class body lives in a separate stylesheet.
+- B keeps styling in CSS and pairs naturally with the `|| undefined` pattern for binary attributes (see Gotchas); adding a new visual variant means editing CSS, not the component.
+- B sidesteps class-name string concatenation inside computeds for complex multi-state styling. A can avoid the same footgun with template literals or a class-map helper; it just doesn't get it for free.
+- A reads more directly when one class encapsulates many unrelated properties that B would need multiple attribute selectors to reach.
 
-Whichever pattern the codebase adopts, the corresponding classic `data-bind` writers are `css:` / `style:` for pattern A, or `attr:` for pattern B (`data-bind="attr: { 'data-active': activeAttr }"`).
+Classic `data-bind` writers for the same effects: `css:` / `style:` for A, `attr:` for B (`data-bind="attr: { 'data-active': activeAttr }"`).
 
 ### JSX scope rule
 

@@ -58,10 +58,11 @@ looks like and is asked only "where is this wrong?".
 - Apply the AGENTS.md failure-modes list *and* the domain-specific checklist for the artefact type (docs → "Never ship docs that reference things that don't exist"; tests → disposal leaks + env assumptions; public API → backwards-compat + changeset; etc.).
 - If the reviewer returns a finding, **verify the specific claim** (re-run the command, read the named file, grep for the named symbol) — do not rely on your own prior reasoning to dismiss it. Subagents produce false positives, so verification is defensive, not a licence to override. If after verification you still believe the finding is wrong, record the reasoning in the PR description or as a code comment so a future reader (or maintainer) can judge it; do not silently reject.
 - If the pass surfaces a finding that belongs in a separate PR, file a follow-up or spawn a task rather than expanding the current change — keep "Keep PRs focused" intact.
-- Record that the pass was run. A single line in the PR description is enough:
+- Record that the pass was run. A single line at the end of the **commit message** that introduces the in-scope change is enough:
   `Adversarial pass: <reviewer name or subagent_type>. Result: clean` or
   `Adversarial pass: <reviewer>. Flagged <N>: <summary>. Resolved: <how>.`
-  Without an audit trail, compliance is unverifiable and the rule is trivially gamed.
+  If a PR has multiple in-scope commits, each gets its own audit line; do not batch them. The commit message is the right home: it travels with the change in `git log` forever, stays granular to what was reviewed, and keeps process metadata out of the PR description (which is for *why* the change exists and *what* it does — not for reviewer ceremony). Do not add review outcomes to the PR description. Without *some* audit trail, compliance is unverifiable and the rule is trivially gamed; the commit message is a cheap, out-of-the-way place to leave it.
+  Caveat for squash-merge repos: squashing collapses per-commit audit lines into the squash target's message. That is acceptable as long as the lines survive the squash; if the squash message is auto-truncated or rewritten, copy the audit lines into it manually before merging.
 - Only after the pass returns clean (or returns findings that you have verified and addressed, deferred to a follow-up, or consciously rejected with documented reasoning) may you declare the work done.
 
 ## Credits
