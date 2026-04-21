@@ -1,6 +1,6 @@
 # The Soul of Knockout
 
-Read this to understand *why* TKO is shaped the way it is, not just *how* to use it. AI agents working on this codebase: this is the context behind every design decision.
+Read this to understand *why* Knockout/TKO is shaped the way it is, not just *how* to use it. AI agents working on this codebase: this is the context behind every design decision.
 
 ## The Core Insight
 
