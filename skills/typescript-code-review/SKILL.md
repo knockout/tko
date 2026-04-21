@@ -93,6 +93,7 @@ description: Perform comprehensive code reviews for LLM-based linting of TypeScr
 Grep references for specific topics:
 - `references/review-reference.md` — type safety checklist, anti-patterns with bad/good examples
 - `references/tko-conventions.md` — TKO monorepo-specific patterns and overrides
+- `AGENTS.md` — when to use this skill vs others
 
 ### 6. tsconfig Review
 

@@ -62,7 +62,7 @@ Key settings to be aware of:
 | `strict` | `true` | Strict mode enabled |
 | `verbatimModuleSyntax` | `true` | `import type` is mandatory for type-only imports |
 | `noEmit` | `true` | esbuild handles compilation; `tsc` only type-checks |
-| `target` | `ES2020` | ES2020 output target |
+| `target` | `ES2022` | ES2022 output target |
 
 
 ### `import type` Enforcement
@@ -151,7 +151,6 @@ const textInput = {
 
 ## Package Conventions
 
-- Each package: `src/`, `spec/`, `types/`, `dist/`, `index.ts`, `Makefile`
 - Inter-package deps use `@tko/package-name` (npm workspaces)
 - **Zero runtime dependencies** — never add external packages to core
 - **Named exports** are strongly preferred (~281 inline vs ~29 default)
@@ -159,11 +158,14 @@ const textInput = {
 
 ## Testing
 
-- **New tests**: Mocha + Chai + Sinon (not Jasmine)
-- **Runner**: Vitest + Playwright (chromium/firefox/webkit)
-- **Test location**: `packages/*/spec/`
+- **Runner**: Vitest + Playwright
+- **Test location**: `packages/*/spec/**/*.ts` and `builds/*/spec/**/*.js`
 - Coverage target: ~89% statements, ~83% branches
 
 ## Code Style
 
 - Run `bun run format` before committing
+
+## References
+
+- More Examples are located under `/tko.io/public/`
