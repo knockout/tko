@@ -18,6 +18,7 @@
 - /agents/testing.md — run + verify TKO code
 - /agents/contract.md — state/binding/DOM architecture
 - /agents/options.md — `ko.options.*` — when to use `defineOption` vs core Options fields
+- /agents/process.md — mandatory agent workflow (doc-ref verification, adversarial review)
 - /agents/verified-behaviors/index.md — test-backed behavior contracts
 - /agents/sample-tsx.html — minimal browser TSX scaffold
 - /examples/ — interactive self-contained HTML examples

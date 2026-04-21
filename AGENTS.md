@@ -176,26 +176,7 @@ changes — update **both** the Starlight docs (for humans) and the agent guide
 (for agents). The agent guide should be token-efficient: dense, code-first,
 minimal prose.
 
-### Never ship docs that reference things that don't exist on the target branch
-
-Before including a doc file — especially any untracked/generated file you find
-in the working tree — verify every package, export, class, function, spec path,
-or URL it names actually exists on the branch you are merging into (normally
-`main`).
-
-Mandatory checks before staging a docs file:
-
-1. `git ls-files <path>` — is it tracked? If not, where did it come from?
-   - If it was emitted by a generator (e.g. `tko.io/scripts/generate-verified-behaviors.mjs`), re-run the generator on a clean checkout of the target branch and diff. If the generator does not produce it, it is stale — do not ship it.
-   - If it was hand-written on a different branch, confirm that branch has merged into the target. `git log --all -- <path>` and `git branch --contains <commit>` will show where it lives.
-2. For each package name in the doc: `ls packages/<name>` and confirm a matching `package.json`. Orphan `@tko/*` references mislead both humans and downstream agents.
-3. For each spec path in the doc: the file must exist at the named location.
-4. For each external URL in the doc: it is OK to trust user-provided URLs, but do not invent them.
-
-The failure mode is shipping a doc that promises behaviour the code does not
-deliver. That is worse than no doc at all — it poisons every future reader
-(human or agent) that trusts the docs as a contract. When in doubt, leave it
-out and open a follow-up.
+**Before staging any doc, verify every package, spec path, and URL it names exists on the target branch.** Pay extra attention to untracked or generated files in the working tree. Full checklist: [`tko.io/public/agents/process.md`](tko.io/public/agents/process.md#never-ship-docs-that-reference-things-that-dont-exist-on-the-target-branch).
 
 ## Docs Verification
 
@@ -225,33 +206,7 @@ Avoid scope creep. If an improvement would balloon the PR, file a follow-up issu
 
 Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises.
 
-**Adversarial review is mandatory, not optional, for anything that changes package behavior, public API, test coverage, docs the team relies on, CI workflows, or build/config that affects the matrix.** A single pair of eyes (yours) is not enough in a dark factory. If small teams plus agents are going to maintain what once took a big team, the missing human reviewer has to be replaced by a second agent that was not told what "good" looks like and is asked only "where is this wrong?".
-
-In scope (always run the pass):
-- Code changes in `packages/*` or `builds/*`
-- Test additions, deletions, or env changes
-- Public `@tko/*` API surface
-- Docs in `tko.io/public/` and agent-facing files (`llms.txt`, `agents/*`)
-- CI workflows, `tools/build.ts`, `vitest.config.ts`, `biome.json`
-- Changesets and commit messages that land a PR
-
-Out of scope (proportionality):
-- Typos, whitespace, comment corrections that do not change behavior or public surface
-- The adversarial review itself — its report is not an artefact that needs its own review. One pass per change closes the loop.
-
-How to run the pass, every time it is in scope:
-
-- Spawn a fresh subagent (`Agent` tool, specialized `subagent_type` when one fits, otherwise `Explore`). Do **not** let the agent that produced the change also sign it off — that is a null check.
-- Brief the reviewer with the **artefact (diff or file) and the claim it makes** ("this PR does X"). Do **not** include your reasoning for why it works, the commit message you intend to write, or the PR title. Anchoring the reviewer to your conclusion defeats the pass.
-- Prompt it to enumerate likely failure modes *before* reviewing for correctness (e.g. "list the three most likely ways this could break, then check each"). Ask: "where is this wrong, what would break, what would mislead a future reader?" Bias toward flagging.
-- Apply the failure-modes list below *and* the domain-specific checklist for the artefact type (docs → "Never ship docs that reference things that don't exist"; tests → disposal leaks + env assumptions; public API → backwards-compat + changeset; etc.).
-- If the reviewer returns a finding, **verify the specific claim** (re-run the command, read the named file, grep for the named symbol) — do not rely on your own prior reasoning to dismiss it. Subagents produce false positives, so verification is defensive, not a licence to override. If after verification you still believe the finding is wrong, record the reasoning in the PR description or as a code comment so a future reader (or maintainer) can judge it; do not silently reject.
-- If the pass surfaces a finding that belongs in a separate PR, file a follow-up or spawn a task rather than expanding the current change — keep "Keep PRs focused" intact.
-- Record that the pass was run. A single line in the PR description is enough:
-  `Adversarial pass: <reviewer name or subagent_type>. Result: clean` or
-  `Adversarial pass: <reviewer>. Flagged <N>: <summary>. Resolved: <how>.`
-  Without an audit trail, compliance is unverifiable and the rule is trivially gamed.
-- Only after the pass returns clean (or returns findings that you have verified and addressed, deferred to a follow-up, or consciously rejected with documented reasoning) may you declare the work done.
+**Adversarial review is mandatory for in-scope changes** (code, tests, public API, agent-facing docs, CI, `tools/build.ts`, `vitest.config.ts`, `biome.json`, landing commit messages). A single pair of eyes (yours) is not enough in a dark factory — the missing human reviewer has to be replaced by a second agent that was not told what "good" looks like and is asked only "where is this wrong?". Spawn a fresh subagent, brief it with the artefact + claim only (no author reasoning), bias toward flagging, verify any findings defensively, and record the outcome in the PR description. Out of scope: typos, whitespace, comment corrections. Full how-to and audit-trail format: [`tko.io/public/agents/process.md`](tko.io/public/agents/process.md#adversarial-review-is-mandatory).
 
 This is the ceiling on "Always Improve": that section pushes toward *more* in a PR; this one pushes toward *scrutiny* of what's in it. Use both — improve in scope, audit the scope itself here.
 
