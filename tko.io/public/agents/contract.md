@@ -1,6 +1,6 @@
 # TKO Agent Contract
 
-Use this file when deciding how state, bindings, and DOM work should be divided in TKO examples and prototypes.
+Use this file when deciding how to divide state, bindings, and DOM work in TKO examples and prototypes.
 
 ## Core Rule
 
@@ -10,7 +10,8 @@ Use this file when deciding how state, bindings, and DOM work should be divided 
 
 ## Replace X With Y
 
-- This section is about replacing ad-hoc DOM/event/state handling with bindings, not about binding-syntax style.
+Replace ad-hoc DOM/event/state handling with bindings. Not about binding-syntax style.
+
 - If you are about to do `element.textContent = value`, use the `text` binding.
 - If you are about to do `element.innerHTML = markup`, first ask whether the content should be plain text instead; prefer the `text` binding by default. Use `html` only when rendering trusted HTML is truly the point.
 - If you are about to manually create, replace, or reconcile a repeated set of child nodes, use `foreach`.

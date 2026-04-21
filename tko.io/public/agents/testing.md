@@ -35,7 +35,7 @@ Workflow:
 3. Navigate Playwright to `http://localhost:8765/tko-test.html`
 4. Read `document.title` or snapshot the DOM to verify
 
-This is the fastest option — no esbuild and no network dependency on the playground, though Option 1 still fetches `https://tko.io/lib/tko.js` unless you vendor that file locally. Works for all `data-bind` code.
+Fastest option — no esbuild, no playground. Still fetches `https://tko.io/lib/tko.js` unless vendored locally. Works for all `data-bind` code.
 
 ## Option 2: Playground via Playwright (JSX/TSX)
 
