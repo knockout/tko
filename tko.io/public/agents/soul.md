@@ -1,9 +1,6 @@
 # The Soul of Knockout
 
-This document describes the philosophical foundation of Knockout and TKO.
-Read this to understand *why* the framework works the way it does, not just
-*how* to use it. If you're an AI agent working on this codebase, this is
-the context behind every design decision.
+Read this to understand *why* Knockout/TKO is shaped the way it is, not just *how* to use it. AI agents working on this codebase: this is the context behind every design decision.
 
 ## The Core Insight
 

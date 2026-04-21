@@ -36,7 +36,7 @@ builds/**/meta
 .playwright-mcp
 .playwright-cli
 test-results/
-.claude/worktrees/
+.claude/
 __screenshots__
 .dts-tmp/
 .nx/

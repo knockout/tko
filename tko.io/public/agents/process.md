@@ -77,7 +77,7 @@ For pages with runnable TSX examples, also run the headless Playwright flow:
 - Use `playwright-cli` in headless mode. Do not use headed/browser-stealing runs unless the user explicitly asks for them.
 - Prefer a live Astro dev server on `127.0.0.1:4321` so markdown/plugin edits reload while you work (`bun run dev` in `tko.io/`).
 - Verify each `Open in Playground` button on the page; if a page has multiple TSX examples, check every one, not just the first.
-- Standard flow: `playwright-cli close-all`, `playwright-cli open http://127.0.0.1:4321/...`, inspect the snapshot for playground refs, click each button, switch to the playground tab, and confirm `#esbuild-status`, `#compile-time`, and `#error-bar`.
+- Standard flow: `playwright-cli close-all`, `playwright-cli open http://127.0.0.1:4321/...`, inspect the snapshot for playground refs, click each button, switch to the playground tab, and confirm `[data-role="status"]` (shows "esbuild ready"), `[data-role="compile-time"]`, and `[data-role="error-bar"]`.
 - Treat docs example work as incomplete until the emitted playground payload compiles cleanly on the live site.
 
 Generator-owned files: see the note at the top of this document under "Never ship docs that reference things that don't exist on the target branch."
