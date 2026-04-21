@@ -65,6 +65,23 @@ looks like and is asked only "where is this wrong?".
   Caveat for squash-merge repos: squashing collapses per-commit audit lines into the squash target's message. That is acceptable as long as the lines survive the squash; if the squash message is auto-truncated or rewritten, copy the audit lines into it manually before merging.
 - Only after the pass returns clean (or returns findings that you have verified and addressed, deferred to a follow-up, or consciously rejected with documented reasoning) may you declare the work done.
 
+## Docs verification
+
+When changing `tko.io` documentation, verify before declaring done.
+
+Minimum (any docs change):
+- `bun run build` in `tko.io/` — clean Astro build is mandatory. It runs the verified-behaviors generator, rebuilds the TKO bundles, and compiles every page. A failure here = broken docs.
+
+For pages with runnable TSX examples, also run the headless Playwright flow:
+
+- Use `playwright-cli` in headless mode. Do not use headed/browser-stealing runs unless the user explicitly asks for them.
+- Prefer a live Astro dev server on `127.0.0.1:4321` so markdown/plugin edits reload while you work (`bun run dev` in `tko.io/`).
+- Verify each `Open in Playground` button on the page; if a page has multiple TSX examples, check every one, not just the first.
+- Standard flow: `playwright-cli close-all`, `playwright-cli open http://127.0.0.1:4321/...`, inspect the snapshot for playground refs, click each button, switch to the playground tab, and confirm `#esbuild-status`, `#compile-time`, and `#error-bar`.
+- Treat docs example work as incomplete until the emitted playground payload compiles cleanly on the live site.
+
+Also — `tko.io/public/agents/verified-behaviors/*.md` are regenerated from `packages/*/verified-behaviors.json` on every `prebuild` / `predev` / CI build. Edit the JSON source, never the generated markdown. Hand edits are wiped on the next build.
+
 ## Credits
 
 Architectural review guidelines at `agents/contract.md` ("DOM Mutation
