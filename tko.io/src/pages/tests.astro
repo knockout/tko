@@ -1,14 +1,38 @@
 ---
 // TKO Browser Test Runner
 //
-// Loads mocha + chai + sinon (via the bundled test suite) and
-// runs the TKO specs in whichever browser is visiting the page.
-// Written so an AI agent can navigate to /tests, read the rendered
-// Mocha report, and learn pass/fail without cloning the repo.
+// Visit /tests (optionally with query params) to run the TKO
+// spec suite in the visiting browser. Two bundles drive the page:
 //
-// Build pipeline: `tko.io/scripts/bundle-tests.mjs` generates
-// `public/tests/bundle.js` from `packages/*/spec/**/*.ts`. See
-// that script for scope and resolution notes.
+//   build-bundle.js   Specs that only touch `ko.*` globals —
+//                     version-portable. Runs against whichever
+//                     build the page has loaded.
+//   source-bundle.js  Specs that `import` from `@tko/*`. Tightly
+//                     coupled to the in-tree source; only valid
+//                     when the page loads the in-tree /lib/ko.js.
+//
+// URL state (all optional, all round-trip via the Run button):
+//   ?mode=dev           (default) in-tree build + both bundles
+//   ?mode=build         load a @tko/build.* from unpkg + build bundle
+//                       only; source bundle incompatible with a
+//                       non-dev ko (would re-bundle its own source
+//                       and collide on class identity)
+//   ?pkg=knockout       either "knockout" or "reference"; ignored
+//                       when mode=dev
+//   ?ver=4.1.0-alpha    specific version; ignored when mode=dev;
+//                       defaults to "latest"
+//   ?suites=build       comma-list of suites to include: "build"
+//                       and/or "source". When unset: both in dev
+//                       mode, build-only in build mode.
+//   ?grep=<regex>       passed through to Mocha's native grep.
+//
+// The runner writes its resolved config into a footer line and
+// `window.__tkoRunnerConfig` so an agent can verify what actually
+// ran without parsing the URL twice.
+//
+// See `tko.io/scripts/bundle-tests.mjs` for the bundler and
+// `builds/knockout/helpers/browser-setup.js` for the in-bundle
+// setup (globals, hooks, ctx-arg shim).
 ---
 <!doctype html>
 <html lang="en">
@@ -16,66 +40,272 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TKO · Browser Tests</title>
-    <!--
-      Mocha HTML reporter loads via CDN. If the CDN is unavailable,
-      the page fails loud (no fallback) — the dark-factory promise
-      is "visit /tests and see live results"; a stale local copy
-      would undermine that. Pin a major version for stability.
-    -->
     <link rel="stylesheet" href="https://unpkg.com/mocha@10/mocha.css" />
     <style>
-      body { margin: 0; font-family: system-ui, sans-serif; }
-      header {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #e5e5e5;
+      :root {
+        --bg: #0f1115;
+        --fg: #e8e8e8;
+        --muted: #9aa1ab;
+        --accent: #62d4ff;
+        --ok: #50d18a;
+        --warn: #ffaa4d;
+        --err: #ff6b6b;
+        --panel: #161a22;
+        --border: #242a36;
       }
-      header h1 { margin: 0; font-size: 1.2rem; }
-      header p { margin: 0.25rem 0 0; color: #666; font-size: 0.9rem; }
+      body { margin: 0; background: var(--bg); color: var(--fg); font-family: ui-sans-serif, system-ui, sans-serif; }
+      header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--panel); }
+      h1 { margin: 0 0 0.25rem; font-size: 1.15rem; }
+      .tagline { margin: 0; color: var(--muted); font-size: 0.88rem; }
+      .chrome {
+        display: grid;
+        grid-template-columns: max-content 1fr max-content;
+        gap: 0.5rem 1rem;
+        align-items: center;
+        margin-top: 0.85rem;
+        font-size: 0.9rem;
+      }
+      .chrome label { color: var(--muted); white-space: nowrap; }
+      .chrome .value { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+      .chrome input[type=radio], .chrome input[type=checkbox] { accent-color: var(--accent); }
+      .chrome select, .chrome button {
+        background: var(--bg);
+        color: var(--fg);
+        border: 1px solid var(--border);
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font: inherit;
+      }
+      .chrome button { cursor: pointer; background: var(--accent); color: #00222e; border-color: var(--accent); font-weight: 600; }
+      .chrome button:hover { filter: brightness(1.1); }
+      .stats { padding: 0.6rem 1.25rem; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+      .stats .ok { color: var(--ok); }
+      .stats .err { color: var(--err); }
+      .stats .pending { color: var(--warn); }
+      .stats .muted { color: var(--muted); }
       #mocha { padding: 0 1rem; }
+      .errors-drawer {
+        margin: 0.5rem 1.25rem 1rem;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--err);
+        border-radius: 4px;
+        background: rgba(255,107,107,0.08);
+        color: var(--err);
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        display: none;
+      }
+      .errors-drawer.shown { display: block; }
+      footer { padding: 0.75rem 1.25rem; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em; }
     </style>
   </head>
   <body>
     <header>
       <h1>TKO — Live Browser Tests</h1>
-      <p>Real browser, real DOM, real TKO. Results update as specs finish.</p>
+      <p class="tagline">Real browser, real DOM, real TKO. Every spec in the repo, runnable from a URL.</p>
+      <div class="chrome">
+        <label>Running against</label>
+        <div class="value">
+          <label><input type="radio" name="mode" value="dev" /> in-tree dev</label>
+          <label><input type="radio" name="mode" value="build" data-pkg="knockout" /> build.knockout</label>
+          <label><input type="radio" name="mode" value="build" data-pkg="reference" /> build.reference</label>
+        </div>
+        <span></span>
+
+        <label>Version</label>
+        <div class="value">
+          <select id="ver"><option value="">(disabled in dev)</option></select>
+        </div>
+        <span></span>
+
+        <label>Suites</label>
+        <div class="value">
+          <label><input type="checkbox" id="suite-build" /> build specs (<code>ko.*</code> only, version-portable)</label>
+          <label><input type="checkbox" id="suite-source" /> source specs (bundled <code>@tko/*</code>, dev-only)</label>
+        </div>
+        <button id="run">Run</button>
+      </div>
     </header>
+
+    <div class="stats" id="stats"><span class="muted">Waiting for config…</span></div>
+    <div class="errors-drawer" id="errors"></div>
     <div id="mocha"></div>
 
-    <!-- Surface any uncaught load-time error so we can see why
-         bundle loading stops short of registering all specs. -->
+    <footer id="footer">
+      <span id="footer-config">config pending</span>
+    </footer>
+
+    <!-- Error collector must be first so every later script is
+         observed. -->
     <script is:inline>
       window.__tkoErrors = []
-      window.addEventListener('error', e => window.__tkoErrors.push({ msg: e.message, src: e.filename, line: e.lineno, col: e.colno, stack: e.error?.stack }))
-      window.addEventListener('unhandledrejection', e => window.__tkoErrors.push({ msg: 'unhandled rejection: ' + (e.reason?.message || e.reason), stack: e.reason?.stack }))
+      window.addEventListener('error', e =>
+        window.__tkoErrors.push({ msg: e.message, src: e.filename, line: e.lineno, col: e.colno, stack: e.error?.stack })
+      )
+      window.addEventListener('unhandledrejection', e =>
+        window.__tkoErrors.push({ msg: 'unhandled rejection: ' + (e.reason?.message || e.reason), stack: e.reason?.stack })
+      )
     </script>
 
-    <!-- All four scripts are `is:inline` so Astro leaves them as
-         classic synchronous scripts. Without that, Astro rewrites
-         them to ES modules and the global-shaping order breaks. -->
     <script is:inline src="https://unpkg.com/mocha@10/mocha.js"></script>
     <script is:inline>
-      // 10000ms matches `testTimeout` in vitest.config.ts so slow async
-      // component + binding specs don't flake under Mocha's default
-      // 2000ms budget.
+      // 10000ms matches `testTimeout` in vitest.config.ts.
       mocha.setup({ ui: 'bdd', reporter: 'html', cleanReferencesAfterRun: false, timeout: 10000 })
     </script>
 
-    <!-- Knockout browser bundle — sets globalThis.ko.
-         Built into public/lib/ko.js by tko.io's prebuild script. -->
-    <script is:inline src="/lib/ko.js"></script>
-
-    <!-- The spec bundle — generated by scripts/bundle-tests.mjs.
-         IIFE, binds to window.tkoTests. Loading it runs
-         browser-setup.js (chai/sinon/isHappyDom globals + the
-         jsxCleanBatchSize `before` hook) and then registers
-         every describe/it block via side-effect. -->
-    <script is:inline src="/tests/bundle.js"></script>
-
     <script is:inline>
-      // Kick the runner once all synchronous suite registration
-      // is done. browser-setup.js already registered its `before`
-      // hook by this point.
-      mocha.run()
+      (async function () {
+        const qs = new URLSearchParams(location.search)
+        const mode = qs.get('mode') || 'dev'
+        const pkg = qs.get('pkg') || 'knockout'
+        const ver = qs.get('ver') || 'latest'
+        const suitesParam = qs.get('suites')
+        const defaultSuites = mode === 'dev' ? ['build', 'source'] : ['build']
+        const suites = suitesParam ? suitesParam.split(',').filter(Boolean) : defaultSuites
+        const grep = qs.get('grep')
+        if (grep) mocha.grep(grep)
+
+        const config = { mode, pkg, ver, suites, grep }
+        window.__tkoRunnerConfig = config
+
+        // --- chrome state binding ---
+        const setChrome = () => {
+          const radios = document.querySelectorAll('input[name=mode]')
+          for (const r of radios) {
+            r.checked = (mode === 'dev' && r.value === 'dev')
+                     || (mode === 'build' && r.value === 'build' && r.dataset.pkg === pkg)
+          }
+          document.getElementById('suite-build').checked = suites.includes('build')
+          document.getElementById('suite-source').checked = suites.includes('source')
+          document.getElementById('suite-source').disabled = mode !== 'dev'
+        }
+        setChrome()
+
+        // Populate version picker from npm registry.
+        const verSel = document.getElementById('ver')
+        if (mode === 'build') {
+          verSel.innerHTML = '<option>loading…</option>'
+          try {
+            const res = await fetch(`https://registry.npmjs.org/@tko/build.${pkg}`)
+            const data = await res.json()
+            const versions = Object.keys(data.versions || {}).reverse()
+            const latest = data['dist-tags']?.latest
+            verSel.innerHTML = versions.map(v =>
+              `<option value="${v}" ${v === ver || (ver === 'latest' && v === latest) ? 'selected' : ''}>${v}${v === latest ? ' (latest)' : ''}</option>`
+            ).join('')
+          } catch (e) {
+            verSel.innerHTML = `<option>npm fetch failed: ${e.message}</option>`
+          }
+        } else {
+          verSel.innerHTML = '<option>(disabled in dev)</option>'
+          verSel.disabled = true
+        }
+
+        // --- footer: config summary ---
+        const configSummary = mode === 'dev'
+          ? `mode: in-tree dev · suites: ${suites.join(', ') || '(none)'}`
+          : `mode: build · pkg: @tko/build.${pkg}@${ver} · suites: ${suites.join(', ') || '(none)'}`
+        document.getElementById('footer-config').textContent = configSummary
+
+        // --- Run button wires to URL state ---
+        document.getElementById('run').addEventListener('click', () => {
+          const radios = document.querySelectorAll('input[name=mode]:checked')
+          const selRadio = radios[0]
+          const nextMode = selRadio?.value || 'dev'
+          const nextPkg = selRadio?.dataset.pkg || pkg
+          const nextVer = document.getElementById('ver').value || 'latest'
+          const nextSuites = [
+            document.getElementById('suite-build').checked ? 'build' : null,
+            document.getElementById('suite-source').checked ? 'source' : null
+          ].filter(Boolean)
+          const next = new URLSearchParams()
+          if (nextMode !== 'dev') {
+            next.set('mode', 'build')
+            next.set('pkg', nextPkg)
+            if (nextVer !== 'latest') next.set('ver', nextVer)
+          }
+          if (nextSuites.length && (nextMode !== 'dev' || nextSuites.length !== 2)) {
+            next.set('suites', nextSuites.join(','))
+          }
+          const qstr = next.toString()
+          location.search = qstr ? `?${qstr}` : ''
+        })
+
+        // --- load ko (dev: /lib/ko.js; build: unpkg) ---
+        const koUrl = mode === 'dev'
+          ? '/lib/ko.js'
+          : `https://unpkg.com/@tko/build.${pkg}@${ver}/dist/browser.min.js`
+        await loadScript(koUrl)
+        if (!window.ko) {
+          showError(`Loaded ${koUrl} but window.ko is not defined. Wrong package or version?`)
+          return
+        }
+
+        // --- load the requested spec bundles ---
+        if (suites.includes('build')) await loadScript('/tests/build-bundle.js')
+        if (suites.includes('source')) {
+          if (mode !== 'dev') {
+            showError('source-bundle selected in build mode — skipped (would collide on class identity).')
+          } else {
+            await loadScript('/tests/source-bundle.js')
+          }
+        }
+
+        // --- stats mirror ---
+        const statsEl = document.getElementById('stats')
+        const renderStats = () => {
+          const pass = document.querySelectorAll('#mocha .pass').length
+          const fail = document.querySelectorAll('#mocha .fail').length
+          const pending = document.querySelectorAll('#mocha .pending').length
+          const total = mocha.suite ? countTests(mocha.suite) : 0
+          const done = pass + fail + pending
+          const pct = total ? Math.round(100 * done / total) : 0
+          statsEl.innerHTML =
+            `<span class="ok">✓ ${pass}</span> · ` +
+            `<span class="err">✖ ${fail}</span> · ` +
+            `<span class="pending">○ ${pending}</span> · ` +
+            `<span class="muted">${done} / ${total} · ${pct}%</span>`
+        }
+        const statsTimer = setInterval(renderStats, 250)
+
+        // Surface any collected window errors as the suite runs.
+        setInterval(() => {
+          const errs = window.__tkoErrors
+          if (!errs.length) return
+          const box = document.getElementById('errors')
+          box.textContent = errs.slice(0, 10).map(e => `${e.msg}\n  ${e.src || ''}${e.line ? ':' + e.line : ''}`).join('\n\n')
+          box.classList.add('shown')
+        }, 1000)
+
+        const runner = mocha.run(() => {
+          clearInterval(statsTimer)
+          renderStats()
+        })
+        window.__tkoRunner = runner
+      })()
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement('script')
+          s.src = src
+          s.onload = () => resolve()
+          s.onerror = () => reject(new Error(`failed to load ${src}`))
+          document.head.appendChild(s)
+        })
+      }
+
+      function countTests(suite) {
+        let n = suite.tests.length
+        for (const s of suite.suites) n += countTests(s)
+        return n
+      }
+
+      function showError(msg) {
+        const box = document.getElementById('errors')
+        box.textContent = msg
+        box.classList.add('shown')
+      }
     </script>
   </body>
 </html>

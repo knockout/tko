@@ -1,17 +1,23 @@
-// Bundles TKO specs into a single browser-loadable IIFE so they can
+// Bundles TKO specs into two browser-loadable IIFEs so they can
 // run under Mocha at /tests on tko.io.
 //
-// Inputs:  packages/*/spec/**/*.ts, builds/*/spec/**/*.js
-// Output:  tko.io/public/tests/bundle.js
+//   public/tests/build-bundle.js   Specs from `builds/*/spec/` that
+//                                  reference `ko.*` globals only.
+//                                  Version-portable — runs against
+//                                  any `@tko/build.knockout` or
+//                                  `@tko/build.reference` loaded
+//                                  via <script> at page-level.
 //
-// The generated entry imports every spec file in sequence. When
-// Mocha's browser runner loads the bundle, each spec registers its
-// describe/it blocks via side-effects; mocha.run() then executes
-// them.
+//   public/tests/source-bundle.js  Specs from `packages/*/spec/`
+//                                  that `import` from `@tko/*` or
+//                                  `../src`. Inlines its own copy
+//                                  of the imported source — only
+//                                  valid against the in-tree
+//                                  version of TKO.
 //
-// Only includes `packages/observable` for the initial POC — expand
-// the SCOPE array as each package's specs are verified to run
-// cleanly in-browser.
+// The page (`src/pages/tests.astro`) decides which bundle(s) to
+// load per query-string configuration. See that file for the UI
+// and URL state contract.
 
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
@@ -23,29 +29,33 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const siteRoot = path.resolve(scriptDir, '..')
 const repoRoot = path.resolve(siteRoot, '..')
 const outputDir = path.join(siteRoot, 'public', 'tests')
-const outputFile = path.join(outputDir, 'bundle.js')
-// The entry lives only in memory (esbuild stdin) — writing it to
-// `public/` would let Astro ship it to `dist/` and leak the spec
-// file list via a static asset. `resolveDir` below pins relative-
-// import resolution to a directory that actually exists.
 const resolveDir = outputDir
 
-// Full scope — every package's specs plus the two bundled builds.
-// Matches the `ALL_SPECS` array in `vitest.config.ts` so the
-// in-browser suite and the Vitest browser matrix stay aligned.
-const SCOPE = [
-  'packages/*/spec/**/*.ts',
-  'builds/reference/spec/**/*.js',
-  'builds/knockout/spec/**/*.js'
-]
-
-// Exclude non-spec siblings that end up under `spec/` directories
-// — Playwright screenshots, helper modules, fixture data.
+// Exclude non-spec siblings that end up under `spec/` directories —
+// Playwright screenshots, helper modules, fixture data.
 const EXCLUDE = /[\\/](__screenshots__|fixtures|helpers)[\\/]/
 
-async function collectSpecs() {
+const BUILDS = {
+  build: {
+    outputFile: path.join(outputDir, 'build-bundle.js'),
+    globalName: 'tkoBuildTests',
+    scope: [
+      'builds/knockout/spec/**/*.js',
+      'builds/knockout/spec/**/*.ts',
+      'builds/reference/spec/**/*.js',
+      'builds/reference/spec/**/*.ts'
+    ]
+  },
+  source: {
+    outputFile: path.join(outputDir, 'source-bundle.js'),
+    globalName: 'tkoSourceTests',
+    scope: ['packages/*/spec/**/*.ts']
+  }
+}
+
+async function collectSpecs(scope) {
   const specs = []
-  for (const pattern of SCOPE) {
+  for (const pattern of scope) {
     for await (const match of glob(pattern, { cwd: repoRoot })) {
       if (EXCLUDE.test(match)) continue
       specs.push(path.join(repoRoot, match))
@@ -72,55 +82,51 @@ function renderEntry(specs) {
   return lines.join('\n')
 }
 
-async function main() {
-  await fs.mkdir(outputDir, { recursive: true })
-  const specs = await collectSpecs()
+async function buildOne(name, config, buildVersion, tsconfig) {
+  const specs = await collectSpecs(config.scope)
   if (specs.length === 0) {
-    throw new Error('No spec files matched SCOPE — check patterns in bundle-tests.mjs')
+    throw new Error(`No spec files matched scope for bundle "${name}" — check patterns in bundle-tests.mjs`)
   }
 
   const entryContents = renderEntry(specs)
-  const tsconfig = path.join(repoRoot, 'tsconfig.json')
-
-  // Mirror the compile-time `--define:BUILD_VERSION='"..."'` that
-  // `tools/build.ts` sets for the knockout + reference builds. A
-  // handful of `builds/{knockout,reference}/spec/*.js` import from
-  // `..` (the build's own `index.ts`), which references
-  // `BUILD_VERSION` at module-top; without the define, evaluating
-  // that module throws `BUILD_VERSION is not defined` and the
-  // surrounding IIFE aborts — dropping every subsequently-imported
-  // spec from the suite.
-  const rootPkg = JSON.parse(await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8'))
-  const buildVersion = rootPkg.version ?? '0.0.0-test'
 
   await esbuild.build({
     stdin: {
       contents: entryContents,
       resolveDir,
       loader: 'ts',
-      sourcefile: '_entry.ts'
+      sourcefile: `_entry-${name}.ts`
     },
     bundle: true,
     format: 'iife',
     platform: 'browser',
     target: 'es2022',
-    outfile: outputFile,
+    outfile: config.outputFile,
     tsconfig,
     define: {
       BUILD_VERSION: JSON.stringify(buildVersion)
     },
-    // chai/sinon/mocha/@tko/* are all bundled so the page only needs
-    // to script-tag the knockout global (/lib/ko.js) + the bundle.
-    // mocha is an exception: mocha's HTML reporter must run as a
-    // classic <script> to register its globals, so mark it external.
+    // mocha loads via <script> before bundles run; stay external so
+    // we don't bundle a second copy that would wreck the BDD globals.
     external: ['mocha'],
-    // Give the bundle a named global so it can be introspected from
-    // the page console if needed.
-    globalName: 'tkoTests',
+    globalName: config.globalName,
     logLevel: 'info'
   })
 
-  console.log(`Bundled ${specs.length} spec file(s) → ${path.relative(repoRoot, outputFile)}`)
+  console.log(
+    `[${name}] bundled ${specs.length} spec file(s) → ${path.relative(repoRoot, config.outputFile)}`
+  )
+}
+
+async function main() {
+  await fs.mkdir(outputDir, { recursive: true })
+  const tsconfig = path.join(repoRoot, 'tsconfig.json')
+  const rootPkg = JSON.parse(await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8'))
+  const buildVersion = rootPkg.version ?? '0.0.0-test'
+
+  for (const [name, config] of Object.entries(BUILDS)) {
+    await buildOne(name, config, buildVersion, tsconfig)
+  }
 }
 
 main().catch(err => {
