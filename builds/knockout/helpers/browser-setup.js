@@ -21,10 +21,23 @@
 
 import * as chai from 'chai'
 import sinon from 'sinon'
+// Register punctuation filters (`uppercase`, `lowercase`, `tail`, …)
+// on the shared `@tko/utils` options so `Parser` instances created
+// ad-hoc by specs (`new Parser().parse("x | tail")`) can resolve
+// them. The knockout builder ALSO registers these via
+// `builder.create({ filters })` at page startup, but it assigns to
+// a module-local `knockout.options` — not the same reference that
+// Parser reads from. Writing to the shared `options.filters` here
+// is safe: it's the same object the Builder later augments, and
+// earlier writes are idempotent for the punctuation set.
+import { filters as punctuationFilters } from '@tko/filter.punches'
+import { options as sharedOptions } from '@tko/utils'
 
 globalThis.chai = chai
 globalThis.expect = chai.expect
 globalThis.sinon = sinon
+
+sharedOptions.filters = Object.assign(sharedOptions.filters || {}, punctuationFilters)
 
 // A real browser is never happy-dom — specs that skip under
 // happy-dom run here.
@@ -45,6 +58,21 @@ before(() => {
   if (globalThis.ko?.options) {
     globalThis.ko.options.jsxCleanBatchSize = 0
   }
+})
+
+// Spies, stubs, and fake timers installed via the non-sandboxed
+// `sinon.spy(obj, 'method')` / `sinon.stub(...)` / `sinon.useFakeTimers()`
+// APIs remain wrapped on their targets until explicitly restored.
+// Specs that forget to restore (or whose `this.after(...)` cleanup
+// entry ran out of order) leak state into the next test, producing
+// `+0 to deeply equal N` on call-count assertions or
+// `Can't install fake timers twice` when the next spec re-installs.
+// `sinon.restore()` is a no-op for sandbox-scoped fakes, so scoped
+// specs are unaffected — only the pathological globals get reset.
+// This hook lives only in the browser runner; Vitest's
+// per-file module isolation shields it from the problem.
+afterEach(() => {
+  if (globalThis.sinon?.restore) globalThis.sinon.restore()
 })
 
 // Vitest-style context-arg shim.

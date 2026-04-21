@@ -112,18 +112,28 @@ function renderEntry(specs, { inlineKo }) {
   return lines.join('\n')
 }
 
-// Many specs do `import { … } from '../dist'` to pull in the
-// package's built bundle. When we also alias `@tko/*` to source,
-// a single spec ends up holding TWO copies of every shared class
-// (one from source, one from `../dist/index.js`). This plugin
-// intercepts any `../dist` import at resolve time and redirects
-// it to the same package's `../src/index.ts`, so both paths
-// converge on one module instance.
+// Many specs do `import { … } from '../dist'` — or
+// `'../dist/<subpath>'` — to pull in the package's built bundle
+// or a single module inside it. When we also alias `@tko/*` to
+// source, a single spec ends up holding TWO copies of every
+// shared class (one from source, one from `../dist/…`). This
+// plugin intercepts any `../dist` / `../dist/<subpath>` import
+// at resolve time and redirects it to the same package's
+// `../src/index.ts` (bare) or `../src/<subpath>.ts` so both
+// paths converge on one module instance.
 const distToSrcPlugin = {
   name: 'dist-to-src',
   setup(build) {
-    build.onResolve({ filter: /(^|\/)\.\.\/dist$/ }, args => {
-      const src = path.resolve(path.dirname(args.importer), '../src/index.ts')
+    build.onResolve({ filter: /(^|\/)\.\.\/dist(\/[^/]+)?$/ }, args => {
+      // Only redirect from packages/* specs — `builds/*/spec/` files
+      // intentionally import the built IIFE (e.g. `../dist/browser.min`)
+      // to test distribution output; don't rewrite those.
+      if (!args.importer.includes(`${path.sep}packages${path.sep}`)) return
+      const match = args.path.match(/\.\.\/dist(?:\/([^/]+))?$/)
+      const subpath = match?.[1]
+      const src = subpath
+        ? path.resolve(path.dirname(args.importer), '../src', subpath + '.ts')
+        : path.resolve(path.dirname(args.importer), '../src/index.ts')
       return { path: src }
     })
   }
@@ -189,7 +199,14 @@ async function main() {
   const tkoAlias = {}
   for (const entry of packageDirs) {
     if (entry.isDirectory()) {
-      tkoAlias[`@tko/${entry.name}`] = path.join(repoRoot, 'packages', entry.name, 'index.ts')
+      // Resolve straight to `src/index.ts` rather than the package's
+      // top-level `index.ts` (which just does `export * from './src'`).
+      // Otherwise specs that import `../dist` (redirected to
+      // `../src/index.ts` by distToSrcPlugin) and specs that import
+      // `@tko/X` (resolved to the package's `index.ts`) hit two
+      // distinct file paths — esbuild bundles each module twice and
+      // class identities split.
+      tkoAlias[`@tko/${entry.name}`] = path.join(repoRoot, 'packages', entry.name, 'src', 'index.ts')
     }
   }
 

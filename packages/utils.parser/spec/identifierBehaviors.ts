@@ -173,6 +173,16 @@ describe('Identifier', function () {
     })
 
     it('sets `this` of a top-level item to $data', function () {
+      // `restoreAfter` is a global cleanup-stack helper from
+      // builds/knockout/helpers/mocha-test-helpers.js. Vitest runs
+      // each spec file in isolated module state so this mutation is
+      // invisible to later specs; in the browser /tests runner all
+      // specs share one module graph, so without this restore the
+      // mutated `bindingGlobals` leaks into every subsequent spec
+      // that resolves `$parent` / `$customProp` / … against the
+      // global lookup, breaking 31 unrelated tests.
+      // @ts-ignore — global helper from mocha-test-helpers.js
+      restoreAfter(options, 'bindingGlobals')
       options.bindingGlobals = Object.create({ Ramanujan: '1729' })
       const div = document.createElement('div'),
         context = {
