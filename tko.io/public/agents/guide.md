@@ -38,7 +38,7 @@ ko.when(() => viewModel.isReady() && viewModel.hasData()).then(() => console.log
 - Bare `ko.observable()` and `ko.observableArray()` are safe anywhere — they are containers and do not re-evaluate.
 - Inside a class using the `LifeCycle` mixin (for example `BindingHandler`, `ComponentABC`, or anything produced by `LifeCycle.mixInto`), prefer `this.computed(...)` over standalone `ko.computed(...)` and `this.subscribe(observable, cb)` over `observable.subscribe(cb)` — both are auto-disposed when the instance is torn down.
 - In plain view models without `LifeCycle`, `ko.computed(...)` and `observable.subscribe(...)` are fine; call `dispose()` on them when you are done.
-- **Never** create `ko.observable()`, `ko.computed()`, or call `.subscribe()` inside a computed's evaluator. The evaluator runs on every dependency change, so new observables/subscriptions pile up and never dispose — memory and CPU grow unbounded. Create them once outside the computed, or in a `LifeCycle`-enabled constructor.
+- **Never** create `ko.observable()`, `ko.computed()`, or call `.subscribe()` inside a computed's evaluator. The evaluator runs on every dependency change, so each re-evaluation allocates a new instance — for `ko.computed()` and `.subscribe()` the prior instance stays alive with its subscriptions and memory + CPU grow unbounded; for `ko.observable()` / `ko.observableArray()` the allocation itself is the only waste (no subscriptions to drag along), but it is still unnecessary reactive state. Create them once outside the computed, or in a `LifeCycle`-enabled constructor.
 
 ## Bindings
 

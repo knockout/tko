@@ -80,7 +80,7 @@ For pages with runnable TSX examples, also run the headless Playwright flow:
 - Standard flow: `playwright-cli close-all`, `playwright-cli open http://127.0.0.1:4321/...`, inspect the snapshot for playground refs, click each button, switch to the playground tab, and confirm `#esbuild-status`, `#compile-time`, and `#error-bar`.
 - Treat docs example work as incomplete until the emitted playground payload compiles cleanly on the live site.
 
-Also — `tko.io/public/agents/verified-behaviors/*.md` are regenerated from `packages/*/verified-behaviors.json` on every `prebuild` / `predev` / CI build. Edit the JSON source, never the generated markdown. Hand edits are wiped on the next build.
+Generator-owned files: see the note at the top of this document under "Never ship docs that reference things that don't exist on the target branch."
 
 ## Credits
 
