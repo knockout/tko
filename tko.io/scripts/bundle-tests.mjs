@@ -30,13 +30,24 @@ const outputFile = path.join(outputDir, 'bundle.js')
 // import resolution to a directory that actually exists.
 const resolveDir = outputDir
 
-// POC scope — expand as each package's specs are verified.
-const SCOPE = ['packages/observable/spec/**/*.ts']
+// Full scope — every package's specs plus the two bundled builds.
+// Matches the `ALL_SPECS` array in `vitest.config.ts` so the
+// in-browser suite and the Vitest browser matrix stay aligned.
+const SCOPE = [
+  'packages/*/spec/**/*.ts',
+  'builds/reference/spec/**/*.js',
+  'builds/knockout/spec/**/*.js'
+]
+
+// Exclude non-spec siblings that end up under `spec/` directories
+// — Playwright screenshots, helper modules, fixture data.
+const EXCLUDE = /[\\/](__screenshots__|fixtures|helpers)[\\/]/
 
 async function collectSpecs() {
   const specs = []
   for (const pattern of SCOPE) {
     for await (const match of glob(pattern, { cwd: repoRoot })) {
+      if (EXCLUDE.test(match)) continue
       specs.push(path.join(repoRoot, match))
     }
   }
@@ -71,6 +82,17 @@ async function main() {
   const entryContents = renderEntry(specs)
   const tsconfig = path.join(repoRoot, 'tsconfig.json')
 
+  // Mirror the compile-time `--define:BUILD_VERSION='"..."'` that
+  // `tools/build.ts` sets for the knockout + reference builds. A
+  // handful of `builds/{knockout,reference}/spec/*.js` import from
+  // `..` (the build's own `index.ts`), which references
+  // `BUILD_VERSION` at module-top; without the define, evaluating
+  // that module throws `BUILD_VERSION is not defined` and the
+  // surrounding IIFE aborts — dropping every subsequently-imported
+  // spec from the suite.
+  const rootPkg = JSON.parse(await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8'))
+  const buildVersion = rootPkg.version ?? '0.0.0-test'
+
   await esbuild.build({
     stdin: {
       contents: entryContents,
@@ -84,6 +106,9 @@ async function main() {
     target: 'es2022',
     outfile: outputFile,
     tsconfig,
+    define: {
+      BUILD_VERSION: JSON.stringify(buildVersion)
+    },
     // chai/sinon/mocha/@tko/* are all bundled so the page only needs
     // to script-tag the knockout global (/lib/ko.js) + the bundle.
     // mocha is an exception: mocha's HTML reporter must run as a

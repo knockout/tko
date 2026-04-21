@@ -30,8 +30,55 @@ globalThis.sinon = sinon
 // happy-dom run here.
 globalThis.isHappyDom = () => false
 
+// Specs depend on helpers registered as globals by
+// mocha-test-helpers.js — `prepareTestNode`, `restoreAfter`,
+// `expectContainHtml`, etc. That module also overrides
+// `globalThis.after` to a cleanup-stack pusher (not a Mocha
+// suite hook) and wires root `beforeEach` / `afterEach` hooks
+// that flush the cleanup stack. Must be imported after Mocha's
+// `bdd` UI has been set up (the HTML page does
+// `mocha.setup('bdd')` before loading the bundle), otherwise
+// its `beforeEach(function () { … })` at module top throws.
+import './mocha-test-helpers.js'
+
 before(() => {
   if (globalThis.ko?.options) {
     globalThis.ko.options.jsxCleanBatchSize = 0
   }
 })
+
+// Vitest-style context-arg shim.
+//
+// Some specs are written for Vitest and take the test context as a
+// single arg, e.g. `function (ctx: any) { if (isHappyDom()) return
+// ctx.skip('...') }`. Mocha inspects `fn.length` to decide whether
+// the test expects a `done` callback; a 1-arg function is treated as
+// async-with-done, and since these specs never call done(), Mocha
+// times them out (~10s each).
+//
+// Fix: wrap `it` so that 1-arg specs that look like ctx-style (use
+// `.skip(...)` and never call `done(...)`) are invoked with a fake
+// ctx `{ skip }` and the wrapper's arity is hidden from Mocha.
+// Genuine Mocha done-callback specs (identified by a `done(` call
+// in the source) pass through unchanged.
+{
+  const wrap = orig => function (name, fn) {
+    if (typeof fn === 'function' && fn.length === 1) {
+      const src = fn.toString()
+      const ctxStyle = /\.skip\s*\(/.test(src) && !/\bdone\s*\(/.test(src)
+      if (ctxStyle) {
+        const wrapped = function () {
+          return fn.call(this, { skip: reason => this.skip(reason) })
+        }
+        Object.defineProperty(wrapped, 'length', { value: 0 })
+        return orig.call(this, name, wrapped)
+      }
+    }
+    return orig.apply(this, arguments)
+  }
+  const origIt = globalThis.it
+  const wrappedIt = wrap(origIt)
+  wrappedIt.only = wrap(origIt.only)
+  wrappedIt.skip = origIt.skip
+  globalThis.it = wrappedIt
+}

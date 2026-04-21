@@ -41,12 +41,23 @@
     </header>
     <div id="mocha"></div>
 
+    <!-- Surface any uncaught load-time error so we can see why
+         bundle loading stops short of registering all specs. -->
+    <script is:inline>
+      window.__tkoErrors = []
+      window.addEventListener('error', e => window.__tkoErrors.push({ msg: e.message, src: e.filename, line: e.lineno, col: e.colno, stack: e.error?.stack }))
+      window.addEventListener('unhandledrejection', e => window.__tkoErrors.push({ msg: 'unhandled rejection: ' + (e.reason?.message || e.reason), stack: e.reason?.stack }))
+    </script>
+
     <!-- All four scripts are `is:inline` so Astro leaves them as
          classic synchronous scripts. Without that, Astro rewrites
          them to ES modules and the global-shaping order breaks. -->
     <script is:inline src="https://unpkg.com/mocha@10/mocha.js"></script>
     <script is:inline>
-      mocha.setup({ ui: 'bdd', reporter: 'html', cleanReferencesAfterRun: false })
+      // 10000ms matches `testTimeout` in vitest.config.ts so slow async
+      // component + binding specs don't flake under Mocha's default
+      // 2000ms budget.
+      mocha.setup({ ui: 'bdd', reporter: 'html', cleanReferencesAfterRun: false, timeout: 10000 })
     </script>
 
     <!-- Knockout browser bundle — sets globalThis.ko.
