@@ -232,24 +232,46 @@
           location.search = qstr ? `?${qstr}` : ''
         })
 
-        // --- load ko (dev: /lib/ko.js; build: jsdelivr) ---
-        const koUrl = mode === 'dev'
-          ? '/lib/ko.js'
-          : `https://cdn.jsdelivr.net/npm/@tko/build.${pkg}@${ver}/dist/browser.min.js`
-        await loadScript(koUrl)
-        if (!window.ko) {
-          showError(`Loaded ${koUrl} but window.ko is not defined. Wrong package or version?`)
-          return
+        // --- load ko + bundles ---
+        //
+        // `source-bundle.js` inlines the knockout build from source
+        // and sets `globalThis.ko` itself — that's the whole point
+        // of inlining, so class identities match the specs it
+        // carries. In any mode where we load the source bundle we
+        // must NOT script-tag an external ko: the second ko would
+        // reintroduce the dual-module collision.
+        //
+        // The only path that needs an external ko script tag is:
+        //   - build mode (loads ko from jsdelivr for the version
+        //     under test), or
+        //   - dev mode without source specs (build bundle alone
+        //     has no inlined ko).
+        const loadingSource = mode === 'dev' && suites.includes('source')
+
+        if (!loadingSource) {
+          const koUrl = mode === 'dev'
+            ? '/lib/ko.js'
+            : `https://cdn.jsdelivr.net/npm/@tko/build.${pkg}@${ver}/dist/browser.min.js`
+          await loadScript(koUrl)
+          if (!window.ko) {
+            showError(`Loaded ${koUrl} but window.ko is not defined. Wrong package or version?`)
+            return
+          }
         }
 
-        // --- load the requested spec bundles ---
-        if (suites.includes('build')) await loadScript('/tests/build-bundle.js')
-        if (suites.includes('source')) {
-          if (mode !== 'dev') {
-            showError('source-bundle selected in build mode — skipped (would collide on class identity).')
-          } else {
-            await loadScript('/tests/source-bundle.js')
+        // Source bundle must load before build bundle in dev mode
+        // so window.ko is set before build-bundle's specs start
+        // reading from it.
+        if (loadingSource) {
+          await loadScript('/tests/source-bundle.js')
+          if (!window.ko) {
+            showError('source-bundle loaded but window.ko is not defined — inline ko failed.')
+            return
           }
+        }
+        if (suites.includes('build')) await loadScript('/tests/build-bundle.js')
+        if (suites.includes('source') && mode !== 'dev') {
+          showError('source-bundle selected in build mode — skipped (would collide on class identity).')
         }
 
         // --- stats mirror ---
