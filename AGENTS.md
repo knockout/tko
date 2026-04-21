@@ -180,14 +180,7 @@ minimal prose.
 
 ## Docs Verification
 
-When validating `tko.io` documentation changes with the local docs site:
-
-- Use `playwright-cli` in headless mode by default. Do not use headed/browser-stealing runs unless the user explicitly asks for them.
-- Prefer a live Astro dev server on `127.0.0.1` so markdown/plugin edits reload while you work.
-- For docs pages with runnable examples, verify the live page and each `Open in Playground` button after edits.
-- Standard headless flow: `playwright-cli close-all`, `playwright-cli open http://127.0.0.1:4321/...`, inspect the snapshot for playground refs, click each button, switch to the playground tab, and confirm `#esbuild-status`, `#compile-time`, and `#error-bar`.
-- Treat docs example work as incomplete until the emitted playground payload compiles cleanly on the live site.
-- If a page has multiple TSX examples, check every TSX playground button, not just the first one.
+When changing `tko.io` docs, run `bun run build` in `tko.io/` for a clean Astro build before merging. For pages with runnable TSX examples, also verify every `Open in Playground` button. Full headless-playwright flow: [`tko.io/public/agents/process.md`](tko.io/public/agents/process.md#docs-verification).
 
 ## Always Improve
 

@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/provider.multi
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Provider composition, preemption, and node-type filtering.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/provider.multi`, especially provider composition, preemption, and node-type filtering.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/provider.multi/spec`
-- Curated source: `packages/provider.multi/verified-behaviors.json`
 
 ## Behaviors
 
@@ -28,3 +16,5 @@ Read this when you need test-backed behavior for `@tko/provider.multi`, especial
   Specs: `packages/provider.multi/spec/MultiProviderBehaviors.ts`
 - `preprocessNode` calls every applicable provider preprocessor.
   Specs: `packages/provider.multi/spec/MultiProviderBehaviors.ts`
+
+_Curated source: `packages/provider.multi/verified-behaviors.json`_

@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/binding.template
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Template and foreach rendering, including `nodes`, callbacks, and destroyed-item handling.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/binding.template`, especially template and foreach rendering, including `nodes`, callbacks, and destroyed-item handling.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/binding.template/spec`
-- Curated source: `packages/binding.template/verified-behaviors.json`
 
 ## Behaviors
 
@@ -32,3 +20,5 @@ Read this when you need test-backed behavior for `@tko/binding.template`, especi
   Specs: `packages/binding.template/spec/foreachBehaviors.ts`
 - `childrenComplete` also fires when rendering through `template`.
   Specs: `packages/binding.template/spec/templatingBehaviors.ts`
+
+_Curated source: `packages/binding.template/verified-behaviors.json`_

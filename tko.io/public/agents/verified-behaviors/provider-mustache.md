@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/provider.mustache
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Mustache-style text and attribute interpolation providers.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/provider.mustache`, especially mustache-style text and attribute interpolation providers.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/provider.mustache/spec`
-- Curated source: `packages/provider.mustache/verified-behaviors.json`
 
 ## Behaviors
 
@@ -30,3 +18,5 @@ Read this when you need test-backed behavior for `@tko/provider.mustache`, espec
   Specs: `packages/provider.mustache/spec/attributeInterpolationSpec.ts`
 - Text interpolation does not rewrite contents inside `<textarea>` or `<script>`, but it does work inside templates declared with `<script>` and `<textarea>`.
   Specs: `packages/provider.mustache/spec/textInterpolationSpec.ts`
+
+_Curated source: `packages/provider.mustache/verified-behaviors.json`_

@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/bind
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Binding application, binding-handler lifecycle, and completion callbacks.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/bind`, especially binding application, binding-handler lifecycle, and completion callbacks.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/bind/spec`
-- Curated source: `packages/bind/verified-behaviors.json`
 
 ## Behaviors
 
@@ -32,3 +20,5 @@ Read this when you need test-backed behavior for `@tko/bind`, especially binding
 - `childrenComplete` fires after descendant bindings are applied.
   Notes: It works on normal elements and virtual elements, and it does not fire when there are no descendants.
   Specs: `packages/bind/spec/bindingAttributeBehaviors.ts`, `packages/bind/spec/nodePreprocessingBehaviors.ts`
+
+_Curated source: `packages/bind/verified-behaviors.json`_

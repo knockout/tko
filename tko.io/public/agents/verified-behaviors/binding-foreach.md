@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/binding.foreach
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Standalone `foreach` binding behavior, templates, and else-chain state.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/binding.foreach`, especially standalone `foreach` binding behavior, templates, and else-chain state.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/binding.foreach/spec`
-- Curated source: `packages/binding.foreach/verified-behaviors.json`
 
 ## Behaviors
 
@@ -30,3 +18,5 @@ Read this when you need test-backed behavior for `@tko/binding.foreach`, especia
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
 - Array mutation, reordering, duplicate values, `$index`, `as`, and `noIndex` are all exercised in spec coverage.
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
+
+_Curated source: `packages/binding.foreach/verified-behaviors.json`_

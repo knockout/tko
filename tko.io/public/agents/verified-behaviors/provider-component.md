@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/provider.component
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Custom-element component provider behavior and component parameter handling.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/provider.component`, especially custom-element component provider behavior and component parameter handling.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/provider.component/spec`
-- Curated source: `packages/provider.component/verified-behaviors.json`
 
 ## Behaviors
 
@@ -30,3 +18,5 @@ Read this when you need test-backed behavior for `@tko/provider.component`, espe
   Specs: `packages/provider.component/spec/customElementBehaviors.ts`
 - Custom elements support transclusion via `componentInfo.templateNodes`, and `afterRender` callbacks on the custom element are invoked after render.
   Specs: `packages/provider.component/spec/customElementBehaviors.ts`
+
+_Curated source: `packages/provider.component/verified-behaviors.json`_

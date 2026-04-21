@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/binding.component
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Component binding runtime, slots, virtual elements, and JSX/object templates.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/binding.component`, especially component binding runtime, slots, virtual elements, and JSX/object templates.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/binding.component/spec`
-- Curated source: `packages/binding.component/verified-behaviors.json`
 
 ## Behaviors
 
@@ -28,3 +16,5 @@ Read this when you need test-backed behavior for `@tko/binding.component`, espec
 - Component templates can be supplied as JSX-style object trees or arrays of JSX-style nodes.
   Notes: Reactive attribute and child updates on those object templates are covered by the specs.
   Specs: `packages/binding.component/spec/componentBindingBehaviors.ts`
+
+_Curated source: `packages/binding.component/verified-behaviors.json`_
