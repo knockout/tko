@@ -1,13 +1,13 @@
 # Verified Behaviors: @tko/lifecycle
 
 > Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If behavior not covered by unit tests, not belong in this directory.
+> If a behavior is not covered by unit tests, it does not belong in this directory.
 
-Lifecycle mixins for subscriptions, computeds, DOM listeners, anchored disposal.
+Lifecycle mixins for subscriptions, computeds, DOM listeners, and anchored disposal.
 
 ## When to Read This
 
-Read when need test-backed behavior for `@tko/lifecycle`, especially lifecycle mixins for subscriptions, computeds, DOM listeners, anchored disposal.
+Read this when you need test-backed behavior for `@tko/lifecycle`, especially lifecycle mixins for subscriptions, computeds, DOM listeners, and anchored disposal.
 
 ## Status
 
@@ -18,19 +18,13 @@ Read when need test-backed behavior for `@tko/lifecycle`, especially lifecycle m
 
 ## Behaviors
 
-- `LifeCycle.mixInto(...)` adds `subscribe`, `computed`, `addEventListener`, `anchorTo`, `dispose`, `addDisposable` to function prototypes, constructed instances, classes, class instances.
+- `LifeCycle.mixInto(...)` adds `subscribe`, `computed`, `addEventListener`, `anchorTo`, `dispose`, and `addDisposable` to function prototypes, constructed instances, classes, and class instances.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
-- `LifeCycle.computed(...)` accepts method names, instance methods, bound functions, plain functions, arrow functions, `{ read }` objects.
+- `LifeCycle.computed(...)` accepts method names, instance methods, bound functions, plain functions, arrow functions, and `{ read }` objects.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
-- `dispose()` tears down subscriptions from `subscribe(...)` and computeds from `computed(...)`.
+- `dispose()` tears down subscriptions created through `subscribe(...)` and computeds created through `computed(...)`.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
-- Event listeners added via `addEventListener(...)` removed on `dispose()`.
+- Event listeners added through `addEventListener(...)` are removed on `dispose()`.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
-- Anchoring lifecycle object to another with `anchorTo(...)` — parent disposal disposes anchored child.
+- Anchoring one lifecycle object to another with `anchorTo(...)` causes disposal of the parent lifecycle to dispose the anchored child as well.
   Specs: `packages/lifecycle/spec/LifeCycleBehaviors.ts`
-
-## Usage guidance
-
-- Prefer `this.computed(...)` over standalone `ko.computed(...)` inside `LifeCycle` subclass — computed auto-added to instance disposal set.
-- Prefer `this.subscribe(observable, callback)` over `observable.subscribe(callback)` inside `LifeCycle` subclass, same reason.
-- Don't create observables, computeds, subscriptions inside computed's evaluator — see anti-pattern in `computed.md`.
