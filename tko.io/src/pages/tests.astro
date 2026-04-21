@@ -103,11 +103,10 @@
   <body>
     <header>
       <h1>TKO — Live Browser Tests</h1>
-      <p class="tagline">Real browser, real DOM, real TKO. Every spec in the repo, runnable from a URL.</p>
+      <p class="tagline">Pick a published <code>@tko/build.*</code> version. Specs run live in your browser against it.</p>
       <div class="chrome">
-        <label>Running against</label>
+        <label>Build</label>
         <div class="value">
-          <label><input type="radio" name="mode" value="dev" /> in-tree dev</label>
           <label><input type="radio" name="mode" value="build" data-pkg="knockout" /> build.knockout</label>
           <label><input type="radio" name="mode" value="build" data-pkg="reference" /> build.reference</label>
         </div>
@@ -115,18 +114,22 @@
 
         <label>Version</label>
         <div class="value">
-          <select id="ver"><option value="">(disabled in dev)</option></select>
-        </div>
-        <span></span>
-
-        <label>Suites</label>
-        <div class="value">
-          <label><input type="checkbox" id="suite-build" /> build specs (<code>ko.*</code> only, version-portable)</label>
-          <label><input type="checkbox" id="suite-source" /> source specs (bundled <code>@tko/*</code>, dev-only)</label>
+          <select id="ver"><option>loading…</option></select>
         </div>
         <button id="run">Run</button>
       </div>
     </header>
+    <!--
+      Dev mode and source-spec bundle are intentionally absent from
+      the UI. They still work via URL (`?mode=dev&suites=source`)
+      for maintainers iterating locally; for anyone else the live
+      page is restricted to the stable, version-portable
+      `build-bundle` path. The source-spec path has systemic
+      Mocha-vs-Vitest isolation gaps that aren't worth surfacing
+      in a dark-factory-facing page.
+    -->
+    <input type="hidden" id="suite-build" value="on" />
+    <input type="hidden" id="suite-source" value="" />
 
     <div class="stats" id="stats"><span class="muted">Waiting for config…</span></div>
     <div class="errors-drawer" id="errors"></div>
@@ -157,7 +160,11 @@
     <script is:inline>
       (async function () {
         const qs = new URLSearchParams(location.search)
-        const mode = qs.get('mode') || 'dev'
+        // Default to `build` mode — the stable, version-portable
+        // path. `dev` + source suites are still reachable via
+        // explicit URL params but intentionally undocumented for
+        // non-maintainer visitors.
+        const mode = qs.get('mode') || 'build'
         const pkg = qs.get('pkg') || 'knockout'
         const ver = qs.get('ver') || 'latest'
         const suitesParam = qs.get('suites')
@@ -173,12 +180,13 @@
         const setChrome = () => {
           const radios = document.querySelectorAll('input[name=mode]')
           for (const r of radios) {
-            r.checked = (mode === 'dev' && r.value === 'dev')
-                     || (mode === 'build' && r.value === 'build' && r.dataset.pkg === pkg)
+            r.checked = mode === 'build' && r.value === 'build' && r.dataset.pkg === pkg
           }
-          document.getElementById('suite-build').checked = suites.includes('build')
-          document.getElementById('suite-source').checked = suites.includes('source')
-          document.getElementById('suite-source').disabled = mode !== 'dev'
+          // Hidden inputs — always reflect current config.
+          const sb = document.getElementById('suite-build')
+          const ss = document.getElementById('suite-source')
+          if (sb) sb.value = suites.includes('build') ? 'on' : ''
+          if (ss) ss.value = suites.includes('source') ? 'on' : ''
         }
         setChrome()
 
@@ -198,7 +206,7 @@
             verSel.innerHTML = `<option>npm fetch failed: ${e.message}</option>`
           }
         } else {
-          verSel.innerHTML = '<option>(disabled in dev)</option>'
+          verSel.innerHTML = '<option>(dev mode — in-tree tko)</option>'
           verSel.disabled = true
         }
 
@@ -212,24 +220,12 @@
         document.getElementById('run').addEventListener('click', () => {
           const radios = document.querySelectorAll('input[name=mode]:checked')
           const selRadio = radios[0]
-          const nextMode = selRadio?.value || 'dev'
           const nextPkg = selRadio?.dataset.pkg || pkg
           const nextVer = document.getElementById('ver').value || 'latest'
-          const nextSuites = [
-            document.getElementById('suite-build').checked ? 'build' : null,
-            document.getElementById('suite-source').checked ? 'source' : null
-          ].filter(Boolean)
           const next = new URLSearchParams()
-          if (nextMode !== 'dev') {
-            next.set('mode', 'build')
-            next.set('pkg', nextPkg)
-            if (nextVer !== 'latest') next.set('ver', nextVer)
-          }
-          if (nextSuites.length && (nextMode !== 'dev' || nextSuites.length !== 2)) {
-            next.set('suites', nextSuites.join(','))
-          }
-          const qstr = next.toString()
-          location.search = qstr ? `?${qstr}` : ''
+          next.set('pkg', nextPkg)
+          if (nextVer !== 'latest') next.set('ver', nextVer)
+          location.search = `?${next.toString()}`
         })
 
         // --- load ko + bundles ---
