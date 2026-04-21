@@ -316,15 +316,13 @@
         self.pkg     = ko.observable(qs.get('pkg') || 'knockout')
         self.ver     = ko.observable(qs.get('ver') || 'latest')
         self.grep    = ko.observable(qs.get('grep') || '')
-        // Default pool=1 (sequential) so each running iframe holds
-        // sole system focus for the whole duration of its spec.
-        // Chromium only grants `contentWindow.focus()` system focus
-        // to ONE iframe at a time — with pool>1 the last-focused
-        // iframe wins and 3+ concurrent specs lose focusin events.
-        // Override with `?pool=4` when the visible suite doesn't
-        // need focus semantics (e.g. agent deep-linking to one spec
-        // via `?grep=…`).
-        self.pool    = Math.max(1, parseInt(qs.get('pool') || '1', 10))
+        // Pool for the parallel (non-focus) phase. Focus-needing
+        // specs — flagged at bundle time via `manifest.specs[].needsFocus`
+        // — always run serially in the visible #workarea so each
+        // has sole system focus; Chromium only grants
+        // `contentWindow.focus()` system focus to one frame at a
+        // time. Everything else runs in parallel, invisibly.
+        self.pool    = Math.max(1, parseInt(qs.get('pool') || '4', 10))
 
         self.versions = ko.observableArray([{ label: 'loading…', value: 'latest' }])
         self.suites   = ko.observableArray([])
@@ -333,13 +331,21 @@
           pass:    ko.observable(0),
           fail:    ko.observable(0),
           pending: ko.observable(0),
-          done:    ko.observable(0),
           total:   ko.observable(0),
           start:   ko.observable(0),
           end:     ko.observable(0)
         }
+        self.stats.done = ko.pureComputed(() =>
+          self.stats.pass() + self.stats.fail() + self.stats.pending()
+        )
         self.tick = ko.observable(Date.now())
-        setInterval(() => self.tick(Date.now()), 250)
+        const tickTimer = setInterval(() => {
+          if (self.stats.end()) {
+            clearInterval(tickTimer)
+            return
+          }
+          self.tick(Date.now())
+        }, 250)
         self.elapsedLabel = ko.pureComputed(() => {
           const s = self.stats.start()
           if (!s) return '—'
@@ -389,7 +395,6 @@
           const row = new TestRow({ kind, title, dur, err: err ? (err + (stack ? '\n' + stack : '')).slice(0, 2000) : '' })
           s.tests.push(row)
           self.stats[kind](self.stats[kind]() + 1)
-          self.stats.done(self.stats.done() + 1)
         }
       }
 
@@ -444,9 +449,9 @@
 
         page.stats.start(Date.now())
         const runner = window.mocha.run()
-        runner.on('pass',    () => { page.stats.pass(page.stats.pass()+1); page.stats.done(page.stats.done()+1) })
-        runner.on('fail',    () => { page.stats.fail(page.stats.fail()+1); page.stats.done(page.stats.done()+1) })
-        runner.on('pending', () => { page.stats.pending(page.stats.pending()+1); page.stats.done(page.stats.done()+1) })
+        runner.on('pass',    () => page.stats.pass(page.stats.pass()+1))
+        runner.on('fail',    () => page.stats.fail(page.stats.fail()+1))
+        runner.on('pending', () => page.stats.pending(page.stats.pending()+1))
         runner.on('end',     () => { page.stats.end(Date.now()) })
         page.stats.total(runner.total)
       }
@@ -487,41 +492,45 @@
           }
         })
 
-        const queue = [...specs]
+        // Split by needsFocus: hidden specs run in parallel,
+        // focus-requiring specs run serially in the #workarea so
+        // each has sole system focus (Chromium grants focus to
+        // one iframe at a time).
+        const hiddenQueue = specs.filter(s => !s.needsFocus)
+        const focusQueue  = specs.filter(s => s.needsFocus)
 
         const workarea = document.getElementById('workarea')
         const workareaLabel = document.getElementById('workarea-label')
 
-        async function runOne(spec) {
+        // Hidden host for non-focus specs; attached to body with
+        // tiny offscreen layout so Chromium doesn't waste work
+        // rendering them.
+        const hiddenHost = document.createElement('div')
+        hiddenHost.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;pointer-events:none'
+        document.body.appendChild(hiddenHost)
+
+        function runOne(spec, { host, label, grantFocus }) {
           return new Promise(resolve => {
             const iframe = document.createElement('iframe')
-            // Full-area iframe in the visible work-area. Chromium
-            // denies `contentWindow.focus()` system focus to
-            // off-screen / zero-area iframes, which breaks the 34
-            // hasfocus tests (focusin / focusout events never fire
-            // without system focus). A real layout box in the work-
-            // area gives the iframe viewport intersection +
-            // focusable status. Visible running is a feature, not
-            // a bug — a dark-factory visitor watches the page work.
-            iframe.style.cssText = 'width:100%;height:100%;border:0;display:block'
+            iframe.style.cssText = grantFocus
+              ? 'width:100%;height:100%;border:0;display:block'
+              : 'width:1px;height:1px;border:0;opacity:0'
             iframe.src = `/tests-frame.html?spec=${encodeURIComponent(spec.slug)}`
-            workareaLabel.textContent = spec.file
-            // After the iframe loads, push focus both to the iframe
-            // element (parent-doc-level) AND its contentWindow —
-            // Chromium's focus model needs both routes for
-            // `element.focus()` inside to fire focusin/focusout.
-            // Only the LAST iframe created wins the focus; hasfocus
-            // specs rely on this landing on the most recent one.
-            iframe.addEventListener('load', () => {
-              try {
-                iframe.focus()
-                iframe.contentWindow?.focus()
-              } catch {}
-            })
+            if (label) label.textContent = spec.file
+            if (grantFocus) {
+              iframe.addEventListener('load', () => {
+                try {
+                  iframe.focus()
+                  iframe.contentWindow?.focus()
+                } catch {}
+              })
+            }
             let done = false
+            let safetyTimer
             const finish = () => {
               if (done) return
               done = true
+              clearTimeout(safetyTimer)
               window.removeEventListener('message', onMsg)
               iframe.remove()
               resolve()
@@ -532,20 +541,28 @@
               if (m.type === 'end' || m.type === 'import-error') finish()
             }
             window.addEventListener('message', onMsg)
-            workarea.appendChild(iframe)
-            setTimeout(finish, 30000) // safety
+            host.appendChild(iframe)
+            safetyTimer = setTimeout(finish, 30000)
           })
         }
 
-        async function worker() {
-          while (queue.length) {
-            const spec = queue.shift()
+        // Phase 1: parallel hidden specs.
+        async function hiddenWorker() {
+          while (hiddenQueue.length) {
+            const spec = hiddenQueue.shift()
             if (!spec) return
-            await runOne(spec)
+            await runOne(spec, { host: hiddenHost, label: null, grantFocus: false })
           }
         }
+        await Promise.all(Array.from({ length: page.pool }, hiddenWorker))
 
-        await Promise.all(Array.from({ length: page.pool }, worker))
+        // Phase 2: serial focus specs in the visible workarea.
+        for (const spec of focusQueue) {
+          await runOne(spec, { host: workarea, label: workareaLabel, grantFocus: true })
+        }
+        workareaLabel.textContent = 'done'
+        hiddenHost.remove()
+
         page.stats.end(Date.now())
       }
     })();

@@ -98,8 +98,9 @@ before(() => {
 //     when the owner isn't "being rendered"; event delivery,
 //     however, is gated on system focus of the top-level browsing
 //     context — that's the Chromium behaviour this patch bridges.
-if (window.parent !== window) {
+if (window.parent !== window && !HTMLElement.prototype.__tkoFocusPatched) {
   const HE = HTMLElement.prototype
+  HE.__tkoFocusPatched = true
   const origFocus = HE.focus
   const origBlur = HE.blur
   HE.focus = function (...args) {

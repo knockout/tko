@@ -82,10 +82,28 @@ async function writeSpecWrappers(specs) {
   const entryPoints = {}
   const manifest = []
 
+  // Chromium denies `contentWindow.focus()` system focus to iframes
+  // without real layout + viewport intersection, and only one frame
+  // can hold focus at a time. Specs that observe focus events
+  // (`hasfocus` binding, `document.activeElement` assertions) must
+  // run serially inside the visible #workarea; the rest run in
+  // parallel, invisibly, with no focus gymnastics. Detect at
+  // bundle time by grepping the spec source.
+  const FOCUS_PATTERNS = /hasfocus|hasFocus|\.focus\(|\.blur\(|focusin|focusout|activeElement/
+  const needsFocusCache = new Map()
+  const needsFocus = async (p) => {
+    if (needsFocusCache.has(p)) return needsFocusCache.get(p)
+    const src = await fs.readFile(p, 'utf8')
+    const n = FOCUS_PATTERNS.test(src)
+    needsFocusCache.set(p, n)
+    return n
+  }
+
   for (const spec of specs) {
     const slug = specSlug(spec)
     const wrapperPath = path.join(wrapperDir, `${slug}.ts`)
     const specRel = path.relative(wrapperDir, spec).replace(/\\/g, '/')
+    const focusNeeded = await needsFocus(spec)
     // Bare spec import. ko + browser-setup are bundled separately
     // into `source/setup.js` (IIFE) and loaded via a <script> tag
     // in tests-frame.html BEFORE this module evaluates. Earlier
@@ -103,13 +121,18 @@ async function writeSpecWrappers(specs) {
       `import '${specRel}'`,
       ''
     ].join('\n')
-    await fs.writeFile(wrapperPath, contents, 'utf8')
+    // Skip the write if contents are unchanged — updating mtime on
+     // every rebuild invalidates downstream watchers for no reason.
+    let existing = null
+    try { existing = await fs.readFile(wrapperPath, 'utf8') } catch {}
+    if (existing !== contents) await fs.writeFile(wrapperPath, contents, 'utf8')
     entryPoints[slug] = wrapperPath
     const rel = path.relative(repoRoot, spec).replace(/\\/g, '/')
     manifest.push({
       slug,
       file: rel,
-      suite: rel.split('/').slice(0, 2).join('/')
+      suite: rel.split('/').slice(0, 2).join('/'),
+      needsFocus: focusNeeded
     })
   }
 
@@ -255,10 +278,12 @@ async function main() {
     }
   }
 
-  await buildBuildBundle({ buildVersion, tsconfig, alias })
   await fs.mkdir(sourceOutputDir, { recursive: true })
-  await buildSetupBundle({ tsconfig, alias, buildVersion })
-  await buildSourceBundles({ buildVersion, tsconfig, alias })
+  await Promise.all([
+    buildBuildBundle({ buildVersion, tsconfig, alias }),
+    buildSetupBundle({ tsconfig, alias, buildVersion }),
+    buildSourceBundles({ buildVersion, tsconfig, alias })
+  ])
 }
 
 main().catch(err => {
