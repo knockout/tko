@@ -86,8 +86,8 @@ const style = this.computed(() => this.isExpanded() ? 'display: block' : 'displa
 return <div style={style}>...</div>
 
 // Good: computed attribute + CSS selector
-const isActive = this.computed(() => this.isActive() || undefined)
-return <div data-active={isActive}>...</div>
+const activeAttr = this.computed(() => this.isActive() || undefined)
+return <div data-active={activeAttr}>...</div>
 ```
 
 ```css
@@ -95,7 +95,7 @@ return <div data-active={isActive}>...</div>
 .my-component[data-active] { opacity: 1; }
 ```
 
-This keeps styling logic in CSS, avoids class-name string juggling inside computeds, and pairs naturally with the `|| undefined` pattern for binary attributes (see Gotchas). For classic `data-bind`, the equivalent writer is the `attr` binding: `data-bind="attr: { 'data-active': isActive }"`.
+This keeps styling logic in CSS, avoids class-name string juggling inside computeds, and pairs naturally with the `|| undefined` pattern for binary attributes (see Gotchas). For classic `data-bind`, the equivalent writer is the `attr` binding: `data-bind="attr: { 'data-active': activeAttr }"`.
 
 ### JSX scope rule
 
