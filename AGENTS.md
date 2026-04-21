@@ -168,7 +168,6 @@ self-contained folder with a `SKILL.md` and optional supporting assets
 
 | Skill | Purpose |
 |-------|---------|
-| `plan-creation` | Scaffold a `plans/` file with the correct template, classify risk per `AI_COMPLIANCE.md`, and enforce approval gates |
 | `typescript-code-review` | Perform comprehensive TypeScript code reviews covering type safety, security, performance, and code quality with actionable feedback |
 
 Skills are loaded on-demand when the agent detects a matching task.
