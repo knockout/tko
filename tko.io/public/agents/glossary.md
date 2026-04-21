@@ -1,7 +1,5 @@
 # TKO Glossary
 
-Domain-specific terms for the TKO (Typed Knockout) framework.
-
 ## Core Concepts
 
 - **Observable** (`ko.observable(value)`) — a value wrapper that notifies subscribers when it changes. The fundamental reactive primitive.

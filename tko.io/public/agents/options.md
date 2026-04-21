@@ -1,8 +1,6 @@
 # `ko.options.*` — Configurable Runtime Options
 
-`ko.options` is TKO's runtime configuration object. It is a singleton `Options`
-instance defined in `packages/utils/src/options.ts`. This page documents how
-to add new options and which of the two available mechanisms to reach for.
+`ko.options` is TKO's runtime configuration singleton, defined in `packages/utils/src/options.ts`. Two mechanisms for adding options — this page explains which to reach for.
 
 ## Two mechanisms — when to use which
 
