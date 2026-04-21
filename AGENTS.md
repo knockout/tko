@@ -176,6 +176,8 @@ changes — update **both** the Starlight docs (for humans) and the agent guide
 (for agents). The agent guide should be token-efficient: dense, code-first,
 minimal prose.
 
+**Before staging any doc, verify every package, spec path, and URL it names exists on the target branch.** Pay extra attention to untracked or generated files in the working tree. Full checklist: [`tko.io/public/agents/process.md`](tko.io/public/agents/process.md#never-ship-docs-that-reference-things-that-dont-exist-on-the-target-branch).
+
 ## Docs Verification
 
 When validating `tko.io` documentation changes with the local docs site:
@@ -202,7 +204,9 @@ Avoid scope creep. If an improvement would balloon the PR, file a follow-up issu
 
 ## Review Your Own Change Adversarially
 
-Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises. Get an independent second pass (a colleague, a subagent where available) on changes that touch framework internals, test coverage, public APIs, or docs the whole team relies on.
+Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises.
+
+**Adversarial review is mandatory for in-scope changes** (code, tests, public API, agent-facing docs, CI, `tools/build.ts`, `vitest.config.ts`, `biome.json`, landing commit messages). A single pair of eyes (yours) is not enough in a dark factory — the missing human reviewer has to be replaced by a second agent that was not told what "good" looks like and is asked only "where is this wrong?". Spawn a fresh subagent, brief it with the artefact + claim only (no author reasoning), bias toward flagging, verify any findings defensively, and record the outcome at the end of the commit message that introduces the in-scope change — one audit line per in-scope commit, never the PR description (that's for *why* the change exists, not reviewer ceremony). Out of scope: typos, whitespace, comment corrections. Full how-to and audit-trail format: [`tko.io/public/agents/process.md`](tko.io/public/agents/process.md#adversarial-review-is-mandatory).
 
 This is the ceiling on "Always Improve": that section pushes toward *more* in a PR; this one pushes toward *scrutiny* of what's in it. Use both — improve in scope, audit the scope itself here.
 
@@ -217,6 +221,7 @@ Failure modes specific to a published low-level framework, worth probing every t
 - Patching the symptom, not the root cause
 - Unrelated refactors or opportunistic redesigns that balloon the PR (the "Always Improve" bar is *small, low-risk, in-scope* fixes — anything larger belongs in its own PR)
 - Silent assumptions about environment, timing, or ordering
+- Docs that reference packages, APIs, or spec paths that do not exist on the target branch (see "Agent-First Documentation" → "Never ship docs that reference things that don't exist on the target branch")
 
 If the change doesn't survive a ten-minute attempt to poke holes in it, it's not ready.
 

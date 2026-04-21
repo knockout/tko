@@ -33,6 +33,13 @@ ko.when(viewModel.isReady, () => console.log('Ready'))
 ko.when(() => viewModel.isReady() && viewModel.hasData()).then(() => console.log('Ready'))
 ```
 
+### Observables vs computed dependency management
+
+- Bare `ko.observable()` and `ko.observableArray()` are safe anywhere — they are containers and do not re-evaluate.
+- Inside a class using the `LifeCycle` mixin (for example `BindingHandler`, `ComponentABC`, or anything produced by `LifeCycle.mixInto`), prefer `this.computed(...)` over standalone `ko.computed(...)` and `this.subscribe(observable, cb)` over `observable.subscribe(cb)` — both are auto-disposed when the instance is torn down.
+- In plain view models without `LifeCycle`, `ko.computed(...)` and `observable.subscribe(...)` are fine; call `dispose()` on them when you are done.
+- **Never** create `ko.observable()`, `ko.computed()`, or call `.subscribe()` inside a computed's evaluator. The evaluator runs on every dependency change, so new observables/subscriptions pile up and never dispose — memory and CPU grow unbounded. Create them once outside the computed, or in a `LifeCycle`-enabled constructor.
+
 ## Bindings
 
 Activate with `ko.applyBindings(viewModel, element)`.
@@ -64,6 +71,69 @@ When the goal is to demonstrate TKO itself, keep the state flow inside observabl
 - Use custom `bindingHandlers` only for DOM-specific effects that do not belong in the state layer, such as animation, focus, canvas, SVG, or third-party widget integration.
 - If an example contrasts reactive models, the counters and highlighted state should also be observable-driven so the example demonstrates the pattern instead of bypassing it.
 - The line to avoid is using the DOM itself as the mutable source of truth after bindings are active.
+
+### Reactive styling
+
+Reactive state that drives visual variations can be expressed several ways in TKO. Two common patterns are shown below; they are examples, not an exhaustive list (CSS custom properties written from a computed, classless inline style objects, component-scoped style blocks, and CSS-in-JS tokens are all reasonable too). **What matters more than the specific pattern is that a codebase applies one consistently** for the same kind of state — mixing approaches for identical problems is what hurts readability.
+
+**Example A — computed class name / inline style.** The computed returns the class name or style string directly. The rule sits next to the reactive expression.
+
+```tsx
+const className = this.computed(() => this.isActive() ? classes.active : classes.inactive)
+return <div class={className}>...</div>
+```
+
+**Example B — computed attribute, CSS selector does the switching.** The computed returns a flag value; CSS reads the attribute and applies styles.
+
+```tsx
+const activeAttr = this.computed(() => this.isActive() || undefined)
+return <div data-active={activeAttr}>...</div>
+```
+
+```css
+.my-component { opacity: 0.5; }
+.my-component[data-active] { opacity: 1; }
+```
+
+**Trade-offs between these two.**
+- A keeps the rule ("active → this class") visible in the component file; refactors that rename classes stay local. Split visibility if the class body lives in a separate stylesheet.
+- B keeps styling in CSS and pairs naturally with the `|| undefined` pattern for binary attributes (see Gotchas); adding a new visual variant means editing CSS, not the component.
+- B sidesteps class-name string concatenation inside computeds for complex multi-state styling. A can avoid the same footgun with template literals or a class-map helper; it just doesn't get it for free.
+- A reads more directly when one class encapsulates many unrelated properties that B would need multiple attribute selectors to reach.
+
+Classic `data-bind` writers for the same effects: `css:` / `style:` for A, `attr:` for B (`data-bind="attr: { 'data-active': activeAttr }"`).
+
+### JSX scope rule
+
+Use JSX inside component view models (classes registered with `components.register(...)`, typically extending `ComponentABC`) or in functions whose output is immediately passed to `tko.jsx.render(...)` and mounted. Do not leave JSX in standalone utility functions that outlive a component lifecycle — without `LifeCycle`, subscriptions and computeds created for that JSX have no owner to dispose them.
+
+```tsx
+// Good: component owns the JSX and its lifecycle
+class MyCard extends ComponentABC {
+  template = () => <div ko-text={this.message} />
+}
+
+// Also fine: top-level render for a fixed mount
+const { node } = tko.jsx.render(<div ko-text={message} />)
+document.getElementById('root').appendChild(node)
+
+// Avoid: JSX returned from a utility module without a clear owner
+export const myView = () => <div ko-text={message} />
+```
+
+### Component params in JSX
+
+When instantiating a component from JSX, pass each constructor parameter as its own attribute. Do **not** wrap them in a single `params={{ ... }}` attribute — JSX collects attributes into one object and hands that object to the component constructor, so wrapping in `params` delivers `{ params: { … } }` instead of the flat shape the constructor expects.
+
+```tsx
+// Bad — wrapped in params
+<my-report-card params={{ output, onView, onEdit }} />
+
+// Good — each prop is its own attribute
+<my-report-card output={output} onView={onView} onEdit={onEdit} />
+```
+
+The constructor receives `{ output, onView, onEdit }` directly.
 
 ## Classic data-bind parsing and CSP
 
@@ -222,6 +292,9 @@ tko.applyBindings({ removeTodo: t => todos.remove(t) }, root)
 - **Observable children in JSX** are reactive — when an observable's value changes, the DOM updates. If it becomes `undefined`, a placeholder comment is rendered.
 - **Cannot apply bindings twice** to the same DOM node — throws error.
 - **`dispose()` on computed/subscriptions** stops updates. After disposal, reading returns last cached value.
+- **HTML-producing computeds** should return `null` for empty output, not `false` or an empty fragment — bindings and JSX observers handle `null` cleanly.
+- **Binary HTML attributes** (`disabled`, `readonly`, `hidden`, `required`, `checked`, `selected`) omit the attribute when the value is `null`, `undefined`, or `false`. Use `|| undefined` in computeds to make "no attribute" explicit: `disabled={this.computed(() => shouldBeDisabled() || undefined)}`. Never return the string `"false"` — it keeps the attribute set.
+- **Prefer named computed variables over inline computeds in JSX.** A computed created inline in JSX is easier to accidentally recreate on each render than one bound to a class field or `const`.
 
 ## Testing
 

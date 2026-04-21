@@ -12,12 +12,13 @@
 
 ## Agent Docs
 
-- /agents/soul.md — why Knockout works the way it does (design philosophy)
+- /agents/soul.md — why Knockout works (design philosophy)
 - /agents/guide.md — API reference, gotchas, examples
 - /agents/glossary.md — domain terms, concepts, packages
-- /agents/testing.md — how to run and verify TKO code
+- /agents/testing.md — run + verify TKO code
 - /agents/contract.md — state/binding/DOM architecture
-- /agents/options.md — ko.options.* — when to use defineOption vs core Options fields
+- /agents/options.md — `ko.options.*` — when to use `defineOption` vs core Options fields
+- /agents/process.md — mandatory agent workflow (doc-ref verification, adversarial review)
 - /agents/verified-behaviors/index.md — test-backed behavior contracts
 - /agents/sample-tsx.html — minimal browser TSX scaffold
 - /examples/ — interactive self-contained HTML examples
@@ -44,8 +45,11 @@
 ## Gotchas
 
 - Derived `ko-*` values must stay observable/computed — inline expressions freeze
-- `ko.applyBindings(...)` returns a Promise
+- `ko.applyBindings(...)` returns Promise
 - Inside `ko-foreach`, binding-context vars use strings: `ko-text="$data"` (not `{$data}`)
+- Component JSX params: pass each constructor param as own attribute (`<my-card out={x} onEdit={fn} />`), never wrap in `params={{...}}` — JSX attrs flatten into one constructor arg, wrapping double-nests to `{ params: {...} }`
+- Never create `ko.observable()`, `ko.computed()`, or `.subscribe()` inside computed evaluator — re-runs leak instances
+- Binary HTML attrs (`disabled`, `hidden`, …): return `|| undefined` from computed; `false` renders string `"false"`, keeps attribute
 
 ## Browser JSX (esbuild-wasm)
 
