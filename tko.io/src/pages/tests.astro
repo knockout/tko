@@ -141,16 +141,26 @@
         word-break: break-word;
       }
       .filter { width: 14rem; }
-      /* Spec iframes must be focusable so `element.focus()` inside them
-         can move focus (hasfocus tests + similar). `width:0;height:0`
-         or `opacity:0` disqualifies an iframe from receiving OS-level
-         focus — `.focus()` calls inside silently fail. Instead: push
-         off-screen but keep real layout + opacity. Visually hidden to
-         the user, fully live to Chromium's focus model. */
+      /* Spec iframes need full viewport-sized layout for Chromium
+         to grant `iframe.contentWindow.focus()` true system focus.
+         Tiny (1×1 or 0×0) or off-viewport (left:-10000px) iframes
+         get denied — `document.hasFocus()` inside stays false,
+         `focusin`/`focusout` events never fire, 34 hasfocus tests
+         fail. Full-viewport iframe with `opacity:0` +
+         `pointer-events:none` + `z-index:-1` gives the iframe the
+         layout area Chromium needs while remaining invisible and
+         non-interactive to the user. Pool=1 means at most one
+         such iframe is live at a time, so nothing stacks on top
+         of the page chrome. */
       .iframe-hidden {
-        position: absolute;
-        left: -10000px; top: -10000px;
-        width: 800px; height: 600px; border: 0;
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+        z-index: -1;
       }
       #mocha { padding: 0 0.5rem; }
       footer { padding: 0.8rem 1rem; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); }
@@ -215,7 +225,31 @@
          to resolve <test-component> custom elements (registered
          by specs against the CDN ko) against the page's own tko. -->
     <div id="mocha" style="padding: 0 1rem"></div>
-    <div id="iframes" hidden></div>
+
+    <!-- Work area: active spec iframes mount here. Kept visible
+         (not hidden) because Chromium denies
+         `iframe.contentWindow.focus()` system focus to off-screen
+         / zero-area iframes, which breaks the 34 hasfocus tests
+         (focusin / focusout events never fire without system
+         focus). The work-area iframe gets a real layout box, real
+         viewport intersection, and real focus routing. Visible-
+         running also doubles as a dark-factory signal: a visitor
+         watches specs flash by in the sandbox rather than
+         wondering if anything is happening. -->
+    <section style="padding:0 1rem;margin-top:1rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;color:#8a93a1;font-size:0.78rem">
+        <span>Work area (current spec)</span>
+        <span id="workarea-label" style="font-variant-numeric:tabular-nums">idle</span>
+      </div>
+      <div id="workarea" style="
+        border:1px solid #222834;
+        border-radius:6px;
+        background:#fff;
+        height:360px;
+        overflow:hidden;
+        position:relative;
+      "></div>
+    </section>
 
     <!-- Error collector before any other script runs. -->
     <script is:inline>
@@ -282,7 +316,15 @@
         self.pkg     = ko.observable(qs.get('pkg') || 'knockout')
         self.ver     = ko.observable(qs.get('ver') || 'latest')
         self.grep    = ko.observable(qs.get('grep') || '')
-        self.pool    = Math.max(1, parseInt(qs.get('pool') || '4', 10))
+        // Default pool=1 (sequential) so each running iframe holds
+        // sole system focus for the whole duration of its spec.
+        // Chromium only grants `contentWindow.focus()` system focus
+        // to ONE iframe at a time — with pool>1 the last-focused
+        // iframe wins and 3+ concurrent specs lose focusin events.
+        // Override with `?pool=4` when the visible suite doesn't
+        // need focus semantics (e.g. agent deep-linking to one spec
+        // via `?grep=…`).
+        self.pool    = Math.max(1, parseInt(qs.get('pool') || '1', 10))
 
         self.versions = ko.observableArray([{ label: 'loading…', value: 'latest' }])
         self.suites   = ko.observableArray([])
@@ -355,9 +397,9 @@
       ko.applyBindings(page, document.getElementById('app'))
       window.__tkoPage = page
 
-      // Show/hide the out-of-tree mocha/iframe hosts based on mode.
+      // Show/hide the out-of-tree mocha host based on mode.
+      // (The #workarea always exists; iframes mount into it.)
       document.getElementById('mocha').hidden = page.suite() !== 'build'
-      document.getElementById('iframes').hidden = true
 
       // ----- Mode-specific kickoff -----
       if (page.suite() === 'source') {
@@ -445,21 +487,36 @@
           }
         })
 
-        const host = document.getElementById('iframes')
         const queue = [...specs]
+
+        const workarea = document.getElementById('workarea')
+        const workareaLabel = document.getElementById('workarea-label')
 
         async function runOne(spec) {
           return new Promise(resolve => {
             const iframe = document.createElement('iframe')
-            iframe.className = 'iframe-hidden'
+            // Full-area iframe in the visible work-area. Chromium
+            // denies `contentWindow.focus()` system focus to
+            // off-screen / zero-area iframes, which breaks the 34
+            // hasfocus tests (focusin / focusout events never fire
+            // without system focus). A real layout box in the work-
+            // area gives the iframe viewport intersection +
+            // focusable status. Visible running is a feature, not
+            // a bug — a dark-factory visitor watches the page work.
+            iframe.style.cssText = 'width:100%;height:100%;border:0;display:block'
             iframe.src = `/tests-frame.html?spec=${encodeURIComponent(spec.slug)}`
-            // After the iframe loads, push focus into its window so
-            // `element.focus()` inside the spec (hasfocus etc.) can
-            // actually land — Chromium's focus model requires the
-            // target window to be focusable before elements within
-            // it can accept focus.
+            workareaLabel.textContent = spec.file
+            // After the iframe loads, push focus both to the iframe
+            // element (parent-doc-level) AND its contentWindow —
+            // Chromium's focus model needs both routes for
+            // `element.focus()` inside to fire focusin/focusout.
+            // Only the LAST iframe created wins the focus; hasfocus
+            // specs rely on this landing on the most recent one.
             iframe.addEventListener('load', () => {
-              try { iframe.contentWindow?.focus() } catch {}
+              try {
+                iframe.focus()
+                iframe.contentWindow?.focus()
+              } catch {}
             })
             let done = false
             const finish = () => {
@@ -475,7 +532,7 @@
               if (m.type === 'end' || m.type === 'import-error') finish()
             }
             window.addEventListener('message', onMsg)
-            host.appendChild(iframe)
+            workarea.appendChild(iframe)
             setTimeout(finish, 30000) // safety
           })
         }

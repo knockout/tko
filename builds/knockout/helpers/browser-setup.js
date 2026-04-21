@@ -60,6 +60,66 @@ before(() => {
   }
 })
 
+// Iframe focus-event polyfill.
+//
+// Each spec runs inside a hidden iframe spawned by
+// `tko.io/src/pages/tests.astro` via `tests-frame.html`. Chromium
+// refuses to grant programmatic `iframe.contentWindow.focus()`
+// true system focus from a parent that already has focus — the
+// iframe's window never passes `document.hasFocus() === true`, so
+// the browser suppresses `focusin` / `focusout` events when specs
+// call `element.focus()` / `element.blur()` inside. The
+// `hasfocus` binding observes those events (not
+// `document.activeElement`); 34 tests fail as a result, both
+// under Playwright and under a real Chrome tab.
+//
+// Fix: wrap `HTMLElement.prototype.focus` and `.blur` to ALSO
+// dispatch the `focus` / `focusin` / `blur` / `focusout` events
+// synchronously after the native call. If the browser ALSO fires
+// them (whenever it does regain system focus), observers see
+// duplicates — harmless for the specs in this suite (they observe
+// state, not call count). Scope-guarded to the iframe context
+// (`window.parent !== window`) so the parent page is never
+// patched.
+//
+// References:
+//   - https://github.com/testing-library/user-event/issues/553
+//     `.focus()` does not fire focus events if the window is not
+//     focused. Confirmed across browsers; the same gate applies
+//     to unfocused iframes.
+//   - https://github.com/cypress-io/cypress/issues/8111
+//     iframe elements that focus are blurred immediately when
+//     they lack system focus.
+//   - https://github.com/jsdom/jsdom/pull/2996
+//     Reference implementation of synthetic focusin/focusout
+//     dispatch in jsdom; same shape as the wrap below.
+//   - https://html.spec.whatwg.org/multipage/interaction.html#focusing-elements
+//     The spec allows `.focus()` to succeed programmatically even
+//     when the owner isn't "being rendered"; event delivery,
+//     however, is gated on system focus of the top-level browsing
+//     context — that's the Chromium behaviour this patch bridges.
+if (window.parent !== window) {
+  const HE = HTMLElement.prototype
+  const origFocus = HE.focus
+  const origBlur = HE.blur
+  HE.focus = function (...args) {
+    const wasActive = this.ownerDocument.activeElement
+    origFocus.apply(this, args)
+    if (this.ownerDocument.activeElement === this && wasActive !== this) {
+      this.dispatchEvent(new FocusEvent('focus', { bubbles: false, relatedTarget: wasActive }))
+      this.dispatchEvent(new FocusEvent('focusin', { bubbles: true, relatedTarget: wasActive }))
+    }
+  }
+  HE.blur = function (...args) {
+    const wasActive = this.ownerDocument.activeElement
+    origBlur.apply(this, args)
+    if (wasActive === this && this.ownerDocument.activeElement !== this) {
+      this.dispatchEvent(new FocusEvent('blur', { bubbles: false, relatedTarget: this.ownerDocument.activeElement }))
+      this.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: this.ownerDocument.activeElement }))
+    }
+  }
+}
+
 // Spies, stubs, and fake timers installed via the non-sandboxed
 // `sinon.spy(obj, 'method')` / `sinon.stub(...)` / `sinon.useFakeTimers()`
 // APIs remain wrapped on their targets until explicitly restored.
