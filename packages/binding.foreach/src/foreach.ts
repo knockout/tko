@@ -5,7 +5,15 @@
 // Employing sound techniques to make a faster Knockout foreach binding.
 // --------
 
-import { arrayForEach, cleanNode, options, virtualElements, domData, domNodeIsContainedBy } from '@tko/utils'
+import {
+  arrayForEach,
+  cleanNode,
+  options,
+  virtualElements,
+  domData,
+  domNodeIsContainedBy,
+  validateHTMLInput
+} from '@tko/utils'
 
 import { isObservable, unwrap, observable } from '@tko/observable'
 
@@ -57,7 +65,7 @@ function makeTemplateNode(sourceNode) {
     parentNode = sourceNode.content
   } else if (sourceNode.tagName === 'SCRIPT') {
     parentNode = document.createElement('div')
-    parentNode.innerHTML = sourceNode.text
+    parentNode.innerHTML = validateHTMLInput(sourceNode.text)
   } else {
     // Anything else e.g. <div>
     parentNode = sourceNode
