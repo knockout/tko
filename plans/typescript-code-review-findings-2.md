@@ -47,6 +47,7 @@ Cross-ref: Issue [#235](https://github.com/knockout/tko/issues/235) — re-check
 
 7. `Parser` imported as value and downcast via `as any` in component provider path.
 File: `packages/provider.component/src/ComponentProvider.ts`
+PR: [#362](https://github.com/knockout/tko/pull/362) (open)
 
 8. JsxObserver subscription callback ignores callback value.
 File: `packages/utils.jsx/src/JsxObserver.ts`
@@ -70,6 +71,7 @@ File: `packages/provider.component/src/ComponentProvider.ts`
 
 14. AMD `require` call has no explicit error callback path.
 File: `packages/utils.component/src/loaders.ts`
+PR: [#361](https://github.com/knockout/tko/pull/361) (open)
 
 ## De-duplication Rules
 
@@ -85,9 +87,9 @@ Disposition of each (findings may have been moved to later rounds or resolved vi
 | Finding | Status | Reference |
 |---------|--------|-----------|
 | Proxy `deleteProperty` trap dropping property key | **Fixed** | PR [#336](https://github.com/knockout/tko/pull/336) (merged) |
-| `??` behaves identically to `||` (earlyOut) | **Confirmed** — `earlyOut` is `a => a`, same as `||` | PR [#345](https://github.com/knockout/tko/pull/345) (open); canonical in Round 3 |
-| Parser operator-precedence inversion | Issue [#342](https://github.com/knockout/tko/issues/342) (closed) | |
-| `TextInputLegacyFirefox` dead code | **Confirmed** — class still present | PR [#346](https://github.com/knockout/tko/pull/346) (open) |
+| `??` behaves identically to `||` (earlyOut) | **Fixed** | PR [#345](https://github.com/knockout/tko/pull/345) (merged) ; canonical in Round 3 |
+| Parser operator-precedence inversion | **Fixed** | Issue [#342](https://github.com/knockout/tko/issues/342) (closed); PR [#343](https://github.com/knockout/tko/pull/343) (merged) |
+| `TextInputLegacyFirefox` dead code | **Fixed** | PR [#346](https://github.com/knockout/tko/pull/346) (merged) |
 | `style` binding referencing global `jQuery` | Uses `options.jQuery` (gated) | PR [#339](https://github.com/knockout/tko/pull/339) (merged) |
 
 ## Verification

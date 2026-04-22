@@ -125,6 +125,7 @@ For historical context and previously cataloged findings, see:
   to `parentNode.innerHTML`, bypassing `options.sanitizeHtmlTemplate`,
   `options.templateSizeLimit`, and `options.allowScriptTagsInTemplates`.
 - **Recommended**: Route through `parseHtmlFragment`.
+- PR: [#352](https://github.com/knockout/tko/pull/352) (open)
 
 #### 9. `LifeCycle.mixInto` copies `constructor`, overwriting target class identity
 **File**: `packages/lifecycle/src/LifeCycle.ts:18–22`
@@ -186,7 +187,8 @@ For historical context and previously cataloged findings, see:
 - Brian recommended treating findings plans as separate follow-ups rather than bundling with the skill PR.
 - Each critical finding should be independently verified before locking it in as a plan item.
 - Findings #1 and #2 are confirmed as real bugs (see verification notes above).
-- Open PRs addressing findings from across all rounds: #345 (`??` earlyOut), #346 (TextInputLegacyFirefox), #347 (duplicate options import).
+- Open PRs addressing findings from across all rounds: #352 (makeTemplateNode sanitization), #361 (AMD require error callback), #362 (Parser instantiation in ComponentProvider), #363 (LifeCycle removeEventListener options).
+- Merged PRs: #343 (operator precedence), #345 (`??` earlyOut), #346 (TextInputLegacyFirefox), #347 (duplicate options import).
 
 ---
 
