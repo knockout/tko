@@ -256,7 +256,14 @@ async function buildSourceBundles({ buildVersion, tsconfig, alias }) {
   const specs = await collectSpecs(scope)
   if (specs.length === 0) throw new Error('source-bundle scope matched no specs')
 
+  // Clean previous chunk-*.js emissions so removed specs / shifted
+  // dependency graphs don't leak stale hashed chunks into the new
+  // manifest. Wrappers + per-spec bundles regenerate from fresh
+  // entry points, so leaving them alone is fine.
   await fs.mkdir(sourceOutputDir, { recursive: true })
+  for await (const name of new Bun.Glob('chunk-*.js').scan({ cwd: sourceOutputDir })) {
+    await fs.unlink(path.join(sourceOutputDir, name))
+  }
   const { entryPoints, manifest } = await writeSpecWrappers(specs)
 
   await esbuild.build({
@@ -275,9 +282,21 @@ async function buildSourceBundles({ buildVersion, tsconfig, alias }) {
     logLevel: 'warning'
   })
 
+  // Enumerate the shared chunk files esbuild just emitted. The
+  // /tests page preloads these via <link rel="modulepreload"> in
+  // <head> so the browser HTTP cache is warm before iframes race
+  // to dynamic-import them — otherwise WebKit occasionally reports
+  // the opaque "Importing a module script failed." error. See
+  // tko.io/src/pages/tests.astro.
+  const chunks = []
+  for await (const name of new Bun.Glob('chunk-*.js').scan({ cwd: sourceOutputDir })) {
+    chunks.push(name)
+  }
+  chunks.sort()
+
   await fs.writeFile(
     path.join(sourceOutputDir, 'manifest.json'),
-    JSON.stringify({ specs: manifest }, null, 2),
+    JSON.stringify({ specs: manifest, chunks }, null, 2),
     'utf8'
   )
 
