@@ -7,10 +7,10 @@
     "postinstall": "patch-package",
     "prebuild": "bun ./scripts/generate-verified-behaviors.mjs && mkdir -p public/lib && cd ../builds/knockout && bun run build && cp dist/browser.min.js ../../tko.io/public/lib/ko.js && cd ../reference && bun run build && cp dist/browser.min.js ../../tko.io/public/lib/tko.js && cd ../../tko.io && bun ./scripts/bundle-tests.mjs",
     "predev": "bun run prebuild",
-    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
-    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build --force",
-    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
-    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check"
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 bun --bun astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 bun --bun astro build --force",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 bun --bun astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 bun --bun astro check"
   },
   "keywords": ["tko", "knockout", "documentation"],
   "author": "",

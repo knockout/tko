@@ -80,8 +80,9 @@
           runner.on('end', () => parent.postMessage({ type: 'end', slug, stats: runner.stats }, '*'))
           parent.postMessage({ type: 'start', slug, total: runner.total }, '*')
         } catch (err) {
-          document.getElementById('err').textContent = 'import failed: ' + (err?.message || err)
-          parent.postMessage({ type: 'import-error', slug, err: err?.message || String(err) }, '*')
+          const msg = err?.message || String(err)
+          document.getElementById('err').textContent = 'import failed: ' + msg
+          parent.postMessage({ type: 'import-error', slug, err: msg }, '*')
         }
       }
     </script>

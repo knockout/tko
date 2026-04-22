@@ -1,4 +1,17 @@
 ---
+import { fileURLToPath } from 'node:url'
+
+// Read the source-mode chunk list at SSR time so the HTML ships
+// with <link rel="modulepreload"> for every shared chunk already
+// in <head>. The browser starts warming the HTTP cache during
+// initial parse — well before any JS runs — which side-steps the
+// concurrent-fetch race that makes WebKit occasionally fail spec
+// iframes with the opaque "Importing a module script failed."
+// error. `prebuild` always runs bundle-tests.mjs before Astro
+// builds the site, so manifest.json is guaranteed to exist.
+const manifestPath = fileURLToPath(new URL('../../public/tests/source/manifest.json', import.meta.url))
+const sourceChunks: string[] = (await Bun.file(manifestPath).json()).chunks ?? []
+
 // TKO Browser Test Runner — written in TKO itself.
 //
 // Two modes:
@@ -32,6 +45,8 @@
     <title>TKO · Browser Tests</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lobster&display=swap" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha@10/mocha.css" />
+    {sourceChunks.map(name => <link rel="modulepreload" href={`/tests/source/${name}`} />)}
+    <link rel="preload" as="script" href="/tests/source/setup.js" />
     <style>
       :root {
         --bg: #0b0d11;
@@ -362,7 +377,7 @@
         self.pkg     = ko.observable(safePkg)
         self.ver     = ko.observable(safeVer)
         self.grep    = ko.observable(qs.get('grep') || '')
-        // Pool for the parallel (non-focus) phase. Focus-needing
+        // Pool for the parallel-hidden run. Focus-needing
         // specs — flagged at bundle time via `manifest.specs[].needsFocus`
         // — always run serially in the visible #workarea so each
         // has sole system focus; Chromium only grants
@@ -520,6 +535,7 @@
         const res = await fetch('/tests/source/manifest.json')
         const manifest = await res.json()
         let specs = manifest.specs
+
         const grep = page.grep().trim()
         if (grep) {
           // Invalid regex patterns (e.g. bare `(`) throw from the
@@ -632,7 +648,11 @@
           })
         }
 
-        // Phase 1: parallel hidden specs.
+        // Parallel-hidden run: non-focus specs, `pool`-at-a-time
+        // inside the offscreen `hiddenHost`. The <link rel=modulepreload>
+        // tags in <head> warmed the HTTP cache, so iframes can
+        // race on dynamic import() without tripping WebKit's
+        // dependency-tree fetcher.
         async function hiddenWorker() {
           while (hiddenQueue.length) {
             const spec = hiddenQueue.shift()
@@ -642,7 +662,8 @@
         }
         await Promise.all(Array.from({ length: page.pool }, hiddenWorker))
 
-        // Phase 2: serial focus specs in the visible workarea.
+        // Serial-focus run: one focus-needing spec at a time in
+        // the visible #workarea so each has sole system focus.
         for (const spec of focusQueue) {
           await runOne(spec, { host: workarea, label: workareaLabel, grantFocus: true })
         }
