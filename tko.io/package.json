@@ -18,7 +18,7 @@
   "devDependencies": {
     "@astrojs/starlight": "0.37.7",
     "@astrojs/check": "0.9.6",
-    "astro": "5.18.1",
+    "astro": "6.1.6",
     "patch-package": "^8.0.1",
     "typescript": "^5.9.3"
   }
