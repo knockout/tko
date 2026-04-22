@@ -216,7 +216,7 @@ operators['??'].precedence = 3
 
 operators['&&'].earlyOut = a => !a
 operators['||'].earlyOut = a => a
-operators['??'].earlyOut = a => a
+operators['??'].earlyOut = a => a !== null && a !== undefined
 
 // Assignment and miscellaneous (lamda)
 operators['=>'].precedence = 2

@@ -52,6 +52,30 @@ describe('Operators', function () {
     test([null, op['??'], false], false)
   })
 
+  it('?? evaluates rhs iff lhs is null/undefined', () => {
+    let rhsCalls = 0
+    const rhs = () => {
+      rhsCalls++
+      return 'right'
+    }
+    const parser = new Parser()
+    const args = new Arguments(null, [])
+
+    for (const [lhs, expected, expectedCalls] of [
+      [0, 0, 0],
+      ['', '', 0],
+      [false, false, 0],
+      [null, 'right', 1],
+      [undefined, 'right', 1]
+    ] as const) {
+      rhsCalls = 0
+      const context = ctxStub({ a: lhs, rhs })
+      const root = nodes_to_tree([new Identifier(parser, 'a'), op['??'], new Identifier(parser, 'rhs', [args])])
+      assert.strictEqual(root.get_value(null, context), expected, `${String(lhs)} ?? rhs() value`)
+      assert.strictEqual(rhsCalls, expectedCalls, `${String(lhs)} ?? rhs() calls`)
+    }
+  })
+
   it('performs ?. optional chaining', () => {
     test([{}, op['?.'], 'a'], undefined)
     test([null, op['?.'], 'a'], undefined)
