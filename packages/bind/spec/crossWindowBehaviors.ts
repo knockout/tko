@@ -50,7 +50,7 @@ describe('Cross-window support', function () {
     const win2 = window.open('', '_blank', 'height=150,location=no,menubar=no,toolbar=no,width=250')
 
     if (!win2) {
-      return
+      return this.skip('popup blocked — cross-window assertions cannot run')
     }
 
     const previousTemplateEngine = nativeTemplateEngine.instance
