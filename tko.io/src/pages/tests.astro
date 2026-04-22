@@ -39,7 +39,8 @@
         --border: #222834;
         --fg: #e8e8e8;
         --muted: #8a93a1;
-        --accent: #5ad9ff;
+        --accent: #0f62fe;
+        --accent-hover: #3b82f6;
         --ok: #57d38a;
         --warn: #ffb04d;
         --err: #ff6b6b;
@@ -49,11 +50,10 @@
         margin: 0;
         background: var(--bg);
         color: var(--fg);
-        font: 13px/1.5 ui-sans-serif, system-ui, sans-serif;
-        /* Reserve space so the fixed-bottom work-area doesn't hide
-           the tail of the suite tree. Matches workarea height
-           (240px) + label row + padding + border. */
-        padding-bottom: 300px;
+        font: 13px/1.5 'Inter', system-ui, sans-serif;
+        /* Small bottom-right padding; the work-area floats in the
+           bottom-right corner and self-removes when tests finish. */
+        padding-bottom: 1rem;
       }
       header {
         padding: 0.8rem 1rem;
@@ -61,7 +61,10 @@
         border-bottom: 1px solid var(--border);
         display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; align-items: center;
       }
-      header h1 { margin: 0; font-size: 0.98rem; letter-spacing: 0.01em; }
+      header h1 { margin: 0; font-size: 0.98rem; letter-spacing: 0.01em; font-weight: 600; }
+      header h1 a { color: var(--fg); text-decoration: none; }
+      header h1 a .brand { color: var(--accent); font-weight: 700; }
+      header h1 a:hover .brand { color: var(--accent-hover); }
       header .tag { color: var(--muted); font-size: 0.82rem; }
       .chip {
         display: inline-flex; align-items: center; gap: 0.35rem;
@@ -86,7 +89,8 @@
         font: inherit;
       }
       header label { display: inline-flex; gap: 0.3rem; align-items: center; color: var(--muted); font-size: 0.85rem; }
-      header button { cursor: pointer; background: var(--accent); color: #001b23; border-color: var(--accent); font-weight: 600; }
+      header button { cursor: pointer; background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+      header button:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
       main { padding: 1rem; display: grid; gap: 1rem; }
       .progress {
         height: 3px;
@@ -163,7 +167,7 @@
   <body>
     <div id="app">
     <header>
-      <h1>TKO · live browser tests</h1>
+      <h1><a href="/"><span class="brand">TKO</span> · live browser tests</a></h1>
       <span class="tag" data-bind="text: tagline"></span>
       <span class="chip ok"    data-bind="text: '✓ ' + stats.pass()"></span>
       <span class="chip err"   data-bind="text: '✖ ' + stats.fail()"></span>
@@ -230,26 +234,54 @@
          running also doubles as a dark-factory signal: a visitor
          watches specs flash by in the sandbox rather than
          wondering if anything is happening. -->
-    <section style="
+    <section id="workarea-section" style="
       position:fixed;
-      left:0; right:0; bottom:0;
-      padding:0.4rem 1rem 0.6rem;
-      background:var(--panel);
-      border-top:1px solid var(--border);
+      right:1rem; bottom:1rem;
+      width:320px; height:200px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.35);
       z-index:5;
-    ">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;color:#8a93a1;font-size:0.78rem">
-        <span>Work area (current spec)</span>
-        <span id="workarea-label" style="font-variant-numeric:tabular-nums">idle</span>
-      </div>
+      overflow:hidden;
+      opacity:0.6;
+      transition:opacity 140ms ease;
+    "
+    onmouseenter="this.style.opacity=1"
+    onmouseleave="this.style.opacity=0.6"
+    >
       <div id="workarea" style="
-        border:1px solid #222834;
-        border-radius:6px;
+        position:absolute;
+        inset:0;
         background:#fff;
-        height:240px;
         overflow:hidden;
-        position:relative;
       "></div>
+      <div style="
+        position:absolute;
+        inset:0;
+        padding:0.55rem 0.7rem 1.3rem;
+        color:#0b0d11;
+        font-size:0.7rem;
+        line-height:1.35;
+        pointer-events:none;
+        text-shadow:0 0 6px rgba(255,255,255,0.85), 0 0 2px rgba(255,255,255,0.85);
+        mix-blend-mode:multiply;
+      ">
+        Focus-requiring specs (<code>hasfocus</code>, <code>.focus()</code>,
+        <code>document.activeElement</code>) run serially here &mdash;
+        Chromium only grants system focus to one iframe at a time and
+        denies it to off-screen / zero-area iframes. This panel will
+        disappear when tests complete.
+      </div>
+      <div id="workarea-label" style="
+        position:absolute;
+        right:0.4rem; bottom:0.3rem;
+        padding:0.1rem 0.4rem;
+        color:#0b0d11;
+        font-size:0.68rem;
+        font-variant-numeric:tabular-nums;
+        pointer-events:none;
+        text-shadow:0 0 6px rgba(255,255,255,0.9);
+      ">idle</div>
     </section>
 
     <!-- Error collector before any other script runs. -->
@@ -597,6 +629,7 @@
           await runOne(spec, { host: workarea, label: workareaLabel, grantFocus: true })
         }
         workareaLabel.textContent = 'done'
+        document.getElementById('workarea-section')?.remove()
         hiddenHost.remove()
 
         page.stats.end(Date.now())
