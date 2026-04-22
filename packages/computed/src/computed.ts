@@ -8,7 +8,6 @@ import {
   arrayForEach,
   domNodeIsAttachedToDocument,
   extend,
-  options,
   hasOwnProperty,
   objectForEach,
   options as koOptions,
@@ -427,7 +426,7 @@ computed.fn = {
       }
 
       state.latestValue = newValue
-      if (options.debug) {
+      if (koOptions.debug) {
         this._latestValue = newValue
       }
 
