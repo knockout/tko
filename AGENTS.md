@@ -17,11 +17,11 @@ Two things shape the coverage/safety bar here more than any specific rule:
 
 Together: coverage and signal are expensive to lose and cheap to keep. When a change trades either away, say so explicitly and justify the delta.
 
-## Before you start (checklist)
+## Before you start
 
-1. **Check `plans/` first.** A significant change (new page, new build step, new CI workflow, new top-level concept, multi-commit refactor) needs a plan file in [`plans/`](plans/) *before implementation* — see the [Plans](#plans) section below. If the task matches an existing plan, read it; if not and the scope is significant, draft one and get alignment.
-2. **Check verified-behaviors.** If the change touches a package with `verified-behaviors.json`, the behaviors are a contract — preserve them unless the plan explicitly calls for a revision.
-3. **Run `bun run verify`** before any commit. It's the safety net.
+- Check [`plans/`](plans/) — significant changes need a plan before code (see [Plans](#plans)).
+- `verified-behaviors.json` in a package is a contract; don't break it without a plan.
+- `bun run verify` passes before every commit.
 
 ## Project Structure
 
@@ -162,27 +162,15 @@ long-lived publish token.
 
 ## Plans
 
-Significant changes need a plan file in [`plans/`](plans/) **before
-implementation begins**. Plans document the context, approach, architecture,
-files touched, and verification steps. Existing plans are the format reference
-— match their shape.
+Significant changes need a plan in [`plans/`](plans/) before code. Plans
+document context, approach, files touched, and verification. Match the shape
+of existing plans.
 
-**Write a plan when the change is any of:**
+**Write one for:** new pages/routes, new build or CI steps, new cross-package
+concepts, refactors across 5+ files.
 
-- a new top-level page, route, or site feature (e.g. `/playground`, `/tests`)
-- a new build, bundling, or release step
-- a new CI workflow or check
-- a new cross-package concept (e.g. verified-behaviors, defineOption)
-- a refactor touching 5+ files across packages
-- anything you'd describe to a teammate as "this is a project, not a fix"
-
-**Skip a plan for:** bug fixes, single-file edits, doc tweaks, dependency
-bumps, comment cleanup, test additions to an existing spec.
-
-If unsure, check `plans/` for precedent — the existing plans span docs
-migrations, build modernization, playground, test runner, agent-verified
-behaviors, and more. If nothing comparable is there, the change probably
-deserves a plan.
+**Skip for:** bug fixes, single-file edits, doc tweaks, dep bumps, comment
+cleanup, new tests in existing specs.
 
 ## Agent-First Documentation
 
