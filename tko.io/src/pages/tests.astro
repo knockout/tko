@@ -1,5 +1,5 @@
 ---
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 // Read the source-mode chunk list at SSR time so the HTML ships
 // with <link rel="modulepreload"> for every shared chunk already
@@ -9,7 +9,9 @@ import { fileURLToPath } from 'node:url'
 // iframes with the opaque "Importing a module script failed."
 // error. `prebuild` always runs bundle-tests.mjs before Astro
 // builds the site, so manifest.json is guaranteed to exist.
-const manifestPath = fileURLToPath(new URL('../../public/tests/source/manifest.json', import.meta.url))
+// Resolve from cwd (project root) — import.meta.url points into
+// dist/.prerender/chunks/ under Astro 6's prerender bundler.
+const manifestPath = join(process.cwd(), 'public/tests/source/manifest.json')
 const sourceChunks: string[] = (await Bun.file(manifestPath).json()).chunks ?? []
 
 // TKO Browser Test Runner — written in TKO itself.
