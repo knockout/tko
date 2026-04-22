@@ -190,7 +190,11 @@ async function buildBuildBundle({ buildVersion, tsconfig, alias }) {
   // drags checkout code into the bundle and undermines that
   // promise. Skip those in build mode — they belong to source
   // mode only. Pure `ko.*`-global specs go through cleanly.
-  const RELATIVE_IMPORT = /from\s+['"]\.\.?\//
+  // Matches every relative-import form we've seen in specs:
+  //   import x from './a'         import './a'
+  //   export * from '../a'        import('./a')
+  //   require('../a')
+  const RELATIVE_IMPORT = /(?:\bfrom\s+['"]\.\.?\/|(?:^|\s|;)import\s*\(?\s*['"]\.\.?\/|\brequire\s*\(\s*['"]\.\.?\/)/m
   const specs = []
   for (const spec of allSpecs) {
     const src = await fs.readFile(spec, 'utf8')

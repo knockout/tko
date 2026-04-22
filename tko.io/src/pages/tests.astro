@@ -64,8 +64,8 @@
       }
       header h1 { margin: 0; font-size: 0.98rem; letter-spacing: 0.01em; font-weight: 600; display: inline-flex; align-items: baseline; gap: 0.5rem; }
       header h1 a { color: var(--fg); text-decoration: none; }
-      header h1 a .brand { color: var(--accent); font-family: 'Lobster', cursive; font-weight: 400; font-size: 1.85rem; letter-spacing: 0.01em; }
-      header h1 a:hover .brand { color: var(--accent-hover); }
+      header h1 a .brand { color: #dce8ff; font-family: 'Lobster', cursive; font-weight: 400; font-size: 1.85rem; letter-spacing: 0.01em; }
+      header h1 a:hover .brand { color: #fff; }
       header .tag { color: var(--muted); font-size: 0.82rem; }
       .chip {
         display: inline-flex; align-items: center; gap: 0.35rem;
@@ -368,7 +368,8 @@
         // has sole system focus; Chromium only grants
         // `contentWindow.focus()` system focus to one frame at a
         // time. Everything else runs in parallel, invisibly.
-        self.pool    = Math.max(1, parseInt(qs.get('pool') || '4', 10))
+        const reqPool = parseInt(qs.get('pool') || '4', 10)
+        self.pool    = Number.isFinite(reqPool) ? Math.min(16, Math.max(1, reqPool)) : 4
 
         self.versions = ko.observableArray([{ label: 'loading…', value: 'latest' }])
         self.suites   = ko.observableArray([])
@@ -491,7 +492,15 @@
         // Mocha browser reporter for build mode — single run.
         await loadScript('https://cdn.jsdelivr.net/npm/mocha@10/mocha.js')
         window.mocha.setup({ ui: 'bdd', reporter: 'html', timeout: 10000, cleanReferencesAfterRun: false })
-        if (page.grep().trim()) window.mocha.grep(page.grep().trim())
+        const buildGrep = page.grep().trim()
+        if (buildGrep) {
+          try {
+            window.mocha.grep(new RegExp(buildGrep, 'i'))
+          } catch {
+            const needle = buildGrep.toLowerCase()
+            window.mocha.grep(t => (t.fullTitle?.() || t.title || '').toLowerCase().includes(needle))
+          }
+        }
 
         const koUrl = `https://cdn.jsdelivr.net/npm/@tko/build.${page.pkg()}@${page.ver()}/dist/browser.min.js`
         await loadScript(koUrl)
@@ -553,6 +562,7 @@
           } else if (m.type === 'end') {
             suite.running(false)
           } else if (m.type === 'import-error') {
+            page.stats.total(Math.max(page.stats.total(), page.stats.done() + 1))
             page.recordTest(key, 'fail', '(iframe import error)', 0, m.err)
           }
         })
@@ -611,7 +621,14 @@
             }
             window.addEventListener('message', onMsg)
             host.appendChild(iframe)
-            safetyTimer = setTimeout(finish, 30000)
+            safetyTimer = setTimeout(() => {
+              const key = spec.file || spec.slug
+              page.stats.total(Math.max(page.stats.total(), page.stats.done() + 1))
+              page.recordTest(key, 'fail', '(iframe timeout)', 30000,
+                `No end/import-error event after 30000ms (spec: ${key})`)
+              page.ensureSuite(key).running(false)
+              finish()
+            }, 30000)
           })
         }
 
