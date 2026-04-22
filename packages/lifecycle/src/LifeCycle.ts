@@ -68,7 +68,7 @@ export default class LifeCycle {
   __addEventListener(node, eventType, handler, options) {
     node.addEventListener(eventType, handler, options)
     function dispose() {
-      node.removeEventListener(eventType, handler)
+      node.removeEventListener(eventType, handler, options)
     }
     addDisposeCallback(node, dispose)
     this.addDisposable({ dispose })
