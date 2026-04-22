@@ -43,7 +43,9 @@ Builds: `@tko/build.knockout` (backwards-compatible) and
 ## Prerequisites
 
 - **Bun** — package manager and script runner. Install via [mise](https://mise.jdx.dev/): `mise install` (reads `.tool-versions`), or [bun.sh](https://bun.sh).
-- Use `bun install` instead of `npm install`.
+- Use `bun install` instead of `npm install`; `bunx` instead of `npx`.
+- In repo scripts (`tko.io/scripts`, `tools/`), prefer native Bun APIs — `Bun.Glob`, `Bun.file`, `Bun.write`, `Bun.$` — over `node:fs`, the `glob` export from `node:fs/promises`, or ad-hoc `child_process`. Runtime is pinned by `.tool-versions`, so there's no Node-version portability concern.
+- Browser automation uses `bunx playwright <cmd>` via the repo's `playwright` dependency (not `npx playwright`, not the deprecated `playwright-cli` package).
 
 ## Build Commands
 
