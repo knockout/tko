@@ -50,6 +50,10 @@
         background: var(--bg);
         color: var(--fg);
         font: 13px/1.5 ui-sans-serif, system-ui, sans-serif;
+        /* Reserve space so the fixed-bottom work-area doesn't hide
+           the tail of the suite tree. Matches workarea height
+           (240px) + label row + padding + border. */
+        padding-bottom: 300px;
       }
       header {
         padding: 0.8rem 1rem;
@@ -226,8 +230,15 @@
          running also doubles as a dark-factory signal: a visitor
          watches specs flash by in the sandbox rather than
          wondering if anything is happening. -->
-    <section style="padding:0 1rem;margin-top:1rem">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;color:#8a93a1;font-size:0.78rem">
+    <section style="
+      position:fixed;
+      left:0; right:0; bottom:0;
+      padding:0.4rem 1rem 0.6rem;
+      background:var(--panel);
+      border-top:1px solid var(--border);
+      z-index:5;
+    ">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;color:#8a93a1;font-size:0.78rem">
         <span>Work area (current spec)</span>
         <span id="workarea-label" style="font-variant-numeric:tabular-nums">idle</span>
       </div>
@@ -235,7 +246,7 @@
         border:1px solid #222834;
         border-radius:6px;
         background:#fff;
-        height:360px;
+        height:240px;
         overflow:hidden;
         position:relative;
       "></div>
