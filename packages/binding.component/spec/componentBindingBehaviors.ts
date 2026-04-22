@@ -1276,7 +1276,9 @@ describe('Components: Component binding', function () {
       // `.trim()` alone strips only leading/trailing; real browsers
       // preserve internal newlines + indentation from the template
       // source between slotted nodes. Collapse to single spaces.
-      expect((testNode.children[0] as HTMLInputElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(`beep / beep`)
+      expect((testNode.children[0] as HTMLInputElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(
+        `beep / beep`
+      )
     })
 
     it('inserts into nested elements', function () {

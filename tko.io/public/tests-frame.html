@@ -24,9 +24,11 @@
         - No spec can leak state into another.
 
       URL contract: `tests-frame.html?spec=<slug>` where <slug> is
-      the key of a spec module under /tests/source/. The spec's
-      wrapper imports the knockout build, browser-setup, and the
-      spec, all in this iframe's private scope.
+      the key of a spec module under /tests/source/. This iframe
+      first loads `/tests/source/setup.js` via a classic <script>
+      tag (inlined ko build + browser-setup globals); the inline
+      module script then dynamic-imports `/tests/source/<slug>.js`,
+      which contains only the spec under test.
 
       File lives at `public/tests-frame.html` (not
       `public/tests/frame.html`) to avoid colliding with Astro's

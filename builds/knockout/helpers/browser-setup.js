@@ -151,20 +151,21 @@ afterEach(() => {
 // Genuine Mocha done-callback specs (identified by a `done(` call
 // in the source) pass through unchanged.
 {
-  const wrap = orig => function (name, fn) {
-    if (typeof fn === 'function' && fn.length === 1) {
-      const src = fn.toString()
-      const ctxStyle = /\.skip\s*\(/.test(src) && !/\bdone\s*\(/.test(src)
-      if (ctxStyle) {
-        const wrapped = function () {
-          return fn.call(this, { skip: reason => this.skip(reason) })
+  const wrap = orig =>
+    function (name, fn) {
+      if (typeof fn === 'function' && fn.length === 1) {
+        const src = fn.toString()
+        const ctxStyle = /\.skip\s*\(/.test(src) && !/\bdone\s*\(/.test(src)
+        if (ctxStyle) {
+          const wrapped = function () {
+            return fn.call(this, { skip: reason => this.skip(reason) })
+          }
+          Object.defineProperty(wrapped, 'length', { value: 0 })
+          return orig.call(this, name, wrapped)
         }
-        Object.defineProperty(wrapped, 'length', { value: 0 })
-        return orig.call(this, name, wrapped)
       }
+      return orig.apply(this, arguments)
     }
-    return orig.apply(this, arguments)
-  }
   const origIt = globalThis.it
   const wrappedIt = wrap(origIt)
   wrappedIt.only = wrap(origIt.only)

@@ -17,7 +17,7 @@
 //     the reactive report.
 //
 // URL params:
-//   ?suite=build|source       default: build
+//   ?suite=build|source       default: source
 //   ?pkg=knockout|reference   build mode only; default: knockout
 //   ?ver=<version>|latest     build mode only; default: latest
 //   ?grep=<pattern>           source mode: filter spec files (regex on file/slug)
@@ -106,6 +106,13 @@
         padding: 0.45rem 0.75rem;
         cursor: pointer;
         user-select: none;
+        /* Button reset for accessibility. */
+        width: 100%;
+        background: transparent;
+        color: inherit;
+        border: 0;
+        text-align: left;
+        font: inherit;
       }
       .suite-head:hover { background: var(--panel-hi); }
       .suite-head .name { font-weight: 600; letter-spacing: 0.01em; }
@@ -141,27 +148,10 @@
         word-break: break-word;
       }
       .filter { width: 14rem; }
-      /* Spec iframes need full viewport-sized layout for Chromium
-         to grant `iframe.contentWindow.focus()` true system focus.
-         Tiny (1×1 or 0×0) or off-viewport (left:-10000px) iframes
-         get denied — `document.hasFocus()` inside stays false,
-         `focusin`/`focusout` events never fire, 34 hasfocus tests
-         fail. Full-viewport iframe with `opacity:0` +
-         `pointer-events:none` + `z-index:-1` gives the iframe the
-         layout area Chromium needs while remaining invisible and
-         non-interactive to the user. Pool=1 means at most one
-         such iframe is live at a time, so nothing stacks on top
-         of the page chrome. */
-      .iframe-hidden {
-        position: fixed;
-        inset: 0;
-        width: 100vw;
-        height: 100vh;
-        border: 0;
-        opacity: 0;
-        pointer-events: none;
-        z-index: -1;
-      }
+      /* Iframe sizing happens inline in runOne() — visible
+         focus-requiring iframes fill the work-area; hidden
+         parallel iframes are tiny + transparent inside
+         `hiddenHost`. No shared `.iframe-hidden` class. */
       #mocha { padding: 0 0.5rem; }
       footer { padding: 0.8rem 1rem; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); }
     </style>
@@ -197,10 +187,10 @@
       <!-- Suite tree: source mode. -->
       <div data-bind="foreach: suites, visible: suite() === 'source'">
         <div class="suite" data-bind="attr: { 'data-state': state, 'data-open': open }">
-          <div class="suite-head" data-bind="click: toggle">
+          <button type="button" class="suite-head" data-bind="click: toggle, attr: { 'aria-expanded': open }">
             <span class="name" data-bind="text: file"></span>
             <span class="meta" data-bind="text: pass() + ' / ' + total()"></span>
-          </div>
+          </button>
           <div class="suite-body" data-bind="foreach: tests">
             <div class="test" data-bind="attr: { 'data-kind': kind }">
               <span class="icon" data-bind="text: icon"></span>
@@ -312,9 +302,21 @@
         // Default to source mode — iframe-per-spec, the isolated
         // runner. Use `?suite=build&pkg=knockout` to test a
         // published `@tko/build.*` version via jsdelivr instead.
-        self.suite   = ko.observable(qs.get('suite') || 'source')
-        self.pkg     = ko.observable(qs.get('pkg') || 'knockout')
-        self.ver     = ko.observable(qs.get('ver') || 'latest')
+        // Validate URL inputs — `pkg` + `ver` feed the jsdelivr
+        // <script> URL in build mode, so a crafted query string
+        // could otherwise load arbitrary third-party code. Fall
+        // back to safe defaults on anything unexpected.
+        const rawSuite = qs.get('suite')
+        const rawPkg = qs.get('pkg')
+        const rawVer = qs.get('ver')
+        const safeSuite = rawSuite === 'build' || rawSuite === 'source' ? rawSuite : 'source'
+        const safePkg = rawPkg === 'knockout' || rawPkg === 'reference' ? rawPkg : 'knockout'
+        // Allow `latest`, or a semver-shaped string
+        // (digits, dots, hyphens, letters for pre-release tags).
+        const safeVer = rawVer && /^[\w.-]{1,40}$/.test(rawVer) ? rawVer : 'latest'
+        self.suite   = ko.observable(safeSuite)
+        self.pkg     = ko.observable(safePkg)
+        self.ver     = ko.observable(safeVer)
         self.grep    = ko.observable(qs.get('grep') || '')
         // Pool for the parallel (non-focus) phase. Focus-needing
         // specs — flagged at bundle time via `manifest.specs[].needsFocus`
@@ -370,7 +372,11 @@
 
         self.onSubmit = () => {
           const next = new URLSearchParams()
-          if (self.suite() !== 'build') next.set('suite', self.suite())
+          // Page default is source. Anything else (including the
+          // Run form's own build mode) must set `suite` explicitly
+          // — else reload drops to source and kills the build-mode
+          // config the user just submitted.
+          if (self.suite() !== 'source') next.set('suite', self.suite())
           if (self.pkg() !== 'knockout') next.set('pkg', self.pkg())
           if (self.ver() !== 'latest') next.set('ver', self.ver())
           const g = self.grep().trim()
@@ -461,16 +467,31 @@
         const res = await fetch('/tests/source/manifest.json')
         const manifest = await res.json()
         let specs = manifest.specs
-        if (page.grep().trim()) {
-          const rx = new RegExp(page.grep().trim(), 'i')
-          specs = specs.filter(s => rx.test(s.file) || rx.test(s.slug))
+        const grep = page.grep().trim()
+        if (grep) {
+          // Invalid regex patterns (e.g. bare `(`) throw from the
+          // RegExp constructor and abort source mode. Fall back to
+          // literal substring matching instead.
+          let rx
+          try { rx = new RegExp(grep, 'i') } catch {}
+          specs = rx
+            ? specs.filter(s => rx.test(s.file) || rx.test(s.slug))
+            : specs.filter(s => s.file.toLowerCase().includes(grep.toLowerCase())
+                              || s.slug.toLowerCase().includes(grep.toLowerCase()))
         }
         specs.sort((a, b) => a.file.localeCompare(b.file))
         for (const s of specs) page.ensureSuite(s.file)
 
         page.stats.start(Date.now())
 
+        // Track live iframe contentWindows so the message handler
+        // can ignore spoofed frames. Same-origin + known-source =
+        // accept; anything else (cross-origin post, unknown window)
+        // is dropped.
+        const liveFrames = new Set()
         window.addEventListener('message', e => {
+          if (e.origin !== location.origin) return
+          if (!liveFrames.has(e.source)) return
           const m = e.data
           if (!m || !m.slug) return
           const spec = specs.find(s => s.slug === m.slug)
@@ -517,14 +538,15 @@
               : 'width:1px;height:1px;border:0;opacity:0'
             iframe.src = `/tests-frame.html?spec=${encodeURIComponent(spec.slug)}`
             if (label) label.textContent = spec.file
-            if (grantFocus) {
-              iframe.addEventListener('load', () => {
+            iframe.addEventListener('load', () => {
+              if (iframe.contentWindow) liveFrames.add(iframe.contentWindow)
+              if (grantFocus) {
                 try {
                   iframe.focus()
                   iframe.contentWindow?.focus()
                 } catch {}
-              })
-            }
+              }
+            })
             let done = false
             let safetyTimer
             const finish = () => {
@@ -532,10 +554,13 @@
               done = true
               clearTimeout(safetyTimer)
               window.removeEventListener('message', onMsg)
+              if (iframe.contentWindow) liveFrames.delete(iframe.contentWindow)
               iframe.remove()
               resolve()
             }
             const onMsg = e => {
+              if (e.origin !== location.origin) return
+              if (e.source !== iframe.contentWindow) return
               const m = e.data
               if (m?.slug !== spec.slug) return
               if (m.type === 'end' || m.type === 'import-error') finish()
