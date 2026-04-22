@@ -25,7 +25,6 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { glob } from 'node:fs/promises'
 import * as esbuild from 'esbuild'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
@@ -55,16 +54,19 @@ const distToSrcPlugin = {
   }
 }
 
+// Script runs under Bun (see `prebuild` in tko.io/package.json).
+// `Bun.Glob` is portable to both Bun and the dev `bun --watch`
+// path, so no Node 22+ dependency.
 async function collectSpecs(patterns) {
-  const specs = []
+  const specs = new Set()
   for (const pattern of patterns) {
-    for await (const match of glob(pattern, { cwd: repoRoot })) {
+    const g = new Bun.Glob(pattern)
+    for await (const match of g.scan({ cwd: repoRoot })) {
       if (EXCLUDE.test(match)) continue
-      specs.push(path.join(repoRoot, match))
+      specs.add(path.join(repoRoot, match))
     }
   }
-  specs.sort()
-  return specs
+  return [...specs].sort()
 }
 
 function specSlug(absPath) {
