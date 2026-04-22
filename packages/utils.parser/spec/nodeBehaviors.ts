@@ -58,7 +58,7 @@ describe('Operators', function () {
       rhsCalls++
       return 'right'
     }
-    const parser = new Parser(null)
+    const parser = new Parser()
     const args = new Arguments(null, [])
 
     for (const [lhs, expected, expectedCalls] of [
