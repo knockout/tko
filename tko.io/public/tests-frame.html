@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TKO Spec Frame</title>
+    <style>
+      html, body { margin: 0; padding: 0; background: #0f1115; color: #e8e8e8; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+      #mocha { padding: 0.5rem 0.75rem; }
+      #err { padding: 0.5rem 0.75rem; color: #ff8080; white-space: pre-wrap; }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha@10/mocha.css" />
+  </head>
+  <body>
+    <!--
+      Per-spec iframe harness. The parent /tests page spawns one of
+      these per spec file in source/manifest.json and reads results
+      via postMessage.
+
+      Each iframe has its own `window`, so:
+        - Module graph is fresh (no class-identity collision across
+          specs).
+        - `globalThis.ko`, `options.filters`, DOM, timers, sinon
+          stubs, testNode — all isolated per spec.
+        - No spec can leak state into another.
+
+      URL contract: `tests-frame.html?spec=<slug>` where <slug> is
+      the key of a spec module under /tests/source/. This iframe
+      first loads `/tests/source/setup.js` via a classic <script>
+      tag (inlined ko build + browser-setup globals); the inline
+      module script then dynamic-imports `/tests/source/<slug>.js`,
+      which contains only the spec under test.
+
+      File lives at `public/tests-frame.html` (not
+      `public/tests/frame.html`) to avoid colliding with Astro's
+      `/tests/` page route — a nested public/tests/*.html 404s in
+      dev because the page route claims the whole prefix.
+    -->
+    <div id="mocha"></div>
+    <div id="err"></div>
+
+    <!-- Pre-module bootstrap: `/tests/source/setup.js` is a
+         bundled IIFE that loads the knockout build from source
+         AND runs `browser-setup.js` (chai / sinon / filter
+         punctuation / mocha-test-helpers globals / jsxClean
+         hook). Must load BEFORE the spec module so
+         `globalThis.ko`, `prepareTestNode`, `restoreAfter`, etc.
+         exist when the spec's top-level code evaluates.
+
+         Earlier iterations tried to embed setup as ESM imports
+         in the spec wrapper; esbuild's code-splitter hoisted
+         the spec's chunk above the ko/setup chunks and
+         `beforeEach(prepareTestNode)` at spec-top threw
+         `ReferenceError`. Moving setup into a classic <script>
+         tag sidesteps the issue: the IIFE runs synchronously
+         before the module loader even starts. -->
+    <!-- Load Mocha FIRST so `before` / `beforeEach` / `describe`
+         globals exist when setup.js evaluates (browser-setup.js
+         calls `before(() => …)` at module-top). -->
+    <script src="https://cdn.jsdelivr.net/npm/mocha@10/mocha.js"></script>
+    <script>
+      mocha.setup({ ui: 'bdd', reporter: 'html', timeout: 10000, cleanReferencesAfterRun: false })
+    </script>
+    <script src="/tests/source/setup.js"></script>
+    <script type="module">
+      const qs = new URLSearchParams(location.search)
+      const slug = qs.get('spec')
+      if (!slug) {
+        document.getElementById('err').textContent = 'missing ?spec= query param'
+      } else {
+        try {
+          await import(`/tests/source/${slug}.js`)
+          const runner = mocha.run()
+          runner.on('pass', t => parent.postMessage({ type: 'pass', slug, title: t.fullTitle(), duration: t.duration }, '*'))
+          runner.on('fail', (t, err) => parent.postMessage({
+            type: 'fail', slug, title: t.fullTitle(), duration: t.duration,
+            err: (err?.message || String(err)),
+            stack: err?.stack
+          }, '*'))
+          runner.on('pending', t => parent.postMessage({ type: 'pending', slug, title: t.fullTitle() }, '*'))
+          runner.on('end', () => parent.postMessage({ type: 'end', slug, stats: runner.stats }, '*'))
+          parent.postMessage({ type: 'start', slug, total: runner.total }, '*')
+        } catch (err) {
+          document.getElementById('err').textContent = 'import failed: ' + (err?.message || err)
+          parent.postMessage({ type: 'import-error', slug, err: err?.message || String(err) }, '*')
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -17,6 +17,12 @@ Two things shape the coverage/safety bar here more than any specific rule:
 
 Together: coverage and signal are expensive to lose and cheap to keep. When a change trades either away, say so explicitly and justify the delta.
 
+## Before you start
+
+- Check [`plans/`](plans/) — significant changes need a plan before code (see [Plans](#plans)).
+- `verified-behaviors.json` in a package is a contract; don't break it without a plan.
+- `bun run verify` passes before every commit.
+
 ## Project Structure
 
 Monorepo with Bun workspaces.
@@ -156,9 +162,15 @@ long-lived publish token.
 
 ## Plans
 
-Significant changes should have a plan file in `plans/` before implementation
-begins. Plans document the context, approach, and verification steps. Review
-existing plans in that directory for format examples.
+Significant changes need a plan in [`plans/`](plans/) before code. Plans
+document context, approach, files touched, and verification. Match the shape
+of existing plans.
+
+**Write one for:** new pages/routes, new build or CI steps, new cross-package
+concepts, refactors across 5+ files.
+
+**Skip for:** bug fixes, single-file edits, doc tweaks, dep bumps, comment
+cleanup, new tests in existing specs.
 
 ## Agent-First Documentation
 

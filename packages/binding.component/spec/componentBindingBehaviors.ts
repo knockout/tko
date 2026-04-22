@@ -1273,7 +1273,12 @@ describe('Components: Component binding', function () {
 
       if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLInputElement).innerText.trim()).to.deep.equal(`beep / beep`)
+      // `.trim()` alone strips only leading/trailing; real browsers
+      // preserve internal newlines + indentation from the template
+      // source between slotted nodes. Collapse to single spaces.
+      expect((testNode.children[0] as HTMLInputElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(
+        `beep / beep`
+      )
     })
 
     it('inserts into nested elements', function () {
@@ -1410,7 +1415,7 @@ describe('Components: Component binding', function () {
 
       if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`A. B. C.`)
+      expect((testNode.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(`A. B. C.`)
       const em = testNode.children[0].children[0].children[0]
       expect(em.tagName).to.deep.equal('EM')
     })
@@ -1432,7 +1437,7 @@ describe('Components: Component binding', function () {
 
       if (isHappyDom()) return ctx.skip('happy-dom: innerText whitespace rendering differs from real browsers')
       applyBindings(outerViewModel, testNode)
-      expect((testNode.children[0] as HTMLElement).innerText.trim()).to.deep.equal(`B. C. E.`)
+      expect((testNode.children[0] as HTMLElement).innerText.replace(/\s+/g, ' ').trim()).to.deep.equal(`B. C. E.`)
       const em = testNode.children[0].children[0].children[0]
       expect(em.tagName).to.deep.equal('EM')
     })

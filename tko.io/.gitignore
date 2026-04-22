@@ -4,3 +4,4 @@ _site/
 dist/
 package-lock.json
 public/lib/
+public/tests/
