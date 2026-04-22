@@ -11,7 +11,7 @@ const { name, version } = pkg
 const banner = `// ${name} 🥊 ${version}`
 const { buildMode = 'default', iifeGlobalName = 'tko' } = pkg.tko ?? {}
 
-const common = `--log-level=warning --define:BUILD_VERSION='"${version}"' --sourcemap=external`
+const common = `--log-level=warning --define:BUILD_VERSION='"${version}"' --sourcemap=linked`
 
 function esbuild(args: string) {
   console.log(`[build] ${name} → ${args.match(/--out(?:file|dir)=(\S+)/)?.[1] ?? ''}`)
