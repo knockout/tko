@@ -110,7 +110,8 @@ hits ≥ 90%.
 
 1. `utils/src/string.ts` — `parseJson`: valid JSON, whitespace-only string,
    non-string input, malformed JSON (throws).
-2. `binding.core/src/descendantsComplete.ts` — `onDescendantsComplete` with
+2. Correction: Allegedly dead code -> 
+   `binding.core/src/descendantsComplete.ts` — `onDescendantsComplete` with
    a function value (callback fires with `$element`), with a non-function
    value (no-op), and `allowVirtualElements` getter already hit.
 3. `observable/src/Subscription.ts` — disposing twice, disposing during
