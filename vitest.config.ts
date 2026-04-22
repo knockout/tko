@@ -21,15 +21,7 @@ export default defineConfig({
       // We include both `dist/` (so v8 picks up execution) and `src/` (so
       // source-map remapping can surface the original TS files in the report).
       include: ['packages/*/src/**/*.ts', 'packages/*/dist/**/*.js', 'builds/*/src/**/*.ts'],
-      exclude: [
-        '**/spec/**',
-        '**/helpers/**',
-        '**/types/**',
-        '**/*.d.ts',
-        '**/*.cjs',
-        '**/index.ts',
-        '**/index.js'
-      ],
+      exclude: ['**/spec/**', '**/helpers/**', '**/types/**', '**/*.d.ts', '**/*.cjs', '**/index.ts', '**/index.js'],
       all: true,
       clean: true
     },
