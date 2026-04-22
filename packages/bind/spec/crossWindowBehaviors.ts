@@ -50,7 +50,9 @@ describe('Cross-window support', function () {
     const win2 = window.open('', '_blank', 'height=150,location=no,menubar=no,toolbar=no,width=250')
 
     if (!win2) {
-      return
+      // Popup blocked — skip so mocha reports pending (○) instead
+      // of silently passing with zero assertions.
+      return this.skip()
     }
 
     const previousTemplateEngine = nativeTemplateEngine.instance
