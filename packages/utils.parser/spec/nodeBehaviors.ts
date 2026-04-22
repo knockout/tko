@@ -54,7 +54,10 @@ describe('Operators', function () {
 
   it('?? evaluates rhs iff lhs is null/undefined', () => {
     let rhsCalls = 0
-    const rhs = () => { rhsCalls++; return 'right' }
+    const rhs = () => {
+      rhsCalls++
+      return 'right'
+    }
     const parser = new Parser(null)
     const args = new Arguments(null, [])
 
@@ -67,11 +70,7 @@ describe('Operators', function () {
     ] as const) {
       rhsCalls = 0
       const context = ctxStub({ a: lhs, rhs })
-      const root = nodes_to_tree([
-        new Identifier(parser, 'a'),
-        op['??'],
-        new Identifier(parser, 'rhs', [args])
-      ])
+      const root = nodes_to_tree([new Identifier(parser, 'a'), op['??'], new Identifier(parser, 'rhs', [args])])
       assert.strictEqual(root.get_value(null, context), expected, `${String(lhs)} ?? rhs() value`)
       assert.strictEqual(rhsCalls, expectedCalls, `${String(lhs)} ?? rhs() calls`)
     }
