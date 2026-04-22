@@ -81,7 +81,6 @@ const sourceChunks: string[] = (await Bun.file(manifestPath).json()).chunks ?? [
       header h1 a { color: var(--fg); text-decoration: none; }
       header h1 a .brand { color: #dce8ff; font-family: 'Lobster', cursive; font-weight: 400; font-size: 1.85rem; letter-spacing: 0.01em; }
       header h1 a:hover .brand { color: #fff; }
-      header .tag { color: var(--muted); font-size: 0.82rem; }
       .chip {
         display: inline-flex; align-items: center; gap: 0.35rem;
         padding: 0.2rem 0.55rem;
@@ -184,7 +183,6 @@ const sourceChunks: string[] = (await Bun.file(manifestPath).json()).chunks ?? [
     <div id="app">
     <header>
       <h1><a href="/"><span class="brand">TKO</span> · live browser tests</a></h1>
-      <span class="tag" data-bind="text: tagline"></span>
       <span class="chip ok"    data-bind="text: '✓ ' + stats.pass()"></span>
       <span class="chip err"   data-bind="text: '✖ ' + stats.fail()"></span>
       <span class="chip warn"  data-bind="text: '○ ' + stats.pending()"></span>
@@ -419,11 +417,6 @@ const sourceChunks: string[] = (await Bun.file(manifestPath).json()).chunks ?? [
           const d = self.stats.done()
           return t > 0 ? Math.min(100, (d / t) * 100).toFixed(1) : 0
         })
-        self.tagline = ko.pureComputed(() =>
-          self.suite() === 'source'
-            ? `source specs · pool ${self.pool}`
-            : `build ${self.pkg()} @ ${self.ver()}`
-        )
         self.footer = ko.pureComputed(() =>
           self.suite() === 'source'
             ? 'source mode · one iframe per spec file (isolated module graph)'
