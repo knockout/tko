@@ -174,6 +174,10 @@ concepts, refactors across 5+ files.
 **Skip for:** bug fixes, single-file edits, doc tweaks, dep bumps, comment
 cleanup, new tests in existing specs.
 
+**Naming:** `plans/YYYY-MM-DD-<slug>.md`, where the date is when the plan
+was written. This keeps `ls plans/` chronological so stale plans are visually
+obvious.
+
 ## Agent-First Documentation
 
 AI coding agents are first-class citizens of TKO. The docs site serves both

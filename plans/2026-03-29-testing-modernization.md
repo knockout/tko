@@ -68,7 +68,7 @@ These should not be carried forward as-is:
 
 ### 1. Reset Testing Guidance
 
-- Update `plans/testing-modernization.md` to describe the Mocha-first path.
+- Update `plans/2026-03-29-testing-modernization.md` to describe the Mocha-first path.
 - Remove Bun references from `AGENTS.md`.
 - Make the repo guidance explicit: no new Jasmine, no `bun:test`.
 
