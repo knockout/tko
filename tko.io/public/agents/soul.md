@@ -83,6 +83,27 @@ script tag, verify your tests pass, ship. From there, adopting modern
 features (TSX, native providers, modular packages) is incremental and
 optional.
 
+The two builds wire the same core differently. Concretely, comparing
+`builds/knockout/src/index.ts` and `builds/reference/src/index.ts`:
+
+- **Providers.** Both ship `Component`, `DataBind`, `Virtual`, and
+  `Attribute`. `reference` additionally enables `Native`,
+  `AttributeMustache`, and `TextMustache`. `knockout` does not.
+- **Equality.** `reference` sets `options.strictEquality = true`, so `==`
+  and `!=` in binding expressions evaluate as `===` / `!==`. `knockout`
+  leaves the legacy lax behavior on.
+- **Globals in bindings.** `knockout` sets
+  `bindingGlobals: options.global`, exposing the global scope inside
+  binding expressions. `reference` does not.
+- **Inline-function rewrite.** `knockout` registers
+  `functionRewrite` from `@tko/utils.functionrewrite` as a binding-string
+  preparser, so legacy inline `function (...) { ... }` expressions in
+  `data-bind` still work. `reference` does not.
+- **Legacy surface.** `knockout` exposes a
+  `ko.expressionRewriting.preProcessBindings` shim for KO 3 plugins.
+  `reference` exposes `ko.jsx = { createElement, Fragment, render }` for
+  TSX. Neither has the other.
+
 TKO aims for stability, not strict backwards compatibility at all costs.
 If a change improves correctness, security, or maintainability and the
 migration path is clear, it's worth making. But gratuitous breakage is
