@@ -24,6 +24,10 @@
     {
       "statement": "Array mutation, reordering, duplicate values, `$index`, `as`, and `noIndex` are all exercised in spec coverage.",
       "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
+    },
+    {
+      "statement": "`foreach` supports `afterRender(nodes, value)`, `beforeMove(node, newIndex, value)`, and `afterMove(node, newIndex, value)` lifecycle callbacks in addition to the existing batch-shaped `afterAdd` and `beforeRemove` callbacks.",
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     }
   ]
 }

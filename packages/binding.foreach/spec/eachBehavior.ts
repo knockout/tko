@@ -836,6 +836,64 @@ describe('observable array changes', function () {
     })
   })
 
+  describe('afterRender', function () {
+    it('is called with rendered nodes and the array value for initial and added items', function () {
+      const calls: any[] = []
+      const arr = observableArray(['a'])
+      function cb(nodes, value) {
+        calls.push({ text: nodes.map(node => node.textContent).join(''), value })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: $data'></li></div>"
+      )
+      applyBindings({ arr: arr, cb: cb }, target[0])
+
+      assert.deepEqual(calls, [{ text: 'a', value: 'a' }])
+      arr.push('b')
+      assert.deepEqual(calls, [
+        { text: 'a', value: 'a' },
+        { text: 'b', value: 'b' }
+      ])
+    })
+  })
+
+  describe('beforeMove and afterMove', function () {
+    it('fire with the retained node, its new index, and its value when items shift', function () {
+      const first = { name: 'first' }
+      const added = { name: 'added' }
+      const calls: any[] = []
+      const arr = observableArray([first])
+      function beforeMove(node, index, value) {
+        calls.push({ phase: 'before', text: node.textContent, index, value, parentText: node.parentNode.textContent })
+      }
+      function afterMove(node, index, value) {
+        calls.push({ phase: 'after', text: node.textContent, index, value, parentText: node.parentNode.textContent })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'><li data-bind='text: name'></li></div>"
+      )
+      applyBindings({ arr: arr, beforeMove: beforeMove, afterMove: afterMove }, target[0])
+
+      arr.splice(0, 0, added)
+
+      assert.equal(calls.length, 2)
+      assert.deepEqual(calls[0], {
+        phase: 'before',
+        text: 'first',
+        index: 1,
+        value: first,
+        parentText: 'first'
+      })
+      assert.deepEqual(calls[1], {
+        phase: 'after',
+        text: 'first',
+        index: 1,
+        value: first,
+        parentText: 'addedfirst'
+      })
+    })
+  })
+
   describe('$index', function () {
     it('is present on the children', function () {
       const target = $("<ul data-bind='foreach: $data'><li data-bind='text: $data'></li></ul>")

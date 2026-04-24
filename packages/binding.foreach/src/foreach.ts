@@ -13,8 +13,6 @@ import type { ObservableArray } from '@tko/observable'
 
 import { contextFor, applyBindingsToDescendants, AsyncBindingHandler } from '@tko/bind'
 
-import type { AllBindings } from '@tko/bind'
-
 //      Utilities
 const MAX_LIST_SIZE = Number.MAX_SAFE_INTEGER
 
@@ -89,8 +87,11 @@ export class ForEachBinding extends AsyncBindingHandler {
   //    computed
   //    {data: array, name: string, as: string}
   afterAdd
+  afterMove
+  afterRender
   static animateFrame
   as
+  beforeMove
   beforeRemove
   container
   changeSubs: any
@@ -99,13 +100,14 @@ export class ForEachBinding extends AsyncBindingHandler {
   $indexHasBeenRequested: boolean
   templateNode
   changeQueue: any[]
-  firstLastNodesList: { first: Node; last: Node }[]
+  firstLastNodesList: { first: Node; last: Node; value: any }[]
   indexesToDelete: any[]
   isNotEmpty: any
   rendering_queued: boolean
   pendingDeletes: any[]
   afterQueueFlush
   beforeQueueFlush
+  pendingAfterRender: { nodes: Node[]; value: any }[]
 
   constructor(params) {
     super(params)
@@ -125,7 +127,15 @@ export class ForEachBinding extends AsyncBindingHandler {
     this.templateNode = makeTemplateNode(
       settings.templateNode || (settings.name ? document.getElementById(settings.name)?.cloneNode(true) : this.$element)
     )
-    ;['afterAdd', 'beforeRemove', 'afterQueueFlush', 'beforeQueueFlush'].forEach(p => {
+    ;[
+      'afterAdd',
+      'afterMove',
+      'afterRender',
+      'beforeMove',
+      'beforeRemove',
+      'afterQueueFlush',
+      'beforeQueueFlush'
+    ].forEach(p => {
       this[p] = settings[p] || this.allBindings.get(p)
     })
 
@@ -134,6 +144,7 @@ export class ForEachBinding extends AsyncBindingHandler {
     this.indexesToDelete = new Array()
     this.rendering_queued = false
     this.pendingDeletes = new Array()
+    this.pendingAfterRender = new Array()
 
     // Expose the conditional so that if the `foreach` data is empty, successive
     // 'else' bindings will appear.
@@ -230,8 +241,10 @@ export class ForEachBinding extends AsyncBindingHandler {
   processQueue() {
     const isEmpty = !unwrap(this.data).length
     let lowestIndexChanged = MAX_LIST_SIZE
+    const moves = this.computeMoves(unwrap(this.data) || [])
 
     this.startQueueFlush()
+    this.fireMoveCallback(this.beforeMove, moves, 'oldIndex')
 
     arrayForEach(this.changeQueue, changeItem => {
       if (typeof changeItem.index === 'number') {
@@ -247,6 +260,8 @@ export class ForEachBinding extends AsyncBindingHandler {
       this.updateIndexes(lowestIndexChanged)
     }
 
+    this.fireMoveCallback(this.afterMove, moves, 'newIndex')
+    this.flushPendingAfterRender()
     this.endQueueFlush()
     this.changeQueue = new Array()
 
@@ -254,6 +269,74 @@ export class ForEachBinding extends AsyncBindingHandler {
     if (isEmpty !== !this.isNotEmpty()) {
       this.isNotEmpty(!isEmpty)
     }
+  }
+
+  // Detect items that remain in the new array but at a different index than in
+  // firstLastNodesList. Only compute if any move callback is registered.
+  computeMoves(newValues: any[]): { value: any; oldIndex: number; newIndex: number }[] {
+    if (typeof this.beforeMove !== 'function' && typeof this.afterMove !== 'function') {
+      return []
+    }
+    const oldByValue = new Map<any, number[]>()
+    this.firstLastNodesList.forEach((entry, oldIndex) => {
+      const list = oldByValue.get(entry.value) || []
+      list.push(oldIndex)
+      oldByValue.set(entry.value, list)
+    })
+    const moves: { value: any; oldIndex: number; newIndex: number }[] = []
+    newValues.forEach((value, newIndex) => {
+      const list = oldByValue.get(value)
+      if (!list || list.length === 0) {
+        return
+      }
+      const oldIndex = list.shift()!
+      if (oldIndex !== newIndex) {
+        moves.push({ value, oldIndex, newIndex })
+      }
+    })
+    return moves
+  }
+
+  fireMoveCallback(
+    callback: any,
+    moves: { value: any; oldIndex: number; newIndex: number }[],
+    lookupKey: 'oldIndex' | 'newIndex'
+  ) {
+    if (typeof callback !== 'function' || moves.length === 0) {
+      return
+    }
+    arrayForEach(moves, move => {
+      const entry = this.firstLastNodesList[move[lookupKey]]
+      if (!entry) {
+        return
+      }
+      arrayForEach(this.getNodesForEntry(entry), node => {
+        callback(node, move.newIndex, move.value)
+      })
+    })
+  }
+
+  getNodesForEntry(entry: { first: Node; last: Node }) {
+    const result: Node[] = []
+    let ptr: Node | null = entry.first
+    const last = entry.last
+    result.push(ptr)
+    while (ptr && ptr !== last) {
+      ptr = ptr.nextSibling
+      if (ptr) {
+        result.push(ptr)
+      }
+    }
+    return result
+  }
+
+  flushPendingAfterRender() {
+    if (typeof this.afterRender === 'function') {
+      arrayForEach(this.pendingAfterRender, item => {
+        this.afterRender(item.nodes, item.value)
+      })
+    }
+    this.pendingAfterRender = new Array()
   }
 
   /**
@@ -306,10 +389,10 @@ export class ForEachBinding extends AsyncBindingHandler {
     }
   }
 
-  updateFirstLastNodesList(index, children) {
+  updateFirstLastNodesList(index, children, value) {
     const first = children[0]
     const last = children[children.length - 1]
-    this.firstLastNodesList.splice(index, 0, { first, last })
+    this.firstLastNodesList.splice(index, 0, { first, last, value })
   }
 
   // Process a changeItem with {status: 'added', ...}
@@ -327,16 +410,17 @@ export class ForEachBinding extends AsyncBindingHandler {
       const pendingDelete = this.getPendingDeleteFor(valuesToAdd[i])
       if (pendingDelete && pendingDelete.nodesets.length) {
         children = pendingDelete.nodesets.pop()
-        this.updateFirstLastNodesList(index + i, children)
+        this.updateFirstLastNodesList(index + i, children, valuesToAdd[i])
       } else {
         const templateClone = this.templateNode.cloneNode(true)
         children = virtualElements.childNodes(templateClone)
-        this.updateFirstLastNodesList(index + i, children)
+        this.updateFirstLastNodesList(index + i, children, valuesToAdd[i])
 
         // Apply bindings first, and then process child nodes,
         // because bindings can add childnodes.
         const bindingResult = applyBindingsToDescendants(this.generateContext(valuesToAdd[i]), templateClone)
         asyncBindingResults.push(bindingResult)
+        this.pendingAfterRender.push({ nodes: Array.from(children), value: valuesToAdd[i] })
       }
 
       allChildNodes.push(...children)

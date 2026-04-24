@@ -306,3 +306,12 @@ Full details:
    3. The moved array element
 
 For examples of `afterAdd` and `beforeRemove`, use CSS transitions or your own DOM removal logic.
+
+> **Note — reference build (`@tko/binding.foreach`) differences:**
+>
+> The reference build's `ForEachBinding` supports `afterRender`, `beforeMove`, and `afterMove` with the per-item `(node, index, value)` signature documented above. Its `afterAdd` and `beforeRemove` callbacks use a different, batch-oriented shape inherited from `knockout-foreach`:
+>
+>  * `afterAdd({ nodeOrArrayInserted, foreachInstance })` — called once per added batch (including the initial render), with the full array of inserted nodes.
+>  * `beforeRemove({ nodesToRemove, foreachInstance })` — called once per removed batch.
+>
+> `beforeRemove` in the reference build also accepts a **thenable return value**: if the callback returns a `Promise` (or any object with a `.then()` method), the nodes are removed automatically when the thenable resolves. This convenience is a tko extension and is **not part of the original Knockout `foreach` API** — Knockout's documented `beforeRemove` fires per node and always requires the callback to remove the DOM node itself. Code that relies on the thenable shortcut will not be portable to plain Knockout or to the knockout build (`@tko/build.knockout`), which follows the documented per-node contract.
