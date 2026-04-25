@@ -273,12 +273,18 @@ export class ForEachBinding extends AsyncBindingHandler {
 
   // Detect items that remain in the new array but at a different index than in
   // firstLastNodesList. Only compute if any move callback is registered.
+  // Limited to values that satisfy `shouldDelayDeletion`; primitives are torn
+  // down in `deleted()` and re-rendered in `added()`, so they are not "moved"
+  // in the documented sense (no node identity is preserved).
   computeMoves(newValues: any[]): { value: any; oldIndex: number; newIndex: number }[] {
     if (typeof this.beforeMove !== 'function' && typeof this.afterMove !== 'function') {
       return []
     }
     const oldByValue = new Map<any, number[]>()
     this.firstLastNodesList.forEach((entry, oldIndex) => {
+      if (!this.shouldDelayDeletion(entry.value)) {
+        return
+      }
       const list = oldByValue.get(entry.value) || []
       list.push(oldIndex)
       oldByValue.set(entry.value, list)
@@ -289,7 +295,10 @@ export class ForEachBinding extends AsyncBindingHandler {
       if (!list || list.length === 0) {
         return
       }
-      const oldIndex = list.shift()!
+      // Pop (rightmost) to align with `pendingDelete.nodesets.pop()` reuse
+      // order in `added()`, so duplicate-value pairings track the actual
+      // recycled nodeset.
+      const oldIndex = list.pop()!
       if (oldIndex !== newIndex) {
         moves.push({ value, oldIndex, newIndex })
       }
@@ -405,12 +414,17 @@ export class ForEachBinding extends AsyncBindingHandler {
     const asyncBindingResults = new Array()
     let children
 
+    const queueAfterRender = typeof this.afterRender === 'function'
+
     for (let i = 0, len = valuesToAdd.length; i < len; ++i) {
       // we check if we have a pending delete with reusable nodesets for this data, and if yes, we reuse one nodeset
       const pendingDelete = this.getPendingDeleteFor(valuesToAdd[i])
       if (pendingDelete && pendingDelete.nodesets.length) {
         children = pendingDelete.nodesets.pop()
         this.updateFirstLastNodesList(index + i, children, valuesToAdd[i])
+        if (queueAfterRender) {
+          this.pendingAfterRender.push({ nodes: Array.from(children), value: valuesToAdd[i] })
+        }
       } else {
         const templateClone = this.templateNode.cloneNode(true)
         children = virtualElements.childNodes(templateClone)
@@ -420,7 +434,9 @@ export class ForEachBinding extends AsyncBindingHandler {
         // because bindings can add childnodes.
         const bindingResult = applyBindingsToDescendants(this.generateContext(valuesToAdd[i]), templateClone)
         asyncBindingResults.push(bindingResult)
-        this.pendingAfterRender.push({ nodes: Array.from(children), value: valuesToAdd[i] })
+        if (queueAfterRender) {
+          this.pendingAfterRender.push({ nodes: Array.from(children), value: valuesToAdd[i] })
+        }
       }
 
       allChildNodes.push(...children)

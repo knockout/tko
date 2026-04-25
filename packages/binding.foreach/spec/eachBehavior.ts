@@ -856,6 +856,29 @@ describe('observable array changes', function () {
       ])
     })
 
+    it('fires for reused nodesets when an item is re-inserted from pendingDeletes', function () {
+      const a = { name: 'a' }
+      const b = { name: 'b' }
+      const c = { name: 'c' }
+      const calls: any[] = []
+      const arr = observableArray([a, b, c])
+      function cb(nodes, value) {
+        calls.push({ text: nodes.map(node => node.textContent).join(''), value })
+      }
+      const target = $("<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: name'></li></div>")
+      applyBindings({ arr: arr, cb: cb }, target[0])
+      assert.equal(calls.length, 3)
+
+      // Reverse moves `a` and `c` via delete+add pairs whose nodesets are
+      // recycled through pendingDeletes (`b` is retained in place). afterRender
+      // must fire for each reinsertion of the recycled nodes.
+      arr.reverse()
+      assert.equal(target.text(), 'cba')
+      const reusedValues = calls.slice(3).map(call => call.value)
+      assert.includeMembers(reusedValues, [a, c])
+      assert.notInclude(reusedValues, b)
+    })
+
     it('does not re-render when an observable read inside afterRender changes', function () {
       const testNode = document.createElement('div')
       testNode.innerHTML =
@@ -925,6 +948,29 @@ describe('observable array changes', function () {
         value: first,
         parentText: 'addedfirst'
       })
+    })
+
+    it('does not fire for primitives whose index changes (no node identity is preserved)', function () {
+      // Primitive values are torn down in `deleted()` and re-rendered fresh in
+      // `added()` (no `pendingDeletes` reuse), so the documented `(node, index,
+      // value)` move contract — the *same* DOM node moved — does not apply.
+      const calls: any[] = []
+      const arr = observableArray(['a'])
+      function beforeMove(_node, index, value) {
+        calls.push({ phase: 'before', index, value })
+      }
+      function afterMove(_node, index, value) {
+        calls.push({ phase: 'after', index, value })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'><li data-bind='text: $data'></li></div>"
+      )
+      applyBindings({ arr: arr, beforeMove: beforeMove, afterMove: afterMove }, target[0])
+
+      arr.splice(0, 0, 'added')
+
+      assert.equal(target.text(), 'addeda')
+      assert.equal(calls.length, 0)
     })
   })
 
