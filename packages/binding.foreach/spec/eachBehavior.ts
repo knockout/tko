@@ -22,7 +22,7 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { ForEachBinding } from '../dist/foreach'
 
-import $ from 'jquery'
+import $ from 'jquery' //TODO Should be removed and replaced with direct DOM manipulation
 
 import { assert } from 'chai'
 
@@ -854,6 +854,40 @@ describe('observable array changes', function () {
         { text: 'a', value: 'a' },
         { text: 'b', value: 'b' }
       ])
+    })
+
+    it('does not re-render when an observable read inside afterRender changes', function () {
+      const testNode = document.createElement('div')
+      testNode.innerHTML =
+        "<div data-bind='foreach: { data: someItems, afterRender: callback }'><span data-bind='text: childprop'></span></div>"
+
+      const callbackObservable = observable(1)
+      const someItems = observableArray([{ childprop: 'first child' }])
+      let callbacks = 0
+
+      applyBindings(
+        {
+          someItems,
+          callback: function () {
+            callbackObservable()
+            callbacks++
+          }
+        },
+        testNode
+      )
+      assert.equal(callbacks, 1)
+
+      // Mutate the underlying array without notifying — foreach must not re-render.
+      someItems().push({ childprop: 'hidden child' })
+      assert.equal(testNode.childNodes[0].textContent, 'first child')
+
+      // Changing an observable that was only *read* inside afterRender must not re-render.
+      callbackObservable(2)
+      assert.equal(testNode.childNodes[0].textContent, 'first child')
+
+      // Now notify — the new child should appear.
+      someItems.valueHasMutated()
+      assert.equal(testNode.childNodes[0].textContent, 'first childhidden child')
     })
   })
 
