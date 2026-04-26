@@ -76,6 +76,19 @@ function valueToChangeAddItem(value, index): ChangeAddItem {
   return { status: 'added', value: value, index: index }
 }
 
+function walkSiblingRange(first: Node, last: Node): Node[] {
+  const result: Node[] = []
+  let ptr: Node | null = first
+  result.push(ptr)
+  while (ptr && ptr !== last) {
+    ptr = ptr.nextSibling
+    if (ptr) {
+      result.push(ptr)
+    }
+  }
+  return result
+}
+
 // store a symbol for caching the pending delete info index in the data item objects
 const PENDING_DELETE_INDEX_SYM = Symbol('_ko_ffe_pending_delete_index')
 
@@ -261,13 +274,15 @@ export class ForEachBinding extends AsyncBindingHandler {
     }
 
     this.fireMoveCallback(this.afterMove, moves, 'newIndex')
-    this.flushPendingAfterRender()
-    this.endQueueFlush()
-    this.changeQueue = new Array()
-
-    // Update the conditional exposed on the domData
-    if (isEmpty !== !this.isNotEmpty()) {
-      this.isNotEmpty(!isEmpty)
+    try {
+      this.flushPendingAfterRender()
+      this.endQueueFlush()
+    } finally {
+      this.changeQueue = new Array()
+      // Update the conditional exposed on the domData
+      if (isEmpty !== !this.isNotEmpty()) {
+        this.isNotEmpty(!isEmpty)
+      }
     }
   }
 
@@ -326,26 +341,19 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   getNodesForEntry(entry: { first: Node; last: Node }) {
-    const result: Node[] = []
-    let ptr: Node | null = entry.first
-    const last = entry.last
-    result.push(ptr)
-    while (ptr && ptr !== last) {
-      ptr = ptr.nextSibling
-      if (ptr) {
-        result.push(ptr)
-      }
-    }
-    return result
+    return walkSiblingRange(entry.first, entry.last)
   }
 
   flushPendingAfterRender() {
-    if (typeof this.afterRender === 'function') {
-      arrayForEach(this.pendingAfterRender, item => {
-        this.afterRender(item.nodes, item.value)
-      })
+    try {
+      if (typeof this.afterRender === 'function') {
+        arrayForEach(this.pendingAfterRender, item => {
+          this.afterRender(item.nodes, item.value)
+        })
+      }
+    } finally {
+      this.pendingAfterRender = new Array()
     }
-    this.pendingAfterRender = new Array()
   }
 
   /**
@@ -455,15 +463,8 @@ export class ForEachBinding extends AsyncBindingHandler {
   }
 
   getNodesForIndex(index) {
-    const result = new Array()
-    let ptr = this.firstLastNodesList[index].first
-    const last = this.firstLastNodesList[index].last
-    result.push(ptr)
-    while (ptr && ptr !== last) {
-      ptr = ptr.nextSibling!
-      result.push(ptr)
-    }
-    return result
+    const entry = this.firstLastNodesList[index]
+    return walkSiblingRange(entry.first, entry.last)
   }
 
   getLastNodeBeforeIndex(index) {

@@ -863,20 +863,40 @@ describe('observable array changes', function () {
       const calls: any[] = []
       const arr = observableArray([a, b, c])
       function cb(nodes, value) {
-        calls.push({ text: nodes.map(node => node.textContent).join(''), value })
+        calls.push({
+          nodes: Array.from(nodes),
+          text: nodes.map(node => node.textContent).join(''),
+          value
+        })
       }
       const target = $("<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: name'></li></div>")
       applyBindings({ arr: arr, cb: cb }, target[0])
       assert.equal(calls.length, 3)
+      const initialNodesByValue = new Map(calls.map(call => [call.value, call.nodes]))
 
       // Reverse moves `a` and `c` via delete+add pairs whose nodesets are
       // recycled through pendingDeletes (`b` is retained in place). afterRender
       // must fire for each reinsertion of the recycled nodes.
       arr.reverse()
       assert.equal(target.text(), 'cba')
-      const reusedValues = calls.slice(3).map(call => call.value)
-      assert.includeMembers(reusedValues, [a, c])
+      assert.equal(calls.length, 5)
+      const reusedCalls = calls.slice(3)
+      const reusedValues = reusedCalls.map(call => call.value)
+      const reusedCallsByValue = new Map(reusedCalls.map(call => [call.value, call]))
+      assert.sameMembers(reusedValues, [a, c])
       assert.notInclude(reusedValues, b)
+      arrayForEach([a, c], value => {
+        const initialNodes = initialNodesByValue.get(value)!
+        const reusedCall = reusedCallsByValue.get(value)!
+        assert.equal(reusedCall.nodes.length, initialNodes.length)
+        arrayForEach(reusedCall.nodes, (node, index) => {
+          assert.strictEqual(node, initialNodes[index!])
+        })
+      })
+      const finalNodes = Array.from(target[0].childNodes)
+      arrayForEach([c, b, a], (value, index) => {
+        assert.strictEqual(finalNodes[index!], initialNodesByValue.get(value)![0])
+      })
     })
 
     it('does not re-render when an observable read inside afterRender changes', function () {
@@ -911,6 +931,64 @@ describe('observable array changes', function () {
       // Now notify — the new child should appear.
       someItems.valueHasMutated()
       assert.equal(testNode.childNodes[0].textContent, 'first childhidden child')
+    })
+
+    it('clears pending afterRender calls when afterRender throws', function () {
+      const error = new Error('afterRender failed')
+      const calls: any[] = []
+      const instance = {
+        pendingAfterRender: [{ nodes: [], value: 'a' }],
+        afterRender(nodes, value) {
+          calls.push({ nodes, value })
+          throw error
+        }
+      }
+      let thrown
+
+      try {
+        ForEachBinding.prototype.flushPendingAfterRender.call(instance)
+      } catch (err) {
+        thrown = err
+      }
+
+      assert.strictEqual(thrown, error)
+      assert.deepEqual(instance.pendingAfterRender, [])
+      assert.deepEqual(calls, [{ nodes: [], value: 'a' }])
+    })
+
+    it('updates conditional state and does not replay a completed queue after afterRender throws', function () {
+      const a = { name: 'a' }
+      const b = { name: 'b' }
+      const error = new Error('afterRender failed')
+      const calls: any[] = []
+      const arr = observableArray<typeof a>([])
+      let shouldThrow = false
+      function cb(_nodes, value) {
+        calls.push(value)
+        if (shouldThrow) {
+          throw error
+        }
+      }
+      const target = $("<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: name'></li></ul>")
+      applyBindings({ arr: arr, cb: cb }, target[0])
+      shouldThrow = true
+      let thrown
+
+      try {
+        arr.push(a)
+      } catch (err) {
+        thrown = err
+      }
+
+      assert.strictEqual(thrown, error)
+      assert.equal(target.text(), 'a')
+      assert.equal(domData.get(target[0], 'conditional').elseChainSatisfied(), true)
+
+      shouldThrow = false
+      arr.push(b)
+
+      assert.equal(target.text(), 'ab')
+      assert.deepEqual(calls, [a, b])
     })
   })
 
@@ -971,6 +1049,51 @@ describe('observable array changes', function () {
 
       assert.equal(target.text(), 'addeda')
       assert.equal(calls.length, 0)
+    })
+
+    it('fires once per DOM node for moved multi-root item templates', function () {
+      const first = { firstLabel: 'first-a', secondLabel: 'first-b' }
+      const added = { firstLabel: 'added-a', secondLabel: 'added-b' }
+      const calls: any[] = []
+      const arr = observableArray([first])
+      function beforeMove(node, index, value) {
+        calls.push({ phase: 'before', node, text: node.textContent, index, value })
+      }
+      function afterMove(node, index, value) {
+        calls.push({ phase: 'after', node, text: node.textContent, index, value })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'>" +
+          "<li data-bind='text: firstLabel'></li><li data-bind='text: secondLabel'></li></ul>"
+      )
+      applyBindings({ arr: arr, beforeMove: beforeMove, afterMove: afterMove }, target[0])
+      const movedNodes = Array.from(target[0].childNodes)
+
+      arr.splice(0, 0, added)
+
+      assert.equal(target.text(), 'added-aadded-bfirst-afirst-b')
+      assert.equal(calls.length, 4)
+      assert.deepEqual(
+        calls.map(({ phase, text, index }) => ({ phase, text, index })),
+        [
+          { phase: 'before', text: 'first-a', index: 1 },
+          { phase: 'before', text: 'first-b', index: 1 },
+          { phase: 'after', text: 'first-a', index: 1 },
+          { phase: 'after', text: 'first-b', index: 1 }
+        ]
+      )
+      const callbackNodes = calls.map(call => call.node)
+      const expectedCallbackNodes = [movedNodes[0], movedNodes[1], movedNodes[0], movedNodes[1]]
+      arrayForEach(expectedCallbackNodes, (node, index) => {
+        assert.strictEqual(callbackNodes[index!], node)
+      })
+      const finalMovedNodes = Array.from(target[0].childNodes).slice(2)
+      arrayForEach(movedNodes, (node, index) => {
+        assert.strictEqual(finalMovedNodes[index!], node)
+      })
+      arrayForEach(calls, call => {
+        assert.strictEqual(call.value, first)
+      })
     })
   })
 
