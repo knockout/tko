@@ -1,26 +1,62 @@
-import { cleanNode } from '@tko/utils'
+import { cleanNode, defineOption, options } from '@tko/utils'
 
 const DELAY_MS = 25
-const MAX_CLEAN_AT_ONCE = 1000
 const cleanNodeQueue = new Array()
 let cleanNodeTimeoutID: ReturnType<typeof setTimeout> | null = null
 
-export function queueCleanNode(node) {
-  cleanNodeQueue.push(node)
-  triggerCleanTimeout()
-}
-
-function triggerCleanTimeout() {
-  if (!cleanNodeTimeoutID && cleanNodeQueue.length) {
-    cleanNodeTimeoutID = setTimeout(flushCleanQueue, DELAY_MS)
+// Extend the Options type so ko.options.jsxCleanBatchSize is strongly typed.
+declare module '@tko/utils' {
+  interface Options {
+    jsxCleanBatchSize: number
   }
 }
 
-function flushCleanQueue() {
+// `0` runs cleanup synchronously on detach. Test environments that tear
+// down DOM globals between files use that to avoid a pending 25ms timer
+// firing against a dead global.
+defineOption('jsxCleanBatchSize', { default: 1000 })
+
+export function queueCleanNode(node) {
+  cleanNodeQueue.push(node)
+  if (options.jsxCleanBatchSize === 0) {
+    flushAll()
+  } else {
+    scheduleBatch()
+  }
+}
+
+function scheduleBatch() {
+  if (!cleanNodeTimeoutID && cleanNodeQueue.length) {
+    cleanNodeTimeoutID = setTimeout(flushBatch, DELAY_MS)
+  }
+}
+
+function flushBatch() {
   cleanNodeTimeoutID = null
-  const nodes = cleanNodeQueue.splice(0, MAX_CLEAN_AT_ONCE)
+  // If the option was flipped to a non-positive / non-finite value while the
+  // timer was pending, fall through to synchronous drain — otherwise
+  // splice(0, <=0|NaN) removes nothing and scheduleBatch re-arms forever.
+  const batchSize = Math.trunc(options.jsxCleanBatchSize)
+  if (!Number.isFinite(batchSize) || batchSize <= 0) {
+    flushAll()
+    return
+  }
+  const nodes = cleanNodeQueue.splice(0, batchSize)
   for (const node of nodes) {
     cleanNode(node)
   }
-  triggerCleanTimeout()
+  scheduleBatch()
+}
+
+function flushAll() {
+  if (cleanNodeTimeoutID !== null) {
+    clearTimeout(cleanNodeTimeoutID)
+    cleanNodeTimeoutID = null
+  }
+  // Outer `while` is for re-enqueues triggered by cleanNode side effects.
+  while (cleanNodeQueue.length) {
+    for (const node of cleanNodeQueue.splice(0)) {
+      cleanNode(node)
+    }
+  }
 }

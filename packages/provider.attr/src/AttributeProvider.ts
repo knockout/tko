@@ -69,6 +69,6 @@ export default class AttrProvider extends Provider {
       return this.globals[token]
     }
 
-    throw new Error(`The variable '${token} not found.`)
+    throw new Error(`The variable '${token}' not found.`)
   }
 }

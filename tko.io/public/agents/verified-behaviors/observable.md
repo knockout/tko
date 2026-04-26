@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/observable
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Core observable and observableArray notification and mutation behavior.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/observable`, especially core observable and observableArray notification and mutation behavior.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/observable/spec`
-- Curated source: `packages/observable/verified-behaviors.json`
 
 ## Behaviors
 
@@ -30,3 +18,5 @@ Read this when you need test-backed behavior for `@tko/observable`, especially c
   Specs: `packages/observable/spec/observableArrayBehaviors.ts`
 - `observableArray` is iterable and reports as both an observable and an observable array.
   Specs: `packages/observable/spec/observableArrayBehaviors.ts`
+
+_Curated source: `packages/observable/verified-behaviors.json`_

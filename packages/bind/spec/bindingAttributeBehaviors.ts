@@ -1,4 +1,6 @@
 /* global testNode */
+import { expect } from 'chai'
+
 import { cleanNode, options, virtualElements, objectForEach } from '@tko/utils'
 
 import { unwrap, observable as koObservable } from '@tko/observable'
@@ -23,15 +25,27 @@ import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
 import { bindings as ifBindings } from '@tko/binding.if'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import {
+  expectContainHtml,
+  expectContainText,
+  prepareTestNode,
+  restoreAfter
+} from '../../utils/helpers/mocha-test-helpers'
 import { Provider } from '@tko/provider'
 
 describe('Binding attribute syntax', function () {
   let bindingHandlers
 
   let testNode: HTMLElement
+  let cleanups: Array<() => void>
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    cleanups = []
+    testNode = prepareTestNode()
+  })
+  afterEach(function () {
+    while (cleanups.length) {
+      cleanups.pop()!()
+    }
   })
 
   beforeEach(function () {
@@ -48,25 +62,25 @@ describe('Binding attribute syntax', function () {
   })
 
   it('applyBindings should accept no parameters and then act on document.body with undefined model', function () {
-    this.after(function () {
+    cleanups.push(function () {
       cleanNode(document.body)
     }) // Just to avoid interfering with other specs
 
     let didInit = false
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
-        expect(element.id).toEqual('testElement')
-        expect(viewModel).toBeUndefined()
+        expect(element.id).to.equal('testElement')
+        expect(viewModel).to.equal(undefined)
         didInit = true
       }
     }
     testNode.innerHTML = "<div id='testElement' data-bind='test:123'></div>"
     applyBindings()
-    expect(didInit).toEqual(true)
+    expect(didInit).to.equal(true)
   })
 
   it('applyBindings should accept one parameter and then act on document.body with parameter as model', function () {
-    this.after(function () {
+    cleanups.push(function () {
       cleanNode(document.body)
     }) // Just to avoid interfering with other specs
 
@@ -74,14 +88,14 @@ describe('Binding attribute syntax', function () {
     const suppliedViewModel = {}
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
-        expect(element.id).toEqual('testElement')
-        expect(viewModel).toEqual(suppliedViewModel)
+        expect(element.id).to.equal('testElement')
+        expect(viewModel).to.equal(suppliedViewModel)
         didInit = true
       }
     }
     testNode.innerHTML = "<div id='testElement' data-bind='test'></div>"
     applyBindings(suppliedViewModel)
-    expect(didInit).toEqual(true)
+    expect(didInit).to.equal(true)
   })
 
   it('applyBindings should accept two parameters and then act on second param as DOM node with first param as model', function () {
@@ -89,8 +103,8 @@ describe('Binding attribute syntax', function () {
     const suppliedViewModel = {}
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel) {
-        expect(element.id).toEqual('testElement')
-        expect(viewModel).toEqual(suppliedViewModel)
+        expect(element.id).to.equal('testElement')
+        expect(viewModel).to.equal(suppliedViewModel)
         didInit = true
       }
     }
@@ -99,19 +113,19 @@ describe('Binding attribute syntax', function () {
     const shouldNotMatchNode = document.createElement('DIV')
     shouldNotMatchNode.innerHTML = "<div id='shouldNotMatchThisElement' data-bind='test'></div>"
     document.body.appendChild(shouldNotMatchNode)
-    this.after(function () {
+    cleanups.push(function () {
       document.body.removeChild(shouldNotMatchNode)
     })
 
     applyBindings(suppliedViewModel, testNode)
-    expect(didInit).toEqual(true)
+    expect(didInit).to.equal(true)
   })
 
   it('applyBindings should accept three parameters and use the third parameter as a callback for modifying the root context', function () {
     let didInit = false
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-        expect(bindingContext.extraValue).toEqual('extra')
+        expect(bindingContext.extraValue).to.equal('extra')
         didInit = true
       }
     }
@@ -119,7 +133,7 @@ describe('Binding attribute syntax', function () {
     applyBindings(null, testNode, function (context) {
       context.extraValue = 'extra'
     })
-    expect(didInit).toEqual(true)
+    expect(didInit).to.equal(true)
   })
 
   it('Should tolerate empty or only white-space binding strings', function () {
@@ -153,7 +167,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='test: (1;2)'></div>"
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrowContaining('Bad operator:')
+    }).to.throw('Bad operator:')
   })
 
   it("Should produce a meaningful error if a binding value doesn't exist", function () {
@@ -165,25 +179,22 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='test: nonexistentValue'></div>"
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrowContaining('nonexistentValue')
+    }).to.throw('nonexistentValue')
   })
 
   it('Should call onBindingError with relevant details of a bindingHandler init error', function () {
-    let saved_obe = options.onError,
-      obe_calls = 0
-    this.after(function () {
-      options.onError = saved_obe
-    })
+    let obe_calls = 0
+    restoreAfter(cleanups, options, 'onError')
     options.onError = function (spec: any) {
       obe_calls++
-      expect(spec.during).toEqual('init')
-      expect(spec.errorCaptured.message).toMatch(/Message: A moth!$/)
-      expect(spec.bindingKey).toEqual('test')
-      expect(spec.valueAccessor()).toEqual(64728)
-      expect(spec.element).toEqual(testNode.childNodes[0])
-      expect(spec.bindings.test()).toEqual(64728)
-      expect(spec.bindingContext.$data).toEqual('0xe')
-      expect(spec.allBindings().test).toEqual(64728)
+      expect(spec.during).to.equal('init')
+      expect(spec.errorCaptured.message).to.match(/Message: A moth!$/)
+      expect(spec.bindingKey).to.equal('test')
+      expect(spec.valueAccessor()).to.equal(64728)
+      expect(spec.element).to.equal(testNode.childNodes[0])
+      expect(spec.bindings.test()).to.equal(64728)
+      expect(spec.bindingContext.$data).to.equal('0xe')
+      expect(spec.allBindings().test).to.equal(64728)
     }
     bindingHandlers.test = {
       init: function () {
@@ -192,25 +203,22 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div data-bind='test: 64728'></div>"
     applyBindings('0xe', testNode)
-    expect(obe_calls).toEqual(1)
+    expect(obe_calls).to.equal(1)
   })
 
   it('Should call onBindingError with relevant details of a bindingHandler update error', function () {
-    let saved_obe = options.onError,
-      obe_calls = 0
-    this.after(function () {
-      options.onError = saved_obe
-    })
+    let obe_calls = 0
+    restoreAfter(cleanups, options, 'onError')
     options.onError = function (spec: any) {
       obe_calls++
-      expect(spec.during).toEqual('update')
-      expect(spec.errorCaptured.message).toMatch(/A beetle!$/)
-      expect(spec.bindingKey).toEqual('test')
-      expect(spec.valueAccessor()).toEqual(64729)
-      expect(spec.element).toEqual(testNode.childNodes[0])
-      expect(spec.bindings.test()).toEqual(64729)
-      expect(spec.bindingContext.$data).toEqual('0xf')
-      expect(spec.allBindings().test).toEqual(64729)
+      expect(spec.during).to.equal('update')
+      expect(spec.errorCaptured.message).to.match(/A beetle!$/)
+      expect(spec.bindingKey).to.equal('test')
+      expect(spec.valueAccessor()).to.equal(64729)
+      expect(spec.element).to.equal(testNode.childNodes[0])
+      expect(spec.bindings.test()).to.equal(64729)
+      expect(spec.bindingContext.$data).to.equal('0xf')
+      expect(spec.allBindings().test).to.equal(64729)
     }
     bindingHandlers.test = {
       update: function () {
@@ -219,28 +227,25 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div data-bind='test: 64729'></div>"
     applyBindings('0xf', testNode)
-    expect(obe_calls).toEqual(1)
+    expect(obe_calls).to.equal(1)
   })
 
   it('Should call onBindingError with relevant details when an update fails', function () {
-    let saved_obe = options.onError,
-      obe_calls = 0,
+    let obe_calls = 0,
       observable = koObservable()
 
-    this.after(function () {
-      options.onError = saved_obe
-    })
+    restoreAfter(cleanups, options, 'onError')
 
     options.onError = function (spec: any) {
       obe_calls++
-      expect(spec.during).toEqual('update')
-      expect(spec.errorCaptured.message).toMatch(/Observable: 42$/)
-      expect(spec.bindingKey).toEqual('test')
-      expect(spec.valueAccessor()).toEqual(64725)
-      expect(spec.element).toEqual(testNode.childNodes[0])
-      expect(spec.bindings.test()).toEqual(64725)
-      expect(spec.bindingContext.$data).toEqual('0xef')
-      expect(spec.allBindings().test).toEqual(64725)
+      expect(spec.during).to.equal('update')
+      expect(spec.errorCaptured.message).to.match(/Observable: 42$/)
+      expect(spec.bindingKey).to.equal('test')
+      expect(spec.valueAccessor()).to.equal(64725)
+      expect(spec.element).to.equal(testNode.childNodes[0])
+      expect(spec.bindings.test()).to.equal(64725)
+      expect(spec.bindingContext.$data).to.equal('0xef')
+      expect(spec.allBindings().test).to.equal(64725)
     }
 
     bindingHandlers.test = {
@@ -252,25 +257,23 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div data-bind='test: 64725'></div>"
     applyBindings('0xef', testNode)
-    expect(obe_calls).toEqual(0)
+    expect(obe_calls).to.equal(0)
     try {
       observable(42)
     } catch (e) {}
-    expect(obe_calls).toEqual(1)
+    expect(obe_calls).to.equal(1)
     observable(24)
-    expect(obe_calls).toEqual(1)
+    expect(obe_calls).to.equal(1)
     try {
       observable(42)
     } catch (e) {}
-    expect(obe_calls).toEqual(2)
+    expect(obe_calls).to.equal(2)
   })
 
   // * This is probably poor policy, but it only applies to legacy handlers. *
   it('Calls the `update` even if `init` fails', function () {
     let cc = false
-    this.after(function () {
-      options.set('onError', undefined)
-    })
+    restoreAfter(cleanups, options as any, 'onError')
     options.set('onError', function () {})
     bindingHandlers.test = {
       init() {
@@ -282,19 +285,17 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div data-bind='test: 64725'></div>"
     applyBindings('0xef', testNode)
-    expect(cc).toEqual(true)
+    expect(cc).to.equal(true)
   })
 
   it('Calls options.onError, if it is defined', function () {
     let oe_calls = 0
     const oxy = koObservable()
-    this.after(function () {
-      options.set('onError', undefined)
-    })
+    restoreAfter(cleanups, options as any, 'onError')
     options.set('onError', function (err) {
-      expect(err.message.indexOf('turtle')).not.toEqual(-1)
+      expect(err.message.indexOf('turtle')).to.not.equal(-1)
       // Check for the `spec` properties
-      expect(err.bindingKey).toEqual('test')
+      expect(err.bindingKey).to.equal('test')
       oe_calls++
     })
     bindingHandlers.test = {
@@ -308,9 +309,9 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = "<div data-bind='test: oxy'></div>"
     applyBindings({ oxy: oxy }, testNode)
-    expect(oe_calls).toEqual(2)
+    expect(oe_calls).to.equal(2)
     oxy(1234)
-    expect(oe_calls).toEqual(3)
+    expect(oe_calls).to.equal(3)
   })
 
   it("Should invoke registered handlers's init() then update() methods passing binding data", function () {
@@ -318,22 +319,22 @@ describe('Binding attribute syntax', function () {
     bindingHandlers.test = {
       init: function (element, valueAccessor, allBindings) {
         methodsInvoked.push('init')
-        expect(element.id).toEqual('testElement')
-        expect(valueAccessor()).toEqual('Hello')
-        expect(allBindings.get('another')).toEqual(123)
+        expect(element.id).to.equal('testElement')
+        expect(valueAccessor()).to.equal('Hello')
+        expect(allBindings.get('another')).to.equal(123)
       },
       update: function (element, valueAccessor, allBindings) {
         methodsInvoked.push('update')
-        expect(element.id).toEqual('testElement')
-        expect(valueAccessor()).toEqual('Hello')
-        expect(allBindings.get('another')).toEqual(123)
+        expect(element.id).to.equal('testElement')
+        expect(valueAccessor()).to.equal('Hello')
+        expect(allBindings.get('another')).to.equal(123)
       }
     }
     testNode.innerHTML = "<div id='testElement' data-bind='test:\"Hello\", another:123'></div>"
     applyBindings(null, testNode)
-    expect(methodsInvoked.length).toEqual(2)
-    expect(methodsInvoked[0]).toEqual('init')
-    expect(methodsInvoked[1]).toEqual('update')
+    expect(methodsInvoked.length).to.equal(2)
+    expect(methodsInvoked[0]).to.equal('init')
+    expect(methodsInvoked[1]).to.equal('update')
   })
 
   it("Should invoke each handlers's init() and update() before running the next one", function () {
@@ -348,25 +349,25 @@ describe('Binding attribute syntax', function () {
     }
     testNode.innerHTML = '<div data-bind=\'test1:"1", test2:"2"\'></div>'
     applyBindings(null, testNode)
-    expect(methodsInvoked).toEqual(['init1', 'update1', 'init2', 'update2'])
+    expect(methodsInvoked).to.deep.equal(['init1', 'update1', 'init2', 'update2'])
   })
 
   it('Should be able to use $element in binding value', function () {
     testNode.innerHTML = "<div data-bind='text: $element.tagName'></div>"
     applyBindings({}, testNode)
-    expect(testNode).toContainText('DIV')
+    expectContainText(testNode, 'DIV')
   })
 
   it('Should be able to use $context in binding value to refer to the context object', function () {
     testNode.innerHTML = "<div data-bind='text: $context.$data === $data'></div>"
     applyBindings({}, testNode)
-    expect(testNode).toContainText('true')
+    expectContainText(testNode, 'true')
   })
 
   it('Should be able to refer to the bound object itself (at the root scope, the viewmodel) via $data', function () {
     testNode.innerHTML = "<div data-bind='text: $data.someProp'></div>"
     applyBindings({ someProp: 'My prop value' }, testNode)
-    expect(testNode).toContainText('My prop value')
+    expectContainText(testNode, 'My prop value')
   })
 
   it('Bindings can signal that they control descendant bindings by returning a flag from their init function', function () {
@@ -376,14 +377,14 @@ describe('Binding attribute syntax', function () {
       }
     }
     testNode.innerHTML =
-      "<div data-bind='test: true'>"
-      + "<div data-bind='text: 123'>456</div>"
-      + '</div>'
-      + "<div data-bind='text: 123'>456</div>"
+      "<div data-bind='test: true'>" +
+      "<div data-bind='text: 123'>456</div>" +
+      '</div>' +
+      "<div data-bind='text: 123'>456</div>"
     applyBindings(null, testNode)
 
-    expect(testNode.childNodes[0].childNodes[0]['innerHTML']).toEqual('456')
-    expect(testNode.childNodes[1]['innerHTML']).toEqual('123')
+    expect(testNode.childNodes[0].childNodes[0]['innerHTML']).to.equal('456')
+    expect(testNode.childNodes[1]['innerHTML']).to.equal('123')
   })
 
   it('Should not be allowed to have multiple bindings on the same element that claim to control descendant bindings', function () {
@@ -396,9 +397,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = "<div data-bind='test1: true, test2: true'></div>"
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrowContaining(
-      'Multiple bindings (test1 and test2) are trying to control descendant bindings of the same element.'
-    )
+    }).to.throw('Multiple bindings (test1 and test2) are trying to control descendant bindings of the same element.')
   })
 
   it('Should use properties on the view model in preference to properties on the binding context', function () {
@@ -407,7 +406,7 @@ describe('Binding attribute syntax', function () {
     const outer = new bindingContext({ someProp: 'Outer value' })
     const inner = new bindingContext({ someProp: 'Inner value' }, outer)
     applyBindings(inner, testNode)
-    expect(testNode).toContainText('Inner value')
+    expectContainText(testNode, 'Inner value')
   })
 
   it('Should be able to extend a binding context, adding new custom properties, without mutating the original binding context', function () {
@@ -421,13 +420,13 @@ describe('Binding attribute syntax', function () {
       "<div data-bind='with: sub'>Static<div data-bind='addCustomProperty: true'>Text-<div data-bind='text: $customProp'></div></div></div>"
     const vm = { sub: {} }
     applyBindings(vm, testNode)
-    expect(testNode).toContainText('StaticText-MyValue')
-    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$customProp).toEqual('MyValue')
-    expect(contextFor(testNode.childNodes[0].childNodes[1]).$customProp).toBeUndefined() // Should not affect original binding context
+    expectContainText(testNode, 'StaticText-MyValue')
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$customProp).to.equal('MyValue')
+    expect(contextFor(testNode.childNodes[0].childNodes[1]).$customProp).to.equal(undefined) // Should not affect original binding context
 
     // value of $data and $parent should be unchanged in extended context
-    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$data).toEqual(vm.sub)
-    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$parent).toEqual(vm)
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$data).to.equal(vm.sub)
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[1]).$parent).to.equal(vm)
   })
 
   it('Binding contexts should inherit any custom properties from ancestor binding contexts', function () {
@@ -440,7 +439,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML =
       "<div data-bind='addCustomProperty: true'><div data-bind='with: true'><div data-bind='text: $customProp'></div></div></div>"
     applyBindings(null, testNode)
-    expect(testNode).toContainText('my value')
+    expectContainText(testNode, 'my value')
   })
 
   it('Binding context should hide or not minify extra internal properties', function () {
@@ -452,30 +451,30 @@ describe('Binding attribute syntax', function () {
       // Test for shim
       allowedProperties.push('_subscribable')
     }
-    objectForEach(contextFor(testNode.childNodes[0].childNodes[0]), prop => expect(allowedProperties).toContain(prop))
+    objectForEach(contextFor(testNode.childNodes[0].childNodes[0]), prop => expect(allowedProperties).to.contain(prop))
   })
 
   it('Should be able to retrieve the binding context associated with any node', function () {
     testNode.innerHTML = "<div><div data-bind='text: name'></div></div>"
     applyBindings({ name: 'Bert' }, testNode.childNodes[0])
 
-    expect(testNode.childNodes[0].childNodes[0]).toContainText('Bert')
+    expectContainText(testNode.childNodes[0].childNodes[0], 'Bert')
 
     // Can't get binding context for unbound nodes
-    expect(dataFor(testNode)).toBeUndefined()
-    expect(contextFor(testNode)).toBeUndefined()
+    expect(dataFor(testNode)).to.equal(undefined)
+    expect(contextFor(testNode)).to.equal(undefined)
 
     // Can get binding context for directly bound nodes
-    expect(dataFor(testNode.childNodes[0]).name).toEqual('Bert')
-    expect(contextFor(testNode.childNodes[0]).$data.name).toEqual('Bert')
+    expect(dataFor(testNode.childNodes[0]).name).to.equal('Bert')
+    expect(contextFor(testNode.childNodes[0]).$data.name).to.equal('Bert')
 
     // Can get binding context for descendants of directly bound nodes
-    expect(dataFor(testNode.childNodes[0].childNodes[0]).name).toEqual('Bert')
-    expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).toEqual('Bert')
+    expect(dataFor(testNode.childNodes[0].childNodes[0]).name).to.equal('Bert')
+    expect(contextFor(testNode.childNodes[0].childNodes[0]).$data.name).to.equal('Bert')
 
     // Also test that a non-node object returns nothing and doesn't crash
-    expect(dataFor({})).toBeUndefined()
-    expect(contextFor({})).toBeUndefined()
+    expect(dataFor({})).to.equal(undefined)
+    expect(contextFor({})).to.equal(undefined)
   })
 
   it('Should not return a context object for unbound elements that are descendants of bound elements', function () {
@@ -494,14 +493,14 @@ describe('Binding attribute syntax', function () {
     applyBindings(vm, testNode)
 
     // All of the bound nodes return the viewmodel
-    expect(dataFor(testNode.childNodes[0])).toBe(vm)
-    expect(dataFor(testNode.childNodes[0].childNodes[0])).toBe(vm)
-    expect(dataFor(testNode.childNodes[0].childNodes[1])).toBe(vm)
-    expect(contextFor(testNode.childNodes[0].childNodes[1]).$data).toBe(vm)
+    expect(dataFor(testNode.childNodes[0])).to.equal(vm)
+    expect(dataFor(testNode.childNodes[0].childNodes[0])).to.equal(vm)
+    expect(dataFor(testNode.childNodes[0].childNodes[1])).to.equal(vm)
+    expect(contextFor(testNode.childNodes[0].childNodes[1]).$data).to.equal(vm)
 
     // The unbound child node returns undefined
-    expect(dataFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined()
-    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[0])).toBeUndefined()
+    expect(dataFor(testNode.childNodes[0].childNodes[1].childNodes[0])).to.equal(undefined)
+    expect(contextFor(testNode.childNodes[0].childNodes[1].childNodes[0])).to.equal(undefined)
   })
 
   it('Should return the context object for nodes specifically bound, but override with general binding', function () {
@@ -510,22 +509,22 @@ describe('Binding attribute syntax', function () {
 
     const vm1 = { name: 'specific' }
     applyBindingsToNode(testNode.childNodes[0], { text: vm1.name }, vm1)
-    expect(testNode).toContainText(vm1.name)
-    expect(dataFor(testNode.childNodes[0])).toBe(vm1)
-    expect(contextFor(testNode.childNodes[0]).$data).toBe(vm1)
+    expectContainText(testNode, vm1.name)
+    expect(dataFor(testNode.childNodes[0])).to.equal(vm1)
+    expect(contextFor(testNode.childNodes[0]).$data).to.equal(vm1)
 
     const vm2 = { name: 'general' }
     applyBindings(vm2, testNode)
-    expect(testNode).toContainText(vm2.name)
-    expect(dataFor(testNode.childNodes[0])).toBe(vm2)
-    expect(contextFor(testNode.childNodes[0]).$data).toBe(vm2)
+    expectContainText(testNode, vm2.name)
+    expect(dataFor(testNode.childNodes[0])).to.equal(vm2)
+    expect(contextFor(testNode.childNodes[0]).$data).to.equal(vm2)
   })
 
   it('Should not be allowed to use containerless binding syntax for bindings other than whitelisted ones', function () {
     testNode.innerHTML = 'Hello <!-- ko visible: false -->Some text<!-- /ko --> Goodbye'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow("The binding 'visible' cannot be used with virtual elements")
+    }).to.throw("The binding 'visible' cannot be used with virtual elements")
   })
 
   it('Should be able to set a custom binding to use containerless binding', function () {
@@ -540,30 +539,30 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = 'Hello <!-- ko test: false -->Some text<!-- /ko --> Goodbye'
     applyBindings(null, testNode)
 
-    expect(initCalls).toEqual(1)
-    expect(testNode).toContainText('Hello Some text Goodbye')
+    expect(initCalls).to.equal(1)
+    expectContainText(testNode, 'Hello Some text Goodbye')
   })
 
   it('Should be allowed to express containerless bindings with arbitrary internal whitespace and newlines', function () {
     testNode.innerHTML =
-      'Hello <!-- ko\n'
-      + '    with\n'
-      + '      : \n '
-      + '        { \n'
-      + "           \tpersonName: 'Bert'\n"
-      + '        }\n'
-      + "   \t --><span data-bind='text: personName'></span><!-- \n"
-      + '     /ko \n'
-      + '-->, Goodbye'
+      'Hello <!-- ko\n' +
+      '    with\n' +
+      '      : \n ' +
+      '        { \n' +
+      "           \tpersonName: 'Bert'\n" +
+      '        }\n' +
+      "   \t --><span data-bind='text: personName'></span><!-- \n" +
+      '     /ko \n' +
+      '-->, Goodbye'
     applyBindings({ personName: 'Bert' }, testNode)
-    expect(testNode).toContainText('Hello Bert, Goodbye')
+    expectContainText(testNode, 'Hello Bert, Goodbye')
   })
 
   it('Should reject closing virtual bindings, when found as a first child', function () {
     testNode.innerHTML = '<div><!-- /ko --></div>'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should reject closing virtual bindings, when found as first child at the top level', function () {
@@ -571,35 +570,35 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = '<!-- /ko -->'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should reject closing virtual bindings without matching open, when found as a sibling', function () {
     testNode.innerHTML = '<div></div><!-- /ko -->'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should reject duplicated closing virtual bindings', function () {
     testNode.innerHTML = '<!-- ko if: true --><div></div><!-- /ko --><!-- /ko -->'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should reject opening virtual bindings that are not closed', function () {
     testNode.innerHTML = '<!-- ko if: true -->'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should reject virtual bindings that are nested incorrectly', function () {
     testNode.innerHTML = '<!-- ko if: true --><div><!-- /ko --></div>'
     expect(function () {
       applyBindings(null, testNode)
-    }).toThrow()
+    }).to.throw()
   })
 
   it('Should be able to access virtual children in custom containerless binding', function () {
@@ -620,8 +619,8 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = 'Hello <!-- ko test: false -->Some text<!-- /ko --> Goodbye'
     applyBindings(null, testNode)
 
-    expect(countNodes).toEqual(1)
-    expect(testNode).toContainText('Hello new text Goodbye')
+    expect(countNodes).to.equal(1)
+    expectContainText(testNode, 'Hello new text Goodbye')
   })
 
   it('Should only bind containerless binding once inside template', function () {
@@ -636,8 +635,8 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = 'Hello <!-- ko if: true --><!-- ko test: false -->Some text<!-- /ko --><!-- /ko --> Goodbye'
     applyBindings(null, testNode)
 
-    expect(initCalls).toEqual(1)
-    expect(testNode).toContainText('Hello Some text Goodbye')
+    expect(initCalls).to.equal(1)
+    expectContainText(testNode, 'Hello Some text Goodbye')
   })
 
   it('Bindings in containerless binding in templates should be bound only once', function () {
@@ -656,14 +655,14 @@ describe('Binding attribute syntax', function () {
             <!-- /ko -->
           </div>`
     applyBindings({}, testNode)
-    expect(initCalls).toEqual(1)
+    expect(initCalls).to.equal(1)
   })
 
   it('Should automatically bind virtual descendants of containerless markers if no binding controlsDescendantBindings', function () {
     testNode.innerHTML =
       'Hello <!-- ko dummy: false --><span data-bind=\'text: "WasBound"\'>Some text</span><!-- /ko --> Goodbye'
     applyBindings(null, testNode)
-    expect(testNode).toContainText('Hello WasBound Goodbye')
+    expectContainText(testNode, 'Hello WasBound Goodbye')
   })
 
   it('Should be able to set and access correct context in custom containerless binding', function () {
@@ -679,7 +678,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = 'Hello <!-- ko bindChildrenWithCustomContext: true --><div>Some text</div><!-- /ko --> Goodbye'
     applyBindings(null, testNode)
 
-    expect(dataFor(testNode.childNodes[2]).myCustomData).toEqual(123)
+    expect(dataFor(testNode.childNodes[2]).myCustomData).to.equal(123)
   })
 
   it('Should be able to set and access correct context in nested containerless binding', function () {
@@ -696,8 +695,8 @@ describe('Binding attribute syntax', function () {
       "Hello <div data-bind='bindChildrenWithCustomContext: true'><!-- ko nonexistentHandler: 123 --><div>Some text</div><!-- /ko --></div> Goodbye"
     applyBindings(null, testNode)
 
-    expect(dataFor(testNode.childNodes[1].childNodes[0]).myCustomData).toEqual(123)
-    expect(dataFor(testNode.childNodes[1].childNodes[1]).myCustomData).toEqual(123)
+    expect(dataFor(testNode.childNodes[1].childNodes[0]).myCustomData).to.equal(123)
+    expect(dataFor(testNode.childNodes[1].childNodes[1]).myCustomData).to.equal(123)
   })
   // TODO: FAIL
   it('Should be able to access custom context variables in child context', function () {
@@ -714,10 +713,10 @@ describe('Binding attribute syntax', function () {
       "Hello <div data-bind='bindChildrenWithCustomContext: true'><!-- ko with: myCustomData --><div>Some text</div><!-- /ko --></div> Goodbye"
     applyBindings(null, testNode)
 
-    expect(contextFor(testNode.childNodes[1].childNodes[0]).customValue).toEqual('xyz')
-    expect(dataFor(testNode.childNodes[1].childNodes[1])).toEqual(123)
-    expect(contextFor(testNode.childNodes[1].childNodes[1]).$parent.myCustomData).toEqual(123)
-    expect(contextFor(testNode.childNodes[1].childNodes[1]).$parentContext.customValue).toEqual('xyz')
+    expect(contextFor(testNode.childNodes[1].childNodes[0]).customValue).to.equal('xyz')
+    expect(dataFor(testNode.childNodes[1].childNodes[1])).to.equal(123)
+    expect(contextFor(testNode.childNodes[1].childNodes[1]).$parent.myCustomData).to.equal(123)
+    expect(contextFor(testNode.childNodes[1].childNodes[1]).$parentContext.customValue).to.equal('xyz')
   })
 
   it('Should be able to use value-less binding in containerless binding', function () {
@@ -732,8 +731,8 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML = 'Hello <!-- ko test -->Some text<!-- /ko --> Goodbye'
     applyBindings(null, testNode)
 
-    expect(initCalls).toEqual(1)
-    expect(testNode).toContainText('Hello Some text Goodbye')
+    expect(initCalls).to.equal(1)
+    expectContainText(testNode, 'Hello Some text Goodbye')
   })
 
   it('Should not allow multiple applyBindings calls for the same element', function () {
@@ -745,7 +744,7 @@ describe('Binding attribute syntax', function () {
     // Second call throws an error
     expect(function () {
       applyBindings({}, testNode)
-    }).toThrow('You cannot apply bindings multiple times to the same element.')
+    }).to.throw('You cannot apply bindings multiple times to the same element.')
   })
 
   it('Should allow multiple applyBindings calls for the same element if cleanNode is used', function () {
@@ -806,15 +805,15 @@ describe('Binding attribute syntax', function () {
     element.setAttribute('data-bind', 'myBinding: o')
     const viewModel = { o: koObservable(123) }
     applyBindings(viewModel, element)
-    expect(read).toEqual('r')
+    expect(read).to.equal('r')
     const event = new Event('change', { bubbles: true, cancelable: true })
     element.dispatchEvent(event)
-    expect(write).toEqual('w')
+    expect(write).to.equal('w')
   })
 
   describe('Should not bind against text content inside restricted elements', function () {
-    this.beforeEach(function () {
-      this.restoreAfter(options, 'bindingProviderInstance')
+    beforeEach(function () {
+      restoreAfter(cleanups, options, 'bindingProviderInstance')
 
       // Developers won't expect or want binding to mutate the contents of <script> or <textarea>
       // elements. Historically this wasn't a problem because the default binding provider only
@@ -859,28 +858,28 @@ describe('Binding attribute syntax', function () {
     it('<script>', function () {
       testNode.innerHTML = '<p>Hello</p><script>alert(123);</script><p>Goodbye</p>'
       applyBindings({ sometext: 'hello' }, testNode)
-      expect(testNode).toContainHtml('<p>replaced</p><script>alert(123);</script><p>replaced</p>')
+      expectContainHtml(testNode, '<p>replaced</p><script>alert(123);</script><p>replaced</p>')
     })
 
     it('<textarea>', function () {
       testNode.innerHTML = '<p>Hello</p><textarea>test</textarea><p>Goodbye</p>'
       applyBindings({ sometext: 'hello' }, testNode)
-      expect(testNode).toContainHtml('<p>replaced</p><textarea>test</textarea><p>replaced</p>')
+      expectContainHtml(testNode, '<p>replaced</p><textarea>test</textarea><p>replaced</p>')
     })
 
     it('<template>', function () {
       testNode.innerHTML = '<p>Hello</p><template>test</template><p>Goodbye</p>'
       applyBindings({ sometext: 'hello' }, testNode)
-      expect(testNode).toContainHtml('<p>replaced</p><template>replaced</template><p>replaced</p>')
+      expectContainHtml(testNode, '<p>replaced</p><template>replaced</template><p>replaced</p>')
     })
   })
 
   it('Should call a childrenComplete callback function after descendent elements are bound', function () {
     let callbacks = 0,
       callback = function (nodes, data) {
-        expect(nodes.length).toEqual(1)
-        expect(nodes[0]).toEqual(testNode.childNodes[0].childNodes[0])
-        expect(data).toEqual(vm)
+        expect(nodes.length).to.equal(1)
+        expect(nodes[0]).to.equal(testNode.childNodes[0].childNodes[0])
+        expect(data).to.equal(vm)
         callbacks++
       },
       vm = { callback: callback }
@@ -888,15 +887,15 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML =
       "<div data-bind='childrenComplete: callback'><span data-bind='text: \"Some Text\"'></span></div>"
     applyBindings(vm, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 
   it('Should call a childrenComplete callback function when bound to a virtual element', function () {
     let callbacks = 0,
       callback = function (nodes, data) {
-        expect(nodes.length).toEqual(1)
-        expect(nodes[0]).toEqual(testNode.childNodes[1])
-        expect(data).toEqual(vm)
+        expect(nodes.length).to.equal(1)
+        expect(nodes[0]).to.equal(testNode.childNodes[1])
+        expect(data).to.equal(vm)
         callbacks++
       },
       vm = { callback: callback }
@@ -904,7 +903,7 @@ describe('Binding attribute syntax', function () {
     testNode.innerHTML =
       '<!-- ko childrenComplete: callback --><span data-bind=\'text: "Some Text"\'></span><!-- /ko -->'
     applyBindings(vm, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 
   it('Should not call a childrenComplete callback function when there are no descendant nodes', function () {
@@ -919,7 +918,7 @@ describe('Binding attribute syntax', function () {
       },
       testNode
     )
-    expect(callbacks).toEqual(0)
+    expect(callbacks).to.equal(0)
   })
 
   it('Should ignore (and not throw an error) for a null childrenComplete callback', function () {
@@ -933,12 +932,12 @@ describe('Binding attribute syntax', function () {
 
     bindingEvent.subscribe(testNode, 'childrenComplete', function (node) {
       callbacks++
-      expect(node).toEqual(testNode)
-      expect(dataFor(node)).toEqual(vm)
+      expect(node).to.equal(testNode)
+      expect(dataFor(node)).to.equal(vm)
     })
 
     testNode.innerHTML = '<div></div>'
     applyBindings(vm, testNode)
-    expect(callbacks).toEqual(1)
+    expect(callbacks).to.equal(1)
   })
 })

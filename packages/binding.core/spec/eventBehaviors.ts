@@ -1,3 +1,6 @@
+import { expect } from 'chai'
+import sinon from 'sinon'
+
 import { applyBindings } from '@tko/bind'
 
 import { triggerEvent } from '@tko/utils'
@@ -10,12 +13,12 @@ import { options } from '@tko/utils'
 
 import { bindings as coreBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Binding: Event', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -28,21 +31,21 @@ describe('Binding: Event', function () {
     const model = {
       firstWasCalled: false,
       firstHandler: function (passedModel, evt) {
-        expect(evt.type).toEqual('click')
-        expect(this).toEqual(model)
-        expect(passedModel).toEqual(model)
+        expect(evt.type).to.equal('click')
+        expect(this).to.equal(model)
+        expect(passedModel).to.equal(model)
 
-        expect(model.firstWasCalled).toEqual(false)
+        expect(model.firstWasCalled).to.equal(false)
         model.firstWasCalled = true
       },
 
       secondWasCalled: false,
       secondHandler: function (passedModel, evt) {
-        expect(evt.type).toEqual('mouseover')
-        expect(this).toEqual(model)
-        expect(passedModel).toEqual(model)
+        expect(evt.type).to.equal('mouseover')
+        expect(this).to.equal(model)
+        expect(passedModel).to.equal(model)
 
-        expect(model.secondWasCalled).toEqual(false)
+        expect(model.secondWasCalled).to.equal(false)
         model.secondWasCalled = true
       }
     }
@@ -50,10 +53,10 @@ describe('Binding: Event', function () {
       "<button data-bind='event:{click:firstHandler, mouseover:secondHandler, mouseout:null}'>hey</button>"
     applyBindings(model, testNode)
     triggerEvent(testNode.children[0], 'click')
-    expect(model.firstWasCalled).toEqual(true)
-    expect(model.secondWasCalled).toEqual(false)
+    expect(model.firstWasCalled).to.equal(true)
+    expect(model.secondWasCalled).to.equal(false)
     triggerEvent(testNode.children[0], 'mouseover')
-    expect(model.secondWasCalled).toEqual(true)
+    expect(model.secondWasCalled).to.equal(true)
     triggerEvent(testNode.children[0], 'mouseout') // Shouldn't do anything (specifically, shouldn't throw)
   })
 
@@ -70,7 +73,7 @@ describe('Binding: Event', function () {
     )
     triggerEvent(testNode.children[0], 'click')
     expect(thing)
-    expect(thing.type).toEqual('click')
+    expect(thing.type).to.equal('click')
   })
 
   it('Should prevent default action', function () {
@@ -86,7 +89,7 @@ describe('Binding: Event', function () {
     let prevented
     applyBindings({ test: (_, event) => (prevented = event.defaultPrevented) }, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(prevented).toEqual(false)
+    expect(prevented).to.equal(false)
   })
 
   it('Should conditionally allow default action when preventDefault is observable', function () {
@@ -96,10 +99,10 @@ describe('Binding: Event', function () {
     const obs = observable(true)
     applyBindings({ test: (_, event) => (prevented = event.defaultPrevented), obs: obs }, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(prevented).toEqual(true)
+    expect(prevented).to.equal(true)
     obs(false)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(prevented).toEqual(false)
+    expect(prevented).to.equal(false)
   })
 
   it('Should let bubblable events bubble to parent elements by default', function () {
@@ -117,8 +120,8 @@ describe('Binding: Event', function () {
       "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}'>hey</button></div>"
     applyBindings(model, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(model.innerWasCalled).toEqual(true)
-    expect(model.outerWasCalled).toEqual(true)
+    expect(model.innerWasCalled).to.equal(true)
+    expect(model.outerWasCalled).to.equal(true)
   })
 
   it('Should be able to prevent bubbling of bubblable events using the (eventname)Bubble:false option', function () {
@@ -136,8 +139,8 @@ describe('Binding: Event', function () {
       "<div data-bind='event:{click:outerDoCall}'><button data-bind='event:{click:innerDoCall}, clickBubble:false'>hey</button></div>"
     applyBindings(model, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(model.innerWasCalled).toEqual(true)
-    expect(model.outerWasCalled).toEqual(false)
+    expect(model.innerWasCalled).to.equal(true)
+    expect(model.outerWasCalled).to.equal(false)
   })
 
   it('Should be able to supply handler params using "bind" helper', function () {
@@ -145,17 +148,17 @@ describe('Binding: Event', function () {
     let didCallHandler = false,
       someObj = {}
     const myHandler = function () {
-      expect(this).toEqual(someObj)
-      expect(arguments.length).toEqual(5)
+      expect(this).to.equal(someObj)
+      expect(arguments.length).to.equal(5)
 
       // First x args will be the ones you bound
-      expect(arguments[0]).toEqual(123)
-      expect(arguments[1]).toEqual('another')
-      expect(arguments[2].something).toEqual(true)
+      expect(arguments[0]).to.equal(123)
+      expect(arguments[1]).to.equal('another')
+      expect(arguments[2].something).to.equal(true)
 
       // Then you get the args we normally pass to handlers, i.e., the model then the event
-      expect(arguments[3]).toEqual(viewModel)
-      expect(arguments[4].type).toEqual('mouseover')
+      expect(arguments[3]).to.equal(viewModel)
+      expect(arguments[4].type).to.equal('mouseover')
 
       didCallHandler = true
     }
@@ -164,7 +167,7 @@ describe('Binding: Event', function () {
     const viewModel = { myHandler: myHandler, someObj: someObj }
     applyBindings(viewModel, testNode)
     triggerEvent(testNode.children[0], 'mouseover')
-    expect(didCallHandler).toEqual(true)
+    expect(didCallHandler).to.equal(true)
   })
 
   it("ordinarily bubbles and is neither passive nor capturing nore 'once'", function () {
@@ -172,13 +175,13 @@ describe('Binding: Event', function () {
     testNode.innerHTML = "<a data-bind='event: {click: { handler: fn }}'><b></b></a>"
     const fn = (vm, evt) => {
       handlerCalls++
-      expect(evt.eventPhase).toEqual(3) // bubbling
+      expect(evt.eventPhase).to.equal(3) // bubbling
     }
     applyBindings({ fn }, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(handlerCalls).toEqual(1)
+    expect(handlerCalls).to.equal(1)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(handlerCalls).toEqual(2)
+    expect(handlerCalls).to.equal(2)
   })
 
   it('prevents bubble', function () {
@@ -187,7 +190,7 @@ describe('Binding: Event', function () {
     const fn = () => handlerCalls++
     applyBindings({ fn }, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(handlerCalls).toEqual(0)
+    expect(handlerCalls).to.equal(0)
   })
 
   it('respects the `once` param', function () {
@@ -196,21 +199,21 @@ describe('Binding: Event', function () {
     const fn = () => handlerCalls++
     applyBindings({ fn }, testNode)
     triggerEvent(testNode.children[0], 'click')
-    expect(handlerCalls).toEqual(1)
+    expect(handlerCalls).to.equal(1)
     triggerEvent(testNode.children[0], 'click')
-    expect(handlerCalls).toEqual(1)
+    expect(handlerCalls).to.equal(1)
   })
 
   it('respects the `capture` param', function () {
     testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, capture: true}}'><b></b></a>"
     const fn = (vm, evt) => {
-      expect(evt.eventPhase).toEqual(1) // capturing
+      expect(evt.eventPhase).to.equal(1) // capturing
     }
     applyBindings({ fn }, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
   })
 
-  xit('respects the `passive` param', function () {
+  it.skip('respects the `passive` param', function () {
     /**
      * This does not appear to be testable.  The evt.preventDefault below
      * throws an uncatchable error in Chrome 63.
@@ -227,52 +230,60 @@ describe('Binding: Event', function () {
     }
     applyBindings({ fn }, testNode)
     triggerEvent(testNode.children[0].children[0], 'click')
-    expect(preventDefaultThrows).toEqual(true)
+    expect(preventDefaultThrows).to.equal(true)
   })
 
   it('respects the `debounce` property', function () {
-    jasmine.Clock.useMock()
-    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, debounce: 50}}'></a>"
-    let calls = 0
-    const fn = () => calls++
-    applyBindings({ fn }, testNode)
-    triggerEvent(testNode.children[0], 'click')
-    triggerEvent(testNode.children[0], 'click')
-    triggerEvent(testNode.children[0], 'click')
-    triggerEvent(testNode.children[0], 'click')
-    triggerEvent(testNode.children[0], 'click')
-    expect(calls).toEqual(0)
-    jasmine.Clock.tick(500)
-    expect(calls).toEqual(1)
+    const clock = sinon.useFakeTimers()
+    try {
+      testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, debounce: 50}}'></a>"
+      let calls = 0
+      const fn = () => calls++
+      applyBindings({ fn }, testNode)
+      triggerEvent(testNode.children[0], 'click')
+      triggerEvent(testNode.children[0], 'click')
+      triggerEvent(testNode.children[0], 'click')
+      triggerEvent(testNode.children[0], 'click')
+      triggerEvent(testNode.children[0], 'click')
+      expect(calls).to.equal(0)
+      clock.tick(500)
+      expect(calls).to.equal(1)
+    } finally {
+      clock.restore()
+    }
   })
 
   it('respects the `throttle` property', function () {
-    jasmine.Clock.useMock()
-    testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, throttle: 50}}'></a>"
-    let calls = 0
-    const fn = () => calls++
-    applyBindings({ fn }, testNode)
-    triggerEvent(testNode.children[0], 'click')
-    expect(calls).toEqual(0)
-    jasmine.Clock.tick(100)
-    expect(calls).toEqual(1)
-    triggerEvent(testNode.children[0], 'click')
-    expect(calls).toEqual(1)
-    jasmine.Clock.tick(100)
-    expect(calls).toEqual(2)
-    triggerEvent(testNode.children[0], 'click')
-    triggerEvent(testNode.children[0], 'click')
-    triggerEvent(testNode.children[0], 'click')
-    expect(calls).toEqual(2)
-    jasmine.Clock.tick(100)
-    expect(calls).toEqual(3)
+    const clock = sinon.useFakeTimers()
+    try {
+      testNode.innerHTML = "<a data-bind='event: {click: {handler: fn, throttle: 50}}'></a>"
+      let calls = 0
+      const fn = () => calls++
+      applyBindings({ fn }, testNode)
+      triggerEvent(testNode.children[0], 'click')
+      expect(calls).to.equal(0)
+      clock.tick(100)
+      expect(calls).to.equal(1)
+      triggerEvent(testNode.children[0], 'click')
+      expect(calls).to.equal(1)
+      clock.tick(100)
+      expect(calls).to.equal(2)
+      triggerEvent(testNode.children[0], 'click')
+      triggerEvent(testNode.children[0], 'click')
+      triggerEvent(testNode.children[0], 'click')
+      expect(calls).to.equal(2)
+      clock.tick(100)
+      expect(calls).to.equal(3)
+    } finally {
+      clock.restore()
+    }
   })
 })
 
 describe('Binding: on.', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -285,8 +296,8 @@ describe('Binding: on.', function () {
     const obs = observable(false)
     testNode.innerHTML = "<button data-bind='on.click: obs(true)'>hey</button>"
     applyBindings({ obs: obs }, testNode)
-    expect(obs()).toEqual(false)
+    expect(obs()).to.equal(false)
     triggerEvent(testNode.children[0], 'click')
-    expect(obs()).toEqual(true)
+    expect(obs()).to.equal(true)
   })
 })

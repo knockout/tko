@@ -1,17 +1,15 @@
 {
-  "version": "4.0.0",
-  "module": "dist/lifecycle.js",
+  "version": "4.0.1",
+  "module": "dist/index.js",
   "dependencies": {
-    "@tko/computed": "^4.0.0",
-    "@tko/utils": "^4.0.0"
+    "@tko/computed": "^4.0.1",
+    "@tko/utils": "^4.0.1"
   },
   "peerDependencies": {
-    "@tko/observable": "^4.0.0"
+    "@tko/observable": "^4.0.1"
   },
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "name": "@tko/lifecycle",
   "description": "Knockout LifeCycle for object instances",
@@ -21,11 +19,6 @@
   },
   "author": "The Knockout Team",
   "license": "MIT",
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {
@@ -35,13 +28,21 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
-  }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "lifecycle",
+    "mixin",
+    "observable"
+  ]
 }

@@ -1,12 +1,10 @@
-'use strict'
-
-import { addDisposeCallback, createSymbolOrString } from '@tko/utils'
+import { addDisposeCallback } from '@tko/utils'
 
 import { computed } from '@tko/computed'
 import type { Observable } from '@tko/observable'
 
-const SUBSCRIPTIONS = createSymbolOrString('LifeCycle Subscriptions List')
-const ANCHOR_NODE = createSymbolOrString('LifeCycle Anchor Node')
+const SUBSCRIPTIONS = Symbol('LifeCycle Subscriptions List')
+const ANCHOR_NODE = Symbol('LifeCycle Anchor Node')
 
 export default class LifeCycle {
   // NOTE: For more advanced integration as an ES6 mixin, see e.g.:

@@ -1,0 +1,119 @@
+---
+title: Installation
+description: How to add TKO to your project — CDN, ES module, or package manager.
+sidebar:
+  label: Overview
+  order: 0
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+TKO ships two builds. Pick the one that fits your project:
+
+| Build | When to use |
+|-------|-------------|
+| `@tko/build.reference` | **New projects.** Modern features: TSX, `ko-*` attributes, native provider, strict equality. |
+| `@tko/build.knockout` | **Migrating from Knockout 3.x.** Drop-in compatible. See the [migration guide](/3to4/). |
+
+The examples below use `build.reference`. Swap in `build.knockout` if you need Knockout compatibility.
+
+## CDN
+
+The fastest way to try TKO — no build step required.
+
+<Tabs syncKey="script">
+  <TabItem label="ES module">
+    ```html
+    <script type="module">
+      import ko from 'https://esm.run/@tko/build.reference'
+
+      const name = ko.observable('TKO')
+      ko.applyBindings({ name })
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Classic script">
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
+    <script>
+      const ko = globalThis.tko
+      const name = ko.observable('TKO')
+      ko.applyBindings({ name })
+    </script>
+    ```
+  </TabItem>
+</Tabs>
+
+## Package manager
+
+<Tabs syncKey="pkg">
+  <TabItem label="npm">
+    ```sh
+    npm install @tko/build.reference
+    ```
+  </TabItem>
+  <TabItem label="bun">
+    ```sh
+    bun add @tko/build.reference
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add @tko/build.reference
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```sh
+    yarn add @tko/build.reference
+    ```
+  </TabItem>
+</Tabs>
+
+Then import in your code:
+
+```js
+import ko from '@tko/build.reference'
+```
+
+## First binding
+
+Here's a complete, self-contained example you can save as an HTML file and open in a browser:
+
+```html
+<!doctype html>
+<html>
+  <body>
+    <div id="app">
+      <label>
+        Name
+        <input data-bind="textInput: name" />
+      </label>
+      <p>Hello, <strong data-bind="text: name"></strong>.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tko/build.reference/dist/browser.min.js"></script>
+    <script>
+      const ko = globalThis.tko
+      ko.applyBindings({ name: ko.observable('TKO') }, document.getElementById('app'))
+    </script>
+  </body>
+</html>
+```
+
+`ko.applyBindings` connects a view model to a DOM subtree. The `textInput` binding keeps the input in sync with the `name` observable, and the `text` binding displays its current value.
+
+## TypeScript
+
+TKO is written in TypeScript. Types are included — no separate `@types` package needed.
+
+```ts
+import ko from '@tko/build.reference'
+
+const name = ko.observable('TKO')  // inferred as Observable<string>
+```
+
+## What to read next
+
+- [Bindings](/bindings/) — the full list of built-in bindings
+- [Observables](/observables/) — how reactive state works
+- [Examples](/examples/) — interactive demos

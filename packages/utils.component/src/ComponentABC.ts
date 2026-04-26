@@ -45,23 +45,29 @@ export class ComponentABC extends LifeCycle {
    * 2. An array of DOM nodes
    * 3. A document fragment
    * 4. An AMD module (with `{require: 'some/template'}`)
+   * If neither this nor `element` is overloaded, the component's own
+   * children serve as its template (children-as-template mode).
    * @return {mixed} One of the accepted template types for the ComponentBinding.
    */
   static get template(): any {
     if ('template' in this.prototype) {
-      return
+      return undefined
     }
-    return { element: this.element }
+    const element = this.element
+    return element ? { element } : undefined
   }
 
   /**
-   * This is called by the default `template`.  Overload this to return:
+   * Overload this to return:
    * 1. The element ID
    * 2. A DOM node itself
-   * @return {string|HTMLElement} either the element ID or actual element.
+   * Leave unset to use children-as-template mode — the component's own
+   * instance children become its template.
+   * @return {string|HTMLElement|undefined} the element ID, actual element,
+   *   or undefined to opt into children-as-template.
    */
-  static get element() {
-    throw new Error('[ComponentABC] `element` must be overloaded.')
+  static get element(): string | HTMLElement | undefined {
+    return undefined
   }
 
   /**
@@ -82,6 +88,7 @@ export class ComponentABC extends LifeCycle {
   }
 
   static register(name = this.customElementName) {
+    // biome-ignore lint/complexity/noUselessThisAlias: viewModel captures the subclass for register()
     const viewModel = this
     const { template } = this
     const synchronous = this.sync

@@ -106,6 +106,8 @@ h1,
 .content-panel h1 {
   font-size: clamp(1.85rem, 4vw, 2.75rem);
   font-weight: 700;
+  margin: 0;
+  line-height: 1;
 }
 
 .content-panel h2 {
@@ -126,18 +128,16 @@ header {
 
 .sidebar,
 .right-sidebar-panel,
-.content-panel,
-.sidebar-pane {
+.content-panel {
   background: transparent;
 }
 
 .content-panel .sl-container,
 .right-sidebar-panel .sl-container {
-  background: var(--tko-surface);
-  border: 1px solid var(--tko-border);
-  border-radius: 1.25rem;
-  box-shadow: var(--tko-shadow);
-  backdrop-filter: blur(12px);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .content-panel .sl-container {
@@ -190,6 +190,9 @@ header {
 
 .content-panel .sl-markdown-content > .sl-heading-wrapper:first-child {
   margin-top: 0;
+  display: flex;
+  align-items: center;
+  min-height: 100%;
 }
 
 .content-panel a {
@@ -227,15 +230,21 @@ header {
   box-shadow: 0 10px 24px -22px rgba(17, 24, 39, 0.22);
 }
 
+/* Hide the Starlight page title when the hero is present */
+.content-panel:has(.landing-hero) [data-page-title],
+.content-panel:has(.landing-hero) > .sl-container > :first-child:is(header, .content-title) {
+  display: none;
+}
+
 .landing-hero {
   margin: 0 0 1.4rem;
-  padding: clamp(1.25rem, 3vw, 2.1rem);
+  padding: clamp(1.5rem, 3.5vw, 2.8rem);
   border: 1px solid var(--tko-border);
   border-radius: 1.5rem;
+  box-shadow: var(--tko-shadow);
   background:
     radial-gradient(circle at top right, rgba(15, 98, 254, 0.12), transparent 34rem),
     linear-gradient(180deg, var(--tko-surface-strong), color-mix(in srgb, var(--tko-surface-strong) 78%, var(--sl-color-accent-low)));
-  box-shadow: var(--tko-shadow);
 }
 
 :root[data-theme='dark'] .landing-hero {
@@ -253,12 +262,35 @@ header {
   color: var(--sl-color-text-accent);
 }
 
+.landing-version {
+  display: inline-block;
+  margin: 0 0 1rem;
+  padding: 0.25em 0.85em;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--sl-color-gray-3);
+  text-decoration: none;
+  border: 1px solid var(--tko-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.landing-version:hover {
+  color: var(--sl-color-white);
+  border-color: var(--sl-color-gray-4);
+}
+
 .landing-hero h2 {
-  margin: 0;
-  max-width: 11ch;
-  font-size: clamp(1.55rem, 3.7vw, 2.55rem);
-  line-height: 1.02;
-  font-weight: 600;
+  margin: 0 0 0.2rem;
+  font-family: var(--tko-font-display);
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--sl-color-white);
 }
 
 .landing-lede {

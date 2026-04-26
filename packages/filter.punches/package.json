@@ -1,12 +1,10 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/filter.punches",
   "description": "TKO filters from knockout punches",
-  "module": "dist/filter.punches.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -15,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "filter",
+    "punches",
+    "extension"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -24,12 +24,7 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/observable": "^4.0.0"
-  },
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
+    "@tko/observable": "^4.0.1"
   },
   "licenses": [
     {
@@ -39,10 +34,11 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

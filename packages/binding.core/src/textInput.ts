@@ -6,7 +6,7 @@ import { BindingHandler } from '@tko/bind'
 
 export const MSIE_REGEX = /MSIE ([^ ;]+)|rv:([^ )]+)/
 
-let operaVersion, safariVersion, firefoxVersion, ieVersion
+let operaVersion, safariVersion, ieVersion
 
 /**
  * TextInput binding handler for modern browsers (legacy below).
@@ -129,19 +129,6 @@ class TextInputLegacyOpera extends TextInput {
   }
 }
 
-class TextInputLegacyFirefox extends TextInput {
-  eventsIndicatingValueChange(): string[] {
-    return [
-      ...super.eventsIndicatingSyncValueChange(),
-      // Firefox <= 3.6 doesn't fire the 'input' event when text is filled in through autocomplete
-      'DOMAutoComplete',
-      // Firefox <=3.5 doesn't fire the 'input' event when text is dropped into the input.
-      'dragdrop', // < 3.5
-      'drop' // 3.5
-    ]
-  }
-}
-
 const w = options.global // window / global
 if (w.navigator) {
   const parseVersion = matches => matches && parseFloat(matches[1])
@@ -151,7 +138,6 @@ if (w.navigator) {
     // Detect various browser versions because some old versions don't fully support the 'input' event
     operaVersion = w.opera && w.opera.version && parseInt(w.opera.version())
     safariVersion = parseVersion(userAgent.match(/Version\/([^ ]+) Safari/))
-    firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/))
     const ieMatch = userAgent.match(MSIE_REGEX)
     ieVersion = ieMatch && (parseFloat(ieMatch[1]) || parseFloat(ieMatch[2]))
   }
@@ -164,6 +150,4 @@ export const textInput =
       ? TextInputLegacySafari
       : operaVersion && operaVersion < 11
         ? TextInputLegacyOpera
-        : firefoxVersion && firefoxVersion < 4
-          ? TextInputLegacyFirefox
-          : TextInput
+        : TextInput

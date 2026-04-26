@@ -1,4 +1,5 @@
-import type { KnockoutUtils, ProviderBase } from './interfaces'
+import type { Provider } from '@tko/provider'
+import type { KnockoutInstance } from '@tko/builder'
 
 export interface CustomBindingGlobalProperties {
   [customBindingName: string]: any
@@ -16,7 +17,7 @@ export class Options {
   bindingStringPreparsers: BindingStringPreparsersFunction[] = []
 
   // Reference to the own knockout instance
-  knockoutInstance: KnockoutUtils | null = null
+  knockoutInstance: KnockoutInstance | null = null
 
   deferUpdates: boolean = false
 
@@ -38,7 +39,7 @@ export class Options {
   bindingGlobals: object & CustomBindingGlobalProperties = Object.create(null)
 
   // An instance of the binding provider.
-  bindingProviderInstance: ProviderBase
+  bindingProviderInstance: Provider
 
   // Whether the `with` binding creates a child context when used with `as`.
   createChildContextWithAs: boolean = false
@@ -49,7 +50,7 @@ export class Options {
   disableJQueryUsage: boolean = false
 
   get jQuery(): JQueryStatic | undefined {
-    if (this.disableJQueryUsage) return
+    if (this.disableJQueryUsage) return undefined
     return this._jQuery ?? (globalThis as any).jQuery
   }
 
@@ -133,5 +134,36 @@ export class Options {
 }
 
 const options = new Options()
+
+/**
+ * Define a custom option on ko.options with an optional side-effect setter.
+ * Plugins use this to register their own configuration properties.
+ *
+ * Must be called before applyBindings — setters run side effects at
+ * configuration time, not retroactively on already-parsed bindings.
+ *
+ * @example
+ * defineOption('strictEquality', {
+ *   default: false,
+ *   set(strict) { /* swap operator functions *\/ }
+ * })
+ * // Then: ko.options.strictEquality = true
+ */
+export function defineOption<T>(name: string, config: { default: T; set?: (value: T) => void }) {
+  let _value = config.default
+  Object.defineProperty(options, name, {
+    get() {
+      return _value
+    },
+    set(value: T) {
+      _value = value
+      config.set?.(value)
+    },
+    enumerable: true,
+    configurable: true
+  })
+  // Run the setter with the default value to initialize side effects
+  config.set?.(_value)
+}
 
 export default options

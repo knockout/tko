@@ -1,28 +1,32 @@
+import { expect } from 'chai'
+
 import { isSubscribable, subscribable } from '../dist'
+
+const browserSupportsProtoAssignment = typeof Object.setPrototypeOf === 'function'
 
 describe('Subscribable', function () {
   it('Should declare that it is subscribable', function () {
     const instance = new subscribable()
-    expect(isSubscribable(instance)).toEqual(true)
+    expect(isSubscribable(instance)).to.equal(true)
   })
 
   it('subscribable has limit', function () {
     const instance = new subscribable()
-    expect(instance.limit).not.toBeUndefined()
+    expect(instance.limit).to.not.equal(undefined)
   })
 
   it('isSubscribable should return false for undefined', function () {
-    expect(isSubscribable(undefined)).toEqual(false)
+    expect(isSubscribable(undefined)).to.equal(false)
   })
 
   it('isSubscribable should return false for null', function () {
-    expect(isSubscribable(null)).toEqual(false)
+    expect(isSubscribable(null)).to.equal(false)
   })
 
   it('creates/has a Symbol.observable', () => {
     const sub = new subscribable()
-    expect(Symbol.observable).toEqual(Symbol.for('@tko/Symbol.observable'))
-    expect(sub[Symbol.observable]()).toBe(sub)
+    expect(Symbol.observable).to.equal(Symbol.for('@tko/Symbol.observable'))
+    expect(sub[Symbol.observable]()).to.equal(sub)
   })
 
   it('Should be able to notify subscribers', function () {
@@ -32,7 +36,7 @@ describe('Subscribable', function () {
       notifiedValue = value
     })
     instance.notifySubscribers(123)
-    expect(notifiedValue).toEqual(123)
+    expect(notifiedValue).to.equal(123)
   })
 
   it('Should be able to unsubscribe', function () {
@@ -43,15 +47,15 @@ describe('Subscribable', function () {
     })
     subscription.dispose()
     instance.notifySubscribers(123)
-    expect(notifiedValue).toEqual(undefined)
+    expect(notifiedValue).to.equal(undefined)
   })
 
   it("Should be able to specify a 'this' pointer for the callback", function () {
     const model = {
       someProperty: 123,
       myCallback: function (arg) {
-        expect(arg).toEqual('notifiedValue')
-        expect(this.someProperty).toEqual(123)
+        expect(arg).to.equal('notifiedValue')
+        expect(this.someProperty).to.equal(123)
       }
     }
     const instance = new subscribable()
@@ -60,9 +64,6 @@ describe('Subscribable', function () {
   })
 
   it('Should not notify subscribers after unsubscription, even if the unsubscription occurs midway through a notification cycle', function () {
-    // This spec represents the unusual case where during notification, subscription1's callback causes subscription2 to be disposed.
-    // Since subscription2 was still active at the start of the cycle, it is scheduled to be notified. This spec verifies that
-    // even though it is scheduled to be notified, it does not get notified, because the unsubscription just happened.
     const instance = new subscribable()
     instance.subscribe(function () {
       subscription2.dispose()
@@ -73,7 +74,7 @@ describe('Subscribable', function () {
     })
 
     instance.notifySubscribers('ignored')
-    expect(subscription2wasNotified).toEqual(false)
+    expect(subscription2wasNotified).to.equal(false)
   })
 
   it("Should be able to notify subscribers for a specific 'event'", function () {
@@ -88,10 +89,10 @@ describe('Subscribable', function () {
     )
 
     instance.notifySubscribers(123, 'unrelatedEvent')
-    expect(notifiedValue).toEqual(undefined)
+    expect(notifiedValue).to.equal(undefined)
 
     instance.notifySubscribers(456, 'myEvent')
-    expect(notifiedValue).toEqual(456)
+    expect(notifiedValue).to.equal(456)
   })
 
   it("Should be able to unsubscribe for a specific 'event'", function () {
@@ -106,7 +107,7 @@ describe('Subscribable', function () {
     )
     subscription.dispose()
     instance.notifySubscribers(123, 'myEvent')
-    expect(notifiedValue).toEqual(undefined)
+    expect(notifiedValue).to.equal(undefined)
   })
 
   it("Should be able to subscribe for a specific 'event' without being notified for the default event", function () {
@@ -120,7 +121,7 @@ describe('Subscribable', function () {
       'myEvent'
     )
     instance.notifySubscribers(123)
-    expect(notifiedValue).toEqual(undefined)
+    expect(notifiedValue).to.equal(undefined)
   })
 
   it('Should be able to retrieve the number of active subscribers', function () {
@@ -128,20 +129,20 @@ describe('Subscribable', function () {
     const sub1 = instance.subscribe(function () {})
     const sub2 = instance.subscribe(function () {}, null, 'someSpecificEvent')
 
-    expect(instance.getSubscriptionsCount()).toEqual(2)
-    expect(instance.getSubscriptionsCount('change')).toEqual(1)
-    expect(instance.getSubscriptionsCount('someSpecificEvent')).toEqual(1)
-    expect(instance.getSubscriptionsCount('nonexistentEvent')).toEqual(0)
+    expect(instance.getSubscriptionsCount()).to.equal(2)
+    expect(instance.getSubscriptionsCount('change')).to.equal(1)
+    expect(instance.getSubscriptionsCount('someSpecificEvent')).to.equal(1)
+    expect(instance.getSubscriptionsCount('nonexistentEvent')).to.equal(0)
 
     sub1.dispose()
-    expect(instance.getSubscriptionsCount()).toEqual(1)
-    expect(instance.getSubscriptionsCount('change')).toEqual(0)
-    expect(instance.getSubscriptionsCount('someSpecificEvent')).toEqual(1)
+    expect(instance.getSubscriptionsCount()).to.equal(1)
+    expect(instance.getSubscriptionsCount('change')).to.equal(0)
+    expect(instance.getSubscriptionsCount('someSpecificEvent')).to.equal(1)
 
     sub2.dispose()
-    expect(instance.getSubscriptionsCount()).toEqual(0)
-    expect(instance.getSubscriptionsCount('change')).toEqual(0)
-    expect(instance.getSubscriptionsCount('someSpecificEvent')).toEqual(0)
+    expect(instance.getSubscriptionsCount()).to.equal(0)
+    expect(instance.getSubscriptionsCount('change')).to.equal(0)
+    expect(instance.getSubscriptionsCount('someSpecificEvent')).to.equal(0)
   })
 
   it('Should be possible to replace notifySubscribers with a custom handler', function () {
@@ -155,63 +156,59 @@ describe('Subscribable', function () {
     }
     instance.notifySubscribers(123, 'myEvent')
 
-    expect(interceptedNotifications.length).toEqual(1)
-    expect(interceptedNotifications[0].eventName).toEqual('myEvent')
-    expect(interceptedNotifications[0].value).toEqual(123)
+    expect(interceptedNotifications.length).to.equal(1)
+    expect(interceptedNotifications[0].eventName).to.equal('myEvent')
+    expect(interceptedNotifications[0].value).to.equal(123)
   })
 
   it('Should inherit any properties defined on subscribable.fn', function () {
-    this.after(function () {
-      delete subscribable.fn.customProp
-      delete subscribable.fn.customFunc
-    })
-
     subscribable.fn.customProp = 'some value'
     subscribable.fn.customFunc = function () {
       return this
     }
 
-    const instance = new subscribable()
-    expect(instance.customProp).toEqual('some value')
-    expect(instance.customFunc()).toEqual(instance)
+    try {
+      const instance = new subscribable()
+      expect(instance.customProp).to.equal('some value')
+      expect(instance.customFunc()).to.equal(instance)
+    } finally {
+      delete subscribable.fn.customProp
+      delete subscribable.fn.customFunc
+    }
   })
 
   it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
-    // On unsupported browsers, there's nothing to test
-    if (!jasmine.browserSupportsProtoAssignment) {
+    if (!browserSupportsProtoAssignment) {
       return
     }
 
-    this.after(function () {
-      delete subscribable.fn.customFunction
-    })
-
     const sub = new subscribable()
-
     const customFunction = function () {}
 
-    sub.fn.customFunction = customFunction
-
-    expect(sub.customFunction).toBe(customFunction)
+    try {
+      subscribable.fn.customFunction = customFunction
+      expect(sub.customFunction).to.equal(customFunction)
+    } finally {
+      delete subscribable.fn.customFunction
+    }
   })
 
   it('the `once` callback is called one time', () => {
     const s = new subscribable()
     let nv = null
     s.once(v => {
-      expect(nv).toEqual(null)
+      expect(nv).to.equal(null)
       nv = v
     })
-    expect(nv).toEqual(null)
+    expect(nv).to.equal(null)
     s.notifySubscribers('123')
-    expect(nv).toEqual('123')
+    expect(nv).to.equal('123')
     s.notifySubscribers('55')
-    expect(nv).toEqual('123')
+    expect(nv).to.equal('123')
   })
 
   it('Should return "[object Object]" with .toString', function () {
-    // Issue #2252: make sure .toString method does not throw error
-    expect(new subscribable().toString()).toBe('[object Object]')
+    expect(new subscribable().toString()).to.equal('[object Object]')
   })
 
   it('subscribes with TC39 Observable {next: () =>}', function () {
@@ -223,6 +220,6 @@ describe('Subscribable', function () {
       }
     })
     instance.notifySubscribers(123)
-    expect(notifiedValue).toEqual(123)
+    expect(notifiedValue).to.equal(123)
   })
 })

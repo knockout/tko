@@ -1,0 +1,210 @@
+---
+title: Deploy in Seconds
+description: Deploy a TKO app to static hosting — no build step required.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+A TKO app can be as simple as a single HTML file. No bundler, no server runtime, no build step — just upload to any static hosting provider and you're live.
+
+## The simplest deploy
+
+Save one of these as `index.html`:
+
+<Tabs>
+  <TabItem label="Plain ESM">
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello, TKO</title>
+    <script type="importmap">
+      { "imports": { "@tko/build.reference": "https://esm.sh/@tko/build.reference" } }
+    </script>
+  </head>
+  <body>
+    <!-- Reusable markup. Native ko- bindings; no data-bind needed. -->
+    <template id="ko-greeting-template">
+      <input ko-textInput="name" />
+      <p>Hello, <strong ko-text="name"></strong>.</p>
+    </template>
+
+    <!-- Mount one or many — each instance gets its own state. -->
+    <ko-greeting></ko-greeting>
+
+    <script type="module">
+      import ko from '@tko/build.reference'
+
+      // Component class — extends ko.Component, auto-registers as <ko-greeting>
+      // (kebab-case derived from class name).
+      class KoGreeting extends ko.Component {
+        // Where TKO finds the markup for this component.
+        static get template () { return { element: 'ko-greeting-template' } }
+
+        name = ko.observable('TKO')
+      }
+      KoGreeting.register()
+
+      ko.applyBindings({}, document.body)
+    </script>
+  </body>
+</html>
+```
+
+Native `ko-` bindings. Reusable component with a `<template>` for markup and a viewModel for state. Drop `<ko-greeting></ko-greeting>` anywhere, any number of times — each instance gets its own observable. No compile step. Ship it.
+
+  </TabItem>
+  <TabItem label="ESM + TSX">
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello, TKO</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@tko/build.reference": "https://esm.sh/@tko/build.reference",
+          "esbuild-wasm": "https://esm.sh/esbuild-wasm@0.27.4/esm/browser.min.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Reusable markup. Native ko- bindings; no data-bind needed. -->
+    <template id="ko-counter-template">
+      <h1>Count: <span ko-text="count"></span></h1>
+      <button ko-click="increment">Increment</button>
+    </template>
+
+    <!-- Two independent counters — shared template, separate state. -->
+    <ko-counter></ko-counter>
+    <ko-counter></ko-counter>
+
+    <script id="app" type="text/tsx">
+      import ko from '@tko/build.reference'
+
+      // Component class — extends ko.Component, auto-registers as <ko-counter>
+      // (kebab-case derived from class name).
+      class KoCounter extends ko.Component {
+        // Where TKO finds the markup for this component.
+        static get template () { return { element: 'ko-counter-template' } }
+
+        count = ko.observable(0)
+        increment = () => this.count(this.count() + 1)
+      }
+      KoCounter.register()
+
+      ko.applyBindings({}, document.body)
+    </script>
+
+    <script type="module">
+      import * as esbuild from 'esbuild-wasm'
+
+      await esbuild.initialize({
+        wasmURL: 'https://esm.sh/esbuild-wasm@0.27.4/esbuild.wasm',
+      })
+
+      const { code } = await esbuild.transform(
+        document.getElementById('app').textContent,
+        {
+          loader: 'tsx',
+          jsx: 'transform',
+          jsxFactory: 'ko.jsx.createElement',
+          jsxFragment: 'ko.jsx.Fragment',
+        },
+      )
+
+      const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }))
+      await import(url)
+    </script>
+  </body>
+</html>
+```
+
+Templates and code live apart. The `<template id="counter-template">` is reusable markup — drop `<ko-counter></ko-counter>` as many times as you like, each instance gets its own `Counter` viewModel. Template content is plain HTML with `ko-` bindings; TKO doesn't care whether it came from JSX or HTML.
+
+Your TypeScript lives in `<script type="text/tsx">` — the browser ignores unknown script types so the source survives verbatim. A tiny `<script type="module">` bootstrap loads esbuild-wasm from the CDN, transforms the source, wraps it in a blob URL, and `import()`s it as a real ES module. `import ko from '@tko/build.reference'` resolves through the import map just like any module.
+
+Trade-off: first load fetches ~3MB of esbuild-wasm (cached after). Great for demos, internal tools, and apps where time-to-compile matters less than zero-build deployment.
+
+  </TabItem>
+</Tabs>
+
+Try it first in the [ESM playground](/playground/esm) — same code, live editor. Use the arrow icon on the code block to open either variant.
+
+## GitHub Pages
+
+Free, deploys from a git push.
+
+1. Create a repo and add your `index.html`
+2. Go to **Settings → Pages → Source** and select your branch
+3. Your site is live at `https://username.github.io/repo/`
+
+Or use the `gh` CLI:
+
+```sh
+gh repo create my-app --public --clone
+# add index.html
+git add index.html && git commit -m "init" && git push
+gh browse --settings  # enable Pages under Settings → Pages
+```
+
+## Cloudflare Pages
+
+Free tier, global CDN, automatic HTTPS.
+
+1. Push your files to a GitHub or GitLab repo
+2. Connect the repo at [dash.cloudflare.com](https://dash.cloudflare.com) → **Pages → Create**
+3. No build command needed — just set the output directory to `/` (or wherever your HTML lives)
+
+Or deploy directly from the CLI:
+
+```sh
+npx wrangler pages deploy . --project-name my-app
+```
+
+## Google Cloud Storage
+
+Good for projects already on GCP.
+
+```sh
+gcloud storage buckets create gs://my-app.example.com
+gcloud storage buckets update gs://my-app.example.com --web-main-page-suffix=index.html
+gcloud storage cp index.html gs://my-app.example.com/
+```
+
+Add a load balancer or use [Firebase Hosting](https://firebase.google.com/docs/hosting) for automatic HTTPS and CDN.
+
+## Firebase Hosting
+
+Free tier, automatic HTTPS, global CDN.
+
+```sh
+npm install -g firebase-tools
+firebase init hosting  # select your project, set public dir to "."
+firebase deploy
+```
+
+## Netlify
+
+Free tier, drag-and-drop or git-based deploys.
+
+1. Go to [app.netlify.com/drop](https://app.netlify.com/drop)
+2. Drag your project folder onto the page
+3. Live in seconds
+
+Or via CLI:
+
+```sh
+npx netlify-cli deploy --dir . --prod
+```
+
+## Why this works
+
+TKO loads over the browser's native ES module loader via an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). No server-side rendering, no Node.js, no build artifacts. The entire deploy is one file.
+
+As your app grows you can add a bundler, but you don't *have* to. Many production TKO apps are a handful of HTML files and a CSS stylesheet.

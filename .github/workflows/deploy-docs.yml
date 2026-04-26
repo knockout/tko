@@ -27,18 +27,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
+          node-version: 24.x
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .tool-versions
 
       - name: Install monorepo dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Build monorepo packages
-        run: make all
+        run: bun run build
 
       - name: Install site dependencies
         run: cd tko.io && bun install --frozen-lockfile
@@ -47,7 +47,7 @@ jobs:
         run: cd tko.io && bun run build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: tko.io/dist
 

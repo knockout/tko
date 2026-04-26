@@ -1,4 +1,5 @@
 /* global testNode */
+import { expect } from 'chai'
 import { applyBindings } from '@tko/bind'
 
 import { observable, type ObservableArray, observableArray } from '@tko/observable'
@@ -10,7 +11,7 @@ import { options } from '@tko/utils'
 import { bindings as templateBindings, renderTemplate, anonymousTemplate } from '../dist'
 import { bindings as coreBindings } from '@tko/binding.core'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { expectContainHtml, expectContainText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Native template engine', function () {
   function ensureNodeExistsAndIsEmpty(id, tagName?, type?) {
@@ -29,7 +30,7 @@ describe('Native template engine', function () {
 
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -45,23 +46,23 @@ describe('Native template engine', function () {
       templateElem[templateElementProp] = "name: <div data-bind='text: name'></div>"
 
       renderTemplate(templateElemId, { name: 'bert' }, null, testNode)
-      expect(testNode).toContainHtml('name: <div data-bind="text: name">bert</div>')
+      expectContainHtml(testNode, 'name: <div data-bind="text: name">bert</div>')
 
       // A second render also works
       renderTemplate(templateElemId, { name: 'tom' }, null, testNode)
-      expect(testNode).toContainHtml('name: <div data-bind="text: name">tom</div>')
+      expectContainHtml(testNode, 'name: <div data-bind="text: name">tom</div>')
 
       // A change to the element contents is picked up
       templateElem[templateElementProp] = "welcome <div data-bind='text: name'></div>"
       renderTemplate(templateElemId, { name: 'dave' }, null, testNode)
-      expect(testNode).toContainHtml('welcome <div data-bind="text: name">dave</div>')
+      expectContainHtml(testNode, 'welcome <div data-bind="text: name">dave</div>')
     }
 
     it('can display static content from regular DOM element', function () {
       const testDivTemplate = ensureNodeExistsAndIsEmpty('testDivTemplate')
       testDivTemplate.innerHTML = 'this is some static content'
       renderTemplate('testDivTemplate', null, null, testNode)
-      expect(testNode).toContainHtml('this is some static content')
+      expectContainHtml(testNode, 'this is some static content')
     })
 
     it('can fetch template from regular DOM element and data-bind on results', function () {
@@ -91,14 +92,14 @@ describe('Native template engine', function () {
       new anonymousTemplate(testNode).text('this is some static content')
       testNode.innerHTML = 'irrelevant initial content'
       renderTemplate(testNode, null, null, testNode)
-      expect(testNode).toContainHtml('this is some static content')
+      expectContainHtml(testNode, 'this is some static content')
     })
 
     it('can data-bind on results', function () {
       new anonymousTemplate(testNode).text("name: <div data-bind='text: name'></div>")
       testNode.innerHTML = 'irrelevant initial content'
       renderTemplate(testNode, { name: 'bert' }, null, testNode)
-      expect(testNode).toContainHtml('name: <div data-bind="text: name">bert</div>')
+      expectContainHtml(testNode, 'name: <div data-bind="text: name">bert</div>')
     })
 
     it('can be supplied by not giving a template name', function () {
@@ -108,7 +109,7 @@ describe('Native template engine', function () {
       const viewModel = { someItem: { val: 'abc' } }
       applyBindings(viewModel, testNode)
 
-      expect(testNode.childNodes[0]).toContainText('Value: abc')
+      expectContainText(testNode.childNodes[0], 'Value: abc')
     })
 
     it('work in conjunction with foreach', function () {
@@ -117,30 +118,30 @@ describe('Native template engine', function () {
       const myItems = observableArray([{ itemProp: 'Alpha' }, { itemProp: 'Beta' }, { itemProp: 'Gamma' }])
       applyBindings({ myItems: myItems }, testNode)
 
-      expect(testNode.childNodes[0].childNodes[0]).toContainText('Item: Alpha')
-      expect(testNode.childNodes[0].childNodes[1]).toContainText('Item: Beta')
-      expect(testNode.childNodes[0].childNodes[2]).toContainText('Item: Gamma')
+      expectContainText(testNode.childNodes[0].childNodes[0], 'Item: Alpha')
+      expectContainText(testNode.childNodes[0].childNodes[1], 'Item: Beta')
+      expectContainText(testNode.childNodes[0].childNodes[2], 'Item: Gamma')
 
       // Can cause re-rendering
       myItems.push({ itemProp: 'Pushed' })
-      expect(testNode.childNodes[0].childNodes[0]).toContainText('Item: Alpha')
-      expect(testNode.childNodes[0].childNodes[1]).toContainText('Item: Beta')
-      expect(testNode.childNodes[0].childNodes[2]).toContainText('Item: Gamma')
-      expect(testNode.childNodes[0].childNodes[3]).toContainText('Item: Pushed')
+      expectContainText(testNode.childNodes[0].childNodes[0], 'Item: Alpha')
+      expectContainText(testNode.childNodes[0].childNodes[1], 'Item: Beta')
+      expectContainText(testNode.childNodes[0].childNodes[2], 'Item: Gamma')
+      expectContainText(testNode.childNodes[0].childNodes[3], 'Item: Pushed')
 
       myItems.splice(1, 1)
-      expect(testNode.childNodes[0].childNodes[0]).toContainText('Item: Alpha')
-      expect(testNode.childNodes[0].childNodes[1]).toContainText('Item: Gamma')
-      expect(testNode.childNodes[0].childNodes[2]).toContainText('Item: Pushed')
+      expectContainText(testNode.childNodes[0].childNodes[0], 'Item: Alpha')
+      expectContainText(testNode.childNodes[0].childNodes[1], 'Item: Gamma')
+      expectContainText(testNode.childNodes[0].childNodes[2], 'Item: Pushed')
     })
 
     it('may be nested', function () {
       testNode.innerHTML =
-        "<div data-bind='template: { foreach: items }'>"
-        + "<div data-bind='template: { foreach: children }'>"
-        + "(Val: <span data-bind='text: $data'></span>, Invocations: <span data-bind='text: $root.invocationCount()'></span>, Parents: <span data-bind='text: $parents.length'></span>)"
-        + '</div>'
-        + '</div>'
+        "<div data-bind='template: { foreach: items }'>" +
+        "<div data-bind='template: { foreach: children }'>" +
+        "(Val: <span data-bind='text: $data'></span>, Invocations: <span data-bind='text: $root.invocationCount()'></span>, Parents: <span data-bind='text: $parents.length'></span>)" +
+        '</div>' +
+        '</div>'
 
       class myViewModel {
         invocations: number = 0 // Verifying # invocations to be sure we're not rendering anything multiple times and discarding the results
@@ -162,19 +163,23 @@ describe('Native template engine', function () {
 
       applyBindings(viewModel, testNode)
 
-      expect(testNode.childNodes[0].childNodes[0]).toContainText(
+      expectContainText(
+        testNode.childNodes[0].childNodes[0],
         '(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)'
       )
-      expect(testNode.childNodes[0].childNodes[1]).toContainText(
+      expectContainText(
+        testNode.childNodes[0].childNodes[1],
         '(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)'
       )
 
       // Check we can insert without causing anything else to rerender
       viewModel.items()[1].children.unshift('ANew')
-      expect(testNode.childNodes[0].childNodes[0]).toContainText(
+      expectContainText(
+        testNode.childNodes[0].childNodes[0],
         '(Val: A1, Invocations: 1, Parents: 2)(Val: A2, Invocations: 2, Parents: 2)(Val: A3, Invocations: 3, Parents: 2)'
       )
-      expect(testNode.childNodes[0].childNodes[1]).toContainText(
+      expectContainText(
+        testNode.childNodes[0].childNodes[1],
         '(Val: ANew, Invocations: 6, Parents: 2)(Val: B1, Invocations: 4, Parents: 2)(Val: B2, Invocations: 5, Parents: 2)'
       )
     })
@@ -196,24 +201,24 @@ describe('Native template engine', function () {
       const x = observable()
       const y = observable()
       applyBindings({ x, y }, node)
-      expect(inner).toEqual(1)
-      expect(outer).toEqual(1)
+      expect(inner).to.equal(1)
+      expect(outer).to.equal(1)
       x('a')
-      expect(inner).toEqual(2)
-      expect(outer).toEqual(2)
+      expect(inner).to.equal(2)
+      expect(outer).to.equal(2)
       y('a')
-      expect(inner).toEqual(2)
-      expect(outer).toEqual(3)
+      expect(inner).to.equal(2)
+      expect(outer).to.equal(3)
     })
 
     it('with no content should be rejected', function () {
-      const anyWindow = window as any
-      anyWindow.testDivTemplate.innerHTML = "<div data-bind='template: { data: someItem }'></div>"
+      const testDivTemplate = ensureNodeExistsAndIsEmpty('testDivTemplate')
+      testDivTemplate.innerHTML = "<div data-bind='template: { data: someItem }'></div>"
 
       const viewModel = { someItem: { val: 'abc' } }
       expect(function () {
-        applyBindings(viewModel, anyWindow.testDivTemplate)
-      }).toThrowContaining('no template content')
+        applyBindings(viewModel, testDivTemplate)
+      }).to.throw(/no template content/)
     })
   })
 
@@ -226,7 +231,7 @@ describe('Native template engine', function () {
       template.innerHTML =
         "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
       applyBindings({ someItem: { val: 'abc' } }, template)
-      expect(template.content.childNodes[0]).toContainText('Value: abc')
+      expectContainText(template.content.childNodes[0], 'Value: abc')
     })
 
     it('applyBindings to fragment should set $data to the template data value', function () {
@@ -237,7 +242,7 @@ describe('Native template engine', function () {
       template.innerHTML =
         "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
       applyBindings({ someItem: { val: 'abc' } }, fragment)
-      expect(template.content.childNodes[0]).toContainText('Value: abc')
+      expectContainText(template.content.childNodes[0], 'Value: abc')
     })
 
     it('should set $data to the DIV at DocumentFragment', function () {
@@ -249,40 +254,41 @@ describe('Native template engine', function () {
 
       fragment.appendChild(div)
       applyBindings({ someItem: { val: 'abc' } }, div)
-      expect(div.childNodes[0]).toContainText('Value: abc')
+      expectContainText(div.childNodes[0], 'Value: abc')
     })
   })
 
   describe('Data-bind syntax', function () {
-    it('should expose parent binding context as $parent if binding with an explicit \"data\" value', function () {
+    it('should expose parent binding context as $parent if binding with an explicit "data" value', function () {
       testNode.innerHTML =
-        "<div data-bind='template: { data: someItem }'>"
-        + "ValueBound: <span data-bind='text: $parent.parentProp'></span>"
-        + '</div>'
+        "<div data-bind='template: { data: someItem }'>" +
+        "ValueBound: <span data-bind='text: $parent.parentProp'></span>" +
+        '</div>'
       applyBindings({ someItem: {}, parentProp: 'Hello' }, testNode)
-      expect(testNode.childNodes[0]).toContainText('ValueBound: Hello')
+      expectContainText(testNode.childNodes[0], 'ValueBound: Hello')
     })
 
     it('should expose all ancestor binding contexts as $parents, with top frame also given as $root', function () {
       testNode.innerHTML =
-        "<div data-bind='template: { data: outerItem }'>"
-        + "<div data-bind='template: { data: middleItem }'>"
-        + "<div data-bind='template: { data: innerItem }'>("
-        + "data: <span data-bind='text: $data.val'></span>, "
-        + "parent: <span data-bind='text: $parent.val'></span>, "
-        + "parents[0]: <span data-bind='text: $parents[0].val'></span>, "
-        + "parents[1]: <span data-bind='text: $parents[1].val'></span>, "
-        + "parents.length: <span data-bind='text: $parents.length'></span>, "
-        + "root: <span data-bind='text: $root.val'></span>"
-        + ')</div>'
-        + '</div>'
-        + '</div>'
+        "<div data-bind='template: { data: outerItem }'>" +
+        "<div data-bind='template: { data: middleItem }'>" +
+        "<div data-bind='template: { data: innerItem }'>(" +
+        "data: <span data-bind='text: $data.val'></span>, " +
+        "parent: <span data-bind='text: $parent.val'></span>, " +
+        "parents[0]: <span data-bind='text: $parents[0].val'></span>, " +
+        "parents[1]: <span data-bind='text: $parents[1].val'></span>, " +
+        "parents.length: <span data-bind='text: $parents.length'></span>, " +
+        "root: <span data-bind='text: $root.val'></span>" +
+        ')</div>' +
+        '</div>' +
+        '</div>'
 
       applyBindings(
         { val: 'ROOT', outerItem: { val: 'OUTER', middleItem: { val: 'MIDDLE', innerItem: { val: 'INNER' } } } },
         testNode
       )
-      expect(testNode.childNodes[0].childNodes[0].childNodes[0]).toContainText(
+      expectContainText(
+        testNode.childNodes[0].childNodes[0].childNodes[0],
         '(data: INNER, parent: MIDDLE, parents[0]: MIDDLE, parents[1]: OUTER, parents.length: 3, root: ROOT)'
       )
     })

@@ -1,4 +1,5 @@
 import { unwrap } from '@tko/observable'
+import { defineOption } from '@tko/utils'
 
 export function LAMBDA() {}
 
@@ -25,6 +26,26 @@ export interface OperatorWithProperties extends OperatorFunction {
 export interface Operators {
   [key: string]: OperatorWithProperties
 }
+function looseEqual(a, b) {
+  return a == b
+}
+looseEqual.precedence = 8
+
+function looseNotEqual(a, b) {
+  return a != b
+}
+looseNotEqual.precedence = 8
+
+function strictEqual(a, b) {
+  return a === b
+}
+strictEqual.precedence = 8
+
+function strictNotEqual(a, b) {
+  return a !== b
+}
+strictNotEqual.precedence = 8
+
 const operators: Operators = {
   // unary
   '@': unwrapOrCall,
@@ -82,19 +103,11 @@ const operators: Operators = {
   //    TODO: 'in': function (a, b) { return a in b; },
   //    TODO: 'instanceof': function (a, b) { return a instanceof b; },
   //    TODO: 'typeof': function (a, b) { return typeof b; },
-  // equality
-  '==': function equal(a, b) {
-    return a == b
-  },
-  '!=': function ne(a, b) {
-    return a != b
-  },
-  '===': function sequal(a, b) {
-    return a === b
-  },
-  '!==': function sne(a, b) {
-    return a !== b
-  },
+  // equality — default loose; set options.strictEquality = true for === behavior
+  '==': looseEqual,
+  '!=': looseNotEqual,
+  '===': strictEqual,
+  '!==': strictNotEqual,
   // bitwise
   '&': function bitAnd(a, b) {
     return a & b
@@ -144,67 +157,90 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Oper
 operators['@'].precedence = 21
 operators['#'].precedence = 21
 
-// Member
-operators['.'].precedence = 19
-operators['['].precedence = 19
-operators['?.'].precedence = 19
+// Member access and call
+operators['.'].precedence = 17
+operators['['].precedence = 17
+operators['?.'].precedence = 17
 
-// Logical not
-operators['!'].precedence = 16
-operators['!!'].precedence = 16 // explicit double-negative
+// Prefix operators
+operators['!'].precedence = 14
+operators['!!'].precedence = 14 // explicit double-negative
 
 // Prefix inc/dec
-operators['++'].precedence = 16
-operators['--'].precedence = 16
-operators['&-'].precedence = 16
+operators['++'].precedence = 14
+operators['--'].precedence = 14
+operators['&-'].precedence = 14
 
-// exponent
-operators['**'].precedence = 15
+// Exponentiation
+operators['**'].precedence = 13
 
-// mul/div/remainder
-operators['%'].precedence = 14
-operators['*'].precedence = 14
-operators['/'].precedence = 14
+// Multiplicative
+operators['%'].precedence = 12
+operators['*'].precedence = 12
+operators['/'].precedence = 12
 
-// add/sub
-operators['+'].precedence = 13
-operators['-'].precedence = 13
+// Additive
+operators['+'].precedence = 11
+operators['-'].precedence = 11
 
-// bitwise
-operators['|'].precedence = 12
-operators['^'].precedence = 11
-operators['&'].precedence = 10
+// Relational
+operators['<'].precedence = 9
+operators['<='].precedence = 9
+operators['>'].precedence = 9
+operators['>='].precedence = 9
 
-// comparison
-operators['<'].precedence = 11
-operators['<='].precedence = 11
-operators['>'].precedence = 11
-operators['>='].precedence = 11
+// operators['in'].precedence = 9;
+// operators['instanceof'].precedence = 9;
 
-// operators['in'].precedence = 8;
-// operators['instanceof'].precedence = 8;
-// equality
-operators['=='].precedence = 10
-operators['!='].precedence = 10
-operators['==='].precedence = 10
-operators['!=='].precedence = 10
+// Equality
+operators['=='].precedence = 8
+operators['!='].precedence = 8
+operators['==='].precedence = 8
+operators['!=='].precedence = 8
 
-// logic
-operators['&&'].precedence = 6
-operators['||'].precedence = 5
-operators['??'].precedence = 5
+// Bitwise AND
+operators['&'].precedence = 7
+
+// Bitwise XOR
+operators['^'].precedence = 6
+
+// Bitwise OR
+operators['|'].precedence = 5
+
+// Logical AND
+operators['&&'].precedence = 4
+
+// Logical OR / Nullish coalescing
+operators['||'].precedence = 3
+operators['??'].precedence = 3
 
 operators['&&'].earlyOut = a => !a
 operators['||'].earlyOut = a => a
-operators['??'].earlyOut = a => a
+operators['??'].earlyOut = a => a !== null && a !== undefined
 
-// multiple values
-operators[','].precedence = 2
+// Assignment and miscellaneous (lamda)
+operators['=>'].precedence = 2
+
+// Comma, multiple values
+operators[','].precedence = 1
 
 // Call a function
 operators['call'].precedence = 1
 
-// lambda
-operators['=>'].precedence = 1
+// Extend the Options type so ko.options.strictEquality is strongly typed
+declare module '@tko/utils' {
+  interface Options {
+    strictEquality: boolean
+  }
+}
+
+/** Register strictEquality as a configurable option on ko.options */
+defineOption('strictEquality', {
+  default: false,
+  set(strict: boolean) {
+    operators['=='] = strict ? strictEqual : looseEqual
+    operators['!='] = strict ? strictNotEqual : looseNotEqual
+  }
+})
 
 export { operators as default }

@@ -1,3 +1,5 @@
+import { expect } from 'chai'
+
 import { options } from '@tko/utils'
 
 import { observable } from '@tko/observable'
@@ -10,12 +12,12 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { applyBindings } from '../dist'
 
-import '@tko/utils/helpers/jasmine-13-helper'
+import { expectContainText, prepareTestNode } from '../../utils/helpers/mocha-test-helpers'
 
 describe('Node preprocessing', function () {
   let testNode: HTMLElement
   beforeEach(function () {
-    testNode = jasmine.prepareTestNode()
+    testNode = prepareTestNode()
   })
 
   beforeEach(function () {
@@ -29,7 +31,7 @@ describe('Node preprocessing', function () {
     }
     testNode.innerHTML = "<p data-bind='text: someValue'></p>"
     applyBindings({ someValue: 'hello' }, testNode)
-    expect(testNode).toContainText('hello')
+    expectContainText(testNode, 'hello')
   })
 
   it('Can replace a node with some other node', function () {
@@ -39,7 +41,7 @@ describe('Node preprocessing', function () {
       if (node instanceof Element && node.tagName && node.tagName.toLowerCase() === 'myspecialnode') {
         const newNode = document.createElement('span')
         newNode.setAttribute('data-bind', 'text: someValue')
-        expect(node.parentNode).not.toBe(null)
+        expect(node.parentNode).to.not.equal(null)
         node.parentNode?.insertBefore(newNode, node)
         node.parentNode?.removeChild(node)
         return [newNode]
@@ -49,11 +51,11 @@ describe('Node preprocessing', function () {
     testNode.innerHTML = '<span>a</span><mySpecialNode></mySpecialNode><span>b</span>'
     const someValue = observable('hello')
     applyBindings({ someValue: someValue }, testNode)
-    expect(testNode).toContainText('ahellob')
+    expectContainText(testNode, 'ahellob')
 
     // Check that updating the observable has the expected effect
     someValue('goodbye')
-    expect(testNode).toContainText('agoodbyeb')
+    expectContainText(testNode, 'agoodbyeb')
   })
 
   it('Can replace a node with multiple new nodes', function () {
@@ -86,11 +88,11 @@ describe('Node preprocessing', function () {
     testNode.innerHTML = "the value is <span data-bind='text: someValue'></span>."
     const someValue = observable('hello')
     applyBindings({ someValue: someValue }, testNode)
-    expect(testNode).toContainText('the value is hello.')
+    expectContainText(testNode, 'the value is hello.')
 
     // Check that updating the observable has the expected effect
     someValue('goodbye')
-    expect(testNode).toContainText('the value is goodbye.')
+    expectContainText(testNode, 'the value is goodbye.')
   })
 
   it('Should call a childrenComplete callback, passing all of the rendered nodes, accounting for node preprocessing and virtual element bindings', function () {
@@ -119,20 +121,20 @@ describe('Node preprocessing', function () {
       vm = {
         childprop: 'child property',
         callback: function (nodes, data) {
-          expect(nodes.length).toBe(5)
-          expect(nodes[0]).toContainText('[') // <span>[</span>
-          expect(nodes[1].nodeType).toBe(8) // <!-- ko text: $data.childprop -->
-          expect(nodes[2].nodeType).toBe(3) // text node inserted by text binding
-          expect(nodes[3].nodeType).toBe(8) // <!-- /ko -->
-          expect(nodes[4]).toContainText(']') // <span>]</span>
-          expect(data).toBe(vm)
+          expect(nodes.length).to.equal(5)
+          expectContainText(nodes[0], '[') // <span>[</span>
+          expect(nodes[1].nodeType).to.equal(8) // <!-- ko text: $data.childprop -->
+          expect(nodes[2].nodeType).to.equal(3) // text node inserted by text binding
+          expect(nodes[3].nodeType).to.equal(8) // <!-- /ko -->
+          expectContainText(nodes[4], ']') // <span>]</span>
+          expect(data).to.equal(vm)
           callbacks++
         }
       }
 
     testNode.innerHTML = "<div data-bind='childrenComplete: callback'><span>[</span>$data.childprop<span>]</span></div>"
     applyBindings(vm, testNode)
-    expect(testNode.childNodes[0]).toContainText('[child property]')
-    expect(callbacks).toBe(1)
+    expectContainText(testNode.childNodes[0], '[child property]')
+    expect(callbacks).to.equal(1)
   })
 })

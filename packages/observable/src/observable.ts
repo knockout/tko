@@ -2,7 +2,7 @@
 //  Observable values
 //  ---
 //
-import { options, overwriteLengthPropertyIfSupported } from '@tko/utils'
+import { options } from '@tko/utils'
 
 import * as dependencyDetection from './dependencyDetection'
 import { deferUpdates } from './defer'
@@ -63,7 +63,7 @@ export interface Observable<T = any> extends ObservableFunctions<T> {
   /**
    * The latest value of the observable.
    */
-  [LATEST_VALUE]: any;
+  [LATEST_VALUE]: any
 
   /**
    * Gets the current value of the observable.
@@ -103,7 +103,7 @@ export function observable<T = any>(initialValue?: T): Observable {
     }
   }
 
-  overwriteLengthPropertyIfSupported(Observable as any, { value: undefined })
+  Object.defineProperty(Observable, 'length', { value: undefined })
 
   Observable[LATEST_VALUE] = initialValue
 
@@ -183,7 +183,6 @@ function limitNotifySubscribers(value, event?: string) {
     this._origNotifySubscribers(value, event)
   }
 }
-
 /**
  * Adds a limit function to the subscribable prototype.
  * @param limitFunction The function to limit notifications.

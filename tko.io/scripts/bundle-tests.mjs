@@ -1,0 +1,331 @@
+// Bundles TKO specs for the in-browser `/tests` runner.
+//
+// Two outputs:
+//
+//   public/tests/build-bundle.js    Version-portable IIFE of
+//                                   `builds/{knockout,reference}/spec/`.
+//                                   Runs as a single Mocha run against
+//                                   whichever `@tko/build.*` the page
+//                                   loaded via <script> (dev: /lib/ko.js,
+//                                   build mode: jsdelivr).
+//
+//   public/tests/source/*.js        One ESM chunk per `packages/*/spec/*`
+//                                   file, plus shared-dep chunks that
+//                                   esbuild extracts via `splitting: true`.
+//                                   The main /tests page loads each
+//                                   chunk in a fresh iframe so each spec
+//                                   file runs against an isolated module
+//                                   graph — fixes the state-leak pile-up
+//                                   that killed the single-bundle dev-mode
+//                                   approach.
+//
+// Also emits `public/tests/source/manifest.json` listing the slug/file
+// mapping so the main page can enumerate iframes.
+
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import * as esbuild from 'esbuild'
+
+const scriptDir = path.dirname(fileURLToPath(import.meta.url))
+const siteRoot = path.resolve(scriptDir, '..')
+const repoRoot = path.resolve(siteRoot, '..')
+const outputDir = path.join(siteRoot, 'public', 'tests')
+const sourceOutputDir = path.join(outputDir, 'source')
+
+// Exclude non-spec siblings that end up under `spec/` directories.
+const EXCLUDE = /[\\/](__screenshots__|fixtures|helpers)[\\/]/
+
+// `../dist` → `../src` rewrite plugin. Specs pervasively import
+// from the package's built bundle; redirecting to source keeps a
+// single module graph.
+const distToSrcPlugin = {
+  name: 'dist-to-src',
+  setup(build) {
+    build.onResolve({ filter: /(^|\/)\.\.\/dist(\/[^/]+)?$/ }, args => {
+      if (!args.importer.includes(`${path.sep}packages${path.sep}`)) return
+      const match = args.path.match(/\.\.\/dist(?:\/([^/]+))?$/)
+      const subpath = match?.[1]
+      const src = subpath
+        ? path.resolve(path.dirname(args.importer), '../src', subpath + '.ts')
+        : path.resolve(path.dirname(args.importer), '../src/index.ts')
+      return { path: src }
+    })
+  }
+}
+
+// Script runs under Bun (see `prebuild` in tko.io/package.json).
+// `Bun.Glob` is portable to both Bun and the dev `bun --watch`
+// path, so no Node 22+ dependency.
+async function collectSpecs(patterns) {
+  const specs = new Set()
+  for (const pattern of patterns) {
+    const g = new Bun.Glob(pattern)
+    for await (const match of g.scan({ cwd: repoRoot })) {
+      if (EXCLUDE.test(match)) continue
+      specs.add(path.join(repoRoot, match))
+    }
+  }
+  return [...specs].sort()
+}
+
+function specSlug(absPath) {
+  // Slug = repo-relative path with separators → `__` and
+  // extension stripped. Covers packages/* and builds/* uniformly.
+  return path
+    .relative(repoRoot, absPath)
+    .replace(/[\\/]/g, '__')
+    .replace(/\.(ts|js)$/, '')
+}
+
+async function writeSpecWrappers(specs) {
+  const wrapperDir = path.join(sourceOutputDir, '_wrappers')
+  await fs.mkdir(wrapperDir, { recursive: true })
+  const entryPoints = {}
+  const manifest = []
+
+  // Chromium denies `contentWindow.focus()` system focus to iframes
+  // without real layout + viewport intersection, and only one frame
+  // can hold focus at a time. Specs that observe focus events
+  // (`hasfocus` binding, `document.activeElement` assertions) must
+  // run serially inside the visible #workarea; the rest run in
+  // parallel, invisibly, with no focus gymnastics. Detect at
+  // bundle time by grepping the spec source.
+  const FOCUS_PATTERNS = /hasfocus|hasFocus|\.focus\(|\.blur\(|focusin|focusout|activeElement/
+  const needsFocusCache = new Map()
+  const needsFocus = async (p) => {
+    if (needsFocusCache.has(p)) return needsFocusCache.get(p)
+    const src = await fs.readFile(p, 'utf8')
+    const n = FOCUS_PATTERNS.test(src)
+    needsFocusCache.set(p, n)
+    return n
+  }
+
+  for (const spec of specs) {
+    const slug = specSlug(spec)
+    const wrapperPath = path.join(wrapperDir, `${slug}.ts`)
+    const specRel = path.relative(wrapperDir, spec).replace(/\\/g, '/')
+    const focusNeeded = await needsFocus(spec)
+    // Bare spec import. ko + browser-setup are bundled separately
+    // into `source/setup.js` (IIFE) and loaded via a <script> tag
+    // in tests-frame.html BEFORE this module evaluates. Earlier
+    // iterations embedded the setup as ESM imports here;
+    // esbuild's code-splitter reordered the resulting chunks and
+    // the spec's top-level `beforeEach(prepareTestNode)` ran
+    // before browser-setup's module installed `prepareTestNode`
+    // — `ReferenceError` cascade.
+    const contents = [
+      '// AUTO-GENERATED by tko.io/scripts/bundle-tests.mjs',
+      '// Globals (ko, chai, sinon, prepareTestNode, …) are',
+      '// installed by tests-frame.html via the classic',
+      '// <script src="/tests/source/setup.js"> tag before this',
+      '// module evaluates.',
+      `import '${specRel}'`,
+      ''
+    ].join('\n')
+    // Skip the write if contents are unchanged — updating mtime on
+     // every rebuild invalidates downstream watchers for no reason.
+    let existing = null
+    try { existing = await fs.readFile(wrapperPath, 'utf8') } catch {}
+    if (existing !== contents) await fs.writeFile(wrapperPath, contents, 'utf8')
+    entryPoints[slug] = wrapperPath
+    const rel = path.relative(repoRoot, spec).replace(/\\/g, '/')
+    manifest.push({
+      slug,
+      file: rel,
+      suite: rel.split('/').slice(0, 2).join('/'),
+      needsFocus: focusNeeded
+    })
+  }
+
+  return { entryPoints, manifest }
+}
+
+async function buildSetupBundle({ tsconfig, alias, buildVersion }) {
+  // Single IIFE carrying ko + browser-setup. Loaded via <script>
+  // in tests-frame.html before any spec module, so spec bundles
+  // can assume `globalThis.ko`, `chai`, `expect`, `sinon`,
+  // `prepareTestNode`, `restoreAfter`, etc. are all ready when
+  // they evaluate — regardless of how esbuild's code-splitter
+  // reorders the per-spec ESM chunks.
+  const setupEntry = [
+    "import ko from '../../../../builds/knockout/src/index.ts'",
+    "if (typeof globalThis !== 'undefined') globalThis.ko = ko",
+    "import '../../../../builds/knockout/helpers/browser-setup.js'",
+    ''
+  ].join('\n')
+  await esbuild.build({
+    stdin: {
+      contents: setupEntry,
+      resolveDir: sourceOutputDir,
+      loader: 'ts',
+      sourcefile: '_setup.ts'
+    },
+    bundle: true,
+    format: 'iife',
+    platform: 'browser',
+    target: 'es2022',
+    outfile: path.join(sourceOutputDir, 'setup.js'),
+    tsconfig,
+    alias,
+    plugins: [distToSrcPlugin],
+    define: { BUILD_VERSION: JSON.stringify(buildVersion) },
+    external: ['mocha'],
+    logLevel: 'warning'
+  })
+  console.log(`[setup]  bundled ko + browser-setup → ${path.relative(repoRoot, path.join(sourceOutputDir, 'setup.js'))}`)
+}
+
+async function buildBuildBundle({ buildVersion, tsconfig, alias }) {
+  const scope = [
+    'builds/knockout/spec/**/*.js',
+    'builds/knockout/spec/**/*.ts',
+    'builds/reference/spec/**/*.js',
+    'builds/reference/spec/**/*.ts'
+  ]
+  const allSpecs = await collectSpecs(scope)
+  if (allSpecs.length === 0) throw new Error('build-bundle scope matched no specs')
+
+  // Build mode's promise is "run specs against the CDN-loaded
+  // `@tko/build.*` version". Any spec that imports a relative
+  // local module (e.g. `../dist/browser.min`, `./helpers/…`)
+  // drags checkout code into the bundle and undermines that
+  // promise. Skip those in build mode — they belong to source
+  // mode only. Pure `ko.*`-global specs go through cleanly.
+  // Matches every relative-import form we've seen in specs:
+  //   import x from './a'         import './a'
+  //   export * from '../a'        import('./a')
+  //   require('../a')
+  const RELATIVE_IMPORT = /(?:\bfrom\s+['"]\.\.?\/|(?:^|\s|;)import\s*\(?\s*['"]\.\.?\/|\brequire\s*\(\s*['"]\.\.?\/)/m
+  const specs = []
+  for (const spec of allSpecs) {
+    const src = await fs.readFile(spec, 'utf8')
+    if (RELATIVE_IMPORT.test(src)) continue
+    specs.push(spec)
+  }
+
+  const lines = [
+    '// AUTO-GENERATED by tko.io/scripts/bundle-tests.mjs — in-memory only.',
+    '',
+    "import '../../../builds/knockout/helpers/browser-setup.js'",
+    ''
+  ]
+  for (const spec of specs) {
+    lines.push(`import '${path.relative(outputDir, spec).replace(/\\/g, '/')}'`)
+  }
+
+  await esbuild.build({
+    stdin: {
+      contents: lines.join('\n'),
+      resolveDir: outputDir,
+      loader: 'ts',
+      sourcefile: '_entry-build.ts'
+    },
+    bundle: true,
+    format: 'iife',
+    platform: 'browser',
+    target: 'es2022',
+    outfile: path.join(outputDir, 'build-bundle.js'),
+    tsconfig,
+    alias,
+    plugins: [distToSrcPlugin],
+    define: { BUILD_VERSION: JSON.stringify(buildVersion) },
+    external: ['mocha'],
+    globalName: 'tkoBuildTests',
+    logLevel: 'warning'
+  })
+
+  console.log(`[build]  bundled ${specs.length} spec file(s) → ${path.relative(repoRoot, path.join(outputDir, 'build-bundle.js'))}`)
+}
+
+async function buildSourceBundles({ buildVersion, tsconfig, alias }) {
+  // Include BOTH `packages/*/spec/**/*.ts` (source-imports) and
+  // `builds/{knockout,reference}/spec/**/*.{js,ts}` (ko-globals
+  // only) so the iframe runner covers the full ~2700-test
+  // corpus. Each spec file still runs in its own iframe for
+  // isolation; the per-wrapper inline-ko setup provides
+  // `globalThis.ko` whether the spec references it via global
+  // or via `@tko/*` imports.
+  const scope = [
+    'packages/*/spec/**/*.ts',
+    'builds/knockout/spec/**/*.js',
+    'builds/knockout/spec/**/*.ts',
+    'builds/reference/spec/**/*.js',
+    'builds/reference/spec/**/*.ts'
+  ]
+  const specs = await collectSpecs(scope)
+  if (specs.length === 0) throw new Error('source-bundle scope matched no specs')
+
+  // Clean previous chunk-*.js emissions so removed specs / shifted
+  // dependency graphs don't leak stale hashed chunks into the new
+  // manifest. Wrappers + per-spec bundles regenerate from fresh
+  // entry points, so leaving them alone is fine.
+  await fs.mkdir(sourceOutputDir, { recursive: true })
+  for await (const name of new Bun.Glob('chunk-*.js').scan({ cwd: sourceOutputDir })) {
+    await fs.unlink(path.join(sourceOutputDir, name))
+  }
+  const { entryPoints, manifest } = await writeSpecWrappers(specs)
+
+  await esbuild.build({
+    entryPoints,
+    bundle: true,
+    format: 'esm',
+    splitting: true,
+    platform: 'browser',
+    target: 'es2022',
+    outdir: sourceOutputDir,
+    tsconfig,
+    alias,
+    plugins: [distToSrcPlugin],
+    define: { BUILD_VERSION: JSON.stringify(buildVersion) },
+    external: ['mocha'],
+    logLevel: 'warning'
+  })
+
+  // Enumerate the shared chunk files esbuild just emitted. The
+  // /tests page preloads these via <link rel="modulepreload"> in
+  // <head> so the browser HTTP cache is warm before iframes race
+  // to dynamic-import them — otherwise WebKit occasionally reports
+  // the opaque "Importing a module script failed." error. See
+  // tko.io/src/pages/tests.astro.
+  const chunks = []
+  for await (const name of new Bun.Glob('chunk-*.js').scan({ cwd: sourceOutputDir })) {
+    chunks.push(name)
+  }
+  chunks.sort()
+
+  await fs.writeFile(
+    path.join(sourceOutputDir, 'manifest.json'),
+    JSON.stringify({ specs: manifest, chunks }, null, 2),
+    'utf8'
+  )
+
+  console.log(`[source] bundled ${specs.length} spec file(s) → ${path.relative(repoRoot, sourceOutputDir)}/*.js`)
+}
+
+async function main() {
+  await fs.mkdir(outputDir, { recursive: true })
+  const tsconfig = path.join(repoRoot, 'tsconfig.json')
+  const rootPkg = JSON.parse(await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8'))
+  const buildVersion = rootPkg.version ?? '0.0.0-test'
+
+  const packageDirs = await fs.readdir(path.join(repoRoot, 'packages'), { withFileTypes: true })
+  const alias = {}
+  for (const entry of packageDirs) {
+    if (entry.isDirectory()) {
+      alias[`@tko/${entry.name}`] = path.join(repoRoot, 'packages', entry.name, 'src', 'index.ts')
+    }
+  }
+
+  await fs.mkdir(sourceOutputDir, { recursive: true })
+  await Promise.all([
+    buildBuildBundle({ buildVersion, tsconfig, alias }),
+    buildSetupBundle({ tsconfig, alias, buildVersion }),
+    buildSourceBundles({ buildVersion, tsconfig, alias })
+  ])
+}
+
+main().catch(err => {
+  console.error(err)
+  process.exit(1)
+})

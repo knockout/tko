@@ -3,39 +3,27 @@
   "behaviors": [
     {
       "statement": "`foreach` accepts a plain array, `observableArray`, plain observable holding an array, or computed returning an array.",
-      "specs": [
-        "packages/binding.foreach/spec/eachBehavior.ts"
-      ]
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     },
     {
       "statement": "Initial render is synchronous even when `ForEachBinding.setSync(false)` is configured; later updates can be asynchronous.",
-      "specs": [
-        "packages/binding.foreach/spec/eachBehavior.ts"
-      ]
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     },
     {
       "statement": "`foreach` binds immediate children, nested descendants, and virtual-element templates.",
-      "specs": [
-        "packages/binding.foreach/spec/eachBehavior.ts"
-      ]
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     },
     {
       "statement": "`foreach: { name: \"id\", data: ... }` resolves templates by `id` from `<template>`, `<script type=\"text/ko-template\">`, and regular DOM elements.",
-      "specs": [
-        "packages/binding.foreach/spec/eachBehavior.ts"
-      ]
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     },
     {
       "statement": "Empty lists set `elseChainSatisfied()` false; non-empty lists set it true, and that flag updates as the array is filled or emptied.",
-      "specs": [
-        "packages/binding.foreach/spec/eachBehavior.ts"
-      ]
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     },
     {
       "statement": "Array mutation, reordering, duplicate values, `$index`, `as`, and `noIndex` are all exercised in spec coverage.",
-      "specs": [
-        "packages/binding.foreach/spec/eachBehavior.ts"
-      ]
+      "specs": ["packages/binding.foreach/spec/eachBehavior.ts"]
     }
   ]
 }

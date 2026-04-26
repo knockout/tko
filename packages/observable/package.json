@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/observable",
   "description": "TKO subscribables and observables",
   "repository": {
@@ -8,23 +8,19 @@
   },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "keywords": [
     "knockout",
+    "tko",
     "observable",
-    "observe",
-    "object",
-    "subscribable"
+    "reactive",
+    "state-management"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -33,17 +29,16 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/utils": "^4.0.0"
-  },
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
+    "@tko/utils": "^4.0.1"
   },
   "licenses": [
     {
       "type": "MIT",
       "url": "https://opensource.org/licenses/MIT"
     }
-  ]
+  ],
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  }
 }

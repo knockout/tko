@@ -3,27 +3,19 @@
   "behaviors": [
     {
       "statement": "`functionRewrite()` rewrites classic `function (...) { ... }` binding expressions into arrow-function form.",
-      "specs": [
-        "packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"
-      ]
+      "specs": ["packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"]
     },
     {
       "statement": "Empty-body functions become `() => undefined`; `return ...` bodies become concise return arrows.",
-      "specs": [
-        "packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"
-      ]
+      "specs": ["packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"]
     },
     {
       "statement": "Multiple function literals in the same binding string are rewritten independently.",
-      "specs": [
-        "packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"
-      ]
+      "specs": ["packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"]
     },
     {
       "statement": "Non-function text is left unchanged.",
-      "specs": [
-        "packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"
-      ]
+      "specs": ["packages/utils.functionrewrite/spec/functionRewriteBehavior.ts"]
     }
   ]
 }

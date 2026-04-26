@@ -1,0 +1,677 @@
+---
+// Read the source-mode chunk list at SSR time so the HTML ships
+// with <link rel="modulepreload"> for every shared chunk already
+// in <head>. The browser starts warming the HTTP cache during
+// initial parse — well before any JS runs — which side-steps the
+// concurrent-fetch race that makes WebKit occasionally fail spec
+// iframes with the opaque "Importing a module script failed."
+// error. `prebuild` always runs bundle-tests.mjs before Astro
+// builds the site, so manifest.json is guaranteed to exist.
+import manifest from '../../public/tests/source/manifest.json'
+const sourceChunks: string[] = manifest.chunks ?? []
+
+// TKO Browser Test Runner — written in TKO itself.
+//
+// Two modes:
+//
+//   Build mode (default)
+//     Load a published `@tko/build.*` from jsdelivr and run
+//     `tests/build-bundle.js`. Single Mocha run against the
+//     built artifact. Version-portable.
+//
+//   Source mode (URL opt-in: `?suite=source`)
+//     Spawn one iframe per spec file in `tests/source/manifest.json`.
+//     Each iframe has its own window + module graph — fresh ko,
+//     fresh options, fresh DOM — so state never leaks between
+//     specs. Mocha events stream into the parent via postMessage;
+//     the parent aggregates into a TKO view model and data-binds
+//     the reactive report.
+//
+// URL params:
+//   ?suite=build|source       default: source
+//   ?pkg=knockout|reference   build mode only; default: knockout
+//   ?ver=<version>|latest     build mode only; default: latest
+//   ?grep=<pattern>           source mode: filter spec files (regex on file/slug)
+//                             build mode: passthrough to Mocha.grep
+//   ?pool=<N>                 source mode: iframe pool size (default 4)
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TKO · Browser Tests</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lobster&display=swap" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha@10/mocha.css" />
+    {sourceChunks.map(name => <link rel="modulepreload" href={`/tests/source/${name}`} />)}
+    <link rel="preload" as="script" href="/tests/source/setup.js" />
+    <style>
+      :root {
+        --bg: #0b0d11;
+        --panel: #12151c;
+        --panel-hi: #1a1f2a;
+        --border: #222834;
+        --fg: #e8e8e8;
+        --muted: #8a93a1;
+        --accent: #0f62fe;
+        --accent-hover: #3b82f6;
+        --ok: #57d38a;
+        --warn: #ffb04d;
+        --err: #ff6b6b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 13px/1.5 'Inter', system-ui, sans-serif;
+        /* Small bottom-right padding; the work-area floats in the
+           bottom-right corner and self-removes when tests finish. */
+        padding-bottom: 1rem;
+      }
+      header {
+        padding: 0.8rem 1rem;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+        display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; align-items: center;
+      }
+      header h1 { margin: 0; font-size: 0.98rem; letter-spacing: 0.01em; font-weight: 600; display: inline-flex; align-items: baseline; gap: 0.5rem; }
+      header h1 a { color: var(--fg); text-decoration: none; }
+      header h1 a .brand { color: #dce8ff; font-family: 'Lobster', cursive; font-weight: 400; font-size: 1.85rem; letter-spacing: 0.01em; }
+      header h1 a:hover .brand { color: #fff; }
+      header .tag { color: var(--muted); font-size: 0.82rem; }
+      .chip {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        padding: 0.2rem 0.55rem;
+        background: var(--panel-hi);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-variant-numeric: tabular-nums;
+        font-size: 0.82rem;
+      }
+      .chip.ok   { color: var(--ok);   border-color: rgba(87,211,138,0.3); }
+      .chip.err  { color: var(--err);  border-color: rgba(255,107,107,0.35); }
+      .chip.warn { color: var(--warn); border-color: rgba(255,176,77,0.3); }
+      .chip.muted { color: var(--muted); }
+      header form { margin-left: auto; display: flex; gap: 0.4rem; align-items: center; }
+      header select, header input[type=text], header button {
+        background: var(--panel-hi);
+        color: var(--fg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.25rem 0.55rem;
+        font: inherit;
+      }
+      header label { display: inline-flex; gap: 0.3rem; align-items: center; color: var(--muted); font-size: 0.85rem; }
+      header button { cursor: pointer; background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+      header button:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+      main { padding: 1rem; display: grid; gap: 1rem; }
+      .progress {
+        height: 3px;
+        background: var(--panel-hi);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .progress > i {
+        display: block; height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--ok));
+        transition: width 120ms;
+      }
+      .suite {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--panel);
+      }
+      .suite-head {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0.45rem 0.75rem;
+        cursor: pointer;
+        user-select: none;
+        /* Button reset for accessibility. */
+        width: 100%;
+        background: transparent;
+        color: inherit;
+        border: 0;
+        text-align: left;
+        font: inherit;
+      }
+      .suite-head:hover { background: var(--panel-hi); }
+      .suite-head .name { font-weight: 600; letter-spacing: 0.01em; }
+      .suite[data-state=fail] .suite-head .name { color: var(--err); }
+      .suite[data-state=pending] .suite-head .name { color: var(--warn); }
+      .suite[data-state=running] .suite-head .name { color: var(--accent); }
+      .suite-head .meta { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.8rem; }
+      .suite-body { border-top: 1px solid var(--border); padding: 0.35rem 0.75rem; display: none; }
+      .suite[data-open=true] .suite-body { display: block; }
+      .suite[data-state=fail] .suite-body { display: block; }
+      .test {
+        display: grid; grid-template-columns: 1rem 1fr auto;
+        gap: 0.5rem; align-items: start;
+        padding: 0.2rem 0;
+        font-size: 0.85rem;
+      }
+      .test .icon { display: inline-block; width: 1rem; text-align: center; }
+      .test[data-kind=pass] .icon { color: var(--ok); }
+      .test[data-kind=fail] .icon { color: var(--err); }
+      .test[data-kind=pending] .icon { color: var(--warn); }
+      .test[data-kind=pending] .title { color: var(--muted); }
+      .test .dur { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.78rem; }
+      .test .err {
+        grid-column: 2 / span 2;
+        margin-top: 0.2rem;
+        padding: 0.4rem 0.55rem;
+        background: rgba(255,107,107,0.08);
+        border-left: 2px solid var(--err);
+        color: var(--err);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.78rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .filter { width: 14rem; }
+      /* Iframe sizing happens inline in runOne() — visible
+         focus-requiring iframes fill the work-area; hidden
+         parallel iframes are tiny + transparent inside
+         `hiddenHost`. No shared `.iframe-hidden` class. */
+      #mocha { padding: 0 0.5rem; }
+      footer { padding: 0.8rem 1rem; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+    <header>
+      <h1><a href="/"><span class="brand">TKO</span> · live browser tests</a></h1>
+      <span class="tag" data-bind="text: tagline"></span>
+      <span class="chip ok"    data-bind="text: '✓ ' + stats.pass()"></span>
+      <span class="chip err"   data-bind="text: '✖ ' + stats.fail()"></span>
+      <span class="chip warn"  data-bind="text: '○ ' + stats.pending()"></span>
+      <span class="chip muted" data-bind="text: stats.done() + ' / ' + stats.total()"></span>
+      <span class="chip muted" data-bind="text: elapsedLabel"></span>
+      <form data-bind="submit: onSubmit, visible: suite() === 'build'">
+        <label>Build
+          <select data-bind="value: pkg">
+            <option value="knockout">build.knockout</option>
+            <option value="reference">build.reference</option>
+          </select>
+        </label>
+        <label>Version
+          <select data-bind="options: versions, optionsText: 'label', optionsValue: 'value', value: ver" style="min-width: 7rem"></select>
+        </label>
+        <input type="text" class="filter" data-bind="textInput: grep" placeholder="grep regex" />
+        <button type="submit">Run</button>
+      </form>
+    </header>
+
+    <div class="progress"><i data-bind="style: { width: progressPct() + '%' }"></i></div>
+
+    <main>
+      <!-- Suite tree: source mode. -->
+      <div data-bind="foreach: suites, visible: suite() === 'source'">
+        <div class="suite" data-bind="attr: { 'data-state': state, 'data-open': open }">
+          <button type="button" class="suite-head" data-bind="click: toggle, attr: { 'aria-expanded': open }">
+            <span class="name" data-bind="text: file"></span>
+            <span class="meta" data-bind="text: pass() + ' / ' + total()"></span>
+          </button>
+          <div class="suite-body" data-bind="foreach: tests">
+            <div class="test" data-bind="attr: { 'data-kind': kind }">
+              <span class="icon" data-bind="text: icon"></span>
+              <span class="title" data-bind="text: title"></span>
+              <span class="dur" data-bind="text: dur"></span>
+              <!-- ko if: err -->
+                <div class="err" data-bind="text: err"></div>
+              <!-- /ko -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer data-bind="text: footer">config pending…</footer>
+    </div><!-- /#app -->
+
+    <!-- Mocha's HTML reporter target lives OUTSIDE the TKO-bound
+         #app wrapper. Otherwise page-level applyBindings scans the
+         dynamic content Mocha + specs inject and erroneously tries
+         to resolve <test-component> custom elements (registered
+         by specs against the CDN ko) against the page's own tko. -->
+    <div id="mocha" style="padding: 0 1rem"></div>
+
+    <!-- Work area: active spec iframes mount here. Kept visible
+         (not hidden) because Chromium denies
+         `iframe.contentWindow.focus()` system focus to off-screen
+         / zero-area iframes, which breaks the 34 hasfocus tests
+         (focusin / focusout events never fire without system
+         focus). The work-area iframe gets a real layout box, real
+         viewport intersection, and real focus routing. Visible-
+         running also doubles as a dark-factory signal: a visitor
+         watches specs flash by in the sandbox rather than
+         wondering if anything is happening. -->
+    <section id="workarea-section" style="
+      position:fixed;
+      right:1rem; bottom:1rem;
+      width:320px; height:200px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.35);
+      z-index:5;
+      overflow:hidden;
+      opacity:0.6;
+      transition:opacity 140ms ease;
+    "
+    onmouseenter="this.style.opacity=1"
+    onmouseleave="this.style.opacity=0.6"
+    >
+      <div id="workarea" style="
+        position:absolute;
+        inset:0;
+        background:#fff;
+        overflow:hidden;
+      "></div>
+      <div style="
+        position:absolute;
+        inset:0;
+        padding:0.55rem 0.7rem 1.3rem;
+        color:#0b0d11;
+        font-size:0.7rem;
+        line-height:1.35;
+        pointer-events:none;
+        text-shadow:0 0 6px rgba(255,255,255,0.85), 0 0 2px rgba(255,255,255,0.85);
+        mix-blend-mode:multiply;
+      ">
+        Focus-requiring specs (<code>hasfocus</code>, <code>.focus()</code>,
+        <code>document.activeElement</code>) run serially here &mdash;
+        Chromium only grants system focus to one iframe at a time and
+        denies it to off-screen / zero-area iframes. This panel will
+        disappear when tests complete.
+      </div>
+      <div id="workarea-label" style="
+        position:absolute;
+        right:0.4rem; bottom:0.3rem;
+        padding:0.1rem 0.4rem;
+        color:#0b0d11;
+        font-size:0.68rem;
+        font-variant-numeric:tabular-nums;
+        pointer-events:none;
+        text-shadow:0 0 6px rgba(255,255,255,0.9);
+      ">idle</div>
+    </section>
+
+    <!-- Error collector before any other script runs. -->
+    <script is:inline>
+      window.__tkoErrors = []
+      window.addEventListener('error', e =>
+        window.__tkoErrors.push({ msg: e.message, src: e.filename, line: e.lineno, stack: e.error?.stack }))
+      window.addEventListener('unhandledrejection', e =>
+        window.__tkoErrors.push({ msg: 'unhandled rejection: ' + (e.reason?.message || e.reason), stack: e.reason?.stack }))
+    </script>
+
+    <!-- Load the knockout-compat TKO build for the page UI. We
+         intentionally use the KO (not reference) build here: the
+         reference build auto-discovers custom elements anywhere in
+         the document, which would trip over the `<test-component>`
+         / other custom tags Mocha + specs inject into #mocha at
+         test time. KO build has no such auto-scan. -->
+    <script is:inline src="/lib/ko.js"></script>
+
+    <script is:inline>
+    (function () {
+      // Page UI uses the locally-loaded ko build. Specs (in their
+      // iframes, or via jsdelivr CDN in build mode) load their own
+      // separate copy — state is isolated by either iframe scope
+      // (source mode) or explicit global shadowing (build mode).
+      const ko = globalThis.ko
+
+      // Per-test row view model.
+      function TestRow({ kind, title, dur, err }) {
+        this.kind = kind
+        this.title = title
+        this.dur = typeof dur === 'number' ? dur + 'ms' : ''
+        this.err = err || ''
+        this.icon = kind === 'pass' ? '✓' : kind === 'fail' ? '✖' : '○'
+      }
+
+      // Per-spec suite view model. `file` is the relative path (manifest key).
+      function Suite(file) {
+        const self = this
+        self.file = file
+        self.tests = ko.observableArray([])
+        self.pass = ko.observable(0)
+        self.fail = ko.observable(0)
+        self.pending = ko.observable(0)
+        self.running = ko.observable(false)
+        self.total = ko.pureComputed(() => self.pass() + self.fail() + self.pending())
+        self.state = ko.pureComputed(() => {
+          if (self.fail() > 0) return 'fail'
+          if (self.running()) return 'running'
+          if (self.pending() > 0) return 'pending'
+          return 'ok'
+        })
+        self.open = ko.observable(false)
+        self.toggle = () => self.open(!self.open())
+      }
+
+      // Page view model.
+      function Page() {
+        const self = this
+        const qs = new URLSearchParams(location.search)
+        // Default to source mode — iframe-per-spec, the isolated
+        // runner. Use `?suite=build&pkg=knockout` to test a
+        // published `@tko/build.*` version via jsdelivr instead.
+        // Validate URL inputs — `pkg` + `ver` feed the jsdelivr
+        // <script> URL in build mode, so a crafted query string
+        // could otherwise load arbitrary third-party code. Fall
+        // back to safe defaults on anything unexpected.
+        const rawSuite = qs.get('suite')
+        const rawPkg = qs.get('pkg')
+        const rawVer = qs.get('ver')
+        const safeSuite = rawSuite === 'build' || rawSuite === 'source' ? rawSuite : 'source'
+        const safePkg = rawPkg === 'knockout' || rawPkg === 'reference' ? rawPkg : 'knockout'
+        // Allow `latest`, or a semver-shaped string
+        // (digits, dots, hyphens, letters for pre-release tags).
+        const safeVer = rawVer && /^[\w.-]{1,40}$/.test(rawVer) ? rawVer : 'latest'
+        self.suite   = ko.observable(safeSuite)
+        self.pkg     = ko.observable(safePkg)
+        self.ver     = ko.observable(safeVer)
+        self.grep    = ko.observable(qs.get('grep') || '')
+        // Pool for the parallel-hidden run. Focus-needing
+        // specs — flagged at bundle time via `manifest.specs[].needsFocus`
+        // — always run serially in the visible #workarea so each
+        // has sole system focus; Chromium only grants
+        // `contentWindow.focus()` system focus to one frame at a
+        // time. Everything else runs in parallel, invisibly.
+        const reqPool = parseInt(qs.get('pool') || '4', 10)
+        self.pool    = Number.isFinite(reqPool) ? Math.min(16, Math.max(1, reqPool)) : 4
+
+        self.versions = ko.observableArray([{ label: 'loading…', value: 'latest' }])
+        self.suites   = ko.observableArray([])
+
+        self.stats = {
+          pass:    ko.observable(0),
+          fail:    ko.observable(0),
+          pending: ko.observable(0),
+          total:   ko.observable(0),
+          start:   ko.observable(0),
+          end:     ko.observable(0)
+        }
+        self.stats.done = ko.pureComputed(() =>
+          self.stats.pass() + self.stats.fail() + self.stats.pending()
+        )
+        self.tick = ko.observable(Date.now())
+        const tickTimer = setInterval(() => {
+          if (self.stats.end()) {
+            clearInterval(tickTimer)
+            return
+          }
+          self.tick(Date.now())
+        }, 250)
+        self.elapsedLabel = ko.pureComputed(() => {
+          const s = self.stats.start()
+          if (!s) return '—'
+          const e = self.stats.end() || self.tick()
+          return `${((e - s) / 1000).toFixed(1)}s`
+        })
+        self.progressPct = ko.pureComputed(() => {
+          const t = self.stats.total()
+          const d = self.stats.done()
+          return t > 0 ? Math.min(100, (d / t) * 100).toFixed(1) : 0
+        })
+        self.tagline = ko.pureComputed(() =>
+          self.suite() === 'source'
+            ? `source specs · pool ${self.pool}`
+            : `build ${self.pkg()} @ ${self.ver()}`
+        )
+        self.footer = ko.pureComputed(() =>
+          self.suite() === 'source'
+            ? 'source mode · one iframe per spec file (isolated module graph)'
+            : `@tko/build.${self.pkg()}@${self.ver()} via jsdelivr`
+        )
+
+        self.onSubmit = () => {
+          const next = new URLSearchParams()
+          // Page default is source. Anything else (including the
+          // Run form's own build mode) must set `suite` explicitly
+          // — else reload drops to source and kills the build-mode
+          // config the user just submitted.
+          if (self.suite() !== 'source') next.set('suite', self.suite())
+          if (self.pkg() !== 'knockout') next.set('pkg', self.pkg())
+          if (self.ver() !== 'latest') next.set('ver', self.ver())
+          const g = self.grep().trim()
+          if (g) next.set('grep', g)
+          location.search = next.toString() ? '?' + next.toString() : ''
+          return false
+        }
+
+        // Per-file suite helpers for source mode.
+        const suiteIndex = new Map()
+        self.ensureSuite = file => {
+          let s = suiteIndex.get(file)
+          if (s) return s
+          s = new Suite(file)
+          suiteIndex.set(file, s)
+          self.suites.push(s)
+          return s
+        }
+        self.recordTest = (file, kind, title, dur, err, stack) => {
+          const s = self.ensureSuite(file)
+          s[kind](s[kind]() + 1)
+          const row = new TestRow({ kind, title, dur, err: err ? (err + (stack ? '\n' + stack : '')).slice(0, 2000) : '' })
+          s.tests.push(row)
+          self.stats[kind](self.stats[kind]() + 1)
+        }
+      }
+
+      const page = new Page()
+      ko.applyBindings(page, document.getElementById('app'))
+      window.__tkoPage = page
+
+      // Show/hide the out-of-tree mocha host based on mode.
+      // (The #workarea always exists; iframes mount into it.)
+      document.getElementById('mocha').hidden = page.suite() !== 'build'
+
+      // ----- Mode-specific kickoff -----
+      if (page.suite() === 'source') {
+        runSourceMode(page)
+      } else {
+        runBuildMode(page)
+      }
+
+      // ---- Build mode ----
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement('script')
+          s.src = src
+          s.onload = () => resolve()
+          s.onerror = () => reject(new Error(`failed to load ${src}`))
+          document.head.appendChild(s)
+        })
+      }
+      async function populateVersions(page) {
+        try {
+          const res = await fetch(`https://registry.npmjs.org/@tko/build.${page.pkg()}`)
+          const data = await res.json()
+          const versions = Object.keys(data.versions || {}).reverse()
+          const latest = data['dist-tags']?.latest
+          page.versions(versions.map(v => ({ value: v, label: v + (v === latest ? ' (latest)' : '') })))
+          if (page.ver() === 'latest' && latest) page.ver(latest)
+        } catch (e) {
+          page.versions([{ label: 'npm fetch failed: ' + e.message, value: 'latest' }])
+        }
+      }
+      async function runBuildMode(page) {
+        await populateVersions(page)
+
+        // Mocha browser reporter for build mode — single run.
+        await loadScript('https://cdn.jsdelivr.net/npm/mocha@10/mocha.js')
+        window.mocha.setup({ ui: 'bdd', reporter: 'html', timeout: 10000, cleanReferencesAfterRun: false })
+        const buildGrep = page.grep().trim()
+        if (buildGrep) {
+          try {
+            window.mocha.grep(new RegExp(buildGrep, 'i'))
+          } catch {
+            const needle = buildGrep.toLowerCase()
+            window.mocha.grep(t => (t.fullTitle?.() || t.title || '').toLowerCase().includes(needle))
+          }
+        }
+
+        const koUrl = `https://cdn.jsdelivr.net/npm/@tko/build.${page.pkg()}@${page.ver()}/dist/browser.min.js`
+        await loadScript(koUrl)
+        await loadScript('/tests/build-bundle.js')
+
+        page.stats.start(Date.now())
+        const runner = window.mocha.run()
+        runner.on('pass',    () => page.stats.pass(page.stats.pass()+1))
+        runner.on('fail',    () => page.stats.fail(page.stats.fail()+1))
+        runner.on('pending', () => page.stats.pending(page.stats.pending()+1))
+        runner.on('end',     () => { page.stats.end(Date.now()) })
+        page.stats.total(runner.total)
+      }
+
+      // ---- Source mode ----
+      async function runSourceMode(page) {
+        const res = await fetch('/tests/source/manifest.json')
+        const manifest = await res.json()
+        let specs = manifest.specs
+
+        const grep = page.grep().trim()
+        if (grep) {
+          // Invalid regex patterns (e.g. bare `(`) throw from the
+          // RegExp constructor and abort source mode. Fall back to
+          // literal substring matching instead.
+          let rx
+          try { rx = new RegExp(grep, 'i') } catch {}
+          specs = rx
+            ? specs.filter(s => rx.test(s.file) || rx.test(s.slug))
+            : specs.filter(s => s.file.toLowerCase().includes(grep.toLowerCase())
+                              || s.slug.toLowerCase().includes(grep.toLowerCase()))
+        }
+        specs.sort((a, b) => a.file.localeCompare(b.file))
+        for (const s of specs) page.ensureSuite(s.file)
+
+        page.stats.start(Date.now())
+
+        // Track live iframe contentWindows so the message handler
+        // can ignore spoofed frames. Same-origin + known-source =
+        // accept; anything else (cross-origin post, unknown window)
+        // is dropped.
+        const liveFrames = new Set()
+        window.addEventListener('message', e => {
+          if (e.origin !== location.origin) return
+          if (!liveFrames.has(e.source)) return
+          const m = e.data
+          if (!m || !m.slug) return
+          const spec = specs.find(s => s.slug === m.slug)
+          const key = spec?.file || m.slug
+          const suite = page.ensureSuite(key)
+          if (m.type === 'start') {
+            page.stats.total(page.stats.total() + m.total)
+            suite.running(true)
+          } else if (m.type === 'pass') {
+            page.recordTest(key, 'pass', m.title, m.duration)
+          } else if (m.type === 'fail') {
+            page.recordTest(key, 'fail', m.title, m.duration, m.err, m.stack)
+          } else if (m.type === 'pending') {
+            page.recordTest(key, 'pending', m.title)
+          } else if (m.type === 'end') {
+            suite.running(false)
+          } else if (m.type === 'import-error') {
+            page.stats.total(Math.max(page.stats.total(), page.stats.done() + 1))
+            page.recordTest(key, 'fail', '(iframe import error)', 0, m.err)
+          }
+        })
+
+        // Split by needsFocus: hidden specs run in parallel,
+        // focus-requiring specs run serially in the #workarea so
+        // each has sole system focus (Chromium grants focus to
+        // one iframe at a time).
+        const hiddenQueue = specs.filter(s => !s.needsFocus)
+        const focusQueue  = specs.filter(s => s.needsFocus)
+
+        const workarea = document.getElementById('workarea')
+        const workareaLabel = document.getElementById('workarea-label')
+
+        // Hidden host for non-focus specs; attached to body with
+        // tiny offscreen layout so Chromium doesn't waste work
+        // rendering them.
+        const hiddenHost = document.createElement('div')
+        hiddenHost.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;pointer-events:none'
+        document.body.appendChild(hiddenHost)
+
+        function runOne(spec, { host, label, grantFocus }) {
+          return new Promise(resolve => {
+            const iframe = document.createElement('iframe')
+            iframe.style.cssText = grantFocus
+              ? 'width:100%;height:100%;border:0;display:block'
+              : 'width:1px;height:1px;border:0;opacity:0'
+            iframe.src = `/tests-frame.html?spec=${encodeURIComponent(spec.slug)}`
+            if (label) label.textContent = spec.file
+            iframe.addEventListener('load', () => {
+              if (iframe.contentWindow) liveFrames.add(iframe.contentWindow)
+              if (grantFocus) {
+                try {
+                  iframe.focus()
+                  iframe.contentWindow?.focus()
+                } catch {}
+              }
+            })
+            let done = false
+            let safetyTimer
+            const finish = () => {
+              if (done) return
+              done = true
+              clearTimeout(safetyTimer)
+              window.removeEventListener('message', onMsg)
+              if (iframe.contentWindow) liveFrames.delete(iframe.contentWindow)
+              iframe.remove()
+              resolve()
+            }
+            const onMsg = e => {
+              if (e.origin !== location.origin) return
+              if (e.source !== iframe.contentWindow) return
+              const m = e.data
+              if (m?.slug !== spec.slug) return
+              if (m.type === 'end' || m.type === 'import-error') finish()
+            }
+            window.addEventListener('message', onMsg)
+            host.appendChild(iframe)
+            safetyTimer = setTimeout(() => {
+              const key = spec.file || spec.slug
+              page.stats.total(Math.max(page.stats.total(), page.stats.done() + 1))
+              page.recordTest(key, 'fail', '(iframe timeout)', 30000,
+                `No end/import-error event after 30000ms (spec: ${key})`)
+              page.ensureSuite(key).running(false)
+              finish()
+            }, 30000)
+          })
+        }
+
+        // Parallel-hidden run: non-focus specs, `pool`-at-a-time
+        // inside the offscreen `hiddenHost`. The <link rel=modulepreload>
+        // tags in <head> warmed the HTTP cache, so iframes can
+        // race on dynamic import() without tripping WebKit's
+        // dependency-tree fetcher.
+        async function hiddenWorker() {
+          while (hiddenQueue.length) {
+            const spec = hiddenQueue.shift()
+            if (!spec) return
+            await runOne(spec, { host: hiddenHost, label: null, grantFocus: false })
+          }
+        }
+        await Promise.all(Array.from({ length: page.pool }, hiddenWorker))
+
+        // Serial-focus run: one focus-needing spec at a time in
+        // the visible #workarea so each has sole system focus.
+        for (const spec of focusQueue) {
+          await runOne(spec, { host: workarea, label: workareaLabel, grantFocus: true })
+        }
+        workareaLabel.textContent = 'done'
+        document.getElementById('workarea-section')?.remove()
+        hiddenHost.remove()
+
+        page.stats.end(Date.now())
+      }
+    })();
+    </script>
+  </body>
+</html>

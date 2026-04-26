@@ -5,7 +5,7 @@ import { DataBindProvider } from '@tko/provider.databind'
 import { VirtualProvider } from '@tko/provider.virtual'
 import { ComponentProvider } from '@tko/provider.component'
 
-import { applyBindings, dataFor } from '@tko/bind'
+import { applyBindings } from '@tko/bind'
 
 import { bindings as coreBindings } from '@tko/binding.core'
 import { bindings as templateBindings } from '@tko/binding.template'
@@ -15,7 +15,9 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import components from '../dist'
 const { ComponentABC } = components
 
-import { useMockForTasks } from '@tko/utils/helpers/jasmine-13-helper'
+import { expect } from 'chai'
+import sinon from 'sinon'
+import { expectContainHtml, prepareTestNode, useMockForTasks } from '../../utils/helpers/mocha-test-helpers'
 
 describe('ComponentABC', function () {
   let testComponentName = 'test-component',
@@ -23,10 +25,14 @@ describe('ComponentABC', function () {
     testComponentParams,
     outerViewModel
   let testNode: HTMLElement
+  let clock: sinon.SinonFakeTimers
+  let cleanups: Array<() => void>
 
   beforeEach(function () {
-    useMockForTasks(options)
-    testNode = jasmine.prepareTestNode()
+    cleanups = []
+    clock = sinon.useFakeTimers()
+    useMockForTasks(cleanups)
+    testNode = prepareTestNode()
     testComponentParams = {}
     testComponentBindingValue = { name: testComponentName, params: testComponentParams }
     outerViewModel = { testComponentBindingValue: testComponentBindingValue, isOuterViewModel: true }
@@ -44,23 +50,26 @@ describe('ComponentABC', function () {
   })
 
   afterEach(function () {
-    expect(tasks.resetForTesting()).toEqual(0)
-    jasmine.Clock.reset()
+    expect(tasks.resetForTesting()).to.equal(0)
+    while (cleanups.length) {
+      cleanups.pop()!()
+    }
+    clock.restore()
     components.unregister(testComponentName)
   })
 
-  it("throws when there's no overloading", function () {
+  it('registers without overloading (children-as-template mode)', function () {
     class CX extends ComponentABC {}
-    expect(() => (CX as any).register()).toThrowContaining('overload')
+    expect(() => (CX as any).register()).to.not.throw()
   })
 
-  it('throws when template or element is not overloaded', function () {
-    class CX extends ComponentABC {
-      customElementName() {
+  it('registers when neither template nor element is overloaded (children-as-template mode)', function () {
+    class CXTwo extends ComponentABC {
+      static get customElementName() {
         return 'a-b'
       }
     }
-    expect(() => (CX as any).register()).toThrowContaining('overload')
+    expect(() => (CXTwo as any).register()).to.not.throw()
   })
 
   it('uses the class name kebab-case elementName is not overloaded', function () {
@@ -70,7 +79,7 @@ describe('ComponentABC', function () {
       }
     }
     ;(CaaXbbb as any).register()
-    expect((CaaXbbb as any).customElementName).toEqual('caa-xbbb')
+    expect((CaaXbbb as any).customElementName).to.equal('caa-xbbb')
   })
 
   it('binds when registered like a normal component', function () {
@@ -89,9 +98,12 @@ describe('ComponentABC', function () {
     }
     ;(CX as any).register()
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.childNodes[0]).toContainHtml('<div data-bind="text: myvalue">some parameter value</div>')
+    expectContainHtml(
+      testNode.childNodes[0] as HTMLElement,
+      '<div data-bind="text: myvalue">some parameter value</div>'
+    )
   })
 
   it('registers on the components', function () {
@@ -109,7 +121,7 @@ describe('ComponentABC', function () {
       }
     }
     ;(CX as any).register()
-    expect(components._allRegisteredComponents['test-component'].viewModel).toEqual(CX)
+    expect(components._allRegisteredComponents['test-component'].viewModel).to.equal(CX)
   })
 
   it('respects the `element` property', function () {
@@ -125,9 +137,9 @@ describe('ComponentABC', function () {
     }
     ;(CX as any).register()
     applyBindings(outerViewModel, testNode)
-    jasmine.Clock.tick(1)
+    clock.tick(1)
 
-    expect(testNode.childNodes[0]).toContainHtml('<i>vid</i>')
+    expectContainHtml(testNode.childNodes[0] as HTMLElement, '<i>vid</i>')
   })
 
   it('disposes when the node is removed', function () {
@@ -147,6 +159,6 @@ describe('ComponentABC', function () {
     ;(CX as any).register()
     applyBindings(outerViewModel, testNode)
     cleanNode(testNode)
-    expect(disp).toEqual(true)
+    expect(disp).to.equal(true)
   })
 })

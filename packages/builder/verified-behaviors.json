@@ -3,15 +3,11 @@
   "behaviors": [
     {
       "statement": "`Builder` constructs successfully when given `filters`, a `provider`, `bindings`, and `options` in its config object.",
-      "specs": [
-        "packages/builder/spec/builderBehaviors.ts"
-      ]
+      "specs": ["packages/builder/spec/builderBehaviors.ts"]
     },
     {
       "statement": "Current active spec coverage for `Builder` is thin; only construction from an explicit config object is verified here.",
-      "specs": [
-        "packages/builder/spec/builderBehaviors.ts"
-      ]
+      "specs": ["packages/builder/spec/builderBehaviors.ts"]
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { extend, arrayPushAll, parseHtmlFragment } from '@tko/utils'
+import { unwrap } from '@tko/observable'
 
 import { renderTemplate, anonymousTemplate, templateEngine } from '../dist'
 
@@ -49,12 +50,7 @@ export function dummyTemplateEngine(templates?) {
     let result
 
     data = data || {}
-    // Builders (e.g. rollup) mangle `data` to e.g. `data$$1`.
-    // This workaround works as long as nomangle$data doesn't
-    // appear anywhere not in tests.
     const nomangle$data: any = data
-    ;(window as any).__prevent_tree_shaking__ = nomangle$data
-    delete (window as any).__prevent_tree_shaking__
 
     rt_options.templateRenderingVariablesInScope = rt_options.templateRenderingVariablesInScope || {}
 
@@ -65,9 +61,21 @@ export function dummyTemplateEngine(templates?) {
       return renderTemplate(templateName, data, rt_options)
     })
 
+    // Bundlers can rename the closure-captured `unwrap` import (e.g. esbuild's
+    // ESM transform), breaking `eval(script)` that references it by name. Pass
+    // dependencies explicitly via `new Function` parameters so the evaluator
+    // survives any module transform. Scripts come in two flavors — a bare
+    // expression (returnable) or a statement list (no implicit return) — so
+    // try the expression form first and fall back on syntax error.
     const evalHandler = function (match, script) {
       try {
-        const evalResult = eval(script)
+        let fn: Function
+        try {
+          fn = new Function('unwrap', 'nomangle$data', 'rt_options', 'bindingContext', `return (${script})`)
+        } catch {
+          fn = new Function('unwrap', 'nomangle$data', 'rt_options', 'bindingContext', script)
+        }
+        const evalResult = fn(unwrap, nomangle$data, rt_options, bindingContext)
         return evalResult === null || evalResult === undefined ? '' : evalResult.toString()
       } catch (ex: any) {
         throw new Error('Error evaluating script: [js: ' + script + ']\n\nException: ' + ex.toString(), { cause: ex })

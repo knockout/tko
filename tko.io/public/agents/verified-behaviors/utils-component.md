@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/utils.component
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 Class-based component registration through `ComponentABC` and the default component utilities.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/utils.component`, especially class-based component registration through `ComponentABC` and the default component utilities.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/utils.component/spec`
-- Curated source: `packages/utils.component/verified-behaviors.json`
 
 ## Behaviors
 
@@ -27,3 +15,5 @@ Read this when you need test-backed behavior for `@tko/utils.component`, especia
   Specs: `packages/utils.component/spec/ComponentABCBehaviors.ts`
 - Component instances derived from `ComponentABC` are disposed when their bound node is cleaned.
   Specs: `packages/utils.component/spec/ComponentABCBehaviors.ts`
+
+_Curated source: `packages/utils.component/verified-behaviors.json`_

@@ -1,6 +1,6 @@
 import Node from './Node'
 import Arguments from './Arguments'
-import Parser from './Parser'
+import type Parser from './Parser'
 import { hasOwnProperty, isObjectLike } from '@tko/utils'
 
 import { isWriteableObservable, isObservable } from '@tko/observable'
@@ -116,11 +116,11 @@ export default class Identifier {
       root = globals
     } else {
       throw new Error(
-        'Identifier::set_value -- '
-          + "The property '"
-          + leaf
-          + "' does not exist "
-          + 'on the $data, $context, or globals.'
+        'Identifier::set_value -- ' +
+          "The property '" +
+          leaf +
+          "' does not exist " +
+          'on the $data, $context, or globals.'
       )
     }
 

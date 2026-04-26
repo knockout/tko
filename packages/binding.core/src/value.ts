@@ -1,4 +1,4 @@
-import { stringStartsWith, safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
+import { safeSetTimeout, tagNameLower, arrayForEach, selectExtensions } from '@tko/utils'
 
 import { unwrap, dependencyDetection } from '@tko/observable'
 
@@ -12,7 +12,6 @@ export class value extends BindingHandler {
   }
 
   elementValueBeforeEvent: any
-  propertyChangeFired: any
   propertyChangedFired: boolean
   updateFromModel: any
   constructor(...args: [any]) {
@@ -30,7 +29,7 @@ export class value extends BindingHandler {
     if (this.ieAutoCompleteHackNeeded) {
       this.addEventListener('propertyChange', () => (this.propertyChangedFired = true))
       this.addEventListener('focus', () => (this.propertyChangedFired = false))
-      this.addEventListener('blur', () => this.propertyChangeFired && this.valueUpdateHandler())
+      this.addEventListener('blur', () => this.propertyChangedFired && this.valueUpdateHandler())
     }
 
     arrayForEach(this.eventsToCatch, eventName => this.registerEvent(eventName))
@@ -64,11 +63,11 @@ export class value extends BindingHandler {
   // IE doesn't fire "change" events on textboxes if the user selects a value from its autocomplete list
   get ieAutoCompleteHackNeeded() {
     return (
-      this.isInput(this.$element)
-      && this.$element.type == 'text'
-      && this.$element.autocomplete != 'off'
-      && (!this.$element.form || this.$element.form.autocomplete != 'off')
-      && MSIE_REGEX.test(window.navigator.userAgent) //IE detection (primarily for IE10/11)
+      this.isInput(this.$element) &&
+      this.$element.type == 'text' &&
+      this.$element.autocomplete != 'off' &&
+      (!this.$element.form || this.$element.form.autocomplete != 'off') &&
+      MSIE_REGEX.test(window.navigator.userAgent) //IE detection (primarily for IE10/11)
     )
   }
 
@@ -83,7 +82,7 @@ export class value extends BindingHandler {
     // This is useful, for example, to catch "keydown" events after the browser has updated the control
     // (otherwise, selectExtensions.readValue(this) will receive the control's value *before* the key event)
     let handler = this.valueUpdateHandler.bind(this)
-    if (stringStartsWith(eventName, 'after')) {
+    if (eventName.startsWith('after')) {
       handler = () => {
         // The elementValueBeforeEvent variable is non-null *only* during the brief gap between
         // a keyX event firing and the valueUpdateHandler running, which is scheduled to happen

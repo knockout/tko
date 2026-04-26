@@ -1,20 +1,8 @@
 # Verified Behaviors: @tko/computed
 
-> Generated from package discovery plus package-local curated unit-test-backed JSON.
-> If a behavior is not covered by unit tests, it does not belong in this directory.
+> Generated from package discovery + curated JSON. Unit-test-backed only.
 
 `computed`, `when`, `throttle`, and `rateLimit` behavior covered by the async/unit specs.
-
-## When to Read This
-
-Read this when you need test-backed behavior for `@tko/computed`, especially `computed`, `when`, `throttle`, and `rateLimit` behavior covered by the async/unit specs.
-
-## Status
-
-- Status: curated
-- Summary: Curated from unit tests.
-- Spec directory: `packages/computed/spec`
-- Curated source: `packages/computed/verified-behaviors.json`
 
 ## Behaviors
 
@@ -30,3 +18,5 @@ Read this when you need test-backed behavior for `@tko/computed`, especially `co
 - `when(predicate, callback)` runs the callback once, then disposes its subscription.
   Notes: The predicate may be either a function or an observable. The return value exposes `dispose()` to cancel the pending notification. With deferred updates enabled, the callback runs in a later task.
   Specs: `packages/computed/spec/observableUtilsBehaviors.ts`, `packages/computed/spec/asyncBehaviors.ts`
+
+_Curated source: `packages/computed/verified-behaviors.json`_

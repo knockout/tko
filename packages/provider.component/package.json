@@ -1,26 +1,19 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/provider.component",
   "description": "Bind custom web components e.g. <custom-binding>",
-  "module": "dist/provider.component.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/computed": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/provider": "^4.0.0",
-    "@tko/utils": "^4.0.0",
-    "@tko/utils.component": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0"
-  },
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
+    "@tko/computed": "^4.0.1",
+    "@tko/observable": "^4.0.1",
+    "@tko/provider": "^4.0.1",
+    "@tko/utils": "^4.0.1",
+    "@tko/utils.component": "^4.0.1",
+    "@tko/utils.parser": "^4.0.1"
   },
   "homepage": "https://tko.io",
   "licenses": [
@@ -31,11 +24,9 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
@@ -44,5 +35,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.git"
-  }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "provider",
+    "web-components",
+    "custom-elements"
+  ]
 }

@@ -1,21 +1,21 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignoreExportsUsedInFile": {
-    "interface": true,
-    "type": true
-  },
-  "tags": [
-    "-lintignore",
-    "-internal"
-  ],
-  "ignoreBinaries": ["make"],
-  "ignoreDependencies": ["@types/mocha", "chai", "electron", "esbuild", "fs-extra", "karma[.]*", "mocha", "nyc", "prettier", "sinon", "lerna"],
+  "$schema": "https://unpkg.com/knip@6/schema.json",
   "workspaces": {
+    ".": {
+      "entry": ["tools/build.ts"],
+      "project": ["*.ts", "tools/**/*.ts"]
+    },
     "packages/*": {
-      "entry": "src/index.ts",
-      "project": "src/**/*.ts",
-      "ignore": ["/helpers/**"]
+      "entry": ["index.ts", "src/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "builds/*": {
+      "entry": ["index.ts", "src/index.ts"],
+      "project": ["src/**/*.ts"]
     }
   },
-  "ignoreWorkspaces": ["builds/**", "docs/**", "tko.io/**", "tools/**"]
+  "ignoreDependencies": [
+    "esbuild",
+    "@vitest/browser"
+  ]
 }

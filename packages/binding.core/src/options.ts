@@ -55,8 +55,8 @@ export const options = {
     }
 
     if (unwrappedArray) {
-      if (typeof unwrappedArray.length === 'undefined') // Coerce single value into array
-      {
+      if (typeof unwrappedArray.length === 'undefined') {
+        // Coerce single value into array
         unwrappedArray = [unwrappedArray]
       }
 
@@ -79,14 +79,14 @@ export const options = {
 
     function applyToObject(object, predicate, defaultValue) {
       const predicateType = typeof predicate
-      if (predicateType === 'function') // Given a function; run it against the data value
-      {
+      if (predicateType === 'function') {
+        // Given a function; run it against the data value
         return predicate(object)
-      } else if (predicateType == 'string') // Given a string; treat it as a property name on the data value
-      {
+      } else if (predicateType == 'string') {
+        // Given a string; treat it as a property name on the data value
         return object[predicate]
-      } else // Given no optionsText arg; use the data value itself
-      {
+      } // Given no optionsText arg; use the data value itself
+      else {
         return defaultValue
       }
     }

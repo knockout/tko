@@ -1,22 +1,15 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/provider.bindingstring",
   "description": "Abstract Base Class for providers that parse a binding string",
-  "module": "dist/provider.bindingString.js",
+  "module": "dist/index.js",
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0"
-  },
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
+    "@tko/provider": "^4.0.1",
+    "@tko/utils.parser": "^4.0.1"
   },
   "homepage": "https://tko.io",
   "licenses": [
@@ -27,11 +20,9 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
@@ -40,5 +31,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/knockout/tko.git"
-  }
+  },
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "provider",
+    "parser",
+    "binding-string"
+  ]
 }

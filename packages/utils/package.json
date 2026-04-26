@@ -1,12 +1,10 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/utils",
   "description": "TKO Utilities",
   "type": "module",
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "repository": {
     "type": "git",
@@ -15,7 +13,9 @@
   "keywords": [
     "knockout",
     "tko",
-    "ko"
+    "utilities",
+    "dom",
+    "helpers"
   ],
   "author": "The Knockout Team",
   "license": "MIT",
@@ -23,12 +23,10 @@
     "url": "https://github.com/knockout/tko/issues"
   },
   "homepage": "https://tko.io",
-  "karma": {
-    "frameworks": [
-      "jasmine"
-    ]
+  "dependencies": {
+    "@tko/provider": "^4.0.1",
+    "@tko/builder": "^4.0.1"
   },
-  "dependencies": {},
   "licenses": [
     {
       "type": "MIT",
@@ -37,10 +35,12 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
+    }
+  },
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
   }
 }

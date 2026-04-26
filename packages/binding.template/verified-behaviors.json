@@ -3,12 +3,8 @@
   "behaviors": [
     {
       "statement": "`foreach` duplicates template content for each array entry and keeps the DOM in sync with array mutations.",
-      "notes": [
-        "Add, insert, splice, shift, and pop flows are covered in the specs."
-      ],
-      "specs": [
-        "packages/binding.template/spec/foreachBehaviors.ts"
-      ]
+      "notes": ["Add, insert, splice, shift, and pop flows are covered in the specs."],
+      "specs": ["packages/binding.template/spec/foreachBehaviors.ts"]
     },
     {
       "statement": "`foreach` and `template: { foreach: ... }` support destroyed-item filtering through `includeDestroyed` and `options.includeDestroyed`.",
@@ -29,24 +25,16 @@
         "Falsy `nodes` values behave like an empty node list.",
         "Observable arrays are rejected for `nodes`."
       ],
-      "specs": [
-        "packages/binding.template/spec/templatingBehaviors.ts"
-      ]
+      "specs": ["packages/binding.template/spec/templatingBehaviors.ts"]
     },
     {
       "statement": "`foreach` supports `afterAdd`, `beforeRemove`, and `afterRender` callbacks.",
-      "notes": [
-        "`beforeRemove` leaves node removal to the callback."
-      ],
-      "specs": [
-        "packages/binding.template/spec/foreachBehaviors.ts"
-      ]
+      "notes": ["`beforeRemove` leaves node removal to the callback."],
+      "specs": ["packages/binding.template/spec/foreachBehaviors.ts"]
     },
     {
       "statement": "`childrenComplete` also fires when rendering through `template`.",
-      "specs": [
-        "packages/binding.template/spec/templatingBehaviors.ts"
-      ]
+      "specs": ["packages/binding.template/spec/templatingBehaviors.ts"]
     }
   ]
 }

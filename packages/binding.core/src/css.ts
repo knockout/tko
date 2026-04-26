@@ -1,4 +1,4 @@
-import { createSymbolOrString, toggleDomNodeCssClass, objectForEach, stringTrim } from '@tko/utils'
+import { toggleDomNodeCssClass, objectForEach } from '@tko/utils'
 
 import { unwrap } from '@tko/observable'
 
@@ -12,11 +12,11 @@ export const css = {
         toggleDomNodeCssClass(element, className, shouldHaveClass)
       })
     } else {
-      value = stringTrim(String(value || '')) // Make sure we don't try to store or set a non-string value
+      value = String(value ?? '').trim() // Make sure we don't try to store or set a non-string value
       toggleDomNodeCssClass(element, element[css.classesWrittenByBindingKey], false)
       element[css.classesWrittenByBindingKey] = value
       toggleDomNodeCssClass(element, value, true)
     }
   },
-  classesWrittenByBindingKey: createSymbolOrString('__ko__cssValue')
+  classesWrittenByBindingKey: Symbol('__ko__cssValue')
 }

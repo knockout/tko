@@ -64,10 +64,7 @@ export const eventHandler = {
 
         const bubbleMark = allBindings.get(eventName + 'Bubble') !== false
         if (bubble === false || !bubbleMark) {
-          event.cancelBubble = true
-          if (event.stopPropagation) {
-            event.stopPropagation()
-          }
+          event.stopPropagation()
         }
       }
 

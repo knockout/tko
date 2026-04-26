@@ -35,7 +35,7 @@ Workflow:
 3. Navigate Playwright to `http://localhost:8765/tko-test.html`
 4. Read `document.title` or snapshot the DOM to verify
 
-This is the fastest option — no esbuild and no network dependency on the playground, though Option 1 still fetches `https://tko.io/lib/tko.js` unless you vendor that file locally. Works for all `data-bind` code.
+Fastest option — no esbuild, no playground. Still fetches `https://tko.io/lib/tko.js` unless vendored locally. Works for all `data-bind` code.
 
 ## Option 2: Playground via Playwright (JSX/TSX)
 
@@ -53,22 +53,22 @@ const url = `https://tko.io/playground#${hash}`
 4. The code auto-compiles and runs in the preview iframe
 5. Read the iframe content or console output to verify
 
-The playground forwards console messages from the iframe to the parent page — look for `#console-messages` in the DOM for console.log/error output.
+The playground forwards console messages from the iframe to the parent page — look for `[data-role="console-messages"]` in the DOM for console.log/error output.
 
 ### Checking results
 
-The preview iframe is `#preview`. To read its content:
+The preview iframe is `[data-role="preview"]`. To read its content:
 
 ```js
-const iframe = document.querySelector('#preview')
+const iframe = document.querySelector('[data-role="preview"]')
 const body = iframe.contentDocument.body
 ```
 
-Console output appears in `#console-messages` as child elements.
+Console output appears in `[data-role="console-messages"]` as child elements.
 
 ### Timing
 
-esbuild-wasm takes a few seconds to initialize on first load. The playground shows "esbuild ready" in `#esbuild-status` when it's ready. Code auto-runs after compilation.
+esbuild-wasm takes a few seconds to initialize on first load. The playground shows "esbuild ready" in `[data-role="status"]` when it's ready. Code auto-runs after compilation.
 
 ## Option 3: Testing doc page examples
 

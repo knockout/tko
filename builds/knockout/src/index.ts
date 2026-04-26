@@ -31,22 +31,13 @@ const expressionRewriting = {
   preProcessBindings: s => dataBindProvider.preProcessBindings(s)
 }
 
-const provider = new MultiProvider({providers: [
-  new ComponentProvider(),
-  dataBindProvider,
-  new VirtualProvider(),
-  new AttributeProvider()
-]})
+const provider = new MultiProvider({
+  providers: [new ComponentProvider(), dataBindProvider, new VirtualProvider(), new AttributeProvider()]
+})
 
 const builder = new Builder({
   provider,
-  bindings: [
-    coreBindings,
-    templateBindings,
-    ifBindings,
-    componentBindings,
-    { each: foreachBindings.foreach }
-  ],
+  bindings: [coreBindings, templateBindings, ifBindings, componentBindings, { each: foreachBindings.foreach }],
   extenders: {},
   filters,
   options: {

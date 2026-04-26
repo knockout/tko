@@ -26,6 +26,8 @@ import $ from 'jquery'
 
 import { assert } from 'chai'
 
+import { isHappyDom } from '../../utils/helpers/test-env'
+
 beforeEach(function () {
   const provider = new MultiProvider({ providers: [new DataBindProvider(), new VirtualProvider()] })
   options.bindingProviderInstance = provider
@@ -122,9 +124,9 @@ describe('each binding', function () {
     applyBindings(list, target[0])
     assert.equal(
       $(target).html(),
-      '<li><em data-bind="text: $data">a</em></li>'
-        + '<li><em data-bind="text: $data">b</em></li>'
-        + '<li><em data-bind="text: $data">c</em></li>'
+      '<li><em data-bind="text: $data">a</em></li>' +
+        '<li><em data-bind="text: $data">b</em></li>' +
+        '<li><em data-bind="text: $data">c</em></li>'
     )
   })
 
@@ -134,10 +136,10 @@ describe('each binding', function () {
     applyBindings(list, target[0])
     assert.equal(
       $(target).html(),
-      '<!-- ko foreach: $data -->'
-        + '<em data-bind="text: $data">A</em>'
-        + '<em data-bind="text: $data">B</em>'
-        + '<!-- /ko -->'
+      '<!-- ko foreach: $data -->' +
+        '<em data-bind="text: $data">A</em>' +
+        '<em data-bind="text: $data">B</em>' +
+        '<!-- /ko -->'
     )
   })
 
@@ -246,7 +248,6 @@ describe('is empty/conditional', function () {
 
 describe('observable array changes', function () {
   let div, obs, view
-  this.timeout(5000) //For Karma-FireFox
 
   beforeEach(function () {
     div = $("<div data-bind='foreach: obs'><i data-bind='text: $data'></i></div>")
@@ -446,7 +447,6 @@ describe('observable array changes', function () {
   })
 
   describe('DOM move capabilities', function () {
-    this.timeout(5000) //For Karma-FireFox
     it('sorting complex data moves 1 DOM node', function () {
       div = $("<div data-bind='foreach: obs'><div data-bind='html: testHtml'></div></div>")
       applyBindings(view, div[0])
@@ -1010,7 +1010,9 @@ describe('observable array changes', function () {
 
 describe('focus', function () {
   let $target
-  this.timeout(5000) //For Karma-FireFox
+  // foreach schedules processQueue via requestAnimationFrame when setSync(false).
+  // Waiting one frame is enough to flush the DOM re-order + focus-preservation pass.
+  const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => resolve(null)))
   beforeEach(function () {
     $target = $("<div data-bind='foreach: $data'>" + '<input />' + '</div>').appendTo(document.body)
     ForEachBinding.setSync(false)
@@ -1020,17 +1022,16 @@ describe('focus', function () {
     $target.remove()
   })
 
-  it('does not preserve the target on apply bindings', function (done) {
+  it('does not preserve the target on apply bindings', async function () {
     const list = ['a', 'b', 'c']
     $target.find(':input').focus()
     applyBindings(list, $target[0])
-    setTimeout(function () {
-      assert.strictEqual(document.activeElement, document.body)
-      done()
-    }, 1000)
+    await nextFrame()
+    assert.strictEqual(document.activeElement, document.body)
   })
 
-  it('does not preserves primitive targets when re-ordering', function (done) {
+  it('does not preserves primitive targets when re-ordering', async function (ctx: any) {
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const list = observableArray(['a', 'b', 'c'])
     applyBindings(list, $target[0])
     $target.find(':input').first().focus()
@@ -1038,13 +1039,12 @@ describe('focus', function () {
 
     list.remove('a')
     list.push('a')
-    setTimeout(function () {
-      assert.strictEqual(document.activeElement, document.body)
-      done()
-    }, 1000)
+    await nextFrame()
+    assert.strictEqual(document.activeElement, document.body)
   })
 
-  it('preserves objects when re-ordering', function (done) {
+  it('preserves objects when re-ordering', async function (ctx: any) {
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1053,13 +1053,12 @@ describe('focus', function () {
 
     list.remove(o0)
     list.push(o0)
-    setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
-      done()
-    }, 1000)
+    await nextFrame()
+    assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
   })
 
-  it('preserves objects when re-ordering multiple identical', function (done) {
+  it('preserves objects when re-ordering multiple identical', async function (ctx: any) {
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1071,13 +1070,12 @@ describe('focus', function () {
     list.push(o0)
     list.push('y')
 
-    setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
-      done()
-    }, 1000)
+    await nextFrame()
+    assert.strictEqual(document.activeElement, $target.find(':input')[3], 'o')
   })
 
-  it('preserves objects when re-ordering multiple identical, alt', function (done) {
+  it('preserves objects when re-ordering multiple identical, alt', async function (ctx: any) {
+    if (isHappyDom()) return ctx.skip('happy-dom: focus()/activeElement semantics differ')
     const o0 = {}
     const list = observableArray([o0, 'b', 'c'])
     applyBindings(list, $target[0])
@@ -1088,10 +1086,8 @@ describe('focus', function () {
     list.push(o0) // focused
     list.push(o0)
 
-    setTimeout(function () {
-      assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
-      done()
-    }, 1000)
+    await nextFrame()
+    assert.strictEqual(document.activeElement, $target.find(':input')[2], 'o')
   })
 })
 

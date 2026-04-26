@@ -1,39 +1,30 @@
 {
-  "compileOnSave": false,  
+  "compileOnSave": false,
   "compilerOptions": {
     "declaration": true,
     "target": "es2022",
     "module": "es2022",
     "moduleResolution": "bundler",
     "allowJs": false,
-    "importHelpers": false,
-    "allowSyntheticDefaultImports":  true,
+    "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noEmit": true,
-    /*Disable some typing feature from ts*/
     "noImplicitAny": false,
     "noImplicitThis": false,
     "noUncheckedIndexedAccess": false,
     "strictPropertyInitialization": false,
-    /* END Disabling */
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true,
+    "types": ["mocha", "jquery"],
     "lib": ["es2022", "dom"],
     "paths": {
-      "@tko/utils/helpers/jasmine-13-helper": [
-        "./packages/utils/helpers/jasmine-13-helper.ts"
-      ],
-      "@tko/binding.template/helpers/dummyTemplateEngine": [
-        "./packages/binding.template/helpers/dummyTemplateEngine.ts"
-      ],
-      "*": [
-        "./*",
-        "./packages/*",
-        "./builds/*"
+      "@tko/*": [
+        "./packages/*/index.ts",
+        "./builds/*/index.ts"
       ]
     }
   },

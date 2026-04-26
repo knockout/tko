@@ -5,15 +5,7 @@
 // Employing sound techniques to make a faster Knockout foreach binding.
 // --------
 
-import {
-  arrayForEach,
-  cleanNode,
-  options,
-  virtualElements,
-  createSymbolOrString,
-  domData,
-  domNodeIsContainedBy
-} from '@tko/utils'
+import { arrayForEach, cleanNode, options, virtualElements, domData, domNodeIsContainedBy } from '@tko/utils'
 
 import { isObservable, unwrap, observable } from '@tko/observable'
 
@@ -24,7 +16,7 @@ import { contextFor, applyBindingsToDescendants, AsyncBindingHandler } from '@tk
 import type { AllBindings } from '@tko/bind'
 
 //      Utilities
-const MAX_LIST_SIZE = 9007199254740991
+const MAX_LIST_SIZE = Number.MAX_SAFE_INTEGER
 
 // from https://github.com/jonschlinkert/is-plain-object
 function isPlainObject(o): o is Record<string, any> {
@@ -87,7 +79,7 @@ function valueToChangeAddItem(value, index): ChangeAddItem {
 }
 
 // store a symbol for caching the pending delete info index in the data item objects
-const PENDING_DELETE_INDEX_SYM = createSymbolOrString('_ko_ffe_pending_delete_index')
+const PENDING_DELETE_INDEX_SYM = Symbol('_ko_ffe_pending_delete_index')
 
 export class ForEachBinding extends AsyncBindingHandler {
   // NOTE: valid valueAccessors include:
@@ -561,11 +553,11 @@ export class ForEachBinding extends AsyncBindingHandler {
       }
     } else {
       ForEachBinding.animateFrame =
-        w.requestAnimationFrame
-        || w.webkitRequestAnimationFrame
-        || w.mozRequestAnimationFrame
-        || w.msRequestAnimationFrame
-        || function (cb) {
+        w.requestAnimationFrame ||
+        w.webkitRequestAnimationFrame ||
+        w.mozRequestAnimationFrame ||
+        w.msRequestAnimationFrame ||
+        function (cb) {
           return w.setTimeout(cb, 1000 / 60)
         }
     }

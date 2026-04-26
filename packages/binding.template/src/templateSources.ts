@@ -73,9 +73,9 @@ export class domElement implements TemplateSource {
           : tagNameLower === 'textarea'
             ? templateTextArea
             : // For browsers with proper <template> element support, where the .content property gives a document fragment
-              tagNameLower == 'template'
-                && (element as HTMLTemplateElement).content
-                && (element as HTMLTemplateElement).content.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+              tagNameLower == 'template' &&
+                (element as HTMLTemplateElement).content &&
+                (element as HTMLTemplateElement).content.nodeType === Node.DOCUMENT_FRAGMENT_NODE
               ? templateTemplate
               : templateElement
     }
@@ -113,8 +113,8 @@ export class domElement implements TemplateSource {
     if (arguments.length == 0) {
       const templateData = getTemplateDomData(element)
       let nodes =
-        templateData.containerData
-        || (this.templateType === templateTemplate
+        templateData.containerData ||
+        (this.templateType === templateTemplate
           ? (element as HTMLTemplateElement).content
           : this.templateType === templateElement
             ? element

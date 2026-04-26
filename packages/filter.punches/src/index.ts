@@ -51,10 +51,10 @@ const filters: Filters = {
           return replacement + value.slice(-length)
         case 'middle': {
           const leftLen = Math.ceil(length / 2)
-          return value.substr(0, leftLen) + replacement + value.slice(leftLen - length)
+          return value.substring(0, leftLen) + replacement + value.slice(leftLen - length)
         }
         default:
-          return value.substr(0, length) + replacement
+          return value.substring(0, length) + replacement
       }
     } else {
       return value

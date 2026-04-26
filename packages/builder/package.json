@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "name": "@tko/builder",
   "description": "Compile a customized instance of Knockout.",
   "repository": {
@@ -9,14 +9,14 @@
   "author": "The Knockout Team",
   "license": "MIT",
   "dependencies": {
-    "@tko/bind": "^4.0.0",
-    "@tko/provider": "^4.0.0",
-    "@tko/binding.template": "^4.0.0",
-    "@tko/computed": "^4.0.0",
-    "@tko/lifecycle": "^4.0.0",
-    "@tko/observable": "^4.0.0",
-    "@tko/utils": "^4.0.0",
-    "@tko/utils.parser": "^4.0.0"
+    "@tko/bind": "^4.0.1",
+    "@tko/binding.template": "^4.0.1",
+    "@tko/computed": "^4.0.1",
+    "@tko/lifecycle": "^4.0.1",
+    "@tko/observable": "^4.0.1",
+    "@tko/provider": "^4.0.1",
+    "@tko/utils": "^4.0.1",
+    "@tko/utils.parser": "^4.0.1"
   },
   "homepage": "https://tko.io",
   "licenses": [
@@ -26,24 +26,26 @@
     }
   ],
   "files": [
-    "dist/",
-    "helpers/",
-    "types/"
+    "dist/"
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
-    },
-    "./helpers/*": "./helpers/*"
-  },
-  "karma": {
-    "frameworks": [
-      "mocha"
-    ]
+    }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
-  }
+  },
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "bun ../../tools/build.ts"
+  },
+  "keywords": [
+    "knockout",
+    "tko",
+    "builder",
+    "framework",
+    "customizable"
+  ]
 }

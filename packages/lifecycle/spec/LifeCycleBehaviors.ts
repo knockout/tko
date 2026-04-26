@@ -93,7 +93,6 @@ describe('KO LifeCycle', function () {
     it('calls a function (unbound)', () => {
       const lf = new LcComputedTest()
       lf.computed(function y() {
-        'use strict'
         lastThis = this
       })
       assert.strictEqual(lastThis, undefined)

@@ -3,33 +3,23 @@
   "behaviors": [
     {
       "statement": "`LifeCycle.mixInto(...)` adds `subscribe`, `computed`, `addEventListener`, `anchorTo`, `dispose`, and `addDisposable` to function prototypes, constructed instances, classes, and class instances.",
-      "specs": [
-        "packages/lifecycle/spec/LifeCycleBehaviors.ts"
-      ]
+      "specs": ["packages/lifecycle/spec/LifeCycleBehaviors.ts"]
     },
     {
       "statement": "`LifeCycle.computed(...)` accepts method names, instance methods, bound functions, plain functions, arrow functions, and `{ read }` objects.",
-      "specs": [
-        "packages/lifecycle/spec/LifeCycleBehaviors.ts"
-      ]
+      "specs": ["packages/lifecycle/spec/LifeCycleBehaviors.ts"]
     },
     {
       "statement": "`dispose()` tears down subscriptions created through `subscribe(...)` and computeds created through `computed(...)`.",
-      "specs": [
-        "packages/lifecycle/spec/LifeCycleBehaviors.ts"
-      ]
+      "specs": ["packages/lifecycle/spec/LifeCycleBehaviors.ts"]
     },
     {
       "statement": "Event listeners added through `addEventListener(...)` are removed on `dispose()`.",
-      "specs": [
-        "packages/lifecycle/spec/LifeCycleBehaviors.ts"
-      ]
+      "specs": ["packages/lifecycle/spec/LifeCycleBehaviors.ts"]
     },
     {
       "statement": "Anchoring one lifecycle object to another with `anchorTo(...)` causes disposal of the parent lifecycle to dispose the anchored child as well.",
-      "specs": [
-        "packages/lifecycle/spec/LifeCycleBehaviors.ts"
-      ]
+      "specs": ["packages/lifecycle/spec/LifeCycleBehaviors.ts"]
     }
   ]
 }

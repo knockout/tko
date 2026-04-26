@@ -8,11 +8,9 @@ export * from './array'
 export * from './async'
 export * from './error'
 export * from './object'
-export * from './function'
 export * from './string'
-export * from './symbol'
 export * from './css'
-export { default as options } from './options'
+export { default as options, defineOption, Options } from './options'
 
 // DOM;
 export * from './dom/event'
@@ -29,5 +27,4 @@ import * as tasks from './tasks'
 import * as virtualElements from './dom/virtualElements'
 import * as domData from './dom/data'
 
-export type { ProviderBase, BindingAccessors, KnockoutUtils, ArrayAndObjectUtils } from './interfaces'
 export { tasks, virtualElements, domData, memoization }

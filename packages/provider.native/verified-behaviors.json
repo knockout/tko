@@ -3,27 +3,19 @@
   "behaviors": [
     {
       "statement": "`NativeProvider` only recognizes entries stored under `NATIVE_BINDINGS` whose keys start with `ko-`.",
-      "notes": [
-        "Nodes without the symbol, or with only non-`ko-*` entries, report no bindings."
-      ],
-      "specs": [
-        "packages/provider.native/spec/NativeProviderBehaviors.ts"
-      ]
+      "notes": ["Nodes without the symbol, or with only non-`ko-*` entries, report no bindings."],
+      "specs": ["packages/provider.native/spec/NativeProviderBehaviors.ts"]
     },
     {
       "statement": "`NativeProvider.getBindingAccessors(node)` returns value accessors that read observables and write back through writable observables.",
-      "specs": [
-        "packages/provider.native/spec/NativeProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.native/spec/NativeProviderBehaviors.ts"]
     },
     {
       "statement": "`NativeProvider` is preemptive: when native bindings are present, it outranks `data-bind` and mustache providers.",
       "notes": [
         "It does not preempt those providers when the native binding bag is empty or contains no `ko-*` entries."
       ],
-      "specs": [
-        "packages/provider.native/spec/NativeProviderBehaviors.ts"
-      ]
+      "specs": ["packages/provider.native/spec/NativeProviderBehaviors.ts"]
     }
   ]
 }

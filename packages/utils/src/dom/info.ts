@@ -21,8 +21,8 @@ export function domNodeIsContainedBy(node: Node | null, containedByNode?: Node |
   }
   if (containedByNode.compareDocumentPosition) {
     return (
-      (containedByNode.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_CONTAINED_BY)
-      === Node.DOCUMENT_POSITION_CONTAINED_BY
+      (containedByNode.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_CONTAINED_BY) ===
+      Node.DOCUMENT_POSITION_CONTAINED_BY
     )
   }
 
