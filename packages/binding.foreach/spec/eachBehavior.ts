@@ -993,6 +993,58 @@ describe('observable array changes', function () {
   })
 
   describe('beforeMove and afterMove', function () {
+    it('cleans queue state when move callbacks or queue processing throws', function () {
+      arrayForEach(['beforeMove', 'changeQueue', 'afterMove'], phase => {
+        const value = { name: phase }
+        const error = new Error(`${phase} failed`)
+        const instance: any = {
+          data: observableArray([value]),
+          changeQueue: [{ status: 'added', index: 0, value }],
+          rendering_queued: true,
+          pendingAfterRender: [{ nodes: [], value }],
+          isNotEmpty: observable(false),
+          $indexHasBeenRequested: false,
+          beforeMove() {},
+          afterMove() {},
+          computeMoves() {
+            return [{ value, oldIndex: 0, newIndex: 1 }]
+          },
+          startQueueFlush() {},
+          fireMoveCallback(callback) {
+            if (phase === 'beforeMove' && callback === this.beforeMove) {
+              throw error
+            }
+            if (phase === 'afterMove' && callback === this.afterMove) {
+              throw error
+            }
+          },
+          added() {
+            if (phase === 'changeQueue') {
+              throw error
+            }
+          },
+          flushPendingDeletes() {},
+          flushPendingAfterRender() {
+            this.pendingAfterRender = new Array()
+          },
+          endQueueFlush() {}
+        }
+        let thrown
+
+        try {
+          ForEachBinding.prototype.processQueue.call(instance)
+        } catch (err) {
+          thrown = err
+        }
+
+        assert.strictEqual(thrown, error)
+        assert.equal(instance.rendering_queued, false)
+        assert.deepEqual(instance.changeQueue, [])
+        assert.deepEqual(instance.pendingAfterRender, [])
+        assert.equal(instance.isNotEmpty(), true)
+      })
+    })
+
     it('fire with the retained node, its new index, and its value when items shift', function () {
       const first = { name: 'first' }
       const added = { name: 'added' }
@@ -1026,6 +1078,30 @@ describe('observable array changes', function () {
         value: first,
         parentText: 'addedfirst'
       })
+    })
+
+    it('fires for every retained node when the array is reversed', function () {
+      const items = ['a', 'b', 'c'].map(name => ({ name }))
+      const calls: Array<{ phase: string; index: number; value: any }> = []
+      const arr = observableArray(items)
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'><li data-bind='text: name'></li></div>"
+      )
+      applyBindings(
+        {
+          arr,
+          beforeMove: (_n, index, value) => calls.push({ phase: 'before', index, value }),
+          afterMove: (_n, index, value) => calls.push({ phase: 'after', index, value })
+        },
+        target[0]
+      )
+      arr.reverse()
+
+      // a: old index 0, new index 2 → moved
+      // b: old index 1, new index 1 → retained, but not moved
+      // c: old index 2, new index 0 → moved
+      // 2 moved items * (beforeMove + afterMove) = 4 calls
+      assert.equal(calls.length, 4)
     })
 
     it('does not fire for primitives whose index changes (no node identity is preserved)', function () {

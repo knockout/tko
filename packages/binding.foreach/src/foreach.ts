@@ -256,29 +256,30 @@ export class ForEachBinding extends AsyncBindingHandler {
     let lowestIndexChanged = MAX_LIST_SIZE
     const moves = this.computeMoves(unwrap(this.data) || [])
 
-    this.startQueueFlush()
-    this.fireMoveCallback(this.beforeMove, moves, 'oldIndex')
-
-    arrayForEach(this.changeQueue, changeItem => {
-      if (typeof changeItem.index === 'number') {
-        lowestIndexChanged = Math.min(lowestIndexChanged, changeItem.index)
-      }
-      this[changeItem.status](changeItem)
-    })
-    this.flushPendingDeletes()
-    this.rendering_queued = false
-
-    // Update our indexes.
-    if (this.$indexHasBeenRequested) {
-      this.updateIndexes(lowestIndexChanged)
-    }
-
-    this.fireMoveCallback(this.afterMove, moves, 'newIndex')
     try {
+      this.startQueueFlush()
+      this.fireMoveCallback(this.beforeMove, moves, 'oldIndex')
+
+      arrayForEach(this.changeQueue, changeItem => {
+        if (typeof changeItem.index === 'number') {
+          lowestIndexChanged = Math.min(lowestIndexChanged, changeItem.index)
+        }
+        this[changeItem.status](changeItem)
+      })
+      this.flushPendingDeletes()
+
+      // Update our indexes.
+      if (this.$indexHasBeenRequested) {
+        this.updateIndexes(lowestIndexChanged)
+      }
+
+      this.fireMoveCallback(this.afterMove, moves, 'newIndex')
       this.flushPendingAfterRender()
       this.endQueueFlush()
     } finally {
+      this.rendering_queued = false
       this.changeQueue = new Array()
+      this.pendingAfterRender = new Array()
       // Update the conditional exposed on the domData
       if (isEmpty !== !this.isNotEmpty()) {
         this.isNotEmpty(!isEmpty)
