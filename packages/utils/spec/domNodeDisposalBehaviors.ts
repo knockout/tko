@@ -64,6 +64,30 @@ describe('DOM node disposal', function () {
     expect(testNode.childNodes.length).to.equal(0)
   })
 
+  it('Should run registered disposal callbacks on descendants inside a <template>.content fragment when the template host subtree is cleaned', function () {
+    // Regression: <template>.content is a detached DocumentFragment that
+    // getElementsByTagName('*') / querySelectorAll('*') do not traverse,
+    // so cleanNode must recurse into it explicitly. Without this, bindings
+    // and subscriptions inside templates leak.
+    const template = document.createElement('template') as HTMLTemplateElement
+    const innerDiv = document.createElement('div')
+    const innerSpan = document.createElement('span')
+    innerDiv.appendChild(innerSpan)
+    template.content.appendChild(innerDiv)
+    testNode.appendChild(template)
+
+    let didRunCount = 0
+    const callback = function () {
+      didRunCount++
+    }
+    addDisposeCallback(innerDiv, callback)
+    addDisposeCallback(innerSpan, callback)
+
+    expect(didRunCount).to.equal(0)
+    cleanNode(testNode)
+    expect(didRunCount).to.equal(2)
+  })
+
   it('Should run registered disposal callbacks when a document fragment is cleaned', function () {
     let didRunCount = 0
 

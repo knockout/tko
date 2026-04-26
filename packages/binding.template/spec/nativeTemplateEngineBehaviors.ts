@@ -256,6 +256,22 @@ describe('Native template engine', function () {
       applyBindings({ someItem: { val: 'abc' } }, div)
       expectContainText(div.childNodes[0], 'Value: abc')
     })
+
+    it('should bind a node attached to a ShadowRoot', function () {
+      // Mirrors the original PR motivation: applyBindings on a node that
+      // lives inside a ShadowRoot should resolve $data and set up bindings
+      // the same way it does for a node in the light DOM.
+      const host = document.createElement('div')
+      testNode.appendChild(host)
+      const shadow = host.attachShadow({ mode: 'open' })
+      const inner = document.createElement('div') as HTMLDivElement
+      inner.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+      shadow.appendChild(inner)
+
+      applyBindings({ someItem: { val: 'abc' } }, inner)
+      expectContainText(inner.childNodes[0], 'Value: abc')
+    })
   })
 
   describe('Data-bind syntax', function () {
