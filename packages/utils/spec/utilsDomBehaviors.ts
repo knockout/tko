@@ -1,12 +1,11 @@
 import { expect } from 'chai'
 
 import * as utils from '../dist'
-import { registerEventHandler, virtualElements } from '../dist'
+import { domNodeIsContainedBy, registerEventHandler, virtualElements } from '../dist'
 import options from '../dist/options'
 import type { KnockoutInstance } from '@tko/builder'
 import { prepareTestNode, restoreAfter } from '../helpers/mocha-test-helpers'
 import { isHappyDom } from '../helpers/test-env'
-import { domNodeIsContainedBy } from '../src'
 
 const ko: KnockoutInstance = globalThis.ko || {}
 ko.utils = utils
@@ -77,65 +76,17 @@ describe('DOM-Info Tool', function () {
     expect(domNodeIsContainedBy(subchild, subchild)).to.equals(true)
     expect(domNodeIsContainedBy(node, parent)).to.equals(false)
   })
-})
 
-describe('DOM-Info Tool', function () {
-  it('domNodeIsContainedBy with special values', function () {
-    const parent = document.createElement('div')
-    const test = document.createDocumentFragment()
-
-    expect(domNodeIsContainedBy(parent, test)).to.equals(false)
-    expect(domNodeIsContainedBy(test, parent)).to.equals(false)
-
-    expect(domNodeIsContainedBy(parent, undefined)).to.equals(false)
-    expect(domNodeIsContainedBy(parent, null)).to.equals(false)
-    expect(domNodeIsContainedBy(null, parent)).to.equals(false)
-
-    test.appendChild(parent)
-
-    expect(domNodeIsContainedBy(parent, test)).to.equals(true)
-    expect(domNodeIsContainedBy(test, parent)).to.equals(false)
-
-    const testDiv = document.createElement('div')
-    const template = document.createElement('template')
-    template.content.appendChild(testDiv)
-    expect(domNodeIsContainedBy(testDiv, template)).to.equals(false) //Because template.content is a DocumentFragment
-    expect(domNodeIsContainedBy(testDiv, template.content)).to.equals(true)
-
-    parent.appendChild(template)
-    expect(domNodeIsContainedBy(template, parent)).to.equals(true)
-    expect(domNodeIsContainedBy(template, test)).to.equals(true)
-    expect(domNodeIsContainedBy(testDiv, parent)).to.equals(false) //Because template.content is a DocumentFragment
-  })
-
-  it('Parent Node contains child', function () {
-    const parent = document.createElement('div')
+  it('ShadowRoot contains its descendants but its host does not', function () {
+    const host = document.createElement('div')
+    const shadow = host.attachShadow({ mode: 'open' })
     const child = document.createElement('span')
-    parent.appendChild(child)
+    shadow.appendChild(child)
 
-    expect(domNodeIsContainedBy(child, parent)).to.equals(true)
-  })
-
-  it('Node not contains node', function () {
-    const parent = document.createElement('div')
-    const child = document.createElement('span')
-
-    expect(domNodeIsContainedBy(child, parent)).to.equals(false)
-  })
-
-  it('Parent Node contains subchild', function () {
-    const parent = document.createElement('div')
-    const child = document.createElement('span')
-    const subchild = document.createElement('em')
-    parent.appendChild(child)
-    child.appendChild(subchild)
-
-    const node = document.createTextNode('text')
-
-    expect(domNodeIsContainedBy(subchild, parent)).to.equals(true)
-    expect(domNodeIsContainedBy(subchild, child)).to.equals(true)
-    expect(domNodeIsContainedBy(subchild, subchild)).to.equals(true)
-    expect(domNodeIsContainedBy(node, parent)).to.equals(false)
+    expect(domNodeIsContainedBy(child, shadow)).to.equals(true)
+    // Like template.content, the shadow root is a DocumentFragment whose
+    // descendants are not part of the host's light-DOM subtree.
+    expect(domNodeIsContainedBy(child, host)).to.equals(false)
   })
 })
 

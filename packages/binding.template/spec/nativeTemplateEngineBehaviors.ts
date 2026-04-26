@@ -245,7 +245,7 @@ describe('Native template engine', function () {
       expectContainText(template.content.childNodes[0], 'Value: abc')
     })
 
-    it('should set $data to the DIV at DocumentFragment', function () {
+    it('should set $data when binding a DIV that is inside a DocumentFragment', function () {
       const fragment = document.createDocumentFragment()
       const div = document.createElement('div') as HTMLDivElement
 

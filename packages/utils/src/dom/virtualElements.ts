@@ -114,11 +114,15 @@ export const allowedBindings: VirtualElementsAllowedBindings = Object.create(nul
 export const hasBindingValue = isStartComment
 
 export function childNodes(node: Node): any {
-  return isStartComment(node) ? getVirtualChildren(node) : node.childNodes
+  if (isStartComment(node)) return getVirtualChildren(node)
+  if (isTemplateTag(node)) return node.content.childNodes
+  return node.childNodes
 }
 
 export function emptyNode(node: Node) {
-  if (!isStartComment(node)) {
+  if (isTemplateTag(node)) {
+    emptyDomNode(node.content)
+  } else if (!isStartComment(node)) {
     emptyDomNode(node)
   } else {
     const virtualChildren = childNodes(node)
@@ -129,7 +133,9 @@ export function emptyNode(node: Node) {
 }
 
 export function setDomNodeChildren(node: Node, childNodes: Node[]) {
-  if (!isStartComment(node)) {
+  if (isTemplateTag(node)) {
+    setRegularDomNodeChildren(node.content, childNodes)
+  } else if (!isStartComment(node)) {
     setRegularDomNodeChildren(node, childNodes)
   } else {
     emptyNode(node)
