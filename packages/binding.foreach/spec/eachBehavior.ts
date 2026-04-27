@@ -22,7 +22,7 @@ import { bindings as coreBindings } from '@tko/binding.core'
 
 import { ForEachBinding } from '../dist/foreach'
 
-import $ from 'jquery'
+import $ from 'jquery' //TODO Should be removed and replaced with direct DOM manipulation
 
 import { assert } from 'chai'
 
@@ -833,6 +833,343 @@ describe('observable array changes', function () {
       arr([])
       assert.equal(cbi, 3)
       assert.equal(target.text(), '')
+    })
+  })
+
+  describe('afterRender', function () {
+    it('is called with rendered nodes and the array value for initial and added items', function () {
+      const calls: any[] = []
+      const arr = observableArray(['a'])
+      function cb(nodes, value) {
+        calls.push({ text: nodes.map(node => node.textContent).join(''), value })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: $data'></li></div>"
+      )
+      applyBindings({ arr: arr, cb: cb }, target[0])
+
+      assert.deepEqual(calls, [{ text: 'a', value: 'a' }])
+      arr.push('b')
+      assert.deepEqual(calls, [
+        { text: 'a', value: 'a' },
+        { text: 'b', value: 'b' }
+      ])
+    })
+
+    it('fires for reused nodesets when an item is re-inserted from pendingDeletes', function () {
+      const a = { name: 'a' }
+      const b = { name: 'b' }
+      const c = { name: 'c' }
+      const calls: any[] = []
+      const arr = observableArray([a, b, c])
+      function cb(nodes, value) {
+        calls.push({
+          nodes: Array.from(nodes),
+          text: nodes.map(node => node.textContent).join(''),
+          value
+        })
+      }
+      const target = $("<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: name'></li></div>")
+      applyBindings({ arr: arr, cb: cb }, target[0])
+      assert.equal(calls.length, 3)
+      const initialNodesByValue = new Map(calls.map(call => [call.value, call.nodes]))
+
+      // Reverse moves `a` and `c` via delete+add pairs whose nodesets are
+      // recycled through pendingDeletes (`b` is retained in place). afterRender
+      // must fire for each reinsertion of the recycled nodes.
+      arr.reverse()
+      assert.equal(target.text(), 'cba')
+      assert.equal(calls.length, 5)
+      const reusedCalls = calls.slice(3)
+      const reusedValues = reusedCalls.map(call => call.value)
+      const reusedCallsByValue = new Map(reusedCalls.map(call => [call.value, call]))
+      assert.sameMembers(reusedValues, [a, c])
+      assert.notInclude(reusedValues, b)
+      arrayForEach([a, c], value => {
+        const initialNodes = initialNodesByValue.get(value)!
+        const reusedCall = reusedCallsByValue.get(value)!
+        assert.equal(reusedCall.nodes.length, initialNodes.length)
+        arrayForEach(reusedCall.nodes, (node, index) => {
+          assert.strictEqual(node, initialNodes[index!])
+        })
+      })
+      const finalNodes = Array.from(target[0].childNodes)
+      arrayForEach([c, b, a], (value, index) => {
+        assert.strictEqual(finalNodes[index!], initialNodesByValue.get(value)![0])
+      })
+    })
+
+    it('does not re-render when an observable read inside afterRender changes', function () {
+      const testNode = document.createElement('div')
+      testNode.innerHTML =
+        "<div data-bind='foreach: { data: someItems, afterRender: callback }'><span data-bind='text: childprop'></span></div>"
+
+      const callbackObservable = observable(1)
+      const someItems = observableArray([{ childprop: 'first child' }])
+      let callbacks = 0
+
+      applyBindings(
+        {
+          someItems,
+          callback: function () {
+            callbackObservable()
+            callbacks++
+          }
+        },
+        testNode
+      )
+      assert.equal(callbacks, 1)
+
+      // Mutate the underlying array without notifying — foreach must not re-render.
+      someItems().push({ childprop: 'hidden child' })
+      assert.equal(testNode.childNodes[0].textContent, 'first child')
+
+      // Changing an observable that was only *read* inside afterRender must not re-render.
+      callbackObservable(2)
+      assert.equal(testNode.childNodes[0].textContent, 'first child')
+
+      // Now notify — the new child should appear.
+      someItems.valueHasMutated()
+      assert.equal(testNode.childNodes[0].textContent, 'first childhidden child')
+    })
+
+    it('clears pending afterRender calls when afterRender throws', function () {
+      const error = new Error('afterRender failed')
+      const calls: any[] = []
+      const instance = {
+        pendingAfterRender: [{ nodes: [], value: 'a' }],
+        afterRender(nodes, value) {
+          calls.push({ nodes, value })
+          throw error
+        }
+      }
+      let thrown
+
+      try {
+        ForEachBinding.prototype.flushPendingAfterRender.call(instance)
+      } catch (err) {
+        thrown = err
+      }
+
+      assert.strictEqual(thrown, error)
+      assert.deepEqual(instance.pendingAfterRender, [])
+      assert.deepEqual(calls, [{ nodes: [], value: 'a' }])
+    })
+
+    it('updates conditional state and does not replay a completed queue after afterRender throws', function () {
+      const a = { name: 'a' }
+      const b = { name: 'b' }
+      const error = new Error('afterRender failed')
+      const calls: any[] = []
+      const arr = observableArray<typeof a>([])
+      let shouldThrow = false
+      function cb(_nodes, value) {
+        calls.push(value)
+        if (shouldThrow) {
+          throw error
+        }
+      }
+      const target = $("<ul data-bind='foreach: { data: arr, afterRender: cb }'><li data-bind='text: name'></li></ul>")
+      applyBindings({ arr: arr, cb: cb }, target[0])
+      shouldThrow = true
+      let thrown
+
+      try {
+        arr.push(a)
+      } catch (err) {
+        thrown = err
+      }
+
+      assert.strictEqual(thrown, error)
+      assert.equal(target.text(), 'a')
+      assert.equal(domData.get(target[0], 'conditional').elseChainSatisfied(), true)
+
+      shouldThrow = false
+      arr.push(b)
+
+      assert.equal(target.text(), 'ab')
+      assert.deepEqual(calls, [a, b])
+    })
+  })
+
+  describe('beforeMove and afterMove', function () {
+    it('cleans queue state when move callbacks or queue processing throws', function () {
+      arrayForEach(['beforeMove', 'changeQueue', 'afterMove'], phase => {
+        const value = { name: phase }
+        const error = new Error(`${phase} failed`)
+        const instance: any = {
+          data: observableArray([value]),
+          changeQueue: [{ status: 'added', index: 0, value }],
+          rendering_queued: true,
+          pendingAfterRender: [{ nodes: [], value }],
+          isNotEmpty: observable(false),
+          $indexHasBeenRequested: false,
+          beforeMove() {},
+          afterMove() {},
+          computeMoves() {
+            return [{ value, oldIndex: 0, newIndex: 1 }]
+          },
+          startQueueFlush() {},
+          fireMoveCallback(callback) {
+            if (phase === 'beforeMove' && callback === this.beforeMove) {
+              throw error
+            }
+            if (phase === 'afterMove' && callback === this.afterMove) {
+              throw error
+            }
+          },
+          added() {
+            if (phase === 'changeQueue') {
+              throw error
+            }
+          },
+          flushPendingDeletes() {},
+          flushPendingAfterRender() {
+            this.pendingAfterRender = new Array()
+          },
+          endQueueFlush() {}
+        }
+        let thrown
+
+        try {
+          ForEachBinding.prototype.processQueue.call(instance)
+        } catch (err) {
+          thrown = err
+        }
+
+        assert.strictEqual(thrown, error)
+        assert.equal(instance.rendering_queued, false)
+        assert.deepEqual(instance.changeQueue, [])
+        assert.deepEqual(instance.pendingAfterRender, [])
+        assert.equal(instance.isNotEmpty(), true)
+      })
+    })
+
+    it('fire with the retained node, its new index, and its value when items shift', function () {
+      const first = { name: 'first' }
+      const added = { name: 'added' }
+      const calls: any[] = []
+      const arr = observableArray([first])
+      function beforeMove(node, index, value) {
+        calls.push({ phase: 'before', text: node.textContent, index, value, parentText: node.parentNode.textContent })
+      }
+      function afterMove(node, index, value) {
+        calls.push({ phase: 'after', text: node.textContent, index, value, parentText: node.parentNode.textContent })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'><li data-bind='text: name'></li></div>"
+      )
+      applyBindings({ arr: arr, beforeMove: beforeMove, afterMove: afterMove }, target[0])
+
+      arr.splice(0, 0, added)
+
+      assert.equal(calls.length, 2)
+      assert.deepEqual(calls[0], {
+        phase: 'before',
+        text: 'first',
+        index: 1,
+        value: first,
+        parentText: 'first'
+      })
+      assert.deepEqual(calls[1], {
+        phase: 'after',
+        text: 'first',
+        index: 1,
+        value: first,
+        parentText: 'addedfirst'
+      })
+    })
+
+    it('fires for every retained node when the array is reversed', function () {
+      const items = ['a', 'b', 'c'].map(name => ({ name }))
+      const calls: Array<{ phase: string; index: number; value: any }> = []
+      const arr = observableArray(items)
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'><li data-bind='text: name'></li></div>"
+      )
+      applyBindings(
+        {
+          arr,
+          beforeMove: (_n, index, value) => calls.push({ phase: 'before', index, value }),
+          afterMove: (_n, index, value) => calls.push({ phase: 'after', index, value })
+        },
+        target[0]
+      )
+      arr.reverse()
+
+      // a: old index 0, new index 2 → moved
+      // b: old index 1, new index 1 → retained, but not moved
+      // c: old index 2, new index 0 → moved
+      // 2 moved items * (beforeMove + afterMove) = 4 calls
+      assert.equal(calls.length, 4)
+    })
+
+    it('does not fire for primitives whose index changes (no node identity is preserved)', function () {
+      // Primitive values are torn down in `deleted()` and re-rendered fresh in
+      // `added()` (no `pendingDeletes` reuse), so the documented `(node, index,
+      // value)` move contract — the *same* DOM node moved — does not apply.
+      const calls: any[] = []
+      const arr = observableArray(['a'])
+      function beforeMove(_node, index, value) {
+        calls.push({ phase: 'before', index, value })
+      }
+      function afterMove(_node, index, value) {
+        calls.push({ phase: 'after', index, value })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'><li data-bind='text: $data'></li></div>"
+      )
+      applyBindings({ arr: arr, beforeMove: beforeMove, afterMove: afterMove }, target[0])
+
+      arr.splice(0, 0, 'added')
+
+      assert.equal(target.text(), 'addeda')
+      assert.equal(calls.length, 0)
+    })
+
+    it('fires once per DOM node for moved multi-root item templates', function () {
+      const first = { firstLabel: 'first-a', secondLabel: 'first-b' }
+      const added = { firstLabel: 'added-a', secondLabel: 'added-b' }
+      const calls: any[] = []
+      const arr = observableArray([first])
+      function beforeMove(node, index, value) {
+        calls.push({ phase: 'before', node, text: node.textContent, index, value })
+      }
+      function afterMove(node, index, value) {
+        calls.push({ phase: 'after', node, text: node.textContent, index, value })
+      }
+      const target = $(
+        "<ul data-bind='foreach: { data: arr, beforeMove: beforeMove, afterMove: afterMove }'>" +
+          "<li data-bind='text: firstLabel'></li><li data-bind='text: secondLabel'></li></ul>"
+      )
+      applyBindings({ arr: arr, beforeMove: beforeMove, afterMove: afterMove }, target[0])
+      const movedNodes = Array.from(target[0].childNodes)
+
+      arr.splice(0, 0, added)
+
+      assert.equal(target.text(), 'added-aadded-bfirst-afirst-b')
+      assert.equal(calls.length, 4)
+      assert.deepEqual(
+        calls.map(({ phase, text, index }) => ({ phase, text, index })),
+        [
+          { phase: 'before', text: 'first-a', index: 1 },
+          { phase: 'before', text: 'first-b', index: 1 },
+          { phase: 'after', text: 'first-a', index: 1 },
+          { phase: 'after', text: 'first-b', index: 1 }
+        ]
+      )
+      const callbackNodes = calls.map(call => call.node)
+      const expectedCallbackNodes = [movedNodes[0], movedNodes[1], movedNodes[0], movedNodes[1]]
+      arrayForEach(expectedCallbackNodes, (node, index) => {
+        assert.strictEqual(callbackNodes[index!], node)
+      })
+      const finalMovedNodes = Array.from(target[0].childNodes).slice(2)
+      arrayForEach(movedNodes, (node, index) => {
+        assert.strictEqual(finalMovedNodes[index!], node)
+      })
+      arrayForEach(calls, call => {
+        assert.strictEqual(call.value, first)
+      })
     })
   })
 
