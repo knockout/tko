@@ -174,6 +174,13 @@ concepts, refactors across 5+ files.
 **Skip for:** bug fixes, single-file edits, doc tweaks, dep bumps, comment
 cleanup, new tests in existing specs.
 
+**Naming:** `plans/YYYY-MM-DD-<slug>.md`, where the date is the **author
+date** of the first commit that adds the plan — i.e. `git log
+--diff-filter=A --follow --format=%as -- plans/YYYY-MM-DD-<slug>.md | tail -1`.
+Use author date, not committer date: a plan written late one day and landed
+the next morning should sort by when it was written. This keeps `ls plans/`
+chronological so stale plans are visually obvious.
+
 ## Agent-First Documentation
 
 AI coding agents are first-class citizens of TKO. The docs site serves both
