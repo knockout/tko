@@ -247,5 +247,30 @@ describe('KO LifeCycle', function () {
       assert.equal(divClick, 2)
       assert.equal(anchorClick, 2)
     })
+
+    it('addEventListener with capture option removes listener on dispose', function () {
+      let clicks = 0
+      const parent = document.createElement('div')
+      const child = document.createElement('span')
+      parent.appendChild(child)
+      document.body.appendChild(parent)
+
+      class CaptureLC extends LifeCycle {
+        constructor() {
+          super()
+          this.addEventListener(parent, 'click', () => clicks++, { capture: true })
+        }
+      }
+
+      const lc = new CaptureLC()
+      child.click()
+      assert.equal(clicks, 1)
+
+      lc.dispose()
+      child.click()
+      assert.equal(clicks, 1, 'capture listener should be removed after dispose')
+
+      document.body.removeChild(parent)
+    })
   })
 })
