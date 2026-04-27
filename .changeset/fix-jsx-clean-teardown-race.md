@@ -1,5 +1,5 @@
 ---
-"@tko/utils.jsx": patch
+"@tko/utils.jsx": minor
 ---
 
 Add `options.jsxCleanBatchSize` (default `1000`) controlling JSX node cleanup
