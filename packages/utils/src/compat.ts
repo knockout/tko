@@ -22,16 +22,13 @@ export function stringTrim(value: any): string {
  * @deprecated Use `String.prototype.startsWith` directly. Will be removed in a future major.
  */
 export function stringStartsWith(value: string, prefix: string): boolean {
-  return value.startsWith(prefix)
+  return (value ?? '').startsWith(prefix)
 }
 
 /**
  * @deprecated Use `Object.defineProperty(fn, 'length', descriptor)` directly.
  * Will be removed in a future major.
  */
-export function overwriteLengthPropertyIfSupported(
-  fn: Function,
-  descriptor: PropertyDescriptor,
-): void {
+export function overwriteLengthPropertyIfSupported(fn: Function, descriptor: PropertyDescriptor): void {
   Object.defineProperty(fn, 'length', descriptor)
 }

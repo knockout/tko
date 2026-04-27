@@ -3,6 +3,7 @@
   "module": "dist/index.js",
   "dependencies": {
     "@tko/computed": "^4.0.1",
+    "@tko/observable": "^4.0.1",
     "@tko/utils": "^4.0.1"
   },
   "files": [
