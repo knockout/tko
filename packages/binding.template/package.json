@@ -29,9 +29,6 @@
     "@tko/observable": "^4.0.1",
     "@tko/utils": "^4.0.1"
   },
-  "peerDependencies": {
-    "@tko/binding.if": "^4.0.1"
-  },
   "licenses": [
     {
       "type": "MIT",

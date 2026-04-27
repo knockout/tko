@@ -17,6 +17,7 @@ import {
   cleanNode,
   cloneNodes,
   compareArrays,
+  createSymbolOrString,
   domData,
   extend,
   memoization,
@@ -115,6 +116,7 @@ export type Utils = {
   arrayRemoveItem: typeof arrayRemoveItem
   cloneNodes: typeof cloneNodes
   compareArrays: typeof compareArrays
+  createSymbolOrString: typeof createSymbolOrString
   domData: typeof domData
   domNodeDisposal: typeof domNodeDisposal
   extend: typeof extend
@@ -147,6 +149,7 @@ const utils: Utils = {
   arrayRemoveItem,
   cloneNodes,
   compareArrays,
+  createSymbolOrString,
   domData,
   domNodeDisposal,
   extend,

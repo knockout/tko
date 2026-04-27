@@ -11,9 +11,6 @@
     "@tko/utils": "^4.0.1",
     "@tko/builder": "^4.0.1"
   },
-  "peerDependencies": {
-    "@tko/binding.foreach": "^4.0.1"
-  },
   "files": [
     "dist/"
   ],
