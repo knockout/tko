@@ -275,7 +275,11 @@ function possiblyGetConfigFromAmd(errorCallback, config, callback) {
   if (typeof config.require === 'string') {
     // The config is the value of an AMD module
     if (window.amdRequire || window.require) {
-      ;(window.amdRequire || window.require)([config.require], callback)
+      const amdRequire = window.amdRequire || window.require
+      amdRequire([config.require], callback, function (err) {
+        const details = err?.message ?? String(err || '')
+        errorCallback('Failed to load AMD module: ' + config.require + (details ? ' — ' + details : ''))
+      })
     } else {
       errorCallback('Uses require, but no AMD loader is present')
     }
