@@ -11,11 +11,6 @@
     "@tko/observable": "^4.0.1",
     "@tko/utils": "^4.0.1"
   },
-  "peerDependencies": {
-    "@tko/bind": "^4.0.1",
-    "@tko/binding.core": "^4.0.1",
-    "@tko/provider.databind": "^4.0.1"
-  },
   "homepage": "https://tko.io",
   "licenses": [
     {
