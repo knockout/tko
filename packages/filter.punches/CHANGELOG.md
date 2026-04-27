@@ -1,5 +1,12 @@
 # @tko/filter.punches
 
+## 4.1.0
+
+### Patch Changes
+
+- Updated dependencies [49576cb]
+  - @tko/observable@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes

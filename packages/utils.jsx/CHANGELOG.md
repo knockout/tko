@@ -1,5 +1,30 @@
 # @tko/utils.jsx
 
+## 4.1.0
+
+### Minor Changes
+
+- 7938c43: Add `options.jsxCleanBatchSize` (default `1000`) controlling JSX node cleanup
+  batching. Setting it to `0` runs cleanup synchronously on detach. Registered
+  via `defineOption` — the hardcoded `MAX_CLEAN_AT_ONCE` constant is gone, but
+  the new default matches it so production behavior is unchanged.
+
+  Fixes a `ReferenceError: Element is not defined` in the `cli-happy-dom` test
+  project where the 25ms batch timer could fire after happy-dom had torn down
+  DOM globals.
+
+### Patch Changes
+
+- Updated dependencies [bdac39c]
+- Updated dependencies [3aea21c]
+- Updated dependencies [49576cb]
+  - @tko/computed@4.1.0
+  - @tko/utils@4.1.0
+  - @tko/observable@4.1.0
+  - @tko/lifecycle@4.1.0
+  - @tko/bind@4.1.0
+  - @tko/provider.native@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes

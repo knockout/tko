@@ -1,5 +1,68 @@
 # @tko/binding.core
 
+## 4.1.0
+
+### Patch Changes
+
+- 3aea21c: Modernize synthetic event construction
+
+  `triggerEvent` (exported from `@tko/utils`) now builds synthetic events using
+  `new MouseEvent`/`KeyboardEvent`/`Event` constructors instead of the
+  deprecated `document.createEvent('HTMLEvents')` + `initEvent(...)` path. This
+  restores native side-effects in modern DOM implementations (e.g. synthetic
+  clicks toggle checkbox `.checked` in happy-dom) without changing behavior in
+  real browsers. `relatedTarget` is still set to the target element for mouse
+  events to match the previous init-event argument list.
+
+  `@tko/binding.core` event handler no longer assigns the legacy
+  `event.cancelBubble = true` before calling `event.stopPropagation()` — the
+  assignment is redundant on modern events and readonly on some implementations.
+
+  `@tko/provider.component` now uses `Object.prototype.toString.call(node)` to
+  detect `HTMLUnknownElement` rather than `'' + node`, which is immune to
+  user-land `toString` overrides on custom elements.
+
+- 49576cb: Drop dead polyfill probes from `@tko/utils`
+
+  Removes runtime feature detection for capabilities that all supported runtimes
+  (modern browsers, Node, Bun, happy-dom) already expose unconditionally. The
+  public API surface is preserved as one-line passthroughs in
+  `packages/utils/src/compat.ts` so existing consumers continue to work; these
+  shims are slated for removal in the next major.
+
+  - `functionSupportsLengthOverwrite` + `overwriteLengthPropertyIfSupported` —
+    `Object.defineProperty(fn, 'length', …)` has worked since IE9. Call sites
+    in `@tko/observable` now invoke `Object.defineProperty` directly. The
+    internal probe is gone; `overwriteLengthPropertyIfSupported` is preserved
+    on `@tko/utils` exports as an inline `Object.defineProperty` call.
+  - `useSymbols` + `createSymbolOrString` — `Symbol` is always defined; call
+    sites now use `Symbol(identifier)` directly. `createSymbolOrString` is
+    preserved as `s => Symbol(s)` on both `@tko/utils` exports and
+    `ko.utils.createSymbolOrString`.
+  - `stringTrim` + `stringStartsWith` — call sites use `String(value ?? '')
+.trim()` / `value.startsWith(prefix)` inline. Both names remain exported
+    from `@tko/utils` as inline passthroughs.
+  - `toggleDomNodeCssClass` SVGAnimatedString fallback — `classList` is
+    available on every supported `Element` (including SVG since SVG2).
+  - `parseJson` no longer routes through `stringTrim`; it trims inline when the
+    input is a string.
+
+  `packages/utils.parser/src/preparse.ts` also guards `str.match(bindingToken)`
+  against the `null` return case using `?? []` — previously relied on the match
+  never returning `null` for the transformed input.
+
+  Patch-level for all packages: zero observable surface change for consumers
+  not reaching into internal probes (`useSymbols`, `functionSupportsLengthOverwrite`),
+  which had no monorepo callers.
+
+- Updated dependencies [bdac39c]
+- Updated dependencies [3aea21c]
+- Updated dependencies [49576cb]
+  - @tko/computed@4.1.0
+  - @tko/utils@4.1.0
+  - @tko/observable@4.1.0
+  - @tko/bind@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes
