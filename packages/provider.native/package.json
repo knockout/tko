@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.1.0",
   "name": "@tko/provider.native",
   "description": "Link binding handlers whose value is already attached to the node",
   "module": "dist/index.js",
@@ -8,9 +8,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/observable": "^4.0.1",
-    "@tko/provider": "^4.0.1",
-    "@tko/bind": "^4.0.1"
+    "@tko/observable": "^4.1.0",
+    "@tko/provider": "^4.1.0",
+    "@tko/bind": "^4.1.0"
   },
   "homepage": "https://tko.io",
   "licenses": [

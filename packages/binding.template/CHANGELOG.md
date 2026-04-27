@@ -1,5 +1,17 @@
 # @tko/binding.template
 
+## 4.1.0
+
+### Patch Changes
+
+- Updated dependencies [bdac39c]
+- Updated dependencies [3aea21c]
+- Updated dependencies [49576cb]
+  - @tko/computed@4.1.0
+  - @tko/utils@4.1.0
+  - @tko/observable@4.1.0
+  - @tko/bind@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes
