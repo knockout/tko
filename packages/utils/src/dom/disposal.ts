@@ -5,14 +5,16 @@
 import * as domData from './data'
 import { default as options } from '../options'
 import { arrayRemoveItem, arrayIndexOf } from '../array'
+import { isTemplateTag } from './info'
 
 const domDataKey = domData.nextKey()
 // Node types:
 // 1: Element
 // 8: Comment
 // 9: Document
-const cleanableNodeTypes = { 1: true, 8: true, 9: true }
-const cleanableNodeTypesWithDescendants = { 1: true, 9: true }
+// 11: DocumentFragment
+const cleanableNodeTypes = { 1: true, 8: true, 9: true, 11: true }
+const cleanableNodeTypesWithDescendants = { 1: true, 9: true, 11: true }
 
 function getDisposeCallbacksCollection(node: Node, createIfNotFound: boolean) {
   let allDisposeCallbacks = domData.get(node, domDataKey)
@@ -86,14 +88,32 @@ export function removeDisposeCallback(node: Node, callback: (node: Node) => void
   }
 }
 
-export function cleanNode(node: Node): typeof node {
+export function cleanNode(node: Node): Node {
   // First clean this node, where applicable
   if (cleanableNodeTypes[node.nodeType]) {
     cleanSingleNode(node)
 
     // ... then its descendants, where applicable
-    if (cleanableNodeTypesWithDescendants[node.nodeType] && node instanceof Element) {
-      cleanNodesInList(node.getElementsByTagName('*'))
+    if (cleanableNodeTypesWithDescendants[node.nodeType]) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        cleanNodesInList((node as Element).getElementsByTagName('*'))
+      } else if (node.nodeType === Node.DOCUMENT_NODE || node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        cleanNodesInList((node as Document | DocumentFragment).querySelectorAll('*'))
+      }
+
+      // <template>.content is a detached DocumentFragment that the descendant
+      // queries above do not traverse into; recurse so bindings created inside
+      // template content are disposed when the host subtree is cleaned.
+      if (isTemplateTag(node)) {
+        cleanNode(node.content)
+      }
+      const root = node as Partial<ParentNode>
+      if (typeof root.querySelectorAll === 'function') {
+        const templates = root.querySelectorAll('template')
+        for (let i = 0; i < templates.length; i++) {
+          cleanNode((templates[i] as HTMLTemplateElement).content)
+        }
+      }
     }
   }
   return node
