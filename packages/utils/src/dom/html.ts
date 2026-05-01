@@ -68,7 +68,7 @@ export function parseHtmlFragment(html: string, documentContext?: Document): Nod
 }
 
 const scriptTagPattern = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/i
-function validateHTMLInput(html: string): string {
+export function validateHTMLInput(html: string): string {
   if (!html) return ''
 
   if (options.templateSizeLimit > 0 && html.length > options.templateSizeLimit) {
