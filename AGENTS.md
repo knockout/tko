@@ -174,6 +174,18 @@ concepts, refactors across 5+ files.
 **Skip for:** bug fixes, single-file edits, doc tweaks, dep bumps, comment
 cleanup, new tests in existing specs.
 
+## AI Skills
+
+Reusable workflow instructions for AI agents live in `skills/`. Each skill is a
+self-contained folder with a `SKILL.md` and optional supporting assets
+(templates, scripts, references).
+
+| Skill | Purpose |
+|-------|---------|
+| `typescript-code-review` | Perform comprehensive TypeScript code reviews covering type safety, security, performance, and code quality with actionable feedback |
+
+Skills are loaded on-demand when the agent detects a matching task.
+
 ## Agent-First Documentation
 
 AI coding agents are first-class citizens of TKO. The docs site serves both
