@@ -406,4 +406,10 @@ describe('Binding: With', function () {
     expect(callbacks).to.equal(2)
     expectContainText(testNode.childNodes[0], 'new child')
   })
+
+  it('Should resolve applyBindings promise when value is null with no else branch', async function () {
+    testNode.innerHTML = "<div data-bind='with: item'><span data-bind='text: $data'></span></div>"
+    await applyBindings({ item: null }, testNode)
+    expect(testNode.childNodes[0].childNodes.length).to.equal(0)
+  })
 })

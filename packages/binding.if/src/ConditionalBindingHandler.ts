@@ -76,6 +76,7 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
       this.renderAndApplyBindings(this.ifElseNodes.elseNodes)
     } else {
       virtualElements.emptyNode(this.$element)
+      this.completeBinding()
     }
   }
 
@@ -83,7 +84,12 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     if (!useOriginalNodes) {
       virtualElements.setDomNodeChildren(this.$element, cloneNodes(nodes))
     }
-    const bound = await applyBindingsToDescendants(this.bindingContext, this.$element)
+    const bound = applyBindingsToDescendants(this.bindingContext, this.$element)
+    if (bound.isSync) {
+      this.bindingCompletion = bound
+    } else {
+      await bound.completionPromise
+    }
     this.completeBinding(bound)
   }
 
