@@ -194,4 +194,14 @@ describe('Binding Application Promise', function () {
       '<div><span data-bind="template: {foreach: y}"><i data-bind="foreach: z"><i data-bind="text: $data">a</i><i data-bind="text: $data">b</i></i></span></div>'
     )
   })
+
+  it('completes with if binding containing async descendants', async function () {
+    const div = document.createElement('div')
+    div.innerHTML = '<span data-bind="if: true"><i data-bind="async: x"></i></span>'
+    const x = observable(false)
+    const abr = applyBindings({ x }, div)
+    expect(x()).to.equal(false)
+    await abr
+    expect(x()).to.equal(true)
+  })
 })
