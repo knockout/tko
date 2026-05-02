@@ -120,7 +120,8 @@ For historical context and previously cataloged findings, see:
 - **Impact**: A custom `options.Promise`, cross-window promises, or thenables can be ignored or wrapped by the wrong
   constructor. The existing "returns a promise" test only proves the default case where `options.Promise === Promise`.
 - **Recommended**: Use a shared thenable check (for example `isThenable`) for completion detection and route framework
-  promise creation through `options.Promise`.
+  promise creation through `options.Promise`. Alternativ, you
+  should remove this unused old option.
 - **Regression tests**: Temporarily replace `options.Promise` with a compatible custom constructor and assert
   `applyBindings()` waits for async bindings.
 
