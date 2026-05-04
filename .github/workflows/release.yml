@@ -6,10 +6,12 @@
 #   - prepare: invoke changesets/action to open or update the
 #     "chore: version packages" PR. This is the only entry point for
 #     opening that PR.
-#   - publish-and-tag: when no pending changesets remain (i.e. the
-#     version PR was just merged), build, test, npm-publish via OIDC,
-#     then create the repo-wide vX.Y.Z tag + GitHub release in one
-#     gh release create call.
+#   - publish-and-tag: runs on any main push that finds no pending
+#     changesets (covers both the version-PR merge and incidental
+#     no-changeset pushes like docs/plans). Builds, runs the browser
+#     matrix gate, npm-publishes via OIDC, and — only if the publish
+#     actually shipped new versions — creates the repo-wide vX.Y.Z
+#     tag + GitHub release.
 #
 # Single human action: merge the version PR. Everything else runs
 # unattended.
@@ -64,7 +66,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          version: npx changeset version
+          version: bunx changeset version
           title: 'chore: version packages'
           commit: 'chore: version packages'
           # Required when persist-credentials: false — without this the
@@ -101,8 +103,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-        # persist-credentials defaults to true — required for the
-        # post-publish tag/release step to authenticate.
+        # persist-credentials defaults to true so `changeset publish`
+        # can push per-package git tags (@tko/utils@X.Y.Z, etc.) via
+        # the runner's git remote auth. The repo-wide vX.Y.Z tag is
+        # created later by `gh release create` using GH_TOKEN.
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -134,17 +138,16 @@ jobs:
 
       # Use changesets/action's publish path so we get its `published`
       # output as the authoritative "did anything actually go to npm"
-      # signal. Without this, a plan-only / doc-only main push (which
-      # also has hasChangesets == 'false') would no-op `changeset
-      # publish` and then fail noisily on `gh release create` for a
-      # tag that already exists.
+      # signal. The action parses `New tag:` lines from
+      # `changeset publish` stdout to set `outputs.published`, so we
+      # MUST let `changeset publish` create its per-package git tags
+      # (i.e. no `--no-git-tag`) — otherwise `published` always
+      # reports false and the post-publish tag step never fires.
       #
-      # changeset publish creates per-package git tags by default
-      # (e.g. @tko/utils@4.1.0). With the .changeset/config.json `fixed`
-      # group all 27 @tko/* packages share one version, so the
-      # per-package tags carry no information beyond the repo-wide
-      # vX.Y.Z. We suppress them via --no-git-tag and rely solely on
-      # the post-publish step below for the single tag.
+      # The per-package tags (@tko/utils@X.Y.Z, etc., 27 of them per
+      # release given the fixed group) are noisy but harmless. The
+      # canonical release marker is the repo-wide vX.Y.Z tag created
+      # by the next step.
       #
       # npm generates provenance attestations automatically during
       # trusted publishing from GitHub Actions.
@@ -152,7 +155,7 @@ jobs:
         id: publish
         uses: changesets/action@v1
         with:
-          publish: npx changeset publish --no-git-tag
+          publish: bunx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
