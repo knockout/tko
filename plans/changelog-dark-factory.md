@@ -1,7 +1,8 @@
 # Plan: Dark-Factory Changelog
 
-**Goal**: Replace TKO's per-package changelog sprawl with a single
-canonical release narrative that agents and humans can grep once.
+**Goal**: Eliminate verbatim duplication of cross-cutting changeset
+bodies across per-package `CHANGELOG.md` files so an agent (or human)
+can answer *"what landed in vX.Y.Z?"* by reading **one** file.
 
 This is a Dark Factory plan: the artifact shape should optimize for
 *token-efficient retrieval by an agent*, not for the
@@ -10,262 +11,322 @@ tooling.
 
 ---
 
-## Original State (April 2026)
+## Original State (May 2026)
 
 `changeset version` writes a `CHANGELOG.md` per package. With TKO's
 fixed-version group of 27 packages, a single cross-cutting concern
-(say, `modernize-utils-dead-polyfills`) appears in **eight** package
-changelogs verbatim — because the changeset listed all eight packages
-that touched the work. Sister packages dragged along by the
-fixed-group bump get a single-line `Updated dependencies` stub.
+(e.g. `modernize-utils-dead-polyfills` on the 4.1.0 cut) appears in
+**eight** package changelogs verbatim — because the changeset listed
+all eight packages that touched the work. Sister packages dragged
+along by the fixed-group bump get a single-line `Updated dependencies`
+stub.
 
 ### Concretely on 4.1.0
 
-| Changeset                          | Full body appears in N CHANGELOGs |
-|------------------------------------|-----------------------------------|
-| `modernize-utils-dead-polyfills`   | 8                                 |
-| `modernize-trigger-event`          | 3                                 |
-| `fix-jsx-clean-teardown-race`      | 1                                 |
-| `fix-proxy-delete-property`        | 1                                 |
+| Changeset                          | Full body in N CHANGELOGs |
+|------------------------------------|---------------------------|
+| `modernize-utils-dead-polyfills`   | 8                         |
+| `modernize-trigger-event`          | 3                         |
+| `fix-jsx-clean-teardown-race`      | 1                         |
+| `fix-proxy-delete-property`        | 1                         |
 
-To answer *"what landed in 4.1.0?"* an agent (or human) currently has
-to:
-
-1. Find every `CHANGELOG.md` in the monorepo.
-2. Read each file's `## 4.1.0` section.
-3. Dedupe the bodies.
-4. Reconstruct the cross-cutting narrative.
-
-That's four wasted operations to recover a story we already wrote
+To answer *"what landed in 4.1.0?"* an agent currently has to (a) find
+every `CHANGELOG.md` in the monorepo, (b) read each file's `## 4.1.0`
+section, (c) dedupe the bodies, (d) reconstruct the cross-cutting
+narrative. Four wasted operations to recover a story we already wrote
 once, in `.changeset/*.md`.
 
-## Pain points
-
-| Symptom                                                    | Cost                                          |
-|------------------------------------------------------------|-----------------------------------------------|
-| Same changeset body duplicated across 8 files              | Storage trivial; cognitive cost real          |
-| No single answer to "what's in this release"               | Agents must aggregate; humans must scroll     |
-| Release notes on GitHub redundantly auto-generate the same | Three sources of truth (PR, CHANGELOG, release) |
-| Per-package `## 4.0.0` history accumulates noise           | Fixed-group means every package sees every release |
-
-The default Changesets layout assumes Lerna-style independent
-packages, each with its own audience reading its own changelog. TKO
-ships as a fixed group with one version line — the model doesn't fit.
-
 ---
 
-## Options
+## Options surveyed
 
-### A. Top-level CHANGELOG, per-package stubs
+### A. Top-level CHANGELOG, per-package stubs **[recommended]**
 
-- Custom `getReleaseLine`/`getDependencyReleaseLine` writes the
-  narrative once to root `CHANGELOG.md`.
-- Per-package `CHANGELOG.md` shrinks to:
-  ```
-  ## 4.1.0 — see [root CHANGELOG](../../CHANGELOG.md#410)
-  ```
-- npm consumer pages still render *something* per package.
-- Smallest behavioral change; each release adds two files modified
-  (root CHANGELOG + per-package stub) instead of 27.
+- Each release writes the full narrative *once* to root
+  `CHANGELOG.md`, deduped across packages.
+- Per-package `CHANGELOG.md` retains its `## X.Y.Z` heading but the
+  body shrinks to one line: `*See [root CHANGELOG](../../CHANGELOG.md#xyz).*`
+- `Updated dependencies` lines suppressed everywhere.
 
-### B. Single source, no per-package files [recommended]
+### B. Single source, no per-package files (rejected)
 
 - Delete every `packages/*/CHANGELOG.md` and `builds/*/CHANGELOG.md`.
-- Root `CHANGELOG.md` is the only release narrative.
-- npm package pages link to the repo for history (standard for
-  monorepos shipping a fixed group: e.g. `nx`, `pnpm` itself).
-- One file to grep, one source of truth. No "see root CHANGELOG"
-  pointers anywhere.
-- **Tradeoff**: npm-page-only browsers lose per-package timelines.
-  Acceptable: anyone browsing `@tko/utils.parser`'s npm page will
-  follow the repo link to the canonical history. The TKO audience
-  reads the repo, not the npm page.
+- Root is the only release narrative; npm-page deep links 404.
 
-### C. (B) + structured release notes
+### C. (B) + curated structured release notes (rejected)
 
-- (B), plus a custom post-`changeset version` step that emits the
-  release entry in a defined shape:
-
-  ```markdown
-  ## 4.1.0 — 2026-04-27
-
-  Internal modernization release. Public API surface unchanged.
-
-  - **Polyfill probes removed.** `useSymbols`,
-    `functionSupportsLengthOverwrite` no longer probed at runtime.
-    Public exports preserved as `@deprecated` passthroughs in
-    `@tko/utils/compat`.
-  - **Synthetic events use native constructors.** `triggerEvent` builds
-    `MouseEvent`/`KeyboardEvent` with `new`, restoring side-effects in
-    happy-dom.
-  - **`ko.proxy` `deleteProperty` trap fixed.** Previously silently
-    no-op; now correctly deletes the property.
-  - **JSX cleanup batching is configurable.** `options.jsxCleanBatchSize`
-    (default 1000, set to 0 for synchronous cleanup).
-
-  ### Packages bumped
-  All 27 fixed-group packages → `4.1.0`.
-
-  ### Changesets
-  - `fix-jsx-clean-teardown-race`
-  - `fix-proxy-delete-property`
-  - `modernize-trigger-event`
-  - `modernize-utils-dead-polyfills`
-  ```
-
-- Plays well with `verified-behaviors.json` style — structured,
-  greppable, agent-readable.
-- **Tradeoff**: more authoring discipline. The `.changeset/*.md` body
-  is no longer the verbatim release-note text; it's source material
-  for a human-curated narrative summary at release time.
+- Hand-curated summary placeholder edited in by the maintainer before
+  merging the version PR.
 
 ---
 
-## Recommendation
+## Why A, not B or C
 
-**B + C together, landing in the next minor (4.2.0).**
+This plan went through three rounds of adversarial review. Earlier
+drafts recommended **B + C**. Both were rejected. Reasoning:
 
-- B alone leaves the file as raw `getReleaseLine` output — fine, but
-  still per-changeset paragraphs in source order, not a curated
-  narrative.
-- C without B keeps 27 redundant files around with the same noise.
-- Together: one root file, structured by release, with a short
-  hand-curated narrative summary on top of the auto-generated
-  changeset-by-changeset detail.
+### C reintroduces the toil dark-factory eliminates
 
-The custom changelog generator that B needs is the same hook C uses to
-emit structured output, so doing them together is one piece of work,
-not two.
+C says "maintainer (or agent acting as release manager) edits a
+placeholder summary before merging the version PR." That is a human
+in the loop on every release — exactly the opposite of dark-factory's
+"merge the version PR is the only human action" thesis (the
+single-action release flow shipped in #377).
+
+The current root `CHANGELOG.md` proves the point: it ends at 4.0.1
+even though 4.1.0 shipped, because nobody hand-curated a 4.1.0
+narrative. If structure can't survive cadence, structure is theater.
+
+### B breaks deep links for a 13-year-old library's downstream users
+
+External docs, blog posts, Stack Overflow answers, and Renovate
+release-note popups link to `packages/utils/CHANGELOG.md#400`. Stub
+files preserve those links at the cost of one line of disk per
+package per release.
+
+Renovate's `release-notes` extractor reads `CHANGELOG.md` from the
+repo and renders nothing if absent — it does *not* automatically swap
+to the GitHub Release. With stubs the popup links to the root.
+
+### Prior art does not support full deletion
+
+`pnpm` (the closest fixed-group monorepo using changesets) ships
+default per-package `CHANGELOG.md` files. So does `nx`. Earlier
+drafts asserted the opposite as supporting evidence; spot-check did
+not survive verification.
+
+### npm-tarball motivation was overstated
+
+All 27 `package.json` `files` arrays are `["dist/"]`, so
+`CHANGELOG.md` is **not** included in any published tarball. npm
+package pages render CHANGELOG content from the **repo URL**, not
+the tarball. Removing per-package `CHANGELOG.md` doesn't change
+tarball content; it breaks the npm-page-deep-link experience.
 
 ---
 
-## Implementation surface (B + C)
+## Recommendation: A only
 
-### `.changeset/config.json`
+The whole win is one file at the root that contains the canonical
+narrative for each release, with per-package stubs preserving the
+deep-link surface.
 
-Swap the changelog generator to a custom one targeting root only:
+---
 
-```json
-{
-  "changelog": ["./tools/changesets/root-changelog.cjs", null],
-  ...
-}
-```
+## Implementation surface
 
-### `tools/changesets/root-changelog.cjs`
+### Why a wrapper is required
 
-Implements the [Changesets changelog interface][1]:
+The natural-looking approach — point `.changeset/config.json` at a
+custom changelog generator — does not work for our goal:
 
-- `getReleaseLine(changeset, type)` → returns the formatted entry
-  for one changeset.
-- `getDependencyReleaseLine(changesets, dependenciesUpdated)` →
-  returns empty string (we don't want per-package "Updated
-  dependencies" lines anywhere).
+- The `getReleaseLine(changeset, type, options)` interface has access
+  to the changeset id, body, and bump type only. It does **not**
+  receive: the package name, the package directory, the new version
+  string, or any context about whether it's the first/last invocation
+  in a run.
+- For a fixed-group cross-cutting changeset listing 8 packages,
+  `getReleaseLine` is invoked 8 times with identical input across
+  different package contexts the function cannot distinguish.
+- The return value is a string spliced into one per-package file by
+  Changesets' built-in writer. It cannot redirect output to root,
+  because root is not the file currently being assembled.
+- Default generators are pure functions returning strings; the
+  Changesets release pipeline applies Prettier and `prependFile` to
+  per-package CHANGELOGs only.
+
+A custom generator can shape the *per-package* string but cannot
+reach the root file. Achieving the goal requires running the default
+generator first, then post-processing — i.e. a wrapper.
 
 ### `tools/changesets/version.cjs` (new)
 
-A small wrapper that:
+Invoked by `release.yml`'s `changesets/action` `version:` input
+instead of `bunx changeset version`. Behavior:
 
-1. Runs `npx changeset version` (which would normally write
-   per-package CHANGELOGs).
-2. Reads what would have been written from each
-   `packages/*/CHANGELOG.md` and `builds/*/CHANGELOG.md`, then
-   deletes those files.
-3. Aggregates the entries into a single new `## X.Y.Z` section in
-   root `CHANGELOG.md`, with the C-shaped layout:
+1. **Snapshot pre-state.**
+   - Read each `packages/*/CHANGELOG.md` and
+     `builds/*/CHANGELOG.md` into memory. Used in step 3 to detect
+     prepended bytes precisely (rather than relying on "topmost
+     heading", which becomes ambiguous on re-run).
+   - Read each `.changeset/*.md` and parse its frontmatter — capture
+     the **declared** package list per changeset id. Required in
+     step 4: dedup keys on what the changeset author intended, not
+     on the fixed-group bump set (which is always all 27).
+
+2. **Run the default version pipeline.** `bunx changeset version`
+   executes normally, writing per-package `## X.Y.Z` sections with
+   full bodies + `Updated dependencies` lines, and consuming the
+   `.changeset/*.md` files.
+
+3. **Extract just-written sections by diff.** For each per-package
+   CHANGELOG, the new bytes are exactly `current_content` minus
+   `pre_content` from step 1 (file is prepended to). Capture:
+   version `X.Y.Z`, full new-section text. If diff is empty, skip
+   (no version change for this package — defensive; never happens in
+   TKO's fixed group).
+
+4. **Dedupe across packages.** Bodies are compared by content hash
+   after stripping leading `### {Major,Minor,Patch} Changes`
+   subheadings. Identical bodies coalesce; the **declared** package
+   list (from step 1) is attached to each unique body.
+
+5. **Write the root section.** Prepend a single `## X.Y.Z` section
+   to root `CHANGELOG.md` (no date in the heading — see slug note
+   below). Date appears in the section body:
 
    ```markdown
-   ## X.Y.Z — YYYY-MM-DD
+   ## X.Y.Z
 
-   <one-paragraph hand-curated summary, edited in by the maintainer
-   before merging the version PR>
+   _Released YYYY-MM-DD._
 
-   ### Highlights
-   - <bullet per significant changeset, body trimmed to 1–2 sentences>
+   ### Major Changes
+   <deduped major bodies, grouped by content>
 
-   ### Packages bumped
-   All N fixed-group packages → `X.Y.Z`.
+   ### Minor Changes
+   <deduped minor bodies, grouped by content>
 
-   ### Changesets
-   - `<changeset-name>` — <one-line description>
+   ### Patch Changes
+   <deduped patch bodies, grouped by content>
    ```
 
-4. The "summary" line starts as a placeholder (`_Summary pending._`)
-   so the version PR is mergeable as soon as the bot opens it. The
-   maintainer can edit it before merge for non-trivial releases, or
-   leave the placeholder for boring patch releases.
+   Each unique body is written once. Bodies whose **declared**
+   package list equals the full fixed-group set get no list footer.
+   Bodies declared on a strict subset get a `Affects: @tko/x,
+   @tko/y` footer.
 
-### `release.yml` (single-action release flow plan)
+   The heading is bare `## X.Y.Z` (no em-dash, no date) so GitHub's
+   GFM slugger produces a stable anchor (`#410` for `4.1.0`,
+   `#4100` for `4.10.0`). The anchors are collision-free for our
+   actual cadence. Adding date to the heading would slug to
+   `#410--2026-mm-dd` and break the per-package stub link.
 
-The release workflow runs `tools/changesets/version.cjs` instead of
-`npx changeset version` directly. One-line change in the
-`changesets/action` invocation:
+6. **Replace per-package new sections with stubs.** For each
+   per-package CHANGELOG, splice over the captured new section so
+   the heading is preserved but the body becomes a single stub line:
+
+   ```markdown
+   ## X.Y.Z
+
+   *See [root CHANGELOG](../../CHANGELOG.md#410).*
+   ```
+
+   `../../` is correct from both `packages/*/` and `builds/*/`
+   depths (both two levels deep). The anchor is computed from the
+   bare heading slug, not from the date-bearing line in the body.
+   `Updated dependencies`-only sections (the 19+ sister packages
+   that didn't appear in any changeset's declared list) are
+   replaced wholesale by the same stub — no special-case parsing
+   needed since step 3 captures whatever new bytes appeared.
+
+7. **No formatter pass needed.** Biome (the project's only
+   formatter) does not format Markdown. Markdown style follows the
+   default Changesets writer for per-package files; the wrapper
+   writes the root file in matching style.
+
+The wrapper is idempotent on no-op runs: if `changeset version`
+writes nothing (no pending changesets, snapshot equals current),
+step 3 finds empty diffs and steps 4–6 short-circuit.
+
+### `release.yml`
+
+One-line change in the `prepare` job:
 
 ```yaml
-with:
-  version: node tools/changesets/version.cjs
-  publish: npx changeset publish
+- name: Open or update version PR
+  id: changesets
+  uses: changesets/action@v1
+  with:
+    version: node tools/changesets/version.cjs        # was: bunx changeset version
+    title: 'chore: version packages'
+    commit: 'chore: version packages'
+    commitMode: github-api
 ```
 
-### One-time cleanup
+`changesets/action`'s `commitMode: github-api` discovers files
+changed via git status post-version, then commits via the API. The
+wrapper's writes — to root CHANGELOG, to each per-package CHANGELOG —
+all show up in `git status` after step 1 of the wrapper, so they're
+included in the bot's commit. No additional auth or push logic
+needed.
 
-```bash
-rm packages/*/CHANGELOG.md builds/*/CHANGELOG.md
-```
+### `.changeset/config.json`
 
-In the same PR as the config change. Root `CHANGELOG.md` is created
-with a header noting the format and a `## Unreleased` section.
+**No change.** The default generator (`@changesets/cli/changelog`)
+keeps writing per-package files; the wrapper post-processes them.
+A custom generator was the original idea but is incompatible with
+the goal (see *Why a wrapper is required* above).
+
+### `CHANGELOG.md` (repo root)
+
+Already exists; ends at 4.0.1. The first run of the wrapper on the
+next release will prepend `## X.Y.Z` (newest first) above the
+existing `## 4.0.1` heading. No retroactive backfill of 4.1.0 — that
+release shipped under the old generator and its narrative lives in
+the eight per-package files until they get overwritten on next
+release.
 
 ---
 
-## Tradeoffs and risks
+## Tradeoffs
 
-- **npm consumer expectations.** Users reading the npm page for
-  `@tko/observable` no longer see a per-package history. The package
-  description is updated to point at `https://github.com/knockout/tko/blob/main/CHANGELOG.md`.
-- **Authoring discipline.** The maintainer (or agent acting as
-  release manager) is expected to edit the placeholder summary
-  before merging the version PR for non-trivial releases. Trivial
-  patches can ship with the placeholder; nothing breaks.
-- **Tooling assumptions.** Some downstream automation (Renovate's
-  changelog popups, Dependabot, GitHub's Releases auto-generation)
-  expects per-package CHANGELOG.md. Renovate falls back gracefully to
-  the GitHub Release; verify before landing.
-- **GitHub Release auto-generation.** The single-action release flow
-  (separate plan) creates the GitHub Release with `--generate-notes`,
-  which uses commit messages, not CHANGELOG content. Output stays
-  reasonable; the CHANGELOG link in the release body becomes the
-  canonical narrative.
-- **Migration cost.** One commit deletes 27 files and adds one. No
-  downstream breakage in this repo. External consumers who linked to
-  per-package CHANGELOG paths will 404 — small risk, easy to mitigate
-  with a redirect note in the release announcement.
+- **Per-package stubs accumulate.** After N releases each per-package
+  CHANGELOG has N stub lines under N headings. Trivially compactable
+  later; not worth solving preemptively.
+- **The 4.1.0 narrative stays only in per-package files.** Migrating
+  it into root retroactively would require a one-time backfill. Out
+  of scope; root's first new entry is the next release.
+- **Wrapper is one more file to maintain.** ~150 lines of CJS,
+  including dedup + Prettier integration. Cheap relative to the
+  retrieval-cost reduction.
+- **Wrapper composes with `commitMode: github-api`.** The bot's API
+  commit picks up the wrapper's writes via the standard "what
+  changed in the worktree" discovery the action already uses. No
+  special handling needed.
+- **Renovate popup quality dips slightly.** Renovate's
+  `release-notes` extractor reads per-package `CHANGELOG.md`; with
+  stubs in place it sees the stub line and the link. Still better
+  than option B's empty-file state. Acceptable.
 
 ---
 
 ## Out of scope
 
-- **Single-action release flow.** Tracked in
-  `plans/single-action-release.md` — about pipeline triggers, not
-  artifact shape.
-- **Per-release blog posts / migration guides.** Different artifact
-  altogether; lives in `tko.io/`, not `CHANGELOG.md`.
-- **Bumping the changelog format retroactively.** Existing
-  `## 4.0.0` and `## 4.0.1` per-package entries are deleted with the
-  files; root CHANGELOG starts at 4.2.0. Historical context stays
-  reachable in git.
+- **Single-action release flow** — already shipped in #377
+  (`release.yml` rewrite).
+- **Deleting per-package CHANGELOG.md files (option B).** Rejected
+  above.
+- **Curated structured release notes (option C).** Rejected above;
+  re-openable as a separate plan if a *non-blocking* curation
+  workflow is found (e.g. agent-generated summary in the version
+  PR description rather than the CHANGELOG itself).
+- **Backfilling 4.1.0 into the root file.** Could be done as a
+  one-shot script post-merge; not part of this plan's surface.
 
 ---
 
 ## Verification
 
-- After landing: `find . -name CHANGELOG.md -not -path './node_modules/*'`
-  returns exactly one path: `./CHANGELOG.md`.
-- `changeset version` on a test branch writes one entry to the root
-  file and modifies zero per-package CHANGELOGs.
-- The next published npm package's tarball does not contain a
-  `CHANGELOG.md`. (`@tko/observable` `package.json` `files: ["dist/"]`
-  already excludes it; verify nothing gets readded.)
-- `gh release view v4.2.0` body links to the root CHANGELOG section.
+- After landing: `find . -name CHANGELOG.md \
+    -not -path './node_modules/*' \
+    -not -path './.claude/*' \
+    -not -path './.git/*' \
+    -not -path './dist/*' \
+    -not -path '*/dist/*'` returns exactly the root file plus the
+  27 package stubs.
+- `bunx node tools/changesets/version.cjs` on a test branch with one
+  cross-cutting changeset listing 8 packages:
+  - Appends one new `## X.Y.Z` section to root `CHANGELOG.md`
+    containing the changeset body **once**.
+  - Each of the 8 listed packages' `CHANGELOG.md` gains a stub line
+    under a new `## X.Y.Z` heading.
+  - The other 19 fixed-group packages' `CHANGELOG.md` gains the same
+    stub (they bumped via fixed-group dependency, no `Updated
+    dependencies` line).
+  - No `Updated dependencies` line in any file.
+- `bunx changeset publish` on the same test branch publishes
+  successfully and creates per-package git tags as before.
+- Re-running the wrapper with no pending changesets is a no-op
+  (no version change → no new sections → wrapper short-circuits).
 
 [1]: https://github.com/changesets/changesets/blob/main/docs/modifying-changelog-format.md
