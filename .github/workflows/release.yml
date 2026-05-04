@@ -75,9 +75,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # Browser matrix gate. Shares the build-and-test reusable workflow
+  # with main-build.yml so we exercise the same Playwright container,
+  # same browsers, same vitest projects on the same SHA. publish-and-tag
+  # depends on this via `needs:`, so a red browser matrix blocks
+  # publish without polling.
+  build-and-test:
+    needs: prepare
+    if: needs.prepare.outputs.should_publish == 'true'
+    uses: ./.github/workflows/build-and-test.yml
+    secrets: inherit
+
   publish-and-tag:
     name: Publish to npm + tag repo
-    needs: prepare
+    needs: [prepare, build-and-test]
     if: needs.prepare.outputs.should_publish == 'true'
     runs-on: ubuntu-latest
 
@@ -108,16 +119,12 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # Build is gated on the publish path so doc-only / plan-only main
-      # pushes do not pay the cost.
+      # Build locally for the publish artifacts. The build-and-test
+      # job already built + tested the same SHA in its Playwright
+      # container; that result is the gate. This second build produces
+      # the npm-publishable dists in this runner's worktree.
       - name: Build all packages
         run: bun run build
-
-      # Tests run before publish so a regression caught only in the
-      # browser matrix cannot ship to npm. main-build.yml runs in
-      # parallel and is not a gate; this is the gate.
-      - name: Run tests
-        run: bun run test
 
       - name: Determine release version
         id: version
