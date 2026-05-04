@@ -60,7 +60,7 @@ See [agents/soul.md](https://tko.io/agents/soul.md) for the design philosophy.
 
 ## Direction
 
-TKO is moving toward an AI-maintained "dark factory" model — where the tooling, tests, and documentation are robust enough that AI agents can handle routine maintenance autonomously. See [plans/dark-factory.md](plans/dark-factory.md).
+TKO is moving toward an AI-maintained "dark factory" model — where the tooling, tests, and documentation are robust enough that AI agents can handle routine maintenance autonomously. See [plans/2026-04-16-dark-factory.md](plans/2026-04-16-dark-factory.md).
 
 ## License
 
