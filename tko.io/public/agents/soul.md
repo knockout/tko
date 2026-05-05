@@ -88,7 +88,11 @@ The two builds wire the same core differently. Concretely, comparing
 
 - **Providers.** Both ship `Component`, `DataBind`, `Virtual`, and
   `Attribute`. `reference` additionally enables `Native`,
-  `AttributeMustache`, and `TextMustache`. `knockout` does not.
+  `AttributeMustache`, and `TextMustache`. `knockout` does not. Provider
+  order is resolution precedence and differs too:
+  - `knockout`: `Component` -> `DataBind` -> `Virtual` -> `Attribute`
+  - `reference`: `Component` -> `Native` -> `AttributeMustache` ->
+    `TextMustache` -> `DataBind` -> `Virtual` -> `Attribute`
 - **Equality.** `reference` sets `options.strictEquality = true`, so `==`
   and `!=` in binding expressions evaluate as `===` / `!==`. `knockout`
   leaves the legacy lax behavior on.
@@ -98,7 +102,12 @@ The two builds wire the same core differently. Concretely, comparing
 - **Inline-function rewrite.** `knockout` registers
   `functionRewrite` from `@tko/utils.functionrewrite` as a binding-string
   preparser, so legacy inline `function (...) { ... }` expressions in
-  `data-bind` still work. `reference` does not.
+  `data-bind` still work. `reference` has no `functionRewrite` preparser.
+- **`foreach` binding target.** `knockout` resolves
+  `data-bind="foreach: ..."` to `TemplateForEachBindingHandler` (legacy
+  template-engine path), while `reference` resolves it to modern
+  `ForEachBinding` from `@tko/binding.foreach`. Both resolve
+  `data-bind="each: ..."` to `ForEachBinding`.
 - **Legacy surface.** `knockout` exposes a
   `ko.expressionRewriting.preProcessBindings` shim for KO 3 plugins.
   `reference` exposes `ko.jsx = { createElement, Fragment, render }` for
