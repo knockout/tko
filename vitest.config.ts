@@ -23,7 +23,18 @@ export default defineConfig({
       // Tests load each `@tko/*` package via its `exports` (compiled `dist/`).
       // We include both `dist/` (so v8 picks up execution) and `src/` (so
       // source-map remapping can surface the original TS files in the report).
-      include: ['packages/*/src/**/*.ts', 'packages/*/dist/**/*.js', 'builds/*/src/**/*.ts'],
+      // builds/*/dist/browser.min.js is what tests actually load
+      // (vitest-setup imports it as the IIFE entry); v8 instruments
+      // it and source-map remap surfaces builds/*/src/index.ts in the
+      // report. Other dist files (browser.js, index.cjs/mjs, common.js)
+      // are alternate output formats not exercised by the test runner,
+      // so we exclude them to avoid 0% rows.
+      include: [
+        'packages/*/src/**/*.ts',
+        'packages/*/dist/**/*.js',
+        'builds/*/src/**/*.ts',
+        'builds/*/dist/browser.min.js'
+      ],
       // `packages/*/index.ts` are 1-line re-export barrels — exclude them.
       // `builds/*/src/index.ts` is the only real source file in each build,
       // so we anchor the index-exclude to packages/ only.
