@@ -271,4 +271,10 @@ describe('Else binding', function () {
     y(false)
     expect(testNode.innerText).to.equal('x')
   })
+
+  it('Should resolve applyBindings promise when if is false with an else sibling chain', async function () {
+    testNode.innerHTML = "<i data-bind='if: x'>a</i>" + "<b data-bind='else'>b</b>"
+    await applyBindings({ x: false }, testNode)
+    expect(testNode.innerText).to.equal('b')
+  })
 })
