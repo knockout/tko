@@ -36,6 +36,11 @@ jobs:
       - name: Install Bun
         run: python3 tools/install-bun
 
+      # The Playwright noble image ships without jq; the coverage-summary
+      # step needs it to format the workflow run summary table.
+      - name: Install jq
+        run: apt-get update && apt-get install -y --no-install-recommends jq
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
