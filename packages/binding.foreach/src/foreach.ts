@@ -12,7 +12,7 @@ import {
   virtualElements,
   domData,
   domNodeIsContainedBy,
-  validateHTMLInput
+  parseHtmlForTemplateNodes
 } from '@tko/utils'
 
 import { isObservable, unwrap, observable } from '@tko/observable'
@@ -20,8 +20,6 @@ import { isObservable, unwrap, observable } from '@tko/observable'
 import type { ObservableArray } from '@tko/observable'
 
 import { contextFor, applyBindingsToDescendants, AsyncBindingHandler } from '@tko/bind'
-
-import type { AllBindings } from '@tko/bind'
 
 //      Utilities
 const MAX_LIST_SIZE = Number.MAX_SAFE_INTEGER
@@ -64,8 +62,7 @@ function makeTemplateNode(sourceNode) {
     // For e.g. <template> tags
     parentNode = sourceNode.content
   } else if (sourceNode.tagName === 'SCRIPT') {
-    parentNode = document.createElement('div')
-    parentNode.innerHTML = validateHTMLInput(sourceNode.text)
+    parentNode = parseHtmlForTemplateNodes(sourceNode.text, sourceNode.ownerDocument)
   } else {
     // Anything else e.g. <div>
     parentNode = sourceNode

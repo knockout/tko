@@ -176,6 +176,67 @@ describe('each binding', function () {
     $template.remove()
   })
 
+  it('applies the template size limit to named <script> templates', function () {
+    const originalTemplateSizeLimit = options.templateSizeLimit
+    const target = $('<ul data-bind=\'foreach: {name: "tID", data: $data}\'>Zee</ul>')
+    const $template = $("<script type='text/ko-template' id='tID'></script>").appendTo(document.body)
+    $template.text('<li data-bind="text: $data"></li>')
+
+    try {
+      options.templateSizeLimit = 10
+
+      assert.throws(function () {
+        applyBindings(['G1'], target[0])
+      }, /Template is too long/)
+    } finally {
+      options.templateSizeLimit = originalTemplateSizeLimit
+      $template.remove()
+    }
+  })
+
+  it('rejects nested script markup in named <script> templates when disallowed', function () {
+    const originalAllowScriptTagsInTemplates = options.allowScriptTagsInTemplates
+    const target = $('<ul data-bind=\'foreach: {name: "tID", data: $data}\'>Zee</ul>')
+    const $template = $("<script type='text/ko-template' id='tID'></script>").appendTo(document.body)
+    $template.text('<li data-bind="text: $data"></li><script>alert(1)</script>')
+
+    try {
+      options.allowScriptTagsInTemplates = false
+
+      assert.throws(function () {
+        applyBindings(['G1'], target[0])
+      }, /Script-tag in template detected/)
+    } finally {
+      options.allowScriptTagsInTemplates = originalAllowScriptTagsInTemplates
+      $template.remove()
+    }
+  })
+
+  it('sanitizes named <script> templates before rendering', function () {
+    const originalSanitizeHtmlTemplate = options.sanitizeHtmlTemplate
+    const target = $('<ul data-bind=\'foreach: {name: "tID", data: $data}\'>Zee</ul>')
+    const $template = $("<script type='text/ko-template' id='tID'></script>").appendTo(document.body)
+    const list = ['G1']
+    let sanitizedHtml = ''
+    $template.text('<li data-bind="text: $data"></li>')
+
+    try {
+      options.sanitizeHtmlTemplate = function (html: string) {
+        sanitizedHtml = html
+        return html.replace('<li ', '<li class="sanitized" ')
+      }
+
+      applyBindings(list, target[0])
+
+      assert.include(sanitizedHtml, 'text: $data')
+      assert.equal(target.find('li.sanitized').length, 1)
+      assert.equal(target.text(), 'G1')
+    } finally {
+      options.sanitizeHtmlTemplate = originalSanitizeHtmlTemplate
+      $template.remove()
+    }
+  })
+
   it('uses the name/id of a <div>', function () {
     const target = $('<ul data-bind=\'foreach: {name: "tID2", data: $data}\'>Zee</ul>')
     const list = ['H1', 'H2']
