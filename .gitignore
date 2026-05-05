@@ -22,6 +22,7 @@ node_modules
 _repo
 coverage
 coverage-temp
+COVERAGE.md
 builds/**/meta
 .nyc_output
 **/dist/*
