@@ -37,7 +37,7 @@
     "@types/mocha": "^10.0.10",
     "@vitest/browser": "^4.1.4",
     "@vitest/browser-playwright": "^4.1.4",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "4.1.4",
     "chai": "^6.2.2",
     "esbuild": "^0.28.0",
     "happy-dom": "^20.9.0",

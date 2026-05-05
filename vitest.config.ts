@@ -12,16 +12,34 @@ export default defineConfig({
     testTimeout: 10000,
     globals: true,
     coverage: {
-      // V8 coverage works against the cli-happy-dom project (Node runtime).
-      // The authoritative real-browser matrix is unaffected.
+      // V8 coverage runs against the `browser` project (Playwright Chromium,
+      // V8 runtime). Firefox/WebKit are not covered — JavaScriptCore and
+      // SpiderMonkey don't expose V8's coverage protocol. The authoritative
+      // real-browser matrix is unaffected; coverage is opt-in via
+      // `bun run test:coverage`.
       provider: 'v8',
       reporter: ['text', 'text-summary', 'html', 'lcov', 'json-summary'],
       reportsDirectory: 'coverage',
       // Tests load each `@tko/*` package via its `exports` (compiled `dist/`).
       // We include both `dist/` (so v8 picks up execution) and `src/` (so
       // source-map remapping can surface the original TS files in the report).
-      include: ['packages/*/src/**/*.ts', 'packages/*/dist/**/*.js', 'builds/*/src/**/*.ts'],
-      exclude: ['**/spec/**', '**/helpers/**', '**/types/**', '**/*.d.ts', '**/*.cjs', '**/index.ts', '**/index.js'],
+      include: [
+        'packages/*/src/**/*.ts',
+        'packages/*/dist/**/*.js',
+        'builds/*/src/**/*.ts'
+      ],
+      // `packages/*/index.ts` are 1-line re-export barrels — exclude them.
+      // `builds/*/src/index.ts` is the only real source file in each build,
+      // so we anchor the index-exclude to packages/ only.
+      exclude: [
+        '**/spec/**',
+        '**/helpers/**',
+        '**/types/**',
+        '**/*.d.ts',
+        '**/*.cjs',
+        'packages/*/index.ts',
+        'packages/*/index.js'
+      ],
       clean: true
     },
     projects: [
