@@ -70,6 +70,6 @@ TKO fits this model:
 - **Small surface area** — 27 focused packages, each simple enough for an AI to fully understand
 - **Fast verification** — 2700+ tests across three browser engines catch regressions instantly
 
-This is the [dark factory](https://github.com/knockout/tko/blob/main/plans/dark-factory.md) thesis: tooling, tests, and documentation robust enough that AI agents can handle routine maintenance autonomously. The "team" that every framework needs doesn't have to be all-human anymore.
+This is the [dark factory](https://github.com/knockout/tko/blob/main/plans/2026-04-16-dark-factory.md) thesis: tooling, tests, and documentation robust enough that AI agents can handle routine maintenance autonomously. The "team" that every framework needs doesn't have to be all-human anymore.
 
 Over 70,000 websites still run Knockout today. TKO gives them — and a new generation of AI-assisted developers — a path forward.

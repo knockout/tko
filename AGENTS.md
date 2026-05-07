@@ -130,7 +130,7 @@ GitHub Actions workflows (`.github/workflows/`):
 | `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
 | `lint-and-typecheck.yml` | PRs | Biome + tsc (lint, format, typecheck) |
 | `publish-check.yml` | PRs | Verify packages are publishable |
-| `release.yml` | Tag push (`v*`) | Changeset version PRs + npm publish + GitHub release creation |
+| `release.yml` | Push to main | Changeset version PRs + npm publish + GitHub release creation |
 | `github-release.yml` | Manual fallback | Backfill a GitHub release/tag for a published `main` commit if automatic release creation needs a retry |
 | `deploy-docs.yml` | Push to main | Deploy tko.io to GitHub Pages |
 | `codeql-analysis.yml` | Weekly + main push | Security scanning |
@@ -151,12 +151,14 @@ bunx changeset add   # Select affected packages, bump type, describe change
 ```
 This creates a changeset file in `.changeset/` that gets committed with your PR.
 
-**For maintainers** — releasing is handled by CI:
-1. Merge the "Version Packages" PR (created by the Changesets action) into main
-2. Tag the resulting commit: `git tag v<version> && git push origin v<version>`
-3. The tag push triggers `.github/workflows/release.yml`, which builds, tests, and publishes to npm via OIDC trusted publishing
-4. The same release workflow creates the matching GitHub Release
-5. If GitHub release creation ever needs a retry after publish, run `github-release.yml` manually with the merged commit SHA
+**For maintainers** — releasing is a single human action: **merge the version PR**.
+
+1. Feature PRs with changesets merge to `main`. `.github/workflows/release.yml` opens or updates a "chore: version packages" PR that bumps versions and updates changelogs.
+2. When the open version PR's batch feels release-worthy, merge it.
+3. The merge fires the workflow again: builds, tests, publishes to npm via OIDC trusted publishing, then creates the repo-wide `vX.Y.Z` git tag and matching GitHub Release in one `gh release create` call. The tag step is gated on `changesets/action`'s `published` output so plan-only / doc-only main pushes that have no pending changesets do not create spurious releases.
+4. If GitHub release creation ever needs a retry after publish, run `github-release.yml` manually with the merged commit SHA.
+
+No tag-push entry point. No force-moving tags. The version PR is the single review surface.
 
 Avoid manual workstation publishes. If release CI is unavailable, fix the
 workflow or npm trusted publisher configuration rather than bypassing it with a
@@ -173,6 +175,13 @@ concepts, refactors across 5+ files.
 
 **Skip for:** bug fixes, single-file edits, doc tweaks, dep bumps, comment
 cleanup, new tests in existing specs.
+
+**Naming:** `plans/YYYY-MM-DD-<slug>.md`, where the date is the **author
+date** of the first commit that adds the plan — i.e. `git log
+--diff-filter=A --follow --format=%as -- plans/YYYY-MM-DD-<slug>.md | tail -1`.
+Use author date, not committer date: a plan written late one day and landed
+the next morning should sort by when it was written. This keeps `ls plans/`
+chronological so stale plans are visually obvious.
 
 ## Agent-First Documentation
 

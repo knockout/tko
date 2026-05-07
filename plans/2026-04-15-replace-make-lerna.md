@@ -97,7 +97,7 @@ Replace build commands section with `bun run` equivalents.
 ## Execution order
 
 0. Create branch `modern-tooling/phase-3-replace-make-lerna` from main
-1. Copy this plan to `plans/replace-make-lerna.md`
+1. Copy this plan to `plans/2026-04-15-replace-make-lerna.md`
 2. Create `tools/build.ts` — test on one package manually
 3. Add `"build"` scripts to all 28 package.json files
 4. Add `tko` config to builds/knockout and builds/reference
@@ -106,7 +106,7 @@ Replace build commands section with `bun run` equivalents.
 7. Run `bunx vitest run` — verify tests pass
 8. Update CI workflows
 9. Delete all Makefiles, `tools/build.mk`, `lerna.json`
-10. Update AGENTS.md and plans/modern-tooling.md
+10. Update AGENTS.md and plans/2026-04-14-modern-tooling.md
 
 ## Verification
 
