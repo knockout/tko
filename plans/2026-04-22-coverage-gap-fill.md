@@ -4,9 +4,9 @@
 
 PR #364 wired up `bun run test:coverage` (vitest + `@vitest/coverage-v8`,
 chromium project, source-map remapped to TS). The first run produced
-`COVERAGE.md` (text summary) and `coverage/` (HTML + `coverage-summary.json`
-+ `lcov.info`). Overall: **92.71% statements / 87.63% branches / 90.29%
-functions / 92.82% lines** across the public `@tko/*` surface.
+`coverage/` (HTML + `coverage-summary.json` + `lcov.info`). Overall:
+**92.71% statements / 87.63% branches / 90.29%
+functions / 92.82% lines** across the public `@tko/*` surface (Date:2026-04-22).
 
 That number hides a long tail of low-coverage files concentrated in the
 provider stack and a few utils modules. Because TKO is a published low-level
@@ -26,7 +26,6 @@ Regenerate with `bun run test:coverage`
 
 - `coverage/coverage-summary.json` — per-file totals (machine-readable)
 - `coverage/lcov-report/index.html` — drill-down with uncovered line ranges
-- `COVERAGE.md` — committed text snapshot
 
 Refresh before working on this plan: `bun run test:coverage` then re-read the
 relevant `coverage/lcov-report/<package>/<file>.ts.html` for exact line numbers.
@@ -84,7 +83,8 @@ will drift as tests land.
 - No file in a public package below **70% lines** unless a follow-up issue
   documents why (e.g. legacy compat path that needs a real DOM quirk).
 - Overall totals: **≥ 95% lines / ≥ 92% branches**.
-- `COVERAGE.md` regenerated and committed with the final commit.
+- Final verification includes a fresh local `bun run test:coverage` run and
+  review of `coverage/` artifacts.
 
 Non-goals:
 - No new features, no refactors, no public API changes.
@@ -102,7 +102,7 @@ spies/timers, real-DOM fixtures via the existing helpers.
 
 Order by risk × ease:
 
-### Phase 1 — Trivial wins (single small file each)
+### Phase 1 — Trivial wins (single small file each) (DONE)
 
 One commit per file. Each adds a `*.spec.ts` or appends to an existing one,
 and re-runs `bun run test:coverage` for that package to confirm the file
@@ -168,8 +168,6 @@ through the existing provider specs rather than poking internals.
 
 - `packages/<pkg>/spec/**/*.ts` — new or extended spec files (one per
   commit, scoped to the file under test).
-- `COVERAGE.md` — regenerated in the final commit of each phase (so the
-  history shows the gap closing).
 
 No production code changes expected. If a phase surfaces a real bug, the
 fix lands in a **separate commit before the test commit** with its own
@@ -185,8 +183,8 @@ Per commit:
 4. `bunx tsc` — types clean.
 
 Per phase:
-- `COVERAGE.md` regenerated and diff reviewed for unexpected regressions
-  in unrelated files (a sign a test is leaking state).
+- Fresh local `bun run test:coverage` run reviewed for unexpected
+  regressions in unrelated files (a sign a test is leaking state).
 
 Per merge:
 - `bun run verify` passes (AGENTS.md "Before you start").
