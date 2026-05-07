@@ -1,5 +1,27 @@
 # @tko/build.knockout
 
+## 4.1.0
+
+### Patch Changes
+
+- Updated dependencies [3aea21c]
+- Updated dependencies [49576cb]
+  - @tko/utils@4.1.0
+  - @tko/binding.core@4.1.0
+  - @tko/provider.component@4.1.0
+  - @tko/binding.foreach@4.1.0
+  - @tko/builder@4.1.0
+  - @tko/binding.component@4.1.0
+  - @tko/binding.if@4.1.0
+  - @tko/binding.template@4.1.0
+  - @tko/filter.punches@4.1.0
+  - @tko/provider.attr@4.1.0
+  - @tko/provider.databind@4.1.0
+  - @tko/provider.multi@4.1.0
+  - @tko/provider.virtual@4.1.0
+  - @tko/utils.component@4.1.0
+  - @tko/utils.functionrewrite@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes

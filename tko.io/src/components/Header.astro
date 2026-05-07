@@ -1,6 +1,6 @@
 ---
 import config from 'virtual:starlight/user-config';
-import { readFileSync } from 'node:fs';
+import pkg from '../../../builds/knockout/package.json';
 
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
@@ -11,7 +11,6 @@ import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 const shouldRenderSearch =
 	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
 
-const pkg = JSON.parse(readFileSync(new URL('../../../builds/knockout/package.json', import.meta.url), 'utf8'));
 const version = pkg.version;
 ---
 

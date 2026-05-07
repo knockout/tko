@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.1.0",
   "name": "@tko/observable",
   "description": "TKO subscribables and observables",
   "repository": {
@@ -29,7 +29,7 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/utils": "^4.0.1"
+    "@tko/utils": "^4.1.0"
   },
   "licenses": [
     {

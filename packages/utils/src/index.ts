@@ -6,6 +6,7 @@
 
 export * from './array'
 export * from './async'
+export * from './compat'
 export * from './error'
 export * from './object'
 export * from './string'

@@ -1,5 +1,7 @@
 # @tko/utils.functionrewrite
 
+## 4.1.0
+
 ## 4.0.1
 
 ### Patch Changes

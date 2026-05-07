@@ -1,6 +1,4 @@
 ---
-import { fileURLToPath } from 'node:url'
-
 // Read the source-mode chunk list at SSR time so the HTML ships
 // with <link rel="modulepreload"> for every shared chunk already
 // in <head>. The browser starts warming the HTTP cache during
@@ -9,8 +7,8 @@ import { fileURLToPath } from 'node:url'
 // iframes with the opaque "Importing a module script failed."
 // error. `prebuild` always runs bundle-tests.mjs before Astro
 // builds the site, so manifest.json is guaranteed to exist.
-const manifestPath = fileURLToPath(new URL('../../public/tests/source/manifest.json', import.meta.url))
-const sourceChunks: string[] = (await Bun.file(manifestPath).json()).chunks ?? []
+import manifest from '../../public/tests/source/manifest.json'
+const sourceChunks: string[] = manifest.chunks ?? []
 
 // TKO Browser Test Runner — written in TKO itself.
 //

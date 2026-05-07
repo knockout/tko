@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.1.0",
   "name": "@tko/builder",
   "description": "Compile a customized instance of Knockout.",
   "repository": {
@@ -9,14 +9,14 @@
   "author": "The Knockout Team",
   "license": "MIT",
   "dependencies": {
-    "@tko/bind": "^4.0.1",
-    "@tko/binding.template": "^4.0.1",
-    "@tko/computed": "^4.0.1",
-    "@tko/lifecycle": "^4.0.1",
-    "@tko/observable": "^4.0.1",
-    "@tko/provider": "^4.0.1",
-    "@tko/utils": "^4.0.1",
-    "@tko/utils.parser": "^4.0.1"
+    "@tko/bind": "^4.1.0",
+    "@tko/binding.template": "^4.1.0",
+    "@tko/computed": "^4.1.0",
+    "@tko/lifecycle": "^4.1.0",
+    "@tko/observable": "^4.1.0",
+    "@tko/provider": "^4.1.0",
+    "@tko/utils": "^4.1.0",
+    "@tko/utils.parser": "^4.1.0"
   },
   "homepage": "https://tko.io",
   "licenses": [

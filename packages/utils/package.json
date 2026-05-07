@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.1.0",
   "name": "@tko/utils",
   "description": "TKO Utilities",
   "type": "module",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://tko.io",
   "dependencies": {
-    "@tko/provider": "^4.0.1",
-    "@tko/builder": "^4.0.1"
+    "@tko/provider": "^4.1.0",
+    "@tko/builder": "^4.1.0"
   },
   "licenses": [
     {

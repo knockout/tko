@@ -77,9 +77,6 @@
         "@tko/provider": "^4.0.1",
         "@tko/utils": "^4.0.1",
       },
-      "peerDependencies": {
-        "@tko/binding.foreach": "^4.0.1",
-      },
     },
     "packages/binding.component": {
       "name": "@tko/binding.component",
@@ -131,9 +128,6 @@
         "@tko/observable": "^4.0.1",
         "@tko/utils": "^4.0.1",
       },
-      "peerDependencies": {
-        "@tko/binding.if": "^4.0.1",
-      },
     },
     "packages/builder": {
       "name": "@tko/builder",
@@ -170,9 +164,6 @@
       "dependencies": {
         "@tko/computed": "^4.0.1",
         "@tko/utils": "^4.0.1",
-      },
-      "peerDependencies": {
-        "@tko/observable": "^4.0.1",
       },
     },
     "packages/observable": {
@@ -277,13 +268,6 @@
         "@tko/observable": "^4.0.1",
         "@tko/utils": "^4.0.1",
       },
-      "peerDependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/binding.core": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/provider.multi": "^4.0.1",
-        "@tko/provider.virtual": "^4.0.1",
-      },
     },
     "packages/utils.functionrewrite": {
       "name": "@tko/utils.functionrewrite",
@@ -307,11 +291,6 @@
       "dependencies": {
         "@tko/observable": "^4.0.1",
         "@tko/utils": "^4.0.1",
-      },
-      "peerDependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/binding.core": "^4.0.1",
-        "@tko/provider.databind": "^4.0.1",
       },
     },
   },

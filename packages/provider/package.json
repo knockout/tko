@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.1.0",
   "name": "@tko/provider",
   "description": "Abstract base class of tko Provider (HTML <-> Data Binding linker)",
   "module": "dist/index.js",
@@ -9,9 +9,9 @@
   "author": "The Knockout Team",
   "license": "MIT",
   "dependencies": {
-    "@tko/observable": "^4.0.1",
-    "@tko/utils": "^4.0.1",
-    "@tko/bind": "^4.0.1"
+    "@tko/observable": "^4.1.0",
+    "@tko/utils": "^4.1.0",
+    "@tko/bind": "^4.1.0"
   },
   "homepage": "https://tko.io",
   "licenses": [

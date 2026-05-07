@@ -4,7 +4,6 @@
   "type": "module",
   "description": "TKO documentation site",
   "scripts": {
-    "postinstall": "patch-package",
     "prebuild": "bun ./scripts/generate-verified-behaviors.mjs && mkdir -p public/lib && cd ../builds/knockout && bun run build && cp dist/browser.min.js ../../tko.io/public/lib/ko.js && cd ../reference && bun run build && cp dist/browser.min.js ../../tko.io/public/lib/tko.js && cd ../../tko.io && bun ./scripts/bundle-tests.mjs",
     "predev": "bun run prebuild",
     "dev": "ASTRO_TELEMETRY_DISABLED=1 bun --bun astro dev",
@@ -16,10 +15,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@astrojs/starlight": "0.37.7",
-    "@astrojs/check": "0.9.6",
-    "astro": "5.18.1",
-    "patch-package": "^8.0.1",
+    "@astrojs/starlight": "0.38.3",
+    "@astrojs/check": "0.9.8",
+    "astro": "6.1.8",
     "typescript": "^5.9.3"
   }
 }

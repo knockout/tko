@@ -1,5 +1,13 @@
 # @tko/provider.bindingstring
 
+## 4.1.0
+
+### Patch Changes
+
+- Updated dependencies [49576cb]
+  - @tko/utils.parser@4.1.0
+  - @tko/provider@4.1.0
+
 ## 4.0.1
 
 ### Patch Changes

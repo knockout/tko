@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1",
+  "version": "4.1.0",
   "name": "@tko/provider.attr",
   "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
   "module": "dist/index.js",
@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider": "^4.0.1"
+    "@tko/provider": "^4.1.0"
   },
   "homepage": "https://tko.io",
   "licenses": [
