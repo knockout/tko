@@ -155,4 +155,10 @@ describe('Binding: If', function () {
     expect(callbacks).to.equal(2)
     expectContainText(testNode.childNodes[0], 'hello')
   })
+
+  it('Should resolve applyBindings promise when condition is false with no else branch', async function () {
+    testNode.innerHTML = "<div data-bind='if: false'><span data-bind='text: $data'></span></div>"
+    await applyBindings({}, testNode)
+    expect(testNode.childNodes[0].childNodes.length).to.equal(0)
+  })
 })
