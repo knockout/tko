@@ -7,6 +7,14 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    # Hold version bumps for 2 days after publish so a freshly compromised
+    # release has time to be yanked / flagged before Dependabot opens the
+    # PR. Security updates ignore cooldown and ship immediately, so CVE
+    # response time is unaffected. The dark-factory thesis: a low-level
+    # framework with an unknown audience cannot afford supply-chain blast
+    # radius from same-day automated dep bumps.
+    cooldown:
+      default-days: 2
     ignore:
       # package will be removed
       - dependency-name: "*jasmine*"
@@ -32,3 +40,5 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 2
