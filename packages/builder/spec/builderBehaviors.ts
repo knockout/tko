@@ -14,9 +14,9 @@ describe('Builder', () => {
     // (which at this point holds the punctuation filters from
     // `@tko/filter.punches`) and breaks ~14 downstream filter-
     // lookup tests.
-    // @ts-ignore — global helper from mocha-test-helpers.js
+    // @ts-expect-error — global helper from mocha-test-helpers.js
     restoreAfter(options, 'filters')
-    // @ts-ignore — global helper from mocha-test-helpers.js
+    // @ts-expect-error — global helper from mocha-test-helpers.js
     restoreAfter(options, 'bindingProviderInstance')
     // We're just testing that the builder constructs, here.
     const builder = new Builder({ filters: {}, provider: new VirtualProvider(), bindings: [ifBindings], options: {} })

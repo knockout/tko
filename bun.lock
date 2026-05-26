@@ -10,7 +10,7 @@
         "@types/mocha": "^10.0.10",
         "@vitest/browser": "^4.1.4",
         "@vitest/browser-playwright": "^4.1.4",
-        "@vitest/coverage-v8": "^4.1.4",
+        "@vitest/coverage-v8": "4.1.4",
         "chai": "^6.2.2",
         "esbuild": "^0.28.0",
         "happy-dom": "^20.9.0",
@@ -24,7 +24,7 @@
     },
     "builds/knockout": {
       "name": "@tko/build.knockout",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/binding.component": "^4.0.1",
         "@tko/binding.core": "^4.0.1",
@@ -45,7 +45,7 @@
     },
     "builds/reference": {
       "name": "@tko/build.reference",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/binding.component": "^4.0.1",
         "@tko/binding.core": "^4.0.1",
@@ -68,19 +68,19 @@
     },
     "packages/bind": {
       "name": "@tko/bind",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/builder": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/lifecycle": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/provider": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/builder": "^4.1.0",
+        "@tko/computed": "^4.1.0",
+        "@tko/lifecycle": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/provider": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/binding.component": {
       "name": "@tko/binding.component",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/lifecycle": "^4.0.1",
@@ -93,7 +93,7 @@
     },
     "packages/binding.core": {
       "name": "@tko/binding.core",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/computed": "^4.0.1",
@@ -103,7 +103,7 @@
     },
     "packages/binding.foreach": {
       "name": "@tko/binding.foreach",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -112,7 +112,7 @@
     },
     "packages/binding.if": {
       "name": "@tko/binding.if",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -121,77 +121,78 @@
     },
     "packages/binding.template": {
       "name": "@tko/binding.template",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/bind": "^4.1.0",
+        "@tko/computed": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/builder": {
       "name": "@tko/builder",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/binding.template": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/lifecycle": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/provider": "^4.0.1",
-        "@tko/utils": "^4.0.1",
-        "@tko/utils.parser": "^4.0.1",
+        "@tko/bind": "^4.1.0",
+        "@tko/binding.template": "^4.1.0",
+        "@tko/computed": "^4.1.0",
+        "@tko/lifecycle": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/provider": "^4.1.0",
+        "@tko/utils": "^4.1.0",
+        "@tko/utils.parser": "^4.1.0",
       },
     },
     "packages/computed": {
       "name": "@tko/computed",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/filter.punches": {
       "name": "@tko/filter.punches",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/observable": "^4.0.1",
       },
     },
     "packages/lifecycle": {
       "name": "@tko/lifecycle",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/computed": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/computed": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/observable": {
       "name": "@tko/observable",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/utils": "^4.0.1",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/provider": {
       "name": "@tko/provider",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/bind": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/provider.attr": {
       "name": "@tko/provider.attr",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/provider": "^4.0.1",
       },
     },
     "packages/provider.bindingstring": {
       "name": "@tko/provider.bindingstring",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/provider": "^4.0.1",
         "@tko/utils.parser": "^4.0.1",
@@ -199,7 +200,7 @@
     },
     "packages/provider.component": {
       "name": "@tko/provider.component",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/computed": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -211,7 +212,7 @@
     },
     "packages/provider.databind": {
       "name": "@tko/provider.databind",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/provider.bindingstring": "^4.0.1",
@@ -219,7 +220,7 @@
     },
     "packages/provider.multi": {
       "name": "@tko/provider.multi",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/provider": "^4.0.1",
@@ -227,7 +228,7 @@
     },
     "packages/provider.mustache": {
       "name": "@tko/provider.mustache",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/observable": "^4.0.1",
         "@tko/provider": "^4.0.1",
@@ -236,7 +237,7 @@
     },
     "packages/provider.native": {
       "name": "@tko/provider.native",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -245,7 +246,7 @@
     },
     "packages/provider.virtual": {
       "name": "@tko/provider.virtual",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/provider.bindingstring": "^4.0.1",
@@ -254,15 +255,15 @@
     },
     "packages/utils": {
       "name": "@tko/utils",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/builder": "^4.0.1",
-        "@tko/provider": "^4.0.1",
+        "@tko/builder": "^4.1.0",
+        "@tko/provider": "^4.1.0",
       },
     },
     "packages/utils.component": {
       "name": "@tko/utils.component",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/lifecycle": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -271,11 +272,11 @@
     },
     "packages/utils.functionrewrite": {
       "name": "@tko/utils.functionrewrite",
-      "version": "4.0.1",
+      "version": "4.1.0",
     },
     "packages/utils.jsx": {
       "name": "@tko/utils.jsx",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/computed": "^4.0.1",
@@ -287,10 +288,10 @@
     },
     "packages/utils.parser": {
       "name": "@tko/utils.parser",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
   },

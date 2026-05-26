@@ -181,7 +181,7 @@ describe('Identifier', function () {
       // mutated `bindingGlobals` leaks into every subsequent spec
       // that resolves `$parent` / `$customProp` / … against the
       // global lookup, breaking 31 unrelated tests.
-      // @ts-ignore — global helper from mocha-test-helpers.js
+      // @ts-expect-error — global helper from mocha-test-helpers.js
       restoreAfter(options, 'bindingGlobals')
       options.bindingGlobals = Object.create({ Ramanujan: '1729' })
       const div = document.createElement('div'),
