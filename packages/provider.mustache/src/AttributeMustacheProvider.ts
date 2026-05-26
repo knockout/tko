@@ -80,13 +80,14 @@ export default class AttributeMustacheProvider extends Provider {
 
   getPossibleDirectBinding(attrName: string | number) {
     const bindingName = this.ATTRIBUTES_BINDING_MAP[attrName]
-    return bindingName && this.bindingHandlers.get(attrName)
+    return bindingName && this.bindingHandlers.get(bindingName)
   }
 
   *bindingObjects(node: Element, context: any) {
     for (const [attrName, parts] of this.bindingParts(node, context)) {
       const bindingForAttribute = this.getPossibleDirectBinding(attrName)
-      const handler: string = bindingForAttribute ? attrName : `attr.${attrName}`
+      const bindingName: string = this.ATTRIBUTES_BINDING_MAP[attrName] || (attrName as string)
+      const handler: string = bindingForAttribute ? bindingName : `attr.${attrName}`
       const accessorFn = bindingForAttribute
         ? (...v: any) => this.partsTogether(parts, context, node, ...v)
         : (...v: any) => ({ [attrName]: this.partsTogether(parts, context, node, ...v) })

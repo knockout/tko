@@ -216,6 +216,15 @@ describe('Attribute Interpolation Markup Provider', function () {
     // expect(testNode.getAttribute('data-bind')).to.equal('attr.title:expr1,attr.id:expr2')
   })
 
+  it('Should map class attribute to css binding (not attr.class)', function () {
+    testNode.setAttribute('class', '{{ className }}')
+    const bindings = provider.getBindingAccessors(testNode, ctxStub({ className: 'active' }))
+    // 'class' is mapped to 'css' in DEFAULT_ATTRIBUTE_BINDING_MAP; the handler key must be 'css'
+    expect(Object.keys(bindings)).to.include('css')
+    expect(Object.keys(bindings)).not.to.include('attr.class')
+    expect(Object.keys(bindings)).not.to.include('class')
+  })
+
   it('should set the style attribute (when there is a `style` binding)', function () {
     const obs = Observable()
     testNode.innerHTML = '<div style="color: {{ obs }}"></div>'
