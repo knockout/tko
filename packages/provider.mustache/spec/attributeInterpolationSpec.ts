@@ -167,6 +167,15 @@ describe('Attribute Interpolation Markup Provider', function () {
     expect(testNode.getAttribute('class')).to.equal('test')
   })
 
+  it('Should map class attribute to css binding', function () {
+    testNode.setAttribute('class', '{{expr}}')
+    const bindings: any[] = Array.from(provider.bindingObjects(testNode, ctxStub({ expr: 'active' })))
+    expect(bindings.length).to.equal(1)
+    expect(bindings[0]).to.have.property('css')
+    expect(bindings[0]).to.not.have.property('class')
+    expect(bindings[0]).to.not.have.property('attr.class')
+  })
+
   it('Should convert value and checked attributes to two-way bindings', function () {
     const input = document.createElement('input')
     input.type = 'checkbox'
