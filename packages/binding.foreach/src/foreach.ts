@@ -570,10 +570,6 @@ export class ForEachBinding extends AsyncBindingHandler {
     return true
   }
 
-  /* TODO: Remove; for legacy/testing */
-  static get ForEach() {
-    return this
-  }
   static get PENDING_DELETE_INDEX_SYM() {
     return PENDING_DELETE_INDEX_SYM
   }
