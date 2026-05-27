@@ -294,6 +294,7 @@ tko.applyBindings({ removeTodo: t => todos.remove(t) }, root)
 - **`dispose()` on computed/subscriptions** stops updates. After disposal, reading returns last cached value.
 - **HTML-producing computeds** should return `null` for empty output, not `false` or an empty fragment — bindings and JSX observers handle `null` cleanly.
 - **Binary HTML attributes** (`disabled`, `readonly`, `hidden`, `required`, `checked`, `selected`) omit the attribute when the value is `null`, `undefined`, or `false`. Use `|| undefined` in computeds to make "no attribute" explicit: `disabled={this.computed(() => shouldBeDisabled() || undefined)}`. Never return the string `"false"` — it keeps the attribute set.
+- **Pass the observable itself to `ko-*` attrs — not a called expression.** `ko-text={obs()}` calls `obs()` once at render time and gives TKO a static value; the DOM never updates after the initial render. Write `ko-text={obs}` (pass the observable). For derived expressions, hoist to a `ko.pureComputed`: `const label = ko.pureComputed(() => a() + b())`, then `ko-text={label}`.
 - **Prefer named computed variables over inline computeds in JSX.** A computed created inline in JSX is easier to accidentally recreate on each render than one bound to a class field or `const`.
 
 ## Testing
