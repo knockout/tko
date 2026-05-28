@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+import { readdir, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -42,8 +42,7 @@ async function readPackageDescription(packageDir) {
   const packageJsonPath = path.join(packagesRoot, packageDir, 'package.json')
 
   try {
-    const raw = await fs.readFile(packageJsonPath, 'utf8')
-    const parsed = JSON.parse(raw)
+    const parsed = await Bun.file(packageJsonPath).json()
     return parsed.description ?? ''
   } catch {
     return ''
@@ -90,9 +89,7 @@ async function assertCuratedPackageIsValid(pkg) {
 
     for (const spec of behavior.specs) {
       const specPath = path.join(repoRoot, spec)
-      try {
-        await fs.access(specPath)
-      } catch {
+      if (!await Bun.file(specPath).exists()) {
         throw new Error(`Missing spec reference: ${spec}`)
       }
     }
@@ -100,7 +97,7 @@ async function assertCuratedPackageIsValid(pkg) {
 }
 
 async function getAllPackageDirs() {
-  const entries = await fs.readdir(packagesRoot, { withFileTypes: true })
+  const entries = await readdir(packagesRoot, { withFileTypes: true })
   return entries
     .filter(entry => entry.isDirectory())
     .map(entry => entry.name)
@@ -111,7 +108,7 @@ async function readCuratedPackage(packageDir) {
   const curatedPath = path.join(packagesRoot, packageDir, curatedFilename)
 
   try {
-    const raw = await fs.readFile(curatedPath, 'utf8')
+    const raw = await Bun.file(curatedPath).text()
     return {
       data: JSON.parse(raw),
       curatedRelativePath: `packages/${packageDir}/${curatedFilename}`
@@ -128,7 +125,7 @@ async function hasSpecFiles(packageDir) {
   const specDir = path.join(packagesRoot, packageDir, 'spec')
 
   try {
-    const entries = await fs.readdir(specDir, { withFileTypes: true })
+    const entries = await readdir(specDir, { withFileTypes: true })
     const hasTests = entries.some(
       entry => entry.isFile() && /\.(?:[cm]?[jt]s|tsx|jsx)$/.test(entry.name)
     )
@@ -190,10 +187,10 @@ function warnForPackagesNeedingCuration(packages) {
 const allPackageDirs = await getAllPackageDirs()
 const packages = await buildPackages(allPackageDirs)
 warnForPackagesNeedingCuration(packages)
-await fs.mkdir(outputDir, { recursive: true })
+await mkdir(outputDir, { recursive: true })
 
 await Promise.all(
-  packages.map(pkg => fs.writeFile(path.join(outputDir, `${pkg.slug}.md`), renderPackage(pkg), 'utf8'))
+  packages.map(pkg => Bun.write(path.join(outputDir, `${pkg.slug}.md`), renderPackage(pkg)))
 )
 
-await fs.writeFile(path.join(outputDir, 'index.md'), renderIndex(packages), 'utf8')
+await Bun.write(path.join(outputDir, 'index.md'), renderIndex(packages))
