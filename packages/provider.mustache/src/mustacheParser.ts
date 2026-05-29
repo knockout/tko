@@ -69,7 +69,7 @@ class Text extends Interpolated {
 /**
  *          Interpolation Parsing
  */
-export function* innerParse(text: string) {
+function* innerParse(text: string) {
   const innerMatch = text.match(INNER_EXPRESSION)
   if (innerMatch) {
     const [pre, inner, post] = innerMatch.slice(1)
@@ -81,7 +81,7 @@ export function* innerParse(text: string) {
   }
 }
 
-export function* parseOuterMatch(outerMatch?: RegExpMatchArray | null) {
+function* parseOuterMatch(outerMatch?: RegExpMatchArray | null) {
   if (!outerMatch) {
     return
   }
