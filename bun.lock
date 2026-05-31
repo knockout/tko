@@ -10,21 +10,21 @@
         "@types/mocha": "^10.0.10",
         "@vitest/browser": "^4.1.4",
         "@vitest/browser-playwright": "^4.1.4",
-        "@vitest/coverage-v8": "^4.1.4",
+        "@vitest/coverage-v8": "4.1.4",
         "chai": "^6.2.2",
         "esbuild": "^0.28.0",
         "happy-dom": "^20.9.0",
         "jquery": "^4.0.0",
         "knip": "^6.4.1",
         "playwright": "^1.59.1",
-        "sinon": "^21.0.3",
+        "sinon": "^22.0.0",
         "typescript": "^6.0.2",
         "vitest": "^4.1.4",
       },
     },
     "builds/knockout": {
       "name": "@tko/build.knockout",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/binding.component": "^4.0.1",
         "@tko/binding.core": "^4.0.1",
@@ -45,7 +45,7 @@
     },
     "builds/reference": {
       "name": "@tko/build.reference",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/binding.component": "^4.0.1",
         "@tko/binding.core": "^4.0.1",
@@ -68,19 +68,19 @@
     },
     "packages/bind": {
       "name": "@tko/bind",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/builder": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/lifecycle": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/provider": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/builder": "^4.1.0",
+        "@tko/computed": "^4.1.0",
+        "@tko/lifecycle": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/provider": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/binding.component": {
       "name": "@tko/binding.component",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/lifecycle": "^4.0.1",
@@ -93,7 +93,7 @@
     },
     "packages/binding.core": {
       "name": "@tko/binding.core",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/computed": "^4.0.1",
@@ -103,7 +103,7 @@
     },
     "packages/binding.foreach": {
       "name": "@tko/binding.foreach",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -112,7 +112,7 @@
     },
     "packages/binding.if": {
       "name": "@tko/binding.if",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -121,77 +121,78 @@
     },
     "packages/binding.template": {
       "name": "@tko/binding.template",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/bind": "^4.1.0",
+        "@tko/computed": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/builder": {
       "name": "@tko/builder",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/binding.template": "^4.0.1",
-        "@tko/computed": "^4.0.1",
-        "@tko/lifecycle": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/provider": "^4.0.1",
-        "@tko/utils": "^4.0.1",
-        "@tko/utils.parser": "^4.0.1",
+        "@tko/bind": "^4.1.0",
+        "@tko/binding.template": "^4.1.0",
+        "@tko/computed": "^4.1.0",
+        "@tko/lifecycle": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/provider": "^4.1.0",
+        "@tko/utils": "^4.1.0",
+        "@tko/utils.parser": "^4.1.0",
       },
     },
     "packages/computed": {
       "name": "@tko/computed",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/filter.punches": {
       "name": "@tko/filter.punches",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/observable": "^4.0.1",
       },
     },
     "packages/lifecycle": {
       "name": "@tko/lifecycle",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/computed": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/computed": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/observable": {
       "name": "@tko/observable",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/utils": "^4.0.1",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/provider": {
       "name": "@tko/provider",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/bind": "^4.0.1",
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/bind": "^4.1.0",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
     "packages/provider.attr": {
       "name": "@tko/provider.attr",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/provider": "^4.0.1",
       },
     },
     "packages/provider.bindingstring": {
       "name": "@tko/provider.bindingstring",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/provider": "^4.0.1",
         "@tko/utils.parser": "^4.0.1",
@@ -199,7 +200,7 @@
     },
     "packages/provider.component": {
       "name": "@tko/provider.component",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/computed": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -211,7 +212,7 @@
     },
     "packages/provider.databind": {
       "name": "@tko/provider.databind",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/provider.bindingstring": "^4.0.1",
@@ -219,7 +220,7 @@
     },
     "packages/provider.multi": {
       "name": "@tko/provider.multi",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/provider": "^4.0.1",
@@ -227,7 +228,7 @@
     },
     "packages/provider.mustache": {
       "name": "@tko/provider.mustache",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/observable": "^4.0.1",
         "@tko/provider": "^4.0.1",
@@ -236,7 +237,7 @@
     },
     "packages/provider.native": {
       "name": "@tko/provider.native",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -245,7 +246,7 @@
     },
     "packages/provider.virtual": {
       "name": "@tko/provider.virtual",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/provider.bindingstring": "^4.0.1",
@@ -254,15 +255,15 @@
     },
     "packages/utils": {
       "name": "@tko/utils",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/builder": "^4.0.1",
-        "@tko/provider": "^4.0.1",
+        "@tko/builder": "^4.1.0",
+        "@tko/provider": "^4.1.0",
       },
     },
     "packages/utils.component": {
       "name": "@tko/utils.component",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/lifecycle": "^4.0.1",
         "@tko/observable": "^4.0.1",
@@ -271,11 +272,11 @@
     },
     "packages/utils.functionrewrite": {
       "name": "@tko/utils.functionrewrite",
-      "version": "4.0.1",
+      "version": "4.1.0",
     },
     "packages/utils.jsx": {
       "name": "@tko/utils.jsx",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
         "@tko/bind": "^4.0.1",
         "@tko/computed": "^4.0.1",
@@ -287,10 +288,10 @@
     },
     "packages/utils.parser": {
       "name": "@tko/utils.parser",
-      "version": "4.0.1",
+      "version": "4.1.0",
       "dependencies": {
-        "@tko/observable": "^4.0.1",
-        "@tko/utils": "^4.0.1",
+        "@tko/observable": "^4.1.0",
+        "@tko/utils": "^4.1.0",
       },
     },
   },
@@ -557,7 +558,7 @@
 
     "@sinonjs/commons": ["@sinonjs/commons@3.0.1", "", { "dependencies": { "type-detect": "4.0.8" } }, "sha512-K3mCHKQ9sVh8o1C9cxkwxaOmXoAMlDxC1mYyHrjqOWEcBjYr76t96zL2zlj5dUGZ3HSw240X1qgH3Mjf1yJWpQ=="],
 
-    "@sinonjs/fake-timers": ["@sinonjs/fake-timers@15.3.2", "", { "dependencies": { "@sinonjs/commons": "^3.0.1" } }, "sha512-mrn35Jl2pCpns+mE3HaZa1yPN5EYCRgiMI+135COjr2hr8Cls9DXqIZ57vZe2cz7y2XVSq92tcs6kGQcT1J8Rw=="],
+    "@sinonjs/fake-timers": ["@sinonjs/fake-timers@15.4.0", "", { "dependencies": { "@sinonjs/commons": "^3.0.1" } }, "sha512-DsG+8/LscQIQg68J6Ef3dv10u6nVyetYn923s3/sus5eaGfTo1of5WMZSLf0UJc9KDuKPilPH0UDJCjvNbDNCA=="],
 
     "@sinonjs/samsam": ["@sinonjs/samsam@10.0.2", "", { "dependencies": { "@sinonjs/commons": "^3.0.1", "type-detect": "^4.1.0" } }, "sha512-8lVwD1Df1BmzoaOLhMcGGcz/Jyr5QY2KSB75/YK1QgKzoabTeLdIVyhXNZK9ojfSKSdirbXqdbsXXqP9/Ve8+A=="],
 
@@ -683,7 +684,7 @@
 
     "detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
 
-    "diff": ["diff@8.0.4", "", {}, "sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw=="],
+    "diff": ["diff@9.0.0", "", {}, "sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw=="],
 
     "dir-glob": ["dir-glob@3.0.1", "", { "dependencies": { "path-type": "^4.0.0" } }, "sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA=="],
 
@@ -889,7 +890,7 @@
 
     "signal-exit": ["signal-exit@4.1.0", "", {}, "sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw=="],
 
-    "sinon": ["sinon@21.1.2", "", { "dependencies": { "@sinonjs/commons": "^3.0.1", "@sinonjs/fake-timers": "^15.3.2", "@sinonjs/samsam": "^10.0.2", "diff": "^8.0.4" } }, "sha512-FS6mN+/bx7e2ajpXkEmOcWB6xBzWiuNoAQT18/+a20SS4U7FSYl8Ms7N6VTUxN/1JAjkx7aXp+THMC8xdpp0gA=="],
+    "sinon": ["sinon@22.0.0", "", { "dependencies": { "@sinonjs/commons": "^3.0.1", "@sinonjs/fake-timers": "^15.4.0", "@sinonjs/samsam": "^10.0.2", "diff": "^9.0.0" } }, "sha512-sq/6DpdXOrLyfbKlXLg/Usc7xu8YXPeLkOFZRvA3bNUSA2lhbrZ06yuXbH1fkzBPCbz9O10+7hznzUsjaYNm0Q=="],
 
     "sirv": ["sirv@3.0.2", "", { "dependencies": { "@polka/url": "^1.0.0-next.24", "mrmime": "^2.0.0", "totalist": "^3.0.0" } }, "sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g=="],
 
