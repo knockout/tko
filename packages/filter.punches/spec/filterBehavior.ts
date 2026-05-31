@@ -6,13 +6,6 @@ import { filters } from '../dist'
 import { assert } from 'chai'
 
 declare let ko: KnockoutInstance
-/* can be remove https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array.isarray
-if (!Array.isArray) {
-  Array.isArray = function (arg) {
-    return Object.prototype.toString.call(arg) === '[object Array]'
-  }
-}
-*/
 
 describe('Text filters preprocessor', function () {
   const filterPreprocessor = function (string) {
