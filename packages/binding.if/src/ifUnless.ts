@@ -34,7 +34,6 @@ export class IfBindingHandler extends ConditionalBindingHandler {
 
     if (this.elseChainIsAlreadySatisfied) {
       shouldDisplay = false
-      // needsRefresh = isFirstRender || this.didDisplayOnLastUpdate FIXME
       this.completesElseChain(true)
     } else {
       this.completesElseChain(shouldDisplay)

@@ -54,6 +54,7 @@ Context variables inside foreach: $data, $parent, $root, $index (observable), $e
 
 Binding notes:
 - `textInput` binds an `<input>` or `<textarea>` with immediate two-way updates as the user types, pastes, drags, or accepts autofill. Prefer it over `value` when the model must update continuously.
+- `foreach` supports lifecycle callbacks as binding parameters: `afterRender(nodes, value)` fires after each item renders; `beforeMove(node, newIndex, value)` and `afterMove(node, newIndex, value)` fire during array reordering.
 
 ```html
 <input data-bind="textInput: query">
