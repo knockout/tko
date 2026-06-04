@@ -27,6 +27,20 @@ declare const BUILD_VERSION: string
 /** Use === and !== instead of == and != in binding expressions */
 options.strictEquality = true
 
+type ReferenceBuildExtensions = {
+  jsx: {
+    createElement: typeof createElement
+    Fragment: typeof Fragment
+    render(jsx: any): {
+      node: ChildNode | DocumentFragment | null
+      dispose: () => void
+    }
+  }
+  components: typeof components
+  version: string
+  Component: typeof components.ComponentABC
+}
+
 const builder = new Builder({
   filters,
   extenders: {},
@@ -54,7 +68,7 @@ const builder = new Builder({
 
 const version = BUILD_VERSION
 
-export default builder.create({
+const referenceBuild: ReferenceBuildExtensions = {
   jsx: {
     createElement,
     Fragment,
@@ -73,4 +87,6 @@ export default builder.create({
   components,
   version,
   Component: components.ComponentABC
-})
+}
+
+export default builder.create(referenceBuild)

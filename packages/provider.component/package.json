@@ -4,7 +4,8 @@
   "description": "Bind custom web components e.g. <custom-binding>",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -24,6 +25,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -45,5 +47,6 @@
     "provider",
     "web-components",
     "custom-elements"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }
