@@ -32,3 +32,6 @@ jobs:
 
       - name: Typecheck
         run: bunx tsc
+
+      - name: Verify types (smoke test .d.ts)
+        run: bun run verify:types
