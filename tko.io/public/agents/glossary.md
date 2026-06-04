@@ -50,14 +50,28 @@ TKO is a monorepo. Key packages:
 |---------|---------|
 | `@tko/observable` | Observables, computed, observable arrays |
 | `@tko/computed` | Computed/pure computed implementation |
+| `@tko/lifecycle` | Subscription and disposal tracking mixin |
 | `@tko/bind` | Binding application, binding context, binding handlers |
 | `@tko/binding.core` | Built-in bindings (text, visible, css, attr, etc.) |
 | `@tko/binding.foreach` | foreach binding implementation |
 | `@tko/binding.if` | if/ifnot/with/using control flow |
 | `@tko/binding.template` | Template rendering engine |
+| `@tko/binding.component` | Component binding for custom elements |
 | `@tko/utils` | DOM utilities, array helpers, tasks scheduler |
+| `@tko/utils.component` | Component registry, loaders, and ComponentABC base class |
+| `@tko/utils.functionrewrite` | Rewrites function expressions as arrow functions for binding |
+| `@tko/utils.jsx` | JSX/TSX rendering: createElement, Fragment, JsxObserver |
+| `@tko/utils.parser` | CSP-safe expression parser for data-bind attributes |
 | `@tko/provider` | Base provider class |
 | `@tko/provider.databind` | `data-bind` attribute provider |
+| `@tko/provider.attr` | Binds `ko-*` HTML attributes to binding handlers |
+| `@tko/provider.bindingstring` | Abstract base for binding string parsers |
+| `@tko/provider.component` | Binding provider for custom web component elements |
+| `@tko/provider.multi` | Combines multiple binding providers into one |
+| `@tko/provider.mustache` | Mustache-style `{{ }}` interpolation in HTML |
+| `@tko/provider.native` | Binding provider for values set directly on DOM nodes (JSX/TSX) |
+| `@tko/provider.virtual` | Binding provider for `<!-- ko -->` virtual elements |
 | `@tko/builder` | Assembles TKO instance from packages |
+| `@tko/filter.punches` | Knockout-punches expression filters for binding strings |
 | `@tko/build.knockout` | Backwards-compatible Knockout.js distribution |
 | `@tko/build.reference` | Modern recommended distribution |
