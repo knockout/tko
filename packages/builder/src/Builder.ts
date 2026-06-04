@@ -318,7 +318,7 @@ export class Builder {
   }
 
   /**
-   * @return {KnockoutInstance} An instance of Knockout.
+   * @return {KnockoutInstance & AdditionalProperties<T>} An instance of Knockout with merged extension properties.
    */
   create<T extends object[]>(...additionalProperties: T): KnockoutInstance & AdditionalProperties<T> {
     const instance = Object.assign(
