@@ -111,7 +111,6 @@ export interface VirtualElementsAllowedBindings {
 }
 
 export const allowedBindings: VirtualElementsAllowedBindings = Object.create(null)
-export const hasBindingValue = isStartComment
 
 export function childNodes(node: Node): any {
   return isStartComment(node) ? getVirtualChildren(node) : node.childNodes
