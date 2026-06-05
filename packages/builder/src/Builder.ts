@@ -229,12 +229,6 @@ export type KnockoutInstance = {
   bindingEvent: typeof bindingEvent
 }
 
-type UnionToIntersection<T> = (T extends unknown ? (value: T) => void : never) extends (value: infer I) => void
-  ? I
-  : never
-
-type AdditionalProperties<T extends object[]> = T extends [] ? {} : UnionToIntersection<T[number]>
-
 const knockout: KnockoutInstance = {
   // --- Utilities ---
   cleanNode,
@@ -318,9 +312,9 @@ export class Builder {
   }
 
   /**
-   * @return {KnockoutInstance & AdditionalProperties<T>} An instance of Knockout with merged extension properties.
+   * @return {KnockoutInstance & T} An instance of Knockout with merged extension properties.
    */
-  create<T extends object[]>(...additionalProperties: T): KnockoutInstance & AdditionalProperties<T> {
+  create<T extends object>(additionalProperties: T): KnockoutInstance & T {
     const instance = Object.assign(
       {
         get getBindingHandler() {
@@ -332,8 +326,8 @@ export class Builder {
       },
       knockout, //never change the order of these
       this.providedProperties,
-      ...additionalProperties
-    ) as KnockoutInstance & AdditionalProperties<T>
+      additionalProperties
+    ) as KnockoutInstance & T
 
     instance.options.knockoutInstance = instance
 

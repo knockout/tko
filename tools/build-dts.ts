@@ -11,8 +11,9 @@ for await (const manifest of new Glob('packages/*/package.json').scan('.')) {
 
 const workspaces = [...packageWorkspaces.sort(), ...buildWorkspaces].sort()
 
-if (workspaces.length !== 27) {
-  throw new Error(`Expected 27 publishable workspaces, found ${workspaces.length}`)
+const WORKSPACES_EXPECTED_COUNT = 27
+if (workspaces.length !== WORKSPACES_EXPECTED_COUNT) {
+  throw new Error(`Expected ${WORKSPACES_EXPECTED_COUNT} publishable workspaces, found ${workspaces.length}`)
 }
 
 await $`rm -rf ${tempOutDir}`.quiet()

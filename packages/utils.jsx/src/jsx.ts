@@ -1,6 +1,6 @@
 import { isObservable, unwrap } from '@tko/observable'
 
-import { ORIGINAL_JSX_SYM } from './JsxObserver'
+import { JsxObserver, ORIGINAL_JSX_SYM } from './JsxObserver'
 
 /**
  *
@@ -55,3 +55,20 @@ export function createElement(elementName, attributes, ...children) {
 }
 
 export const Fragment = Symbol('JSX Fragment')
+
+/** The shape returned by `render()`. */
+export type JsxRenderResult = {
+  node: ChildNode | DocumentFragment | null
+  dispose: () => void
+}
+
+/** Converts JSX to DOM nodes, returning the node and a dispose callback. */
+export function render(jsx: any): JsxRenderResult {
+  const fragment = document.createDocumentFragment()
+  const observer = new JsxObserver(jsx, fragment)
+  const node = fragment.childNodes.length === 1 ? fragment.firstChild : fragment
+  return {
+    node,
+    dispose: () => observer.dispose()
+  }
+}
