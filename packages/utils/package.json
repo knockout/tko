@@ -4,7 +4,8 @@
   "description": "TKO Utilities",
   "type": "module",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -35,12 +36,19 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "module": "dist/index.js",
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "types": "./types/index.d.ts"
 }
