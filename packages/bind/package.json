@@ -2,7 +2,7 @@
   "version": "4.1.0",
   "name": "@tko/bind",
   "description": "TKO DOM-Observable Binding",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "dependencies": {
     "@tko/computed": "^4.1.0",
     "@tko/lifecycle": "^4.1.0",
@@ -34,9 +34,14 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "scripts": {

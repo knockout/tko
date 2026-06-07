@@ -54,9 +54,14 @@
   },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "tko": {

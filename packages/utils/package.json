@@ -36,9 +36,14 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "module": "dist/index.js",

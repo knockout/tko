@@ -2,7 +2,7 @@
   "version": "4.1.0",
   "name": "@tko/utils.parser",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "files": [
     "dist/",
     "types/"
@@ -21,9 +21,14 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "bugs": {

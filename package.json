@@ -13,7 +13,8 @@
     "test:coverage": "bun run build && bunx vitest run --coverage --project browser",
     "tsc": "bunx tsc",
     "dts": "bun tools/build-dts.ts",
-    "verify:types": "bunx tsc -p tools/types-smoke/tsconfig.json",
+    "verify:types": "bunx tsc -p tools/types-smoke/tsconfig.json && bunx tsc -p tools/types-smoke/tsconfig.node16.json && bunx tsc -p tools/types-smoke/tsconfig.nodenext.json",
+    "verify:publish-types": "bun tools/verify-publish-types.ts",
     "format": "bunx @biomejs/biome format .",
     "format:fix": "bunx @biomejs/biome format --write .",
     "lint": "bunx @biomejs/biome lint .",
@@ -21,7 +22,7 @@
     "check": "bunx @biomejs/biome check .",
     "knip": "knip",
     "verify:esm": "bun tools/verify-esm-extensions.ts",
-    "verify": "bunx @biomejs/biome check . && bunx tsc && bun run build && bun run verify:types && bun run verify:esm && bunx vitest run",
+    "verify": "bunx @biomejs/biome check . && bunx tsc && bun run build && bun run verify:types && bun run verify:esm && bun run verify:publish-types && bunx vitest run",
     "clean": "rm -rf packages/*/dist packages/*/types builds/*/dist builds/*/types coverage .dts-tmp"
   },
   "bugs": "https://github.com/knockout/tko/issues",
@@ -32,6 +33,7 @@
     }
   ],
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
     "@biomejs/biome": "^2.4.16",
     "@changesets/cli": "^2.31.0",
     "@types/jquery": "^4.0.0",
@@ -45,6 +47,7 @@
     "jquery": "^4.0.0",
     "knip": "^6.14.2",
     "playwright": "^1.60.0",
+    "publint": "^0.3.21",
     "sinon": "^22.0.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.7"
