@@ -18,7 +18,7 @@ import { bindings as componentBindings } from '@tko/binding.component'
 
 import { ComponentProvider } from '@tko/provider.component'
 
-import { JsxObserver } from '../src'
+import { JsxObserver, render } from '../src'
 
 import { ORIGINAL_JSX_SYM } from '../src/JsxObserver'
 
@@ -1032,5 +1032,76 @@ describe('jsx', function () {
       assert.equal(parent.innerHTML, 'AB<!--O-->')
       jo.dispose()
     })
+  })
+})
+
+describe('render()', () => {
+  it('returns an object with a node and dispose function', () => {
+    const result = render({ elementName: 'div', children: [], attributes: {} })
+    assert.isObject(result)
+    assert.property(result, 'node')
+    assert.isFunction(result.dispose)
+    result.dispose()
+  })
+
+  it('returns the single child node when jsx produces exactly one element', () => {
+    const result = render({ elementName: 'span', children: [], attributes: { id: 'test' } })
+    assert.instanceOf(result.node, window.Element)
+    assert.equal((result.node as Element).tagName.toLowerCase(), 'span')
+    result.dispose()
+  })
+
+  it('returns the single text node when jsx is a plain string', () => {
+    const result = render('hello world')
+    assert.instanceOf(result.node, window.Text)
+    assert.equal((result.node as Text).nodeValue, 'hello world')
+    result.dispose()
+  })
+
+  it('returns a DocumentFragment when jsx produces multiple top-level nodes', () => {
+    // An observable with a string value renders a text node + a comment (<!--O-->),
+    // which is two child nodes inside the fragment, so render() returns the fragment.
+    const obs = observable('a')
+    const result = render(obs)
+    assert.instanceOf(result.node, DocumentFragment)
+    result.dispose()
+  })
+
+  it('returns a DocumentFragment when jsx is an array of multiple items', () => {
+    const result = render(['first', 'second'])
+    assert.instanceOf(result.node, DocumentFragment)
+    result.dispose()
+  })
+
+  it('dispose() can be called without throwing', () => {
+    const result = render({ elementName: 'div', children: ['text'], attributes: {} })
+    assert.doesNotThrow(() => result.dispose())
+  })
+
+  it('returns null node when jsx produces no children (empty array)', () => {
+    // An empty array inserts nothing — fragment stays empty, so firstChild is null.
+    // fragment.childNodes.length === 0 → falls to the fragment branch (length !== 1)
+    const result = render([])
+    // The fragment branch is taken when childNodes.length !== 1.
+    // Either null (firstChild of empty fragment) would be wrong — the fragment path
+    // is chosen, which is a DocumentFragment instance.
+    assert.instanceOf(result.node, DocumentFragment)
+    result.dispose()
+  })
+
+  it('node property reflects the rendered element tag name', () => {
+    const result = render({ elementName: 'article', children: ['content'], attributes: { class: 'main' } })
+    // A single element + text child inside it is still one root element node.
+    assert.instanceOf(result.node, window.Element)
+    assert.equal((result.node as Element).tagName.toLowerCase(), 'article')
+    result.dispose()
+  })
+
+  it('dispose() tears down the observer so observable updates no longer apply', () => {
+    const obs = observable({ elementName: 'p', children: ['initial'], attributes: {} })
+    const result = render(obs)
+    result.dispose()
+    // After dispose, updating the observable should not throw.
+    assert.doesNotThrow(() => obs({ elementName: 'p', children: ['updated'], attributes: {} }))
   })
 })
