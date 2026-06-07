@@ -29,3 +29,5 @@
 ---
 
 Publish generated `types/` folders for all public packages and both bundled builds, and advertise those declarations through package `types` metadata and `exports` conditions so consumer imports resolve the shipped type surface instead of repo-only sources.
+
+This also corrects the published module metadata for modern TypeScript package modes by routing `import` and `require` consumers to mode-appropriate JavaScript and declaration entrypoints. Packages now publish ESM/CJS-aware declaration entries so `bundler`, `node16`, and `nodenext` consumers resolve the shipped surface consistently instead of hitting Node-specific module-resolution mismatches.
