@@ -4,7 +4,8 @@
   "description": "Link binding handlers whose value is already attached to the node",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -21,6 +22,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -42,5 +44,6 @@
     "provider",
     "native",
     "jsx"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

@@ -4,7 +4,8 @@
   "description": "Combine multiple other providers into one",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -20,6 +21,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -41,5 +43,6 @@
     "provider",
     "composition",
     "multi-provider"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

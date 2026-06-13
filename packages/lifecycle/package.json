@@ -7,7 +7,8 @@
     "@tko/utils": "^4.1.0"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "name": "@tko/lifecycle",
   "description": "Knockout LifeCycle for object instances",
@@ -26,6 +27,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -42,5 +44,6 @@
     "lifecycle",
     "mixin",
     "observable"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }
