@@ -1,5 +1,12 @@
 # @tko/provider.multi
 
+## 4.1.1
+
+### Patch Changes
+
+- @tko/bind@4.1.1
+- @tko/provider@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 {
-  "version": "4.1.0",
+  "version": "4.1.1",
   "name": "@tko/utils.parser",
   "description": "Parse the Javascript-like language used in data-bind and other HTML attributes (CSP-safe)",
   "module": "dist/index.js",
@@ -8,8 +8,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/observable": "^4.1.0",
-    "@tko/utils": "^4.1.0"
+    "@tko/observable": "^4.1.1",
+    "@tko/utils": "^4.1.1"
   },
   "homepage": "https://tko.io",
   "licenses": [

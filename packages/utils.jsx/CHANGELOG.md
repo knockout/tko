@@ -1,5 +1,16 @@
 # @tko/utils.jsx
 
+## 4.1.1
+
+### Patch Changes
+
+- @tko/bind@4.1.1
+- @tko/computed@4.1.1
+- @tko/lifecycle@4.1.1
+- @tko/observable@4.1.1
+- @tko/provider.native@4.1.1
+- @tko/utils@4.1.1
+
 ## 4.1.0
 
 ### Minor Changes
