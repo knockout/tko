@@ -17,8 +17,8 @@ import { bindings as componentBindings } from '@tko/binding.component'
 import { filters } from '@tko/filter.punches'
 
 import components from '@tko/utils.component'
-import { createElement, Fragment } from '@tko/utils.jsx'
-import { JsxObserver } from '@tko/utils.jsx'
+import { createElement, Fragment, render } from '@tko/utils.jsx'
+import type { JsxRenderResult } from '@tko/utils.jsx'
 
 import { options } from '@tko/utils'
 
@@ -26,6 +26,17 @@ declare const BUILD_VERSION: string
 
 /** Use === and !== instead of == and != in binding expressions */
 options.strictEquality = true
+
+type ReferenceBuildExtensions = {
+  jsx: {
+    createElement: typeof createElement
+    Fragment: typeof Fragment
+    render(jsx: any): JsxRenderResult
+  }
+  components: typeof components
+  version: string
+  Component: typeof components.ComponentABC
+}
 
 const builder = new Builder({
   filters,
@@ -54,23 +65,15 @@ const builder = new Builder({
 
 const version = BUILD_VERSION
 
-export default builder.create({
+const referenceBuild: ReferenceBuildExtensions = {
   jsx: {
     createElement,
     Fragment,
-    /** Public render function that converts JSX to DOM nodes */
-    render(jsx: any) {
-      const fragment = document.createDocumentFragment()
-      const observer = new JsxObserver(jsx, fragment)
-      // Return the first child if single node, or the fragment if multiple
-      const node = fragment.childNodes.length === 1 ? fragment.firstChild : fragment
-      return {
-        node,
-        dispose: () => observer.dispose()
-      }
-    }
+    render
   },
   components,
   version,
   Component: components.ComponentABC
-})
+}
+
+export default builder.create(referenceBuild)
