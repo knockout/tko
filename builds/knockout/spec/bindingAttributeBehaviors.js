@@ -640,10 +640,12 @@ describe('Binding attribute syntax', function () {
     })
 
     it('<template>', function () {
-      document.createElement('template') // For old IE
+      // TKO recurses into <template>.content (unlike legacy KO, which left
+      // <template> contents alone). Verifies the build.knockout bundle
+      // matches the package-level behavior.
       testNode.innerHTML = '<p>Hello</p><template>test</template><p>Goodbye</p>'
       ko.applyBindings({ sometext: 'hello' }, testNode)
-      expectContainHtml(testNode, '<p>replaced</p><template>test</template><p>replaced</p>')
+      expectContainHtml(testNode, '<p>replaced</p><template>replaced</template><p>replaced</p>')
     })
   })
 
