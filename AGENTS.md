@@ -190,9 +190,13 @@ humans (HTML via Starlight) and agents (plain text).
 
 Agent-facing files in `tko.io/public/`:
 - `llms.txt` — discovery entry point, points to the guides below
+- `agents/soul.md` — why Knockout/TKO is shaped the way it is; read before making design decisions
 - `agents/guide.md` — API reference, gotchas, examples, playground URL format
 - `agents/testing.md` — how to run and verify TKO code without human interaction
 - `agents/glossary.md` — domain-specific terms, concepts, and package reference
+- `agents/contract.md` — canonical checklist for dividing state, bindings, and DOM work
+- `agents/options.md` — when to use `defineOption` vs a core `Options` field
+- `agents/process.md` — mandatory workflow: doc-ref verification, adversarial review, docs build
 
 When documentation changes — new APIs, new bindings, new patterns, behavioral
 changes — update **both** the Starlight docs (for humans) and the agent guide
