@@ -31,7 +31,7 @@
     }
   ],
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16",
+    "@biomejs/biome": "^2.5.0",
     "@changesets/cli": "^2.31.0",
     "@types/jquery": "^4.0.1",
     "@types/mocha": "^10.0.10",
@@ -39,10 +39,10 @@
     "@vitest/browser-playwright": "^4.1.8",
     "@vitest/coverage-v8": "4.1.8",
     "chai": "^6.2.2",
-    "esbuild": "^0.28.0",
-    "happy-dom": "^20.10.1",
+    "esbuild": "^0.28.1",
+    "happy-dom": "^20.10.3",
     "jquery": "^4.0.0",
-    "knip": "^6.16.0",
+    "knip": "^6.16.1",
     "playwright": "^1.60.0",
     "sinon": "^22.0.0",
     "typescript": "^6.0.3",
