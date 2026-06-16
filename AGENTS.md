@@ -28,7 +28,7 @@ Together: coverage and signal are expensive to lose and cheap to keep. When a ch
 Monorepo with Bun workspaces.
 
 ```text
-packages/          # 26 modular @tko/* packages (all TypeScript)
+packages/          # 25 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
 tools/             # Shared build script (build.ts)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
