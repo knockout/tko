@@ -199,7 +199,7 @@ ko.applyBindings({}, root)
 ```tsx
 const { node, dispose } = tko.jsx.render(<Component />)
 container.appendChild(node)
-tko.applyBindings({}, container) // activates ko-* bindings on the DOM
+ko.applyBindings({}, container) // activates ko-* bindings on the DOM
 ```
 
 ## Browser TSX transform (esbuild-wasm)
