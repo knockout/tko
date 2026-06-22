@@ -570,7 +570,17 @@ export default class Parser {
 
       ch = this.white()
 
-      if (ch === ']' || (!op && ch === '(')) {
+      if (
+        ch === ']' ||
+        ch === '}' ||
+        ch === ')' ||
+        ch === ':' ||
+        ch === '' ||
+        ch === '`' ||
+        (ch === '|' && filterable === '|') ||
+        (ch === ',' && !allowMultipleValues) ||
+        (!op && ch === '(')
+      ) {
         break
       }
     }

@@ -157,6 +157,26 @@ describe('the bindings parser', function () {
     assert.equal(bindings.attr().b, 'Imaginary')
   })
 
+  it('parses ?. (optional chaining) inside object literal values', function () {
+    // Regression: `?.` as the last operator in an object-value expression
+    // caused "Bad operator: '}'" because the expression loop re-entered its
+    // top, calling operator() with this.ch === '}' before the break check ran.
+    const binding = "css: {'active': obj?.active}",
+      context = ctxStub({ obj: { active: true } }),
+      bindings = new Parser().parse(binding, context)
+    assert.deepEqual(bindings.css(), { active: true })
+  })
+
+  it('parses ?. after function call inside object literal values', function () {
+    // Regression: `server()?.prop` inside an object `{...}` binding value
+    // caused "Bad operator: '}'" — see GitHub issue #410.
+    const server = () => ({ enableSimpleNumberedChapters: true })
+    const binding = "css: {'sc': server()?.enableSimpleNumberedChapters}",
+      context = ctxStub({ server }),
+      bindings = new Parser().parse(binding, context)
+    assert.deepEqual(bindings.css(), { sc: true })
+  })
+
   it('parses compound operator d()[0]()', function () {
     const binding = 'attr: d()[0]()',
       d = function () {
