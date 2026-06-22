@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # changesets/action commits version bumps via the GitHub API
           # (commitMode: github-api) so we deliberately disable
@@ -102,7 +102,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         # persist-credentials defaults to true so `changeset publish`
         # can push per-package git tags (@tko/utils@X.Y.Z, etc.) via
         # the runner's git remote auth. The repo-wide vX.Y.Z tag is
