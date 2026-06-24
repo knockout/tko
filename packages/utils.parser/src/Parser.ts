@@ -394,6 +394,7 @@ export default class Parser {
         ch === '"' ||
         ch === "'" ||
         ch === '{' ||
+        ch === '}' ||
         ch === '(' ||
         ch === '`' ||
         ch === ')' ||
