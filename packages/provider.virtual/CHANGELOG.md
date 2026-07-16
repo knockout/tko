@@ -1,5 +1,13 @@
 # @tko/provider.virtual
 
+## 4.1.1
+
+### Patch Changes
+
+- @tko/bind@4.1.1
+- @tko/provider.bindingstring@4.1.1
+- @tko/utils@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes
