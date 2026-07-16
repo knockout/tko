@@ -218,6 +218,16 @@ When a feedback loop fails, fix the loop — not just the symptom. Examples: `bu
 
 Avoid scope creep. If an improvement would balloon the PR, file a follow-up issue or spawn a separate task instead.
 
+## Pre-Merge Verification
+
+A PR that adds or modifies a runnable artifact (script, workflow, CLI entry point, build target) is not mergeable until **all three** of these are done — without waiting to be asked:
+
+1. **Run it.** Invoke the new entry point locally and confirm exit 0 plus the expected artifact (file, output, exit code). For coverage harnesses this means actually generating a report; for workflow changes, push to a branch and watch the run. `bun install` to sync deps when verifying a PR is part of the work — the "ask before bun install" rule applies to *unrelated* installs.
+2. **Test it.** Either an existing test exercises the new path, or a new spec / smoke test is added in the same PR. "I trust the author / I trust the tooling" doesn't count.
+3. **CI parallel.** After push, run `gh run list --branch <branch>` and confirm every triggered workflow is GREEN. If lint / tests / publish-check fail, fix and re-push *before* declaring ready for merge.
+
+State the verification result explicitly in the final summary or PR comment: "ran locally: ✓; CI green: ✓; smoke test added: ✓". If anything is ✗, fix it. Don't declare done with known failures.
+
 ## Review Your Own Change Adversarially
 
 Before declaring a change done, steelman the case against it. Ask what could go wrong, what assumption could be false, what future goal it quietly forecloses, what coverage or signal it weakens, who it surprises.
