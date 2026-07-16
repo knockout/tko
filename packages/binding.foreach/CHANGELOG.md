@@ -1,5 +1,18 @@
 # @tko/binding.foreach
 
+## 4.1.1
+
+### Patch Changes
+
+- 43e69da: Add documented `foreach` lifecycle callbacks to `ForEachBinding`:
+  `afterRender(nodes, value)` fires when an item is rendered from the template,
+  `beforeMove(node, newIndex, value)` and `afterMove(node, newIndex, value)` fire
+  for retained items that shift position. The existing `afterAdd` and
+  `beforeRemove` signatures are unchanged.
+  - @tko/bind@4.1.1
+  - @tko/observable@4.1.1
+  - @tko/utils@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes
