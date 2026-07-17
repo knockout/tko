@@ -32,11 +32,7 @@ type InnerFilterType = (value: any, ignored: any, context: any, globals: any, no
 type FilterType = InnerFilterType & { precedence: number }
 
 /**
- * Construct a new Parser instance with new Parser(node, context)
- * @param {Node} node    The DOM element from which we parsed the
- *                         content.
- * @param {object} context The Knockout context.
- * @param {object} globals An object containing any desired globals.
+ * Parser for binding and params expressions.
  */
 export default class Parser {
   ch: any
