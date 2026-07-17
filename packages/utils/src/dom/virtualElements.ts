@@ -13,7 +13,7 @@
 
 import { emptyDomNode, setDomNodeChildren as setRegularDomNodeChildren } from './manipulation'
 import { removeNode } from './disposal'
-import { tagNameLower } from './info'
+import { tagNameLower, isTemplateTag } from './info'
 import * as domData from './data'
 import options from '../options'
 
@@ -114,11 +114,15 @@ export const allowedBindings: VirtualElementsAllowedBindings = Object.create(nul
 export const hasBindingValue = isStartComment
 
 export function childNodes(node: Node): any {
-  return isStartComment(node) ? getVirtualChildren(node) : node.childNodes
+  if (isStartComment(node)) return getVirtualChildren(node)
+  if (isTemplateTag(node)) return node.content.childNodes
+  return node.childNodes
 }
 
 export function emptyNode(node: Node) {
-  if (!isStartComment(node)) {
+  if (isTemplateTag(node)) {
+    emptyDomNode(node.content)
+  } else if (!isStartComment(node)) {
     emptyDomNode(node)
   } else {
     const virtualChildren = childNodes(node)
@@ -129,7 +133,9 @@ export function emptyNode(node: Node) {
 }
 
 export function setDomNodeChildren(node: Node, childNodes: Node[]) {
-  if (!isStartComment(node)) {
+  if (isTemplateTag(node)) {
+    setRegularDomNodeChildren(node.content, childNodes)
+  } else if (!isStartComment(node)) {
     setRegularDomNodeChildren(node, childNodes)
   } else {
     emptyNode(node)
@@ -173,6 +179,10 @@ export function insertAfter(containerNode: Node, nodeToInsert: Node, insertAfter
 }
 
 export function firstChild(node: Node) {
+  if (isTemplateTag(node)) {
+    return node.content.firstChild
+  }
+
   if (!isStartComment(node)) {
     if (node.firstChild && isEndComment(node.firstChild)) {
       throw new Error('Found invalid end comment, as the first child of ' + (node as Element).outerHTML)
