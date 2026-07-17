@@ -14,7 +14,8 @@
     "@tko/utils.jsx": "^4.1.0"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "homepage": "https://tko.io",
   "licenses": [
@@ -25,6 +26,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -46,5 +48,6 @@
     "binding",
     "web-components",
     "custom-elements"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

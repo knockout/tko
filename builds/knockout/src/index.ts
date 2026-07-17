@@ -31,6 +31,13 @@ const expressionRewriting = {
   preProcessBindings: s => dataBindProvider.preProcessBindings(s)
 }
 
+type KnockoutBuildExtensions = {
+  version: string
+  components: typeof components
+  Component: typeof components.ComponentABC
+  expressionRewriting: typeof expressionRewriting
+}
+
 const provider = new MultiProvider({
   providers: [new ComponentProvider(), dataBindProvider, new VirtualProvider(), new AttributeProvider()]
 })
@@ -47,9 +54,11 @@ const builder = new Builder({
 })
 
 const version = BUILD_VERSION
-export default builder.create({
+const knockoutBuild: KnockoutBuildExtensions = {
   version,
   components,
   Component: components.ComponentABC,
   expressionRewriting
-})
+}
+
+export default builder.create(knockoutBuild)

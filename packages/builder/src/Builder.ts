@@ -312,10 +312,10 @@ export class Builder {
   }
 
   /**
-   * @return {KnockoutInstance} An instance of Knockout.
+   * @return {KnockoutInstance & T} An instance of Knockout with merged extension properties.
    */
-  create(...additionalProperties): KnockoutInstance {
-    const instance: KnockoutInstance = Object.assign(
+  create<T extends object>(additionalProperties: T): KnockoutInstance & T {
+    const instance = Object.assign(
       {
         get getBindingHandler() {
           return options.getBindingHandler
@@ -326,8 +326,8 @@ export class Builder {
       },
       knockout, //never change the order of these
       this.providedProperties,
-      ...additionalProperties
-    )
+      additionalProperties
+    ) as KnockoutInstance & T
 
     instance.options.knockoutInstance = instance
 

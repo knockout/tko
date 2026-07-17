@@ -12,7 +12,8 @@
     "@tko/builder": "^4.1.0"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -47,5 +49,6 @@
     "dom",
     "observable",
     "data-binding"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }
