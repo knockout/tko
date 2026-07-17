@@ -2,9 +2,10 @@
   "version": "4.1.0",
   "name": "@tko/computed",
   "description": "TKO Computed Observables",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "dependencies": {
     "@tko/observable": "^4.1.0",
@@ -35,11 +36,18 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "types": "./types/index.d.ts"
 }

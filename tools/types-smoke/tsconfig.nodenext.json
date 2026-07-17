@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["jquery"],
+    "lib": ["es2022", "dom"]
+  },
+  "include": ["./consumer.mts", "./consumer.cts"]
+}

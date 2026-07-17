@@ -7,12 +7,14 @@
     "url": "https://github.com/knockout/tko.git"
   },
   "scripts": {
-    "build": "bun run --filter './packages/*' build && bun run --filter './builds/*' build",
+    "build": "bun run dts && bun run --filter './packages/*' build && bun run --filter './builds/*' build",
     "test": "bunx @biomejs/biome ci . && bun run build && bunx vitest run",
     "test:ff": "bunx @biomejs/biome ci . && bun run build && VITEST_BROWSERS=firefox bunx vitest run",
     "test:coverage": "bun run build && bunx vitest run --coverage --project browser",
     "tsc": "bunx tsc",
-    "dts": "bunx tsc --build tsconfig.dts.json",
+    "dts": "bun tools/build-dts.ts",
+    "verify:types": "bunx tsc -p tools/types-smoke/tsconfig.json && bunx tsc -p tools/types-smoke/tsconfig.node16.json && bunx tsc -p tools/types-smoke/tsconfig.nodenext.json",
+    "verify:publish-types": "bun tools/verify-publish-types.ts",
     "format": "bunx @biomejs/biome format .",
     "format:fix": "bunx @biomejs/biome format --write .",
     "lint": "bunx @biomejs/biome lint .",
@@ -20,8 +22,8 @@
     "check": "bunx @biomejs/biome check .",
     "knip": "knip",
     "verify:esm": "bun tools/verify-esm-extensions.ts",
-    "verify": "bunx @biomejs/biome check . && bunx tsc && bun run build && bun run verify:esm && bunx vitest run",
-    "clean": "rm -rf packages/*/dist builds/*/dist coverage"
+    "verify": "bunx @biomejs/biome check . && bunx tsc && bun run build && bun run verify:types && bun run verify:esm && bun run verify:publish-types && bunx vitest run",
+    "clean": "rm -rf packages/*/dist packages/*/types builds/*/dist builds/*/types coverage .dts-tmp"
   },
   "bugs": "https://github.com/knockout/tko/issues",
   "licenses": [
@@ -31,6 +33,7 @@
     }
   ],
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
     "@biomejs/biome": "^2.4.16",
     "@changesets/cli": "^2.31.0",
     "@types/jquery": "^4.0.1",
@@ -44,6 +47,7 @@
     "jquery": "^4.0.0",
     "knip": "^6.16.0",
     "playwright": "^1.60.0",
+    "publint": "^0.3.21",
     "sinon": "^22.0.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"

@@ -2,9 +2,10 @@
   "version": "4.1.0",
   "name": "@tko/provider.attr",
   "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -19,8 +20,14 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "bugs": {
@@ -40,5 +47,6 @@
     "provider",
     "attributes",
     "ko-attr"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

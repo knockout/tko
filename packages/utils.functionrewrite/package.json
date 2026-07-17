@@ -2,9 +2,10 @@
   "version": "4.1.0",
   "name": "@tko/utils.functionrewrite",
   "description": "Rewrite `function {}` as lambdas (=>)",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {},
@@ -17,8 +18,14 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "bugs": {
@@ -37,5 +44,6 @@
     "tko",
     "function-rewrite",
     "arrow-functions"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

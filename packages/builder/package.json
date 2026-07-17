@@ -26,18 +26,25 @@
     }
   ],
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "bugs": {
     "url": "https://github.com/knockout/tko/issues"
   },
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "scripts": {
     "build": "bun ../../tools/build.ts"
   },
@@ -47,5 +54,6 @@
     "builder",
     "framework",
     "customizable"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

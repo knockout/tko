@@ -2,7 +2,7 @@
   "version": "4.1.0",
   "name": "@tko/binding.component",
   "description": "component: binding for web components",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "license": "MIT",
   "dependencies": {
     "@tko/bind": "^4.1.0",
@@ -14,7 +14,8 @@
     "@tko/utils.jsx": "^4.1.0"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "homepage": "https://tko.io",
   "licenses": [
@@ -25,8 +26,14 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "bugs": {
@@ -46,5 +53,6 @@
     "binding",
     "web-components",
     "custom-elements"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }
