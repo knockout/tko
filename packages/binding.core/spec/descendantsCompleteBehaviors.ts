@@ -115,7 +115,7 @@ describe('Binding: DescendantsComplete', function () {
     expect(callbacks).to.equal(1)
   })
 
-  it('TKO-Change: descendantsComplete callback function is not called after nested "if" binding', function () {
+  it('Should call a descendantsComplete callback after a nested "if" binding renders (KO 3.5 default)', function () {
     testNode.innerHTML =
       "<div data-bind='if: outerCondition, descendantsComplete: callback'><div data-bind='if: innerCondition, childrenComplete: render'><span data-bind='text: someText'></span></div></div>"
     let callbacks = 0,
@@ -137,15 +137,82 @@ describe('Binding: DescendantsComplete', function () {
     expect(render).to.equal(0)
     expectContainText(testNode, '')
 
-    // Complete the outer condition first and then the inner one
+    // Rendering the outer content completes its descendants (the inner "if"
+    // renders nothing but still reports completion), so the callback fires.
+    viewModel.outerCondition(true)
+    expect(callbacks).to.equal(1)
+    expect(render).to.equal(0)
+
+    // The inner condition renders its content; childrenComplete fires there.
+    viewModel.innerCondition(true)
+    expect(callbacks).to.equal(1)
+    expect(render).to.equal(1)
+    expectContainText(testNode, 'hello')
+  })
+
+  it("Should defer descendantsComplete with completeOn: 'render' until inner content renders", function () {
+    testNode.innerHTML =
+      "<div data-bind='if: outerCondition, descendantsComplete: callback'><div data-bind='if: innerCondition, completeOn: \"render\"'><span data-bind='text: someText'></span></div></div>"
+    let callbacks = 0
+    const viewModel = {
+      outerCondition: observable(false),
+      innerCondition: observable(false),
+      someText: 'hello',
+      callback: function () {
+        callbacks++
+      }
+    }
+
+    applyBindings(viewModel, testNode)
+    expect(callbacks).to.equal(0)
+
+    // The inner "if" holds the outer's descendantsComplete open until it renders.
     viewModel.outerCondition(true)
     expect(callbacks).to.equal(0)
-    expect(render).to.equal(0)
-    expectContainText(testNode, '')
 
     viewModel.innerCondition(true)
-    expect(callbacks).to.equal(0) //Breaking Changing to KO = there was completeOn: 'render' possible
-    expect(render).to.equal(1) //The workaround with children is complete. It is also asynchronously usable in TKO.
+    expect(callbacks).to.equal(1)
     expectContainText(testNode, 'hello')
+  })
+
+  it('Should still fire childrenComplete on a false "if" branch that renders nothing', function () {
+    testNode.innerHTML = "<div data-bind='if: condition, childrenComplete: callback'></div>"
+    let callbacks = 0
+    const viewModel = {
+      condition: observable(false),
+      callback: function () {
+        callbacks++
+      }
+    }
+    applyBindings(viewModel, testNode)
+    // childrenComplete fires even though there are no rendered children, but the
+    // callback only runs when there are child nodes to hand back.
+    expect(callbacks).to.equal(0)
+  })
+
+  it('Should re-fire descendantsComplete each time a conditional re-renders its content (KO 3.5 semantics)', function () {
+    testNode.innerHTML =
+      "<div data-bind='if: condition, descendantsComplete: callback'><span data-bind='text: someText'></span></div>"
+    let callbacks = 0
+    const viewModel = {
+      condition: observable(false),
+      someText: 'hello',
+      callback: function () {
+        callbacks++
+      }
+    }
+
+    applyBindings(viewModel, testNode)
+    expect(callbacks).to.equal(0)
+
+    // Each render cycle that produces content re-arms and re-fires the callback.
+    viewModel.condition(true)
+    expect(callbacks).to.equal(1)
+
+    viewModel.condition(false)
+    expect(callbacks).to.equal(1)
+
+    viewModel.condition(true)
+    expect(callbacks).to.equal(2)
   })
 })

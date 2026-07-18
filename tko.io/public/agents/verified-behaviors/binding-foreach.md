@@ -18,5 +18,7 @@ Standalone `foreach` binding behavior, templates, and else-chain state.
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
 - Array mutation, reordering, duplicate values, `$index`, `as`, and `noIndex` are all exercised in spec coverage.
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
+- `foreach` supports `afterRender(nodes, value)`, `beforeMove(node, newIndex, value)`, and `afterMove(node, newIndex, value)` lifecycle callbacks in addition to the existing batch-shaped `afterAdd` and `beforeRemove` callbacks.
+  Specs: `packages/binding.foreach/spec/eachBehavior.ts`
 
 _Curated source: `packages/binding.foreach/verified-behaviors.json`_

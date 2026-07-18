@@ -26,7 +26,8 @@
     {
       "statement": "`childrenComplete` fires after descendant bindings are applied.",
       "notes": [
-        "It works on normal elements and virtual elements, and it does not fire when there are no descendants."
+        "It works on normal elements and virtual elements. The event is notified unconditionally once children are bound, but the callback only runs when there are child nodes to hand back — so it does not call back when there are no descendants.",
+        "`bindingEvent` owns the KO 3.5 async-completion bookkeeping (`startPossiblyAsyncContentBinding` / `AsyncCompleteContext`): `childrenComplete` drives a node's pending-descendant tracking so `descendantsComplete` fires once children and every async descendant have bound."
       ],
       "specs": ["packages/bind/spec/bindingAttributeBehaviors.ts", "packages/bind/spec/nodePreprocessingBehaviors.ts"]
     }

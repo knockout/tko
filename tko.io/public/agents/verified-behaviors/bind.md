@@ -18,7 +18,7 @@ Binding application, binding-handler lifecycle, and completion callbacks.
   Notes: Virtual-element use requires `allowVirtualElements = true`.
   Specs: `packages/bind/spec/bindingHandlerBehaviors.ts`
 - `childrenComplete` fires after descendant bindings are applied.
-  Notes: It works on normal elements and virtual elements, and it does not fire when there are no descendants.
+  Notes: It works on normal elements and virtual elements. The event is notified unconditionally once children are bound, but the callback only runs when there are child nodes to hand back — so it does not call back when there are no descendants. `bindingEvent` owns the KO 3.5 async-completion bookkeeping (`startPossiblyAsyncContentBinding` / `AsyncCompleteContext`): `childrenComplete` drives a node's pending-descendant tracking so `descendantsComplete` fires once children and every async descendant have bound.
   Specs: `packages/bind/spec/bindingAttributeBehaviors.ts`, `packages/bind/spec/nodePreprocessingBehaviors.ts`
 
 _Curated source: `packages/bind/verified-behaviors.json`_
