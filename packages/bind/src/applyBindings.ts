@@ -98,34 +98,35 @@ function applyBindingsToDescendantsInternal(
 ) {
   let nextInQueue: ChildNode | null = virtualElements.firstChild(elementOrVirtualElement)
 
-  if (!nextInQueue) {
-    return
-  }
+  if (nextInQueue) {
+    let currentChild: Node | null
+    const provider = getBindingProvider()
+    const preprocessNode = provider.preprocessNode
 
-  let currentChild: Node | null
-  const provider = getBindingProvider()
-  const preprocessNode = provider.preprocessNode
+    // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
+    // possible to insert new siblings after it, and/or replace the node with a different one. This can be used to
+    // implement custom binding syntaxes, such as {{ value }} for string interpolation, or custom element types that
+    // trigger insertion of <template> contents at that point in the document.
+    if (preprocessNode) {
+      while ((currentChild = nextInQueue)) {
+        nextInQueue = virtualElements.nextSibling(currentChild)
+        preprocessNode.call(provider, currentChild)
+      }
 
-  // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
-  // possible to insert new siblings after it, and/or replace the node with a different one. This can be used to
-  // implement custom binding syntaxes, such as {{ value }} for string interpolation, or custom element types that
-  // trigger insertion of <template> contents at that point in the document.
-  if (preprocessNode) {
-    while ((currentChild = nextInQueue)) {
-      nextInQueue = virtualElements.nextSibling(currentChild)
-      preprocessNode.call(provider, currentChild)
+      // Reset nextInQueue for the next loop
+      nextInQueue = virtualElements.firstChild(elementOrVirtualElement)
     }
 
-    // Reset nextInQueue for the next loop
-    nextInQueue = virtualElements.firstChild(elementOrVirtualElement)
+    while ((currentChild = nextInQueue)) {
+      // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
+      nextInQueue = virtualElements.nextSibling(currentChild)
+      applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
+    }
   }
 
-  while ((currentChild = nextInQueue)) {
-    // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
-    nextInQueue = virtualElements.nextSibling(currentChild)
-    applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, asyncBindingsApplied)
-  }
-
+  // Notify childrenComplete unconditionally (KO parity) — a node that renders no
+  // content still reached a completed state, which the async-completion
+  // bookkeeping and `childrenComplete` subscribers need to observe.
   bindingEvent.notify(elementOrVirtualElement, bindingEvent.childrenComplete)
 }
 
@@ -157,9 +158,9 @@ function applyBindingsToNodeAndDescendantsInternal(
     isElement || // Case (1)
     hasBindings(nodeVerified) // Case (2)
 
-  const { shouldBindDescendants }: any = shouldApplyBindings
+  const { shouldBindDescendants, bindingContextForDescendants }: any = shouldApplyBindings
     ? applyBindingsToNodeInternal(nodeVerified, null, bindingContext, asyncBindingsApplied)
-    : { shouldBindDescendants: true }
+    : { shouldBindDescendants: true, bindingContextForDescendants: bindingContext }
 
   if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[tagNameLower(nodeVerified as Element)]) {
     // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
@@ -168,7 +169,7 @@ function applyBindingsToNodeAndDescendantsInternal(
     //  * For children of a *virtual* element, we can't be sure. Evaluating .parentNode on those children may
     //    skip over any number of intermediate virtual elements, any of which might define a custom binding context,
     //    hence bindingContextsMayDifferFromDomParentElement is true
-    applyBindingsToDescendantsInternal(bindingContext, nodeVerified, asyncBindingsApplied)
+    applyBindingsToDescendantsInternal(bindingContextForDescendants, nodeVerified, asyncBindingsApplied)
   }
 }
 
@@ -276,6 +277,7 @@ function applyBindingsToNodeInternal<T>(
   }
 
   let bindingHandlerThatControlsDescendantBindings: string | undefined
+  let contextToExtend = bindingContext
   if (bindings) {
     const $component = bindingContext.$component || {}
 
@@ -324,8 +326,27 @@ function applyBindingsToNodeInternal<T>(
       )
     }
 
+    if (bindingEvent.descendantsComplete in bindings) {
+      // Register the node as (potentially) completing asynchronously and thread
+      // the resulting context to descendants so nested async content reports
+      // completion up to this node. The callback re-checks `firstChild` at fire
+      // time, so a conditional that renders nothing suppresses the callback yet
+      // still re-arms when it later renders content.
+      contextToExtend = bindingEvent.startPossiblyAsyncContentBinding(node, bindingContext)
+      bindingEvent.subscribe(
+        node,
+        bindingEvent.descendantsComplete,
+        () => {
+          const callback = evaluateValueAccessor(bindings![bindingEvent.descendantsComplete])
+          if (callback && virtualElements.firstChild(node)) {
+            callback(node)
+          }
+        },
+        null
+      )
+    }
+
     const bindingsGenerated = topologicalSortBindings(bindings, $component)
-    const nodeAsyncBindingPromises = new Set<Promise<any>>()
     for (const [key, BindingHandlerClass] of bindingsGenerated) {
       // Go through the sorted bindings, calling init and update for each
       const reportBindingError = function (during: string, errorCaptured: Error) {
@@ -351,7 +372,7 @@ function applyBindingsToNodeInternal<T>(
             new BindingHandlerClass({
               allBindings,
               $element: node,
-              $context: bindingContext,
+              $context: contextToExtend,
               onError: reportBindingError,
               valueAccessor(...v) {
                 return getValueAccessor(key)(...v)
@@ -381,43 +402,18 @@ function applyBindingsToNodeInternal<T>(
 
         if (bindingHandler.bindingCompleted instanceof Promise) {
           asyncBindingsApplied!.add(bindingHandler.bindingCompleted)
-          nodeAsyncBindingPromises.add(bindingHandler.bindingCompleted)
         }
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err))
         reportBindingError('creation', error)
       }
     }
-
-    triggerDescendantsComplete(node, bindings, nodeAsyncBindingPromises)
   }
 
   const shouldBindDescendants = bindingHandlerThatControlsDescendantBindings === undefined
-  return { shouldBindDescendants }
-}
-
-/**
- *
- * @param {HTMLElement} node
- * @param {Object} bindings
- * @param {[Promise]} nodeAsyncBindingPromises
- */
-function triggerDescendantsComplete(node: Node, bindings: object, nodeAsyncBindingPromises: Set<Promise<any>>) {
-  /** descendantsComplete ought to be an instance of the descendantsComplete
-   *  binding handler. */
-  const hasBindingHandler = bindingEvent.descendantsComplete in bindings
-  const hasFirstChild = virtualElements.firstChild(node)
-  const accessor = hasBindingHandler && evaluateValueAccessor(bindings[bindingEvent.descendantsComplete])
-  const callback = () => {
-    bindingEvent.notify(node, bindingEvent.descendantsComplete)
-    if (accessor && hasFirstChild) {
-      accessor(node)
-    }
-  }
-  if (nodeAsyncBindingPromises.size) {
-    Promise.all(nodeAsyncBindingPromises).then(callback)
-  } else {
-    callback()
+  return {
+    shouldBindDescendants,
+    bindingContextForDescendants: shouldBindDescendants ? contextToExtend : bindingContext
   }
 }
 
