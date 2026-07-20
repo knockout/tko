@@ -39,4 +39,39 @@ describe('Binding: Submit', function () {
     expect(model.wasCalled).to.equal(true)
     expect(firstParamStored).to.equal(formNode)
   })
+
+  it('Should throw when the bound value is not a function', function () {
+    testNode.innerHTML = '<form data-bind=\'submit: "not a function"\' />'
+    expect(() => applyBindings({}, testNode)).to.throw(/value for a submit binding must be a function/)
+  })
+
+  it('Should not prevent the default form submission when the handler returns true', function () {
+    testNode.innerHTML = "<form data-bind='submit: doCall' />"
+    const handler = function () {
+      return true
+    }
+    applyBindings({ doCall: handler }, testNode)
+    const formNode = testNode.children[0] as HTMLFormElement
+    let defaultPrevented: boolean | undefined
+    formNode.addEventListener('submit', function (event) {
+      defaultPrevented = event.defaultPrevented
+      // stop the actual form navigation in case preventDefault was skipped
+      event.preventDefault()
+    })
+    triggerEvent(formNode, 'submit')
+    expect(defaultPrevented).to.equal(false)
+  })
+
+  it('Should prevent the default form submission when the handler returns a non-true value', function () {
+    testNode.innerHTML = "<form data-bind='submit: doCall' />"
+    applyBindings({ doCall: function () {} }, testNode)
+    const formNode = testNode.children[0] as HTMLFormElement
+    let defaultPrevented: boolean | undefined
+    formNode.addEventListener('submit', function (event) {
+      defaultPrevented = event.defaultPrevented
+      event.preventDefault()
+    })
+    triggerEvent(formNode, 'submit')
+    expect(defaultPrevented).to.equal(true)
+  })
 })
