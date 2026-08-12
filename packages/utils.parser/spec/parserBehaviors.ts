@@ -169,6 +169,48 @@ describe('the bindings parser', function () {
     })
   })
 
+  describe('quoted binding names containing terminator characters', function () {
+    // name() must not stop at ':', whitespace, ',', '|', or '}' while inside
+    // a quoted (enclosedBy) name -- those characters only terminate an
+    // unquoted name; a quote should keep scanning through to its closing quote.
+    it('parses a double-quoted name containing }', function () {
+      const bindings = new Parser().parse('"a}b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a}b'])
+      assert.equal(bindings['a}b'](), 1)
+    })
+
+    it('parses a single-quoted name containing }', function () {
+      const bindings = new Parser().parse("'a}b': 1")
+      assert.deepEqual(Object.keys(bindings), ['a}b'])
+      assert.equal(bindings['a}b'](), 1)
+    })
+
+    it('parses a quoted name containing a space', function () {
+      const bindings = new Parser().parse('"a b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a b'])
+      assert.equal(bindings['a b'](), 1)
+    })
+
+    it('parses a quoted name containing a comma', function () {
+      const bindings = new Parser().parse('"a,b": 1, c: 2')
+      assert.deepEqual(Object.keys(bindings), ['a,b', 'c'])
+      assert.equal(bindings['a,b'](), 1)
+      assert.equal(bindings.c(), 2)
+    })
+
+    it('parses a quoted name containing a pipe', function () {
+      const bindings = new Parser().parse('"a|b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a|b'])
+      assert.equal(bindings['a|b'](), 1)
+    })
+
+    it('parses a quoted name containing a colon', function () {
+      const bindings = new Parser().parse('"a:b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a:b'])
+      assert.equal(bindings['a:b'](), 1)
+    })
+  })
+
   it('parses object: attr: {name: observable(value)}', function () {
     const binding = 'attr : { klass: kValue }',
       context = ctxStub({ kValue: observable('Gollum') }),
