@@ -134,6 +134,83 @@ describe('the bindings parser', function () {
     assert.equal(bindings.attr().kv, 'Sam')
   })
 
+  describe('shorthand (ES6) object properties', function () {
+    it('parses a shorthand property immediately followed by }', function () {
+      const bindings = new Parser().parse('x:{a}', ctxStub({ a: 1 }))
+      assert.deepEqual(Object.keys(bindings.x()), ['a'])
+      assert.equal(bindings.x().a, 1)
+    })
+
+    it('parses multiple shorthand properties with no trailing comma', function () {
+      const bindings = new Parser().parse('x:{a,b,c}', ctxStub({ a: 1, b: 2, c: 3 }))
+      assert.deepEqual(Object.keys(bindings.x()), ['a', 'b', 'c'])
+    })
+
+    it('parses a shorthand property mixed with explicit key:value pairs', function () {
+      const bindings = new Parser().parse('x:{a:1,b}', ctxStub({ b: 2 }))
+      assert.deepEqual(Object.keys(bindings.x()), ['a', 'b'])
+      assert.equal(bindings.x().b, 2)
+    })
+
+    it('still parses a trailing comma after a shorthand property (regression guard)', function () {
+      const bindings = new Parser().parse('x:{a,}', ctxStub({ a: 1 }))
+      assert.deepEqual(Object.keys(bindings.x()), ['a'])
+    })
+
+    it('parses a shorthand-object literal as a bare function-call argument', function () {
+      const foo = (o: any) => o.a
+      const bindings = new Parser().parse('x: foo({a})', ctxStub({ foo, a: 1 }))
+      assert.equal(bindings.x(), 1)
+    })
+
+    it('parses a shorthand-object literal as a bare array element', function () {
+      const bindings = new Parser().parse('x: [{a}]', ctxStub({ a: 1 }))
+      assert.deepEqual(Object.keys(bindings.x()[0]), ['a'])
+    })
+  })
+
+  describe('quoted binding names containing terminator characters', function () {
+    // name() must not stop at ':', whitespace, ',', '|', or '}' while inside
+    // a quoted (enclosedBy) name -- those characters only terminate an
+    // unquoted name; a quote should keep scanning through to its closing quote.
+    it('parses a double-quoted name containing }', function () {
+      const bindings = new Parser().parse('"a}b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a}b'])
+      assert.equal(bindings['a}b'](), 1)
+    })
+
+    it('parses a single-quoted name containing }', function () {
+      const bindings = new Parser().parse("'a}b': 1")
+      assert.deepEqual(Object.keys(bindings), ['a}b'])
+      assert.equal(bindings['a}b'](), 1)
+    })
+
+    it('parses a quoted name containing a space', function () {
+      const bindings = new Parser().parse('"a b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a b'])
+      assert.equal(bindings['a b'](), 1)
+    })
+
+    it('parses a quoted name containing a comma', function () {
+      const bindings = new Parser().parse('"a,b": 1, c: 2')
+      assert.deepEqual(Object.keys(bindings), ['a,b', 'c'])
+      assert.equal(bindings['a,b'](), 1)
+      assert.equal(bindings.c(), 2)
+    })
+
+    it('parses a quoted name containing a pipe', function () {
+      const bindings = new Parser().parse('"a|b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a|b'])
+      assert.equal(bindings['a|b'](), 1)
+    })
+
+    it('parses a quoted name containing a colon', function () {
+      const bindings = new Parser().parse('"a:b": 1')
+      assert.deepEqual(Object.keys(bindings), ['a:b'])
+      assert.equal(bindings['a:b'](), 1)
+    })
+  })
+
   it('parses object: attr: {name: observable(value)}', function () {
     const binding = 'attr : { klass: kValue }',
       context = ctxStub({ kValue: observable('Gollum') }),
