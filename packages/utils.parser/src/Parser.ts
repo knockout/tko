@@ -570,7 +570,18 @@ export default class Parser {
 
       ch = this.white()
 
-      if (ch === ']' || (!op && ch === '(')) {
+      if (
+        ch === ']' ||
+        (!op &&
+          (ch === '(' ||
+            ch === ':' ||
+            ch === '}' ||
+            ch === ')' ||
+            ch === '' ||
+            ch === '`' ||
+            (ch === '|' && filterable === '|') ||
+            (ch === ',' && !allowMultipleValues)))
+      ) {
         break
       }
     }
@@ -686,6 +697,15 @@ export default class Parser {
         return member
       } else if (ch === '.') {
         // a.x membership
+        this.next('.')
+        return this.member()
+      } else if (ch === '?' && this.lookahead() === '.' && Identifier.is_valid_start_char(this.text[this.at + 1])) {
+        // a?.x optional-chaining membership.
+        // Identifier.dereference is already null-safe, so this behaves
+        // exactly like `.` — see https://github.com/knockout/tko/issues/410
+        // Only plain-member form; `?.[` and `?.(` still error rather than
+        // silently dereferencing an empty member name.
+        this.next('?')
         this.next('.')
         return this.member()
       } else {

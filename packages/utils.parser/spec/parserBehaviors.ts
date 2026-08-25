@@ -77,6 +77,39 @@ describe('the bindings parser', function () {
     assert.equal(value.z(), -8)
   })
 
+  // https://github.com/knockout/tko/issues/410
+  it('parses optional chaining (?.) wherever plain (.) parses', function () {
+    const server = () => ({ enableSimpleNumberedChapters: true })
+    const context = ctxStub({ $root: { server }, server, a: { b: 1 }, u: null, x: 5, y: 7 })
+    const value = new Parser().parse(
+      "css: {'simple-numbered-chapters': $root.server()?.enableSimpleNumberedChapters}, " +
+        'p: a?.b, q: u?.b, r: a?.b + 1, s: a?.b ? x : y, t: server()?.missing',
+      context
+    )
+    assert.deepEqual(value.css(), { 'simple-numbered-chapters': true })
+    assert.strictEqual(value.p(), 1)
+    // Like tko's null-safe plain `.`, a nullish base short-circuits to the
+    // base value itself (null here), not JS's undefined.
+    assert.strictEqual(value.q(), null)
+    assert.strictEqual(value.r(), 2)
+    assert.strictEqual(value.s(), 5)
+    assert.strictEqual(value.t(), undefined)
+  })
+
+  it('parses optional chaining (?.) after a parenthesized expression', function () {
+    const context = ctxStub({ u: null, a: { b: 1 } })
+    const value = new Parser().parse('v: {w: (u || a)?.b}', context)
+    assert.deepEqual(value.v(), { w: 1 })
+  })
+
+  it('still errors loudly on optional index/call (?.[ and ?.()', function () {
+    // `?.[` / `?.(` are unsupported; they must not silently dereference an
+    // empty member name — see the review of #410.
+    const context = ctxStub({ arr: [10, 20, 30], f: (n) => n * 2 })
+    assert.throws(() => new Parser().parse('o: arr?.[1]', context).o(), /Bad operator/)
+    assert.throws(() => new Parser().parse('o: f?.(2)', context).o())
+  })
+
   it('parses an array of JSON values', function () {
     const binding = 'x: [1, 2.1, true, false, null, undefined]',
       bindings = new Parser(null).parse(binding, ctxStub())
