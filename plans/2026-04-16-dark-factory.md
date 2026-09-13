@@ -93,3 +93,57 @@ The tooling modernization (Phases 1–6) was the foundation:
    formatting). Expand to bug fixes and features as confidence grows. The
    level of autonomy an agent gets should match the level of safety net
    around it.
+
+## Status — September 2026
+
+Shipped since this plan was written (the gap table above is the original
+April snapshot):
+
+- **Dependency updates** — Dependabot weekly with a 2-day cooldown
+  (`.github/dependabot.yml`); Dependabot applies cooldown to version
+  updates only, so security updates are not delayed by it.
+- **Release automation** — single-action release via `release.yml`
+  (PR #377): merging the version PR builds, tests, publishes to npm via
+  OIDC, and creates the tag + GitHub Release.
+- **Copilot support** — `.github/copilot-instructions.md` delegates to
+  AGENTS.md. No Cursor-specific config; tools that read AGENTS.md
+  directly are covered by the standard itself.
+- **Coverage confidence (partial)** — `coverage.yml` runs Vitest + V8
+  coverage on every PR and main push, with no threshold gate. The closed
+  loop is tracked in #379 ("Closed-loop coverage: PR delta comment +
+  regression gate").
+- **Autonomous PR review (partial)** — a mandatory adversarial subagent
+  pass with a commit-message audit trail (`tko.io/public/agents/process.md`)
+  covers authorship-time review. It is not a CI gate and does not check
+  against verified behaviors, so the original gap is only half closed.
+
+Still open, roughly ordered by value per unit cost:
+
+1. **Closed-loop coverage** (#379) — the report already runs on every PR;
+   wiring the delta comment and a no-regression gate converts an artifact a
+   human must remember to read into a signal nobody has to watch.
+2. **Issue triage** — open reproducible bugs are the natural proving
+   ground: an agent reads the issue, writes the failing spec, then fixes
+   it — or lands the failing spec alone as an executable reproduction when
+   the fix is unclear. Candidates as of September 2026: #421 (parser fails
+   on ES6 property shorthand before a closing brace), #414 (`if` binding
+   delays `koDescendantsComplete`), #410 (`?.` operator binding
+   regression), #401 (JSX `foreach` on a `jsx.render` template renders
+   nothing).
+3. **Bundle size tracking** — CI compares `browser.min.js` bytes against
+   main; a budget check is a cheap tripwire for accidental dependency or
+   dead-code regressions.
+4. **Benchmarks** — `vitest bench` for the hot paths (observable read,
+   dependency tracking, binding apply); start informational, like coverage.
+5. **CI-side AI reviewer** — the original gap: a reviewer in CI that
+   checks PRs against `verified-behaviors.json`. The adversarial pass
+   replaces the second human at authorship time but is not a gate.
+6. **Scenario testing** — StrongDM-style holdout scenarios; highest cost,
+   revisit after the cheaper gates above are closed.
+
+The direction matches the 2026 discourse: the bottleneck in agentic
+development is human review capacity, not code production, so investment
+belongs in review-replacing infrastructure — tests, gates, adversarial
+passes. See [Agentic Engineering Patterns](https://simonw.substack.com/p/agentic-engineering-patterns)
+(Willison, Feb 2026) and the [Pragmatic Summit fireside chat](https://simonw.substack.com/p/fireside-chat-about-agentic-engineering)
+(Willison, Mar 2026).
