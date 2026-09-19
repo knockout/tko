@@ -35,9 +35,9 @@
     "@changesets/cli": "^3.0.3",
     "@types/jquery": "^4.0.1",
     "@types/mocha": "^10.0.10",
-    "@vitest/browser": "^4.1.8",
-    "@vitest/browser-playwright": "^4.1.8",
-    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/browser": "^5.0.1",
+    "@vitest/browser-playwright": "^5.0.1",
+    "@vitest/coverage-v8": "^5.0.1",
     "chai": "^6.2.2",
     "esbuild": "^0.28.2",
     "happy-dom": "^20.14.0",
@@ -46,7 +46,7 @@
     "playwright": "^1.63.0",
     "sinon": "^22.1.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.8"
+    "vitest": "^5.0.1"
   },
   "workspaces": [
     "packages/*",

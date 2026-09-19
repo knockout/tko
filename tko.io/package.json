@@ -15,9 +15,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@astrojs/starlight": "0.38.3",
-    "@astrojs/check": "0.9.8",
-    "astro": "7.2.8",
+    "@astrojs/starlight": "0.42.2",
+    "@astrojs/check": "0.9.10",
+    "@astrojs/markdown-remark": "^7.3.1",
+    "astro": "7.3.3",
     "typescript": "^5.9.3"
   }
 }
