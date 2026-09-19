@@ -54,7 +54,7 @@ jobs:
           bun-version-file: .tool-versions
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24.x
           registry-url: 'https://registry.npmjs.org'
@@ -114,7 +114,7 @@ jobs:
           bun-version-file: .tool-versions
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           # npm trusted publishing requires npm CLI 11.5.1+
           node-version: 24.x
