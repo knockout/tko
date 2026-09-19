@@ -1,5 +1,11 @@
 # @tko/observable
 
+## 4.1.1
+
+### Patch Changes
+
+- @tko/utils@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes

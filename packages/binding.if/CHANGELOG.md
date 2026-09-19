@@ -1,5 +1,14 @@
 # @tko/binding.if
 
+## 4.1.1
+
+### Patch Changes
+
+- 6f94126: Fix async completion in ConditionalBindingHandler: call completeBinding() for non-rendering branches (if: false, ifnot: true, with: null) and correctly await async descendants via completionPromise instead of awaiting the BindingResult directly.
+  - @tko/bind@4.1.1
+  - @tko/observable@4.1.1
+  - @tko/utils@4.1.1
+
 ## 4.1.0
 
 ### Patch Changes
