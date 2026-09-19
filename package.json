@@ -32,7 +32,7 @@
   ],
   "devDependencies": {
     "@biomejs/biome": "^2.5.12",
-    "@changesets/cli": "^2.31.0",
+    "@changesets/cli": "^3.0.3",
     "@types/jquery": "^4.0.1",
     "@types/mocha": "^10.0.10",
     "@vitest/browser": "^4.1.8",
