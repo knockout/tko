@@ -2,3 +2,9 @@
 # Reject package versions published less than 48 hours ago.
 # Protects against supply-chain attacks via compromised fresh releases.
 minimumReleaseAge = 172800
+# Bun >=1.4 defaults to "isolated", which only links each workspace package's
+# declared deps into its own nested node_modules. Specs that import a
+# `@tko/*` package their own package.json doesn't depend on (relying on the
+# monorepo-wide root hoist) then fail to resolve. Pin "hoisted" to keep that
+# working.
+linker = "hoisted"
