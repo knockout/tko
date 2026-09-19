@@ -133,7 +133,7 @@ export default class Parser {
           this.error('Object name: ' + name + ' missing closing ' + enclosedBy)
         }
         return name
-      } else if (ch === ':' || ch <= ' ' || ch === ',' || ch === '|') {
+      } else if (!enclosedBy && (ch === ':' || ch <= ' ' || ch === ',' || ch === '|' || ch === '}')) {
         return name
       }
       name += ch
