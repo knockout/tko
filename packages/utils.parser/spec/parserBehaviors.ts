@@ -167,6 +167,11 @@ describe('the bindings parser', function () {
       const bindings = new Parser().parse('x: [{a}]', ctxStub({ a: 1 }))
       assert.deepEqual(Object.keys(bindings.x()[0]), ['a'])
     })
+
+    it('parses a shorthand property with whitespace before }', function () {
+      const bindings = new Parser().parse('x: { a }', ctxStub({ a: 1 }))
+      assert.equal(bindings.x().a, 1)
+    })
   })
 
   describe('quoted binding names containing terminator characters', function () {
