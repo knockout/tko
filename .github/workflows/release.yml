@@ -64,7 +64,7 @@ jobs:
 
       - name: Open or update version PR
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           version: bunx changeset version
           title: 'chore: version packages'
@@ -153,7 +153,7 @@ jobs:
       # trusted publishing from GitHub Actions.
       - name: Publish packages
         id: publish
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           publish: bunx changeset publish
         env:
