@@ -28,9 +28,9 @@ Together: coverage and signal are expensive to lose and cheap to keep. When a ch
 Monorepo with Bun workspaces.
 
 ```text
-packages/          # 26 modular @tko/* packages (all TypeScript)
+packages/          # 25 modular @tko/* packages (all TypeScript)
 builds/            # 2 bundled distributions (knockout, reference)
-tools/             # Shared build script (build.ts)
+tools/             # Shared build & release scripts (build.ts, install-bun, release-version.cjs, verify-esm-extensions.ts)
 tko.io/            # Documentation site (Astro + Starlight, deployed to GitHub Pages)
 ```
 
@@ -54,7 +54,7 @@ All commands use Bun. Run from the repo root:
 ```bash
 bun install               # Install all dependencies (uses Bun workspaces)
 bun run build             # Build all packages (ESM, CommonJS, MJS, browser)
-bun run test              # Run all tests (Vitest, headless Chromium via Playwright)
+bun run test              # Run all tests (Vitest via Playwright; chromium by default)
 bun run check             # Run Biome (lint + format)
 bun run lint              # Run Biome lint only
 bun run lint:fix          # Run Biome lint with auto-fix
@@ -70,7 +70,7 @@ Individual packages can be built from their directory with `bun run build`.
 
 ## Testing
 
-- **Runner**: Vitest browser mode (Playwright, headless Chromium)
+- **Runner**: Vitest browser mode (Playwright; headless chromium by default locally, chromium/firefox/webkit matrix in CI)
 - **Assertions**: Chai (expect) + Sinon (spies/stubs/timers)
 - **Config**: `vitest.config.ts` at repo root
 - **Test files**: `packages/*/spec/**/*.ts`, `builds/*/spec/**/*.js`
@@ -111,7 +111,7 @@ packages/example/
 ```
 
 Inter-package dependencies use `@tko/package-name` and are resolved via
-npm workspaces.
+Bun workspaces.
 
 ### Configurable runtime options (`ko.options.*`)
 
@@ -126,9 +126,11 @@ GitHub Actions workflows (`.github/workflows/`):
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `main-build.yml` | Push to main | Build + audit + headless test |
-| `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
-| `lint-and-typecheck.yml` | PRs | Biome + tsc (lint, format, typecheck) |
+| `build-and-test.yml` | `workflow_call` (reusable) | Build + ESM verify + browser-matrix test; called by `main-build.yml` and `release.yml` |
+| `main-build.yml` | Push to main | Entry point for `build-and-test.yml` |
+| `test-headless.yml` | PRs | Matrix test (chromium, firefox, webkit) + happy-dom |
+| `lint-and-typecheck.yml` | PRs | Biome + tsc + ESM extension verify |
+| `coverage.yml` | PRs + push to main | vitest+v8 coverage summary (informational, chromium only; closed loop tracked in #379) |
 | `publish-check.yml` | PRs | Verify packages are publishable |
 | `release.yml` | Push to main | Changeset version PRs + npm publish + GitHub release creation |
 | `github-release.yml` | Manual fallback | Backfill a GitHub release/tag for a published `main` commit if automatic release creation needs a retry |
@@ -189,10 +191,15 @@ AI coding agents are first-class citizens of TKO. The docs site serves both
 humans (HTML via Starlight) and agents (plain text).
 
 Agent-facing files in `tko.io/public/`:
-- `llms.txt` — discovery entry point, points to the guides below
+- `llms.txt` — discovery entry point and canonical index of the files below
 - `agents/guide.md` — API reference, gotchas, examples, playground URL format
 - `agents/testing.md` — how to run and verify TKO code without human interaction
 - `agents/glossary.md` — domain-specific terms, concepts, and package reference
+- `agents/soul.md` — design philosophy (why Knockout works the way it does)
+- `agents/contract.md` — state/binding/DOM architecture and review guidelines
+- `agents/options.md` — the `defineOption` pattern for `ko.options.*`
+- `agents/process.md` — mandatory workflow rules (doc-ref verification, adversarial review)
+- `agents/verified-behaviors/` — generated from `packages/*/verified-behaviors.json`; edit the JSON, not these
 
 When documentation changes — new APIs, new bindings, new patterns, behavioral
 changes — update **both** the Starlight docs (for humans) and the agent guide
