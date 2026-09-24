@@ -36,16 +36,16 @@ jobs:
       pull-requests: write
 
     outputs:
-      should_publish: ${{ steps.changesets.outputs.hasChangesets == 'false' }}
+      should_publish: ${{ steps.changesets.outputs.has-changesets == 'false' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
         with:
           # changesets/action commits version bumps via the GitHub API
-          # (commitMode: github-api) so we deliberately disable
-          # persisted credentials — there is no `git push` from this
-          # job.
+          # (the action's default, since push-with-git-cli is false unless
+          # set) so we deliberately disable persisted credentials — there
+          # is no `git push` from this job.
           persist-credentials: false
 
       - name: Setup Bun
@@ -66,14 +66,14 @@ jobs:
         id: changesets
         uses: changesets/action@v2
         with:
-          version: bunx changeset version
-          title: 'chore: version packages'
-          commit: 'chore: version packages'
-          # Required when persist-credentials: false — without this the
-          # action falls back to git-cli, which has no remote auth and
-          # fails the push. github-api also produces a verified commit
-          # authored by github-actions[bot].
-          commitMode: github-api
+          version-script: bunx changeset version
+          pr-title: 'chore: version packages'
+          commit-message: 'chore: version packages'
+          # push-with-git-cli defaults to false, i.e. commits/tags go via
+          # the GitHub API. Required when persist-credentials: false —
+          # otherwise the action would fall back to git-cli, which has no
+          # remote auth and fails the push. The GitHub API path also
+          # produces a verified commit authored by github-actions[bot].
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -155,7 +155,7 @@ jobs:
         id: publish
         uses: changesets/action@v2
         with:
-          publish: bunx changeset publish
+          publish-script: bunx changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
