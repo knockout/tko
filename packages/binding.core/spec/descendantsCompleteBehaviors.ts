@@ -175,6 +175,47 @@ describe('Binding: DescendantsComplete', function () {
     expectContainText(testNode, 'hello')
   })
 
+  it("Should defer descendantsComplete with completeOn: 'render' until an 'ifnot' region renders", function () {
+    testNode.innerHTML =
+      "<div data-bind='descendantsComplete: callback'><div data-bind='ifnot: hideInner, completeOn: \"render\"'><span data-bind='text: someText'></span></div></div>"
+    let callbacks = 0
+    const viewModel = {
+      hideInner: observable(true),
+      someText: 'hello',
+      callback: function () {
+        callbacks++
+      }
+    }
+
+    applyBindings(viewModel, testNode)
+    expect(callbacks).to.equal(0)
+
+    // "ifnot" holds the outer's descendantsComplete open until its content renders.
+    viewModel.hideInner(false)
+    expect(callbacks).to.equal(1)
+    expectContainText(testNode, 'hello')
+  })
+
+  it("Should defer descendantsComplete with completeOn: 'render' until a 'with' region renders", function () {
+    testNode.innerHTML =
+      "<div data-bind='descendantsComplete: callback'><div data-bind='with: item, completeOn: \"render\"'><span data-bind='text: childprop'></span></div></div>"
+    let callbacks = 0
+    const viewModel = {
+      item: observable(null),
+      callback: function () {
+        callbacks++
+      }
+    }
+
+    applyBindings(viewModel, testNode)
+    expect(callbacks).to.equal(0)
+
+    // "with" holds the outer's descendantsComplete open until it has a value to render.
+    viewModel.item({ childprop: 'hello' })
+    expect(callbacks).to.equal(1)
+    expectContainText(testNode, 'hello')
+  })
+
   it('Should still fire childrenComplete on a false "if" branch that renders nothing', function () {
     testNode.innerHTML = "<div data-bind='if: condition, childrenComplete: callback'></div>"
     let callbacks = 0
