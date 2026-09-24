@@ -1,5 +1,5 @@
 {
-  "version": "4.1.1",
+  "version": "5.0.0",
   "name": "@tko/provider.databind",
   "description": "Link HTML attributes based on a `data-bind` HTML attribute",
   "module": "dist/index.js",
@@ -8,8 +8,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@tko/provider.bindingstring": "^4.1.1",
-    "@tko/bind": "^4.1.1"
+    "@tko/provider.bindingstring": "^5.0.0",
+    "@tko/bind": "^5.0.0"
   },
   "homepage": "https://tko.io",
   "licenses": [

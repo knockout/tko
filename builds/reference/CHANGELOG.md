@@ -1,5 +1,37 @@
 # @tko/build.reference
 
+## 5.0.0
+
+### Major Changes
+
+- 1d86d65: Fix the `Release` workflow, which failed on every push to `main` because
+  `changesets/action@v2` renamed several inputs (`version` -> `version-script`,
+  `title` -> `pr-title`, `commit` -> `commit-message`, `publish` ->
+  `publish-script`) and no longer accepts `commitMode`. Also fixes
+  `outputs.should_publish`, which read the stale `hasChangesets` key instead of
+  the current `has-changesets`. CI-only change; no package behavior affected.
+
+### Patch Changes
+
+- Updated dependencies [1d86d65]
+  - @tko/binding.component@5.0.0
+  - @tko/binding.core@5.0.0
+  - @tko/binding.foreach@5.0.0
+  - @tko/binding.if@5.0.0
+  - @tko/binding.template@5.0.0
+  - @tko/builder@5.0.0
+  - @tko/filter.punches@5.0.0
+  - @tko/provider.attr@5.0.0
+  - @tko/provider.component@5.0.0
+  - @tko/provider.databind@5.0.0
+  - @tko/provider.multi@5.0.0
+  - @tko/provider.mustache@5.0.0
+  - @tko/provider.native@5.0.0
+  - @tko/provider.virtual@5.0.0
+  - @tko/utils@5.0.0
+  - @tko/utils.component@5.0.0
+  - @tko/utils.jsx@5.0.0
+
 ## 4.1.1
 
 ### Patch Changes

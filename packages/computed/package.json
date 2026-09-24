@@ -1,5 +1,5 @@
 {
-  "version": "4.1.1",
+  "version": "5.0.0",
   "name": "@tko/computed",
   "description": "TKO Computed Observables",
   "module": "dist/index.js",
@@ -7,8 +7,8 @@
     "dist/"
   ],
   "dependencies": {
-    "@tko/observable": "^4.1.1",
-    "@tko/utils": "^4.1.1"
+    "@tko/observable": "^5.0.0",
+    "@tko/utils": "^5.0.0"
   },
   "repository": {
     "type": "git",
