@@ -19,5 +19,8 @@ Conditional and contextual bindings: `if`, `ifnot`, `with`, `else`, and `elseif`
 - When `options.createChildContextWithAs` is disabled, `with: value, as: "alias"` aliases the value without creating a new child context.
   Notes: Observable aliases update in place without re-rendering the region.
   Specs: `packages/binding.if/spec/withBehaviors.ts`
+- `if`/`ifnot`/`with` participate in the KO 3.5 async-completion lifecycle: each render cycle re-arms the node's async context so an ancestor's `descendantsComplete` fires once content renders, and a false branch that renders nothing still notifies `childrenComplete`.
+  Notes: `completeOn: "render"` defers the node's `childrenComplete` (and any ancestor `descendantsComplete`) until content is actually rendered. The `completeOn` binding key is reserved and read via `allBindings`; it needs no binding handler of its own.
+  Specs: `packages/binding.core/spec/descendantsCompleteBehaviors.ts`
 
 _Curated source: `packages/binding.if/verified-behaviors.json`_

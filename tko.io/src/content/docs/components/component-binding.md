@@ -183,6 +183,8 @@ For slot-based composition, components can expose named `<slot>` placeholders in
 
 If a component viewmodel defines `koDescendantsComplete(element)`, TKO calls it after the component's descendants have finished binding. Use this for post-render work that must wait until the component tree is active.
 
+Following Knockout 3.5 semantics, this waits for every asynchronously-completing descendant — so a nested component's `koDescendantsComplete` runs before its outer component's. To hold the callback open until a conditional inside the template actually renders, mark that conditional with `completeOn: "render"` (see [binding lifecycle](../../3to4/#descendantscomplete-matches-knockout-35)).
+
 ### Disposal and memory management
 
 Optionally, your viewmodel class may have a `dispose` function. If implemented, Knockout will call this whenever the component is being torn down and removed from the DOM (e.g., because the corresponding item was removed from a `foreach`, or an `if` binding has become `false`).

@@ -947,6 +947,80 @@ describe('Components: Component binding', function () {
     expect(callbacks).to.deep.equal(1)
   })
 
+  it("Calls koDescendantsComplete when the component template's content is an 'if' region that renders false (#414)", function () {
+    let renderedCount = 0
+    components.register(testComponentName, {
+      template: '<div data-bind="if: false"><span data-bind="text: myvalue"></span></div>',
+      viewModel: function () {
+        this.myvalue = 123
+        this.koDescendantsComplete = function () {
+          renderedCount++
+        }
+      }
+    })
+
+    applyBindings(outerViewModel, testNode)
+    expect(renderedCount).to.equal(0)
+
+    clock.tick(1)
+    expect(renderedCount).to.equal(1)
+  })
+
+  it("Disposes the previous component's koDescendantsComplete subscription when switching between components", function () {
+    cleanups.push(() => {
+      components.unregister('component-alpha')
+      components.unregister('component-beta')
+      components.unregister('component-gamma')
+    })
+
+    let alphaCalls = 0
+    let betaCalls = 0
+    let gammaCalls = 0
+    components.register('component-alpha', {
+      template: '<span>alpha</span>',
+      viewModel: function () {
+        this.koDescendantsComplete = function () {
+          alphaCalls++
+        }
+      }
+    })
+    components.register('component-beta', {
+      template: '<span>beta</span>',
+      viewModel: function () {
+        this.koDescendantsComplete = function () {
+          betaCalls++
+        }
+      }
+    })
+    components.register('component-gamma', {
+      template: '<span>gamma</span>',
+      viewModel: function () {
+        this.koDescendantsComplete = function () {
+          gammaCalls++
+        }
+      }
+    })
+
+    testComponentBindingValue.name = observable('component-alpha')
+    applyBindings(outerViewModel, testNode)
+    clock.tick(1)
+    expect(alphaCalls).to.equal(1)
+
+    // Switching to a new component reuses the same host element, so the stale
+    // `afterRenderSub` from the previous viewmodel must be disposed - otherwise
+    // it would keep firing every time the host's `descendantsComplete` re-arms.
+    testComponentBindingValue.name('component-beta')
+    clock.tick(1)
+    expect(betaCalls).to.equal(1)
+    expect(alphaCalls).to.equal(1)
+
+    testComponentBindingValue.name('component-gamma')
+    clock.tick(1)
+    expect(gammaCalls).to.equal(1)
+    expect(alphaCalls).to.equal(1)
+    expect(betaCalls).to.equal(1)
+  })
+
   describe('Component `bindingHandlers`', function () {
     it('overloads existing and provides new bindings', function () {
       const calls = new Array()

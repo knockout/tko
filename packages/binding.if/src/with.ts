@@ -26,11 +26,11 @@ export class WithBindingHandler extends ConditionalBindingHandler {
 
   override get bindingContext() {
     if (!this.asOption) {
-      return this.$context.createChildContext(this.valueAccessor)
+      return this.asyncParentContext.createChildContext(this.valueAccessor)
     }
     return options.createChildContextWithAs
-      ? this.$context.createChildContext(this.value, this.asOption)
-      : this.$context.extend({ [this.asOption]: this.value })
+      ? this.asyncParentContext.createChildContext(this.value, this.asOption)
+      : this.asyncParentContext.extend({ [this.asOption]: this.value })
   }
 
   override renderStatus() {
