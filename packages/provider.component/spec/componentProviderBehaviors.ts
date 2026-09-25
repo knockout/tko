@@ -150,6 +150,29 @@ describe('Components: Provider', function () {
       applyBindings({}, ne)
       // No error raised.
     })
+
+    it('resolves globals in component params', function () {
+      const provider = new MultiProvider({
+        providers: [new DataBindProvider(), new ComponentProvider()],
+        globals: { GLOBAL_CONST: 42 }
+      })
+      options.bindingProviderInstance = provider
+      bindingHandlers = provider.bindingHandlers
+      bindingHandlers.set(componentBindings)
+      bindingHandlers.set(coreBindings)
+
+      components.register('xenon', {
+        viewModel: function (params) {
+          expect(params.answer).to.equal(42)
+        },
+        template: '<span>ok</span>',
+        synchronous: true,
+        ignoreCustomElementWarning: true
+      })
+      const xe = document.createElement('xenon')
+      xe.setAttribute('params', 'answer: GLOBAL_CONST')
+      applyBindings({}, xe)
+    })
   })
 
   /* describe("nodeParamsToObject", function() {
