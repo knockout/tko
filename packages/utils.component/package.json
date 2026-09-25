@@ -4,7 +4,8 @@
   "description": "Registry and loading utilities for web components",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -21,6 +22,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -42,5 +44,6 @@
     "components",
     "registry",
     "loader"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

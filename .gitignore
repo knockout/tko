@@ -26,6 +26,8 @@ COVERAGE.md
 builds/**/meta
 .nyc_output
 **/dist/*
+packages/*/types/*
+builds/*/types/*
 !packages/tko/dist/*
 
 *-debug.log

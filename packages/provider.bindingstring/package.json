@@ -4,7 +4,8 @@
   "description": "Abstract Base Class for providers that parse a binding string",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -20,6 +21,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -41,5 +43,6 @@
     "provider",
     "parser",
     "binding-string"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

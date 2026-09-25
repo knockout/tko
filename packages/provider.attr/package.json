@@ -4,7 +4,8 @@
   "description": "Link HTML attributes (e.g. ko-handler-name) to binding handlers",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "license": "MIT",
   "dependencies": {
@@ -19,6 +20,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -40,5 +42,6 @@
     "provider",
     "attributes",
     "ko-attr"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }
