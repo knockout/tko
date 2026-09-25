@@ -183,6 +183,18 @@ Use author date, not committer date: a plan written late one day and landed
 the next morning should sort by when it was written. This keeps `ls plans/`
 chronological so stale plans are visually obvious.
 
+## AI Skills
+
+Reusable workflow instructions for AI agents live in `skills/`. Each skill is a
+self-contained folder with a `SKILL.md` and optional supporting assets
+(templates, scripts, references).
+
+| Skill | Purpose |
+|-------|---------|
+| `typescript-code-review` | Perform comprehensive TypeScript code reviews covering type safety, security, performance, and code quality with actionable feedback |
+
+Skills are loaded on-demand when the agent detects a matching task.
+
 ## Agent-First Documentation
 
 AI coding agents are first-class citizens of TKO. The docs site serves both
