@@ -50,6 +50,27 @@ describe('Subscribable', function () {
     expect(notifiedValue).to.equal(undefined)
   })
 
+  it('Should expose a TC39 Observable-style `unsubscribe()` alias for dispose', function () {
+    const instance = new subscribable()
+    let notified = 0
+    const subscription = instance.subscribe(function () {
+      notified++
+    })
+    expect(subscription.closed).to.equal(false)
+    subscription.unsubscribe()
+    expect(subscription.closed).to.equal(true)
+    instance.notifySubscribers('value')
+    expect(notified).to.equal(0)
+  })
+
+  it('Should report `closed` as true once disposed', function () {
+    const instance = new subscribable()
+    const subscription = instance.subscribe(function () {})
+    expect(subscription.closed).to.equal(false)
+    subscription.dispose()
+    expect(subscription.closed).to.equal(true)
+  })
+
   it("Should be able to specify a 'this' pointer for the callback", function () {
     const model = {
       someProperty: 123,
