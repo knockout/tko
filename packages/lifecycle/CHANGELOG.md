@@ -1,5 +1,13 @@
 # @tko/lifecycle
 
+## 4.2.0
+
+### Patch Changes
+
+- @tko/computed@4.2.0
+  - @tko/observable@4.2.0
+  - @tko/utils@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # @tko/builder
 
+## 4.2.0
+
+### Patch Changes
+
+- Updated dependencies [1d86d65]
+  - @tko/utils.parser@4.2.0
+  - @tko/bind@4.2.0
+  - @tko/binding.template@4.2.0
+  - @tko/computed@4.2.0
+  - @tko/lifecycle@4.2.0
+  - @tko/observable@4.2.0
+  - @tko/provider@4.2.0
+  - @tko/utils@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes

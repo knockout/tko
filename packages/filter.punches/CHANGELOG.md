@@ -1,5 +1,11 @@
 # @tko/filter.punches
 
+## 4.2.0
+
+### Patch Changes
+
+- @tko/observable@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes

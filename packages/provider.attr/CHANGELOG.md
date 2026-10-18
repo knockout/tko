@@ -1,5 +1,11 @@
 # @tko/provider.attr
 
+## 4.2.0
+
+### Patch Changes
+
+- @tko/provider@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes
