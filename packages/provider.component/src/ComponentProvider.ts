@@ -72,9 +72,9 @@ export default class ComponentProvider extends Provider {
       return { $raw: {} }
     }
 
-    const parser = new (Parser as any)(node, context, this.globals) as Parser
+    const parser = new Parser()
     const paramsString = (node.getAttribute('params') || '').trim()
-    const accessors = parser.parse(paramsString, context, undefined, node)
+    const accessors = parser.parse(paramsString, context, this.globals, node)
     if (!accessors || Object.keys(accessors).length === 0) {
       return { $raw: {} }
     }
