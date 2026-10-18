@@ -19,14 +19,14 @@ export class IfBindingHandler extends ConditionalBindingHandler {
 
   override get bindingContext() {
     return this.ifCondition.isActive()
-      ? this.$context.extend(() => {
+      ? this.asyncParentContext.extend(() => {
           // Ensure that this context is dependant upon the conditional, so the
           // order of binding application is: conditional before its children.
           // See https://github.com/knockout/knockout/pull/2226
           this.ifCondition()
           return null
         })
-      : this.$context
+      : this.asyncParentContext
   }
 
   override renderStatus() {

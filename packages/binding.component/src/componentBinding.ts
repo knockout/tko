@@ -6,7 +6,7 @@ import { virtualElements, makeArray, cloneNodes } from '@tko/utils'
 
 import { unwrap } from '@tko/observable'
 
-import { DescendantBindingHandler } from '@tko/bind'
+import { DescendantBindingHandler, bindingEvent } from '@tko/bind'
 
 import { JsxObserver, maybeJsx } from '@tko/utils.jsx'
 
@@ -27,6 +27,12 @@ export default class ComponentBinding extends DescendantBindingHandler {
   latestComponentName: string
   loadingOperationId: number
   originalChildNodes: Node[]
+  /** Context extended with this element's async-completion info, used as the
+   *  parent of the component's child context (KO parity). */
+  asyncBindingContext?: BindingContext
+  /** Subscription bridging the element's `descendantsComplete` event to the
+   *  view model's `koDescendantsComplete` hook. */
+  afterRenderSub?: { dispose(): void } | null
   constructor(params: any) {
     super(params)
     this.originalChildNodes = makeArray(virtualElements.childNodes(this.$element as Node))
@@ -112,6 +118,11 @@ export default class ComponentBinding extends DescendantBindingHandler {
       throw new Error('No component name specified')
     }
 
+    // Register the element as (potentially) completing asynchronously so an
+    // ancestor's `descendantsComplete` waits for this component, and so the
+    // component's own `descendantsComplete` fires once its content is bound.
+    this.asyncBindingContext = bindingEvent.startPossiblyAsyncContentBinding(this.$element, this.$context)
+
     this.loadingOperationId = this.currentLoadingOperationId = ++componentLoadingOperationUniqueId
     registry.get(componentName, (defn: any) => this.applyComponentDefinition(componentName, componentParams, defn))
   }
@@ -124,7 +135,7 @@ export default class ComponentBinding extends DescendantBindingHandler {
         $componentTemplateSlotNodes: this.makeTemplateSlotNodes(this.originalChildNodes as HTMLElement[])
       })
 
-    return this.$context.createChildContext($component, undefined, ctxExtender)
+    return (this.asyncBindingContext ?? this.$context).createChildContext($component, undefined, ctxExtender)
   }
 
   applyComponentDefinition(componentName: string, componentParams: any, componentDefinition: any) {
@@ -156,6 +167,17 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     this.childBindingContext = this.makeChildBindingContext(componentViewModel)
 
+    // Fire the view model's `koDescendantsComplete` hook when the element's
+    // descendants (including async ones) have all completed (KO parity).
+    if (componentViewModel && typeof componentViewModel.koDescendantsComplete === 'function') {
+      this.afterRenderSub = bindingEvent.subscribe(
+        this.$element,
+        bindingEvent.descendantsComplete,
+        componentViewModel.koDescendantsComplete,
+        componentViewModel
+      )
+    }
+
     const viewTemplate = componentViewModel && componentViewModel.template
 
     if (!componentDefinition.template) {
@@ -174,14 +196,11 @@ export default class ComponentBinding extends DescendantBindingHandler {
 
     this.currentViewModel = componentViewModel
 
-    const onBinding = this.onBindingComplete.bind(this, componentViewModel)
+    const onBinding = this.onBindingComplete.bind(this)
     this.applyBindingsToDescendants(this.childBindingContext, onBinding)
   }
 
-  onBindingComplete(componentViewModel, bindingResult) {
-    if (componentViewModel && componentViewModel.koDescendantsComplete) {
-      componentViewModel.koDescendantsComplete(this.$element)
-    }
+  onBindingComplete(bindingResult) {
     this.completeBinding(bindingResult)
   }
 
@@ -190,6 +209,10 @@ export default class ComponentBinding extends DescendantBindingHandler {
     const currentViewDispose = currentView && currentView.dispose
     if (typeof currentViewDispose === 'function') {
       currentViewDispose.call(currentView)
+    }
+    if (this.afterRenderSub) {
+      this.afterRenderSub.dispose()
+      this.afterRenderSub = null
     }
     this.currentViewModel = null
     // Any in-flight loading operation is no longer relevant, so make sure we ignore its completion

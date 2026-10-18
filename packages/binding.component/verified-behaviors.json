@@ -10,6 +10,14 @@
       "specs": ["packages/binding.component/spec/componentBindingBehaviors.ts"]
     },
     {
+      "statement": "A component viewmodel's `koDescendantsComplete` is invoked via the element's `descendantsComplete` event, so it waits for inner components to complete first (KO 3.5 ordering: inner components before outer).",
+      "notes": [
+        "Ordering holds whether components render synchronously or asynchronously, and across intermediate bindings (`with`, nesting several layers deep).",
+        "Re-rendering an inner component does not re-fire the outer component's `koDescendantsComplete`."
+      ],
+      "specs": ["builds/knockout/spec/components/componentBindingBehaviors.js"]
+    },
+    {
       "statement": "`slot` supports named and default slots, works in virtual-element form, and preprocesses native `<slot>` elements.",
       "notes": ["Named slot templates and plain nodes with a matching `slot` attribute are both covered."],
       "specs": ["packages/binding.component/spec/componentBindingBehaviors.ts"]

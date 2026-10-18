@@ -4,7 +4,7 @@ import { dependencyDetection, observable } from '@tko/observable'
 
 import type { Observable } from '@tko/observable'
 
-import { applyBindingsToDescendants, AsyncBindingHandler } from '@tko/bind'
+import { applyBindingsToDescendants, AsyncBindingHandler, bindingEvent } from '@tko/bind'
 
 import type { BindingContext } from '@tko/bind'
 
@@ -42,11 +42,22 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
   completesElseChain: Observable
   hasElse: boolean
   ifElseNodes?: any
+  /** When `completeOn: "render"`, defer this node's `childrenComplete` (and thus
+   *  any ancestor `descendantsComplete`) until content is actually rendered. */
+  completeOnRender: boolean
+  /** Whether this node participates in the async-completion bookkeeping. */
+  needAsyncContext: boolean
+  /** Parent context used for rendered content; carries the async-completion
+   *  ancestor info when `needAsyncContext` is set. Re-armed on each render. */
+  asyncParentContext: BindingContext
   constructor(params) {
     super(params)
     this.hasElse = this.detectElse(this.$element)
     const elseChainSatisfied = (this.completesElseChain = observable())
     domData.set(this.$element, 'conditional', { elseChainSatisfied })
+    this.completeOnRender = this.allBindings.get('completeOn') === 'render'
+    this.needAsyncContext = this.completeOnRender || this.allBindings.has('descendantsComplete')
+    this.asyncParentContext = this.$context
   }
 
   getIfElseNodes() {
@@ -69,6 +80,13 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     // Save the nodes before we possibly remove them from the DOM.
     this.ifElseNodes = this.getIfElseNodes() || {}
 
+    // Re-arm the async-completion context on every render cycle. This links the
+    // node into its ancestor's pending set so `descendantsComplete` (and a
+    // component's `koDescendantsComplete`) can stay open until content renders.
+    this.asyncParentContext = this.needAsyncContext
+      ? bindingEvent.startPossiblyAsyncContentBinding(this.$element, this.$context)
+      : this.$context
+
     if (shouldDisplay) {
       const useOriginalNodes = isFirstRender && !this.hasElse
       this.renderAndApplyBindings(this.ifElseNodes.ifNodes, useOriginalNodes)
@@ -77,6 +95,12 @@ export default class ConditionalBindingHandler extends AsyncBindingHandler {
     } else {
       virtualElements.emptyNode(this.$element)
       this.completeBinding()
+      // A branch that renders nothing has still reached a completed state — notify
+      // `childrenComplete` so the async bookkeeping resolves. Unless `completeOn:
+      // "render"` asked us to hold it open until content actually renders.
+      if (!this.completeOnRender) {
+        bindingEvent.notify(this.$element, bindingEvent.childrenComplete)
+      }
     }
   }
 

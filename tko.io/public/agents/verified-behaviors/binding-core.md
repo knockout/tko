@@ -13,7 +13,7 @@ Core element bindings such as `event` and descendant-completion hooks.
   Notes: Default click handling prevents default navigation unless `preventDefault: false` is supplied. Bubbling is on by default and can be disabled.
   Specs: `packages/binding.core/spec/eventBehaviors.ts`
 - `descendantsComplete` fires after descendant bindings finish on both DOM and virtual elements.
-  Notes: It does not fire when there are no descendant nodes. A `null` callback is ignored. It also works with `ko.bindingEvent.subscribe(...)`.
+  Notes: It does not fire when there are no descendant nodes. A `null` callback is ignored. It also works with `ko.bindingEvent.subscribe(...)`. It re-arms per content cycle: a nested `if` firing its content re-fires the ancestor's `descendantsComplete` (KO 3.5 semantics), and toggling a conditional off then on fires it again. `completeOn: "render"` on an inner conditional holds the ancestor's `descendantsComplete` open until the inner content actually renders. A false `if` branch that renders nothing still notifies `childrenComplete`, but the callback only runs when there are child nodes to hand back.
   Specs: `packages/binding.core/spec/descendantsCompleteBehaviors.ts`
 
 _Curated source: `packages/binding.core/verified-behaviors.json`_
