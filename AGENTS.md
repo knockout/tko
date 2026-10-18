@@ -126,9 +126,11 @@ GitHub Actions workflows (`.github/workflows/`):
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `main-build.yml` | Push to main | Build + audit + headless test |
-| `test-headless.yml` | PRs | Matrix test (Chrome, Firefox, jQuery) |
+| `build-and-test.yml` | `workflow_call` only | Reusable build + verify:esm + browser-matrix and happy-dom tests; called by `main-build.yml` and `release.yml` |
+| `main-build.yml` | Push to main + manual dispatch | Entry point for `build-and-test.yml` |
+| `test-headless.yml` | PRs | Matrix test (chromium, firefox, webkit) + happy-dom job |
 | `lint-and-typecheck.yml` | PRs | Biome + tsc (lint, format, typecheck) |
+| `coverage.yml` | PRs + push to main | vitest+v8 coverage (informational; closed-loop gate tracked in #379) |
 | `publish-check.yml` | PRs | Verify packages are publishable |
 | `release.yml` | Push to main | Changeset version PRs + npm publish + GitHub release creation |
 | `github-release.yml` | Manual fallback | Backfill a GitHub release/tag for a published `main` commit if automatic release creation needs a retry |

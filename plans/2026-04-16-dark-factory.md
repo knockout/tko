@@ -58,17 +58,19 @@ The tooling modernization (Phases 1–6) was the foundation:
 
 ## What's not there yet
 
-| Gap | What's needed |
-|-----|---------------|
-| **Dependency updates** | Renovate/Dependabot with 48h minimumReleaseAge |
-| **Bundle size tracking** | CI check comparing browser.min.js against main |
-| **Benchmarks** | vitest bench for observable/computed hot paths |
-| **Coverage confidence** | Know which code paths are covered, which aren't |
-| **Autonomous PR review** | AI reviewer that checks against verified behaviors |
-| **Release automation** | Tag + release triggered by changeset merge, not manual |
-| **Copilot/Cursor support** | `.github/copilot-instructions.md` extending AGENTS.md |
-| **Issue triage** | AI can read an issue, reproduce it, propose a fix |
-| **Scenario testing** | StrongDM-style holdout scenarios for end-to-end validation |
+Status column updated 2026-10-18 (scheduled dark-factory review).
+
+| Gap | What's needed | Status |
+|-----|---------------|--------|
+| **Dependency updates** | Renovate/Dependabot with 48h minimumReleaseAge | ✅ Dependabot weekly, minor/patch grouped, 2-day cooldown on version bumps — security updates ship immediately (`.github/dependabot.yml`) |
+| **Bundle size tracking** | CI check comparing browser.min.js against main | ❌ open |
+| **Benchmarks** | vitest bench for observable/computed hot paths | ❌ open |
+| **Coverage confidence** | Know which code paths are covered, which aren't | 🟡 open-loop `coverage.yml` ships summaries + artifacts; PR delta comment + regression gate specced in #379 |
+| **Autonomous PR review** | AI reviewer that checks against verified behaviors | 🟡 author-side adversarial pass mandated (`agents/process.md`); no repo-side CI reviewer yet |
+| **Release automation** | Tag + release triggered by changeset merge, not manual | ✅ single-action release (`release.yml`, #377): merge the version PR → publish + tag + GitHub release |
+| **Copilot/Cursor support** | `.github/copilot-instructions.md` extending AGENTS.md | ✅ delegates to AGENTS.md |
+| **Issue triage** | AI can read an issue, reproduce it, propose a fix | ❌ open (backlog has agent-ready repros, e.g. #410, #401) |
+| **Scenario testing** | StrongDM-style holdout scenarios for end-to-end validation | ❌ open (nearest artifact today: `verified-behaviors.json` contracts) |
 
 ## Principles
 
