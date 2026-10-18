@@ -1,5 +1,12 @@
 # @tko/utils
 
+## 4.2.0
+
+### Patch Changes
+
+- @tko/builder@4.2.0
+  - @tko/provider@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes

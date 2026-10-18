@@ -1,5 +1,17 @@
 # @tko/binding.component
 
+## 4.2.0
+
+### Patch Changes
+
+- @tko/bind@4.2.0
+  - @tko/lifecycle@4.2.0
+  - @tko/observable@4.2.0
+  - @tko/provider.native@4.2.0
+  - @tko/utils@4.2.0
+  - @tko/utils.component@4.2.0
+  - @tko/utils.jsx@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes

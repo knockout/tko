@@ -1,5 +1,14 @@
 # @tko/provider.mustache
 
+## 4.2.0
+
+### Patch Changes
+
+- Updated dependencies [1d86d65]
+  - @tko/utils.parser@4.2.0
+  - @tko/observable@4.2.0
+  - @tko/provider@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes

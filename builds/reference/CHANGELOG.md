@@ -1,5 +1,27 @@
 # @tko/build.reference
 
+## 4.2.0
+
+### Patch Changes
+
+- @tko/binding.component@4.2.0
+  - @tko/binding.core@4.2.0
+  - @tko/binding.foreach@4.2.0
+  - @tko/binding.if@4.2.0
+  - @tko/binding.template@4.2.0
+  - @tko/builder@4.2.0
+  - @tko/filter.punches@4.2.0
+  - @tko/provider.attr@4.2.0
+  - @tko/provider.component@4.2.0
+  - @tko/provider.databind@4.2.0
+  - @tko/provider.multi@4.2.0
+  - @tko/provider.mustache@4.2.0
+  - @tko/provider.native@4.2.0
+  - @tko/provider.virtual@4.2.0
+  - @tko/utils@4.2.0
+  - @tko/utils.component@4.2.0
+  - @tko/utils.jsx@4.2.0
+
 ## 4.1.1
 
 ### Patch Changes
