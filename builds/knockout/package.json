@@ -26,7 +26,8 @@
     ]
   },
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "licenses": [
     {
@@ -53,6 +54,7 @@
   },
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     }
@@ -71,5 +73,6 @@
     "mvvm",
     "data-binding",
     "compatible"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

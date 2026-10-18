@@ -4,7 +4,8 @@
   "description": "TKO Utilities",
   "type": "module",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -42,5 +44,6 @@
   "module": "dist/index.js",
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "types": "./types/index.d.ts"
 }

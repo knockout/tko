@@ -26,10 +26,12 @@
     }
   ],
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -47,5 +49,6 @@
     "builder",
     "framework",
     "customizable"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

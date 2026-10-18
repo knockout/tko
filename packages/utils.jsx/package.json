@@ -4,7 +4,8 @@
   "description": "TKO JSX Rendering",
   "module": "dist/index.js",
   "files": [
-    "dist/"
+    "dist/",
+    "types/"
   ],
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
@@ -45,5 +47,6 @@
   },
   "scripts": {
     "build": "bun ../../tools/build.ts"
-  }
+  },
+  "types": "./types/index.d.ts"
 }
