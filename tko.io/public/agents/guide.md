@@ -54,7 +54,8 @@ Context variables inside foreach: $data, $parent, $root, $index (observable), $e
 
 Binding notes:
 - `textInput` binds an `<input>` or `<textarea>` with immediate two-way updates as the user types, pastes, drags, or accepts autofill. Prefer it over `value` when the model must update continuously.
-- `foreach` supports lifecycle callbacks as binding parameters: `afterRender(nodes, value)` fires after each item renders; `beforeMove(node, newIndex, value)` and `afterMove(node, newIndex, value)` fire during array reordering.
+- `foreach` supports lifecycle callbacks as binding parameters: `afterRender(nodes, value)` fires after each item renders; `beforeMove(node, newIndex, value)` and `afterMove(node, newIndex, value)` fire during array reordering. `nodes` includes whitespace text nodes (filter `nodeType === 1` before `ko.contextFor`); `this` in the callback is not the view model (use arrow functions or `.bind`). Changes the callback makes to the array are applied in a follow-up pass.
+- `foreach: { data, as: 'x' }` adds `x` to the current context (no child context, KO 3.5 default), so `$parent` is *not* the foreach parent. Set `ko.options.createChildContextWithAs = true` for a child context (`$data` = item, `$parent` = outer data).
 
 ```html
 <input data-bind="textInput: query">

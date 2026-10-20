@@ -990,6 +990,268 @@ describe('observable array changes', function () {
       assert.equal(target.text(), 'ab')
       assert.deepEqual(calls, [a, b])
     })
+
+    describe('with $parent', function () {
+      const firstElement = (nodes: Node[]) => nodes.find(node => node.nodeType === Node.ELEMENT_NODE)!
+      const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => resolve(null)))
+
+      it('resolves $parent in inner bindings and in a nested afterRender taken from $parent', function () {
+        const calls: string[] = []
+        const g1 = { name: 'G1', items: observableArray(['a']) }
+        const groups = observableArray([g1])
+        const vm = {
+          groups,
+          cb(nodes, value) {
+            calls.push(`${value}:${contextFor(firstElement(nodes))!.$parent.name}`)
+          }
+        }
+        const target = $(
+          "<div data-bind='foreach: groups'><ul data-bind='foreach: { data: items, afterRender: $parent.cb }'><li data-bind='text: $parent.name + $data'></li></ul></div>"
+        )
+        applyBindings(vm, target[0])
+        assert.equal(target.text(), 'G1a')
+
+        g1.items.push('b')
+        groups.push({ name: 'G2', items: observableArray(['c']) })
+
+        assert.equal(target.text(), 'G1aG1bG2c')
+        assert.deepEqual(calls, ['a:G1', 'b:G1', 'c:G2'])
+      })
+
+      it('resolves $parent inside virtual-element foreach', function () {
+        const calls: string[] = []
+        const g1 = { name: 'G1', items: observableArray(['a']) }
+        const vm = {
+          groups: [g1],
+          cb(nodes, value) {
+            calls.push(`${value}:${contextFor(firstElement(nodes))!.$parent.name}`)
+          }
+        }
+        const target = $(
+          "<div data-bind='foreach: groups'><!-- ko foreach: { data: items, afterRender: $parent.cb } --><b data-bind='text: $parent.name + $data'></b><!-- /ko --></div>"
+        )
+        applyBindings(vm, target[0])
+        g1.items.push('b')
+
+        assert.equal(target.text(), 'G1aG1b')
+        assert.deepEqual(calls, ['a:G1', 'b:G1'])
+      })
+
+      it('resolves $parent for nodesets reused from pendingDeletes', function () {
+        const a = { n: 'a' }
+        const b = { n: 'b' }
+        const items = observableArray([a, b])
+        const calls: string[] = []
+        const vm = {
+          title: 'T',
+          items,
+          cb(nodes, value) {
+            calls.push(`${value.n}:${contextFor(firstElement(nodes))!.$parent.title}`)
+          }
+        }
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'><li data-bind='text: $parent.title + n'></li></ul>"
+        )
+        applyBindings(vm, target[0])
+        items.reverse()
+
+        assert.equal(target.text(), 'TbTa')
+        assert.lengthOf(calls, 3)
+        arrayForEach(calls, call => assert.match(call, /^[ab]:T$/))
+      })
+
+      it('updates inner bindings when afterRender writes a $parent observable', function () {
+        const count = observable(0)
+        const items = observableArray([{ n: 'a' }])
+        const vm = { count, items, cb: () => count(count() + 1) }
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'><li data-bind='text: n + $parent.count()'></li></ul>"
+        )
+        applyBindings(vm, target[0])
+        assert.equal(target.text(), 'a1')
+
+        items.push({ n: 'b' })
+        assert.equal(target.text(), 'a2b2')
+      })
+
+      it('resolves $parent when afterRender runs asynchronously', async function () {
+        ForEachBinding.setSync(false)
+        const items = observableArray(['a'])
+        const calls: string[] = []
+        const vm = {
+          title: 'T',
+          items,
+          cb(nodes, value) {
+            calls.push(`${value}:${contextFor(firstElement(nodes))!.$parent.title}`)
+          }
+        }
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'><li data-bind='text: $parent.title + $data'></li></ul>"
+        )
+        applyBindings(vm, target[0])
+        items.push('b')
+        await nextFrame()
+
+        assert.equal(target.text(), 'TaTb')
+        assert.deepEqual(calls, ['a:T', 'b:T'])
+      })
+
+      // Regression: array changes made from inside `afterRender` used to be
+      // dropped, leaving `firstLastNodesList` out of sync with the array; the
+      // next delete threw "Cannot read properties of undefined (reading 'first')".
+      it('renders items pushed by afterRender during the initial render', function () {
+        const items = observableArray<any>([{ n: 'a' }])
+        let pushed = false
+        const vm = {
+          title: 'T',
+          items,
+          cb() {
+            if (!pushed) {
+              pushed = true
+              items.push({ n: 'new' })
+            }
+          }
+        }
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'><li data-bind='text: $parent.title + n'></li></ul>"
+        )
+        applyBindings(vm, target[0])
+        assert.equal(target.text(), 'TaTnew')
+
+        items.pop()
+        assert.equal(target.text(), 'Ta')
+      })
+
+      it('removes items removed by afterRender', function () {
+        const items = observableArray<any>([{ n: 'a' }])
+        const vm = { title: 'T', items, cb: (_nodes, value) => value.n === 'x' && items.remove(value) }
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'><li data-bind='text: $parent.title + n'></li></ul>"
+        )
+        applyBindings(vm, target[0])
+
+        items.push({ n: 'x' })
+        assert.equal(target.text(), 'Ta')
+        items.push({ n: 'y' })
+        assert.equal(target.text(), 'TaTy')
+        items.removeAll()
+        assert.equal(target.text(), '')
+        assert.equal(target[0].children.length, 0)
+      })
+
+      it('keeps nested foreach in sync when afterRender from $parent mutates the array', function () {
+        const groups = observableArray<any>([])
+        const vm = {
+          groups,
+          onRender(_nodes, value) {
+            if (value === 'a') {
+              groups()[0].items.push('auto')
+            }
+          }
+        }
+        const target = $(
+          "<div data-bind='foreach: groups'><ul data-bind='foreach: { data: items, afterRender: $parent.onRender }'><li data-bind='text: $parent.name + $data'></li></ul></div>"
+        )
+        applyBindings(vm, target[0])
+        groups.push({ name: 'G', items: observableArray(['x']) })
+        groups()[0].items.push('a')
+        assert.equal(target.text(), 'GxGaGauto')
+
+        groups()[0].items.remove('auto')
+        assert.equal(target.text(), 'GxGa')
+      })
+
+      it('processes array changes from afterRender in a later frame when async', async function () {
+        ForEachBinding.setSync(false)
+        const items = observableArray<any>([])
+        let pushed = false
+        const vm = {
+          title: 'T',
+          items,
+          cb() {
+            if (!pushed) {
+              pushed = true
+              items.push({ n: 'auto' })
+            }
+          }
+        }
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'><li data-bind='text: $parent.title + n'></li></ul>"
+        )
+        applyBindings(vm, target[0])
+        items.push({ n: 'a' })
+        await nextFrame()
+        await nextFrame()
+        assert.equal(target.text(), 'TaTauto')
+
+        items.pop()
+        await nextFrame()
+        assert.equal(target.text(), 'Ta')
+      })
+
+      // The following pin current, Knockout 3.5 compatible behavior.
+      it('does not create a child context with `as` by default, so $parent is the outer context parent', function () {
+        const rootTarget = $(
+          "<ul data-bind='foreach: { data: items, as: \"item\", afterRender: cb }'><li data-bind='text: $parent.title'></li></ul>"
+        )
+        assert.throws(
+          () => applyBindings({ title: 'T', items: ['a'], cb() {} }, rootTarget[0]),
+          /The variable "\$parent" was not found/
+        )
+
+        const calls: any[] = []
+        const nestedTarget = $(
+          "<div data-bind='foreach: groups'><ul data-bind='foreach: { data: items, as: \"item\", afterRender: $parent.cb }'><li data-bind='text: $parent.name'></li></ul></div>"
+        )
+        applyBindings(
+          {
+            name: 'ROOT',
+            groups: [{ name: 'G1', items: ['a'] }],
+            cb: nodes => calls.push(contextFor(firstElement(nodes))!.$parent.name)
+          },
+          nestedTarget[0]
+        )
+        assert.equal(nestedTarget.text(), 'ROOT')
+        assert.deepEqual(calls, ['ROOT'])
+      })
+
+      it('passes whitespace text nodes, which have no binding context', function () {
+        const calls: any[] = []
+        const target = $(
+          "<ul data-bind='foreach: { data: items, afterRender: cb }'>\n  <li data-bind='text: $parent.title'></li>\n</ul>"
+        )
+        applyBindings(
+          {
+            title: 'T',
+            items: ['a'],
+            cb: nodes =>
+              calls.push({
+                firstType: nodes[0].nodeType,
+                firstContext: contextFor(nodes[0]),
+                elementParent: contextFor(firstElement(nodes))!.$parent.title
+              })
+          },
+          target[0]
+        )
+        assert.deepEqual(calls, [{ firstType: Node.TEXT_NODE, firstContext: undefined, elementParent: 'T' }])
+      })
+
+      it('does not bind `this` to $parent when afterRender is a $parent method', function () {
+        let receiver
+        const vm = {
+          items: ['a'],
+          cb() {
+            receiver = this
+          }
+        }
+        const target = $(
+          "<div data-bind='foreach: [1]'><ul data-bind='foreach: { data: $parent.items, afterRender: $parent.cb }'><li data-bind='text: $data'></li></ul></div>"
+        )
+        applyBindings(vm, target[0])
+        // Knockout 3.5 compatible: the receiver is not the view model. Its exact value is not API.
+        assert.notStrictEqual(receiver, vm)
+      })
+    })
   })
 
   describe('beforeMove and afterMove', function () {
@@ -1341,6 +1603,65 @@ describe('observable array changes', function () {
       const list = ['a', 'b', 'c']
       applyBindings(list, target[0])
       assert.equal(target.text(), 'abc')
+    })
+
+    describe('with options.createChildContextWithAs = true', function () {
+      let original: boolean
+      beforeEach(function () {
+        original = options.createChildContextWithAs
+        options.createChildContextWithAs = true
+      })
+      afterEach(function () {
+        options.createChildContextWithAs = original
+      })
+
+      it('creates a child context per item', function () {
+        const target = $("<ul data-bind='foreach: { data: items, as: \"item\" }'><li data-bind='text: item'></li></ul>")
+        const vm = { items: ['a', 'b'] }
+        applyBindings(vm, target[0])
+        assert.equal(target.text(), 'ab')
+        assert.equal(dataFor(target.children()[0]), 'a')
+        assert.equal(dataFor(target.children()[1]), 'b')
+        assert.strictEqual(contextFor(target.children()[0])!.$parent, vm)
+      })
+
+      it('resolves $parent to the foreach parent at root and in nested blocks', function () {
+        const calls: string[] = []
+        const g1 = { name: 'G1', items: observableArray(['a']) }
+        const vm = {
+          name: 'ROOT',
+          groups: [g1],
+          cb: nodes => calls.push(contextFor(nodes[0])!.$parent.name)
+        }
+        const target = $(
+          "<div data-bind='foreach: { data: groups, as: \"group\" }'><ul data-bind='foreach: { data: group.items, as: \"item\", afterRender: $parent.cb }'><li data-bind='text: $parent.name + $parents[1].name + item'></li></ul></div>"
+        )
+        applyBindings(vm, target[0])
+        g1.items.push('b')
+
+        assert.equal(target.text(), 'G1ROOTaG1ROOTb')
+        assert.deepEqual(calls, ['G1', 'G1'])
+      })
+
+      it('unwraps observable items and exposes the observable as $rawData', function () {
+        const x = observable('first')
+        const target = $("<ul data-bind='foreach: { data: items, as: \"item\" }'><li data-bind='text: item'></li></ul>")
+        applyBindings({ items: observableArray([x]) }, target[0])
+        const ctx = contextFor(target.children()[0])!
+        assert.equal(ctx.item, 'first')
+        assert.strictEqual(ctx.$rawData, x)
+
+        x('second')
+        assert.equal(target.text(), 'second')
+      })
+
+      it('keeps $index and $list', function () {
+        const items = observableArray(['a', 'b'])
+        const target = $("<ul data-bind='foreach: { data: items, as: \"xyz\" }'><li data-bind='text: xyz'></li></ul>")
+        applyBindings({ items }, target[0])
+        assert.equal(contextFor(target.children()[1])!.$index(), 1)
+        assert.strictEqual(contextFor(target.children()[1])!.$list, items)
+      })
     })
   })
 })

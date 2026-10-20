@@ -242,6 +242,8 @@ By default, the `foreach` binding keeps destroyed entries in the rendered list. 
 
 The `as` option gives each item a local name, but the exact context shape depends on `ko.options.createChildContextWithAs`. When that option is enabled, `as` creates a child context; otherwise the alias is added to the current context. If you rely on `$data`, `$rawData`, or parent lookups, set that option deliberately and test the mode you ship.
 
+With the default (`createChildContextWithAs: false`), `$data` and `$parent` inside the loop are the same as outside it, so `$parent` does **not** refer to the data the `foreach` is placed in. Reference outer data directly (or via `$root`) instead, or enable the option to get a child context where `$data` is the current item and `$parent` is the outer data.
+
 ### Note 8: Post-processing or animating the generated DOM elements
 
 If you need to run some further custom logic on the generated DOM elements, you can use any of the `afterRender`/`afterAdd`/`beforeRemove`/`beforeMove`/`afterMove` callbacks described below.
