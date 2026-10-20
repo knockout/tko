@@ -167,21 +167,22 @@ export class ForEachBinding extends AsyncBindingHandler {
     // Remove existing content.
     virtualElements.emptyNode(this.$element)
 
-    // Prime content
-    const primeData = unwrap(this.data)
-    if (primeData && primeData.map) {
-      this.onArrayChange(primeData.map(valueToChangeAddItem), true)
-    } else {
-      this.completeBinding()
-    }
-
-    // Watch for changes
+    // Watch for changes. Subscribe before priming so that changes made by
+    // callbacks during the initial render (e.g. `afterRender`) are not missed.
     if (isObservable(this.data)) {
       if (!(this.data as ObservableArray).indexOf) {
         // Make sure the observable is trackable.
         this.data = this.data.extend({ trackArrayChanges: true })
       }
       this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange')
+    }
+
+    // Prime content
+    const primeData = unwrap(this.data)
+    if (primeData && primeData.map) {
+      this.onArrayChange(primeData.map(valueToChangeAddItem), true)
+    } else {
+      this.completeBinding()
     }
   }
 
@@ -231,36 +232,42 @@ export class ForEachBinding extends AsyncBindingHandler {
       if (isInitial) {
         this.processQueue()
       } else {
-        ForEachBinding.animateFrame.call(window, () => this.processQueue())
+        ForEachBinding.animateFrame.call(options.global, () => this.processQueue())
       }
     }
   }
 
-  startQueueFlush() {
+  startQueueFlush(changeQueue = this.changeQueue) {
     // Callback so folks can do things before the queue flush.
     if (typeof this.beforeQueueFlush === 'function') {
-      this.beforeQueueFlush(this.changeQueue)
+      this.beforeQueueFlush(changeQueue)
     }
   }
 
-  endQueueFlush() {
+  endQueueFlush(changeQueue = this.changeQueue) {
     // Callback so folks can do things.
     if (typeof this.afterQueueFlush === 'function') {
-      this.afterQueueFlush(this.changeQueue)
+      this.afterQueueFlush(changeQueue)
     }
   }
 
   // Reflect all the changes in the queue in the DOM, then wipe the queue.
   processQueue() {
+    // Detach the queue being processed: changes registered while it is
+    // processed (e.g. an `afterRender` callback mutating the array) land on a
+    // fresh queue and are scheduled after this pass, so `firstLastNodesList`
+    // stays in sync with the array.
+    const changeQueue = this.changeQueue
+    this.changeQueue = new Array()
     const isEmpty = !unwrap(this.data).length
     let lowestIndexChanged = MAX_LIST_SIZE
     const moves = this.computeMoves(unwrap(this.data) || [])
 
     try {
-      this.startQueueFlush()
+      this.startQueueFlush(changeQueue)
       this.fireMoveCallback(this.beforeMove, moves, 'oldIndex')
 
-      arrayForEach(this.changeQueue, changeItem => {
+      arrayForEach(changeQueue, changeItem => {
         if (typeof changeItem.index === 'number') {
           lowestIndexChanged = Math.min(lowestIndexChanged, changeItem.index)
         }
@@ -275,15 +282,19 @@ export class ForEachBinding extends AsyncBindingHandler {
 
       this.fireMoveCallback(this.afterMove, moves, 'newIndex')
       this.flushPendingAfterRender()
-      this.endQueueFlush()
+      this.endQueueFlush(changeQueue)
     } finally {
       this.rendering_queued = false
-      this.changeQueue = new Array()
       this.pendingAfterRender = new Array()
       // Update the conditional exposed on the domData
       if (isEmpty !== !this.isNotEmpty()) {
         this.isNotEmpty(!isEmpty)
       }
+    }
+
+    if (this.changeQueue.length > 0 && !this.rendering_queued) {
+      this.rendering_queued = true
+      ForEachBinding.animateFrame.call(options.global, () => this.processQueue())
     }
   }
 
@@ -400,10 +411,10 @@ export class ForEachBinding extends AsyncBindingHandler {
    */
   createContextGenerator(as) {
     const $ctx = this.$context
-    if (as) {
+    if (as && !options.createChildContextWithAs) {
       return v => this._contextExtensions($ctx.extend({ [as]: v }))
     } else {
-      return v => $ctx.createChildContext(v, undefined, ctx => this._contextExtensions(ctx))
+      return v => $ctx.createChildContext(v, as || undefined, ctx => this._contextExtensions(ctx))
     }
   }
 
@@ -654,14 +665,10 @@ export class ForEachBinding extends AsyncBindingHandler {
         frame()
       }
     } else {
-      ForEachBinding.animateFrame =
-        w.requestAnimationFrame ||
-        w.webkitRequestAnimationFrame ||
-        w.mozRequestAnimationFrame ||
-        w.msRequestAnimationFrame ||
-        function (cb) {
-          return w.setTimeout(cb, 1000 / 60)
-        }
+      // Non-browser runtimes (Node, Bun) have no requestAnimationFrame.
+      ForEachBinding.animateFrame = w.requestAnimationFrame
+        ? cb => w.requestAnimationFrame(cb)
+        : cb => w.setTimeout(cb, 1000 / 60)
     }
   }
 

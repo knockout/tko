@@ -20,5 +20,9 @@ Standalone `foreach` binding behavior, templates, and else-chain state.
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
 - `foreach` supports `afterRender(nodes, value)`, `beforeMove(node, newIndex, value)`, and `afterMove(node, newIndex, value)` lifecycle callbacks in addition to the existing batch-shaped `afterAdd` and `beforeRemove` callbacks.
   Specs: `packages/binding.foreach/spec/eachBehavior.ts`
+- Array changes made synchronously from `foreach` callbacks while a change batch is rendered (e.g. `afterRender` pushing or removing items, including during the initial render) are processed in a follow-up pass instead of being dropped.
+  Specs: `packages/binding.foreach/spec/eachBehavior.ts`
+- With `as`, `foreach` extends the current context by default; when `options.createChildContextWithAs` is enabled it creates a child context per item (`$data` is the item, `$parent` the outer data, observable items unwrapped with the observable as `$rawData`).
+  Specs: `packages/binding.foreach/spec/eachBehavior.ts`
 
 _Curated source: `packages/binding.foreach/verified-behaviors.json`_

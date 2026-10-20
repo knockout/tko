@@ -41,7 +41,7 @@ export class Options {
   // An instance of the binding provider.
   bindingProviderInstance: Provider
 
-  // Whether the `with` binding creates a child context when used with `as`.
+  // Whether `with` and `foreach` create a child context when used with `as`.
   createChildContextWithAs: boolean = false
 
   // jQuery will be automatically set to globalThis.jQuery in applyBindings
