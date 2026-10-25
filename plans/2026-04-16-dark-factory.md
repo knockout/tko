@@ -56,17 +56,24 @@ The tooling modernization (Phases 1–6) was the foundation:
 - **Branch protection** — all changes go through PRs
 - **plans/** — documented intent so agents understand context
 
-## What's not there yet
+## Gap status (updated 2026-10-25)
+
+Shipped since this plan was written:
+
+| Gap | Status |
+|-----|--------|
+| **Dependency updates** | ✅ Dependabot weekly with 2-day cooldown; bun minor/patch updates grouped (`.github/dependabot.yml`). Gap: `tko.io/` workspace gets only security PRs, no version updates |
+| **Release automation** | ✅ Single-action release: merge the version PR → npm publish via OIDC + tag + GitHub Release (`release.yml`, #377; changesets/action v2 inputs fixed Sept 2026). Confirmed end-to-end by v4.2.0 (2026-10-18) |
+| **Copilot/Cursor support** | ✅ `.github/copilot-instructions.md` defers to AGENTS.md; Cursor reads AGENTS.md natively |
+| **Coverage confidence** | 🟡 `coverage.yml` runs vitest+v8 (chromium only) on PRs and main, informational only. Closed loop (PR delta comment + regression gate) tracked in #379 |
+| **Autonomous PR review** | 🟡 Adversarial subagent pass mandated for in-scope changes by `tko.io/public/agents/process.md` (convention, not CI-enforced); Copilot review applied on past PRs. No reviewer checks against `verified-behaviors.json` yet |
+
+Still open:
 
 | Gap | What's needed |
 |-----|---------------|
-| **Dependency updates** | Renovate/Dependabot with 48h minimumReleaseAge |
 | **Bundle size tracking** | CI check comparing browser.min.js against main |
 | **Benchmarks** | vitest bench for observable/computed hot paths |
-| **Coverage confidence** | Know which code paths are covered, which aren't |
-| **Autonomous PR review** | AI reviewer that checks against verified behaviors |
-| **Release automation** | Tag + release triggered by changeset merge, not manual |
-| **Copilot/Cursor support** | `.github/copilot-instructions.md` extending AGENTS.md |
 | **Issue triage** | AI can read an issue, reproduce it, propose a fix |
 | **Scenario testing** | StrongDM-style holdout scenarios for end-to-end validation |
 
