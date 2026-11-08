@@ -56,19 +56,22 @@ The tooling modernization (Phases 1–6) was the foundation:
 - **Branch protection** — all changes go through PRs
 - **plans/** — documented intent so agents understand context
 
-## What's not there yet
+## Gap status
 
-| Gap | What's needed |
-|-----|---------------|
-| **Dependency updates** | Renovate/Dependabot with 48h minimumReleaseAge |
-| **Bundle size tracking** | CI check comparing browser.min.js against main |
-| **Benchmarks** | vitest bench for observable/computed hot paths |
-| **Coverage confidence** | Know which code paths are covered, which aren't |
-| **Autonomous PR review** | AI reviewer that checks against verified behaviors |
-| **Release automation** | Tag + release triggered by changeset merge, not manual |
-| **Copilot/Cursor support** | `.github/copilot-instructions.md` extending AGENTS.md |
-| **Issue triage** | AI can read an issue, reproduce it, propose a fix |
-| **Scenario testing** | StrongDM-style holdout scenarios for end-to-end validation |
+Status last reviewed 2026-11-08.
+
+| Gap | Status |
+|-----|--------|
+| **Dependency updates** | ✅ Shipped — `.github/dependabot.yml`: weekly bun + github-actions bumps, 2-day cooldown, grouped minor/patch. Covers the root workspace only; `tko.io/` has its own lockfile and gets no scheduled bumps |
+| **Release automation** | ✅ Shipped — `release.yml` single-action release (merge the version PR); see `plans/single-action-release.md` (note: that plan's workflow snippets predate the `changesets/action@v2` input names now in `release.yml`) |
+| **Copilot support** | ✅ Shipped — `.github/copilot-instructions.md` defers to AGENTS.md (same pattern as CLAUDE.md). Cursor has no repo-specific config and relies on its native AGENTS.md support |
+| **Coverage confidence** | ◐ Partial — `coverage.yml` runs vitest+v8 on every PR, informational only and Chromium-only; PR delta comment + regression gate tracked in [#379](https://github.com/knockout/tko/issues/379) |
+| **Autonomous PR review** | ◐ Partial — a second-agent adversarial review is mandatory (`tko.io/public/agents/process.md`), but it runs inside the authoring session and compliance is a commit-message audit line no CI check enforces; no independent CI reviewer yet |
+| **Changelog retrieval** | ◐ Planned — `plans/changelog-dark-factory.md` merged; `tools/changesets/version.cjs` wrapper not yet implemented, and the plan's `release.yml` snippet needs updating to the `changesets/action@v2` inputs first |
+| **Bundle size tracking** | ❌ CI check comparing `builds/*/dist/browser.min.js` against main (`tools/build.ts` already emits `meta/browser_min_meta.json`, which a check could reuse) |
+| **Benchmarks** | ❌ vitest bench for observable/computed hot paths |
+| **Issue triage** | ❌ AI can read an issue, reproduce it, propose a fix |
+| **Scenario testing** | ❌ StrongDM-style holdout scenarios for end-to-end validation |
 
 ## Principles
 
