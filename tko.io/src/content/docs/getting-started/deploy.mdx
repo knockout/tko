@@ -203,6 +203,16 @@ Or via CLI:
 npx netlify-cli deploy --dir . --prod
 ```
 
+## deed.page
+
+Free tier, no account, one `curl` call. Handy when an AI coding agent wrote the page and you just want a link.
+
+```sh
+curl -sS -T index.html "https://deed.page/v1/sites?slug=my-tko-app"
+```
+
+The JSON reply has the live URL (`https://my-tko-app.deed.page/`) and an owner token. Keep the token: send it as `Authorization: Bearer <token>` to update or delete the site. Free sites show a small "Published with deed.page" badge. Details in the [deed.page docs](https://deed.page/docs).
+
 ## Why this works
 
 TKO loads over the browser's native ES module loader via an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). No server-side rendering, no Node.js, no build artifacts. The entire deploy is one file.
