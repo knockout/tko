@@ -222,6 +222,58 @@ describe('Native template engine', function () {
     })
   })
 
+  describe('Template data context', function () {
+    it('should set $data to the template data value', function () {
+      const fragment = document.createDocumentFragment()
+      const template = document.createElement('template') as HTMLTemplateElement
+      fragment.appendChild(template)
+
+      template.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+      applyBindings({ someItem: { val: 'abc' } }, template)
+      expectContainText(template.content.childNodes[0], 'Value: abc')
+    })
+
+    it('applyBindings to fragment should set $data to the template data value', function () {
+      const fragment = document.createDocumentFragment()
+      const template = document.createElement('template') as HTMLTemplateElement
+      fragment.appendChild(template)
+
+      template.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+      applyBindings({ someItem: { val: 'abc' } }, fragment)
+      expectContainText(template.content.childNodes[0], 'Value: abc')
+    })
+
+    it('should set $data when binding a DIV that is inside a DocumentFragment', function () {
+      const fragment = document.createDocumentFragment()
+      const div = document.createElement('div') as HTMLDivElement
+
+      div.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+
+      fragment.appendChild(div)
+      applyBindings({ someItem: { val: 'abc' } }, div)
+      expectContainText(div.childNodes[0], 'Value: abc')
+    })
+
+    it('should bind a node attached to a ShadowRoot', function () {
+      // Mirrors the original PR motivation: applyBindings on a node that
+      // lives inside a ShadowRoot should resolve $data and set up bindings
+      // the same way it does for a node in the light DOM.
+      const host = document.createElement('div')
+      testNode.appendChild(host)
+      const shadow = host.attachShadow({ mode: 'open' })
+      const inner = document.createElement('div') as HTMLDivElement
+      inner.innerHTML =
+        "<div data-bind='template: { data: someItem }'>" + "Value: <span data-bind='text: $data.val'></span>" + '</div>'
+      shadow.appendChild(inner)
+
+      applyBindings({ someItem: { val: 'abc' } }, inner)
+      expectContainText(inner.childNodes[0], 'Value: abc')
+    })
+  })
+
   describe('Data-bind syntax', function () {
     it('should expose parent binding context as $parent if binding with an explicit "data" value', function () {
       testNode.innerHTML =
